@@ -1,5 +1,5 @@
 ## Issues
-closed #이슈번호
+- closed #이슈번호
 
 ## ✔️  Check-list
 - [ ] : Label을 지정해 주세요.
