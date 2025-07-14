@@ -1,4 +1,4 @@
-package com.on.focuswithme
+package com.on.turip
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge

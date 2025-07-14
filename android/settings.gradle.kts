@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "FocusWithMe"
+rootProject.name = "Turip"
 include(":app")
