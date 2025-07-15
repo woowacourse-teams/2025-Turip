@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.on.focuswithme"
+    namespace = "com.on.turip"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.on.focuswithme"
+        applicationId = "com.on.turip"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
@@ -33,7 +33,7 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
-    buildFeatures{
+    buildFeatures {
         viewBinding = true
     }
 }
@@ -48,11 +48,12 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
     // coroutine
     implementation(libs.kotlinx.coroutines.core)
     testImplementation(libs.kotlinx.coroutines.test)
     // aac viewmodel
-    implementation (libs.androidx.lifecycle.viewmodel.ktx)
-    implementation (libs.androidx.activity.ktx)
-    implementation (libs.androidx.fragment.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.activity.ktx)
+    implementation(libs.androidx.fragment.ktx)
 }
