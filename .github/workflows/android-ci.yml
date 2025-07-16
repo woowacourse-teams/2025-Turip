@@ -6,6 +6,7 @@ on:
     branches: [ "develop" ]
 
 jobs:
+
   build:
     name: Build APK
     runs-on: ubuntu-latest
@@ -34,9 +35,11 @@ jobs:
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
+      working-directory: ./android
     
     - name: Build with Gradle
       run: ./gradlew build --stacktrace
+      working-directory: ./android
     
   lint:
     name: Ktlint Check
@@ -55,9 +58,11 @@ jobs:
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
+      working-directory: ./android
 
     - name: Run ktlintCheck
       run: ./gradlew ktlintCheck --stacktrace
+      working-directory: ./android
 
   test:
     name: Run Unit Tests
@@ -76,9 +81,11 @@ jobs:
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
+      working-directory: ./android
     
     - name: Run tests
       run: ./gradlew test --stacktrace
+      working-directory: ./android
     
     - name: Publish Unit Test Results
       uses: EnricoMi/publish-unit-test-result-action@v2
