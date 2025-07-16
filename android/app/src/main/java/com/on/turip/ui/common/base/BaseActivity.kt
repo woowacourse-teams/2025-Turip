@@ -9,9 +9,8 @@ import androidx.lifecycle.ViewModel
 import androidx.viewbinding.ViewBinding
 
 abstract class BaseActivity<V : ViewModel, B : ViewBinding> : AppCompatActivity() {
-
-    abstract val viewModel : V
-    abstract val binding : B
+    abstract val viewModel: V
+    abstract val binding: B
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
