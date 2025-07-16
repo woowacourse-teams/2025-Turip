@@ -42,7 +42,7 @@ jobs:
         cache: gradle
 
     - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
+      run: chmod +x ./gradlew
       
     - name: Build with Gradle
       run: ./gradlew build --stacktrace
@@ -71,7 +71,7 @@ jobs:
         cache: gradle
 
     - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
+      run: chmod +x ./gradlew
 
     - name: Run ktlintCheck
       run: ./gradlew ktlintCheck --stacktrace
@@ -100,7 +100,7 @@ jobs:
         cache: gradle
 
     - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
+      run: chmod +x ./gradlew
     
     - name: Run tests
       run: ./gradlew test --stacktrace
