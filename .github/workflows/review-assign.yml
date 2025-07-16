@@ -1,0 +1,50 @@
+name: Review Assign
+
+on:
+  pull_request:
+    types: [opened, ready_for_review]
+
+jobs:
+  assign:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Determine reviewers by file path
+        id: reviewers
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const androidReviewers = ['m6z1', 'yrsel', 'jerry8282'];
+            const backendReviewers = ['RaZel713', 'seaniiio', 'eunseongu'];
+            const allReviewers = ['m6z1', 'yrsel', 'jerry8282', 'RaZel713', 'seaniiio', 'eunseongu'];
+
+            const changedFiles = await github.paginate(
+              github.rest.pulls.listFiles, {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.payload.pull_request.number
+              }
+            );
+
+            const filePaths = changedFiles.map(f => f.filename);
+
+            let reviewersToAssign;
+
+            if (filePaths.every(path => path.startsWith('android/'))) {
+              reviewersToAssign = androidReviewers;
+            } else if (filePaths.every(path => path.startsWith('backend/'))) {
+              reviewersToAssign = backendReviewers;
+            } else {
+              reviewersToAssign = allReviewers;
+            }
+
+            core.setOutput('reviewers', reviewersToAssign.join(','));
+      
+      - name: Assign reviewers
+        uses: hkusu/review-assign-action@v1
+        with:
+          assignees: ${{ github.actor }}
+          reviewers: ${{ steps.reviewers.outputs.reviewers }}
