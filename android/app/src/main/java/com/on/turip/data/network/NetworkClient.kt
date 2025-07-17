@@ -18,7 +18,7 @@ object NetworkClient {
             .addInterceptor(
                 HttpLoggingInterceptor().apply {
                     level = HttpLoggingInterceptor.Level.BODY
-                }
+                },
             )
             .build()
     }
