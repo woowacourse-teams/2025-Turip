@@ -57,4 +57,6 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.fragment.ktx)
+    // retrofit2
+    implementation(libs.retrofit)
 }
