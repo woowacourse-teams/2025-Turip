@@ -22,7 +22,7 @@ android {
         buildConfigField(
             "String",
             "BASE_URL",
-            "\"${project.findProperty("base_url") ?: ""}\""
+            "\"${project.findProperty("base_url") ?: ""}\"",
         )
     }
 
