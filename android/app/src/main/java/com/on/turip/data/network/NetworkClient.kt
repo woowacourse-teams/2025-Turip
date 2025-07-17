@@ -11,26 +11,23 @@ import retrofit2.Retrofit
 object NetworkClient {
     private const val BASE_URL = BuildConfig.BASE_URL
     private val json = Json { ignoreUnknownKeys = true }
+    private val contentType = "application/json".toMediaType()
 
-    fun getApiClient(): Retrofit {
-        val contentType = "application/json".toMediaType()
-
-        return Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .client(provideOkHttpClient())
-            .addConverterFactory(json.asConverterFactory(contentType))
-            .build()
+    private val okHttpClient: OkHttpClient by lazy {
+        HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        }.let { loggingInterceptor ->
+            OkHttpClient.Builder()
+                .addInterceptor(loggingInterceptor)
+                .build()
+        }
     }
 
-    fun provideOkHttpClient(): OkHttpClient {
-        val loggingInterceptor =
-            HttpLoggingInterceptor().apply {
-                level = HttpLoggingInterceptor.Level.BODY
-            }
-
-        return OkHttpClient.Builder().run {
-            addInterceptor(loggingInterceptor)
-            build()
-        }
+    val retrofit: Retrofit by lazy {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(json.asConverterFactory(contentType))
+            .build()
     }
 }
