@@ -66,6 +66,7 @@ dependencies {
     implementation(libs.androidx.fragment.ktx)
     // retrofit2
     implementation(libs.retrofit)
+    implementation(libs.retrofit2.kotlinx.serialization.converter)
     // kotlinx.serialization
     implementation(libs.kotlinx.serialization.json)
     // okhttp
