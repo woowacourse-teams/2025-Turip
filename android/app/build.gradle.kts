@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ktlint)
+    kotlin("plugin.serialization") version "2.2.0"
 }
 
 android {
@@ -67,4 +68,6 @@ dependencies {
     implementation(libs.androidx.fragment.ktx)
     // retrofit2
     implementation(libs.retrofit)
+    // kotlinx.serialization
+    implementation(libs.kotlinx.serialization.json)
 }
