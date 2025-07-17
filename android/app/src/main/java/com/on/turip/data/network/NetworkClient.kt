@@ -14,13 +14,13 @@ object NetworkClient {
     private val contentType = "application/json".toMediaType()
 
     private val okHttpClient: OkHttpClient by lazy {
-        HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
-        }.let { loggingInterceptor ->
-            OkHttpClient.Builder()
-                .addInterceptor(loggingInterceptor)
-                .build()
-        }
+        OkHttpClient.Builder()
+            .addInterceptor(
+                HttpLoggingInterceptor().apply {
+                    level = HttpLoggingInterceptor.Level.BODY
+                }
+            )
+            .build()
     }
 
     val retrofit: Retrofit by lazy {
