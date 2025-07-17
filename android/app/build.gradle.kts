@@ -70,4 +70,7 @@ dependencies {
     implementation(libs.retrofit)
     // kotlinx.serialization
     implementation(libs.kotlinx.serialization.json)
+    // okhttp
+    implementation(libs.okhttp)
+    implementation(libs.logging.interceptor)
 }
