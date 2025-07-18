@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ktlint)
+    kotlin("plugin.serialization") version "2.1.0"
 }
 
 android {
@@ -17,6 +18,12 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField(
+            "String",
+            "BASE_URL",
+            "\"${project.findProperty("base_url") ?: ""}\"",
+        )
     }
 
     buildTypes {
@@ -57,4 +64,12 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.fragment.ktx)
+    // retrofit2
+    implementation(libs.retrofit)
+    implementation(libs.retrofit2.kotlinx.serialization.converter)
+    // kotlinx.serialization
+    implementation(libs.kotlinx.serialization.json)
+    // okhttp
+    implementation(libs.okhttp)
+    implementation(libs.logging.interceptor)
 }
