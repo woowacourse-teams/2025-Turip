@@ -13,7 +13,7 @@ object NetworkClient {
     private val json = Json { ignoreUnknownKeys = true }
     private val contentType = "application/json".toMediaType()
 
-    private val okHttpClient: OkHttpClient by lazy {
+    private val client: OkHttpClient by lazy {
         OkHttpClient.Builder()
             .addInterceptor(
                 HttpLoggingInterceptor().apply {
@@ -23,10 +23,10 @@ object NetworkClient {
             .build()
     }
 
-    val retrofit: Retrofit by lazy {
+    val turipNetwork: Retrofit by lazy {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
-            .client(okHttpClient)
+            .client(client)
             .addConverterFactory(json.asConverterFactory(contentType))
             .build()
     }
