@@ -14,6 +14,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:titleCentered="true"
+        app:titleTextAppearance="@style/title1"
         tools:title="대구" />
 
     <TextView
