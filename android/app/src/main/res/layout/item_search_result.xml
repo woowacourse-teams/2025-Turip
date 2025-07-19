@@ -11,15 +11,16 @@
     <ImageView
         android:id="@+id/iv_search_result_thumbnail"
         android:layout_width="40dp"
-        android:layout_height="43.24dp"
+        android:layout_height="44dp"
         android:layout_margin="16dp"
+        android:contentDescription="@null"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:src="@mipmap/ic_launcher" />
 
     <TextView
         android:id="@+id/tv_search_result_title"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="72dp"
         android:ellipsize="end"
@@ -33,22 +34,23 @@
 
     <TextView
         android:id="@+id/tv_search_result_description"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="72dp"
         android:layout_marginTop="2dp"
-        android:textSize="10sp"
+        android:textSize="12sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_search_result_title"
         tools:text="뭉치 · 2024-04-21" />
 
     <ImageView
         android:id="@+id/iv_search_result_location"
-        android:layout_width="17dp"
-        android:layout_height="22dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginTop="18.76dp"
         android:layout_marginEnd="23dp"
         android:layout_marginBottom="17dp"
+        android:contentDescription="@null"
         android:src="@drawable/ic_location"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/iv_search_result_thumbnail"
@@ -56,7 +58,7 @@
 
     <TextView
         android:id="@+id/tv_search_result_location"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="2dp"
@@ -68,16 +70,17 @@
 
     <ImageView
         android:id="@+id/iv_search_result_calendar"
-        android:layout_width="22dp"
-        android:layout_height="22dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginStart="124dp"
+        android:contentDescription="@null"
         android:src="@drawable/ic_calendar"
         app:layout_constraintStart_toEndOf="@+id/tv_search_result_location"
         app:layout_constraintTop_toTopOf="@+id/tv_search_result_location" />
 
     <TextView
         android:id="@+id/tv_search_result_day"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="4dp"
