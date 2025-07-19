@@ -1,4 +1,4 @@
-package com.on.turip.ui.search
+package com.on.turip.ui.search.result
 
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback

@@ -1,4 +1,4 @@
-package com.on.turip.ui.searchResult
+package com.on.turip.ui.search.result
 
 import androidx.lifecycle.ViewModel
 
