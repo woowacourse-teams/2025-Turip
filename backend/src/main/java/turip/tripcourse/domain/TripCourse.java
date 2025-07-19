@@ -22,9 +22,9 @@ public class TripCourse {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private int day;
+    private int visitDay;
 
-    private int order;
+    private int visitOrder;
 
     @OneToOne
     private Place place;
