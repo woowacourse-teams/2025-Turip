@@ -22,13 +22,13 @@
     <TextView
         android:id="@+id/tv_search_result_title"
         android:layout_width="0dp"
+        android:layout_marginStart="12dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="72dp"
         android:ellipsize="end"
         android:maxLines="1"
         android:textAppearance="@style/title2"
         android:textColor="@color/pure_black_151515"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@id/iv_search_result_thumbnail"
         app:layout_constraintTop_toTopOf="@id/iv_search_result_thumbnail"
         tools:text="느좋 감성 대구 여행 어쩌구.." />
 
@@ -36,11 +36,10 @@
         android:id="@+id/tv_search_result_description"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="72dp"
         android:layout_marginTop="2dp"
         android:textAppearance="@style/info1"
         android:textColor="@color/gray_300_5b5b5b"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/tv_search_result_title"
         app:layout_constraintTop_toBottomOf="@+id/tv_search_result_title"
         tools:text="뭉치 · 2024-04-21" />
 
