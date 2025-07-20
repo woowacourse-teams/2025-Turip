@@ -44,7 +44,24 @@ public class Content {
 
     private LocalDate uploadedDate;
 
+    public Content(Creator creator, Region region, List<TripCourse> tripCourses, String title, String url,
+                   LocalDate uploadedDate) {
+        this.creator = creator;
+        this.region = region;
+        this.tripCourses = tripCourses;
+        this.title = title;
+        this.url = url;
+        this.uploadedDate = uploadedDate;
+    }
+
     public int getTripCourseCount() {
         return tripCourses.size();
+    }
+
+    public int getTripDurationDays() {
+        return tripCourses.stream()
+                .mapToInt(TripCourse::getVisitDay)
+                .max()
+                .orElse(0);
     }
 }

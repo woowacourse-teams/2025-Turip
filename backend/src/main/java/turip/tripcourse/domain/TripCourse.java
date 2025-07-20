@@ -28,4 +28,10 @@ public class TripCourse {
 
     @OneToOne
     private Place place;
+
+    public TripCourse(int visitDay, int visitOrder, Place place) {
+        this.visitDay = visitDay;
+        this.visitOrder = visitOrder;
+        this.place = place;
+    }
 }

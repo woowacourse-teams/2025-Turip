@@ -20,4 +20,8 @@ public class ContentService {
     private int getTripCourseCount(Content content) {
         return content.getTripCourseCount();
     }
+
+    private int calculateDurationDays(Content content) {
+        return content.getTripDurationDays();
+    }
 }
