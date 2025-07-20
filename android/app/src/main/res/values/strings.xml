@@ -3,4 +3,9 @@
 
     <!-- 검색 결과 페이지 -->
     <string name="no_result">검색 결과가 없습니다.</string>
+
+    <!-- 메인 페이지 -->
+    <string name="main_where_should_we_go_title">어디로 떠나볼까요?</string>
+    <string name="main_searching_metropolitan_city">광역시 둘러보기</string>
+    <string name="main_searching_province">도 둘러보기</string>
 </resources>
