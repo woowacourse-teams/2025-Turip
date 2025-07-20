@@ -43,4 +43,8 @@ public class Content {
     private String url;
 
     private LocalDate uploadedDate;
+
+    public int getTripCourseCount() {
+        return tripCourses.size();
+    }
 }
