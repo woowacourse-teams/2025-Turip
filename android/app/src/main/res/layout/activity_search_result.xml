@@ -25,8 +25,8 @@
         android:layout_marginStart="13dp"
         android:layout_marginTop="13dp"
         android:textColor="@color/gray_300_5b5b5b"
-        app:layout_constraintStart_toStartOf="@+id/tb_search_result"
-        app:layout_constraintTop_toBottomOf="@+id/tb_search_result"
+        app:layout_constraintStart_toStartOf="@id/tb_search_result"
+        app:layout_constraintTop_toBottomOf="@id/tb_search_result"
         tools:text="검색결과 15개" />
 
     <androidx.recyclerview.widget.RecyclerView
@@ -38,7 +38,7 @@
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         android:orientation="vertical"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_search_result_count"
+        app:layout_constraintTop_toBottomOf="@id/tv_search_result_count"
         tools:itemCount="10"
         tools:listitem="@layout/item_search_result" />
 
@@ -52,7 +52,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_search_result_count"
+        app:layout_constraintTop_toBottomOf="@id/tv_search_result_count"
         app:tint="@color/gray_300_5b5b5b" />
 
     <TextView
@@ -63,9 +63,9 @@
         android:text="@string/no_result"
         android:textAppearance="@style/title1"
         android:textColor="@color/gray_400_2b2b2b"
-        app:layout_constraintEnd_toEndOf="@+id/iv_empty_result"
-        app:layout_constraintStart_toStartOf="@+id/iv_empty_result"
-        app:layout_constraintTop_toBottomOf="@+id/iv_empty_result" />
+        app:layout_constraintEnd_toEndOf="@id/iv_empty_result"
+        app:layout_constraintStart_toStartOf="@id/iv_empty_result"
+        app:layout_constraintTop_toBottomOf="@id/iv_empty_result" />
 
     <androidx.constraintlayout.widget.Group
         android:id="@+id/group_empty_result"

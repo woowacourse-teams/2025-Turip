@@ -39,8 +39,8 @@
         android:layout_marginTop="2dp"
         android:textAppearance="@style/info1"
         android:textColor="@color/gray_300_5b5b5b"
-        app:layout_constraintStart_toStartOf="@+id/tv_search_result_title"
-        app:layout_constraintTop_toBottomOf="@+id/tv_search_result_title"
+        app:layout_constraintStart_toStartOf="@id/tv_search_result_title"
+        app:layout_constraintTop_toBottomOf="@id/tv_search_result_title"
         tools:text="뭉치 · 2024-04-21" />
 
     <ImageView
@@ -53,8 +53,8 @@
         android:contentDescription="@null"
         android:src="@drawable/ic_location"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/iv_search_result_thumbnail"
-        app:layout_constraintTop_toBottomOf="@+id/iv_search_result_thumbnail"
+        app:layout_constraintEnd_toEndOf="@id/iv_search_result_thumbnail"
+        app:layout_constraintTop_toBottomOf="@id/iv_search_result_thumbnail"
         app:tint="@color/turip_blue_5ac3d5" />
 
     <TextView
@@ -66,8 +66,8 @@
         android:layout_marginBottom="3dp"
         android:textAppearance="@style/info1"
         android:textColor="@color/pure_black_151515"
-        app:layout_constraintBottom_toBottomOf="@+id/iv_search_result_location"
-        app:layout_constraintStart_toEndOf="@+id/iv_search_result_location"
+        app:layout_constraintBottom_toBottomOf="@id/iv_search_result_location"
+        app:layout_constraintStart_toEndOf="@id/iv_search_result_location"
         tools:text="14개 장소" />
 
     <ImageView
@@ -76,10 +76,10 @@
         android:layout_height="wrap_content"
         android:contentDescription="@null"
         android:src="@drawable/ic_calendar"
-        app:layout_constraintBottom_toBottomOf="@+id/tv_search_result_location"
+        app:layout_constraintBottom_toBottomOf="@id/tv_search_result_location"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/tv_search_result_location"
-        app:layout_constraintTop_toTopOf="@+id/tv_search_result_location"
+        app:layout_constraintStart_toEndOf="@id/tv_search_result_location"
+        app:layout_constraintTop_toTopOf="@id/tv_search_result_location"
         app:tint="@color/turip_blue_5ac3d5" />
 
     <TextView
@@ -91,9 +91,9 @@
         android:layout_marginBottom="5dp"
         android:textAppearance="@style/info1"
         android:textColor="@color/pure_black_151515"
-        app:layout_constraintBottom_toBottomOf="@+id/iv_search_result_calendar"
+        app:layout_constraintBottom_toBottomOf="@id/iv_search_result_calendar"
         app:layout_constraintStart_toEndOf="@id/iv_search_result_calendar"
-        app:layout_constraintTop_toTopOf="@+id/iv_search_result_calendar"
+        app:layout_constraintTop_toTopOf="@id/iv_search_result_calendar"
         tools:text="2박 3일" />
 
 
