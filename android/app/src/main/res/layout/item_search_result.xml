@@ -22,8 +22,8 @@
     <TextView
         android:id="@+id/tv_search_result_title"
         android:layout_width="0dp"
-        android:layout_marginStart="12dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
         android:ellipsize="end"
         android:maxLines="1"
         android:textAppearance="@style/title2"
@@ -78,7 +78,7 @@
         android:src="@drawable/ic_calendar"
         app:layout_constraintBottom_toBottomOf="@+id/tv_search_result_location"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tv_search_result_location"
         app:layout_constraintTop_toTopOf="@+id/tv_search_result_location"
         app:tint="@color/turip_blue_5ac3d5" />
 
