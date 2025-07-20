@@ -36,6 +36,7 @@
         android:layout_marginTop="14dp"
         android:visibility="gone"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        android:orientation="vertical"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_search_result_count"
         tools:itemCount="10"
