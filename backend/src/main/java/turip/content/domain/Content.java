@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import java.time.LocalDate;
@@ -34,6 +35,7 @@ public class Content {
     private Region region;
 
     @OneToMany
+    @JoinColumn(name = "content_id")
     private List<TripCourse> tripCourses;
 
     private String title;
