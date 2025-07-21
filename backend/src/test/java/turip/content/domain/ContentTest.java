@@ -12,8 +12,12 @@ class ContentTest {
     @Test
     void getTripDurationDays1() {
         // given
-        TripCourse firstDayCourse = new TripCourse(1, 1, null);
-        TripCourse secondDayCourse = new TripCourse(2, 1, null);
+        int firstVisitDay = 1;
+        int secondVisitDay = 2;
+        int visitOrder = 1;
+
+        TripCourse firstDayCourse = new TripCourse(firstVisitDay, visitOrder, null);
+        TripCourse secondDayCourse = new TripCourse(secondVisitDay, visitOrder, null);
         Content content = new Content(null, null, List.of(firstDayCourse, secondDayCourse), null, null, null);
 
         // when & then
