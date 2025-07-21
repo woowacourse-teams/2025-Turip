@@ -1,7 +1,8 @@
 package turip.content.domain;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import turip.tripcourse.domain.TripCourse;
@@ -21,7 +22,7 @@ class ContentTest {
         Content content = new Content(null, null, List.of(firstDayCourse, secondDayCourse), null, null, null);
 
         // when & then
-        Assertions.assertThat(content.getTripDurationDays())
+        assertThat(content.getTripDurationDays())
                 .isEqualTo(2);
     }
 
@@ -32,7 +33,7 @@ class ContentTest {
         Content content = new Content(null, null, List.of(), null, null, null);
 
         // when & then
-        Assertions.assertThat(content.getTripDurationDays())
+        assertThat(content.getTripDurationDays())
                 .isEqualTo(0);
     }
 }
