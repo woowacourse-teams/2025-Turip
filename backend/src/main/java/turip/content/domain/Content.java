@@ -5,16 +5,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import java.time.LocalDate;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import turip.creator.domain.Creator;
 import turip.region.domain.Region;
-import turip.tripcourse.domain.TripCourse;
 
 @Getter
 @Entity
@@ -33,12 +30,23 @@ public class Content {
     @ManyToOne
     private Region region;
 
-    @OneToMany
-    private List<TripCourse> tripCourses;
-
     private String title;
 
     private String url;
 
     private LocalDate uploadedDate;
+
+    public Content(
+            Creator creator,
+            Region region,
+            String title,
+            String url,
+            LocalDate uploadedDate
+    ) {
+        this.creator = creator;
+        this.region = region;
+        this.title = title;
+        this.url = url;
+        this.uploadedDate = uploadedDate;
+    }
 }
