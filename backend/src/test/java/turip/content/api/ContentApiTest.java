@@ -41,12 +41,12 @@ public class ContentApiTest {
         void readCountByRegionName() {
             // given
             jdbcTemplate.update(
-                    "INSERT INTO Creator (profile_image, channel_name) VALUES ('https://image.example.com/creator1.jpg', 'TravelMate')");
-            jdbcTemplate.update("INSERT INTO Region (name) VALUES ('seoul')");
+                    "INSERT INTO creator (profile_image, channel_name) VALUES ('https://image.example.com/creator1.jpg', 'TravelMate')");
+            jdbcTemplate.update("INSERT INTO region (name) VALUES ('seoul')");
             jdbcTemplate.update(
-                    "INSERT INTO Content (creator_id, region_id, url, title, uploaded_date) VALUES (1, 1, 'https://youtube.com/watch?v=abcd1', '서울 데이트 코스 추천', '2024-07-01')");
+                    "INSERT INTO content (creator_id, region_id, url, title, uploaded_date) VALUES (1, 1, 'https://youtube.com/watch?v=abcd1', '서울 데이트 코스 추천', '2024-07-01')");
             jdbcTemplate.update(
-                    "INSERT INTO Content (creator_id, region_id, url, title, uploaded_date) VALUES (1, 1, 'https://youtube.com/watch?v=abcd1', '서촌 당일치기 코스 추천', '2025-06-18')");
+                    "INSERT INTO content (creator_id, region_id, url, title, uploaded_date) VALUES (1, 1, 'https://youtube.com/watch?v=abcd1', '서촌 당일치기 코스 추천', '2025-06-18')");
 
             // when & then
             RestAssured.given().port(port)
