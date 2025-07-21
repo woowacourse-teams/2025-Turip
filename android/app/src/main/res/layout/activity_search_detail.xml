@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.search.detail.SearchDetailActivity">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/tb_search_detail"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:layout_scrollFlags="scroll|enterAlways"
+            app:titleTextAppearance="@style/title1"
+            app:titleTextColor="@color/pure_black_151515" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_search_detail"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/iv_search_detail_creator_thumbnail"
+                android:layout_width="84dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="28dp"
+                android:contentDescription="@null"
+                app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:src="@drawable/ic_launcher_background" />
+
+            <ImageView
+                android:id="@+id/iv_search_detail_platform_badge"
+                android:layout_width="19dp"
+                android:layout_height="19dp"
+                android:layout_marginTop="16dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_youtuber_badge"
+                app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintStart_toStartOf="@id/iv_search_detail_creator_thumbnail"
+                app:layout_constraintTop_toBottomOf="@id/iv_search_detail_creator_thumbnail"
+                tools:src="@drawable/ic_youtuber_badge" />
+
+            <TextView
+                android:id="@+id/tv_search_detail_creator_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:layout_marginEnd="50dp"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:textAppearance="@style/title2"
+                android:textColor="@color/pure_black_151515"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/iv_search_detail_platform_badge"
+                app:layout_constraintTop_toTopOf="@id/iv_search_detail_platform_badge"
+                tools:text="여행하는 뭉치와 함께하는 하루와 메이와 라젤과 제리 이름이 길어지면 어떻게 되나? ... 으로 잘 표시되는 지 확인해보자@@@@@" />
+
+            <TextView
+                android:id="@+id/tv_search_detail_content_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:layout_marginEnd="50dp"
+                android:ellipsize="end"
+                android:maxLines="3"
+                android:textAppearance="@style/title1"
+                android:textColor="@color/pure_black_151515"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@id/iv_search_detail_platform_badge"
+                app:layout_constraintTop_toBottomOf="@id/tv_search_detail_creator_name"
+                tools:text="맛집여행기 - 전라도 비빔밥을 찾아서 편 \n맛집여행기 - 전라도 비빔밥을 찾아서 편 \n맛집여행기 - 전라도 비빔밥을 찾아서 편 \n맛집여행기 - 전라도 비빔밥을 찾아서 편" />
+
+            <TextView
+                android:id="@+id/tv_search_detail_upload_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:textAppearance="@style/title3"
+                android:textColor="@color/gray_300_5b5b5b"
+                app:layout_constraintStart_toStartOf="@id/tv_search_detail_content_title"
+                app:layout_constraintTop_toBottomOf="@id/tv_search_detail_content_title"
+                tools:text="2025-07-20" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -19,6 +19,9 @@
             android:name=".ui.search.result.SearchResultActivity"
             android:exported="false" />
         <activity
+            android:name=".ui.search.detail.SearchDetailActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.main.MainActivity"
             android:exported="true">
             <intent-filter>
