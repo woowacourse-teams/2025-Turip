@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Turip</string>
+    <string name="app_name">튜립</string>
 
     <!-- 검색 결과 페이지 -->
     <string name="no_result">검색 결과가 없습니다.</string>
