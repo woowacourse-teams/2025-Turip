@@ -1,0 +1,84 @@
+package turip.content.api;
+
+import static org.hamcrest.Matchers.is;
+
+import io.restassured.RestAssured;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.jdbc.core.JdbcTemplate;
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+class ContentPagingApiTest {
+
+    @LocalServerPort
+    private int port;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @BeforeEach
+    void setUp() {
+        jdbcTemplate.update("DELETE FROM trip_course");
+        jdbcTemplate.update("DELETE FROM place");
+        jdbcTemplate.update("DELETE FROM content");
+        jdbcTemplate.update("DELETE FROM creator");
+        jdbcTemplate.update("DELETE FROM region");
+
+        jdbcTemplate.update("ALTER TABLE trip_course ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE place ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE content ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE creator ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE region ALTER COLUMN id RESTART WITH 1");
+
+        jdbcTemplate.update(
+                "INSERT INTO Creator (profile_image, channel_name) VALUES ('https://image.example.com/creator1.jpg', 'TravelMate')");
+        jdbcTemplate.update("INSERT INTO Region (name) VALUES ('seoul')");
+        for (int i = 1; i <= 10; i++) {
+            jdbcTemplate.update(
+                    "INSERT INTO Content (creator_id, region_id, url, title, uploaded_date) VALUES (1, 1, ?, ?, '2024-07-01')",
+                    "https://youtube.com/watch?v=abcd" + i, "서울 여행 " + i
+            );
+            jdbcTemplate.update("INSERT INTO Place (name) VALUES (?)", "장소" + i);
+            jdbcTemplate.update(
+                    "INSERT INTO Trip_Course (visit_day, visit_order, place_id, content_id) VALUES (1, 1, ?, ?)", i, i);
+        }
+    }
+
+    @DisplayName("/contents GET 지역별 컨텐츠 목록 페이징 테스트")
+    @Test
+    void readContentsByRegionNamePaging() {
+        // when: 첫 페이지 요청 (lastId=0, size=5)
+        var firstPageResponse = RestAssured.given().port(port)
+                .queryParam("region", "seoul")
+                .queryParam("size", 5)
+                .queryParam("lastId", 0)
+                .when().get("/contents");
+
+        // then: id 10~6, 5개, loadable=true
+        firstPageResponse.then()
+                .statusCode(200)
+                .body("contentDetailsByRegionResponse.size()", is(5))
+                .body("contentDetailsByRegionResponse[0].contentWithoutRegionResponse.id", is(10))
+                .body("contentDetailsByRegionResponse[4].contentWithoutRegionResponse.id", is(6))
+                .body("loadable", is(true));
+
+        // when: 두 번째 페이지 요청 (lastId=6, size=5)
+        var secondPageResponse = RestAssured.given().port(port)
+                .queryParam("region", "seoul")
+                .queryParam("size", 5)
+                .queryParam("lastId", 6)
+                .when().get("/contents");
+
+        // then: id 5~1, 5개, loadable=false
+        secondPageResponse.then()
+                .statusCode(200)
+                .body("contentDetailsByRegionResponse.size()", is(5))
+                .body("contentDetailsByRegionResponse[0].contentWithoutRegionResponse.id", is(5))
+                .body("contentDetailsByRegionResponse[4].contentWithoutRegionResponse.id", is(1))
+                .body("loadable", is(false));
+    }
+}
