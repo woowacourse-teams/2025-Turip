@@ -1,5 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="pure_black_151515">#FF151515</color>
+    <color name="pure_white_ffffff">#FFFFFFFF</color>
+
+    <color name="gray_500_1e1e1e">#FF1E1E1E</color>
+    <color name="gray_400_2b2b2b">#FF2B2B2B</color>
+    <color name="gray_300_5b5b5b">#FF5B5B5B</color>
+    <color name="gray_200_c1c1c1">#FFC1C1C1</color>
+    <color name="gray_100_f0f0ee">#FFF0F0EE</color>
+
+    <color name="turip_lemon_faff60">#FFFAFF60</color>
+    <color name="turip_lemon_faff60_50">#80FAFF60</color>
+    <color name="gradient_aqua_start_60e7ff">#FF60E7FF</color>
+    <color name="gradient_aqua_end_94ea53">#FF94EA53</color>
+    <color name="turip_ochre_faff60">#FFFAFF60</color>
+    <color name="turip_blue_5ac3d5">#FF5AC3D5</color>
 </resources>
