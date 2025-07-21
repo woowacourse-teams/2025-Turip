@@ -4,11 +4,13 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import turip.content.domain.Content;
 import turip.place.domain.Place;
 
 @Getter
@@ -29,9 +31,13 @@ public class TripCourse {
     @OneToOne
     private Place place;
 
-    public TripCourse(int visitDay, int visitOrder, Place place) {
+    @ManyToOne
+    private Content content;
+
+    public TripCourse(int visitDay, int visitOrder, Place place, Content content) {
         this.visitDay = visitDay;
         this.visitOrder = visitOrder;
         this.place = place;
+        this.content = content;
     }
 }

@@ -16,12 +16,4 @@ public class ContentService {
         return contentRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("컨텐츠를 찾을 수 없습니다."));
     }
-
-    private int getTripCourseCount(Content content) {
-        return content.getTripCourseCount();
-    }
-
-    private int calculateDurationDays(Content content) {
-        return content.getTripDurationDays();
-    }
 }
