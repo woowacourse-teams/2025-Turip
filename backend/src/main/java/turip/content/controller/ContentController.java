@@ -17,7 +17,8 @@ public class ContentController {
     private final ContentService contentService;
 
     @GetMapping("/count")
-    public ResponseEntity<ContentCountResponse> getCountByRegionName(@RequestParam(name = "region") String regionName) {
+    public ResponseEntity<ContentCountResponse> readCountByRegionName(
+            @RequestParam(name = "region") String regionName) {
         ContentCountResponse response = contentService.getCountByRegionName(regionName);
         return ResponseEntity.ok(response);
     }
