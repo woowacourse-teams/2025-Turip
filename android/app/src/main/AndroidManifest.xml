@@ -16,6 +16,10 @@
         android:theme="@style/Theme.Turip"
         tools:targetApi="31">
         <activity
+            android:name=".ui.search.detail.SearchDetailActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="false" />
+        <activity
             android:name=".ui.main.MainActivity"
             android:exported="true">
             <intent-filter>
