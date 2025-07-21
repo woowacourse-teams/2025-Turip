@@ -17,13 +17,13 @@ import turip.tripcourse.repository.TripCourseRepository;
 
 @ExtendWith(MockitoExtension.class)
 class TripCourseServiceTest {
-    
+
     @InjectMocks
     private TripCourseService tripCourseService;
     @Mock
     private TripCourseRepository tripCourseRepository;
 
-    @DisplayName("컨텐츠에 대한 여행 일수를 확인할 수 있다")
+    @DisplayName("여행 코스의 여행 기간을 계산할 수 있다")
     @Test
     void calculateDurationDays1() {
         // given
@@ -44,7 +44,7 @@ class TripCourseServiceTest {
                 .isEqualTo(2);
     }
 
-    @DisplayName("컨텐츠 여행 코스 정보가 존재하지 않는 경우, 여행 일수는 0을 반환한다")
+    @DisplayName("여행 코스 정보가 존재하지 않는 경우, 여행 기간은 0을 반환한다")
     @Test
     void calculateDurationDays2() {
         // given
