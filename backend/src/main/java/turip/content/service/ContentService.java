@@ -11,7 +11,7 @@ public class ContentService {
 
     private final ContentRepository contentRepository;
 
-    public ContentCountResponse getCountByRegionName(String regionName) {
+    public ContentCountResponse findCountByRegionName(String regionName) {
         int count = contentRepository.countByRegion_Name(regionName);
         return ContentCountResponse.from(count);
     }

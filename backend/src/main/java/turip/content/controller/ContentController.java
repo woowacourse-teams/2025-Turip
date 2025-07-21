@@ -19,7 +19,7 @@ public class ContentController {
     @GetMapping("/count")
     public ResponseEntity<ContentCountResponse> readCountByRegionName(
             @RequestParam(name = "region") String regionName) {
-        ContentCountResponse response = contentService.getCountByRegionName(regionName);
+        ContentCountResponse response = contentService.findCountByRegionName(regionName);
         return ResponseEntity.ok(response);
     }
 }
