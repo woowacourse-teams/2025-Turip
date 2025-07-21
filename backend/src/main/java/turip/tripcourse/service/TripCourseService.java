@@ -17,7 +17,8 @@ public class TripCourseService {
         List<TripCourse> tripCourses = tripCourseRepository.findAllByContent_Id(contentId);
         int days = calculateDurationDays(contentId);
         int nights = days - 1;
-        return TripCourseDetailResponse.from(nights, days, 0, tripCourses);
+        int tripPlaceCount = calculatePlaceCount(tripCourses);
+        return TripCourseDetailResponse.from(nights, days, tripPlaceCount, tripCourses);
     }
 
     public int calculateDurationDays(Long contentId) {
@@ -26,6 +27,13 @@ public class TripCourseService {
                 .mapToInt(TripCourse::getVisitDay)
                 .max()
                 .orElse(0);
+    }
+
+    private int calculatePlaceCount(List<TripCourse> tripCourses) {
+        return (int) tripCourses.stream()
+                .map(TripCourse::getPlace)
+                .distinct()
+                .count();
     }
 
     private int countByContentId(Long contentId) {

@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@EqualsAndHashCode
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Place {
 
@@ -27,9 +27,20 @@ public class Place {
 
     private String address;
 
-    private Double latitude;
+    private double latitude;
 
-    private Double longitude;
+    private double longitude;
 
     private List<String> categories;
+
+    public Place(Long id, String name, String url, String address, double latitude, double longitude,
+                 List<String> categories) {
+        this.id = id;
+        this.name = name;
+        this.url = url;
+        this.address = address;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.categories = categories;
+    }
 }
