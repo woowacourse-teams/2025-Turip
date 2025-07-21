@@ -1,23 +1,25 @@
 package com.on.turip.ui.search.detail.webview
 
 import android.annotation.SuppressLint
-import android.webkit.WebSettings
 import android.webkit.WebView
+import com.on.turip.ui.search.detail.webview.VideoRegex.patternShortUrl
+import com.on.turip.ui.search.detail.webview.VideoRegex.patternVParam
 
 @SuppressLint("SetJavaScriptEnabled")
 fun WebView.applyVideoSettings() {
     this.settings.apply {
         javaScriptEnabled = true
         domStorageEnabled = true
-
-        setSupportMultipleWindows(false)
         allowFileAccess = false
-        mixedContentMode = WebSettings.MIXED_CONTENT_NEVER_ALLOW
     }
 }
 
+private object VideoRegex {
+    val patternVParam = "v=([a-zA-Z0-9_-]{11})(?:&|$)".toRegex()
+    val patternShortUrl = "youtu\\.be/([a-zA-Z0-9_-]{11})".toRegex()
+}
+
 fun String.extractVideoId(): String {
-    val startIdx = this.indexOf("v=")
-    if (startIdx == -1) return ""
-    return this.substring(startIdx + 2)
+    val matches = patternVParam.find(this) ?: patternShortUrl.find(this)
+    return matches?.groups?.get(1)?.value ?: ""
 }
