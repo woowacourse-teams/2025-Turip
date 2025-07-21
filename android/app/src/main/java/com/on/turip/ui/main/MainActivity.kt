@@ -24,10 +24,10 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     }
 
     private fun setupTextHighlighting() {
-        val originalText = getString(R.string.main_where_should_we_go_title)
-        val highlightText = "떠나볼까요?"
-        val startIndex = originalText.indexOf(highlightText)
-        val endIndex = startIndex + highlightText.length
+        val originalText: String = getString(R.string.main_where_should_we_go_title)
+        val highlightText: String = getString(R.string.main_where_should_we_go_highlighting)
+        val startIndex: Int = originalText.indexOf(highlightText)
+        val endIndex: Int = startIndex + highlightText.length
 
         val spannableText =
             SpannableString(originalText).apply {
