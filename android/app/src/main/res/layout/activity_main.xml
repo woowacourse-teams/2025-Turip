@@ -67,7 +67,7 @@
         app:layout_constraintTop_toBottomOf="@id/rv_main_metropolitan_city" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_main_searching_province"
+        android:id="@+id/rv_main_province"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
