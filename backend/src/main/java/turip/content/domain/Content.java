@@ -44,8 +44,14 @@ public class Content {
 
     private LocalDate uploadedDate;
 
-    public Content(Creator creator, Region region, List<TripCourse> tripCourses, String title, String url,
-                   LocalDate uploadedDate) {
+    public Content(
+            Creator creator,
+            Region region,
+            List<TripCourse> tripCourses,
+            String title,
+            String url,
+            LocalDate uploadedDate
+    ) {
         this.creator = creator;
         this.region = region;
         this.tripCourses = tripCourses;
