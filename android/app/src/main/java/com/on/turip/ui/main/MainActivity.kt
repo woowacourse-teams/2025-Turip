@@ -1,5 +1,7 @@
 package com.on.turip.ui.main
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.Spanned
@@ -80,5 +82,9 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         viewModel.provinces.observe(this) { provinces: List<RegionModel> ->
             provincesAdapter.submitList(provinces)
         }
+    }
+
+    companion object {
+        fun newIntent(context: Context): Intent = Intent(context, MainActivity::class.java)
     }
 }
