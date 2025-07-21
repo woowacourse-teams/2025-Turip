@@ -1,10 +1,8 @@
 package com.on.turip.ui.main
 
-import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import com.on.turip.databinding.ItemSearchingRegionBinding
 import com.on.turip.ui.common.model.RegionModel
 
 class RegionAdapter(
@@ -15,12 +13,7 @@ class RegionAdapter(
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): RegionViewHolder {
-        val inflater: LayoutInflater = LayoutInflater.from(parent.context)
-        val binding: ItemSearchingRegionBinding =
-            ItemSearchingRegionBinding.inflate(inflater, parent, false)
-        return RegionViewHolder(binding, onRegionListener)
-    }
+    ): RegionViewHolder = RegionViewHolder.of(parent, onRegionListener)
 
     override fun onBindViewHolder(
         holder: RegionViewHolder,
