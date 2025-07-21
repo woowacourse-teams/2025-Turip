@@ -1,116 +1,136 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".ui.search.detail.SearchDetailActivity">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <FrameLayout
+        android:id="@+id/fl_search_detail_video_fullscreen"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.search.detail.SearchDetailActivity">
+        android:visibility="gone" />
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/tb_search_detail"
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/nsv_search_detail"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_height="match_parent">
 
-        <ImageView
-            android:id="@+id/iv_search_detail_creator_thumbnail"
-            android:layout_width="84dp"
-            android:layout_height="0dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="28dp"
-            android:contentDescription="@null"
-            app:layout_constraintDimensionRatio="1:1"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tb_search_detail"
-            tools:src="@drawable/ic_launcher_background" />
-
-        <ImageView
-            android:id="@+id/iv_search_detail_platform_badge"
-            android:layout_width="18dp"
-            android:layout_height="0dp"
-            android:layout_marginStart="20dp"
-            android:contentDescription="@null"
-            app:layout_constraintBottom_toBottomOf="@id/tv_search_detail_creator_name"
-            app:layout_constraintDimensionRatio="1:1"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/tv_search_detail_creator_name"
-            tools:src="@drawable/ic_launcher_foreground" />
-
-        <TextView
-            android:id="@+id/tv_search_detail_creator_name"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="6dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="50dp"
-            android:ellipsize="end"
-            android:maxLines="2"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/iv_search_detail_platform_badge"
-            app:layout_constraintTop_toBottomOf="@id/iv_search_detail_creator_thumbnail"
-            tools:text="여행하는 뭉치와 함께하는 하루와 메이와 라젤과 제리 \n 이름이 길어지면 어떻게 되나? ... 으로 잘 표시되는 지 확인해보자@@@@@" />
-
-        <TextView
-            android:id="@+id/tv_search_detail_content_title"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="18dp"
-            android:layout_marginEnd="50dp"
-            android:ellipsize="end"
-            android:maxLines="3"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_search_detail_creator_name"
-            tools:text="맛집여행기 - 전라도 비빔밥을 찾아서 편 \n맛집여행기 - 전라도 비빔밥을 찾아서 편 \n맛집여행기 - 전라도 비빔밥을 찾아서 편 \n맛집여행기 - 전라도 비빔밥을 찾아서 편" />
-
-        <TextView
-            android:id="@+id/tv_search_detail_upload_date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="4dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_search_detail_content_title"
-            tools:text="2025-07-20" />
-
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cv_search_detail_video_container"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginHorizontal="20dp"
-            android:layout_marginTop="24dp"
-            app:cardCornerRadius="10dp"
-            app:layout_constraintDimensionRatio="16:9"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_search_detail_upload_date">
-
-            <WebView
-                android:id="@+id/wv_search_detail_video"
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/tb_search_detail"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="visible" />
+                android:layout_height="?attr/actionBarSize"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/iv_search_detail_creator_thumbnail"
+                android:layout_width="84dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="28dp"
+                android:contentDescription="@null"
+                app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tb_search_detail"
+                tools:src="@drawable/ic_launcher_background" />
+
+            <ImageView
+                android:id="@+id/iv_search_detail_platform_badge"
+                android:layout_width="18dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="20dp"
+                android:contentDescription="@null"
+                app:layout_constraintBottom_toBottomOf="@id/tv_search_detail_creator_name"
+                app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/tv_search_detail_creator_name"
+                tools:src="@drawable/ic_launcher_foreground" />
 
             <TextView
-                android:id="@+id/tv_search_detail_video_error"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/black"
-                android:contentDescription="@null"
-                android:gravity="center"
-                android:text="@string/search_detail_video_error"
-                android:textColor="@color/white"
-                android:visibility="gone"
-                tools:text="해당 영상은 제작자의 요청으로 유튜브 서비스를 이용해야 시청할 수 있습니다. 클릭 시 유튜브로 이동합니다." />
-        </androidx.cardview.widget.CardView>
+                android:id="@+id/tv_search_detail_creator_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="50dp"
+                android:ellipsize="end"
+                android:maxLines="2"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/iv_search_detail_platform_badge"
+                app:layout_constraintTop_toBottomOf="@id/iv_search_detail_creator_thumbnail"
+                tools:text="여행하는 뭉치와 함께하는 하루와 메이와 라젤과 제리 \n 이름이 길어지면 어떻게 되나? ... 으로 잘 표시되는 지 확인해보자@@@@@" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.core.widget.NestedScrollView>
+            <TextView
+                android:id="@+id/tv_search_detail_content_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="18dp"
+                android:layout_marginEnd="50dp"
+                android:ellipsize="end"
+                android:maxLines="3"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_search_detail_creator_name"
+                tools:text="맛집여행기 - 전라도 비빔밥을 찾아서 편 \n맛집여행기 - 전라도 비빔밥을 찾아서 편 \n맛집여행기 - 전라도 비빔밥을 찾아서 편 \n맛집여행기 - 전라도 비빔밥을 찾아서 편" />
+
+            <TextView
+                android:id="@+id/tv_search_detail_upload_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="4dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_search_detail_content_title"
+                tools:text="2025-07-20" />
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cv_search_detail_video_container"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="24dp"
+                app:cardCornerRadius="20dp"
+                app:layout_constraintDimensionRatio="16:9"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_search_detail_upload_date">
+
+                <WebView
+                    android:id="@+id/wv_search_detail_video"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="visible" />
+
+                <ProgressBar
+                    android:id="@+id/pb_search_detail_video"
+                    style="?android:attr/progressBarStyleLarge"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_gravity="center"
+                    android:indeterminateTint="@color/white" />
+
+                <TextView
+                    android:id="@+id/tv_search_detail_video_error"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/black"
+                    android:contentDescription="@null"
+                    android:gravity="center"
+                    android:text="@string/search_detail_video_error"
+                    android:textColor="@color/white"
+                    android:visibility="gone"
+                    tools:text="해당 영상은 제작자의 요청으로 유튜브 서비스를 이용해야 시청할 수 있습니다. 클릭 시 유튜브로 이동합니다." />
+            </androidx.cardview.widget.CardView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
+</FrameLayout>
