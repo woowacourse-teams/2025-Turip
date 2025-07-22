@@ -4,7 +4,6 @@ import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.view.View
-import android.webkit.WebView
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.core.net.toUri
@@ -23,20 +22,18 @@ class SearchDetailActivity : BaseActivity<SearchDetailViewModel, ActivitySearchD
     override val binding: ActivitySearchDetailBinding by lazy {
         ActivitySearchDetailBinding.inflate(layoutInflater)
     }
-    private lateinit var webView: WebView
     private lateinit var turipWebChromeClient: TuripWebChromeClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setupToolbar()
-        setupBindings()
         setupWebView()
         setupListeners()
     }
 
     override fun onDestroy() {
-        webView.destroy()
+        binding.wvSearchDetailVideo.destroy()
         super.onDestroy()
     }
 
@@ -51,18 +48,14 @@ class SearchDetailActivity : BaseActivity<SearchDetailViewModel, ActivitySearchD
                 override fun handleOnBackPressed() {
                     if (turipWebChromeClient.isFullScreen()) {
                         turipWebChromeClient.onHideCustomView()
-                    } else if (webView.canGoBack()) {
-                        webView.goBack()
+                    } else if (binding.wvSearchDetailVideo.canGoBack()) {
+                        binding.wvSearchDetailVideo.goBack()
                     } else {
                         finish()
                     }
                 }
             },
         )
-    }
-
-    private fun setupBindings() {
-        webView = binding.wvSearchDetailVideo
     }
 
     private fun setupWebView() {
@@ -73,15 +66,18 @@ class SearchDetailActivity : BaseActivity<SearchDetailViewModel, ActivitySearchD
                 onExitFullScreen = ::disableFullscreen,
             )
 
-        webView.applyVideoSettings()
-        webView.webChromeClient = turipWebChromeClient
-        webView.webViewClient = TuripWebViewClient(binding.pbSearchDetailVideo)
-        webView.addJavascriptInterface(
-            // TODO 생성자에 url의 일부 추출 필요, WebViewUtils에 구현한 String.extractVideoId() 사용 예정
-            WebViewVideoBridge("") { showWebViewErrorView() },
-            BRIDGE_NAME_IN_JS_FILE,
-        )
-        webView.loadUrl(LOAD_URL_FILE_PATH)
+        binding.wvSearchDetailVideo.apply {
+            applyVideoSettings()
+            webChromeClient = turipWebChromeClient
+            webViewClient = TuripWebViewClient(binding.pbSearchDetailVideo)
+            addJavascriptInterface(
+                // TODO 생성자에 url의 일부 추출 필요, WebViewUtils에 구현한 String.extractVideoId() 사용 예정
+                WebViewVideoBridge("") { showWebViewErrorView() },
+                BRIDGE_NAME_IN_JS_FILE,
+            )
+        }
+
+        binding.wvSearchDetailVideo.loadUrl(LOAD_URL_FILE_PATH)
     }
 
     private fun enableFullscreen() {
