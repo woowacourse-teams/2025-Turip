@@ -157,7 +157,7 @@
                 app:layout_constraintTop_toBottomOf="@id/cv_search_detail_video_container" />
 
             <TextView
-                android:id="@+id/tv_search_detail_place_count"
+                android:id="@+id/tv_search_detail_total_place_count"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
                 android:layout_marginStart="12dp"
@@ -177,10 +177,10 @@
                 android:layout_height="0dp"
                 app:dividerColor="@color/gray_200_c1c1c1"
                 app:dividerThickness="1dp"
-                app:layout_constraintBottom_toBottomOf="@id/tv_search_detail_place_count"
+                app:layout_constraintBottom_toBottomOf="@id/tv_search_detail_total_place_count"
                 app:layout_constraintEnd_toStartOf="@id/iv_search_detail_calendar"
-                app:layout_constraintStart_toEndOf="@id/tv_search_detail_place_count"
-                app:layout_constraintTop_toTopOf="@id/tv_search_detail_place_count" />
+                app:layout_constraintStart_toEndOf="@id/tv_search_detail_total_place_count"
+                app:layout_constraintTop_toTopOf="@id/tv_search_detail_total_place_count" />
 
             <ImageView
                 android:id="@+id/iv_search_detail_calendar"
@@ -190,7 +190,7 @@
                 android:contentDescription="@null"
                 android:src="@drawable/ic_calendar"
                 app:layout_constraintEnd_toStartOf="@id/tv_search_detail_travel_duration"
-                app:layout_constraintTop_toTopOf="@id/tv_search_detail_place_count" />
+                app:layout_constraintTop_toTopOf="@id/tv_search_detail_total_place_count" />
 
             <TextView
                 android:id="@+id/tv_search_detail_travel_duration"
@@ -229,6 +229,18 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/div_search_detail_horizontal"
                 tools:listitem="@layout/item_travel_day" />
+
+            <TextView
+                android:id="@+id/tv_search_detail_day_place_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="20dp"
+                android:textAppearance="@style/body1"
+                android:textColor="@color/gray_500_1e1e1e"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/rv_search_detail_travel_day"
+                tools:text="일정 4개" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
