@@ -30,10 +30,18 @@ class SearchDetailActivity : BaseActivity<SearchDetailViewModel, ActivitySearchD
         )
     }
 
-    private val travelDayAdapter: TravelDayAdapter =
+    private val travelDayAdapter by lazy {
         TravelDayAdapter { dayModel ->
             viewModel.selectDay(dayModel)
         }
+    }
+
+    private val travelPlaceAdapter by lazy {
+        TravelPlaceAdapter { placeModel ->
+            val intent = Intent(Intent.ACTION_VIEW, placeModel.mapLink.toUri())
+            startActivity(intent)
+        }
+    }
 
     private fun enableFullscreen() {
         WindowCompat.setDecorFitsSystemWindows(this.window, false)
@@ -117,6 +125,8 @@ class SearchDetailActivity : BaseActivity<SearchDetailViewModel, ActivitySearchD
 
     private fun setupBindings() {
         binding.rvSearchDetailTravelDay.adapter = travelDayAdapter
+        binding.rvSearchDetailTravelPlace.adapter = travelPlaceAdapter
+        binding.rvSearchDetailTravelPlace.itemAnimator = null
     }
 
     private fun setupListeners() {
@@ -133,6 +143,9 @@ class SearchDetailActivity : BaseActivity<SearchDetailViewModel, ActivitySearchD
     private fun setupObservers() {
         viewModel.days.observe(this) { dayModels ->
             travelDayAdapter.submitList(dayModels)
+        }
+        viewModel.places.observe(this) { placeModels ->
+            travelPlaceAdapter.submitList(placeModels)
         }
     }
 
