@@ -8,8 +8,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import turip.content.controller.dto.response.ContentCountResponse;
 import turip.content.controller.dto.response.ContentDetailsByRegionResponse;
-import turip.content.controller.dto.response.ContentListByRegionResponse;
 import turip.content.controller.dto.response.ContentWithoutRegionResponse;
+import turip.content.controller.dto.response.ContentsByRegionResponse;
 import turip.content.controller.dto.response.TripDurationResponse;
 import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
@@ -30,7 +30,7 @@ public class ContentService {
         return ContentCountResponse.from(count);
     }
 
-    public ContentListByRegionResponse findContentListByRegionName(
+    public ContentsByRegionResponse findContentListByRegionName(
             String regionName,
             int size,
             long lastId
@@ -45,7 +45,7 @@ public class ContentService {
         List<ContentDetailsByRegionResponse> contentDetails = getContentDetailsByRegionResponses(pagedContents);
         boolean loadable = contents.size() > size;
 
-        return ContentListByRegionResponse.of(contentDetails, loadable);
+        return ContentsByRegionResponse.of(contentDetails, loadable);
     }
 
     private List<Content> findContentsByRegion(
