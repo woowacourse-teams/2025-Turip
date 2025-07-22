@@ -12,6 +12,7 @@ import com.on.turip.R
 import com.on.turip.databinding.ActivityMainBinding
 import com.on.turip.ui.common.base.BaseActivity
 import com.on.turip.ui.common.model.RegionModel
+import com.on.turip.ui.search.result.SearchResultActivity
 
 class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     override val viewModel: MainViewModel by viewModels()
@@ -24,7 +25,8 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         RegionAdapter(
             object : RegionViewHolder.OnRegionListener {
                 override fun onRegionClick(region: RegionModel) {
-                    // TODO: 지역 검색 결과 뷰로 이동
+                    val intent = SearchResultActivity.newIntent(this@MainActivity, region.english)
+                    startActivity(intent)
                 }
             },
         )
@@ -32,7 +34,8 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         RegionAdapter(
             object : RegionViewHolder.OnRegionListener {
                 override fun onRegionClick(region: RegionModel) {
-                    // TODO: 지역 검색 결과 뷰로 이동
+                    val intent = SearchResultActivity.newIntent(this@MainActivity, region.english)
+                    startActivity(intent)
                 }
             },
         )

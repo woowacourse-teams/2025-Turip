@@ -1,5 +1,7 @@
 package com.on.turip.ui.search.result
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
@@ -43,5 +45,16 @@ class SearchResultActivity : BaseActivity<SearchResultViewModel, ActivitySearchR
 
     private fun setupAdapters() {
         binding.rvSearchResult.adapter = videosAdapter
+    }
+
+    companion object {
+        private const val REGION_ID: String = "com.on.turip.REGION_ID"
+
+        fun newIntent(
+            context: Context,
+            region: String,
+        ): Intent =
+            Intent(context, SearchResultActivity::class.java)
+                .putExtra(REGION_ID, region)
     }
 }
