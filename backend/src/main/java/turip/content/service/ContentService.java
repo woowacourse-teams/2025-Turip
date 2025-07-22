@@ -3,6 +3,7 @@ package turip.content.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import turip.content.controller.dto.response.ContentCountResponse;
+import turip.content.controller.dto.response.ContentResponse;
 import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
 import turip.exception.NotFoundException;
@@ -18,8 +19,9 @@ public class ContentService {
         return ContentCountResponse.from(count);
     }
 
-    private Content getById(Long id) {
-        return contentRepository.findById(id)
+    public ContentResponse getById(Long id) {
+        Content content = contentRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("컨텐츠를 찾을 수 없습니다."));
+        return ContentResponse.of(content);
     }
 }
