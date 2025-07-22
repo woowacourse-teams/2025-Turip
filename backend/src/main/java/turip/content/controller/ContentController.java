@@ -30,7 +30,7 @@ public class ContentController {
             @RequestParam(name = "size") Integer size,
             @RequestParam(name = "lastId") Long lastId
     ) {
-        ContentsByRegionResponse response = contentService.findContentListByRegionName(regionName, size, lastId);
+        ContentsByRegionResponse response = contentService.findContentsByRegionName(regionName, size, lastId);
         return ResponseEntity.ok(response);
     }
 }

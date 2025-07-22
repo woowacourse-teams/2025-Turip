@@ -30,7 +30,7 @@ public class ContentService {
         return ContentCountResponse.from(count);
     }
 
-    public ContentsByRegionResponse findContentListByRegionName(
+    public ContentsByRegionResponse findContentsByRegionName(
             String regionName,
             int size,
             long lastId
