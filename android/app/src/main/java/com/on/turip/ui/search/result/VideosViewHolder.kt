@@ -12,7 +12,7 @@ class VideosViewHolder(
     private val onSearchResultListener: OnSearchResultListener,
 ) : RecyclerView.ViewHolder(binding.root) {
     init {
-        binding.root.setOnClickListener {
+        itemView.setOnClickListener {
             onSearchResultListener.onSearchResultClick()
         }
     }
@@ -20,18 +20,18 @@ class VideosViewHolder(
     fun bind(searchResultModel: SearchResultModel) {
         binding.tvSearchResultTitle.text = searchResultModel.content.title
         binding.tvSearchResultDay.text =
-            binding.root.context.getString(
+            itemView.context.getString(
                 R.string.search_result_trip_duration,
                 searchResultModel.tripDuration.nights,
                 searchResultModel.tripDuration.days,
             )
         binding.tvSearchResultLocation.text =
-            binding.root.context.getString(
+            itemView.context.getString(
                 R.string.search_result_location_number,
                 searchResultModel.tripPlaceCount,
             )
         binding.tvSearchResultDescription.text =
-            binding.root.context.getString(
+            itemView.context.getString(
                 R.string.search_result_video_description,
                 searchResultModel.content.creator.channelName,
                 searchResultModel.content.uploadedDate,
