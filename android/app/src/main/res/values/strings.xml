@@ -18,4 +18,5 @@
     <string name="search_detail_total_place_count">%d개 장소</string>
     <string name="search_detail_travel_duration">%d박 %d일</string>
     <string name="search_detail_day_place_count">일정 %d개</string>
+    <string name="search_detail_travel_day">%d일차</string>
 </resources>
