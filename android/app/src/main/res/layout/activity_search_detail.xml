@@ -22,6 +22,7 @@
             android:id="@+id/tb_search_detail"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
+            android:background="@color/pure_white_ffffff"
             app:layout_scrollFlags="scroll|enterAlways"
             app:titleTextAppearance="@style/title1"
             app:titleTextColor="@color/pure_black_151515" />

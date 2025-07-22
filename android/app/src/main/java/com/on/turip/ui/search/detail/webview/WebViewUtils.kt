@@ -21,5 +21,7 @@ private object VideoRegex {
 
 fun String.extractVideoId(): String {
     val matches = patternVParam.find(this) ?: patternShortUrl.find(this)
-    return matches?.groups?.get(1)?.value ?: ""
+    return matches?.groups?.get(VIDEO_ID_POSITION)?.value ?: ""
 }
+
+private const val VIDEO_ID_POSITION = 1

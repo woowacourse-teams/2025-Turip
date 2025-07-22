@@ -22,68 +22,18 @@ class SearchDetailActivity : BaseActivity<SearchDetailViewModel, ActivitySearchD
     override val binding: ActivitySearchDetailBinding by lazy {
         ActivitySearchDetailBinding.inflate(layoutInflater)
     }
-    private lateinit var turipWebChromeClient: TuripWebChromeClient
+    private val turipWebChromeClient: TuripWebChromeClient by lazy {
+        TuripWebChromeClient(
+            fullScreenView = binding.flSearchDetailVideoFullscreen,
+            onEnterFullScreen = ::enableFullscreen,
+            onExitFullScreen = ::disableFullscreen,
+        )
+    }
+
     private val travelDayAdapter: TravelDayAdapter =
         TravelDayAdapter { dayModel ->
             viewModel.selectDay(dayModel)
         }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        setupToolbar()
-        setupWebView()
-        setupBindings()
-        setupListeners()
-        setupObservers()
-    }
-
-    override fun onDestroy() {
-        binding.wvSearchDetailVideo.destroy()
-        super.onDestroy()
-    }
-
-    private fun setupToolbar() {
-        setSupportActionBar(binding.tbSearchDetail)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = null
-
-        onBackPressedDispatcher.addCallback(
-            this,
-            object : OnBackPressedCallback(true) {
-                override fun handleOnBackPressed() {
-                    if (turipWebChromeClient.isFullScreen()) {
-                        turipWebChromeClient.onHideCustomView()
-                    } else if (binding.wvSearchDetailVideo.canGoBack()) {
-                        binding.wvSearchDetailVideo.goBack()
-                    } else {
-                        finish()
-                    }
-                }
-            },
-        )
-    }
-
-    private fun setupWebView() {
-        turipWebChromeClient =
-            TuripWebChromeClient(
-                fullScreenView = binding.flSearchDetailVideoFullscreen,
-                onEnterFullScreen = ::enableFullscreen,
-                onExitFullScreen = ::disableFullscreen,
-            )
-
-        binding.wvSearchDetailVideo.apply {
-            applyVideoSettings()
-            webChromeClient = turipWebChromeClient
-            webViewClient = TuripWebViewClient(binding.pbSearchDetailVideo)
-            addJavascriptInterface(
-                // TODO 생성자에 url의 일부 추출 필요, WebViewUtils에 구현한 String.extractVideoId() 사용 예정
-                WebViewVideoBridge("") { showWebViewErrorView() },
-                BRIDGE_NAME_IN_JS_FILE,
-            )
-        }
-        binding.wvSearchDetailVideo.loadUrl(LOAD_URL_FILE_PATH)
-    }
 
     private fun enableFullscreen() {
         WindowCompat.setDecorFitsSystemWindows(this.window, false)
@@ -113,6 +63,51 @@ class SearchDetailActivity : BaseActivity<SearchDetailViewModel, ActivitySearchD
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        setupToolbar()
+        setupWebView()
+        setupBindings()
+        setupListeners()
+        setupObservers()
+    }
+
+    private fun setupToolbar() {
+        setSupportActionBar(binding.tbSearchDetail)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.title = null
+
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    if (turipWebChromeClient.isFullScreen()) {
+                        turipWebChromeClient.onHideCustomView()
+                    } else if (binding.wvSearchDetailVideo.canGoBack()) {
+                        binding.wvSearchDetailVideo.goBack()
+                    } else {
+                        finish()
+                    }
+                }
+            },
+        )
+    }
+
+    private fun setupWebView() {
+        binding.wvSearchDetailVideo.apply {
+            applyVideoSettings()
+            webChromeClient = turipWebChromeClient
+            webViewClient = TuripWebViewClient(binding.pbSearchDetailVideo)
+            addJavascriptInterface(
+                // TODO 생성자에 url의 일부 추출 필요, WebViewUtils에 구현한 String.extractVideoId() 사용 예정
+                WebViewVideoBridge("") { showWebViewErrorView() },
+                BRIDGE_NAME_IN_JS_FILE,
+            )
+        }
+        binding.wvSearchDetailVideo.loadUrl(LOAD_URL_FILE_PATH)
+    }
+
     private fun showWebViewErrorView() {
         runOnUiThread {
             binding.wvSearchDetailVideo.visibility = View.GONE
@@ -139,6 +134,11 @@ class SearchDetailActivity : BaseActivity<SearchDetailViewModel, ActivitySearchD
         viewModel.days.observe(this) { dayModels ->
             travelDayAdapter.submitList(dayModels)
         }
+    }
+
+    override fun onDestroy() {
+        binding.wvSearchDetailVideo.destroy()
+        super.onDestroy()
     }
 
     companion object {
