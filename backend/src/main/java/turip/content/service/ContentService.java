@@ -29,9 +29,9 @@ public class ContentService {
     }
 
     public ContentListByRegionResponse findContentListByRegionName(
-            final String regionName,
-            final int size,
-            final long lastId
+            String regionName,
+            int size,
+            long lastId
     ) {
         // 원하는 size 보다 1개 더 가져와서 더 가져올 수 있는지 확인한다.
         List<Content> contents = findContentsByRegion(regionName, lastId, size + 1);
@@ -48,9 +48,9 @@ public class ContentService {
     }
 
     private List<Content> findContentsByRegion(
-            final String regionName,
-            final long lastId,
-            final int sizePlusOne
+            String regionName,
+            long lastId,
+            int sizePlusOne
     ) {
         Pageable pageable = PageRequest.of(0, sizePlusOne);
         boolean isFirstPage = lastId == 0;
@@ -61,13 +61,13 @@ public class ContentService {
         return contentRepository.findByRegion_NameAndIdLessThanOrderByIdDesc(regionName, lastId, pageable);
     }
 
-    private List<ContentDetailsByRegionResponse> getContentDetailsByRegionResponses(final List<Content> contents) {
+    private List<ContentDetailsByRegionResponse> getContentDetailsByRegionResponses(List<Content> contents) {
         return contents.stream()
                 .map(this::toContentDetailsResponse)
                 .collect(Collectors.toList());
     }
 
-    private ContentDetailsByRegionResponse toContentDetailsResponse(final Content content) {
+    private ContentDetailsByRegionResponse toContentDetailsResponse(Content content) {
         ContentWithoutRegionResponse contentWithoutRegion = ContentWithoutRegionResponse.of(content);
 
         int totalTripDay = tripCourseService.calculateDurationDays(content.getId());
