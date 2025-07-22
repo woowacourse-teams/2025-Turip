@@ -30,17 +30,40 @@ class SearchDetailActivity : BaseActivity<SearchDetailViewModel, ActivitySearchD
         )
     }
 
+    private fun enableFullscreen() {
+        WindowCompat.setDecorFitsSystemWindows(this.window, false)
+        WindowInsetsControllerCompat(window, window.decorView).apply {
+            hide(WindowInsetsCompat.Type.systemBars())
+            systemBarsBehavior =
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        }
+
+        binding.tbSearchDetail.visibility = View.GONE
+        binding.nsvSearchDetail.visibility = View.GONE
+
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+    }
+
+    private fun disableFullscreen() {
+        WindowCompat.setDecorFitsSystemWindows(this.window, true)
+        WindowInsetsControllerCompat(window, window.decorView).apply {
+            show(WindowInsetsCompat.Type.systemBars())
+            systemBarsBehavior =
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        }
+
+        binding.tbSearchDetail.visibility = View.VISIBLE
+        binding.nsvSearchDetail.visibility = View.VISIBLE
+
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setupToolbar()
         setupWebView()
         setupListeners()
-    }
-
-    override fun onDestroy() {
-        binding.wvSearchDetailVideo.destroy()
-        super.onDestroy()
     }
 
     private fun setupToolbar() {
@@ -79,34 +102,6 @@ class SearchDetailActivity : BaseActivity<SearchDetailViewModel, ActivitySearchD
         binding.wvSearchDetailVideo.loadUrl(LOAD_URL_FILE_PATH)
     }
 
-    private fun enableFullscreen() {
-        WindowCompat.setDecorFitsSystemWindows(this.window, false)
-        WindowInsetsControllerCompat(window, window.decorView).apply {
-            hide(WindowInsetsCompat.Type.systemBars())
-            systemBarsBehavior =
-                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-        }
-
-        binding.tbSearchDetail.visibility = View.GONE
-        binding.nsvSearchDetail.visibility = View.GONE
-
-        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-    }
-
-    private fun disableFullscreen() {
-        WindowCompat.setDecorFitsSystemWindows(this.window, true)
-        WindowInsetsControllerCompat(window, window.decorView).apply {
-            show(WindowInsetsCompat.Type.systemBars())
-            systemBarsBehavior =
-                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-        }
-
-        binding.tbSearchDetail.visibility = View.VISIBLE
-        binding.nsvSearchDetail.visibility = View.VISIBLE
-
-        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-    }
-
     private fun showWebViewErrorView() {
         runOnUiThread {
             binding.wvSearchDetailVideo.visibility = View.GONE
@@ -123,6 +118,11 @@ class SearchDetailActivity : BaseActivity<SearchDetailViewModel, ActivitySearchD
                 ) // TODO "" 에는 유튜브 영상 uri가 들어가야 한다.
             startActivity(intent)
         }
+    }
+
+    override fun onDestroy() {
+        binding.wvSearchDetailVideo.destroy()
+        super.onDestroy()
     }
 
     companion object {
