@@ -39,7 +39,7 @@ public class ContentService {
         // 실제 반환할 content는 size 만큼 잘라서 반환한다.
         List<Content> pagedContents = contents.stream()
                 .limit(size)
-                .collect(Collectors.toList());
+                .toList();
 
         List<ContentDetailsByRegionResponse> contentDetails = getContentDetailsByRegionResponses(pagedContents);
         boolean loadable = contents.size() > size;
