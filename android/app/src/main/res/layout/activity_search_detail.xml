@@ -242,6 +242,18 @@
                 app:layout_constraintTop_toBottomOf="@id/rv_search_detail_travel_day"
                 tools:text="일정 4개" />
 
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_search_detail_travel_place"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="12dp"
+                android:orientation="vertical"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_search_detail_day_place_count"
+                tools:listitem="@layout/item_travel_place" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
