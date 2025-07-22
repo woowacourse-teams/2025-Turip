@@ -2,7 +2,7 @@ package com.on.turip.ui.common.model
 
 data class DayModel(
     val day: Int,
-    val isSelected: Boolean,
+    val isSelected: Boolean = false,
 )
 
 fun Int.initDayModels(): List<DayModel> = (1..this).map { it.initDayModel() }
