@@ -20,6 +20,8 @@ import turip.tripcourse.service.TripCourseService;
 @RequiredArgsConstructor
 public class ContentService {
 
+    private static final int EXTRA_FETCH_COUNT = 1;
+
     private final ContentRepository contentRepository;
     private final TripCourseService tripCourseService;
 
@@ -33,8 +35,7 @@ public class ContentService {
             int size,
             long lastId
     ) {
-        // 원하는 size 보다 1개 더 가져와서 더 가져올 수 있는지 확인한다.
-        List<Content> contents = findContentsByRegion(regionName, lastId, size + 1);
+        List<Content> contents = findContentsByRegion(regionName, lastId, size + EXTRA_FETCH_COUNT);
 
         // 실제 반환할 content는 size 만큼 잘라서 반환한다.
         List<Content> pagedContents = contents.stream()
