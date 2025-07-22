@@ -12,7 +12,7 @@ public record ContentWithoutRegionResponse(
         LocalDate uploadedDate
 ) {
 
-    public static ContentWithoutRegionResponse of(Content content) {
+    public static ContentWithoutRegionResponse from(Content content) {
         return new ContentWithoutRegionResponse(
                 content.getId(),
                 CreatorResponse.from(content.getCreator()),

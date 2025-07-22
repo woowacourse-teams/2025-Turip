@@ -69,7 +69,7 @@ public class ContentService {
     }
 
     private ContentDetailsByRegionResponse toContentDetailsResponse(Content content) {
-        ContentWithoutRegionResponse contentWithoutRegion = ContentWithoutRegionResponse.of(content);
+        ContentWithoutRegionResponse contentWithoutRegion = ContentWithoutRegionResponse.from(content);
         TripDurationResponse tripDuration = calculateTripDuration(content);
         int tripPlaceCount = tripCourseService.countByContentId(content.getId());
 
