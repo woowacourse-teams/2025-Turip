@@ -11,10 +11,20 @@ class SearchResultActivity : BaseActivity<SearchResultViewModel, ActivitySearchR
     override val binding: ActivitySearchResultBinding by lazy {
         ActivitySearchResultBinding.inflate(layoutInflater)
     }
+    private val videosAdapter: VideosAdapter by lazy {
+        VideosAdapter(
+            object : VideosViewHolder.OnSearchResultListener {
+                override fun onSearchResultClick() {
+                    TODO("영상 상세 페이지로 이동")
+                }
+            },
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setupToolbar()
+        setupAdapters()
     }
 
     private fun setupToolbar() {
@@ -29,5 +39,9 @@ class SearchResultActivity : BaseActivity<SearchResultViewModel, ActivitySearchR
                 }
             },
         )
+    }
+
+    private fun setupAdapters() {
+        binding.rvSearchResult.adapter = videosAdapter
     }
 }
