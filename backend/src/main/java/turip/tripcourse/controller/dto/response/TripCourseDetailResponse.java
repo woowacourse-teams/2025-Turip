@@ -15,7 +15,7 @@ public record TripCourseDetailResponse(
             List<TripCourse> tripCourses
     ) {
         return new TripCourseDetailResponse(
-                TripDurationResponse.from(nights, days),
+                TripDurationResponse.of(nights, days),
                 tripPlaceCount,
                 tripCourses.stream()
                         .map(tripCourse -> TripCourseResponse.from(tripCourse, tripCourse.getPlace()))
