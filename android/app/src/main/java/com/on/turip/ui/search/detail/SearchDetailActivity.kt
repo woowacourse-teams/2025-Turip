@@ -38,7 +38,7 @@ class SearchDetailActivity : BaseActivity<SearchDetailViewModel, ActivitySearchD
 
     private val travelPlaceAdapter by lazy {
         TravelPlaceAdapter { placeModel ->
-            val intent = Intent(Intent.ACTION_VIEW, placeModel.mapLink.toUri())
+            val intent = Intent(Intent.ACTION_VIEW, placeModel.placeUri())
             startActivity(intent)
         }
     }
@@ -75,6 +75,7 @@ class SearchDetailActivity : BaseActivity<SearchDetailViewModel, ActivitySearchD
         super.onCreate(savedInstanceState)
 
         setupToolbar()
+        setupOnBackPressedDispatcher()
         setupWebView()
         setupBindings()
         setupListeners()
@@ -83,9 +84,13 @@ class SearchDetailActivity : BaseActivity<SearchDetailViewModel, ActivitySearchD
 
     private fun setupToolbar() {
         setSupportActionBar(binding.tbSearchDetail)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = null
+        supportActionBar?.apply {
+            setDisplayHomeAsUpEnabled(true)
+            title = null
+        }
+    }
 
+    private fun setupOnBackPressedDispatcher() {
         onBackPressedDispatcher.addCallback(
             this,
             object : OnBackPressedCallback(true) {
@@ -125,8 +130,10 @@ class SearchDetailActivity : BaseActivity<SearchDetailViewModel, ActivitySearchD
 
     private fun setupBindings() {
         binding.rvSearchDetailTravelDay.adapter = travelDayAdapter
-        binding.rvSearchDetailTravelPlace.adapter = travelPlaceAdapter
-        binding.rvSearchDetailTravelPlace.itemAnimator = null
+        binding.rvSearchDetailTravelPlace.apply {
+            adapter = travelPlaceAdapter
+            itemAnimator = null
+        }
     }
 
     private fun setupListeners() {

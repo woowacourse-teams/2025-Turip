@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.on.turip.ui.common.model.DayModel
 import com.on.turip.ui.common.model.PlaceModel
-import com.on.turip.ui.common.model.getPlaceDummyWithDay
 import com.on.turip.ui.common.model.initDayModels
 
 class SearchDetailViewModel : ViewModel() {
@@ -20,21 +19,21 @@ class SearchDetailViewModel : ViewModel() {
     init {
         val loadDay: Int = 3 // TODO: 서버에서 받아온 여행일정 X일을 추출해서 추가
         _days.value = loadDay.initDayModels()
-        placeCacheByDay = getPlaceDummyWithDay()
+        placeCacheByDay = emptyMap() // TODO: 서버에서 받아온 데이터로 key:일차, value: 장소들로 map 자료구조로 캐싱
         _places.value = placeCacheByDay[DayModel(1)]
     }
 
-    fun selectDay(selectedDay: DayModel) {
-        val currentList = days.value ?: return
-        val newList =
-            currentList.map { item ->
-                if (item.day == selectedDay.day) {
-                    item.copy(isSelected = true)
+    fun selectDay(day: DayModel) {
+        val daysStatus: List<DayModel> = days.value ?: return // TODO: days.value null 일 때 로직 처리 필요
+        val updateDaysStatus =
+            daysStatus.map { dayModel ->
+                if (dayModel.isSame(day)) {
+                    dayModel.copy(isSelected = true)
                 } else {
-                    item.copy(isSelected = false)
+                    dayModel.copy(isSelected = false)
                 }
             }
-        _days.value = newList
-        _places.value = placeCacheByDay[selectedDay]
+        _days.value = updateDaysStatus
+        _places.value = placeCacheByDay[day]
     }
 }
