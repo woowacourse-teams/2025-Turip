@@ -3,11 +3,13 @@ package turip.content.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import turip.content.controller.dto.response.ContentCountResponse;
 import turip.content.controller.dto.response.ContentsByRegionResponse;
+import turip.content.controller.dto.response.ContentResponse;
 import turip.content.service.ContentService;
 
 @RestController
@@ -31,6 +33,14 @@ public class ContentController {
             @RequestParam(name = "lastId") Long lastId
     ) {
         ContentsByRegionResponse response = contentService.findContentsByRegionName(regionName, size, lastId);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ContentResponse> readContentById(
+            @PathVariable Long id
+    ) {
+        ContentResponse response = contentService.getById(id);
         return ResponseEntity.ok(response);
     }
 }
