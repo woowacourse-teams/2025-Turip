@@ -215,7 +215,20 @@
                 app:dividerThickness="1dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_search_detail_place_count" />
+                app:layout_constraintTop_toBottomOf="@id/tv_search_detail_total_place_count" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_search_detail_travel_day"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:clipToPadding="false"
+                android:orientation="horizontal"
+                android:paddingTop="16dp"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/div_search_detail_horizontal"
+                tools:listitem="@layout/item_travel_day" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
