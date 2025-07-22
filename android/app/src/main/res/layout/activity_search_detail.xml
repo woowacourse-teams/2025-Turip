@@ -145,6 +145,78 @@
                     tools:text="해당 영상은 제작자의 요청으로 유튜브 서비스를 이용해야 시청할 수 있습니다. 클릭 시 유튜브로 이동합니다." />
             </androidx.cardview.widget.CardView>
 
+            <ImageView
+                android:id="@+id/iv_search_detail_location"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_marginStart="72dp"
+                android:layout_marginTop="28dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_location"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cv_search_detail_video_container" />
+
+            <TextView
+                android:id="@+id/tv_search_detail_place_count"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_marginStart="12dp"
+                android:gravity="center"
+                android:text="@string/search_detail_place_count"
+                android:textAppearance="@style/title3"
+                android:textColor="@color/pure_black_151515"
+                app:layout_constraintBottom_toBottomOf="@id/iv_search_detail_location"
+                app:layout_constraintStart_toEndOf="@id/iv_search_detail_location"
+                app:layout_constraintTop_toTopOf="@id/iv_search_detail_location"
+                app:layout_constraintVertical_bias="0.0"
+                tools:text="14개 장소" />
+
+            <com.google.android.material.divider.MaterialDivider
+                android:id="@+id/div_search_detail_vertical"
+                android:layout_width="1dp"
+                android:layout_height="0dp"
+                app:dividerColor="@color/gray_200_c1c1c1"
+                app:dividerThickness="1dp"
+                app:layout_constraintBottom_toBottomOf="@id/tv_search_detail_place_count"
+                app:layout_constraintEnd_toStartOf="@id/iv_search_detail_calendar"
+                app:layout_constraintStart_toEndOf="@id/tv_search_detail_place_count"
+                app:layout_constraintTop_toTopOf="@id/tv_search_detail_place_count" />
+
+            <ImageView
+                android:id="@+id/iv_search_detail_calendar"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_marginEnd="8dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_calendar"
+                app:layout_constraintEnd_toStartOf="@id/tv_search_detail_travel_duration"
+                app:layout_constraintTop_toTopOf="@id/tv_search_detail_place_count" />
+
+            <TextView
+                android:id="@+id/tv_search_detail_travel_duration"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_marginEnd="72dp"
+                android:gravity="center"
+                android:text="@string/search_detail_travel_duration"
+                android:textAppearance="@style/title3"
+                android:textColor="@color/pure_black_151515"
+                app:layout_constraintBottom_toBottomOf="@id/iv_search_detail_calendar"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/iv_search_detail_calendar"
+                tools:text="2박 3일" />
+
+            <com.google.android.material.divider.MaterialDivider
+                android:id="@+id/div_search_detail_horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="30dp"
+                app:dividerColor="@color/gray_200_c1c1c1"
+                app:dividerThickness="1dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_search_detail_place_count" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
