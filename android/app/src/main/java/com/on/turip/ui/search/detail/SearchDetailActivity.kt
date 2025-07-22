@@ -22,7 +22,13 @@ class SearchDetailActivity : BaseActivity<SearchDetailViewModel, ActivitySearchD
     override val binding: ActivitySearchDetailBinding by lazy {
         ActivitySearchDetailBinding.inflate(layoutInflater)
     }
-    private lateinit var turipWebChromeClient: TuripWebChromeClient
+    private val turipWebChromeClient: TuripWebChromeClient by lazy {
+        TuripWebChromeClient(
+            fullScreenView = binding.flSearchDetailVideoFullscreen,
+            onEnterFullScreen = ::enableFullscreen,
+            onExitFullScreen = ::disableFullscreen,
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,13 +65,6 @@ class SearchDetailActivity : BaseActivity<SearchDetailViewModel, ActivitySearchD
     }
 
     private fun setupWebView() {
-        turipWebChromeClient =
-            TuripWebChromeClient(
-                fullScreenView = binding.flSearchDetailVideoFullscreen,
-                onEnterFullScreen = ::enableFullscreen,
-                onExitFullScreen = ::disableFullscreen,
-            )
-
         binding.wvSearchDetailVideo.apply {
             applyVideoSettings()
             webChromeClient = turipWebChromeClient
