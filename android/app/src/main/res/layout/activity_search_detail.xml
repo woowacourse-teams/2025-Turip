@@ -6,6 +6,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/pure_white_ffffff"
     tools:context=".ui.search.detail.SearchDetailActivity">
 
     <FrameLayout
