@@ -69,13 +69,15 @@ public class ContentService {
 
     private ContentDetailsByRegionResponse toContentDetailsResponse(Content content) {
         ContentWithoutRegionResponse contentWithoutRegion = ContentWithoutRegionResponse.of(content);
-
-        int totalTripDay = tripCourseService.calculateDurationDays(content.getId());
-        TripDurationResponse tripDuration = TripDurationResponse.convertToTripDurationFrom(totalTripDay);
-
+        TripDurationResponse tripDuration = calculateTripDuration(content);
         int tripPlaceCount = tripCourseService.countByContentId(content.getId());
 
         return ContentDetailsByRegionResponse.of(contentWithoutRegion, tripDuration, tripPlaceCount);
+    }
+
+    private TripDurationResponse calculateTripDuration(Content content) {
+        int totalTripDay = tripCourseService.calculateDurationDays(content.getId());
+        return TripDurationResponse.of(totalTripDay - 1, totalTripDay);
     }
 
     private Content getById(Long id) {
