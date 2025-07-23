@@ -1,12 +1,10 @@
-package com.on.turip.ui.search.detail
+package com.on.turip.ui.travel.detail
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.on.turip.ui.common.model.DayModel
-import com.on.turip.ui.common.model.initDayModels
 
-class SearchDetailViewModel : ViewModel() {
+class TravelDetailViewModel : ViewModel() {
     private val _days: MutableLiveData<List<DayModel>> = MutableLiveData()
     val days: LiveData<List<DayModel>> = _days
 

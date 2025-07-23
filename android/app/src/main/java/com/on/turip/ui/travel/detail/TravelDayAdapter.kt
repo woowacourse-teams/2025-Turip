@@ -1,9 +1,8 @@
-package com.on.turip.ui.search.detail
+package com.on.turip.ui.travel.detail
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import com.on.turip.ui.common.model.DayModel
 
 class TravelDayAdapter(
     private val onClickListener: TravelDayViewHolder.OnDayListener,

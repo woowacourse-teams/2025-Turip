@@ -1,4 +1,4 @@
-package com.on.turip.ui.search.detail
+package com.on.turip.ui.travel.detail
 
 import android.content.Intent
 import android.content.pm.ActivityInfo
@@ -12,13 +12,13 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.on.turip.databinding.ActivitySearchDetailBinding
 import com.on.turip.ui.common.base.BaseActivity
-import com.on.turip.ui.search.detail.webview.TuripWebChromeClient
-import com.on.turip.ui.search.detail.webview.TuripWebViewClient
-import com.on.turip.ui.search.detail.webview.WebViewVideoBridge
-import com.on.turip.ui.search.detail.webview.applyVideoSettings
+import com.on.turip.ui.travel.detail.webview.TuripWebChromeClient
+import com.on.turip.ui.travel.detail.webview.TuripWebViewClient
+import com.on.turip.ui.travel.detail.webview.WebViewVideoBridge
+import com.on.turip.ui.travel.detail.webview.applyVideoSettings
 
-class SearchDetailActivity : BaseActivity<SearchDetailViewModel, ActivitySearchDetailBinding>() {
-    override val viewModel: SearchDetailViewModel by viewModels()
+class TravelDetailActivity : BaseActivity<TravelDetailViewModel, ActivitySearchDetailBinding>() {
+    override val viewModel: TravelDetailViewModel by viewModels()
     override val binding: ActivitySearchDetailBinding by lazy {
         ActivitySearchDetailBinding.inflate(layoutInflater)
     }
