@@ -1,4 +1,4 @@
-package com.on.turip.domain.contents
+package com.on.turip.domain.videoinfo.contents
 
 data class TripDuration(
     val nights: Int,

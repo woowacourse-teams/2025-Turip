@@ -3,7 +3,7 @@ package com.on.turip.ui.search.result
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import com.on.turip.domain.contents.VideoInformation
+import com.on.turip.domain.videoinfo.contents.VideoInformation
 
 class SearchResultAdapter(
     private val onSearchResultListener: SearchResultViewHolder.OnSearchResultListener,

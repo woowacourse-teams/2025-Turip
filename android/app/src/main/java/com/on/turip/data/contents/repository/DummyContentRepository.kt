@@ -1,11 +1,11 @@
 package com.on.turip.data.contents.repository
 
-import com.on.turip.domain.contents.Content
-import com.on.turip.domain.contents.Creator
-import com.on.turip.domain.contents.PagedContentsResult
-import com.on.turip.domain.contents.TripDuration
-import com.on.turip.domain.contents.VideoInformation
-import com.on.turip.domain.contents.repository.ContentRepository
+import com.on.turip.domain.videoinfo.contents.Content
+import com.on.turip.domain.videoinfo.contents.PagedContentsResult
+import com.on.turip.domain.videoinfo.contents.TripDuration
+import com.on.turip.domain.videoinfo.contents.VideoInformation
+import com.on.turip.domain.videoinfo.contents.creator.Creator
+import com.on.turip.domain.videoinfo.contents.repository.ContentRepository
 
 class DummyContentRepository(
     private val dummyData: List<VideoInformation> = dummyVideoInformations,

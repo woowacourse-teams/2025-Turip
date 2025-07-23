@@ -1,4 +1,4 @@
-package com.on.turip.domain.contents
+package com.on.turip.domain.videoinfo.contents.creator
 
 data class Creator(
     val id: Long,
