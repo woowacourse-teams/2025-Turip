@@ -61,9 +61,9 @@ class ContentPagingApiTest {
         // then: id 10~6, 5개, loadable=true
         firstPageResponse.then()
                 .statusCode(200)
-                .body("contentDetailsByRegionResponse.size()", is(5))
-                .body("contentDetailsByRegionResponse[0].contentWithoutRegionResponse.id", is(10))
-                .body("contentDetailsByRegionResponse[4].contentWithoutRegionResponse.id", is(6))
+                .body("contents.size()", is(5))
+                .body("contents[0].content.id", is(10))
+                .body("contents[4].content.id", is(6))
                 .body("loadable", is(true));
 
         // when: 두 번째 페이지 요청 (lastId=6, size=5)
@@ -76,9 +76,9 @@ class ContentPagingApiTest {
         // then: id 5~1, 5개, loadable=false
         secondPageResponse.then()
                 .statusCode(200)
-                .body("contentDetailsByRegionResponse.size()", is(5))
-                .body("contentDetailsByRegionResponse[0].contentWithoutRegionResponse.id", is(5))
-                .body("contentDetailsByRegionResponse[4].contentWithoutRegionResponse.id", is(1))
+                .body("contents.size()", is(5))
+                .body("contents[0].content.id", is(5))
+                .body("contents[4].content.id", is(1))
                 .body("loadable", is(false));
     }
 }
