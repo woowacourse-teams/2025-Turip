@@ -9,6 +9,8 @@ import com.on.turip.data.contents.repository.DummyContentRepository
 import com.on.turip.domain.contents.PagedContentsResult
 import com.on.turip.domain.contents.VideoInformation
 import com.on.turip.domain.contents.repository.ContentRepository
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 class SearchResultViewModel(
@@ -21,32 +23,35 @@ class SearchResultViewModel(
 
     init {
         loadContentsFromRegion()
-        loadContentsSize()
         setTitle()
     }
 
     private fun loadContentsFromRegion() {
         viewModelScope.launch {
-            runCatching {
-                contentRepository.loadContents(
-                    region = region,
-                    size = 100,
-                    lastId = 0L,
-                )
-            }.onSuccess { result: PagedContentsResult ->
+            val pagedContentsResult: Deferred<Result<PagedContentsResult>> =
+                async {
+                    runCatching {
+                        contentRepository.loadContents(
+                            region = region,
+                            size = 100,
+                            lastId = 0L,
+                        )
+                    }
+                }
+            val contentsSize: Deferred<Result<Int>> =
+                async {
+                    runCatching {
+                        contentRepository.loadContentsSize(region)
+                    }
+                }
+
+            pagedContentsResult.await().onSuccess { result: PagedContentsResult ->
                 _searchResultState.value =
                     searchResultState.value?.copy(
                         videoInformations = result.videos,
                     )
             }
-        }
-    }
-
-    private fun loadContentsSize() {
-        viewModelScope.launch {
-            runCatching {
-                contentRepository.loadContentsSize(region)
-            }.onSuccess { result: Int ->
+            contentsSize.await().onSuccess { result: Int ->
                 setSearchResultExistence(result)
             }
         }
