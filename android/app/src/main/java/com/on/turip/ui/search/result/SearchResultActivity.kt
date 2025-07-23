@@ -15,7 +15,7 @@ import com.on.turip.ui.common.model.RegionModel
 class SearchResultActivity : BaseActivity<SearchResultViewModel, ActivitySearchResultBinding>() {
     override val viewModel: SearchResultViewModel by viewModels {
         SearchResultViewModel.provideFactory(
-            intent.getStringExtra(REGION_ID) ?: "",
+            intent.getStringExtra(REGION_KEY) ?: "",
         )
     }
     override val binding: ActivitySearchResultBinding by lazy {
@@ -83,13 +83,13 @@ class SearchResultActivity : BaseActivity<SearchResultViewModel, ActivitySearchR
     }
 
     companion object {
-        private const val REGION_ID: String = "com.on.turip.REGION_ID"
+        private const val REGION_KEY: String = "com.on.turip.REGION_KEY"
 
         fun newIntent(
             context: Context,
             region: String,
         ): Intent =
             Intent(context, SearchResultActivity::class.java)
-                .putExtra(REGION_ID, region)
+                .putExtra(REGION_KEY, region)
     }
 }
