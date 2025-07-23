@@ -55,7 +55,8 @@ class DummyContentsRepository(
                                 Creator(
                                     id = 102,
                                     channelName = "뚜벅이의 하루",
-                                    profileImage = "http://turip.com/static/youtuber2",
+                                    profileImage = @Suppress("ktlint:standard:max-line-length")
+                                    "https://yt3.ggpht.com/UdF_j2R_Prv7kamTRqItI0QUgMvdbJk_xXFjjYGFUIMZUYt1EbrJpEmzJbciKbrrdoX4me8g5w=s176-c-k-c0x00ffffff-no-rj-mo",
                                 ),
                             title = "제주도 혼자 여행 브이로그",
                             url = "https://youtu.be/dummy2",
@@ -76,7 +77,8 @@ class DummyContentsRepository(
                                 Creator(
                                     id = 103,
                                     channelName = "감성캠퍼",
-                                    profileImage = "http://turip.com/static/youtuber3",
+                                    profileImage = @Suppress("ktlint:standard:max-line-length")
+                                    "https://yt3.ggpht.com/UdF_j2R_Prv7kamTRqItI0QUgMvdbJk_xXFjjYGFUIMZUYt1EbrJpEmzJbciKbrrdoX4me8g5w=s176-c-k-c0x00ffffff-no-rj-mo",
                                 ),
                             title = "강원도 캠핑 2박 3일 여행",
                             url = "https://youtu.be/dummy3",

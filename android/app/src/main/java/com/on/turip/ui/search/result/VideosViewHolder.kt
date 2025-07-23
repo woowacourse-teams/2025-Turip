@@ -3,6 +3,8 @@ package com.on.turip.ui.search.result
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
+import coil.transform.CircleCropTransformation
 import com.on.turip.R
 import com.on.turip.databinding.ItemSearchResultBinding
 import com.on.turip.domain.contents.Video
@@ -36,7 +38,10 @@ class VideosViewHolder(
                 video.content.creator.channelName,
                 video.content.uploadedDate,
             )
-        binding.ivSearchResultThumbnail
+        binding.ivSearchResultThumbnail.load(video.content.creator.profileImage) {
+            crossfade(true)
+            transformations(CircleCropTransformation())
+        }
     }
 
     companion object {
