@@ -4,13 +4,13 @@ import com.on.turip.domain.videoinfo.contents.PagedContentsResult
 import com.on.turip.domain.videoinfo.contents.VideoData
 
 interface ContentRepository {
-    suspend fun loadContentsSize(region: String): Int
+    suspend fun loadContentsSize(region: String): Result<Int>
 
     suspend fun loadContents(
         region: String,
         size: Int,
         lastId: Long,
-    ): PagedContentsResult
+    ): Result<PagedContentsResult>
 
-    suspend fun loadContent(contentId: Long): VideoData
+    suspend fun loadContent(contentId: Long): Result<VideoData>
 }
