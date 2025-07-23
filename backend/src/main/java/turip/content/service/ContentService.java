@@ -58,9 +58,9 @@ public class ContentService {
         boolean isFirstPage = lastId == 0;
 
         if (isFirstPage) {
-            return contentRepository.findByRegion_NameOrderByIdDesc(regionName, pageable);
+            return contentRepository.findByRegionNameOrderByIdDesc(regionName, pageable);
         }
-        return contentRepository.findByRegion_NameAndIdLessThanOrderByIdDesc(regionName, lastId, pageable);
+        return contentRepository.findByRegionNameAndIdLessThanOrderByIdDesc(regionName, lastId, pageable);
     }
 
     private List<ContentDetailsByRegionResponse> getContentDetailsByRegionResponses(List<Content> contents) {

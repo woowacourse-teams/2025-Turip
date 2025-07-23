@@ -9,7 +9,7 @@ public interface ContentRepository extends JpaRepository<Content, Long> {
 
     int countByRegion_Name(String regionName);
 
-    List<Content> findByRegion_NameAndIdLessThanOrderByIdDesc(String regionName, Long lastId, Pageable pageable);
+    List<Content> findByRegionNameAndIdLessThanOrderByIdDesc(String regionName, Long lastId, Pageable pageable);
 
-    List<Content> findByRegion_NameOrderByIdDesc(String regionName, Pageable pageable);
+    List<Content> findByRegionNameOrderByIdDesc(String regionName, Pageable pageable);
 }
