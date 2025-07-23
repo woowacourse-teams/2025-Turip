@@ -5,11 +5,11 @@ import com.on.turip.domain.contents.Creator
 import com.on.turip.domain.contents.PagedContentsResult
 import com.on.turip.domain.contents.TripDuration
 import com.on.turip.domain.contents.VideoInformation
-import com.on.turip.domain.contents.repository.ContentsRepository
+import com.on.turip.domain.contents.repository.ContentRepository
 
-class DummyContentsRepository(
+class DummyContentRepository(
     private val dummyData: List<VideoInformation> = dummyVideoInformations,
-) : ContentsRepository {
+) : ContentRepository {
     override suspend fun loadContentsSize(region: String): Int = dummyData.size
 
     override suspend fun loadContents(

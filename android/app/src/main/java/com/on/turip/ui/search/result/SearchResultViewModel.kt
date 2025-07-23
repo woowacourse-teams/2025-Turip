@@ -5,15 +5,15 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.on.turip.data.contents.repository.DummyContentsRepository
+import com.on.turip.data.contents.repository.DummyContentRepository
 import com.on.turip.domain.contents.PagedContentsResult
 import com.on.turip.domain.contents.VideoInformation
-import com.on.turip.domain.contents.repository.ContentsRepository
+import com.on.turip.domain.contents.repository.ContentRepository
 import kotlinx.coroutines.launch
 
 class SearchResultViewModel(
     private val region: String,
-    private val contentsRepository: ContentsRepository,
+    private val contentRepository: ContentRepository,
 ) : ViewModel() {
     private val _searchResultState: MutableLiveData<SearchResultState> =
         MutableLiveData(SearchResultState())
@@ -28,7 +28,7 @@ class SearchResultViewModel(
     private fun loadContentsFromRegion() {
         viewModelScope.launch {
             runCatching {
-                contentsRepository.loadContents(
+                contentRepository.loadContents(
                     region = region,
                     size = 100,
                     lastId = 0L,
@@ -45,7 +45,7 @@ class SearchResultViewModel(
     private fun loadContentsSize() {
         viewModelScope.launch {
             runCatching {
-                contentsRepository.loadContentsSize(region)
+                contentRepository.loadContentsSize(region)
             }.onSuccess { result: Int ->
                 setSearchResultExistence(result)
             }
@@ -77,7 +77,7 @@ class SearchResultViewModel(
     companion object {
         fun provideFactory(
             region: String,
-            contentsRepository: ContentsRepository = DummyContentsRepository(),
+            contentRepository: ContentRepository = DummyContentRepository(),
         ): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
@@ -85,7 +85,7 @@ class SearchResultViewModel(
                     if (modelClass.isAssignableFrom(SearchResultViewModel::class.java)) {
                         return SearchResultViewModel(
                             region,
-                            contentsRepository,
+                            contentRepository,
                         ) as T
                     }
                     throw IllegalArgumentException()
