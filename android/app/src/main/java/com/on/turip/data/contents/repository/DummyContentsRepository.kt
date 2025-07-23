@@ -4,11 +4,11 @@ import com.on.turip.domain.contents.Content
 import com.on.turip.domain.contents.Creator
 import com.on.turip.domain.contents.PagedContentsResult
 import com.on.turip.domain.contents.TripDuration
-import com.on.turip.domain.contents.Video
+import com.on.turip.domain.contents.VideoInformation
 import com.on.turip.domain.contents.repository.ContentsRepository
 
 class DummyContentsRepository(
-    private val dummyData: List<Video> = dummyVideos,
+    private val dummyData: List<VideoInformation> = dummyVideoInformations,
 ) : ContentsRepository {
     override suspend fun loadContentsSize(region: String): Int = dummyData.size
 
@@ -23,9 +23,9 @@ class DummyContentsRepository(
         )
 
     companion object {
-        val dummyVideos =
+        val dummyVideoInformations =
             listOf(
-                Video(
+                VideoInformation(
                     content =
                         Content(
                             id = 1,
@@ -47,7 +47,7 @@ class DummyContentsRepository(
                         ),
                     tripPlaceCount = 5,
                 ),
-                Video(
+                VideoInformation(
                     content =
                         Content(
                             id = 2,
@@ -69,7 +69,7 @@ class DummyContentsRepository(
                         ),
                     tripPlaceCount = 8,
                 ),
-                Video(
+                VideoInformation(
                     content =
                         Content(
                             id = 3,

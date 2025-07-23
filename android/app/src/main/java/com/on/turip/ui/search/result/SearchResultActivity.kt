@@ -70,7 +70,7 @@ class SearchResultActivity : BaseActivity<SearchResultViewModel, ActivitySearchR
 
             supportActionBar?.title = setupTitle(searchResultState.region)
 
-            searchResultAdapter.submitList(searchResultState.videos)
+            searchResultAdapter.submitList(searchResultState.videoInformations)
 
             binding.rvSearchResult.isVisible = searchResultState.isExist == true
             binding.groupEmptyResult.isVisible = searchResultState.isExist == false

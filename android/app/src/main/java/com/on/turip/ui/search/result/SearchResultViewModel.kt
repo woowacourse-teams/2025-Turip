@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.on.turip.data.contents.repository.DummyContentsRepository
 import com.on.turip.domain.contents.PagedContentsResult
-import com.on.turip.domain.contents.Video
+import com.on.turip.domain.contents.VideoInformation
 import com.on.turip.domain.contents.repository.ContentsRepository
 import kotlinx.coroutines.launch
 
@@ -36,7 +36,7 @@ class SearchResultViewModel(
             }.onSuccess { result: PagedContentsResult ->
                 _searchResultState.value =
                     searchResultState.value?.copy(
-                        videos = result.videos,
+                        videoInformations = result.videos,
                     )
             }
         }
@@ -95,7 +95,7 @@ class SearchResultViewModel(
 
     data class SearchResultState(
         val searchResultCount: Int = 0,
-        val videos: List<Video> = emptyList(),
+        val videoInformations: List<VideoInformation> = emptyList(),
         val region: String = "",
         val isExist: Boolean = false,
     )

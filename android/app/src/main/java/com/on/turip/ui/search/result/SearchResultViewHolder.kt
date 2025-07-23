@@ -7,7 +7,7 @@ import coil.load
 import coil.transform.CircleCropTransformation
 import com.on.turip.R
 import com.on.turip.databinding.ItemSearchResultBinding
-import com.on.turip.domain.contents.Video
+import com.on.turip.domain.contents.VideoInformation
 
 class SearchResultViewHolder(
     private val binding: ItemSearchResultBinding,
@@ -19,26 +19,26 @@ class SearchResultViewHolder(
         }
     }
 
-    fun bind(video: Video) {
-        binding.tvSearchResultTitle.text = video.content.title
+    fun bind(videoInformation: VideoInformation) {
+        binding.tvSearchResultTitle.text = videoInformation.content.title
         binding.tvSearchResultDay.text =
             itemView.context.getString(
                 R.string.search_result_trip_duration,
-                video.tripDuration.nights,
-                video.tripDuration.days,
+                videoInformation.tripDuration.nights,
+                videoInformation.tripDuration.days,
             )
         binding.tvSearchResultLocation.text =
             itemView.context.getString(
                 R.string.search_result_location_number,
-                video.tripPlaceCount,
+                videoInformation.tripPlaceCount,
             )
         binding.tvSearchResultDescription.text =
             itemView.context.getString(
                 R.string.search_result_video_description,
-                video.content.creator.channelName,
-                video.content.uploadedDate,
+                videoInformation.content.creator.channelName,
+                videoInformation.content.uploadedDate,
             )
-        binding.ivSearchResultThumbnail.load(video.content.creator.profileImage) {
+        binding.ivSearchResultThumbnail.load(videoInformation.content.creator.profileImage) {
             crossfade(true)
             transformations(CircleCropTransformation())
         }
