@@ -1,6 +1,6 @@
 package com.on.turip.domain.contents
 
 data class PagedContentsResult(
-    val videos: List<Video>,
+    val videos: List<VideoInformation>,
     val loadable: Boolean,
 )
