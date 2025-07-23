@@ -1,11 +1,12 @@
 package com.on.turip.data.content.dataSource
 
+import com.on.turip.data.content.dto.ContentDetailResponse
 import com.on.turip.data.content.dto.ContentInformationCountResponse
 import com.on.turip.data.content.dto.ContentsInformationResponse
 import com.on.turip.data.content.service.ContentService
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlin.coroutines.CoroutineContext
 
 class DefaultContentRemoteDataSource(
     private val contentService: ContentService,
@@ -27,6 +28,15 @@ class DefaultContentRemoteDataSource(
                     region = region,
                     size = size,
                     lastId = lastId,
+                )
+            }
+        }
+
+    override suspend fun getContentDetail(contentId: Long): Result<ContentDetailResponse> =
+        withContext(coroutineContext) {
+            runCatching {
+                contentService.getContentDetail(
+                    contentId = contentId,
                 )
             }
         }

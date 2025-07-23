@@ -1,5 +1,6 @@
 package com.on.turip.data.content
 
+import com.on.turip.data.content.dto.ContentDetailResponse
 import com.on.turip.data.content.dto.ContentInformationResponse
 import com.on.turip.data.content.dto.ContentResponse
 import com.on.turip.data.content.dto.ContentsInformationResponse
@@ -52,4 +53,11 @@ fun CreatorResponse.toDomain(): Creator =
         id = id,
         channelName = channelName,
         profileImage = profileImage,
+    )
+
+fun ContentDetailResponse.toDomain(): VideoData =
+    VideoData(
+        title = title,
+        url = url,
+        uploadedDate = uploadedDate,
     )
