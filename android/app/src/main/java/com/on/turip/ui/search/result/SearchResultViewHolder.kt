@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.on.turip.R
 import com.on.turip.databinding.ItemSearchResultBinding
-import com.on.turip.domain.contents.VideoInformation
+import com.on.turip.domain.videoinfo.contents.video.VideoInformation
 import com.on.turip.ui.common.loadCircularImage
 
 class SearchResultViewHolder(
@@ -19,23 +19,23 @@ class SearchResultViewHolder(
     }
 
     fun bind(videoInformation: VideoInformation) {
-        binding.tvSearchResultTitle.text = videoInformation.content.title
+        binding.tvSearchResultTitle.text = videoInformation.content.videoData.title
         binding.tvSearchResultDay.text =
             itemView.context.getString(
                 R.string.all_travel_duration,
-                videoInformation.tripDuration.nights,
-                videoInformation.tripDuration.days,
+                videoInformation.trip.tripDuration.nights,
+                videoInformation.trip.tripDuration.days,
             )
         binding.tvSearchResultLocation.text =
             itemView.context.getString(
                 R.string.all_total_place_count,
-                videoInformation.tripPlaceCount,
+                videoInformation.trip.tripPlaceCount,
             )
         binding.tvSearchResultDescription.text =
             itemView.context.getString(
                 R.string.search_result_video_description,
                 videoInformation.content.creator.channelName,
-                videoInformation.content.uploadedDate,
+                videoInformation.content.videoData.uploadedDate,
             )
         binding.ivSearchResultThumbnail.loadCircularImage(videoInformation.content.creator.profileImage)
     }

@@ -2,8 +2,9 @@ package com.on.turip.data.content.repository
 
 import com.on.turip.data.content.dataSource.ContentRemoteDataSource
 import com.on.turip.data.content.toDomain
-import com.on.turip.domain.contents.PagedContentsResult
-import com.on.turip.domain.contents.repository.ContentRepository
+import com.on.turip.domain.videoinfo.contents.PagedContentsResult
+import com.on.turip.domain.videoinfo.contents.VideoData
+import com.on.turip.domain.videoinfo.contents.repository.ContentRepository
 
 class DefaultContentRepository(
     private val contentRemoteDataSource: ContentRemoteDataSource,
@@ -21,4 +22,6 @@ class DefaultContentRepository(
         contentRemoteDataSource
             .getContents(region, size, lastId)
             .mapCatching { it.toDomain() }
+
+    override suspend fun loadContent(contentId: Long): Result<VideoData> = TODO("추가 구현")
 }
