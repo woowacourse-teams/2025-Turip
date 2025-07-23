@@ -20,12 +20,12 @@ class SearchResultViewModel(
     val searchResultState: LiveData<SearchResultState> get() = _searchResultState
 
     init {
-        setRegionFromIntent()
-        setExist()
+        loadContentsFromRegion()
+        loadContentsSize()
         setTitle()
     }
 
-    private fun setRegionFromIntent() {
+    private fun loadContentsFromRegion() {
         viewModelScope.launch {
             runCatching {
                 contentsRepository.loadContents(
@@ -42,24 +42,28 @@ class SearchResultViewModel(
         }
     }
 
-    private fun setExist() {
+    private fun loadContentsSize() {
         viewModelScope.launch {
             runCatching {
                 contentsRepository.loadContentsSize(region)
             }.onSuccess { result: Int ->
-                if (result > 0) {
-                    _searchResultState.value =
-                        searchResultState.value?.copy(
-                            searchResultCount = result,
-                            isExist = true,
-                        )
-                } else {
-                    _searchResultState.value =
-                        searchResultState.value?.copy(
-                            isExist = false,
-                        )
-                }
+                setSearchResultExistence(result)
             }
+        }
+    }
+
+    private fun setSearchResultExistence(result: Int) {
+        if (result > 0) {
+            _searchResultState.value =
+                searchResultState.value?.copy(
+                    searchResultCount = result,
+                    isExist = true,
+                )
+        } else {
+            _searchResultState.value =
+                searchResultState.value?.copy(
+                    isExist = false,
+                )
         }
     }
 
