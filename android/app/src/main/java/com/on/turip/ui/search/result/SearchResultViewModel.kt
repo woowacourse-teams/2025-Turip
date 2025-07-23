@@ -14,8 +14,9 @@ class SearchResultViewModel(
     private val contentsRepository: ContentsRepository = DummyContentsRepository(),
 ) : ViewModel() {
     data class SearchResultState(
-        val searchResultCount: Int = 3,
+        val searchResultCount: Int = 0,
         val videos: List<Video> = emptyList(),
+        val isExist: Boolean = false,
     )
 
     private val _searchResultState: MutableLiveData<SearchResultState> =
@@ -35,6 +36,28 @@ class SearchResultViewModel(
                     searchResultState.value?.copy(
                         videos = result.videos,
                     )
+            }
+        }
+        setExist(region)
+    }
+
+    private fun setExist(region: String) {
+        viewModelScope.launch {
+            runCatching {
+                contentsRepository.loadContentsSize(region)
+            }.onSuccess { result: Int ->
+                if (result > 0) {
+                    _searchResultState.value =
+                        searchResultState.value?.copy(
+                            searchResultCount = result,
+                            isExist = true,
+                        )
+                } else {
+                    _searchResultState.value =
+                        searchResultState.value?.copy(
+                            isExist = false,
+                        )
+                }
             }
         }
     }

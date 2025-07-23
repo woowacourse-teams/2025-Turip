@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
+import androidx.core.view.isVisible
 import com.on.turip.R
 import com.on.turip.databinding.ActivitySearchResultBinding
 import com.on.turip.ui.common.base.BaseActivity
@@ -77,6 +78,14 @@ class SearchResultActivity : BaseActivity<SearchResultViewModel, ActivitySearchR
                 )
 
             videosAdapter.submitList(searchResultState?.videos)
+
+            if (searchResultState?.isExist == true) {
+                binding.rvSearchResult.isVisible = true
+                binding.groupEmptyResult.isVisible = false
+            } else {
+                binding.rvSearchResult.isVisible = false
+                binding.groupEmptyResult.isVisible = true
+            }
         }
     }
 
