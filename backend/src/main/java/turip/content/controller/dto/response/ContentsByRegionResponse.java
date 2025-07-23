@@ -1,8 +1,10 @@
 package turip.content.controller.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 public record ContentsByRegionResponse(
+        @JsonProperty("contents")
         List<ContentDetailsByRegionResponse> contentDetailsByRegionResponse,
         boolean loadable
 ) {
