@@ -7,17 +7,10 @@ import com.on.turip.domain.contents.repository.ContentRepository
 class DefaultContentRepository(
     private val contentRemoteDataSource: ContentRemoteDataSource,
 ) : ContentRepository {
-    override suspend fun loadContentsSize(region: String): Result<Int> {
-        contentRemoteDataSource.getContentsSize(region).count
-    }
-        runCatching {
-            contentRemoteDataSource.getContentsSize(region).count
-        }.onSuccess { contentsSize ->
-            contentsSize
-        }.onFailure {
-            it.message
-            // TODO: 어떤 에러인지 반환
-        }
+    override suspend fun loadContentsSize(region: String): Result<Int> =
+        contentRemoteDataSource
+            .getContentsSize(region)
+            .mapCatching { it.count }
 
     override suspend fun loadContents(
         region: String,

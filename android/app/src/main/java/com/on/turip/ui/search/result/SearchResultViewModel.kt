@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.on.turip.data.content.repository.DummyContentRepository
 import com.on.turip.di.RepositoryModule
 import com.on.turip.domain.contents.PagedContentsResult
 import com.on.turip.domain.contents.VideoInformation
@@ -16,7 +15,7 @@ import kotlinx.coroutines.launch
 
 class SearchResultViewModel(
     private val region: String,
-    private val contentRepository: ContentRepository = RepositoryModule.contentRepository,
+    private val contentRepository: ContentRepository,
 ) : ViewModel() {
     private val _searchResultState: MutableLiveData<SearchResultState> =
         MutableLiveData(SearchResultState())
@@ -44,15 +43,20 @@ class SearchResultViewModel(
                     contentRepository.loadContentsSize(region)
                 }
 
-            pagedContentsResult.await().onSuccess { result: PagedContentsResult ->
-                _searchResultState.value =
-                    searchResultState.value?.copy(
-                        videoInformations = result.videos,
-                    )
-            }
-            contentsSize.await().onSuccess { result: Int ->
-                setSearchResultExistence(result)
-            }
+            pagedContentsResult
+                .await()
+                .onSuccess { result: PagedContentsResult ->
+                    _searchResultState.value =
+                        searchResultState.value?.copy(
+                            videoInformations = result.videos,
+                        )
+                }
+            contentsSize
+                .await()
+                .onSuccess { result: Int ->
+                    setSearchResultExistence(result)
+                }.onFailure {
+                }
         }
     }
 
@@ -81,7 +85,7 @@ class SearchResultViewModel(
     companion object {
         fun provideFactory(
             region: String,
-            contentRepository: ContentRepository = DummyContentRepository(),
+            contentRepository: ContentRepository = RepositoryModule.contentRepository,
         ): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
