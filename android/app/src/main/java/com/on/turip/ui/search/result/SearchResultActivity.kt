@@ -72,13 +72,8 @@ class SearchResultActivity : BaseActivity<SearchResultViewModel, ActivitySearchR
 
             videosAdapter.submitList(searchResultState.videos)
 
-            if (searchResultState.isExist == true) {
-                binding.rvSearchResult.isVisible = true
-                binding.groupEmptyResult.isVisible = false
-            } else {
-                binding.rvSearchResult.isVisible = false
-                binding.groupEmptyResult.isVisible = true
-            }
+            binding.rvSearchResult.isVisible = searchResultState.isExist == true
+            binding.groupEmptyResult.isVisible = searchResultState.isExist == false
         }
     }
 
