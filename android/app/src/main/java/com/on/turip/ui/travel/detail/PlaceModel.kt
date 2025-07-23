@@ -10,5 +10,4 @@ data class PlaceModel(
 ) {
     val placeUri: Uri
         get() = mapLink.toUri()
-//    fun placeUri(): Uri = mapLink.toUri()
 }
