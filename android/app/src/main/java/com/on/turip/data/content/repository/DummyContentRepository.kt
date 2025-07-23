@@ -1,4 +1,4 @@
-package com.on.turip.data.contents.repository
+package com.on.turip.data.content.repository
 
 import com.on.turip.domain.contents.Content
 import com.on.turip.domain.contents.Creator

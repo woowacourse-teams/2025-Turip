@@ -1,10 +1,10 @@
-package com.on.turip.data.contents.dto
+package com.on.turip.data.content.dto
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ContentsCountResponse(
+data class ContentCountResponse(
     @SerialName("count")
     val count: Int,
 )

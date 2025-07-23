@@ -5,7 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.on.turip.data.contents.repository.DummyContentRepository
+import com.on.turip.data.content.repository.DummyContentRepository
+import com.on.turip.di.RepositoryModule
 import com.on.turip.domain.contents.PagedContentsResult
 import com.on.turip.domain.contents.VideoInformation
 import com.on.turip.domain.contents.repository.ContentRepository
@@ -15,7 +16,7 @@ import kotlinx.coroutines.launch
 
 class SearchResultViewModel(
     private val region: String,
-    private val contentRepository: ContentRepository,
+    private val contentRepository: ContentRepository = RepositoryModule.contentRepository,
 ) : ViewModel() {
     private val _searchResultState: MutableLiveData<SearchResultState> =
         MutableLiveData(SearchResultState())
@@ -40,9 +41,7 @@ class SearchResultViewModel(
                 }
             val contentsSize: Deferred<Result<Int>> =
                 async {
-                    runCatching {
-                        contentRepository.loadContentsSize(region)
-                    }
+                    contentRepository.loadContentsSize(region)
                 }
 
             pagedContentsResult.await().onSuccess { result: PagedContentsResult ->

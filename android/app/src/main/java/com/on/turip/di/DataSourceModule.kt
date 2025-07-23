@@ -1,10 +1,10 @@
 package com.on.turip.di
 
-import com.on.turip.data.contents.dataSource.ContentsRemoteDataSource
-import com.on.turip.data.contents.dataSource.DefaultContentsRemoteDataSource
+import com.on.turip.data.content.dataSource.ContentRemoteDataSource
+import com.on.turip.data.content.dataSource.DefaultContentRemoteDataSource
 
 object DataSourceModule {
-    val contentsRemoteDataSource: ContentsRemoteDataSource by lazy {
-        DefaultContentsRemoteDataSource(NetworkModule.contentsService)
+    val contentRemoteDataSource: ContentRemoteDataSource by lazy {
+        DefaultContentRemoteDataSource(NetworkModule.contentService)
     }
 }
