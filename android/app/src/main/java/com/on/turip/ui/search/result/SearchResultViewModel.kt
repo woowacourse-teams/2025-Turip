@@ -15,13 +15,6 @@ class SearchResultViewModel(
     private val region: String,
     private val contentsRepository: ContentsRepository,
 ) : ViewModel() {
-    data class SearchResultState(
-        val searchResultCount: Int = 0,
-        val videos: List<Video> = emptyList(),
-        val region: String = "",
-        val isExist: Boolean = false,
-    )
-
     private val _searchResultState: MutableLiveData<SearchResultState> =
         MutableLiveData(SearchResultState())
     val searchResultState: LiveData<SearchResultState> get() = _searchResultState
@@ -95,4 +88,11 @@ class SearchResultViewModel(
                 }
             }
     }
+
+    data class SearchResultState(
+        val searchResultCount: Int = 0,
+        val videos: List<Video> = emptyList(),
+        val region: String = "",
+        val isExist: Boolean = false,
+    )
 }
