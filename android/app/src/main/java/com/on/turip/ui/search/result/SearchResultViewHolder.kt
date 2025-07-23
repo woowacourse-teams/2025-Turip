@@ -9,7 +9,7 @@ import com.on.turip.R
 import com.on.turip.databinding.ItemSearchResultBinding
 import com.on.turip.domain.contents.Video
 
-class VideosViewHolder(
+class SearchResultViewHolder(
     private val binding: ItemSearchResultBinding,
     private val onSearchResultListener: OnSearchResultListener,
 ) : RecyclerView.ViewHolder(binding.root) {
@@ -48,11 +48,11 @@ class VideosViewHolder(
         fun of(
             parent: ViewGroup,
             onSearchResultListener: OnSearchResultListener,
-        ): VideosViewHolder {
+        ): SearchResultViewHolder {
             val inflater: LayoutInflater = LayoutInflater.from(parent.context)
             val binding: ItemSearchResultBinding =
                 ItemSearchResultBinding.inflate(inflater, parent, false)
-            return VideosViewHolder(binding, onSearchResultListener)
+            return SearchResultViewHolder(binding, onSearchResultListener)
         }
     }
 

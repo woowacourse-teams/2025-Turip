@@ -21,8 +21,8 @@ class SearchResultActivity : BaseActivity<SearchResultViewModel, ActivitySearchR
     override val binding: ActivitySearchResultBinding by lazy {
         ActivitySearchResultBinding.inflate(layoutInflater)
     }
-    private val videosAdapter: VideosAdapter =
-        VideosAdapter {
+    private val searchResultAdapter: SearchResultAdapter =
+        SearchResultAdapter {
             // TODO : 여행 상세 페이지로 이동
         }
 
@@ -57,7 +57,7 @@ class SearchResultActivity : BaseActivity<SearchResultViewModel, ActivitySearchR
     }
 
     private fun setupAdapters() {
-        binding.rvSearchResult.adapter = videosAdapter
+        binding.rvSearchResult.adapter = searchResultAdapter
     }
 
     private fun setupObservers() {
@@ -70,7 +70,7 @@ class SearchResultActivity : BaseActivity<SearchResultViewModel, ActivitySearchR
 
             supportActionBar?.title = setupTitle(searchResultState.region)
 
-            videosAdapter.submitList(searchResultState.videos)
+            searchResultAdapter.submitList(searchResultState.videos)
 
             binding.rvSearchResult.isVisible = searchResultState.isExist == true
             binding.groupEmptyResult.isVisible = searchResultState.isExist == false

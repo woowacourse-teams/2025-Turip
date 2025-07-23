@@ -5,16 +5,16 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.on.turip.domain.contents.Video
 
-class VideosAdapter(
-    private val onSearchResultListener: VideosViewHolder.OnSearchResultListener,
-) : ListAdapter<Video, VideosViewHolder>(VideosDiffUtil) {
+class SearchResultAdapter(
+    private val onSearchResultListener: SearchResultViewHolder.OnSearchResultListener,
+) : ListAdapter<Video, SearchResultViewHolder>(VideosDiffUtil) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): VideosViewHolder = VideosViewHolder.of(parent, onSearchResultListener)
+    ): SearchResultViewHolder = SearchResultViewHolder.of(parent, onSearchResultListener)
 
     override fun onBindViewHolder(
-        holder: VideosViewHolder,
+        holder: SearchResultViewHolder,
         position: Int,
     ) {
         holder.bind(getItem(position))
