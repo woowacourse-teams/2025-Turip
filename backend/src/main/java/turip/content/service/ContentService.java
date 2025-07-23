@@ -42,7 +42,8 @@ public class ContentService {
                 .limit(size)
                 .toList();
 
-        List<ContentDetailsByRegionResponse> contentDetails = getContentDetailsByRegionResponses(pagedContents);
+        List<ContentDetailsByRegionResponse> contentDetails
+                = convertContentsToContentDetailsByRegionResponses(pagedContents);
         boolean loadable = contents.size() > size;
 
         return ContentsByRegionResponse.of(contentDetails, loadable);
@@ -62,7 +63,8 @@ public class ContentService {
         return contentRepository.findByRegionNameAndIdLessThanOrderByIdDesc(regionName, lastId, pageable);
     }
 
-    private List<ContentDetailsByRegionResponse> getContentDetailsByRegionResponses(List<Content> contents) {
+    private List<ContentDetailsByRegionResponse> convertContentsToContentDetailsByRegionResponses(
+            List<Content> contents) {
         return contents.stream()
                 .map(this::toContentDetailsResponse)
                 .toList();
