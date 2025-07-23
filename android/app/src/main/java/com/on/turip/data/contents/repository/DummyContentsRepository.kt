@@ -33,7 +33,8 @@ class DummyContentsRepository(
                                 Creator(
                                     id = 101,
                                     channelName = "여행하는 뭉치",
-                                    profileImage = "http://turip.com/static/youtuber1",
+                                    profileImage = @Suppress("ktlint:standard:max-line-length")
+                                    "https://yt3.ggpht.com/JUGArpQttMzK-jwi4triQrkDf_c_OWv1iikYOimdu63bv_R-bH0U3bY7BOfKs2Gnp2CyP8YBpQ=s88-c-k-c0x00ffffff-no-rj",
                                 ),
                             title = "느좋 감성 대구 여행 어쩌구저쩌구",
                             url = "https://youtu.be/dummy1",
