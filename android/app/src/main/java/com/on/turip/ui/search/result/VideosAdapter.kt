@@ -3,11 +3,11 @@ package com.on.turip.ui.search.result
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import com.on.turip.ui.common.model.SearchResultModel
+import com.on.turip.domain.contents.Video
 
 class VideosAdapter(
     private val onSearchResultListener: VideosViewHolder.OnSearchResultListener,
-) : ListAdapter<SearchResultModel, VideosViewHolder>(VideosDiffUtil) {
+) : ListAdapter<Video, VideosViewHolder>(VideosDiffUtil) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -21,14 +21,14 @@ class VideosAdapter(
     }
 }
 
-private object VideosDiffUtil : DiffUtil.ItemCallback<SearchResultModel>() {
+private object VideosDiffUtil : DiffUtil.ItemCallback<Video>() {
     override fun areItemsTheSame(
-        oldItem: SearchResultModel,
-        newItem: SearchResultModel,
+        oldItem: Video,
+        newItem: Video,
     ): Boolean = oldItem.content.id == newItem.content.id
 
     override fun areContentsTheSame(
-        oldItem: SearchResultModel,
-        newItem: SearchResultModel,
+        oldItem: Video,
+        newItem: Video,
     ): Boolean = oldItem == newItem
 }
