@@ -8,7 +8,7 @@ public record TripCourseDetailResponse(
         int tripPlaceCount,
         List<TripCourseResponse> tripCourses
 ) {
-    public static TripCourseDetailResponse from(
+    public static TripCourseDetailResponse of(
             int nights,
             int days,
             int tripPlaceCount,
@@ -18,7 +18,7 @@ public record TripCourseDetailResponse(
                 TripDurationResponse.of(nights, days),
                 tripPlaceCount,
                 tripCourses.stream()
-                        .map(tripCourse -> TripCourseResponse.from(tripCourse, tripCourse.getPlace()))
+                        .map(tripCourse -> TripCourseResponse.of(tripCourse, tripCourse.getPlace()))
                         .toList()
         );
     }

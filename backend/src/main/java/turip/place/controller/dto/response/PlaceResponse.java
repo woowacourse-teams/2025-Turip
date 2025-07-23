@@ -1,6 +1,7 @@
 package turip.place.controller.dto.response;
 
 import java.util.List;
+import turip.category.controller.dto.response.CategoryResponse;
 import turip.place.domain.Place;
 import turip.placecategory.domain.PlaceCategory;
 

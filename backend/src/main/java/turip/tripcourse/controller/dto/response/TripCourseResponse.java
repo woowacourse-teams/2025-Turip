@@ -10,7 +10,7 @@ public record TripCourseResponse(
         int visitOrder,
         PlaceResponse place
 ) {
-    public static TripCourseResponse from(TripCourse tripCourse, Place place) {
+    public static TripCourseResponse of(TripCourse tripCourse, Place place) {
         return new TripCourseResponse(
                 tripCourse.getId(),
                 tripCourse.getVisitDay(),

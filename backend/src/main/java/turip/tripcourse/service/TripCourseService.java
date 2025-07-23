@@ -18,7 +18,7 @@ public class TripCourseService {
         int days = calculateDurationDays(contentId);
         int nights = days - 1;
         int tripPlaceCount = calculatePlaceCount(tripCourses);
-        return TripCourseDetailResponse.from(nights, days, tripPlaceCount, tripCourses);
+        return TripCourseDetailResponse.of(nights, days, tripPlaceCount, tripCourses);
     }
 
     public int calculateDurationDays(Long contentId) {

@@ -1,4 +1,4 @@
-package turip.place.controller.dto.response;
+package turip.category.controller.dto.response;
 
 import java.util.List;
 import turip.category.domain.Category;
