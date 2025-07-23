@@ -3,6 +3,7 @@ package com.on.turip.data.contents.repository
 import com.on.turip.domain.videoinfo.contents.Content
 import com.on.turip.domain.videoinfo.contents.PagedContentsResult
 import com.on.turip.domain.videoinfo.contents.TripDuration
+import com.on.turip.domain.videoinfo.contents.VideoData
 import com.on.turip.domain.videoinfo.contents.VideoInformation
 import com.on.turip.domain.videoinfo.contents.creator.Creator
 import com.on.turip.domain.videoinfo.contents.repository.ContentRepository
@@ -22,6 +23,13 @@ class DummyContentRepository(
             loadable = false,
         )
 
+    override suspend fun loadContent(contentId: Long): VideoData =
+        VideoData(
+            title = "느좋 감성 대구 여행 어쩌구저쩌구",
+            url = "https://youtu.be/dummy1",
+            uploadedDate = "2025-07-15",
+        )
+
     companion object {
         val dummyVideoInformations =
             listOf(
@@ -36,9 +44,12 @@ class DummyContentRepository(
                                     profileImage = @Suppress("ktlint:standard:max-line-length")
                                     "https://yt3.ggpht.com/JUGArpQttMzK-jwi4triQrkDf_c_OWv1iikYOimdu63bv_R-bH0U3bY7BOfKs2Gnp2CyP8YBpQ=s88-c-k-c0x00ffffff-no-rj",
                                 ),
-                            title = "느좋 감성 대구 여행 어쩌구저쩌구",
-                            url = "https://youtu.be/dummy1",
-                            uploadedDate = "2025-07-15",
+                            videoData =
+                                VideoData(
+                                    title = "느좋 감성 대구 여행 어쩌구저쩌구",
+                                    url = "https://youtu.be/dummy1",
+                                    uploadedDate = "2025-07-15",
+                                ),
                         ),
                     tripDuration =
                         TripDuration(
@@ -58,9 +69,12 @@ class DummyContentRepository(
                                     profileImage = @Suppress("ktlint:standard:max-line-length")
                                     "https://yt3.ggpht.com/UdF_j2R_Prv7kamTRqItI0QUgMvdbJk_xXFjjYGFUIMZUYt1EbrJpEmzJbciKbrrdoX4me8g5w=s176-c-k-c0x00ffffff-no-rj-mo",
                                 ),
-                            title = "제주도 혼자 여행 브이로그",
-                            url = "https://youtu.be/dummy2",
-                            uploadedDate = "2025-06-28",
+                            videoData =
+                                VideoData(
+                                    title = "제주도 혼자 여행 브이로그",
+                                    url = "https://youtu.be/dummy2",
+                                    uploadedDate = "2025-06-28",
+                                ),
                         ),
                     tripDuration =
                         TripDuration(
@@ -80,9 +94,12 @@ class DummyContentRepository(
                                     profileImage = @Suppress("ktlint:standard:max-line-length")
                                     "https://yt3.ggpht.com/UdF_j2R_Prv7kamTRqItI0QUgMvdbJk_xXFjjYGFUIMZUYt1EbrJpEmzJbciKbrrdoX4me8g5w=s176-c-k-c0x00ffffff-no-rj-mo",
                                 ),
-                            title = "강원도 캠핑 2박 3일 여행",
-                            url = "https://youtu.be/dummy3",
-                            uploadedDate = "2025-05-10",
+                            videoData =
+                                VideoData(
+                                    title = "강원도 캠핑 2박 3일 여행",
+                                    url = "https://youtu.be/dummy3",
+                                    uploadedDate = "2025-05-10",
+                                ),
                         ),
                     tripDuration =
                         TripDuration(

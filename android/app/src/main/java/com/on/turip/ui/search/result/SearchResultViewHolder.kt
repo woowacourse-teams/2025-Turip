@@ -19,7 +19,7 @@ class SearchResultViewHolder(
     }
 
     fun bind(videoInformation: VideoInformation) {
-        binding.tvSearchResultTitle.text = videoInformation.content.title
+        binding.tvSearchResultTitle.text = videoInformation.content.videoData.title
         binding.tvSearchResultDay.text =
             itemView.context.getString(
                 R.string.all_travel_duration,
@@ -35,7 +35,7 @@ class SearchResultViewHolder(
             itemView.context.getString(
                 R.string.search_result_video_description,
                 videoInformation.content.creator.channelName,
-                videoInformation.content.uploadedDate,
+                videoInformation.content.videoData.uploadedDate,
             )
         binding.ivSearchResultThumbnail.loadCircularImage(videoInformation.content.creator.profileImage)
     }
