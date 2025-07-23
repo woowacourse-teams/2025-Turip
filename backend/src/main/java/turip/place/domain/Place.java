@@ -9,6 +9,7 @@ import jakarta.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,6 +18,7 @@ import turip.placecategory.domain.PlaceCategory;
 
 @Getter
 @Entity
+@AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Place {
@@ -38,15 +40,6 @@ public class Place {
 
     @OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PlaceCategory> placeCategories = new ArrayList<>();
-
-    public Place(Long id, String name, String url, String address, double latitude, double longitude) {
-        this.id = id;
-        this.name = name;
-        this.url = url;
-        this.address = address;
-        this.latitude = latitude;
-        this.longitude = longitude;
-    }
 
     public void addCategory(Category category) {
         PlaceCategory placeCategory = new PlaceCategory(this, category);
