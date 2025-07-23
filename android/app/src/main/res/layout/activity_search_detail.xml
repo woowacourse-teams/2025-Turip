@@ -6,7 +6,14 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.search.detail.SearchDetailActivity">
+    android:background="@color/pure_white_ffffff"
+    tools:context=".ui.travel.detail.TravelDetailActivity">
+
+    <FrameLayout
+        android:id="@+id/fl_search_detail_video_fullscreen"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -16,6 +23,7 @@
             android:id="@+id/tb_search_detail"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
+            android:background="@color/pure_white_ffffff"
             app:layout_scrollFlags="scroll|enterAlways"
             app:titleTextAppearance="@style/title1"
             app:titleTextColor="@color/pure_black_151515" />
@@ -23,6 +31,7 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/nsv_search_detail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
@@ -46,8 +55,8 @@
 
             <ImageView
                 android:id="@+id/iv_search_detail_platform_badge"
-                android:layout_width="19dp"
-                android:layout_height="19dp"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:layout_marginTop="16dp"
                 android:contentDescription="@null"
                 android:src="@drawable/ic_youtuber_badge"
@@ -61,6 +70,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
+                android:layout_marginTop="14dp"
                 android:layout_marginEnd="50dp"
                 android:ellipsize="end"
                 android:maxLines="2"
@@ -68,7 +78,7 @@
                 android:textColor="@color/pure_black_151515"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/iv_search_detail_platform_badge"
-                app:layout_constraintTop_toTopOf="@id/iv_search_detail_platform_badge"
+                app:layout_constraintTop_toBottomOf="@id/iv_search_detail_creator_thumbnail"
                 tools:text="여행하는 뭉치와 함께하는 하루와 메이와 라젤과 제리 이름이 길어지면 어떻게 되나? ... 으로 잘 표시되는 지 확인해보자@@@@@" />
 
             <TextView
@@ -96,6 +106,141 @@
                 app:layout_constraintStart_toStartOf="@id/tv_search_detail_content_title"
                 app:layout_constraintTop_toBottomOf="@id/tv_search_detail_content_title"
                 tools:text="2025-07-20" />
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cv_search_detail_video_container"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="24dp"
+                app:cardCornerRadius="20dp"
+                app:layout_constraintDimensionRatio="16:9"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_search_detail_upload_date">
+
+                <WebView
+                    android:id="@+id/wv_search_detail_video"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="visible" />
+
+                <ProgressBar
+                    android:id="@+id/pb_search_detail_video"
+                    style="?android:attr/progressBarStyleLarge"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_gravity="center"
+                    android:indeterminateTint="@color/pure_white_ffffff" />
+
+                <TextView
+                    android:id="@+id/tv_search_detail_video_error"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/pure_black_151515"
+                    android:contentDescription="@null"
+                    android:gravity="center"
+                    android:text="@string/search_detail_video_error"
+                    android:textAppearance="@style/title2"
+                    android:textColor="@color/pure_white_ffffff"
+                    android:visibility="gone"
+                    tools:text="해당 영상은 제작자의 요청으로 유튜브 서비스를 이용해야 시청할 수 있습니다. 클릭 시 유튜브로 이동합니다." />
+            </androidx.cardview.widget.CardView>
+
+            <ImageView
+                android:id="@+id/iv_search_detail_location"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_marginStart="72dp"
+                android:layout_marginTop="28dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_location"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cv_search_detail_video_container" />
+
+            <TextView
+                android:id="@+id/tv_search_detail_total_place_count"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_marginStart="12dp"
+                android:gravity="center"
+                android:textAppearance="@style/title3"
+                android:textColor="@color/pure_black_151515"
+                app:layout_constraintBottom_toBottomOf="@id/iv_search_detail_location"
+                app:layout_constraintStart_toEndOf="@id/iv_search_detail_location"
+                app:layout_constraintTop_toTopOf="@id/iv_search_detail_location"
+                app:layout_constraintVertical_bias="0.0"
+                tools:text="14개 장소" />
+
+            <com.google.android.material.divider.MaterialDivider
+                android:id="@+id/div_search_detail_vertical"
+                android:layout_width="1dp"
+                android:layout_height="0dp"
+                app:dividerColor="@color/gray_200_c1c1c1"
+                app:dividerThickness="1dp"
+                app:layout_constraintBottom_toBottomOf="@id/tv_search_detail_total_place_count"
+                app:layout_constraintEnd_toStartOf="@id/iv_search_detail_calendar"
+                app:layout_constraintStart_toEndOf="@id/tv_search_detail_total_place_count"
+                app:layout_constraintTop_toTopOf="@id/tv_search_detail_total_place_count" />
+
+            <ImageView
+                android:id="@+id/iv_search_detail_calendar"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_marginEnd="8dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_calendar"
+                app:layout_constraintEnd_toStartOf="@id/tv_search_detail_travel_duration"
+                app:layout_constraintTop_toTopOf="@id/tv_search_detail_total_place_count" />
+
+            <TextView
+                android:id="@+id/tv_search_detail_travel_duration"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_marginEnd="72dp"
+                android:gravity="center"
+                android:textAppearance="@style/title3"
+                android:textColor="@color/pure_black_151515"
+                app:layout_constraintBottom_toBottomOf="@id/iv_search_detail_calendar"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/iv_search_detail_calendar"
+                tools:text="2박 3일" />
+
+            <com.google.android.material.divider.MaterialDivider
+                android:id="@+id/div_search_detail_horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="30dp"
+                app:dividerColor="@color/gray_200_c1c1c1"
+                app:dividerThickness="1dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_search_detail_total_place_count" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_search_detail_travel_day"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:clipToPadding="false"
+                android:orientation="horizontal"
+                android:paddingTop="16dp"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/div_search_detail_horizontal"
+                tools:listitem="@layout/item_travel_day" />
+
+            <TextView
+                android:id="@+id/tv_search_detail_day_place_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="20dp"
+                android:textAppearance="@style/body1"
+                android:textColor="@color/gray_500_1e1e1e"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/rv_search_detail_travel_day"
+                tools:text="일정 4개" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>

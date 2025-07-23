@@ -1,0 +1,93 @@
+name: CI Build and Test, EC2 CD
+
+on:
+  push:
+    branches: [ develop ]
+    paths:
+      - 'backend/**'
+  pull_request:
+    branches: [ develop ]
+    paths:
+      - 'backend/**'
+
+jobs:
+  build_and_test:
+     runs-on: ubuntu-latest
+     
+     defaults:
+      run:
+        working-directory: backend
+        
+     steps: 
+     - name: Checkout code
+       uses: actions/checkout@v4
+
+     - name: Set up Gradle
+       uses: gradle/actions/setup-gradle@v3
+             
+     - name: Grant execute permission for gradlew
+       run: chmod +x gradlew
+
+     - name: Set up JDK 21
+       uses: actions/setup-java@v4
+       with:
+         java-version: '21'
+         distribution: 'temurin'
+         cache: 'gradle'
+       
+     - name: Build with Gradle
+       run: ./gradlew clean build -x test
+
+     - name: Run Unit Tests
+       run: ./gradlew test
+
+     - name: Upload Jar
+       uses: actions/upload-artifact@v4
+       with:
+         name: turip
+         path: backend/build/libs/*SNAPSHOT.jar
+
+  deploy:
+    needs: build_and_test
+    runs-on: self-hosted
+    environment: production
+    if: github.event_name == 'push'
+
+    steps:
+      - name: Download artifact from CI workflow
+        uses: actions/download-artifact@v4
+        with:
+          name: turip
+          path: ./downloaded-artifact
+
+      - name: Get JAR file name
+        id: get_jar_name
+        run: |
+          JAR_FILE=$(find ./downloaded-artifact -name "*.jar" | head -n 1)
+          if [ -z "$JAR_FILE" ]; then
+            echo "Error: JAR file not found in downloaded-artifact directory."
+            exit 1
+          fi
+          echo "JAR_NAME=$(basename $JAR_FILE)" >> $GITHUB_OUTPUT
+          echo "JAR file located at: $JAR_FILE"
+
+      - name: Kill Existing Server On Port 80
+        run: |
+          PID=$(sudo lsof -t -i :80 || true)
+          if [ -n "$PID" ]; then
+            echo "Killing existing process: $PID"
+            sudo kill -9 $PID
+          fi
+    
+      - name: Run App On Port 80
+        run: |
+          JAR_NAME="${{ steps.get_jar_name.outputs.JAR_NAME }}"
+          DOWNLOADED_JAR="./downloaded-artifact/$JAR_NAME"
+          TARGET_JAR="/home/ubuntu/app/$JAR_NAME"
+
+          echo "Moving new JAR to $TARGET_JAR"
+          mv "$DOWNLOADED_JAR" "$TARGET_JAR"
+          chmod +x "$TARGET_JAR"
+
+          echo "Starting application..."
+          sudo nohup java -jar "$TARGET_JAR" --server.port=80 > /dev/null 2>&1 &

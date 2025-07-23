@@ -6,7 +6,7 @@ import turip.tripcourse.domain.TripCourse;
 
 public interface TripCourseRepository extends JpaRepository<TripCourse, Long> {
 
-    List<TripCourse> findAllByContent_Id(Long contentID);
+    List<TripCourse> findAllByContent_Id(Long contentId);
 
     int countByContent_Id(Long contentId);
 }

@@ -30,5 +30,9 @@ enum class RegionModel(
         fun find(region: Region): RegionModel =
             RegionModel.entries.find { it.origin == region }
                 ?: throw IllegalArgumentException("해당 $region 에 일치하는 Model이 없습니다.")
+
+        fun findByEnglish(english: String): RegionModel =
+            RegionModel.entries.find { it.english == english }
+                ?: throw IllegalArgumentException("해당 $english 에 일치하는 Model이 없습니다.")
     }
 }

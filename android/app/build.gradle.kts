@@ -76,4 +76,8 @@ dependencies {
     // okhttp
     implementation(libs.okhttp)
     implementation(libs.logging.interceptor)
+    // coil
+    implementation(libs.coil)
+    // WebView
+    implementation(libs.androidx.webkit)
 }

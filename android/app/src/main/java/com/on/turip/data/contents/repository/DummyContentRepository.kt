@@ -4,12 +4,12 @@ import com.on.turip.domain.contents.Content
 import com.on.turip.domain.contents.Creator
 import com.on.turip.domain.contents.PagedContentsResult
 import com.on.turip.domain.contents.TripDuration
-import com.on.turip.domain.contents.Video
-import com.on.turip.domain.contents.repository.ContentsRepository
+import com.on.turip.domain.contents.VideoInformation
+import com.on.turip.domain.contents.repository.ContentRepository
 
-class DummyContentsRepository(
-    private val dummyData: List<Video> = dummyVideos,
-) : ContentsRepository {
+class DummyContentRepository(
+    private val dummyData: List<VideoInformation> = dummyVideoInformations,
+) : ContentRepository {
     override suspend fun loadContentsSize(region: String): Result<Int> = Result.success(dummyData.size)
 
     override suspend fun loadContents(
@@ -23,9 +23,9 @@ class DummyContentsRepository(
         )
 
     companion object {
-        val dummyVideos =
+        val dummyVideoInformations =
             listOf(
-                Video(
+                VideoInformation(
                     content =
                         Content(
                             id = 1,
@@ -33,7 +33,8 @@ class DummyContentsRepository(
                                 Creator(
                                     id = 101,
                                     channelName = "여행하는 뭉치",
-                                    profileImage = "http://turip.com/static/youtuber1",
+                                    profileImage = @Suppress("ktlint:standard:max-line-length")
+                                    "https://yt3.ggpht.com/JUGArpQttMzK-jwi4triQrkDf_c_OWv1iikYOimdu63bv_R-bH0U3bY7BOfKs2Gnp2CyP8YBpQ=s88-c-k-c0x00ffffff-no-rj",
                                 ),
                             title = "느좋 감성 대구 여행 어쩌구저쩌구",
                             url = "https://youtu.be/dummy1",
@@ -46,7 +47,7 @@ class DummyContentsRepository(
                         ),
                     tripPlaceCount = 5,
                 ),
-                Video(
+                VideoInformation(
                     content =
                         Content(
                             id = 2,
@@ -54,7 +55,8 @@ class DummyContentsRepository(
                                 Creator(
                                     id = 102,
                                     channelName = "뚜벅이의 하루",
-                                    profileImage = "http://turip.com/static/youtuber2",
+                                    profileImage = @Suppress("ktlint:standard:max-line-length")
+                                    "https://yt3.ggpht.com/UdF_j2R_Prv7kamTRqItI0QUgMvdbJk_xXFjjYGFUIMZUYt1EbrJpEmzJbciKbrrdoX4me8g5w=s176-c-k-c0x00ffffff-no-rj-mo",
                                 ),
                             title = "제주도 혼자 여행 브이로그",
                             url = "https://youtu.be/dummy2",
@@ -67,7 +69,7 @@ class DummyContentsRepository(
                         ),
                     tripPlaceCount = 8,
                 ),
-                Video(
+                VideoInformation(
                     content =
                         Content(
                             id = 3,
@@ -75,7 +77,8 @@ class DummyContentsRepository(
                                 Creator(
                                     id = 103,
                                     channelName = "감성캠퍼",
-                                    profileImage = "http://turip.com/static/youtuber3",
+                                    profileImage = @Suppress("ktlint:standard:max-line-length")
+                                    "https://yt3.ggpht.com/UdF_j2R_Prv7kamTRqItI0QUgMvdbJk_xXFjjYGFUIMZUYt1EbrJpEmzJbciKbrrdoX4me8g5w=s176-c-k-c0x00ffffff-no-rj-mo",
                                 ),
                             title = "강원도 캠핑 2박 3일 여행",
                             url = "https://youtu.be/dummy3",
