@@ -43,6 +43,9 @@ jobs:
 
     - name: Grant execute permission for gradlew
       run: chmod +x ./gradlew
+
+    - name: Create local.properties
+      run: echo "base_url=${{ secrets.BASE_URL }}" > local.properties  
       
     - name: Build with Gradle
       run: ./gradlew build --stacktrace
