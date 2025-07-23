@@ -22,7 +22,7 @@
         android:id="@+id/tv_search_result_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="13dp"
+        android:layout_marginStart="20dp"
         android:layout_marginTop="13dp"
         android:textColor="@color/gray_300_5b5b5b"
         app:layout_constraintStart_toStartOf="@id/tb_search_result"
