@@ -15,7 +15,7 @@ import turip.place.domain.Place;
 
 @Getter
 @Entity
-@EqualsAndHashCode
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class TripCourse {
 

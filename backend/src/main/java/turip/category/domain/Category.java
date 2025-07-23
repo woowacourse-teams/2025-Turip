@@ -16,7 +16,7 @@ import turip.placecategory.domain.PlaceCategory;
 
 @Getter
 @Entity
-@EqualsAndHashCode
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Category {
 
