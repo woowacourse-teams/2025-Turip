@@ -18,13 +18,9 @@ class SearchResultActivity : BaseActivity<SearchResultViewModel, ActivitySearchR
         ActivitySearchResultBinding.inflate(layoutInflater)
     }
     private val videosAdapter: VideosAdapter =
-        VideosAdapter(
-            object : VideosViewHolder.OnSearchResultListener {
-                override fun onSearchResultClick() {
-                    TODO("영상 상세 페이지로 이동")
-                }
-            },
-        )
+        VideosAdapter {
+            // TODO : 여행 상세 페이지로 이동
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
