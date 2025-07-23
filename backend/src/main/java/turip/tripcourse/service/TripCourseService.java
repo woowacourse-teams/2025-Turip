@@ -11,7 +11,7 @@ public class TripCourseService {
 
     private final TripCourseRepository tripCourseRepository;
 
-    private int countByContentId(Long contentId) {
+    public int countByContentId(Long contentId) {
         return tripCourseRepository.countByContent_Id(contentId);
     }
 

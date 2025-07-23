@@ -2,7 +2,7 @@ package com.on.turip.domain.contents.repository
 
 import com.on.turip.domain.contents.PagedContentsResult
 
-interface ContentsRepository {
+interface ContentRepository {
     suspend fun loadContentsSize(region: String): Int
 
     suspend fun loadContents(
