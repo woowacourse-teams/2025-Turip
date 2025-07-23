@@ -7,7 +7,7 @@ import com.on.turip.domain.contents.VideoInformation
 
 class SearchResultAdapter(
     private val onSearchResultListener: SearchResultViewHolder.OnSearchResultListener,
-) : ListAdapter<VideoInformation, SearchResultViewHolder>(VideosDiffUtil) {
+) : ListAdapter<VideoInformation, SearchResultViewHolder>(VideoInformationDiffUtil) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -19,16 +19,16 @@ class SearchResultAdapter(
     ) {
         holder.bind(getItem(position))
     }
-}
 
-private object VideosDiffUtil : DiffUtil.ItemCallback<VideoInformation>() {
-    override fun areItemsTheSame(
-        oldItem: VideoInformation,
-        newItem: VideoInformation,
-    ): Boolean = oldItem.content.id == newItem.content.id
+    private object VideoInformationDiffUtil : DiffUtil.ItemCallback<VideoInformation>() {
+        override fun areItemsTheSame(
+            oldItem: VideoInformation,
+            newItem: VideoInformation,
+        ): Boolean = oldItem.content.id == newItem.content.id
 
-    override fun areContentsTheSame(
-        oldItem: VideoInformation,
-        newItem: VideoInformation,
-    ): Boolean = oldItem == newItem
+        override fun areContentsTheSame(
+            oldItem: VideoInformation,
+            newItem: VideoInformation,
+        ): Boolean = oldItem == newItem
+    }
 }
