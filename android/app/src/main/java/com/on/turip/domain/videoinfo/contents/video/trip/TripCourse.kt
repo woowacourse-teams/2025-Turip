@@ -1,4 +1,4 @@
-package com.on.turip.domain.videoinfo
+package com.on.turip.domain.videoinfo.contents.video.trip
 
 data class TripCourse(
     val tripCourseId: Long,

@@ -7,8 +7,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.on.turip.di.RepositoryModule
 import com.on.turip.domain.videoinfo.contents.PagedContentsResult
-import com.on.turip.domain.videoinfo.contents.VideoInformation
 import com.on.turip.domain.videoinfo.contents.repository.ContentRepository
+import com.on.turip.domain.videoinfo.contents.video.VideoInformation
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch

@@ -1,6 +1,4 @@
-package com.on.turip.domain.videoinfo
-
-import com.on.turip.domain.videoinfo.contents.TripDuration
+package com.on.turip.domain.videoinfo.contents.video.trip
 
 data class Trip(
     val tripDuration: TripDuration,
