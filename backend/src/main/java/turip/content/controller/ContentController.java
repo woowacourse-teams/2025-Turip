@@ -29,10 +29,11 @@ public class ContentController {
     @GetMapping()
     public ResponseEntity<ContentsByRegionResponse> readContentsByRegionName(
             @RequestParam(name = "region") String regionName,
-            @RequestParam(name = "size") Integer size,
-            @RequestParam(name = "lastId") Long lastId
+            @RequestParam(name = "pageSize") Integer pageSize,
+            @RequestParam(name = "lastContentId") Long lastContentId
     ) {
-        ContentsByRegionResponse response = contentService.findContentsByRegionName(regionName, size, lastId);
+        ContentsByRegionResponse response = contentService.findContentsByRegionName(regionName, pageSize,
+                lastContentId);
         return ResponseEntity.ok(response);
     }
 
