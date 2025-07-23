@@ -1,13 +1,14 @@
 package turip.place.controller.dto.response;
 
 import java.util.List;
+import turip.category.domain.Category;
 
 public record CategoryResponse(
         String name
 ) {
-    public static List<CategoryResponse> from(List<String> categories) {
+    public static List<CategoryResponse> from(List<Category> categories) {
         return categories.stream()
-                .map(CategoryResponse::new)
+                .map(category -> new CategoryResponse(category.getName()))
                 .toList();
     }
 }

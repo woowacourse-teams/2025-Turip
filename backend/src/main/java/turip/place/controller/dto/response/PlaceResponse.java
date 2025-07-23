@@ -2,6 +2,7 @@ package turip.place.controller.dto.response;
 
 import java.util.List;
 import turip.place.domain.Place;
+import turip.placecategory.domain.PlaceCategory;
 
 public record PlaceResponse(
         Long id,
@@ -20,7 +21,11 @@ public record PlaceResponse(
                 place.getAddress(),
                 place.getLatitude(),
                 place.getLongitude(),
-                CategoryResponse.from(place.getCategories())
+                CategoryResponse.from(
+                        place.getPlaceCategories().stream()
+                                .map(PlaceCategory::getCategory)
+                                .toList()
+                )
         );
     }
 }

@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import turip.category.domain.Category;
 import turip.place.domain.Place;
 import turip.tripcourse.controller.dto.response.TripCourseDetailResponse;
 import turip.tripcourse.domain.TripCourse;
@@ -74,18 +75,19 @@ class TripCourseServiceTest {
                 "https://naver.me/5UrZAIeY",
                 "경포대 해수욕장의 도로명 주소",
                 38.1234,
-                127.23123,
-                List.of("관광")
+                127.23123
         );
+        place1.addCategory(new Category("관광지"));
         Place place2 = new Place(
                 2L,
                 "하우스멜",
                 "https://naver.me/test",
                 "하우스멜의 도로명 주소",
                 38.0001,
-                127.12345,
-                List.of("베이커리", "카페")
+                127.12345
         );
+        place2.addCategory(new Category("빵집"));
+        place2.addCategory(new Category("카페"));
         TripCourse firstDayCourse = new TripCourse(firstVisitDay, visitOrder, place1, null);
         TripCourse secondDayCourse = new TripCourse(secondVisitDay, visitOrder, place2, null);
 
