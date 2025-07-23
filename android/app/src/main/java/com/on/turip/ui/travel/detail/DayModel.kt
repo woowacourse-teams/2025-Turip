@@ -2,8 +2,10 @@ package com.on.turip.ui.travel.detail
 
 data class DayModel(
     val day: Int,
-    val isSelected: Boolean,
-)
+    val isSelected: Boolean = false,
+) {
+    fun isSame(dayModel: DayModel): Boolean = this == dayModel
+}
 
 fun Int.initDayModels(): List<DayModel> = (1..this).map { it.initDayModel() }
 

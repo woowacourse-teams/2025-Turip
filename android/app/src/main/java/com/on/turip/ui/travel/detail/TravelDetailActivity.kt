@@ -30,10 +30,18 @@ class TravelDetailActivity : BaseActivity<TravelDetailViewModel, ActivitySearchD
         )
     }
 
-    private val travelDayAdapter: TravelDayAdapter =
+    private val travelDayAdapter by lazy {
         TravelDayAdapter { dayModel ->
-            viewModel.selectDay(dayModel)
+            viewModel.updateDay(dayModel)
         }
+    }
+
+    private val travelPlaceAdapter by lazy {
+        TravelPlaceAdapter { placeModel ->
+            val intent = Intent(Intent.ACTION_VIEW, placeModel.placeUri)
+            startActivity(intent)
+        }
+    }
 
     private fun enableFullscreen() {
         WindowCompat.setDecorFitsSystemWindows(this.window, false)
@@ -67,6 +75,7 @@ class TravelDetailActivity : BaseActivity<TravelDetailViewModel, ActivitySearchD
         super.onCreate(savedInstanceState)
 
         setupToolbar()
+        setupOnBackPressedDispatcher()
         setupWebView()
         setupAdapters()
         setupListeners()
@@ -75,9 +84,13 @@ class TravelDetailActivity : BaseActivity<TravelDetailViewModel, ActivitySearchD
 
     private fun setupToolbar() {
         setSupportActionBar(binding.tbSearchDetail)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = null
+        supportActionBar?.apply {
+            setDisplayHomeAsUpEnabled(true)
+            title = null
+        }
+    }
 
+    private fun setupOnBackPressedDispatcher() {
         onBackPressedDispatcher.addCallback(
             this,
             object : OnBackPressedCallback(true) {
@@ -117,6 +130,10 @@ class TravelDetailActivity : BaseActivity<TravelDetailViewModel, ActivitySearchD
 
     private fun setupAdapters() {
         binding.rvSearchDetailTravelDay.adapter = travelDayAdapter
+        binding.rvSearchDetailTravelPlace.apply {
+            adapter = travelPlaceAdapter
+            itemAnimator = null
+        }
     }
 
     private fun setupListeners() {
@@ -133,6 +150,9 @@ class TravelDetailActivity : BaseActivity<TravelDetailViewModel, ActivitySearchD
     private fun setupObservers() {
         viewModel.days.observe(this) { dayModels ->
             travelDayAdapter.submitList(dayModels)
+        }
+        viewModel.places.observe(this) { placeModels ->
+            travelPlaceAdapter.submitList(placeModels)
         }
     }
 

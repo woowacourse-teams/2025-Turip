@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.on.turip.R
 import com.on.turip.databinding.ItemSearchResultBinding
 import com.on.turip.domain.contents.VideoInformation
-import com.on.turip.ui.common.loadByCircle
+import com.on.turip.ui.common.loadCircularImage
 
 class SearchResultViewHolder(
     private val binding: ItemSearchResultBinding,
@@ -37,7 +37,7 @@ class SearchResultViewHolder(
                 videoInformation.content.creator.channelName,
                 videoInformation.content.uploadedDate,
             )
-        binding.ivSearchResultThumbnail.loadByCircle(videoInformation.content.creator.profileImage)
+        binding.ivSearchResultThumbnail.loadCircularImage(videoInformation.content.creator.profileImage)
     }
 
     companion object {
