@@ -1,7 +1,6 @@
 package turip.content.service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -66,7 +65,7 @@ public class ContentService {
     private List<ContentDetailsByRegionResponse> getContentDetailsByRegionResponses(List<Content> contents) {
         return contents.stream()
                 .map(this::toContentDetailsResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private ContentDetailsByRegionResponse toContentDetailsResponse(Content content) {
