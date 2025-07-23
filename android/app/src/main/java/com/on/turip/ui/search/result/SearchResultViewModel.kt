@@ -18,6 +18,7 @@ class SearchResultViewModel(
     data class SearchResultState(
         val searchResultCount: Int = 0,
         val videos: List<Video> = emptyList(),
+        val region: String = "",
         val isExist: Boolean = false,
     )
 
@@ -25,7 +26,13 @@ class SearchResultViewModel(
         MutableLiveData(SearchResultState())
     val searchResultState: LiveData<SearchResultState> get() = _searchResultState
 
-    fun setRegionFromIntent(region: String) {
+    init {
+        setRegionFromIntent()
+        setExist()
+        setTitle()
+    }
+
+    private fun setRegionFromIntent() {
         viewModelScope.launch {
             runCatching {
                 contentsRepository.loadContents(
@@ -40,10 +47,9 @@ class SearchResultViewModel(
                     )
             }
         }
-        setExist(region)
     }
 
-    private fun setExist(region: String) {
+    private fun setExist() {
         viewModelScope.launch {
             runCatching {
                 contentsRepository.loadContentsSize(region)
@@ -62,6 +68,13 @@ class SearchResultViewModel(
                 }
             }
         }
+    }
+
+    private fun setTitle() {
+        _searchResultState.value =
+            searchResultState.value?.copy(
+                region = region,
+            )
     }
 
     companion object {

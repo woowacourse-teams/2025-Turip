@@ -29,12 +29,8 @@ class SearchResultActivity : BaseActivity<SearchResultViewModel, ActivitySearchR
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val region: String = intent.getStringExtra(REGION_ID) ?: return
-        viewModel.setRegionFromIntent(region)
-
         setupToolbar()
         setupAdapters()
-        setupBindings(region)
         setupObservers()
     }
 
@@ -64,22 +60,19 @@ class SearchResultActivity : BaseActivity<SearchResultViewModel, ActivitySearchR
         binding.rvSearchResult.adapter = videosAdapter
     }
 
-    private fun setupBindings(region: String) {
-        val regionOrigin = RegionModel.findByEnglish(region)
-        binding.tbSearchResult.title = regionOrigin.korean
-    }
-
     private fun setupObservers() {
-        viewModel.searchResultState.observe(this) { searchResultState: SearchResultViewModel.SearchResultState? ->
+        viewModel.searchResultState.observe(this) { searchResultState: SearchResultViewModel.SearchResultState ->
             binding.tvSearchResultCount.text =
                 getString(
                     R.string.search_result_exist_result,
-                    searchResultState?.searchResultCount ?: 0,
+                    searchResultState.searchResultCount,
                 )
 
-            videosAdapter.submitList(searchResultState?.videos)
+            supportActionBar?.title = setupTitle(searchResultState.region)
 
-            if (searchResultState?.isExist == true) {
+            videosAdapter.submitList(searchResultState.videos)
+
+            if (searchResultState.isExist == true) {
                 binding.rvSearchResult.isVisible = true
                 binding.groupEmptyResult.isVisible = false
             } else {
@@ -87,6 +80,11 @@ class SearchResultActivity : BaseActivity<SearchResultViewModel, ActivitySearchR
                 binding.groupEmptyResult.isVisible = true
             }
         }
+    }
+
+    private fun setupTitle(region: String): String {
+        val regionOrigin = RegionModel.findByEnglish(region)
+        return regionOrigin.korean
     }
 
     companion object {
