@@ -29,8 +29,8 @@ public class ContentController {
     @GetMapping()
     public ResponseEntity<ContentsByRegionResponse> readContentsByRegionName(
             @RequestParam(name = "region") String regionName,
-            @RequestParam(name = "pageSize") Integer pageSize,
-            @RequestParam(name = "lastContentId") Long lastContentId
+            @RequestParam(name = "size") Integer pageSize,
+            @RequestParam(name = "lastId") Long lastContentId
     ) {
         ContentsByRegionResponse response = contentService.findContentsByRegionName(regionName, pageSize,
                 lastContentId);

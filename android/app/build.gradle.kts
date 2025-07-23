@@ -1,3 +1,5 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -19,10 +21,11 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
+        val baseUrl: String = gradleLocalProperties(rootDir, providers).getProperty("base_url")
         buildConfigField(
             "String",
             "BASE_URL",
-            "\"${project.findProperty("base_url") ?: ""}\"",
+            "\"$baseUrl\"",
         )
     }
 

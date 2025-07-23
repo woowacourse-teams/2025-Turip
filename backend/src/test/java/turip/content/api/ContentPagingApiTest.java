@@ -55,8 +55,8 @@ class ContentPagingApiTest {
         // when: 첫 페이지 요청 (lastId=0, size=5)
         var firstPageResponse = RestAssured.given().port(port)
                 .queryParam("region", "seoul")
-                .queryParam("pageSize", 5)
-                .queryParam("lastContentId", 0)
+                .queryParam("size", 5)
+                .queryParam("lastId", 0)
                 .when().get("/contents");
 
         // then: id 10~6, 5개, loadable=true
@@ -70,8 +70,8 @@ class ContentPagingApiTest {
         // when: 두 번째 페이지 요청 (lastId=6, size=5)
         var secondPageResponse = RestAssured.given().port(port)
                 .queryParam("region", "seoul")
-                .queryParam("pageSize", 5)
-                .queryParam("lastContentId", 6)
+                .queryParam("size", 5)
+                .queryParam("lastId", 6)
                 .when().get("/contents");
 
         // then: id 5~1, 5개, loadable=false

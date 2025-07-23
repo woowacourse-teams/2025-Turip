@@ -5,10 +5,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.on.turip.data.contents.repository.DummyContentRepository
-import com.on.turip.domain.videoinfo.contents.PagedContentsResult
-import com.on.turip.domain.videoinfo.contents.VideoInformation
-import com.on.turip.domain.videoinfo.contents.repository.ContentRepository
+import com.on.turip.di.RepositoryModule
+import com.on.turip.domain.contents.PagedContentsResult
+import com.on.turip.domain.contents.VideoInformation
+import com.on.turip.domain.contents.repository.ContentRepository
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -30,30 +30,31 @@ class SearchResultViewModel(
         viewModelScope.launch {
             val pagedContentsResult: Deferred<Result<PagedContentsResult>> =
                 async {
-                    runCatching {
-                        contentRepository.loadContents(
-                            region = region,
-                            size = 100,
-                            lastId = 0L,
-                        )
-                    }
+                    contentRepository.loadContents(
+                        region = region,
+                        size = 100,
+                        lastId = 0L,
+                    )
                 }
             val contentsSize: Deferred<Result<Int>> =
                 async {
-                    runCatching {
-                        contentRepository.loadContentsSize(region)
-                    }
+                    contentRepository.loadContentsSize(region)
                 }
 
-            pagedContentsResult.await().onSuccess { result: PagedContentsResult ->
-                _searchResultState.value =
-                    searchResultState.value?.copy(
-                        videoInformations = result.videos,
-                    )
-            }
-            contentsSize.await().onSuccess { result: Int ->
-                setSearchResultExistence(result)
-            }
+            pagedContentsResult
+                .await()
+                .onSuccess { result: PagedContentsResult ->
+                    _searchResultState.value =
+                        searchResultState.value?.copy(
+                            videoInformations = result.videos,
+                        )
+                }.onFailure {}
+            contentsSize
+                .await()
+                .onSuccess { result: Int ->
+                    setSearchResultExistence(result)
+                }.onFailure {
+                }
         }
     }
 
@@ -82,7 +83,7 @@ class SearchResultViewModel(
     companion object {
         fun provideFactory(
             region: String,
-            contentRepository: ContentRepository = DummyContentRepository(),
+            contentRepository: ContentRepository = RepositoryModule.contentRepository,
         ): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
