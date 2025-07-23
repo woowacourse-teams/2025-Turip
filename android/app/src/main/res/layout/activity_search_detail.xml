@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/pure_white_ffffff"
-    tools:context=".ui.search.detail.SearchDetailActivity">
+    tools:context=".ui.travel.detail.TravelDetailActivity">
 
     <FrameLayout
         android:id="@+id/fl_search_detail_video_fullscreen"

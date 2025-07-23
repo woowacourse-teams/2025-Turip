@@ -1,4 +1,4 @@
-package com.on.turip.ui.search.detail
+package com.on.turip.ui.travel.detail
 
 import android.content.Intent
 import android.content.pm.ActivityInfo
@@ -12,13 +12,13 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.on.turip.databinding.ActivitySearchDetailBinding
 import com.on.turip.ui.common.base.BaseActivity
-import com.on.turip.ui.search.detail.webview.TuripWebChromeClient
-import com.on.turip.ui.search.detail.webview.TuripWebViewClient
-import com.on.turip.ui.search.detail.webview.WebViewVideoBridge
-import com.on.turip.ui.search.detail.webview.applyVideoSettings
+import com.on.turip.ui.travel.detail.webview.TuripWebChromeClient
+import com.on.turip.ui.travel.detail.webview.TuripWebViewClient
+import com.on.turip.ui.travel.detail.webview.WebViewVideoBridge
+import com.on.turip.ui.travel.detail.webview.applyVideoSettings
 
-class SearchDetailActivity : BaseActivity<SearchDetailViewModel, ActivitySearchDetailBinding>() {
-    override val viewModel: SearchDetailViewModel by viewModels()
+class TravelDetailActivity : BaseActivity<TravelDetailViewModel, ActivitySearchDetailBinding>() {
+    override val viewModel: TravelDetailViewModel by viewModels()
     override val binding: ActivitySearchDetailBinding by lazy {
         ActivitySearchDetailBinding.inflate(layoutInflater)
     }
@@ -32,13 +32,13 @@ class SearchDetailActivity : BaseActivity<SearchDetailViewModel, ActivitySearchD
 
     private val travelDayAdapter by lazy {
         TravelDayAdapter { dayModel ->
-            viewModel.selectDay(dayModel)
+            viewModel.updateDay(dayModel)
         }
     }
 
     private val travelPlaceAdapter by lazy {
         TravelPlaceAdapter { placeModel ->
-            val intent = Intent(Intent.ACTION_VIEW, placeModel.placeUri())
+            val intent = Intent(Intent.ACTION_VIEW, placeModel.placeUri)
             startActivity(intent)
         }
     }
@@ -77,7 +77,7 @@ class SearchDetailActivity : BaseActivity<SearchDetailViewModel, ActivitySearchD
         setupToolbar()
         setupOnBackPressedDispatcher()
         setupWebView()
-        setupBindings()
+        setupAdapters()
         setupListeners()
         setupObservers()
     }
@@ -128,7 +128,7 @@ class SearchDetailActivity : BaseActivity<SearchDetailViewModel, ActivitySearchD
         }
     }
 
-    private fun setupBindings() {
+    private fun setupAdapters() {
         binding.rvSearchDetailTravelDay.adapter = travelDayAdapter
         binding.rvSearchDetailTravelPlace.apply {
             adapter = travelPlaceAdapter

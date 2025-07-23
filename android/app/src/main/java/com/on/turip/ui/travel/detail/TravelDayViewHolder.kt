@@ -1,4 +1,4 @@
-package com.on.turip.ui.search.detail
+package com.on.turip.ui.travel.detail
 
 import android.view.LayoutInflater
 import android.view.View
@@ -6,7 +6,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.on.turip.R
 import com.on.turip.databinding.ItemTravelDayBinding
-import com.on.turip.ui.common.model.DayModel
 
 class TravelDayViewHolder(
     private val binding: ItemTravelDayBinding,

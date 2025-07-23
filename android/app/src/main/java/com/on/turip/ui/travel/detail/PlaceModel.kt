@@ -1,4 +1,4 @@
-package com.on.turip.ui.common.model
+package com.on.turip.ui.travel.detail
 
 import android.net.Uri
 import androidx.core.net.toUri
@@ -8,5 +8,7 @@ data class PlaceModel(
     val category: String,
     val mapLink: String,
 ) {
-    fun placeUri(): Uri = mapLink.toUri()
+    val placeUri: Uri
+        get() = mapLink.toUri()
+//    fun placeUri(): Uri = mapLink.toUri()
 }

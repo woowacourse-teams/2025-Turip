@@ -1,10 +1,9 @@
-package com.on.turip.ui.search.detail
+package com.on.turip.ui.travel.detail
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.on.turip.databinding.ItemTravelPlaceBinding
-import com.on.turip.ui.common.model.PlaceModel
 
 class TravelPlaceViewHolder(
     private val binding: ItemTravelPlaceBinding,

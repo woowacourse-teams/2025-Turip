@@ -1,4 +1,4 @@
-package com.on.turip.ui.search.detail.webview
+package com.on.turip.ui.travel.detail.webview
 
 import android.webkit.JavascriptInterface
 
