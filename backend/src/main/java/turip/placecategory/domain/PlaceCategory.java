@@ -1,43 +1,35 @@
-package turip.tripcourse.domain;
+package turip.placecategory.domain;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import turip.content.domain.Content;
+import turip.category.domain.Category;
 import turip.place.domain.Place;
 
-@Getter
 @Entity
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class TripCourse {
+@EqualsAndHashCode(of = {"place", "category"})
+public class PlaceCategory {
 
     @Id
-    @EqualsAndHashCode.Include
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private int visitDay;
-
-    private int visitOrder;
-
-    @OneToOne
+    @ManyToOne
     private Place place;
 
     @ManyToOne
-    private Content content;
+    private Category category;
 
-    public TripCourse(int visitDay, int visitOrder, Place place, Content content) {
-        this.visitDay = visitDay;
-        this.visitOrder = visitOrder;
+    public PlaceCategory(Place place, Category category) {
         this.place = place;
-        this.content = content;
+        this.category = category;
     }
 }
