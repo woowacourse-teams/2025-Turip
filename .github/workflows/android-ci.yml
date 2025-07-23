@@ -7,13 +7,6 @@ on:
 
 jobs:
 
-- name: Create local.properties
-      env:
-        BASE_URL: ${{ secrets.BASE_URL }}
-      run: |
-        echo "base_url=${BASE_URL}" > local.properties
-      
-
   build:
     name: Build APK
     runs-on: ubuntu-latest
