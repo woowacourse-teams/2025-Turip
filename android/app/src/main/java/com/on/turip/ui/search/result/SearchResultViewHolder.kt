@@ -23,13 +23,13 @@ class SearchResultViewHolder(
         binding.tvSearchResultDay.text =
             itemView.context.getString(
                 R.string.all_travel_duration,
-                videoInformation.tripDuration.nights,
-                videoInformation.tripDuration.days,
+                videoInformation.trip.tripDuration.nights,
+                videoInformation.trip.tripDuration.days,
             )
         binding.tvSearchResultLocation.text =
             itemView.context.getString(
                 R.string.all_total_place_count,
-                videoInformation.tripPlaceCount,
+                videoInformation.trip.tripPlaceCount,
             )
         binding.tvSearchResultDescription.text =
             itemView.context.getString(

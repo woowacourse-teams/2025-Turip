@@ -5,11 +5,13 @@ import com.on.turip.data.content.dto.ContentResponse
 import com.on.turip.data.content.dto.ContentsInformationResponse
 import com.on.turip.data.content.dto.CreatorResponse
 import com.on.turip.data.content.dto.TripDurationResponse
-import com.on.turip.domain.contents.Content
-import com.on.turip.domain.contents.Creator
-import com.on.turip.domain.contents.PagedContentsResult
-import com.on.turip.domain.contents.TripDuration
-import com.on.turip.domain.contents.VideoInformation
+import com.on.turip.domain.videoinfo.Trip
+import com.on.turip.domain.videoinfo.contents.Content
+import com.on.turip.domain.videoinfo.contents.PagedContentsResult
+import com.on.turip.domain.videoinfo.contents.TripDuration
+import com.on.turip.domain.videoinfo.contents.VideoData
+import com.on.turip.domain.videoinfo.contents.VideoInformation
+import com.on.turip.domain.videoinfo.contents.creator.Creator
 
 fun ContentsInformationResponse.toDomain(): PagedContentsResult =
     PagedContentsResult(
@@ -20,17 +22,23 @@ fun ContentsInformationResponse.toDomain(): PagedContentsResult =
 fun ContentInformationResponse.toDomain(): VideoInformation =
     VideoInformation(
         content = content.toDomain(),
-        tripDuration = tripDuration.toDomain(),
-        tripPlaceCount = tripPlaceCount,
+        trip =
+            Trip(
+                tripDuration = tripDuration.toDomain(),
+                tripPlaceCount = tripPlaceCount,
+            ),
     )
 
 fun ContentResponse.toDomain(): Content =
     Content(
         id = id,
         creator = creator.toDomain(),
-        title = title,
-        url = url,
-        uploadedDate = uploadedDate,
+        videoData =
+            VideoData(
+                title = title,
+                url = url,
+                uploadedDate = uploadedDate,
+            ),
     )
 
 fun TripDurationResponse.toDomain(): TripDuration =
