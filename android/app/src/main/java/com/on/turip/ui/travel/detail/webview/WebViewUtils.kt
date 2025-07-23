@@ -1,9 +1,9 @@
-package com.on.turip.ui.search.detail.webview
+package com.on.turip.ui.travel.detail.webview
 
 import android.annotation.SuppressLint
 import android.webkit.WebView
-import com.on.turip.ui.search.detail.webview.VideoRegex.patternShortUrl
-import com.on.turip.ui.search.detail.webview.VideoRegex.patternVParam
+import com.on.turip.ui.travel.detail.webview.VideoRegex.patternShortUrl
+import com.on.turip.ui.travel.detail.webview.VideoRegex.patternVParam
 
 @SuppressLint("SetJavaScriptEnabled")
 fun WebView.applyVideoSettings() {
