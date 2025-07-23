@@ -68,7 +68,7 @@ class SearchDetailActivity : BaseActivity<SearchDetailViewModel, ActivitySearchD
 
         setupToolbar()
         setupWebView()
-        setupBindings()
+        setupAdapters()
         setupListeners()
         setupObservers()
     }
@@ -115,7 +115,7 @@ class SearchDetailActivity : BaseActivity<SearchDetailViewModel, ActivitySearchD
         }
     }
 
-    private fun setupBindings() {
+    private fun setupAdapters() {
         binding.rvSearchDetailTravelDay.adapter = travelDayAdapter
     }
 
