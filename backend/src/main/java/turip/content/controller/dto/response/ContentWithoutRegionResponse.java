@@ -2,20 +2,20 @@ package turip.content.controller.dto.response;
 
 import java.time.LocalDate;
 import turip.content.domain.Content;
+import turip.creator.controller.dto.response.CreatorResponse;
 
-public record ContentResponse(
+public record ContentWithoutRegionResponse(
         Long id,
-        Long creatorId,
-        Long regionId,
+        CreatorResponse creator,
         String title,
         String url,
         LocalDate uploadedDate
 ) {
-    public static ContentResponse from(Content content) {
-        return new ContentResponse(
+
+    public static ContentWithoutRegionResponse from(Content content) {
+        return new ContentWithoutRegionResponse(
                 content.getId(),
-                content.getCreator().getId(),
-                content.getRegion().getId(),
+                CreatorResponse.from(content.getCreator()),
                 content.getTitle(),
                 content.getUrl(),
                 content.getUploadedDate()

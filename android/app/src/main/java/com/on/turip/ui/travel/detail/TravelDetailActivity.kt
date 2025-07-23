@@ -1,4 +1,4 @@
-package com.on.turip.ui.search.detail
+package com.on.turip.ui.travel.detail
 
 import android.content.Intent
 import android.content.pm.ActivityInfo
@@ -12,13 +12,13 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.on.turip.databinding.ActivitySearchDetailBinding
 import com.on.turip.ui.common.base.BaseActivity
-import com.on.turip.ui.search.detail.webview.TuripWebChromeClient
-import com.on.turip.ui.search.detail.webview.TuripWebViewClient
-import com.on.turip.ui.search.detail.webview.WebViewVideoBridge
-import com.on.turip.ui.search.detail.webview.applyVideoSettings
+import com.on.turip.ui.travel.detail.webview.TuripWebChromeClient
+import com.on.turip.ui.travel.detail.webview.TuripWebViewClient
+import com.on.turip.ui.travel.detail.webview.WebViewVideoBridge
+import com.on.turip.ui.travel.detail.webview.applyVideoSettings
 
-class SearchDetailActivity : BaseActivity<SearchDetailViewModel, ActivitySearchDetailBinding>() {
-    override val viewModel: SearchDetailViewModel by viewModels()
+class TravelDetailActivity : BaseActivity<TravelDetailViewModel, ActivitySearchDetailBinding>() {
+    override val viewModel: TravelDetailViewModel by viewModels()
     override val binding: ActivitySearchDetailBinding by lazy {
         ActivitySearchDetailBinding.inflate(layoutInflater)
     }
@@ -29,6 +29,11 @@ class SearchDetailActivity : BaseActivity<SearchDetailViewModel, ActivitySearchD
             onExitFullScreen = ::disableFullscreen,
         )
     }
+
+    private val travelDayAdapter: TravelDayAdapter =
+        TravelDayAdapter { dayModel ->
+            viewModel.selectDay(dayModel)
+        }
 
     private fun enableFullscreen() {
         WindowCompat.setDecorFitsSystemWindows(this.window, false)
@@ -63,7 +68,9 @@ class SearchDetailActivity : BaseActivity<SearchDetailViewModel, ActivitySearchD
 
         setupToolbar()
         setupWebView()
+        setupAdapters()
         setupListeners()
+        setupObservers()
     }
 
     private fun setupToolbar() {
@@ -98,7 +105,6 @@ class SearchDetailActivity : BaseActivity<SearchDetailViewModel, ActivitySearchD
                 BRIDGE_NAME_IN_JS_FILE,
             )
         }
-
         binding.wvSearchDetailVideo.loadUrl(LOAD_URL_FILE_PATH)
     }
 
@@ -109,14 +115,24 @@ class SearchDetailActivity : BaseActivity<SearchDetailViewModel, ActivitySearchD
         }
     }
 
+    private fun setupAdapters() {
+        binding.rvSearchDetailTravelDay.adapter = travelDayAdapter
+    }
+
     private fun setupListeners() {
         binding.tvSearchDetailVideoError.setOnClickListener {
-            val intent =
+            val intent: Intent =
                 Intent(
                     Intent.ACTION_VIEW,
                     "".toUri(),
                 ) // TODO "" 에는 유튜브 영상 uri가 들어가야 한다.
             startActivity(intent)
+        }
+    }
+
+    private fun setupObservers() {
+        viewModel.days.observe(this) { dayModels ->
+            travelDayAdapter.submitList(dayModels)
         }
     }
 
