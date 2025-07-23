@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ContentCountResponse(
+data class ContentInformationCountResponse(
     @SerialName("count")
     val count: Int,
 )
