@@ -1,5 +1,6 @@
 package com.on.turip.ui.travel.detail
 
+import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Bundle
@@ -12,6 +13,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.on.turip.databinding.ActivitySearchDetailBinding
 import com.on.turip.ui.common.base.BaseActivity
+import com.on.turip.ui.search.result.SearchResultActivity
 import com.on.turip.ui.travel.detail.webview.TuripWebChromeClient
 import com.on.turip.ui.travel.detail.webview.TuripWebViewClient
 import com.on.turip.ui.travel.detail.webview.WebViewVideoBridge
@@ -164,5 +166,16 @@ class TravelDetailActivity : BaseActivity<TravelDetailViewModel, ActivitySearchD
     companion object {
         private const val BRIDGE_NAME_IN_JS_FILE = "videoBridge"
         private const val LOAD_URL_FILE_PATH = "file:///android_asset/iframe.html"
+        private const val CREATOR_KEY: String = "com.on.turip.CREATOR_KEY"
+        private const val CONTENT_KEY: String = "com.on.turip.CONTENT_KEY"
+
+        fun newIntent(
+            context: Context,
+            contentId: Long,
+            creatorId: Long,
+        ): Intent =
+            Intent(context, SearchResultActivity::class.java)
+                .putExtra(CONTENT_KEY, contentId)
+                .putExtra(CREATOR_KEY, creatorId)
     }
 }

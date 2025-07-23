@@ -11,6 +11,7 @@ import com.on.turip.R
 import com.on.turip.databinding.ActivitySearchResultBinding
 import com.on.turip.ui.common.base.BaseActivity
 import com.on.turip.ui.common.model.RegionModel
+import com.on.turip.ui.travel.detail.TravelDetailActivity
 
 class SearchResultActivity : BaseActivity<SearchResultViewModel, ActivitySearchResultBinding>() {
     override val viewModel: SearchResultViewModel by viewModels {
@@ -22,8 +23,14 @@ class SearchResultActivity : BaseActivity<SearchResultViewModel, ActivitySearchR
         ActivitySearchResultBinding.inflate(layoutInflater)
     }
     private val searchResultAdapter: SearchResultAdapter =
-        SearchResultAdapter {
-            // TODO : 여행 상세 페이지로 이동
+        SearchResultAdapter { contentId: Long?, creatorId: Long? ->
+            val intent =
+                TravelDetailActivity.newIntent(
+                    context = this,
+                    contentId = contentId ?: 0,
+                    creatorId = creatorId ?: 0,
+                )
+            startActivity(intent)
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
