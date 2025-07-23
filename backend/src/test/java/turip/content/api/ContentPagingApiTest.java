@@ -35,16 +35,17 @@ class ContentPagingApiTest {
         jdbcTemplate.update("ALTER TABLE region ALTER COLUMN id RESTART WITH 1");
 
         jdbcTemplate.update(
-                "INSERT INTO Creator (profile_image, channel_name) VALUES ('https://image.example.com/creator1.jpg', 'TravelMate')");
-        jdbcTemplate.update("INSERT INTO Region (name) VALUES ('seoul')");
+                "INSERT INTO creator (profile_image, channel_name) VALUES ('https://image.example.com/creator1.jpg', 'TravelMate')");
+        jdbcTemplate.update("INSERT INTO region (name) VALUES ('seoul')");
         for (int i = 1; i <= 10; i++) {
             jdbcTemplate.update(
-                    "INSERT INTO Content (creator_id, region_id, url, title, uploaded_date) VALUES (1, 1, ?, ?, '2024-07-01')",
+                    "INSERT INTO content (creator_id, region_id, url, title, uploaded_date) VALUES (1, 1, ?, ?, '2024-07-01')",
                     "https://youtube.com/watch?v=abcd" + i, "서울 여행 " + i
             );
-            jdbcTemplate.update("INSERT INTO Place (name) VALUES (?)", "장소" + i);
+            jdbcTemplate.update("INSERT INTO place (name, latitude, longitude) VALUES (?, ?, ?)", "장소" + i, 34.5,
+                    127.5);
             jdbcTemplate.update(
-                    "INSERT INTO Trip_Course (visit_day, visit_order, place_id, content_id) VALUES (1, 1, ?, ?)", i, i);
+                    "INSERT INTO trip_course (visit_day, visit_order, place_id, content_id) VALUES (1, 1, ?, ?)", i, i);
         }
     }
 
