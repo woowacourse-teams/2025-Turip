@@ -2,15 +2,13 @@
     <string name="app_name">튜립</string>
 
     <!-- 공용 -->
-    <string name="search_detail_total_place_count">%d개 장소</string>
-    <string name="search_detail_travel_duration">%d박 %d일</string>
+    <string name="all_total_place_count">%d개 장소</string>
+    <string name="all_travel_duration">%d박 %d일</string>
 
     <!-- 검색 결과 페이지 -->
     <string name="search_result_no_result">검색 결과가 없습니다.</string>
-    <string name="search_result_trip_duration">%d박 %d일</string>
     <string name="search_result_video_description">%s · %s</string>
     <string name="search_result_exist_result">검색결과 %d개</string>
-    <string name="search_result_location_number">%d개 장소</string>
 
     <!-- 메인 페이지 -->
     <string name="main_where_should_we_go_title">어디로 떠나볼까요?</string>
