@@ -3,6 +3,7 @@ package com.on.turip.ui.search.result
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.on.turip.data.contents.repository.DummyContentsRepository
 import com.on.turip.domain.contents.PagedContentsResult
@@ -11,7 +12,8 @@ import com.on.turip.domain.contents.repository.ContentsRepository
 import kotlinx.coroutines.launch
 
 class SearchResultViewModel(
-    private val contentsRepository: ContentsRepository = DummyContentsRepository(),
+    private val region: String,
+    private val contentsRepository: ContentsRepository,
 ) : ViewModel() {
     data class SearchResultState(
         val searchResultCount: Int = 0,
@@ -60,5 +62,24 @@ class SearchResultViewModel(
                 }
             }
         }
+    }
+
+    companion object {
+        fun provideFactory(
+            region: String,
+            contentsRepository: ContentsRepository = DummyContentsRepository(),
+        ): ViewModelProvider.Factory =
+            object : ViewModelProvider.Factory {
+                @Suppress("UNCHECKED_CAST")
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    if (modelClass.isAssignableFrom(SearchResultViewModel::class.java)) {
+                        return SearchResultViewModel(
+                            region,
+                            contentsRepository,
+                        ) as T
+                    }
+                    throw IllegalArgumentException()
+                }
+            }
     }
 }

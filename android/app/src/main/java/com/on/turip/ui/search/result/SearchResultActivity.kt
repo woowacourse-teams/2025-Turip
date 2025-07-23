@@ -13,7 +13,11 @@ import com.on.turip.ui.common.base.BaseActivity
 import com.on.turip.ui.common.model.RegionModel
 
 class SearchResultActivity : BaseActivity<SearchResultViewModel, ActivitySearchResultBinding>() {
-    override val viewModel: SearchResultViewModel by viewModels()
+    override val viewModel: SearchResultViewModel by viewModels {
+        SearchResultViewModel.provideFactory(
+            intent.getStringExtra(REGION_ID) ?: "",
+        )
+    }
     override val binding: ActivitySearchResultBinding by lazy {
         ActivitySearchResultBinding.inflate(layoutInflater)
     }
