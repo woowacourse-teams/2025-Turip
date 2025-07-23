@@ -9,5 +9,5 @@ interface ContentRepository {
         region: String,
         size: Int,
         lastId: Long,
-    ): PagedContentsResult
+    ): Result<PagedContentsResult>
 }

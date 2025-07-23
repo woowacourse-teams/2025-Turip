@@ -30,13 +30,11 @@ class SearchResultViewModel(
         viewModelScope.launch {
             val pagedContentsResult: Deferred<Result<PagedContentsResult>> =
                 async {
-                    runCatching {
-                        contentRepository.loadContents(
-                            region = region,
-                            size = 100,
-                            lastId = 0L,
-                        )
-                    }
+                    contentRepository.loadContents(
+                        region = region,
+                        size = 100,
+                        lastId = 0L,
+                    )
                 }
             val contentsSize: Deferred<Result<Int>> =
                 async {
@@ -50,7 +48,7 @@ class SearchResultViewModel(
                         searchResultState.value?.copy(
                             videoInformations = result.videos,
                         )
-                }
+                }.onFailure {}
             contentsSize
                 .await()
                 .onSuccess { result: Int ->

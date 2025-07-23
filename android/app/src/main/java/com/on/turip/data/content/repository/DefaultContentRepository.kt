@@ -1,6 +1,7 @@
 package com.on.turip.data.content.repository
 
 import com.on.turip.data.content.dataSource.ContentRemoteDataSource
+import com.on.turip.data.content.toDomain
 import com.on.turip.domain.contents.PagedContentsResult
 import com.on.turip.domain.contents.repository.ContentRepository
 
@@ -16,8 +17,8 @@ class DefaultContentRepository(
         region: String,
         size: Int,
         lastId: Long,
-    ): PagedContentsResult {
-        return PagedContentsResult(videos = emptyList(), false)
-        // TODO("추후 API 연결")
-    }
+    ): Result<PagedContentsResult> =
+        contentRemoteDataSource
+            .getContents(region, size, lastId)
+            .mapCatching { it.toDomain() }
 }
