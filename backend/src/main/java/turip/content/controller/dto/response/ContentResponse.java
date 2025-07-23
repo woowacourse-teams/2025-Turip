@@ -11,7 +11,7 @@ public record ContentResponse(
         String url,
         LocalDate uploadedDate
 ) {
-    public static ContentResponse of(Content content) {
+    public static ContentResponse from(Content content) {
         return new ContentResponse(
                 content.getId(),
                 content.getCreator().getId(),

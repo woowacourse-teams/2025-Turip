@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import turip.content.controller.dto.response.ContentCountResponse;
-import turip.content.controller.dto.response.ContentsByRegionResponse;
 import turip.content.controller.dto.response.ContentResponse;
+import turip.content.controller.dto.response.ContentsByRegionResponse;
 import turip.content.service.ContentService;
 
 @RestController
@@ -37,9 +37,7 @@ public class ContentController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ContentResponse> readContentById(
-            @PathVariable Long id
-    ) {
+    public ResponseEntity<ContentResponse> readContent(@PathVariable Long id) {
         ContentResponse response = contentService.getById(id);
         return ResponseEntity.ok(response);
     }
