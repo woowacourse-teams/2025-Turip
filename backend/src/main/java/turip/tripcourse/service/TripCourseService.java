@@ -13,6 +13,10 @@ public class TripCourseService {
 
     private final TripCourseRepository tripCourseRepository;
 
+    public int countByContentId(Long contentId) {
+        return tripCourseRepository.countByContent_Id(contentId);
+    }
+
     public TripCourseDetailResponse findTripCourseDetails(Long contentId) {
         List<TripCourse> tripCourses = tripCourseRepository.findAllByContent_Id(contentId);
         int days = calculateDurationDays(contentId);
@@ -34,9 +38,5 @@ public class TripCourseService {
                 .map(TripCourse::getPlace)
                 .distinct()
                 .count();
-    }
-
-    private int countByContentId(Long contentId) {
-        return tripCourseRepository.countByContent_Id(contentId);
     }
 }
