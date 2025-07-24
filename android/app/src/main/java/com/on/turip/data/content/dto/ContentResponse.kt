@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ContentResponse(
     @SerialName("creator")
-    val creator: CreatorResponse,
+    val creator: CreatorInformationResponse,
     @SerialName("id")
     val id: Long,
     @SerialName("title")

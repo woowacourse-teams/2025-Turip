@@ -48,7 +48,7 @@ fun TripDurationResponse.toDomain(): TripDuration =
         days = days,
     )
 
-fun CreatorResponse.toDomain(): Creator =
+fun CreatorInformationResponse.toDomain(): Creator =
     Creator(
         id = id,
         channelName = channelName,
