@@ -4,6 +4,7 @@
     <!-- 공용 -->
     <string name="all_total_place_count">%d개 장소</string>
     <string name="all_travel_duration">%d박 %d일</string>
+    <string name="all_loading">로딩 중…</string>
 
     <!-- 검색 결과 페이지 -->
     <string name="search_result_no_result">검색 결과가 없습니다.</string>
