@@ -172,8 +172,8 @@ class TripDetailActivity : BaseActivity<TripDetailViewModel, ActivityTripDetailB
             binding.tvTripDetailTravelDuration.text =
                 getString(
                     R.string.all_travel_duration,
-                    tripDetailState.trip.tripDuration.days,
                     tripDetailState.trip.tripDuration.nights,
+                    tripDetailState.trip.tripDuration.days,
                 )
             binding.tvTripDetailDayPlaceCount.text =
                 getString(
