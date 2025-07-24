@@ -5,10 +5,10 @@ import com.on.turip.data.trip.dto.PlaceResponse
 import com.on.turip.data.trip.dto.TripCourseResponse
 import com.on.turip.data.trip.dto.TripDurationResponse
 import com.on.turip.data.trip.dto.TripResponse
-import com.on.turip.domain.videoinfo.contents.video.trip.Place
-import com.on.turip.domain.videoinfo.contents.video.trip.Trip
-import com.on.turip.domain.videoinfo.contents.video.trip.TripCourse
-import com.on.turip.domain.videoinfo.contents.video.trip.TripDuration
+import com.on.turip.domain.trip.Place
+import com.on.turip.domain.trip.Trip
+import com.on.turip.domain.trip.TripCourse
+import com.on.turip.domain.trip.TripDuration
 
 fun TripResponse.toDomain(): Trip =
     Trip(

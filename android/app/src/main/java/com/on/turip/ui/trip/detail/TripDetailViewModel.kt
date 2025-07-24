@@ -6,14 +6,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.on.turip.di.RepositoryModule
-import com.on.turip.domain.videoinfo.contents.Content
-import com.on.turip.domain.videoinfo.contents.VideoData
-import com.on.turip.domain.videoinfo.contents.creator.Creator
-import com.on.turip.domain.videoinfo.contents.creator.repository.CreatorRepository
-import com.on.turip.domain.videoinfo.contents.repository.ContentRepository
-import com.on.turip.domain.videoinfo.contents.video.trip.Trip
-import com.on.turip.domain.videoinfo.contents.video.trip.TripDuration
-import com.on.turip.domain.videoinfo.contents.video.trip.repository.TripRepository
+import com.on.turip.domain.content.Content
+import com.on.turip.domain.content.repository.ContentRepository
+import com.on.turip.domain.content.video.VideoData
+import com.on.turip.domain.creator.Creator
+import com.on.turip.domain.creator.repository.CreatorRepository
+import com.on.turip.domain.trip.Trip
+import com.on.turip.domain.trip.TripDuration
+import com.on.turip.domain.trip.repository.TripRepository
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -28,6 +28,9 @@ class TripDetailViewModel(
     private val _tripDetailState: MutableLiveData<TripDetailState> =
         MutableLiveData(TripDetailState())
     val tripDetailState: LiveData<TripDetailState> = _tripDetailState
+
+    private val _videoUri: MutableLiveData<String> = MutableLiveData()
+    val videoUri: LiveData<String> get() = _videoUri
 
     private var placeCacheByDay: Map<Int, List<PlaceModel>> = emptyMap()
 
@@ -62,6 +65,7 @@ class TripDetailViewModel(
                                             videoData = videoData,
                                         ),
                                 )
+                            _videoUri.value = videoData.url
                         }
                 }
         }

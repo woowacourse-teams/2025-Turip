@@ -39,11 +39,12 @@
         android:orientation="vertical"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_search_result_count"
+        app:layout_constraintBottom_toBottomOf="parent"
         tools:itemCount="10"
         tools:listitem="@layout/item_search_result" />
 
     <ImageView
-        android:id="@+id/iv_empty_result"
+        android:id="@+id/iv_search_result_empty"
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:layout_marginBottom="100dp"
@@ -56,22 +57,31 @@
         app:tint="@color/gray_300_5b5b5b" />
 
     <TextView
-        android:id="@+id/tv_empty_result"
+        android:id="@+id/tv_search_result_empty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="@string/search_result_no_result"
         android:text="@string/search_result_no_result"
         android:textAppearance="@style/title1"
         android:textColor="@color/gray_400_2b2b2b"
-        app:layout_constraintEnd_toEndOf="@id/iv_empty_result"
-        app:layout_constraintStart_toStartOf="@id/iv_empty_result"
-        app:layout_constraintTop_toBottomOf="@id/iv_empty_result" />
+        app:layout_constraintEnd_toEndOf="@id/iv_search_result_empty"
+        app:layout_constraintStart_toStartOf="@id/iv_search_result_empty"
+        app:layout_constraintTop_toBottomOf="@id/iv_search_result_empty" />
 
     <androidx.constraintlayout.widget.Group
-        android:id="@+id/group_empty_result"
+        android:id="@+id/group_search_result_empty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        app:constraint_referenced_ids="iv_empty_result,tv_empty_result" />
+        app:constraint_referenced_ids="iv_search_result_empty,tv_search_result_empty" />
 
+    <TextView
+        android:id="@+id/tv_search_result_loading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/all_loading"
+        android:gravity="center"
+        android:textColor="@color/pure_black_151515"
+        android:textAppearance="@style/display"
+        android:background="@color/pure_white_ffffff" />
 </androidx.constraintlayout.widget.ConstraintLayout>

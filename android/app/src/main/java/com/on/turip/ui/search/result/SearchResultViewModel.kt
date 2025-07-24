@@ -6,9 +6,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.on.turip.di.RepositoryModule
-import com.on.turip.domain.videoinfo.contents.PagedContentsResult
-import com.on.turip.domain.videoinfo.contents.repository.ContentRepository
-import com.on.turip.domain.videoinfo.contents.video.VideoInformation
+import com.on.turip.domain.content.PagedContentsResult
+import com.on.turip.domain.content.repository.ContentRepository
+import com.on.turip.domain.content.video.VideoInformation
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -48,14 +48,24 @@ class SearchResultViewModel(
                         searchResultState.value?.copy(
                             videoInformations = result.videos,
                         )
-                }.onFailure {}
+                }.onFailure {
+                }
             contentsSize
                 .await()
                 .onSuccess { result: Int ->
                     setSearchResultExistence(result)
+                    updateLoading(false)
                 }.onFailure {
+                    updateLoading(false)
                 }
         }
+    }
+
+    private fun updateLoading(state: Boolean) {
+        _searchResultState.value =
+            searchResultState.value?.copy(
+                loading = state,
+            )
     }
 
     private fun setSearchResultExistence(result: Int) {
@@ -100,9 +110,10 @@ class SearchResultViewModel(
     }
 
     data class SearchResultState(
-        val searchResultCount: Int = 0,
+        val searchResultCount: Int? = null,
         val videoInformations: List<VideoInformation> = emptyList(),
         val region: String = "",
         val isExist: Boolean = false,
+        val loading: Boolean = true,
     )
 }

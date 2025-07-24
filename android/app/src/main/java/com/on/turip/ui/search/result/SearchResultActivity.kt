@@ -87,7 +87,8 @@ class SearchResultActivity : BaseActivity<SearchResultViewModel, ActivitySearchR
             searchResultAdapter.submitList(searchResultState.videoInformations)
 
             binding.rvSearchResult.isVisible = searchResultState.isExist == true
-            binding.groupEmptyResult.isVisible = searchResultState.isExist == false
+            binding.groupSearchResultEmpty.isVisible = searchResultState.isExist == false
+            binding.tvSearchResultLoading.isVisible = searchResultState.loading == true
         }
     }
 

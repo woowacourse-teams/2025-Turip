@@ -1,7 +1,7 @@
-package com.on.turip.domain.videoinfo.contents.repository
+package com.on.turip.domain.content.repository
 
-import com.on.turip.domain.videoinfo.contents.PagedContentsResult
-import com.on.turip.domain.videoinfo.contents.VideoData
+import com.on.turip.domain.content.PagedContentsResult
+import com.on.turip.domain.content.video.VideoData
 
 interface ContentRepository {
     suspend fun loadContentsSize(region: String): Result<Int>

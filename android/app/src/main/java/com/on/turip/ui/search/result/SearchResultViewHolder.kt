@@ -5,9 +5,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.on.turip.R
 import com.on.turip.databinding.ItemSearchResultBinding
-import com.on.turip.domain.videoinfo.contents.Content
-import com.on.turip.domain.videoinfo.contents.creator.Creator
-import com.on.turip.domain.videoinfo.contents.video.VideoInformation
+import com.on.turip.domain.content.Content
+import com.on.turip.domain.content.video.VideoInformation
+import com.on.turip.domain.creator.Creator
 import com.on.turip.ui.common.loadCircularImage
 
 class SearchResultViewHolder(

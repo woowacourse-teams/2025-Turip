@@ -2,9 +2,9 @@ package com.on.turip.data.content.repository
 
 import com.on.turip.data.content.dataSource.ContentRemoteDataSource
 import com.on.turip.data.content.toDomain
-import com.on.turip.domain.videoinfo.contents.PagedContentsResult
-import com.on.turip.domain.videoinfo.contents.VideoData
-import com.on.turip.domain.videoinfo.contents.repository.ContentRepository
+import com.on.turip.domain.content.PagedContentsResult
+import com.on.turip.domain.content.repository.ContentRepository
+import com.on.turip.domain.content.video.VideoData
 
 class DefaultContentRepository(
     private val contentRemoteDataSource: ContentRemoteDataSource,

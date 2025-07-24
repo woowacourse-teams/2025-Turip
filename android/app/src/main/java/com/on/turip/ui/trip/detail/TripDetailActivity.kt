@@ -191,14 +191,12 @@ class TripDetailActivity : BaseActivity<TripDetailViewModel, ActivityTripDetailB
                     R.string.trip_detail_day_place_count,
                     tripDetailState.places.size,
                 )
+        }
+        viewModel.videoUri.observe(this) { url ->
             binding.wvTripDetailVideo.apply {
                 addJavascriptInterface(
                     WebViewVideoBridge(
-                        tripDetailState
-                            ?.content
-                            ?.videoData
-                            ?.url
-                            ?.extractVideoId() ?: "",
+                        url.extractVideoId(),
                     ) { showWebViewErrorView() },
                     BRIDGE_NAME_IN_JS_FILE,
                 )

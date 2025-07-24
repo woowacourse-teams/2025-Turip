@@ -6,13 +6,13 @@ import com.on.turip.data.content.dto.ContentResponse
 import com.on.turip.data.content.dto.ContentsInformationResponse
 import com.on.turip.data.content.dto.CreatorInformationResponse
 import com.on.turip.data.content.dto.TripDurationInformationResponse
-import com.on.turip.domain.videoinfo.contents.Content
-import com.on.turip.domain.videoinfo.contents.PagedContentsResult
-import com.on.turip.domain.videoinfo.contents.VideoData
-import com.on.turip.domain.videoinfo.contents.creator.Creator
-import com.on.turip.domain.videoinfo.contents.video.VideoInformation
-import com.on.turip.domain.videoinfo.contents.video.trip.Trip
-import com.on.turip.domain.videoinfo.contents.video.trip.TripDuration
+import com.on.turip.domain.content.Content
+import com.on.turip.domain.content.PagedContentsResult
+import com.on.turip.domain.content.video.VideoData
+import com.on.turip.domain.content.video.VideoInformation
+import com.on.turip.domain.creator.Creator
+import com.on.turip.domain.trip.Trip
+import com.on.turip.domain.trip.TripDuration
 
 fun ContentsInformationResponse.toDomain(): PagedContentsResult =
     PagedContentsResult(
