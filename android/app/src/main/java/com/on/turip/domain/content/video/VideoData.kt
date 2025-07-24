@@ -1,4 +1,4 @@
-package com.on.turip.domain.videoinfo.contents
+package com.on.turip.domain.content.video
 
 data class VideoData(
     val title: String,
