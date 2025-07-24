@@ -29,6 +29,9 @@ class TripDetailViewModel(
         MutableLiveData(TripDetailState())
     val tripDetailState: LiveData<TripDetailState> = _tripDetailState
 
+    private val _videoUri: MutableLiveData<String> = MutableLiveData()
+    val videoUri: LiveData<String> get() = _videoUri
+
     private var placeCacheByDay: Map<Int, List<PlaceModel>> = emptyMap()
 
     init {
@@ -62,6 +65,7 @@ class TripDetailViewModel(
                                             videoData = videoData,
                                         ),
                                 )
+                            _videoUri.value = videoData.url
                         }
                 }
         }
