@@ -8,6 +8,7 @@ import android.view.MenuItem
 import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -104,6 +105,12 @@ class TripDetailActivity : BaseActivity<TripDetailViewModel, ActivityTripDetailB
             setDisplayHomeAsUpEnabled(true)
             title = null
         }
+        binding.tbTripDetail.navigationIcon?.setTint(
+            ContextCompat.getColor(
+                this,
+                R.color.gray_300_5b5b5b,
+            ),
+        )
     }
 
     private fun setupOnBackPressedDispatcher() {
