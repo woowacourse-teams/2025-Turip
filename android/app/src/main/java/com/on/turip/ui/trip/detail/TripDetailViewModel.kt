@@ -12,7 +12,6 @@ import com.on.turip.domain.videoinfo.contents.creator.Creator
 import com.on.turip.domain.videoinfo.contents.creator.repository.CreatorRepository
 import com.on.turip.domain.videoinfo.contents.repository.ContentRepository
 import com.on.turip.domain.videoinfo.contents.video.trip.Trip
-import com.on.turip.domain.videoinfo.contents.video.trip.TripCourse
 import com.on.turip.domain.videoinfo.contents.video.trip.TripDuration
 import com.on.turip.domain.videoinfo.contents.video.trip.repository.TripRepository
 import kotlinx.coroutines.Deferred
@@ -30,7 +29,7 @@ class TripDetailViewModel(
         MutableLiveData(TripDetailState())
     val tripDetailState: LiveData<TripDetailState> = _tripDetailState
 
-    private var placeCacheByDay: Map<DayModel, List<PlaceModel>> = emptyMap()
+    private var placeCacheByDay: Map<Int, List<PlaceModel>> = emptyMap()
 
     init {
         loadContent()
@@ -77,8 +76,13 @@ class TripDetailViewModel(
 
                     _tripDetailState.value =
                         tripDetailState.value?.copy(
-                            days = placeCacheByDay.keys.toList(),
-                            places = placeCacheByDay[DayModel(1, true)] ?: emptyList(),
+                            days =
+                                placeCacheByDay.keys
+                                    .sorted()
+                                    .mapIndexed { index, day ->
+                                        DayModel(day = day, isSelected = index == 0)
+                                    },
+                            places = placeCacheByDay[1] ?: emptyList(),
                             trip = trip,
                         )
                 }
@@ -86,38 +90,32 @@ class TripDetailViewModel(
     }
 
     private fun setupCached(trip: Trip) {
-        val dayModel: List<DayModel> = trip.tripDuration.days.initDayModels()
+        val dayModels = trip.tripDuration.days.initDayModels()
 
         placeCacheByDay =
-            dayModel.associateWith { dayModel: DayModel ->
-                val coursesForDay: List<TripCourse> =
-                    trip.tripCourses.filter { it.visitDay == dayModel.day }
-                coursesForDay.map { it: TripCourse ->
-                    PlaceModel(
-                        name = it.place.name,
-                        category = it.place.category.joinToString(),
-                        mapLink = it.place.url,
-                    )
-                }
+            dayModels.associate { dayModel ->
+                val day = dayModel.day
+                val coursesForDay = trip.tripCourses.filter { it.visitDay == day }
+                val placeModels =
+                    coursesForDay.map { course ->
+                        PlaceModel(
+                            name = course.place.name,
+                            category = course.place.category.joinToString(),
+                            mapLink = course.place.url,
+                        )
+                    }
+                day to placeModels
             }
     }
 
-    fun updateDay(day: DayModel) {
-        val daysStatus: List<DayModel> =
-            tripDetailState.value?.days ?: return // TODO: days.value null 일 때 로직 처리 필요
-        val updateDaysStatus =
-            daysStatus.map { dayModel ->
-                if (dayModel.isSame(day)) {
-                    dayModel.copy(isSelected = true)
-                } else {
-                    dayModel.copy(isSelected = false)
-                }
-            }
-        _tripDetailState.value =
-            tripDetailState.value?.copy(
-                days = updateDaysStatus,
-                places = placeCacheByDay[day] ?: emptyList(),
-            )
+    fun updateDay(dayModel: DayModel) {
+        tripDetailState.value?.let { state ->
+            _tripDetailState.value =
+                state.copy(
+                    days = state.days.map { it.copy(isSelected = it.day == dayModel.day) },
+                    places = placeCacheByDay[dayModel.day].orEmpty(),
+                )
+        }
     }
 
     companion object {
