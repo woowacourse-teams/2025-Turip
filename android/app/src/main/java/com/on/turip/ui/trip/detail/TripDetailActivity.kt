@@ -20,6 +20,7 @@ import com.on.turip.ui.trip.detail.webview.TuripWebChromeClient
 import com.on.turip.ui.trip.detail.webview.TuripWebViewClient
 import com.on.turip.ui.trip.detail.webview.WebViewVideoBridge
 import com.on.turip.ui.trip.detail.webview.applyVideoSettings
+import com.on.turip.ui.trip.detail.webview.extractVideoId
 
 class TripDetailActivity : BaseActivity<TripDetailViewModel, ActivityTripDetailBinding>() {
     override val binding: ActivityTripDetailBinding by lazy {
@@ -127,13 +128,7 @@ class TripDetailActivity : BaseActivity<TripDetailViewModel, ActivityTripDetailB
             applyVideoSettings()
             webChromeClient = turipWebChromeClient
             webViewClient = TuripWebViewClient(binding.pbTripDetailVideo)
-            addJavascriptInterface(
-                // TODO 생성자에 url의 일부 추출 필요, WebViewUtils에 구현한 String.extractVideoId() 사용 예정
-                WebViewVideoBridge("") { showWebViewErrorView() },
-                BRIDGE_NAME_IN_JS_FILE,
-            )
         }
-        binding.wvTripDetailVideo.loadUrl(LOAD_URL_FILE_PATH)
     }
 
     private fun showWebViewErrorView() {
@@ -189,6 +184,20 @@ class TripDetailActivity : BaseActivity<TripDetailViewModel, ActivityTripDetailB
                     R.string.trip_detail_day_place_count,
                     tripDetailState.places.size,
                 )
+            binding.wvTripDetailVideo.apply {
+                addJavascriptInterface(
+                    WebViewVideoBridge(
+                        tripDetailState
+                            ?.content
+                            ?.videoData
+                            ?.url
+                            ?.extractVideoId() ?: "",
+                    ) { showWebViewErrorView() },
+                    BRIDGE_NAME_IN_JS_FILE,
+                )
+            }
+
+            binding.wvTripDetailVideo.loadUrl(LOAD_URL_FILE_PATH)
         }
     }
 
