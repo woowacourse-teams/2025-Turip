@@ -6,11 +6,13 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import com.on.turip.R
 import com.on.turip.databinding.ActivitySearchResultBinding
 import com.on.turip.ui.common.base.BaseActivity
 import com.on.turip.ui.common.model.RegionModel
+import com.on.turip.ui.trip.detail.TripDetailActivity
 
 class SearchResultActivity : BaseActivity<SearchResultViewModel, ActivitySearchResultBinding>() {
     override val viewModel: SearchResultViewModel by viewModels {
@@ -22,8 +24,14 @@ class SearchResultActivity : BaseActivity<SearchResultViewModel, ActivitySearchR
         ActivitySearchResultBinding.inflate(layoutInflater)
     }
     private val searchResultAdapter: SearchResultAdapter =
-        SearchResultAdapter {
-            // TODO : 여행 상세 페이지로 이동
+        SearchResultAdapter { contentId: Long?, creatorId: Long? ->
+            val intent =
+                TripDetailActivity.newIntent(
+                    context = this,
+                    contentId = contentId ?: 0,
+                    creatorId = creatorId ?: 0,
+                )
+            startActivity(intent)
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,6 +46,12 @@ class SearchResultActivity : BaseActivity<SearchResultViewModel, ActivitySearchR
         setSupportActionBar(binding.tbSearchResult)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+        binding.tbSearchResult.navigationIcon?.setTint(
+            ContextCompat.getColor(
+                this,
+                R.color.gray_300_5b5b5b,
+            ),
+        )
         onBackPressedDispatcher.addCallback(
             this,
             object : OnBackPressedCallback(true) {

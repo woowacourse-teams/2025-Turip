@@ -5,6 +5,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.on.turip.R
 import com.on.turip.databinding.ItemSearchResultBinding
+import com.on.turip.domain.videoinfo.contents.Content
+import com.on.turip.domain.videoinfo.contents.creator.Creator
 import com.on.turip.domain.videoinfo.contents.video.VideoInformation
 import com.on.turip.ui.common.loadCircularImage
 
@@ -12,13 +14,21 @@ class SearchResultViewHolder(
     private val binding: ItemSearchResultBinding,
     private val onSearchResultListener: OnSearchResultListener,
 ) : RecyclerView.ViewHolder(binding.root) {
+    private var creator: Creator? = null
+    private var content: Content? = null
+
     init {
         itemView.setOnClickListener {
-            onSearchResultListener.onSearchResultClick()
+            onSearchResultListener.onSearchResultClick(
+                content?.id ?: 0,
+                creator?.id ?: 0,
+            )
         }
     }
 
     fun bind(videoInformation: VideoInformation) {
+        creator = videoInformation.content.creator
+        content = videoInformation.content
         binding.tvSearchResultTitle.text = videoInformation.content.videoData.title
         binding.tvSearchResultDay.text =
             itemView.context.getString(
@@ -53,6 +63,9 @@ class SearchResultViewHolder(
     }
 
     fun interface OnSearchResultListener {
-        fun onSearchResultClick()
+        fun onSearchResultClick(
+            contentId: Long,
+            creatorId: Long,
+        )
     }
 }

@@ -33,7 +33,7 @@
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nsv_trip_detail"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -236,7 +236,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 android:layout_marginEnd="20dp"
-                android:textAppearance="@style/body1"
+                android:textAppearance="@style/info1"
                 android:textColor="@color/gray_500_1e1e1e"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/rv_trip_detail_travel_day"
@@ -248,6 +248,7 @@
                 android:layout_height="0dp"
                 android:layout_marginTop="12dp"
                 android:orientation="vertical"
+                android:overScrollMode="never"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

@@ -3,34 +3,155 @@ package com.on.turip.ui.trip.detail
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import com.on.turip.di.RepositoryModule
+import com.on.turip.domain.videoinfo.contents.Content
+import com.on.turip.domain.videoinfo.contents.VideoData
+import com.on.turip.domain.videoinfo.contents.creator.Creator
+import com.on.turip.domain.videoinfo.contents.creator.repository.CreatorRepository
+import com.on.turip.domain.videoinfo.contents.repository.ContentRepository
+import com.on.turip.domain.videoinfo.contents.video.trip.Trip
+import com.on.turip.domain.videoinfo.contents.video.trip.TripDuration
+import com.on.turip.domain.videoinfo.contents.video.trip.repository.TripRepository
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 
-class TripDetailViewModel : ViewModel() {
-    private val _days: MutableLiveData<List<DayModel>> = MutableLiveData(emptyList())
-    val days: LiveData<List<DayModel>> get() = _days
+class TripDetailViewModel(
+    private val contentId: Long,
+    private val creatorId: Long,
+    private val contentRepository: ContentRepository,
+    private val creatorRepository: CreatorRepository,
+    private val tripRepository: TripRepository,
+) : ViewModel() {
+    private val _tripDetailState: MutableLiveData<TripDetailState> =
+        MutableLiveData(TripDetailState())
+    val tripDetailState: LiveData<TripDetailState> = _tripDetailState
 
-    private val _places: MutableLiveData<List<PlaceModel>> = MutableLiveData(emptyList())
-    val places: LiveData<List<PlaceModel>> get() = _places
-
-    private var placeCacheByDay: Map<DayModel, List<PlaceModel>>
+    private var placeCacheByDay: Map<Int, List<PlaceModel>> = emptyMap()
 
     init {
-        val loadDay: Int = 3 // TODO: 서버에서 받아온 여행일정 X일을 추출해서 추가
-        _days.value = loadDay.initDayModels()
-        placeCacheByDay = emptyMap() // TODO: 서버에서 받아온 데이터로 key:일차, value: 장소들로 map 자료구조로 캐싱
-        _places.value = placeCacheByDay[DayModel(1)]
+        loadContent()
+        loadTrip()
     }
 
-    fun updateDay(day: DayModel) {
-        val daysStatus: List<DayModel> = days.value ?: return // TODO: days.value null 일 때 로직 처리 필요
-        val updateDaysStatus =
-            daysStatus.map { dayModel ->
-                if (dayModel.isSame(day)) {
-                    dayModel.copy(isSelected = true)
-                } else {
-                    dayModel.copy(isSelected = false)
+    private fun loadContent() {
+        viewModelScope.launch {
+            val creator: Deferred<Result<Creator>> =
+                async {
+                    creatorRepository.loadCreator(creatorId)
+                }
+            val videoData: Deferred<Result<VideoData>> =
+                async {
+                    contentRepository.loadContent(contentId)
+                }
+
+            creator
+                .await()
+                .onSuccess { creator: Creator ->
+                    videoData
+                        .await()
+                        .onSuccess { videoData: VideoData ->
+                            _tripDetailState.value =
+                                tripDetailState.value?.copy(
+                                    content =
+                                        Content(
+                                            id = contentId,
+                                            creator = creator,
+                                            videoData = videoData,
+                                        ),
+                                )
+                        }
+                }
+        }
+    }
+
+    private fun loadTrip() {
+        viewModelScope.launch {
+            tripRepository
+                .loadTripInfo(contentId)
+                .onSuccess { trip: Trip ->
+                    setupCached(trip)
+
+                    _tripDetailState.value =
+                        tripDetailState.value?.copy(
+                            days =
+                                placeCacheByDay.keys
+                                    .sorted()
+                                    .mapIndexed { index, day ->
+                                        DayModel(day = day, isSelected = index == 0)
+                                    },
+                            places = placeCacheByDay[1] ?: emptyList(),
+                            trip = trip,
+                        )
+                }
+        }
+    }
+
+    private fun setupCached(trip: Trip) {
+        val dayModels = trip.tripDuration.days.initDayModels()
+
+        placeCacheByDay =
+            dayModels.associate { dayModel ->
+                val day = dayModel.day
+                val coursesForDay = trip.tripCourses.filter { it.visitDay == day }
+                val placeModels =
+                    coursesForDay.map { course ->
+                        PlaceModel(
+                            name = course.place.name,
+                            category = course.place.category.joinToString(),
+                            mapLink = course.place.url,
+                        )
+                    }
+                day to placeModels
+            }
+    }
+
+    fun updateDay(dayModel: DayModel) {
+        tripDetailState.value?.let { state ->
+            _tripDetailState.value =
+                state.copy(
+                    days = state.days.map { it.copy(isSelected = it.day == dayModel.day) },
+                    places = placeCacheByDay[dayModel.day].orEmpty(),
+                )
+        }
+    }
+
+    companion object {
+        fun provideFactory(
+            contentId: Long,
+            creatorId: Long,
+            contentRepository: ContentRepository = RepositoryModule.contentRepository,
+            creatorRepository: CreatorRepository = RepositoryModule.creatorRepository,
+            travelRepository: TripRepository = RepositoryModule.tripRepository,
+        ): ViewModelProvider.Factory =
+            object : ViewModelProvider.Factory {
+                @Suppress("UNCHECKED_CAST")
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    if (modelClass.isAssignableFrom(TripDetailViewModel::class.java)) {
+                        return TripDetailViewModel(
+                            contentId,
+                            creatorId,
+                            contentRepository,
+                            creatorRepository,
+                            travelRepository,
+                        ) as T
+                    }
+                    throw IllegalArgumentException()
                 }
             }
-        _days.value = updateDaysStatus
-        _places.value = placeCacheByDay[day]
     }
+
+    data class TripDetailState(
+        val content: Content? = null,
+        val days: List<DayModel> = emptyList<DayModel>(),
+        val places: List<PlaceModel> = emptyList<PlaceModel>(),
+        val trip: Trip =
+            Trip(
+                tripDuration = TripDuration(0, 0),
+                tripPlaceCount = 0,
+                tripCourses = emptyList(),
+            ),
+    )
 }
