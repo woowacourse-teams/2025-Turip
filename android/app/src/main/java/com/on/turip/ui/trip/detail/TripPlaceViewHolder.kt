@@ -2,6 +2,7 @@ package com.on.turip.ui.trip.detail
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.on.turip.databinding.ItemTravelPlaceBinding
 
@@ -23,6 +24,7 @@ class TripPlaceViewHolder(
         this.placeModel = placeModel
         binding.tvTravelPlaceName.text = placeModel.name
         binding.tvTravelPlaceCategory.text = placeModel.category
+        binding.ivTravelPlaceLink.isVisible = placeModel.mapLink != "nan"
     }
 
     companion object {
