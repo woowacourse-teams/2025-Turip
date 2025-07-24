@@ -1,19 +1,19 @@
-package com.on.turip.ui.travel.detail
+package com.on.turip.ui.trip.detail
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 
-class TravelDayAdapter(
-    private val onClickListener: TravelDayViewHolder.OnDayListener,
-) : ListAdapter<DayModel, TravelDayViewHolder>(TravelDayDiffUtil) {
+class TripDayAdapter(
+    private val onClickListener: TripDayViewHolder.OnDayListener,
+) : ListAdapter<DayModel, TripDayViewHolder>(TravelDayDiffUtil) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): TravelDayViewHolder = TravelDayViewHolder.of(parent, onClickListener)
+    ): TripDayViewHolder = TripDayViewHolder.of(parent, onClickListener)
 
     override fun onBindViewHolder(
-        holder: TravelDayViewHolder,
+        holder: TripDayViewHolder,
         position: Int,
     ) {
         val dayModel: DayModel = getItem(position)

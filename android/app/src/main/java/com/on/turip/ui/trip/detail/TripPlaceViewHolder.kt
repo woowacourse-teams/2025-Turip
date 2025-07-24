@@ -1,11 +1,11 @@
-package com.on.turip.ui.travel.detail
+package com.on.turip.ui.trip.detail
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.on.turip.databinding.ItemTravelPlaceBinding
 
-class TravelPlaceViewHolder(
+class TripPlaceViewHolder(
     private val binding: ItemTravelPlaceBinding,
     onClickListener: OnPlaceListener,
 ) : RecyclerView.ViewHolder(binding.root) {
@@ -29,11 +29,11 @@ class TravelPlaceViewHolder(
         fun of(
             parent: ViewGroup,
             onClickListener: OnPlaceListener,
-        ): TravelPlaceViewHolder {
+        ): TripPlaceViewHolder {
             val inflater: LayoutInflater = LayoutInflater.from(parent.context)
             val binding: ItemTravelPlaceBinding =
                 ItemTravelPlaceBinding.inflate(inflater, parent, false)
-            return TravelPlaceViewHolder(binding, onClickListener)
+            return TripPlaceViewHolder(binding, onClickListener)
         }
     }
 

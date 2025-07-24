@@ -29,7 +29,7 @@
             android:name=".ui.search.result.SearchResultActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.travel.detail.TravelDetailActivity"
+            android:name=".ui.trip.detail.TripDetailActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="false" />
         <activity

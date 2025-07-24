@@ -1,4 +1,4 @@
-package com.on.turip.ui.travel.detail
+package com.on.turip.ui.trip.detail
 
 import android.view.LayoutInflater
 import android.view.View
@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.on.turip.R
 import com.on.turip.databinding.ItemTravelDayBinding
 
-class TravelDayViewHolder(
+class TripDayViewHolder(
     private val binding: ItemTravelDayBinding,
     onClickListener: OnDayListener,
 ) : RecyclerView.ViewHolder(binding.root) {
@@ -24,7 +24,7 @@ class TravelDayViewHolder(
     fun bind(dayModel: DayModel) {
         this.dayModel = dayModel
         binding.tvTravelDayDay.text =
-            itemView.context.getString(R.string.search_detail_travel_day, dayModel.day)
+            itemView.context.getString(R.string.trip_detail_travel_day, dayModel.day)
         binding.divTravelDayUnderline.visibility =
             if (dayModel.isSelected) View.VISIBLE else View.GONE
     }
@@ -33,11 +33,11 @@ class TravelDayViewHolder(
         fun of(
             parent: ViewGroup,
             onClickListener: OnDayListener,
-        ): TravelDayViewHolder {
+        ): TripDayViewHolder {
             val inflater: LayoutInflater = LayoutInflater.from(parent.context)
             val binding: ItemTravelDayBinding =
                 ItemTravelDayBinding.inflate(inflater, parent, false)
-            return TravelDayViewHolder(binding, onClickListener)
+            return TripDayViewHolder(binding, onClickListener)
         }
     }
 

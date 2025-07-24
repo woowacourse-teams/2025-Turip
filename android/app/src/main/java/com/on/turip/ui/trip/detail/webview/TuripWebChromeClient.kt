@@ -1,4 +1,4 @@
-package com.on.turip.ui.travel.detail.webview
+package com.on.turip.ui.trip.detail.webview
 
 import android.view.View
 import android.webkit.WebChromeClient
