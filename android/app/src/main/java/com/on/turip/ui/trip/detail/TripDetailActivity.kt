@@ -13,7 +13,6 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.on.turip.databinding.ActivityTripDetailBinding
 import com.on.turip.ui.common.base.BaseActivity
-import com.on.turip.ui.trip.detail.TravelDetailViewModel.TripDetailViewModel
 import com.on.turip.ui.trip.detail.webview.TuripWebChromeClient
 import com.on.turip.ui.trip.detail.webview.TuripWebViewClient
 import com.on.turip.ui.trip.detail.webview.WebViewVideoBridge
@@ -155,11 +154,9 @@ class TripDetailActivity : BaseActivity<TripDetailViewModel, ActivityTripDetailB
     }
 
     private fun setupObservers() {
-        viewModel.days.observe(this) { dayModels ->
-            tripDayAdapter.submitList(dayModels)
-        }
-        viewModel.places.observe(this) { placeModels ->
-            tripPlaceAdapter.submitList(placeModels)
+        viewModel.tripDetailState.observe(this) { tripDetailState: TripDetailViewModel.TripDetailState ->
+            tripDayAdapter.submitList(tripDetailState.days)
+            tripPlaceAdapter.submitList(tripDetailState.places)
         }
     }
 

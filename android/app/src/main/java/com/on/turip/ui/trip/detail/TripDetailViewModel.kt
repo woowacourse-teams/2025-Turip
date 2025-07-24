@@ -1,5 +1,6 @@
 package com.on.turip.ui.trip.detail
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,6 +13,8 @@ import com.on.turip.domain.videoinfo.contents.creator.Creator
 import com.on.turip.domain.videoinfo.contents.creator.repository.CreatorRepository
 import com.on.turip.domain.videoinfo.contents.repository.ContentRepository
 import com.on.turip.domain.videoinfo.contents.video.trip.Trip
+import com.on.turip.domain.videoinfo.contents.video.trip.TripCourse
+import com.on.turip.domain.videoinfo.contents.video.trip.TripDuration
 import com.on.turip.domain.videoinfo.contents.video.trip.repository.TripRepository
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
@@ -24,44 +27,16 @@ class TripDetailViewModel(
     private val creatorRepository: CreatorRepository,
     private val tripRepository: TripRepository,
 ) : ViewModel() {
-    private val _travelDetailState: MutableLiveData<TravelDetailState> = MutableLiveData()
-    val travelDetailState: LiveData<TravelDetailState> = _travelDetailState
+    private val _tripDetailState: MutableLiveData<TripDetailState> =
+        MutableLiveData(TripDetailState())
+    val tripDetailState: LiveData<TripDetailState> = _tripDetailState
 
     private var placeCacheByDay: Map<DayModel, List<PlaceModel>> = emptyMap()
 
     init {
-        setting()
         loadContent()
         loadTrip()
-    }
-
-    private fun setting() {
-        val loadDay = travelDetailState.value?.trip?.tripPlaceCount ?: 0
-        _travelDetailState.value =
-            travelDetailState.value?.copy(
-                days = loadDay.initDayModels(),
-            )
-        placeCacheByDay = emptyMap() // TODO: 서버에서 받아온 데이터로 key:일차, value: 장소들로 map 자료구조로 캐싱
-        _travelDetailState.value =
-            travelDetailState.value?.copy(
-                places = placeCacheByDay[DayModel(1)] ?: emptyList(),
-            )
-    }
-
-    private fun loadTrip() {
-        viewModelScope.launch {
-            val trip =
-                async {
-                    tripRepository.loadTripInfo(contentId)
-                }
-
-            trip.await().onSuccess { trip: Trip ->
-                _travelDetailState.value =
-                    travelDetailState.value?.copy(
-                        trip = trip,
-                    )
-            }
-        }
+        setupTripDetails()
     }
 
     private fun loadContent() {
@@ -75,24 +50,83 @@ class TripDetailViewModel(
                     contentRepository.loadContent(contentId)
                 }
 
-            creator.await().onSuccess { creator: Creator ->
-                videoData.await().onSuccess { videoData: VideoData ->
-                    _travelDetailState.value =
-                        travelDetailState.value?.copy(
-                            content =
-                                Content(
-                                    id = contentId,
-                                    creator = creator,
-                                    videoData = videoData,
-                                ),
-                        )
+            creator
+                .await()
+                .onSuccess { creator: Creator ->
+                    Log.e("TAG", "loadContent: $creator")
+                    videoData
+                        .await()
+                        .onSuccess { videoData: VideoData ->
+                            _tripDetailState.value =
+                                tripDetailState.value?.copy(
+                                    content =
+                                        Content(
+                                            id = contentId,
+                                            creator = creator,
+                                            videoData = videoData,
+                                        ),
+                                )
+                        }
+                }.onFailure {
+                    Log.e("TAG", "loadContent ${it.message}")
                 }
-            }
         }
     }
 
+    private fun loadTrip() {
+        viewModelScope.launch {
+            val trip =
+                async {
+                    tripRepository.loadTripInfo(contentId)
+                }
+
+            trip
+                .await()
+                .onSuccess { trip: Trip ->
+                    Log.e("TAG", "loadTrip: $trip ")
+                    _tripDetailState.value =
+                        tripDetailState.value?.copy(
+                            trip = trip,
+                        )
+                    setupCache(trip)
+                }.onFailure {
+                    Log.d("TAG", "loadTrip: ${it.message}")
+                }
+        }
+    }
+
+    private fun setupTripDetails() {
+        val loadDay = tripDetailState.value?.trip?.tripPlaceCount ?: 0
+        _tripDetailState.value =
+            tripDetailState.value?.copy(
+                days = loadDay.initDayModels(),
+            )
+        _tripDetailState.value =
+            tripDetailState.value?.copy(
+                places = placeCacheByDay[DayModel(1)] ?: emptyList(),
+            )
+    }
+
+    private fun setupCache(trip: Trip) {
+        val dayModel: List<DayModel> = trip.tripDuration.days.initDayModels()
+
+        placeCacheByDay =
+            dayModel.associateWith { dayModel: DayModel ->
+                val coursesForDay: List<TripCourse> =
+                    trip.tripCourses.filter { it.visitDay == dayModel.day }
+                coursesForDay.map { it: TripCourse ->
+                    PlaceModel(
+                        name = it.place.name,
+                        category = it.place.category.toString(),
+                        mapLink = it.place.url,
+                    )
+                }
+            }
+    }
+
     fun updateDay(day: DayModel) {
-        val daysStatus: List<DayModel> = days.value ?: return // TODO: days.value null 일 때 로직 처리 필요
+        val daysStatus: List<DayModel> =
+            tripDetailState.value?.days ?: return // TODO: days.value null 일 때 로직 처리 필요
         val updateDaysStatus =
             daysStatus.map { dayModel ->
                 if (dayModel.isSame(day)) {
@@ -101,8 +135,8 @@ class TripDetailViewModel(
                     dayModel.copy(isSelected = false)
                 }
             }
-        _travelDetailState.value =
-            travelDetailState.value?.copy(
+        _tripDetailState.value =
+            tripDetailState.value?.copy(
                 days = updateDaysStatus,
                 places = placeCacheByDay[day] ?: emptyList(),
             )
@@ -133,9 +167,33 @@ class TripDetailViewModel(
             }
     }
 
-    data class TravelDetailState(
-        val content: Content,
-        val trip: Trip,
+    data class TripDetailState(
+        val content: Content =
+            Content(
+                id = 1,
+                creator =
+                    Creator(
+                        id = 1,
+                        channelName = "",
+                        profileImage = "",
+                    ),
+                videoData =
+                    VideoData(
+                        title = "",
+                        url = "",
+                        uploadedDate = "",
+                    ),
+            ),
+        val trip: Trip =
+            Trip(
+                tripDuration =
+                    TripDuration(
+                        nights = 1,
+                        days = 1,
+                    ),
+                tripPlaceCount = 1,
+                tripCourses = emptyList(),
+            ),
         var days: List<DayModel> = emptyList<DayModel>(),
         val places: List<PlaceModel> = emptyList<PlaceModel>(),
     )

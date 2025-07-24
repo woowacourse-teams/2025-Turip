@@ -20,13 +20,15 @@ class SearchResultViewHolder(
     init {
         itemView.setOnClickListener {
             onSearchResultListener.onSearchResultClick(
-                content?.id,
-                creator?.id,
+                content?.id ?: 0,
+                creator?.id ?: 0,
             )
         }
     }
 
     fun bind(videoInformation: VideoInformation) {
+        creator = videoInformation.content.creator
+        content = videoInformation.content
         binding.tvSearchResultTitle.text = videoInformation.content.videoData.title
         binding.tvSearchResultDay.text =
             itemView.context.getString(
@@ -46,7 +48,6 @@ class SearchResultViewHolder(
                 videoInformation.content.videoData.uploadedDate,
             )
         binding.ivSearchResultThumbnail.loadCircularImage(videoInformation.content.creator.profileImage)
-        creator = videoInformation.content.creator
     }
 
     companion object {
@@ -63,8 +64,8 @@ class SearchResultViewHolder(
 
     fun interface OnSearchResultListener {
         fun onSearchResultClick(
-            contentId: Long?,
-            creatorId: Long?,
+            contentId: Long,
+            creatorId: Long,
         )
     }
 }
