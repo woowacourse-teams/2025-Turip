@@ -23,5 +23,8 @@ class DefaultContentRepository(
             .getContents(region, size, lastId)
             .mapCatching { it.toDomain() }
 
-    override suspend fun loadContent(contentId: Long): Result<VideoData> = TODO("추가 구현")
+    override suspend fun loadContent(contentId: Long): Result<VideoData> =
+        contentRemoteDataSource
+            .getContentDetail(contentId)
+            .mapCatching { it.toDomain() }
 }

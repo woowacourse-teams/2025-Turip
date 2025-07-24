@@ -5,7 +5,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -28,7 +27,7 @@ public class TripCourse {
 
     private int visitOrder;
 
-    @OneToOne
+    @ManyToOne
     private Place place;
 
     @ManyToOne

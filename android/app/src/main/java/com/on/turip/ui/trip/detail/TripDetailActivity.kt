@@ -1,4 +1,4 @@
-package com.on.turip.ui.travel.detail
+package com.on.turip.ui.trip.detail
 
 import android.content.Context
 import android.content.Intent
@@ -11,39 +11,40 @@ import androidx.core.net.toUri
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import com.on.turip.databinding.ActivitySearchDetailBinding
+import com.on.turip.databinding.ActivityTripDetailBinding
 import com.on.turip.ui.common.base.BaseActivity
-import com.on.turip.ui.travel.detail.webview.TuripWebChromeClient
-import com.on.turip.ui.travel.detail.webview.TuripWebViewClient
-import com.on.turip.ui.travel.detail.webview.WebViewVideoBridge
-import com.on.turip.ui.travel.detail.webview.applyVideoSettings
+import com.on.turip.ui.trip.detail.TravelDetailViewModel.TripDetailViewModel
+import com.on.turip.ui.trip.detail.webview.TuripWebChromeClient
+import com.on.turip.ui.trip.detail.webview.TuripWebViewClient
+import com.on.turip.ui.trip.detail.webview.WebViewVideoBridge
+import com.on.turip.ui.trip.detail.webview.applyVideoSettings
 
-class TravelDetailActivity : BaseActivity<TravelDetailViewModel, ActivitySearchDetailBinding>() {
-    override val viewModel: TravelDetailViewModel by viewModels {
-        TravelDetailViewModel.provideFactory(
+class TripDetailActivity : BaseActivity<TripDetailViewModel, ActivityTripDetailBinding>() {
+    override val binding: ActivityTripDetailBinding by lazy {
+        ActivityTripDetailBinding.inflate(layoutInflater)
+    }
+    override val viewModel: TripDetailViewModel by viewModels {
+        TripDetailViewModel.provideFactory(
             intent.getLongExtra(CONTENT_KEY, 0),
             intent.getLongExtra(CREATOR_KEY, 0),
         )
     }
-    override val binding: ActivitySearchDetailBinding by lazy {
-        ActivitySearchDetailBinding.inflate(layoutInflater)
-    }
     private val turipWebChromeClient: TuripWebChromeClient by lazy {
         TuripWebChromeClient(
-            fullScreenView = binding.flSearchDetailVideoFullscreen,
+            fullScreenView = binding.flTripDetailVideoFullscreen,
             onEnterFullScreen = ::enableFullscreen,
             onExitFullScreen = ::disableFullscreen,
         )
     }
 
-    private val travelDayAdapter by lazy {
-        TravelDayAdapter { dayModel ->
+    private val tripDayAdapter by lazy {
+        TripDayAdapter { dayModel ->
             viewModel.updateDay(dayModel)
         }
     }
 
-    private val travelPlaceAdapter by lazy {
-        TravelPlaceAdapter { placeModel ->
+    private val tripPlaceAdapter by lazy {
+        TripPlaceAdapter { placeModel ->
             val intent = Intent(Intent.ACTION_VIEW, placeModel.placeUri)
             startActivity(intent)
         }
@@ -57,8 +58,8 @@ class TravelDetailActivity : BaseActivity<TravelDetailViewModel, ActivitySearchD
                 WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
 
-        binding.tbSearchDetail.visibility = View.GONE
-        binding.nsvSearchDetail.visibility = View.GONE
+        binding.tbTripDetail.visibility = View.GONE
+        binding.nsvTripDetail.visibility = View.GONE
 
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
     }
@@ -71,8 +72,8 @@ class TravelDetailActivity : BaseActivity<TravelDetailViewModel, ActivitySearchD
                 WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
 
-        binding.tbSearchDetail.visibility = View.VISIBLE
-        binding.nsvSearchDetail.visibility = View.VISIBLE
+        binding.tbTripDetail.visibility = View.VISIBLE
+        binding.nsvTripDetail.visibility = View.VISIBLE
 
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     }
@@ -89,7 +90,7 @@ class TravelDetailActivity : BaseActivity<TravelDetailViewModel, ActivitySearchD
     }
 
     private fun setupToolbar() {
-        setSupportActionBar(binding.tbSearchDetail)
+        setSupportActionBar(binding.tbTripDetail)
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
             title = null
@@ -103,8 +104,8 @@ class TravelDetailActivity : BaseActivity<TravelDetailViewModel, ActivitySearchD
                 override fun handleOnBackPressed() {
                     if (turipWebChromeClient.isFullScreen()) {
                         turipWebChromeClient.onHideCustomView()
-                    } else if (binding.wvSearchDetailVideo.canGoBack()) {
-                        binding.wvSearchDetailVideo.goBack()
+                    } else if (binding.wvTripDetailVideo.canGoBack()) {
+                        binding.wvTripDetailVideo.goBack()
                     } else {
                         finish()
                     }
@@ -114,36 +115,36 @@ class TravelDetailActivity : BaseActivity<TravelDetailViewModel, ActivitySearchD
     }
 
     private fun setupWebView() {
-        binding.wvSearchDetailVideo.apply {
+        binding.wvTripDetailVideo.apply {
             applyVideoSettings()
             webChromeClient = turipWebChromeClient
-            webViewClient = TuripWebViewClient(binding.pbSearchDetailVideo)
+            webViewClient = TuripWebViewClient(binding.pbTripDetailVideo)
             addJavascriptInterface(
                 // TODO 생성자에 url의 일부 추출 필요, WebViewUtils에 구현한 String.extractVideoId() 사용 예정
                 WebViewVideoBridge("") { showWebViewErrorView() },
                 BRIDGE_NAME_IN_JS_FILE,
             )
         }
-        binding.wvSearchDetailVideo.loadUrl(LOAD_URL_FILE_PATH)
+        binding.wvTripDetailVideo.loadUrl(LOAD_URL_FILE_PATH)
     }
 
     private fun showWebViewErrorView() {
         runOnUiThread {
-            binding.wvSearchDetailVideo.visibility = View.GONE
-            binding.tvSearchDetailVideoError.visibility = View.VISIBLE
+            binding.wvTripDetailVideo.visibility = View.GONE
+            binding.tvTripDetailVideoError.visibility = View.VISIBLE
         }
     }
 
     private fun setupAdapters() {
-        binding.rvSearchDetailTravelDay.adapter = travelDayAdapter
-        binding.rvSearchDetailTravelPlace.apply {
-            adapter = travelPlaceAdapter
+        binding.rvTripDetailTravelDay.adapter = tripDayAdapter
+        binding.rvTripDetailTravelPlace.apply {
+            adapter = tripPlaceAdapter
             itemAnimator = null
         }
     }
 
     private fun setupListeners() {
-        binding.tvSearchDetailVideoError.setOnClickListener {
+        binding.tvTripDetailVideoError.setOnClickListener {
             val intent: Intent =
                 Intent(
                     Intent.ACTION_VIEW,
@@ -155,15 +156,15 @@ class TravelDetailActivity : BaseActivity<TravelDetailViewModel, ActivitySearchD
 
     private fun setupObservers() {
         viewModel.days.observe(this) { dayModels ->
-            travelDayAdapter.submitList(dayModels)
+            tripDayAdapter.submitList(dayModels)
         }
         viewModel.places.observe(this) { placeModels ->
-            travelPlaceAdapter.submitList(placeModels)
+            tripPlaceAdapter.submitList(placeModels)
         }
     }
 
     override fun onDestroy() {
-        binding.wvSearchDetailVideo.destroy()
+        binding.wvTripDetailVideo.destroy()
         super.onDestroy()
     }
 
@@ -178,7 +179,7 @@ class TravelDetailActivity : BaseActivity<TravelDetailViewModel, ActivitySearchD
             contentId: Long,
             creatorId: Long,
         ): Intent =
-            Intent(context, TravelDetailActivity::class.java)
+            Intent(context, TripDetailActivity::class.java)
                 .putExtra(CONTENT_KEY, contentId)
                 .putExtra(CREATOR_KEY, creatorId)
     }

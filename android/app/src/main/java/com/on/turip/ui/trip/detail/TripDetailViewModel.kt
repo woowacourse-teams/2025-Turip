@@ -1,4 +1,4 @@
-package com.on.turip.ui.travel.detail
+package com.on.turip.ui.trip.detail
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -12,17 +12,17 @@ import com.on.turip.domain.videoinfo.contents.creator.Creator
 import com.on.turip.domain.videoinfo.contents.creator.repository.CreatorRepository
 import com.on.turip.domain.videoinfo.contents.repository.ContentRepository
 import com.on.turip.domain.videoinfo.contents.video.trip.Trip
-import com.on.turip.domain.videoinfo.contents.video.trip.repository.TravelCourseRepository
+import com.on.turip.domain.videoinfo.contents.video.trip.repository.TripRepository
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
-class TravelDetailViewModel(
+class TripDetailViewModel(
     private val contentId: Long,
     private val creatorId: Long,
     private val contentRepository: ContentRepository,
     private val creatorRepository: CreatorRepository,
-    private val travelRepository: TravelCourseRepository,
+    private val tripRepository: TripRepository,
 ) : ViewModel() {
     private val _travelDetailState: MutableLiveData<TravelDetailState> = MutableLiveData()
     val travelDetailState: LiveData<TravelDetailState> = _travelDetailState
@@ -52,7 +52,7 @@ class TravelDetailViewModel(
         viewModelScope.launch {
             val trip =
                 async {
-                    travelRepository.loadTripInfo(contentId)
+                    tripRepository.loadTripInfo(contentId)
                 }
 
             trip.await().onSuccess { trip: Trip ->
@@ -92,7 +92,7 @@ class TravelDetailViewModel(
     }
 
     fun updateDay(day: DayModel) {
-        val daysStatus: List<DayModel> = travelDetailState.value?.days ?: emptyList()
+        val daysStatus: List<DayModel> = days.value ?: return // TODO: days.value null 일 때 로직 처리 필요
         val updateDaysStatus =
             daysStatus.map { dayModel ->
                 if (dayModel.isSame(day)) {
@@ -114,13 +114,13 @@ class TravelDetailViewModel(
             creatorId: Long,
             contentRepository: ContentRepository = RepositoryModule.contentRepository,
             creatorRepository: CreatorRepository = RepositoryModule.creatorRepository,
-            travelRepository: TravelCourseRepository = RepositoryModule.travelCourseRepository,
+            travelRepository: TripRepository = RepositoryModule.tripRepository,
         ): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    if (modelClass.isAssignableFrom(TravelDetailViewModel::class.java)) {
-                        return TravelDetailViewModel(
+                    if (modelClass.isAssignableFrom(TripDetailViewModel::class.java)) {
+                        return TripDetailViewModel(
                             contentId,
                             creatorId,
                             contentRepository,

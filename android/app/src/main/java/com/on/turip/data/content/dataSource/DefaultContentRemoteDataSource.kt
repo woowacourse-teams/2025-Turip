@@ -1,5 +1,6 @@
 package com.on.turip.data.content.dataSource
 
+import com.on.turip.data.content.dto.ContentDetailResponse
 import com.on.turip.data.content.dto.ContentInformationCountResponse
 import com.on.turip.data.content.dto.ContentsInformationResponse
 import com.on.turip.data.content.service.ContentService
@@ -29,5 +30,10 @@ class DefaultContentRemoteDataSource(
                     lastId = lastId,
                 )
             }
+        }
+
+    override suspend fun getContentDetail(contentId: Long): Result<ContentDetailResponse> =
+        withContext(coroutineContext) {
+            runCatching { contentService.getContentDetail(contentId) }
         }
 }

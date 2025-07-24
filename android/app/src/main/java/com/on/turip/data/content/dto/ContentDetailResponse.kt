@@ -4,11 +4,11 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ContentResponse(
-    @SerialName("creator")
-    val creator: CreatorInformationResponse,
-    @SerialName("id")
-    val id: Long,
+data class ContentDetailResponse(
+    @SerialName("creatorId")
+    val creatorId: Int,
+    @SerialName("regionId")
+    val regionId: Int,
     @SerialName("title")
     val title: String,
     @SerialName("uploadedDate")

@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class TripDurationResponse(
+data class TripDurationInformationResponse(
     @SerialName("days")
     val days: Int,
     @SerialName("nights")

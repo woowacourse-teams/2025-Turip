@@ -1,19 +1,19 @@
-package com.on.turip.ui.travel.detail
+package com.on.turip.ui.trip.detail
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 
-class TravelPlaceAdapter(
-    private val onClickListener: TravelPlaceViewHolder.OnPlaceListener,
-) : ListAdapter<PlaceModel, TravelPlaceViewHolder>(TravelPlaceDiffUtil) {
+class TripPlaceAdapter(
+    private val onClickListener: TripPlaceViewHolder.OnPlaceListener,
+) : ListAdapter<PlaceModel, TripPlaceViewHolder>(TravelPlaceDiffUtil) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): TravelPlaceViewHolder = TravelPlaceViewHolder.of(parent, onClickListener)
+    ): TripPlaceViewHolder = TripPlaceViewHolder.of(parent, onClickListener)
 
     override fun onBindViewHolder(
-        holder: TravelPlaceViewHolder,
+        holder: TripPlaceViewHolder,
         position: Int,
     ) {
         val placeModel: PlaceModel = getItem(position)
