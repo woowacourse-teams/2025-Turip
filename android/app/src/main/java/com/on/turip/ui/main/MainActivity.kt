@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.BackgroundColorSpan
+import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import com.on.turip.R
@@ -32,10 +34,13 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
             startActivity(intent)
         }
 
+    private var backPressedTime: Long = 0L
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setupTextHighlighting()
+        handleDoubleBackPressToExit()
         setupAdapters()
         setupObservers()
     }
@@ -62,6 +67,27 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
             }
 
         binding.tvMainWhereShouldWeGoTitle.text = spannableText
+    }
+
+    private fun handleDoubleBackPressToExit() {
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    if (System.currentTimeMillis() - backPressedTime <= 2000) {
+                        finish()
+                    } else {
+                        backPressedTime = System.currentTimeMillis()
+                        Toast
+                            .makeText(
+                                this@MainActivity,
+                                getString(R.string.main_double_back_pressed_to_exit),
+                                Toast.LENGTH_SHORT,
+                            ).show()
+                    }
+                }
+            },
+        )
     }
 
     private fun setupAdapters() {
