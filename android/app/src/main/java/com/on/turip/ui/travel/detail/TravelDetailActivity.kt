@@ -13,14 +13,18 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.on.turip.databinding.ActivitySearchDetailBinding
 import com.on.turip.ui.common.base.BaseActivity
-import com.on.turip.ui.search.result.SearchResultActivity
 import com.on.turip.ui.travel.detail.webview.TuripWebChromeClient
 import com.on.turip.ui.travel.detail.webview.TuripWebViewClient
 import com.on.turip.ui.travel.detail.webview.WebViewVideoBridge
 import com.on.turip.ui.travel.detail.webview.applyVideoSettings
 
 class TravelDetailActivity : BaseActivity<TravelDetailViewModel, ActivitySearchDetailBinding>() {
-    override val viewModel: TravelDetailViewModel by viewModels()
+    override val viewModel: TravelDetailViewModel by viewModels {
+        TravelDetailViewModel.provideFactory(
+            intent.getLongExtra(CONTENT_KEY, 0),
+            intent.getLongExtra(CREATOR_KEY, 0),
+        )
+    }
     override val binding: ActivitySearchDetailBinding by lazy {
         ActivitySearchDetailBinding.inflate(layoutInflater)
     }
@@ -174,7 +178,7 @@ class TravelDetailActivity : BaseActivity<TravelDetailViewModel, ActivitySearchD
             contentId: Long,
             creatorId: Long,
         ): Intent =
-            Intent(context, SearchResultActivity::class.java)
+            Intent(context, TravelDetailActivity::class.java)
                 .putExtra(CONTENT_KEY, contentId)
                 .putExtra(CREATOR_KEY, creatorId)
     }

@@ -3,8 +3,19 @@ package com.on.turip.ui.travel.detail
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import com.on.turip.di.RepositoryModule
+import com.on.turip.domain.videoinfo.contents.creator.repository.CreatorRepository
+import com.on.turip.domain.videoinfo.contents.repository.ContentRepository
+import com.on.turip.domain.videoinfo.contents.video.trip.repository.TravelCourseRepository
 
-class TravelDetailViewModel : ViewModel() {
+class TravelDetailViewModel(
+    private val contentId: Long,
+    private val creatorId: Long,
+    private val contentRepository: ContentRepository,
+    private val creatorRepository: CreatorRepository,
+    private val travelRepository: TravelCourseRepository,
+) : ViewModel() {
     private val _days: MutableLiveData<List<DayModel>> = MutableLiveData(emptyList())
     val days: LiveData<List<DayModel>> get() = _days
 
@@ -32,5 +43,30 @@ class TravelDetailViewModel : ViewModel() {
             }
         _days.value = updateDaysStatus
         _places.value = placeCacheByDay[day]
+    }
+
+    companion object {
+        fun provideFactory(
+            contentId: Long,
+            creatorId: Long,
+            contentRepository: ContentRepository = RepositoryModule.contentRepository,
+            creatorRepository: CreatorRepository = RepositoryModule.creatorRepository,
+            travelRepository: TravelCourseRepository = RepositoryModule.travelCourseRepository,
+        ): ViewModelProvider.Factory =
+            object : ViewModelProvider.Factory {
+                @Suppress("UNCHECKED_CAST")
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    if (modelClass.isAssignableFrom(TravelDetailViewModel::class.java)) {
+                        return TravelDetailViewModel(
+                            contentId,
+                            creatorId,
+                            contentRepository,
+                            creatorRepository,
+                            travelRepository,
+                        ) as T
+                    }
+                    throw IllegalArgumentException()
+                }
+            }
     }
 }
