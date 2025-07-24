@@ -34,10 +34,6 @@ class DefaultContentRemoteDataSource(
 
     override suspend fun getContentDetail(contentId: Long): Result<ContentDetailResponse> =
         withContext(coroutineContext) {
-            runCatching {
-                contentService.getContentDetail(
-                    contentId = contentId,
-                )
-            }
+            runCatching { contentService.getContentDetail(contentId) }
         }
 }
