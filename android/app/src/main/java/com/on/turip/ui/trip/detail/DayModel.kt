@@ -1,4 +1,4 @@
-package com.on.turip.ui.travel.detail
+package com.on.turip.ui.trip.detail
 
 data class DayModel(
     val day: Int,

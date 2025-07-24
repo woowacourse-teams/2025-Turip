@@ -1,4 +1,4 @@
-package com.on.turip.ui.travel.detail
+package com.on.turip.ui.trip.detail
 
 import android.net.Uri
 import androidx.core.net.toUri
