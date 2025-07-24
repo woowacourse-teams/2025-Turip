@@ -13,6 +13,7 @@ import com.on.turip.domain.videoinfo.contents.creator.repository.CreatorReposito
 import com.on.turip.domain.videoinfo.contents.repository.ContentRepository
 import com.on.turip.domain.videoinfo.contents.video.trip.Trip
 import com.on.turip.domain.videoinfo.contents.video.trip.TripCourse
+import com.on.turip.domain.videoinfo.contents.video.trip.TripDuration
 import com.on.turip.domain.videoinfo.contents.video.trip.repository.TripRepository
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
@@ -78,6 +79,7 @@ class TripDetailViewModel(
                         tripDetailState.value?.copy(
                             days = placeCacheByDay.keys.toList(),
                             places = placeCacheByDay[DayModel(1, true)] ?: emptyList(),
+                            trip = trip,
                         )
                 }
         }
@@ -93,7 +95,7 @@ class TripDetailViewModel(
                 coursesForDay.map { it: TripCourse ->
                     PlaceModel(
                         name = it.place.name,
-                        category = it.place.category.toString(),
+                        category = it.place.category.joinToString(),
                         mapLink = it.place.url,
                     )
                 }
@@ -147,5 +149,11 @@ class TripDetailViewModel(
         val content: Content? = null,
         val days: List<DayModel> = emptyList<DayModel>(),
         val places: List<PlaceModel> = emptyList<PlaceModel>(),
+        val trip: Trip =
+            Trip(
+                tripDuration = TripDuration(0, 0),
+                tripPlaceCount = 0,
+                tripCourses = emptyList(),
+            ),
     )
 }

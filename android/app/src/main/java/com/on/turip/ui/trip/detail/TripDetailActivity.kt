@@ -11,8 +11,10 @@ import androidx.core.net.toUri
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import com.on.turip.R
 import com.on.turip.databinding.ActivityTripDetailBinding
 import com.on.turip.ui.common.base.BaseActivity
+import com.on.turip.ui.common.loadCircularImage
 import com.on.turip.ui.trip.detail.webview.TuripWebChromeClient
 import com.on.turip.ui.trip.detail.webview.TuripWebViewClient
 import com.on.turip.ui.trip.detail.webview.WebViewVideoBridge
@@ -53,8 +55,7 @@ class TripDetailActivity : BaseActivity<TripDetailViewModel, ActivityTripDetailB
         WindowCompat.setDecorFitsSystemWindows(this.window, false)
         WindowInsetsControllerCompat(window, window.decorView).apply {
             hide(WindowInsetsCompat.Type.systemBars())
-            systemBarsBehavior =
-                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
 
         binding.tbTripDetail.visibility = View.GONE
@@ -67,8 +68,7 @@ class TripDetailActivity : BaseActivity<TripDetailViewModel, ActivityTripDetailB
         WindowCompat.setDecorFitsSystemWindows(this.window, true)
         WindowInsetsControllerCompat(window, window.decorView).apply {
             show(WindowInsetsCompat.Type.systemBars())
-            systemBarsBehavior =
-                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
 
         binding.tbTripDetail.visibility = View.VISIBLE
@@ -144,11 +144,15 @@ class TripDetailActivity : BaseActivity<TripDetailViewModel, ActivityTripDetailB
 
     private fun setupListeners() {
         binding.tvTripDetailVideoError.setOnClickListener {
-            val intent: Intent =
+            val intent =
                 Intent(
                     Intent.ACTION_VIEW,
-                    "".toUri(),
-                ) // TODO "" 에는 유튜브 영상 uri가 들어가야 한다.
+                    viewModel.tripDetailState.value
+                        ?.content
+                        ?.videoData
+                        ?.url
+                        ?.toUri(),
+                )
             startActivity(intent)
         }
     }
@@ -157,6 +161,25 @@ class TripDetailActivity : BaseActivity<TripDetailViewModel, ActivityTripDetailB
         viewModel.tripDetailState.observe(this) { tripDetailState ->
             tripDayAdapter.submitList(tripDetailState.days)
             tripPlaceAdapter.submitList(tripDetailState.places)
+            binding.ivTripDetailCreatorThumbnail.loadCircularImage(
+                tripDetailState.content?.creator?.profileImage ?: "",
+            )
+            binding.tvTripDetailCreatorName.text = tripDetailState.content?.creator?.channelName
+            binding.tvTripDetailContentTitle.text = tripDetailState.content?.videoData?.title
+            binding.tvTripDetailUploadDate.text = tripDetailState.content?.videoData?.uploadedDate
+            binding.tvTripDetailTotalPlaceCount.text =
+                getString(R.string.all_total_place_count, tripDetailState.trip.tripPlaceCount)
+            binding.tvTripDetailTravelDuration.text =
+                getString(
+                    R.string.all_travel_duration,
+                    tripDetailState.trip.tripDuration.days,
+                    tripDetailState.trip.tripDuration.nights,
+                )
+            binding.tvTripDetailDayPlaceCount.text =
+                getString(
+                    R.string.trip_detail_day_place_count,
+                    tripDetailState.places.size,
+                )
         }
     }
 
