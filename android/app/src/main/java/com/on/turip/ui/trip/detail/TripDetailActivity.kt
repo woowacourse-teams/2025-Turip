@@ -154,7 +154,7 @@ class TripDetailActivity : BaseActivity<TripDetailViewModel, ActivityTripDetailB
     }
 
     private fun setupObservers() {
-        viewModel.tripDetailState.observe(this) { tripDetailState: TripDetailViewModel.TripDetailState ->
+        viewModel.tripDetailState.observe(this) { tripDetailState ->
             tripDayAdapter.submitList(tripDetailState.days)
             tripPlaceAdapter.submitList(tripDetailState.places)
         }

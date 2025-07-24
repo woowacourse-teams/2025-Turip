@@ -1,6 +1,5 @@
 package com.on.turip.ui.trip.detail
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -14,7 +13,6 @@ import com.on.turip.domain.videoinfo.contents.creator.repository.CreatorReposito
 import com.on.turip.domain.videoinfo.contents.repository.ContentRepository
 import com.on.turip.domain.videoinfo.contents.video.trip.Trip
 import com.on.turip.domain.videoinfo.contents.video.trip.TripCourse
-import com.on.turip.domain.videoinfo.contents.video.trip.TripDuration
 import com.on.turip.domain.videoinfo.contents.video.trip.repository.TripRepository
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
@@ -36,7 +34,6 @@ class TripDetailViewModel(
     init {
         loadContent()
         loadTrip()
-        setupTripDetails()
     }
 
     private fun loadContent() {
@@ -53,7 +50,6 @@ class TripDetailViewModel(
             creator
                 .await()
                 .onSuccess { creator: Creator ->
-                    Log.e("TAG", "loadContent: $creator")
                     videoData
                         .await()
                         .onSuccess { videoData: VideoData ->
@@ -67,47 +63,27 @@ class TripDetailViewModel(
                                         ),
                                 )
                         }
-                }.onFailure {
-                    Log.e("TAG", "loadContent ${it.message}")
                 }
         }
     }
 
     private fun loadTrip() {
         viewModelScope.launch {
-            val trip =
-                async {
-                    tripRepository.loadTripInfo(contentId)
-                }
-
-            trip
-                .await()
+            tripRepository
+                .loadTripInfo(contentId)
                 .onSuccess { trip: Trip ->
-                    Log.e("TAG", "loadTrip: $trip ")
+                    setupCached(trip)
+
                     _tripDetailState.value =
                         tripDetailState.value?.copy(
-                            trip = trip,
+                            days = placeCacheByDay.keys.toList(),
+                            places = placeCacheByDay[DayModel(1, true)] ?: emptyList(),
                         )
-                    setupCache(trip)
-                }.onFailure {
-                    Log.d("TAG", "loadTrip: ${it.message}")
                 }
         }
     }
 
-    private fun setupTripDetails() {
-        val loadDay = tripDetailState.value?.trip?.tripPlaceCount ?: 0
-        _tripDetailState.value =
-            tripDetailState.value?.copy(
-                days = loadDay.initDayModels(),
-            )
-        _tripDetailState.value =
-            tripDetailState.value?.copy(
-                places = placeCacheByDay[DayModel(1)] ?: emptyList(),
-            )
-    }
-
-    private fun setupCache(trip: Trip) {
+    private fun setupCached(trip: Trip) {
         val dayModel: List<DayModel> = trip.tripDuration.days.initDayModels()
 
         placeCacheByDay =
@@ -168,33 +144,8 @@ class TripDetailViewModel(
     }
 
     data class TripDetailState(
-        val content: Content =
-            Content(
-                id = 1,
-                creator =
-                    Creator(
-                        id = 1,
-                        channelName = "",
-                        profileImage = "",
-                    ),
-                videoData =
-                    VideoData(
-                        title = "",
-                        url = "",
-                        uploadedDate = "",
-                    ),
-            ),
-        val trip: Trip =
-            Trip(
-                tripDuration =
-                    TripDuration(
-                        nights = 1,
-                        days = 1,
-                    ),
-                tripPlaceCount = 1,
-                tripCourses = emptyList(),
-            ),
-        var days: List<DayModel> = emptyList<DayModel>(),
+        val content: Content? = null,
+        val days: List<DayModel> = emptyList<DayModel>(),
         val places: List<PlaceModel> = emptyList<PlaceModel>(),
     )
 }
