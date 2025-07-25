@@ -12,7 +12,7 @@ public record CreatorResponse(
         return new CreatorResponse(
                 creator.getId(),
                 creator.getChannelName(),
-                creator.getChannelName()
+                creator.getProfileImage()
         );
     }
 }

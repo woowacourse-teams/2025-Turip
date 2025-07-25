@@ -1,6 +1,28 @@
 <resources>
-    <string name="app_name">Turip</string>
+    <string name="app_name">튜립</string>
+
+    <!-- 공용 -->
+    <string name="all_total_place_count">%d개 장소</string>
+    <string name="all_travel_duration">%d박 %d일</string>
+    <string name="all_loading">로딩 중…</string>
 
     <!-- 검색 결과 페이지 -->
-    <string name="no_result">검색 결과가 없습니다.</string>
+    <string name="search_result_no_result">검색 결과가 없습니다.</string>
+    <string name="search_result_video_description">%s · %s</string>
+    <string name="search_result_exist_result">검색결과 %d개</string>
+
+    <!-- 메인 페이지 -->
+    <string name="main_where_should_we_go_title">어디로 떠나볼까요?</string>
+    <string name="main_where_should_we_go_highlighting">떠나볼까요?</string>
+    <string name="main_searching_metropolitan_city">광역시 둘러보기</string>
+    <string name="main_searching_province">도 둘러보기</string>
+
+    <!-- 스플래시 페이지 -->
+    <string name="splash_description">직진만 남은 여행</string>
+
+    <!-- 검색 상세 페이지 -->
+    <string name="trip_detail_video_error">해당 영상은 제작자의 요청으로 유튜브를 이용해야만 시청할 수 있습니다.\n클릭 시 유튜브로 이동합니다.</string>
+    <string name="trip_detail_day_place_count">일정 %d개</string>
+    <string name="trip_detail_travel_day">%d일차</string>
+    <string name="main_double_back_pressed_to_exit">한 번 더 누르면 종료됩니다.</string>
 </resources>
