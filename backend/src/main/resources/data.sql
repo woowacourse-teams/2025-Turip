@@ -57,7 +57,12 @@ INSERT INTO creator (channel_name, profile_image)
 VALUES ('하찬투어 hachantour',
         'https://yt3.googleusercontent.com/xMc7FcCl689p_ymaijuY5WOwX9DeHaZ_WTnRHb8UajggQotOO8Bxd0P7cqsYYfubotgjlh4Qfw=s160-c-k-c0x00ffffff-no-rj');
 
+INSERT INTO creator (channel_name, profile_image)
+SELECT '여코남 - 여행코스짜주는남자', 'https://yt3.googleusercontent.com/u-Xw8QqIlARFXXN587LDHjc26YRupa53pSXkSbCkLvSDkO_sT8Vl17oPxRAfEuns4etcGlP8=s160-c-k-c0x00ffffff-no-rj'
+    WHERE NOT EXISTS (SELECT 1 FROM creator WHERE channel_name = '여코남 - 여행코스짜주는남자');
+
 -- Content
+-- 연수연
 INSERT INTO content (creator_id, region_id, title, url, uploaded_date)
 SELECT (SELECT id FROM creator WHERE channel_name = '연수연'),
        (SELECT id FROM region WHERE name = 'busan'),
@@ -65,6 +70,7 @@ SELECT (SELECT id FROM creator WHERE channel_name = '연수연'),
        'https://www.youtube.com/watch?v=U7vwpgZlD6Q',
        '2025-07-01';
 
+-- 하찬투어
 INSERT INTO content (creator_id, region_id, title, url, uploaded_date)
 SELECT (SELECT id FROM creator WHERE channel_name = '하찬투어 hachantour'),
        (SELECT id FROM region WHERE name = 'busan'),
@@ -73,6 +79,7 @@ SELECT (SELECT id FROM creator WHERE channel_name = '하찬투어 hachantour'),
        '2025-07-10';
 
 -- Place
+-- 부산
 INSERT INTO place (name, url, address, latitude, longitude)
 VALUES ('거북이금고',
         'https://map.naver.com/p/search/거북이금고/place/38623885',
@@ -352,55 +359,6 @@ VALUES ('이가네떡볶이',
         '부산 중구 부평1길 48',
         35.101531,
         129.026035);
-
-INSERT INTO place (name, url, address, latitude, longitude)
-VALUES ('오봉식당',
-        'https://map.naver.com/p/search/%EC%98%A4%EB%B4%89%EC%8B%9D%EB%8B%B9/place/12868910?c=15.00,0,0,0,dh&placePath=/home?entry=bmp&from=map&fromPanelNum=2&timestamp=202507212227&locale=ko&svcName=map_pcv5&searchText=%EC%98%A4%EB%B4%89%EC%8B%9D%EB%8B%B9',
-        '강원 속초시 중앙로 398',
-        38.223645,
-        128.588942);
-
-INSERT INTO place (name, url, address, latitude, longitude)
-VALUES ('켄싱턴호텔 설악',
-        'https://map.naver.com/p/entry/place/11555552?c=15.00,0,0,0,dh&placePath=/home?from=map&fromPanelNum=1&additionalHeight=76&timestamp=202507212229&locale=ko&svcName=map_pcv5&businessCategory=hotel&fromPanelNum=1&additionalHeight=76&timestamp=202507212229&locale=ko&svcName=map_pcv5',
-        '강원 속초시 설악산로 998',
-        38.1731,
-        128.498513);
-
-INSERT INTO place (name, url, address, latitude, longitude)
-VALUES ('청초수물회 속초본점',
-        'https://map.naver.com/p/search/%EC%B2%AD%EC%B4%88%EC%88%98%EB%AC%BC%ED%9A%8C/place/12028621?c=13.00,0,0,0,dh&placePath=/home?entry=bmp&from=map&fromPanelNum=2&timestamp=202507212232&locale=ko&svcName=map_pcv5&searchText=%EC%B2%AD%EC%B4%88%EC%88%98%EB%AC%BC%ED%9A%8C',
-        '강원 속초시 엑스포로 12-36 청초수물회 속초본점',
-        38.192355,
-        128.590454);
-
-INSERT INTO place (name, url, address, latitude, longitude)
-VALUES ('설악케이블카',
-        'https://map.naver.com/p/search/%EC%84%A4%EC%95%85%EC%82%B0/place/1244805381?c=6.00,0,0,0,dh&placePath=/home?entry=bmp&from=map&fromPanelNum=2&timestamp=202507212238&locale=ko&svcName=map_pcv5&searchText=%EC%84%A4%EC%95%85%EC%82%B0',
-        '강원 속초시 설악산로 1085',
-        38.173277,
-        128.489065);
-
-INSERT INTO place (name, url, address, latitude, longitude)
-VALUES ('영금정',
-        'https://map.naver.com/p/search/%EC%98%81%EA%B8%88%EC%A0%95/place/15085338?c=8.00,0,0,0,dh&placePath=/home?entry=bmp&from=map&fromPanelNum=2&timestamp=202507212241&locale=ko&svcName=map_pcv5&searchText=%EC%98%81%EA%B8%88%EC%A0%95',
-        '강원 속초시 영금정로 43',
-        38.212277,
-        128.602082);
-
-INSERT INTO place (name, url, address, latitude, longitude)
-VALUES ('속초해수욕장',
-        'https://map.naver.com/p/search/%EC%86%8D%EC%B4%88%ED%95%B4%EC%88%98%EC%9A%95%EC%9E%A5/place/11491735?c=15.00,0,0,0,dh&placePath=/home?entry=bmp&from=map&fromPanelNum=2&timestamp=202507212242&locale=ko&svcName=map_pcv5&searchText=%EC%86%8D%EC%B4%88%ED%95%B4%EC%88%98%EC%9A%95%EC%9E%A5',
-        '강원 속초시 조양동',
-        38.191593,
-        128.603584);
-
-INSERT INTO place (name, url, address, latitude, longitude)
-VALUES ('속초관광수산시장',
-        'https://map.naver.com/p/search/%EC%86%8D%EC%B4%88%20%EC%A4%91%EC%95%99%EC%8B%9C%EC%9E%A5/place/13345965?c=15.00,0,0,0,dh&placePath=/home?entry=bmp&from=map&fromPanelNum=2&timestamp=202507212244&locale=ko&svcName=map_pcv5&searchText=%EC%86%8D%EC%B4%88%20%EC%A4%91%EC%95%99%EC%8B%9C%EC%9E%A5',
-        '강원 속초시 중앙로147번길 12',
-        38.204687,
-        128.590235);
 
 -- PlaceCategory
 INSERT INTO place_category (place_id, category_id)
