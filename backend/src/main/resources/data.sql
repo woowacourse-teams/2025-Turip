@@ -66,7 +66,7 @@ SELECT '여코남 - 여행코스짜주는남자', 'https://yt3.googleusercontent
 INSERT INTO content (creator_id, region_id, title, url, uploaded_date)
 SELECT (SELECT id FROM creator WHERE channel_name = '연수연'),
        (SELECT id FROM region WHERE name = 'busan'),
-       '나혼자 기차 타고 부산 여행 vlog 🌊 | 당일치기 쌉가능한 여행코스 💌 , 200% 만족한 광안리 숙소 🏠, 부산 토박이의 단골집 추천까지,,💛 | 3박4일 부산 브이로그',
+       '🧳 튜립 파이팅! 🧳 ✈️',
        'https://www.youtube.com/watch?v=U7vwpgZlD6Q',
        '2025-07-01';
 
@@ -538,7 +538,7 @@ INSERT INTO trip_course (content_id, place_id, visit_day, visit_order)
 VALUES ((SELECT id
          FROM content
          WHERE title =
-               '나혼자 기차 타고 부산 여행 vlog 🌊 | 당일치기 쌉가능한 여행코스 💌 , 200% 만족한 광안리 숙소 🏠, 부산 토박이의 단골집 추천까지,,💛 | 3박4일 부산 브이로그'),
+               '🧳 튜립 파이팅! 🧳 ✈️'),
         (SELECT id FROM place WHERE name = '거북이금고'),
         1,
         1);
@@ -547,7 +547,7 @@ INSERT INTO trip_course (content_id, place_id, visit_day, visit_order)
 VALUES ((SELECT id
          FROM content
          WHERE title =
-               '나혼자 기차 타고 부산 여행 vlog 🌊 | 당일치기 쌉가능한 여행코스 💌 , 200% 만족한 광안리 숙소 🏠, 부산 토박이의 단골집 추천까지,,💛 | 3박4일 부산 브이로그'),
+               '🧳 튜립 파이팅! 🧳 ✈️'),
         (SELECT id FROM place WHERE name = '해운대'),
         1,
         2);
@@ -556,7 +556,7 @@ INSERT INTO trip_course (content_id, place_id, visit_day, visit_order)
 VALUES ((SELECT id
          FROM content
          WHERE title =
-               '나혼자 기차 타고 부산 여행 vlog 🌊 | 당일치기 쌉가능한 여행코스 💌 , 200% 만족한 광안리 숙소 🏠, 부산 토박이의 단골집 추천까지,,💛 | 3박4일 부산 브이로그'),
+               '🧳 튜립 파이팅! 🧳 ✈️'),
         (SELECT id FROM place WHERE name = '상국이네'),
         1,
         3);
@@ -565,7 +565,7 @@ INSERT INTO trip_course (content_id, place_id, visit_day, visit_order)
 VALUES ((SELECT id
          FROM content
          WHERE title =
-               '나혼자 기차 타고 부산 여행 vlog 🌊 | 당일치기 쌉가능한 여행코스 💌 , 200% 만족한 광안리 숙소 🏠, 부산 토박이의 단골집 추천까지,,💛 | 3박4일 부산 브이로그'),
+               '🧳 튜립 파이팅! 🧳 ✈️'),
         (SELECT id FROM place WHERE name = '고래서이뻐 해리단길'),
         1,
         4);
@@ -574,7 +574,7 @@ INSERT INTO trip_course (content_id, place_id, visit_day, visit_order)
 VALUES ((SELECT id
          FROM content
          WHERE title =
-               '나혼자 기차 타고 부산 여행 vlog 🌊 | 당일치기 쌉가능한 여행코스 💌 , 200% 만족한 광안리 숙소 🏠, 부산 토박이의 단골집 추천까지,,💛 | 3박4일 부산 브이로그'),
+               '🧳 튜립 파이팅! 🧳 ✈️'),
         (SELECT id FROM place WHERE name = '어컵오브웜티'),
         1,
         5);
@@ -583,7 +583,7 @@ INSERT INTO trip_course (content_id, place_id, visit_day, visit_order)
 VALUES ((SELECT id
          FROM content
          WHERE title =
-               '나혼자 기차 타고 부산 여행 vlog 🌊 | 당일치기 쌉가능한 여행코스 💌 , 200% 만족한 광안리 숙소 🏠, 부산 토박이의 단골집 추천까지,,💛 | 3박4일 부산 브이로그'),
+               '🧳 튜립 파이팅! 🧳 ✈️'),
         (SELECT id FROM place WHERE name = '코오리마찌 해운대해리단길'),
         1,
         6);
@@ -592,7 +592,7 @@ INSERT INTO trip_course (content_id, place_id, visit_day, visit_order)
 VALUES ((SELECT id
          FROM content
          WHERE title =
-               '나혼자 기차 타고 부산 여행 vlog 🌊 | 당일치기 쌉가능한 여행코스 💌 , 200% 만족한 광안리 숙소 🏠, 부산 토박이의 단골집 추천까지,,💛 | 3박4일 부산 브이로그'),
+               '🧳 튜립 파이팅! 🧳 ✈️'),
         (SELECT id FROM place WHERE name = '브로쓰마카롱 해운대점'),
         1,
         7);
@@ -601,7 +601,7 @@ INSERT INTO trip_course (content_id, place_id, visit_day, visit_order)
 VALUES ((SELECT id
          FROM content
          WHERE title =
-               '나혼자 기차 타고 부산 여행 vlog 🌊 | 당일치기 쌉가능한 여행코스 💌 , 200% 만족한 광안리 숙소 🏠, 부산 토박이의 단골집 추천까지,,💛 | 3박4일 부산 브이로그'),
+               '🧳 튜립 파이팅! 🧳 ✈️'),
         (SELECT id FROM place WHERE name = '신세계백화점 센텀시티점'),
         1,
         8);
@@ -610,7 +610,7 @@ INSERT INTO trip_course (content_id, place_id, visit_day, visit_order)
 VALUES ((SELECT id
          FROM content
          WHERE title =
-               '나혼자 기차 타고 부산 여행 vlog 🌊 | 당일치기 쌉가능한 여행코스 💌 , 200% 만족한 광안리 숙소 🏠, 부산 토박이의 단골집 추천까지,,💛 | 3박4일 부산 브이로그'),
+               '🧳 튜립 파이팅! 🧳 ✈️'),
         (SELECT id FROM place WHERE name = '개미집 광안리본점'),
         1,
         9);
@@ -619,7 +619,7 @@ INSERT INTO trip_course (content_id, place_id, visit_day, visit_order)
 VALUES ((SELECT id
          FROM content
          WHERE title =
-               '나혼자 기차 타고 부산 여행 vlog 🌊 | 당일치기 쌉가능한 여행코스 💌 , 200% 만족한 광안리 숙소 🏠, 부산 토박이의 단골집 추천까지,,💛 | 3박4일 부산 브이로그'),
+               '🧳 튜립 파이팅! 🧳 ✈️'),
         (SELECT id FROM place WHERE name = '밀락더마켓'),
         1,
         10);
@@ -628,7 +628,7 @@ INSERT INTO trip_course (content_id, place_id, visit_day, visit_order)
 VALUES ((SELECT id
          FROM content
          WHERE title =
-               '나혼자 기차 타고 부산 여행 vlog 🌊 | 당일치기 쌉가능한 여행코스 💌 , 200% 만족한 광안리 숙소 🏠, 부산 토박이의 단골집 추천까지,,💛 | 3박4일 부산 브이로그'),
+               '🧳 튜립 파이팅! 🧳 ✈️'),
         (SELECT id FROM place WHERE name = '호텔1'),
         1,
         11);
@@ -637,7 +637,7 @@ INSERT INTO trip_course (content_id, place_id, visit_day, visit_order)
 VALUES ((SELECT id
          FROM content
          WHERE title =
-               '나혼자 기차 타고 부산 여행 vlog 🌊 | 당일치기 쌉가능한 여행코스 💌 , 200% 만족한 광안리 숙소 🏠, 부산 토박이의 단골집 추천까지,,💛 | 3박4일 부산 브이로그'),
+               '🧳 튜립 파이팅! 🧳 ✈️'),
         (SELECT id FROM place WHERE name = '일등가마솥돼지국밥 남포점'),
         2,
         1);
@@ -646,7 +646,7 @@ INSERT INTO trip_course (content_id, place_id, visit_day, visit_order)
 VALUES ((SELECT id
          FROM content
          WHERE title =
-               '나혼자 기차 타고 부산 여행 vlog 🌊 | 당일치기 쌉가능한 여행코스 💌 , 200% 만족한 광안리 숙소 🏠, 부산 토박이의 단골집 추천까지,,💛 | 3박4일 부산 브이로그'),
+               '🧳 튜립 파이팅! 🧳 ✈️'),
         (SELECT id FROM place WHERE name = '부평깡통시장'),
         2,
         2);
@@ -655,7 +655,7 @@ INSERT INTO trip_course (content_id, place_id, visit_day, visit_order)
 VALUES ((SELECT id
          FROM content
          WHERE title =
-               '나혼자 기차 타고 부산 여행 vlog 🌊 | 당일치기 쌉가능한 여행코스 💌 , 200% 만족한 광안리 숙소 🏠, 부산 토박이의 단골집 추천까지,,💛 | 3박4일 부산 브이로그'),
+               '🧳 튜립 파이팅! 🧳 ✈️'),
         (SELECT id FROM place WHERE name = '보수동책방골목'),
         2,
         3);
@@ -664,7 +664,7 @@ INSERT INTO trip_course (content_id, place_id, visit_day, visit_order)
 VALUES ((SELECT id
          FROM content
          WHERE title =
-               '나혼자 기차 타고 부산 여행 vlog 🌊 | 당일치기 쌉가능한 여행코스 💌 , 200% 만족한 광안리 숙소 🏠, 부산 토박이의 단골집 추천까지,,💛 | 3박4일 부산 브이로그'),
+               '🧳 튜립 파이팅! 🧳 ✈️'),
         (SELECT id FROM place WHERE name = '해빙모먼트'),
         2,
         4);
@@ -673,7 +673,7 @@ INSERT INTO trip_course (content_id, place_id, visit_day, visit_order)
 VALUES ((SELECT id
          FROM content
          WHERE title =
-               '나혼자 기차 타고 부산 여행 vlog 🌊 | 당일치기 쌉가능한 여행코스 💌 , 200% 만족한 광안리 숙소 🏠, 부산 토박이의 단골집 추천까지,,💛 | 3박4일 부산 브이로그'),
+               '🧳 튜립 파이팅! 🧳 ✈️'),
         (SELECT id FROM place WHERE name = '흰여울문화마을'),
         2,
         5);
@@ -682,7 +682,7 @@ INSERT INTO trip_course (content_id, place_id, visit_day, visit_order)
 VALUES ((SELECT id
          FROM content
          WHERE title =
-               '나혼자 기차 타고 부산 여행 vlog 🌊 | 당일치기 쌉가능한 여행코스 💌 , 200% 만족한 광안리 숙소 🏠, 부산 토박이의 단골집 추천까지,,💛 | 3박4일 부산 브이로그'),
+               '🧳 튜립 파이팅! 🧳 ✈️'),
         (SELECT id FROM place WHERE name = '기장손칼국수'),
         2,
         6);
@@ -691,7 +691,7 @@ INSERT INTO trip_course (content_id, place_id, visit_day, visit_order)
 VALUES ((SELECT id
          FROM content
          WHERE title =
-               '나혼자 기차 타고 부산 여행 vlog 🌊 | 당일치기 쌉가능한 여행코스 💌 , 200% 만족한 광안리 숙소 🏠, 부산 토박이의 단골집 추천까지,,💛 | 3박4일 부산 브이로그'),
+               '🧳 튜립 파이팅! 🧳 ✈️'),
         (SELECT id FROM place WHERE name = '얼룩'),
         3,
         1);
@@ -700,7 +700,7 @@ INSERT INTO trip_course (content_id, place_id, visit_day, visit_order)
 VALUES ((SELECT id
          FROM content
          WHERE title =
-               '나혼자 기차 타고 부산 여행 vlog 🌊 | 당일치기 쌉가능한 여행코스 💌 , 200% 만족한 광안리 숙소 🏠, 부산 토박이의 단골집 추천까지,,💛 | 3박4일 부산 브이로그'),
+               '🧳 튜립 파이팅! 🧳 ✈️'),
         (SELECT id FROM place WHERE name = '이재모피자 서면2호점'),
         3,
         2);
@@ -709,7 +709,7 @@ INSERT INTO trip_course (content_id, place_id, visit_day, visit_order)
 VALUES ((SELECT id
          FROM content
          WHERE title =
-               '나혼자 기차 타고 부산 여행 vlog 🌊 | 당일치기 쌉가능한 여행코스 💌 , 200% 만족한 광안리 숙소 🏠, 부산 토박이의 단골집 추천까지,,💛 | 3박4일 부산 브이로그'),
+               '🧳 튜립 파이팅! 🧳 ✈️'),
         (SELECT id FROM place WHERE name = 'CRR 전포'),
         3,
         3);
@@ -718,7 +718,7 @@ INSERT INTO trip_course (content_id, place_id, visit_day, visit_order)
 VALUES ((SELECT id
          FROM content
          WHERE title =
-               '나혼자 기차 타고 부산 여행 vlog 🌊 | 당일치기 쌉가능한 여행코스 💌 , 200% 만족한 광안리 숙소 🏠, 부산 토박이의 단골집 추천까지,,💛 | 3박4일 부산 브이로그'),
+               '🧳 튜립 파이팅! 🧳 ✈️'),
         (SELECT id FROM place WHERE name = '김유순대구뽈찜'),
         3,
         4);
