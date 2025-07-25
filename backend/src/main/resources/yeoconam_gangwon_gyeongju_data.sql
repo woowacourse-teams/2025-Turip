@@ -168,6 +168,10 @@ VALUES ((SELECT id FROM place WHERE name = '황남두꺼비식당' AND address =
         (SELECT id FROM category WHERE name = '음식점'));
 
 INSERT INTO place_category (place_id, category_id)
+VALUES ((SELECT id FROM place WHERE name = '켄싱턴호텔 설악' AND address = '강원 속초시 설악산로 998'),
+        (SELECT id FROM category WHERE name = '숙소'));
+
+INSERT INTO place_category (place_id, category_id)
 VALUES ((SELECT id FROM place WHERE name = '하슬라아트월드' AND address = '강원 강릉시 강동면 율곡로 1441'),
         (SELECT id FROM category WHERE name = '관광지'));
 
