@@ -11,7 +11,6 @@ import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.content.video.VideoInformation
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class SearchResultViewModel(
@@ -31,7 +30,6 @@ class SearchResultViewModel(
         viewModelScope.launch {
             val pagedContentsResult: Deferred<Result<PagedContentsResult>> =
                 async {
-                    delay(1000)
                     contentRepository.loadContents(
                         region = region,
                         size = 100,
