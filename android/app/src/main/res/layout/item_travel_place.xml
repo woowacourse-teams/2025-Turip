@@ -43,6 +43,7 @@
         android:contentDescription="@null"
         android:padding="15dp"
         android:src="@drawable/btn_map_link"
+        app:tint="@color/pure_white_ffffff"
         app:layout_constraintBottom_toBottomOf="@id/tv_travel_place_category"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
