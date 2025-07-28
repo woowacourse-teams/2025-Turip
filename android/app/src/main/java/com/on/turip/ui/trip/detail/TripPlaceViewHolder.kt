@@ -13,7 +13,7 @@ class TripPlaceViewHolder(
     private var placeModel: PlaceModel? = null
 
     init {
-        binding.ivTravelPlaceLink.setOnClickListener {
+        itemView.setOnClickListener {
             placeModel?.let {
                 onClickListener.onPlaceClick(it)
             }
