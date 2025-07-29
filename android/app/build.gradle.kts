@@ -38,6 +38,8 @@ android {
             isMinifyEnabled = false
             isDebuggable = true
             applicationIdSuffix = ".debug"
+            versionNameSuffix = ".debug"
+            manifestPlaceholders["appName"] = "튜립.debug"
         }
 
         release {
@@ -47,6 +49,7 @@ android {
                 "proguard-rules.pro",
             )
             signingConfig = signingConfigs.getByName("debug")
+            manifestPlaceholders["appName"] = "튜립"
         }
     }
 
