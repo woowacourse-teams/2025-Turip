@@ -1,6 +1,7 @@
 package com.on.turip.ui.common
 
 object TuripUrlConverter {
+    private const val YOUTUBE_VIDEO_THUMBNAIL_FORM = "https://img.youtube.com/vi/%s/0.jpg"
     private const val VIDEO_ID_POSITION = 1
 
     private object VideoRegex {
@@ -12,5 +13,10 @@ object TuripUrlConverter {
         val matches =
             VideoRegex.patternVParam.find(videoUrl) ?: VideoRegex.patternShortUrl.find(videoUrl)
         return matches?.groups?.get(VIDEO_ID_POSITION)?.value ?: ""
+    }
+
+    fun toVideoThumbnailUrl(videoUrl: String): String {
+        val videoId = extractVideoId(videoUrl)
+        return YOUTUBE_VIDEO_THUMBNAIL_FORM.format(videoId)
     }
 }
