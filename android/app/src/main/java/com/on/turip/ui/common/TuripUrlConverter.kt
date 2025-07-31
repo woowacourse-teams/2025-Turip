@@ -16,7 +16,7 @@ object TuripUrlConverter {
         return matches?.groups?.get(VIDEO_ID_POSITION)?.value ?: ""
     }
 
-    fun toVideoThumbnailUrl(videoUrl: String): String {
+    fun convertVideoThumbnailUrl(videoUrl: String): String {
         val videoId: String = extractVideoId(videoUrl)
         return YOUTUBE_VIDEO_THUMBNAIL_FORM.format(videoId)
     }
