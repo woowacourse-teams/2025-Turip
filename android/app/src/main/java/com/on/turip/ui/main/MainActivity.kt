@@ -17,9 +17,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     override val binding: ActivityMainBinding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
     }
-
-    private var activeTag: String? = null
-
     private var backPressedTime: Long = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,14 +26,14 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         initBottomNavigation()
 
         if (savedInstanceState == null) {
-            binding.bottomNavMenu.selectedItemId = R.id.menu_fragment_home
+            binding.bnvMain.selectedItemId = R.id.menu_fragment_home
         }
     }
 
     private fun initBottomNavigation() {
-        binding.bottomNavMenu.itemIconTintList = null
+        binding.bnvMain.itemIconTintList = null
 
-        binding.bottomNavMenu.setOnItemSelectedListener { item ->
+        binding.bnvMain.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.menu_fragment_home -> {
                     HomeFragment::class.java.let { switchFragment(it, it.simpleName) }

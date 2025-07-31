@@ -70,12 +70,12 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                 )
             }
 
-        binding.tvMainWhereShouldWeGoTitle.text = spannableText
+        binding.tvHomeWhereShouldWeGoTitle.text = spannableText
     }
 
     private fun setupAdapters() {
-        binding.rvMainMetropolitanCity.adapter = metropolitanCitiesAdapter
-        binding.rvMainProvince.adapter = provincesAdapter
+        binding.rvHomeMetropolitanCity.adapter = metropolitanCitiesAdapter
+        binding.rvHomeProvince.adapter = provincesAdapter
     }
 
     private fun setupObservers() {
