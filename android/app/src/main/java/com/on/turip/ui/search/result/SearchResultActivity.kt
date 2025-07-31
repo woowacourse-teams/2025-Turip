@@ -14,8 +14,8 @@ import com.on.turip.ui.common.base.BaseActivity
 import com.on.turip.ui.common.model.RegionModel
 import com.on.turip.ui.trip.detail.TripDetailActivity
 
-class SearchResultActivity : BaseActivity<SearchResultViewModel, ActivitySearchResultBinding>() {
-    override val viewModel: SearchResultViewModel by viewModels {
+class SearchResultActivity : BaseActivity<ActivitySearchResultBinding>() {
+    val viewModel: SearchResultViewModel by viewModels {
         SearchResultViewModel.provideFactory(
             intent.getStringExtra(REGION_KEY) ?: "",
         )

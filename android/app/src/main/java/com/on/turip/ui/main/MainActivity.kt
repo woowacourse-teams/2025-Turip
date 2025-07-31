@@ -16,8 +16,8 @@ import com.on.turip.ui.common.base.BaseActivity
 import com.on.turip.ui.common.model.RegionModel
 import com.on.turip.ui.search.result.SearchResultActivity
 
-class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
-    override val viewModel: MainViewModel by viewModels()
+class MainActivity : BaseActivity<ActivityMainBinding>() {
+    val viewModel: MainViewModel by viewModels()
 
     override val binding: ActivityMainBinding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
