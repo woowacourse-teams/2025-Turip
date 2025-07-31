@@ -95,4 +95,6 @@ dependencies {
     implementation(libs.coil)
     // WebView
     implementation(libs.androidx.webkit)
+    // Timber
+    implementation(libs.timber)
 }
