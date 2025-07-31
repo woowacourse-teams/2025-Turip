@@ -24,7 +24,7 @@ class TuripUrlConverterTest {
         val expected = "https://img.youtube.com/vi/PIVg1paYVX8/0.jpg"
 
         // when:
-        val actual = TuripUrlConverter.toVideoThumbnailUrl(youtubeUrl)
+        val actual = TuripUrlConverter.convertVideoThumbnailUrl(youtubeUrl)
 
         // then:
         assertThat(actual).isEqualTo(expected)
