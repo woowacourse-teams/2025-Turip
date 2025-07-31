@@ -2,10 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/menu_fragment_home"
-        android:icon="@drawable/menu_home_selector_color"
+        android:icon="@drawable/btn_home_gradient"
         android:title="@string/bottom_navigation_home" />
     <item
         android:id="@+id/menu_fragment_favorite"
-        android:icon="@drawable/menu_favorite_selector_color"
+        android:icon="@drawable/btn_favorite_gradient"
         android:title="@string/bottom_navigation_selected_catalog" />
 </menu>
