@@ -4,10 +4,13 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import turip.content.controller.dto.response.ContentCountResponse;
 import turip.content.controller.dto.response.ContentDetailsByRegionResponse;
 import turip.content.controller.dto.response.ContentResponse;
+import turip.content.controller.dto.response.ContentSearchResponse;
+import turip.content.controller.dto.response.ContentSearchResultResponse;
 import turip.content.controller.dto.response.ContentWithoutRegionResponse;
 import turip.content.controller.dto.response.ContentsByRegionResponse;
 import turip.content.controller.dto.response.TripDurationResponse;
@@ -81,6 +84,40 @@ public class ContentService {
     private TripDurationResponse calculateTripDuration(Content content) {
         int totalTripDay = tripCourseService.calculateDurationDays(content.getId());
         return TripDurationResponse.of(totalTripDay - 1, totalTripDay);
+    }
+
+    public ContentSearchResponse findContentsByKeyword(
+            String keyword,
+            int pageSize,
+            long lastContentId
+    ) {
+        if (lastContentId == 0) {
+            lastContentId = Long.MAX_VALUE;
+        }
+        Slice<Content> contents = contentRepository.findByKeyword(keyword, lastContentId,
+                PageRequest.of(0, pageSize));
+        boolean loadable = contents.hasNext();
+
+        List<ContentSearchResultResponse> contentSearchResultResponses = convertContentsToContentSearchResultResponse(
+                contents);
+
+        return ContentSearchResponse.of(contentSearchResultResponses, loadable);
+    }
+
+    private List<ContentSearchResultResponse> convertContentsToContentSearchResultResponse(Slice<Content> contents) {
+        return contents.stream()
+                .map(this::toContentSearchResultResponse)
+                .toList();
+    }
+
+    private ContentSearchResultResponse toContentSearchResultResponse(Content content) {
+        int placeCount = tripCourseService.countByContentId(content.getId());
+
+        return ContentSearchResultResponse.of(
+                ContentWithoutRegionResponse.from(content),
+                calculateTripDuration(content),
+                placeCount
+        );
     }
 
     public ContentResponse getById(Long id) {

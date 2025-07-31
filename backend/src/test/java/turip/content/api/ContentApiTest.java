@@ -69,6 +69,7 @@ public class ContentApiTest {
     @DisplayName("/contents/{id} GET 컨텐츠 단건 조회 테스트")
     @Nested
     class readContentById {
+
         @DisplayName("id로 컨텐츠 단건 조회 성공 시 200 OK 코드와 컨텐츠 정보를 응답한다")
         @Test
         void readContentById() {
@@ -94,6 +95,59 @@ public class ContentApiTest {
                     .body("title", is("서울 데이트 코스 추천"))
                     .body("url", is("https://youtube.com/watch?v=abcd1"))
                     .body("uploadedDate", is("2024-07-01"));
+        }
+    }
+
+    @DisplayName("/contents/search GET 키워드 기반 컨텐츠 검색 테스트")
+    @Nested
+    class readByKeyword {
+
+        @DisplayName("키워드 기반 검색 성공 시, 200 코드와 컨텐츠 정보들과 더 받아올 정보가 있는지 여부를 응답한다")
+        @Test
+        void readByKeyword_unloadable() {
+            // given
+            jdbcTemplate.update(
+                    "INSERT INTO creator (profile_image, channel_name) VALUES ('https://image.example.com/creator1.jpg', '메이')");
+            jdbcTemplate.update("INSERT INTO region (name) VALUES ('seoul')");
+            jdbcTemplate.update(
+                    "INSERT INTO content (creator_id, region_id, url, title, uploaded_date) VALUES (1, 1, 'https://youtube.com/watch?v=abcd1', '서울 데이트 코스 추천', '2024-07-01')");
+            jdbcTemplate.update(
+                    "INSERT INTO content (creator_id, region_id, url, title, uploaded_date) VALUES (1, 1, 'https://youtube.com/watch?v=abcd1', '메이의 서촌 당일치기 코스 추천', '2025-06-18')");
+
+            // when & then
+            RestAssured.given().port(port)
+                    .queryParam("keyword", "메이")
+                    .queryParam("size", 2)
+                    .queryParam("lastId", 0)
+                    .when().get("/contents/search")
+                    .then()
+                    .statusCode(200)
+                    .body("contents.size()", is(2))
+                    .body("loadable", is(false));
+        }
+
+        @DisplayName("키워드 기반 검색 성공 시, 200 코드와 컨텐츠 정보들과 더 받아올 정보가 있는지 여부를 응답한다")
+        @Test
+        void readByKeyword_loadable() {
+            // given
+            jdbcTemplate.update(
+                    "INSERT INTO creator (profile_image, channel_name) VALUES ('https://image.example.com/creator1.jpg', '메이')");
+            jdbcTemplate.update("INSERT INTO region (name) VALUES ('seoul')");
+            jdbcTemplate.update(
+                    "INSERT INTO content (creator_id, region_id, url, title, uploaded_date) VALUES (1, 1, 'https://youtube.com/watch?v=abcd1', '서울 데이트 코스 추천', '2024-07-01')");
+            jdbcTemplate.update(
+                    "INSERT INTO content (creator_id, region_id, url, title, uploaded_date) VALUES (1, 1, 'https://youtube.com/watch?v=abcd1', '메이의 서촌 당일치기 코스 추천', '2025-06-18')");
+
+            // when & then
+            RestAssured.given().port(port)
+                    .queryParam("keyword", "메이")
+                    .queryParam("size", 1)
+                    .queryParam("lastId", 0)
+                    .when().get("/contents/search")
+                    .then()
+                    .statusCode(200)
+                    .body("contents.size()", is(1))
+                    .body("loadable", is(true));
         }
     }
 }

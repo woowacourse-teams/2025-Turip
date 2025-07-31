@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import turip.content.controller.dto.response.ContentCountResponse;
 import turip.content.controller.dto.response.ContentResponse;
+import turip.content.controller.dto.response.ContentSearchResponse;
 import turip.content.controller.dto.response.ContentsByRegionResponse;
 import turip.content.service.ContentService;
 
@@ -34,6 +35,16 @@ public class ContentController {
     ) {
         ContentsByRegionResponse response = contentService.findContentsByRegionName(regionName, pageSize,
                 lastContentId);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<ContentSearchResponse> readContentsByKeyword(
+            @RequestParam(name = "keyword") String keyword,
+            @RequestParam(name = "size") Integer pageSize,
+            @RequestParam(name = "lastId") Long lastContentId
+    ) {
+        ContentSearchResponse response = contentService.findContentsByKeyword(keyword, pageSize, lastContentId);
         return ResponseEntity.ok(response);
     }
 
