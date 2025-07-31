@@ -7,8 +7,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.viewbinding.ViewBinding
 
-abstract class BaseActivity<B : ViewBinding> : AppCompatActivity() {
-    abstract val binding: B
+abstract class BaseActivity<VB : ViewBinding> : AppCompatActivity() {
+    abstract val binding: VB
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
