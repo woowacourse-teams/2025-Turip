@@ -23,11 +23,11 @@ import com.on.turip.ui.trip.detail.webview.TuripWebViewClient
 import com.on.turip.ui.trip.detail.webview.WebViewVideoBridge
 import com.on.turip.ui.trip.detail.webview.applyVideoSettings
 
-class TripDetailActivity : BaseActivity<TripDetailViewModel, ActivityTripDetailBinding>() {
+class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
     override val binding: ActivityTripDetailBinding by lazy {
         ActivityTripDetailBinding.inflate(layoutInflater)
     }
-    override val viewModel: TripDetailViewModel by viewModels {
+    val viewModel: TripDetailViewModel by viewModels {
         TripDetailViewModel.provideFactory(
             intent.getLongExtra(CONTENT_KEY, 0),
             intent.getLongExtra(CREATOR_KEY, 0),
