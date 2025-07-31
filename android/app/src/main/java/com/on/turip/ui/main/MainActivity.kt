@@ -54,21 +54,20 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         target: Class<out Fragment>,
         tag: String,
     ) {
-        if (activeTag == tag) return
-
-        val activeFragment = supportFragmentManager.findFragmentByTag(activeTag)
+        val fragments = supportFragmentManager.fragments
         val targetFragment = supportFragmentManager.findFragmentByTag(tag)
 
+        if (targetFragment?.isVisible == true) return
+
         supportFragmentManager.commit {
-            activeFragment?.let { hide(it) }
+            fragments.filter { it.isVisible }.forEach { hide(it) }
 
             if (targetFragment == null) {
-                add(R.id.main_fragment_container, target, null, tag)
+                add(R.id.fcv_main, target, null, tag)
             } else {
                 show(targetFragment)
             }
         }
-        activeTag = tag
     }
 
     private fun handleDoubleBackPressToExit() {
