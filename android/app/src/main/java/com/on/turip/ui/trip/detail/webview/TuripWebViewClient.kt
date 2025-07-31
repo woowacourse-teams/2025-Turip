@@ -1,10 +1,12 @@
 package com.on.turip.ui.trip.detail.webview
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.view.View
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.core.net.toUri
 
 class TuripWebViewClient(
     private val progressBar: View,
@@ -16,7 +18,13 @@ class TuripWebViewClient(
         val url = request?.url.toString()
         return when {
             url.startsWith(TARGET_URL_PREFIX) -> false
-            else -> true
+            else -> {
+                if (!url.startsWith(SECURE_URL)) return true
+
+                val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+                view?.context?.startActivity(intent)
+                true
+            }
         }
     }
 
@@ -39,5 +47,6 @@ class TuripWebViewClient(
 
     companion object {
         private const val TARGET_URL_PREFIX = "https://www.youtube.com/"
+        private const val SECURE_URL = "https://"
     }
 }
