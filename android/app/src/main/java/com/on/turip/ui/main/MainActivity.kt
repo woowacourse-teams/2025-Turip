@@ -14,8 +14,8 @@ import com.on.turip.ui.common.base.BaseActivity
 import com.on.turip.ui.main.favorite.FavoriteFragment
 import com.on.turip.ui.main.home.HomeFragment
 
-class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
-    override val viewModel: MainViewModel by viewModels()
+class MainActivity : BaseActivity<ActivityMainBinding>() {
+    val viewModel: MainViewModel by viewModels()
 
     override val binding: ActivityMainBinding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
