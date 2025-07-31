@@ -5,7 +5,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import com.on.turip.R
@@ -15,8 +14,6 @@ import com.on.turip.ui.main.favorite.FavoriteFragment
 import com.on.turip.ui.main.home.HomeFragment
 
 class MainActivity : BaseActivity<ActivityMainBinding>() {
-    val viewModel: MainViewModel by viewModels()
-
     override val binding: ActivityMainBinding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
     }
