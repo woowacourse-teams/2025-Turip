@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".ui.main.home.HomeFragment">
+
+    <ImageView
+        android:id="@+id/iv_main_logo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="16dp"
+        android:contentDescription="@null"
+        android:src="@drawable/ic_logo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_main_where_should_we_go_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:text="@string/main_where_should_we_go_title"
+        android:textAppearance="@style/display"
+        android:textColor="@color/gray_500_1e1e1e"
+        app:layout_constraintStart_toStartOf="@id/iv_main_logo"
+        app:layout_constraintTop_toBottomOf="@id/iv_main_logo" />
+
+    <TextView
+        android:id="@+id/tv_main_searching_metropolitan_city"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="28dp"
+        android:text="@string/main_searching_metropolitan_city"
+        android:textAppearance="@style/title1"
+        android:textColor="@color/gray_400_2b2b2b"
+        app:layout_constraintStart_toStartOf="@id/tv_main_where_should_we_go_title"
+        app:layout_constraintTop_toBottomOf="@id/tv_main_where_should_we_go_title" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_main_metropolitan_city"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:clipToPadding="false"
+        android:orientation="horizontal"
+        android:paddingVertical="20dp"
+        android:paddingStart="20dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_main_searching_metropolitan_city"
+        tools:listitem="@layout/item_searching_region"
+        tools:ignore="RtlSymmetry" />
+
+    <TextView
+        android:id="@+id/tv_main_searching_province"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:text="@string/main_searching_province"
+        android:textAppearance="@style/title1"
+        android:textColor="@color/gray_400_2b2b2b"
+        app:layout_constraintStart_toStartOf="@id/tv_main_searching_metropolitan_city"
+        app:layout_constraintTop_toBottomOf="@id/rv_main_metropolitan_city" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_main_province"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:clipToPadding="false"
+        android:orientation="horizontal"
+        android:paddingVertical="20dp"
+        android:paddingStart="20dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_main_searching_province"
+        tools:ignore="RtlSymmetry"
+        tools:listitem="@layout/item_searching_region" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
