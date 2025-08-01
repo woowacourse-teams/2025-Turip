@@ -27,7 +27,7 @@ public class ContentController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping()
+    @GetMapping(params = "region")
     public ResponseEntity<ContentsByRegionResponse> readContentsByRegionName(
             @RequestParam(name = "region") String regionName,
             @RequestParam(name = "size") Integer pageSize,
@@ -38,7 +38,7 @@ public class ContentController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/search")
+    @GetMapping(params = "keyword")
     public ResponseEntity<ContentSearchResponse> readContentsByKeyword(
             @RequestParam(name = "keyword") String keyword,
             @RequestParam(name = "size") Integer pageSize,
