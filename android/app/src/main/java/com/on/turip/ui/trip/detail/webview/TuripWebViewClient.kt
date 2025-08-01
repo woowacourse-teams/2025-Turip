@@ -15,13 +15,13 @@ class TuripWebViewClient(
         view: WebView?,
         request: WebResourceRequest?,
     ): Boolean {
-        val url = request?.url.toString()
+        val url: String = request?.url.toString()
         return when {
             url.startsWith(TARGET_URL_PREFIX) -> false
             else -> {
                 if (!url.startsWith(SECURE_URL)) return true
 
-                val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+                val intent: Intent = Intent(Intent.ACTION_VIEW, url.toUri())
                 view?.context?.startActivity(intent)
                 true
             }
