@@ -48,11 +48,11 @@ class SearchResultViewModel(
             pagedContentsResult
                 .await()
                 .onSuccess { result: PagedContentsResult ->
-                    val videoUiModels: List<VideoInformationModel> =
+                    val videoModels: List<VideoInformationModel> =
                         result.videos.map { videoInformation: VideoInformation -> videoInformation.toUiModel() }
                     _searchResultState.value =
                         searchResultState.value?.copy(
-                            videoInformations = videoUiModels,
+                            videoInformations = videoModels,
                         )
                 }.onFailure {
                 }
