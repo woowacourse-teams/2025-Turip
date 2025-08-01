@@ -9,6 +9,8 @@ import com.on.turip.di.RepositoryModule
 import com.on.turip.domain.content.PagedContentsResult
 import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.content.video.VideoInformation
+import com.on.turip.ui.common.mapper.toUiModel
+import com.on.turip.ui.search.model.VideoInformationModel
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -44,9 +46,11 @@ class SearchResultViewModel(
             pagedContentsResult
                 .await()
                 .onSuccess { result: PagedContentsResult ->
+                    val videoUiModels: List<VideoInformationModel> =
+                        result.videos.map { videoInformation: VideoInformation -> videoInformation.toUiModel() }
                     _searchResultState.value =
                         searchResultState.value?.copy(
-                            videoInformations = result.videos,
+                            videoInformations = videoUiModels,
                         )
                 }.onFailure {
                 }
@@ -111,7 +115,7 @@ class SearchResultViewModel(
 
     data class SearchResultState(
         val searchResultCount: Int = 0,
-        val videoInformations: List<VideoInformation> = emptyList(),
+        val videoInformations: List<VideoInformationModel> = emptyList(),
         val region: String = "",
         val isExist: Boolean = false,
         val loading: Boolean = true,
