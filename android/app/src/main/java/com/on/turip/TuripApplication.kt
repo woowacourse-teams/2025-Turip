@@ -1,6 +1,7 @@
 package com.on.turip
 
 import android.app.Application
+import com.on.turip.common.TuripDebugTree
 import com.on.turip.common.TuripReleaseTree
 import timber.log.Timber
 
@@ -9,7 +10,7 @@ class TuripApplication : Application() {
         super.onCreate()
 
         if (BuildConfig.DEBUG) {
-            Timber.plant(Timber.DebugTree())
+            Timber.plant(TuripDebugTree())
         } else {
             Timber.plant(TuripReleaseTree())
         }
