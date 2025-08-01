@@ -12,8 +12,10 @@ import com.on.turip.domain.content.video.VideoData
 import com.on.turip.domain.creator.Creator
 import com.on.turip.domain.creator.repository.CreatorRepository
 import com.on.turip.domain.trip.Trip
-import com.on.turip.domain.trip.TripDuration
 import com.on.turip.domain.trip.repository.TripRepository
+import com.on.turip.ui.common.mapper.toUiModel
+import com.on.turip.ui.common.model.trip.TripDurationModel
+import com.on.turip.ui.common.model.trip.TripModel
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -87,7 +89,7 @@ class TripDetailViewModel(
                                         DayModel(day = day, isSelected = index == 0)
                                     },
                             places = placeCacheByDay[1] ?: emptyList(),
-                            trip = trip,
+                            tripModel = trip.toUiModel(),
                         )
                 }
         }
@@ -151,9 +153,9 @@ class TripDetailViewModel(
         val content: Content? = null,
         val days: List<DayModel> = emptyList<DayModel>(),
         val places: List<PlaceModel> = emptyList<PlaceModel>(),
-        val trip: Trip =
-            Trip(
-                tripDuration = TripDuration(0, 0),
+        val tripModel: TripModel =
+            TripModel(
+                tripDurationModel = TripDurationModel(0, 0),
                 tripPlaceCount = 0,
                 tripCourses = emptyList(),
             ),
