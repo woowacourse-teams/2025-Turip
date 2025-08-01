@@ -3,70 +3,71 @@ package com.on.turip.ui.main
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.text.SpannableString
-import android.text.Spanned
-import android.text.style.BackgroundColorSpan
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.viewModels
-import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.commit
 import com.on.turip.R
 import com.on.turip.databinding.ActivityMainBinding
 import com.on.turip.ui.common.base.BaseActivity
-import com.on.turip.ui.common.model.RegionModel
-import com.on.turip.ui.search.result.SearchResultActivity
+import com.on.turip.ui.main.favorite.FavoriteFragment
+import com.on.turip.ui.main.home.HomeFragment
 
 class MainActivity : BaseActivity<ActivityMainBinding>() {
-    val viewModel: MainViewModel by viewModels()
-
     override val binding: ActivityMainBinding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
     }
-
-    private val metropolitanCitiesAdapter: RegionAdapter =
-        RegionAdapter { region: RegionModel ->
-            val intent = SearchResultActivity.newIntent(this@MainActivity, region.english)
-            startActivity(intent)
-        }
-    private val provincesAdapter: RegionAdapter =
-        RegionAdapter { region: RegionModel ->
-            val intent = SearchResultActivity.newIntent(this@MainActivity, region.english)
-            startActivity(intent)
-        }
-
     private var backPressedTime: Long = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setupTextHighlighting()
         handleDoubleBackPressToExit()
-        setupAdapters()
-        setupObservers()
+        initBottomNavigation()
+
+        if (savedInstanceState == null) {
+            binding.bnvMain.selectedItemId = R.id.menu_fragment_home
+        }
     }
 
-    private fun setupTextHighlighting() {
-        val originalText: String = getString(R.string.main_where_should_we_go_title)
-        val highlightText: String = getString(R.string.main_where_should_we_go_highlighting)
-        val startIndex: Int = originalText.indexOf(highlightText)
-        val endIndex: Int = startIndex + highlightText.length
+    private fun initBottomNavigation() {
+        binding.bnvMain.itemIconTintList = null
 
-        val spannableText =
-            SpannableString(originalText).apply {
-                setSpan(
-                    BackgroundColorSpan(
-                        ContextCompat.getColor(
-                            this@MainActivity,
-                            R.color.turip_lemon_faff60_50,
-                        ),
-                    ),
-                    startIndex,
-                    endIndex,
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
-                )
+        binding.bnvMain.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.menu_fragment_home -> {
+                    HomeFragment::class.java.let { switchFragment(it, it.simpleName) }
+                    return@setOnItemSelectedListener true
+                }
+
+                R.id.menu_fragment_favorite -> {
+                    FavoriteFragment::class.java.let { switchFragment(it, it.simpleName) }
+                    return@setOnItemSelectedListener true
+                }
+
+                else -> return@setOnItemSelectedListener false
             }
+        }
+    }
 
-        binding.tvMainWhereShouldWeGoTitle.text = spannableText
+    private fun switchFragment(
+        target: Class<out Fragment>,
+        tag: String,
+    ) {
+        val fragments = supportFragmentManager.fragments
+        val targetFragment = supportFragmentManager.findFragmentByTag(tag)
+
+        if (targetFragment?.isVisible == true) return
+
+        supportFragmentManager.commit {
+            fragments.filter { it.isVisible }.forEach { hide(it) }
+
+            if (targetFragment == null) {
+                add(R.id.fcv_main, target, null, tag)
+            } else {
+                show(targetFragment)
+            }
+        }
     }
 
     private fun handleDoubleBackPressToExit() {
@@ -88,21 +89,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
                 }
             },
         )
-    }
-
-    private fun setupAdapters() {
-        binding.rvMainMetropolitanCity.adapter = metropolitanCitiesAdapter
-        binding.rvMainProvince.adapter = provincesAdapter
-    }
-
-    private fun setupObservers() {
-        viewModel.metropolitanCities.observe(this) { metropolitanCities: List<RegionModel> ->
-            metropolitanCitiesAdapter.submitList(metropolitanCities)
-        }
-
-        viewModel.provinces.observe(this) { provinces: List<RegionModel> ->
-            provincesAdapter.submitList(provinces)
-        }
     }
 
     companion object {
