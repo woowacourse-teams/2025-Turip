@@ -5,6 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import com.on.turip.di.RepositoryModule
 import com.on.turip.domain.content.PagedContentsResult
 import com.on.turip.domain.content.repository.ContentRepository
@@ -99,16 +101,12 @@ class SearchResultViewModel(
             region: String,
             contentRepository: ContentRepository = RepositoryModule.contentRepository,
         ): ViewModelProvider.Factory =
-            object : ViewModelProvider.Factory {
-                @Suppress("UNCHECKED_CAST")
-                override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    if (modelClass.isAssignableFrom(SearchResultViewModel::class.java)) {
-                        return SearchResultViewModel(
-                            region,
-                            contentRepository,
-                        ) as T
-                    }
-                    throw IllegalArgumentException()
+            viewModelFactory {
+                initializer {
+                    SearchResultViewModel(
+                        region,
+                        contentRepository,
+                    )
                 }
             }
     }

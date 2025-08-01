@@ -5,6 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import com.on.turip.di.RepositoryModule
 import com.on.turip.domain.content.Content
 import com.on.turip.domain.content.repository.ContentRepository
@@ -132,19 +134,15 @@ class TripDetailViewModel(
             creatorRepository: CreatorRepository = RepositoryModule.creatorRepository,
             travelRepository: TripRepository = RepositoryModule.tripRepository,
         ): ViewModelProvider.Factory =
-            object : ViewModelProvider.Factory {
-                @Suppress("UNCHECKED_CAST")
-                override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    if (modelClass.isAssignableFrom(TripDetailViewModel::class.java)) {
-                        return TripDetailViewModel(
-                            contentId,
-                            creatorId,
-                            contentRepository,
-                            creatorRepository,
-                            travelRepository,
-                        ) as T
-                    }
-                    throw IllegalArgumentException()
+            viewModelFactory {
+                initializer {
+                    TripDetailViewModel(
+                        contentId,
+                        creatorId,
+                        contentRepository,
+                        creatorRepository,
+                        travelRepository,
+                    )
                 }
             }
     }
