@@ -13,9 +13,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.SliceImpl;
+import turip.city.domain.City;
 import turip.content.controller.dto.response.ContentSearchResponse;
 import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
+import turip.country.domain.Country;
 import turip.creator.domain.Creator;
 import turip.tripcourse.service.TripCourseService;
 
@@ -45,9 +47,11 @@ class ContentServiceTest {
             Long maxId = Long.MAX_VALUE;
 
             Creator creator = new Creator("메이", null);
+            Country korea = new Country("korea", null);
+            City seoul = new City(korea, null, "seoul", null);
 
-            List<Content> contents = List.of(new Content(1L, creator, null, null, null, null),
-                    new Content(2L, creator, null, null, null, null));
+            List<Content> contents = List.of(new Content(1L, creator, seoul, null, null, null),
+                    new Content(2L, creator, seoul, null, null, null));
             given(contentRepository.findByKeywordContaining(keyword, maxId, PageRequest.of(0, pageSize)))
                     .willReturn(new SliceImpl<>(contents));
 

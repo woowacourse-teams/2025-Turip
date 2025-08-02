@@ -11,6 +11,7 @@ import turip.content.controller.dto.response.ContentDetailsByCityResponse;
 import turip.content.controller.dto.response.ContentResponse;
 import turip.content.controller.dto.response.ContentSearchResponse;
 import turip.content.controller.dto.response.ContentSearchResultResponse;
+import turip.content.controller.dto.response.ContentWithCreatorAndCityResponse;
 import turip.content.controller.dto.response.ContentWithoutCityResponse;
 import turip.content.controller.dto.response.ContentsByCityResponse;
 import turip.content.controller.dto.response.TripDurationResponse;
@@ -119,7 +120,7 @@ public class ContentService {
         int placeCount = tripCourseService.countByContentId(content.getId());
 
         return ContentSearchResultResponse.of(
-                ContentWithoutCityResponse.from(content),
+                ContentWithCreatorAndCityResponse.from(content),
                 calculateTripDuration(content),
                 placeCount
         );
