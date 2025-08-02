@@ -16,6 +16,13 @@ public interface ContentRepository extends JpaRepository<Content, Long> {
     List<Content> findByRegionNameOrderByIdDesc(String regionName, Pageable pageable);
 
     @Query("""
+                SELECT count(c) FROM Content c
+                JOIN c.creator cr
+                WHERE c.title LIKE %:keyword% OR cr.channelName LIKE %:keyword%
+            """)
+    int countByKeyword(String keyword);
+
+    @Query("""
                 SELECT c FROM Content c
                 JOIN c.creator cr
                 WHERE c.id < :lastId

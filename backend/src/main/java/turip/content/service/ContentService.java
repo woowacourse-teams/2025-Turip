@@ -86,6 +86,11 @@ public class ContentService {
         return TripDurationResponse.of(totalTripDay - 1, totalTripDay);
     }
 
+    public ContentCountResponse countByKeyword(String keyword) {
+        int count = contentRepository.countByKeyword(keyword);
+        return ContentCountResponse.from(count);
+    }
+
     public ContentSearchResponse findContentsByKeyword(
             String keyword,
             int pageSize,

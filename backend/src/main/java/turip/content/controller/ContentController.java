@@ -20,7 +20,7 @@ public class ContentController {
 
     private final ContentService contentService;
 
-    @GetMapping("/count")
+    @GetMapping(value = "/count", params = "region")
     public ResponseEntity<ContentCountResponse> readCountByRegionName(
             @RequestParam(name = "region") String regionName) {
         ContentCountResponse response = contentService.countByRegionName(regionName);
@@ -35,6 +35,13 @@ public class ContentController {
     ) {
         ContentsByRegionResponse response = contentService.findContentsByRegionName(regionName, pageSize,
                 lastContentId);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping(value = "/count", params = "keyword")
+    public ResponseEntity<ContentCountResponse> readCountByKeyword(
+            @RequestParam(name = "keyword") String keyword) {
+        ContentCountResponse response = contentService.countByKeyword(keyword);
         return ResponseEntity.ok(response);
     }
 

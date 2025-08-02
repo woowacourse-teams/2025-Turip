@@ -40,9 +40,9 @@ public class ContentApiTest {
         jdbcTemplate.update("ALTER TABLE place_category ALTER COLUMN id RESTART WITH 1");
     }
 
-    @DisplayName("/contents/count GET 컨텐츠 수 조회 테스트")
+    @DisplayName("/contents/count GET 지역별 컨텐츠 수 조회 테스트")
     @Nested
-    class readCount {
+    class readCountByRegion {
 
         @DisplayName("지역별 컨텐츠 수 조회 성공 시 200 OK 코드와 컨텐츠 수를 응답한다")
         @Test
@@ -98,7 +98,33 @@ public class ContentApiTest {
         }
     }
 
-    @DisplayName("/contents/search GET 키워드 기반 컨텐츠 검색 테스트")
+    @DisplayName("/contents/count GET 키워드로 검색된 컨텐츠 수 조회 테스트")
+    @Nested
+    class readCountByKeyword {
+
+        @DisplayName("키워드에 대한 컨텐츠 수 조회 성공 시 200 OK 코드와 컨텐츠 수를 응답한다")
+        @Test
+        void readCountByKeyword1() {
+            // given
+            jdbcTemplate.update(
+                    "INSERT INTO creator (profile_image, channel_name) VALUES ('https://image.example.com/creator1.jpg', '여행하는 뭉치')");
+            jdbcTemplate.update("INSERT INTO region (name) VALUES ('seoul')");
+            jdbcTemplate.update(
+                    "INSERT INTO content (creator_id, region_id, url, title, uploaded_date) VALUES (1, 1, 'https://youtube.com/watch?v=abcd1', '서울 데이트 코스 추천 with 메이', '2024-07-01')");
+            jdbcTemplate.update(
+                    "INSERT INTO content (creator_id, region_id, url, title, uploaded_date) VALUES (1, 1, 'https://youtube.com/watch?v=abcd1', '서촌 당일치기 코스 추천', '2025-06-18')");
+
+            // when & then
+            RestAssured.given().port(port)
+                    .queryParam("keyword", "메이")
+                    .when().get("/contents/count")
+                    .then()
+                    .statusCode(200)
+                    .body("count", is(1));
+        }
+    }
+
+    @DisplayName("/contents GET 키워드 기반 컨텐츠 검색 테스트")
     @Nested
     class readByKeyword {
 

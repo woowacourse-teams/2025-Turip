@@ -26,6 +26,38 @@ class ContentRepositoryTest {
     @Autowired
     private ContentRepository contentRepository;
 
+    @DisplayName("키워드로 콘텐츠 및 크리에이터 이름을 검색해 개수를 반환하는 메서드 테스트")
+    @Nested
+    class countByKeyword {
+
+        @DisplayName("제목 혹은 크리에이터 이름에 키워드가 포함되는 컨텐츠들의 수를 확인할 수 있다.")
+        @ParameterizedTest
+        @CsvSource({
+                "메이,3",
+                "뭉치,2",
+                "대구,2"
+        })
+        void countByKeyword1(String keyword, int expected) {
+            // given
+            Creator may = new Creator("여행하는 메이", null);
+            Creator moong = new Creator("여행하는 뭉치", null);
+            Content mayContent1 = new Content(may, null, "메이의 대구 여행", null, null);
+            Content mayContent2 = new Content(may, null, "메이의 부산 여행", null, null);
+            Content moongAndMayContent = new Content(moong, null, "뭉치와 메이의 서울 여행", null, null);
+            Content moongContent = new Content(moong, null, "뭉치의 대구 여행", null, null);
+
+            creatorRepository.saveAll(List.of(may, moong));
+            contentRepository.saveAll(List.of(mayContent1, mayContent2, moongAndMayContent, moongContent));
+
+            // when
+            int count = contentRepository.countByKeyword(keyword);
+
+            // then
+            assertThat(count)
+                    .isEqualTo(expected);
+        }
+    }
+
     @DisplayName("페이지네이션 기반 키워드 검색 메서드 테스트")
     @Nested
     class findByKeyword {
