@@ -2,9 +2,9 @@ INSERT INTO creator (channel_name, profile_image)
 VALUES ('제주에디',
         'https://yt3.ggpht.com/UdF_j2R_Prv7kamTRqItI0QUgMvdbJk_xXFjjYGFUIMZUYt1EbrJpEmzJbciKbrrdoX4me8g5w=s88-c-k-c0x00ffffff-no-rj');
 
-INSERT INTO content (creator_id, region_id, title, url, uploaded_date)
+INSERT INTO content (creator_id, city_id, title, url, uploaded_date)
 SELECT (SELECT id FROM creator WHERE channel_name = '제주에디'),
-       (SELECT id FROM city WHERE name = 'sokcho-si'),
+       (SELECT id FROM city WHERE name = 'sokcho'),
        '강원도 4박5일 맛집 여행 코스와 경비 총정리 (속초, 강릉)',
        'https://youtu.be/m2SPPxloo9w?si=6BY2pYrz9FMP2C4W',
        '2025-2-11';
