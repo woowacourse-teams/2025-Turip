@@ -28,7 +28,7 @@ class ContentRepositoryTest {
 
     @DisplayName("키워드로 콘텐츠 및 크리에이터 이름을 검색해 개수를 반환하는 메서드 테스트")
     @Nested
-    class countByKeyword {
+    class CountByKeyword {
 
         @DisplayName("제목 혹은 크리에이터 이름에 키워드가 포함되는 컨텐츠들의 수를 확인할 수 있다.")
         @ParameterizedTest
@@ -50,7 +50,7 @@ class ContentRepositoryTest {
             contentRepository.saveAll(List.of(mayContent1, mayContent2, moongAndMayContent, moongContent));
 
             // when
-            int count = contentRepository.countByKeyword(keyword);
+            int count = contentRepository.countByKeywordContaining(keyword);
 
             // then
             assertThat(count)
@@ -82,7 +82,8 @@ class ContentRepositoryTest {
             contentRepository.saveAll(List.of(mayContent1, mayContent2, moongAndMayContent, moongContent));
 
             // when
-            Slice<Content> contents = contentRepository.findByKeyword(keyword, Long.MAX_VALUE, PageRequest.of(0, 5));
+            Slice<Content> contents = contentRepository.findByKeywordContaining(keyword, Long.MAX_VALUE,
+                    PageRequest.of(0, 5));
 
             // then
             assertThat(contents.getContent().size())
@@ -110,9 +111,9 @@ class ContentRepositoryTest {
             // when
             int pageSize = 5;
             int totalSize = savedContents.size();
-            Slice<Content> firstPageContents = contentRepository.findByKeyword(keyword, Long.MAX_VALUE,
+            Slice<Content> firstPageContents = contentRepository.findByKeywordContaining(keyword, Long.MAX_VALUE,
                     PageRequest.of(0, pageSize));
-            Slice<Content> secondPageContents = contentRepository.findByKeyword(keyword, Long.MAX_VALUE,
+            Slice<Content> secondPageContents = contentRepository.findByKeywordContaining(keyword, Long.MAX_VALUE,
                     PageRequest.of(1, pageSize));
 
             // then

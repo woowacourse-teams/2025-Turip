@@ -20,7 +20,7 @@ public interface ContentRepository extends JpaRepository<Content, Long> {
                 JOIN c.creator cr
                 WHERE c.title LIKE %:keyword% OR cr.channelName LIKE %:keyword%
             """)
-    int countByKeyword(String keyword);
+    int countByKeywordContaining(String keyword);
 
     @Query("""
                 SELECT c FROM Content c
@@ -29,5 +29,5 @@ public interface ContentRepository extends JpaRepository<Content, Long> {
                 AND (c.title LIKE %:keyword% OR cr.channelName LIKE %:keyword%)
                 ORDER BY c.id DESC
             """)
-    Slice<Content> findByKeyword(String keyword, Long lastId, Pageable pageable);
+    Slice<Content> findByKeywordContaining(String keyword, Long lastId, Pageable pageable);
 }

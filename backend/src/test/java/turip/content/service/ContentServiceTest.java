@@ -33,7 +33,7 @@ class ContentServiceTest {
 
     @DisplayName("키워드 기반 검색 기능 테스트")
     @Nested
-    class findContentsByKeyword {
+    class FindContentsByKeyword {
 
         @DisplayName("lastContentId가 0인 경우, lastContentId가 Long.MAX_VALUE로 치환되어 id가 가장 큰 컨텐츠부터 순서대로 pageSize만큼 읽어온다.")
         @Test
@@ -48,11 +48,11 @@ class ContentServiceTest {
 
             List<Content> contents = List.of(new Content(1L, creator, null, null, null, null),
                     new Content(2L, creator, null, null, null, null));
-            given(contentRepository.findByKeyword(keyword, maxId, PageRequest.of(0, pageSize)))
+            given(contentRepository.findByKeywordContaining(keyword, maxId, PageRequest.of(0, pageSize)))
                     .willReturn(new SliceImpl<>(contents));
 
             // when
-            ContentSearchResponse contentsByKeyword = contentService.findContentsByKeyword(keyword, pageSize,
+            ContentSearchResponse contentsByKeyword = contentService.searchContentsByKeyword(keyword, pageSize,
                     lastContentId);
 
             // then

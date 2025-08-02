@@ -87,11 +87,11 @@ public class ContentService {
     }
 
     public ContentCountResponse countByKeyword(String keyword) {
-        int count = contentRepository.countByKeyword(keyword);
+        int count = contentRepository.countByKeywordContaining(keyword);
         return ContentCountResponse.from(count);
     }
 
-    public ContentSearchResponse findContentsByKeyword(
+    public ContentSearchResponse searchContentsByKeyword(
             String keyword,
             int pageSize,
             long lastContentId
@@ -99,7 +99,7 @@ public class ContentService {
         if (lastContentId == 0) {
             lastContentId = Long.MAX_VALUE;
         }
-        Slice<Content> contents = contentRepository.findByKeyword(keyword, lastContentId,
+        Slice<Content> contents = contentRepository.findByKeywordContaining(keyword, lastContentId,
                 PageRequest.of(0, pageSize));
         boolean loadable = contents.hasNext();
 

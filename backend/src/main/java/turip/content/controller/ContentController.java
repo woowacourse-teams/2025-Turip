@@ -51,7 +51,7 @@ public class ContentController {
             @RequestParam(name = "size") Integer pageSize,
             @RequestParam(name = "lastId") Long lastContentId
     ) {
-        ContentSearchResponse response = contentService.findContentsByKeyword(keyword, pageSize, lastContentId);
+        ContentSearchResponse response = contentService.searchContentsByKeyword(keyword, pageSize, lastContentId);
         return ResponseEntity.ok(response);
     }
 

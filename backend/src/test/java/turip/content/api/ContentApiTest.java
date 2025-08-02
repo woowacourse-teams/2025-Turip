@@ -42,7 +42,7 @@ public class ContentApiTest {
 
     @DisplayName("/contents/count GET 지역별 컨텐츠 수 조회 테스트")
     @Nested
-    class readCountByRegionName {
+    class ReadCountByRegionName {
 
         @DisplayName("지역별 컨텐츠 수 조회 성공 시 200 OK 코드와 컨텐츠 수를 응답한다")
         @Test
@@ -68,7 +68,7 @@ public class ContentApiTest {
 
     @DisplayName("/contents/{id} GET 컨텐츠 단건 조회 테스트")
     @Nested
-    class readContentById {
+    class ReadContentById {
 
         @DisplayName("id로 컨텐츠 단건 조회 성공 시 200 OK 코드와 컨텐츠 정보를 응답한다")
         @Test
@@ -100,7 +100,7 @@ public class ContentApiTest {
 
     @DisplayName("/contents/count GET 키워드로 검색된 컨텐츠 수 조회 테스트")
     @Nested
-    class readCountByKeyword {
+    class ReadCountByKeyword {
 
         @DisplayName("키워드에 대한 컨텐츠 수 조회 성공 시 200 OK 코드와 컨텐츠 수를 응답한다")
         @Test
@@ -126,7 +126,7 @@ public class ContentApiTest {
 
     @DisplayName("/contents GET 키워드 기반 컨텐츠 검색 테스트")
     @Nested
-    class readByKeyword {
+    class ReadByKeyword {
 
         @DisplayName("키워드 기반 검색 성공 시, 200 코드와 컨텐츠 정보들과 더 받아올 정보가 있는지 여부를 응답한다")
         @Test
