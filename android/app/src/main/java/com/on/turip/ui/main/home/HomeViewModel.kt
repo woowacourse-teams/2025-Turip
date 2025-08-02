@@ -1,4 +1,4 @@
-package com.on.turip.ui.main
+package com.on.turip.ui.main.home
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
@@ -7,7 +7,7 @@ import com.on.turip.domain.region.Region
 import com.on.turip.domain.region.RegionType
 import com.on.turip.ui.common.model.RegionModel
 
-class MainViewModel : ViewModel() {
+class HomeViewModel : ViewModel() {
     val metropolitanCities: LiveData<List<RegionModel>> =
         liveData {
             val metropolitans: List<Region> = Region.from(RegionType.METROPOLITAN_CITY)

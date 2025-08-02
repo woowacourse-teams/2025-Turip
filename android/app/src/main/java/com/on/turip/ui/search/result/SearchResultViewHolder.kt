@@ -6,9 +6,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.on.turip.R
 import com.on.turip.databinding.ItemSearchResultBinding
 import com.on.turip.domain.content.Content
-import com.on.turip.domain.content.video.VideoInformation
 import com.on.turip.domain.creator.Creator
 import com.on.turip.ui.common.loadCircularImage
+import com.on.turip.ui.common.model.trip.toDisplayText
+import com.on.turip.ui.search.model.VideoInformationModel
 
 class SearchResultViewHolder(
     private val binding: ItemSearchResultBinding,
@@ -26,28 +27,24 @@ class SearchResultViewHolder(
         }
     }
 
-    fun bind(videoInformation: VideoInformation) {
-        creator = videoInformation.content.creator
-        content = videoInformation.content
-        binding.tvSearchResultTitle.text = videoInformation.content.videoData.title
+    fun bind(videoInformationModel: VideoInformationModel) {
+        creator = videoInformationModel.content.creator
+        content = videoInformationModel.content
+        binding.tvSearchResultTitle.text = videoInformationModel.content.videoData.title
         binding.tvSearchResultDay.text =
-            itemView.context.getString(
-                R.string.all_travel_duration,
-                videoInformation.trip.tripDuration.nights,
-                videoInformation.trip.tripDuration.days,
-            )
+            videoInformationModel.tripModel.tripDurationModel.toDisplayText(itemView.context)
         binding.tvSearchResultLocation.text =
             itemView.context.getString(
                 R.string.all_total_place_count,
-                videoInformation.trip.tripPlaceCount,
+                videoInformationModel.tripModel.tripPlaceCount,
             )
         binding.tvSearchResultDescription.text =
             itemView.context.getString(
                 R.string.search_result_video_description,
-                videoInformation.content.creator.channelName,
-                videoInformation.content.videoData.uploadedDate,
+                videoInformationModel.content.creator.channelName,
+                videoInformationModel.content.videoData.uploadedDate,
             )
-        binding.ivSearchResultThumbnail.loadCircularImage(videoInformation.content.creator.profileImage)
+        binding.ivSearchResultThumbnail.loadCircularImage(videoInformationModel.content.creator.profileImage)
     }
 
     companion object {

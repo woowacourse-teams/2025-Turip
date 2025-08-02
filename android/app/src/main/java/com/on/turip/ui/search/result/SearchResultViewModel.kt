@@ -5,10 +5,14 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import com.on.turip.di.RepositoryModule
 import com.on.turip.domain.content.PagedContentsResult
 import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.content.video.VideoInformation
+import com.on.turip.ui.common.mapper.toUiModel
+import com.on.turip.ui.search.model.VideoInformationModel
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -44,9 +48,11 @@ class SearchResultViewModel(
             pagedContentsResult
                 .await()
                 .onSuccess { result: PagedContentsResult ->
+                    val videoModels: List<VideoInformationModel> =
+                        result.videos.map { videoInformation: VideoInformation -> videoInformation.toUiModel() }
                     _searchResultState.value =
                         searchResultState.value?.copy(
-                            videoInformations = result.videos,
+                            videoInformations = videoModels,
                         )
                 }.onFailure {
                 }
@@ -95,23 +101,19 @@ class SearchResultViewModel(
             region: String,
             contentRepository: ContentRepository = RepositoryModule.contentRepository,
         ): ViewModelProvider.Factory =
-            object : ViewModelProvider.Factory {
-                @Suppress("UNCHECKED_CAST")
-                override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    if (modelClass.isAssignableFrom(SearchResultViewModel::class.java)) {
-                        return SearchResultViewModel(
-                            region,
-                            contentRepository,
-                        ) as T
-                    }
-                    throw IllegalArgumentException()
+            viewModelFactory {
+                initializer {
+                    SearchResultViewModel(
+                        region,
+                        contentRepository,
+                    )
                 }
             }
     }
 
     data class SearchResultState(
         val searchResultCount: Int = 0,
-        val videoInformations: List<VideoInformation> = emptyList(),
+        val videoInformations: List<VideoInformationModel> = emptyList(),
         val region: String = "",
         val isExist: Boolean = false,
         val loading: Boolean = true,

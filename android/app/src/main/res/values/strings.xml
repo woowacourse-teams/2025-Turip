@@ -4,7 +4,12 @@
     <!-- 공용 -->
     <string name="all_total_place_count">%d개 장소</string>
     <string name="all_travel_duration">%d박 %d일</string>
+    <string name="all_travel_day_trip_duration">당일치기</string>
     <string name="all_loading">로딩 중…</string>
+
+    <!-- 바텀 네비게이션 -->
+    <string name="bottom_navigation_home">홈</string>
+    <string name="bottom_navigation_selected_catalog">찜 목록</string>
 
     <!-- 검색 결과 페이지 -->
     <string name="search_result_no_result">검색 결과가 없습니다.</string>

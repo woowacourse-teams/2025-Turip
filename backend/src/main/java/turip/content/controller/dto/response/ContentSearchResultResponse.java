@@ -4,19 +4,19 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public record ContentSearchResultResponse(
         @JsonProperty("content")
-        ContentWithoutRegionResponse contentWithoutRegionResponse,
+        ContentWithoutCityResponse contentWithoutCityResponse,
         @JsonProperty("tripDuration")
         TripDurationResponse tripDurationResponse,
         int tripPlaceCount
 ) {
 
     public static ContentSearchResultResponse of(
-            ContentWithoutRegionResponse contentWithoutRegionResponse,
+            ContentWithoutCityResponse contentWithoutCityResponse,
             TripDurationResponse tripDurationResponse,
             int tripPlaceCount
     ) {
         return new ContentSearchResultResponse(
-                contentWithoutRegionResponse,
+                contentWithoutCityResponse,
                 tripDurationResponse,
                 tripPlaceCount
         );

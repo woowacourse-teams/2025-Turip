@@ -15,19 +15,20 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.on.turip.R
 import com.on.turip.databinding.ActivityTripDetailBinding
+import com.on.turip.ui.common.TuripUrlConverter
 import com.on.turip.ui.common.base.BaseActivity
 import com.on.turip.ui.common.loadCircularImage
+import com.on.turip.ui.common.model.trip.toDisplayText
 import com.on.turip.ui.trip.detail.webview.TuripWebChromeClient
 import com.on.turip.ui.trip.detail.webview.TuripWebViewClient
 import com.on.turip.ui.trip.detail.webview.WebViewVideoBridge
 import com.on.turip.ui.trip.detail.webview.applyVideoSettings
-import com.on.turip.ui.trip.detail.webview.extractVideoId
 
-class TripDetailActivity : BaseActivity<TripDetailViewModel, ActivityTripDetailBinding>() {
+class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
     override val binding: ActivityTripDetailBinding by lazy {
         ActivityTripDetailBinding.inflate(layoutInflater)
     }
-    override val viewModel: TripDetailViewModel by viewModels {
+    val viewModel: TripDetailViewModel by viewModels {
         TripDetailViewModel.provideFactory(
             intent.getLongExtra(CONTENT_KEY, 0),
             intent.getLongExtra(CREATOR_KEY, 0),
@@ -179,13 +180,9 @@ class TripDetailActivity : BaseActivity<TripDetailViewModel, ActivityTripDetailB
             binding.tvTripDetailContentTitle.text = tripDetailState.content?.videoData?.title
             binding.tvTripDetailUploadDate.text = tripDetailState.content?.videoData?.uploadedDate
             binding.tvTripDetailTotalPlaceCount.text =
-                getString(R.string.all_total_place_count, tripDetailState.trip.tripPlaceCount)
+                getString(R.string.all_total_place_count, tripDetailState.tripModel.tripPlaceCount)
             binding.tvTripDetailTravelDuration.text =
-                getString(
-                    R.string.all_travel_duration,
-                    tripDetailState.trip.tripDuration.nights,
-                    tripDetailState.trip.tripDuration.days,
-                )
+                tripDetailState.tripModel.tripDurationModel.toDisplayText(this)
             binding.tvTripDetailDayPlaceCount.text =
                 getString(
                     R.string.trip_detail_day_place_count,
@@ -196,7 +193,7 @@ class TripDetailActivity : BaseActivity<TripDetailViewModel, ActivityTripDetailB
             binding.wvTripDetailVideo.apply {
                 addJavascriptInterface(
                     WebViewVideoBridge(
-                        url.extractVideoId(),
+                        TuripUrlConverter.extractVideoId(url),
                     ) { showWebViewErrorView() },
                     BRIDGE_NAME_IN_JS_FILE,
                 )

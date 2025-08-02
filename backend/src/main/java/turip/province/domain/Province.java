@@ -1,4 +1,4 @@
-package turip.region.domain;
+package turip.province.domain;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Region {
+public class Province {
 
     @Id
     @EqualsAndHashCode.Include
