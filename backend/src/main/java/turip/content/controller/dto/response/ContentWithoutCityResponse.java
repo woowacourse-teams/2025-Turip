@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import turip.content.domain.Content;
 import turip.creator.controller.dto.response.CreatorResponse;
 
-public record ContentWithoutRegionResponse(
+public record ContentWithoutCityResponse(
         Long id,
         CreatorResponse creator,
         String title,
@@ -12,8 +12,8 @@ public record ContentWithoutRegionResponse(
         LocalDate uploadedDate
 ) {
 
-    public static ContentWithoutRegionResponse from(Content content) {
-        return new ContentWithoutRegionResponse(
+    public static ContentWithoutCityResponse from(Content content) {
+        return new ContentWithoutCityResponse(
                 content.getId(),
                 CreatorResponse.from(content.getCreator()),
                 content.getTitle(),

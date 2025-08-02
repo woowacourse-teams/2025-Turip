@@ -6,7 +6,7 @@ import turip.content.domain.Content;
 public record ContentResponse(
         Long id,
         Long creatorId,
-        Long regionId,
+        Long cityId,
         String title,
         String url,
         LocalDate uploadedDate
@@ -15,7 +15,7 @@ public record ContentResponse(
         return new ContentResponse(
                 content.getId(),
                 content.getCreator().getId(),
-                content.getRegion().getId(),
+                content.getCity().getId(),
                 content.getTitle(),
                 content.getUrl(),
                 content.getUploadedDate()

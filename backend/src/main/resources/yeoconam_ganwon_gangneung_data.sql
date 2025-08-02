@@ -1,6 +1,6 @@
 INSERT INTO content (creator_id, region_id, title, url, uploaded_date)
 SELECT (SELECT id FROM creator WHERE channel_name = '여코남 - 여행코스짜주는남자'),
-       (SELECT id FROM region WHERE name = 'gangwon'),
+       (SELECT id FROM city WHERE name = 'gangneung-si'),
        '단 5분 만에 강릉 여행에 대한 모든 것 완벽 몰아보기! /혼자,연인,가족 여행 당일치기,1박2일 진짜 다 알려드리는 최종 정리',
        'https://www.youtube.com/watch?v=5EYf3nb8UJ4&list=PL8z7KQfD7gudY2s4CIFJzaxpBnS8uh-AP&index=2',
        '2024-1-20';

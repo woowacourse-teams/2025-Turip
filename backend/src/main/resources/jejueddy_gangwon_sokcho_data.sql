@@ -4,7 +4,7 @@ VALUES ('제주에디',
 
 INSERT INTO content (creator_id, region_id, title, url, uploaded_date)
 SELECT (SELECT id FROM creator WHERE channel_name = '제주에디'),
-       (SELECT id FROM region WHERE name = 'gangwon'),
+       (SELECT id FROM city WHERE name = 'sokcho-si'),
        '강원도 4박5일 맛집 여행 코스와 경비 총정리 (속초, 강릉)',
        'https://youtu.be/m2SPPxloo9w?si=6BY2pYrz9FMP2C4W',
        '2025-2-11';

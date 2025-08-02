@@ -1,6 +1,6 @@
 INSERT INTO content (creator_id, region_id, title, url, uploaded_date)
 SELECT (SELECT id FROM creator WHERE channel_name = '하찬투어 hachantour'),
-       (SELECT id FROM region WHERE name = 'gangwon'),
+       (SELECT id FROM city WHERE name = 'sokcho-si'),
        '외국인 많음주의 국내여행중 만난 유럽감성 해외보다 더 멋진 강원도 속초 호텔 추천 유명맛집과 가볼만한 곳 직접 다녀와봤습니다 솔직 후기',
        'https://www.youtube.com/watch?v=G6BaTbbj2hA',
        '2025-4-22';
