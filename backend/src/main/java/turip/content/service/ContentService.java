@@ -6,10 +6,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import turip.content.controller.dto.response.ContentCountResponse;
-import turip.content.controller.dto.response.ContentDetailsByRegionResponse;
+import turip.content.controller.dto.response.ContentDetailsByCityResponse;
 import turip.content.controller.dto.response.ContentResponse;
-import turip.content.controller.dto.response.ContentWithoutRegionResponse;
-import turip.content.controller.dto.response.ContentsByRegionResponse;
+import turip.content.controller.dto.response.ContentWithoutCityResponse;
+import turip.content.controller.dto.response.ContentsByCityResponse;
 import turip.content.controller.dto.response.TripDurationResponse;
 import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
@@ -25,32 +25,32 @@ public class ContentService {
     private final ContentRepository contentRepository;
     private final TripCourseService tripCourseService;
 
-    public ContentCountResponse countByRegionName(String regionName) {
-        int count = contentRepository.countByRegion_Name(regionName);
+    public ContentCountResponse countByCityName(String cityName) {
+        int count = contentRepository.countByCityName(cityName);
         return ContentCountResponse.from(count);
     }
 
-    public ContentsByRegionResponse findContentsByRegionName(
-            String regionName,
+    public ContentsByCityResponse findContentsByCityName(
+            String cityName,
             int size,
             long lastId
     ) {
-        List<Content> contents = findContentsByRegion(regionName, lastId, size + EXTRA_FETCH_COUNT);
+        List<Content> contents = findContentsByCity(cityName, lastId, size + EXTRA_FETCH_COUNT);
 
         // 실제 반환할 content는 size 만큼 잘라서 반환한다.
         List<Content> pagedContents = contents.stream()
                 .limit(size)
                 .toList();
 
-        List<ContentDetailsByRegionResponse> contentDetails
+        List<ContentDetailsByCityResponse> contentDetails
                 = convertContentsToContentDetailsByRegionResponses(pagedContents);
         boolean loadable = contents.size() > size;
 
-        return ContentsByRegionResponse.of(contentDetails, loadable);
+        return ContentsByCityResponse.of(contentDetails, loadable);
     }
 
-    private List<Content> findContentsByRegion(
-            String regionName,
+    private List<Content> findContentsByCity(
+            String cityName,
             long lastId,
             int sizePlusOne
     ) {
@@ -58,24 +58,24 @@ public class ContentService {
         boolean isFirstPage = lastId == 0;
 
         if (isFirstPage) {
-            return contentRepository.findByRegionNameOrderByIdDesc(regionName, pageable);
+            return contentRepository.findByCityNameOrderByIdDesc(cityName, pageable);
         }
-        return contentRepository.findByRegionNameAndIdLessThanOrderByIdDesc(regionName, lastId, pageable);
+        return contentRepository.findByCityNameAndIdLessThanOrderByIdDesc(cityName, lastId, pageable);
     }
 
-    private List<ContentDetailsByRegionResponse> convertContentsToContentDetailsByRegionResponses(
+    private List<ContentDetailsByCityResponse> convertContentsToContentDetailsByRegionResponses(
             List<Content> contents) {
         return contents.stream()
                 .map(this::toContentDetailsResponse)
                 .toList();
     }
 
-    private ContentDetailsByRegionResponse toContentDetailsResponse(Content content) {
-        ContentWithoutRegionResponse contentWithoutRegion = ContentWithoutRegionResponse.from(content);
+    private ContentDetailsByCityResponse toContentDetailsResponse(Content content) {
+        ContentWithoutCityResponse contentWithoutRegion = ContentWithoutCityResponse.from(content);
         TripDurationResponse tripDuration = calculateTripDuration(content);
         int tripPlaceCount = tripCourseService.countByContentId(content.getId());
 
-        return ContentDetailsByRegionResponse.of(contentWithoutRegion, tripDuration, tripPlaceCount);
+        return ContentDetailsByCityResponse.of(contentWithoutRegion, tripDuration, tripPlaceCount);
     }
 
     private TripDurationResponse calculateTripDuration(Content content) {

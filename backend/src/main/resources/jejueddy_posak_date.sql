@@ -1,7 +1,7 @@
 -- Content
-INSERT INTO content (creator_id, region_id, title, url, uploaded_date)
+INSERT INTO content (creator_id, city_id, title, url, uploaded_date)
 SELECT (SELECT id FROM creator WHERE channel_name = '제주에디'),
-       (SELECT id FROM region WHERE name = 'jeju'),
+       (SELECT id FROM city WHERE name = 'jeju'),
        '폭싹 속았수다 제주도 촬영지 모음 (+ 봄 유채꽃 명소까지)',
        'https://youtu.be/uf4snftpKOk?si=CfgUFgCDBeLulCul',
        '2025-03-28';

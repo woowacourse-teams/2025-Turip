@@ -26,20 +26,25 @@ class ContentPagingApiTest {
         jdbcTemplate.update("DELETE FROM place");
         jdbcTemplate.update("DELETE FROM content");
         jdbcTemplate.update("DELETE FROM creator");
-        jdbcTemplate.update("DELETE FROM region");
+        jdbcTemplate.update("DELETE FROM city");
+        jdbcTemplate.update("DELETE FROM country");
+        jdbcTemplate.update("DELETE FROM province");
 
         jdbcTemplate.update("ALTER TABLE trip_course ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE place ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE content ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE creator ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE region ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE city ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE country ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE province ALTER COLUMN id RESTART WITH 1");
 
         jdbcTemplate.update(
                 "INSERT INTO creator (profile_image, channel_name) VALUES ('https://image.example.com/creator1.jpg', 'TravelMate')");
-        jdbcTemplate.update("INSERT INTO region (name) VALUES ('seoul')");
+        jdbcTemplate.update("INSERT INTO country (name) VALUES ('korea')");
+        jdbcTemplate.update("INSERT INTO city (name, country_id) VALUES ('seoul', 1)");
         for (int i = 1; i <= 10; i++) {
             jdbcTemplate.update(
-                    "INSERT INTO content (creator_id, region_id, url, title, uploaded_date) VALUES (1, 1, ?, ?, '2024-07-01')",
+                    "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 1, ?, ?, '2024-07-01')",
                     "https://youtube.com/watch?v=abcd" + i, "서울 여행 " + i
             );
             jdbcTemplate.update("INSERT INTO place (name, latitude, longitude) VALUES (?, ?, ?)", "장소" + i, 34.5,
@@ -51,10 +56,10 @@ class ContentPagingApiTest {
 
     @DisplayName("/contents GET 지역별 컨텐츠 목록 페이징 테스트")
     @Test
-    void readContentsByRegionNamePaging() {
+    void readContentsByCityNamePaging() {
         // when: 첫 페이지 요청 (lastId=0, size=5)
         var firstPageResponse = RestAssured.given().port(port)
-                .queryParam("region", "seoul")
+                .queryParam("cityName", "seoul")
                 .queryParam("size", 5)
                 .queryParam("lastId", 0)
                 .when().get("/contents");
@@ -69,7 +74,7 @@ class ContentPagingApiTest {
 
         // when: 두 번째 페이지 요청 (lastId=6, size=5)
         var secondPageResponse = RestAssured.given().port(port)
-                .queryParam("region", "seoul")
+                .queryParam("cityName", "seoul")
                 .queryParam("size", 5)
                 .queryParam("lastId", 6)
                 .when().get("/contents");
