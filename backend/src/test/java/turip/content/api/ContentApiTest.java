@@ -42,11 +42,11 @@ public class ContentApiTest {
 
     @DisplayName("/contents/count GET 지역별 컨텐츠 수 조회 테스트")
     @Nested
-    class readCountByRegion {
+    class readCountByRegionName {
 
         @DisplayName("지역별 컨텐츠 수 조회 성공 시 200 OK 코드와 컨텐츠 수를 응답한다")
         @Test
-        void readCountByRegionName() {
+        void readCountByRegionName1() {
             // given
             jdbcTemplate.update(
                     "INSERT INTO creator (profile_image, channel_name) VALUES ('https://image.example.com/creator1.jpg', 'TravelMate')");
@@ -72,7 +72,7 @@ public class ContentApiTest {
 
         @DisplayName("id로 컨텐츠 단건 조회 성공 시 200 OK 코드와 컨텐츠 정보를 응답한다")
         @Test
-        void readContentById() {
+        void readContentById1() {
             // given
             jdbcTemplate.update(
                     "INSERT INTO Creator (profile_image, channel_name) VALUES (?, ?)",
