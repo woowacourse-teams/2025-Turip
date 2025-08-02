@@ -12,9 +12,9 @@
     <string name="bottom_navigation_selected_catalog">찜 목록</string>
 
     <!-- 검색 결과 페이지 -->
-    <string name="search_result_no_result">검색 결과가 없습니다.</string>
-    <string name="search_result_video_description">%s · %s</string>
-    <string name="search_result_exist_result">검색결과 %d개</string>
+    <string name="region_result_no_result">검색 결과가 없습니다.</string>
+    <string name="region_result_video_description">%s · %s</string>
+    <string name="region_result_exist_result">검색결과 %d개</string>
 
     <!-- 메인 페이지 -->
     <string name="main_where_should_we_go_title">어디로 떠나볼까요?</string>

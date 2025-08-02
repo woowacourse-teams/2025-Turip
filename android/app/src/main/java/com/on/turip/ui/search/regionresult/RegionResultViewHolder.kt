@@ -1,4 +1,4 @@
-package com.on.turip.ui.search.result
+package com.on.turip.ui.search.regionresult
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -11,7 +11,7 @@ import com.on.turip.ui.common.loadCircularImage
 import com.on.turip.ui.common.model.trip.toDisplayText
 import com.on.turip.ui.search.model.VideoInformationModel
 
-class SearchResultViewHolder(
+class RegionResultViewHolder(
     private val binding: ItemSearchResultBinding,
     private val onSearchResultListener: OnSearchResultListener,
 ) : RecyclerView.ViewHolder(binding.root) {
@@ -40,22 +40,22 @@ class SearchResultViewHolder(
             )
         binding.tvSearchResultDescription.text =
             itemView.context.getString(
-                R.string.search_result_video_description,
+                R.string.region_result_video_description,
                 videoInformationModel.content.creator.channelName,
                 videoInformationModel.content.videoData.uploadedDate,
             )
-        binding.ivSearchResultThumbnail.loadCircularImage(videoInformationModel.content.creator.profileImage)
+        binding.ivSearchResultCreatorThumbnail.loadCircularImage(videoInformationModel.content.creator.profileImage)
     }
 
     companion object {
         fun of(
             parent: ViewGroup,
             onSearchResultListener: OnSearchResultListener,
-        ): SearchResultViewHolder {
+        ): RegionResultViewHolder {
             val inflater: LayoutInflater = LayoutInflater.from(parent.context)
             val binding: ItemSearchResultBinding =
                 ItemSearchResultBinding.inflate(inflater, parent, false)
-            return SearchResultViewHolder(binding, onSearchResultListener)
+            return RegionResultViewHolder(binding, onSearchResultListener)
         }
     }
 

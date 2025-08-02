@@ -1,4 +1,4 @@
-package com.on.turip.ui.search.result
+package com.on.turip.ui.search.regionresult
 
 import android.content.Context
 import android.content.Intent
@@ -9,22 +9,22 @@ import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import com.on.turip.R
-import com.on.turip.databinding.ActivitySearchResultBinding
+import com.on.turip.databinding.ActivityRegionResultBinding
 import com.on.turip.ui.common.base.BaseActivity
 import com.on.turip.ui.common.model.RegionModel
 import com.on.turip.ui.trip.detail.TripDetailActivity
 
-class SearchResultActivity : BaseActivity<ActivitySearchResultBinding>() {
-    val viewModel: SearchResultViewModel by viewModels {
-        SearchResultViewModel.provideFactory(
+class RegionResultActivity : BaseActivity<ActivityRegionResultBinding>() {
+    val viewModel: RegionResultViewModel by viewModels {
+        RegionResultViewModel.provideFactory(
             intent.getStringExtra(REGION_KEY) ?: "",
         )
     }
-    override val binding: ActivitySearchResultBinding by lazy {
-        ActivitySearchResultBinding.inflate(layoutInflater)
+    override val binding: ActivityRegionResultBinding by lazy {
+        ActivityRegionResultBinding.inflate(layoutInflater)
     }
-    private val searchResultAdapter: SearchResultAdapter =
-        SearchResultAdapter { contentId: Long?, creatorId: Long? ->
+    private val regionResultAdapter: RegionResultAdapter =
+        RegionResultAdapter { contentId: Long?, creatorId: Long? ->
             val intent =
                 TripDetailActivity.newIntent(
                     context = this,
@@ -71,20 +71,20 @@ class SearchResultActivity : BaseActivity<ActivitySearchResultBinding>() {
     }
 
     private fun setupAdapters() {
-        binding.rvSearchResult.adapter = searchResultAdapter
+        binding.rvSearchResult.adapter = regionResultAdapter
     }
 
     private fun setupObservers() {
-        viewModel.searchResultState.observe(this) { searchResultState: SearchResultViewModel.SearchResultState ->
+        viewModel.searchResultState.observe(this) { searchResultState: RegionResultViewModel.SearchResultState ->
             binding.tvSearchResultCount.text =
                 getString(
-                    R.string.search_result_exist_result,
+                    R.string.region_result_exist_result,
                     searchResultState.searchResultCount,
                 )
 
             supportActionBar?.title = setupTitle(searchResultState.region)
 
-            searchResultAdapter.submitList(searchResultState.videoInformations)
+            regionResultAdapter.submitList(searchResultState.videoInformations)
 
             binding.rvSearchResult.isVisible = searchResultState.isExist == true
             binding.groupSearchResultEmpty.isVisible = searchResultState.isExist == false
@@ -104,7 +104,7 @@ class SearchResultActivity : BaseActivity<ActivitySearchResultBinding>() {
             context: Context,
             region: String,
         ): Intent =
-            Intent(context, SearchResultActivity::class.java)
+            Intent(context, RegionResultActivity::class.java)
                 .putExtra(REGION_KEY, region)
     }
 }

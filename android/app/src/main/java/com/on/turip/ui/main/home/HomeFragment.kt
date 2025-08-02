@@ -14,19 +14,19 @@ import com.on.turip.databinding.FragmentHomeBinding
 import com.on.turip.ui.common.base.BaseFragment
 import com.on.turip.ui.common.model.RegionModel
 import com.on.turip.ui.main.RegionAdapter
-import com.on.turip.ui.search.result.SearchResultActivity
+import com.on.turip.ui.search.regionresult.RegionResultActivity
 
 class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     private val viewModel: HomeViewModel by viewModels()
 
     private val metropolitanCitiesAdapter: RegionAdapter =
         RegionAdapter { region: RegionModel ->
-            val intent = SearchResultActivity.newIntent(requireActivity(), region.english)
+            val intent = RegionResultActivity.newIntent(requireActivity(), region.english)
             startActivity(intent)
         }
     private val provincesAdapter: RegionAdapter =
         RegionAdapter { region: RegionModel ->
-            val intent = SearchResultActivity.newIntent(requireActivity(), region.english)
+            val intent = RegionResultActivity.newIntent(requireActivity(), region.english)
             startActivity(intent)
         }
 

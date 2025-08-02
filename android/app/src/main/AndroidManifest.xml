@@ -26,7 +26,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.search.result.SearchResultActivity"
+            android:name=".ui.search.regionresult.RegionResultActivity"
             android:exported="false" />
         <activity
             android:name=".ui.trip.detail.TripDetailActivity"
