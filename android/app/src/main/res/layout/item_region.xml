@@ -3,22 +3,31 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:paddingEnd="12dp"
+    tools:ignore="RtlSymmetry">
+
+    <ImageView
+        android:id="@+id/iv_region"
+        android:layout_width="76dp"
+        android:layout_height="76dp"
+        android:contentDescription="@null"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 
     <TextView
         android:id="@+id/tv_searching_region"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:background="@drawable/bg_gra400_radius_24dp"
-        android:paddingHorizontal="20dp"
-        android:paddingVertical="10dp"
-        android:textAppearance="@style/title2"
-        android:textColor="@color/pure_white_ffffff"
+        android:paddingVertical="4dp"
+        android:textAppearance="@style/title3"
+        android:textColor="@color/pure_black_151515"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/iv_region"
         tools:text="제주" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
