@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="10dp"
+    android:background="@drawable/bg_stroke_gray200_radius_12dp"
+    android:padding="10dp">
+
+    <ImageView
+        android:id="@+id/iv_users_like_content_thumbnail"
+        android:layout_width="176dp"
+        android:layout_height="92dp"
+        android:contentDescription="@null"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_users_like_content_region"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/bg_turip_lemon_radius_24dp"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="2dp"
+        android:textAppearance="@style/info2"
+        android:textColor="@color/pure_black_151515"
+        app:layout_constraintStart_toStartOf="@id/iv_users_like_content_thumbnail"
+        app:layout_constraintTop_toTopOf="@id/iv_users_like_content_thumbnail"
+        tools:text="대구" />
+
+    <TextView
+        android:id="@+id/tv_users_like_content_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:ellipsize="end"
+        android:maxLines="2"
+        android:textAppearance="@style/body2"
+        android:textColor="@color/pure_black_151515"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/iv_users_like_content_thumbnail"
+        tools:text="대프리카지만 괜찮아... 느좋 대구여행기 어쩌구저쩌ㅜㄹㄹㄹㄹㄹㄹㄹ." />
+
+    <TextView
+        android:id="@+id/tv_users_like_content_channel_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textAppearance="@style/info2"
+        android:textColor="@color/gray_300_5b5b5b"
+        app:layout_constraintEnd_toEndOf="@id/tv_users_like_content_title"
+        app:layout_constraintStart_toStartOf="@id/tv_users_like_content_title"
+        app:layout_constraintTop_toBottomOf="@id/tv_users_like_content_title"
+        tools:text="여행하는 튜립팀" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/info2"
+        android:textColor="@color/gray_300_5b5b5b"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@id/tv_users_like_content_channel_name"
+        app:layout_constraintTop_toBottomOf="@id/tv_users_like_content_channel_name"
+        tools:text="2024-07-25 · 1박 2일" />
+</androidx.constraintlayout.widget.ConstraintLayout>
