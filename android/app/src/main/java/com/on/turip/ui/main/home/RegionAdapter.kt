@@ -1,4 +1,4 @@
-package com.on.turip.ui.main
+package com.on.turip.ui.main.home
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
