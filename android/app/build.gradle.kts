@@ -103,4 +103,6 @@ dependencies {
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.crashlytics.ndk)
     implementation(libs.firebase.installations)
+    // datastore
+    implementation(libs.androidx.datastore.preferences)
 }
