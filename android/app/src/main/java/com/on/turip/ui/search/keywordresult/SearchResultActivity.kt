@@ -18,6 +18,7 @@ class SearchResultActivity : BaseActivity<ActivitySearchResultBinding>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setupToolbar()
+        setupBindings()
     }
 
     private fun setupToolbar() {
@@ -46,6 +47,10 @@ class SearchResultActivity : BaseActivity<ActivitySearchResultBinding>() {
             return true
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun setupBindings() {
+        binding.svSearchResult.requestFocus()
     }
 
     companion object {
