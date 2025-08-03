@@ -45,6 +45,7 @@
                 android:autofillHints=""
                 android:background="@null"
                 android:hint="@string/hint_text"
+                android:imeOptions="actionSearch"
                 android:textColor="@color/pure_black_151515"
                 android:textColorHint="@color/gray_300_5b5b5b"
                 android:textAppearance="@style/title3"
