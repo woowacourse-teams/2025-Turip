@@ -4,6 +4,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import turip.content.controller.dto.response.ContentCountResponse;
 import turip.content.controller.dto.response.ContentDetailsByCityResponse;
@@ -20,8 +21,6 @@ import turip.tripcourse.service.TripCourseService;
 @RequiredArgsConstructor
 public class ContentService {
 
-    private static final int EXTRA_FETCH_COUNT = 1;
-
     private final ContentRepository contentRepository;
     private final TripCourseService tripCourseService;
 
@@ -35,26 +34,22 @@ public class ContentService {
             int size,
             long lastId
     ) {
-        List<Content> contents = findContentsByCity(cityName, lastId, size + EXTRA_FETCH_COUNT);
+        Slice<Content> contentSlice = findContentsByCity(cityName, lastId, size);
 
-        // 실제 반환할 content는 size 만큼 잘라서 반환한다.
-        List<Content> pagedContents = contents.stream()
-                .limit(size)
-                .toList();
-
+        List<Content> contents = contentSlice.getContent();
         List<ContentDetailsByCityResponse> contentDetails
-                = convertContentsToContentDetailsByRegionResponses(pagedContents);
-        boolean loadable = contents.size() > size;
+                = convertContentsToContentDetailsByRegionResponses(contents);
+        boolean loadable = contentSlice.hasNext();
 
         return ContentsByCityResponse.of(contentDetails, loadable);
     }
 
-    private List<Content> findContentsByCity(
+    private Slice<Content> findContentsByCity(
             String cityName,
             long lastId,
-            int sizePlusOne
+            int size
     ) {
-        Pageable pageable = PageRequest.of(0, sizePlusOne);
+        Pageable pageable = PageRequest.of(0, size);
         boolean isFirstPage = lastId == 0;
 
         if (isFirstPage) {
