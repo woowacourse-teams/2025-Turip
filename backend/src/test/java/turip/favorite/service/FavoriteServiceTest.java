@@ -114,4 +114,30 @@ class FavoriteServiceTest {
         assertThatThrownBy(() -> favoriteService.create(request, deviceFid))
                 .isInstanceOf(BadRequestException.class);
     }
+
+    @DisplayName("찜을 삭제할 수 있다")
+    @Test
+    void deleteFavorite() {
+        // given
+        Long contentId = 1L;
+        String deviceFid = "testDeviceFid";
+        Creator creator = new Creator(null, null);
+        City city = new City(null, null, null, null);
+        Content content = new Content(contentId, creator, city, null, null, null);
+        Member member = new Member(deviceFid);
+        Favorite favorite = new Favorite(LocalDate.now(), member, content);
+
+        given(contentRepository.findById(contentId))
+                .willReturn(Optional.of(content));
+        given(memberRepository.findByDeviceFid(deviceFid))
+                .willReturn(Optional.of(member));
+        given(favoriteRepository.findByMemberIdAndContentId(any(), eq(contentId)))
+                .willReturn(Optional.of(favorite));
+
+        // when
+        favoriteService.remove(deviceFid, contentId);
+
+        // then
+        assertThat(favoriteRepository.findById(contentId)).isEmpty();
+    }
 }
