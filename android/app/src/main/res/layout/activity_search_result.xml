@@ -13,47 +13,25 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:titleCentered="false"
-        app:title=""
-        app:titleTextAppearance="@style/title1"
-        app:titleTextColor="@color/pure_black_151515">
+        app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <SearchView
+            android:id="@+id/et_search"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-
-            <EditText
-                android:id="@+id/et_search"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="20dp"
-                android:layout_gravity="center_vertical"
-                android:autofillHints=""
-                android:hint="@string/hint_text"
-                android:paddingVertical="8dp"
-                android:paddingHorizontal="12dp"
-                android:background="@drawable/bg_gra100_radius_12dp"
-                android:textColor="@color/pure_black_151515"
-                android:textColorHint="@color/gray_300_5b5b5b"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:inputType="text" />
-
-            <ImageView
-                android:id="@+id/iv_clear"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_gravity="end|center_vertical"
-                android:layout_marginEnd="12dp"
-                app:layout_constraintEnd_toEndOf="@+id/et_search"
-                app:layout_constraintTop_toTopOf="@+id/et_search"
-                app:layout_constraintBottom_toBottomOf="@+id/et_search"
-                android:src="@drawable/ic_cancel" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:layout_gravity="center_vertical"
+            android:queryHint="@string/hint_text"
+            android:paddingHorizontal="12dp"
+            android:background="@drawable/bg_gra100_radius_12dp"
+            android:queryBackground="@null"
+            android:textColor="@color/pure_black_151515"
+            android:textColorHint="@color/gray_300_5b5b5b"
+            android:iconifiedByDefault="false"
+            android:imeOptions="actionSearch"
+            android:searchIcon="@drawable/ic_search"
+            android:closeIcon="@drawable/ic_cancel"
+            android:inputType="text" />
 
     </com.google.android.material.appbar.MaterialToolbar>
 
