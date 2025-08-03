@@ -1,4 +1,4 @@
-package turip.regionCategory.domain;
+package turip.regioncategory.domain;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

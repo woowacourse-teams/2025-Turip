@@ -1,4 +1,4 @@
-package turip.regionCategory.service;
+package turip.regioncategory.service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,10 +8,10 @@ import turip.city.domain.City;
 import turip.city.service.CityService;
 import turip.country.domain.Country;
 import turip.country.service.CountryService;
-import turip.regionCategory.controller.dto.response.RegionCategoriesResponse;
-import turip.regionCategory.controller.dto.response.RegionCategoryResponse;
-import turip.regionCategory.domain.DomesticRegionCategory;
-import turip.regionCategory.domain.OverseasRegionCategory;
+import turip.regioncategory.controller.dto.response.RegionCategoriesResponse;
+import turip.regioncategory.controller.dto.response.RegionCategoryResponse;
+import turip.regioncategory.domain.DomesticRegionCategory;
+import turip.regioncategory.domain.OverseasRegionCategory;
 
 @Service
 @RequiredArgsConstructor

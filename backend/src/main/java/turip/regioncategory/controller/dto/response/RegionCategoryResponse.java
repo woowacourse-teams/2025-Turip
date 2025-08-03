@@ -1,4 +1,4 @@
-package turip.regionCategory.controller.dto.response;
+package turip.regioncategory.controller.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import turip.city.domain.City;

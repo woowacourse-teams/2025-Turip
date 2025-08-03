@@ -1,4 +1,4 @@
-package turip.regionCategory.service;
+package turip.regioncategory.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -16,8 +16,7 @@ import turip.city.domain.City;
 import turip.city.service.CityService;
 import turip.country.domain.Country;
 import turip.country.service.CountryService;
-import turip.regionCategory.controller.dto.response.RegionCategoriesResponse;
-import turip.regionCategory.controller.dto.response.RegionCategoryResponse;
+import turip.regioncategory.controller.dto.response.RegionCategoriesResponse;
 
 @ExtendWith(MockitoExtension.class)
 class RegionCategoryServiceTest {

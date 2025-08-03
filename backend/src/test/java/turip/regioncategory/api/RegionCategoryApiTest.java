@@ -1,4 +1,4 @@
-package turip.regionCategory.api;
+package turip.regioncategory.api;
 
 import static org.hamcrest.Matchers.is;
 
@@ -47,8 +47,10 @@ class RegionCategoryApiTest {
         void getRegionCategoriesByCountryType_withIsKoreaTrue_returnsDomesticCategories() {
             // given
             jdbcTemplate.update("INSERT INTO country (name, image_url) VALUES ('한국', 'https://example.com/korea.jpg')");
-            jdbcTemplate.update("INSERT INTO city (name, country_id, image_url) VALUES ('서울', 1, 'https://example.com/seoul.jpg')");
-            jdbcTemplate.update("INSERT INTO city (name, country_id, image_url) VALUES ('부산', 1, 'https://example.com/busan.jpg')");
+            jdbcTemplate.update(
+                    "INSERT INTO city (name, country_id, image_url) VALUES ('서울', 1, 'https://example.com/seoul.jpg')");
+            jdbcTemplate.update(
+                    "INSERT INTO city (name, country_id, image_url) VALUES ('부산', 1, 'https://example.com/busan.jpg')");
 
             // when & then
             RestAssured.given().port(port)
