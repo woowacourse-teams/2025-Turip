@@ -23,4 +23,9 @@ public class Creator {
     private String channelName;
 
     private String profileImage;
+
+    public Creator(String profileImage, String channelName) {
+        this.profileImage = profileImage;
+        this.channelName = channelName;
+    }
 }
