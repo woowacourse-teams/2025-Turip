@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,9 +38,12 @@ public class ContentController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ContentResponse> readContent(@PathVariable Long id) {
-        ContentResponse response = contentService.getById(id);
+    @GetMapping("/{contentId}")
+    public ResponseEntity<ContentResponse> readContent(
+            @RequestHeader(value = "device-fid", required = false) String deviceFid,
+            @PathVariable Long contentId
+    ) {
+        ContentResponse response = contentService.getContentWithFavoriteStatus(contentId, deviceFid);
         return ResponseEntity.ok(response);
     }
 }

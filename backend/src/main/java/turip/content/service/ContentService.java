@@ -14,6 +14,8 @@ import turip.content.controller.dto.response.TripDurationResponse;
 import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
 import turip.exception.NotFoundException;
+import turip.favorite.repository.FavoriteRepository;
+import turip.member.repository.MemberRepository;
 import turip.tripcourse.service.TripCourseService;
 
 @Service
@@ -24,10 +26,20 @@ public class ContentService {
 
     private final ContentRepository contentRepository;
     private final TripCourseService tripCourseService;
+    private final MemberRepository memberRepository;
+    private final FavoriteRepository favoriteRepository;
 
-    public ContentCountResponse countByCityName(String cityName) {
-        int count = contentRepository.countByCityName(cityName);
-        return ContentCountResponse.from(count);
+    public ContentResponse getContentWithFavoriteStatus(Long contentId, String deviceFid) {
+        Content content = contentRepository.findById(contentId)
+                .orElseThrow(() -> new NotFoundException("컨텐츠를 찾을 수 없습니다."));
+        boolean isFavorite = false;
+        if (deviceFid != null) {
+            isFavorite = memberRepository.findByDeviceFid(deviceFid)
+                    .map(member -> favoriteRepository.existsByMemberIdAndContentId(member.getId(), content.getId()))
+                    .orElse(false);
+        }
+
+        return ContentResponse.of(content, isFavorite);
     }
 
     public ContentsByCityResponse findContentsByCityName(
@@ -47,6 +59,11 @@ public class ContentService {
         boolean loadable = contents.size() > size;
 
         return ContentsByCityResponse.of(contentDetails, loadable);
+    }
+
+    public ContentCountResponse countByCityName(String cityName) {
+        int count = contentRepository.countByCityName(cityName);
+        return ContentCountResponse.from(count);
     }
 
     private List<Content> findContentsByCity(
@@ -81,11 +98,5 @@ public class ContentService {
     private TripDurationResponse calculateTripDuration(Content content) {
         int totalTripDay = tripCourseService.calculateDurationDays(content.getId());
         return TripDurationResponse.of(totalTripDay - 1, totalTripDay);
-    }
-
-    public ContentResponse getById(Long id) {
-        Content content = contentRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("컨텐츠를 찾을 수 없습니다."));
-        return ContentResponse.from(content);
     }
 }
