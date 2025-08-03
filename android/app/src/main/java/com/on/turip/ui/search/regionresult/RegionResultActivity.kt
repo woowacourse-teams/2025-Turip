@@ -43,10 +43,10 @@ class RegionResultActivity : BaseActivity<ActivityRegionResultBinding>() {
     }
 
     private fun setupToolbar() {
-        setSupportActionBar(binding.tbSearchResult)
+        setSupportActionBar(binding.tbRegionResult)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        binding.tbSearchResult.navigationIcon?.setTint(
+        binding.tbRegionResult.navigationIcon?.setTint(
             ContextCompat.getColor(
                 this,
                 R.color.gray_300_5b5b5b,
@@ -71,12 +71,12 @@ class RegionResultActivity : BaseActivity<ActivityRegionResultBinding>() {
     }
 
     private fun setupAdapters() {
-        binding.rvSearchResult.adapter = regionResultAdapter
+        binding.rvRegionResult.adapter = regionResultAdapter
     }
 
     private fun setupObservers() {
         viewModel.searchResultState.observe(this) { searchResultState: RegionResultViewModel.SearchResultState ->
-            binding.tvSearchResultCount.text =
+            binding.tvRegionResultCount.text =
                 getString(
                     R.string.region_result_exist_result,
                     searchResultState.searchResultCount,
@@ -86,9 +86,9 @@ class RegionResultActivity : BaseActivity<ActivityRegionResultBinding>() {
 
             regionResultAdapter.submitList(searchResultState.videoInformations)
 
-            binding.rvSearchResult.isVisible = searchResultState.isExist == true
-            binding.groupSearchResultEmpty.isVisible = searchResultState.isExist == false
-            binding.tvSearchResultLoading.isVisible = searchResultState.loading == true
+            binding.rvRegionResult.isVisible = searchResultState.isExist == true
+            binding.groupRegionResultEmpty.isVisible = searchResultState.isExist == false
+            binding.tvRegionResultLoading.isVisible = searchResultState.loading == true
         }
     }
 

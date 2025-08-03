@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.on.turip.R
-import com.on.turip.databinding.ItemSearchResultBinding
+import com.on.turip.databinding.ItemResultBinding
 import com.on.turip.domain.content.Content
 import com.on.turip.domain.creator.Creator
 import com.on.turip.ui.common.loadCircularImage
@@ -12,7 +12,7 @@ import com.on.turip.ui.common.model.trip.toDisplayText
 import com.on.turip.ui.search.model.VideoInformationModel
 
 class RegionResultViewHolder(
-    private val binding: ItemSearchResultBinding,
+    private val binding: ItemResultBinding,
     private val onSearchResultListener: OnSearchResultListener,
 ) : RecyclerView.ViewHolder(binding.root) {
     private var creator: Creator? = null
@@ -30,21 +30,21 @@ class RegionResultViewHolder(
     fun bind(videoInformationModel: VideoInformationModel) {
         creator = videoInformationModel.content.creator
         content = videoInformationModel.content
-        binding.tvSearchResultTitle.text = videoInformationModel.content.videoData.title
-        binding.tvSearchResultDay.text =
+        binding.tvResultTitle.text = videoInformationModel.content.videoData.title
+        binding.tvResultDay.text =
             videoInformationModel.tripModel.tripDurationModel.toDisplayText(itemView.context)
-        binding.tvSearchResultLocation.text =
+        binding.tvResultLocation.text =
             itemView.context.getString(
                 R.string.all_total_place_count,
                 videoInformationModel.tripModel.tripPlaceCount,
             )
-        binding.tvSearchResultDescription.text =
+        binding.tvResultDescription.text =
             itemView.context.getString(
                 R.string.region_result_video_description,
                 videoInformationModel.content.creator.channelName,
                 videoInformationModel.content.videoData.uploadedDate,
             )
-        binding.ivSearchResultCreatorThumbnail.loadCircularImage(videoInformationModel.content.creator.profileImage)
+        binding.ivResultCreatorThumbnail.loadCircularImage(videoInformationModel.content.creator.profileImage)
     }
 
     companion object {
@@ -53,8 +53,8 @@ class RegionResultViewHolder(
             onSearchResultListener: OnSearchResultListener,
         ): RegionResultViewHolder {
             val inflater: LayoutInflater = LayoutInflater.from(parent.context)
-            val binding: ItemSearchResultBinding =
-                ItemSearchResultBinding.inflate(inflater, parent, false)
+            val binding: ItemResultBinding =
+                ItemResultBinding.inflate(inflater, parent, false)
             return RegionResultViewHolder(binding, onSearchResultListener)
         }
     }
