@@ -11,6 +11,7 @@ import android.widget.EditText
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.core.widget.addTextChangedListener
 import com.on.turip.R
 import com.on.turip.databinding.ActivitySearchResultBinding
 import com.on.turip.ui.common.base.BaseActivity
@@ -60,9 +61,11 @@ class SearchResultActivity : BaseActivity<ActivitySearchResultBinding>() {
             binding.ivSearchResultSearch.isVisible = !hasFocus
         }
         binding.ivSearchResultSearch.isVisible = !binding.etSearchResult.hasFocus()
-
+        binding.etSearchResult.addTextChangedListener {
+            binding.ivSearchResultClear.isVisible = it?.isNotBlank() == true
+        }
         binding.ivSearchResultClear.setOnClickListener {
-            binding.etSearchResult.setText("")
+            binding.etSearchResult.text.clear()
         }
     }
 
