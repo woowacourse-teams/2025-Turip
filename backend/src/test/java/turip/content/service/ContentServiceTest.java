@@ -47,8 +47,8 @@ class ContentServiceTest {
             Long maxId = Long.MAX_VALUE;
 
             Creator creator = new Creator("메이", null);
-            Country korea = new Country("korea", null);
-            City seoul = new City(korea, null, "seoul", null);
+            Country korea = new Country("대한민국", null);
+            City seoul = new City(korea, null, "서울", null);
 
             List<Content> contents = List.of(new Content(1L, creator, seoul, null, null, null),
                     new Content(2L, creator, seoul, null, null, null));

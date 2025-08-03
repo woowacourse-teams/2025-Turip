@@ -53,8 +53,8 @@ public class TripCourseApiTest {
             // given
             jdbcTemplate.update(
                     "INSERT INTO creator (profile_image, channel_name) VALUES ('https://image.example.com/creator1.jpg', 'TravelMate')");
-            jdbcTemplate.update("INSERT INTO country (name) VALUES ('korea')");
-            jdbcTemplate.update("INSERT INTO city (name, country_id, province_id) VALUES ('seoul', 1, null)");
+            jdbcTemplate.update("INSERT INTO country (name) VALUES ('대한민국')");
+            jdbcTemplate.update("INSERT INTO city (name, country_id, province_id) VALUES ('서울', 1, null)");
             jdbcTemplate.update("INSERT INTO category (name) VALUES ('관광지')");
             jdbcTemplate.update("INSERT INTO category (name) VALUES ('빵집')");
             jdbcTemplate.update("INSERT INTO category (name) VALUES ('카페')");
