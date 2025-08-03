@@ -3,6 +3,7 @@ package com.on.turip.ui.search.keywordresult
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.MenuItem
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import com.on.turip.R
@@ -37,6 +38,14 @@ class SearchResultActivity : BaseActivity<ActivitySearchResultBinding>() {
                 }
             },
         )
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) {
+            finish()
+            return true
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     companion object {
