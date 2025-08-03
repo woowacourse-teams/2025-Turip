@@ -5,6 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import com.on.turip.di.RepositoryModule
 import com.on.turip.domain.content.Content
 import com.on.turip.domain.content.repository.ContentRepository
@@ -12,8 +14,10 @@ import com.on.turip.domain.content.video.VideoData
 import com.on.turip.domain.creator.Creator
 import com.on.turip.domain.creator.repository.CreatorRepository
 import com.on.turip.domain.trip.Trip
-import com.on.turip.domain.trip.TripDuration
 import com.on.turip.domain.trip.repository.TripRepository
+import com.on.turip.ui.common.mapper.toUiModel
+import com.on.turip.ui.common.model.trip.TripDurationModel
+import com.on.turip.ui.common.model.trip.TripModel
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -87,7 +91,7 @@ class TripDetailViewModel(
                                         DayModel(day = day, isSelected = index == 0)
                                     },
                             places = placeCacheByDay[1] ?: emptyList(),
-                            trip = trip,
+                            tripModel = trip.toUiModel(),
                         )
                 }
         }
@@ -130,19 +134,15 @@ class TripDetailViewModel(
             creatorRepository: CreatorRepository = RepositoryModule.creatorRepository,
             travelRepository: TripRepository = RepositoryModule.tripRepository,
         ): ViewModelProvider.Factory =
-            object : ViewModelProvider.Factory {
-                @Suppress("UNCHECKED_CAST")
-                override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    if (modelClass.isAssignableFrom(TripDetailViewModel::class.java)) {
-                        return TripDetailViewModel(
-                            contentId,
-                            creatorId,
-                            contentRepository,
-                            creatorRepository,
-                            travelRepository,
-                        ) as T
-                    }
-                    throw IllegalArgumentException()
+            viewModelFactory {
+                initializer {
+                    TripDetailViewModel(
+                        contentId,
+                        creatorId,
+                        contentRepository,
+                        creatorRepository,
+                        travelRepository,
+                    )
                 }
             }
     }
@@ -151,9 +151,9 @@ class TripDetailViewModel(
         val content: Content? = null,
         val days: List<DayModel> = emptyList<DayModel>(),
         val places: List<PlaceModel> = emptyList<PlaceModel>(),
-        val trip: Trip =
-            Trip(
-                tripDuration = TripDuration(0, 0),
+        val tripModel: TripModel =
+            TripModel(
+                tripDurationModel = TripDurationModel(0, 0),
                 tripPlaceCount = 0,
                 tripCourses = emptyList(),
             ),

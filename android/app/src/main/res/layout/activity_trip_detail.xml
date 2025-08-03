@@ -111,9 +111,7 @@
                 android:id="@+id/cv_trip_detail_video_container"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_marginHorizontal="20dp"
                 android:layout_marginTop="24dp"
-                app:cardCornerRadius="20dp"
                 app:layout_constraintDimensionRatio="16:9"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -155,9 +153,9 @@
                 android:layout_marginTop="28dp"
                 android:contentDescription="@null"
                 android:src="@drawable/ic_location"
-                app:tint="@color/gray_500_1e1e1e"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/cv_trip_detail_video_container" />
+                app:layout_constraintTop_toBottomOf="@id/cv_trip_detail_video_container"
+                app:tint="@color/gray_500_1e1e1e" />
 
             <TextView
                 android:id="@+id/tv_trip_detail_total_place_count"
@@ -191,9 +189,9 @@
                 android:layout_marginEnd="8dp"
                 android:contentDescription="@null"
                 android:src="@drawable/ic_calendar"
-                app:tint="@color/gray_500_1e1e1e"
                 app:layout_constraintEnd_toStartOf="@id/tv_trip_detail_travel_duration"
-                app:layout_constraintTop_toTopOf="@id/tv_trip_detail_total_place_count" />
+                app:layout_constraintTop_toTopOf="@id/tv_trip_detail_total_place_count"
+                app:tint="@color/gray_500_1e1e1e" />
 
             <TextView
                 android:id="@+id/tv_trip_detail_travel_duration"
@@ -225,7 +223,6 @@
                 android:layout_height="0dp"
                 android:clipToPadding="false"
                 android:orientation="horizontal"
-                android:paddingTop="16dp"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

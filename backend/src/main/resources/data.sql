@@ -1,40 +1,62 @@
 ALTER TABLE place ALTER COLUMN url VARCHAR(65535);
 
--- Region
-INSERT INTO region (name)
-VALUES ('seoul');
-INSERT INTO region (name)
-VALUES ('busan');
-INSERT INTO region (name)
-VALUES ('daegu');
-INSERT INTO region (name)
-VALUES ('incheon');
-INSERT INTO region (name)
-VALUES ('gwangju');
-INSERT INTO region (name)
-VALUES ('daejeon');
-INSERT INTO region (name)
-VALUES ('ulsan');
-INSERT INTO region (name)
-VALUES ('sejong');
-INSERT INTO region (name)
-VALUES ('gyeonggi');
-INSERT INTO region (name)
-VALUES ('gangwon');
-INSERT INTO region (name)
-VALUES ('chungcheongbuk');
-INSERT INTO region (name)
-VALUES ('chungcheongnam');
-INSERT INTO region (name)
-VALUES ('jeollabuk');
-INSERT INTO region (name)
-VALUES ('jeollanam');
-INSERT INTO region (name)
-VALUES ('gyeongsangbuk');
-INSERT INTO region (name)
-VALUES ('gyeongsangnam');
-INSERT INTO region (name)
-VALUES ('jeju');
+-- Country
+INSERT INTO country (name) VALUES ('korea');
+INSERT INTO country (name) VALUES ('japan');
+INSERT INTO country (name) VALUES ('taiwan');
+
+-- Province
+INSERT INTO province (name) VALUES ('gyeonggi');
+INSERT INTO province (name) VALUES ('gangwon');
+INSERT INTO province (name) VALUES ('chungcheongbuk');
+INSERT INTO province (name) VALUES ('chungcheongnam');
+INSERT INTO province (name) VALUES ('jeollabuk');
+INSERT INTO province (name) VALUES ('jeollanam');
+INSERT INTO province (name) VALUES ('gyeongsangbuk');
+INSERT INTO province (name) VALUES ('gyeongsangnam');
+INSERT INTO province (name) VALUES ('jeju');
+
+-- City
+INSERT INTO city (name, country_id, province_id) VALUES ('seoul', 1, null);
+INSERT INTO city (name, country_id, province_id) VALUES ('busan', 1, null);
+INSERT INTO city (name, country_id, province_id) VALUES ('daegu', 1, null);
+INSERT INTO city (name, country_id, province_id) VALUES ('incheon', 1, null);
+INSERT INTO city (name, country_id, province_id) VALUES ('gwangju', 1, null);
+INSERT INTO city (name, country_id, province_id) VALUES ('daejeon', 1, null);
+INSERT INTO city (name, country_id, province_id) VALUES ('ulsan', 1, null);
+INSERT INTO city (name, country_id, province_id) VALUES ('sejong', 1, null);
+INSERT INTO city (name, country_id, province_id) VALUES ('suwon', 1, 1);
+INSERT INTO city (name, country_id, province_id) VALUES ('yongin', 1, 1);
+INSERT INTO city (name, country_id, province_id) VALUES ('seongnam', 1, 1);
+INSERT INTO city (name, country_id, province_id) VALUES ('goyang', 1, 1);
+INSERT INTO city (name, country_id, province_id) VALUES ('chuncheon', 1, 2);
+INSERT INTO city (name, country_id, province_id) VALUES ('wonju', 1, 2);
+INSERT INTO city (name, country_id, province_id) VALUES ('gangneung', 1, 2);
+INSERT INTO city (name, country_id, province_id) VALUES ('sokcho', 1, 2);
+INSERT INTO city (name, country_id, province_id) VALUES ('cheongju', 1, 3);
+INSERT INTO city (name, country_id, province_id) VALUES ('chungju', 1, 3);
+INSERT INTO city (name, country_id, province_id) VALUES ('jecheon', 1, 3);
+INSERT INTO city (name, country_id, province_id) VALUES ('cheonan', 1, 4);
+INSERT INTO city (name, country_id, province_id) VALUES ('asan', 1, 4);
+INSERT INTO city (name, country_id, province_id) VALUES ('seosan', 1, 4);
+INSERT INTO city (name, country_id, province_id) VALUES ('jeonju', 1, 5);
+INSERT INTO city (name, country_id, province_id) VALUES ('iksan', 1, 5);
+INSERT INTO city (name, country_id, province_id) VALUES ('gunsan', 1, 5);
+INSERT INTO city (name, country_id, province_id) VALUES ('yeosu', 1, 6);
+INSERT INTO city (name, country_id, province_id) VALUES ('suncheon', 1, 6);
+INSERT INTO city (name, country_id, province_id) VALUES ('mokpo', 1, 6);
+INSERT INTO city (name, country_id, province_id) VALUES ('pohang', 1, 7);
+INSERT INTO city (name, country_id, province_id) VALUES ('gyeongju', 1, 7);
+INSERT INTO city (name, country_id, province_id) VALUES ('gumi', 1, 7);
+INSERT INTO city (name, country_id, province_id) VALUES ('changwon', 1, 8);
+INSERT INTO city (name, country_id, province_id) VALUES ('jinju', 1, 8);
+INSERT INTO city (name, country_id, province_id) VALUES ('gimhae', 1, 8);
+INSERT INTO city (name, country_id, province_id) VALUES ('jeju', 1, 9);
+INSERT INTO city (name, country_id, province_id) VALUES ('seogwipo', 1, 9);
+INSERT INTO city (name, country_id, province_id) VALUES ('tokyo', 2, null);
+INSERT INTO city (name, country_id, province_id) VALUES ('fukuoka', 2, null);
+INSERT INTO city (name, country_id, province_id) VALUES ('kyoto', 2, null);
+INSERT INTO city (name, country_id, province_id) VALUES ('taipei', 3, null);
 
 -- Category
 INSERT INTO category (name)
@@ -63,17 +85,17 @@ SELECT '여코남 - 여행코스짜주는남자', 'https://yt3.googleusercontent
 
 -- Content
 -- 연수연
-INSERT INTO content (creator_id, region_id, title, url, uploaded_date)
+INSERT INTO content (creator_id, city_id, title, url, uploaded_date)
 SELECT (SELECT id FROM creator WHERE channel_name = '연수연'),
-       (SELECT id FROM region WHERE name = 'busan'),
+       (SELECT id FROM city WHERE name = 'busan'),
        '나혼자 기차 타고 부산 여행 vlog 🌊 | 당일치기 쌉가능한 여행코스 💌 , 200% 만족한 광안리 숙소 🏠, 부산 토박이의 단골집 추천까지,,💛 | 3박4일 부산 브이로그',
        'https://www.youtube.com/watch?v=U7vwpgZlD6Q',
        '2025-07-01';
 
 -- 하찬투어
-INSERT INTO content (creator_id, region_id, title, url, uploaded_date)
+INSERT INTO content (creator_id, city_id, title, url, uploaded_date)
 SELECT (SELECT id FROM creator WHERE channel_name = '하찬투어 hachantour'),
-       (SELECT id FROM region WHERE name = 'busan'),
+       (SELECT id FROM city WHERE name = 'busan'),
        '동선낭비없는 부산 3박4일 코스 대마도 당일치기 꿀팁 반드시 가봐야 할 여행지 국내 단 하나뿐인 스카이캡슐 오륙도해맞이공원 흰여울문화마을 감천문화마을 해동용궁사 송도케이블카',
        'https://www.youtube.com/watch?v=1he5ed8Y5TA',
        '2025-07-10';

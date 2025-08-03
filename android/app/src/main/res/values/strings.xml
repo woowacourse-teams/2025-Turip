@@ -4,6 +4,7 @@
     <!-- 공용 -->
     <string name="all_total_place_count">%d개 장소</string>
     <string name="all_travel_duration">%d박 %d일</string>
+    <string name="all_travel_day_trip_duration">당일치기</string>
     <string name="all_loading">로딩 중…</string>
 
     <!-- 바텀 네비게이션 -->

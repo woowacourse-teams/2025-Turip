@@ -1,6 +1,6 @@
-INSERT INTO content (creator_id, region_id, title, url, uploaded_date)
+INSERT INTO content (creator_id, city_id, title, url, uploaded_date)
 SELECT (SELECT id FROM creator WHERE channel_name = '여코남 - 여행코스짜주는남자'),
-       (SELECT id FROM region WHERE name = 'gyeongsangbuk'),
+       (SELECT id FROM city WHERE name = 'gyeongju'),
        '경주여행 1박2일 주요 가이드 총정리 / "아니,여기가 우리가 알던 경주가 맞다고?"',
        'https://www.youtube.com/watch?v=5TF2zJFvXdw&list=PL8z7KQfD7gudY2s4CIFJzaxpBnS8uh-AP&index=6',
        '2023-10-7';
@@ -267,4 +267,3 @@ VALUES ((SELECT id
         (SELECT id FROM place WHERE name = '황남두꺼비식당' AND address = '경북 경주시 포석로1050번길 16'),
         2,
         3);
-

@@ -7,6 +7,7 @@ import android.webkit.WebView
 fun WebView.applyVideoSettings() {
     this.settings.apply {
         javaScriptEnabled = true
+        javaScriptCanOpenWindowsAutomatically = true
         domStorageEnabled = true
         allowFileAccess = false
     }

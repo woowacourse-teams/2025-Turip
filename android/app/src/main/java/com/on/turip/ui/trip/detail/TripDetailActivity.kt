@@ -18,6 +18,7 @@ import com.on.turip.databinding.ActivityTripDetailBinding
 import com.on.turip.ui.common.TuripUrlConverter
 import com.on.turip.ui.common.base.BaseActivity
 import com.on.turip.ui.common.loadCircularImage
+import com.on.turip.ui.common.model.trip.toDisplayText
 import com.on.turip.ui.trip.detail.webview.TuripWebChromeClient
 import com.on.turip.ui.trip.detail.webview.TuripWebViewClient
 import com.on.turip.ui.trip.detail.webview.WebViewVideoBridge
@@ -179,13 +180,9 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
             binding.tvTripDetailContentTitle.text = tripDetailState.content?.videoData?.title
             binding.tvTripDetailUploadDate.text = tripDetailState.content?.videoData?.uploadedDate
             binding.tvTripDetailTotalPlaceCount.text =
-                getString(R.string.all_total_place_count, tripDetailState.trip.tripPlaceCount)
+                getString(R.string.all_total_place_count, tripDetailState.tripModel.tripPlaceCount)
             binding.tvTripDetailTravelDuration.text =
-                getString(
-                    R.string.all_travel_duration,
-                    tripDetailState.trip.tripDuration.nights,
-                    tripDetailState.trip.tripDuration.days,
-                )
+                tripDetailState.tripModel.tripDurationModel.toDisplayText(this)
             binding.tvTripDetailDayPlaceCount.text =
                 getString(
                     R.string.trip_detail_day_place_count,
