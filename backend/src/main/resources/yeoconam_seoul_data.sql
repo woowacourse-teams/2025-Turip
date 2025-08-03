@@ -1,6 +1,6 @@
-INSERT INTO content (creator_id, region_id, title, url, uploaded_date)
+INSERT INTO content (creator_id, city_id, title, url, uploaded_date)
 SELECT (SELECT id FROM creator WHERE channel_name = '여코남 - 여행코스짜주는남자'),
-       (SELECT id FROM region WHERE name = 'seoul'),
+       (SELECT id FROM city WHERE name = 'seoul'),
        '[서울투어] 청량리 뚜벅이 여행코스 BEST5 / 청량리역 당일치기 여행 / 안동집 손칼국시 / 금성전파사&스타벅스 경동 1960 / 수호명과 / 플레임 스튜디오 / 산리오 마켓',
        'https://youtu.be/FTpR_QOqFEQ?si=xsamjUq3ptFqmEar',
        '2023-02-16';

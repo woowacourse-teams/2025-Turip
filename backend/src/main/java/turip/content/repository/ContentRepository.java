@@ -7,9 +7,9 @@ import turip.content.domain.Content;
 
 public interface ContentRepository extends JpaRepository<Content, Long> {
 
-    int countByRegion_Name(String regionName);
+    int countByCityName(String provinceName);
 
-    List<Content> findByRegionNameAndIdLessThanOrderByIdDesc(String regionName, Long lastId, Pageable pageable);
+    List<Content> findByCityNameAndIdLessThanOrderByIdDesc(String provinceName, Long lastId, Pageable pageable);
 
-    List<Content> findByRegionNameOrderByIdDesc(String regionName, Pageable pageable);
+    List<Content> findByCityNameOrderByIdDesc(String provinceName, Pageable pageable);
 }
