@@ -14,6 +14,8 @@ import turip.content.controller.dto.response.TripDurationResponse;
 import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
 import turip.exception.NotFoundException;
+import turip.regioncategory.domain.DomesticRegionCategory;
+import turip.regioncategory.domain.OverseasRegionCategory;
 import turip.tripcourse.service.TripCourseService;
 
 @Service
@@ -25,9 +27,35 @@ public class ContentService {
     private final ContentRepository contentRepository;
     private final TripCourseService tripCourseService;
 
-    public ContentCountResponse countByCityName(String cityName) {
-        int count = contentRepository.countByCityName(cityName);
+    public ContentCountResponse countByRegionCategory(String regionCategory) {
+        int count = calculateCountByRegionCategory(regionCategory);
         return ContentCountResponse.from(count);
+    }
+
+    private int calculateCountByRegionCategory(String regionCategory) {
+        if ("국내 기타".equals(regionCategory)) {
+            return calculateDomesticEtcCount();
+        }
+
+        if ("해외 기타".equals(regionCategory)) {
+            return calculateOverseasEtcCount();
+        }
+
+        if (DomesticRegionCategory.containsName(regionCategory)) {
+            return contentRepository.countByCityName(regionCategory);
+        }
+
+        return contentRepository.countByCountryName(regionCategory);
+    }
+
+    private int calculateDomesticEtcCount() {
+        List<String> domesticCategoryNames = DomesticRegionCategory.getDisplayNamesExcludingEtc();
+        return contentRepository.countByCityNameNotIn(domesticCategoryNames);
+    }
+
+    private int calculateOverseasEtcCount() {
+        List<String> overseasCategoryNames = OverseasRegionCategory.getDisplayNamesExcludingEtc();
+        return contentRepository.countByCountryNameNotIn(overseasCategoryNames);
     }
 
     public ContentsByCityResponse findContentsByCityName(
