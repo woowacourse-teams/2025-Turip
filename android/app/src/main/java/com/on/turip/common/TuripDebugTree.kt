@@ -4,5 +4,9 @@ import timber.log.Timber
 
 class TuripDebugTree : Timber.DebugTree() {
     override fun createStackElementTag(element: StackTraceElement): String =
-        "moongjenut ${element.className}:${element.lineNumber}#${element.methodName}"
+        "$DEBUG_LOG_PREFIX ${element.className}:${element.lineNumber}#${element.methodName}"
+
+    companion object {
+        private const val DEBUG_LOG_PREFIX = "moongjenut"
+    }
 }
