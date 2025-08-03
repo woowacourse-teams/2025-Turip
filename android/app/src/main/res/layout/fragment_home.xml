@@ -78,6 +78,7 @@
         android:id="@+id/tv_home_users_like_content_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
         android:text="@string/home_users_like_content_title"
         android:textAppearance="@style/title1"
         android:textColor="@color/gray_400_2b2b2b"
