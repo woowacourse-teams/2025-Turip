@@ -1,5 +1,7 @@
 package com.on.turip.ui.search.keywordresult
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -17,5 +19,9 @@ class SearchResultActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+    }
+
+    companion object {
+        fun newIntent(context: Context): Intent = Intent(context, SearchResultActivity::class.java)
     }
 }

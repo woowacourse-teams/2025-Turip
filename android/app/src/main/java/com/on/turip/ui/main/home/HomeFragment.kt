@@ -14,6 +14,7 @@ import com.on.turip.databinding.FragmentHomeBinding
 import com.on.turip.ui.common.base.BaseFragment
 import com.on.turip.ui.common.model.RegionModel
 import com.on.turip.ui.main.RegionAdapter
+import com.on.turip.ui.search.keywordresult.SearchResultActivity
 import com.on.turip.ui.search.regionresult.RegionResultActivity
 
 class HomeFragment : BaseFragment<FragmentHomeBinding>() {
@@ -21,12 +22,12 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     private val metropolitanCitiesAdapter: RegionAdapter =
         RegionAdapter { region: RegionModel ->
-            val intent = RegionResultActivity.newIntent(requireActivity(), region.english)
+            val intent = RegionResultActivity.newIntent(requireContext(), region.english)
             startActivity(intent)
         }
     private val provincesAdapter: RegionAdapter =
         RegionAdapter { region: RegionModel ->
-            val intent = RegionResultActivity.newIntent(requireActivity(), region.english)
+            val intent = RegionResultActivity.newIntent(requireContext(), region.english)
             startActivity(intent)
         }
 
@@ -40,6 +41,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         setupTextHighlighting()
         setupAdapters()
         setupObservers()
+        setupBindings()
 
         return view
     }
@@ -48,6 +50,13 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         inflater: LayoutInflater,
         container: ViewGroup?,
     ): FragmentHomeBinding = FragmentHomeBinding.inflate(inflater, container, false)
+
+    private fun setupBindings() {
+        binding.ivHomeSearch.setOnClickListener {
+            val intent = SearchResultActivity.newIntent(requireContext())
+            startActivity(intent)
+        }
+    }
 
     private fun setupTextHighlighting() {
         val originalText: String = getString(R.string.main_where_should_we_go_title)
