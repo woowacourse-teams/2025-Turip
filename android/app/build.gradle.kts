@@ -45,7 +45,6 @@ android {
         }
 
         release {
-            manifestPlaceholders += mapOf()
             isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -98,6 +97,8 @@ dependencies {
     implementation(libs.coil)
     // WebView
     implementation(libs.androidx.webkit)
+    // Timber
+    implementation(libs.timber)
     // firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
