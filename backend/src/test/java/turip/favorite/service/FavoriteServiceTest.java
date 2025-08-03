@@ -110,7 +110,7 @@ class FavoriteServiceTest {
         given(favoriteRepository.existsByMemberIdAndContentId(any(), eq(contentId)))
                 .willReturn(true);
 
-        //
+        // when & then
         assertThatThrownBy(() -> favoriteService.create(request, deviceFid))
                 .isInstanceOf(BadRequestException.class);
     }
