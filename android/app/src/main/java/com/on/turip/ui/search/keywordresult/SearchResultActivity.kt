@@ -50,7 +50,7 @@ class SearchResultActivity : BaseActivity<ActivitySearchResultBinding>() {
     }
 
     private fun setupBindings() {
-        binding.svSearchResult.requestFocus()
+        binding.etSearchResult.requestFocus()
     }
 
     companion object {
