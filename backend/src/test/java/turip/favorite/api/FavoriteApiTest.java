@@ -54,7 +54,6 @@ class FavoriteApiTest {
         jdbcTemplate.update("ALTER TABLE member ALTER COLUMN id RESTART WITH 1");
     }
 
-
     @DisplayName("/favorites POST 찜 생성 테스트")
     @Nested
     class createFavorite {
@@ -132,6 +131,33 @@ class FavoriteApiTest {
                     .when().post("/favorites")
                     .then()
                     .statusCode(400);
+        }
+    }
+
+    @DisplayName("/favorites DELETE 찜 삭제 테스트")
+    @Nested
+    class deleteFavorite {
+
+        @DisplayName("성공 시 204 No Content를 응답한다")
+        @Test
+        void removeFavorite() {
+            // given
+            jdbcTemplate.update(
+                    "INSERT INTO creator (profile_image, channel_name) VALUES ('https://image.example.com/creator.jpg', 'Travel')");
+            jdbcTemplate.update("INSERT INTO country (name) VALUES ('korea')");
+            jdbcTemplate.update("INSERT INTO city (name, country_id, province_id) VALUES ('seoul', 1, null)");
+            jdbcTemplate.update(
+                    "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 1, 'https://youtube.com/watch?v=deleteTest', '삭제 테스트 영상', '2025-06-01')");
+            jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('testDeviceFid')");
+            jdbcTemplate.update(
+                    "INSERT INTO favorite (member_id, content_id, created_at) VALUES (1, 1, CURRENT_TIMESTAMP)");
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .when().delete("/favorites?contentId=1")
+                    .then()
+                    .statusCode(204);
         }
     }
 }
