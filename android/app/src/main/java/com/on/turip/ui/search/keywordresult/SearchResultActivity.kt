@@ -48,9 +48,6 @@ class SearchResultActivity : BaseActivity<ActivitySearchResultBinding>() {
     }
 
     private fun setupListeners() {
-        binding.etSearchResult.setOnFocusChangeListener { _, hasFocus ->
-            binding.ivSearchResultSearch.isVisible = !hasFocus
-        }
         binding.etSearchResult.addTextChangedListener {
             binding.ivSearchResultClear.isVisible = it?.isNotBlank() == true
         }
@@ -61,7 +58,6 @@ class SearchResultActivity : BaseActivity<ActivitySearchResultBinding>() {
 
     private fun setupVisible() {
         binding.etSearchResult.requestFocus()
-        binding.ivSearchResultSearch.isVisible = !binding.etSearchResult.hasFocus()
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {

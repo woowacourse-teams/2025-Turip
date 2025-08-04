@@ -21,22 +21,11 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="37dp"
+            android:layout_height="wrap_content"
             android:layout_marginEnd="20dp"
             android:paddingVertical="8dp"
             android:paddingHorizontal="16dp"
             android:background="@drawable/bg_gra100_radius_24dp">
-
-            <ImageView
-                android:id="@+id/iv_search_result_search"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:contentDescription="@null"
-                android:src="@drawable/ic_search"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent" />
-
 
             <EditText
                 android:id="@+id/et_search_result"
@@ -44,12 +33,13 @@
                 android:layout_height="wrap_content"
                 android:autofillHints=""
                 android:background="@null"
+                android:paddingVertical="4dp"
                 android:hint="@string/hint_text"
                 android:imeOptions="actionSearch"
                 android:textColor="@color/pure_black_151515"
                 android:textColorHint="@color/gray_300_5b5b5b"
                 android:textAppearance="@style/title3"
-                app:layout_constraintStart_toEndOf="@id/iv_search_result_search"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/iv_search_result_clear"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -69,7 +59,6 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </com.google.android.material.appbar.MaterialToolbar>
-
 
     <TextView
         android:id="@+id/tv_search_result_count"
