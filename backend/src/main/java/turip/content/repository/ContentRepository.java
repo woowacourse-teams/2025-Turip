@@ -1,8 +1,11 @@
 package turip.content.repository;
 
+import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import turip.content.domain.Content;
 
 public interface ContentRepository extends JpaRepository<Content, Long> {
@@ -12,4 +15,34 @@ public interface ContentRepository extends JpaRepository<Content, Long> {
     Slice<Content> findByCityNameAndIdLessThanOrderByIdDesc(String provinceName, Long lastId, Pageable pageable);
 
     Slice<Content> findByCityNameOrderByIdDesc(String provinceName, Pageable pageable);
+
+    Slice<Content> findByCityCountryNameOrderByIdDesc(String countryName, Pageable pageable);
+
+    Slice<Content> findByCityCountryNameAndIdLessThanOrderByIdDesc(String countryName, Long lastId, Pageable pageable);
+
+    // 국내 기타: city 이름이 domesticCategoryNames 안에 없어야 하고, country 이름이 "한국"인 경우
+    @Query("SELECT c FROM Content c JOIN c.city ct JOIN ct.country co " +
+            "WHERE ct.name NOT IN :domesticCategoryNames AND co.name = '한국' " +
+            "ORDER BY c.id DESC")
+    Slice<Content> findDomesticEtcContents(@Param("domesticCategoryNames") List<String> domesticCategoryNames,
+                                           Pageable pageable);
+
+    @Query("SELECT c FROM Content c JOIN c.city ct JOIN ct.country co " +
+            "WHERE ct.name NOT IN :domesticCategoryNames AND co.name = '한국' AND c.id < :lastId " +
+            "ORDER BY c.id DESC")
+    Slice<Content> findDomesticEtcContentsWithLastId(@Param("domesticCategoryNames") List<String> domesticCategoryNames,
+                                                     @Param("lastId") Long lastId, Pageable pageable);
+
+    // 해외 기타: country 이름이 overseasCategoryNames 안에 없어야 하고, country 이름이 "한국"가 아닌 경우
+    @Query("SELECT c FROM Content c JOIN c.city ct JOIN ct.country co " +
+            "WHERE co.name NOT IN :overseasCategoryNames AND co.name != '한국' " +
+            "ORDER BY c.id DESC")
+    Slice<Content> findOverseasEtcContents(@Param("overseasCategoryNames") List<String> overseasCategoryNames,
+                                           Pageable pageable);
+
+    @Query("SELECT c FROM Content c JOIN c.city ct JOIN ct.country co " +
+            "WHERE co.name NOT IN :overseasCategoryNames AND co.name != '한국' AND c.id < :lastId " +
+            "ORDER BY c.id DESC")
+    Slice<Content> findOverseasEtcContentsWithLastId(@Param("overseasCategoryNames") List<String> overseasCategoryNames,
+                                                     @Param("lastId") Long lastId, Pageable pageable);
 }
