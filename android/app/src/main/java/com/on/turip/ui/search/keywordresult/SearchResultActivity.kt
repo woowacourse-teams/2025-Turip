@@ -23,7 +23,8 @@ class SearchResultActivity : BaseActivity<ActivitySearchResultBinding>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setupToolbar()
-        setupBindings()
+        setupVisible()
+        setupListeners()
     }
 
     private fun setupToolbar() {
@@ -46,18 +47,21 @@ class SearchResultActivity : BaseActivity<ActivitySearchResultBinding>() {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun setupBindings() {
-        binding.etSearchResult.requestFocus()
+    private fun setupListeners() {
         binding.etSearchResult.setOnFocusChangeListener { _, hasFocus ->
             binding.ivSearchResultSearch.isVisible = !hasFocus
         }
-        binding.ivSearchResultSearch.isVisible = !binding.etSearchResult.hasFocus()
         binding.etSearchResult.addTextChangedListener {
             binding.ivSearchResultClear.isVisible = it?.isNotBlank() == true
         }
         binding.ivSearchResultClear.setOnClickListener {
             binding.etSearchResult.text.clear()
         }
+    }
+
+    private fun setupVisible() {
+        binding.etSearchResult.requestFocus()
+        binding.ivSearchResultSearch.isVisible = !binding.etSearchResult.hasFocus()
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
