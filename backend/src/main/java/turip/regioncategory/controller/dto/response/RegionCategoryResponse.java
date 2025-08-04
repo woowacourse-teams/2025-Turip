@@ -6,7 +6,6 @@ import turip.country.controller.dto.CountryResponse;
 import turip.country.domain.Country;
 
 public record RegionCategoryResponse(
-        Long id,
         @JsonProperty("regionCategoryName")
         String name,
         CountryResponse country,
@@ -16,7 +15,6 @@ public record RegionCategoryResponse(
 
     public static RegionCategoryResponse from(City city) {
         return new RegionCategoryResponse(
-                city.getId(),
                 city.getName(),
                 CountryResponse.from(city.getCountry()),
                 city.getImageUrl()
@@ -25,7 +23,6 @@ public record RegionCategoryResponse(
 
     public static RegionCategoryResponse from(Country country) {
         return new RegionCategoryResponse(
-                country.getId(),
                 country.getName(),
                 CountryResponse.from(country),
                 country.getImageUrl()
@@ -34,7 +31,6 @@ public record RegionCategoryResponse(
 
     public static RegionCategoryResponse of(String name, String imageUrl) {
         return new RegionCategoryResponse(
-                null,
                 name,
                 null,
                 imageUrl
