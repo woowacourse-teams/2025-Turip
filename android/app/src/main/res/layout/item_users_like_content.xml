@@ -61,6 +61,7 @@
         tools:text="여행하는 튜립팀" />
 
     <TextView
+        android:id="@+id/tv_users_like_content_description"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="@style/info2"
