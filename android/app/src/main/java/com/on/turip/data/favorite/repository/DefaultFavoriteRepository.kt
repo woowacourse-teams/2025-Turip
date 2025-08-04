@@ -3,17 +3,21 @@ package com.on.turip.data.favorite.repository
 import com.on.turip.data.favorite.dataSource.FavoriteRemoteDataSource
 import com.on.turip.data.favorite.toFavoriteAddRequest
 import com.on.turip.domain.favorite.repository.FavoriteRepository
+import com.on.turip.domain.userStorage.TuripDeviceIdentifier
 
 class DefaultFavoriteRepository(
     private val favoriteRemoteDataSource: FavoriteRemoteDataSource,
 ) : FavoriteRepository {
     override suspend fun updateFavorite(
         isFavorite: Boolean,
-        fid: String,
+        turipDeviceIdentifier: TuripDeviceIdentifier,
         contentId: Long,
     ) {
         if (isFavorite) {
-            favoriteRemoteDataSource.postFavorite(fid, contentId.toFavoriteAddRequest())
+            favoriteRemoteDataSource.postFavorite(
+                turipDeviceIdentifier.fid,
+                contentId.toFavoriteAddRequest(),
+            )
         } else {
         }
     }

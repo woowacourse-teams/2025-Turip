@@ -1,9 +1,11 @@
 package com.on.turip.domain.favorite.repository
 
+import com.on.turip.domain.userStorage.TuripDeviceIdentifier
+
 interface FavoriteRepository {
     suspend fun updateFavorite(
         isFavorite: Boolean,
-        fid: String,
+        turipDeviceIdentifier: TuripDeviceIdentifier,
         contentId: Long,
     )
 }

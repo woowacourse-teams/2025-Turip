@@ -10,8 +10,8 @@ import kotlinx.coroutines.tasks.await
 class DefaultUserStorageRepository(
     private val userStorageLocalDataSource: UserStorageLocalDataSource,
 ) : UserStorageRepository {
-    override suspend fun createId(id: String) {
-        userStorageLocalDataSource.createId(id)
+    override suspend fun createId(turipDeviceIdentifier: TuripDeviceIdentifier) {
+        userStorageLocalDataSource.createId(turipDeviceIdentifier.fid)
     }
 
     override suspend fun loadId(): Result<TuripDeviceIdentifier> =
