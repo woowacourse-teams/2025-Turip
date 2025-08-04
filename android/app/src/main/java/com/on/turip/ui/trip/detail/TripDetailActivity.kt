@@ -189,7 +189,7 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
                     tripDetailState.places.size,
                 )
         }
-        viewModel.videoUri.observe(this) { url ->
+        viewModel.videoUri.observe(this) { url: String ->
             binding.wvTripDetailVideo.apply {
                 addJavascriptInterface(
                     WebViewVideoBridge(
@@ -200,6 +200,9 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
             }
 
             binding.wvTripDetailVideo.loadUrl(LOAD_URL_FILE_PATH)
+        }
+        viewModel.isFavorite.observe(this) { isFavorite: Boolean ->
+            binding.ivTripDetailFavorite.isSelected = isFavorite
         }
     }
 

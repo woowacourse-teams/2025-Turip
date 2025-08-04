@@ -13,6 +13,7 @@ import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.content.video.VideoData
 import com.on.turip.domain.creator.Creator
 import com.on.turip.domain.creator.repository.CreatorRepository
+import com.on.turip.domain.favorite.repository.FavoriteRepository
 import com.on.turip.domain.trip.Trip
 import com.on.turip.domain.trip.repository.TripRepository
 import com.on.turip.ui.common.mapper.toUiModel
@@ -28,6 +29,7 @@ class TripDetailViewModel(
     private val contentRepository: ContentRepository,
     private val creatorRepository: CreatorRepository,
     private val tripRepository: TripRepository,
+    private val favoriteRepository: FavoriteRepository,
 ) : ViewModel() {
     private val _tripDetailState: MutableLiveData<TripDetailState> =
         MutableLiveData(TripDetailState())
@@ -35,6 +37,9 @@ class TripDetailViewModel(
 
     private val _videoUri: MutableLiveData<String> = MutableLiveData()
     val videoUri: LiveData<String> get() = _videoUri
+
+    private val _isFavorite: MutableLiveData<Boolean> = MutableLiveData()
+    val isFavorite: LiveData<Boolean> get() = _isFavorite
 
     private var placeCacheByDay: Map<Int, List<PlaceModel>> = emptyMap()
 
@@ -70,6 +75,7 @@ class TripDetailViewModel(
                                         ),
                                 )
                             _videoUri.value = videoData.url
+                            // _isFavorite.value = videoData.isFavorite
                         }
                 }
         }
@@ -133,6 +139,7 @@ class TripDetailViewModel(
             contentRepository: ContentRepository = RepositoryModule.contentRepository,
             creatorRepository: CreatorRepository = RepositoryModule.creatorRepository,
             travelRepository: TripRepository = RepositoryModule.tripRepository,
+            favoriteRepository: FavoriteRepository = RepositoryModule.favoriteRepository,
         ): ViewModelProvider.Factory =
             viewModelFactory {
                 initializer {
@@ -142,6 +149,7 @@ class TripDetailViewModel(
                         contentRepository,
                         creatorRepository,
                         travelRepository,
+                        favoriteRepository,
                     )
                 }
             }
