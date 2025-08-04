@@ -60,7 +60,7 @@ class ContentRepositoryTest {
 
     @DisplayName("페이지네이션 기반 키워드 검색 메서드 테스트")
     @Nested
-    class findByKeyword {
+    class FindByKeyword {
 
         @DisplayName("제목 혹은 크리에이터 이름에 키워드가 포함되는 컨텐츠들을 확인할 수 있다.")
         @ParameterizedTest

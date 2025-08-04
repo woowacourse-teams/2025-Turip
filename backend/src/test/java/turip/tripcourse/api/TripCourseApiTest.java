@@ -45,7 +45,7 @@ public class TripCourseApiTest {
 
     @DisplayName("/trip-courses GET 여행 상세 조회 테스트")
     @Nested
-    class readTripCourse {
+    class ReadTripCourse {
 
         @DisplayName("성공 시 200 OK 코드와 여행 상세 정보를 응답한다")
         @Test
