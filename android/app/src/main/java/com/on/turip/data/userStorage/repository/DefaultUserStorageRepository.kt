@@ -24,7 +24,7 @@ class DefaultUserStorageRepository(
             }
 
     private suspend fun recreateId(): String {
-        val newFid = FirebaseInstallations.getInstance().id.await()
+        val newFid: String = FirebaseInstallations.getInstance().id.await()
         userStorageLocalDataSource.createId(newFid)
         return newFid
     }
