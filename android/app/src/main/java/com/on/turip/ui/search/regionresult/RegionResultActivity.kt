@@ -25,7 +25,7 @@ class RegionResultActivity : BaseActivity<ActivityRegionResultBinding>() {
     }
     private val regionResultAdapter: RegionResultAdapter =
         RegionResultAdapter { contentId: Long?, creatorId: Long? ->
-            val intent =
+            val intent: Intent =
                 TripDetailActivity.newIntent(
                     context = this,
                     contentId = contentId ?: 0,

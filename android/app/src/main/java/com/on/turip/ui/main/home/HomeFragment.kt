@@ -1,5 +1,6 @@
 package com.on.turip.ui.main.home
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.Spanned
@@ -21,7 +22,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     private val regionAdapter: RegionAdapter =
         RegionAdapter { region: RegionModel ->
-            val intent = RegionResultActivity.newIntent(requireContext(), region.english)
+            val intent: Intent = RegionResultActivity.newIntent(requireContext(), region.english)
             startActivity(intent)
         }
 
@@ -44,7 +45,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     private fun setupListeners() {
         binding.ivHomeSearch.setOnClickListener {
-            val intent = SearchResultActivity.newIntent(requireContext())
+            val intent: Intent = SearchResultActivity.newIntent(requireContext())
             startActivity(intent)
         }
     }
