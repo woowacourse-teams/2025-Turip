@@ -18,4 +18,13 @@ class DefaultFavoriteRemoteDataSource(
             favoriteService.postFavorite(fid, favoriteAddRequest)
         }
     }
+
+    override suspend fun deleteFavorite(
+        fid: String,
+        contentId: Long,
+    ) {
+        withContext(coroutineContext) {
+            favoriteService.deleteFavorite(fid, contentId)
+        }
+    }
 }

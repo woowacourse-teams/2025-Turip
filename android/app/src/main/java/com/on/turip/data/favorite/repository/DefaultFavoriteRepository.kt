@@ -19,6 +19,10 @@ class DefaultFavoriteRepository(
                 contentId.toFavoriteAddRequest(),
             )
         } else {
+            favoriteRemoteDataSource.deleteFavorite(
+                turipDeviceIdentifier.fid,
+                contentId,
+            )
         }
     }
 }

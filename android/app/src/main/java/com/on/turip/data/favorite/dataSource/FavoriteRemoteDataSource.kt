@@ -7,4 +7,9 @@ interface FavoriteRemoteDataSource {
         fid: String,
         favoriteAddRequest: FavoriteAddRequest,
     )
+
+    suspend fun deleteFavorite(
+        fid: String,
+        contentId: Long,
+    )
 }
