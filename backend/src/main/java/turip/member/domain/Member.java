@@ -1,4 +1,5 @@
-package turip.creator.domain;
+package turip.member.domain;
+
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -13,19 +14,16 @@ import lombok.NoArgsConstructor;
 @Entity
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Creator {
+public class Member {
 
     @Id
     @EqualsAndHashCode.Include
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String channelName;
+    private String deviceFid;
 
-    private String profileImage;
-
-    public Creator(String profileImage, String channelName) {
-        this.profileImage = profileImage;
-        this.channelName = channelName;
+    public Member(String deviceFid) {
+        this.deviceFid = deviceFid;
     }
 }

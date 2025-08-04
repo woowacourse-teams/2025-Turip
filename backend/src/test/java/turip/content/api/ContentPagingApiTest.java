@@ -22,8 +22,12 @@ class ContentPagingApiTest {
 
     @BeforeEach
     void setUp() {
+        jdbcTemplate.update("DELETE FROM place_category");
         jdbcTemplate.update("DELETE FROM trip_course");
         jdbcTemplate.update("DELETE FROM place");
+        jdbcTemplate.update("DELETE FROM category");
+        jdbcTemplate.update("DELETE FROM favorite");
+        jdbcTemplate.update("DELETE FROM member");
         jdbcTemplate.update("DELETE FROM content");
         jdbcTemplate.update("DELETE FROM creator");
         jdbcTemplate.update("DELETE FROM city");
