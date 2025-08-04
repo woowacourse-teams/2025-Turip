@@ -24,10 +24,19 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/pure_white_ffffff"
+            app:contentInsetEnd="30dp"
             app:layout_scrollFlags="scroll|enterAlways"
             app:titleTextAppearance="@style/title1"
-            app:titleTextColor="@color/pure_black_151515" />
+            app:titleTextColor="@color/pure_black_151515">
 
+            <ImageView
+                android:id="@+id/iv_trip_detail_favorite"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|center_vertical"
+                android:background="@drawable/btn_favorite_press_red"
+                android:contentDescription="@null" />
+        </com.google.android.material.appbar.MaterialToolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
