@@ -99,8 +99,8 @@ public class ContentApiTest {
                     .then()
                     .statusCode(200)
                     .body("id", is(1))
-                    .body("creatorId", is(1))
-                    .body("cityId", is(1))
+                    .body("creator.id", is(1))
+                    .body("city.name", is("서울"))
                     .body("title", is("서울 데이트 코스 추천"))
                     .body("url", is("https://youtube.com/watch?v=abcd1"))
                     .body("uploadedDate", is("2024-07-01"))
@@ -114,8 +114,8 @@ public class ContentApiTest {
             jdbcTemplate.update(
                     "INSERT INTO creator (profile_image, channel_name) VALUES (?, ?)",
                     "https://image.example.com/creator1.jpg", "TravelMate");
-            jdbcTemplate.update("INSERT INTO country (name) VALUES ('korea')");
-            jdbcTemplate.update("INSERT INTO city (name, country_id) VALUES ('seoul', 1)");
+            jdbcTemplate.update("INSERT INTO country (name) VALUES ('대한민국')");
+            jdbcTemplate.update("INSERT INTO city (name, country_id) VALUES ('서울', 1)");
             jdbcTemplate.update(
                     "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (?, ?, ?, ?, ?)",
                     1, 1, "https://youtube.com/watch?v=abcd1", "서울 데이트 코스 추천", "2024-07-01");
@@ -131,8 +131,8 @@ public class ContentApiTest {
                     .then()
                     .statusCode(200)
                     .body("id", is(1))
-                    .body("creatorId", is(1))
-                    .body("cityId", is(1))
+                    .body("creator.id", is(1))
+                    .body("city.name", is("서울"))
                     .body("title", is("서울 데이트 코스 추천"))
                     .body("url", is("https://youtube.com/watch?v=abcd1"))
                     .body("uploadedDate", is("2024-07-01"))
