@@ -23,8 +23,8 @@ class SearchResultActivity : BaseActivity<ActivitySearchResultBinding>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setupToolbar()
-        setupVisible()
         setupListeners()
+        binding.etSearchResult.requestFocus()
     }
 
     private fun setupToolbar() {
@@ -54,10 +54,6 @@ class SearchResultActivity : BaseActivity<ActivitySearchResultBinding>() {
         binding.ivSearchResultClear.setOnClickListener {
             binding.etSearchResult.text.clear()
         }
-    }
-
-    private fun setupVisible() {
-        binding.etSearchResult.requestFocus()
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
