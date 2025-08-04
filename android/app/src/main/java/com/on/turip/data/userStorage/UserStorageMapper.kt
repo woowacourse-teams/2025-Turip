@@ -1,4 +1,4 @@
-package com.on.turip.data.settingsStorage
+package com.on.turip.data.userStorage
 
 import com.on.turip.domain.settingsStorage.TuripDeviceIdentifier
 

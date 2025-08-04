@@ -1,21 +1,21 @@
-package com.on.turip.data.settingsStorage.repository
+package com.on.turip.data.userStorage.repository
 
 import com.google.firebase.installations.FirebaseInstallations
-import com.on.turip.data.settingsStorage.dataSource.SettingsStorageLocalDataSource
-import com.on.turip.data.settingsStorage.toDomain
+import com.on.turip.data.userStorage.dataSource.UserStorageLocalDataSource
+import com.on.turip.data.userStorage.toDomain
 import com.on.turip.domain.settingsStorage.TuripDeviceIdentifier
 import com.on.turip.domain.settingsStorage.repository.SettingsStorageRepository
 import kotlinx.coroutines.tasks.await
 
-class DefaultSettingsStorageRepository(
-    private val settingsStorageLocalDataSource: SettingsStorageLocalDataSource,
+class DefaultUserStorageRepository(
+    private val userStorageLocalDataSource: UserStorageLocalDataSource,
 ) : SettingsStorageRepository {
     override suspend fun createId(id: String) {
-        settingsStorageLocalDataSource.createId(id)
+        userStorageLocalDataSource.createId(id)
     }
 
     override suspend fun loadId(): Result<TuripDeviceIdentifier> =
-        settingsStorageLocalDataSource
+        userStorageLocalDataSource
             .getId()
             .mapCatching { fid: String? -> fid ?: recreateId() }
             .mapCatching { fid: String -> fid.toDomain() }
@@ -25,7 +25,7 @@ class DefaultSettingsStorageRepository(
 
     private suspend fun recreateId(): String {
         val newFid = FirebaseInstallations.getInstance().id.await()
-        settingsStorageLocalDataSource.createId(newFid)
+        userStorageLocalDataSource.createId(newFid)
         return newFid
     }
 }

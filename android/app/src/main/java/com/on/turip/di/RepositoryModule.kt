@@ -2,8 +2,8 @@ package com.on.turip.di
 
 import com.on.turip.data.content.repository.DefaultContentRepository
 import com.on.turip.data.creator.repository.DefaultCreatorRepository
-import com.on.turip.data.settingsStorage.repository.DefaultSettingsStorageRepository
 import com.on.turip.data.trip.repository.DefaultTripRepository
+import com.on.turip.data.userStorage.repository.DefaultUserStorageRepository
 import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.creator.repository.CreatorRepository
 import com.on.turip.domain.settingsStorage.repository.SettingsStorageRepository
@@ -20,6 +20,6 @@ object RepositoryModule {
         DefaultTripRepository(DataSourceModule.tripRemoteDataSource)
     }
     val settingsStorageRepository: SettingsStorageRepository by lazy {
-        DefaultSettingsStorageRepository(DataSourceModule.settingsStorageLocalDataSource)
+        DefaultUserStorageRepository(DataSourceModule.userStorageLocalDataSource)
     }
 }
