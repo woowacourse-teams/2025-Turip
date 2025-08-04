@@ -3,8 +3,8 @@ package com.on.turip.data.userStorage.repository
 import com.google.firebase.installations.FirebaseInstallations
 import com.on.turip.data.userStorage.dataSource.UserStorageLocalDataSource
 import com.on.turip.data.userStorage.toDomain
-import com.on.turip.domain.settingsStorage.TuripDeviceIdentifier
-import com.on.turip.domain.settingsStorage.repository.UserStorageRepository
+import com.on.turip.domain.userStorage.TuripDeviceIdentifier
+import com.on.turip.domain.userStorage.repository.UserStorageRepository
 import kotlinx.coroutines.tasks.await
 
 class DefaultUserStorageRepository(
