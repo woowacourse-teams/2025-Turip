@@ -1,4 +1,4 @@
-package com.on.turip.initializer
+package com.on.turip.data.initializer
 
 import com.google.firebase.installations.FirebaseInstallations
 import com.on.turip.domain.settingsStorage.repository.SettingsStorageRepository
@@ -9,10 +9,10 @@ import kotlinx.coroutines.launch
 class FirebaseInstallationsInitializer(
     private val repository: SettingsStorageRepository,
 ) {
-    fun setupFirebaseInstallationId(scope: CoroutineScope = CoroutineScope(Dispatchers.IO)) {
+    fun setupFirebaseInstallationId(coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)) {
         FirebaseInstallations.getInstance().id.addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                scope.launch {
+                coroutineScope.launch {
                     repository.createId(task.result)
                 }
             } else {
