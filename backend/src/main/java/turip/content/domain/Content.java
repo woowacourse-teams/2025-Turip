@@ -51,13 +51,4 @@ public class Content {
         this.url = url;
         this.uploadedDate = uploadedDate;
     }
-
-    public Content(Long id, Creator creator, City city, String title, String url, LocalDate uploadedDate) {
-        this.id = id;
-        this.creator = creator;
-        this.city = city;
-        this.title = title;
-        this.url = url;
-        this.uploadedDate = uploadedDate;
-    }
 }
