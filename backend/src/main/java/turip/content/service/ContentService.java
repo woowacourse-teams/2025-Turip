@@ -53,40 +53,6 @@ public class ContentService {
         return ContentsByCityResponse.of(contentDetails, loadable);
     }
 
-    private List<Content> findContentsByCity(
-            String cityName,
-            long lastId,
-            int sizePlusOne
-    ) {
-        Pageable pageable = PageRequest.of(0, sizePlusOne);
-        boolean isFirstPage = lastId == 0;
-
-        if (isFirstPage) {
-            return contentRepository.findByCityNameOrderByIdDesc(cityName, pageable);
-        }
-        return contentRepository.findByCityNameAndIdLessThanOrderByIdDesc(cityName, lastId, pageable);
-    }
-
-    private List<ContentDetailsByCityResponse> convertContentsToContentDetailsByRegionResponses(
-            List<Content> contents) {
-        return contents.stream()
-                .map(this::toContentDetailsResponse)
-                .toList();
-    }
-
-    private ContentDetailsByCityResponse toContentDetailsResponse(Content content) {
-        ContentWithoutCityResponse contentWithoutRegion = ContentWithoutCityResponse.from(content);
-        TripDurationResponse tripDuration = calculateTripDuration(content);
-        int tripPlaceCount = tripCourseService.countByContentId(content.getId());
-
-        return ContentDetailsByCityResponse.of(contentWithoutRegion, tripDuration, tripPlaceCount);
-    }
-
-    private TripDurationResponse calculateTripDuration(Content content) {
-        int totalTripDay = tripCourseService.calculateDurationDays(content.getId());
-        return TripDurationResponse.of(totalTripDay - 1, totalTripDay);
-    }
-
     public ContentCountResponse countByKeyword(String keyword) {
         int count = contentRepository.countByKeywordContaining(keyword);
         return ContentCountResponse.from(count);
@@ -110,10 +76,45 @@ public class ContentService {
         return ContentSearchResponse.of(contentSearchResultResponses, loadable);
     }
 
+    public ContentResponse getById(Long id) {
+        Content content = contentRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("컨텐츠를 찾을 수 없습니다."));
+        return ContentResponse.from(content);
+    }
+
+    private List<Content> findContentsByCity(
+            String cityName,
+            long lastId,
+            int sizePlusOne
+    ) {
+        Pageable pageable = PageRequest.of(0, sizePlusOne);
+        boolean isFirstPage = lastId == 0;
+
+        if (isFirstPage) {
+            return contentRepository.findByCityNameOrderByIdDesc(cityName, pageable);
+        }
+        return contentRepository.findByCityNameAndIdLessThanOrderByIdDesc(cityName, lastId, pageable);
+    }
+
+    private List<ContentDetailsByCityResponse> convertContentsToContentDetailsByRegionResponses(
+            List<Content> contents) {
+        return contents.stream()
+                .map(this::toContentDetailsResponse)
+                .toList();
+    }
+
     private List<ContentSearchResultResponse> convertContentsToContentSearchResultResponse(Slice<Content> contents) {
         return contents.stream()
                 .map(this::toContentSearchResultResponse)
                 .toList();
+    }
+
+    private ContentDetailsByCityResponse toContentDetailsResponse(Content content) {
+        ContentWithoutCityResponse contentWithoutRegion = ContentWithoutCityResponse.from(content);
+        TripDurationResponse tripDuration = calculateTripDuration(content);
+        int tripPlaceCount = tripCourseService.countByContentId(content.getId());
+
+        return ContentDetailsByCityResponse.of(contentWithoutRegion, tripDuration, tripPlaceCount);
     }
 
     private ContentSearchResultResponse toContentSearchResultResponse(Content content) {
@@ -126,9 +127,8 @@ public class ContentService {
         );
     }
 
-    public ContentResponse getById(Long id) {
-        Content content = contentRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("컨텐츠를 찾을 수 없습니다."));
-        return ContentResponse.from(content);
+    private TripDurationResponse calculateTripDuration(Content content) {
+        int totalTripDay = tripCourseService.calculateDurationDays(content.getId());
+        return TripDurationResponse.of(totalTripDay - 1, totalTripDay);
     }
 }
