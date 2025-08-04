@@ -152,7 +152,8 @@ class FavoriteApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .when().delete("/favorites?contentId=1")
+                    .queryParam("contentId", 1)
+                    .when().delete("/favorites")
                     .then()
                     .statusCode(204);
         }
