@@ -23,4 +23,9 @@ public class Country {
     private String name;
 
     private String imageUrl;
+
+    public Country(String name, String imageUrl) {
+        this.name = name;
+        this.imageUrl = imageUrl;
+    }
 }

@@ -44,8 +44,8 @@ class ContentPagingApiTest {
 
         jdbcTemplate.update(
                 "INSERT INTO creator (profile_image, channel_name) VALUES ('https://image.example.com/creator1.jpg', 'TravelMate')");
-        jdbcTemplate.update("INSERT INTO country (name) VALUES ('korea')");
-        jdbcTemplate.update("INSERT INTO city (name, country_id) VALUES ('seoul', 1)");
+        jdbcTemplate.update("INSERT INTO country (name) VALUES ('대한민국')");
+        jdbcTemplate.update("INSERT INTO city (name, country_id) VALUES ('서울', 1)");
         for (int i = 1; i <= 10; i++) {
             jdbcTemplate.update(
                     "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 1, ?, ?, '2024-07-01')",
@@ -63,7 +63,7 @@ class ContentPagingApiTest {
     void readContentsByCityNamePaging() {
         // when: 첫 페이지 요청 (lastId=0, size=5)
         var firstPageResponse = RestAssured.given().port(port)
-                .queryParam("cityName", "seoul")
+                .queryParam("cityName", "서울")
                 .queryParam("size", 5)
                 .queryParam("lastId", 0)
                 .when().get("/contents");
@@ -78,7 +78,7 @@ class ContentPagingApiTest {
 
         // when: 두 번째 페이지 요청 (lastId=6, size=5)
         var secondPageResponse = RestAssured.given().port(port)
-                .queryParam("cityName", "seoul")
+                .queryParam("cityName", "서울")
                 .queryParam("size", 5)
                 .queryParam("lastId", 6)
                 .when().get("/contents");
