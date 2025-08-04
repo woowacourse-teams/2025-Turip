@@ -167,6 +167,9 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
                 )
             startActivity(intent)
         }
+        binding.ivTripDetailFavorite.setOnClickListener {
+            viewModel.updateFavorite()
+        }
     }
 
     private fun setupObservers() {

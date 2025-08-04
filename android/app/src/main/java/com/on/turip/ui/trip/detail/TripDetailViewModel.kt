@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -22,7 +23,11 @@ import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.common.model.trip.TripDurationModel
 import com.on.turip.ui.common.model.trip.TripModel
 import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
 class TripDetailViewModel(
@@ -52,6 +57,7 @@ class TripDetailViewModel(
         loadContent()
         loadTrip()
         loadDeviceIdentifier()
+        handleFavoriteWithDebounce()
     }
 
     private fun loadContent() {
@@ -145,6 +151,27 @@ class TripDetailViewModel(
                     days = state.days.map { it.copy(isSelected = it.day == dayModel.day) },
                     places = placeCacheByDay[dayModel.day].orEmpty(),
                 )
+        }
+    }
+
+    fun updateFavorite() {
+        _isFavorite.value = isFavorite.value?.not()
+    }
+
+    @OptIn(FlowPreview::class)
+    private fun handleFavoriteWithDebounce() {
+        viewModelScope.launch {
+            _isFavorite
+                .asFlow()
+                .debounce(500L)
+                .filterNotNull()
+                .collectLatest { favoriteStatus: Boolean ->
+                    favoriteRepository.updateFavorite(
+                        favoriteStatus,
+                        deviceIdentifier,
+                        contentId,
+                    )
+                }
         }
     }
 
