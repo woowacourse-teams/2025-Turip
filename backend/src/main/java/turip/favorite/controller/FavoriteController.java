@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import turip.favorite.FavoriteService;
 import turip.favorite.controller.dto.request.FavoriteRequest;
 import turip.favorite.controller.dto.response.FavoriteResponse;
+import turip.favorite.service.FavoriteService;
 
 @RestController
 @RequiredArgsConstructor

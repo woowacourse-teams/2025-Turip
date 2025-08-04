@@ -21,7 +21,6 @@ import turip.content.repository.ContentRepository;
 import turip.creator.domain.Creator;
 import turip.exception.BadRequestException;
 import turip.exception.NotFoundException;
-import turip.favorite.FavoriteService;
 import turip.favorite.controller.dto.request.FavoriteRequest;
 import turip.favorite.controller.dto.response.FavoriteResponse;
 import turip.favorite.domain.Favorite;

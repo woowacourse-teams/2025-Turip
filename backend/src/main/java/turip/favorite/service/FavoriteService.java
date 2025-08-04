@@ -1,4 +1,4 @@
-package turip.favorite;
+package turip.favorite.service;
 
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
