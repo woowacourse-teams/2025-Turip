@@ -36,12 +36,12 @@ public class ContentService {
     public ContentResponse getContentWithFavoriteStatus(Long contentId, String deviceFid) {
         Content content = contentRepository.findById(contentId)
                 .orElseThrow(() -> new NotFoundException("컨텐츠를 찾을 수 없습니다."));
-        boolean isFavorite = false;
-        if (deviceFid != null) {
-            isFavorite = memberRepository.findByDeviceFid(deviceFid)
-                    .map(member -> favoriteRepository.existsByMemberIdAndContentId(member.getId(), content.getId()))
-                    .orElse(false);
+        if (deviceFid == null) {
+            return ContentResponse.of(content, false);
         }
+        boolean isFavorite = memberRepository.findByDeviceFid(deviceFid)
+                .map(member -> favoriteRepository.existsByMemberIdAndContentId(member.getId(), content.getId()))
+                .orElse(false);
 
         return ContentResponse.of(content, isFavorite);
     }
