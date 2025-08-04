@@ -1,6 +1,5 @@
 package com.on.turip.di
 
-import android.content.Context
 import com.on.turip.data.content.dataSource.ContentRemoteDataSource
 import com.on.turip.data.content.dataSource.DefaultContentRemoteDataSource
 import com.on.turip.data.creator.dataSource.CreatorRemoteDataSource
@@ -20,11 +19,7 @@ object DataSourceModule {
     val tripRemoteDataSource: TripRemoteDataSource by lazy {
         DefaultTripRemoteDataSource(NetworkModule.tripService)
     }
-
-    lateinit var userStorageLocalDataSource: UserStorageLocalDataSource
-        private set
-
-    fun setupSettingsStorageLocalDataSource(context: Context) {
-        userStorageLocalDataSource = DefaultUserStorageLocalDataSource(context)
+    val userStorageLocalDataSource: UserStorageLocalDataSource by lazy {
+        DefaultUserStorageLocalDataSource(ApplicationContextProvider.applicationContext)
     }
 }

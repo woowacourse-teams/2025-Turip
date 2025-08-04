@@ -4,7 +4,7 @@ import android.app.Application
 import com.on.turip.common.TuripDebugTree
 import com.on.turip.common.TuripReleaseTree
 import com.on.turip.data.initializer.FirebaseInstallationsInitializer
-import com.on.turip.di.DataSourceModule
+import com.on.turip.di.ApplicationContextProvider
 import com.on.turip.di.RepositoryModule
 import timber.log.Timber
 
@@ -18,7 +18,7 @@ class TuripApplication : Application() {
             Timber.plant(TuripReleaseTree())
         }
 
-        DataSourceModule.setupSettingsStorageLocalDataSource(applicationContext)
+        ApplicationContextProvider.setupApplicationContext(this)
         FirebaseInstallationsInitializer(RepositoryModule.userStorageRepository).setupFirebaseInstallationId()
     }
 }
