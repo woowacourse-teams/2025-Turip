@@ -6,6 +6,8 @@ import com.on.turip.data.creator.dataSource.CreatorRemoteDataSource
 import com.on.turip.data.creator.dataSource.DefaultCreatorRemoteDataSource
 import com.on.turip.data.trip.dataSource.DefaultTripRemoteDataSource
 import com.on.turip.data.trip.dataSource.TripRemoteDataSource
+import com.on.turip.data.userStorage.dataSource.DefaultUserStorageLocalDataSource
+import com.on.turip.data.userStorage.dataSource.UserStorageLocalDataSource
 
 object DataSourceModule {
     val contentRemoteDataSource: ContentRemoteDataSource by lazy {
@@ -16,5 +18,8 @@ object DataSourceModule {
     }
     val tripRemoteDataSource: TripRemoteDataSource by lazy {
         DefaultTripRemoteDataSource(NetworkModule.tripService)
+    }
+    val userStorageLocalDataSource: UserStorageLocalDataSource by lazy {
+        DefaultUserStorageLocalDataSource(ApplicationContextProvider.applicationContext)
     }
 }

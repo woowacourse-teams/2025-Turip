@@ -11,5 +11,5 @@ class DefaultTripRepository(
     override suspend fun loadTripInfo(contentId: Long): Result<Trip> =
         tripRemoteDataSource
             .getTrip(contentId)
-            .map { it.toDomain() }
+            .mapCatching { it.toDomain() }
 }
