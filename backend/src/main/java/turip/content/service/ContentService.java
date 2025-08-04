@@ -93,12 +93,6 @@ public class ContentService {
         return ContentSearchResponse.of(contentSearchResultResponses, loadable);
     }
 
-    public ContentResponse getById(Long id) {
-        Content content = contentRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("컨텐츠를 찾을 수 없습니다."));
-        return ContentResponse.from(content);
-    }
-
     private List<Content> findContentsByCity(
             String cityName,
             long lastId,
