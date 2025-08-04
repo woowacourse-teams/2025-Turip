@@ -1,4 +1,5 @@
-package turip.country.domain;
+package turip.member.domain;
+
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -13,19 +14,16 @@ import lombok.NoArgsConstructor;
 @Entity
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Country {
+public class Member {
 
     @Id
     @EqualsAndHashCode.Include
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
+    private String deviceFid;
 
-    private String imageUrl;
-
-    public Country(String name, String imageUrl) {
-        this.name = name;
-        this.imageUrl = imageUrl;
+    public Member(String deviceFid) {
+        this.deviceFid = deviceFid;
     }
 }

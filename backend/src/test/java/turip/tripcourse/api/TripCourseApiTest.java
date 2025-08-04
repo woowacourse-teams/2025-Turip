@@ -22,16 +22,18 @@ public class TripCourseApiTest {
 
     @BeforeEach
     void setUp() {
+        jdbcTemplate.update("DELETE FROM place_category");
         jdbcTemplate.update("DELETE FROM trip_course");
         jdbcTemplate.update("DELETE FROM place");
+        jdbcTemplate.update("DELETE FROM category");
+        jdbcTemplate.update("DELETE FROM favorite");
+        jdbcTemplate.update("DELETE FROM member");
         jdbcTemplate.update("DELETE FROM content");
         jdbcTemplate.update("DELETE FROM creator");
         jdbcTemplate.update("DELETE FROM city");
         jdbcTemplate.update("DELETE FROM country");
         jdbcTemplate.update("DELETE FROM province");
-        jdbcTemplate.update("DELETE FROM category");
-        jdbcTemplate.update("DELETE FROM place_category");
-
+        
         jdbcTemplate.update("ALTER TABLE trip_course ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE place ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE content ALTER COLUMN id RESTART WITH 1");
@@ -45,7 +47,7 @@ public class TripCourseApiTest {
 
     @DisplayName("/trip-courses GET 여행 상세 조회 테스트")
     @Nested
-    class readTripCourse {
+    class ReadTripCourse {
 
         @DisplayName("성공 시 200 OK 코드와 여행 상세 정보를 응답한다")
         @Test
@@ -53,8 +55,8 @@ public class TripCourseApiTest {
             // given
             jdbcTemplate.update(
                     "INSERT INTO creator (profile_image, channel_name) VALUES ('https://image.example.com/creator1.jpg', 'TravelMate')");
-            jdbcTemplate.update("INSERT INTO country (name) VALUES ('korea')");
-            jdbcTemplate.update("INSERT INTO city (name, country_id, province_id) VALUES ('seoul', 1, null)");
+            jdbcTemplate.update("INSERT INTO country (name) VALUES ('대한민국')");
+            jdbcTemplate.update("INSERT INTO city (name, country_id, province_id) VALUES ('서울', 1, null)");
             jdbcTemplate.update("INSERT INTO category (name) VALUES ('관광지')");
             jdbcTemplate.update("INSERT INTO category (name) VALUES ('빵집')");
             jdbcTemplate.update("INSERT INTO category (name) VALUES ('카페')");
