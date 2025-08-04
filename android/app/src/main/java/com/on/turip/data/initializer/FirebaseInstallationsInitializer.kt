@@ -1,7 +1,7 @@
 package com.on.turip.data.initializer
 
 import com.google.firebase.installations.FirebaseInstallations
-import com.on.turip.domain.settingsStorage.repository.UserStorageRepository
+import com.on.turip.domain.userStorage.repository.UserStorageRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
