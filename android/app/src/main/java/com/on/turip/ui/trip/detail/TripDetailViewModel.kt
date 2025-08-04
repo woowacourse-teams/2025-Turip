@@ -16,6 +16,8 @@ import com.on.turip.domain.creator.repository.CreatorRepository
 import com.on.turip.domain.favorite.repository.FavoriteRepository
 import com.on.turip.domain.trip.Trip
 import com.on.turip.domain.trip.repository.TripRepository
+import com.on.turip.domain.userStorage.TuripDeviceIdentifier
+import com.on.turip.domain.userStorage.repository.UserStorageRepository
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.common.model.trip.TripDurationModel
 import com.on.turip.ui.common.model.trip.TripModel
@@ -30,6 +32,7 @@ class TripDetailViewModel(
     private val creatorRepository: CreatorRepository,
     private val tripRepository: TripRepository,
     private val favoriteRepository: FavoriteRepository,
+    private val userStorageRepository: UserStorageRepository,
 ) : ViewModel() {
     private val _tripDetailState: MutableLiveData<TripDetailState> =
         MutableLiveData(TripDetailState())
@@ -43,9 +46,12 @@ class TripDetailViewModel(
 
     private var placeCacheByDay: Map<Int, List<PlaceModel>> = emptyMap()
 
+    private lateinit var deviceIdentifier: TuripDeviceIdentifier
+
     init {
         loadContent()
         loadTrip()
+        loadDeviceIdentifier()
     }
 
     private fun loadContent() {
@@ -122,6 +128,16 @@ class TripDetailViewModel(
             }
     }
 
+    private fun loadDeviceIdentifier() {
+        viewModelScope.launch {
+            userStorageRepository
+                .loadId()
+                .onSuccess { turipDeviceIdentifier: TuripDeviceIdentifier ->
+                    deviceIdentifier = turipDeviceIdentifier
+                }.onFailure { }
+        }
+    }
+
     fun updateDay(dayModel: DayModel) {
         tripDetailState.value?.let { state ->
             _tripDetailState.value =
@@ -140,6 +156,7 @@ class TripDetailViewModel(
             creatorRepository: CreatorRepository = RepositoryModule.creatorRepository,
             travelRepository: TripRepository = RepositoryModule.tripRepository,
             favoriteRepository: FavoriteRepository = RepositoryModule.favoriteRepository,
+            userStorageRepository: UserStorageRepository = RepositoryModule.userStorageRepository,
         ): ViewModelProvider.Factory =
             viewModelFactory {
                 initializer {
@@ -150,6 +167,7 @@ class TripDetailViewModel(
                         creatorRepository,
                         travelRepository,
                         favoriteRepository,
+                        userStorageRepository,
                     )
                 }
             }
