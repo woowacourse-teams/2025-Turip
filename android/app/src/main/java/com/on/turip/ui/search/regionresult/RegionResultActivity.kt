@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
-import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -51,14 +50,6 @@ class RegionResultActivity : BaseActivity<ActivityRegionResultBinding>() {
                 this,
                 R.color.gray_300_5b5b5b,
             ),
-        )
-        onBackPressedDispatcher.addCallback(
-            this,
-            object : OnBackPressedCallback(true) {
-                override fun handleOnBackPressed() {
-                    finish()
-                }
-            },
         )
     }
 
