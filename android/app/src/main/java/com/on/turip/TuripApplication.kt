@@ -19,6 +19,6 @@ class TuripApplication : Application() {
         }
 
         DataSourceModule.setupSettingsStorageLocalDataSource(applicationContext)
-        FirebaseInstallationsInitializer(RepositoryModule.settingsStorageRepository).setupFirebaseInstallationId()
+        FirebaseInstallationsInitializer(RepositoryModule.userStorageRepository).setupFirebaseInstallationId()
     }
 }
