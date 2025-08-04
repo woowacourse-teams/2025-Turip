@@ -20,7 +20,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     private val regionAdapter: RegionAdapter =
         RegionAdapter { region: RegionModel ->
-            val intent = SearchResultActivity.newIntent(requireActivity(), region.english)
+            val intent = SearchResultActivity.newIntent(requireContext(), region.english)
             startActivity(intent)
         }
 
