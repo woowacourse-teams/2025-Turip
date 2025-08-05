@@ -1,5 +1,8 @@
 package turip.content.service;
 
+import static turip.regioncategory.domain.DomesticRegionCategory.OTHER_DOMESTIC;
+import static turip.regioncategory.domain.OverseasRegionCategory.OTHER_OVERSEAS;
+
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -37,11 +40,11 @@ public class ContentService {
     }
 
     private int calculateCountByRegionCategory(String regionCategory) {
-        if ("국내 기타".equals(regionCategory)) {
+        if (OTHER_DOMESTIC.matchesDisplayName(regionCategory)) {
             return calculateDomesticEtcCount();
         }
 
-        if ("해외 기타".equals(regionCategory)) {
+        if (OTHER_OVERSEAS.matchesDisplayName(regionCategory)) {
             return calculateOverseasEtcCount();
         }
 

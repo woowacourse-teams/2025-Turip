@@ -1,10 +1,9 @@
 package turip.regioncategory.domain;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
 import java.util.Arrays;
 import java.util.List;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
@@ -31,5 +30,9 @@ public enum OverseasRegionCategory {
                 .filter(category -> !category.equals(OTHER_OVERSEAS))
                 .map(OverseasRegionCategory::getDisplayName)
                 .toList();
+    }
+
+    public boolean matchesDisplayName(String name) {
+        return this.displayName.equals(name);
     }
 }

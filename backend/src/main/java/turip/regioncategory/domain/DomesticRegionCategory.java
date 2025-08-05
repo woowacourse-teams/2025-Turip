@@ -36,4 +36,8 @@ public enum DomesticRegionCategory {
                 .map(DomesticRegionCategory::getDisplayName)
                 .toList();
     }
+
+    public boolean matchesDisplayName(String name) {
+        return this.displayName.equals(name);
+    }
 }
