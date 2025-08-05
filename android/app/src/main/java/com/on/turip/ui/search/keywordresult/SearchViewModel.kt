@@ -17,6 +17,7 @@ import com.on.turip.ui.search.model.VideoInformationModel
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class SearchViewModel(
     private val contentRepository: ContentRepository,
@@ -61,7 +62,7 @@ class SearchViewModel(
                 .onSuccess { result: Int ->
                     _searchResultCount.value = result
                 }.onFailure {
-                    // TODO 로그
+                    Timber.e("${it.message}")
                 }
 
             pagedContentsResult
@@ -72,7 +73,7 @@ class SearchViewModel(
                     _videoInformation.value = videoModels
                     _loading.value = false
                 }.onFailure {
-                    // TODO 실패 했을 때
+                    Timber.e("${it.message}")
                 }
         }
     }

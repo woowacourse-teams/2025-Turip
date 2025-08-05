@@ -16,6 +16,7 @@ import com.on.turip.ui.search.model.VideoInformationModel
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class RegionResultViewModel(
     private val region: String,
@@ -63,6 +64,7 @@ class RegionResultViewModel(
                     updateLoading(false)
                 }.onFailure {
                     updateLoading(false)
+                    Timber.e("${it.message}")
                 }
         }
     }
