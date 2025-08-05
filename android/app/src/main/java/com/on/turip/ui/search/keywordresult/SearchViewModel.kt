@@ -18,7 +18,7 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
-class SearchResultViewModel(
+class SearchViewModel(
     private val contentRepository: ContentRepository,
 ) : ViewModel() {
     private val _searchingWord: MutableLiveData<String> = MutableLiveData()
@@ -76,7 +76,7 @@ class SearchResultViewModel(
         fun provideFactory(contentRepository: ContentRepository = RepositoryModule.contentRepository): ViewModelProvider.Factory =
             viewModelFactory {
                 initializer {
-                    SearchResultViewModel(
+                    SearchViewModel(
                         contentRepository,
                     )
                 }

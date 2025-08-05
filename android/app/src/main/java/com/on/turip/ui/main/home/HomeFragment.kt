@@ -14,7 +14,7 @@ import com.on.turip.R
 import com.on.turip.databinding.FragmentHomeBinding
 import com.on.turip.ui.common.base.BaseFragment
 import com.on.turip.ui.common.model.RegionModel
-import com.on.turip.ui.search.keywordresult.SearchResultActivity
+import com.on.turip.ui.search.keywordresult.SearchActivity
 import com.on.turip.ui.search.regionresult.RegionResultActivity
 
 class HomeFragment : BaseFragment<FragmentHomeBinding>() {
@@ -45,7 +45,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     private fun setupListeners() {
         binding.ivHomeSearch.setOnClickListener {
-            val intent: Intent = SearchResultActivity.newIntent(requireContext())
+            val intent: Intent = SearchActivity.newIntent(requireContext())
             startActivity(intent)
         }
     }

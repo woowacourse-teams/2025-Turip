@@ -15,18 +15,18 @@ import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import com.on.turip.R
-import com.on.turip.databinding.ActivitySearchResultBinding
+import com.on.turip.databinding.ActivitySearchBinding
 import com.on.turip.ui.common.base.BaseActivity
 import com.on.turip.ui.search.model.VideoInformationModel
 import com.on.turip.ui.trip.detail.TripDetailActivity
 
-class SearchResultActivity : BaseActivity<ActivitySearchResultBinding>() {
-    private val viewModel: SearchResultViewModel by viewModels {
-        SearchResultViewModel.provideFactory()
+class SearchActivity : BaseActivity<ActivitySearchBinding>() {
+    private val viewModel: SearchViewModel by viewModels {
+        SearchViewModel.provideFactory()
     }
 
-    override val binding: ActivitySearchResultBinding by lazy {
-        ActivitySearchResultBinding.inflate(layoutInflater)
+    override val binding: ActivitySearchBinding by lazy {
+        ActivitySearchBinding.inflate(layoutInflater)
     }
 
     private val searchAdapter: SearchAdapter =
@@ -118,6 +118,6 @@ class SearchResultActivity : BaseActivity<ActivitySearchResultBinding>() {
     }
 
     companion object {
-        fun newIntent(context: Context): Intent = Intent(context, SearchResultActivity::class.java)
+        fun newIntent(context: Context): Intent = Intent(context, SearchActivity::class.java)
     }
 }
