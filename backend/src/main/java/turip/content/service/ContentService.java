@@ -50,7 +50,7 @@ public class ContentService {
 
         return ContentResponse.of(content, isFavorite);
     }
-  
+
     public ContentCountResponse countByRegionCategory(String regionCategory) {
         int count = calculateCountByRegionCategory(regionCategory);
         return ContentCountResponse.from(count);
@@ -101,12 +101,6 @@ public class ContentService {
                 contents);
 
         return ContentSearchResponse.of(contentSearchResultResponses, loadable);
-    }
-
-    public ContentResponse getById(Long id) {
-        Content content = contentRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("컨텐츠를 찾을 수 없습니다."));
-        return ContentResponse.from(content);
     }
 
     private int calculateCountByRegionCategory(String regionCategory) {
