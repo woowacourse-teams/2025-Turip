@@ -16,6 +16,7 @@ import com.on.turip.domain.creator.Creator
 import com.on.turip.domain.creator.repository.CreatorRepository
 import com.on.turip.domain.favorite.usecase.UpdateFavoriteUseCase
 import com.on.turip.domain.trip.Trip
+import com.on.turip.domain.trip.TripCourse
 import com.on.turip.domain.trip.repository.TripRepository
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.common.model.trip.TripModel
@@ -117,13 +118,13 @@ class TripDetailViewModel(
     }
 
     private fun setupCached(trip: Trip) {
-        val dayModels = trip.tripDuration.days.initDayModels()
+        val dayModels: List<DayModel> = trip.tripDuration.days.initDayModels()
 
         placeCacheByDay =
             dayModels.associate { dayModel ->
-                val day = dayModel.day
-                val coursesForDay = trip.tripCourses.filter { it.visitDay == day }
-                val placeModels =
+                val day: Int = dayModel.day
+                val coursesForDay: List<TripCourse> = trip.tripCourses.filter { it.visitDay == day }
+                val placeModels: List<PlaceModel> =
                     coursesForDay.map { course ->
                         PlaceModel(
                             name = course.place.name,
@@ -153,7 +154,9 @@ class TripDetailViewModel(
                 .filterNotNull()
                 .collectLatest { favoriteStatus: Boolean ->
                     updateFavoriteUseCase(favoriteStatus, contentId)
-                        .onFailure {
+                        .onSuccess {
+                            Timber.d("찜 API 통신 성공")
+                        }.onFailure {
                             Timber.e("${it.message}")
                         }
                 }
