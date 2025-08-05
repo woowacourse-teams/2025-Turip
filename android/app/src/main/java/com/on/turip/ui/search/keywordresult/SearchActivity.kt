@@ -17,7 +17,6 @@ import androidx.core.widget.addTextChangedListener
 import com.on.turip.R
 import com.on.turip.databinding.ActivitySearchBinding
 import com.on.turip.ui.common.base.BaseActivity
-import com.on.turip.ui.search.model.VideoInformationModel
 import com.on.turip.ui.trip.detail.TripDetailActivity
 
 class SearchActivity : BaseActivity<ActivitySearchBinding>() {
@@ -89,20 +88,51 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
     }
 
     private fun setupObserves() {
-        viewModel.searchingWord.observe(this) { words: String ->
+        var latestSearchResultCount: Int = 0
+        var latestLoading: Boolean = false
+
+        viewModel.searchResultCount.observe(this) { count ->
+            latestSearchResultCount = count
+            binding.tvSearchResultCount.text =
+                getString(R.string.search_result_exist_result, count)
+            updateUiState(latestLoading, count)
+        }
+
+        viewModel.loading.observe(this) { loading ->
+            latestLoading = loading
+            updateUiState(loading, latestSearchResultCount)
+        }
+
+        viewModel.videoInformation.observe(this) { videoInformationModels ->
+            searchAdapter.submitList(videoInformationModels)
+        }
+
+        viewModel.searchingWord.observe(this) { words ->
             binding.ivSearchResultClear.visibility =
                 if (words.isNotBlank()) View.VISIBLE else View.GONE
         }
-        viewModel.videoInformation.observe(this) { videoInformationModels: List<VideoInformationModel> ->
-            searchAdapter.submitList(videoInformationModels)
-        }
-        viewModel.searchResultCount.observe(this) { searchResultCount: Int ->
-            binding.tvSearchResultCount.text =
-                getString(R.string.search_result_exist_result, searchResultCount)
-        }
-        viewModel.loading.observe(this) { loading: Boolean ->
-            binding.pbSearchResult.visibility =
-                if (loading) View.VISIBLE else View.GONE
+    }
+
+    private fun updateUiState(
+        loading: Boolean,
+        searchResultCount: Int,
+    ) {
+        if (loading) {
+            binding.pbSearchResult.visibility = View.VISIBLE
+            binding.tvSearchResultCount.visibility = View.GONE
+            binding.rvSearchResult.visibility = View.GONE
+            binding.groupSearchResultEmpty.visibility = View.GONE
+        } else {
+            binding.pbSearchResult.visibility = View.GONE
+            if (searchResultCount == 0) {
+                binding.groupSearchResultEmpty.visibility = View.VISIBLE
+                binding.tvSearchResultCount.visibility = View.GONE
+                binding.rvSearchResult.visibility = View.GONE
+            } else {
+                binding.groupSearchResultEmpty.visibility = View.GONE
+                binding.tvSearchResultCount.visibility = View.VISIBLE
+                binding.rvSearchResult.visibility = View.VISIBLE
+            }
         }
     }
 
