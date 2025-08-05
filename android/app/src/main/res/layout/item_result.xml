@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="20dp"
+    android:layout_marginVertical="6dp"
+    android:background="@drawable/bg_stroke_gray200_radius_24dp">
+
+    <ImageView
+        android:id="@+id/iv_result_creator_thumbnail"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:layout_marginStart="14dp"
+        android:layout_marginTop="14dp"
+        android:contentDescription="@null"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@mipmap/ic_turip_launcher_round" />
+
+    <TextView
+        android:id="@+id/tv_result_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        android:layout_marginEnd="14dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textAppearance="@style/title2"
+        android:textColor="@color/pure_black_151515"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/iv_result_creator_thumbnail"
+        app:layout_constraintTop_toTopOf="@id/iv_result_creator_thumbnail"
+        tools:text="대프리카지만 괜찮...느좋 대구 카페..." />
+
+    <TextView
+        android:id="@+id/tv_result_description"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:textAppearance="@style/info2"
+        android:textColor="@color/gray_300_5b5b5b"
+        app:layout_constraintStart_toStartOf="@id/tv_result_title"
+        app:layout_constraintTop_toBottomOf="@id/tv_result_title"
+        tools:text="뭉치 · 2024-04-21" />
+
+    <ImageView
+        android:id="@+id/iv_result_video_thumbnail"
+        android:layout_width="202dp"
+        android:layout_height="110dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="14dp"
+        android:contentDescription="@null"
+        app:layout_constraintStart_toStartOf="@id/iv_result_creator_thumbnail"
+        app:layout_constraintTop_toBottomOf="@id/iv_result_creator_thumbnail"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+
+    <ImageView
+        android:id="@+id/iv_result_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:contentDescription="@null"
+        android:src="@drawable/ic_location"
+        app:layout_constraintHorizontal_bias="0.25"
+        app:layout_constraintStart_toEndOf="@id/iv_result_video_thumbnail"
+        app:layout_constraintTop_toTopOf="@id/iv_result_video_thumbnail"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:tint="@color/gray_200_c1c1c1" />
+
+    <TextView
+        android:id="@+id/tv_result_location"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:textAppearance="@style/info1"
+        android:textColor="@color/pure_black_151515"
+        app:layout_constraintTop_toTopOf="@id/iv_result_location"
+        app:layout_constraintBottom_toBottomOf="@id/iv_result_location"
+        app:layout_constraintStart_toEndOf="@id/iv_result_location"
+        tools:text="14개 장소" />
+
+    <ImageView
+        android:id="@+id/iv_result_calendar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:layout_marginStart="-5dp"
+        android:contentDescription="@null"
+        android:src="@drawable/ic_calendar"
+        app:layout_constraintStart_toStartOf="@id/iv_result_location"
+        app:layout_constraintTop_toBottomOf="@id/iv_result_location"
+        app:tint="@color/gray_200_c1c1c1" />
+
+    <TextView
+        android:id="@+id/tv_result_day"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        android:textAppearance="@style/info1"
+        android:textColor="@color/pure_black_151515"
+        app:layout_constraintBottom_toBottomOf="@id/iv_result_calendar"
+        app:layout_constraintStart_toEndOf="@id/iv_result_calendar"
+        app:layout_constraintTop_toTopOf="@id/iv_result_calendar"
+        tools:text="2박 3일" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

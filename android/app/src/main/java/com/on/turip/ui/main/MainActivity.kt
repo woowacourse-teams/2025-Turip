@@ -24,6 +24,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
 
         handleDoubleBackPressToExit()
         initBottomNavigation()
+        setupBottomNavigation()
 
         if (savedInstanceState == null) {
             binding.bnvMain.selectedItemId = R.id.menu_fragment_home
@@ -48,6 +49,10 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
                 else -> return@setOnItemSelectedListener false
             }
         }
+    }
+
+    private fun setupBottomNavigation() {
+        binding.bnvMain.setOnApplyWindowInsetsListener(null)
     }
 
     private fun switchFragment(

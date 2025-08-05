@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import turip.content.controller.dto.response.ContentCountResponse;
 import turip.content.controller.dto.response.ContentResponse;
-import turip.content.controller.dto.response.ContentsByCityResponse;
 import turip.content.controller.dto.response.ContentSearchResponse;
+import turip.content.controller.dto.response.ContentsByCityResponse;
 import turip.content.service.ContentService;
 
 @RestController
@@ -21,10 +21,10 @@ public class ContentController {
 
     private final ContentService contentService;
 
-    @GetMapping(value = "/count", params = "cityName")
-    public ResponseEntity<ContentCountResponse> readCountByCityName(
-            @RequestParam(name = "cityName") String cityName) {
-        ContentCountResponse response = contentService.countByCityName(cityName);
+    @GetMapping(value = "/count", params = "regionCategory")
+    public ResponseEntity<ContentCountResponse> readCountByRegionCategory(
+            @RequestParam(name = "regionCategory") String regionCategory) {
+        ContentCountResponse response = contentService.countByRegionCategory(regionCategory);
         return ResponseEntity.ok(response);
     }
 

@@ -1,20 +1,20 @@
-package com.on.turip.ui.search.result
+package com.on.turip.ui.search.regionresult
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.on.turip.ui.search.model.VideoInformationModel
 
-class SearchResultAdapter(
-    private val onSearchResultListener: SearchResultViewHolder.OnSearchResultListener,
-) : ListAdapter<VideoInformationModel, SearchResultViewHolder>(VideoInformationDiffUtil) {
+class RegionResultAdapter(
+    private val onSearchResultListener: RegionResultViewHolder.OnSearchResultListener,
+) : ListAdapter<VideoInformationModel, RegionResultViewHolder>(VideoInformationDiffUtil) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): SearchResultViewHolder = SearchResultViewHolder.of(parent, onSearchResultListener)
+    ): RegionResultViewHolder = RegionResultViewHolder.of(parent, onSearchResultListener)
 
     override fun onBindViewHolder(
-        holder: SearchResultViewHolder,
+        holder: RegionResultViewHolder,
         position: Int,
     ) {
         holder.bind(getItem(position))
