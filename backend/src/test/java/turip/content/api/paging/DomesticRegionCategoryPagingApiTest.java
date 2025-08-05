@@ -41,7 +41,7 @@ class DomesticRegionCategoryPagingApiTest {
         // 크리에이터, 도시 데이터 설정
         jdbcTemplate.update(
                 "INSERT INTO creator (profile_image, channel_name) VALUES ('https://image.example.com/creator1.jpg', 'TravelMate')");
-        jdbcTemplate.update("INSERT INTO country (name) VALUES ('한국')");
+        jdbcTemplate.update("INSERT INTO country (name) VALUES ('대한민국')");
         jdbcTemplate.update("INSERT INTO country (name) VALUES ('일본')");
         jdbcTemplate.update("INSERT INTO city (name, country_id, province_id) VALUES ('서울', 1, null)");
         jdbcTemplate.update("INSERT INTO city (name, country_id, province_id) VALUES ('세종', 1, null)");
