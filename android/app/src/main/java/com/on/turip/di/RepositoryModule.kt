@@ -25,6 +25,6 @@ object RepositoryModule {
         DefaultUserStorageRepository(DataSourceModule.userStorageLocalDataSource)
     }
     val favoriteRepository: FavoriteRepository by lazy {
-        DefaultFavoriteRepository(DataSourceModule.favoriteRemoteDataSource)
+        DefaultFavoriteRepository(DataSourceModule.favoriteRemoteDataSource, userStorageRepository)
     }
 }
