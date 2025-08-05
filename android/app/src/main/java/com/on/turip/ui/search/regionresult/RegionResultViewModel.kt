@@ -1,4 +1,4 @@
-package com.on.turip.ui.search.result
+package com.on.turip.ui.search.regionresult
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -17,7 +17,7 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
-class SearchResultViewModel(
+class RegionResultViewModel(
     private val region: String,
     private val contentRepository: ContentRepository,
 ) : ViewModel() {
@@ -103,7 +103,7 @@ class SearchResultViewModel(
         ): ViewModelProvider.Factory =
             viewModelFactory {
                 initializer {
-                    SearchResultViewModel(
+                    RegionResultViewModel(
                         region,
                         contentRepository,
                     )
