@@ -18,6 +18,6 @@ fun ImageView.loadRoundedCornerImage(
 ) {
     this.load(imageUrl) {
         crossfade(true)
-        transformations(RoundedCornersTransformation(radius.dpToPx))
+        transformations(RoundedCornersTransformation(radius.dpToPxFloat))
     }
 }
