@@ -13,5 +13,8 @@ interface ContentRemoteDataSource {
         lastId: Long,
     ): Result<ContentsInformationResponse>
 
-    suspend fun getContentDetail(contentId: Long): Result<ContentDetailResponse>
+    suspend fun getContentDetail(
+        contentId: Long,
+        fid: String,
+    ): Result<ContentDetailResponse>
 }
