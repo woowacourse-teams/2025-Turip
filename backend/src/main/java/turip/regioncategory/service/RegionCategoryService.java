@@ -23,7 +23,6 @@ public class RegionCategoryService {
     private static final String DOMESTIC_ETC_IMAGE_URL = "https://example.com/default-image.jpg";
     private static final String OVERSEAS_ETC_IMAGE_URL = "https://example.com/default-image.jpg";
 
-
     private final CityService cityService;
     private final CountryService countryService;
 
