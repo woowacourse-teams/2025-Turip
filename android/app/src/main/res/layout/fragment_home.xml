@@ -7,7 +7,7 @@
     tools:context=".ui.main.home.HomeFragment">
 
     <ImageView
-        android:id="@+id/iv_main_logo"
+        android:id="@+id/iv_home_logo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
@@ -17,6 +17,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <ImageView
+        android:id="@+id/iv_home_search"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@null"
+        android:src="@drawable/ic_search"
+        app:layout_constraintTop_toTopOf="@id/iv_home_logo"
+        app:layout_constraintBottom_toBottomOf="@id/iv_home_logo"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="14dp" />
+
     <TextView
         android:id="@+id/tv_home_where_should_we_go_title"
         android:layout_width="wrap_content"
@@ -25,8 +36,8 @@
         android:text="@string/home_where_should_we_go_title"
         android:textAppearance="@style/display"
         android:textColor="@color/gray_500_1e1e1e"
-        app:layout_constraintStart_toStartOf="@id/iv_main_logo"
-        app:layout_constraintTop_toBottomOf="@id/iv_main_logo" />
+        app:layout_constraintStart_toStartOf="@id/iv_home_logo"
+        app:layout_constraintTop_toBottomOf="@id/iv_home_logo" />
 
     <TextView
         android:id="@+id/tv_home_domestic_button"
