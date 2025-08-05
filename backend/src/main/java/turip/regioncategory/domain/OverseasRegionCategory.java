@@ -16,15 +16,6 @@ public enum OverseasRegionCategory {
 
     private final String displayName;
 
-    public static boolean containsName(String name) {
-        for (OverseasRegionCategory category : values()) {
-            if (name.contains(category.displayName)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public static List<String> getDisplayNamesExcludingEtc() {
         return Arrays.stream(values())
                 .filter(category -> !category.equals(OTHER_OVERSEAS))
