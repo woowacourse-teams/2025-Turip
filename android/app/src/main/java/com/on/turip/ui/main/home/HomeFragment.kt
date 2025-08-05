@@ -1,5 +1,6 @@
 package com.on.turip.ui.main.home
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.Spanned
@@ -11,9 +12,11 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import com.on.turip.R
 import com.on.turip.databinding.FragmentHomeBinding
+import com.on.turip.domain.content.Content
 import com.on.turip.domain.region.RegionCategory
 import com.on.turip.ui.common.base.BaseFragment
 import com.on.turip.ui.search.result.SearchResultActivity
+import com.on.turip.ui.trip.detail.TripDetailActivity
 import timber.log.Timber
 
 class HomeFragment : BaseFragment<FragmentHomeBinding>() {
@@ -21,7 +24,19 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     private val regionAdapter: RegionAdapter =
         RegionAdapter { regionCategoryName: String ->
-            val intent = SearchResultActivity.newIntent(requireContext(), regionCategoryName)
+            val intent: Intent =
+                SearchResultActivity.newIntent(requireContext(), regionCategoryName)
+            startActivity(intent)
+        }
+
+    private val usersLikeContentAdapter: UsersLikeContentAdapter =
+        UsersLikeContentAdapter { content: Content ->
+            val intent: Intent =
+                TripDetailActivity.newIntent(
+                    context = requireContext(),
+                    contentId = content.id,
+                    creatorId = content.creator.id,
+                )
             startActivity(intent)
         }
 
@@ -68,6 +83,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     private fun setupAdapters() {
         binding.rvHomeRegion.adapter = regionAdapter
+        binding.rvUsersLikeContent.adapter = usersLikeContentAdapter
     }
 
     private fun setupObservers() {
