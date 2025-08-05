@@ -39,32 +39,6 @@ public class ContentService {
         return ContentCountResponse.from(count);
     }
 
-    private int calculateCountByRegionCategory(String regionCategory) {
-        if (OTHER_DOMESTIC.matchesDisplayName(regionCategory)) {
-            return calculateDomesticEtcCount();
-        }
-
-        if (OTHER_OVERSEAS.matchesDisplayName(regionCategory)) {
-            return calculateOverseasEtcCount();
-        }
-
-        if (DomesticRegionCategory.containsName(regionCategory)) {
-            return contentRepository.countByCityName(regionCategory);
-        }
-
-        return contentRepository.countByCityCountryName(regionCategory);
-    }
-
-    private int calculateDomesticEtcCount() {
-        List<String> domesticCategoryNames = DomesticRegionCategory.getDisplayNamesExcludingEtc();
-        return contentRepository.countByCityNameNotIn(domesticCategoryNames);
-    }
-
-    private int calculateOverseasEtcCount() {
-        List<String> overseasCategoryNames = OverseasRegionCategory.getDisplayNamesExcludingEtc();
-        return contentRepository.countByCountryNameNotIn(overseasCategoryNames);
-    }
-
     public ContentsByCityResponse findContentsByCityName(
             String cityName,
             int size,
@@ -111,6 +85,32 @@ public class ContentService {
         Content content = contentRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("컨텐츠를 찾을 수 없습니다."));
         return ContentResponse.from(content);
+    }
+
+    private int calculateCountByRegionCategory(String regionCategory) {
+        if (OTHER_DOMESTIC.matchesDisplayName(regionCategory)) {
+            return calculateDomesticEtcCount();
+        }
+
+        if (OTHER_OVERSEAS.matchesDisplayName(regionCategory)) {
+            return calculateOverseasEtcCount();
+        }
+
+        if (DomesticRegionCategory.containsName(regionCategory)) {
+            return contentRepository.countByCityName(regionCategory);
+        }
+
+        return contentRepository.countByCityCountryName(regionCategory);
+    }
+
+    private int calculateDomesticEtcCount() {
+        List<String> domesticCategoryNames = DomesticRegionCategory.getDisplayNamesExcludingEtc();
+        return contentRepository.countByCityNameNotIn(domesticCategoryNames);
+    }
+
+    private int calculateOverseasEtcCount() {
+        List<String> overseasCategoryNames = OverseasRegionCategory.getDisplayNamesExcludingEtc();
+        return contentRepository.countByCountryNameNotIn(overseasCategoryNames);
     }
 
     private List<Content> findContentsByCity(
