@@ -150,7 +150,11 @@ public class ContentService {
             return findContentsByCityName(regionCategory, lastId, pageable, isFirstPage);
         }
 
-        return findContentsByCountryName(regionCategory, lastId, pageable, isFirstPage);
+        if (OverseasRegionCategory.containsName(regionCategory)) {
+            return findContentsByCountryName(regionCategory, lastId, pageable, isFirstPage);
+        }
+
+        throw new BadRequestException("지역 카테고리가 올바르지 않습니다.");
     }
 
     private Slice<Content> findDomesticEtcContents(long lastId, Pageable pageable, boolean isFirstPage) {
