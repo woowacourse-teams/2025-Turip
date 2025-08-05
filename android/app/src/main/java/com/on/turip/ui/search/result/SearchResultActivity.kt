@@ -11,7 +11,6 @@ import androidx.core.view.isVisible
 import com.on.turip.R
 import com.on.turip.databinding.ActivitySearchResultBinding
 import com.on.turip.ui.common.base.BaseActivity
-import com.on.turip.ui.common.model.RegionModel
 import com.on.turip.ui.trip.detail.TripDetailActivity
 
 class SearchResultActivity : BaseActivity<ActivitySearchResultBinding>() {
@@ -82,7 +81,7 @@ class SearchResultActivity : BaseActivity<ActivitySearchResultBinding>() {
                     searchResultState.searchResultCount,
                 )
 
-            supportActionBar?.title = setupTitle(searchResultState.region)
+            supportActionBar?.title = searchResultState.region
 
             searchResultAdapter.submitList(searchResultState.videoInformations)
 
@@ -90,11 +89,6 @@ class SearchResultActivity : BaseActivity<ActivitySearchResultBinding>() {
             binding.groupSearchResultEmpty.isVisible = searchResultState.isExist == false
             binding.tvSearchResultLoading.isVisible = searchResultState.loading == true
         }
-    }
-
-    private fun setupTitle(region: String): String {
-        val regionOrigin = RegionModel.findByEnglish(region)
-        return regionOrigin.korean
     }
 
     companion object {
