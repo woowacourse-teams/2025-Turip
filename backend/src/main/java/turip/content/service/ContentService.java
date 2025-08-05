@@ -55,12 +55,12 @@ public class ContentService {
 
     private int calculateDomesticEtcCount() {
         List<String> domesticCategoryNames = DomesticRegionCategory.getDisplayNamesExcludingEtc();
-        return contentRepository.countByCityNameNotIn(domesticCategoryNames);
+        return contentRepository.countDomesticEtcContents(domesticCategoryNames);
     }
 
     private int calculateOverseasEtcCount() {
         List<String> overseasCategoryNames = OverseasRegionCategory.getDisplayNamesExcludingEtc();
-        return contentRepository.countByCityCountryNameNotIn(overseasCategoryNames);
+        return contentRepository.countOverseasEtcContents(overseasCategoryNames);
     }
 
     public ContentsByRegionCategoryResponse findContentsByRegionCategory(

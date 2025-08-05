@@ -13,12 +13,24 @@ public interface ContentRepository extends JpaRepository<Content, Long> {
     // 국내 카테고리 컨텐츠 수 조회
     int countByCityName(String cityName);
 
-    int countByCityNameNotIn(List<String> cityNames);
+    @Query("""
+                SELECT COUNT(c) FROM Content c
+                JOIN c.city ct
+                JOIN ct.country co
+                WHERE ct.name NOT IN :cityNames AND co.name = '대한민국'
+            """)
+    int countDomesticEtcContents(List<String> cityNames);
 
     // 해외 카테고리 컨텐츠 수 조회
     int countByCityCountryName(@Param("countryName") String countryName);
 
-    int countByCityCountryNameNotIn(@Param("countryNames") List<String> countryNames);
+    @Query("""
+                SELECT COUNT(c) FROM Content c
+                JOIN c.city ct
+                JOIN ct.country co
+                WHERE co.name NOT IN :countryNames AND co.name != '대한민국'
+            """)
+    int countOverseasEtcContents(@Param("countryNames") List<String> countryNames);
 
     // 국내 카테고리
     Slice<Content> findByCityNameOrderByIdDesc(String cityName, Pageable pageable);
