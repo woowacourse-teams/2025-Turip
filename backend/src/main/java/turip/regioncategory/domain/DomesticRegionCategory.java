@@ -1,9 +1,11 @@
 package turip.regioncategory.domain;
 
+import io.micrometer.common.util.StringUtils;
 import java.util.Arrays;
 import java.util.List;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import turip.exception.BadRequestException;
 
 @Getter
 @RequiredArgsConstructor
@@ -22,6 +24,10 @@ public enum DomesticRegionCategory {
     private final String displayName;
 
     public static boolean containsName(String regionCategoryName) {
+        if (StringUtils.isBlank(regionCategoryName)) {
+            throw new BadRequestException("지역 카테고리 명이 빈 값입니다.");
+        }
+
         for (DomesticRegionCategory category : values()) {
             if (regionCategoryName.contains(category.displayName)) {
                 return true;
