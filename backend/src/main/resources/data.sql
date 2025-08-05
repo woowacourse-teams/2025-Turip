@@ -1,62 +1,62 @@
 ALTER TABLE place ALTER COLUMN url VARCHAR(65535);
 
 -- Country
-INSERT INTO country (name) VALUES ('korea');
-INSERT INTO country (name) VALUES ('japan');
-INSERT INTO country (name) VALUES ('taiwan');
+INSERT INTO country (name) VALUES ('대한민국');
+INSERT INTO country (name) VALUES ('일본');
+INSERT INTO country (name) VALUES ('대만');
 
 -- Province
-INSERT INTO province (name) VALUES ('gyeonggi');
-INSERT INTO province (name) VALUES ('gangwon');
-INSERT INTO province (name) VALUES ('chungcheongbuk');
-INSERT INTO province (name) VALUES ('chungcheongnam');
-INSERT INTO province (name) VALUES ('jeollabuk');
-INSERT INTO province (name) VALUES ('jeollanam');
-INSERT INTO province (name) VALUES ('gyeongsangbuk');
-INSERT INTO province (name) VALUES ('gyeongsangnam');
-INSERT INTO province (name) VALUES ('jeju');
+INSERT INTO province (name) VALUES ('경기도');
+INSERT INTO province (name) VALUES ('강원도');
+INSERT INTO province (name) VALUES ('충청북도');
+INSERT INTO province (name) VALUES ('충청남도');
+INSERT INTO province (name) VALUES ('전라북도');
+INSERT INTO province (name) VALUES ('전라남도');
+INSERT INTO province (name) VALUES ('경상북도');
+INSERT INTO province (name) VALUES ('경상남도');
+INSERT INTO province (name) VALUES ('제주특별자치도');
 
 -- City
-INSERT INTO city (name, country_id, province_id) VALUES ('seoul', 1, null);
-INSERT INTO city (name, country_id, province_id) VALUES ('busan', 1, null);
-INSERT INTO city (name, country_id, province_id) VALUES ('daegu', 1, null);
-INSERT INTO city (name, country_id, province_id) VALUES ('incheon', 1, null);
-INSERT INTO city (name, country_id, province_id) VALUES ('gwangju', 1, null);
-INSERT INTO city (name, country_id, province_id) VALUES ('daejeon', 1, null);
-INSERT INTO city (name, country_id, province_id) VALUES ('ulsan', 1, null);
-INSERT INTO city (name, country_id, province_id) VALUES ('sejong', 1, null);
-INSERT INTO city (name, country_id, province_id) VALUES ('suwon', 1, 1);
-INSERT INTO city (name, country_id, province_id) VALUES ('yongin', 1, 1);
-INSERT INTO city (name, country_id, province_id) VALUES ('seongnam', 1, 1);
-INSERT INTO city (name, country_id, province_id) VALUES ('goyang', 1, 1);
-INSERT INTO city (name, country_id, province_id) VALUES ('chuncheon', 1, 2);
-INSERT INTO city (name, country_id, province_id) VALUES ('wonju', 1, 2);
-INSERT INTO city (name, country_id, province_id) VALUES ('gangneung', 1, 2);
-INSERT INTO city (name, country_id, province_id) VALUES ('sokcho', 1, 2);
-INSERT INTO city (name, country_id, province_id) VALUES ('cheongju', 1, 3);
-INSERT INTO city (name, country_id, province_id) VALUES ('chungju', 1, 3);
-INSERT INTO city (name, country_id, province_id) VALUES ('jecheon', 1, 3);
-INSERT INTO city (name, country_id, province_id) VALUES ('cheonan', 1, 4);
-INSERT INTO city (name, country_id, province_id) VALUES ('asan', 1, 4);
-INSERT INTO city (name, country_id, province_id) VALUES ('seosan', 1, 4);
-INSERT INTO city (name, country_id, province_id) VALUES ('jeonju', 1, 5);
-INSERT INTO city (name, country_id, province_id) VALUES ('iksan', 1, 5);
-INSERT INTO city (name, country_id, province_id) VALUES ('gunsan', 1, 5);
-INSERT INTO city (name, country_id, province_id) VALUES ('yeosu', 1, 6);
-INSERT INTO city (name, country_id, province_id) VALUES ('suncheon', 1, 6);
-INSERT INTO city (name, country_id, province_id) VALUES ('mokpo', 1, 6);
-INSERT INTO city (name, country_id, province_id) VALUES ('pohang', 1, 7);
-INSERT INTO city (name, country_id, province_id) VALUES ('gyeongju', 1, 7);
-INSERT INTO city (name, country_id, province_id) VALUES ('gumi', 1, 7);
-INSERT INTO city (name, country_id, province_id) VALUES ('changwon', 1, 8);
-INSERT INTO city (name, country_id, province_id) VALUES ('jinju', 1, 8);
-INSERT INTO city (name, country_id, province_id) VALUES ('gimhae', 1, 8);
-INSERT INTO city (name, country_id, province_id) VALUES ('jeju', 1, 9);
-INSERT INTO city (name, country_id, province_id) VALUES ('seogwipo', 1, 9);
-INSERT INTO city (name, country_id, province_id) VALUES ('tokyo', 2, null);
-INSERT INTO city (name, country_id, province_id) VALUES ('fukuoka', 2, null);
-INSERT INTO city (name, country_id, province_id) VALUES ('kyoto', 2, null);
-INSERT INTO city (name, country_id, province_id) VALUES ('taipei', 3, null);
+INSERT INTO city (name, country_id, province_id) VALUES ('서울', 1, null);
+INSERT INTO city (name, country_id, province_id) VALUES ('부산', 1, null);
+INSERT INTO city (name, country_id, province_id) VALUES ('대구', 1, null);
+INSERT INTO city (name, country_id, province_id) VALUES ('인천', 1, null);
+INSERT INTO city (name, country_id, province_id) VALUES ('광주', 1, null);
+INSERT INTO city (name, country_id, province_id) VALUES ('대전', 1, null);
+INSERT INTO city (name, country_id, province_id) VALUES ('울산', 1, null);
+INSERT INTO city (name, country_id, province_id) VALUES ('세종', 1, null);
+INSERT INTO city (name, country_id, province_id) VALUES ('수원', 1, 1);
+INSERT INTO city (name, country_id, province_id) VALUES ('용인', 1, 1);
+INSERT INTO city (name, country_id, province_id) VALUES ('성남', 1, 1);
+INSERT INTO city (name, country_id, province_id) VALUES ('고양', 1, 1);
+INSERT INTO city (name, country_id, province_id) VALUES ('춘천', 1, 2);
+INSERT INTO city (name, country_id, province_id) VALUES ('원주', 1, 2);
+INSERT INTO city (name, country_id, province_id) VALUES ('강릉', 1, 2);
+INSERT INTO city (name, country_id, province_id) VALUES ('속초', 1, 2);
+INSERT INTO city (name, country_id, province_id) VALUES ('청주', 1, 3);
+INSERT INTO city (name, country_id, province_id) VALUES ('충주', 1, 3);
+INSERT INTO city (name, country_id, province_id) VALUES ('제천', 1, 3);
+INSERT INTO city (name, country_id, province_id) VALUES ('천안', 1, 4);
+INSERT INTO city (name, country_id, province_id) VALUES ('아산', 1, 4);
+INSERT INTO city (name, country_id, province_id) VALUES ('서산', 1, 4);
+INSERT INTO city (name, country_id, province_id) VALUES ('전주', 1, 5);
+INSERT INTO city (name, country_id, province_id) VALUES ('익산', 1, 5);
+INSERT INTO city (name, country_id, province_id) VALUES ('군산', 1, 5);
+INSERT INTO city (name, country_id, province_id) VALUES ('여수', 1, 6);
+INSERT INTO city (name, country_id, province_id) VALUES ('순천', 1, 6);
+INSERT INTO city (name, country_id, province_id) VALUES ('목포', 1, 6);
+INSERT INTO city (name, country_id, province_id) VALUES ('포항', 1, 7);
+INSERT INTO city (name, country_id, province_id) VALUES ('경주', 1, 7);
+INSERT INTO city (name, country_id, province_id) VALUES ('구미', 1, 7);
+INSERT INTO city (name, country_id, province_id) VALUES ('창원', 1, 8);
+INSERT INTO city (name, country_id, province_id) VALUES ('진주', 1, 8);
+INSERT INTO city (name, country_id, province_id) VALUES ('김해', 1, 8);
+INSERT INTO city (name, country_id, province_id) VALUES ('제주', 1, 9);
+INSERT INTO city (name, country_id, province_id) VALUES ('서귀포', 1, 9);
+INSERT INTO city (name, country_id, province_id) VALUES ('도쿄', 2, null);
+INSERT INTO city (name, country_id, province_id) VALUES ('후쿠오카', 2, null);
+INSERT INTO city (name, country_id, province_id) VALUES ('교토', 2, null);
+INSERT INTO city (name, country_id, province_id) VALUES ('타이페이', 3, null);
 
 -- Category
 INSERT INTO category (name)
@@ -87,7 +87,7 @@ SELECT '여코남 - 여행코스짜주는남자', 'https://yt3.googleusercontent
 -- 연수연
 INSERT INTO content (creator_id, city_id, title, url, uploaded_date)
 SELECT (SELECT id FROM creator WHERE channel_name = '연수연'),
-       (SELECT id FROM city WHERE name = 'busan'),
+       (SELECT id FROM city WHERE name = '부산'),
        '나혼자 기차 타고 부산 여행 vlog 🌊 | 당일치기 쌉가능한 여행코스 💌 , 200% 만족한 광안리 숙소 🏠, 부산 토박이의 단골집 추천까지,,💛 | 3박4일 부산 브이로그',
        'https://www.youtube.com/watch?v=U7vwpgZlD6Q',
        '2025-07-01';
@@ -95,7 +95,7 @@ SELECT (SELECT id FROM creator WHERE channel_name = '연수연'),
 -- 하찬투어
 INSERT INTO content (creator_id, city_id, title, url, uploaded_date)
 SELECT (SELECT id FROM creator WHERE channel_name = '하찬투어 hachantour'),
-       (SELECT id FROM city WHERE name = 'busan'),
+       (SELECT id FROM city WHERE name = '부산'),
        '동선낭비없는 부산 3박4일 코스 대마도 당일치기 꿀팁 반드시 가봐야 할 여행지 국내 단 하나뿐인 스카이캡슐 오륙도해맞이공원 흰여울문화마을 감천문화마을 해동용궁사 송도케이블카',
        'https://www.youtube.com/watch?v=1he5ed8Y5TA',
        '2025-07-10';
