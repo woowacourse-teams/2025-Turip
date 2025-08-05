@@ -76,6 +76,9 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         binding.etSearchResult.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 viewModel.updateByKeyword()
+                val inputMethodManager =
+                    getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                inputMethodManager.hideSoftInputFromWindow(binding.etSearchResult.windowToken, 0)
                 true
             } else {
                 false
