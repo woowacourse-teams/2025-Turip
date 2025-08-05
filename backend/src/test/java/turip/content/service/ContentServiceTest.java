@@ -1,6 +1,7 @@
 package turip.content.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 
 import java.util.List;
@@ -20,6 +21,7 @@ import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
 import turip.country.domain.Country;
 import turip.creator.domain.Creator;
+import turip.exception.custom.BadRequestException;
 import turip.regioncategory.domain.DomesticRegionCategory;
 import turip.regioncategory.domain.OverseasRegionCategory;
 import turip.tripcourse.service.TripCourseService;
@@ -135,6 +137,17 @@ class ContentServiceTest {
 
             // then
             assertThat(response.count()).isEqualTo(expectedCount);
+        }
+
+        @DisplayName("지역 카테고리가 올바르지 않은 경우 BadRequest를 발생시킨다.")
+        @Test
+        void countByRegionCategory_withWrongCategory_throwsNotFoundException() {
+            // given
+            String regionCategory = "아라키스";
+
+            // when & then
+            assertThatThrownBy(() -> contentService.countByRegionCategory(regionCategory))
+                    .isInstanceOf(BadRequestException.class);
         }
     }
 }
