@@ -17,7 +17,7 @@ import turip.regioncategory.domain.OverseasRegionCategory;
 @RequiredArgsConstructor
 public class RegionCategoryService {
 
-    private static final String KOREA_COUNTRY_NAME = "한국";
+    private static final String KOREA_COUNTRY_NAME = "대한민국";
     private static final String DOMESTIC_ETC_NAME = "국내 기타";
     private static final String OVERSEAS_ETC_NAME = "해외 기타";
     private static final String DOMESTIC_ETC_IMAGE_URL = "https://example.com/default-image.jpg";

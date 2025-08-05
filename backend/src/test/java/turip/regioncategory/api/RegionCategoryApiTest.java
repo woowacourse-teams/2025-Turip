@@ -48,7 +48,8 @@ class RegionCategoryApiTest {
         @Test
         void getRegionCategoriesByCountryType_withIsKoreaTrue_returnsDomesticCategories() {
             // given
-            jdbcTemplate.update("INSERT INTO country (name, image_url) VALUES ('한국', 'https://example.com/korea.jpg')");
+            jdbcTemplate.update(
+                    "INSERT INTO country (name, image_url) VALUES ('대한민국', 'https://example.com/korea.jpg')");
             jdbcTemplate.update(
                     "INSERT INTO city (name, country_id, image_url) VALUES ('서울', 1, 'https://example.com/seoul.jpg')");
             jdbcTemplate.update(

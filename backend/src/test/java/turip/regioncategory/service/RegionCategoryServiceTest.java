@@ -39,7 +39,7 @@ class RegionCategoryServiceTest {
         List<City> cities = List.of(seoul, busan);
 
         Country korea = mock(Country.class);
-        given(korea.getName()).willReturn("한국");
+        given(korea.getName()).willReturn("대한민국");
         given(korea.getImageUrl()).willReturn("https://example.com/korea.jpg");
 
         given(seoul.getName()).willReturn("서울");
@@ -77,7 +77,7 @@ class RegionCategoryServiceTest {
         given(china.getName()).willReturn("중국");
         given(china.getImageUrl()).willReturn("https://example.com/china.jpg");
 
-        given(countryService.getOverseasCountries())
+        given(countryService.findOverseasCountries())
                 .willReturn(countries);
 
         // when
@@ -123,7 +123,7 @@ class RegionCategoryServiceTest {
         lenient().when(unsupportedCountry.getName()).thenReturn("지원하지않는국가");
         lenient().when(unsupportedCountry.getImageUrl()).thenReturn("https://example.com/unsupported.jpg");
 
-        given(countryService.getOverseasCountries())
+        given(countryService.findOverseasCountries())
                 .willReturn(countries);
 
         // when

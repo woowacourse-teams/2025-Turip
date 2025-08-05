@@ -10,7 +10,7 @@ import turip.country.repository.CountryRepository;
 @RequiredArgsConstructor
 public class CountryService {
 
-    public static final String KOREA_COUNTRY_NAME = "한국";
+    public static final String KOREA_COUNTRY_NAME = "대한민국";
 
     private final CountryRepository countryRepository;
 
