@@ -22,7 +22,7 @@ object DataSourceModule {
         DefaultTripRemoteDataSource(NetworkModule.tripService)
     }
     val userStorageLocalDataSource: UserStorageLocalDataSource by lazy {
-        DefaultUserStorageLocalDataSource(ApplicationContextProvider.applicationContext)
+        DefaultUserStorageLocalDataSource(LocalStorageModule.userStorage)
     }
     val favoriteRemoteDataSource: FavoriteRemoteDataSource by lazy {
         DefaultFavoriteRemoteDataSource(NetworkModule.favoriteService)
