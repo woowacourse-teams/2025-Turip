@@ -52,6 +52,7 @@ class SearchViewHolder(
                 videoInformationModel.content.videoData.url,
             ),
         )
+        binding.tvResultRegionName.text = videoInformationModel.content.city.name
     }
 
     companion object {
