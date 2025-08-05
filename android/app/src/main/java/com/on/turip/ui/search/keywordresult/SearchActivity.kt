@@ -47,6 +47,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         setupObserves()
         binding.etSearchResult.requestFocus()
         binding.rvSearchResult.adapter = searchAdapter
+        binding.rvSearchResult.itemAnimator = null
     }
 
     private fun setupToolbar() {
@@ -98,6 +99,10 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         viewModel.searchResultCount.observe(this) { searchResultCount: Int ->
             binding.tvSearchResultCount.text =
                 getString(R.string.search_result_exist_result, searchResultCount)
+        }
+        viewModel.loading.observe(this) { loading: Boolean ->
+            binding.pbSearchResult.visibility =
+                if (loading) View.VISIBLE else View.GONE
         }
     }
 
