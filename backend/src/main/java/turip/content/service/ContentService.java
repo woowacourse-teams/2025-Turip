@@ -37,6 +37,50 @@ public class ContentService {
         return ContentCountResponse.from(count);
     }
 
+    public ContentsByRegionCategoryResponse findContentsByRegionCategory(
+            String regionCategory,
+            int size,
+            long lastId
+    ) {
+        Slice<Content> contentSlice = findContentSlicesByRegionCategory(regionCategory, lastId, size);
+
+        List<Content> contents = contentSlice.getContent();
+        List<ContentDetailsByRegionCategoryResponse> contentDetails
+                = convertContentsToContentDetailsByRegionResponses(contents);
+        boolean loadable = contentSlice.hasNext();
+
+        return ContentsByRegionCategoryResponse.of(contentDetails, loadable, regionCategory);
+    }
+
+    public ContentCountResponse countByKeyword(String keyword) {
+        int count = contentRepository.countByKeywordContaining(keyword);
+        return ContentCountResponse.from(count);
+    }
+
+    public ContentSearchResponse searchContentsByKeyword(
+            String keyword,
+            int pageSize,
+            long lastContentId
+    ) {
+        if (lastContentId == 0) {
+            lastContentId = Long.MAX_VALUE;
+        }
+        Slice<Content> contents = contentRepository.findByKeywordContaining(keyword, lastContentId,
+                PageRequest.of(0, pageSize));
+        boolean loadable = contents.hasNext();
+
+        List<ContentSearchResultResponse> contentSearchResultResponses = convertContentsToContentSearchResultResponse(
+                contents);
+
+        return ContentSearchResponse.of(contentSearchResultResponses, loadable);
+    }
+
+    public ContentResponse getById(Long id) {
+        Content content = contentRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("컨텐츠를 찾을 수 없습니다."));
+        return ContentResponse.from(content);
+    }
+
     private int calculateCountByRegionCategory(String regionCategory) {
         if (OTHER_DOMESTIC.matchesDisplayName(regionCategory)) {
             return calculateDomesticEtcCount();
@@ -61,21 +105,6 @@ public class ContentService {
     private int calculateOverseasEtcCount() {
         List<String> overseasCategoryNames = OverseasRegionCategory.getDisplayNamesExcludingEtc();
         return contentRepository.countOverseasEtcContents(overseasCategoryNames);
-    }
-
-    public ContentsByRegionCategoryResponse findContentsByRegionCategory(
-            String regionCategory,
-            int size,
-            long lastId
-    ) {
-        Slice<Content> contentSlice = findContentSlicesByRegionCategory(regionCategory, lastId, size);
-
-        List<Content> contents = contentSlice.getContent();
-        List<ContentDetailsByRegionCategoryResponse> contentDetails
-                = convertContentsToContentDetailsByRegionResponses(contents);
-        boolean loadable = contentSlice.hasNext();
-
-        return ContentsByRegionCategoryResponse.of(contentDetails, loadable, regionCategory);
     }
 
     private Slice<Content> findContentSlicesByRegionCategory(
@@ -150,29 +179,6 @@ public class ContentService {
         return ContentDetailsByRegionCategoryResponse.of(contentWithCity, tripDuration, tripPlaceCount);
     }
 
-    public ContentCountResponse countByKeyword(String keyword) {
-        int count = contentRepository.countByKeywordContaining(keyword);
-        return ContentCountResponse.from(count);
-    }
-
-    public ContentSearchResponse searchContentsByKeyword(
-            String keyword,
-            int pageSize,
-            long lastContentId
-    ) {
-        if (lastContentId == 0) {
-            lastContentId = Long.MAX_VALUE;
-        }
-        Slice<Content> contents = contentRepository.findByKeywordContaining(keyword, lastContentId,
-                PageRequest.of(0, pageSize));
-        boolean loadable = contents.hasNext();
-
-        List<ContentSearchResultResponse> contentSearchResultResponses = convertContentsToContentSearchResultResponse(
-                contents);
-
-        return ContentSearchResponse.of(contentSearchResultResponses, loadable);
-    }
-
     private List<ContentSearchResultResponse> convertContentsToContentSearchResultResponse(Slice<Content> contents) {
         return contents.stream()
                 .map(this::toContentSearchResultResponse)
@@ -192,11 +198,5 @@ public class ContentService {
     private TripDurationResponse calculateTripDuration(Content content) {
         int totalTripDay = tripCourseService.calculateDurationDays(content.getId());
         return TripDurationResponse.of(totalTripDay - 1, totalTripDay);
-    }
-
-    public ContentResponse getById(Long id) {
-        Content content = contentRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("컨텐츠를 찾을 수 없습니다."));
-        return ContentResponse.from(content);
     }
 }
