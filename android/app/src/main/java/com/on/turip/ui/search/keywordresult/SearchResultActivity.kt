@@ -4,10 +4,12 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
+import android.text.Editable
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
@@ -16,6 +18,10 @@ import com.on.turip.databinding.ActivitySearchResultBinding
 import com.on.turip.ui.common.base.BaseActivity
 
 class SearchResultActivity : BaseActivity<ActivitySearchResultBinding>() {
+    private val viewModel: SearchResultViewModel by viewModels {
+        SearchResultViewModel.provideFactory()
+    }
+
     override val binding: ActivitySearchResultBinding by lazy {
         ActivitySearchResultBinding.inflate(layoutInflater)
     }
@@ -24,6 +30,7 @@ class SearchResultActivity : BaseActivity<ActivitySearchResultBinding>() {
         super.onCreate(savedInstanceState)
         setupToolbar()
         setupListeners()
+        setupObserves()
         binding.etSearchResult.requestFocus()
     }
 
@@ -48,11 +55,17 @@ class SearchResultActivity : BaseActivity<ActivitySearchResultBinding>() {
     }
 
     private fun setupListeners() {
-        binding.etSearchResult.addTextChangedListener {
-            binding.ivSearchResultClear.isVisible = it?.isNotBlank() == true
+        binding.etSearchResult.addTextChangedListener { editable: Editable? ->
+            viewModel.updateSearchingWord(editable)
         }
         binding.ivSearchResultClear.setOnClickListener {
             binding.etSearchResult.text.clear()
+        }
+    }
+
+    private fun setupObserves() {
+        viewModel.searchingWord.observe(this) { words: String ->
+            binding.ivSearchResultClear.isVisible = words.isNotBlank() == true
         }
     }
 
