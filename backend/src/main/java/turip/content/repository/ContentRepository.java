@@ -16,8 +16,7 @@ public interface ContentRepository extends JpaRepository<Content, Long> {
 
     List<Content> findByCityNameOrderByIdDesc(String provinceName, Pageable pageable);
 
-    @Query("SELECT COUNT(c) FROM Content c JOIN c.city.country co WHERE co.name = :countryName")
-    int countByCountryName(@Param("countryName") String countryName);
+    int countByCityCountryName(@Param("countryName") String countryName);
 
     int countByCityNameNotIn(List<String> cityNames);
 

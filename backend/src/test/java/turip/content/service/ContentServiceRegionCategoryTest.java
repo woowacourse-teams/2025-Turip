@@ -46,7 +46,7 @@ class ContentServiceRegionCategoryTest {
         // given
         String regionCategory = "일본";
         int expectedCount = 3;
-        given(contentRepository.countByCountryName(regionCategory))
+        given(contentRepository.countByCityCountryName(regionCategory))
                 .willReturn(expectedCount);
 
         // when

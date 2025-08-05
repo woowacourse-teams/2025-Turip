@@ -49,7 +49,7 @@ public class ContentService {
             return contentRepository.countByCityName(regionCategory);
         }
 
-        return contentRepository.countByCountryName(regionCategory);
+        return contentRepository.countByCityCountryName(regionCategory);
     }
 
     private int calculateDomesticEtcCount() {
