@@ -8,6 +8,7 @@ import android.text.Editable
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.activity.viewModels
@@ -16,6 +17,8 @@ import androidx.core.widget.addTextChangedListener
 import com.on.turip.R
 import com.on.turip.databinding.ActivitySearchResultBinding
 import com.on.turip.ui.common.base.BaseActivity
+import com.on.turip.ui.search.model.VideoInformationModel
+import com.on.turip.ui.trip.detail.TripDetailActivity
 
 class SearchResultActivity : BaseActivity<ActivitySearchResultBinding>() {
     private val viewModel: SearchResultViewModel by viewModels {
@@ -26,12 +29,24 @@ class SearchResultActivity : BaseActivity<ActivitySearchResultBinding>() {
         ActivitySearchResultBinding.inflate(layoutInflater)
     }
 
+    private val searchAdapter: SearchAdapter =
+        SearchAdapter { contentId: Long?, creatorId: Long? ->
+            val intent: Intent =
+                TripDetailActivity.newIntent(
+                    context = this,
+                    contentId = contentId ?: 0,
+                    creatorId = creatorId ?: 0,
+                )
+            startActivity(intent)
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setupToolbar()
         setupListeners()
         setupObserves()
         binding.etSearchResult.requestFocus()
+        binding.rvSearchResult.adapter = searchAdapter
     }
 
     private fun setupToolbar() {
@@ -58,6 +73,15 @@ class SearchResultActivity : BaseActivity<ActivitySearchResultBinding>() {
         binding.etSearchResult.addTextChangedListener { editable: Editable? ->
             viewModel.updateSearchingWord(editable)
         }
+        binding.etSearchResult.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                viewModel.updateByKeyword()
+                true
+            } else {
+                false
+            }
+        }
+
         binding.ivSearchResultClear.setOnClickListener {
             binding.etSearchResult.text.clear()
         }
@@ -67,6 +91,9 @@ class SearchResultActivity : BaseActivity<ActivitySearchResultBinding>() {
         viewModel.searchingWord.observe(this) { words: String ->
             binding.ivSearchResultClear.visibility =
                 if (words.isNotBlank()) View.VISIBLE else View.GONE
+        }
+        viewModel.videoInformation.observe(this) { videoInformationModels: List<VideoInformationModel> ->
+            searchAdapter.submitList(videoInformationModels)
         }
     }
 
