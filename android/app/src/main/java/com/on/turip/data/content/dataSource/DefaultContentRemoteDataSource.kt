@@ -17,7 +17,7 @@ class DefaultContentRemoteDataSource(
             runCatching { contentService.getContentsCount(region) }
         }
 
-    override suspend fun getContents(
+    override suspend fun getContentsByRegion(
         region: String,
         size: Int,
         lastId: Long,
@@ -26,6 +26,21 @@ class DefaultContentRemoteDataSource(
             runCatching {
                 contentService.getContentsInformationByRegion(
                     region = region,
+                    size = size,
+                    lastId = lastId,
+                )
+            }
+        }
+
+    override suspend fun getContentsByKeyword(
+        keyword: String,
+        size: Int,
+        lastId: Long,
+    ): Result<ContentsInformationResponse> =
+        withContext(coroutineContext) {
+            runCatching {
+                contentService.getContentsInformationByKeyword(
+                    keyword = keyword,
                     size = size,
                     lastId = lastId,
                 )

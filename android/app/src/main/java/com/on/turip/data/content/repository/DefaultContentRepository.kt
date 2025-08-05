@@ -14,13 +14,22 @@ class DefaultContentRepository(
             .getContentsSize(region)
             .mapCatching { it.count }
 
-    override suspend fun loadContents(
+    override suspend fun loadContentsByRegion(
         region: String,
         size: Int,
         lastId: Long,
     ): Result<PagedContentsResult> =
         contentRemoteDataSource
-            .getContents(region, size, lastId)
+            .getContentsByRegion(region, size, lastId)
+            .mapCatching { it.toDomain() }
+
+    override suspend fun loadContentsByKeyword(
+        keyword: String,
+        size: Int,
+        lastId: Long,
+    ): Result<PagedContentsResult> =
+        contentRemoteDataSource
+            .getContentsByKeyword(keyword, size, lastId)
             .mapCatching { it.toDomain() }
 
     override suspend fun loadContent(contentId: Long): Result<VideoData> =

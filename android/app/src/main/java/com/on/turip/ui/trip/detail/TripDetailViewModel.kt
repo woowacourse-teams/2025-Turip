@@ -67,6 +67,7 @@ class TripDetailViewModel(
                                             id = contentId,
                                             creator = creator,
                                             videoData = videoData,
+                                            city = "TODO 여기에 지역 받아와서 연결",
                                         ),
                                 )
                             _videoUri.value = videoData.url

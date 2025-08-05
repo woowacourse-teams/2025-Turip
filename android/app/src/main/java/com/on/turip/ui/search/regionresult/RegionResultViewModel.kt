@@ -34,7 +34,7 @@ class RegionResultViewModel(
         viewModelScope.launch {
             val pagedContentsResult: Deferred<Result<PagedContentsResult>> =
                 async {
-                    contentRepository.loadContents(
+                    contentRepository.loadContentsByRegion(
                         region = region,
                         size = 100,
                         lastId = 0L,

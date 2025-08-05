@@ -40,6 +40,7 @@ fun ContentResponse.toDomain(): Content =
                 url = url,
                 uploadedDate = uploadedDate,
             ),
+        city = city,
     )
 
 fun TripDurationInformationResponse.toDomain(): TripDuration =

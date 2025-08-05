@@ -20,6 +20,13 @@ interface ContentService {
         @Query("lastId") lastId: Long,
     ): ContentsInformationResponse
 
+    @GET("contents")
+    suspend fun getContentsInformationByKeyword(
+        @Query("keyword") keyword: String,
+        @Query("size") size: Int,
+        @Query("lastId") lastId: Long,
+    ): ContentsInformationResponse
+
     @GET("contents/{contentId}")
     suspend fun getContentDetail(
         @Path("contentId") contentId: Long,
