@@ -34,4 +34,11 @@ public class City {
     private String name;
 
     private String imageUrl;
+
+    public City(Country country, Province province, String name, String imageUrl) {
+        this.country = country;
+        this.province = province;
+        this.name = name;
+        this.imageUrl = imageUrl;
+    }
 }

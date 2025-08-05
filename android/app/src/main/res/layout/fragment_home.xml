@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ui.main.home.HomeFragment">
 
     <ImageView
-        android:id="@+id/iv_main_logo"
+        android:id="@+id/iv_home_logo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
@@ -17,69 +17,98 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <ImageView
+        android:id="@+id/iv_home_search"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@null"
+        android:src="@drawable/ic_search"
+        app:layout_constraintTop_toTopOf="@id/iv_home_logo"
+        app:layout_constraintBottom_toBottomOf="@id/iv_home_logo"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="14dp" />
+
     <TextView
         android:id="@+id/tv_home_where_should_we_go_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
-        android:text="@string/main_where_should_we_go_title"
+        android:text="@string/home_where_should_we_go_title"
         android:textAppearance="@style/display"
         android:textColor="@color/gray_500_1e1e1e"
-        app:layout_constraintStart_toStartOf="@id/iv_main_logo"
-        app:layout_constraintTop_toBottomOf="@id/iv_main_logo" />
+        app:layout_constraintStart_toStartOf="@id/iv_home_logo"
+        app:layout_constraintTop_toBottomOf="@id/iv_home_logo" />
 
     <TextView
-        android:id="@+id/tv_home_searching_metropolitan_city"
+        android:id="@+id/tv_home_domestic_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="28dp"
-        android:text="@string/main_searching_metropolitan_city"
-        android:textAppearance="@style/title1"
-        android:textColor="@color/gray_400_2b2b2b"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/btn_region_filter"
+        android:enabled="true"
+        android:paddingHorizontal="24dp"
+        android:paddingVertical="8dp"
+        android:text="@string/home_domestic"
+        android:textAppearance="@style/title3"
+        android:textColor="@color/pure_white_ffffff"
         app:layout_constraintStart_toStartOf="@id/tv_home_where_should_we_go_title"
         app:layout_constraintTop_toBottomOf="@id/tv_home_where_should_we_go_title" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_home_metropolitan_city"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
-        android:clipToPadding="false"
-        android:orientation="horizontal"
-        android:paddingVertical="20dp"
-        android:paddingStart="20dp"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_home_searching_metropolitan_city"
-        tools:listitem="@layout/item_searching_region"
-        tools:ignore="RtlSymmetry" />
-
     <TextView
-        android:id="@+id/tv_home_searching_province"
+        android:id="@+id/tv_home_abroad_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
-        android:text="@string/main_searching_province"
-        android:textAppearance="@style/title1"
-        android:textColor="@color/gray_400_2b2b2b"
-        app:layout_constraintStart_toStartOf="@id/tv_home_searching_metropolitan_city"
-        app:layout_constraintTop_toBottomOf="@id/rv_home_metropolitan_city" />
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/btn_region_filter"
+        android:enabled="false"
+        android:paddingHorizontal="24dp"
+        android:paddingVertical="8dp"
+        android:text="@string/home_abroad"
+        android:textAppearance="@style/title3"
+        android:textColor="@color/pure_white_ffffff"
+        app:layout_constraintStart_toEndOf="@id/tv_home_domestic_button"
+        app:layout_constraintTop_toBottomOf="@id/tv_home_where_should_we_go_title" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_home_province"
+        android:id="@+id/rv_home_region"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
+        android:layout_marginTop="26dp"
         android:clipToPadding="false"
         android:orientation="horizontal"
-        android:paddingVertical="20dp"
         android:paddingStart="20dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_home_searching_province"
+        app:layout_constraintTop_toBottomOf="@id/tv_home_domestic_button"
         tools:ignore="RtlSymmetry"
-        tools:listitem="@layout/item_searching_region" />
+        tools:listitem="@layout/item_region" />
+
+    <TextView
+        android:id="@+id/tv_home_users_like_content_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="@string/home_users_like_content_title"
+        android:textAppearance="@style/title1"
+        android:textColor="@color/gray_400_2b2b2b"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/tv_home_domestic_button"
+        app:layout_constraintTop_toBottomOf="@id/rv_home_region" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_users_like_content"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        android:orientation="horizontal"
+        android:paddingStart="20dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_home_users_like_content_title"
+        tools:ignore="RtlSymmetry"
+        tools:listitem="@layout/item_users_like_content" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

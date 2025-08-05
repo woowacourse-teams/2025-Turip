@@ -1,5 +1,8 @@
 package turip.content.service;
 
+import static turip.regioncategory.domain.DomesticRegionCategory.OTHER_DOMESTIC;
+import static turip.regioncategory.domain.OverseasRegionCategory.OTHER_OVERSEAS;
+
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -8,8 +11,13 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import turip.content.controller.dto.response.ContentByCityResponse;
 import turip.content.controller.dto.response.ContentCountResponse;
-import turip.content.controller.dto.response.ContentDetailsByRegionCategoryResponse;
+import turip.content.controller.dto.response.ContentDetailsByCityResponse;
 import turip.content.controller.dto.response.ContentResponse;
+import turip.content.controller.dto.response.ContentSearchResponse;
+import turip.content.controller.dto.response.ContentSearchResultResponse;
+import turip.content.controller.dto.response.ContentWithCreatorAndCityResponse;
+import turip.content.controller.dto.response.ContentWithoutCityResponse;
+import turip.content.controller.dto.response.ContentsByCityResponse;
 import turip.content.controller.dto.response.ContentsByRegionCategoryResponse;
 import turip.content.controller.dto.response.TripDurationResponse;
 import turip.content.domain.Content;
@@ -26,8 +34,8 @@ public class ContentService {
     private final ContentRepository contentRepository;
     private final TripCourseService tripCourseService;
 
-    public ContentCountResponse countByCityName(String cityName) {
-        int count = contentRepository.countByCityName(cityName);
+    public ContentCountResponse countByRegionCategory(String regionCategory) {
+        int count = calculateCountByRegionCategory(regionCategory);
         return ContentCountResponse.from(count);
     }
 
@@ -50,6 +58,61 @@ public class ContentService {
         Content content = contentRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("컨텐츠를 찾을 수 없습니다."));
         return ContentResponse.from(content);
+    }
+
+    public ContentCountResponse countByKeyword(String keyword) {
+        int count = contentRepository.countByKeywordContaining(keyword);
+        return ContentCountResponse.from(count);
+    }
+
+    public ContentSearchResponse searchContentsByKeyword(
+            String keyword,
+            int pageSize,
+            long lastContentId
+    ) {
+        if (lastContentId == 0) {
+            lastContentId = Long.MAX_VALUE;
+        }
+        Slice<Content> contents = contentRepository.findByKeywordContaining(keyword, lastContentId,
+                PageRequest.of(0, pageSize));
+        boolean loadable = contents.hasNext();
+
+        List<ContentSearchResultResponse> contentSearchResultResponses = convertContentsToContentSearchResultResponse(
+                contents);
+
+        return ContentSearchResponse.of(contentSearchResultResponses, loadable);
+    }
+
+    public ContentResponse getById(Long id) {
+        Content content = contentRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("컨텐츠를 찾을 수 없습니다."));
+        return ContentResponse.from(content);
+    }
+
+    private int calculateCountByRegionCategory(String regionCategory) {
+        if (OTHER_DOMESTIC.matchesDisplayName(regionCategory)) {
+            return calculateDomesticEtcCount();
+        }
+
+        if (OTHER_OVERSEAS.matchesDisplayName(regionCategory)) {
+            return calculateOverseasEtcCount();
+        }
+
+        if (DomesticRegionCategory.containsName(regionCategory)) {
+            return contentRepository.countByCityName(regionCategory);
+        }
+
+        return contentRepository.countByCityCountryName(regionCategory);
+    }
+
+    private int calculateDomesticEtcCount() {
+        List<String> domesticCategoryNames = DomesticRegionCategory.getDisplayNamesExcludingEtc();
+        return contentRepository.countByCityNameNotIn(domesticCategoryNames);
+    }
+
+    private int calculateOverseasEtcCount() {
+        List<String> overseasCategoryNames = OverseasRegionCategory.getDisplayNamesExcludingEtc();
+        return contentRepository.countByCountryNameNotIn(overseasCategoryNames);
     }
 
     private Slice<Content> findContentSlicesByRegionCategory(
@@ -116,12 +179,28 @@ public class ContentService {
                 .toList();
     }
 
+    private List<ContentSearchResultResponse> convertContentsToContentSearchResultResponse(Slice<Content> contents) {
+        return contents.stream()
+                .map(this::toContentSearchResultResponse)
+                .toList();
+    }
+
     private ContentDetailsByRegionCategoryResponse toContentDetailsByRegionResponse(Content content) {
         ContentByCityResponse contentWithCity = ContentByCityResponse.from(content);
         TripDurationResponse tripDuration = calculateTripDuration(content);
         int tripPlaceCount = tripCourseService.countByContentId(content.getId());
 
         return ContentDetailsByRegionCategoryResponse.of(contentWithCity, tripDuration, tripPlaceCount);
+    }
+
+    private ContentSearchResultResponse toContentSearchResultResponse(Content content) {
+        int placeCount = tripCourseService.countByContentId(content.getId());
+
+        return ContentSearchResultResponse.of(
+                ContentWithCreatorAndCityResponse.from(content),
+                calculateTripDuration(content),
+                placeCount
+        );
     }
 
     private TripDurationResponse calculateTripDuration(Content content) {

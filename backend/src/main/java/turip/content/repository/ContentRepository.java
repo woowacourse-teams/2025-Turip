@@ -27,6 +27,7 @@ public interface ContentRepository extends JpaRepository<Content, Long> {
     Slice<Content> findDomesticEtcContents(@Param("domesticCategoryNames") List<String> domesticCategoryNames,
                                            Pageable pageable);
 
+
     @Query("SELECT c FROM Content c JOIN c.city ct JOIN ct.country co " +
             "WHERE ct.name NOT IN :domesticCategoryNames AND co.name = '한국' AND c.id < :lastId " +
             "ORDER BY c.id DESC")
@@ -44,5 +45,28 @@ public interface ContentRepository extends JpaRepository<Content, Long> {
             "WHERE co.name NOT IN :overseasCategoryNames AND co.name != '한국' AND c.id < :lastId " +
             "ORDER BY c.id DESC")
     Slice<Content> findOverseasEtcContentsWithLastId(@Param("overseasCategoryNames") List<String> overseasCategoryNames,
-                                                     @Param("lastId") Long lastId, Pageable pageable);
+
+
+                                                     int countByCityCountryName(@Param("countryName") String countryName);
+
+    int countByCityNameNotIn(List<String> cityNames);
+
+    @Query("SELECT COUNT(c) FROM Content c JOIN c.city.country co WHERE co.name NOT IN :countryNames")
+    int countByCountryNameNotIn(@Param("countryNames") List<String> countryNames);
+
+    @Query("""
+                SELECT count(c) FROM Content c
+                JOIN c.creator cr
+                WHERE c.title LIKE %:keyword% OR cr.channelName LIKE %:keyword%
+            """)
+    int countByKeywordContaining(String keyword);
+
+    @Query("""
+                SELECT c FROM Content c
+                JOIN c.creator cr
+                WHERE c.id < :lastId
+                AND (c.title LIKE %:keyword% OR cr.channelName LIKE %:keyword%)
+                ORDER BY c.id DESC
+            """)
+    Slice<Content> findByKeywordContaining(String keyword, Long lastId, Pageable pageable);
 }

@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import turip.content.controller.dto.response.ContentCountResponse;
 import turip.content.controller.dto.response.ContentResponse;
+import turip.content.controller.dto.response.ContentSearchResponse;
+import turip.content.controller.dto.response.ContentsByCityResponse;
 import turip.content.controller.dto.response.ContentsByRegionCategoryResponse;
 import turip.content.service.ContentService;
 
@@ -19,21 +21,37 @@ public class ContentController {
 
     private final ContentService contentService;
 
-    @GetMapping("/count")
-    public ResponseEntity<ContentCountResponse> readCountByCityName(
-            @RequestParam(name = "cityName") String cityName) {
-        ContentCountResponse response = contentService.countByCityName(cityName);
+    @GetMapping(value = "/count", params = "regionCategory")
+    public ResponseEntity<ContentCountResponse> readCountByRegionCategory(
+            @RequestParam(name = "regionCategory") String regionCategory) {
+        ContentCountResponse response = contentService.countByRegionCategory(regionCategory);
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping()
+    @GetMapping(params = "regionCategory")
     public ResponseEntity<ContentsByRegionCategoryResponse> readContentsByRegionCategory(
             @RequestParam(name = "regionCategory") String regionCategory,
             @RequestParam(name = "size") Integer pageSize,
             @RequestParam(name = "lastId") Long lastContentId
     ) {
-        ContentsByRegionCategoryResponse response
-                = contentService.getContentsByRegionCategory(regionCategory, pageSize, lastContentId);
+        ContentsByRegionCategoryResponse response = contentService.findContentsByCityName(regionCategory, pageSize, lastContentId);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping(value = "/count", params = "keyword")
+    public ResponseEntity<ContentCountResponse> readCountByKeyword(
+            @RequestParam(name = "keyword") String keyword) {
+        ContentCountResponse response = contentService.countByKeyword(keyword);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping(params = "keyword")
+    public ResponseEntity<ContentSearchResponse> readContentsByKeyword(
+            @RequestParam(name = "keyword") String keyword,
+            @RequestParam(name = "size") Integer pageSize,
+            @RequestParam(name = "lastId") Long lastContentId
+    ) {
+        ContentSearchResponse response = contentService.searchContentsByKeyword(keyword, pageSize, lastContentId);
         return ResponseEntity.ok(response);
     }
 
