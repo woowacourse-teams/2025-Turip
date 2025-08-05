@@ -109,7 +109,7 @@ class RegionCategoryServiceTest {
 
         // then
         assertThat(response.regionCategories()).hasSize(1);
-        assertThat(response.regionCategories().get(0).name()).isEqualTo("국내 기타");
+        assertThat(response.regionCategories().getFirst().name()).isEqualTo("국내 기타");
     }
 
     @DisplayName("지원하지 않는 국가명은 필터링되어 기타 카테고리만 반환된다")
@@ -123,14 +123,13 @@ class RegionCategoryServiceTest {
         lenient().when(unsupportedCountry.getName()).thenReturn("지원하지않는국가");
         lenient().when(unsupportedCountry.getImageUrl()).thenReturn("https://example.com/unsupported.jpg");
 
-        given(countryService.findOverseasCountries())
-                .willReturn(countries);
+        given(countryService.findOverseasCountries()).willReturn(countries);
 
         // when
         RegionCategoriesResponse response = regionCategoryService.findRegionCategoriesByCountryType(false);
 
         // then
         assertThat(response.regionCategories()).hasSize(1);
-        assertThat(response.regionCategories().get(0).name()).isEqualTo("해외 기타");
+        assertThat(response.regionCategories().getFirst().name()).isEqualTo("해외 기타");
     }
 } 
