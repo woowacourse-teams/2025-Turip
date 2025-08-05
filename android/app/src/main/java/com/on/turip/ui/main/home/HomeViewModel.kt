@@ -8,6 +8,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.on.turip.di.RepositoryModule
+import com.on.turip.domain.content.PopularFavoriteContent
+import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.region.RegionCategory
 import com.on.turip.domain.region.RegionRepository
 import kotlinx.coroutines.launch
@@ -15,6 +17,7 @@ import timber.log.Timber
 
 class HomeViewModel(
     private val regionRepository: RegionRepository,
+    private val contentRepository: ContentRepository,
 ) : ViewModel() {
     private val _regionCategories: MutableLiveData<List<RegionCategory>> = MutableLiveData()
     val regionCategories: LiveData<List<RegionCategory>> get() = _regionCategories
@@ -22,8 +25,25 @@ class HomeViewModel(
     private val _isSelectedDomestic: MutableLiveData<Boolean> = MutableLiveData()
     val isSelectedDomestic: LiveData<Boolean> get() = _isSelectedDomestic
 
+    private val _usersLikeContents: MutableLiveData<List<PopularFavoriteContent>> =
+        MutableLiveData()
+    val usersLikeContents: LiveData<List<PopularFavoriteContent>> get() = _usersLikeContents
+
     init {
+        loadUsersLikeContents()
         loadRegionCategories(isKorea = true)
+    }
+
+    private fun loadUsersLikeContents() {
+        viewModelScope.launch {
+            contentRepository
+                .loadPopularFavoriteContents()
+                .onSuccess { popularFavoriteContents: List<PopularFavoriteContent> ->
+                    _usersLikeContents.value = popularFavoriteContents
+                }.onFailure {
+                    Timber.e("${it.message}")
+                }
+        }
     }
 
     fun loadRegionCategories(isKorea: Boolean) {
@@ -40,11 +60,15 @@ class HomeViewModel(
     }
 
     companion object {
-        fun provideFactory(regionRepository: RegionRepository = RepositoryModule.regionRepository): ViewModelProvider.Factory =
+        fun provideFactory(
+            regionRepository: RegionRepository = RepositoryModule.regionRepository,
+            contentRepository: ContentRepository = RepositoryModule.contentRepository,
+        ): ViewModelProvider.Factory =
             viewModelFactory {
                 initializer {
                     HomeViewModel(
                         regionRepository,
+                        contentRepository,
                     )
                 }
             }
