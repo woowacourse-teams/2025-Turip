@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.on.turip.di.RepositoryModule
+import com.on.turip.domain.content.City
 import com.on.turip.domain.content.Content
 import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.content.video.VideoData
@@ -53,7 +54,6 @@ class TripDetailViewModel(
                 async {
                     contentRepository.loadContent(contentId)
                 }
-
             creator
                 .await()
                 .onSuccess { creator: Creator ->
@@ -67,7 +67,7 @@ class TripDetailViewModel(
                                             id = contentId,
                                             creator = creator,
                                             videoData = videoData,
-                                            city = "TODO 여기에 지역 받아와서 연결",
+                                            city = City("// TODO 지역 여기서 받아와서 연결"),
                                         ),
                                 )
                             _videoUri.value = videoData.url

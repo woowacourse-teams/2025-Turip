@@ -16,5 +16,5 @@ data class ContentResponse(
     @SerialName("url")
     val url: String,
     @SerialName("city")
-    val city: String,
+    val city: CityResponse,
 )
