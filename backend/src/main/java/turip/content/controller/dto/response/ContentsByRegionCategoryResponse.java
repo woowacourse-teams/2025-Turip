@@ -10,9 +10,11 @@ public record ContentsByRegionCategoryResponse(
         String regionCategoryName
 ) {
 
-    public static ContentsByRegionCategoryResponse of(List<ContentDetailsByRegionCategoryResponse> contents,
-                                                      boolean loadable,
-                                                      String regionCategoryName) {
+    public static ContentsByRegionCategoryResponse of(
+            List<ContentDetailsByRegionCategoryResponse> contents,
+            boolean loadable,
+            String regionCategoryName
+    ) {
         return new ContentsByRegionCategoryResponse(contents, loadable, regionCategoryName);
     }
 } 
