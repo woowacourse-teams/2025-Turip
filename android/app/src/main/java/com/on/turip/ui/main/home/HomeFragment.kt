@@ -11,16 +11,17 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import com.on.turip.R
 import com.on.turip.databinding.FragmentHomeBinding
+import com.on.turip.domain.region.RegionCategory
 import com.on.turip.ui.common.base.BaseFragment
-import com.on.turip.ui.common.model.RegionModel
 import com.on.turip.ui.search.result.SearchResultActivity
+import timber.log.Timber
 
 class HomeFragment : BaseFragment<FragmentHomeBinding>() {
-    private val viewModel: HomeViewModel by viewModels()
+    private val viewModel: HomeViewModel by viewModels { HomeViewModel.provideFactory() }
 
     private val regionAdapter: RegionAdapter =
-        RegionAdapter { region: RegionModel ->
-            val intent = SearchResultActivity.newIntent(requireContext(), region.english)
+        RegionAdapter { regionCategoryName: String ->
+            val intent = SearchResultActivity.newIntent(requireContext(), regionCategoryName)
             startActivity(intent)
         }
 
@@ -38,6 +39,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         setupTextHighlighting()
         setupAdapters()
         setupObservers()
+        setupListeners()
     }
 
     private fun setupTextHighlighting() {
@@ -69,8 +71,23 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     }
 
     private fun setupObservers() {
-        viewModel.metropolitanCities.observe(viewLifecycleOwner) { metropolitanCities: List<RegionModel> ->
-            regionAdapter.submitList(metropolitanCities)
+        viewModel.regionCategories.observe(viewLifecycleOwner) { regionCategories: List<RegionCategory> ->
+            regionAdapter.submitList(regionCategories)
+        }
+        viewModel.isSelectedDomestic.observe(viewLifecycleOwner) { isSelectedDomestic: Boolean ->
+            binding.tvHomeDomesticButton.isSelected = isSelectedDomestic
+            binding.tvHomeAbroadButton.isSelected = isSelectedDomestic.not()
+        }
+    }
+
+    private fun setupListeners() {
+        binding.tvHomeDomesticButton.setOnClickListener {
+            viewModel.loadRegionCategories(isKorea = true)
+            Timber.d("국내 클릭")
+        }
+        binding.tvHomeAbroadButton.setOnClickListener {
+            viewModel.loadRegionCategories(isKorea = false)
+            Timber.d("해외 클릭")
         }
     }
 }
