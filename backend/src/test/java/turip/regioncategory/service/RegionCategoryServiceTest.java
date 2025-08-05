@@ -49,7 +49,7 @@ class RegionCategoryServiceTest {
         given(busan.getImageUrl()).willReturn("https://example.com/busan.jpg");
         given(busan.getCountry()).willReturn(korea);
 
-        given(cityService.getCityByCountryName(CountryService.KOREA_COUNTRY_NAME))
+        given(cityService.findCitiesByCountryName(CountryService.KOREA_COUNTRY_NAME))
                 .willReturn(cities);
 
         // when
@@ -101,7 +101,7 @@ class RegionCategoryServiceTest {
         lenient().when(unsupportedCity.getName()).thenReturn("지원하지않는도시");
         lenient().when(unsupportedCity.getImageUrl()).thenReturn("https://example.com/unsupported.jpg");
 
-        given(cityService.getCityByCountryName(CountryService.KOREA_COUNTRY_NAME))
+        given(cityService.findCitiesByCountryName(CountryService.KOREA_COUNTRY_NAME))
                 .willReturn(cities);
 
         // when

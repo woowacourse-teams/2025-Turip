@@ -12,7 +12,7 @@ public class CityService {
 
     private final CityRepository cityRepository;
 
-    public List<City> getCityByCountryName(String name) {
+    public List<City> findCitiesByCountryName(String name) {
         return cityRepository.findAllByCountryName(name);
     }
 }

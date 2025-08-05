@@ -37,7 +37,7 @@ public class RegionCategoryService {
 
     private List<RegionCategoryResponse> getDomesticRegionCategories() {
         List<RegionCategoryResponse> results = new ArrayList<>();
-        List<City> cities = cityService.getCityByCountryName(KOREA_COUNTRY_NAME);
+        List<City> cities = cityService.findCitiesByCountryName(KOREA_COUNTRY_NAME);
 
         for (City city : cities) {
             if (DomesticRegionCategory.containsName(city.getName())) {
@@ -51,7 +51,7 @@ public class RegionCategoryService {
 
     private List<RegionCategoryResponse> getOverseasRegionCategories() {
         List<RegionCategoryResponse> results = new ArrayList<>();
-        List<Country> countries = countryService.getOverseasCountries();
+        List<Country> countries = countryService.findOverseasCountries();
 
         for (Country country : countries) {
             if (OverseasRegionCategory.containsName(country.getName())) {

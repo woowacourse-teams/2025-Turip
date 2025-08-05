@@ -14,7 +14,7 @@ public class CountryService {
 
     private final CountryRepository countryRepository;
 
-    public List<Country> getOverseasCountries() {
+    public List<Country> findOverseasCountries() {
         return countryRepository.findAllByNameNot(KOREA_COUNTRY_NAME);
     }
 }
