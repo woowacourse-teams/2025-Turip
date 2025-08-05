@@ -11,7 +11,7 @@ import turip.regioncategory.service.RegionCategoryService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/regionCategories")
+@RequestMapping("/region-categories")
 public class RegionCategoryController {
 
     private final RegionCategoryService regionCategoryService;
