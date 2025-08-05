@@ -17,7 +17,8 @@ import com.on.turip.domain.content.PopularFavoriteContent
 import com.on.turip.domain.region.RegionCategory
 import com.on.turip.ui.common.ItemSpaceDecoration
 import com.on.turip.ui.common.base.BaseFragment
-import com.on.turip.ui.search.result.SearchResultActivity
+import com.on.turip.ui.search.keywordresult.SearchResultActivity
+import com.on.turip.ui.search.regionresult.RegionResultActivity
 import com.on.turip.ui.trip.detail.TripDetailActivity
 import timber.log.Timber
 
@@ -26,8 +27,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     private val regionAdapter: RegionAdapter =
         RegionAdapter { regionCategoryName: String ->
-            val intent: Intent =
-                SearchResultActivity.newIntent(requireContext(), regionCategoryName)
+            val intent: Intent = RegionResultActivity.newIntent(requireContext(), regionCategoryName)
             startActivity(intent)
         }
 
@@ -112,6 +112,10 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         binding.tvHomeAbroadButton.setOnClickListener {
             viewModel.loadRegionCategories(isKorea = false)
             Timber.d("해외 클릭")
+        }
+        binding.ivHomeSearch.setOnClickListener {
+            val intent: Intent = SearchResultActivity.newIntent(requireContext())
+            startActivity(intent)
         }
     }
 }
