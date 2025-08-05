@@ -15,6 +15,7 @@ import com.on.turip.databinding.FragmentHomeBinding
 import com.on.turip.domain.content.Content
 import com.on.turip.domain.content.PopularFavoriteContent
 import com.on.turip.domain.region.RegionCategory
+import com.on.turip.ui.common.ItemSpaceDecoration
 import com.on.turip.ui.common.base.BaseFragment
 import com.on.turip.ui.search.result.SearchResultActivity
 import com.on.turip.ui.trip.detail.TripDetailActivity
@@ -84,7 +85,10 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     private fun setupAdapters() {
         binding.rvHomeRegion.adapter = regionAdapter
-        binding.rvUsersLikeContent.adapter = usersLikeContentAdapter
+        binding.rvUsersLikeContent.apply {
+            adapter = usersLikeContentAdapter
+            addItemDecoration(ItemSpaceDecoration(end = 10))
+        }
     }
 
     private fun setupObservers() {
