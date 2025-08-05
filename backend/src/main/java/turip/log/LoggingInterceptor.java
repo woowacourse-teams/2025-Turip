@@ -17,7 +17,7 @@ public class LoggingInterceptor implements HandlerInterceptor {
     private static final String DURATION_TIME_UNIT = "ms";
 
     @Override
-    public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler)
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {
         String traceId = UUID.randomUUID().toString().substring(0, 8);
 
@@ -33,8 +33,8 @@ public class LoggingInterceptor implements HandlerInterceptor {
     }
 
     @Override
-    public void afterCompletion(final HttpServletRequest request, final HttpServletResponse response,
-                                final Object handler, final Exception ex) throws Exception {
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
+            throws Exception {
         Long startTime = (Long) request.getAttribute(REQUEST_START_TIME_ATTRIBUTE);
         if (startTime != null) {
             long duration = System.currentTimeMillis() - startTime;
