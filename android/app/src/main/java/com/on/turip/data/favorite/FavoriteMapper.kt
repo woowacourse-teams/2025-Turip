@@ -2,4 +2,4 @@ package com.on.turip.data.favorite
 
 import com.on.turip.data.favorite.dto.FavoriteAddRequest
 
-fun Long.toFavoriteAddRequest(): FavoriteAddRequest = FavoriteAddRequest(contentId = this)
+fun Long.toRequestDto(): FavoriteAddRequest = FavoriteAddRequest(contentId = this)
