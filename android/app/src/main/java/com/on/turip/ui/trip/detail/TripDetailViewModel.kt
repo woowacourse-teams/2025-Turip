@@ -44,7 +44,7 @@ class TripDetailViewModel(
     private val _videoUri: MutableLiveData<String> = MutableLiveData()
     val videoUri: LiveData<String> get() = _videoUri
 
-    private val _isFavorite: MutableLiveData<Boolean> = MutableLiveData()
+    private val _isFavorite: MutableLiveData<Boolean> = MutableLiveData(false)
     val isFavorite: LiveData<Boolean> get() = _isFavorite
 
     private var placeCacheByDay: Map<Int, List<PlaceModel>> = emptyMap()
