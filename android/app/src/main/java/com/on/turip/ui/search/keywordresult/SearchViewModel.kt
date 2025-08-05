@@ -62,6 +62,7 @@ class SearchViewModel(
                 .onSuccess { result: Int ->
                     _searchResultCount.value = result
                 }.onFailure {
+                    _loading.value = false
                     Timber.e("${it.message}")
                 }
 
@@ -73,6 +74,7 @@ class SearchViewModel(
                     _videoInformation.value = videoModels
                     _loading.value = false
                 }.onFailure {
+                    _loading.value = false
                     Timber.e("${it.message}")
                 }
         }
