@@ -1,13 +1,13 @@
-package com.on.turip.ui.main
+package com.on.turip.ui.main.home
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.on.turip.databinding.ItemSearchingRegionBinding
+import com.on.turip.databinding.ItemRegionBinding
 import com.on.turip.ui.common.model.RegionModel
 
 class RegionViewHolder(
-    private val binding: ItemSearchingRegionBinding,
+    private val binding: ItemRegionBinding,
     onRegionListener: OnRegionListener,
 ) : RecyclerView.ViewHolder(binding.root) {
     private var region: RegionModel? = null
@@ -20,7 +20,7 @@ class RegionViewHolder(
 
     fun bind(region: RegionModel) {
         this.region = region
-        binding.tvSearchingRegion.text = region.korean
+        binding.tvRegionName.text = region.korean
     }
 
     companion object {
@@ -29,8 +29,8 @@ class RegionViewHolder(
             onRegionListener: OnRegionListener,
         ): RegionViewHolder {
             val inflater: LayoutInflater = LayoutInflater.from(parent.context)
-            val binding: ItemSearchingRegionBinding =
-                ItemSearchingRegionBinding.inflate(inflater, parent, false)
+            val binding: ItemRegionBinding =
+                ItemRegionBinding.inflate(inflater, parent, false)
             return RegionViewHolder(binding, onRegionListener)
         }
     }

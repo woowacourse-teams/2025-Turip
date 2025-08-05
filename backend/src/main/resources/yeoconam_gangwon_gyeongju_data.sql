@@ -1,6 +1,6 @@
 INSERT INTO content (creator_id, city_id, title, url, uploaded_date)
 SELECT (SELECT id FROM creator WHERE channel_name = '여코남 - 여행코스짜주는남자'),
-       (SELECT id FROM city WHERE name = 'gyeongju'),
+       (SELECT id FROM city WHERE name = '경주'),
        '경주여행 1박2일 주요 가이드 총정리 / "아니,여기가 우리가 알던 경주가 맞다고?"',
        'https://www.youtube.com/watch?v=5TF2zJFvXdw&list=PL8z7KQfD7gudY2s4CIFJzaxpBnS8uh-AP&index=6',
        '2023-10-7';
