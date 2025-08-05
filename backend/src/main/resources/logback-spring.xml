@@ -16,13 +16,17 @@
                     <fieldName>level</fieldName>
                 </logLevel>
 
-                <mdc>
-                    <includeMdcKeyName>traceId</includeMdcKeyName>
-                </mdc>
-
                 <message>
                     <fieldName>message</fieldName>
                 </message>
+
+                <mdc>
+                    <includeMdcKeyName>traceId</includeMdcKeyName>
+                    <includeMdcKeyName>method</includeMdcKeyName>
+                    <includeMdcKeyName>uri</includeMdcKeyName>
+                    <includeMdcKeyName>httpStatus</includeMdcKeyName>
+                    <includeMdcKeyName>duration</includeMdcKeyName>
+                </mdc>
             </providers>
         </encoder>
     </appender>
@@ -40,13 +44,17 @@
                     <fieldName>level</fieldName>
                 </logLevel>
 
-                <mdc>
-                    <includeMdcKeyName>traceId</includeMdcKeyName>
-                </mdc>
-
                 <message>
                     <fieldName>message</fieldName>
                 </message>
+
+                <mdc>
+                    <includeMdcKeyName>traceId</includeMdcKeyName>
+                    <includeMdcKeyName>method</includeMdcKeyName>
+                    <includeMdcKeyName>uri</includeMdcKeyName>
+                    <includeMdcKeyName>httpStatus</includeMdcKeyName>
+                    <includeMdcKeyName>duration</includeMdcKeyName>
+                </mdc>
             </providers>
         </encoder>
 

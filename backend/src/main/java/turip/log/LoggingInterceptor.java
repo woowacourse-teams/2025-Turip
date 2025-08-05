@@ -14,6 +14,7 @@ public class LoggingInterceptor implements HandlerInterceptor {
 
     private static final String REQUEST_START_TIME_ATTRIBUTE = "requestStartTime";
     private static final String REQUEST_ID_ATTRIBUTE = "traceId";
+    private static final String DURATION_TIME_UNIT = "ms";
 
     @Override
     public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler)
@@ -24,10 +25,10 @@ public class LoggingInterceptor implements HandlerInterceptor {
         request.setAttribute(REQUEST_START_TIME_ATTRIBUTE, System.currentTimeMillis());
 
         MDC.put("traceId", traceId);
+        MDC.put("method", request.getMethod());
+        MDC.put("uri", request.getRequestURI());
 
-        log.info("API 요청",
-                "method", request.getMethod(),
-                "uri", request.getRequestURI());
+        log.info("API 요청");
         return true;
     }
 
@@ -38,27 +39,23 @@ public class LoggingInterceptor implements HandlerInterceptor {
         if (startTime != null) {
             long duration = System.currentTimeMillis() - startTime;
 
+            MDC.put("httpStatus", String.valueOf(response.getStatus()));
+            MDC.put("duration", duration + DURATION_TIME_UNIT);
+
             if (ex != null) {
-                log.error("API 처리 중 예외 발생",
-                        "method", request.getMethod(),
-                        "uri", request.getRequestURI(),
-                        "exceptionMessage", ex.getMessage(),
-                        "httpStatus", response.getStatus());
+                log.error("API 처리 중 예외 발생");
 
             } else {
-                log.info("API 처리 성공",
-                        "method", request.getMethod(),
-                        "uri", request.getRequestURI(),
-                        "durationMs", duration,
-                        "httpStatus", response.getStatus());
+                log.info("API 처리 성공");
             }
         } else {
-            log.warn("요청 시작 시간을 찾을 수 없음",
-                    "method", request.getMethod(),
-                    "uri", request.getRequestURI(),
-                    "httpStatus", response.getStatus());
+            log.warn("요청 시작 시간을 찾을 수 없음");
         }
 
         MDC.remove("traceId");
+        MDC.remove("method");
+        MDC.remove("uri");
+        MDC.remove("httpStatus");
+        MDC.remove("duration");
     }
 }
