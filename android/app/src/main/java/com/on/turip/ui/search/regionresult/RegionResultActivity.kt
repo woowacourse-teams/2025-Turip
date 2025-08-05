@@ -4,9 +4,9 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
 import com.on.turip.R
 import com.on.turip.databinding.ActivityRegionResultBinding
 import com.on.turip.ui.common.base.BaseActivity
@@ -77,10 +77,19 @@ class RegionResultActivity : BaseActivity<ActivityRegionResultBinding>() {
 
             regionResultAdapter.submitList(searchResultState.videoInformations)
 
-            binding.rvRegionResult.isVisible = searchResultState.isExist == true
-            binding.groupRegionResultEmpty.isVisible = searchResultState.isExist == false
-            binding.tvRegionResultLoading.isVisible = searchResultState.loading == true
+            setupVisible(searchResultState)
         }
+    }
+
+    private fun setupVisible(searchResultState: RegionResultViewModel.SearchResultState) {
+        binding.rvRegionResult.visibility =
+            if (searchResultState.isExist) View.VISIBLE else View.GONE
+
+        binding.groupRegionResultEmpty.visibility =
+            if (searchResultState.isExist) View.GONE else View.VISIBLE
+
+        binding.tvRegionResultLoading.visibility =
+            if (searchResultState.loading) View.VISIBLE else View.GONE
     }
 
     private fun setupTitle(region: String): String {

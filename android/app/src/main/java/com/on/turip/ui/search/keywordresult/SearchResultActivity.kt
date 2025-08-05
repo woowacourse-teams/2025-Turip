@@ -7,11 +7,11 @@ import android.os.Bundle
 import android.text.Editable
 import android.view.MenuItem
 import android.view.MotionEvent
+import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import com.on.turip.R
 import com.on.turip.databinding.ActivitySearchResultBinding
@@ -65,7 +65,8 @@ class SearchResultActivity : BaseActivity<ActivitySearchResultBinding>() {
 
     private fun setupObserves() {
         viewModel.searchingWord.observe(this) { words: String ->
-            binding.ivSearchResultClear.isVisible = words.isNotBlank() == true
+            binding.ivSearchResultClear.visibility =
+                if (words.isNotBlank()) View.VISIBLE else View.GONE
         }
     }
 
