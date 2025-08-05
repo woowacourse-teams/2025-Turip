@@ -6,10 +6,10 @@ interface FavoriteRemoteDataSource {
     suspend fun postFavorite(
         fid: String,
         favoriteAddRequest: FavoriteAddRequest,
-    )
+    ): Result<Unit>
 
     suspend fun deleteFavorite(
         fid: String,
         contentId: Long,
-    )
+    ): Result<Unit>
 }

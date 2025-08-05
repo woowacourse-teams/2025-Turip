@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class TripDetailViewModel(
     private val contentId: Long,
@@ -166,11 +167,14 @@ class TripDetailViewModel(
                 .debounce(500L)
                 .filterNotNull()
                 .collectLatest { favoriteStatus: Boolean ->
-                    favoriteRepository.updateFavorite(
-                        favoriteStatus,
-                        deviceIdentifier,
-                        contentId,
-                    )
+                    favoriteRepository
+                        .updateFavorite(
+                            favoriteStatus,
+                            deviceIdentifier,
+                            contentId,
+                        ).onFailure {
+                            Timber.e("${it.message}")
+                        }
                 }
         }
     }

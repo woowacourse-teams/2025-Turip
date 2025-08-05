@@ -7,5 +7,5 @@ interface FavoriteRepository {
         isFavorite: Boolean,
         turipDeviceIdentifier: TuripDeviceIdentifier,
         contentId: Long,
-    )
+    ): Result<Unit>
 }

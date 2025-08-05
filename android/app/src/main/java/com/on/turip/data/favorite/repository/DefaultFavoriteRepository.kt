@@ -12,7 +12,7 @@ class DefaultFavoriteRepository(
         isFavorite: Boolean,
         turipDeviceIdentifier: TuripDeviceIdentifier,
         contentId: Long,
-    ) {
+    ): Result<Unit> =
         if (isFavorite) {
             favoriteRemoteDataSource.postFavorite(
                 turipDeviceIdentifier.fid,
@@ -24,5 +24,4 @@ class DefaultFavoriteRepository(
                 contentId,
             )
         }
-    }
 }
