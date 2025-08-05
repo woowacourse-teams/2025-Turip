@@ -14,7 +14,7 @@ interface ContentService {
     ): ContentInformationCountResponse
 
     @GET("contents")
-    suspend fun getContentsInformation(
+    suspend fun getContentsInformationByRegion(
         @Query("region") region: String,
         @Query("size") size: Int,
         @Query("lastId") lastId: Long,
