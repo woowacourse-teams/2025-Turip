@@ -35,7 +35,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="end|center_vertical"
                 android:contentDescription="@null"
-                android:src="@drawable/btn_favorite_press_red" />
+                android:src="@drawable/btn_favorite_red" />
         </com.google.android.material.appbar.MaterialToolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
