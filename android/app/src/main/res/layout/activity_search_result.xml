@@ -25,7 +25,7 @@
             android:layout_marginEnd="20dp"
             android:paddingVertical="8dp"
             android:paddingHorizontal="16dp"
-            android:background="@drawable/bg_gra100_radius_24dp">
+            android:background="@drawable/bg_gray100_radius_24dp">
 
             <EditText
                 android:id="@+id/et_search_result"
