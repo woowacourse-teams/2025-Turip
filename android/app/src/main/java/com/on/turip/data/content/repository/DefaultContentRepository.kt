@@ -9,9 +9,14 @@ import com.on.turip.domain.content.video.VideoData
 class DefaultContentRepository(
     private val contentRemoteDataSource: ContentRemoteDataSource,
 ) : ContentRepository {
-    override suspend fun loadContentsSize(region: String): Result<Int> =
+    override suspend fun loadContentsSizeByRegion(region: String): Result<Int> =
         contentRemoteDataSource
-            .getContentsSize(region)
+            .getContentsSizeByRegion(region)
+            .mapCatching { it.count }
+
+    override suspend fun loadContentsSizeByKeyword(keyword: String): Result<Int> =
+        contentRemoteDataSource
+            .getContentsSizeByKeyword(keyword)
             .mapCatching { it.count }
 
     override suspend fun loadContentsByRegion(

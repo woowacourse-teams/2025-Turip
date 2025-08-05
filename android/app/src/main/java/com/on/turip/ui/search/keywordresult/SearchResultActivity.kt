@@ -95,6 +95,10 @@ class SearchResultActivity : BaseActivity<ActivitySearchResultBinding>() {
         viewModel.videoInformation.observe(this) { videoInformationModels: List<VideoInformationModel> ->
             searchAdapter.submitList(videoInformationModels)
         }
+        viewModel.searchResultCount.observe(this) { searchResultCount: Int ->
+            binding.tvSearchResultCount.text =
+                getString(R.string.search_result_exist_result, searchResultCount)
+        }
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {

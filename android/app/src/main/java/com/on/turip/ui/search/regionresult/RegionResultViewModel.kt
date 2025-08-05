@@ -42,7 +42,7 @@ class RegionResultViewModel(
                 }
             val contentsSize: Deferred<Result<Int>> =
                 async {
-                    contentRepository.loadContentsSize(region)
+                    contentRepository.loadContentsSizeByRegion(region)
                 }
 
             pagedContentsResult

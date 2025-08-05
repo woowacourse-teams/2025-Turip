@@ -9,8 +9,13 @@ import retrofit2.http.Query
 
 interface ContentService {
     @GET("contents/count")
-    suspend fun getContentsCount(
+    suspend fun getContentsCountByRegion(
         @Query("region") region: String,
+    ): ContentInformationCountResponse
+
+    @GET("contents/count")
+    suspend fun getContentsCountByKeyword(
+        @Query("keyword") keyword: String,
     ): ContentInformationCountResponse
 
     @GET("contents")

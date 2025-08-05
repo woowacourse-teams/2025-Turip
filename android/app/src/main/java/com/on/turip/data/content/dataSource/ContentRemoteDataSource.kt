@@ -5,7 +5,9 @@ import com.on.turip.data.content.dto.ContentInformationCountResponse
 import com.on.turip.data.content.dto.ContentsInformationResponse
 
 interface ContentRemoteDataSource {
-    suspend fun getContentsSize(region: String): Result<ContentInformationCountResponse>
+    suspend fun getContentsSizeByRegion(region: String): Result<ContentInformationCountResponse>
+
+    suspend fun getContentsSizeByKeyword(keyword: String): Result<ContentInformationCountResponse>
 
     suspend fun getContentsByRegion(
         region: String,

@@ -16,6 +16,7 @@ import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.search.model.VideoInformationModel
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 
 class SearchResultViewModel(
     private val contentRepository: ContentRepository,
@@ -34,7 +35,14 @@ class SearchResultViewModel(
     }
 
     fun updateByKeyword() {
-        viewModelScope.async {
+        viewModelScope.launch {
+            val searchResultCountResult =
+                async {
+                    contentRepository.loadContentsSizeByKeyword(
+                        searchingWord.value.toString(),
+                    )
+                }
+
             val pagedContentsResult: Deferred<Result<PagedContentsResult>> =
                 async {
                     contentRepository.loadContentsByKeyword(
@@ -43,6 +51,15 @@ class SearchResultViewModel(
                         lastId = 0L,
                     )
                 }
+
+            searchResultCountResult
+                .await()
+                .onSuccess { result: Int ->
+                    _searchResultCount.value = result
+                }.onFailure {
+                    // TODO 로그
+                }
+
             pagedContentsResult
                 .await()
                 .onSuccess { result: PagedContentsResult ->

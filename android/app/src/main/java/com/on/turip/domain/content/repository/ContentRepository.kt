@@ -4,7 +4,9 @@ import com.on.turip.domain.content.PagedContentsResult
 import com.on.turip.domain.content.video.VideoData
 
 interface ContentRepository {
-    suspend fun loadContentsSize(region: String): Result<Int>
+    suspend fun loadContentsSizeByRegion(region: String): Result<Int>
+
+    suspend fun loadContentsSizeByKeyword(keyword: String): Result<Int>
 
     suspend fun loadContentsByRegion(
         region: String,
