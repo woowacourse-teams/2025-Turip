@@ -246,10 +246,10 @@ public class ContentApiTest {
                     .when().log().all().get("/contents/popular/favorites")
                     .then().log().all()
                     .statusCode(200)
-                    .body("[0].content.id", is(1))
-                    .body("[0].content.title", is("서울 여행"))
-                    .body("[0].content.city.name", is("서울"))
-                    .body("[0].content.isFavorite", is(false));
+                    .body("contents[0].content.id", is(1))
+                    .body("contents[0].content.title", is("서울 여행"))
+                    .body("contents[0].content.city.name", is("서울"))
+                    .body("contents[0].content.isFavorite", is(false));
         }
 
         @DisplayName("device-fid 헤더가 존재하면 컨텐츠 목록과 찜 여부를 응답한다. 성공 시 200 OK 코드를 응답한다")
@@ -273,10 +273,10 @@ public class ContentApiTest {
                     .when().get("/contents/popular/favorites")
                     .then()
                     .statusCode(200)
-                    .body("[0].content.id", is(1))
-                    .body("[0].content.title", is("서울 여행"))
-                    .body("[0].content.city.name", is("서울"))
-                    .body("[0].content.isFavorite", is(true));
+                    .body("contents[0].content.id", is(1))
+                    .body("contents[0].content.title", is("서울 여행"))
+                    .body("contents[0].content.city.name", is("서울"))
+                    .body("contents[0].content.isFavorite", is(true));
         }
     }
 }

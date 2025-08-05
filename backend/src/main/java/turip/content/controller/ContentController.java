@@ -1,6 +1,5 @@
 package turip.content.controller;
 
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,7 +12,7 @@ import turip.content.controller.dto.response.ContentCountResponse;
 import turip.content.controller.dto.response.ContentResponse;
 import turip.content.controller.dto.response.ContentSearchResponse;
 import turip.content.controller.dto.response.ContentsByCityResponse;
-import turip.content.controller.dto.response.WeeklyPopularFavoriteContentResponse;
+import turip.content.controller.dto.response.WeeklyPopularFavoriteContentsResponse;
 import turip.content.service.ContentService;
 
 @RestController
@@ -68,10 +67,10 @@ public class ContentController {
     }
 
     @GetMapping("/popular/favorites")
-    public ResponseEntity<List<WeeklyPopularFavoriteContentResponse>> readWeeklyPopularFavoriteContents(
+    public ResponseEntity<WeeklyPopularFavoriteContentsResponse> readWeeklyPopularFavoriteContents(
             @RequestHeader(value = "device-fid", required = false) String deviceFid,
             @RequestParam("size") int topContentSize) {
-        List<WeeklyPopularFavoriteContentResponse> weeklyPopularFavoriteContents = contentService.findWeeklyPopularFavoriteContents(
+        WeeklyPopularFavoriteContentsResponse weeklyPopularFavoriteContents = contentService.findWeeklyPopularFavoriteContents(
                 deviceFid, topContentSize);
         return ResponseEntity.ok(weeklyPopularFavoriteContents);
     }

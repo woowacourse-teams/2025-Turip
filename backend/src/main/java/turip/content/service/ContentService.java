@@ -21,6 +21,7 @@ import turip.content.controller.dto.response.ContentWithoutCityResponse;
 import turip.content.controller.dto.response.ContentsByCityResponse;
 import turip.content.controller.dto.response.TripDurationResponse;
 import turip.content.controller.dto.response.WeeklyPopularFavoriteContentResponse;
+import turip.content.controller.dto.response.WeeklyPopularFavoriteContentsResponse;
 import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
 import turip.exception.NotFoundException;
@@ -74,8 +75,8 @@ public class ContentService {
         return ContentsByCityResponse.of(contentDetails, loadable);
     }
 
-    public List<WeeklyPopularFavoriteContentResponse> findWeeklyPopularFavoriteContents(String deviceFid,
-                                                                                        int topContentSize) {
+    public WeeklyPopularFavoriteContentsResponse findWeeklyPopularFavoriteContents(String deviceFid,
+                                                                                   int topContentSize) {
         List<LocalDate> lastWeekPeriod = getLastWeekPeriod();
         LocalDate startDate = lastWeekPeriod.getFirst();
         LocalDate endDate = lastWeekPeriod.getLast();
@@ -92,13 +93,15 @@ public class ContentService {
         }
         Set<Long> favoritedContentIds = findFavoritedContentIds(member, popularContents);
 
-        return popularContents.stream()
-                .map(content -> WeeklyPopularFavoriteContentResponse.of(
-                        content,
-                        favoritedContentIds.contains(content.getId()),
-                        calculateTripDuration(content)
-                ))
-                .toList();
+        return WeeklyPopularFavoriteContentsResponse.from(
+                popularContents.stream()
+                        .map(content -> WeeklyPopularFavoriteContentResponse.of(
+                                content,
+                                favoritedContentIds.contains(content.getId()),
+                                calculateTripDuration(content)
+                        ))
+                        .toList()
+        );
     }
 
     public ContentCountResponse countByCityName(String cityName) {
@@ -195,11 +198,13 @@ public class ContentService {
                 .collect(Collectors.toSet());
     }
 
-    private List<WeeklyPopularFavoriteContentResponse> convertContentsToPopularContentsResponse(
+    private WeeklyPopularFavoriteContentsResponse convertContentsToPopularContentsResponse(
             List<Content> popularContents, boolean isFavorite) {
-        return popularContents.stream()
-                .map(content -> WeeklyPopularFavoriteContentResponse.of(content, isFavorite,
-                        calculateTripDuration(content)))
-                .toList();
+        return WeeklyPopularFavoriteContentsResponse.from(
+                popularContents.stream()
+                        .map(content -> WeeklyPopularFavoriteContentResponse.of(content, isFavorite,
+                                calculateTripDuration(content)))
+                        .toList()
+        );
     }
 }

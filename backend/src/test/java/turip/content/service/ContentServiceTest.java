@@ -18,7 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.SliceImpl;
 import turip.city.domain.City;
 import turip.content.controller.dto.response.ContentSearchResponse;
-import turip.content.controller.dto.response.WeeklyPopularFavoriteContentResponse;
+import turip.content.controller.dto.response.WeeklyPopularFavoriteContentsResponse;
 import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
 import turip.country.domain.Country;
@@ -114,18 +114,18 @@ class ContentServiceTest {
                     .willReturn(2); // content2, 1박 2일
 
             // when
-            List<WeeklyPopularFavoriteContentResponse> responses = contentService.findWeeklyPopularFavoriteContents(
+            WeeklyPopularFavoriteContentsResponse response = contentService.findWeeklyPopularFavoriteContents(
                     "testDeviceFid", topContentSize);
 
             // then
-            assertThat(responses).hasSize(2);
-            assertThat(responses.getFirst().content().id()).isEqualTo(1L);
-            assertThat(responses.getFirst().content().isFavorite()).isTrue();
-            assertThat(responses.getFirst().tripDuration().days()).isEqualTo(3);
+            assertThat(response.contents()).hasSize(2);
+            assertThat(response.contents().getFirst().content().id()).isEqualTo(1L);
+            assertThat(response.contents().getFirst().content().isFavorite()).isTrue();
+            assertThat(response.contents().getFirst().tripDuration().days()).isEqualTo(3);
 
-            assertThat(responses.get(1).content().id()).isEqualTo(2L);
-            assertThat(responses.get(1).content().isFavorite()).isTrue();
-            assertThat(responses.get(1).tripDuration().days()).isEqualTo(2);
+            assertThat(response.contents().get(1).content().id()).isEqualTo(2L);
+            assertThat(response.contents().get(1).content().isFavorite()).isTrue();
+            assertThat(response.contents().get(1).tripDuration().days()).isEqualTo(2);
         }
     }
 }
