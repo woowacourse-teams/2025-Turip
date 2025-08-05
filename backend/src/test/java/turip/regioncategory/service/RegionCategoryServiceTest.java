@@ -39,15 +39,12 @@ class RegionCategoryServiceTest {
         List<City> cities = List.of(seoul, busan);
 
         Country korea = mock(Country.class);
-        given(korea.getId()).willReturn(1L);
         given(korea.getName()).willReturn("한국");
         given(korea.getImageUrl()).willReturn("https://example.com/korea.jpg");
 
-        given(seoul.getId()).willReturn(1L);
         given(seoul.getName()).willReturn("서울");
         given(seoul.getImageUrl()).willReturn("https://example.com/seoul.jpg");
         given(seoul.getCountry()).willReturn(korea);
-        given(busan.getId()).willReturn(2L);
         given(busan.getName()).willReturn("부산");
         given(busan.getImageUrl()).willReturn("https://example.com/busan.jpg");
         given(busan.getCountry()).willReturn(korea);
