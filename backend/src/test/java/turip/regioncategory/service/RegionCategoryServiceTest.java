@@ -32,7 +32,7 @@ class RegionCategoryServiceTest {
 
     @DisplayName("국내 지역 카테고리 조회 시 국내 도시 목록과 기타 카테고리를 반환한다")
     @Test
-    void getRegionCategoriesByCountryType_withIsKoreaTrue_returnsDomesticCategories() {
+    void findRegionCategoriesByCountryType_withIsKoreaTrue_returnsDomesticCategories() {
         // given
         City seoul = mock(City.class);
         City busan = mock(City.class);
@@ -53,7 +53,7 @@ class RegionCategoryServiceTest {
                 .willReturn(cities);
 
         // when
-        RegionCategoriesResponse response = regionCategoryService.getRegionCategoriesByCountryType(true);
+        RegionCategoriesResponse response = regionCategoryService.findRegionCategoriesByCountryType(true);
 
         // then
         assertThat(response.regionCategories()).hasSize(3);
@@ -64,7 +64,7 @@ class RegionCategoryServiceTest {
 
     @DisplayName("해외 지역 카테고리 조회 시 해외 국가 목록과 기타 카테고리를 반환한다")
     @Test
-    void getRegionCategoriesByCountryType_withIsKoreaFalse_returnsOverseasCategories() {
+    void findRegionCategoriesByCountryType_withIsKoreaFalse_returnsOverseasCategories() {
         // given
         Country japan = mock(Country.class);
         Country china = mock(Country.class);
@@ -81,7 +81,7 @@ class RegionCategoryServiceTest {
                 .willReturn(countries);
 
         // when
-        RegionCategoriesResponse response = regionCategoryService.getRegionCategoriesByCountryType(false);
+        RegionCategoriesResponse response = regionCategoryService.findRegionCategoriesByCountryType(false);
 
         // then
         assertThat(response.regionCategories()).hasSize(3);
@@ -92,7 +92,7 @@ class RegionCategoryServiceTest {
 
     @DisplayName("지원하지 않는 도시명은 필터링되어 기타 카테고리만 반환된다")
     @Test
-    void getDomesticRegionCategories_withUnsupportedCityName_returnsOnlyEtcCategory() {
+    void findDomesticRegionCategories_withUnsupportedCityName_returnsOnlyEtcCategory() {
         // given
         City unsupportedCity = mock(City.class);
         List<City> cities = List.of(unsupportedCity);
@@ -105,7 +105,7 @@ class RegionCategoryServiceTest {
                 .willReturn(cities);
 
         // when
-        RegionCategoriesResponse response = regionCategoryService.getRegionCategoriesByCountryType(true);
+        RegionCategoriesResponse response = regionCategoryService.findRegionCategoriesByCountryType(true);
 
         // then
         assertThat(response.regionCategories()).hasSize(1);
@@ -114,7 +114,7 @@ class RegionCategoryServiceTest {
 
     @DisplayName("지원하지 않는 국가명은 필터링되어 기타 카테고리만 반환된다")
     @Test
-    void getOverseasRegionCategories_withUnsupportedCountryName_returnsOnlyEtcCategory() {
+    void findOverseasRegionCategories_withUnsupportedCountryName_returnsOnlyEtcCategory() {
         // given
         Country unsupportedCountry = mock(Country.class);
         List<Country> countries = List.of(unsupportedCountry);
@@ -127,7 +127,7 @@ class RegionCategoryServiceTest {
                 .willReturn(countries);
 
         // when
-        RegionCategoriesResponse response = regionCategoryService.getRegionCategoriesByCountryType(false);
+        RegionCategoriesResponse response = regionCategoryService.findRegionCategoriesByCountryType(false);
 
         // then
         assertThat(response.regionCategories()).hasSize(1);

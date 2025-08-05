@@ -26,15 +26,15 @@ public class RegionCategoryService {
     private final CityService cityService;
     private final CountryService countryService;
 
-    public RegionCategoriesResponse getRegionCategoriesByCountryType(boolean isKorea) {
+    public RegionCategoriesResponse findRegionCategoriesByCountryType(boolean isKorea) {
         if (isKorea) {
-            return RegionCategoriesResponse.from(getDomesticRegionCategories());
+            return RegionCategoriesResponse.from(findDomesticRegionCategories());
         }
 
-        return RegionCategoriesResponse.from(getOverseasRegionCategories());
+        return RegionCategoriesResponse.from(findOverseasRegionCategories());
     }
 
-    private List<RegionCategoryResponse> getDomesticRegionCategories() {
+    private List<RegionCategoryResponse> findDomesticRegionCategories() {
         List<RegionCategoryResponse> results = new ArrayList<>();
         List<City> cities = cityService.findCitiesByCountryName(KOREA_COUNTRY_NAME);
 
@@ -48,7 +48,7 @@ public class RegionCategoryService {
         return results;
     }
 
-    private List<RegionCategoryResponse> getOverseasRegionCategories() {
+    private List<RegionCategoryResponse> findOverseasRegionCategories() {
         List<RegionCategoryResponse> results = new ArrayList<>();
         List<Country> countries = countryService.findOverseasCountries();
 
