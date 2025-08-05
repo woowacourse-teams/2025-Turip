@@ -21,9 +21,9 @@ public enum DomesticRegionCategory {
 
     private final String displayName;
 
-    public static boolean containsName(String name) {
+    public static boolean containsName(String regionCategoryName) {
         for (DomesticRegionCategory category : values()) {
-            if (name.contains(category.displayName)) {
+            if (regionCategoryName.contains(category.displayName)) {
                 return true;
             }
         }
