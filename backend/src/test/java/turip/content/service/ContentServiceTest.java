@@ -127,7 +127,7 @@ class ContentServiceTest {
             String regionCategory = "해외 기타";
             int expectedCount = 7;
             List<String> overseasCategoryNames = OverseasRegionCategory.getDisplayNamesExcludingEtc();
-            given(contentRepository.countByCountryNameNotIn(overseasCategoryNames))
+            given(contentRepository.countByCityCountryNameNotIn(overseasCategoryNames))
                     .willReturn(expectedCount);
 
             // when
