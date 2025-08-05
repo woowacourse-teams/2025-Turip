@@ -50,7 +50,7 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
 
     private val tripPlaceAdapter by lazy {
         TripPlaceAdapter { placeModel ->
-            val intent = Intent(Intent.ACTION_VIEW, placeModel.placeUri)
+            val intent: Intent = Intent(Intent.ACTION_VIEW, placeModel.placeUri)
             startActivity(intent)
         }
     }

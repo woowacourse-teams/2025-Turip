@@ -3,6 +3,10 @@ package turip.content.service;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
+ 
+import static turip.regioncategory.domain.DomesticRegionCategory.OTHER_DOMESTIC;
+import static turip.regioncategory.domain.OverseasRegionCategory.OTHER_OVERSEAS;
+
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -28,6 +32,8 @@ import turip.exception.NotFoundException;
 import turip.favorite.repository.FavoriteRepository;
 import turip.member.domain.Member;
 import turip.member.repository.MemberRepository;
+import turip.regioncategory.domain.DomesticRegionCategory;
+import turip.regioncategory.domain.OverseasRegionCategory;
 import turip.tripcourse.service.TripCourseService;
 
 @Service
@@ -54,6 +60,11 @@ public class ContentService {
                 .orElse(false);
 
         return ContentResponse.of(content, isFavorite);
+    }
+
+    public ContentCountResponse countByRegionCategory(String regionCategory) {
+        int count = calculateCountByRegionCategory(regionCategory);
+        return ContentCountResponse.from(count);
     }
 
     public ContentsByCityResponse findContentsByCityName(
@@ -130,6 +141,32 @@ public class ContentService {
                 contents);
 
         return ContentSearchResponse.of(contentSearchResultResponses, loadable);
+    }
+
+    private int calculateCountByRegionCategory(String regionCategory) {
+        if (OTHER_DOMESTIC.matchesDisplayName(regionCategory)) {
+            return calculateDomesticEtcCount();
+        }
+
+        if (OTHER_OVERSEAS.matchesDisplayName(regionCategory)) {
+            return calculateOverseasEtcCount();
+        }
+
+        if (DomesticRegionCategory.containsName(regionCategory)) {
+            return contentRepository.countByCityName(regionCategory);
+        }
+
+        return contentRepository.countByCityCountryName(regionCategory);
+    }
+
+    private int calculateDomesticEtcCount() {
+        List<String> domesticCategoryNames = DomesticRegionCategory.getDisplayNamesExcludingEtc();
+        return contentRepository.countByCityNameNotIn(domesticCategoryNames);
+    }
+
+    private int calculateOverseasEtcCount() {
+        List<String> overseasCategoryNames = OverseasRegionCategory.getDisplayNamesExcludingEtc();
+        return contentRepository.countByCountryNameNotIn(overseasCategoryNames);
     }
 
     private List<Content> findContentsByCity(
