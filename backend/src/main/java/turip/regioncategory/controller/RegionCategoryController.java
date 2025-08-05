@@ -18,8 +18,8 @@ public class RegionCategoryController {
 
     @GetMapping
     public ResponseEntity<RegionCategoriesResponse> readRegionCategories(
-            @RequestParam(name = "isKorea") boolean isKorea) {
-        RegionCategoriesResponse response = regionCategoryService.findRegionCategoriesByCountryType(isKorea);
+            @RequestParam(name = "isKorea") boolean isDomestic) {
+        RegionCategoriesResponse response = regionCategoryService.findRegionCategoriesByCountryType(isDomestic);
         return ResponseEntity.ok(response);
     }
 }

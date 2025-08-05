@@ -26,8 +26,8 @@ public class RegionCategoryService {
     private final CityService cityService;
     private final CountryService countryService;
 
-    public RegionCategoriesResponse findRegionCategoriesByCountryType(boolean isKorea) {
-        if (isKorea) {
+    public RegionCategoriesResponse findRegionCategoriesByCountryType(boolean isDomestic) {
+        if (isDomestic) {
             return RegionCategoriesResponse.from(findDomesticRegionCategories());
         }
 
