@@ -9,16 +9,18 @@ public record ContentResponse(
         Long cityId,
         String title,
         String url,
-        LocalDate uploadedDate
+        LocalDate uploadedDate,
+        boolean isFavorite
 ) {
-    public static ContentResponse from(Content content) {
+    public static ContentResponse of(Content content, boolean isFavorite) {
         return new ContentResponse(
                 content.getId(),
                 content.getCreator().getId(),
                 content.getCity().getId(),
                 content.getTitle(),
                 content.getUrl(),
-                content.getUploadedDate()
+                content.getUploadedDate(),
+                isFavorite
         );
     }
 }

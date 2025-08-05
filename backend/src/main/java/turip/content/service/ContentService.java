@@ -21,6 +21,8 @@ import turip.content.controller.dto.response.TripDurationResponse;
 import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
 import turip.exception.NotFoundException;
+import turip.favorite.repository.FavoriteRepository;
+import turip.member.repository.MemberRepository;
 import turip.regioncategory.domain.DomesticRegionCategory;
 import turip.regioncategory.domain.OverseasRegionCategory;
 import turip.tripcourse.service.TripCourseService;
@@ -33,6 +35,21 @@ public class ContentService {
 
     private final ContentRepository contentRepository;
     private final TripCourseService tripCourseService;
+    private final MemberRepository memberRepository;
+    private final FavoriteRepository favoriteRepository;
+
+    public ContentResponse getContentWithFavoriteStatus(Long contentId, String deviceFid) {
+        Content content = contentRepository.findById(contentId)
+                .orElseThrow(() -> new NotFoundException("컨텐츠를 찾을 수 없습니다."));
+        if (deviceFid == null) {
+            return ContentResponse.of(content, false);
+        }
+        boolean isFavorite = memberRepository.findByDeviceFid(deviceFid)
+                .map(member -> favoriteRepository.existsByMemberIdAndContentId(member.getId(), content.getId()))
+                .orElse(false);
+
+        return ContentResponse.of(content, isFavorite);
+    }
 
     public ContentCountResponse countByRegionCategory(String regionCategory) {
         int count = calculateCountByRegionCategory(regionCategory);
@@ -58,6 +75,11 @@ public class ContentService {
         return ContentsByCityResponse.of(contentDetails, loadable);
     }
 
+    public ContentCountResponse countByCityName(String cityName) {
+        int count = contentRepository.countByCityName(cityName);
+        return ContentCountResponse.from(count);
+    }
+
     public ContentCountResponse countByKeyword(String keyword) {
         int count = contentRepository.countByKeywordContaining(keyword);
         return ContentCountResponse.from(count);
@@ -79,12 +101,6 @@ public class ContentService {
                 contents);
 
         return ContentSearchResponse.of(contentSearchResultResponses, loadable);
-    }
-
-    public ContentResponse getById(Long id) {
-        Content content = contentRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("컨텐츠를 찾을 수 없습니다."));
-        return ContentResponse.from(content);
     }
 
     private int calculateCountByRegionCategory(String regionCategory) {
