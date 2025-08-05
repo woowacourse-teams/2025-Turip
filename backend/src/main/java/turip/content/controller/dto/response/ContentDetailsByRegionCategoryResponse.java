@@ -2,23 +2,23 @@ package turip.content.controller.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public record ContentDetailsByCityResponse(
+public record ContentDetailsByRegionCategoryResponse(
         @JsonProperty("content")
-        ContentWithoutCityResponse contentWithoutCityResponse,
+        ContentByCityResponse contentByCityResponse,
         @JsonProperty("tripDuration")
         TripDurationResponse tripDurationResponse,
         int tripPlaceCount
 ) {
 
-    public static ContentDetailsByCityResponse of(
-            ContentWithoutCityResponse contentWithoutCityResponse,
+    public static ContentDetailsByRegionCategoryResponse of(
+            ContentByCityResponse contentByCityResponse,
             TripDurationResponse tripDurationResponse,
             int tripPlaceCount
     ) {
-        return new ContentDetailsByCityResponse(
-                contentWithoutCityResponse,
+        return new ContentDetailsByRegionCategoryResponse(
+                contentByCityResponse,
                 tripDurationResponse,
                 tripPlaceCount
         );
     }
-}
+} 

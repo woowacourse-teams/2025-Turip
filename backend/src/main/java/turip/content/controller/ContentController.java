@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import turip.content.controller.dto.response.ContentCountResponse;
 import turip.content.controller.dto.response.ContentResponse;
 import turip.content.controller.dto.response.ContentSearchResponse;
-import turip.content.controller.dto.response.ContentsByCityResponse;
+import turip.content.controller.dto.response.ContentsByRegionCategoryResponse;
 import turip.content.service.ContentService;
 
 @RestController
@@ -28,21 +28,21 @@ public class ContentController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping(params = "cityName")
-    public ResponseEntity<ContentsByCityResponse> readContentsByRegionName(
-            @RequestParam(name = "cityName") String cityName,
-            @RequestParam(name = "size") Integer pageSize,
-            @RequestParam(name = "lastId") Long lastContentId
-    ) {
-        ContentsByCityResponse response = contentService.findContentsByCityName(cityName, pageSize,
-                lastContentId);
-        return ResponseEntity.ok(response);
-    }
-
     @GetMapping(value = "/count", params = "keyword")
     public ResponseEntity<ContentCountResponse> readCountByKeyword(
             @RequestParam(name = "keyword") String keyword) {
         ContentCountResponse response = contentService.countByKeyword(keyword);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping(params = "regionCategory")
+    public ResponseEntity<ContentsByRegionCategoryResponse> readContentsByRegionCategory(
+            @RequestParam(name = "regionCategory") String regionCategory,
+            @RequestParam(name = "size") Integer pageSize,
+            @RequestParam(name = "lastId") Long lastContentId
+    ) {
+        ContentsByRegionCategoryResponse response = contentService.findContentsByRegionCategory(regionCategory,
+                pageSize, lastContentId);
         return ResponseEntity.ok(response);
     }
 
