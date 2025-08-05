@@ -20,7 +20,7 @@ import turip.content.controller.dto.response.ContentsByCityResponse;
 import turip.content.controller.dto.response.TripDurationResponse;
 import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
-import turip.exception.NotFoundException;
+import turip.exception.custom.NotFoundException;
 import turip.regioncategory.domain.DomesticRegionCategory;
 import turip.regioncategory.domain.OverseasRegionCategory;
 import turip.tripcourse.service.TripCourseService;

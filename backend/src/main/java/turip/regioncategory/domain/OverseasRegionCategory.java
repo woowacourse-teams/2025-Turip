@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import turip.exception.BadRequestException;
+import turip.exception.custom.BadRequestException;
 
 @Getter
 @RequiredArgsConstructor
