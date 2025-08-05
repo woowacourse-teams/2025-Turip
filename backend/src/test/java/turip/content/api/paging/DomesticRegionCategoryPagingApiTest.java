@@ -3,6 +3,7 @@ package turip.content.api.paging;
 import static org.hamcrest.Matchers.is;
 
 import io.restassured.RestAssured;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -76,7 +77,7 @@ class DomesticRegionCategoryPagingApiTest {
     @Test
     void readContentsBySeoulRegionCategory() {
         // when: 첫 번째 페이지 (lastId=0, size=5)
-        var firstPageResponse = RestAssured.given().port(port)
+        Response firstPageResponse = RestAssured.given().port(port)
                 .queryParam("regionCategory", "서울")
                 .queryParam("size", 5)
                 .queryParam("lastId", 0)
@@ -93,7 +94,7 @@ class DomesticRegionCategoryPagingApiTest {
         Integer lastContentId = firstPageResponse.jsonPath().get("contents[4].content.id");
 
         // when: 두 번째 페이지
-        var secondPageResponse = RestAssured.given().port(port)
+        Response secondPageResponse = RestAssured.given().port(port)
                 .queryParam("regionCategory", "서울")
                 .queryParam("size", 5)
                 .queryParam("lastId", lastContentId)
@@ -111,7 +112,7 @@ class DomesticRegionCategoryPagingApiTest {
     @Test
     void readContentsByDomesticOtherRegionCategory() {
         // when: 첫 번째 페이지 (lastId=0, size=5)
-        var firstPageResponse = RestAssured.given().port(port)
+        Response firstPageResponse = RestAssured.given().port(port)
                 .queryParam("regionCategory", "국내 기타")
                 .queryParam("size", 5)
                 .queryParam("lastId", 0)
@@ -128,7 +129,7 @@ class DomesticRegionCategoryPagingApiTest {
         Integer lastContentId = firstPageResponse.jsonPath().get("contents[4].content.id");
 
         // when: 두 번째 페이지
-        var secondPageResponse = RestAssured.given().port(port)
+        Response secondPageResponse = RestAssured.given().port(port)
                 .queryParam("regionCategory", "국내 기타")
                 .queryParam("size", 5)
                 .queryParam("lastId", lastContentId)
