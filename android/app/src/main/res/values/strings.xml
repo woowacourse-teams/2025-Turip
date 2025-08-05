@@ -19,7 +19,6 @@
 
     <!-- 지역 결과 페이지 -->
     <string name="region_result_no_result">검색 결과가 없습니다.</string>
-    <string name="region_result_video_description">%s · %s</string>
     <string name="region_result_exist_result">검색결과 %d개</string>
 
     <!-- 홈 페이지 -->
