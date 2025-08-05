@@ -58,7 +58,7 @@ class RegionCategoryApiTest {
             // when & then
             RestAssured.given().port(port)
                     .queryParam("isKorea", true)
-                    .when().get("/regionCategories")
+                    .when().get("/region-categories")
                     .then()
                     .statusCode(200)
                     .body("regionCategories.size()", is(3)) // 서울, 부산, 국내 기타
@@ -77,7 +77,7 @@ class RegionCategoryApiTest {
             // when & then
             RestAssured.given().port(port)
                     .queryParam("isKorea", false)
-                    .when().get("/regionCategories")
+                    .when().get("/region-categories")
                     .then()
                     .statusCode(200)
                     .body("regionCategories.size()", is(3)) // 일본, 중국, 해외 기타
