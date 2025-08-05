@@ -141,7 +141,9 @@ class TripDetailViewModel(
                 .loadId()
                 .onSuccess { turipDeviceIdentifier: TuripDeviceIdentifier ->
                     deviceIdentifier = turipDeviceIdentifier
-                }.onFailure { }
+                }.onFailure {
+                    Timber.e("${it.message}")
+                }
         }
     }
 
