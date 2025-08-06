@@ -44,7 +44,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         super.onCreate(savedInstanceState)
         setupToolbar()
         setupListeners()
-        setupObserves()
+        setupObservers()
         binding.etSearchResult.requestFocus()
         binding.rvSearchResult.adapter = searchAdapter
         binding.rvSearchResult.itemAnimator = null
@@ -91,7 +91,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         }
     }
 
-    private fun setupObserves() {
+    private fun setupObservers() {
         viewModel.searchingWord.observe(this) { words: String ->
             binding.ivSearchResultClear.visibility =
                 if (words.isNotBlank()) View.VISIBLE else View.GONE
