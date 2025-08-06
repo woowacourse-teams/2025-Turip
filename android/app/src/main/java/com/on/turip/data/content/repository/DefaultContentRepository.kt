@@ -2,10 +2,10 @@ package com.on.turip.data.content.repository
 
 import com.on.turip.data.content.datasource.ContentRemoteDataSource
 import com.on.turip.data.content.toDomain
+import com.on.turip.domain.content.Content
 import com.on.turip.domain.content.PagedContentsResult
 import com.on.turip.domain.content.UsersLikeContent
 import com.on.turip.domain.content.repository.ContentRepository
-import com.on.turip.domain.content.video.VideoData
 import com.on.turip.domain.userstorage.TuripDeviceIdentifier
 import com.on.turip.domain.userstorage.repository.UserStorageRepository
 import kotlinx.coroutines.CoroutineScope
@@ -59,7 +59,7 @@ class DefaultContentRepository(
             .getContentsByKeyword(keyword, size, lastId)
             .mapCatching { it.toDomain() }
 
-    override suspend fun loadContent(contentId: Long): Result<VideoData> =
+    override suspend fun loadContent(contentId: Long): Result<Content> =
         contentRemoteDataSource
             .getContentDetail(contentId, deviceIdentifier.fid)
             .mapCatching { it.toDomain() }

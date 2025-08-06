@@ -9,6 +9,7 @@ import com.on.turip.data.content.dto.CreatorInformationResponse
 import com.on.turip.data.content.dto.TripDurationInformationResponse
 import com.on.turip.data.content.dto.UsersLikeContentResponse
 import com.on.turip.data.content.dto.UsersLikeContentsResponse
+import com.on.turip.data.creator.toDomain
 import com.on.turip.domain.content.Content
 import com.on.turip.domain.content.PagedContentsResult
 import com.on.turip.domain.content.UsersLikeContent
@@ -44,8 +45,6 @@ fun ContentResponse.toDomain(): Content =
                 title = title,
                 url = url,
                 uploadedDate = uploadedDate,
-                isFavorite = false,
-                // TODO : isFavorite 나중에 검색 결과에서도 찜 현황 보여주고 싶을 때 서버에서 받아오기
             ),
         city = city.toDomain(),
         isFavorite = isFavorite,
@@ -69,11 +68,17 @@ fun CreatorInformationResponse.toDomain(): Creator =
         profileImage = profileImage,
     )
 
-fun ContentDetailResponse.toDomain(): VideoData =
-    VideoData(
-        title = title,
-        url = url,
-        uploadedDate = uploadedDate,
+fun ContentDetailResponse.toDomain(): Content =
+    Content(
+        id = id,
+        creator = creator.toDomain(),
+        videoData =
+            VideoData(
+                title = title,
+                url = url,
+                uploadedDate = uploadedDate,
+            ),
+        city = city.toDomain(),
         isFavorite = isFavorite,
     )
 
