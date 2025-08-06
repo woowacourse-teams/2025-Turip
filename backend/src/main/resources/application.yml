@@ -11,13 +11,8 @@ spring:
       mode: always
       data-locations:
         - classpath:Region/region_data.sql
-        - classpath:data.sql
-        - classpath:yeoconam_gangwon_gyeongju_data.sql
-        - classpath:yeoconam_ganwon_gangneung_data.sql
-        - classpath:hachantour_gangwon_data.sql
-        - classpath:jejueddy_gangwon_sokcho_data.sql
-        - classpath:yeoconam_seoul_data.sql
-        - classpath:jejueddy_posak_date.sql
+        - classpath:Creator/creator_data.sql
+
 
   jpa:
     show-sql: true
