@@ -5,10 +5,14 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ContentDetailResponse(
-    @SerialName("creatorId")
-    val creatorId: Int,
-    @SerialName("regionId")
-    val regionId: Int,
+    @SerialName("city")
+    val city: City,
+    @SerialName("creator")
+    val creator: Creator,
+    @SerialName("id")
+    val id: Int,
+    @SerialName("isFavorite")
+    val isFavorite: Boolean,
     @SerialName("title")
     val title: String,
     @SerialName("uploadedDate")

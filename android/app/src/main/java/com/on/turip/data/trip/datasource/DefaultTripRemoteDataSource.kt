@@ -1,4 +1,4 @@
-package com.on.turip.data.trip.dataSource
+package com.on.turip.data.trip.datasource
 
 import com.on.turip.data.trip.dto.TripResponse
 import com.on.turip.data.trip.service.TripService

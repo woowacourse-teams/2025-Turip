@@ -1,4 +1,4 @@
-package com.on.turip.data.creator.dataSource
+package com.on.turip.data.creator.datasource
 
 import com.on.turip.data.creator.dto.CreatorResponse
 import com.on.turip.data.creator.service.CreatorService

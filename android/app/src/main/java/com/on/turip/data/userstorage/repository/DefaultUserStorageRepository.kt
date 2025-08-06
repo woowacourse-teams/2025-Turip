@@ -1,18 +1,18 @@
-package com.on.turip.data.userStorage.repository
+package com.on.turip.data.userstorage.repository
 
 import com.google.firebase.installations.FirebaseInstallations
-import com.on.turip.data.userStorage.dataSource.UserStorageLocalDataSource
-import com.on.turip.data.userStorage.toDomain
-import com.on.turip.domain.settingsStorage.TuripDeviceIdentifier
-import com.on.turip.domain.settingsStorage.repository.UserStorageRepository
+import com.on.turip.data.userstorage.datasource.UserStorageLocalDataSource
+import com.on.turip.data.userstorage.toDomain
+import com.on.turip.domain.userstorage.TuripDeviceIdentifier
+import com.on.turip.domain.userstorage.repository.UserStorageRepository
 import kotlinx.coroutines.tasks.await
 import timber.log.Timber
 
 class DefaultUserStorageRepository(
     private val userStorageLocalDataSource: UserStorageLocalDataSource,
 ) : UserStorageRepository {
-    override suspend fun createId(id: String) {
-        userStorageLocalDataSource.createId(id)
+    override suspend fun createId(turipDeviceIdentifier: TuripDeviceIdentifier) {
+        userStorageLocalDataSource.createId(turipDeviceIdentifier.fid)
     }
 
     override suspend fun loadId(): Result<TuripDeviceIdentifier> =

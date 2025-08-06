@@ -41,6 +41,8 @@ fun ContentResponse.toDomain(): Content =
                 title = title,
                 url = url,
                 uploadedDate = uploadedDate,
+                isFavorite = false,
+                // TODO : isFavorite 나중에 검색 결과에서도 찜 현황 보여주고 싶을 때 서버에서 받아오기
             ),
         city = city.toDomain(),
     )
@@ -68,4 +70,5 @@ fun ContentDetailResponse.toDomain(): VideoData =
         title = title,
         url = url,
         uploadedDate = uploadedDate,
+        isFavorite = isFavorite,
     )

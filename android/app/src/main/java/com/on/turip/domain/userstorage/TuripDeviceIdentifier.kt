@@ -1,4 +1,4 @@
-package com.on.turip.domain.settingsStorage
+package com.on.turip.domain.userstorage
 
 data class TuripDeviceIdentifier(
     val fid: String,
