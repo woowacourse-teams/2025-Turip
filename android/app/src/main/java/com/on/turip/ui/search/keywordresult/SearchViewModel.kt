@@ -12,6 +12,7 @@ import com.on.turip.di.RepositoryModule
 import com.on.turip.domain.content.PagedContentsResult
 import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.content.video.VideoInformation
+import com.on.turip.domain.searchhistory.SearchHistoryRepository
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.search.model.VideoInformationModel
 import kotlinx.coroutines.Deferred
@@ -21,6 +22,7 @@ import timber.log.Timber
 
 class SearchViewModel(
     private val contentRepository: ContentRepository,
+    private val searchHistoryRepository: SearchHistoryRepository,
 ) : ViewModel() {
     private val _searchingWord: MutableLiveData<String> = MutableLiveData()
     val searchingWord: LiveData<String> get() = _searchingWord
@@ -81,11 +83,15 @@ class SearchViewModel(
     }
 
     companion object {
-        fun provideFactory(contentRepository: ContentRepository = RepositoryModule.contentRepository): ViewModelProvider.Factory =
+        fun provideFactory(
+            contentRepository: ContentRepository = RepositoryModule.contentRepository,
+            searchHistoryRepository: SearchHistoryRepository = RepositoryModule.searchHistoryRepository,
+        ): ViewModelProvider.Factory =
             viewModelFactory {
                 initializer {
                     SearchViewModel(
                         contentRepository,
+                        searchHistoryRepository,
                     )
                 }
             }
