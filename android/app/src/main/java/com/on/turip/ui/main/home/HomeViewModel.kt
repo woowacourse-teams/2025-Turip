@@ -1,78 +1,16 @@
 package com.on.turip.ui.main.home
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.on.turip.di.RepositoryModule
-import com.on.turip.domain.content.PopularFavoriteContent
-import com.on.turip.domain.content.repository.ContentRepository
-import com.on.turip.domain.region.RegionCategory
-import com.on.turip.domain.region.RegionRepository
-import kotlinx.coroutines.launch
-import timber.log.Timber
+import androidx.lifecycle.liveData
+import com.on.turip.domain.region.Region
+import com.on.turip.domain.region.RegionType
+import com.on.turip.ui.common.model.RegionModel
 
-class HomeViewModel(
-    private val regionRepository: RegionRepository,
-    private val contentRepository: ContentRepository,
-) : ViewModel() {
-    private val _regionCategories: MutableLiveData<List<RegionCategory>> = MutableLiveData()
-    val regionCategories: LiveData<List<RegionCategory>> get() = _regionCategories
-
-    private val _isSelectedDomestic: MutableLiveData<Boolean> = MutableLiveData()
-    val isSelectedDomestic: LiveData<Boolean> get() = _isSelectedDomestic
-
-    private val _usersLikeContents: MutableLiveData<List<PopularFavoriteContent>> =
-        MutableLiveData()
-    val usersLikeContents: LiveData<List<PopularFavoriteContent>> get() = _usersLikeContents
-
-    init {
-        loadUsersLikeContents()
-        loadRegionCategories(isDomestic = true)
-    }
-
-    private fun loadUsersLikeContents() {
-        viewModelScope.launch {
-            contentRepository
-                .loadPopularFavoriteContents()
-                .onSuccess { popularFavoriteContents: List<PopularFavoriteContent> ->
-                    _usersLikeContents.value = popularFavoriteContents
-                    Timber.d("$popularFavoriteContents")
-                }.onFailure {
-                    Timber.e("${it.message}")
-                }
-        }
-    }
-
-    fun loadRegionCategories(isDomestic: Boolean) {
-        viewModelScope.launch {
-            regionRepository
-                .loadRegionCategories(isDomestic)
-                .onSuccess { regionCategories: List<RegionCategory> ->
-                    _regionCategories.value = regionCategories
-                    _isSelectedDomestic.value = isDomestic
-                    Timber.d("$regionCategories")
-                }.onFailure {
-                    Timber.e("${it.message}")
-                }
-        }
-    }
-
-    companion object {
-        fun provideFactory(
-            regionRepository: RegionRepository = RepositoryModule.regionRepository,
-            contentRepository: ContentRepository = RepositoryModule.contentRepository,
-        ): ViewModelProvider.Factory =
-            viewModelFactory {
-                initializer {
-                    HomeViewModel(
-                        regionRepository,
-                        contentRepository,
-                    )
-                }
-            }
-    }
+class HomeViewModel : ViewModel() {
+    val metropolitanCities: LiveData<List<RegionModel>> =
+        liveData {
+            val metropolitans: List<Region> = Region.from(RegionType.METROPOLITAN_CITY)
+            emit(metropolitans.map(RegionModel::find))
+        } // TODO: 추후 수정 예정
 }

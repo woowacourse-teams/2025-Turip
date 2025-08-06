@@ -1,6 +1,6 @@
 package com.on.turip.data.creator.repository
 
-import com.on.turip.data.creator.datasource.CreatorRemoteDataSource
+import com.on.turip.data.creator.dataSource.CreatorRemoteDataSource
 import com.on.turip.data.creator.toDomain
 import com.on.turip.domain.creator.Creator
 import com.on.turip.domain.creator.repository.CreatorRepository

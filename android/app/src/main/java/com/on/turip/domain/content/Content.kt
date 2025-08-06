@@ -7,5 +7,4 @@ data class Content(
     val id: Long,
     val creator: Creator,
     val videoData: VideoData,
-    val city: City,
 )

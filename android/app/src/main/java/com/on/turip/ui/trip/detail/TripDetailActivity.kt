@@ -15,11 +15,9 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.on.turip.R
 import com.on.turip.databinding.ActivityTripDetailBinding
-import com.on.turip.domain.content.Content
 import com.on.turip.ui.common.TuripUrlConverter
 import com.on.turip.ui.common.base.BaseActivity
 import com.on.turip.ui.common.loadCircularImage
-import com.on.turip.ui.common.model.trip.TripModel
 import com.on.turip.ui.common.model.trip.toDisplayText
 import com.on.turip.ui.trip.detail.webview.TuripWebChromeClient
 import com.on.turip.ui.trip.detail.webview.TuripWebViewClient
@@ -158,42 +156,40 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
 
     private fun setupListeners() {
         binding.tvTripDetailVideoError.setOnClickListener {
-            val intent: Intent =
+            val intent =
                 Intent(
                     Intent.ACTION_VIEW,
-                    viewModel.videoUri.value?.toUri(),
+                    viewModel.tripDetailState.value
+                        ?.content
+                        ?.videoData
+                        ?.url
+                        ?.toUri(),
                 )
             startActivity(intent)
-        }
-        binding.ivTripDetailFavorite.setOnClickListener {
-            viewModel.updateFavorite()
         }
     }
 
     private fun setupObservers() {
-        viewModel.days.observe(this) { days: List<DayModel> ->
-            tripDayAdapter.submitList(days)
-        }
-        viewModel.places.observe(this) { places: List<PlaceModel> ->
-            tripPlaceAdapter.submitList(places)
-            binding.tvTripDetailDayPlaceCount.text =
-                getString(R.string.trip_detail_day_place_count, places.size)
-        }
-        viewModel.content.observe(this) { content: Content ->
+        viewModel.tripDetailState.observe(this) { tripDetailState ->
+            tripDayAdapter.submitList(tripDetailState.days)
+            tripPlaceAdapter.submitList(tripDetailState.places)
             binding.ivTripDetailCreatorThumbnail.loadCircularImage(
-                content.creator.profileImage,
+                tripDetailState.content?.creator?.profileImage ?: "",
             )
-            binding.tvTripDetailCreatorName.text = content.creator.channelName
-            binding.tvTripDetailContentTitle.text = content.videoData.title
-            binding.tvTripDetailUploadDate.text = content.videoData.uploadedDate
-        }
-        viewModel.tripModel.observe(this) { tripModel: TripModel ->
+            binding.tvTripDetailCreatorName.text = tripDetailState.content?.creator?.channelName
+            binding.tvTripDetailContentTitle.text = tripDetailState.content?.videoData?.title
+            binding.tvTripDetailUploadDate.text = tripDetailState.content?.videoData?.uploadedDate
             binding.tvTripDetailTotalPlaceCount.text =
-                getString(R.string.all_total_place_count, tripModel.tripPlaceCount)
+                getString(R.string.all_total_place_count, tripDetailState.tripModel.tripPlaceCount)
             binding.tvTripDetailTravelDuration.text =
-                tripModel.tripDurationModel.toDisplayText(this)
+                tripDetailState.tripModel.tripDurationModel.toDisplayText(this)
+            binding.tvTripDetailDayPlaceCount.text =
+                getString(
+                    R.string.trip_detail_day_place_count,
+                    tripDetailState.places.size,
+                )
         }
-        viewModel.videoUri.observe(this) { url: String ->
+        viewModel.videoUri.observe(this) { url ->
             binding.wvTripDetailVideo.apply {
                 addJavascriptInterface(
                     WebViewVideoBridge(
@@ -204,9 +200,6 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
             }
 
             binding.wvTripDetailVideo.loadUrl(LOAD_URL_FILE_PATH)
-        }
-        viewModel.isFavorite.observe(this) { isFavorite: Boolean ->
-            binding.ivTripDetailFavorite.isSelected = isFavorite
         }
     }
 

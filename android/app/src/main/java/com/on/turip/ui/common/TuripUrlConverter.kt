@@ -1,8 +1,7 @@
 package com.on.turip.ui.common
 
 object TuripUrlConverter {
-    private const val YOUTUBE_VIDEO_THUMBNAIL_FORM: String =
-        "https://img.youtube.com/vi/%s/maxresdefault.jpg"
+    private const val YOUTUBE_VIDEO_THUMBNAIL_FORM: String = "https://img.youtube.com/vi/%s/0.jpg"
     private const val VIDEO_ID_POSITION: Int = 1
 
     private object VideoRegex {
