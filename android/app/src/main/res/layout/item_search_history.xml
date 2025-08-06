@@ -7,6 +7,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <TextView
+        android:id="@+id/tv_search_history_keyword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAppearance="@style/body1"
@@ -18,8 +19,10 @@
         tools:text="대구" />
 
     <ImageView
+        android:id="@+id/iv_search_history_cancel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:contentDescription="@null"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
