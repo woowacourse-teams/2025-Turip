@@ -14,6 +14,7 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.on.turip.R
@@ -98,12 +99,19 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 viewModel.loadByKeyword()
                 viewModel.createSearchHistory()
+                binding.rvSearchResultSearchHistory.visibility = View.GONE
                 val inputMethodManager: InputMethodManager =
                     getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                 inputMethodManager.hideSoftInputFromWindow(binding.etSearchResult.windowToken, 0)
                 true
             } else {
                 false
+            }
+        }
+
+        binding.etSearchResult.setOnFocusChangeListener { view, hasFocus ->
+            if (hasFocus) {
+                binding.rvSearchResultSearchHistory.visibility = View.VISIBLE
             }
         }
 
@@ -162,17 +170,36 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
         if (ev.action == MotionEvent.ACTION_DOWN) {
             val v: View? = currentFocus
+            val touchX = ev.rawX.toInt()
+            val touchY = ev.rawY.toInt()
+
             if (v is EditText) {
                 val outRect: Rect = Rect()
                 v.getGlobalVisibleRect(outRect)
-                if (!outRect.contains(ev.rawX.toInt(), ev.rawY.toInt())) {
+                if (!outRect.contains(touchX, touchY)) {
                     v.clearFocus()
                     val imm: InputMethodManager =
                         getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                     imm.hideSoftInputFromWindow(v.windowToken, 0)
                 }
             }
+
+            if (binding.rvSearchResultSearchHistory.isVisible) {
+                val rvRect: Rect = Rect()
+                binding.rvSearchResultSearchHistory.getGlobalVisibleRect(rvRect)
+
+                val editTextRect: Rect = Rect()
+                binding.etSearchResult.getGlobalVisibleRect(editTextRect)
+
+                val isTouchInRecyclerView: Boolean = rvRect.contains(touchX, touchY)
+                val isTouchInEditText: Boolean = editTextRect.contains(touchX, touchY)
+
+                if (!isTouchInRecyclerView && !isTouchInEditText) {
+                    binding.rvSearchResultSearchHistory.visibility = View.GONE
+                }
+            }
         }
+
         return super.dispatchTouchEvent(ev)
     }
 
