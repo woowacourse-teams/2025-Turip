@@ -12,20 +12,40 @@ class DefaultContentRemoteDataSource(
     private val contentService: ContentService,
     private val coroutineContext: CoroutineContext = Dispatchers.IO,
 ) : ContentRemoteDataSource {
-    override suspend fun getContentsSize(region: String): Result<ContentInformationCountResponse> =
+    override suspend fun getContentsSizeByRegion(region: String): Result<ContentInformationCountResponse> =
         withContext(coroutineContext) {
-            runCatching { contentService.getContentsCount(region) }
+            runCatching { contentService.getContentsCountByRegion(region) }
         }
 
-    override suspend fun getContents(
+    override suspend fun getContentsSizeByKeyword(keyword: String): Result<ContentInformationCountResponse> =
+        withContext(coroutineContext) {
+            runCatching { contentService.getContentsCountByKeyword(keyword) }
+        }
+
+    override suspend fun getContentsByRegion(
         region: String,
         size: Int,
         lastId: Long,
     ): Result<ContentsInformationResponse> =
         withContext(coroutineContext) {
             runCatching {
-                contentService.getContentsInformation(
+                contentService.getContentsByRegion(
                     region = region,
+                    size = size,
+                    lastId = lastId,
+                )
+            }
+        }
+
+    override suspend fun getContentsByKeyword(
+        keyword: String,
+        size: Int,
+        lastId: Long,
+    ): Result<ContentsInformationResponse> =
+        withContext(coroutineContext) {
+            runCatching {
+                contentService.getContentsByKeyword(
+                    keyword = keyword,
                     size = size,
                     lastId = lastId,
                 )
