@@ -131,7 +131,7 @@ public class ContentApiTest {
         }
     }
 
-    @DisplayName("/contents/count GET 키워드로 검색된 컨텐츠 수 조회 테스트")
+    @DisplayName("/contents/keyword/count GET 키워드로 검색된 컨텐츠 수 조회 테스트")
     @Nested
     class ReadCountByKeyword {
 
@@ -151,14 +151,14 @@ public class ContentApiTest {
             // when & then
             RestAssured.given().port(port)
                     .queryParam("keyword", "메이")
-                    .when().get("/contents/count")
+                    .when().get("/contents/keyword/count")
                     .then()
                     .statusCode(200)
                     .body("count", is(1));
         }
     }
 
-    @DisplayName("/contents GET 키워드 기반 컨텐츠 검색 테스트")
+    @DisplayName("/contents/keyword GET 키워드 기반 컨텐츠 검색 테스트")
     @Nested
     class ReadByKeyword {
 
@@ -180,7 +180,7 @@ public class ContentApiTest {
                     .queryParam("keyword", "메이")
                     .queryParam("size", 2)
                     .queryParam("lastId", 0)
-                    .when().get("/contents")
+                    .when().get("/contents/keyword")
                     .then()
                     .statusCode(200)
                     .body("contents.size()", is(2))
@@ -205,11 +205,69 @@ public class ContentApiTest {
                     .queryParam("keyword", "메이")
                     .queryParam("size", 1)
                     .queryParam("lastId", 0)
-                    .when().get("/contents")
+                    .when().get("/contents/keyword")
                     .then()
                     .statusCode(200)
                     .body("contents.size()", is(1))
                     .body("loadable", is(true));
+        }
+    }
+
+    @DisplayName("/contents/popular/favorites GET 주간 인기 컨텐츠 조회 테스트")
+    @Nested
+    class ReadWeeklyPopularFavoriteContents {
+
+        @DisplayName("device-fid 헤더가 존재하지 않는 경우 컨텐츠 목록과 찜 상태 false를 응답한다. 성공 시 200 OK 코드를 응답한다")
+        @Test
+        void getPopularContentsWithoutDeviceFid() {
+            // given
+            jdbcTemplate.update(
+                    "INSERT INTO creator (profile_image, channel_name) VALUES ('https://image.example.com/creator.jpg', '여행채널')");
+            jdbcTemplate.update("INSERT INTO country (name) VALUES ('대한민국')");
+            jdbcTemplate.update("INSERT INTO city (name, country_id, province_id) VALUES ('서울', 1, null)");
+            jdbcTemplate.update("INSERT INTO content (creator_id, city_id, url, title, uploaded_date) " +
+                    "VALUES (1, 1, 'https://youtube.com/watch?v=test', '서울 여행', '2025-07-28')");
+            jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('testDeviceFid')");
+            jdbcTemplate.update(
+                    "INSERT INTO favorite (member_id, content_id, created_at) VALUES (1, 1, CURRENT_DATE - 7)");
+
+            // when & then
+            RestAssured.given().port(port)
+                    .queryParam("size", 5)
+                    .when().log().all().get("/contents/popular/favorites")
+                    .then().log().all()
+                    .statusCode(200)
+                    .body("contents[0].content.id", is(1))
+                    .body("contents[0].content.title", is("서울 여행"))
+                    .body("contents[0].content.city.name", is("서울"))
+                    .body("contents[0].content.isFavorite", is(false));
+        }
+
+        @DisplayName("device-fid 헤더가 존재하면 컨텐츠 목록과 찜 여부를 응답한다. 성공 시 200 OK 코드를 응답한다")
+        @Test
+        void getPopularContentsWithDeviceFid() {
+            // given
+            jdbcTemplate.update(
+                    "INSERT INTO creator (profile_image, channel_name) VALUES ('https://image.example.com/creator.jpg', '여행채널')");
+            jdbcTemplate.update("INSERT INTO country (name) VALUES ('대한민국')");
+            jdbcTemplate.update("INSERT INTO city (name, country_id, province_id) VALUES ('서울', 1, null)");
+            jdbcTemplate.update("INSERT INTO content (creator_id, city_id, url, title, uploaded_date) " +
+                    "VALUES (1, 1, 'https://youtube.com/watch?v=test', '서울 여행', '2025-07-28')");
+            jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('testDeviceFid')");
+            jdbcTemplate.update(
+                    "INSERT INTO favorite (member_id, content_id, created_at) VALUES (1, 1, CURRENT_DATE - 7)");
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .queryParam("size", 5)
+                    .when().get("/contents/popular/favorites")
+                    .then()
+                    .statusCode(200)
+                    .body("contents[0].content.id", is(1))
+                    .body("contents[0].content.title", is("서울 여행"))
+                    .body("contents[0].content.city.name", is("서울"))
+                    .body("contents[0].content.isFavorite", is(true));
         }
     }
 }
