@@ -45,7 +45,7 @@ public class LoggingInterceptor implements HandlerInterceptor {
             MDC.put("duration", duration + DURATION_TIME_UNIT);
 
             if (ex != null) {
-                log.error("API 처리 중 예외 발생");
+                log.error("API 처리 중 예외 발생: {}", ex.getMessage(), ex);
 
             } else {
                 log.info("API 응답");
