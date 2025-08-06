@@ -1,9 +1,9 @@
 ALTER TABLE place ALTER COLUMN url VARCHAR(65535);
 
 -- Country
-INSERT INTO country (name) VALUES ('대한민국');
-INSERT INTO country (name) VALUES ('일본');
-INSERT INTO country (name) VALUES ('대만');
+INSERT INTO country (name, image_url) VALUES ('대한민국', 'https://drive.google.com/uc?export=view&id=1KBDFs86Avql4SBmjRcsfXKLPCfDowmBk');
+INSERT INTO country (name, image_url) VALUES ('일본', 'https://drive.google.com/uc?export=view&id=1KBDFs86Avql4SBmjRcsfXKLPCfDowmBk');
+INSERT INTO country (name, image_url) VALUES ('대만', 'https://drive.google.com/uc?export=view&id=1KBDFs86Avql4SBmjRcsfXKLPCfDowmBk');
 
 -- Province
 INSERT INTO province (name) VALUES ('경기도');
