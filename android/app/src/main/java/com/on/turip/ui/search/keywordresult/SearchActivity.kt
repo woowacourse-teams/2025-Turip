@@ -45,9 +45,13 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         setupToolbar()
         setupListeners()
         setupObservers()
+        setupAdapters()
         binding.etSearchResult.requestFocus()
-        binding.rvSearchResult.adapter = searchAdapter
         binding.rvSearchResult.itemAnimator = null
+    }
+
+    private fun setupAdapters() {
+        binding.rvSearchResult.adapter = searchAdapter
     }
 
     private fun setupToolbar() {
