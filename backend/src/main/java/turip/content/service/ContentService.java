@@ -3,7 +3,12 @@ package turip.content.service;
 import static turip.regioncategory.domain.DomesticRegionCategory.OTHER_DOMESTIC;
 import static turip.regioncategory.domain.OverseasRegionCategory.OTHER_OVERSEAS;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,9 +23,12 @@ import turip.content.controller.dto.response.ContentSearchResultResponse;
 import turip.content.controller.dto.response.ContentWithCreatorAndCityResponse;
 import turip.content.controller.dto.response.ContentsByRegionCategoryResponse;
 import turip.content.controller.dto.response.TripDurationResponse;
+import turip.content.controller.dto.response.WeeklyPopularFavoriteContentResponse;
+import turip.content.controller.dto.response.WeeklyPopularFavoriteContentsResponse;
 import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
 import turip.favorite.repository.FavoriteRepository;
+import turip.member.domain.Member;
 import turip.member.repository.MemberRepository;
 import turip.exception.custom.BadRequestException;
 import turip.exception.custom.NotFoundException;
@@ -33,6 +41,8 @@ import turip.tripcourse.service.TripCourseService;
 public class ContentService {
 
     private static final int EXTRA_FETCH_COUNT = 1;
+    private static final int DAYS_UNTIL_SUNDAY = 6;
+    private static final int ONE_WEEK = 1;
 
     private final ContentRepository contentRepository;
     private final TripCourseService tripCourseService;
@@ -72,9 +82,33 @@ public class ContentService {
         return ContentsByRegionCategoryResponse.of(contentDetails, loadable, regionCategory);
     }
 
-    public ContentCountResponse countByCityName(String cityName) {
-        int count = contentRepository.countByCityName(cityName);
-        return ContentCountResponse.from(count);
+    public WeeklyPopularFavoriteContentsResponse findWeeklyPopularFavoriteContents(String deviceFid,
+                                                                                   int topContentSize) {
+        List<LocalDate> lastWeekPeriod = getLastWeekPeriod();
+        LocalDate startDate = lastWeekPeriod.getFirst();
+        LocalDate endDate = lastWeekPeriod.getLast();
+
+        List<Content> popularContents = favoriteRepository.findPopularContentsByFavoriteBetweenDatesWithLimit(
+                startDate, endDate, topContentSize);
+        if (deviceFid == null) {
+            return convertContentsToPopularContentsResponse(popularContents, false);
+        }
+        Member member = memberRepository.findByDeviceFid(deviceFid)
+                .orElse(null);
+        if (member == null) {
+            return convertContentsToPopularContentsResponse(popularContents, false);
+        }
+        Set<Long> favoritedContentIds = findFavoritedContentIds(member, popularContents);
+
+        return WeeklyPopularFavoriteContentsResponse.from(
+                popularContents.stream()
+                        .map(content -> WeeklyPopularFavoriteContentResponse.of(
+                                content,
+                                favoritedContentIds.contains(content.getId()),
+                                calculateTripDuration(content)
+                        ))
+                        .toList()
+        );
     }
 
     public ContentCountResponse countByKeyword(String keyword) {
@@ -225,5 +259,31 @@ public class ContentService {
     private TripDurationResponse calculateTripDuration(Content content) {
         int totalTripDay = tripCourseService.calculateDurationDays(content.getId());
         return TripDurationResponse.of(totalTripDay - 1, totalTripDay);
+    }
+
+    private List<LocalDate> getLastWeekPeriod() {
+        LocalDate thisWeekMonday = LocalDate.now().with(DayOfWeek.MONDAY);
+        LocalDate lastWeekMonday = thisWeekMonday.minusWeeks(ONE_WEEK);
+        LocalDate lastWeekSunday = lastWeekMonday.plusDays(DAYS_UNTIL_SUNDAY);
+        return new ArrayList<>(List.of(lastWeekMonday, lastWeekSunday));
+    }
+
+    private Set<Long> findFavoritedContentIds(Member member, List<Content> contents) {
+        List<Long> contentIds = contents.stream()
+                .map(Content::getId)
+                .toList();
+        return favoriteRepository.findByMemberIdAndContentIdIn(member.getId(), contentIds).stream()
+                .map(favorite -> favorite.getContent().getId())
+                .collect(Collectors.toSet());
+    }
+
+    private WeeklyPopularFavoriteContentsResponse convertContentsToPopularContentsResponse(
+            List<Content> popularContents, boolean isFavorite) {
+        return WeeklyPopularFavoriteContentsResponse.from(
+                popularContents.stream()
+                        .map(content -> WeeklyPopularFavoriteContentResponse.of(content, isFavorite,
+                                calculateTripDuration(content)))
+                        .toList()
+        );
     }
 }

@@ -19,6 +19,7 @@ import turip.content.controller.dto.response.ContentCountResponse;
 import turip.content.controller.dto.response.ContentResponse;
 import turip.content.controller.dto.response.ContentSearchResponse;
 import turip.content.controller.dto.response.ContentsByRegionCategoryResponse;
+import turip.content.controller.dto.response.WeeklyPopularFavoriteContentsResponse;
 import turip.content.service.ContentService;
 import turip.exception.ErrorResponse;
 
@@ -99,7 +100,7 @@ public class ContentController {
                             )
                     ))
     })
-    @GetMapping("/count/keyword")
+    @GetMapping("/keyword/count")
     public ResponseEntity<ContentCountResponse> readCountByKeyword(
             @RequestParam(name = "keyword") String keyword) {
         ContentCountResponse response = contentService.countByKeyword(keyword);
@@ -335,5 +336,14 @@ public class ContentController {
     ) {
         ContentResponse response = contentService.getContentWithFavoriteStatus(contentId, deviceFid);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/popular/favorites")
+    public ResponseEntity<WeeklyPopularFavoriteContentsResponse> readWeeklyPopularFavoriteContents(
+            @RequestHeader(value = "device-fid", required = false) String deviceFid,
+            @RequestParam("size") int topContentSize) {
+        WeeklyPopularFavoriteContentsResponse weeklyPopularFavoriteContents = contentService.findWeeklyPopularFavoriteContents(
+                deviceFid, topContentSize);
+        return ResponseEntity.ok(weeklyPopularFavoriteContents);
     }
 }
