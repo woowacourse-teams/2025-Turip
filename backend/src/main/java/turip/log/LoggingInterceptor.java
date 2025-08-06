@@ -25,6 +25,8 @@ public class LoggingInterceptor implements HandlerInterceptor {
         request.setAttribute(REQUEST_START_TIME_ATTRIBUTE, System.currentTimeMillis());
 
         MDC.put("traceId", traceId);
+        MDC.put("remoteAddr", request.getRemoteAddr());
+        MDC.put("userAgent", request.getHeader("User-Agent"));
         MDC.put("method", request.getMethod());
         MDC.put("uri", request.getRequestURI());
 
@@ -46,13 +48,15 @@ public class LoggingInterceptor implements HandlerInterceptor {
                 log.error("API 처리 중 예외 발생");
 
             } else {
-                log.info("API 처리 성공");
+                log.info("API 응답");
             }
         } else {
             log.warn("요청 시작 시간을 찾을 수 없음");
         }
 
         MDC.remove("traceId");
+        MDC.remove("remoteAddr");
+        MDC.remove("userAgent");
         MDC.remove("method");
         MDC.remove("uri");
         MDC.remove("httpStatus");
