@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/pure_white_ffffff"
-    tools:context=".ui.search.result.SearchResultActivity">
+    tools:context=".ui.search.regionresult.RegionResultActivity">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/tb_search_result"
@@ -14,10 +14,51 @@
         android:layout_height="?attr/actionBarSize"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:titleCentered="true"
+        app:titleCentered="false"
+        app:title=""
         app:titleTextAppearance="@style/title1"
-        app:titleTextColor="@color/pure_black_151515"
-        tools:title="대구" />
+        app:titleTextColor="@color/pure_black_151515">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:paddingVertical="8dp"
+            android:paddingHorizontal="16dp"
+            android:background="@drawable/bg_gray100_radius_24dp">
+
+            <EditText
+                android:id="@+id/et_search_result"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:autofillHints=""
+                android:background="@null"
+                android:paddingVertical="4dp"
+                android:hint="@string/hint_text"
+                android:imeOptions="actionSearch"
+                android:textColor="@color/pure_black_151515"
+                android:textColorHint="@color/gray_300_5b5b5b"
+                android:textAppearance="@style/title3"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/iv_search_result_clear"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:inputType="text" />
+
+            <ImageView
+                android:id="@+id/iv_search_result_clear"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:contentDescription="@null"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/et_search_result"
+                app:layout_constraintBottom_toBottomOf="@id/et_search_result"
+                android:src="@drawable/ic_cancel"
+                android:visibility="gone" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.appbar.MaterialToolbar>
 
     <TextView
         android:id="@+id/tv_search_result_count"
@@ -41,14 +82,14 @@
         app:layout_constraintTop_toBottomOf="@id/tv_search_result_count"
         app:layout_constraintBottom_toBottomOf="parent"
         tools:itemCount="10"
-        tools:listitem="@layout/item_search_result" />
+        tools:listitem="@layout/item_result" />
 
     <ImageView
         android:id="@+id/iv_search_result_empty"
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:layout_marginBottom="100dp"
-        android:contentDescription="@string/search_result_no_result"
+        android:contentDescription="@string/region_result_no_result"
         android:src="@drawable/ic_sorry"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -61,7 +102,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="@string/search_result_no_result"
-        android:text="@string/search_result_no_result"
+        android:text="@string/region_result_no_result"
         android:textAppearance="@style/title1"
         android:textColor="@color/gray_400_2b2b2b"
         app:layout_constraintEnd_toEndOf="@id/iv_search_result_empty"
@@ -80,6 +121,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:text="@string/all_loading"
+        android:visibility="gone"
         android:gravity="center"
         android:textColor="@color/pure_black_151515"
         android:textAppearance="@style/display"

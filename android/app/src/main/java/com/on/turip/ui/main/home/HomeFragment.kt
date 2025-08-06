@@ -1,5 +1,6 @@
 package com.on.turip.ui.main.home
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.Spanned
@@ -11,16 +12,36 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import com.on.turip.R
 import com.on.turip.databinding.FragmentHomeBinding
+import com.on.turip.domain.content.Content
+import com.on.turip.domain.content.PopularFavoriteContent
+import com.on.turip.domain.region.RegionCategory
+import com.on.turip.ui.common.ItemSpaceDecoration
 import com.on.turip.ui.common.base.BaseFragment
-import com.on.turip.ui.common.model.RegionModel
-import com.on.turip.ui.search.result.SearchResultActivity
+import com.on.turip.ui.search.keywordresult.SearchResultActivity
+import com.on.turip.ui.search.regionresult.RegionResultActivity
+import com.on.turip.ui.trip.detail.TripDetailActivity
+import timber.log.Timber
 
 class HomeFragment : BaseFragment<FragmentHomeBinding>() {
-    private val viewModel: HomeViewModel by viewModels()
+    private val viewModel: HomeViewModel by viewModels { HomeViewModel.provideFactory() }
 
     private val regionAdapter: RegionAdapter =
-        RegionAdapter { region: RegionModel ->
-            val intent = SearchResultActivity.newIntent(requireContext(), region.english)
+        RegionAdapter { regionCategoryName: String ->
+            Timber.d("지역 선택 : $regionCategoryName")
+            val intent: Intent =
+                RegionResultActivity.newIntent(requireContext(), regionCategoryName)
+            startActivity(intent)
+        }
+
+    private val usersLikeContentAdapter: UsersLikeContentAdapter =
+        UsersLikeContentAdapter { content: Content ->
+            Timber.d("인기 컨텐츠 선택 : ContentId = ${content.id} CreatorId = ${content.creator.id}")
+            val intent: Intent =
+                TripDetailActivity.newIntent(
+                    context = requireContext(),
+                    contentId = content.id,
+                    creatorId = content.creator.id,
+                )
             startActivity(intent)
         }
 
@@ -38,6 +59,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         setupTextHighlighting()
         setupAdapters()
         setupObservers()
+        setupListeners()
     }
 
     private fun setupTextHighlighting() {
@@ -66,11 +88,38 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     private fun setupAdapters() {
         binding.rvHomeRegion.adapter = regionAdapter
+        binding.rvUsersLikeContent.apply {
+            adapter = usersLikeContentAdapter
+            addItemDecoration(ItemSpaceDecoration(end = 10))
+        }
     }
 
     private fun setupObservers() {
-        viewModel.metropolitanCities.observe(viewLifecycleOwner) { metropolitanCities: List<RegionModel> ->
-            regionAdapter.submitList(metropolitanCities)
+        viewModel.regionCategories.observe(viewLifecycleOwner) { regionCategories: List<RegionCategory> ->
+            regionAdapter.submitList(regionCategories)
+        }
+        viewModel.isSelectedDomestic.observe(viewLifecycleOwner) { isSelectedDomestic: Boolean ->
+            binding.tvHomeDomesticButton.isSelected = isSelectedDomestic
+            binding.tvHomeAbroadButton.isSelected = isSelectedDomestic.not()
+        }
+        viewModel.usersLikeContents.observe(viewLifecycleOwner) { usersLikeContents: List<PopularFavoriteContent> ->
+            usersLikeContentAdapter.submitList(usersLikeContents)
+        }
+    }
+
+    private fun setupListeners() {
+        binding.tvHomeDomesticButton.setOnClickListener {
+            Timber.d("국내 클릭")
+            viewModel.loadRegionCategories(isDomestic = true)
+        }
+        binding.tvHomeAbroadButton.setOnClickListener {
+            Timber.d("해외 클릭")
+            viewModel.loadRegionCategories(isDomestic = false)
+        }
+        binding.ivHomeSearch.setOnClickListener {
+            Timber.d("검색 화면 클릭")
+            val intent: Intent = SearchResultActivity.newIntent(requireContext())
+            startActivity(intent)
         }
     }
 }
