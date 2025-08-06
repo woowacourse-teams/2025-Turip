@@ -1,5 +1,12 @@
 package turip.favorite.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import turip.exception.ErrorResponse;
 import turip.favorite.controller.dto.request.FavoriteRequest;
 import turip.favorite.controller.dto.response.FavoriteResponse;
 import turip.favorite.service.FavoriteService;
@@ -17,10 +25,89 @@ import turip.favorite.service.FavoriteService;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/favorites")
+@Tag(name = "Favorite", description = "찜 API")
 public class FavoriteController {
 
     private final FavoriteService favoriteService;
 
+    @Operation(
+            summary = "찜 생성 api",
+            description = "찜을 생성한다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "성공 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = FavoriteResponse.class),
+                            examples = @ExampleObject(
+                                    name = "success",
+                                    summary = "찜 생성 성공",
+                                    value = """
+                                            {
+                                                "id": 1,
+                                                "createdAt": "2025-08-06",
+                                                "memberId": 1,
+                                                "content": {
+                                                    "id": 1,
+                                                    "title": "나혼자 기차 타고 부산 여행 vlog 🌊 | 당일치기 쌉가능한 여행코스 💌 , 200% 만족한 광안리 숙소 🏠, 부산 토박이의 단골집 추천까지,,💛 | 3박4일 부산 브이로그",
+                                                    "url": "https://www.youtube.com/watch?v=U7vwpgZlD6Q",
+                                                    "uploadedDate": "2025-07-01",
+                                                    "city": {
+                                                        "name": "부산"
+                                                    },
+                                                    "creator": {
+                                                        "id": 1,
+                                                        "channelName": "연수연",
+                                                        "profileImage": "https://yt3.googleusercontent.com/EMvavcwV96_NkCYm4V8TZIrsytHaiS2AaxS_goqR57WP7kn36qQY92Ujex8JUbBWGQ7P5VY0DA=s160-c-k-c0x00ffffff-no-rj"
+                                                    },
+                                                    "isFavorite": true
+                                                }
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "content_not_found",
+                                            summary = "컨텐츠를 찾을 수 없음",
+                                            value = """
+                                                    {
+                                                        "message": "존재하지 않는 컨텐츠입니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "already_favorite",
+                                            summary = "이미 찜 한 컨텐츠",
+                                            value = """
+                                                    {
+                                                        "message": "이미 찜한 컨텐츠입니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            )
+    })
     @PostMapping
     public ResponseEntity<FavoriteResponse> create(@RequestHeader("device-fid") String deviceFid,
                                                    @RequestBody FavoriteRequest request) {
@@ -29,6 +116,53 @@ public class FavoriteController {
                 .body(response);
     }
 
+    @Operation(
+            summary = "찜 삭제 api",
+            description = "찜을 삭제한다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "성공 예시"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "content_not_found",
+                                            summary = "컨텐츠를 찾을 수 없음",
+                                            value = """
+                                                    {
+                                                        "message": "존재하지 않는 컨텐츠입니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "member_not_found",
+                                            summary = "존재하지 않는 사용자",
+                                            value = """
+                                                    {
+                                                        "message": "존재하지 않는 사용자입니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "not_favorite",
+                                            summary = "찜하지 않은 컨텐츠",
+                                            value = """
+                                                    {
+                                                        "message": "해당 컨텐츠는 찜한 상태가 아닙니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            )
+    })
     @DeleteMapping
     public ResponseEntity<Void> delete(@RequestHeader("device-fid") String deviceFid,
                                        @RequestParam(name = "contentId") Long contentId) {
