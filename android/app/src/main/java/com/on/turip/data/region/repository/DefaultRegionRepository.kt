@@ -1,8 +1,8 @@
-package com.on.turip.data.region
+package com.on.turip.data.region.repository
 
 import com.on.turip.domain.region.Country
 import com.on.turip.domain.region.RegionCategory
-import com.on.turip.domain.region.RegionRepository
+import com.on.turip.domain.region.repository.RegionRepository
 
 class DefaultRegionRepository : RegionRepository {
     override suspend fun loadRegionCategories(isKorea: Boolean): Result<List<RegionCategory>> =

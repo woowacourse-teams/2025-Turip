@@ -11,7 +11,7 @@ import com.on.turip.di.RepositoryModule
 import com.on.turip.domain.content.PopularFavoriteContent
 import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.region.RegionCategory
-import com.on.turip.domain.region.RegionRepository
+import com.on.turip.domain.region.repository.RegionRepository
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
