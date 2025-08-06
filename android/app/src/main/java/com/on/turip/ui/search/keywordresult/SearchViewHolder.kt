@@ -3,13 +3,13 @@ package com.on.turip.ui.search.keywordresult
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import coil.load
 import com.on.turip.R
 import com.on.turip.databinding.ItemResultBinding
 import com.on.turip.domain.content.Content
 import com.on.turip.domain.creator.Creator
 import com.on.turip.ui.common.TuripUrlConverter
 import com.on.turip.ui.common.loadCircularImage
+import com.on.turip.ui.common.loadRoundedCornerImage
 import com.on.turip.ui.common.model.trip.toDisplayText
 import com.on.turip.ui.search.model.VideoInformationModel
 
@@ -51,10 +51,11 @@ class SearchViewHolder(
                 videoInformationModel.content.videoData.uploadedDate,
             )
         binding.ivResultCreatorThumbnail.loadCircularImage(videoInformationModel.content.creator.profileImage)
-        binding.ivResultVideoThumbnail.load(
+        binding.ivResultVideoThumbnail.loadRoundedCornerImage(
             TuripUrlConverter.convertVideoThumbnailUrl(
                 videoInformationModel.content.videoData.url,
             ),
+            12,
         )
         binding.tvResultRegionName.text = videoInformationModel.content.city.name
     }
