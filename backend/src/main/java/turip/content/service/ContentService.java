@@ -114,11 +114,6 @@ public class ContentService {
         );
     }
 
-    public ContentCountResponse countByCityName(String cityName) {
-        int count = contentRepository.countByCityName(cityName);
-        return ContentCountResponse.from(count);
-    }
-
     public ContentCountResponse countByKeyword(String keyword) {
         int count = contentRepository.countByKeywordContaining(keyword);
         return ContentCountResponse.from(count);
