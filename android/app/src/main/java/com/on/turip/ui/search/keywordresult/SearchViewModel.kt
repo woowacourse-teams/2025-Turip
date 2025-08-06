@@ -40,7 +40,7 @@ class SearchViewModel(
 
     fun updateByKeyword() {
         viewModelScope.launch {
-            val searchResultCountResult =
+            val searchResultCountResult: Deferred<Result<Int>> =
                 async {
                     _loading.value = true
                     contentRepository.loadContentsSizeByKeyword(
