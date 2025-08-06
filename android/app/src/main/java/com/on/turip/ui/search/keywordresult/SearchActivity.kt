@@ -99,27 +99,35 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         viewModel.searchResultCount.observe(this) { searchResultCount: Int ->
             binding.tvSearchResultCount.text =
                 getString(R.string.search_result_exist_result, searchResultCount)
-            if (searchResultCount == 0) {
-                binding.groupSearchResultEmpty.visibility = View.VISIBLE
-                binding.tvSearchResultCount.visibility = View.GONE
-                binding.rvSearchResult.visibility = View.GONE
-            } else {
-                binding.groupSearchResultEmpty.visibility = View.GONE
-                binding.tvSearchResultCount.visibility = View.VISIBLE
-                binding.rvSearchResult.visibility = View.VISIBLE
-            }
+            handleVisibleBySearchResult(searchResultCount)
         }
         viewModel.loading.observe(this) { loading: Boolean ->
-            if (loading) {
-                binding.pbSearchResult.visibility = View.VISIBLE
-                binding.tvSearchResultCount.visibility = View.GONE
-                binding.rvSearchResult.visibility = View.GONE
-                binding.groupSearchResultEmpty.visibility = View.GONE
-            } else {
-                binding.pbSearchResult.visibility = View.GONE
-                binding.tvSearchResultCount.visibility = View.VISIBLE
-                binding.rvSearchResult.visibility = View.VISIBLE
-            }
+            handleVisibleByLoading(loading)
+        }
+    }
+
+    private fun handleVisibleBySearchResult(searchResultCount: Int) {
+        if (searchResultCount == 0) {
+            binding.groupSearchResultEmpty.visibility = View.VISIBLE
+            binding.tvSearchResultCount.visibility = View.GONE
+            binding.rvSearchResult.visibility = View.GONE
+        } else {
+            binding.groupSearchResultEmpty.visibility = View.GONE
+            binding.tvSearchResultCount.visibility = View.VISIBLE
+            binding.rvSearchResult.visibility = View.VISIBLE
+        }
+    }
+
+    private fun handleVisibleByLoading(loading: Boolean) {
+        if (loading) {
+            binding.pbSearchResult.visibility = View.VISIBLE
+            binding.tvSearchResultCount.visibility = View.GONE
+            binding.rvSearchResult.visibility = View.GONE
+            binding.groupSearchResultEmpty.visibility = View.GONE
+        } else {
+            binding.pbSearchResult.visibility = View.GONE
+            binding.tvSearchResultCount.visibility = View.VISIBLE
+            binding.rvSearchResult.visibility = View.VISIBLE
         }
     }
 
