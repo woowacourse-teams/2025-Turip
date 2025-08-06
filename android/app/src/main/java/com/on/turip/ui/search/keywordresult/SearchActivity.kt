@@ -11,9 +11,11 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.LinearLayout
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
+import androidx.recyclerview.widget.DividerItemDecoration
 import com.on.turip.R
 import com.on.turip.databinding.ActivitySearchBinding
 import com.on.turip.domain.searchhistory.SearchHistory
@@ -55,6 +57,12 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         binding.etSearchResult.requestFocus()
         binding.rvSearchResult.itemAnimator = null
         binding.rvSearchResultSearchHistory.itemAnimator = null
+        binding.rvSearchResultSearchHistory.addItemDecoration(
+            DividerItemDecoration(
+                this,
+                LinearLayout.VERTICAL,
+            ),
+        )
     }
 
     private fun setupAdapters() {
