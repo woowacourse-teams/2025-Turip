@@ -126,4 +126,15 @@
         android:textColor="@color/pure_black_151515"
         android:textAppearance="@style/display"
         android:background="@color/pure_white_ffffff" />
+
+    <ProgressBar
+        android:id="@+id/pb_search_result"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:visibility="gone" />
 </androidx.constraintlayout.widget.ConstraintLayout>

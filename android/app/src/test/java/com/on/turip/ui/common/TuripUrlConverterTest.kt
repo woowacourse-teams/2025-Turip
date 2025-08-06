@@ -21,7 +21,7 @@ class TuripUrlConverterTest {
     fun `유튜브 영상 url에서 유튜브 영상 썸네일 url로 변환한다`() {
         // given:
         val youtubeUrl = "https://www.youtube.com/watch?v=PIVg1paYVX8"
-        val expected = "https://img.youtube.com/vi/PIVg1paYVX8/0.jpg"
+        val expected = "https://img.youtube.com/vi/PIVg1paYVX8/maxresdefault.jpg"
 
         // when:
         val actual = TuripUrlConverter.convertVideoThumbnailUrl(youtubeUrl)
