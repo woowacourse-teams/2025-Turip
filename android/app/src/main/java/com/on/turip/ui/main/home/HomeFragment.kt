@@ -17,7 +17,7 @@ import com.on.turip.domain.content.PopularFavoriteContent
 import com.on.turip.domain.region.RegionCategory
 import com.on.turip.ui.common.ItemSpaceDecoration
 import com.on.turip.ui.common.base.BaseFragment
-import com.on.turip.ui.search.keywordresult.SearchResultActivity
+import com.on.turip.ui.search.keywordresult.SearchActivity
 import com.on.turip.ui.search.regionresult.RegionResultActivity
 import com.on.turip.ui.trip.detail.TripDetailActivity
 import timber.log.Timber
@@ -118,7 +118,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         }
         binding.ivHomeSearch.setOnClickListener {
             Timber.d("검색 화면 클릭")
-            val intent: Intent = SearchResultActivity.newIntent(requireContext())
+            val intent: Intent = SearchActivity.newIntent(requireContext())
             startActivity(intent)
         }
     }

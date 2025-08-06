@@ -35,18 +35,32 @@ class DefaultContentRepository(
         }
     }
 
-    override suspend fun loadContentsSize(region: String): Result<Int> =
+    override suspend fun loadContentsSizeByRegion(region: String): Result<Int> =
         contentRemoteDataSource
-            .getContentsSize(region)
+            .getContentsSizeByRegion(region)
             .mapCatching { it.count }
 
-    override suspend fun loadContents(
+    override suspend fun loadContentsSizeByKeyword(keyword: String): Result<Int> =
+        contentRemoteDataSource
+            .getContentsSizeByKeyword(keyword)
+            .mapCatching { it.count }
+
+    override suspend fun loadContentsByRegion(
         region: String,
         size: Int,
         lastId: Long,
     ): Result<PagedContentsResult> =
         contentRemoteDataSource
-            .getContents(region, size, lastId)
+            .getContentsByRegion(region, size, lastId)
+            .mapCatching { it.toDomain() }
+
+    override suspend fun loadContentsByKeyword(
+        keyword: String,
+        size: Int,
+        lastId: Long,
+    ): Result<PagedContentsResult> =
+        contentRemoteDataSource
+            .getContentsByKeyword(keyword, size, lastId)
             .mapCatching { it.toDomain() }
 
     override suspend fun loadContent(contentId: Long): Result<VideoData> =
@@ -73,6 +87,7 @@ class DefaultContentRepository(
                                     url = "https://i.ytimg.com/vi/koJ6u7uxEwY/maxresdefault.jpg",
                                     uploadedDate = "2025-06-10",
                                 ),
+                            City("서울"),
                         ),
                     isFavorite = true,
                     city = "서울",
@@ -98,6 +113,7 @@ class DefaultContentRepository(
                                     url = "https://i.ytimg.com/vi/koJ6u7uxEwY/maxresdefault.jpg",
                                     uploadedDate = "2025-07-02",
                                 ),
+                            City("부산"),
                         ),
                     isFavorite = false,
                     city = "부산",
@@ -123,6 +139,7 @@ class DefaultContentRepository(
                                     url = "https://i.ytimg.com/vi/koJ6u7uxEwY/maxresdefault.jpg",
                                     uploadedDate = "2025-08-01",
                                 ),
+                            City("도쿄"),
                         ),
                     isFavorite = true,
                     city = "도쿄",

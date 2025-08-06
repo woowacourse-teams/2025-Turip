@@ -16,6 +16,7 @@ import com.on.turip.ui.search.model.VideoInformationModel
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class RegionResultViewModel(
     private val region: String,
@@ -34,7 +35,7 @@ class RegionResultViewModel(
         viewModelScope.launch {
             val pagedContentsResult: Deferred<Result<PagedContentsResult>> =
                 async {
-                    contentRepository.loadContents(
+                    contentRepository.loadContentsByRegion(
                         region = region,
                         size = 100,
                         lastId = 0L,
@@ -42,7 +43,7 @@ class RegionResultViewModel(
                 }
             val contentsSize: Deferred<Result<Int>> =
                 async {
-                    contentRepository.loadContentsSize(region)
+                    contentRepository.loadContentsSizeByRegion(region)
                 }
 
             pagedContentsResult
@@ -63,6 +64,7 @@ class RegionResultViewModel(
                     updateLoading(false)
                 }.onFailure {
                     updateLoading(false)
+                    Timber.e("${it.message}")
                 }
         }
     }

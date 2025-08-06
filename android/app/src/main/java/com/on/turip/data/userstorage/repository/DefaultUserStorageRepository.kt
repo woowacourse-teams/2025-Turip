@@ -6,6 +6,7 @@ import com.on.turip.data.userstorage.toDomain
 import com.on.turip.domain.userstorage.TuripDeviceIdentifier
 import com.on.turip.domain.userstorage.repository.UserStorageRepository
 import kotlinx.coroutines.tasks.await
+import timber.log.Timber
 
 class DefaultUserStorageRepository(
     private val userStorageLocalDataSource: UserStorageLocalDataSource,
@@ -20,7 +21,7 @@ class DefaultUserStorageRepository(
             .mapCatching { fid: String? -> fid ?: recreateId() }
             .mapCatching { fid: String -> fid.toDomain() }
             .onFailure {
-                // TODO : 예외 발생
+                Timber.e("${it.message}")
             }
 
     private suspend fun recreateId(): String {
