@@ -111,7 +111,7 @@ public class ContentApiTest {
         }
     }
 
-    @DisplayName("/contents/count GET 키워드로 검색된 컨텐츠 수 조회 테스트")
+    @DisplayName("/contents/keyword/count GET 키워드로 검색된 컨텐츠 수 조회 테스트")
     @Nested
     class ReadCountByKeyword {
 
@@ -131,14 +131,14 @@ public class ContentApiTest {
             // when & then
             RestAssured.given().port(port)
                     .queryParam("keyword", "메이")
-                    .when().get("/contents/count")
+                    .when().get("/contents/keyword/count")
                     .then()
                     .statusCode(200)
                     .body("count", is(1));
         }
     }
 
-    @DisplayName("/contents GET 키워드 기반 컨텐츠 검색 테스트")
+    @DisplayName("/contents/keyword GET 키워드 기반 컨텐츠 검색 테스트")
     @Nested
     class ReadByKeyword {
 
@@ -160,7 +160,7 @@ public class ContentApiTest {
                     .queryParam("keyword", "메이")
                     .queryParam("size", 2)
                     .queryParam("lastId", 0)
-                    .when().get("/contents")
+                    .when().get("/contents/keyword")
                     .then()
                     .statusCode(200)
                     .body("contents.size()", is(2))
@@ -185,7 +185,7 @@ public class ContentApiTest {
                     .queryParam("keyword", "메이")
                     .queryParam("size", 1)
                     .queryParam("lastId", 0)
-                    .when().get("/contents")
+                    .when().get("/contents/keyword")
                     .then()
                     .statusCode(200)
                     .body("contents.size()", is(1))
