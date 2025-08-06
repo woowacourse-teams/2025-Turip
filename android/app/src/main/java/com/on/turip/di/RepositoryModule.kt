@@ -22,7 +22,7 @@ object RepositoryModule {
         DefaultTripRepository(DataSourceModule.tripRemoteDataSource)
     }
     val regionRepository: RegionRepository by lazy {
-        DefaultRegionRepository()
+        DefaultRegionRepository(DataSourceModule.regionRemoteDataSource)
     }
     val userStorageRepository: UserStorageRepository by lazy {
         DefaultUserStorageRepository(DataSourceModule.userStorageLocalDataSource)
