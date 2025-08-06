@@ -11,9 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 import turip.content.controller.dto.response.ContentCountResponse;
 import turip.content.controller.dto.response.ContentResponse;
 import turip.content.controller.dto.response.ContentSearchResponse;
-import turip.content.controller.dto.response.ContentsByCityResponse;
-import turip.content.controller.dto.response.WeeklyPopularFavoriteContentsResponse;
 import turip.content.controller.dto.response.ContentsByRegionCategoryResponse;
+import turip.content.controller.dto.response.WeeklyPopularFavoriteContentsResponse;
 import turip.content.service.ContentService;
 
 @RestController
