@@ -4,6 +4,8 @@ import com.on.turip.data.content.dataSource.ContentRemoteDataSource
 import com.on.turip.data.content.dataSource.DefaultContentRemoteDataSource
 import com.on.turip.data.creator.dataSource.CreatorRemoteDataSource
 import com.on.turip.data.creator.dataSource.DefaultCreatorRemoteDataSource
+import com.on.turip.data.searchhistory.datasource.DefaultSearchHistoryDataSource
+import com.on.turip.data.searchhistory.datasource.SearchHistoryDataSource
 import com.on.turip.data.trip.dataSource.DefaultTripRemoteDataSource
 import com.on.turip.data.trip.dataSource.TripRemoteDataSource
 import com.on.turip.data.userStorage.dataSource.DefaultUserStorageLocalDataSource
@@ -21,5 +23,8 @@ object DataSourceModule {
     }
     val userStorageLocalDataSource: UserStorageLocalDataSource by lazy {
         DefaultUserStorageLocalDataSource(ApplicationContextProvider.applicationContext)
+    }
+    val searchHistoryDataSource: SearchHistoryDataSource by lazy {
+        DefaultSearchHistoryDataSource(DatabaseModule.turipDao)
     }
 }

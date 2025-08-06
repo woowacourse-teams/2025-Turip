@@ -3,7 +3,7 @@ package com.on.turip.data.searchhistory.datasource
 import com.on.turip.data.dao.SearchHistoryDao
 import com.on.turip.data.searchhistory.SearchHistoryEntity
 
-class LocalSearchHistoryDataSource(
+class DefaultSearchHistoryDataSource(
     private val dao: SearchHistoryDao,
 ) : SearchHistoryDataSource {
     override suspend fun createSearchHistory(keyword: String): Result<Unit> =
