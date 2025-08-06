@@ -7,6 +7,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -122,14 +123,15 @@ class ContentServiceTest {
                     "testDeviceFid", topContentSize);
 
             // then
-            assertThat(response.contents()).hasSize(2);
-            assertThat(response.contents().getFirst().content().id()).isEqualTo(1L);
-            assertThat(response.contents().getFirst().content().isFavorite()).isTrue();
-            assertThat(response.contents().getFirst().tripDuration().days()).isEqualTo(3);
-
-            assertThat(response.contents().get(1).content().id()).isEqualTo(2L);
-            assertThat(response.contents().get(1).content().isFavorite()).isTrue();
-            assertThat(response.contents().get(1).tripDuration().days()).isEqualTo(2);
+            Assertions.assertAll(
+                    () -> assertThat(response.contents()).hasSize(2),
+                    () -> assertThat(response.contents().getFirst().content().id()).isEqualTo(1L),
+                    () -> assertThat(response.contents().getFirst().content().isFavorite()).isTrue(),
+                    () -> assertThat(response.contents().getFirst().tripDuration().days()).isEqualTo(3),
+                    () -> assertThat(response.contents().get(1).content().id()).isEqualTo(2L),
+                    () -> assertThat(response.contents().get(1).content().isFavorite()).isTrue(),
+                    () -> assertThat(response.contents().get(1).tripDuration().days()).isEqualTo(2)
+            );
         }
     }
 
