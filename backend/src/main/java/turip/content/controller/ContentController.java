@@ -286,7 +286,7 @@ public class ContentController {
                     description = "성공 예시",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ContentCountResponse.class),
+                            schema = @Schema(implementation = ContentResponse.class),
                             examples = @ExampleObject(
                                     name = "success",
                                     summary = "성공적으로 컨텐츠 조회",

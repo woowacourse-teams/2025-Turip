@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import turip.content.controller.dto.response.ContentCountResponse;
 import turip.tripcourse.controller.dto.response.TripCourseDetailResponse;
 import turip.tripcourse.service.TripCourseService;
 
@@ -35,7 +34,7 @@ public class TripCourseController {
                     description = "성공 예시",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ContentCountResponse.class),
+                            schema = @Schema(implementation = TripCourseDetailResponse.class),
                             examples = @ExampleObject(
                                     name = "success",
                                     summary = "성공적으로 컨텐츠 목록 조회",
