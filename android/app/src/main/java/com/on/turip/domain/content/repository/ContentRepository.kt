@@ -1,6 +1,7 @@
 package com.on.turip.domain.content.repository
 
 import com.on.turip.domain.content.PagedContentsResult
+import com.on.turip.domain.content.PopularFavoriteContent
 import com.on.turip.domain.content.video.VideoData
 
 interface ContentRepository {
@@ -13,4 +14,6 @@ interface ContentRepository {
     ): Result<PagedContentsResult>
 
     suspend fun loadContent(contentId: Long): Result<VideoData>
+
+    suspend fun loadPopularFavoriteContents(): Result<List<PopularFavoriteContent>>
 }

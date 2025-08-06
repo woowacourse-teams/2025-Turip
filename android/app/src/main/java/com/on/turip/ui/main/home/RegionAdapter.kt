@@ -3,11 +3,11 @@ package com.on.turip.ui.main.home
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import com.on.turip.ui.common.model.RegionModel
+import com.on.turip.domain.region.RegionCategory
 
 class RegionAdapter(
     private val onRegionListener: RegionViewHolder.OnRegionListener,
-) : ListAdapter<RegionModel, RegionViewHolder>(
+) : ListAdapter<RegionCategory, RegionViewHolder>(
         RegionDiffUtil,
     ) {
     override fun onCreateViewHolder(
@@ -20,15 +20,15 @@ class RegionAdapter(
         position: Int,
     ): Unit = holder.bind(getItem(position))
 
-    private object RegionDiffUtil : DiffUtil.ItemCallback<RegionModel>() {
+    private object RegionDiffUtil : DiffUtil.ItemCallback<RegionCategory>() {
         override fun areItemsTheSame(
-            oldItem: RegionModel,
-            newItem: RegionModel,
-        ): Boolean = oldItem.english == newItem.english
+            oldItem: RegionCategory,
+            newItem: RegionCategory,
+        ): Boolean = oldItem.name == newItem.name
 
         override fun areContentsTheSame(
-            oldItem: RegionModel,
-            newItem: RegionModel,
+            oldItem: RegionCategory,
+            newItem: RegionCategory,
         ): Boolean = oldItem == newItem
     }
 }

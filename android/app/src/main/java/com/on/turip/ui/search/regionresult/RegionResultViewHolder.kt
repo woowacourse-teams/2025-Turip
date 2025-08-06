@@ -40,7 +40,7 @@ class RegionResultViewHolder(
             )
         binding.tvResultDescription.text =
             itemView.context.getString(
-                R.string.region_result_video_description,
+                R.string.all_video_description,
                 videoInformationModel.content.creator.channelName,
                 videoInformationModel.content.videoData.uploadedDate,
             )
