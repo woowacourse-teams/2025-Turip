@@ -29,7 +29,7 @@ class DefaultContentRemoteDataSource(
     ): Result<ContentsInformationResponse> =
         withContext(coroutineContext) {
             runCatching {
-                contentService.getContentsInformationByRegion(
+                contentService.getContentsByRegion(
                     region = region,
                     size = size,
                     lastId = lastId,
@@ -44,7 +44,7 @@ class DefaultContentRemoteDataSource(
     ): Result<ContentsInformationResponse> =
         withContext(coroutineContext) {
             runCatching {
-                contentService.getContentsInformationByKeyword(
+                contentService.getContentsByKeyword(
                     keyword = keyword,
                     size = size,
                     lastId = lastId,

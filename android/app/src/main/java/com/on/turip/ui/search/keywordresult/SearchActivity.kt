@@ -17,6 +17,7 @@ import androidx.core.widget.addTextChangedListener
 import com.on.turip.R
 import com.on.turip.databinding.ActivitySearchBinding
 import com.on.turip.ui.common.base.BaseActivity
+import com.on.turip.ui.search.model.VideoInformationModel
 import com.on.turip.ui.trip.detail.TripDetailActivity
 
 class SearchActivity : BaseActivity<ActivitySearchBinding>() {
@@ -29,12 +30,12 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
     }
 
     private val searchAdapter: SearchAdapter =
-        SearchAdapter { contentId: Long?, creatorId: Long? ->
+        SearchAdapter { contentId: Long, creatorId: Long ->
             val intent: Intent =
                 TripDetailActivity.newIntent(
                     context = this,
-                    contentId = contentId ?: 0,
-                    creatorId = creatorId ?: 0,
+                    contentId = contentId,
+                    creatorId = creatorId,
                 )
             startActivity(intent)
         }
@@ -43,10 +44,14 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         super.onCreate(savedInstanceState)
         setupToolbar()
         setupListeners()
-        setupObserves()
+        setupObservers()
+        setupAdapters()
         binding.etSearchResult.requestFocus()
-        binding.rvSearchResult.adapter = searchAdapter
         binding.rvSearchResult.itemAnimator = null
+    }
+
+    private fun setupAdapters() {
+        binding.rvSearchResult.adapter = searchAdapter
     }
 
     private fun setupToolbar() {
@@ -75,8 +80,8 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         }
         binding.etSearchResult.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                viewModel.updateByKeyword()
-                val inputMethodManager =
+                viewModel.loadByKeyword()
+                val inputMethodManager: InputMethodManager =
                     getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                 inputMethodManager.hideSoftInputFromWindow(binding.etSearchResult.windowToken, 0)
                 true
@@ -90,36 +95,37 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         }
     }
 
-    private fun setupObserves() {
-        var latestSearchResultCount: Int = 0
-        var latestLoading: Boolean = false
-
-        viewModel.searchResultCount.observe(this) { count ->
-            latestSearchResultCount = count
-            binding.tvSearchResultCount.text =
-                getString(R.string.search_result_exist_result, count)
-            updateUiState(latestLoading, count)
+    private fun setupObservers() {
+        viewModel.searchingWord.observe(this) { searchWord: String ->
+            binding.ivSearchResultClear.visibility =
+                if (searchWord.isNotBlank()) View.VISIBLE else View.GONE
         }
-
-        viewModel.loading.observe(this) { loading ->
-            latestLoading = loading
-            updateUiState(loading, latestSearchResultCount)
-        }
-
-        viewModel.videoInformation.observe(this) { videoInformationModels ->
+        viewModel.videoInformation.observe(this) { videoInformationModels: List<VideoInformationModel> ->
             searchAdapter.submitList(videoInformationModels)
         }
-
-        viewModel.searchingWord.observe(this) { words ->
-            binding.ivSearchResultClear.visibility =
-                if (words.isNotBlank()) View.VISIBLE else View.GONE
+        viewModel.searchResultCount.observe(this) { searchResultCount: Int ->
+            binding.tvSearchResultCount.text =
+                getString(R.string.search_result_exist_result, searchResultCount)
+            handleVisibleBySearchResult(searchResultCount)
+        }
+        viewModel.loading.observe(this) { loading: Boolean ->
+            handleVisibleByLoading(loading)
         }
     }
 
-    private fun updateUiState(
-        loading: Boolean,
-        searchResultCount: Int,
-    ) {
+    private fun handleVisibleBySearchResult(searchResultCount: Int) {
+        if (searchResultCount == 0) {
+            binding.groupSearchResultEmpty.visibility = View.VISIBLE
+            binding.tvSearchResultCount.visibility = View.GONE
+            binding.rvSearchResult.visibility = View.GONE
+        } else {
+            binding.groupSearchResultEmpty.visibility = View.GONE
+            binding.tvSearchResultCount.visibility = View.VISIBLE
+            binding.rvSearchResult.visibility = View.VISIBLE
+        }
+    }
+
+    private fun handleVisibleByLoading(loading: Boolean) {
         if (loading) {
             binding.pbSearchResult.visibility = View.VISIBLE
             binding.tvSearchResultCount.visibility = View.GONE
@@ -127,27 +133,21 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
             binding.groupSearchResultEmpty.visibility = View.GONE
         } else {
             binding.pbSearchResult.visibility = View.GONE
-            if (searchResultCount == 0) {
-                binding.groupSearchResultEmpty.visibility = View.VISIBLE
-                binding.tvSearchResultCount.visibility = View.GONE
-                binding.rvSearchResult.visibility = View.GONE
-            } else {
-                binding.groupSearchResultEmpty.visibility = View.GONE
-                binding.tvSearchResultCount.visibility = View.VISIBLE
-                binding.rvSearchResult.visibility = View.VISIBLE
-            }
+            binding.tvSearchResultCount.visibility = View.VISIBLE
+            binding.rvSearchResult.visibility = View.VISIBLE
         }
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
         if (ev.action == MotionEvent.ACTION_DOWN) {
-            val v = currentFocus
+            val v: View? = currentFocus
             if (v is EditText) {
-                val outRect = Rect()
+                val outRect: Rect = Rect()
                 v.getGlobalVisibleRect(outRect)
                 if (!outRect.contains(ev.rawX.toInt(), ev.rawY.toInt())) {
                     v.clearFocus()
-                    val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                    val imm: InputMethodManager =
+                        getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                     imm.hideSoftInputFromWindow(v.windowToken, 0)
                 }
             }

@@ -16,7 +16,7 @@ public record FavoriteResponse(
                 favorite.getId(),
                 favorite.getCreatedAt(),
                 favorite.getMember().getId(),
-                ContentResponse.from(favorite.getContent())
+                ContentResponse.of(favorite.getContent(), true)
         );
     }
 }

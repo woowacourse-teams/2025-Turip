@@ -23,26 +23,26 @@ class SearchViewModel(
     private val contentRepository: ContentRepository,
 ) : ViewModel() {
     private val _searchingWord: MutableLiveData<String> = MutableLiveData()
-    val searchingWord: LiveData<String> = _searchingWord
+    val searchingWord: LiveData<String> get() = _searchingWord
 
     private val _videoInformation: MutableLiveData<List<VideoInformationModel>> = MutableLiveData()
-    val videoInformation: LiveData<List<VideoInformationModel>> = _videoInformation
+    val videoInformation: LiveData<List<VideoInformationModel>> get() = _videoInformation
 
     private val _searchResultCount: MutableLiveData<Int> = MutableLiveData()
-    val searchResultCount: LiveData<Int> = _searchResultCount
+    val searchResultCount: LiveData<Int> get() = _searchResultCount
 
     private val _loading: MutableLiveData<Boolean> = MutableLiveData()
-    val loading: LiveData<Boolean> = _loading
+    val loading: LiveData<Boolean> get() = _loading
 
     fun updateSearchingWord(newWords: Editable?) {
         _searchingWord.value = newWords.toString()
     }
 
-    fun updateByKeyword() {
+    fun loadByKeyword() {
+        _loading.value = true
         viewModelScope.launch {
-            val searchResultCountResult =
+            val searchResultCountResult: Deferred<Result<Int>> =
                 async {
-                    _loading.value = true
                     contentRepository.loadContentsSizeByKeyword(
                         searchingWord.value.toString(),
                     )
@@ -57,22 +57,22 @@ class SearchViewModel(
                     )
                 }
 
-            searchResultCountResult
-                .await()
-                .onSuccess { result: Int ->
-                    _searchResultCount.value = result
-                }.onFailure {
-                    _loading.value = false
-                    Timber.e("${it.message}")
-                }
-
             pagedContentsResult
                 .await()
                 .onSuccess { result: PagedContentsResult ->
                     val videoModels: List<VideoInformationModel> =
                         result.videos.map { videoInformation: VideoInformation -> videoInformation.toUiModel() }
                     _videoInformation.value = videoModels
+                }.onFailure {
                     _loading.value = false
+                    Timber.e("${it.message}")
+                }
+
+            searchResultCountResult
+                .await()
+                .onSuccess { result: Int ->
+                    _loading.value = false
+                    _searchResultCount.value = result
                 }.onFailure {
                     _loading.value = false
                     Timber.e("${it.message}")
