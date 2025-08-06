@@ -2,9 +2,9 @@ package com.on.turip.data.favorite.datasource
 
 import com.on.turip.data.favorite.dto.FavoriteAddRequest
 import com.on.turip.data.favorite.service.FavoriteService
-import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlin.coroutines.CoroutineContext
 
 class DefaultFavoriteRemoteDataSource(
     private val favoriteService: FavoriteService,
