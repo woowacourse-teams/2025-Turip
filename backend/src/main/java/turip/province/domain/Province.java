@@ -21,4 +21,8 @@ public class Province {
     private Long id;
 
     private String name;
+
+    public Province(String name) {
+        this.name = name;
+    }
 }
