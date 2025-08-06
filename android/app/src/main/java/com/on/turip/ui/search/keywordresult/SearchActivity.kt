@@ -30,12 +30,12 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
     }
 
     private val searchAdapter: SearchAdapter =
-        SearchAdapter { contentId: Long?, creatorId: Long? ->
+        SearchAdapter { contentId: Long, creatorId: Long ->
             val intent: Intent =
                 TripDetailActivity.newIntent(
                     context = this,
-                    contentId = contentId ?: 0,
-                    creatorId = creatorId ?: 0,
+                    contentId = contentId,
+                    creatorId = creatorId,
                 )
             startActivity(intent)
         }

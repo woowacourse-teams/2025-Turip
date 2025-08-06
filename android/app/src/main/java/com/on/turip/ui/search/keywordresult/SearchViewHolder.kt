@@ -22,10 +22,14 @@ class SearchViewHolder(
 
     init {
         itemView.setOnClickListener {
-            onSearchResultListener.onSearchResultClick(
-                content?.id ?: 0,
-                creator?.id ?: 0,
-            )
+            content?.let { content ->
+                creator?.let { creator ->
+                    onSearchResultListener.onSearchResultClick(
+                        content.id,
+                        creator.id,
+                    )
+                }
+            }
         }
     }
 
