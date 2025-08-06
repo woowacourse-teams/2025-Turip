@@ -23,16 +23,16 @@ class SearchViewModel(
     private val contentRepository: ContentRepository,
 ) : ViewModel() {
     private val _searchingWord: MutableLiveData<String> = MutableLiveData()
-    val searchingWord: LiveData<String> = _searchingWord
+    val searchingWord: LiveData<String> get() = _searchingWord
 
     private val _videoInformation: MutableLiveData<List<VideoInformationModel>> = MutableLiveData()
-    val videoInformation: LiveData<List<VideoInformationModel>> = _videoInformation
+    val videoInformation: LiveData<List<VideoInformationModel>> get() = _videoInformation
 
     private val _searchResultCount: MutableLiveData<Int> = MutableLiveData()
-    val searchResultCount: LiveData<Int> = _searchResultCount
+    val searchResultCount: LiveData<Int> get() = _searchResultCount
 
     private val _loading: MutableLiveData<Boolean> = MutableLiveData()
-    val loading: LiveData<Boolean> = _loading
+    val loading: LiveData<Boolean> get() = _loading
 
     fun updateSearchingWord(newWords: Editable?) {
         _searchingWord.value = newWords.toString()
