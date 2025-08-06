@@ -1,10 +1,10 @@
-package com.on.turip.data.trip.dataSource
+package com.on.turip.data.trip.datasource
 
 import com.on.turip.data.trip.dto.TripResponse
 import com.on.turip.data.trip.service.TripService
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlin.coroutines.CoroutineContext
 
 class DefaultTripRemoteDataSource(
     private val tripService: TripService,

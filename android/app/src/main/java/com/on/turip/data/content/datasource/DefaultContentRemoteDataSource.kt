@@ -1,12 +1,12 @@
-package com.on.turip.data.content.dataSource
+package com.on.turip.data.content.datasource
 
 import com.on.turip.data.content.dto.ContentDetailResponse
 import com.on.turip.data.content.dto.ContentInformationCountResponse
 import com.on.turip.data.content.dto.ContentsInformationResponse
 import com.on.turip.data.content.service.ContentService
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlin.coroutines.CoroutineContext
 
 class DefaultContentRemoteDataSource(
     private val contentService: ContentService,

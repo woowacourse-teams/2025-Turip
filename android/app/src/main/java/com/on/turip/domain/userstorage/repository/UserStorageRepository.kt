@@ -1,6 +1,6 @@
-package com.on.turip.domain.userStorage.repository
+package com.on.turip.domain.userstorage.repository
 
-import com.on.turip.domain.userStorage.TuripDeviceIdentifier
+import com.on.turip.domain.userstorage.TuripDeviceIdentifier
 
 interface UserStorageRepository {
     suspend fun createId(turipDeviceIdentifier: TuripDeviceIdentifier)

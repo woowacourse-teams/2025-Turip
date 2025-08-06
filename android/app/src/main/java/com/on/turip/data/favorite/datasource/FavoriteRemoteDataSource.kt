@@ -1,4 +1,4 @@
-package com.on.turip.data.favorite.dataSource
+package com.on.turip.data.favorite.datasource
 
 import com.on.turip.data.favorite.dto.FavoriteAddRequest
 

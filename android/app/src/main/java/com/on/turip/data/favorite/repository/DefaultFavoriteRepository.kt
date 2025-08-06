@@ -1,10 +1,10 @@
 package com.on.turip.data.favorite.repository
 
-import com.on.turip.data.favorite.dataSource.FavoriteRemoteDataSource
+import com.on.turip.data.favorite.datasource.FavoriteRemoteDataSource
 import com.on.turip.data.favorite.toRequestDto
 import com.on.turip.domain.favorite.repository.FavoriteRepository
-import com.on.turip.domain.userStorage.TuripDeviceIdentifier
-import com.on.turip.domain.userStorage.repository.UserStorageRepository
+import com.on.turip.domain.userstorage.TuripDeviceIdentifier
+import com.on.turip.domain.userstorage.repository.UserStorageRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

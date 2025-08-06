@@ -1,4 +1,4 @@
-package com.on.turip.data.content.dataSource
+package com.on.turip.data.content.datasource
 
 import com.on.turip.data.content.dto.ContentDetailResponse
 import com.on.turip.data.content.dto.ContentInformationCountResponse

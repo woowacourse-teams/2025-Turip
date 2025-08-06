@@ -1,6 +1,6 @@
 package com.on.turip.data.content.repository
 
-import com.on.turip.data.content.dataSource.ContentRemoteDataSource
+import com.on.turip.data.content.datasource.ContentRemoteDataSource
 import com.on.turip.data.content.toDomain
 import com.on.turip.domain.content.Content
 import com.on.turip.domain.content.PagedContentsResult
@@ -10,8 +10,8 @@ import com.on.turip.domain.content.video.VideoData
 import com.on.turip.domain.creator.Creator
 import com.on.turip.domain.trip.Trip
 import com.on.turip.domain.trip.TripDuration
-import com.on.turip.domain.userStorage.TuripDeviceIdentifier
-import com.on.turip.domain.userStorage.repository.UserStorageRepository
+import com.on.turip.domain.userstorage.TuripDeviceIdentifier
+import com.on.turip.domain.userstorage.repository.UserStorageRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
