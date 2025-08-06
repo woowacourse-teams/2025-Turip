@@ -27,12 +27,15 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     private val regionAdapter: RegionAdapter =
         RegionAdapter { regionCategoryName: String ->
-            val intent: Intent = RegionResultActivity.newIntent(requireContext(), regionCategoryName)
+            Timber.d("지역 선택 : $regionCategoryName")
+            val intent: Intent =
+                RegionResultActivity.newIntent(requireContext(), regionCategoryName)
             startActivity(intent)
         }
 
     private val usersLikeContentAdapter: UsersLikeContentAdapter =
         UsersLikeContentAdapter { content: Content ->
+            Timber.d("인기 컨텐츠 선택 : ContentId = ${content.id} CreatorId = ${content.creator.id}")
             val intent: Intent =
                 TripDetailActivity.newIntent(
                     context = requireContext(),
@@ -106,14 +109,15 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     private fun setupListeners() {
         binding.tvHomeDomesticButton.setOnClickListener {
-            viewModel.loadRegionCategories(isKorea = true)
             Timber.d("국내 클릭")
+            viewModel.loadRegionCategories(isKorea = true)
         }
         binding.tvHomeAbroadButton.setOnClickListener {
-            viewModel.loadRegionCategories(isKorea = false)
             Timber.d("해외 클릭")
+            viewModel.loadRegionCategories(isKorea = false)
         }
         binding.ivHomeSearch.setOnClickListener {
+            Timber.d("검색 화면 클릭")
             val intent: Intent = SearchResultActivity.newIntent(requireContext())
             startActivity(intent)
         }

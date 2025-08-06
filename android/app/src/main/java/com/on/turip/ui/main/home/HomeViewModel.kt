@@ -40,6 +40,7 @@ class HomeViewModel(
                 .loadPopularFavoriteContents()
                 .onSuccess { popularFavoriteContents: List<PopularFavoriteContent> ->
                     _usersLikeContents.value = popularFavoriteContents
+                    Timber.d("$popularFavoriteContents")
                 }.onFailure {
                     Timber.e("${it.message}")
                 }
@@ -53,6 +54,7 @@ class HomeViewModel(
                 .onSuccess { regionCategories: List<RegionCategory> ->
                     _regionCategories.value = regionCategories
                     _isSelectedDomestic.value = isKorea
+                    Timber.d("$regionCategories")
                 }.onFailure {
                     Timber.e("${it.message}")
                 }
