@@ -8,6 +8,21 @@ import com.on.turip.domain.region.repository.RegionRepository
 class DefaultRegionRepository(
     private val regionRemoteDataSource: RegionRemoteDataSource,
 ) : RegionRepository {
-    override suspend fun loadRegionCategories(isKorea: Boolean): Result<List<RegionCategory>> =
-        regionRemoteDataSource.getRegionCategories(isKorea).mapCatching { it.toDomain() }
+    private val cachedDomesticRegionCategories: MutableList<RegionCategory> = mutableListOf()
+    private val cachedAbroadRegionCategories: MutableList<RegionCategory> = mutableListOf()
+
+    override suspend fun loadRegionCategories(isKorea: Boolean): Result<List<RegionCategory>> {
+        val cachedRegionCategories: MutableList<RegionCategory> =
+            if (isKorea) cachedDomesticRegionCategories else cachedAbroadRegionCategories
+
+        if (cachedRegionCategories.isNotEmpty()) return Result.success(cachedRegionCategories)
+
+        return regionRemoteDataSource
+            .getRegionCategories(isKorea)
+            .mapCatching {
+                val categories: List<RegionCategory> = it.toDomain()
+                cachedRegionCategories.addAll(categories)
+                categories
+            }
+    }
 }
