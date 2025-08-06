@@ -9,5 +9,5 @@ data class SearchHistoryEntity(
     @PrimaryKey
     val keyword: String,
     @ColumnInfo(name = "history")
-    val searchedAt: Long = System.currentTimeMillis(),
+    val history: Long = System.currentTimeMillis(),
 )
