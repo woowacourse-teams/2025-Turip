@@ -1,4 +1,4 @@
-package com.on.turip.data.content.dataSource
+package com.on.turip.data.content.datasource
 
 import com.on.turip.data.content.dto.ContentDetailResponse
 import com.on.turip.data.content.dto.ContentInformationCountResponse
@@ -22,7 +22,10 @@ interface ContentRemoteDataSource {
         lastId: Long,
     ): Result<ContentsInformationResponse>
 
-    suspend fun getContentDetail(contentId: Long): Result<ContentDetailResponse>
+    suspend fun getContentDetail(
+        contentId: Long,
+        fid: String,
+    ): Result<ContentDetailResponse>
 
     suspend fun getUsersLikeContents(size: Int): Result<UsersLikeContentsResponse>
 }
