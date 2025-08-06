@@ -15,6 +15,9 @@ import com.on.turip.ui.common.base.BaseFragment
 
 class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>() {
     private val viewModel: FavoriteViewModel by viewModels()
+    private val inquireMailUri: Uri by lazy {
+        "mailto:$EMAIL_RECIPIENT?subject=${Uri.encode(EMAIL_SUBJECT)}&body=${Uri.encode(EMAIL_BODY)}".toUri()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,17 +43,10 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>() {
         binding.ivFavoriteInquire.setOnClickListener {
             val intent: Intent =
                 Intent(Intent.ACTION_SENDTO).apply {
-                    data = createMailFormToUri()
+                    data = inquireMailUri
                 }
             startActivity(intent)
         }
-    }
-
-    private fun createMailFormToUri(): Uri {
-        val email: String = EMAIL_RECIPIENT
-        val subject: String = EMAIL_SUBJECT
-        val body: String = EMAIL_BODY
-        return "mailto:$email?subject=${Uri.encode(subject)}&body=${Uri.encode(body)}".toUri()
     }
 
     companion object {
