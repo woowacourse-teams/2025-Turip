@@ -19,14 +19,14 @@ interface ContentService {
     ): ContentInformationCountResponse
 
     @GET("contents")
-    suspend fun getContentsInformationByRegion(
+    suspend fun getContentsByRegion(
         @Query("region") region: String,
         @Query("size") size: Int,
         @Query("lastId") lastId: Long,
     ): ContentsInformationResponse
 
     @GET("contents")
-    suspend fun getContentsInformationByKeyword(
+    suspend fun getContentsByKeyword(
         @Query("keyword") keyword: String,
         @Query("size") size: Int,
         @Query("lastId") lastId: Long,
