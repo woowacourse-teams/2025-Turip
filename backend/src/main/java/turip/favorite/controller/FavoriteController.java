@@ -77,11 +77,11 @@ public class FavoriteController {
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = {
                                     @ExampleObject(
-                                            name = "content_not_found",
-                                            summary = "컨텐츠를 찾을 수 없음",
+                                            name = "already_favorite",
+                                            summary = "이미 찜 한 컨텐츠",
                                             value = """
                                                     {
-                                                        "message": "존재하지 않는 컨텐츠입니다."
+                                                        "message": "이미 찜한 컨텐츠입니다."
                                                     }
                                                     """
                                     )
@@ -96,11 +96,11 @@ public class FavoriteController {
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = {
                                     @ExampleObject(
-                                            name = "already_favorite",
-                                            summary = "이미 찜 한 컨텐츠",
+                                            name = "content_not_found",
+                                            summary = "컨텐츠를 찾을 수 없음",
                                             value = """
                                                     {
-                                                        "message": "이미 찜한 컨텐츠입니다."
+                                                        "message": "존재하지 않는 컨텐츠입니다."
                                                     }
                                                     """
                                     )
