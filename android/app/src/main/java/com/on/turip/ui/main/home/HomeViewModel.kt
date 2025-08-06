@@ -31,7 +31,7 @@ class HomeViewModel(
 
     init {
         loadUsersLikeContents()
-        loadRegionCategories(isKorea = true)
+        loadRegionCategories(isDomestic = true)
     }
 
     private fun loadUsersLikeContents() {
@@ -47,13 +47,13 @@ class HomeViewModel(
         }
     }
 
-    fun loadRegionCategories(isKorea: Boolean) {
+    fun loadRegionCategories(isDomestic: Boolean) {
         viewModelScope.launch {
             regionRepository
-                .loadRegionCategories(isKorea)
+                .loadRegionCategories(isDomestic)
                 .onSuccess { regionCategories: List<RegionCategory> ->
                     _regionCategories.value = regionCategories
-                    _isSelectedDomestic.value = isKorea
+                    _isSelectedDomestic.value = isDomestic
                     Timber.d("$regionCategories")
                 }.onFailure {
                     Timber.e("${it.message}")

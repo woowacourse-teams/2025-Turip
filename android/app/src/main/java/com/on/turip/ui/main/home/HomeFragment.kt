@@ -110,11 +110,11 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     private fun setupListeners() {
         binding.tvHomeDomesticButton.setOnClickListener {
             Timber.d("국내 클릭")
-            viewModel.loadRegionCategories(isKorea = true)
+            viewModel.loadRegionCategories(isDomestic = true)
         }
         binding.tvHomeAbroadButton.setOnClickListener {
             Timber.d("해외 클릭")
-            viewModel.loadRegionCategories(isKorea = false)
+            viewModel.loadRegionCategories(isDomestic = false)
         }
         binding.ivHomeSearch.setOnClickListener {
             Timber.d("검색 화면 클릭")
