@@ -38,7 +38,7 @@ class SearchViewModel(
         _searchingWord.value = newWords.toString()
     }
 
-    fun updateByKeyword() {
+    fun loadByKeyword() {
         viewModelScope.launch {
             val searchResultCountResult: Deferred<Result<Int>> =
                 async {
