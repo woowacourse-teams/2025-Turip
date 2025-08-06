@@ -10,6 +10,7 @@ spring:
     init:
       mode: always
       data-locations:
+        - classpath:Region/region_data.sql
         - classpath:data.sql
         - classpath:yeoconam_gangwon_gyeongju_data.sql
         - classpath:yeoconam_ganwon_gangneung_data.sql
