@@ -77,7 +77,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         binding.etSearchResult.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 viewModel.updateByKeyword()
-                val inputMethodManager =
+                val inputMethodManager: InputMethodManager =
                     getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                 inputMethodManager.hideSoftInputFromWindow(binding.etSearchResult.windowToken, 0)
                 true
@@ -136,13 +136,14 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
         if (ev.action == MotionEvent.ACTION_DOWN) {
-            val v = currentFocus
+            val v: View? = currentFocus
             if (v is EditText) {
-                val outRect = Rect()
+                val outRect: Rect = Rect()
                 v.getGlobalVisibleRect(outRect)
                 if (!outRect.contains(ev.rawX.toInt(), ev.rawY.toInt())) {
                     v.clearFocus()
-                    val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                    val imm: InputMethodManager =
+                        getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                     imm.hideSoftInputFromWindow(v.windowToken, 0)
                 }
             }
