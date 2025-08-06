@@ -7,12 +7,15 @@ import com.on.turip.data.content.dto.ContentResponse
 import com.on.turip.data.content.dto.ContentsInformationResponse
 import com.on.turip.data.content.dto.CreatorInformationResponse
 import com.on.turip.data.content.dto.TripDurationInformationResponse
-import com.on.turip.domain.content.City
+import com.on.turip.data.content.dto.UsersLikeContentResponse
+import com.on.turip.data.content.dto.UsersLikeContentsResponse
 import com.on.turip.domain.content.Content
 import com.on.turip.domain.content.PagedContentsResult
+import com.on.turip.domain.content.UsersLikeContent
 import com.on.turip.domain.content.video.VideoData
 import com.on.turip.domain.content.video.VideoInformation
 import com.on.turip.domain.creator.Creator
+import com.on.turip.domain.region.City
 import com.on.turip.domain.trip.Trip
 import com.on.turip.domain.trip.TripDuration
 
@@ -43,6 +46,7 @@ fun ContentResponse.toDomain(): Content =
                 uploadedDate = uploadedDate,
             ),
         city = city.toDomain(),
+        isFavorite = isFavorite,
     )
 
 fun CityResponse.toDomain(): City =
@@ -68,4 +72,12 @@ fun ContentDetailResponse.toDomain(): VideoData =
         title = title,
         url = url,
         uploadedDate = uploadedDate,
+    )
+
+fun UsersLikeContentsResponse.toDomain(): List<UsersLikeContent> = contents.map { it.toDomain() }
+
+fun UsersLikeContentResponse.toDomain(): UsersLikeContent =
+    UsersLikeContent(
+        content = content.toDomain(),
+        tripDuration = tripDuration.toDomain(),
     )

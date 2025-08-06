@@ -3,6 +3,7 @@ package com.on.turip.data.content.service
 import com.on.turip.data.content.dto.ContentDetailResponse
 import com.on.turip.data.content.dto.ContentInformationCountResponse
 import com.on.turip.data.content.dto.ContentsInformationResponse
+import com.on.turip.data.content.dto.UsersLikeContentsResponse
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -36,4 +37,9 @@ interface ContentService {
     suspend fun getContentDetail(
         @Path("contentId") contentId: Long,
     ): ContentDetailResponse
+
+    @GET("/contents/popular/favorites")
+    suspend fun getUsersLikeContents(
+        @Query("size") size: Int,
+    ): UsersLikeContentsResponse
 }

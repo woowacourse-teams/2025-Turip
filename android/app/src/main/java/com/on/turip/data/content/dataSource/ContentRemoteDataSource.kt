@@ -3,6 +3,7 @@ package com.on.turip.data.content.dataSource
 import com.on.turip.data.content.dto.ContentDetailResponse
 import com.on.turip.data.content.dto.ContentInformationCountResponse
 import com.on.turip.data.content.dto.ContentsInformationResponse
+import com.on.turip.data.content.dto.UsersLikeContentsResponse
 
 interface ContentRemoteDataSource {
     suspend fun getContentsSizeByRegion(region: String): Result<ContentInformationCountResponse>
@@ -22,4 +23,6 @@ interface ContentRemoteDataSource {
     ): Result<ContentsInformationResponse>
 
     suspend fun getContentDetail(contentId: Long): Result<ContentDetailResponse>
+
+    suspend fun getUsersLikeContents(size: Int): Result<UsersLikeContentsResponse>
 }

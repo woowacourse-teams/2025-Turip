@@ -8,7 +8,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.on.turip.di.RepositoryModule
-import com.on.turip.domain.content.City
+import com.on.turip.domain.region.City
 import com.on.turip.domain.content.Content
 import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.content.video.VideoData
@@ -68,6 +68,7 @@ class TripDetailViewModel(
                                             creator = creator,
                                             videoData = videoData,
                                             city = City("// TODO 지역 여기서 받아와서 연결"),
+                                            isFavorite = true, // TODO: 받아온 API 로 수정해서 사용
                                         ),
                                 )
                             _videoUri.value = videoData.url
