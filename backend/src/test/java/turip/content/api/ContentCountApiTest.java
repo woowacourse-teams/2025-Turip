@@ -48,7 +48,7 @@ class ContentCountApiTest {
             // given
             jdbcTemplate.update(
                     "INSERT INTO creator (profile_image, channel_name) VALUES ('https://image.example.com/creator1.jpg', 'TravelMate')");
-            jdbcTemplate.update("INSERT INTO country (name) VALUES ('한국')");
+            jdbcTemplate.update("INSERT INTO country (name) VALUES ('대한민국')");
             jdbcTemplate.update("INSERT INTO city (name, country_id) VALUES ('서울', 1)");
             jdbcTemplate.update("INSERT INTO city (name, country_id) VALUES ('부산', 1)");
             jdbcTemplate.update(
@@ -100,7 +100,7 @@ class ContentCountApiTest {
             // given
             jdbcTemplate.update(
                     "INSERT INTO creator (profile_image, channel_name) VALUES ('https://image.example.com/creator1.jpg', 'TravelMate')");
-            jdbcTemplate.update("INSERT INTO country (name) VALUES ('한국')");
+            jdbcTemplate.update("INSERT INTO country (name) VALUES ('대한민국')");
             jdbcTemplate.update("INSERT INTO city (name, country_id) VALUES ('서울', 1)");
             jdbcTemplate.update("INSERT INTO city (name, country_id) VALUES ('대구', 1)");
             jdbcTemplate.update("INSERT INTO city (name, country_id) VALUES ('울산', 1)");

@@ -4,23 +4,25 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.on.turip.databinding.ItemRegionBinding
-import com.on.turip.ui.common.model.RegionModel
+import com.on.turip.domain.region.RegionCategory
+import com.on.turip.ui.common.loadCircularImage
 
 class RegionViewHolder(
     private val binding: ItemRegionBinding,
     onRegionListener: OnRegionListener,
 ) : RecyclerView.ViewHolder(binding.root) {
-    private var region: RegionModel? = null
+    private var regionCategory: RegionCategory? = null
 
     init {
         binding.root.setOnClickListener {
-            region?.let { onRegionListener.onRegionClick(it) }
+            regionCategory?.let { onRegionListener.onRegionClick(it.name) }
         }
     }
 
-    fun bind(region: RegionModel) {
-        this.region = region
-        binding.tvRegionName.text = region.korean
+    fun bind(regionCategory: RegionCategory) {
+        this.regionCategory = regionCategory
+        binding.tvRegionName.text = regionCategory.name
+        binding.ivRegion.loadCircularImage(regionCategory.imageUrl)
     }
 
     companion object {
@@ -36,6 +38,6 @@ class RegionViewHolder(
     }
 
     fun interface OnRegionListener {
-        fun onRegionClick(region: RegionModel)
+        fun onRegionClick(regionCategoryName: String)
     }
 }

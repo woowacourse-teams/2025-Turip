@@ -177,7 +177,7 @@ class ContentServiceTest {
             String regionCategory = "국내 기타";
             int expectedCount = 10;
             List<String> domesticCategoryNames = DomesticRegionCategory.getDisplayNamesExcludingEtc();
-            given(contentRepository.countByCityNameNotIn(domesticCategoryNames))
+            given(contentRepository.countDomesticEtcContents(domesticCategoryNames))
                     .willReturn(expectedCount);
 
             // when
@@ -194,7 +194,7 @@ class ContentServiceTest {
             String regionCategory = "해외 기타";
             int expectedCount = 7;
             List<String> overseasCategoryNames = OverseasRegionCategory.getDisplayNamesExcludingEtc();
-            given(contentRepository.countByCountryNameNotIn(overseasCategoryNames))
+            given(contentRepository.countOverseasEtcContents(overseasCategoryNames))
                     .willReturn(expectedCount);
 
             // when

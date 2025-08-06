@@ -14,14 +14,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
+import turip.content.controller.dto.response.ContentByCityResponse;
 import turip.content.controller.dto.response.ContentCountResponse;
-import turip.content.controller.dto.response.ContentDetailsByCityResponse;
+import turip.content.controller.dto.response.ContentDetailsByRegionCategoryResponse;
 import turip.content.controller.dto.response.ContentResponse;
 import turip.content.controller.dto.response.ContentSearchResponse;
 import turip.content.controller.dto.response.ContentSearchResultResponse;
 import turip.content.controller.dto.response.ContentWithCreatorAndCityResponse;
-import turip.content.controller.dto.response.ContentWithoutCityResponse;
-import turip.content.controller.dto.response.ContentsByCityResponse;
+import turip.content.controller.dto.response.ContentsByRegionCategoryResponse;
 import turip.content.controller.dto.response.TripDurationResponse;
 import turip.content.controller.dto.response.WeeklyPopularFavoriteContentResponse;
 import turip.content.controller.dto.response.WeeklyPopularFavoriteContentsResponse;
@@ -66,23 +66,19 @@ public class ContentService {
         return ContentCountResponse.from(count);
     }
 
-    public ContentsByCityResponse findContentsByCityName(
-            String cityName,
+    public ContentsByRegionCategoryResponse findContentsByRegionCategory(
+            String regionCategory,
             int size,
             long lastId
     ) {
-        List<Content> contents = findContentsByCity(cityName, lastId, size + EXTRA_FETCH_COUNT);
+        Slice<Content> contentSlice = findContentSlicesByRegionCategory(regionCategory, lastId, size);
 
-        // 실제 반환할 content는 size 만큼 잘라서 반환한다.
-        List<Content> pagedContents = contents.stream()
-                .limit(size)
-                .toList();
+        List<Content> contents = contentSlice.getContent();
+        List<ContentDetailsByRegionCategoryResponse> contentDetails
+                = convertContentsToContentDetailsByRegionResponses(contents);
+        boolean loadable = contentSlice.hasNext();
 
-        List<ContentDetailsByCityResponse> contentDetails
-                = convertContentsToContentDetailsByRegionResponses(pagedContents);
-        boolean loadable = contents.size() > size;
-
-        return ContentsByCityResponse.of(contentDetails, loadable);
+        return ContentsByRegionCategoryResponse.of(contentDetails, loadable, regionCategory);
     }
 
     public WeeklyPopularFavoriteContentsResponse findWeeklyPopularFavoriteContents(String deviceFid,
@@ -155,47 +151,90 @@ public class ContentService {
 
     private int calculateDomesticEtcCount() {
         List<String> domesticCategoryNames = DomesticRegionCategory.getDisplayNamesExcludingEtc();
-        return contentRepository.countByCityNameNotIn(domesticCategoryNames);
+        return contentRepository.countDomesticEtcContents(domesticCategoryNames);
     }
 
     private int calculateOverseasEtcCount() {
         List<String> overseasCategoryNames = OverseasRegionCategory.getDisplayNamesExcludingEtc();
-        return contentRepository.countByCountryNameNotIn(overseasCategoryNames);
+        return contentRepository.countOverseasEtcContents(overseasCategoryNames);
     }
 
-    private List<Content> findContentsByCity(
-            String cityName,
+    private Slice<Content> findContentSlicesByRegionCategory(
+            String regionCategory,
             long lastId,
-            int sizePlusOne
+            int size
     ) {
-        Pageable pageable = PageRequest.of(0, sizePlusOne);
+        Pageable pageable = PageRequest.of(0, size);
         boolean isFirstPage = lastId == 0;
 
+        if (OTHER_DOMESTIC.matchesDisplayName(regionCategory)) {
+            return findDomesticEtcContents(lastId, pageable, isFirstPage);
+        }
+
+        if (OTHER_OVERSEAS.matchesDisplayName(regionCategory)) {
+            return findOverseasEtcContents(lastId, pageable, isFirstPage);
+        }
+
+        if (DomesticRegionCategory.containsName(regionCategory)) {
+            return findContentsByCityName(regionCategory, lastId, pageable, isFirstPage);
+        }
+
+        return findContentsByCountryName(regionCategory, lastId, pageable, isFirstPage);
+    }
+
+    private Slice<Content> findDomesticEtcContents(long lastId, Pageable pageable, boolean isFirstPage) {
+        List<String> domesticCategoryNames = DomesticRegionCategory.getDisplayNamesExcludingEtc();
+
+        if (isFirstPage) {
+            return contentRepository.findDomesticEtcContents(domesticCategoryNames, pageable);
+        }
+        return contentRepository.findDomesticEtcContentsWithLastId(domesticCategoryNames, lastId, pageable);
+    }
+
+    private Slice<Content> findOverseasEtcContents(long lastId, Pageable pageable, boolean isFirstPage) {
+        List<String> overseasCategoryNames = OverseasRegionCategory.getDisplayNamesExcludingEtc();
+
+        if (isFirstPage) {
+            return contentRepository.findOverseasEtcContents(overseasCategoryNames, pageable);
+        }
+        return contentRepository.findOverseasEtcContentsWithLastId(overseasCategoryNames, lastId, pageable);
+    }
+
+    private Slice<Content> findContentsByCityName(String cityName, long lastId, Pageable pageable,
+                                                  boolean isFirstPage) {
         if (isFirstPage) {
             return contentRepository.findByCityNameOrderByIdDesc(cityName, pageable);
         }
         return contentRepository.findByCityNameAndIdLessThanOrderByIdDesc(cityName, lastId, pageable);
     }
 
-    private List<ContentDetailsByCityResponse> convertContentsToContentDetailsByRegionResponses(
+    private Slice<Content> findContentsByCountryName(String countryName, long lastId, Pageable pageable,
+                                                     boolean isFirstPage) {
+        if (isFirstPage) {
+            return contentRepository.findByCityCountryNameOrderByIdDesc(countryName, pageable);
+        }
+        return contentRepository.findByCityCountryNameAndIdLessThanOrderByIdDesc(countryName, lastId, pageable);
+    }
+
+    private List<ContentDetailsByRegionCategoryResponse> convertContentsToContentDetailsByRegionResponses(
             List<Content> contents) {
         return contents.stream()
-                .map(this::toContentDetailsResponse)
+                .map(this::toContentDetailsByRegionResponse)
                 .toList();
+    }
+
+    private ContentDetailsByRegionCategoryResponse toContentDetailsByRegionResponse(Content content) {
+        ContentByCityResponse contentWithCity = ContentByCityResponse.from(content);
+        TripDurationResponse tripDuration = calculateTripDuration(content);
+        int tripPlaceCount = tripCourseService.countByContentId(content.getId());
+
+        return ContentDetailsByRegionCategoryResponse.of(contentWithCity, tripDuration, tripPlaceCount);
     }
 
     private List<ContentSearchResultResponse> convertContentsToContentSearchResultResponse(Slice<Content> contents) {
         return contents.stream()
                 .map(this::toContentSearchResultResponse)
                 .toList();
-    }
-
-    private ContentDetailsByCityResponse toContentDetailsResponse(Content content) {
-        ContentWithoutCityResponse contentWithoutRegion = ContentWithoutCityResponse.from(content);
-        TripDurationResponse tripDuration = calculateTripDuration(content);
-        int tripPlaceCount = tripCourseService.countByContentId(content.getId());
-
-        return ContentDetailsByCityResponse.of(contentWithoutRegion, tripDuration, tripPlaceCount);
     }
 
     private ContentSearchResultResponse toContentSearchResultResponse(Content content) {
