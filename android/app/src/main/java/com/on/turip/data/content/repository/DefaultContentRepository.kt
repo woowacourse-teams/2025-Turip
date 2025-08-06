@@ -2,6 +2,7 @@ package com.on.turip.data.content.repository
 
 import com.on.turip.data.content.datasource.ContentRemoteDataSource
 import com.on.turip.data.content.toDomain
+import com.on.turip.domain.content.City
 import com.on.turip.domain.content.Content
 import com.on.turip.domain.content.PagedContentsResult
 import com.on.turip.domain.content.PopularFavoriteContent
@@ -87,7 +88,7 @@ class DefaultContentRepository(
                                     url = "https://i.ytimg.com/vi/koJ6u7uxEwY/maxresdefault.jpg",
                                     uploadedDate = "2025-06-10",
                                 ),
-                            City("서울"),
+                            city = City("서울"),
                         ),
                     isFavorite = true,
                     city = "서울",
@@ -113,7 +114,7 @@ class DefaultContentRepository(
                                     url = "https://i.ytimg.com/vi/koJ6u7uxEwY/maxresdefault.jpg",
                                     uploadedDate = "2025-07-02",
                                 ),
-                            City("부산"),
+                            city = City("부산"),
                         ),
                     isFavorite = false,
                     city = "부산",
@@ -139,7 +140,7 @@ class DefaultContentRepository(
                                     url = "https://i.ytimg.com/vi/koJ6u7uxEwY/maxresdefault.jpg",
                                     uploadedDate = "2025-08-01",
                                 ),
-                            City("도쿄"),
+                            city = City("도쿄"),
                         ),
                     isFavorite = true,
                     city = "도쿄",
