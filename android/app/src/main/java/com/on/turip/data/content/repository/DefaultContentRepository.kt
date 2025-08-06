@@ -65,7 +65,7 @@ class DefaultContentRepository(
             .mapCatching { it.toDomain() }
 
     override suspend fun loadPopularFavoriteContents(size: Int): Result<List<UsersLikeContent>> =
-        contentRemoteDataSource.getUsersLikeContents(size).mapCatching {
-            it.toDomain()
-        }
+        contentRemoteDataSource
+            .getUsersLikeContents(size)
+            .mapCatching { it.toDomain() }
 }
