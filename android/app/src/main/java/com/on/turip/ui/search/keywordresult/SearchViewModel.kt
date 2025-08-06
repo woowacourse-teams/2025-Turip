@@ -90,6 +90,18 @@ class SearchViewModel(
         }
     }
 
+    fun loadSearchHistory() {
+        viewModelScope.launch {
+            searchHistoryRepository
+                .loadRecentSearches(10)
+                .onSuccess { result: List<SearchHistory> ->
+                    _searchHistory.value = result
+                }.onFailure {
+                    Timber.e("${it.message}")
+                }
+        }
+    }
+
     fun createSearchHistory() {
         viewModelScope.launch {
             searchHistoryRepository
@@ -100,13 +112,11 @@ class SearchViewModel(
         }
     }
 
-    private fun loadSearchHistory() {
+    fun deleteSearchHistory(keyword: String) {
         viewModelScope.launch {
             searchHistoryRepository
-                .loadRecentSearches(10)
-                .onSuccess { result: List<SearchHistory> ->
-                    _searchHistory.value = result
-                }.onFailure {
+                .deleteSearch(keyword)
+                .onFailure {
                     Timber.e("${it.message}")
                 }
         }

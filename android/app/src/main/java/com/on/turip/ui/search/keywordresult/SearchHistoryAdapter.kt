@@ -4,14 +4,15 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import com.on.turip.domain.searchhistory.SearchHistory
 
-class SearchHistoryAdapter :
-    androidx.recyclerview.widget.ListAdapter<SearchHistory, SearchHistoryViewHolder>(
+class SearchHistoryAdapter(
+    private val onSearchHistoryListener: SearchHistoryViewHolder.OnSearchHistoryListener,
+) : androidx.recyclerview.widget.ListAdapter<SearchHistory, SearchHistoryViewHolder>(
         SearchHistoryDiffUtil,
     ) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): SearchHistoryViewHolder = SearchHistoryViewHolder.of(parent)
+    ): SearchHistoryViewHolder = SearchHistoryViewHolder.of(parent, onSearchHistoryListener)
 
     override fun onBindViewHolder(
         holder: SearchHistoryViewHolder,

@@ -42,7 +42,9 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         }
 
     private val searchHistoryAdapter: SearchHistoryAdapter =
-        SearchHistoryAdapter()
+        SearchHistoryAdapter { keyword ->
+            viewModel.deleteSearchHistory(keyword)
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,6 +54,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         setupAdapters()
         binding.etSearchResult.requestFocus()
         binding.rvSearchResult.itemAnimator = null
+        binding.rvSearchResultSearchHistory.itemAnimator = null
     }
 
     private fun setupAdapters() {
@@ -119,6 +122,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         }
         viewModel.searchHistory.observe(this) { searchHistories: List<SearchHistory> ->
             searchHistoryAdapter.submitList(searchHistories)
+            viewModel.loadSearchHistory()
         }
     }
 
