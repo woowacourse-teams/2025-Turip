@@ -24,7 +24,7 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
             ORDER BY COUNT(*) DESC
             LIMIT :topContentSize
             """, nativeQuery = true)
-    List<Content> findTop5PopularContentsByFavoriteBetweenDates(
+    List<Content> findPopularContentsByFavoriteBetweenDatesWithLimit(
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,
             @Param("topContentSize") int topContentSize

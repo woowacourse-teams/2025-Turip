@@ -1,12 +1,11 @@
 package turip.content.service;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.util.ArrayList;
- 
 import static turip.regioncategory.domain.DomesticRegionCategory.OTHER_DOMESTIC;
 import static turip.regioncategory.domain.OverseasRegionCategory.OTHER_OVERSEAS;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -92,7 +91,7 @@ public class ContentService {
         LocalDate startDate = lastWeekPeriod.getFirst();
         LocalDate endDate = lastWeekPeriod.getLast();
 
-        List<Content> popularContents = favoriteRepository.findTop5PopularContentsByFavoriteBetweenDates(
+        List<Content> popularContents = favoriteRepository.findPopularContentsByFavoriteBetweenDatesWithLimit(
                 startDate, endDate, topContentSize);
         if (deviceFid == null) {
             return convertContentsToPopularContentsResponse(popularContents, false);

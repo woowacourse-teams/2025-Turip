@@ -104,7 +104,8 @@ class ContentServiceTest {
 
             List<Content> popularContents = List.of(content1, content2);
 
-            given(favoriteRepository.findTop5PopularContentsByFavoriteBetweenDates(startDate, endDate, topContentSize))
+            given(favoriteRepository.findPopularContentsByFavoriteBetweenDatesWithLimit(startDate, endDate,
+                    topContentSize))
                     .willReturn(popularContents);
             given(memberRepository.findByDeviceFid("testDeviceFid"))
                     .willReturn(Optional.of(member));
@@ -131,7 +132,7 @@ class ContentServiceTest {
             assertThat(response.contents().get(1).tripDuration().days()).isEqualTo(2);
         }
     }
-     
+
     @DisplayName("지역별 카테고리 기반 컨텐츠 수 조회 기능 테스트")
     @Nested
     class CountContentByRegionCategory {
