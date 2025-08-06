@@ -16,6 +16,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import com.on.turip.R
 import com.on.turip.databinding.ActivitySearchBinding
+import com.on.turip.domain.searchhistory.SearchHistory
 import com.on.turip.ui.common.base.BaseActivity
 import com.on.turip.ui.search.model.VideoInformationModel
 import com.on.turip.ui.trip.detail.TripDetailActivity
@@ -40,6 +41,9 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
             startActivity(intent)
         }
 
+    private val searchHistoryAdapter: SearchHistoryAdapter =
+        SearchHistoryAdapter()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setupToolbar()
@@ -52,6 +56,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
 
     private fun setupAdapters() {
         binding.rvSearchResult.adapter = searchAdapter
+        binding.rvSearchResultSearchHistory.adapter = searchHistoryAdapter
     }
 
     private fun setupToolbar() {
@@ -81,6 +86,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         binding.etSearchResult.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 viewModel.loadByKeyword()
+                viewModel.createSearchHistory()
                 val inputMethodManager: InputMethodManager =
                     getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                 inputMethodManager.hideSoftInputFromWindow(binding.etSearchResult.windowToken, 0)
@@ -110,6 +116,9 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         }
         viewModel.loading.observe(this) { loading: Boolean ->
             handleVisibleByLoading(loading)
+        }
+        viewModel.searchHistory.observe(this) { searchHistories: List<SearchHistory> ->
+            searchHistoryAdapter.submitList(searchHistories)
         }
     }
 

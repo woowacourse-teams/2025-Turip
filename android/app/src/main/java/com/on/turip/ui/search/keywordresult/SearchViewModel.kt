@@ -12,6 +12,7 @@ import com.on.turip.di.RepositoryModule
 import com.on.turip.domain.content.PagedContentsResult
 import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.content.video.VideoInformation
+import com.on.turip.domain.searchhistory.SearchHistory
 import com.on.turip.domain.searchhistory.SearchHistoryRepository
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.search.model.VideoInformationModel
@@ -35,6 +36,13 @@ class SearchViewModel(
 
     private val _loading: MutableLiveData<Boolean> = MutableLiveData()
     val loading: LiveData<Boolean> get() = _loading
+
+    private val _searchHistory: MutableLiveData<List<SearchHistory>> = MutableLiveData()
+    val searchHistory: LiveData<List<SearchHistory>> = _searchHistory
+
+    init {
+        loadSearchHistory()
+    }
 
     fun updateSearchingWord(newWords: Editable?) {
         _searchingWord.value = newWords.toString()
@@ -77,6 +85,28 @@ class SearchViewModel(
                     _searchResultCount.value = result
                 }.onFailure {
                     _loading.value = false
+                    Timber.e("${it.message}")
+                }
+        }
+    }
+
+    fun createSearchHistory() {
+        viewModelScope.launch {
+            searchHistoryRepository
+                .createSearchHistory(searchingWord.value.toString())
+                .onFailure {
+                    Timber.e("${it.message}")
+                }
+        }
+    }
+
+    private fun loadSearchHistory() {
+        viewModelScope.launch {
+            searchHistoryRepository
+                .loadRecentSearches(10)
+                .onSuccess { result: List<SearchHistory> ->
+                    _searchHistory.value = result
+                }.onFailure {
                     Timber.e("${it.message}")
                 }
         }
