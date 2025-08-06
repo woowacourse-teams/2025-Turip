@@ -96,9 +96,9 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
     }
 
     private fun setupObservers() {
-        viewModel.searchingWord.observe(this) { words: String ->
+        viewModel.searchingWord.observe(this) { searchWord: String ->
             binding.ivSearchResultClear.visibility =
-                if (words.isNotBlank()) View.VISIBLE else View.GONE
+                if (searchWord.isNotBlank()) View.VISIBLE else View.GONE
         }
         viewModel.videoInformation.observe(this) { videoInformationModels: List<VideoInformationModel> ->
             searchAdapter.submitList(videoInformationModels)
