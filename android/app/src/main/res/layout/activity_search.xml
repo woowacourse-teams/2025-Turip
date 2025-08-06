@@ -128,10 +128,12 @@
         android:background="@color/pure_white_ffffff" />
 
     <androidx.recyclerview.widget.RecyclerView
+        android:paddingHorizontal="20dp"
         android:id="@+id/rv_search_result_search_history"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:background="@color/pure_white_ffffff"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintTop_toBottomOf="@id/tb_search_result" />
 
