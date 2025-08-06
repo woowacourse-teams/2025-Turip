@@ -338,6 +338,74 @@ public class ContentController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(
+            summary = "주간 인기 찜 컨텐츠 조회 api",
+            description = "지난 주 찜 수가 많은 컨텐츠 조회"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "성공 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = WeeklyPopularFavoriteContentsResponse.class),
+                            examples = @ExampleObject(
+                                    name = "success",
+                                    summary = "성공적으로 주간 인기 컨텐츠 조회",
+                                    value = """
+                                            {
+                                              "contents": [
+                                                {
+                                                  "content": {
+                                                    "id": 1,
+                                                    "title": "느좋 감성 대구 여행 어쩌구저쩌구",
+                                                    "url": "https://youtube.com/watch?v=abc123",
+                                                    "uploadedDate": "2024-04-21",
+                                                    "city": {
+                                                      "name": "속초"
+                                                    },
+                                                    "creator": {
+                                                      "id": 10,
+                                                      "channelName": "여행하는 뭉치",
+                                                      "profileImage": "http://turip.com/static/youtuber1"
+                                                    },
+                                                    "isFavorite": false
+                                                  },
+                                                  "tripDuration": {
+                                                    "nights": 2,
+                                                    "days": 3
+                                                  }
+                                                },
+                                                {
+                                                  "content": {
+                                                    "id": 2,
+                                                    "title": "커피 냄새가 솔솔 나는 대전 2박 3일 브이로그",
+                                                    "url": "https://youtube.com/watch?v=def456",
+                                                    "uploadedDate": "2025-07-21",
+                                                    "city": {
+                                                      "name": "대전"
+                                                    },
+                                                    "creator": {
+                                                      "id": 11,
+                                                      "channelName": "여행하는 하루",
+                                                      "profileImage": "http://turip.com/static/youtuber2"
+                                                    },
+                                                    "isFavorite": true
+                                                  },
+                                                  "tripDuration": {
+                                                    "nights": 1,
+                                                    "days": 2
+                                                  }
+                                                }
+                                              ]
+                                            }
+                                            
+                                            """
+                            )
+                    )
+
+            )
+    })
     @GetMapping("/popular/favorites")
     public ResponseEntity<WeeklyPopularFavoriteContentsResponse> readWeeklyPopularFavoriteContents(
             @RequestHeader(value = "device-fid", required = false) String deviceFid,
