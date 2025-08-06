@@ -61,8 +61,8 @@ class FavoriteApiTest {
             // given
             jdbcTemplate.update(
                     "INSERT INTO creator (profile_image, channel_name) VALUES ('https://image.example.com/creator1.jpg', 'TravelMate')");
-            jdbcTemplate.update("INSERT INTO country (name) VALUES ('korea')");
-            jdbcTemplate.update("INSERT INTO city (name, country_id, province_id) VALUES ('seoul', 1, null)");
+            jdbcTemplate.update("INSERT INTO country (name) VALUES ('대한민국')");
+            jdbcTemplate.update("INSERT INTO city (name, country_id, province_id) VALUES ('서울', 1, null)");
             jdbcTemplate.update("INSERT INTO category (name) VALUES ('관광지')");
             jdbcTemplate.update("INSERT INTO category (name) VALUES ('빵집')");
             jdbcTemplate.update("INSERT INTO category (name) VALUES ('카페')");
@@ -105,8 +105,8 @@ class FavoriteApiTest {
             // given
             jdbcTemplate.update(
                     "INSERT INTO creator (profile_image, channel_name) VALUES ('https://image.example.com/creator1.jpg', 'TravelMate')");
-            jdbcTemplate.update("INSERT INTO country (name) VALUES ('korea')");
-            jdbcTemplate.update("INSERT INTO city (name, country_id, province_id) VALUES ('seoul', 1, null)");
+            jdbcTemplate.update("INSERT INTO country (name) VALUES ('대한민국')");
+            jdbcTemplate.update("INSERT INTO city (name, country_id, province_id) VALUES ('서울', 1, null)");
             jdbcTemplate.update("INSERT INTO category (name) VALUES ('관광지')");
             jdbcTemplate.update(
                     "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('경복궁','https://naver.me/test','경복궁 도로명 주소',37.1234,126.1234)");
@@ -136,8 +136,8 @@ class FavoriteApiTest {
             // given
             jdbcTemplate.update(
                     "INSERT INTO creator (profile_image, channel_name) VALUES ('https://image.example.com/creator1.jpg', 'TravelMate')");
-            jdbcTemplate.update("INSERT INTO country (name) VALUES ('korea')");
-            jdbcTemplate.update("INSERT INTO city (name, country_id, province_id) VALUES ('seoul', 1, null)");
+            jdbcTemplate.update("INSERT INTO country (name) VALUES ('대한민국')");
+            jdbcTemplate.update("INSERT INTO city (name, country_id, province_id) VALUES ('서울', 1, null)");
             jdbcTemplate.update("INSERT INTO category (name) VALUES ('관광지')");
             jdbcTemplate.update(
                     "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('경복궁','https://naver.me/test','경복궁 도로명 주소',37.1234,126.1234)");
@@ -172,8 +172,8 @@ class FavoriteApiTest {
             // given
             jdbcTemplate.update(
                     "INSERT INTO creator (profile_image, channel_name) VALUES ('https://image.example.com/creator.jpg', 'Travel')");
-            jdbcTemplate.update("INSERT INTO country (name) VALUES ('korea')");
-            jdbcTemplate.update("INSERT INTO city (name, country_id, province_id) VALUES ('seoul', 1, null)");
+            jdbcTemplate.update("INSERT INTO country (name) VALUES ('대한민국')");
+            jdbcTemplate.update("INSERT INTO city (name, country_id, province_id) VALUES ('서울', 1, null)");
             jdbcTemplate.update(
                     "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 1, 'https://youtube.com/watch?v=deleteTest', '삭제 테스트 영상', '2025-06-01')");
             jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('testDeviceFid')");
@@ -195,8 +195,8 @@ class FavoriteApiTest {
             // given
             jdbcTemplate.update(
                     "INSERT INTO creator (profile_image, channel_name) VALUES ('https://image.example.com/creator.jpg', 'Travel')");
-            jdbcTemplate.update("INSERT INTO country (name) VALUES ('korea')");
-            jdbcTemplate.update("INSERT INTO city (name, country_id, province_id) VALUES ('seoul', 1, null)");
+            jdbcTemplate.update("INSERT INTO country (name) VALUES ('대한민국')");
+            jdbcTemplate.update("INSERT INTO city (name, country_id, province_id) VALUES ('서울', 1, null)");
             jdbcTemplate.update(
                     "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 1, 'https://youtube.com/watch?v=deleteTest', '삭제 테스트 영상', '2025-06-01')");
             jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('testDeviceFid')");
@@ -218,8 +218,8 @@ class FavoriteApiTest {
             // given
             jdbcTemplate.update(
                     "INSERT INTO creator (profile_image, channel_name) VALUES ('https://image.example.com/creator.jpg', 'Travel')");
-            jdbcTemplate.update("INSERT INTO country (name) VALUES ('korea')");
-            jdbcTemplate.update("INSERT INTO city (name, country_id, province_id) VALUES ('seoul', 1, null)");
+            jdbcTemplate.update("INSERT INTO country (name) VALUES ('대한민국')");
+            jdbcTemplate.update("INSERT INTO city (name, country_id, province_id) VALUES ('서울', 1, null)");
             jdbcTemplate.update(
                     "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 1, 'https://youtube.com/watch?v=deleteTest', '삭제 테스트 영상', '2025-06-01')");
             jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('testDeviceFid')");
@@ -241,8 +241,8 @@ class FavoriteApiTest {
             // given
             jdbcTemplate.update(
                     "INSERT INTO creator (profile_image, channel_name) VALUES ('https://image.example.com/creator.jpg', 'Travel')");
-            jdbcTemplate.update("INSERT INTO country (name) VALUES ('korea')");
-            jdbcTemplate.update("INSERT INTO city (name, country_id, province_id) VALUES ('seoul', 1, null)");
+            jdbcTemplate.update("INSERT INTO country (name) VALUES ('대한민국')");
+            jdbcTemplate.update("INSERT INTO city (name, country_id, province_id) VALUES ('서울', 1, null)");
             jdbcTemplate.update(
                     "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 1, 'https://youtube.com/watch?v=deleteTest', '삭제 테스트 영상', '2025-06-01')");
             jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('testDeviceFid')");
