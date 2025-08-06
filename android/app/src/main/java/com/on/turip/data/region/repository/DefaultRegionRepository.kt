@@ -11,14 +11,14 @@ class DefaultRegionRepository(
     private val cachedDomesticRegionCategories: MutableList<RegionCategory> = mutableListOf()
     private val cachedAbroadRegionCategories: MutableList<RegionCategory> = mutableListOf()
 
-    override suspend fun loadRegionCategories(isKorea: Boolean): Result<List<RegionCategory>> {
+    override suspend fun loadRegionCategories(isDomestic: Boolean): Result<List<RegionCategory>> {
         val cachedRegionCategories: MutableList<RegionCategory> =
-            if (isKorea) cachedDomesticRegionCategories else cachedAbroadRegionCategories
+            if (isDomestic) cachedDomesticRegionCategories else cachedAbroadRegionCategories
 
         if (cachedRegionCategories.isNotEmpty()) return Result.success(cachedRegionCategories)
 
         return regionRemoteDataSource
-            .getRegionCategories(isKorea)
+            .getRegionCategories(isDomestic)
             .mapCatching {
                 val categories: List<RegionCategory> = it.toDomain()
                 cachedRegionCategories.addAll(categories)

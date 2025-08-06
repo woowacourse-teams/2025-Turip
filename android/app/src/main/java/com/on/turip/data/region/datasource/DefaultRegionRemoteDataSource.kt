@@ -10,8 +10,8 @@ class DefaultRegionRemoteDataSource(
     private val regionService: RegionService,
     private val coroutineContext: CoroutineContext = Dispatchers.IO,
 ) : RegionRemoteDataSource {
-    override suspend fun getRegionCategories(isKorea: Boolean): Result<RegionCategoriesResponse> =
+    override suspend fun getRegionCategories(isDomestic: Boolean): Result<RegionCategoriesResponse> =
         withContext(coroutineContext) {
-            runCatching { regionService.getRegionCategories(isKorea) }
+            runCatching { regionService.getRegionCategories(isDomestic) }
         }
 }

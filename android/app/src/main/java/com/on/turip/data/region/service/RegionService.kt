@@ -7,6 +7,6 @@ import retrofit2.http.Query
 interface RegionService {
     @GET("region-categories")
     suspend fun getRegionCategories(
-        @Query("isKorea") isKorea: Boolean,
+        @Query("isKorea") isDomestic: Boolean,
     ): RegionCategoriesResponse
 }
