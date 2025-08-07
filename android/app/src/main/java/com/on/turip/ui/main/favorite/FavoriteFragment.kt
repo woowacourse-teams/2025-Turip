@@ -26,8 +26,12 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>() {
     private val favoriteItemAdapter: FavoriteItemAdapter by lazy {
         FavoriteItemAdapter(
             object : FavoriteItemViewHolder.FavoriteItemListener {
-                override fun onFavoriteClick(contentId: Long) {
-                    Timber.d("찜 목록의 찜 버튼을 클릭(contentId=$contentId)")
+                override fun onFavoriteClick(
+                    contentId: Long,
+                    isFavorite: Boolean,
+                ) {
+                    Timber.d("찜 목록의 찜 버튼을 클릭(contentId=$contentId)\n업데이트 된 찜 상태 =${!isFavorite}")
+                    viewModel.updateFavorite(contentId, isFavorite)
                 }
 
                 override fun onFavoriteItemClick(
@@ -47,12 +51,6 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>() {
         )
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        // TODO: Use the ViewModel
-    }
-
     override fun inflateBinding(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -64,8 +62,20 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
+        handleVisibleByHasContent()
         setupAdapters()
         setupListeners()
+        setupObservers()
+    }
+
+    private fun handleVisibleByHasContent() {
+        if (viewModel.favoriteContents.value?.isEmpty() == true) {
+            binding.clFavoriteEmpty.visibility = View.VISIBLE
+            binding.clFavoriteNotEmpty.visibility = View.GONE
+        } else {
+            binding.clFavoriteEmpty.visibility = View.GONE
+            binding.clFavoriteNotEmpty.visibility = View.VISIBLE
+        }
     }
 
     private fun setupAdapters() {
@@ -87,6 +97,12 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>() {
                     data = inquireMailUri
                 }
             startActivity(intent)
+        }
+    }
+
+    private fun setupObservers() {
+        viewModel.favoriteContents.observe(viewLifecycleOwner) {
+            favoriteItemAdapter.submitList(it)
         }
     }
 
