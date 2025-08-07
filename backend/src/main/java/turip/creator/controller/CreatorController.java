@@ -38,7 +38,7 @@ public class CreatorController {
                             schema = @Schema(implementation = CreatorResponse.class),
                             examples = @ExampleObject(
                                     name = "success",
-                                    summary = "성공적으로 크리에이터 수 조회",
+                                    summary = "성공적으로 크리에이터 조회",
                                     value = """
                                             {
                                                 "id": 1,

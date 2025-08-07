@@ -131,7 +131,7 @@ public class FavoriteController {
                             schema = @Schema(implementation = MyFavoriteContentsResponse.class),
                             examples = @ExampleObject(
                                     name = "success",
-                                    summary = "내 찜 목공 조회 성공",
+                                    summary = "내 찜 목록 조회 성공",
                                     value = """
                                             {
                                                 "contents": [
