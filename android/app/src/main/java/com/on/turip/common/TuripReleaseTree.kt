@@ -12,7 +12,11 @@ class TuripReleaseTree : Timber.Tree() {
         t: Throwable?,
     ) {
         if (priority >= Log.ERROR) {
-            FirebaseCrashlytics.getInstance().recordException(t ?: Exception(message))
+            FirebaseCrashlytics.getInstance().apply {
+                log(message)
+                recordException(t ?: Exception(message))
+                setCustomKey("log_priority", priority)
+            }
         }
     }
 }
