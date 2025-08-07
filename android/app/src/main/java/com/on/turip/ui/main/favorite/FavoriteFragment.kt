@@ -73,7 +73,7 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>() {
             adapter = favoriteItemAdapter
             addItemDecoration(
                 ItemDividerDecoration(
-                    height = 8.0f,
+                    height = 8,
                     color = ContextCompat.getColor(context, R.color.gray_100_f0f0ee),
                 ),
             )

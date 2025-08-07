@@ -6,8 +6,8 @@ import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 
 class ItemDividerDecoration(
-    private val height: Float,
-    private val padding: Float = 0f,
+    private val height: Int,
+    private val padding: Int = 0,
     private val color: Int,
 ) : RecyclerView.ItemDecoration() {
     override fun onDrawOver(
@@ -16,13 +16,13 @@ class ItemDividerDecoration(
         state: RecyclerView.State,
     ) {
         val paint: Paint = Paint().apply { color = this@ItemDividerDecoration.color }
-        val left: Float = parent.paddingStart + padding
-        val right: Float = parent.width - parent.paddingEnd - padding
+        val left: Float = parent.paddingStart + padding.dpToPxFloat
+        val right: Float = parent.width - parent.paddingEnd - padding.dpToPxFloat
         for (i in 0 until parent.childCount - 1) {
             val child: View = parent.getChildAt(i)
             val params: RecyclerView.LayoutParams = child.layoutParams as RecyclerView.LayoutParams
             val top: Float = (child.bottom + params.bottomMargin).toFloat()
-            val bottom: Float = top + height
+            val bottom: Float = top + height.dpToPxFloat
             c.drawRect(left, top, right, bottom, paint)
         }
     }
