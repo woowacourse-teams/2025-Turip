@@ -10,7 +10,6 @@ import androidx.core.content.ContextCompat
 import com.on.turip.R
 import com.on.turip.databinding.ActivityRegionResultBinding
 import com.on.turip.ui.common.base.BaseActivity
-import com.on.turip.ui.common.model.RegionModel
 import com.on.turip.ui.trip.detail.TripDetailActivity
 
 class RegionResultActivity : BaseActivity<ActivityRegionResultBinding>() {
@@ -73,7 +72,7 @@ class RegionResultActivity : BaseActivity<ActivityRegionResultBinding>() {
                     searchResultState.searchResultCount,
                 )
 
-            supportActionBar?.title = setupTitle(searchResultState.region)
+            supportActionBar?.title = searchResultState.region
 
             regionResultAdapter.submitList(searchResultState.videoInformations)
 
@@ -90,11 +89,6 @@ class RegionResultActivity : BaseActivity<ActivityRegionResultBinding>() {
 
         binding.tvRegionResultLoading.visibility =
             if (searchResultState.loading) View.VISIBLE else View.GONE
-    }
-
-    private fun setupTitle(region: String): String {
-        val regionOrigin = RegionModel.findByEnglish(region)
-        return regionOrigin.korean
     }
 
     companion object {
