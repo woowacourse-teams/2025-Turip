@@ -43,6 +43,19 @@ class SearchViewModel(
         loadSearchHistory()
     }
 
+    private fun loadSearchHistory() {
+        viewModelScope.launch {
+            searchHistoryRepository
+                .loadRecentSearches(MAX_SEARCH_HISTORY_COUNT)
+                .onSuccess { result: List<SearchHistory> ->
+                    Timber.d("최근 검색 목록 받아옴 $result")
+                    _searchHistory.value = result
+                }.onFailure {
+                    Timber.e("${it.message}")
+                }
+        }
+    }
+
     fun updateSearchingWord(newWord: String) {
         _searchingWord.value = newWord
     }
@@ -86,19 +99,6 @@ class SearchViewModel(
                     _searchResultCount.value = result
                 }.onFailure {
                     _loading.value = false
-                    Timber.e("${it.message}")
-                }
-        }
-    }
-
-    private fun loadSearchHistory() {
-        viewModelScope.launch {
-            searchHistoryRepository
-                .loadRecentSearches(MAX_SEARCH_HISTORY_COUNT)
-                .onSuccess { result: List<SearchHistory> ->
-                    Timber.d("최근 검색 목록 받아옴 $result")
-                    _searchHistory.value = result
-                }.onFailure {
                     Timber.e("${it.message}")
                 }
         }
