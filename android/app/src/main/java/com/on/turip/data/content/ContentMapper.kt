@@ -3,8 +3,11 @@ package com.on.turip.data.content
 import com.on.turip.data.content.dto.CityResponse
 import com.on.turip.data.content.dto.ContentDetailResponse
 import com.on.turip.data.content.dto.ContentInformationResponse
+import com.on.turip.data.content.dto.ContentInformationResponse2
 import com.on.turip.data.content.dto.ContentResponse
+import com.on.turip.data.content.dto.ContentResponse2
 import com.on.turip.data.content.dto.ContentsInformationResponse
+import com.on.turip.data.content.dto.ContentsInformationResponse2
 import com.on.turip.data.content.dto.CreatorInformationResponse
 import com.on.turip.data.content.dto.TripDurationInformationResponse
 import com.on.turip.data.content.dto.UsersLikeContentResponse
@@ -88,4 +91,34 @@ fun UsersLikeContentResponse.toDomain(): UsersLikeContent =
     UsersLikeContent(
         content = content.toDomain(),
         tripDuration = tripDuration.toDomain(),
+    )
+
+fun ContentsInformationResponse2.toDomain(): PagedContentsResult =
+    PagedContentsResult(
+        videos = contentsInformation.map(ContentInformationResponse2::toDomain),
+        loadable = loadable,
+    )
+
+fun ContentInformationResponse2.toDomain(): VideoInformation =
+    VideoInformation(
+        content = content.toDomain(),
+        trip =
+            Trip(
+                tripDuration = tripDuration.toDomain(),
+                tripPlaceCount = tripPlaceCount,
+            ),
+    )
+
+fun ContentResponse2.toDomain(): Content =
+    Content(
+        id = id,
+        creator = creator.toDomain(),
+        videoData =
+            VideoData(
+                title = title,
+                url = url,
+                uploadedDate = uploadedDate,
+            ),
+        city = City(name = city),
+        isFavorite = true,
     )
