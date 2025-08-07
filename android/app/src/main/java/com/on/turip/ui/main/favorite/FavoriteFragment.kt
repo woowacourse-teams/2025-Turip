@@ -112,6 +112,13 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>() {
         viewModel.loadFavoriteContents()
     }
 
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (!hidden) {
+            viewModel.loadFavoriteContents()
+        }
+    }
+
     companion object {
         private const val EMAIL_RECIPIENT: String = "team.turip@gmail.com"
         private const val EMAIL_SUBJECT: String = "튜립 사용 문의 및 불편 사항 건의 "
