@@ -7,8 +7,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import turip.content.controller.dto.response.ContentWithCreatorAndCityResponse;
-import turip.content.controller.dto.response.ContentWithTripInfoResponse;
+import turip.content.controller.dto.response.ContentResponse;
+import turip.content.controller.dto.response.ContentWithTripInfoAndFavoriteResponse;
 import turip.content.controller.dto.response.MyFavoriteContentsResponse;
 import turip.content.controller.dto.response.TripDurationResponse;
 import turip.content.domain.Content;
@@ -56,7 +56,8 @@ public class FavoriteService {
         Slice<Content> contentSlice = favoriteRepository.findMyFavoriteContentsByDeviceFid(deviceFid, lastContentId,
                 PageRequest.of(0, pageSize));
         List<Content> contents = contentSlice.getContent();
-        List<ContentWithTripInfoResponse> contentsWithTripInfo = convertToContentWithTripInfoResponses(contents);
+        List<ContentWithTripInfoAndFavoriteResponse> contentsWithTripInfo = convertToContentWithTripInfoResponses(
+                contents);
         boolean loadable = contentSlice.hasNext();
 
         return MyFavoriteContentsResponse.of(contentsWithTripInfo, loadable);
@@ -72,7 +73,7 @@ public class FavoriteService {
                 .orElseThrow(() -> new NotFoundException("해당 컨텐츠는 찜한 상태가 아닙니다."));
         favoriteRepository.delete(favorite);
     }
-    
+
     private Member findOrCreateMember(String deviceFid) {
         return memberRepository.findByDeviceFid(deviceFid)
                 .orElseGet(() -> memberRepository.save(new Member(deviceFid)));
@@ -83,14 +84,14 @@ public class FavoriteService {
         return TripDurationResponse.of(totalTripDay - 1, totalTripDay);
     }
 
-    private List<ContentWithTripInfoResponse> convertToContentWithTripInfoResponses(List<Content> contents) {
+    private List<ContentWithTripInfoAndFavoriteResponse> convertToContentWithTripInfoResponses(List<Content> contents) {
         return contents.stream()
                 .map(content -> {
-                    ContentWithCreatorAndCityResponse contentWithCreatorAndCity = ContentWithCreatorAndCityResponse.from(
-                            content);
+                    ContentResponse contentWithCreatorAndCity = ContentResponse.of(content, true);
                     TripDurationResponse tripDuration = calculateTripDuration(content);
                     int tripPlaceCount = tripCourseService.countByContentId(content.getId());
-                    return ContentWithTripInfoResponse.of(contentWithCreatorAndCity, tripDuration, tripPlaceCount);
+                    return ContentWithTripInfoAndFavoriteResponse.of(contentWithCreatorAndCity, tripDuration,
+                            tripPlaceCount);
                 })
                 .toList();
     }
