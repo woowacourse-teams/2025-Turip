@@ -10,14 +10,24 @@ class SearchHistoryViewHolder(
     private val binding: ItemSearchHistoryBinding,
     private val searchHistoryListener: SearchHistoryListener,
 ) : RecyclerView.ViewHolder(binding.root) {
-    fun bind(searchHistory: SearchHistory) {
-        binding.tvSearchHistoryKeyword.text = searchHistory.keyword
+    private var searchHistory: SearchHistory? = null
+
+    init {
         itemView.setOnClickListener {
-            searchHistoryListener.onSearchHistoryItemClicked(searchHistory.keyword)
+            searchHistory?.let {
+                searchHistoryListener.onSearchHistoryItemClicked(it.keyword)
+            }
         }
         binding.ivSearchHistoryCancel.setOnClickListener {
-            searchHistoryListener.onSearchHistoryDeleteClicked(searchHistory.keyword)
+            searchHistory?.let {
+                searchHistoryListener.onSearchHistoryDeleteClicked(it.keyword)
+            }
         }
+    }
+
+    fun bind(searchHistory: SearchHistory) {
+        binding.tvSearchHistoryKeyword.text = searchHistory.keyword
+        this.searchHistory = searchHistory
     }
 
     companion object {
