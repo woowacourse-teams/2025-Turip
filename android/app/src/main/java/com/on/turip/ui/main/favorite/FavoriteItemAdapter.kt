@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.ListAdapter
 import com.on.turip.ui.search.model.VideoInformationModel
 
 class FavoriteItemAdapter(
-    private val onFavoriteItemListener: FavoriteItemViewHolder.OnFavoriteItemListener,
+    private val onFavoriteItemListener: FavoriteItemViewHolder.FavoriteItemListener,
 ) : ListAdapter<VideoInformationModel, FavoriteItemViewHolder>(FavoriteItemDiffUtil) {
     override fun onCreateViewHolder(
         parent: ViewGroup,

@@ -14,7 +14,7 @@ import com.on.turip.ui.search.model.VideoInformationModel
 
 class FavoriteItemViewHolder(
     private val binding: ItemFavoriteBinding,
-    private val onFavoriteItemListener: OnFavoriteItemListener,
+    private val onFavoriteItemListener: FavoriteItemListener,
 ) : RecyclerView.ViewHolder(binding.root) {
     private var videoInformationModel: VideoInformationModel? = null
 
@@ -73,15 +73,15 @@ class FavoriteItemViewHolder(
     companion object {
         fun of(
             parent: ViewGroup,
-            onFavoriteItemListener: OnFavoriteItemListener,
+            favoriteItemListener: FavoriteItemListener,
         ): FavoriteItemViewHolder {
             val inflater: LayoutInflater = LayoutInflater.from(parent.context)
             val binding: ItemFavoriteBinding = ItemFavoriteBinding.inflate(inflater, parent, false)
-            return FavoriteItemViewHolder(binding, onFavoriteItemListener)
+            return FavoriteItemViewHolder(binding, favoriteItemListener)
         }
     }
 
-    interface OnFavoriteItemListener {
+    interface FavoriteItemListener {
         fun onFavoriteClick(contentId: Long)
 
         fun onFavoriteItemClick(

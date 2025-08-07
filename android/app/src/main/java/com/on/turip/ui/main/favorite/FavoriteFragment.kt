@@ -25,7 +25,7 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>() {
     }
     private val favoriteItemAdapter: FavoriteItemAdapter by lazy {
         FavoriteItemAdapter(
-            object : FavoriteItemViewHolder.OnFavoriteItemListener {
+            object : FavoriteItemViewHolder.FavoriteItemListener {
                 override fun onFavoriteClick(contentId: Long) {
                     Timber.d("찜 목록의 찜 버튼을 클릭(contentId=$contentId)")
                 }
