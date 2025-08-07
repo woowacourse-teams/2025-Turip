@@ -1,17 +1,17 @@
 package turip.content.controller.dto.response;
 
-public record ContentSearchResultResponse(
+public record ContentWithTripInfoResponse(
         ContentWithCreatorAndCityResponse content,
         TripDurationResponse tripDuration,
         int tripPlaceCount
 ) {
 
-    public static ContentSearchResultResponse of(
+    public static ContentWithTripInfoResponse of(
             ContentWithCreatorAndCityResponse contentWithCreatorAndCityResponse,
             TripDurationResponse tripDurationResponse,
             int tripPlaceCount
     ) {
-        return new ContentSearchResultResponse(
+        return new ContentWithTripInfoResponse(
                 contentWithCreatorAndCityResponse,
                 tripDurationResponse,
                 tripPlaceCount

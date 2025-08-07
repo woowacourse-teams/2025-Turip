@@ -3,6 +3,8 @@ package turip.favorite.repository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -31,4 +33,18 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
     );
 
     List<Favorite> findByMemberIdAndContentIdIn(Long memberId, List<Long> contentIds);
+
+    @Query("""
+                SELECT f.content
+                FROM Favorite f
+                JOIN f.member m
+                WHERE m.deviceFid = :deviceFid
+                  AND f.content.id < :lastContentId
+                ORDER BY f.createdAt DESC
+            """)
+    Slice<Content> findMyFavoriteContentsByDeviceFid(
+            @Param("deviceFid") String deviceFid,
+            @Param("lastContentId") Long lastContentId,
+            Pageable pageable
+    );
 }

@@ -19,8 +19,8 @@ import turip.content.controller.dto.response.ContentCountResponse;
 import turip.content.controller.dto.response.ContentDetailsByRegionCategoryResponse;
 import turip.content.controller.dto.response.ContentResponse;
 import turip.content.controller.dto.response.ContentSearchResponse;
-import turip.content.controller.dto.response.ContentSearchResultResponse;
 import turip.content.controller.dto.response.ContentWithCreatorAndCityResponse;
+import turip.content.controller.dto.response.ContentWithTripInfoResponse;
 import turip.content.controller.dto.response.ContentsByRegionCategoryResponse;
 import turip.content.controller.dto.response.TripDurationResponse;
 import turip.content.controller.dto.response.WeeklyPopularFavoriteContentResponse;
@@ -128,10 +128,10 @@ public class ContentService {
                 PageRequest.of(0, pageSize));
         boolean loadable = contents.hasNext();
 
-        List<ContentSearchResultResponse> contentSearchResultResponses = convertContentsToContentSearchResultResponse(
+        List<ContentWithTripInfoResponse> contentWithTripDetailResponse = convertContentsToContentSearchResultResponse(
                 contents);
 
-        return ContentSearchResponse.of(contentSearchResultResponses, loadable);
+        return ContentSearchResponse.of(contentWithTripDetailResponse, loadable);
     }
 
     private int calculateCountByRegionCategory(String regionCategory) {
@@ -236,16 +236,16 @@ public class ContentService {
         return ContentDetailsByRegionCategoryResponse.of(contentWithCity, tripDuration, tripPlaceCount);
     }
 
-    private List<ContentSearchResultResponse> convertContentsToContentSearchResultResponse(Slice<Content> contents) {
+    private List<ContentWithTripInfoResponse> convertContentsToContentSearchResultResponse(Slice<Content> contents) {
         return contents.stream()
                 .map(this::toContentSearchResultResponse)
                 .toList();
     }
 
-    private ContentSearchResultResponse toContentSearchResultResponse(Content content) {
+    private ContentWithTripInfoResponse toContentSearchResultResponse(Content content) {
         int placeCount = tripCourseService.countByContentId(content.getId());
 
-        return ContentSearchResultResponse.of(
+        return ContentWithTripInfoResponse.of(
                 ContentWithCreatorAndCityResponse.from(content),
                 calculateTripDuration(content),
                 placeCount
