@@ -37,7 +37,7 @@ class SearchViewModel(
     val loading: LiveData<Boolean> get() = _loading
 
     private val _searchHistory: MutableLiveData<List<SearchHistory>> = MutableLiveData()
-    val searchHistory: LiveData<List<SearchHistory>> = _searchHistory
+    val searchHistory: LiveData<List<SearchHistory>> get() = _searchHistory
 
     init {
         loadSearchHistory()
