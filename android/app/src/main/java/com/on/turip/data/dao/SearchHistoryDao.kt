@@ -12,7 +12,7 @@ interface SearchHistoryDao {
     suspend fun insertSearchHistory(searchHistory: SearchHistoryEntity)
 
     @Query("SELECT * FROM search_history ORDER BY history DESC LIMIT :limit")
-    suspend fun getRecentSearches(limit: Int): List<SearchHistoryEntity>
+    suspend fun getRecentSearchHistories(limit: Int): List<SearchHistoryEntity>
 
     @Query("DELETE FROM search_history WHERE keyword = :keyword")
     suspend fun deleteSearch(keyword: String)
