@@ -8,6 +8,8 @@ import com.on.turip.data.favorite.datasource.DefaultFavoriteRemoteDataSource
 import com.on.turip.data.favorite.datasource.FavoriteRemoteDataSource
 import com.on.turip.data.region.datasource.DefaultRegionRemoteDataSource
 import com.on.turip.data.region.datasource.RegionRemoteDataSource
+import com.on.turip.data.searchhistory.datasource.DefaultSearchHistoryDataSource
+import com.on.turip.data.searchhistory.datasource.SearchHistoryDataSource
 import com.on.turip.data.trip.datasource.DefaultTripRemoteDataSource
 import com.on.turip.data.trip.datasource.TripRemoteDataSource
 import com.on.turip.data.userstorage.datasource.DefaultUserStorageLocalDataSource
@@ -31,5 +33,8 @@ object DataSourceModule {
     }
     val regionRemoteDataSource: RegionRemoteDataSource by lazy {
         DefaultRegionRemoteDataSource(NetworkModule.regionService)
+    }
+    val searchHistoryDataSource: SearchHistoryDataSource by lazy {
+        DefaultSearchHistoryDataSource(LocalStorageModule.turipDao)
     }
 }

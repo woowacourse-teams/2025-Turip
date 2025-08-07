@@ -127,6 +127,18 @@
         android:textAppearance="@style/display"
         android:background="@color/pure_white_ffffff" />
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:paddingHorizontal="20dp"
+        android:id="@+id/rv_search_result_search_history"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:background="@color/pure_white_ffffff"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tb_search_result" />
+
     <ProgressBar
         android:id="@+id/pb_search_result"
         style="?android:attr/progressBarStyleLarge"

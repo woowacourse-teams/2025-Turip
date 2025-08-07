@@ -47,8 +47,8 @@
 
     <ImageView
         android:id="@+id/iv_result_video_thumbnail"
-        android:layout_width="232dp"
-        android:layout_height="130dp"
+        android:layout_width="202dp"
+        android:layout_height="110dp"
         android:layout_marginTop="12dp"
         android:layout_marginBottom="14dp"
         android:contentDescription="@null"

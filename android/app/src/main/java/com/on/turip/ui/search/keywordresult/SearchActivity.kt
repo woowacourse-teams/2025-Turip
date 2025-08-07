@@ -11,14 +11,20 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.LinearLayout
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
+import androidx.recyclerview.widget.DividerItemDecoration
 import com.on.turip.R
 import com.on.turip.databinding.ActivitySearchBinding
+import com.on.turip.domain.searchhistory.SearchHistory
 import com.on.turip.ui.common.base.BaseActivity
 import com.on.turip.ui.search.model.VideoInformationModel
 import com.on.turip.ui.trip.detail.TripDetailActivity
+import timber.log.Timber
 
 class SearchActivity : BaseActivity<ActivitySearchBinding>() {
     private val viewModel: SearchViewModel by viewModels {
@@ -40,18 +46,46 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
             startActivity(intent)
         }
 
+    private val searchHistoryAdapter: SearchHistoryAdapter =
+        SearchHistoryAdapter(
+            object : SearchHistoryViewHolder.SearchHistoryListener {
+                override fun onSearchHistoryDeleteClick(keyword: String) {
+                    viewModel.deleteSearchHistory(keyword)
+                }
+
+                override fun onSearchHistoryItemClick(keyword: String) {
+                    binding.etSearchResult.setText(keyword)
+                    binding.etSearchResult.setSelection(keyword.length)
+
+                    viewModel.updateSearchingWord(keyword)
+                    viewModel.loadByKeyword()
+                    viewModel.createSearchHistory()
+                    binding.rvSearchResultSearchHistory.visibility = View.GONE
+                }
+            },
+        )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setupToolbar()
         setupListeners()
         setupObservers()
         setupAdapters()
+        setupOnBackPressedDispatcher()
         binding.etSearchResult.requestFocus()
-        binding.rvSearchResult.itemAnimator = null
     }
 
     private fun setupAdapters() {
         binding.rvSearchResult.adapter = searchAdapter
+        binding.rvSearchResultSearchHistory.adapter = searchHistoryAdapter
+        binding.rvSearchResult.itemAnimator = null
+        binding.rvSearchResultSearchHistory.itemAnimator = null
+        binding.rvSearchResultSearchHistory.addItemDecoration(
+            DividerItemDecoration(
+                this,
+                LinearLayout.VERTICAL,
+            ),
+        )
     }
 
     private fun setupToolbar() {
@@ -74,25 +108,58 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         return super.onOptionsItemSelected(item)
     }
 
+    private fun setupOnBackPressedDispatcher() {
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    if (binding.rvSearchResultSearchHistory.isVisible) {
+                        binding.rvSearchResultSearchHistory.visibility = View.GONE
+                        binding.etSearchResult.clearFocus()
+                    } else {
+                        finish()
+                    }
+                }
+            },
+        )
+    }
+
     private fun setupListeners() {
         binding.etSearchResult.addTextChangedListener { editable: Editable? ->
-            viewModel.updateSearchingWord(editable)
+            viewModel.updateSearchingWord(editable.toString())
         }
         binding.etSearchResult.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 viewModel.loadByKeyword()
-                val inputMethodManager: InputMethodManager =
-                    getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-                inputMethodManager.hideSoftInputFromWindow(binding.etSearchResult.windowToken, 0)
+                viewModel.createSearchHistory()
+                binding.rvSearchResultSearchHistory.visibility = View.GONE
+                binding.etSearchResult.clearFocus()
+                hideKeyBoard(binding.etSearchResult)
+                Timber.d("검색창 클릭")
                 true
             } else {
                 false
             }
         }
 
+        binding.etSearchResult.setOnFocusChangeListener { view, hasFocus ->
+            if (hasFocus) {
+                Timber.d("검색창 포커싱")
+                binding.rvSearchResultSearchHistory.visibility = View.VISIBLE
+            }
+        }
+
         binding.ivSearchResultClear.setOnClickListener {
             binding.etSearchResult.text.clear()
+            binding.etSearchResult.requestFocus()
+            showKeyBoard(binding.etSearchResult)
+            Timber.d("최근 검색 목록에서 삭제 버튼 클릭")
         }
+    }
+
+    private fun showKeyBoard(editText: EditText) {
+        val imm: InputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT)
     }
 
     private fun setupObservers() {
@@ -110,6 +177,9 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         }
         viewModel.loading.observe(this) { loading: Boolean ->
             handleVisibleByLoading(loading)
+        }
+        viewModel.searchHistory.observe(this) { searchHistories: List<SearchHistory> ->
+            searchHistoryAdapter.submitList(searchHistories)
         }
     }
 
@@ -146,13 +216,16 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
                 v.getGlobalVisibleRect(outRect)
                 if (!outRect.contains(ev.rawX.toInt(), ev.rawY.toInt())) {
                     v.clearFocus()
-                    val imm: InputMethodManager =
-                        getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-                    imm.hideSoftInputFromWindow(v.windowToken, 0)
+                    hideKeyBoard(v)
                 }
             }
         }
         return super.dispatchTouchEvent(ev)
+    }
+
+    private fun hideKeyBoard(editText: EditText) {
+        val imm: InputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(editText.windowToken, 0)
     }
 
     companion object {

@@ -16,7 +16,7 @@ interface ContentService {
         @Query("regionCategory") regionCategoryName: String,
     ): ContentInformationCountResponse
 
-    @GET("contents/count")
+    @GET("contents/keyword/count")
     suspend fun getContentsCountByKeyword(
         @Query("keyword") keyword: String,
     ): ContentInformationCountResponse
@@ -35,7 +35,7 @@ interface ContentService {
         @Query("lastId") lastId: Long,
     ): ContentsInformationResponse2
 
-    @GET("contents")
+    @GET("contents/keyword")
     suspend fun getContentsByKeyword(
         @Query("keyword") keyword: String,
         @Query("size") size: Int,
