@@ -1,6 +1,7 @@
 package com.on.turip.common
 
 import android.util.Log
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import timber.log.Timber
 
 class TuripReleaseTree : Timber.Tree() {
@@ -11,7 +12,7 @@ class TuripReleaseTree : Timber.Tree() {
         t: Throwable?,
     ) {
         if (priority >= Log.ERROR) {
-            // TODO: Firebase crashlytics 연동
+            FirebaseCrashlytics.getInstance().recordException(t ?: Exception(message))
         }
     }
 }
