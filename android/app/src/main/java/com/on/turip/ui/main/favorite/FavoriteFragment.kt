@@ -70,6 +70,7 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>() {
     private fun setupAdapters() {
         binding.rvFavoriteContent.apply {
             adapter = favoriteItemAdapter
+            itemAnimator = null
             addItemDecoration(
                 ItemDividerDecoration(
                     height = 8,
