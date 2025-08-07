@@ -106,6 +106,11 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.loadFavoriteContents()
+    }
+
     companion object {
         private const val EMAIL_RECIPIENT: String = "team.turip@gmail.com"
         private const val EMAIL_SUBJECT: String = "튜립 사용 문의 및 불편 사항 건의 "
