@@ -87,7 +87,10 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     }
 
     private fun setupAdapters() {
-        binding.rvHomeRegion.adapter = regionAdapter
+        binding.rvHomeRegion.apply {
+            adapter = regionAdapter
+            addItemDecoration(ItemSpaceDecoration(end = 12))
+        }
         binding.rvUsersLikeContent.apply {
             adapter = usersLikeContentAdapter
             addItemDecoration(ItemSpaceDecoration(end = 10))
