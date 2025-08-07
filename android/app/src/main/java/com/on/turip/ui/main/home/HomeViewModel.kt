@@ -40,9 +40,9 @@ class HomeViewModel(
                 .loadPopularFavoriteContents()
                 .onSuccess { contents: List<UsersLikeContent> ->
                     _usersLikeContents.value = contents
-                    Timber.d("$contents")
+                    Timber.d("인기 찜 목록: $contents")
                 }.onFailure {
-                    Timber.e("${it.message}")
+                    Timber.e("인기 찜 목록 실패: ${it.message}")
                 }
         }
     }
@@ -54,9 +54,9 @@ class HomeViewModel(
                 .onSuccess { regionCategories: List<RegionCategory> ->
                     _regionCategories.value = regionCategories
                     _isSelectedDomestic.value = isDomestic
-                    Timber.d("$regionCategories")
+                    Timber.d("지역 카테고리 조회: $regionCategories")
                 }.onFailure {
-                    Timber.e("${it.message}")
+                    Timber.e("지역 카테고리 조회 실패: ${it.message}")
                 }
         }
     }
