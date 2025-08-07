@@ -4,12 +4,14 @@ import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import turip.content.controller.dto.response.MyFavoriteContentsResponse;
 import turip.favorite.controller.dto.request.FavoriteRequest;
 import turip.favorite.controller.dto.response.FavoriteResponse;
 import turip.favorite.service.FavoriteService;
@@ -27,6 +29,17 @@ public class FavoriteController {
         FavoriteResponse response = favoriteService.create(request, deviceFid);
         return ResponseEntity.created(URI.create("/favorites/" + response.id()))
                 .body(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<MyFavoriteContentsResponse> readMyFavoriteContents(
+            @RequestHeader("device-fid") String deviceFid,
+            @RequestParam(name = "size") Integer pageSize,
+            @RequestParam(name = "lastId") Long lastContentId
+    ) {
+        MyFavoriteContentsResponse response = favoriteService.findMyFavoriteContents(deviceFid, pageSize,
+                lastContentId);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping
