@@ -135,6 +135,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
             binding.etSearchResult.text.clear()
             binding.etSearchResult.requestFocus()
             showKeyBoard(binding.etSearchResult)
+            Timber.d("최근 검색 목록에서 삭제 버튼 클릭")
         }
     }
 
