@@ -7,20 +7,22 @@ import com.on.turip.domain.searchhistory.SearchHistory
 import com.on.turip.domain.searchhistory.SearchHistoryRepository
 
 class DefaultSearchHistoryRepository(
-    private val dataSource: SearchHistoryDataSource,
+    private val searchHistoryDataSource: SearchHistoryDataSource,
 ) : SearchHistoryRepository {
     override suspend fun createSearchHistory(keyword: String): Result<Unit> =
         runCatching {
-            dataSource.createSearchHistory(keyword)
+            searchHistoryDataSource.createSearchHistory(keyword)
         }
 
     override suspend fun loadRecentSearches(limit: Int): Result<List<SearchHistory>> =
-        dataSource.getRecentSearchHistories(limit).mapCatching { it: List<SearchHistoryEntity> ->
-            it.map { it.toDomain() }
-        }
+        searchHistoryDataSource
+            .getRecentSearchHistories(limit)
+            .mapCatching { it: List<SearchHistoryEntity> ->
+                it.map { it.toDomain() }
+            }
 
     override suspend fun deleteSearch(keyword: String): Result<Unit> =
         runCatching {
-            dataSource.deleteSearch(keyword)
+            searchHistoryDataSource.deleteSearch(keyword)
         }
 }
