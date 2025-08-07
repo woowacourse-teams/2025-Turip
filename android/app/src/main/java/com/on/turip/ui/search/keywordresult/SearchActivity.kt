@@ -22,6 +22,7 @@ import com.on.turip.domain.searchhistory.SearchHistory
 import com.on.turip.ui.common.base.BaseActivity
 import com.on.turip.ui.search.model.VideoInformationModel
 import com.on.turip.ui.trip.detail.TripDetailActivity
+import timber.log.Timber
 
 class SearchActivity : BaseActivity<ActivitySearchBinding>() {
     private val viewModel: SearchViewModel by viewModels {
@@ -116,6 +117,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
                 viewModel.createSearchHistory()
                 binding.rvSearchResultSearchHistory.visibility = View.GONE
                 hideKeyBoard(binding.etSearchResult)
+                Timber.d("검색창 클릭")
                 true
             } else {
                 false
@@ -124,6 +126,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
 
         binding.etSearchResult.setOnFocusChangeListener { view, hasFocus ->
             if (hasFocus) {
+                Timber.d("검색창 포커싱")
                 binding.rvSearchResultSearchHistory.visibility = View.VISIBLE
             }
         }

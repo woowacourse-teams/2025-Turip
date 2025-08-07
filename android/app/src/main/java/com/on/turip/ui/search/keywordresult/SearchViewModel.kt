@@ -70,6 +70,7 @@ class SearchViewModel(
             pagedContentsResult
                 .await()
                 .onSuccess { result: PagedContentsResult ->
+                    Timber.d("검색결과 목록들을 받아옴 $result")
                     val videoModels: List<VideoInformationModel> =
                         result.videos.map { videoInformation: VideoInformation -> videoInformation.toUiModel() }
                     _videoInformation.value = videoModels
@@ -81,6 +82,7 @@ class SearchViewModel(
             searchResultCountResult
                 .await()
                 .onSuccess { result: Int ->
+                    Timber.d("최근 검색 목록 갯수를 받아옴 $result")
                     _loading.value = false
                     _searchResultCount.value = result
                 }.onFailure {
@@ -95,6 +97,7 @@ class SearchViewModel(
             searchHistoryRepository
                 .loadRecentSearches(10)
                 .onSuccess { result: List<SearchHistory> ->
+                    Timber.d("최근 검색 목록 받아옴 $result")
                     _searchHistory.value = result
                 }.onFailure {
                     Timber.e("${it.message}")
@@ -106,7 +109,9 @@ class SearchViewModel(
         viewModelScope.launch {
             searchHistoryRepository
                 .createSearchHistory(searchingWord.value.toString())
-                .onFailure {
+                .onSuccess {
+                    Timber.d("최근 검색 목록에 추가됨")
+                }.onFailure {
                     Timber.e("${it.message}")
                 }
         }
@@ -116,7 +121,9 @@ class SearchViewModel(
         viewModelScope.launch {
             searchHistoryRepository
                 .deleteSearch(keyword)
-                .onFailure {
+                .onSuccess {
+                    Timber.d("${keyword}가 최근 검색 목록에서 삭제")
+                }.onFailure {
                     Timber.e("${it.message}")
                 }
         }
