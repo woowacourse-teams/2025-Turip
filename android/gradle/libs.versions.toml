@@ -1,4 +1,5 @@
 [versions]
+roomRuntime = "2.7.2"
 versionName = "1.0.2"
 versionCode = "102"
 datastorePreferences = "1.1.7"
@@ -33,6 +34,8 @@ androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = 
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 androidx-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragmentKtx" }
 androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomRuntime" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
 assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertjCore" }
 coil = { module = "io.coil-kt:coil", version.ref = "coil" }
 coil-transformations = { module = "io.coil-kt:coil-transformations", version.ref = "coil" }

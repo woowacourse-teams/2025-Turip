@@ -7,6 +7,7 @@ plugins {
     kotlin("plugin.serialization") version "2.1.0"
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
+    id("kotlin-kapt")
 }
 
 android {
@@ -106,4 +107,7 @@ dependencies {
     implementation(libs.firebase.installations)
     // datastore
     implementation(libs.androidx.datastore.preferences)
+    // Room
+    implementation(libs.androidx.room.runtime)
+    kapt(libs.androidx.room.compiler)
 }
