@@ -1,6 +1,6 @@
 -- Countries (국가)
 INSERT INTO country (name, image_url)
-VALUES ('대한민국', null),
+VALUES ('대한민국', ''),
        ('일본', 'https://drive.google.com/uc?export=view&id=12bEpmYKsOwqriesfpyC_sZJJsWpW3foC'),
        ('대만', 'https://drive.google.com/uc?export=view&id=1lWUI2bkaJp8Dmx4jCGgQCZwQMsXF5ggC'),
        ('중국', 'https://drive.google.com/uc?export=view&id=1qlxdrNonMpK5evz04hx9ILQqUzsJwWXU'),
@@ -31,69 +31,69 @@ VALUES ('서울', 1, 7, 'https://drive.google.com/uc?export=view&id=1MBHO5IlYuFh
        ('부산', 1, 8, 'https://drive.google.com/uc?export=view&id=1VIpK_n7YDXRnq7XPkZTjR21rK0BRVAO6'),
        ('대구', 1, 9, 'https://drive.google.com/uc?export=view&id=1Hvl79W-r_jaB6oHHFOTUZzx4tpE6baKN'),
        ('인천', 1, 10, 'https://drive.google.com/uc?export=view&id=1dNP0LEvc4ueY5avsl4mQYtKRIpXJA-z1'),
-       ('광주', 1, 11, null),
+       ('광주', 1, 11, ''),
        ('대전', 1, 12, 'https://drive.google.com/uc?export=view&id=18esK0aVfcZQrhA-hlKQuufcp_SsY0V4V'),
-       ('울산', 1, 13, null),
-       ('세종', 1, 14, null);
+       ('울산', 1, 13, ''),
+       ('세종', 1, 14, '');
 
 -- 대한민국 - 경기도
 INSERT INTO city (name, country_id, province_id, image_url)
 VALUES ('수원', 1, 1, 'https://drive.google.com/uc?export=view&id=1jxQEkWHb1p3VwtISPbVBZh_N78_UNACI'),
-       ('용인', 1, 1, null),
-       ('성남', 1, 1, null),
-       ('고양', 1, 1, null),
-       ('안산', 1, 1, null),
-       ('안양', 1, 1, null),
-       ('평택', 1, 1, null),
-       ('남양주', 1, 1, null),
-       ('시흥', 1, 1, null),
-       ('의정부', 1, 1, null),
-       ('파주', 1, 1, null),
-       ('김포', 1, 1, null);
+       ('용인', 1, 1, ''),
+       ('성남', 1, 1, ''),
+       ('고양', 1, 1, ''),
+       ('안산', 1, 1, ''),
+       ('안양', 1, 1, ''),
+       ('평택', 1, 1, ''),
+       ('남양주', 1, 1, ''),
+       ('시흥', 1, 1, ''),
+       ('의정부', 1, 1, ''),
+       ('파주', 1, 1, ''),
+       ('김포', 1, 1, '');
 
 -- 대한민국 - 강원
 INSERT INTO city (name, country_id, province_id, image_url)
-VALUES ('춘천', 1, 2, null),
-       ('원주', 1, 2, null),
+VALUES ('춘천', 1, 2, ''),
+       ('원주', 1, 2, ''),
        ('강릉', 1, 2, 'https://drive.google.com/uc?export=view&id=1mqoEwNb2jYjwg4zZ2H4AyG4-eGw_LOn1'),
-       ('속초', 1, 2, null);
+       ('속초', 1, 2, '');
 
 -- 대한민국 - 충청
 INSERT INTO city (name, country_id, province_id, image_url)
-VALUES ('청주', 1, 3, null),
-       ('충주', 1, 3, null),
-       ('제천', 1, 3, null),
-       ('천안', 1, 3, null),
-       ('아산', 1, 3, null),
-       ('서산', 1, 3, null);
+VALUES ('청주', 1, 3, ''),
+       ('충주', 1, 3, ''),
+       ('제천', 1, 3, ''),
+       ('천안', 1, 3, ''),
+       ('아산', 1, 3, ''),
+       ('서산', 1, 3, '');
 
 -- 대한민국 - 전라
 INSERT INTO city (name, country_id, province_id, image_url)
 VALUES ('전주', 1, 4, 'https://drive.google.com/uc?export=view&id=1lJri1uIuexbul6GJmX96571myOWxpozz'),
-       ('익산', 1, 4, null),
-       ('군산', 1, 4, null),
-       ('여수', 1, 4, null),
-       ('순천', 1, 4, null),
-       ('목포', 1, 4, null),
-       ('광양', 1, 4, null),
-       ('나주', 1, 4, null);
+       ('익산', 1, 4, ''),
+       ('군산', 1, 4, ''),
+       ('여수', 1, 4, ''),
+       ('순천', 1, 4, ''),
+       ('목포', 1, 4, ''),
+       ('광양', 1, 4, ''),
+       ('나주', 1, 4, '');
 
 -- 대한민국 - 경상
 INSERT INTO city (name, country_id, province_id, image_url)
 VALUES ('포항', 1, 5, null),
        ('경주', 1, 5, 'https://drive.google.com/uc?export=view&id=1vsAX9Q8LCePDtA_RGEMPvViUpXtmgX7b'),
-       ('구미', 1, 5, null),
-       ('안동', 1, 5, null),
-       ('상주', 1, 5, null),
-       ('창원', 1, 5, null),
-       ('진주', 1, 5, null),
-       ('김해', 1, 5, null),
-       ('양산', 1, 5, null);
+       ('구미', 1, 5, ''),
+       ('안동', 1, 5, ''),
+       ('상주', 1, 5, ''),
+       ('창원', 1, 5, ''),
+       ('진주', 1, 5, ''),
+       ('김해', 1, 5, ''),
+       ('양산', 1, 5, '');
 
 -- 대한민국 - 제주
 INSERT INTO city (name, country_id, province_id, image_url)
 VALUES ('제주', 1, 6, 'https://drive.google.com/uc?export=view&id=1‑bAoY9Anokv2Hct1e7IqGIVa5hLCU4jz'),
-       ('서귀포', 1, 6, null);
+       ('서귀포', 1, 6, '');
 
 -- 일본
 INSERT INTO city (name, country_id, province_id, image_url)
