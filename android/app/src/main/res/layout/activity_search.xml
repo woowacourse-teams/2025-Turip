@@ -19,6 +19,7 @@
         app:titleTextColor="@color/pure_black_151515">
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_search"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginEnd="20dp"

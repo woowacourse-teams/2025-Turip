@@ -155,6 +155,11 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
             showKeyBoard(binding.etSearchResult)
             Timber.d("최근 검색 목록에서 삭제 버튼 클릭")
         }
+        binding.clSearch.setOnClickListener {
+            binding.etSearchResult.requestFocus()
+            showKeyBoard(binding.etSearchResult)
+            Timber.d("검색창 포커싱")
+        }
     }
 
     private fun showKeyBoard(editText: EditText) {
