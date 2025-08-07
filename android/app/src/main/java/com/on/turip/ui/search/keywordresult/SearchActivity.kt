@@ -45,9 +45,25 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         }
 
     private val searchHistoryAdapter: SearchHistoryAdapter =
-        SearchHistoryAdapter { keyword ->
-            viewModel.deleteSearchHistory(keyword)
-        }
+        SearchHistoryAdapter(
+            object : SearchHistoryViewHolder.SearchHistoryListener {
+                override fun onSearchHistoryDeleteClicked(keyword: String) {
+                    viewModel.deleteSearchHistory(keyword)
+                }
+
+                override fun onSearchHistoryItemClicked(keyword: String) {
+                    binding.etSearchResult.setText(keyword)
+                    binding.etSearchResult.setSelection(keyword.length)
+
+                    viewModel.updateSearchingWord(
+                        Editable.Factory.getInstance().newEditable(keyword),
+                    )
+                    viewModel.loadByKeyword()
+                    viewModel.createSearchHistory()
+                    binding.rvSearchResultSearchHistory.visibility = View.GONE
+                }
+            },
+        )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -178,8 +194,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
                 v.getGlobalVisibleRect(outRect)
                 if (!outRect.contains(touchX, touchY)) {
                     v.clearFocus()
-                    val imm: InputMethodManager =
-                        getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                    val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                     imm.hideSoftInputFromWindow(v.windowToken, 0)
                 }
             }

@@ -8,28 +8,33 @@ import com.on.turip.domain.searchhistory.SearchHistory
 
 class SearchHistoryViewHolder(
     private val binding: ItemSearchHistoryBinding,
-    private val onSearchHistoryListener: OnSearchHistoryListener,
+    private val searchHistoryListener: SearchHistoryListener,
 ) : RecyclerView.ViewHolder(binding.root) {
     fun bind(searchHistory: SearchHistory) {
         binding.tvSearchHistoryKeyword.text = searchHistory.keyword
+        itemView.setOnClickListener {
+            searchHistoryListener.onSearchHistoryItemClicked(searchHistory.keyword)
+        }
         binding.ivSearchHistoryCancel.setOnClickListener {
-            onSearchHistoryListener.onSearchHistoryListener(searchHistory.keyword)
+            searchHistoryListener.onSearchHistoryDeleteClicked(searchHistory.keyword)
         }
     }
 
     companion object {
         fun of(
             parent: ViewGroup,
-            onSearchHistoryListener: OnSearchHistoryListener,
+            searchHistoryListener: SearchHistoryListener,
         ): SearchHistoryViewHolder {
             val inflater: LayoutInflater = LayoutInflater.from(parent.context)
             val binding: ItemSearchHistoryBinding =
                 ItemSearchHistoryBinding.inflate(inflater, parent, false)
-            return SearchHistoryViewHolder(binding, onSearchHistoryListener)
+            return SearchHistoryViewHolder(binding, searchHistoryListener)
         }
     }
 
-    fun interface OnSearchHistoryListener {
-        fun onSearchHistoryListener(keyword: String)
+    interface SearchHistoryListener {
+        fun onSearchHistoryDeleteClicked(keyword: String)
+
+        fun onSearchHistoryItemClicked(keyword: String)
     }
 }
