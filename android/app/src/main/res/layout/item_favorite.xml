@@ -16,6 +16,7 @@
         android:maxLines="3"
         android:textAppearance="@style/title1"
         android:textColor="@color/pure_black_151515"
+        app:layout_constraintBottom_toTopOf="@id/tv_favorite_creator_name_and_upload_date"
         app:layout_constraintEnd_toStartOf="@id/iv_favorite_video_thumbnail"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -59,14 +60,17 @@
 
     <TextView
         android:id="@+id/tv_favorite_creator_name_and_upload_date"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
-        android:textAppearance="@style/info2"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="10dp"
+        android:textAppearance="@style/info1"
         android:textColor="@color/gray_300_5b5b5b"
         app:layout_constraintBottom_toBottomOf="@id/iv_favorite_creator_thumbnail"
+        app:layout_constraintEnd_toStartOf="@id/iv_favorite_video_thumbnail"
         app:layout_constraintStart_toEndOf="@id/iv_favorite_creator_thumbnail"
-        app:layout_constraintTop_toTopOf="@id/iv_favorite_creator_thumbnail"
+        app:layout_constraintTop_toBottomOf="@id/tv_favorite_title"
         tools:text="뭉치즈 · 2024-07-25" />
 
     <TextView
@@ -74,10 +78,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:textAppearance="@style/info2"
+        android:textAppearance="@style/info1"
         android:textColor="@color/gray_300_5b5b5b"
         app:layout_constraintStart_toStartOf="@id/iv_favorite_creator_thumbnail"
-        app:layout_constraintTop_toBottomOf="@id/iv_favorite_creator_thumbnail"
+        app:layout_constraintTop_toBottomOf="@id/tv_favorite_creator_name_and_upload_date"
         tools:text="서울" />
 
     <TextView
@@ -85,7 +89,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="14dp"
-        android:textAppearance="@style/info2"
+        android:textAppearance="@style/info1"
         android:textColor="@color/gray_300_5b5b5b"
         app:layout_constraintStart_toEndOf="@id/tv_favorite_city"
         app:layout_constraintTop_toTopOf="@id/tv_favorite_city"
@@ -96,7 +100,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="14dp"
-        android:textAppearance="@style/info2"
+        android:textAppearance="@style/info1"
         android:textColor="@color/gray_300_5b5b5b"
         app:layout_constraintStart_toEndOf="@id/tv_favorite_total_place_count"
         app:layout_constraintTop_toTopOf="@id/tv_favorite_total_place_count"
