@@ -27,5 +27,5 @@ interface SearchHistoryDao {
     )
 """,
     )
-    suspend fun deleteOldSearchesExceptLatest(limit: Int)
+    suspend fun deleteOldSearches(limit: Int)
 }

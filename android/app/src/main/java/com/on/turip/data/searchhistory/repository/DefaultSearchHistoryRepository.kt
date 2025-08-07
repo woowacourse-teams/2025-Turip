@@ -12,7 +12,7 @@ class DefaultSearchHistoryRepository(
     override suspend fun createSearchHistory(keyword: String): Result<Unit> =
         runCatching {
             dataSource.createSearchHistory(keyword)
-            dataSource.deleteOldSearchesExceptLatest(10)
+            dataSource.deleteOldSearches(10)
         }
 
     override suspend fun loadRecentSearches(limit: Int): Result<List<SearchHistory>> =

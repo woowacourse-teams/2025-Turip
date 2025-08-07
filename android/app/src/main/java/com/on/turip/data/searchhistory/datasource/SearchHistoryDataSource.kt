@@ -9,5 +9,5 @@ interface SearchHistoryDataSource {
 
     suspend fun deleteSearch(keyword: String): Result<Unit>
 
-    suspend fun deleteOldSearchesExceptLatest(limit: Int): Result<Unit>
+    suspend fun deleteOldSearches(limit: Int): Result<Unit>
 }

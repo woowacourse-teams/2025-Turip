@@ -18,8 +18,8 @@ class DefaultSearchHistoryDataSource(
             )
         }
 
-    override suspend fun deleteOldSearchesExceptLatest(limit: Int): Result<Unit> =
+    override suspend fun deleteOldSearches(limit: Int): Result<Unit> =
         runCatching {
-            dao.deleteOldSearchesExceptLatest(limit)
+            dao.deleteOldSearches(limit)
         }
 }
