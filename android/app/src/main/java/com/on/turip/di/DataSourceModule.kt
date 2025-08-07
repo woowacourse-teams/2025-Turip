@@ -35,6 +35,6 @@ object DataSourceModule {
         DefaultRegionRemoteDataSource(NetworkModule.regionService)
     }
     val searchHistoryDataSource: SearchHistoryDataSource by lazy {
-        DefaultSearchHistoryDataSource(DatabaseModule.turipDao)
+        DefaultSearchHistoryDataSource(LocalStorageModule.turipDao)
     }
 }
