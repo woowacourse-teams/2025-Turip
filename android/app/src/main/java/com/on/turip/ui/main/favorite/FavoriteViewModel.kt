@@ -22,6 +22,10 @@ class FavoriteViewModel(
     val favoriteContents: LiveData<List<FavoriteContent>> get() = _favoriteContents
 
     init {
+        loadFavoriteContents()
+    }
+
+    fun loadFavoriteContents() {
         viewModelScope.launch {
             favoriteRepository
                 .loadFavoriteContents(10, 0L)
