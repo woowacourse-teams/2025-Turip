@@ -10,27 +10,13 @@ import com.on.turip.domain.userstorage.TuripDeviceIdentifier
 import com.on.turip.domain.userstorage.repository.UserStorageRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.async
 import timber.log.Timber
 
 class DefaultContentRepository(
     private val contentRemoteDataSource: ContentRemoteDataSource,
     private val userStorageRepository: UserStorageRepository,
 ) : ContentRepository {
-    private lateinit var deviceIdentifier: TuripDeviceIdentifier
-
-    init {
-        CoroutineScope(Dispatchers.IO).launch {
-            userStorageRepository
-                .loadId()
-                .onSuccess { turipDeviceIdentifier: TuripDeviceIdentifier ->
-                    deviceIdentifier = turipDeviceIdentifier
-                }.onFailure {
-                    Timber.e("${it.message}")
-                }
-        }
-    }
-
     override suspend fun loadContentsSizeByRegion(regionCategoryName: String): Result<Int> =
         contentRemoteDataSource
             .getContentsSizeByRegion(regionCategoryName)
@@ -59,10 +45,22 @@ class DefaultContentRepository(
             .getContentsByKeyword(keyword, size, lastId)
             .mapCatching { it.toDomain() }
 
-    override suspend fun loadContent(contentId: Long): Result<Content> =
-        contentRemoteDataSource
-            .getContentDetail(contentId, deviceIdentifier.fid)
+    override suspend fun loadContent(contentId: Long): Result<Content> {
+        val turipDeviceIdentifier: TuripDeviceIdentifier =
+            CoroutineScope(Dispatchers.IO)
+                .async {
+                    userStorageRepository
+                        .loadId()
+                        .onFailure {
+                            Timber.e("${it.message}")
+                        }
+                }.await()
+                .getOrThrow()
+
+        return contentRemoteDataSource
+            .getContentDetail(contentId, turipDeviceIdentifier.fid)
             .mapCatching { it.toDomain() }
+    }
 
     override suspend fun loadPopularFavoriteContents(size: Int): Result<List<UsersLikeContent>> =
         contentRemoteDataSource
