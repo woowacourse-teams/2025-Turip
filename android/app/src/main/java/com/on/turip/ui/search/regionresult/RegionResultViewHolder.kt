@@ -50,8 +50,8 @@ class RegionResultViewHolder(
                 )
             ivResultCreatorThumbnail.loadCircularImage(videoInformationModel.content.creator.profileImage)
             ivResultVideoThumbnail.loadRoundedCornerImage(
-                TuripUrlConverter.convertVideoThumbnailUrl(videoInformationModel.content.videoData.url),
-                4,
+                imageUrl = TuripUrlConverter.convertVideoThumbnailUrl(videoInformationModel.content.videoData.url),
+                radius = 4,
             )
         }
     }
