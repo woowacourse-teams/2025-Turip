@@ -258,4 +258,43 @@ class FavoriteApiTest {
                     .statusCode(404);
         }
     }
+
+    
+    @DisplayName("/favorites GET 찜 조회 테스트")
+    @Nested
+    class readFavorite {
+
+        @DisplayName("성공 시 200 OK 코드와 찜한 콘텐츠 정보를 반환한다")
+        @Test
+        void readMyFavoriteContents_success() {
+            // given
+            jdbcTemplate.update(
+                    "INSERT INTO creator (profile_image, channel_name) VALUES ('https://image.example.com/creator.jpg', 'Travel')");
+            jdbcTemplate.update("INSERT INTO country (name) VALUES ('대한민국')");
+            jdbcTemplate.update("INSERT INTO city (name, country_id, province_id) VALUES ('서울', 1, null)");
+            jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('testDeviceFid')");
+            jdbcTemplate.update(
+                    "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 1, 'https://youtube.com/watch?v=test', '테스트 영상', '2025-08-01')");
+            jdbcTemplate.update(
+                    "INSERT INTO favorite (member_id, content_id, created_at) VALUES (1, 1, CURRENT_TIMESTAMP)");
+            jdbcTemplate.update(
+                    "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('장소1','https://naver.me/place1','주소1',37.5,127.0)");
+            jdbcTemplate.update(
+                    "INSERT INTO trip_course (content_id, place_id, visit_day, visit_order) VALUES (1, 1, 1, 1)");
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .queryParam("size", 5)
+                    .queryParam("lastId", 0)
+                    .when().get("/favorites")
+                    .then()
+                    .statusCode(200)
+                    .body("contents.size()", is(1))
+                    .body("contents[0].content.id", is(1))
+                    .body("contents[0].content.title", is("테스트 영상"))
+                    .body("contents[0].tripDuration.days", is(1))
+                    .body("loadable", is(false));
+        }
+    }
 }
