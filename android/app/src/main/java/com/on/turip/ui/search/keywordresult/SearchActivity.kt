@@ -136,7 +136,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
     }
 
     private fun showKeyBoard(editText: EditText) {
-        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        val imm: InputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT)
     }
 
@@ -203,7 +203,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
     }
 
     private fun hideKeyBoard(editText: EditText) {
-        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        val imm: InputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(editText.windowToken, 0)
     }
 
