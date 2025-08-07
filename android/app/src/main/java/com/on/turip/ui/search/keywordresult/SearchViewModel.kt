@@ -61,6 +61,7 @@ class SearchViewModel(
     }
 
     fun loadByKeyword() {
+        if (searchingWord.value?.trim() == "" || searchingWord.value?.trim() == null) return
         _loading.value = true
         viewModelScope.launch {
             val searchResultCountResult: Deferred<Result<Int>> =
@@ -105,6 +106,7 @@ class SearchViewModel(
     }
 
     fun createSearchHistory() {
+        if (searchingWord.value?.trim() == "" || searchingWord.value?.trim() == null) return
         viewModelScope.launch {
             searchHistoryRepository
                 .createSearchHistory(searchingWord.value.toString())
