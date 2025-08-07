@@ -2,11 +2,13 @@ package turip.favorite.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.any;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -15,7 +17,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.SliceImpl;
 import turip.city.domain.City;
+import turip.content.controller.dto.response.MyFavoriteContentsResponse;
 import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
 import turip.creator.domain.Creator;
@@ -27,6 +31,7 @@ import turip.favorite.domain.Favorite;
 import turip.favorite.repository.FavoriteRepository;
 import turip.member.domain.Member;
 import turip.member.repository.MemberRepository;
+import turip.tripcourse.service.TripCourseService;
 
 @ExtendWith(MockitoExtension.class)
 class FavoriteServiceTest {
@@ -42,6 +47,9 @@ class FavoriteServiceTest {
 
     @Mock
     private ContentRepository contentRepository;
+
+    @Mock
+    private TripCourseService tripCourseService;
 
     @DisplayName("찜을 생성할 수 있다")
     @Test
@@ -112,6 +120,39 @@ class FavoriteServiceTest {
         // when & then
         assertThatThrownBy(() -> favoriteService.create(request, deviceFid))
                 .isInstanceOf(BadRequestException.class);
+    }
+    
+    @DisplayName("내 찜 목록을 페이징 조회할 수 있다")
+    @Test
+    void findMyFavoriteContents() {
+        // given
+        String deviceFid = "testDeviceFid";
+        int pageSize = 2;
+        long lastContentId = 0L;
+
+        Creator creator = new Creator(null, null);
+        City city = new City(null, null, null, null);
+        Content content1 = new Content(1L, creator, city, null, null, null);
+        Content content2 = new Content(2L, creator, city, null, null, null);
+        List<Content> contents = List.of(content1, content2);
+
+        given(favoriteRepository.findMyFavoriteContentsByDeviceFid(eq(deviceFid), eq(Long.MAX_VALUE), any()))
+                .willReturn(new SliceImpl<>(contents));
+        given(tripCourseService.calculateDurationDays(1L))
+                .willReturn(2); // content1 1박 2일
+        given(tripCourseService.calculateDurationDays(2L))
+                .willReturn(3); // content2 2박 3일
+
+        MyFavoriteContentsResponse response = favoriteService.findMyFavoriteContents(deviceFid, pageSize,
+                lastContentId);
+
+        // then
+        assertAll(
+                () -> assertThat(response.contents()).hasSize(2),
+                () -> assertThat(response.loadable()).isFalse(),
+                () -> assertThat(response.contents().getFirst().tripDuration().days()).isEqualTo(2),
+                () -> assertThat(response.contents().get(1).tripDuration().days()).isEqualTo(3)
+        );
     }
 
     @DisplayName("찜 삭제 테스트")

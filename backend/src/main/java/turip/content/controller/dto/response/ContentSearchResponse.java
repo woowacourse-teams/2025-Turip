@@ -5,11 +5,11 @@ import java.util.List;
 
 public record ContentSearchResponse(
         @JsonProperty("contents")
-        List<ContentSearchResultResponse> contentDetailsByRegionResponse,
+        List<ContentWithTripInfoResponse> contentDetailsByRegionResponse,
         boolean loadable
 ) {
 
-    public static ContentSearchResponse of(List<ContentSearchResultResponse> contents, boolean loadable) {
+    public static ContentSearchResponse of(List<ContentWithTripInfoResponse> contents, boolean loadable) {
         return new ContentSearchResponse(contents, loadable);
     }
 }

@@ -31,9 +31,9 @@ class DefaultContentRepository(
         }
     }
 
-    override suspend fun loadContentsSizeByRegion(region: String): Result<Int> =
+    override suspend fun loadContentsSizeByRegion(regionCategoryName: String): Result<Int> =
         contentRemoteDataSource
-            .getContentsSizeByRegion(region)
+            .getContentsSizeByRegion(regionCategoryName)
             .mapCatching { it.count }
 
     override suspend fun loadContentsSizeByKeyword(keyword: String): Result<Int> =
@@ -42,12 +42,12 @@ class DefaultContentRepository(
             .mapCatching { it.count }
 
     override suspend fun loadContentsByRegion(
-        region: String,
+        regionCategoryName: String,
         size: Int,
         lastId: Long,
     ): Result<PagedContentsResult> =
         contentRemoteDataSource
-            .getContentsByRegion(region, size, lastId)
+            .getContentsByRegion2(regionCategoryName, size, lastId)
             .mapCatching { it.toDomain() }
 
     override suspend fun loadContentsByKeyword(

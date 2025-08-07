@@ -11,12 +11,14 @@ import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import turip.content.controller.dto.response.MyFavoriteContentsResponse;
 import turip.exception.ErrorResponse;
 import turip.favorite.controller.dto.request.FavoriteRequest;
 import turip.favorite.controller.dto.response.FavoriteResponse;
@@ -114,6 +116,82 @@ public class FavoriteController {
         FavoriteResponse response = favoriteService.create(request, deviceFid);
         return ResponseEntity.created(URI.create("/favorites/" + response.id()))
                 .body(response);
+    }
+
+    @Operation(
+            summary = "내 찜 목록 조회 api",
+            description = "내 찜 목록을 조회한다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "성공 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = MyFavoriteContentsResponse.class),
+                            examples = @ExampleObject(
+                                    name = "success",
+                                    summary = "내 찜 목공 조회 성공",
+                                    value = """
+                                            {
+                                                "contents": [
+                                                    {
+                                                        "content": {
+                                                            "id": 1,
+                                                            "creator": {
+                                                                "id": 1,
+                                                                "channelName": "연수연",
+                                                                "profileImage": "https://yt3.googleusercontent.com/EMvavcwV96_NkCYm4V8TZIrsytHaiS2AaxS_goqR57WP7kn36qQY92Ujex8JUbBWGQ7P5VY0DA=s160-c-k-c0x00ffffff-no-rj"
+                                                            },
+                                                            "title": "나혼자 기차 타고 부산 여행 vlog 🌊 | 당일치기 쌉가능한 여행코스 💌 , 200% 만족한 광안리 숙소 🏠, 부산 토박이의 단골집 추천까지,,💛 | 3박4일 부산 브이로그",
+                                                            "url": "https://www.youtube.com/watch?v=U7vwpgZlD6Q",
+                                                            "uploadedDate": "2025-07-01",
+                                                            "city": {
+                                                                "name": "부산"
+                                                            }
+                                                        },
+                                                        "tripDuration": {
+                                                            "nights": 2,
+                                                            "days": 3
+                                                        },
+                                                        "tripPlaceCount": 21
+                                                    }
+                                                ],
+                                                "loadable": false
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "invalid device-fid",
+                                            summary = "올바르지 않은 device-fid",
+                                            value = """
+                                                    {
+                                                        "message": "사용자 정보를 조회할 수 없습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            )
+    })
+    @GetMapping
+    public ResponseEntity<MyFavoriteContentsResponse> readMyFavoriteContents(
+            @RequestHeader("device-fid") String deviceFid,
+            @RequestParam(name = "size") Integer pageSize,
+            @RequestParam(name = "lastId") Long lastContentId
+    ) {
+        MyFavoriteContentsResponse response = favoriteService.findMyFavoriteContents(deviceFid, pageSize,
+                lastContentId);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(

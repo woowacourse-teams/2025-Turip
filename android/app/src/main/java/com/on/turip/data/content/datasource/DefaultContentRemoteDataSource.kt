@@ -3,6 +3,7 @@ package com.on.turip.data.content.datasource
 import com.on.turip.data.content.dto.ContentDetailResponse
 import com.on.turip.data.content.dto.ContentInformationCountResponse
 import com.on.turip.data.content.dto.ContentsInformationResponse
+import com.on.turip.data.content.dto.ContentsInformationResponse2
 import com.on.turip.data.content.dto.UsersLikeContentsResponse
 import com.on.turip.data.content.service.ContentService
 import kotlinx.coroutines.Dispatchers
@@ -13,9 +14,9 @@ class DefaultContentRemoteDataSource(
     private val contentService: ContentService,
     private val coroutineContext: CoroutineContext = Dispatchers.IO,
 ) : ContentRemoteDataSource {
-    override suspend fun getContentsSizeByRegion(region: String): Result<ContentInformationCountResponse> =
+    override suspend fun getContentsSizeByRegion(regionCategoryName: String): Result<ContentInformationCountResponse> =
         withContext(coroutineContext) {
-            runCatching { contentService.getContentsCountByRegion(region) }
+            runCatching { contentService.getContentsCountByRegion(regionCategoryName) }
         }
 
     override suspend fun getContentsSizeByKeyword(keyword: String): Result<ContentInformationCountResponse> =
@@ -24,14 +25,29 @@ class DefaultContentRemoteDataSource(
         }
 
     override suspend fun getContentsByRegion(
-        region: String,
+        regionCategoryName: String,
         size: Int,
         lastId: Long,
     ): Result<ContentsInformationResponse> =
         withContext(coroutineContext) {
             runCatching {
                 contentService.getContentsByRegion(
-                    region = region,
+                    regionCategoryName = regionCategoryName,
+                    size = size,
+                    lastId = lastId,
+                )
+            }
+        }
+
+    override suspend fun getContentsByRegion2(
+        regionCategoryName: String,
+        size: Int,
+        lastId: Long,
+    ): Result<ContentsInformationResponse2> =
+        withContext(coroutineContext) {
+            runCatching {
+                contentService.getContentsByRegion2(
+                    regionCategoryName = regionCategoryName,
                     size = size,
                     lastId = lastId,
                 )
