@@ -4,11 +4,10 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.on.turip.domain.content.Content
-import com.on.turip.domain.content.UsersLikeContent
 
 class UsersLikeContentAdapter(
     private val onContentListener: (content: Content) -> Unit,
-) : ListAdapter<UsersLikeContent, UsersLikeContentViewHolder>(UsersLikeContentDiffUtil) {
+) : ListAdapter<UsersLikeContentModel, UsersLikeContentViewHolder>(UsersLikeContentDiffUtil) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -21,15 +20,15 @@ class UsersLikeContentAdapter(
         holder.bind(getItem(position))
     }
 
-    private object UsersLikeContentDiffUtil : DiffUtil.ItemCallback<UsersLikeContent>() {
+    private object UsersLikeContentDiffUtil : DiffUtil.ItemCallback<UsersLikeContentModel>() {
         override fun areItemsTheSame(
-            oldItem: UsersLikeContent,
-            newItem: UsersLikeContent,
+            oldItem: UsersLikeContentModel,
+            newItem: UsersLikeContentModel,
         ): Boolean = oldItem.content.id == newItem.content.id
 
         override fun areContentsTheSame(
-            oldItem: UsersLikeContent,
-            newItem: UsersLikeContent,
+            oldItem: UsersLikeContentModel,
+            newItem: UsersLikeContentModel,
         ): Boolean = oldItem == newItem
     }
 }
