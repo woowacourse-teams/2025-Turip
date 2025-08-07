@@ -12,7 +12,7 @@ import retrofit2.http.Query
 interface ContentService {
     @GET("contents/count")
     suspend fun getContentsCountByRegion(
-        @Query("region") region: String,
+        @Query("regionCategory") regionCategoryName: String,
     ): ContentInformationCountResponse
 
     @GET("contents/count")
@@ -22,7 +22,7 @@ interface ContentService {
 
     @GET("contents")
     suspend fun getContentsByRegion(
-        @Query("region") region: String,
+        @Query("regionCategory") regionCategoryName: String,
         @Query("size") size: Int,
         @Query("lastId") lastId: Long,
     ): ContentsInformationResponse

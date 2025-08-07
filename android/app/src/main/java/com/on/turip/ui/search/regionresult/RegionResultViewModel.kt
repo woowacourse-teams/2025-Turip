@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class RegionResultViewModel(
-    private val region: String,
+    private val regionCategoryName: String,
     private val contentRepository: ContentRepository,
 ) : ViewModel() {
     private val _searchResultState: MutableLiveData<SearchResultState> =
@@ -36,14 +36,14 @@ class RegionResultViewModel(
             val pagedContentsResult: Deferred<Result<PagedContentsResult>> =
                 async {
                     contentRepository.loadContentsByRegion(
-                        region = region,
+                        regionCategoryName = regionCategoryName,
                         size = 100,
                         lastId = 0L,
                     )
                 }
             val contentsSize: Deferred<Result<Int>> =
                 async {
-                    contentRepository.loadContentsSizeByRegion(region)
+                    contentRepository.loadContentsSizeByRegion(regionCategoryName)
                 }
 
             pagedContentsResult
@@ -94,19 +94,19 @@ class RegionResultViewModel(
     private fun setTitle() {
         _searchResultState.value =
             searchResultState.value?.copy(
-                region = region,
+                region = regionCategoryName,
             )
     }
 
     companion object {
         fun provideFactory(
-            region: String,
+            regionCategoryName: String,
             contentRepository: ContentRepository = RepositoryModule.contentRepository,
         ): ViewModelProvider.Factory =
             viewModelFactory {
                 initializer {
                     RegionResultViewModel(
-                        region,
+                        regionCategoryName,
                         contentRepository,
                     )
                 }

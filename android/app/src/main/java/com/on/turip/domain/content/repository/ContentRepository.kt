@@ -5,12 +5,12 @@ import com.on.turip.domain.content.PagedContentsResult
 import com.on.turip.domain.content.UsersLikeContent
 
 interface ContentRepository {
-    suspend fun loadContentsSizeByRegion(region: String): Result<Int>
+    suspend fun loadContentsSizeByRegion(regionCategoryName: String): Result<Int>
 
     suspend fun loadContentsSizeByKeyword(keyword: String): Result<Int>
 
     suspend fun loadContentsByRegion(
-        region: String,
+        regionCategoryName: String,
         size: Int,
         lastId: Long,
     ): Result<PagedContentsResult>
