@@ -101,7 +101,6 @@
         android:id="@+id/iv_result_calendar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="-4dp"
         android:layout_marginTop="14dp"
         android:contentDescription="@null"
         android:src="@drawable/ic_calendar"
@@ -114,11 +113,10 @@
         android:id="@+id/tv_result_day"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="6dp"
         android:textAppearance="@style/info1"
         android:textColor="@color/pure_black_151515"
         app:layout_constraintBottom_toBottomOf="@id/iv_result_calendar"
-        app:layout_constraintStart_toEndOf="@id/iv_result_calendar"
+        app:layout_constraintStart_toStartOf="@id/tv_result_location"
         app:layout_constraintTop_toTopOf="@id/iv_result_calendar"
         tools:text="2박 3일" />
 
