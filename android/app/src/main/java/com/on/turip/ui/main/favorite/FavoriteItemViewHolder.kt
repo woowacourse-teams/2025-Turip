@@ -65,8 +65,8 @@ class FavoriteItemViewHolder(
                 tripModel.tripDurationModel.toDisplayText(itemView.context)
 
             ivFavoriteVideoThumbnail.loadRoundedCornerImage(
-                TuripUrlConverter.convertVideoThumbnailUrl(videoData.url),
-                10,
+                imageUrl = TuripUrlConverter.convertVideoThumbnailUrl(videoData.url),
+                radius = 10,
             )
 
             ivFavoriteFavorite.isSelected = content.isFavorite
