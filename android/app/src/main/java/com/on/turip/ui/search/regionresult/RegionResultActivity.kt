@@ -11,11 +11,14 @@ import com.on.turip.R
 import com.on.turip.databinding.ActivityRegionResultBinding
 import com.on.turip.ui.common.base.BaseActivity
 import com.on.turip.ui.trip.detail.TripDetailActivity
+import timber.log.Timber
 
 class RegionResultActivity : BaseActivity<ActivityRegionResultBinding>() {
     val viewModel: RegionResultViewModel by viewModels {
+        val regionCategoryName: String = intent.getStringExtra(REGION_CATEGORY_NAME_KEY) ?: ""
+        Timber.d("선택한 지역 카테고리: $regionCategoryName")
         RegionResultViewModel.provideFactory(
-            intent.getStringExtra(REGION_KEY) ?: "",
+            regionCategoryName = regionCategoryName,
         )
     }
     override val binding: ActivityRegionResultBinding by lazy {
@@ -92,13 +95,13 @@ class RegionResultActivity : BaseActivity<ActivityRegionResultBinding>() {
     }
 
     companion object {
-        private const val REGION_KEY: String = "com.on.turip.REGION_KEY"
+        private const val REGION_CATEGORY_NAME_KEY: String = "com.on.turip.REGION_CATEGORY_NAME_KEY"
 
         fun newIntent(
             context: Context,
-            region: String,
+            regionCategoryName: String,
         ): Intent =
             Intent(context, RegionResultActivity::class.java)
-                .putExtra(REGION_KEY, region)
+                .putExtra(REGION_CATEGORY_NAME_KEY, regionCategoryName)
     }
 }
