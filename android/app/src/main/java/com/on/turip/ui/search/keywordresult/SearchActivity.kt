@@ -115,6 +115,9 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
                 override fun handleOnBackPressed() {
                     if (binding.rvSearchResultSearchHistory.isVisible) {
                         binding.rvSearchResultSearchHistory.visibility = View.GONE
+                        binding.etSearchResult.clearFocus()
+                    } else {
+                        finish()
                     }
                 }
             },
@@ -130,6 +133,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
                 viewModel.loadByKeyword()
                 viewModel.createSearchHistory()
                 binding.rvSearchResultSearchHistory.visibility = View.GONE
+                binding.etSearchResult.clearFocus()
                 hideKeyBoard(binding.etSearchResult)
                 Timber.d("검색창 클릭")
                 true
