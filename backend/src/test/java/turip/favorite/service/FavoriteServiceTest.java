@@ -23,6 +23,7 @@ import turip.content.controller.dto.response.MyFavoriteContentsResponse;
 import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
 import turip.creator.domain.Creator;
+import turip.exception.custom.BadRequestException;
 import turip.exception.custom.NotFoundException;
 import turip.favorite.controller.dto.request.FavoriteRequest;
 import turip.favorite.controller.dto.response.FavoriteResponse;
@@ -96,7 +97,31 @@ class FavoriteServiceTest {
                 .isInstanceOf(NotFoundException.class);
     }
 
+    @DisplayName("이미 찜한 컨텐츠인 경우 예외가 발생한다")
+    @Test
+    void createFavoriteException2() {
+        // given
+        Long contentId = 5L;
+        String deviceFid = "testDeviceFid";
+        FavoriteRequest request = new FavoriteRequest(contentId);
 
+        Creator creator = new Creator(null, null);
+        City city = new City(null, null, null, null);
+        Content content = new Content(contentId, creator, city, null, null, null);
+        Member member = new Member(deviceFid);
+
+        given(contentRepository.findById(contentId))
+                .willReturn(Optional.of(content));
+        given(memberRepository.findByDeviceFid(deviceFid))
+                .willReturn(Optional.of(member));
+        given(favoriteRepository.existsByMemberIdAndContentId(any(), eq(contentId)))
+                .willReturn(true);
+
+        // when & then
+        assertThatThrownBy(() -> favoriteService.create(request, deviceFid))
+                .isInstanceOf(BadRequestException.class);
+    }
+    
     @DisplayName("내 찜 목록을 페이징 조회할 수 있다")
     @Test
     void findMyFavoriteContents() {

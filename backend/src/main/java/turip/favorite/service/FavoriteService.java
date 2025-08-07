@@ -72,8 +72,7 @@ public class FavoriteService {
                 .orElseThrow(() -> new NotFoundException("해당 컨텐츠는 찜한 상태가 아닙니다."));
         favoriteRepository.delete(favorite);
     }
-
-
+    
     private Member findOrCreateMember(String deviceFid) {
         return memberRepository.findByDeviceFid(deviceFid)
                 .orElseGet(() -> memberRepository.save(new Member(deviceFid)));

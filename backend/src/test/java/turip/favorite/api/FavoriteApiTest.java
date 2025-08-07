@@ -259,10 +259,9 @@ class FavoriteApiTest {
         }
     }
 
-    
     @DisplayName("/favorites GET 찜 조회 테스트")
     @Nested
-    class readFavorite {
+    class ReadFavorite {
 
         @DisplayName("성공 시 200 OK 코드와 찜한 콘텐츠 정보를 반환한다")
         @Test
