@@ -1,11 +1,14 @@
 package com.on.turip.data.favorite.service
 
 import com.on.turip.data.favorite.dto.FavoriteAddRequest
+import com.on.turip.data.favorite.dto.FavoriteContentsResponse
 import retrofit2.http.Body
 import retrofit2.http.DELETE
+import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface FavoriteService {
     @POST("favorites")
@@ -19,4 +22,11 @@ interface FavoriteService {
         @Header("device-fid") fid: String,
         @Path("contentId") contentId: Long,
     )
+
+    @GET("favorites")
+    suspend fun getFavoriteContents(
+        @Header("device-fid") fid: String,
+        @Query("size") size: Int,
+        @Query("lastId") lastId: Long,
+    ): FavoriteContentsResponse
 }
