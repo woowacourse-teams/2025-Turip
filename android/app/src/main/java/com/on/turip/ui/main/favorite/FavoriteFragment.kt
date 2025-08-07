@@ -62,20 +62,9 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        handleVisibleByHasContent()
         setupAdapters()
         setupListeners()
         setupObservers()
-    }
-
-    private fun handleVisibleByHasContent() {
-        if (viewModel.favoriteContents.value?.isEmpty() == true) {
-            binding.clFavoriteEmpty.visibility = View.VISIBLE
-            binding.clFavoriteNotEmpty.visibility = View.GONE
-        } else {
-            binding.clFavoriteEmpty.visibility = View.GONE
-            binding.clFavoriteNotEmpty.visibility = View.VISIBLE
-        }
     }
 
     private fun setupAdapters() {
@@ -102,7 +91,18 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>() {
 
     private fun setupObservers() {
         viewModel.favoriteContents.observe(viewLifecycleOwner) {
+            handleVisibleByHasContent()
             favoriteItemAdapter.submitList(it)
+        }
+    }
+
+    private fun handleVisibleByHasContent() {
+        if (viewModel.favoriteContents.value == null || viewModel.favoriteContents.value?.isEmpty() == true) {
+            binding.clFavoriteEmpty.visibility = View.VISIBLE
+            binding.clFavoriteNotEmpty.visibility = View.GONE
+        } else {
+            binding.clFavoriteEmpty.visibility = View.GONE
+            binding.clFavoriteNotEmpty.visibility = View.VISIBLE
         }
     }
 
