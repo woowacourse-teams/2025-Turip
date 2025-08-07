@@ -128,15 +128,20 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         binding.etSearchResult.addTextChangedListener { editable: Editable? ->
             viewModel.updateSearchingWord(editable.toString())
         }
-        binding.etSearchResult.setOnEditorActionListener { _, actionId, _ ->
+        binding.etSearchResult.setOnEditorActionListener { input, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                viewModel.loadByKeyword()
-                viewModel.createSearchHistory()
-                binding.rvSearchResultSearchHistory.visibility = View.GONE
-                binding.etSearchResult.clearFocus()
-                hideKeyBoard(binding.etSearchResult)
-                Timber.d("검색창 클릭")
-                true
+                val input: String = input.text.toString()
+                return@setOnEditorActionListener if (input.isBlank()) {
+                    true
+                } else {
+                    viewModel.loadByKeyword()
+                    viewModel.createSearchHistory()
+                    binding.rvSearchResultSearchHistory.visibility = View.GONE
+                    binding.etSearchResult.clearFocus()
+                    hideKeyBoard(binding.etSearchResult)
+                    Timber.d("검색창 클릭")
+                    true
+                }
             } else {
                 false
             }
@@ -155,6 +160,11 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
             showKeyBoard(binding.etSearchResult)
             Timber.d("최근 검색 목록에서 삭제 버튼 클릭")
         }
+        binding.clSearch.setOnClickListener {
+            binding.etSearchResult.requestFocus()
+            showKeyBoard(binding.etSearchResult)
+            Timber.d("검색창 포커싱")
+        }
     }
 
     private fun showKeyBoard(editText: EditText) {
@@ -165,7 +175,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
     private fun setupObservers() {
         viewModel.searchingWord.observe(this) { searchWord: String ->
             binding.ivSearchResultClear.visibility =
-                if (searchWord.isNotBlank()) View.VISIBLE else View.GONE
+                if (searchWord.isNotEmpty()) View.VISIBLE else View.GONE
         }
         viewModel.videoInformation.observe(this) { videoInformationModels: List<VideoInformationModel> ->
             searchAdapter.submitList(videoInformationModels)
