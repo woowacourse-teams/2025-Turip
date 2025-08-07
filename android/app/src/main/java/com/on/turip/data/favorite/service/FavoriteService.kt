@@ -7,7 +7,6 @@ import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
-import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface FavoriteService {
@@ -17,10 +16,10 @@ interface FavoriteService {
         @Body favoriteAddRequest: FavoriteAddRequest,
     )
 
-    @DELETE("favorites/{contentId}")
+    @DELETE("favorites")
     suspend fun deleteFavorite(
         @Header("device-fid") fid: String,
-        @Path("contentId") contentId: Long,
+        @Query("contentId") contentId: Long,
     )
 
     @GET("favorites")
