@@ -15,7 +15,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:titleCentered="false"
-        app:title=""
         app:titleTextAppearance="@style/title1"
         app:titleTextColor="@color/pure_black_151515">
 
@@ -23,38 +22,36 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginEnd="20dp"
-            android:paddingVertical="8dp"
-            android:paddingHorizontal="16dp"
-            android:background="@drawable/bg_gray100_radius_24dp">
+            android:background="@drawable/bg_gray100_radius_24dp"
+            android:paddingHorizontal="16dp">
 
             <EditText
                 android:id="@+id/et_search_result"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:autofillHints=""
                 android:background="@null"
-                android:paddingVertical="4dp"
-                android:hint="@string/hint_text"
+                android:hint="@string/search_result_hint_text"
                 android:imeOptions="actionSearch"
+                android:inputType="text"
+                android:paddingVertical="8dp"
+                android:textAppearance="@style/title3"
                 android:textColor="@color/pure_black_151515"
                 android:textColorHint="@color/gray_300_5b5b5b"
-                android:textAppearance="@style/title3"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/iv_search_result_clear"
-                app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                android:inputType="text" />
+                app:layout_constraintEnd_toStartOf="@id/iv_search_result_clear"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
                 android:id="@+id/iv_search_result_clear"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
                 android:contentDescription="@null"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/et_search_result"
-                app:layout_constraintBottom_toBottomOf="@id/et_search_result"
+                android:paddingHorizontal="4dp"
                 android:src="@drawable/ic_cancel"
-                android:visibility="gone" />
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -76,11 +73,11 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="14dp"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         android:orientation="vertical"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_search_result_count"
-        app:layout_constraintBottom_toBottomOf="parent"
         tools:itemCount="10"
         tools:listitem="@layout/item_result" />
 
@@ -120,23 +117,23 @@
         android:id="@+id/tv_search_result_loading"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/all_loading"
-        android:visibility="gone"
+        android:background="@color/pure_white_ffffff"
         android:gravity="center"
-        android:textColor="@color/pure_black_151515"
+        android:text="@string/all_loading"
         android:textAppearance="@style/display"
-        android:background="@color/pure_white_ffffff" />
+        android:textColor="@color/pure_black_151515"
+        android:visibility="gone" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:paddingHorizontal="20dp"
         android:id="@+id/rv_search_result_search_history"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:orientation="vertical"
         android:background="@color/pure_white_ffffff"
+        android:orientation="vertical"
+        android:paddingHorizontal="20dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tb_search_result" />
 
     <ProgressBar
@@ -144,9 +141,9 @@
         style="?android:attr/progressBarStyleLarge"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:visibility="gone" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
