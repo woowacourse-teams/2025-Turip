@@ -14,7 +14,7 @@ import com.on.turip.databinding.FragmentFavoriteBinding
 import com.on.turip.ui.common.base.BaseFragment
 
 class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>() {
-    private val viewModel: FavoriteViewModel by viewModels()
+    private val viewModel: FavoriteViewModel by viewModels { FavoriteViewModel.provideFactory() }
     private val inquireMailUri: Uri by lazy {
         "mailto:$EMAIL_RECIPIENT?subject=${Uri.encode(EMAIL_SUBJECT)}&body=${Uri.encode(EMAIL_BODY)}".toUri()
     }
