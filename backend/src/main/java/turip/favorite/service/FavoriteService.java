@@ -56,15 +56,7 @@ public class FavoriteService {
         Slice<Content> contentSlice = favoriteRepository.findMyFavoriteContentsByDeviceFid(deviceFid, lastContentId,
                 PageRequest.of(0, pageSize));
         List<Content> contents = contentSlice.getContent();
-        List<ContentWithTripInfoResponse> contentsWithTripInfo = contents.stream()
-                .map(content -> {
-                    ContentWithCreatorAndCityResponse contentWithCreatorAndCity = ContentWithCreatorAndCityResponse.from(
-                            content);
-                    TripDurationResponse tripDuration = calculateTripDuration(content);
-                    int tripPlaceCount = tripCourseService.countByContentId(content.getId());
-                    return ContentWithTripInfoResponse.of(contentWithCreatorAndCity, tripDuration, tripPlaceCount);
-                })
-                .toList();
+        List<ContentWithTripInfoResponse> contentsWithTripInfo = convertToContentWithTripInfoResponses(contents);
         boolean loadable = contentSlice.hasNext();
 
         return MyFavoriteContentsResponse.of(contentsWithTripInfo, loadable);
@@ -90,5 +82,17 @@ public class FavoriteService {
     private TripDurationResponse calculateTripDuration(Content content) {
         int totalTripDay = tripCourseService.calculateDurationDays(content.getId());
         return TripDurationResponse.of(totalTripDay - 1, totalTripDay);
+    }
+
+    private List<ContentWithTripInfoResponse> convertToContentWithTripInfoResponses(List<Content> contents) {
+        return contents.stream()
+                .map(content -> {
+                    ContentWithCreatorAndCityResponse contentWithCreatorAndCity = ContentWithCreatorAndCityResponse.from(
+                            content);
+                    TripDurationResponse tripDuration = calculateTripDuration(content);
+                    int tripPlaceCount = tripCourseService.countByContentId(content.getId());
+                    return ContentWithTripInfoResponse.of(contentWithCreatorAndCity, tripDuration, tripPlaceCount);
+                })
+                .toList();
     }
 }
