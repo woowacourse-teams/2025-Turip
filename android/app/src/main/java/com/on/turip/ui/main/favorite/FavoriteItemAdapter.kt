@@ -17,8 +17,7 @@ class FavoriteItemAdapter(
         holder: FavoriteItemViewHolder,
         position: Int,
     ) {
-        val videoInformationModel: VideoInformationModel = getItem(position)
-        holder.bind(videoInformationModel)
+        holder.bind(getItem(position))
     }
 
     private object FavoriteItemDiffUtil : DiffUtil.ItemCallback<VideoInformationModel>() {
