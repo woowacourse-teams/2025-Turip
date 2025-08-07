@@ -14,8 +14,6 @@ class DefaultSearchHistoryDataSource(
 
     override suspend fun deleteSearch(keyword: String): Result<Unit> =
         runCatching {
-            dao.deleteSearch(
-                keyword,
-            )
+            dao.deleteSearch(keyword)
         }
 }
