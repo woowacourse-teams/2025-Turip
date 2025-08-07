@@ -12,8 +12,10 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.LinearLayout
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.on.turip.R
@@ -69,6 +71,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         setupListeners()
         setupObservers()
         setupAdapters()
+        setupOnBackPressedDispatcher()
         binding.etSearchResult.requestFocus()
         binding.rvSearchResult.itemAnimator = null
         binding.rvSearchResultSearchHistory.itemAnimator = null
@@ -103,6 +106,19 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
             return true
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun setupOnBackPressedDispatcher() {
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    if (binding.rvSearchResultSearchHistory.isVisible) {
+                        binding.rvSearchResultSearchHistory.visibility = View.GONE
+                    }
+                }
+            },
+        )
     }
 
     private fun setupListeners() {
