@@ -18,5 +18,5 @@ data class ContentResponse(
     @SerialName("city")
     val city: CityResponse,
     @SerialName("isFavorite")
-    val isFavorite: Boolean = false, // TODO 추후에 서버에서 값이 내려오면 삭제
+    val isFavorite: Boolean = false,
 )

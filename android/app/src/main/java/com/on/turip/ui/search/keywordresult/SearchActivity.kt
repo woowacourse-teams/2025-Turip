@@ -160,7 +160,6 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         }
         viewModel.searchHistory.observe(this) { searchHistories: List<SearchHistory> ->
             searchHistoryAdapter.submitList(searchHistories)
-            viewModel.loadSearchHistory()
         }
     }
 

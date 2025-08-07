@@ -91,7 +91,7 @@ class SearchViewModel(
         }
     }
 
-    fun loadSearchHistory() {
+    private fun loadSearchHistory() {
         viewModelScope.launch {
             searchHistoryRepository
                 .loadRecentSearches(10)
@@ -110,6 +110,7 @@ class SearchViewModel(
                 .createSearchHistory(searchingWord.value.toString())
                 .onSuccess {
                     Timber.d("최근 검색 목록에 추가됨")
+                    loadSearchHistory()
                 }.onFailure {
                     Timber.e("${it.message}")
                 }
@@ -122,6 +123,7 @@ class SearchViewModel(
                 .deleteSearch(keyword)
                 .onSuccess {
                     Timber.d("${keyword}가 최근 검색 목록에서 삭제")
+                    loadSearchHistory()
                 }.onFailure {
                     Timber.e("${it.message}")
                 }
