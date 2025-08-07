@@ -69,6 +69,7 @@ class RegionResultActivity : BaseActivity<ActivityRegionResultBinding>() {
 
     private fun setupObservers() {
         viewModel.searchResultState.observe(this) { searchResultState: RegionResultViewModel.SearchResultState ->
+            Timber.d("videoInformations size = ${searchResultState.videoInformations.size}")
             binding.tvRegionResultCount.text =
                 getString(
                     R.string.region_result_exist_result,

@@ -47,7 +47,7 @@ class DefaultContentRepository(
         lastId: Long,
     ): Result<PagedContentsResult> =
         contentRemoteDataSource
-            .getContentsByRegion(regionCategoryName, size, lastId)
+            .getContentsByRegion2(regionCategoryName, size, lastId)
             .mapCatching { it.toDomain() }
 
     override suspend fun loadContentsByKeyword(

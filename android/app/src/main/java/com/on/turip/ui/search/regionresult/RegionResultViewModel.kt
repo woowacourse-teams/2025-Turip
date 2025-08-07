@@ -56,6 +56,7 @@ class RegionResultViewModel(
                             videoInformations = videoModels,
                         )
                 }.onFailure {
+                    Timber.e("${it.message}")
                 }
             contentsSize
                 .await()

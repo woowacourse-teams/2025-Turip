@@ -3,6 +3,7 @@ package com.on.turip.data.content.datasource
 import com.on.turip.data.content.dto.ContentDetailResponse
 import com.on.turip.data.content.dto.ContentInformationCountResponse
 import com.on.turip.data.content.dto.ContentsInformationResponse
+import com.on.turip.data.content.dto.ContentsInformationResponse2
 import com.on.turip.data.content.dto.UsersLikeContentsResponse
 import com.on.turip.data.content.service.ContentService
 import kotlinx.coroutines.Dispatchers
@@ -31,6 +32,21 @@ class DefaultContentRemoteDataSource(
         withContext(coroutineContext) {
             runCatching {
                 contentService.getContentsByRegion(
+                    regionCategoryName = regionCategoryName,
+                    size = size,
+                    lastId = lastId,
+                )
+            }
+        }
+
+    override suspend fun getContentsByRegion2(
+        regionCategoryName: String,
+        size: Int,
+        lastId: Long,
+    ): Result<ContentsInformationResponse2> =
+        withContext(coroutineContext) {
+            runCatching {
+                contentService.getContentsByRegion2(
                     regionCategoryName = regionCategoryName,
                     size = size,
                     lastId = lastId,
