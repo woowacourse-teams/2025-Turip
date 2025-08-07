@@ -17,9 +17,4 @@ class DefaultSearchHistoryDataSource(
                 keyword,
             )
         }
-
-    override suspend fun deleteOldSearches(limit: Int): Result<Unit> =
-        runCatching {
-            dao.deleteOldSearches(limit)
-        }
 }

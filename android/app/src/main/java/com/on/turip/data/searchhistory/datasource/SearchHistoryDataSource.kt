@@ -8,6 +8,4 @@ interface SearchHistoryDataSource {
     suspend fun getRecentSearches(limit: Int): Result<List<SearchHistoryEntity>>
 
     suspend fun deleteSearch(keyword: String): Result<Unit>
-
-    suspend fun deleteOldSearches(limit: Int): Result<Unit>
 }

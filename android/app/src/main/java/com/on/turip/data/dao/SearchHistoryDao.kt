@@ -16,16 +16,4 @@ interface SearchHistoryDao {
 
     @Query("DELETE FROM search_history WHERE keyword = :keyword")
     suspend fun deleteSearch(keyword: String)
-
-    @Query(
-        """
-    DELETE FROM search_history
-    WHERE keyword NOT IN (
-        SELECT keyword FROM search_history
-        ORDER BY history DESC
-        LIMIT :limit
-    )
-""",
-    )
-    suspend fun deleteOldSearches(limit: Int)
 }
