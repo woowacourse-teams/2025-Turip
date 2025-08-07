@@ -3,11 +3,11 @@ package com.on.turip.ui.main.favorite
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import com.on.turip.ui.search.model.VideoInformationModel
+import com.on.turip.domain.favorite.FavoriteContent
 
 class FavoriteItemAdapter(
     private val onFavoriteItemListener: FavoriteItemViewHolder.FavoriteItemListener,
-) : ListAdapter<VideoInformationModel, FavoriteItemViewHolder>(FavoriteItemDiffUtil) {
+) : ListAdapter<FavoriteContent, FavoriteItemViewHolder>(FavoriteItemDiffUtil) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -20,15 +20,15 @@ class FavoriteItemAdapter(
         holder.bind(getItem(position))
     }
 
-    private object FavoriteItemDiffUtil : DiffUtil.ItemCallback<VideoInformationModel>() {
+    private object FavoriteItemDiffUtil : DiffUtil.ItemCallback<FavoriteContent>() {
         override fun areItemsTheSame(
-            oldItem: VideoInformationModel,
-            newItem: VideoInformationModel,
+            oldItem: FavoriteContent,
+            newItem: FavoriteContent,
         ): Boolean = oldItem.content.id == newItem.content.id
 
         override fun areContentsTheSame(
-            oldItem: VideoInformationModel,
-            newItem: VideoInformationModel,
+            oldItem: FavoriteContent,
+            newItem: FavoriteContent,
         ): Boolean = oldItem == newItem
     }
 }
