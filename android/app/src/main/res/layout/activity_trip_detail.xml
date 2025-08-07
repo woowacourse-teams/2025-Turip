@@ -24,7 +24,6 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/pure_white_ffffff"
-            app:contentInsetEnd="30dp"
             app:layout_scrollFlags="scroll|enterAlways"
             app:titleTextAppearance="@style/title1"
             app:titleTextColor="@color/pure_black_151515">
@@ -33,6 +32,7 @@
                 android:id="@+id/iv_trip_detail_favorite"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:padding="20dp"
                 android:layout_gravity="end|center_vertical"
                 android:contentDescription="@null"
                 android:src="@drawable/btn_favorite_red" />

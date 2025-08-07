@@ -1,10 +1,10 @@
 -- Countries (국가)
 INSERT INTO country (name, image_url)
 VALUES ('대한민국', ''),
-       ('일본', 'https://drive.google.com/uc?export=view&id=12bEpmYKsOwqriesfpyC_sZJJsWpW3foC'),
-       ('대만', 'https://drive.google.com/uc?export=view&id=1lWUI2bkaJp8Dmx4jCGgQCZwQMsXF5ggC'),
-       ('중국', 'https://drive.google.com/uc?export=view&id=1qlxdrNonMpK5evz04hx9ILQqUzsJwWXU'),
-       ('베트남', 'https://drive.google.com/uc?export=view&id=1fHwzyETYPoqLJayLajlI7I9HfUq3fLNg');
+       ('일본', 'https://drive.google.com/uc?export=view&id=1XJEi-3uY6JSCPbGAHtGPp3DMsX9Fxbre'),
+       ('대만', 'https://drive.google.com/uc?export=view&id=19ab6qDf2SndV1Pwd8rCMupx8qa_EIO9V'),
+       ('중국', 'https://drive.google.com/uc?export=view&id=1Wjdvnzp-UEi76VJZNX068vfMfVBopCq3'),
+       ('베트남', 'https://drive.google.com/uc?export=view&id=12hJnGcO6exvbM-2lZUdSaAx8wAZu864_');
 
 -- Provinces (도/시)
 INSERT INTO province (name)
@@ -27,18 +27,18 @@ VALUES ('경기'),
 -- Cities (도시)
 -- 대한민국 - 광역시/특별시/자치시
 INSERT INTO city (name, country_id, province_id, image_url)
-VALUES ('서울', 1, 7, 'https://drive.google.com/uc?export=view&id=1MBHO5IlYuFhhvPqjaBk0UnMX3ip5R3uL'),
-       ('부산', 1, 8, 'https://drive.google.com/uc?export=view&id=1VIpK_n7YDXRnq7XPkZTjR21rK0BRVAO6'),
-       ('대구', 1, 9, 'https://drive.google.com/uc?export=view&id=1Hvl79W-r_jaB6oHHFOTUZzx4tpE6baKN'),
-       ('인천', 1, 10, 'https://drive.google.com/uc?export=view&id=1dNP0LEvc4ueY5avsl4mQYtKRIpXJA-z1'),
+VALUES ('서울', 1, 7, 'https://drive.google.com/uc?export=view&id=1UGj1YCxHUVjQGsHrDmYmQlCuRFkHpn92'),
+       ('부산', 1, 8, 'https://drive.google.com/uc?export=view&id=1Fbins0H99JXI5nLCRGqTyIAxqRgryliZ'),
+       ('대구', 1, 9, 'https://drive.google.com/uc?export=view&id=1UL3kAWg19irtiotj-fvzRkOICTt2Fn7k'),
+       ('인천', 1, 10, 'https://drive.google.com/uc?export=view&id=1hsFHqJKfhvj-GgWQzfDl15OywTgdrOJ5'),
        ('광주', 1, 11, ''),
-       ('대전', 1, 12, 'https://drive.google.com/uc?export=view&id=18esK0aVfcZQrhA-hlKQuufcp_SsY0V4V'),
+       ('대전', 1, 12, 'https://drive.google.com/uc?export=view&id=1MKR-tYsyLcNwoD0V5AHgf-3SSHaDgq_6'),
        ('울산', 1, 13, ''),
        ('세종', 1, 14, '');
 
 -- 대한민국 - 경기도
 INSERT INTO city (name, country_id, province_id, image_url)
-VALUES ('수원', 1, 1, 'https://drive.google.com/uc?export=view&id=1jxQEkWHb1p3VwtISPbVBZh_N78_UNACI'),
+VALUES ('수원', 1, 1, 'https://drive.google.com/uc?export=view&id=1p4D4b09pzPZ3Xp1NE_LgBIRcbwfiNCd9'),
        ('용인', 1, 1, ''),
        ('성남', 1, 1, ''),
        ('고양', 1, 1, ''),
@@ -55,8 +55,8 @@ VALUES ('수원', 1, 1, 'https://drive.google.com/uc?export=view&id=1jxQEkWHb1p3
 INSERT INTO city (name, country_id, province_id, image_url)
 VALUES ('춘천', 1, 2, ''),
        ('원주', 1, 2, ''),
-       ('강릉', 1, 2, 'https://drive.google.com/uc?export=view&id=1mqoEwNb2jYjwg4zZ2H4AyG4-eGw_LOn1'),
-       ('속초', 1, 2, '');
+       ('강릉', 1, 2, 'https://drive.google.com/uc?export=view&id=1MuVxiOenZS5JnpW0BlsqwOGxcXT2Ncm9'),
+       ('속초', 1, 2, 'https://drive.google.com/uc?export=view&id=1WUDx88PHeEyUp-pVmsxwXXD-WY92_X2O');
 
 -- 대한민국 - 충청
 INSERT INTO city (name, country_id, province_id, image_url)
@@ -69,7 +69,7 @@ VALUES ('청주', 1, 3, ''),
 
 -- 대한민국 - 전라
 INSERT INTO city (name, country_id, province_id, image_url)
-VALUES ('전주', 1, 4, 'https://drive.google.com/uc?export=view&id=1lJri1uIuexbul6GJmX96571myOWxpozz'),
+VALUES ('전주', 1, 4, 'https://drive.google.com/uc?export=view&id=1B6vyjYUsH7VAZYptMLjBx2fTxa_XvCKb'),
        ('익산', 1, 4, ''),
        ('군산', 1, 4, ''),
        ('여수', 1, 4, ''),
@@ -81,7 +81,7 @@ VALUES ('전주', 1, 4, 'https://drive.google.com/uc?export=view&id=1lJri1uIuexb
 -- 대한민국 - 경상
 INSERT INTO city (name, country_id, province_id, image_url)
 VALUES ('포항', 1, 5, null),
-       ('경주', 1, 5, 'https://drive.google.com/uc?export=view&id=1vsAX9Q8LCePDtA_RGEMPvViUpXtmgX7b'),
+       ('경주', 1, 5, 'https://drive.google.com/uc?export=view&id=1gwJkaUj1btIzsUeMdanMClhkgN9AJ0LJ'),
        ('구미', 1, 5, ''),
        ('안동', 1, 5, ''),
        ('상주', 1, 5, ''),
@@ -92,7 +92,7 @@ VALUES ('포항', 1, 5, null),
 
 -- 대한민국 - 제주
 INSERT INTO city (name, country_id, province_id, image_url)
-VALUES ('제주', 1, 6, 'https://drive.google.com/uc?export=view&id=1‑bAoY9Anokv2Hct1e7IqGIVa5hLCU4jz'),
+VALUES ('제주', 1, 6, 'https://drive.google.com/uc?export=view&id=14Z74DP4OwiOqkCNGqehUvz_4OxbC7zVh'),
        ('서귀포', 1, 6, '');
 
 -- 일본
