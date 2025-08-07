@@ -8,22 +8,22 @@ import com.on.turip.databinding.ItemFavoriteBinding
 import com.on.turip.domain.content.Content
 import com.on.turip.domain.content.video.VideoData
 import com.on.turip.domain.creator.Creator
+import com.on.turip.domain.favorite.FavoriteContent
 import com.on.turip.ui.common.TuripUrlConverter
 import com.on.turip.ui.common.loadCircularImage
 import com.on.turip.ui.common.loadRoundedCornerImage
-import com.on.turip.ui.common.model.trip.TripModel
+import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.common.model.trip.toDisplayText
-import com.on.turip.ui.search.model.VideoInformationModel
 
 class FavoriteItemViewHolder(
     private val binding: ItemFavoriteBinding,
     private val onFavoriteItemListener: FavoriteItemListener,
 ) : RecyclerView.ViewHolder(binding.root) {
-    private var videoInformationModel: VideoInformationModel? = null
+    private var favoriteContent: FavoriteContent? = null
 
     init {
         itemView.setOnClickListener {
-            videoInformationModel?.content?.let { content: Content ->
+            favoriteContent?.content?.let { content: Content ->
                 onFavoriteItemListener.onFavoriteItemClick(
                     content.id,
                     content.creator.id,
@@ -31,15 +31,20 @@ class FavoriteItemViewHolder(
             }
         }
         binding.ivFavoriteFavorite.setOnClickListener {
-            videoInformationModel?.let { onFavoriteItemListener.onFavoriteClick(it.content.id) }
+            favoriteContent?.let {
+                onFavoriteItemListener.onFavoriteClick(
+                    it.content.id,
+                    it.content.isFavorite,
+                )
+            }
         }
     }
 
-    fun bind(videoInformationModel: VideoInformationModel) {
-        val content: Content = videoInformationModel.content
+    fun bind(favoriteContent: FavoriteContent) {
+        this.favoriteContent = favoriteContent
+        val content: Content = favoriteContent.content
         val videoData: VideoData = content.videoData
         val creator: Creator = content.creator
-        val tripModel: TripModel = videoInformationModel.tripModel
 
         binding.apply {
             tvFavoriteTitle.text = videoData.title
@@ -58,11 +63,11 @@ class FavoriteItemViewHolder(
             tvFavoriteTotalPlaceCount.text =
                 itemView.context.getString(
                     R.string.all_total_place_count,
-                    tripModel.tripPlaceCount,
+                    favoriteContent.tripPlaceCount,
                 )
 
             tvFavoriteTravelDuration.text =
-                tripModel.tripDurationModel.toDisplayText(itemView.context)
+                favoriteContent.tripDuration.toUiModel().toDisplayText(itemView.context)
 
             ivFavoriteVideoThumbnail.loadRoundedCornerImage(
                 imageUrl = TuripUrlConverter.convertVideoThumbnailUrl(videoData.url),
@@ -85,7 +90,10 @@ class FavoriteItemViewHolder(
     }
 
     interface FavoriteItemListener {
-        fun onFavoriteClick(contentId: Long)
+        fun onFavoriteClick(
+            contentId: Long,
+            isFavorite: Boolean,
+        )
 
         fun onFavoriteItemClick(
             contentId: Long,

@@ -1,6 +1,7 @@
 package com.on.turip.data.favorite.datasource
 
 import com.on.turip.data.favorite.dto.FavoriteAddRequest
+import com.on.turip.data.favorite.dto.FavoriteContentsResponse
 import com.on.turip.data.favorite.service.FavoriteService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -27,6 +28,17 @@ class DefaultFavoriteRemoteDataSource(
         withContext(coroutineContext) {
             runCatching {
                 favoriteService.deleteFavorite(fid, contentId)
+            }
+        }
+
+    override suspend fun getFavoriteContents(
+        fid: String,
+        size: Int,
+        lastId: Long,
+    ): Result<FavoriteContentsResponse> =
+        withContext(coroutineContext) {
+            runCatching {
+                favoriteService.getFavoriteContents(fid, size, lastId)
             }
         }
 }
