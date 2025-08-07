@@ -1,5 +1,4 @@
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
-import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension
 
 plugins {
     alias(libs.plugins.android.application)
@@ -54,10 +53,6 @@ android {
             )
             signingConfig = signingConfigs.getByName("debug")
             manifestPlaceholders["appName"] = "튜립"
-            configure<CrashlyticsExtension> {
-                // Enable processing and uploading of native symbols to Firebase servers.
-                nativeSymbolUploadEnabled = true
-            }
         }
     }
 
