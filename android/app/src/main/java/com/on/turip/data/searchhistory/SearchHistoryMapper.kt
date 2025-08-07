@@ -4,6 +4,6 @@ import com.on.turip.domain.searchhistory.SearchHistory
 
 fun SearchHistoryEntity.toDomain(): SearchHistory =
     SearchHistory(
-        keyword = this.keyword,
-        historyTime = this.history,
+        keyword = keyword,
+        historyTime = history,
     )
