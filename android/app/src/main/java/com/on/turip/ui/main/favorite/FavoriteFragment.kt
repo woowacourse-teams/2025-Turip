@@ -7,16 +7,44 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.fragment.app.viewModels
 import com.on.turip.BuildConfig
+import com.on.turip.R
 import com.on.turip.databinding.FragmentFavoriteBinding
+import com.on.turip.ui.common.ItemDividerDecoration
 import com.on.turip.ui.common.base.BaseFragment
+import com.on.turip.ui.trip.detail.TripDetailActivity
+import timber.log.Timber
 
 class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>() {
-    private val viewModel: FavoriteViewModel by viewModels()
+    private val viewModel: FavoriteViewModel by viewModels { FavoriteViewModel.provideFactory() }
     private val inquireMailUri: Uri by lazy {
         "mailto:$EMAIL_RECIPIENT?subject=${Uri.encode(EMAIL_SUBJECT)}&body=${Uri.encode(EMAIL_BODY)}".toUri()
+    }
+    private val favoriteItemAdapter: FavoriteItemAdapter by lazy {
+        FavoriteItemAdapter(
+            object : FavoriteItemViewHolder.FavoriteItemListener {
+                override fun onFavoriteClick(contentId: Long) {
+                    Timber.d("찜 목록의 찜 버튼을 클릭(contentId=$contentId)")
+                }
+
+                override fun onFavoriteItemClick(
+                    contentId: Long,
+                    creatorId: Long,
+                ) {
+                    Timber.d("찜 목록의 아이템 클릭(contentId=$contentId)")
+                    val intent =
+                        TripDetailActivity.newIntent(
+                            context = requireContext(),
+                            contentId = contentId,
+                            creatorId = creatorId,
+                        )
+                    startActivity(intent)
+                }
+            },
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,7 +64,20 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupAdapters()
         setupListeners()
+    }
+
+    private fun setupAdapters() {
+        binding.rvFavoriteContent.apply {
+            adapter = favoriteItemAdapter
+            addItemDecoration(
+                ItemDividerDecoration(
+                    height = 8,
+                    color = ContextCompat.getColor(context, R.color.gray_100_f0f0ee),
+                ),
+            )
+        }
     }
 
     private fun setupListeners() {
@@ -75,7 +116,5 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>() {
             사용자의 OS: Android ${Build.VERSION.RELEASE} (SDK ${Build.VERSION.SDK_INT})
             사용자 기기: ${Build.MANUFACTURER} ${Build.MODEL}
             """.trimIndent()
-
-        fun newInstance() = FavoriteFragment()
     }
 }
