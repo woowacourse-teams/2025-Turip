@@ -6,9 +6,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.on.turip.R
 import com.on.turip.databinding.ItemFavoriteBinding
 import com.on.turip.domain.content.Content
+import com.on.turip.domain.content.video.VideoData
+import com.on.turip.domain.creator.Creator
 import com.on.turip.ui.common.TuripUrlConverter
 import com.on.turip.ui.common.loadCircularImage
 import com.on.turip.ui.common.loadRoundedCornerImage
+import com.on.turip.ui.common.model.trip.TripModel
 import com.on.turip.ui.common.model.trip.toDisplayText
 import com.on.turip.ui.search.model.VideoInformationModel
 
@@ -33,10 +36,10 @@ class FavoriteItemViewHolder(
     }
 
     fun bind(videoInformationModel: VideoInformationModel) {
-        val content = videoInformationModel.content
-        val videoData = content.videoData
-        val creator = content.creator
-        val tripModel = videoInformationModel.tripModel
+        val content: Content = videoInformationModel.content
+        val videoData: VideoData = content.videoData
+        val creator: Creator = content.creator
+        val tripModel: TripModel = videoInformationModel.tripModel
 
         binding.apply {
             tvFavoriteTitle.text = videoData.title
