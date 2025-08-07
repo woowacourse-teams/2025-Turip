@@ -19,6 +19,10 @@ public class LoggingInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {
+
+        if ("/error".equals(request.getRequestURI())) {
+            return true;
+        }
         String traceId = UUID.randomUUID().toString().substring(0, 8);
 
         request.setAttribute(REQUEST_ID_ATTRIBUTE, traceId);
