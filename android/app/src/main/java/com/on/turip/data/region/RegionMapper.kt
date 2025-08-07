@@ -11,7 +11,7 @@ fun RegionCategoriesResponse.toDomain(): List<RegionCategory> = regionCategories
 fun RegionCategoryResponse.toDomain(): RegionCategory =
     RegionCategory(
         name = regionCategoryName,
-        country = country.toDomain(),
+        country = country?.toDomain(),
         imageUrl = regionCategoryImageUrl,
     )
 
