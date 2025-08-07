@@ -55,9 +55,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
                     binding.etSearchResult.setText(keyword)
                     binding.etSearchResult.setSelection(keyword.length)
 
-                    viewModel.updateSearchingWord(
-                        Editable.Factory.getInstance().newEditable(keyword),
-                    )
+                    viewModel.updateSearchingWord(keyword)
                     viewModel.loadByKeyword()
                     viewModel.createSearchHistory()
                     binding.rvSearchResultSearchHistory.visibility = View.GONE
@@ -109,7 +107,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
 
     private fun setupListeners() {
         binding.etSearchResult.addTextChangedListener { editable: Editable? ->
-            viewModel.updateSearchingWord(editable)
+            viewModel.updateSearchingWord(editable.toString())
         }
         binding.etSearchResult.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {

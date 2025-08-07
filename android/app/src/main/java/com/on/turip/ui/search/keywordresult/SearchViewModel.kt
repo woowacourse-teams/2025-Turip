@@ -1,6 +1,5 @@
 package com.on.turip.ui.search.keywordresult
 
-import android.text.Editable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -44,8 +43,8 @@ class SearchViewModel(
         loadSearchHistory()
     }
 
-    fun updateSearchingWord(newWords: Editable?) {
-        _searchingWord.value = newWords.toString()
+    fun updateSearchingWord(newWord: String) {
+        _searchingWord.value = newWord
     }
 
     fun loadByKeyword() {
