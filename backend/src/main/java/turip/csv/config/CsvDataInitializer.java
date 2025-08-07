@@ -3,12 +3,15 @@ package turip.csv.config;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StreamUtils;
 import turip.csv.service.CsvDataImportService;
 
 @Slf4j
@@ -17,6 +20,7 @@ import turip.csv.service.CsvDataImportService;
 public class CsvDataInitializer implements CommandLineRunner {
 
     private final CsvDataImportService csvDataImportService;
+    private final JdbcTemplate jdbcTemplate;
 
     @Override
     public void run(String... args) {
@@ -27,31 +31,74 @@ public class CsvDataInitializer implements CommandLineRunner {
 
             if (csvResources.length == 0) {
                 log.warn("import 할 CSV 파일이 없습니다.");
-                return;
-            }
+            } else {
+                log.info("찾은 CSV 파일 개수: {}", csvResources.length);
+                for (Resource resource : csvResources) {
+                    log.info("import 대상 CSV 파일: {}", resource.getFilename());
 
-            log.info("찾은 CSV 파일 개수: {}", csvResources.length);
-            for (Resource resource : csvResources) {
-                log.info("import 대상 CSV 파일: {}", resource.getFilename());
+                    // 임시 파일로 복사
+                    File tempFile = File.createTempFile("csv_import_", ".csv");
+                    tempFile.deleteOnExit();
 
-                // 임시 파일로 복사
-                File tempFile = File.createTempFile("csv_import_", ".csv");
-                tempFile.deleteOnExit();
+                    try (InputStream inputStream = resource.getInputStream();
+                         FileOutputStream outputStream = new FileOutputStream(tempFile)) {
+                        inputStream.transferTo(outputStream);
+                    }
 
-                try (InputStream inputStream = resource.getInputStream();
-                     FileOutputStream outputStream = new FileOutputStream(tempFile)) {
-                    inputStream.transferTo(outputStream);
+                    // CSV 데이터 import 실행
+                    csvDataImportService.importCsvData(tempFile.getAbsolutePath());
+                    log.info("CSV 파일 import 완료: {}", resource.getFilename());
                 }
 
-                // CSV 데이터 import 실행
-                csvDataImportService.importCsvData(tempFile.getAbsolutePath());
-                log.info("CSV 파일 import 완료: {}", resource.getFilename());
+                log.info("모든 CSV 파일 import 완료되었습니다.");
             }
 
-            log.info("모든 CSV 파일 import 완료되었습니다.");
+            // CSV import 완료 후 data.sql 실행
+            executeDataSql();
 
         } catch (Exception e) {
             log.error("CSV import 중 오류 발생: {}", e.getMessage(), e);
+        }
+    }
+
+    private void executeDataSql() {
+        try {
+            log.info("data.sql 실행을 시작합니다.");
+            
+            // data.sql 파일 읽기
+            Resource dataSqlResource = new PathMatchingResourcePatternResolver()
+                    .getResource("classpath:data.sql");
+            
+            if (!dataSqlResource.exists()) {
+                log.warn("data.sql 파일을 찾을 수 없습니다.");
+                return;
+            }
+
+            String sqlContent = StreamUtils.copyToString(
+                    dataSqlResource.getInputStream(), 
+                    StandardCharsets.UTF_8
+            );
+
+            // SQL 문장들을 세미콜론으로 분리하여 실행
+            String[] sqlStatements = sqlContent.split(";");
+            
+            for (String sql : sqlStatements) {
+                sql = sql.trim();
+                if (!sql.isEmpty()) {
+                    try {
+                        jdbcTemplate.execute(sql);
+                        log.debug("SQL 실행 완료: {}", sql.substring(0, Math.min(50, sql.length())) + "...");
+                    } catch (Exception e) {
+                        log.error("SQL 실행 중 오류 발생: {}", e.getMessage());
+                        log.error("실행 실패한 SQL: {}", sql);
+                    }
+                }
+            }
+            
+            log.info("data.sql 실행이 완료되었습니다.");
+            
+        } catch (Exception e) {
+            log.error("data.sql 실행 중 오류 발생: {}", e.getMessage(), e);
         }
     }
 }
