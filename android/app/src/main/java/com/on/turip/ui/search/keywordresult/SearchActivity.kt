@@ -133,7 +133,14 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
 
         binding.ivSearchResultClear.setOnClickListener {
             binding.etSearchResult.text.clear()
+            binding.etSearchResult.requestFocus()
+            showKeyBoard(binding.etSearchResult)
         }
+    }
+
+    private fun showKeyBoard(editText: EditText) {
+        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT)
     }
 
     private fun setupObservers() {
@@ -194,8 +201,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
                 v.getGlobalVisibleRect(outRect)
                 if (!outRect.contains(touchX, touchY)) {
                     v.clearFocus()
-                    val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-                    imm.hideSoftInputFromWindow(v.windowToken, 0)
+                    hideKeyBoard(v)
                 }
             }
 
@@ -216,6 +222,11 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         }
 
         return super.dispatchTouchEvent(ev)
+    }
+
+    private fun hideKeyBoard(editText: EditText) {
+        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(editText.windowToken, 0)
     }
 
     companion object {
