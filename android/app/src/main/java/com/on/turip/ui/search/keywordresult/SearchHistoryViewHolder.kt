@@ -15,12 +15,12 @@ class SearchHistoryViewHolder(
     init {
         itemView.setOnClickListener {
             searchHistory?.let {
-                searchHistoryListener.onSearchHistoryItemClicked(it.keyword)
+                searchHistoryListener.onSearchHistoryItemClick(it.keyword)
             }
         }
         binding.ivSearchHistoryCancel.setOnClickListener {
             searchHistory?.let {
-                searchHistoryListener.onSearchHistoryDeleteClicked(it.keyword)
+                searchHistoryListener.onSearchHistoryDeleteClick(it.keyword)
             }
         }
     }
@@ -43,8 +43,8 @@ class SearchHistoryViewHolder(
     }
 
     interface SearchHistoryListener {
-        fun onSearchHistoryDeleteClicked(keyword: String)
+        fun onSearchHistoryDeleteClick(keyword: String)
 
-        fun onSearchHistoryItemClicked(keyword: String)
+        fun onSearchHistoryItemClick(keyword: String)
     }
 }

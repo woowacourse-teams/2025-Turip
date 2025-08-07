@@ -49,11 +49,11 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
     private val searchHistoryAdapter: SearchHistoryAdapter =
         SearchHistoryAdapter(
             object : SearchHistoryViewHolder.SearchHistoryListener {
-                override fun onSearchHistoryDeleteClicked(keyword: String) {
+                override fun onSearchHistoryDeleteClick(keyword: String) {
                     viewModel.deleteSearchHistory(keyword)
                 }
 
-                override fun onSearchHistoryItemClicked(keyword: String) {
+                override fun onSearchHistoryItemClick(keyword: String) {
                     binding.etSearchResult.setText(keyword)
                     binding.etSearchResult.setSelection(keyword.length)
 
