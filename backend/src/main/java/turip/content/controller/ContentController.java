@@ -11,9 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 import turip.content.controller.dto.response.ContentCountResponse;
 import turip.content.controller.dto.response.ContentResponse;
 import turip.content.controller.dto.response.ContentSearchResponse;
-import turip.content.controller.dto.response.ContentsByCityResponse;
-import turip.content.controller.dto.response.WeeklyPopularFavoriteContentsResponse;
 import turip.content.controller.dto.response.ContentsByRegionCategoryResponse;
+import turip.content.controller.dto.response.WeeklyPopularFavoriteContentsResponse;
 import turip.content.service.ContentService;
 
 @RestController
@@ -23,21 +22,21 @@ public class ContentController {
 
     private final ContentService contentService;
 
-    @GetMapping(value = "/count", params = "regionCategory")
+    @GetMapping("/count")
     public ResponseEntity<ContentCountResponse> readCountByRegionCategory(
             @RequestParam(name = "regionCategory") String regionCategory) {
         ContentCountResponse response = contentService.countByRegionCategory(regionCategory);
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping(value = "/count", params = "keyword")
+    @GetMapping("/keyword/count")
     public ResponseEntity<ContentCountResponse> readCountByKeyword(
             @RequestParam(name = "keyword") String keyword) {
         ContentCountResponse response = contentService.countByKeyword(keyword);
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping(params = "regionCategory")
+    @GetMapping
     public ResponseEntity<ContentsByRegionCategoryResponse> readContentsByRegionCategory(
             @RequestParam(name = "regionCategory") String regionCategory,
             @RequestParam(name = "size") Integer pageSize,
@@ -48,7 +47,7 @@ public class ContentController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping(params = "keyword")
+    @GetMapping("/keyword")
     public ResponseEntity<ContentSearchResponse> readContentsByKeyword(
             @RequestParam(name = "keyword") String keyword,
             @RequestParam(name = "size") Integer pageSize,
