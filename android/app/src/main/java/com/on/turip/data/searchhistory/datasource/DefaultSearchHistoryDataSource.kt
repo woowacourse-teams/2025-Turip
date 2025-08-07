@@ -9,7 +9,7 @@ class DefaultSearchHistoryDataSource(
     override suspend fun createSearchHistory(keyword: String): Result<Unit> =
         runCatching { dao.insertSearchHistory(SearchHistoryEntity(keyword = keyword)) }
 
-    override suspend fun getRecentSearches(limit: Int): Result<List<SearchHistoryEntity>> =
+    override suspend fun getRecentSearchHistories(limit: Int): Result<List<SearchHistoryEntity>> =
         runCatching { dao.getRecentSearchHistories(limit) }
 
     override suspend fun deleteSearch(keyword: String): Result<Unit> =

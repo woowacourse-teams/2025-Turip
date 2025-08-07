@@ -15,7 +15,7 @@ class DefaultSearchHistoryRepository(
         }
 
     override suspend fun loadRecentSearches(limit: Int): Result<List<SearchHistory>> =
-        dataSource.getRecentSearches(limit).mapCatching { it: List<SearchHistoryEntity> ->
+        dataSource.getRecentSearchHistories(limit).mapCatching { it: List<SearchHistoryEntity> ->
             it.map { it.toDomain() }
         }
 
