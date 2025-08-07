@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class RegionCategoryResponse(
     @SerialName("country")
-    val country: CountryResponse,
+    val country: CountryResponse?,
     @SerialName("regionCategoryImageUrl")
     val regionCategoryImageUrl: String,
     @SerialName("regionCategoryName")

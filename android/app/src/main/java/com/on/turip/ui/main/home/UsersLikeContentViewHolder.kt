@@ -7,6 +7,7 @@ import com.on.turip.R
 import com.on.turip.databinding.ItemUsersLikeContentBinding
 import com.on.turip.domain.content.Content
 import com.on.turip.domain.content.UsersLikeContent
+import com.on.turip.ui.common.TuripUrlConverter
 import com.on.turip.ui.common.loadRoundedCornerImage
 
 class UsersLikeContentViewHolder(
@@ -28,7 +29,7 @@ class UsersLikeContentViewHolder(
             tvUsersLikeContentRegion.text = usersLikeContent.content.city.name
             tvUsersLikeContentChannelName.text = usersLikeContent.content.creator.channelName
             ivUsersLikeContentThumbnail.loadRoundedCornerImage(
-                imageUrl = usersLikeContent.content.videoData.url,
+                imageUrl = TuripUrlConverter.convertVideoThumbnailUrl(usersLikeContent.content.videoData.url),
                 radius = 12,
             )
             tvUsersLikeContentDescription.text =
