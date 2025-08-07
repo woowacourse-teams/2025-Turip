@@ -41,6 +41,7 @@ class FavoriteItemViewHolder(
     }
 
     fun bind(favoriteContent: FavoriteContent) {
+        this.favoriteContent = favoriteContent
         val content: Content = favoriteContent.content
         val videoData: VideoData = content.videoData
         val creator: Creator = content.creator
