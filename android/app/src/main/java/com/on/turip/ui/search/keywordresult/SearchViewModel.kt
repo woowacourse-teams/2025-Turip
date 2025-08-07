@@ -94,7 +94,7 @@ class SearchViewModel(
     private fun loadSearchHistory() {
         viewModelScope.launch {
             searchHistoryRepository
-                .loadRecentSearches(10)
+                .loadRecentSearches(MAX_SEARCH_HISTORY_COUNT)
                 .onSuccess { result: List<SearchHistory> ->
                     Timber.d("최근 검색 목록 받아옴 $result")
                     _searchHistory.value = result
@@ -109,12 +109,28 @@ class SearchViewModel(
             searchHistoryRepository
                 .createSearchHistory(searchingWord.value.toString())
                 .onSuccess {
+                    addSearchHistory(
+                        SearchHistory(
+                            keyword = searchingWord.value.toString(),
+                            historyTime = System.currentTimeMillis(),
+                        ),
+                        MAX_SEARCH_HISTORY_COUNT,
+                    )
                     Timber.d("최근 검색 목록에 추가됨")
-                    loadSearchHistory()
                 }.onFailure {
                     Timber.e("${it.message}")
                 }
         }
+    }
+
+    fun addSearchHistory(
+        newItem: SearchHistory,
+        limit: Int,
+    ) {
+        val currentList = _searchHistory.value?.toMutableList()
+        val updatedList = currentList?.filterNot { it.keyword == newItem.keyword }?.toMutableList()
+        updatedList?.add(FIRST_INDEX, newItem)
+        _searchHistory.value = updatedList?.take(limit)
     }
 
     fun deleteSearchHistory(keyword: String) {
@@ -122,8 +138,8 @@ class SearchViewModel(
             searchHistoryRepository
                 .deleteSearch(keyword)
                 .onSuccess {
+                    _searchHistory.value = searchHistory.value?.filterNot { it.keyword == keyword }
                     Timber.d("${keyword}가 최근 검색 목록에서 삭제")
-                    loadSearchHistory()
                 }.onFailure {
                     Timber.e("${it.message}")
                 }
@@ -131,6 +147,9 @@ class SearchViewModel(
     }
 
     companion object {
+        private const val MAX_SEARCH_HISTORY_COUNT = 10
+        private const val FIRST_INDEX = 0
+
         fun provideFactory(
             contentRepository: ContentRepository = RepositoryModule.contentRepository,
             searchHistoryRepository: SearchHistoryRepository = RepositoryModule.searchHistoryRepository,
