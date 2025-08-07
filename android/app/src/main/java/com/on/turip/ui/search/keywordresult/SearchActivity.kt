@@ -73,6 +73,11 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         setupAdapters()
         setupOnBackPressedDispatcher()
         binding.etSearchResult.requestFocus()
+    }
+
+    private fun setupAdapters() {
+        binding.rvSearchResult.adapter = searchAdapter
+        binding.rvSearchResultSearchHistory.adapter = searchHistoryAdapter
         binding.rvSearchResult.itemAnimator = null
         binding.rvSearchResultSearchHistory.itemAnimator = null
         binding.rvSearchResultSearchHistory.addItemDecoration(
@@ -81,11 +86,6 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
                 LinearLayout.VERTICAL,
             ),
         )
-    }
-
-    private fun setupAdapters() {
-        binding.rvSearchResult.adapter = searchAdapter
-        binding.rvSearchResultSearchHistory.adapter = searchHistoryAdapter
     }
 
     private fun setupToolbar() {
