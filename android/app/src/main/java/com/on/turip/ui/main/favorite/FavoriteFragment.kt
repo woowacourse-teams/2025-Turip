@@ -70,6 +70,7 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>() {
     private fun setupAdapters() {
         binding.rvFavoriteContent.apply {
             adapter = favoriteItemAdapter
+            itemAnimator = null
             addItemDecoration(
                 ItemDividerDecoration(
                     height = 8,
@@ -109,6 +110,13 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>() {
     override fun onResume() {
         super.onResume()
         viewModel.loadFavoriteContents()
+    }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (!hidden) {
+            viewModel.loadFavoriteContents()
+        }
     }
 
     companion object {

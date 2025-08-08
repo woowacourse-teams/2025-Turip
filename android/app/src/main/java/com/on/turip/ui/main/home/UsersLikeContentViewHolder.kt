@@ -6,9 +6,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.on.turip.R
 import com.on.turip.databinding.ItemUsersLikeContentBinding
 import com.on.turip.domain.content.Content
-import com.on.turip.domain.content.UsersLikeContent
 import com.on.turip.ui.common.TuripUrlConverter
 import com.on.turip.ui.common.loadRoundedCornerImage
+import com.on.turip.ui.common.model.trip.toDisplayText
 
 class UsersLikeContentViewHolder(
     private val binding: ItemUsersLikeContentBinding,
@@ -22,7 +22,7 @@ class UsersLikeContentViewHolder(
         }
     }
 
-    fun bind(usersLikeContent: UsersLikeContent) {
+    fun bind(usersLikeContent: UsersLikeContentModel) {
         this.content = usersLikeContent.content
         binding.apply {
             tvUsersLikeContentTitle.text = usersLikeContent.content.videoData.title
@@ -36,11 +36,7 @@ class UsersLikeContentViewHolder(
                 itemView.context.getString(
                     R.string.all_video_description,
                     usersLikeContent.content.videoData.uploadedDate,
-                    itemView.context.getString(
-                        R.string.all_travel_duration,
-                        usersLikeContent.tripDuration.nights,
-                        usersLikeContent.tripDuration.days,
-                    ),
+                    usersLikeContent.tripDuration.toDisplayText(itemView.context),
                 )
         }
     }

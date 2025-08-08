@@ -12,6 +12,7 @@ import com.on.turip.domain.content.UsersLikeContent
 import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.region.RegionCategory
 import com.on.turip.domain.region.repository.RegionRepository
+import com.on.turip.ui.common.mapper.toUiModel
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -25,9 +26,9 @@ class HomeViewModel(
     private val _isSelectedDomestic: MutableLiveData<Boolean> = MutableLiveData()
     val isSelectedDomestic: LiveData<Boolean> get() = _isSelectedDomestic
 
-    private val _usersLikeContents: MutableLiveData<List<UsersLikeContent>> =
+    private val _usersLikeContents: MutableLiveData<List<UsersLikeContentModel>> =
         MutableLiveData()
-    val usersLikeContents: LiveData<List<UsersLikeContent>> get() = _usersLikeContents
+    val usersLikeContents: LiveData<List<UsersLikeContentModel>> get() = _usersLikeContents
 
     init {
         loadUsersLikeContents()
@@ -39,10 +40,10 @@ class HomeViewModel(
             contentRepository
                 .loadPopularFavoriteContents()
                 .onSuccess { contents: List<UsersLikeContent> ->
-                    _usersLikeContents.value = contents
-                    Timber.d("$contents")
+                    _usersLikeContents.value = contents.map { it.toUiModel() }
+                    Timber.d("인기 찜 목록: $contents")
                 }.onFailure {
-                    Timber.e("${it.message}")
+                    Timber.e("인기 찜 목록 실패: ${it.message}")
                 }
         }
     }
@@ -54,9 +55,9 @@ class HomeViewModel(
                 .onSuccess { regionCategories: List<RegionCategory> ->
                     _regionCategories.value = regionCategories
                     _isSelectedDomestic.value = isDomestic
-                    Timber.d("$regionCategories")
+                    Timber.d("지역 카테고리 조회: $regionCategories")
                 }.onFailure {
-                    Timber.e("${it.message}")
+                    Timber.e("지역 카테고리 조회 실패: ${it.message}")
                 }
         }
     }
