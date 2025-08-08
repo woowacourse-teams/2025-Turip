@@ -30,7 +30,7 @@ class FavoriteViewModel(
             favoriteRepository
                 .loadFavoriteContents(10, 0L)
                 .onSuccess {
-                    Timber.e("찜 목록 데이터 조회 성공")
+                    Timber.d("찜 목록 데이터 조회 성공")
                     _favoriteContents.value = it.favoriteContents
                 }.onFailure {
                     Timber.e("찜 목록 데이터 조회 에러 발생")

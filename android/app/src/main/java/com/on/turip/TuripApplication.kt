@@ -1,6 +1,7 @@
 package com.on.turip
 
 import android.app.Application
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.on.turip.common.TuripDebugTree
 import com.on.turip.common.TuripReleaseTree
 import com.on.turip.data.initializer.FirebaseInstallationsInitializer
@@ -11,6 +12,8 @@ import timber.log.Timber
 class TuripApplication : Application() {
     override fun onCreate() {
         super.onCreate()
+
+        FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(!BuildConfig.DEBUG)
 
         if (BuildConfig.DEBUG) {
             Timber.plant(TuripDebugTree())
