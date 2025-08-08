@@ -13,11 +13,7 @@ class TuripApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
-        Thread.setDefaultUncaughtExceptionHandler { thread, exception ->
-            FirebaseCrashlytics.getInstance().isCrashlyticsCollectionEnabled = !BuildConfig.DEBUG
-            defaultHandler?.uncaughtException(thread, exception)
-        }
+        FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(!BuildConfig.DEBUG)
 
         if (BuildConfig.DEBUG) {
             Timber.plant(TuripDebugTree())
