@@ -1,0 +1,18 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:database
+
+  h2:
+    console:
+      enabled: true
+
+  sql:
+    init:
+      mode: always
+      data-locations:
+        - classpath:Region/region_data.sql
+        - classpath:Creator/creator_data.sql
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop

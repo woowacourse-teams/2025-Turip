@@ -1,24 +1,10 @@
 spring:
-  h2:
-    console:
-      enabled: true
-
-  datasource:
-    url: jdbc:h2:mem:database
-
-  sql:
-    init:
-      mode: always
-      data-locations:
-        - classpath:Region/region_data.sql
-        - classpath:Creator/creator_data.sql
-
+  profiles:
+    active: dev
 
   jpa:
     show-sql: true
     properties:
       hibernate:
         format_sql: true
-    hibernate:
-      ddl-auto: create-drop
     defer-datasource-initialization: true
