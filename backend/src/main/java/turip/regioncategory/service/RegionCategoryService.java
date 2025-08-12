@@ -20,8 +20,8 @@ public class RegionCategoryService {
     private static final String KOREA_COUNTRY_NAME = "대한민국";
     private static final String DOMESTIC_ETC_NAME = "국내 기타";
     private static final String OVERSEAS_ETC_NAME = "해외 기타";
-    private static final String DOMESTIC_ETC_IMAGE_URL = "https://drive.google.com/uc?export=view&id=1NLfO_raehCOaO_6I3TIUKL9mF4bPQw2C";
-    private static final String OVERSEAS_ETC_IMAGE_URL = "https://drive.google.com/uc?export=view&id=10Ci4DNJ9yG0USvdmlLwpx9soUoKRoy2f";
+    private static final String DOMESTIC_ETC_IMAGE_URL = "https://techcourse-project-2025.s3.ap-northeast-2.amazonaws.com/turip/domestic/otherDomestic.jpeg";
+    private static final String OVERSEAS_ETC_IMAGE_URL = "https://techcourse-project-2025.s3.ap-northeast-2.amazonaws.com/turip/overseas/otherAbroad.jpeg";
 
     private final CityService cityService;
     private final CountryService countryService;
