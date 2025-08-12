@@ -1,6 +1,6 @@
 [versions]
 versionName = "1.1.0"
-versionCode = "110"
+versionCode = "111"
 roomRuntime = "2.7.2"
 datastorePreferences = "1.1.7"
 firebaseInstallations = "19.0.0"
