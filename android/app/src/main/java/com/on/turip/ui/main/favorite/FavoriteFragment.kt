@@ -144,6 +144,7 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>() {
             사용자의 튜립 앱 버전: ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})
             사용자의 OS: Android ${Build.VERSION.RELEASE} (SDK ${Build.VERSION.SDK_INT})
             사용자 기기: ${Build.MANUFACTURER} ${Build.MODEL}
+            사용자 device id: ${Build.MANUFACTURER} ${Build.MODEL}
             """.trimIndent()
     }
 }
