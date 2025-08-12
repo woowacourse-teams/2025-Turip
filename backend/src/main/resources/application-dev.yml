@@ -16,3 +16,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create-drop
+
+logging:
+  level:
+    root: INFO
