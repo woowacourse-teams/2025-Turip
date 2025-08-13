@@ -23,7 +23,7 @@ public class ContentPlaceApiTest {
     @BeforeEach
     void setUp() {
         jdbcTemplate.update("DELETE FROM place_category");
-        jdbcTemplate.update("DELETE FROM trip_course");
+        jdbcTemplate.update("DELETE FROM content_place");
         jdbcTemplate.update("DELETE FROM place");
         jdbcTemplate.update("DELETE FROM category");
         jdbcTemplate.update("DELETE FROM favorite");
@@ -34,7 +34,7 @@ public class ContentPlaceApiTest {
         jdbcTemplate.update("DELETE FROM country");
         jdbcTemplate.update("DELETE FROM province");
 
-        jdbcTemplate.update("ALTER TABLE trip_course ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE content_place ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE place ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE content ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE creator ALTER COLUMN id RESTART WITH 1");
@@ -72,14 +72,14 @@ public class ContentPlaceApiTest {
             jdbcTemplate.update(
                     "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 1, 'https://youtube.com/watch?v=abcd1', '서촌 당일치기 코스 추천', '2025-06-18')");
             jdbcTemplate.update(
-                    "INSERT INTO trip_course (content_id, place_id, visit_day, visit_order) VALUES (1, 1, 1, 1)");
+                    "INSERT INTO content_place (content_id, place_id, visit_day, visit_order, time_line) VALUES (1, 1, 1, 1, '00:11:00')");
             jdbcTemplate.update(
-                    "INSERT INTO trip_course (content_id, place_id, visit_day, visit_order) VALUES (1, 2, 2, 1)");
+                    "INSERT INTO content_place (content_id, place_id, visit_day, visit_order, time_line) VALUES (1, 2, 2, 1, '00:12:00')");
 
             // when & then
             RestAssured.given().port(port)
                     .queryParam("contentId", "1")
-                    .when().get("/trip-courses")
+                    .when().get("/content-places")
                     .then()
                     .statusCode(200)
                     .body("contentPlaceCount", is(2));
