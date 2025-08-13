@@ -1,4 +1,4 @@
-package turip.tripcourse.domain;
+package turip.contentplace.domain;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -16,7 +16,7 @@ import turip.place.domain.Place;
 @Entity
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class TripCourse {
+public class ContentPlace {
 
     @Id
     @EqualsAndHashCode.Include
@@ -33,7 +33,7 @@ public class TripCourse {
     @ManyToOne
     private Content content;
 
-    public TripCourse(int visitDay, int visitOrder, Place place, Content content) {
+    public ContentPlace(int visitDay, int visitOrder, Place place, Content content) {
         this.visitDay = visitDay;
         this.visitOrder = visitOrder;
         this.place = place;

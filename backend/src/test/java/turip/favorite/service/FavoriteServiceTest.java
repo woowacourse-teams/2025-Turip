@@ -22,6 +22,7 @@ import turip.city.domain.City;
 import turip.content.controller.dto.response.MyFavoriteContentsResponse;
 import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
+import turip.contentplace.service.ContentPlaceService;
 import turip.creator.domain.Creator;
 import turip.exception.custom.BadRequestException;
 import turip.exception.custom.NotFoundException;
@@ -31,7 +32,6 @@ import turip.favorite.domain.Favorite;
 import turip.favorite.repository.FavoriteRepository;
 import turip.member.domain.Member;
 import turip.member.repository.MemberRepository;
-import turip.tripcourse.service.TripCourseService;
 
 @ExtendWith(MockitoExtension.class)
 class FavoriteServiceTest {
@@ -49,7 +49,7 @@ class FavoriteServiceTest {
     private ContentRepository contentRepository;
 
     @Mock
-    private TripCourseService tripCourseService;
+    private ContentPlaceService contentPlaceService;
 
     @DisplayName("찜을 생성할 수 있다")
     @Test
@@ -121,7 +121,7 @@ class FavoriteServiceTest {
         assertThatThrownBy(() -> favoriteService.create(request, deviceFid))
                 .isInstanceOf(BadRequestException.class);
     }
-    
+
     @DisplayName("내 찜 목록을 페이징 조회할 수 있다")
     @Test
     void findMyFavoriteContents() {
@@ -138,9 +138,9 @@ class FavoriteServiceTest {
 
         given(favoriteRepository.findMyFavoriteContentsByDeviceFid(eq(deviceFid), eq(Long.MAX_VALUE), any()))
                 .willReturn(new SliceImpl<>(contents));
-        given(tripCourseService.calculateDurationDays(1L))
+        given(contentPlaceService.calculateDurationDays(1L))
                 .willReturn(2); // content1 1박 2일
-        given(tripCourseService.calculateDurationDays(2L))
+        given(contentPlaceService.calculateDurationDays(2L))
                 .willReturn(3); // content2 2박 3일
 
         MyFavoriteContentsResponse response = favoriteService.findMyFavoriteContents(deviceFid, pageSize,

@@ -24,16 +24,16 @@ import turip.content.controller.dto.response.ContentSearchResponse;
 import turip.content.controller.dto.response.WeeklyPopularFavoriteContentsResponse;
 import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
+import turip.contentplace.service.ContentPlaceService;
 import turip.country.domain.Country;
 import turip.creator.domain.Creator;
+import turip.exception.custom.BadRequestException;
 import turip.favorite.domain.Favorite;
 import turip.favorite.repository.FavoriteRepository;
 import turip.member.domain.Member;
 import turip.member.repository.MemberRepository;
-import turip.exception.custom.BadRequestException;
 import turip.regioncategory.domain.DomesticRegionCategory;
 import turip.regioncategory.domain.OverseasRegionCategory;
-import turip.tripcourse.service.TripCourseService;
 
 @ExtendWith(MockitoExtension.class)
 class ContentServiceTest {
@@ -45,7 +45,7 @@ class ContentServiceTest {
     private ContentRepository contentRepository;
 
     @Mock
-    private TripCourseService tripCourseService;
+    private ContentPlaceService contentPlaceService;
 
     @Mock
     private FavoriteRepository favoriteRepository;
@@ -115,9 +115,9 @@ class ContentServiceTest {
             given(favoriteRepository.findByMemberIdAndContentIdIn(1L, List.of(1L, 2L)))
                     .willReturn(List.of(new Favorite(LocalDate.now().minusWeeks(1), member, content1),
                             new Favorite(LocalDate.now().minusWeeks(1), member, content2)));
-            given(tripCourseService.calculateDurationDays(content1.getId()))
+            given(contentPlaceService.calculateDurationDays(content1.getId()))
                     .willReturn(3); // content1, 2박 3일
-            given(tripCourseService.calculateDurationDays(content2.getId()))
+            given(contentPlaceService.calculateDurationDays(content2.getId()))
                     .willReturn(2); // content2, 1박 2일
 
             // when

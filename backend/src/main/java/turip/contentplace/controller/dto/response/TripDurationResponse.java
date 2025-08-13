@@ -1,4 +1,4 @@
-package turip.tripcourse.controller.dto.response;
+package turip.contentplace.controller.dto.response;
 
 public record TripDurationResponse(
         int nights,

@@ -27,14 +27,14 @@ import turip.content.controller.dto.response.WeeklyPopularFavoriteContentRespons
 import turip.content.controller.dto.response.WeeklyPopularFavoriteContentsResponse;
 import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
+import turip.contentplace.service.ContentPlaceService;
+import turip.exception.custom.BadRequestException;
+import turip.exception.custom.NotFoundException;
 import turip.favorite.repository.FavoriteRepository;
 import turip.member.domain.Member;
 import turip.member.repository.MemberRepository;
-import turip.exception.custom.BadRequestException;
-import turip.exception.custom.NotFoundException;
 import turip.regioncategory.domain.DomesticRegionCategory;
 import turip.regioncategory.domain.OverseasRegionCategory;
-import turip.tripcourse.service.TripCourseService;
 
 @Service
 @RequiredArgsConstructor
@@ -45,7 +45,7 @@ public class ContentService {
     private static final int ONE_WEEK = 1;
 
     private final ContentRepository contentRepository;
-    private final TripCourseService tripCourseService;
+    private final ContentPlaceService contentPlaceService;
     private final MemberRepository memberRepository;
     private final FavoriteRepository favoriteRepository;
 
@@ -231,7 +231,7 @@ public class ContentService {
     private ContentDetailsByRegionCategoryResponse toContentDetailsByRegionResponse(Content content) {
         ContentByCityResponse contentWithCity = ContentByCityResponse.from(content);
         TripDurationResponse tripDuration = calculateTripDuration(content);
-        int tripPlaceCount = tripCourseService.countByContentId(content.getId());
+        int tripPlaceCount = contentPlaceService.countByContentId(content.getId());
 
         return ContentDetailsByRegionCategoryResponse.of(contentWithCity, tripDuration, tripPlaceCount);
     }
@@ -243,7 +243,7 @@ public class ContentService {
     }
 
     private ContentWithTripInfoResponse toContentSearchResultResponse(Content content) {
-        int placeCount = tripCourseService.countByContentId(content.getId());
+        int placeCount = contentPlaceService.countByContentId(content.getId());
 
         return ContentWithTripInfoResponse.of(
                 ContentWithCreatorAndCityResponse.from(content),
@@ -253,7 +253,7 @@ public class ContentService {
     }
 
     private TripDurationResponse calculateTripDuration(Content content) {
-        int totalTripDay = tripCourseService.calculateDurationDays(content.getId());
+        int totalTripDay = contentPlaceService.calculateDurationDays(content.getId());
         return TripDurationResponse.of(totalTripDay - 1, totalTripDay);
     }
 

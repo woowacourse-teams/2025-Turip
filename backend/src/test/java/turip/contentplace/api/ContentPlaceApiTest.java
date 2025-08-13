@@ -1,4 +1,4 @@
-package turip.tripcourse.api;
+package turip.contentplace.api;
 
 import static org.hamcrest.Matchers.is;
 
@@ -13,7 +13,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class TripCourseApiTest {
+public class ContentPlaceApiTest {
 
     @LocalServerPort
     private int port;
@@ -33,7 +33,7 @@ public class TripCourseApiTest {
         jdbcTemplate.update("DELETE FROM city");
         jdbcTemplate.update("DELETE FROM country");
         jdbcTemplate.update("DELETE FROM province");
-        
+
         jdbcTemplate.update("ALTER TABLE trip_course ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE place ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE content ALTER COLUMN id RESTART WITH 1");
@@ -47,11 +47,11 @@ public class TripCourseApiTest {
 
     @DisplayName("/trip-courses GET 여행 상세 조회 테스트")
     @Nested
-    class ReadTripCourse {
+    class ReadContentPlace {
 
         @DisplayName("성공 시 200 OK 코드와 여행 상세 정보를 응답한다")
         @Test
-        void readTripCourseDetails() {
+        void readContentPlaceDetails() {
             // given
             jdbcTemplate.update(
                     "INSERT INTO creator (profile_image, channel_name) VALUES ('https://image.example.com/creator1.jpg', 'TravelMate')");
@@ -82,7 +82,7 @@ public class TripCourseApiTest {
                     .when().get("/trip-courses")
                     .then()
                     .statusCode(200)
-                    .body("tripPlaceCount", is(2));
+                    .body("contentPlaceCount", is(2));
         }
     }
 }

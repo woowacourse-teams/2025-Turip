@@ -13,6 +13,7 @@ import turip.content.controller.dto.response.MyFavoriteContentsResponse;
 import turip.content.controller.dto.response.TripDurationResponse;
 import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
+import turip.contentplace.service.ContentPlaceService;
 import turip.exception.custom.BadRequestException;
 import turip.exception.custom.NotFoundException;
 import turip.favorite.controller.dto.request.FavoriteRequest;
@@ -21,7 +22,6 @@ import turip.favorite.domain.Favorite;
 import turip.favorite.repository.FavoriteRepository;
 import turip.member.domain.Member;
 import turip.member.repository.MemberRepository;
-import turip.tripcourse.service.TripCourseService;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +30,7 @@ public class FavoriteService {
     private final FavoriteRepository favoriteRepository;
     private final MemberRepository memberRepository;
     private final ContentRepository contentRepository;
-    private final TripCourseService tripCourseService;
+    private final ContentPlaceService contentPlaceService;
 
     @Transactional
     public FavoriteResponse create(FavoriteRequest request, String deviceFid) {
@@ -80,7 +80,7 @@ public class FavoriteService {
     }
 
     private TripDurationResponse calculateTripDuration(Content content) {
-        int totalTripDay = tripCourseService.calculateDurationDays(content.getId());
+        int totalTripDay = contentPlaceService.calculateDurationDays(content.getId());
         return TripDurationResponse.of(totalTripDay - 1, totalTripDay);
     }
 
@@ -89,7 +89,7 @@ public class FavoriteService {
                 .map(content -> {
                     ContentResponse contentWithCreatorAndCity = ContentResponse.of(content, true);
                     TripDurationResponse tripDuration = calculateTripDuration(content);
-                    int tripPlaceCount = tripCourseService.countByContentId(content.getId());
+                    int tripPlaceCount = contentPlaceService.countByContentId(content.getId());
                     return ContentWithTripInfoAndFavoriteResponse.of(contentWithCreatorAndCity, tripDuration,
                             tripPlaceCount);
                 })
