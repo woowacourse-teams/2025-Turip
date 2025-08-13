@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -68,12 +70,16 @@ class ContentPlaceServiceTest {
         );
         place2.addCategory(new Category("빵집"));
         place2.addCategory(new Category("카페"));
-        ContentPlace firstDayCourse = new ContentPlace(firstVisitDay, visitOrder, place1, null);
-        ContentPlace secondDayCourse = new ContentPlace(secondVisitDay, visitOrder, place2, null);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("mm:ss");
+        LocalTime firstDayTimeLine = LocalTime.parse("11:30", formatter);
+        LocalTime secondDayTimeLine = LocalTime.parse("13:30", formatter);
+        ContentPlace firstContentPlace = new ContentPlace(firstVisitDay, visitOrder, firstDayTimeLine, place1, null);
+        ContentPlace secondContentPlace = new ContentPlace(secondVisitDay, visitOrder, secondDayTimeLine, place2, null);
 
         // when
         given(contentPlaceRepository.findAllByContent_Id(contentId))
-                .willReturn(List.of(firstDayCourse, secondDayCourse));
+                .willReturn(List.of(firstContentPlace, secondContentPlace));
         ContentPlaceDetailResponse response = contentPlaceService.findContentPlaceDetails(contentId);
 
         // then
@@ -93,12 +99,16 @@ class ContentPlaceServiceTest {
             int visitOrder = 1;
             long contentId = 1L;
 
-            ContentPlace firstDayCourse = new ContentPlace(firstVisitDay, visitOrder, null, null);
-            ContentPlace secondDayCourse = new ContentPlace(secondVisitDay, visitOrder, null, null);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("mm:ss");
+            LocalTime firstDayTimeLine = LocalTime.parse("11:30", formatter);
+            LocalTime secondDayTimeLine = LocalTime.parse("13:30", formatter);
+            ContentPlace firstContentPlace = new ContentPlace(firstVisitDay, visitOrder, firstDayTimeLine, null, null);
+            ContentPlace secondContentPlace = new ContentPlace(secondVisitDay, visitOrder, secondDayTimeLine, null,
+                    null);
 
             // when
             given(contentPlaceRepository.findAllByContent_Id(contentId))
-                    .willReturn(List.of(firstDayCourse, secondDayCourse));
+                    .willReturn(List.of(firstContentPlace, secondContentPlace));
 
             // then
             assertThat(contentPlaceService.calculateDurationDays(contentId))
