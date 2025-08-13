@@ -64,24 +64,24 @@ public class CsvDataInitializer implements CommandLineRunner {
     private void executeDataSql() {
         try {
             log.info("data.sql 실행을 시작합니다.");
-            
+
             // data.sql 파일 읽기
             Resource dataSqlResource = new PathMatchingResourcePatternResolver()
                     .getResource("classpath:data.sql");
-            
+
             if (!dataSqlResource.exists()) {
                 log.warn("data.sql 파일을 찾을 수 없습니다.");
                 return;
             }
 
             String sqlContent = StreamUtils.copyToString(
-                    dataSqlResource.getInputStream(), 
+                    dataSqlResource.getInputStream(),
                     StandardCharsets.UTF_8
             );
 
             // SQL 문장들을 세미콜론으로 분리하여 실행
             String[] sqlStatements = sqlContent.split(";");
-            
+
             for (String sql : sqlStatements) {
                 sql = sql.trim();
                 if (!sql.isEmpty()) {
@@ -94,9 +94,9 @@ public class CsvDataInitializer implements CommandLineRunner {
                     }
                 }
             }
-            
+
             log.info("data.sql 실행이 완료되었습니다.");
-            
+
         } catch (Exception e) {
             log.error("data.sql 실행 중 오류 발생: {}", e.getMessage(), e);
         }

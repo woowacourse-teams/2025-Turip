@@ -1,4 +1,4 @@
-package turip.favorite.repository;
+package turip.favoritecontent.repository;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -9,17 +9,17 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import turip.content.domain.Content;
-import turip.favorite.domain.Favorite;
+import turip.favoritecontent.domain.FavoriteContent;
 
-public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
+public interface FavoriteContentRepository extends JpaRepository<FavoriteContent, Long> {
 
     boolean existsByMemberIdAndContentId(Long memberId, Long contentId);
 
-    Optional<Favorite> findByMemberIdAndContentId(Long memberId, Long contentId);
+    Optional<FavoriteContent> findByMemberIdAndContentId(Long memberId, Long contentId);
 
     @Query(value = """
             SELECT c.*
-            FROM favorite f
+            FROM favorite_content f
             JOIN content c ON f.content_id = c.id
             WHERE f.created_at BETWEEN :startDate AND :endDate
             GROUP BY f.content_id
@@ -32,11 +32,11 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
             @Param("topContentSize") int topContentSize
     );
 
-    List<Favorite> findByMemberIdAndContentIdIn(Long memberId, List<Long> contentIds);
+    List<FavoriteContent> findByMemberIdAndContentIdIn(Long memberId, List<Long> contentIds);
 
     @Query("""
                 SELECT f.content
-                FROM Favorite f
+                FROM FavoriteContent f
                 JOIN f.member m
                 WHERE m.deviceFid = :deviceFid
                   AND f.content.id < :lastContentId

@@ -27,11 +27,11 @@ import turip.content.controller.dto.response.WeeklyPopularFavoriteContentRespons
 import turip.content.controller.dto.response.WeeklyPopularFavoriteContentsResponse;
 import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
-import turip.favorite.repository.FavoriteRepository;
-import turip.member.domain.Member;
-import turip.member.repository.MemberRepository;
 import turip.exception.custom.BadRequestException;
 import turip.exception.custom.NotFoundException;
+import turip.favoritecontent.repository.FavoriteContentRepository;
+import turip.member.domain.Member;
+import turip.member.repository.MemberRepository;
 import turip.regioncategory.domain.DomesticRegionCategory;
 import turip.regioncategory.domain.OverseasRegionCategory;
 import turip.tripcourse.service.TripCourseService;
@@ -47,7 +47,7 @@ public class ContentService {
     private final ContentRepository contentRepository;
     private final TripCourseService tripCourseService;
     private final MemberRepository memberRepository;
-    private final FavoriteRepository favoriteRepository;
+    private final FavoriteContentRepository favoriteContentRepository;
 
     public ContentResponse getContentWithFavoriteStatus(Long contentId, String deviceFid) {
         Content content = contentRepository.findById(contentId)
@@ -56,7 +56,7 @@ public class ContentService {
             return ContentResponse.of(content, false);
         }
         boolean isFavorite = memberRepository.findByDeviceFid(deviceFid)
-                .map(member -> favoriteRepository.existsByMemberIdAndContentId(member.getId(), content.getId()))
+                .map(member -> favoriteContentRepository.existsByMemberIdAndContentId(member.getId(), content.getId()))
                 .orElse(false);
 
         return ContentResponse.of(content, isFavorite);
@@ -88,7 +88,7 @@ public class ContentService {
         LocalDate startDate = lastWeekPeriod.getFirst();
         LocalDate endDate = lastWeekPeriod.getLast();
 
-        List<Content> popularContents = favoriteRepository.findPopularContentsByFavoriteBetweenDatesWithLimit(
+        List<Content> popularContents = favoriteContentRepository.findPopularContentsByFavoriteBetweenDatesWithLimit(
                 startDate, endDate, topContentSize);
         if (deviceFid == null) {
             return convertContentsToPopularContentsResponse(popularContents, false);
@@ -268,7 +268,7 @@ public class ContentService {
         List<Long> contentIds = contents.stream()
                 .map(Content::getId)
                 .toList();
-        return favoriteRepository.findByMemberIdAndContentIdIn(member.getId(), contentIds).stream()
+        return favoriteContentRepository.findByMemberIdAndContentIdIn(member.getId(), contentIds).stream()
                 .map(favorite -> favorite.getContent().getId())
                 .collect(Collectors.toSet());
     }
