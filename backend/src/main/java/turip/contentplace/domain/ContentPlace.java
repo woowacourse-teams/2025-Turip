@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import turip.content.domain.Content;
 import turip.place.domain.Place;
+import java.time.LocalTime;
 
 @Getter
 @Entity
@@ -27,15 +28,18 @@ public class ContentPlace {
 
     private int visitOrder;
 
+    private LocalTime timeLine;
+
     @ManyToOne
     private Place place;
 
     @ManyToOne
     private Content content;
 
-    public ContentPlace(int visitDay, int visitOrder, Place place, Content content) {
+    public ContentPlace(int visitDay, int visitOrder, LocalTime timeLine, Place place, Content content) {
         this.visitDay = visitDay;
         this.visitOrder = visitOrder;
+        this.timeLine = timeLine;
         this.place = place;
         this.content = content;
     }
