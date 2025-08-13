@@ -38,7 +38,7 @@ public class FavoriteContentController {
     )
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = "200",
+                    responseCode = "201",
                     description = "성공 예시",
                     content = @Content(
                             mediaType = "application/json",
@@ -200,7 +200,7 @@ public class FavoriteContentController {
     )
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = "200",
+                    responseCode = "204",
                     description = "성공 예시"
             ),
             @ApiResponse(
