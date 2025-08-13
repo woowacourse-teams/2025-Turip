@@ -27,7 +27,7 @@ class FavoriteApiTest {
     @BeforeEach
     void setUp() {
         jdbcTemplate.update("DELETE FROM place_category");
-        jdbcTemplate.update("DELETE FROM trip_course");
+        jdbcTemplate.update("DELETE FROM content_place");
         jdbcTemplate.update("DELETE FROM place");
         jdbcTemplate.update("DELETE FROM category");
         jdbcTemplate.update("DELETE FROM favorite");
@@ -38,7 +38,7 @@ class FavoriteApiTest {
         jdbcTemplate.update("DELETE FROM country");
         jdbcTemplate.update("DELETE FROM province");
 
-        jdbcTemplate.update("ALTER TABLE trip_course ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE content_place ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE place_category ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE place ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE creator ALTER COLUMN id RESTART WITH 1");
@@ -78,9 +78,9 @@ class FavoriteApiTest {
             jdbcTemplate.update(
                     "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 1, 'https://youtube.com/watch?v=abcd1', '서촌 당일치기 코스 추천', '2025-06-18')");
             jdbcTemplate.update(
-                    "INSERT INTO trip_course (content_id, place_id, visit_day, visit_order) VALUES (1, 1, 1, 1)");
+                    "INSERT INTO content_place (content_id, place_id, visit_day, visit_order) VALUES (1, 1, 1, 1)");
             jdbcTemplate.update(
-                    "INSERT INTO trip_course (content_id, place_id, visit_day, visit_order) VALUES (1, 2, 2, 1)");
+                    "INSERT INTO content_place (content_id, place_id, visit_day, visit_order) VALUES (1, 2, 2, 1)");
 
             // when & then
             Map<String, String> request = new HashMap<>(Map.of("contentId", "1"));
@@ -114,7 +114,7 @@ class FavoriteApiTest {
             jdbcTemplate.update(
                     "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 1, 'https://youtube.com/watch?v=test123', '서울 여행', '2025-06-01')");
             jdbcTemplate.update(
-                    "INSERT INTO trip_course (content_id, place_id, visit_day, visit_order) VALUES (1, 1, 1, 1)");
+                    "INSERT INTO content_place (content_id, place_id, visit_day, visit_order) VALUES (1, 1, 1, 1)");
             jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('testDeviceFid')");
             jdbcTemplate.update(
                     "INSERT INTO favorite (member_id, content_id, created_at) VALUES (1, 1, CURRENT_TIMESTAMP)");
@@ -145,7 +145,7 @@ class FavoriteApiTest {
             jdbcTemplate.update(
                     "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 1, 'https://youtube.com/watch?v=test123', '서울 여행', '2025-06-01')");
             jdbcTemplate.update(
-                    "INSERT INTO trip_course (content_id, place_id, visit_day, visit_order) VALUES (1, 1, 1, 1)");
+                    "INSERT INTO content_place (content_id, place_id, visit_day, visit_order) VALUES (1, 1, 1, 1)");
             jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('testDeviceFid')");
             jdbcTemplate.update(
                     "INSERT INTO favorite (member_id, content_id, created_at) VALUES (1, 1, CURRENT_TIMESTAMP)");
@@ -279,7 +279,7 @@ class FavoriteApiTest {
             jdbcTemplate.update(
                     "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('장소1','https://naver.me/place1','주소1',37.5,127.0)");
             jdbcTemplate.update(
-                    "INSERT INTO trip_course (content_id, place_id, visit_day, visit_order) VALUES (1, 1, 1, 1)");
+                    "INSERT INTO content_place (content_id, place_id, visit_day, visit_order) VALUES (1, 1, 1, 1)");
 
             // when & then
             RestAssured.given().port(port)

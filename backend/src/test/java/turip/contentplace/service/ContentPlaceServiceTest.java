@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -71,9 +70,8 @@ class ContentPlaceServiceTest {
         place2.addCategory(new Category("빵집"));
         place2.addCategory(new Category("카페"));
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("mm:ss");
-        LocalTime firstDayTimeLine = LocalTime.parse("11:30", formatter);
-        LocalTime secondDayTimeLine = LocalTime.parse("13:30", formatter);
+        LocalTime firstDayTimeLine = LocalTime.parse("00:11:30");
+        LocalTime secondDayTimeLine = LocalTime.parse("00:13:30");
         ContentPlace firstContentPlace = new ContentPlace(firstVisitDay, visitOrder, firstDayTimeLine, place1, null);
         ContentPlace secondContentPlace = new ContentPlace(secondVisitDay, visitOrder, secondDayTimeLine, place2, null);
 
@@ -99,9 +97,8 @@ class ContentPlaceServiceTest {
             int visitOrder = 1;
             long contentId = 1L;
 
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("mm:ss");
-            LocalTime firstDayTimeLine = LocalTime.parse("11:30", formatter);
-            LocalTime secondDayTimeLine = LocalTime.parse("13:30", formatter);
+            LocalTime firstDayTimeLine = LocalTime.parse("11:30");
+            LocalTime secondDayTimeLine = LocalTime.parse("13:30");
             ContentPlace firstContentPlace = new ContentPlace(firstVisitDay, visitOrder, firstDayTimeLine, null, null);
             ContentPlace secondContentPlace = new ContentPlace(secondVisitDay, visitOrder, secondDayTimeLine, null,
                     null);
