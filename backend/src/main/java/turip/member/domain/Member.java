@@ -10,13 +10,18 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+import turip.domain.TimeStamp;
 
 @Getter
 @Entity
 @AllArgsConstructor
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Member {
+@SQLRestriction("deleted_at is Null")
+@SQLDelete(sql = "UPDATE member SET deleted_at = NOW() WHERE id = ?")
+public class Member extends TimeStamp {
 
     @Id
     @EqualsAndHashCode.Include
