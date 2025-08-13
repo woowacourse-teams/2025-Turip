@@ -144,7 +144,7 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
     private fun showWebViewErrorView() {
         runOnUiThread {
             binding.wvTripDetailVideo.visibility = View.GONE
-            binding.tvTripDetailVideoError.visibility = View.VISIBLE
+            binding.clTripDetailVideoError.visibility = View.VISIBLE
         }
     }
 
@@ -157,7 +157,7 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
     }
 
     private fun setupListeners() {
-        binding.tvTripDetailVideoError.setOnClickListener {
+        binding.clTripDetailVideoError.setOnClickListener {
             val intent: Intent =
                 Intent(
                     Intent.ACTION_VIEW,

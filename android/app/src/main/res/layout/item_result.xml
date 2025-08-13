@@ -72,15 +72,41 @@
         tools:text="제주" />
 
     <ImageView
-        android:id="@+id/iv_result_location"
+        android:id="@+id/iv_result_calendar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:contentDescription="@null"
-        android:src="@drawable/ic_location"
-        app:layout_constraintBottom_toTopOf="@id/iv_result_calendar"
+        android:src="@drawable/ic_calendar"
+        app:layout_constraintBottom_toTopOf="@id/iv_result_location"
         app:layout_constraintStart_toEndOf="@id/iv_result_video_thumbnail"
         app:layout_constraintTop_toTopOf="@id/iv_result_video_thumbnail"
+        app:tint="@color/gray_200_c1c1c1" />
+
+    <TextView
+        android:id="@+id/tv_result_day"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:gravity="start"
+        android:textAppearance="@style/info1"
+        android:textColor="@color/pure_black_151515"
+        app:layout_constraintBottom_toBottomOf="@id/iv_result_calendar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/iv_result_calendar"
+        app:layout_constraintTop_toTopOf="@id/iv_result_calendar"
+        tools:text="2박 3일" />
+
+
+    <ImageView
+        android:id="@+id/iv_result_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@null"
+        android:src="@drawable/ic_location"
+        app:layout_constraintBottom_toBottomOf="@id/iv_result_video_thumbnail"
+        app:layout_constraintStart_toStartOf="@id/iv_result_calendar"
+        app:layout_constraintTop_toBottomOf="@id/iv_result_calendar"
         app:layout_constraintVertical_chainStyle="packed"
         app:tint="@color/gray_200_c1c1c1" />
 
@@ -88,36 +114,12 @@
         android:id="@+id/tv_result_location"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
         android:textAppearance="@style/info1"
         android:textColor="@color/pure_black_151515"
         app:layout_constraintBottom_toBottomOf="@id/iv_result_location"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/iv_result_location"
+        app:layout_constraintStart_toStartOf="@id/tv_result_day"
         app:layout_constraintTop_toTopOf="@id/iv_result_location"
         tools:text="14개 장소" />
-
-    <ImageView
-        android:id="@+id/iv_result_calendar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="14dp"
-        android:contentDescription="@null"
-        android:src="@drawable/ic_calendar"
-        app:layout_constraintBottom_toBottomOf="@id/iv_result_video_thumbnail"
-        app:layout_constraintStart_toStartOf="@id/iv_result_location"
-        app:layout_constraintTop_toBottomOf="@id/iv_result_location"
-        app:tint="@color/gray_200_c1c1c1" />
-
-    <TextView
-        android:id="@+id/tv_result_day"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:textAppearance="@style/info1"
-        android:textColor="@color/pure_black_151515"
-        app:layout_constraintBottom_toBottomOf="@id/iv_result_calendar"
-        app:layout_constraintStart_toStartOf="@id/tv_result_location"
-        app:layout_constraintTop_toTopOf="@id/iv_result_calendar"
-        tools:text="2박 3일" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
