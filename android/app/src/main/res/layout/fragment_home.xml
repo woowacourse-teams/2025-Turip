@@ -32,7 +32,8 @@
             android:src="@drawable/btn_search"
             app:layout_constraintBottom_toBottomOf="@id/iv_home_logo"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/iv_home_logo" />
+            app:layout_constraintTop_toTopOf="@id/iv_home_logo"
+            app:tint="@color/gray_300_5b5b5b" />
 
         <TextView
             android:id="@+id/tv_home_where_should_we_go_title"
