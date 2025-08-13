@@ -62,7 +62,8 @@ public class ContentPlaceController {
                                                                     "name": "음식점"
                                                                 }
                                                             ]
-                                                        }
+                                                        },
+                                                        "timeLine": "11:11"
                                                     },
                                                     {
                                                         "id": 2,
@@ -80,7 +81,8 @@ public class ContentPlaceController {
                                                                     "name": "관광지"
                                                                 }
                                                             ]
-                                                        }
+                                                        },
+                                                        "timeLine": "12:12"
                                                     }
                                                 ]
                                             }
