@@ -4,15 +4,15 @@ import java.time.LocalDate;
 import turip.content.controller.dto.response.ContentResponse;
 import turip.favoritecontent.domain.FavoriteContent;
 
-public record FavoriteResponse(
+public record FavoriteContentResponse(
         Long id,
         LocalDate createdAt,
         Long memberId,
         ContentResponse content
 ) {
 
-    public static FavoriteResponse from(FavoriteContent favoriteContent) {
-        return new FavoriteResponse(
+    public static FavoriteContentResponse from(FavoriteContent favoriteContent) {
+        return new FavoriteContentResponse(
                 favoriteContent.getId(),
                 favoriteContent.getCreatedAt(),
                 favoriteContent.getMember().getId(),

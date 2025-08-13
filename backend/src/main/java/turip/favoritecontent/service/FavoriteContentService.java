@@ -15,8 +15,8 @@ import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
 import turip.exception.custom.BadRequestException;
 import turip.exception.custom.NotFoundException;
-import turip.favoritecontent.controller.dto.request.FavoriteRequest;
-import turip.favoritecontent.controller.dto.response.FavoriteResponse;
+import turip.favoritecontent.controller.dto.request.FavoriteContentRequest;
+import turip.favoritecontent.controller.dto.response.FavoriteContentResponse;
 import turip.favoritecontent.domain.FavoriteContent;
 import turip.favoritecontent.repository.FavoriteContentRepository;
 import turip.member.domain.Member;
@@ -33,7 +33,7 @@ public class FavoriteContentService {
     private final TripCourseService tripCourseService;
 
     @Transactional
-    public FavoriteResponse create(FavoriteRequest request, String deviceFid) {
+    public FavoriteContentResponse create(FavoriteContentRequest request, String deviceFid) {
         Long contentId = request.contentId();
         Content content = contentRepository.findById(contentId)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 컨텐츠입니다."));
@@ -43,7 +43,7 @@ public class FavoriteContentService {
         }
         FavoriteContent favoriteContent = new FavoriteContent(LocalDate.now(), member, content);
         FavoriteContent savedFavoriteContent = favoriteContentRepository.save(favoriteContent);
-        return FavoriteResponse.from(savedFavoriteContent);
+        return FavoriteContentResponse.from(savedFavoriteContent);
     }
 
     public MyFavoriteContentsResponse findMyFavoriteContents(String deviceFid, int pageSize, long lastContentId) {

@@ -25,8 +25,8 @@ import turip.content.repository.ContentRepository;
 import turip.creator.domain.Creator;
 import turip.exception.custom.BadRequestException;
 import turip.exception.custom.NotFoundException;
-import turip.favoritecontent.controller.dto.request.FavoriteRequest;
-import turip.favoritecontent.controller.dto.response.FavoriteResponse;
+import turip.favoritecontent.controller.dto.request.FavoriteContentRequest;
+import turip.favoritecontent.controller.dto.response.FavoriteContentResponse;
 import turip.favoritecontent.domain.FavoriteContent;
 import turip.favoritecontent.repository.FavoriteContentRepository;
 import turip.member.domain.Member;
@@ -53,12 +53,12 @@ class FavoriteContentServiceTest {
 
     @DisplayName("찜을 생성할 수 있다")
     @Test
-    void createFavorite() {
+    void createFavoriteContent() {
         // given
         Long contentId = 1L;
         String deviceFid = "testDeviceFid";
 
-        FavoriteRequest request = new FavoriteRequest(contentId);
+        FavoriteContentRequest request = new FavoriteContentRequest(contentId);
         Creator creator = new Creator(null, null);
         City city = new City(null, null, null, null);
         Content content = new Content(contentId, creator, city, null, null, null);
@@ -75,7 +75,7 @@ class FavoriteContentServiceTest {
                 .willReturn(favoriteContent);
 
         // when
-        FavoriteResponse response = favoriteContentService.create(request, deviceFid);
+        FavoriteContentResponse response = favoriteContentService.create(request, deviceFid);
 
         // then
         assertThat(response.content().id()).isEqualTo(contentId);
@@ -87,7 +87,7 @@ class FavoriteContentServiceTest {
         // given
         Long contentId = 10L;
         String deviceFid = "testDeviceFid";
-        FavoriteRequest request = new FavoriteRequest(contentId);
+        FavoriteContentRequest request = new FavoriteContentRequest(contentId);
 
         given(contentRepository.findById(contentId))
                 .willReturn(Optional.empty());
@@ -103,7 +103,7 @@ class FavoriteContentServiceTest {
         // given
         Long contentId = 5L;
         String deviceFid = "testDeviceFid";
-        FavoriteRequest request = new FavoriteRequest(contentId);
+        FavoriteContentRequest request = new FavoriteContentRequest(contentId);
 
         Creator creator = new Creator(null, null);
         City city = new City(null, null, null, null);
@@ -157,11 +157,11 @@ class FavoriteContentServiceTest {
 
     @DisplayName("찜 삭제 테스트")
     @Nested
-    class Remove {
+    class RemoveFavoriteContent {
 
         @DisplayName("찜을 삭제할 수 있다")
         @Test
-        void deleteFavorite1() {
+        void deleteFavoriteContent1() {
             // given
             Long contentId = 1L;
             String deviceFid = "testDeviceFid";
@@ -187,7 +187,7 @@ class FavoriteContentServiceTest {
 
         @DisplayName("삭제하려는 찜의 contentId에 대한 컨텐츠가 존재하지 않으면 에러가 발생한다.")
         @Test
-        void deleteFavorite2() {
+        void deleteFavoriteContent2() {
             // given
             Long contentId = 1L;
             String deviceFid = "testDeviceFid";
@@ -202,7 +202,7 @@ class FavoriteContentServiceTest {
 
         @DisplayName("삭제하려는 찜의 사용자가 존재하지 않으면 에러가 발생한다.")
         @Test
-        void deleteFavorite3() {
+        void deleteFavoriteContent3() {
             // given
             Long contentId = 1L;
             String deviceFid = "testDeviceFid";
@@ -222,7 +222,7 @@ class FavoriteContentServiceTest {
 
         @DisplayName("삭제하려는 찜이 찜 상태가 아니라면 에러를 발생시킨다.")
         @Test
-        void deleteFavorite4() {
+        void deleteFavoriteContent4() {
             // given
             Long contentId = 1L;
             String deviceFid = "testDeviceFid";

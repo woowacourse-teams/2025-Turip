@@ -20,15 +20,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import turip.content.controller.dto.response.MyFavoriteContentsResponse;
 import turip.exception.ErrorResponse;
-import turip.favoritecontent.controller.dto.request.FavoriteRequest;
-import turip.favoritecontent.controller.dto.response.FavoriteResponse;
+import turip.favoritecontent.controller.dto.request.FavoriteContentRequest;
+import turip.favoritecontent.controller.dto.response.FavoriteContentResponse;
 import turip.favoritecontent.service.FavoriteContentService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/favorites")
-@Tag(name = "Favorite", description = "찜 API")
-public class FavoriteController {
+@RequestMapping("/favorite-contents")
+@Tag(name = "FavoriteContent", description = "찜 API")
+public class FavoriteContentController {
 
     private final FavoriteContentService favoriteContentService;
 
@@ -42,7 +42,7 @@ public class FavoriteController {
                     description = "성공 예시",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = FavoriteResponse.class),
+                            schema = @Schema(implementation = FavoriteContentResponse.class),
                             examples = @ExampleObject(
                                     name = "success",
                                     summary = "찜 생성 성공",
@@ -111,10 +111,10 @@ public class FavoriteController {
             )
     })
     @PostMapping
-    public ResponseEntity<FavoriteResponse> create(@RequestHeader("device-fid") String deviceFid,
-                                                   @RequestBody FavoriteRequest request) {
-        FavoriteResponse response = favoriteContentService.create(request, deviceFid);
-        return ResponseEntity.created(URI.create("/favorites/" + response.id()))
+    public ResponseEntity<FavoriteContentResponse> create(@RequestHeader("device-fid") String deviceFid,
+                                                          @RequestBody FavoriteContentRequest request) {
+        FavoriteContentResponse response = favoriteContentService.create(request, deviceFid);
+        return ResponseEntity.created(URI.create("/favorite-contents/" + response.id()))
                 .body(response);
     }
 

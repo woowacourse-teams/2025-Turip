@@ -87,7 +87,7 @@ class ContentServiceTest {
 
     @DisplayName("주간 인기 찜 컨텐츠 조회 테스트")
     @Nested
-    class FindWeeklyPopularFavoriteContentContents {
+    class FindWeeklyPopularFavoriteContents {
 
         @Test
         void findWeeklyPopularFavoriteContents() {

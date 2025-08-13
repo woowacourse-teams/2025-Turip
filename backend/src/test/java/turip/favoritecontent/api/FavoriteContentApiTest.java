@@ -51,13 +51,13 @@ class FavoriteContentApiTest {
         jdbcTemplate.update("ALTER TABLE member ALTER COLUMN id RESTART WITH 1");
     }
 
-    @DisplayName("/favorites POST 찜 생성 테스트")
+    @DisplayName("/favorites-contents POST 찜 생성 테스트")
     @Nested
     class createFavoriteContent {
 
         @DisplayName("성공 시 201 Created 코드와 찜 생성 정보를 응답한다")
         @Test
-        void addFavorite() {
+        void addFavoriteContent() {
             // given
             jdbcTemplate.update(
                     "INSERT INTO creator (profile_image, channel_name) VALUES ('https://image.example.com/creator1.jpg', 'TravelMate')");
@@ -88,10 +88,10 @@ class FavoriteContentApiTest {
                     .header("device-fid", "testDeviceFid")
                     .contentType(ContentType.JSON)
                     .body(request)
-                    .when().post("/favorites")
+                    .when().post("/favorite-contents")
                     .then()
                     .statusCode(201)
-                    .header("Location", org.hamcrest.Matchers.containsString("/favorites/"))
+                    .header("Location", org.hamcrest.Matchers.containsString("/favorite-contents/"))
                     .body("id", Matchers.notNullValue())
                     .body("createdAt", Matchers.notNullValue())
                     .body("memberId", Matchers.notNullValue())
@@ -125,7 +125,7 @@ class FavoriteContentApiTest {
                     .header("device-fid", "testDeviceFid")
                     .contentType(ContentType.JSON)
                     .body(request)
-                    .when().post("/favorites")
+                    .when().post("/favorite-contents")
                     .then()
                     .statusCode(404);
         }
@@ -156,13 +156,13 @@ class FavoriteContentApiTest {
                     .header("device-fid", "testDeviceFid")
                     .contentType(ContentType.JSON)
                     .body(request)
-                    .when().post("/favorites")
+                    .when().post("/favorite-contents")
                     .then()
                     .statusCode(400);
         }
     }
 
-    @DisplayName("/favorites DELETE 찜 삭제 테스트")
+    @DisplayName("/favorite-contents DELETE 찜 삭제 테스트")
     @Nested
     class deleteFavoriteContent {
 
@@ -184,7 +184,7 @@ class FavoriteContentApiTest {
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
                     .queryParam("contentId", 1)
-                    .when().delete("/favorites")
+                    .when().delete("/favorite-contents")
                     .then()
                     .statusCode(204);
         }
@@ -207,7 +207,7 @@ class FavoriteContentApiTest {
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
                     .queryParam("contentId", 2)
-                    .when().delete("/favorites")
+                    .when().delete("/favorite-contents")
                     .then()
                     .statusCode(404);
         }
@@ -230,7 +230,7 @@ class FavoriteContentApiTest {
             RestAssured.given().port(port)
                     .header("device-fid", "haruharu")
                     .queryParam("contentId", 1)
-                    .when().delete("/favorites")
+                    .when().delete("/favorite-contents")
                     .then()
                     .statusCode(404);
         }
@@ -253,13 +253,13 @@ class FavoriteContentApiTest {
             RestAssured.given().port(port)
                     .header("device-fid", "haruharu")
                     .queryParam("contentId", 2)
-                    .when().delete("/favorites")
+                    .when().delete("/favorite-contents")
                     .then()
                     .statusCode(404);
         }
     }
 
-    @DisplayName("/favorites GET 찜 조회 테스트")
+    @DisplayName("/favorite-contents GET 찜 조회 테스트")
     @Nested
     class ReadFavoriteContent {
 
@@ -286,7 +286,7 @@ class FavoriteContentApiTest {
                     .header("device-fid", "testDeviceFid")
                     .queryParam("size", 5)
                     .queryParam("lastId", 0)
-                    .when().get("/favorites")
+                    .when().get("/favorite-contents")
                     .then()
                     .statusCode(200)
                     .body("contents.size()", is(1))
