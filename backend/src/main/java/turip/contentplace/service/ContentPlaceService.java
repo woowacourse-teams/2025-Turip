@@ -26,8 +26,8 @@ public class ContentPlaceService {
         List<ContentPlace> contentPlaces = contentPlaceRepository.findAllByContent_Id(contentId);
         int days = calculateDurationDays(contentId);
         int nights = days - 1;
-        int tripPlaceCount = calculatePlaceCount(contentPlaces);
-        return ContentPlaceDetailResponse.of(nights, days, tripPlaceCount, contentPlaces);
+        int contentPlaceCount = calculatePlaceCount(contentPlaces);
+        return ContentPlaceDetailResponse.of(nights, days, contentPlaceCount, contentPlaces);
     }
 
     public int calculateDurationDays(Long contentId) {
