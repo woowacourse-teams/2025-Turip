@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -270,9 +271,14 @@ public class CsvDataImportService {
         int visitDay = parseIntegerOrDefault(csvData.visitDay(), "방문 일차");
         int visitOrder = parseIntegerOrDefault(csvData.visitOrder(), "방문 순서");
 
+        String[] parts = csvData.timeline().split(":");
+        int minute = Integer.parseInt(parts[0]);
+        int second = Integer.parseInt(parts[1]);
+        LocalTime timeLine = LocalTime.of(0, minute, second);
+
         return contentPlaceRepository
                 .findByContentAndPlaceAndVisitDayAndVisitOrder(content, place, visitDay, visitOrder)
-                .orElseGet(() -> createAndSaveContentPlace(content, place, visitDay, visitOrder));
+                .orElseGet(() -> createAndSaveContentPlace(content, place, timeLine, visitDay, visitOrder));
     }
 
     private int parseIntegerOrDefault(String value, String label) {
@@ -287,8 +293,9 @@ public class CsvDataImportService {
         }
     }
 
-    private ContentPlace createAndSaveContentPlace(Content content, Place place, int visitDay, int visitOrder) {
-        ContentPlace newContentPlace = new ContentPlace(visitDay, visitOrder, place, content);
+    private ContentPlace createAndSaveContentPlace(Content content, Place place, LocalTime timeLine, int visitDay,
+                                                   int visitOrder) {
+        ContentPlace newContentPlace = new ContentPlace(visitDay, visitOrder, timeLine, place, content);
         return contentPlaceRepository.save(newContentPlace);
     }
 
