@@ -1,4 +1,4 @@
-package turip.favorite.repository;
+package turip.favoritecontent.repository;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -16,15 +16,15 @@ import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
 import turip.creator.domain.Creator;
 import turip.creator.repository.CreatorRepository;
-import turip.favorite.domain.Favorite;
+import turip.favoritecontent.domain.FavoriteContent;
 import turip.member.domain.Member;
 import turip.member.repository.MemberRepository;
 
 @DataJpaTest
-class FavoriteRepositoryTest {
+class FavoriteContentRepositoryTest {
 
     @Autowired
-    private FavoriteRepository favoriteRepository;
+    private FavoriteContentRepository favoriteContentRepository;
 
     @Autowired
     private MemberRepository memberRepository;
@@ -51,14 +51,15 @@ class FavoriteRepositoryTest {
 
         Member member = memberRepository.save(new Member("testDeviceFid"));
 
-        Favorite favorite1 = new Favorite(LocalDate.now().minusDays(2), member, content1);
-        Favorite favorite2 = new Favorite(LocalDate.now().minusDays(1), member, content2); // 최신 찜 컨텐츠
+        FavoriteContent favoriteContent1 = new FavoriteContent(LocalDate.now().minusDays(2), member, content1);
+        FavoriteContent favoriteContent2 = new FavoriteContent(LocalDate.now().minusDays(1), member,
+                content2); // 최신 찜 컨텐츠
 
-        favoriteRepository.save(favorite1);
-        favoriteRepository.save(favorite2);
+        favoriteContentRepository.save(favoriteContent1);
+        favoriteContentRepository.save(favoriteContent2);
 
         // when
-        Slice<Content> result = favoriteRepository.findMyFavoriteContentsByDeviceFid(
+        Slice<Content> result = favoriteContentRepository.findMyFavoriteContentsByDeviceFid(
                 member.getDeviceFid(), Long.MAX_VALUE, PageRequest.of(0, 10));
         List<Content> contents = result.getContent();
 

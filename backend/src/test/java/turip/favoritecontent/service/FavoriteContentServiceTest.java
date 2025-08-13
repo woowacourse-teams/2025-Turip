@@ -1,4 +1,4 @@
-package turip.favorite.service;
+package turip.favoritecontent.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -25,22 +25,22 @@ import turip.content.repository.ContentRepository;
 import turip.creator.domain.Creator;
 import turip.exception.custom.BadRequestException;
 import turip.exception.custom.NotFoundException;
-import turip.favorite.controller.dto.request.FavoriteRequest;
-import turip.favorite.controller.dto.response.FavoriteResponse;
-import turip.favorite.domain.Favorite;
-import turip.favorite.repository.FavoriteRepository;
+import turip.favoritecontent.controller.dto.request.FavoriteRequest;
+import turip.favoritecontent.controller.dto.response.FavoriteResponse;
+import turip.favoritecontent.domain.FavoriteContent;
+import turip.favoritecontent.repository.FavoriteContentRepository;
 import turip.member.domain.Member;
 import turip.member.repository.MemberRepository;
 import turip.tripcourse.service.TripCourseService;
 
 @ExtendWith(MockitoExtension.class)
-class FavoriteServiceTest {
+class FavoriteContentServiceTest {
 
     @InjectMocks
-    private FavoriteService favoriteService;
+    private FavoriteContentService favoriteContentService;
 
     @Mock
-    private FavoriteRepository favoriteRepository;
+    private FavoriteContentRepository favoriteContentRepository;
 
     @Mock
     private MemberRepository memberRepository;
@@ -63,19 +63,19 @@ class FavoriteServiceTest {
         City city = new City(null, null, null, null);
         Content content = new Content(contentId, creator, city, null, null, null);
         Member member = new Member(deviceFid);
-        Favorite favorite = new Favorite(LocalDate.now(), member, content);
+        FavoriteContent favoriteContent = new FavoriteContent(LocalDate.now(), member, content);
 
         given(contentRepository.findById(contentId))
                 .willReturn(Optional.of(content));
         given(memberRepository.findByDeviceFid(deviceFid))
                 .willReturn(Optional.of(member));
-        given(favoriteRepository.existsByMemberIdAndContentId(any(), eq(contentId)))
+        given(favoriteContentRepository.existsByMemberIdAndContentId(any(), eq(contentId)))
                 .willReturn(false);
-        given(favoriteRepository.save(any(Favorite.class)))
-                .willReturn(favorite);
+        given(favoriteContentRepository.save(any(FavoriteContent.class)))
+                .willReturn(favoriteContent);
 
         // when
-        FavoriteResponse response = favoriteService.create(request, deviceFid);
+        FavoriteResponse response = favoriteContentService.create(request, deviceFid);
 
         // then
         assertThat(response.content().id()).isEqualTo(contentId);
@@ -93,7 +93,7 @@ class FavoriteServiceTest {
                 .willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> favoriteService.create(request, deviceFid))
+        assertThatThrownBy(() -> favoriteContentService.create(request, deviceFid))
                 .isInstanceOf(NotFoundException.class);
     }
 
@@ -114,14 +114,14 @@ class FavoriteServiceTest {
                 .willReturn(Optional.of(content));
         given(memberRepository.findByDeviceFid(deviceFid))
                 .willReturn(Optional.of(member));
-        given(favoriteRepository.existsByMemberIdAndContentId(any(), eq(contentId)))
+        given(favoriteContentRepository.existsByMemberIdAndContentId(any(), eq(contentId)))
                 .willReturn(true);
 
         // when & then
-        assertThatThrownBy(() -> favoriteService.create(request, deviceFid))
+        assertThatThrownBy(() -> favoriteContentService.create(request, deviceFid))
                 .isInstanceOf(BadRequestException.class);
     }
-    
+
     @DisplayName("내 찜 목록을 페이징 조회할 수 있다")
     @Test
     void findMyFavoriteContents() {
@@ -136,14 +136,14 @@ class FavoriteServiceTest {
         Content content2 = new Content(2L, creator, city, null, null, null);
         List<Content> contents = List.of(content1, content2);
 
-        given(favoriteRepository.findMyFavoriteContentsByDeviceFid(eq(deviceFid), eq(Long.MAX_VALUE), any()))
+        given(favoriteContentRepository.findMyFavoriteContentsByDeviceFid(eq(deviceFid), eq(Long.MAX_VALUE), any()))
                 .willReturn(new SliceImpl<>(contents));
         given(tripCourseService.calculateDurationDays(1L))
                 .willReturn(2); // content1 1박 2일
         given(tripCourseService.calculateDurationDays(2L))
                 .willReturn(3); // content2 2박 3일
 
-        MyFavoriteContentsResponse response = favoriteService.findMyFavoriteContents(deviceFid, pageSize,
+        MyFavoriteContentsResponse response = favoriteContentService.findMyFavoriteContents(deviceFid, pageSize,
                 lastContentId);
 
         // then
@@ -169,20 +169,20 @@ class FavoriteServiceTest {
             City city = new City(null, null, null, null);
             Content content = new Content(contentId, creator, city, null, null, null);
             Member member = new Member(deviceFid);
-            Favorite favorite = new Favorite(LocalDate.now(), member, content);
+            FavoriteContent favoriteContent = new FavoriteContent(LocalDate.now(), member, content);
 
             given(contentRepository.findById(contentId))
                     .willReturn(Optional.of(content));
             given(memberRepository.findByDeviceFid(deviceFid))
                     .willReturn(Optional.of(member));
-            given(favoriteRepository.findByMemberIdAndContentId(any(), eq(contentId)))
-                    .willReturn(Optional.of(favorite));
+            given(favoriteContentRepository.findByMemberIdAndContentId(any(), eq(contentId)))
+                    .willReturn(Optional.of(favoriteContent));
 
             // when
-            favoriteService.remove(deviceFid, contentId);
+            favoriteContentService.remove(deviceFid, contentId);
 
             // then
-            assertThat(favoriteRepository.findById(contentId)).isEmpty();
+            assertThat(favoriteContentRepository.findById(contentId)).isEmpty();
         }
 
         @DisplayName("삭제하려는 찜의 contentId에 대한 컨텐츠가 존재하지 않으면 에러가 발생한다.")
@@ -196,7 +196,7 @@ class FavoriteServiceTest {
                     .willReturn(Optional.empty());
 
             // when & then
-            assertThatThrownBy(() -> favoriteService.remove(deviceFid, contentId))
+            assertThatThrownBy(() -> favoriteContentService.remove(deviceFid, contentId))
                     .isInstanceOf(NotFoundException.class);
         }
 
@@ -216,7 +216,7 @@ class FavoriteServiceTest {
                     .willReturn(Optional.empty());
 
             // when & then
-            assertThatThrownBy(() -> favoriteService.remove(deviceFid, contentId))
+            assertThatThrownBy(() -> favoriteContentService.remove(deviceFid, contentId))
                     .isInstanceOf(NotFoundException.class);
         }
 
@@ -235,11 +235,11 @@ class FavoriteServiceTest {
                     .willReturn(Optional.of(content));
             given(memberRepository.findByDeviceFid(deviceFid))
                     .willReturn(Optional.of(member));
-            given(favoriteRepository.findByMemberIdAndContentId(any(), eq(contentId)))
+            given(favoriteContentRepository.findByMemberIdAndContentId(any(), eq(contentId)))
                     .willReturn(Optional.empty());
 
             // when & then
-            assertThatThrownBy(() -> favoriteService.remove(deviceFid, contentId))
+            assertThatThrownBy(() -> favoriteContentService.remove(deviceFid, contentId))
                     .isInstanceOf(NotFoundException.class);
         }
     }

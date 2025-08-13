@@ -1,4 +1,4 @@
-package turip.favorite.api;
+package turip.favoritecontent.api;
 
 import static org.hamcrest.Matchers.is;
 
@@ -17,7 +17,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class FavoriteApiTest {
+class FavoriteContentApiTest {
 
     @LocalServerPort
     private int port;
@@ -30,7 +30,7 @@ class FavoriteApiTest {
         jdbcTemplate.update("DELETE FROM trip_course");
         jdbcTemplate.update("DELETE FROM place");
         jdbcTemplate.update("DELETE FROM category");
-        jdbcTemplate.update("DELETE FROM favorite");
+        jdbcTemplate.update("DELETE FROM favorite_content");
         jdbcTemplate.update("DELETE FROM member");
         jdbcTemplate.update("DELETE FROM content");
         jdbcTemplate.update("DELETE FROM creator");
@@ -46,14 +46,14 @@ class FavoriteApiTest {
         jdbcTemplate.update("ALTER TABLE city ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE province ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE category ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE favorite ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE favorite_content ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE content ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE member ALTER COLUMN id RESTART WITH 1");
     }
 
     @DisplayName("/favorites POST 찜 생성 테스트")
     @Nested
-    class createFavorite {
+    class createFavoriteContent {
 
         @DisplayName("성공 시 201 Created 코드와 찜 생성 정보를 응답한다")
         @Test
@@ -117,7 +117,7 @@ class FavoriteApiTest {
                     "INSERT INTO trip_course (content_id, place_id, visit_day, visit_order) VALUES (1, 1, 1, 1)");
             jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('testDeviceFid')");
             jdbcTemplate.update(
-                    "INSERT INTO favorite (member_id, content_id, created_at) VALUES (1, 1, CURRENT_TIMESTAMP)");
+                    "INSERT INTO favorite_content (member_id, content_id, created_at) VALUES (1, 1, CURRENT_TIMESTAMP)");
 
             // when & then
             Map<String, String> request = new HashMap<>(Map.of("contentId", "2"));
@@ -148,7 +148,7 @@ class FavoriteApiTest {
                     "INSERT INTO trip_course (content_id, place_id, visit_day, visit_order) VALUES (1, 1, 1, 1)");
             jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('testDeviceFid')");
             jdbcTemplate.update(
-                    "INSERT INTO favorite (member_id, content_id, created_at) VALUES (1, 1, CURRENT_TIMESTAMP)");
+                    "INSERT INTO favorite_content (member_id, content_id, created_at) VALUES (1, 1, CURRENT_TIMESTAMP)");
 
             // when & then
             Map<String, String> request = new HashMap<>(Map.of("contentId", "1"));
@@ -164,7 +164,7 @@ class FavoriteApiTest {
 
     @DisplayName("/favorites DELETE 찜 삭제 테스트")
     @Nested
-    class deleteFavorite {
+    class deleteFavoriteContent {
 
         @DisplayName("성공 시 204 No Content를 응답한다")
         @Test
@@ -178,7 +178,7 @@ class FavoriteApiTest {
                     "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 1, 'https://youtube.com/watch?v=deleteTest', '삭제 테스트 영상', '2025-06-01')");
             jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('testDeviceFid')");
             jdbcTemplate.update(
-                    "INSERT INTO favorite (member_id, content_id, created_at) VALUES (1, 1, CURRENT_TIMESTAMP)");
+                    "INSERT INTO favorite_content (member_id, content_id, created_at) VALUES (1, 1, CURRENT_TIMESTAMP)");
 
             // when & then
             RestAssured.given().port(port)
@@ -201,7 +201,7 @@ class FavoriteApiTest {
                     "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 1, 'https://youtube.com/watch?v=deleteTest', '삭제 테스트 영상', '2025-06-01')");
             jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('testDeviceFid')");
             jdbcTemplate.update(
-                    "INSERT INTO favorite (member_id, content_id, created_at) VALUES (1, 1, CURRENT_TIMESTAMP)");
+                    "INSERT INTO favorite_content (member_id, content_id, created_at) VALUES (1, 1, CURRENT_TIMESTAMP)");
 
             // when & then
             RestAssured.given().port(port)
@@ -224,7 +224,7 @@ class FavoriteApiTest {
                     "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 1, 'https://youtube.com/watch?v=deleteTest', '삭제 테스트 영상', '2025-06-01')");
             jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('testDeviceFid')");
             jdbcTemplate.update(
-                    "INSERT INTO favorite (member_id, content_id, created_at) VALUES (1, 1, CURRENT_TIMESTAMP)");
+                    "INSERT INTO favorite_content (member_id, content_id, created_at) VALUES (1, 1, CURRENT_TIMESTAMP)");
 
             // when & then
             RestAssured.given().port(port)
@@ -247,7 +247,7 @@ class FavoriteApiTest {
                     "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 1, 'https://youtube.com/watch?v=deleteTest', '삭제 테스트 영상', '2025-06-01')");
             jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('testDeviceFid')");
             jdbcTemplate.update(
-                    "INSERT INTO favorite (member_id, content_id, created_at) VALUES (1, 1, CURRENT_TIMESTAMP)");
+                    "INSERT INTO favorite_content (member_id, content_id, created_at) VALUES (1, 1, CURRENT_TIMESTAMP)");
 
             // when & then
             RestAssured.given().port(port)
@@ -261,7 +261,7 @@ class FavoriteApiTest {
 
     @DisplayName("/favorites GET 찜 조회 테스트")
     @Nested
-    class ReadFavorite {
+    class ReadFavoriteContent {
 
         @DisplayName("성공 시 200 OK 코드와 찜한 콘텐츠 정보를 반환한다")
         @Test
@@ -275,7 +275,7 @@ class FavoriteApiTest {
             jdbcTemplate.update(
                     "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 1, 'https://youtube.com/watch?v=test', '테스트 영상', '2025-08-01')");
             jdbcTemplate.update(
-                    "INSERT INTO favorite (member_id, content_id, created_at) VALUES (1, 1, CURRENT_TIMESTAMP)");
+                    "INSERT INTO favorite_content (member_id, content_id, created_at) VALUES (1, 1, CURRENT_TIMESTAMP)");
             jdbcTemplate.update(
                     "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('장소1','https://naver.me/place1','주소1',37.5,127.0)");
             jdbcTemplate.update(

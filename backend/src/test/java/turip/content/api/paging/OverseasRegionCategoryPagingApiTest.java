@@ -25,6 +25,7 @@ class OverseasRegionCategoryPagingApiTest {
     void setUp() {
         jdbcTemplate.update("DELETE FROM trip_course");
         jdbcTemplate.update("DELETE FROM place");
+        jdbcTemplate.update("DELETE FROM favorite_content");
         jdbcTemplate.update("DELETE FROM content");
         jdbcTemplate.update("DELETE FROM creator");
         jdbcTemplate.update("DELETE FROM city");

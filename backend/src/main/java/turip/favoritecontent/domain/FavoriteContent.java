@@ -1,4 +1,4 @@
-package turip.favorite.domain;
+package turip.favoritecontent.domain;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -17,7 +17,7 @@ import turip.member.domain.Member;
 @Entity
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Favorite {
+public class FavoriteContent {
 
     @Id
     @EqualsAndHashCode.Include
@@ -32,7 +32,7 @@ public class Favorite {
     @ManyToOne
     private Content content;
 
-    public Favorite(LocalDate createdAt, Member member, Content content) {
+    public FavoriteContent(LocalDate createdAt, Member member, Content content) {
         this.createdAt = createdAt;
         this.member = member;
         this.content = content;
