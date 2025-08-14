@@ -5,7 +5,7 @@ VALUES ('1234'),
        ('3456'),
        ('7890');
 
-INSERT INTO favoriteContent (member_id, content_id)
+INSERT INTO favorite_content (member_id, content_id)
 VALUES (1, 1),
        (1, 3),
        (2, 2),
