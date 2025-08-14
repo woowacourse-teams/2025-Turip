@@ -19,6 +19,8 @@ import turip.favoritecontent.controller.dto.request.FavoriteContentRequest;
 import turip.favoritecontent.controller.dto.response.FavoriteContentResponse;
 import turip.favoritecontent.domain.FavoriteContent;
 import turip.favoritecontent.repository.FavoriteContentRepository;
+import turip.favoritefolder.domain.FavoriteFolder;
+import turip.favoritefolder.repository.FavoriteFolderRepository;
 import turip.member.domain.Member;
 import turip.member.repository.MemberRepository;
 import turip.tripcourse.service.TripCourseService;
@@ -31,6 +33,7 @@ public class FavoriteContentService {
     private final MemberRepository memberRepository;
     private final ContentRepository contentRepository;
     private final TripCourseService tripCourseService;
+    private final FavoriteFolderRepository favoriteFolderRepository;
 
     @Transactional
     public FavoriteContentResponse create(FavoriteContentRequest request, String deviceFid) {
@@ -78,7 +81,12 @@ public class FavoriteContentService {
 
     private Member findOrCreateMember(String deviceFid) {
         return memberRepository.findByDeviceFid(deviceFid)
-                .orElseGet(() -> memberRepository.save(new Member(deviceFid)));
+                .orElseGet(() -> {
+                    Member savedMember = memberRepository.save(new Member(deviceFid));
+                    FavoriteFolder defaultFolder = FavoriteFolder.defaultFolderOf(savedMember);
+                    favoriteFolderRepository.save(defaultFolder);
+                    return savedMember;
+                });
     }
 
     private TripDurationResponse calculateTripDuration(Content content) {
