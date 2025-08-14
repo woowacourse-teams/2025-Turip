@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import turip.exception.ErrorResponse;
 import turip.favoritefolder.controller.dto.request.FavoriteFolderRequest;
 import turip.favoritefolder.controller.dto.response.FavoriteFolderResponse;
+import turip.favoritefolder.controller.dto.response.FavoriteFoldersWithPlaceCountResponse;
 import turip.favoritefolder.service.FavoriteFolderService;
 
 @RestController
@@ -79,5 +81,12 @@ public class FavoriteFolderController {
         FavoriteFolderResponse response = favoriteFolderService.createCustomFavoriteFolder(request, deviceFid);
         return ResponseEntity.created(URI.create("/favorite-folders/" + response.id()))
                 .body(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<FavoriteFoldersWithPlaceCountResponse> readAllByMember(
+            @RequestHeader("device-fid") String deviceFid) {
+        FavoriteFoldersWithPlaceCountResponse response = favoriteFolderService.findAllByDeviceFid(deviceFid);
+        return ResponseEntity.ok(response);
     }
 }
