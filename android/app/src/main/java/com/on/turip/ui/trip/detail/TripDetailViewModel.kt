@@ -150,7 +150,6 @@ class TripDetailViewModel(
                         .onSuccess {
                             Timber.d("찜 API 통신 성공")
                         }.onFailure {
-                            Timber.e("${it.message}")
                         }
                 }
         }
