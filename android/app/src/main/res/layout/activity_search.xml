@@ -37,7 +37,7 @@
                 android:paddingVertical="8dp"
                 android:textAppearance="@style/title3"
                 android:textColor="@color/pure_black_151515"
-                android:textColorHint="@color/gray_300_5b5b5b"
+                android:textColorHint="@color/gray_200_c1c1c1"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/iv_search_result_clear"
                 app:layout_constraintStart_toStartOf="parent"
