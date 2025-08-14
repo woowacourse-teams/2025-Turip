@@ -29,7 +29,7 @@
     <string name="home_where_should_we_go_highlighting">떠나볼까요?</string>
     <string name="home_domestic">국내</string>
     <string name="home_abroad">해외</string>
-    <string name="home_users_like_content_title">🩵 이번 주, 유저들이 가장 많이 찜한 콘텐츠!</string>
+    <string name="home_users_like_content_title">🩵 한 주간 가장 많이 찜 된 콘텐츠</string>
 
     <!-- 찜 목록 페이지 -->
     <string name="favorite_empty_suggest_title">컨텐츠를 찜 해보세요!</string>
