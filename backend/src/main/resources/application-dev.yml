@@ -18,7 +18,7 @@ spring:
       ddl-auto: create-drop
 
   flyway:
-    enabled: false
+    enabled: true
 
 logging:
   level:
