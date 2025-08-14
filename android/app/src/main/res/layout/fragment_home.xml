@@ -32,7 +32,8 @@
             android:src="@drawable/btn_search"
             app:layout_constraintBottom_toBottomOf="@id/iv_home_logo"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/iv_home_logo" />
+            app:layout_constraintTop_toTopOf="@id/iv_home_logo"
+            app:tint="@color/gray_300_5b5b5b" />
 
         <TextView
             android:id="@+id/tv_home_where_should_we_go_title"
@@ -78,15 +79,15 @@
             android:id="@+id/rv_home_region"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
             android:layout_marginTop="26dp"
-            android:clipToPadding="false"
+            android:fadingEdgeLength="12dp"
             android:orientation="horizontal"
-            android:paddingStart="20dp"
+            android:requiresFadingEdge="horizontal"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_home_domestic_button"
-            tools:ignore="RtlSymmetry"
             tools:listitem="@layout/item_region" />
 
         <TextView
@@ -105,15 +106,15 @@
             android:id="@+id/rv_users_like_content"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
             android:layout_marginTop="14dp"
-            android:clipToPadding="false"
+            android:fadingEdgeLength="12dp"
             android:orientation="horizontal"
-            android:paddingStart="20dp"
+            android:requiresFadingEdge="horizontal"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_home_users_like_content_title"
-            tools:ignore="RtlSymmetry"
             tools:listitem="@layout/item_users_like_content" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
