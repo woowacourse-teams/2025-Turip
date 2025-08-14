@@ -12,6 +12,10 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.google.android.material.snackbar.Snackbar
 import com.on.turip.R
 
+/*
+ * ⚠️ 현재 스낵바를 상단에 표시하는 기능은 CoordinatorLayout 에 한해서 제공하고 있습니다.
+ *     만약 다른 ViewGroup 에서 topMargin을 설정하더라도 적용이 되지 않습니다.
+ */
 class TuripSnackbar private constructor(
     private val rootView: View,
     private val messageResource: Int,
