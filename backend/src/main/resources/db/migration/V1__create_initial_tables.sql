@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS city
 (
     id          BIGINT AUTO_INCREMENT PRIMARY KEY,
     country_id  BIGINT NOT NULL,
-    province_id BIGINT NULL, -- 해외는 주가 없다.
+    province_id BIGINT NULL, -- 해외는 주를 표기하지 않는다.
     name        VARCHAR(255),
     image_url   VARCHAR(255),
     CONSTRAINT fk_city_country
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS city
         FOREIGN KEY (province_id) REFERENCES province (id)
 );
 
--- 유튜버 테이블
+-- 크리에이터 테이블
 CREATE TABLE IF NOT EXISTS creator
 (
     id            BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -131,11 +131,11 @@ CREATE TABLE IF NOT EXISTS favorite_folder
     id          BIGINT AUTO_INCREMENT PRIMARY KEY,
     member_id   BIGINT       NOT NULL,
     name        VARCHAR(100) NOT NULL,
-    is_default  BOOLEAN       NOT NULL DEFAULT FALSE, -- boolean
+    is_default  BOOLEAN      NOT NULL, -- 기본 폴더 여부
 
     created_at  DATETIME(6)  NOT NULL,
     modified_at DATETIME(6)  NOT NULL,
-    deleted_at  DATETIME(6)  NULL, -- soft delete
+    deleted_at  DATETIME(6)  NULL,     -- soft delete
 
     CONSTRAINT fk_favorite_folder__member
         FOREIGN KEY (member_id) REFERENCES member (id)
@@ -182,22 +182,3 @@ CREATE TABLE IF NOT EXISTS favorite_content
     CONSTRAINT uq_favorite_content__member_content
         UNIQUE (member_id, content_id)
 );
-
--- 인덱스 생성
-CREATE INDEX idx_member_deleted_at ON member (deleted_at);
-CREATE INDEX idx_content_creator_id ON content (creator_id);
-CREATE INDEX idx_content_city_id ON content (city_id);
-CREATE INDEX idx_content_uploaded_date ON content (uploaded_date);
-CREATE INDEX idx_place_name ON place (name);
-CREATE INDEX idx_place_category__place_id ON place_category (place_id);
-CREATE INDEX idx_place_category__category_id ON place_category (category_id);
-CREATE INDEX idx_content_place__content_day ON content_place (content_id, visit_day);
-CREATE INDEX idx_content_place__place ON content_place (place_id);
-CREATE INDEX idx_favorite_folder__member_deleted ON favorite_folder (member_id, deleted_at);
-CREATE INDEX idx_favorite_folder__deleted ON favorite_folder (deleted_at);
-CREATE INDEX idx_favorite_place__folder_deleted ON favorite_place (favorite_folder_id, deleted_at);
-CREATE INDEX idx_favorite_place__place_deleted ON favorite_place (place_id, deleted_at);
-CREATE INDEX idx_favorite_place__deleted ON favorite_place (deleted_at);
-CREATE INDEX idx_favorite_content__member_deleted ON favorite_content (member_id, deleted_at);
-CREATE INDEX idx_favorite_content__content_deleted ON favorite_content (content_id, deleted_at);
-CREATE INDEX idx_favorite_content__deleted ON favorite_content (deleted_at);
