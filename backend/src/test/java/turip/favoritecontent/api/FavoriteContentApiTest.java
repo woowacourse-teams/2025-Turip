@@ -30,6 +30,7 @@ class FavoriteContentApiTest {
     void setUp() {
         jdbcTemplate.update("DELETE FROM place_category");
         jdbcTemplate.update("DELETE FROM trip_course");
+        jdbcTemplate.update("DELETE FROM favorite_folder");
         jdbcTemplate.update("DELETE FROM place");
         jdbcTemplate.update("DELETE FROM category");
         jdbcTemplate.update("DELETE FROM favorite_content");
