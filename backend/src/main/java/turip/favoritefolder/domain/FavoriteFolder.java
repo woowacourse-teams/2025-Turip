@@ -28,4 +28,18 @@ public class FavoriteFolder {
     private String name;
 
     private boolean isDefault;
+
+    public static FavoriteFolder defaultFolderOf(Member member, String name) {
+        return new FavoriteFolder(member, name, true);
+    }
+
+    public static FavoriteFolder customFolderOf(Member member, String name) {
+        return new FavoriteFolder(member, name, false);
+    }
+
+    private FavoriteFolder(Member member, String name, boolean isDefault) {
+        this.member = member;
+        this.name = name;
+        this.isDefault = isDefault;
+    }
 }
