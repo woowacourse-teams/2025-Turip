@@ -139,4 +139,90 @@ public class FavoriteFolderApiTest {
                     .body("favoriteFolders[0].isDefault", is(true));
         }
     }
+
+    @DisplayName("/favorites-folders PATCH 폴더 이름 수정 테스트")
+    @Nested
+    class UpdateName {
+
+        @DisplayName("수정에 성공한 경우 200 OK 코드와 수정된 폴더 정보를 응답한다")
+        @Test
+        void updateName1() {
+            // given
+            jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('testDeviceFid')");
+            jdbcTemplate.update(
+                    "INSERT INTO favorite_folder (member_id, name, is_default) VALUES (1, '기존 폴더', false)");
+
+            // when & then
+            Map<String, String> request = new HashMap<>(Map.of("name", "변경된 폴더"));
+            RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .body(request)
+                    .contentType(ContentType.JSON)
+                    .when().patch("/favorite-folders/1")
+                    .then()
+                    .statusCode(200)
+                    .body("id", is(1))
+                    .body("memberId", is(1))
+                    .body("name", is("변경된 폴더"))
+                    .body("isDefault", is(false));
+        }
+
+        @DisplayName("device-fid에 대한 회원을 찾을 수 없는 경우 404 NOT FOUND를 응답한다")
+        @Test
+        void updateName2() {
+            // given
+            jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('existingDeviceFid')");
+            jdbcTemplate.update(
+                    "INSERT INTO favorite_folder (member_id, name, is_default) VALUES (1, '기존 폴더', false)");
+
+            // when & then
+            Map<String, String> request = new HashMap<>(Map.of("name", "변경된 폴더"));
+            RestAssured.given().port(port)
+                    .header("device-fid", "nonExistentDeviceFid")
+                    .body(request)
+                    .contentType(ContentType.JSON)
+                    .when().patch("/favorite-folders/1")
+                    .then()
+                    .statusCode(404);
+        }
+
+        @DisplayName("favoriteFolderId에 대한 폴더를 찾을 수 없는 경우 404 NOT FOUND를 응답한다")
+        @Test
+        void updateName3() {
+            // given
+            jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('testDeviceFid')");
+            jdbcTemplate.update(
+                    "INSERT INTO favorite_folder (member_id, name, is_default) VALUES (1, '기존 폴더', false)");
+
+            // when & then
+            Map<String, String> request = new HashMap<>(Map.of("name", "변경된 폴더"));
+            RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .body(request)
+                    .contentType(ContentType.JSON)
+                    .when().patch("/favorite-folders/999")
+                    .then()
+                    .statusCode(404);
+        }
+
+        @DisplayName("요청 회원 정보와 폴더 소유자의 정보가 일치하지 않는 경우 403 FORBIDDEN을 응답한다")
+        @Test
+        void updateName4() {
+            // given
+            jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('ownerDeviceFid')");
+            jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('requestDeviceFid')");
+            jdbcTemplate.update(
+                    "INSERT INTO favorite_folder (member_id, name, is_default) VALUES (1, '기존 폴더', false)");
+
+            // when & then
+            Map<String, String> request = new HashMap<>(Map.of("name", "변경된 폴더"));
+            RestAssured.given().port(port)
+                    .header("device-fid", "requestDeviceFid")
+                    .body(request)
+                    .contentType(ContentType.JSON)
+                    .when().patch("/favorite-folders/1")
+                    .then()
+                    .statusCode(403);
+        }
+    }
 }

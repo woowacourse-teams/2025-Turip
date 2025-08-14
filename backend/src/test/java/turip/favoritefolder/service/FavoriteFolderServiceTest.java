@@ -16,6 +16,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import turip.exception.custom.ConflictException;
+import turip.exception.custom.ForbiddenException;
+import turip.exception.custom.NotFoundException;
+import turip.favoritefolder.controller.dto.request.FavoriteFolderNameRequest;
 import turip.favoritefolder.controller.dto.request.FavoriteFolderRequest;
 import turip.favoritefolder.controller.dto.response.FavoriteFolderResponse;
 import turip.favoritefolder.controller.dto.response.FavoriteFoldersWithPlaceCountResponse;
@@ -154,10 +157,117 @@ class FavoriteFolderServiceTest {
 
             // when
             favoriteFolderService.findAllByDeviceFid(deviceFid);
-            
+
             // then
             FavoriteFolder defaultFolder = FavoriteFolder.defaultFolderOf(savedMember);
             verify(favoriteFolderRepository).save(defaultFolder);
+        }
+    }
+
+    @DisplayName("장소 찜 폴더 이름 변경 테스트")
+    @Nested
+    class UpdateName {
+
+        @DisplayName("찜 폴더의 이름을 변경할 수 있다")
+        @Test
+        void updateName1() {
+            // given
+            String deviceFid = "testDeviceFid";
+            Long memberId = 1L;
+            Long folderId = 1L;
+            String oldName = "기존 폴더 이름";
+            String newName = "변경된 폴더 이름";
+            boolean isDefault = false;
+
+            Member member = new Member(memberId, deviceFid);
+            FavoriteFolder favoriteFolder = new FavoriteFolder(folderId, member, oldName, isDefault);
+            FavoriteFolderNameRequest request = new FavoriteFolderNameRequest(newName);
+
+            given(memberRepository.findByDeviceFid(deviceFid))
+                    .willReturn(Optional.of(member));
+            given(favoriteFolderRepository.findById(folderId))
+                    .willReturn(Optional.of(favoriteFolder));
+
+            // when
+            FavoriteFolderResponse response = favoriteFolderService.updateName(deviceFid, folderId, request);
+
+            // then
+            assertAll(
+                    () -> assertThat(response.id()).isEqualTo(folderId),
+                    () -> assertThat(response.name()).isEqualTo(newName),
+                    () -> assertThat(response.memberId()).isEqualTo(memberId),
+                    () -> assertThat(response.isDefault()).isFalse()
+            );
+        }
+
+        @DisplayName("deviceId에 대한 회원이 존재하지 않는 경우 NotFoundException을 발생시킨다")
+        @Test
+        void updateName2() {
+            // given
+            String deviceFid = "nonExistentDeviceFid";
+            Long folderId = 1L;
+            String newName = "변경된 폴더 이름";
+
+            FavoriteFolderNameRequest request = new FavoriteFolderNameRequest(newName);
+
+            given(memberRepository.findByDeviceFid(deviceFid))
+                    .willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> favoriteFolderService.updateName(deviceFid, folderId, request))
+                    .isInstanceOf(NotFoundException.class)
+                    .hasMessageContaining("해당 id에 대한 회원이 존재하지 않습니다");
+        }
+
+        @DisplayName("favoriteFolderId에 대한 회원이 존재하지 않는 경우 NotFoundException을 발생시킨다")
+        @Test
+        void updateName3() {
+            // given
+            String deviceFid = "testDeviceFid";
+            Long memberId = 1L;
+            Long nonExistentFolderId = 999L;
+            String newName = "변경된 폴더 이름";
+
+            Member member = new Member(memberId, deviceFid);
+            FavoriteFolderNameRequest request = new FavoriteFolderNameRequest(newName);
+
+            given(memberRepository.findByDeviceFid(deviceFid))
+                    .willReturn(Optional.of(member));
+            given(favoriteFolderRepository.findById(nonExistentFolderId))
+                    .willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> favoriteFolderService.updateName(deviceFid, nonExistentFolderId, request))
+                    .isInstanceOf(NotFoundException.class)
+                    .hasMessageContaining("해당 id에 대한 폴더가 존재하지 않습니다");
+        }
+
+        @DisplayName("요청 회원 정보와 폴더 소유자의 정보가 일치하지 않는 경우 ForbiddenException을 발생시킨다")
+        @Test
+        void updateName4() {
+            // given
+            String requestDeviceFid = "requestDeviceFid";
+            String ownerDeviceFid = "ownerDeviceFid";
+            Long requestMemberId = 1L;
+            Long ownerMemberId = 2L;
+            Long folderId = 1L;
+            String oldName = "기존 폴더 이름";
+            String newName = "변경된 폴더 이름";
+            boolean isDefault = false;
+
+            Member requestMember = new Member(requestMemberId, requestDeviceFid);
+            Member ownerMember = new Member(ownerMemberId, ownerDeviceFid);
+            FavoriteFolder favoriteFolder = new FavoriteFolder(folderId, ownerMember, oldName, isDefault);
+            FavoriteFolderNameRequest request = new FavoriteFolderNameRequest(newName);
+
+            given(memberRepository.findByDeviceFid(requestDeviceFid))
+                    .willReturn(Optional.of(requestMember));
+            given(favoriteFolderRepository.findById(folderId))
+                    .willReturn(Optional.of(favoriteFolder));
+
+            // when & then
+            assertThatThrownBy(() -> favoriteFolderService.updateName(requestDeviceFid, folderId, request))
+                    .isInstanceOf(ForbiddenException.class);
         }
     }
 }
