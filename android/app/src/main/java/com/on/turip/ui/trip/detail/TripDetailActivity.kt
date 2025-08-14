@@ -14,9 +14,11 @@ import androidx.core.net.toUri
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import com.google.android.material.snackbar.Snackbar
 import com.on.turip.R
 import com.on.turip.databinding.ActivityTripDetailBinding
 import com.on.turip.domain.content.Content
+import com.on.turip.ui.common.TuripSnackbar
 import com.on.turip.ui.common.TuripUrlConverter
 import com.on.turip.ui.common.base.BaseActivity
 import com.on.turip.ui.common.loadCircularImage
@@ -168,10 +170,29 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
         }
         binding.ivTripDetailFavorite.setOnClickListener {
             viewModel.updateFavorite()
+            showFavoriteStatusSnackbar(viewModel.isFavorite.value == true)
         }
         binding.ivTripDetailContentToggle.setOnClickListener {
             viewModel.updateExpandTextToggle()
         }
+    }
+
+    private fun showFavoriteStatusSnackbar(isFavorite: Boolean) {
+        val messageResource: Int =
+            if (isFavorite) R.string.trip_detail_snackbar_favorite_save else R.string.trip_detail_snackbar_favorite_remove
+        val iconResource: Int =
+            if (isFavorite) R.drawable.ic_heart_normal else R.drawable.ic_heart_empty
+
+        TuripSnackbar
+            .make(
+                rootView = binding.root,
+                messageResource = messageResource,
+                duration = Snackbar.LENGTH_LONG,
+                layoutInflater = layoutInflater,
+            ).topMarginInCoordinatorLayout(binding.tbTripDetail.height)
+            .icon(iconResource)
+            .action(R.string.all_snackbar_close)
+            .show()
     }
 
     private fun setupObservers() {
