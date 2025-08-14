@@ -67,12 +67,12 @@ class TripDetailViewModel(
 
     private fun loadContent() {
         viewModelScope.launch {
-            val deferredCreator: Deferred<Result<Creator>> =
+            val deferredCreator: Deferred<TuripCustomResult<Creator>> =
                 async { creatorRepository.loadCreator(creatorId) }
             val deferredVideoData: Deferred<TuripCustomResult<Content>> =
                 async { contentRepository.loadContent(contentId) }
 
-            val creatorResult: Result<Creator> = deferredCreator.await()
+            val creatorResult: TuripCustomResult<Creator> = deferredCreator.await()
             val videoDataResult: TuripCustomResult<Content> = deferredVideoData.await()
 
             creatorResult
@@ -85,7 +85,6 @@ class TripDetailViewModel(
                         }.onFailure {
                         }
                 }.onFailure {
-                    Timber.e("${it.message}")
                 }
         }
     }
