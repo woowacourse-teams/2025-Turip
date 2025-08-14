@@ -64,6 +64,16 @@ public class FavoriteFolderService {
         return FavoriteFolderResponse.from(favoriteFolder);
     }
 
+    @Transactional
+    public void remove(String deviceFid, Long favoriteFolderId) {
+        Member member = getMemberByDeviceId(deviceFid);
+        FavoriteFolder favoriteFolder = getById(favoriteFolderId);
+
+        validateOwnership(member, favoriteFolder);
+
+        favoriteFolderRepository.deleteById(favoriteFolderId);
+    }
+
     private Member findOrCreateMember(String deviceFid) {
         return memberRepository.findByDeviceFid(deviceFid)
                 .orElseGet(() -> {

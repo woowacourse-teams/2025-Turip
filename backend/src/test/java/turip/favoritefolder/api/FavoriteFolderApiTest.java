@@ -246,4 +246,74 @@ public class FavoriteFolderApiTest {
                     .statusCode(409);
         }
     }
+
+    @DisplayName("/favorites-folders DELETE 장소 찜 폴더 삭제 테스트")
+    @Nested
+    class Delete {
+
+        @DisplayName("삭제에 성공한 경우 204 NO CONTENT 코드를 응답한다")
+        @Test
+        void delete1() {
+            // given
+            jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('testDeviceFid')");
+            jdbcTemplate.update(
+                    "INSERT INTO favorite_folder (member_id, name, is_default) VALUES (1, '삭제할 폴더', false)");
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .when().delete("/favorite-folders/1")
+                    .then()
+                    .statusCode(204);
+        }
+
+        @DisplayName("favoriteFolderId에 대한 폴더를 찾을 수 없는 경우 404 NOT FOUND를 응답한다")
+        @Test
+        void delete2() {
+            // given
+            jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('testDeviceFid')");
+            jdbcTemplate.update(
+                    "INSERT INTO favorite_folder (member_id, name, is_default) VALUES (1, '존재하는 폴더', false)");
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .when().delete("/favorite-folders/999")
+                    .then()
+                    .statusCode(404);
+        }
+
+        @DisplayName("device-fid에 대한 회원을 찾을 수 없는 경우 404 NOT FOUND를 응답한다")
+        @Test
+        void delete3() {
+            // given
+            jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('existingDeviceFid')");
+            jdbcTemplate.update(
+                    "INSERT INTO favorite_folder (member_id, name, is_default) VALUES (1, '존재하는 폴더', false)");
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("device-fid", "nonExistentDeviceFid")
+                    .when().delete("/favorite-folders/1")
+                    .then()
+                    .statusCode(404);
+        }
+
+        @DisplayName("요청 회원 정보와 폴더 소유자의 정보가 일치하지 않는 경우 403 FORBIDDEN을 응답한다")
+        @Test
+        void delete4() {
+            // given
+            jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('ownerDeviceFid')");
+            jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('requestDeviceFid')");
+            jdbcTemplate.update(
+                    "INSERT INTO favorite_folder (member_id, name, is_default) VALUES (1, '다른 사람의 폴더', false)");
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("device-fid", "requestDeviceFid")
+                    .when().delete("/favorite-folders/1")
+                    .then()
+                    .statusCode(403);
+        }
+    }
 }

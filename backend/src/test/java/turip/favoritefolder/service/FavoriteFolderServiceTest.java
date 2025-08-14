@@ -297,4 +297,97 @@ class FavoriteFolderServiceTest {
                     .isInstanceOf(ConflictException.class);
         }
     }
+
+    @DisplayName("장소 찜 폴더 삭제 테스트")
+    @Nested
+    class Remove {
+
+        @DisplayName("장소 찜 폴더를 삭제할 수 있다")
+        @Test
+        void remove1() {
+            // given
+            String deviceFid = "testDeviceFid";
+            Long memberId = 1L;
+            Long folderId = 1L;
+            String folderName = "삭제할 폴더";
+            boolean isDefault = false;
+
+            Member member = new Member(memberId, deviceFid);
+            FavoriteFolder favoriteFolder = new FavoriteFolder(folderId, member, folderName, isDefault);
+
+            given(memberRepository.findByDeviceFid(deviceFid))
+                    .willReturn(Optional.of(member));
+            given(favoriteFolderRepository.findById(folderId))
+                    .willReturn(Optional.of(favoriteFolder));
+
+            // when
+            favoriteFolderService.remove(deviceFid, folderId);
+
+            // then
+            verify(favoriteFolderRepository).deleteById(folderId);
+        }
+
+        @DisplayName("deviceId에 대한 회원이 존재하지 않는 경우 NotFoundException을 발생시킨다")
+        @Test
+        void remove2() {
+            // given
+            String deviceFid = "nonExistentDeviceFid";
+            Long folderId = 1L;
+
+            given(memberRepository.findByDeviceFid(deviceFid))
+                    .willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> favoriteFolderService.remove(deviceFid, folderId))
+                    .isInstanceOf(NotFoundException.class)
+                    .hasMessageContaining("해당 id에 대한 회원이 존재하지 않습니다");
+        }
+
+        @DisplayName("favoriteFolderId에 대한 회원이 존재하지 않는 경우 NotFoundException을 발생시킨다")
+        @Test
+        void remove3() {
+            // given
+            String deviceFid = "testDeviceFid";
+            Long memberId = 1L;
+            Long nonExistentFolderId = 999L;
+
+            Member member = new Member(memberId, deviceFid);
+
+            given(memberRepository.findByDeviceFid(deviceFid))
+                    .willReturn(Optional.of(member));
+            given(favoriteFolderRepository.findById(nonExistentFolderId))
+                    .willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> favoriteFolderService.remove(deviceFid, nonExistentFolderId))
+                    .isInstanceOf(NotFoundException.class)
+                    .hasMessageContaining("해당 id에 대한 폴더가 존재하지 않습니다");
+        }
+
+        @DisplayName("요청 회원 정보와 폴더 소유자의 정보가 일치하지 않는 경우 ForbiddenException을 발생시킨다")
+        @Test
+        void remove4() {
+            // given
+            String requestDeviceFid = "requestDeviceFid";
+            String ownerDeviceFid = "ownerDeviceFid";
+            Long requestMemberId = 1L;
+            Long ownerMemberId = 2L;
+            Long folderId = 1L;
+            String folderName = "다른 사람의 폴더";
+            boolean isDefault = false;
+
+            Member requestMember = new Member(requestMemberId, requestDeviceFid);
+            Member ownerMember = new Member(ownerMemberId, ownerDeviceFid);
+            FavoriteFolder favoriteFolder = new FavoriteFolder(folderId, ownerMember, folderName, isDefault);
+
+            given(memberRepository.findByDeviceFid(requestDeviceFid))
+                    .willReturn(Optional.of(requestMember));
+            given(favoriteFolderRepository.findById(folderId))
+                    .willReturn(Optional.of(favoriteFolder));
+
+            // when & then
+            assertThatThrownBy(() -> favoriteFolderService.remove(requestDeviceFid, folderId))
+                    .isInstanceOf(ForbiddenException.class);
+        }
+    }
 }
