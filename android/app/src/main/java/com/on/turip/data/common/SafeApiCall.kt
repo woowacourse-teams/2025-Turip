@@ -3,15 +3,11 @@ package com.on.turip.data.common
 import retrofit2.HttpException
 import retrofit2.Response
 
+@Suppress("UNCHECKED_CAST")
 suspend inline fun <T> safeApiCall(apiCall: suspend () -> Response<T>): TuripCustomResult<T> =
     runCatching { apiCall() }
         .mapCatching { response: Response<T> ->
-            if (response.isSuccessful) {
-                val body = response.body() ?: throw IllegalStateException("서버에 body값이 현재 null입니다.")
-                TuripCustomResult.Success(body)
-            } else {
-                TuripCustomResult.HttpError(response.code())
-            }
+            TuripCustomResult.success(response.body() as T)
         }.getOrElse { e: Throwable ->
             when (e) {
                 is HttpException -> TuripCustomResult.HttpError(e.code())

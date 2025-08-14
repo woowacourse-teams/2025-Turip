@@ -48,7 +48,7 @@ sealed class TuripCustomResult<out T> {
     }
 
     companion object {
-        inline fun <T> success(value: T): TuripCustomResult<T> = Success(value)
+        fun <T> success(value: T): TuripCustomResult<T> = Success(value)
     }
 }
 
