@@ -269,5 +269,32 @@ class FavoriteFolderServiceTest {
             assertThatThrownBy(() -> favoriteFolderService.updateName(requestDeviceFid, folderId, request))
                     .isInstanceOf(ForbiddenException.class);
         }
+
+        @DisplayName("해당 회원이 이미 같은 이름의 폴더를 소유하고 있는 경우 ConflictException을 발생시킨다")
+        @Test
+        void updateName5() {
+            // given
+            String deviceFid = "testDeviceFid";
+            Long memberId = 1L;
+            Long folderId = 1L;
+            String oldName = "기존 폴더 이름";
+            String newName = "중복된 폴더 이름";
+            boolean isDefault = false;
+
+            Member member = new Member(memberId, deviceFid);
+            FavoriteFolder favoriteFolder = new FavoriteFolder(folderId, member, oldName, isDefault);
+            FavoriteFolderNameRequest request = new FavoriteFolderNameRequest(newName);
+
+            given(memberRepository.findByDeviceFid(deviceFid))
+                    .willReturn(Optional.of(member));
+            given(favoriteFolderRepository.findById(folderId))
+                    .willReturn(Optional.of(favoriteFolder));
+            given(favoriteFolderRepository.existsByNameAndMember(newName, member))
+                    .willReturn(true);
+
+            // when & then
+            assertThatThrownBy(() -> favoriteFolderService.updateName(deviceFid, folderId, request))
+                    .isInstanceOf(ConflictException.class);
+        }
     }
 }

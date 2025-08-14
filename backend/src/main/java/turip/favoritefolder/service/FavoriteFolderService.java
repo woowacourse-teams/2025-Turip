@@ -57,6 +57,8 @@ public class FavoriteFolderService {
         FavoriteFolder favoriteFolder = getById(favoriteFolderId);
 
         validateOwnership(member, favoriteFolder);
+        validateDuplicatedName(request.name(), member);
+
         favoriteFolder.setName(request.name());
 
         return FavoriteFolderResponse.from(favoriteFolder);

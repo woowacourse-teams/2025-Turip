@@ -73,7 +73,7 @@ public class FavoriteFolderApiTest {
                     .statusCode(201);
         }
 
-        @DisplayName("중복된 찜 폴더 이름이 존재하여 생성에 실패한 경우 201 CONFLICT 코드를 응답한다")
+        @DisplayName("중복된 찜 폴더 이름이 존재하여 생성에 실패한 경우 409 CONFLICT 코드를 응답한다")
         @Test
         void create2() {
             // given
@@ -223,6 +223,27 @@ public class FavoriteFolderApiTest {
                     .when().patch("/favorite-folders/1")
                     .then()
                     .statusCode(403);
+        }
+
+        @DisplayName("중복된 찜 폴더 이름이 존재하여 수정에 실패한 경우 409 CONFLICT 코드를 응답한다")
+        @Test
+        void updateName5() {
+            // given
+            jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('testDeviceFid')");
+            jdbcTemplate.update(
+                    "INSERT INTO favorite_folder (member_id, name, is_default) VALUES (1, '기존 폴더', false)");
+            jdbcTemplate.update(
+                    "INSERT INTO favorite_folder (member_id, name, is_default) VALUES (1, '다른 폴더', false)");
+
+            // when & then
+            Map<String, String> request = new HashMap<>(Map.of("name", "다른 폴더"));
+            RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .body(request)
+                    .contentType(ContentType.JSON)
+                    .when().patch("/favorite-folders/1")
+                    .then()
+                    .statusCode(409);
         }
     }
 }
