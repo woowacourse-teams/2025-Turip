@@ -31,10 +31,6 @@ public class FavoriteFolder {
 
     private boolean isDefault;
 
-    public static FavoriteFolder defaultFolderOf(Member member, String name) {
-        return new FavoriteFolder(member, name, true);
-    }
-
     public static FavoriteFolder customFolderOf(Member member, String name) {
         return new FavoriteFolder(member, name, false);
     }
