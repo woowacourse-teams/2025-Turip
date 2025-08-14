@@ -32,9 +32,9 @@
                 android:id="@+id/iv_trip_detail_favorite"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="20dp"
                 android:layout_gravity="end|center_vertical"
                 android:contentDescription="@null"
+                android:padding="20dp"
                 android:src="@drawable/btn_favorite_red" />
         </com.google.android.material.appbar.MaterialToolbar>
     </com.google.android.material.appbar.AppBarLayout>
@@ -97,13 +97,26 @@
                 android:layout_marginTop="18dp"
                 android:layout_marginEnd="50dp"
                 android:ellipsize="end"
-                android:maxLines="3"
+                android:maxLines="2"
                 android:textAppearance="@style/title1"
                 android:textColor="@color/pure_black_151515"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="@id/iv_trip_detail_platform_badge"
                 app:layout_constraintTop_toBottomOf="@id/tv_trip_detail_creator_name"
                 tools:text="맛집여행기 - 전라도 비빔밥을 찾아서 편 \n맛집여행기 - 전라도 비빔밥을 찾아서 편 \n맛집여행기 - 전라도 비빔밥을 찾아서 편 \n맛집여행기 - 전라도 비빔밥을 찾아서 편" />
+
+            <ImageView
+                android:id="@+id/iv_trip_detail_content_toggle"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:contentDescription="@null"
+                android:paddingTop="10dp"
+                android:paddingBottom="18dp"
+                android:src="@drawable/btn_content_title_toggle"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_trip_detail_content_title" />
 
             <TextView
                 android:id="@+id/tv_trip_detail_upload_date"
@@ -113,7 +126,7 @@
                 android:textAppearance="@style/title3"
                 android:textColor="@color/gray_300_5b5b5b"
                 app:layout_constraintStart_toStartOf="@id/tv_trip_detail_content_title"
-                app:layout_constraintTop_toBottomOf="@id/tv_trip_detail_content_title"
+                app:layout_constraintTop_toBottomOf="@id/iv_trip_detail_content_toggle"
                 tools:text="2025-07-20" />
 
             <androidx.cardview.widget.CardView
