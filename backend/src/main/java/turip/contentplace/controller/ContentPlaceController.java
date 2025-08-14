@@ -1,4 +1,4 @@
-package turip.tripcourse.controller;
+package turip.contentplace.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -13,16 +13,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import turip.tripcourse.controller.dto.response.TripCourseDetailResponse;
-import turip.tripcourse.service.TripCourseService;
+import turip.contentplace.controller.dto.response.ContentPlaceDetailResponse;
+import turip.contentplace.service.ContentPlaceService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/trip-courses")
-@Tag(name = "TripCourse", description = "여행 코스 API")
-public class TripCourseController {
+@RequestMapping("/content-places")
+@Tag(name = "ContentPlace", description = "여행 코스 API")
+public class ContentPlaceController {
 
-    private final TripCourseService tripCourseService;
+    private final ContentPlaceService contentPlaceService;
 
     @Operation(
             summary = "여행 상세 조회 api",
@@ -34,7 +34,7 @@ public class TripCourseController {
                     description = "성공 예시",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = TripCourseDetailResponse.class),
+                            schema = @Schema(implementation = ContentPlaceDetailResponse.class),
                             examples = @ExampleObject(
                                     name = "success",
                                     summary = "성공적으로 컨텐츠 목록 조회",
@@ -44,8 +44,8 @@ public class TripCourseController {
                                                     "nights": 0,
                                                     "days": 1
                                                 },
-                                                "tripPlaceCount": 2,
-                                                "tripCourses": [
+                                                "contentPlaceCount": 2,
+                                                "contentPlaces": [
                                                     {
                                                         "id": 1,
                                                         "visitDay": 1,
@@ -62,7 +62,8 @@ public class TripCourseController {
                                                                     "name": "음식점"
                                                                 }
                                                             ]
-                                                        }
+                                                        },
+                                                        "timeLine": "11:11"
                                                     },
                                                     {
                                                         "id": 2,
@@ -80,7 +81,8 @@ public class TripCourseController {
                                                                     "name": "관광지"
                                                                 }
                                                             ]
-                                                        }
+                                                        },
+                                                        "timeLine": "12:12"
                                                     }
                                                 ]
                                             }
@@ -90,9 +92,9 @@ public class TripCourseController {
             )
     })
     @GetMapping
-    public ResponseEntity<TripCourseDetailResponse> readTripCourseDetails(
+    public ResponseEntity<ContentPlaceDetailResponse> readContentPlaceDetails(
             @RequestParam(name = "contentId") Long contentId) {
-        TripCourseDetailResponse response = tripCourseService.findTripCourseDetails(contentId);
+        ContentPlaceDetailResponse response = contentPlaceService.findContentPlaceDetails(contentId);
         return ResponseEntity.ok(response);
     }
 }
