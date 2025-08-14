@@ -58,7 +58,6 @@ class HomeViewModel(
                     _isSelectedDomestic.value = isDomestic
                     Timber.d("지역 카테고리 조회: $regionCategories")
                 }.onFailure {
-                    Timber.e("지역 카테고리 조회 실패: ${it.message}")
                 }
         }
     }

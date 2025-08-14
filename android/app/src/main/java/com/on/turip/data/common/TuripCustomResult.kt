@@ -46,6 +46,10 @@ sealed class TuripCustomResult<out T> {
             Timber.e("네트워크 에러: ${exception.message}")
         }
     }
+
+    companion object {
+        inline fun <T> success(value: T): TuripCustomResult<T> = Success(value)
+    }
 }
 
 inline fun <T> TuripCustomResult<T>.onSuccess(action: (value: T) -> Unit): TuripCustomResult<T> {
