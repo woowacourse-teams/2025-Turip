@@ -82,7 +82,15 @@ public class ContentPlaceApiTest {
                     .when().get("/content-places")
                     .then()
                     .statusCode(200)
-                    .body("contentPlaceCount", is(2));
+                    .body("contentPlaceCount", is(2))
+                    .body("contentPlaces[0].timeLine", is("11:00"))
+                    .body("contentPlaces[1].timeLine", is("12:00"))
+                    .body("contentPlaces[0].visitDay", is(1))
+                    .body("contentPlaces[1].visitDay", is(2))
+                    .body("contentPlaces[0].visitOrder", is(1))
+                    .body("contentPlaces[1].visitOrder", is(1))
+                    .body("contentPlaces[0].place.name", is("루터회관"))
+                    .body("contentPlaces[1].place.name", is("테디뵈르하우스"));
         }
     }
 }
