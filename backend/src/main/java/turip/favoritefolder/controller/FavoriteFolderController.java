@@ -11,12 +11,15 @@ import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import turip.exception.ErrorResponse;
+import turip.favoritefolder.controller.dto.request.FavoriteFolderNameRequest;
 import turip.favoritefolder.controller.dto.request.FavoriteFolderRequest;
 import turip.favoritefolder.controller.dto.response.FavoriteFolderResponse;
 import turip.favoritefolder.controller.dto.response.FavoriteFoldersWithPlaceCountResponse;
@@ -125,6 +128,16 @@ public class FavoriteFolderController {
     public ResponseEntity<FavoriteFoldersWithPlaceCountResponse> readAllByMember(
             @RequestHeader("device-fid") String deviceFid) {
         FavoriteFoldersWithPlaceCountResponse response = favoriteFolderService.findAllByDeviceFid(deviceFid);
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/{favoriteFolderId}")
+    public ResponseEntity<FavoriteFolderResponse> updateName(
+            @RequestHeader("device-fid") String deviceFid,
+            @PathVariable Long favoriteFolderId,
+            @RequestBody FavoriteFolderNameRequest request
+    ) {
+        FavoriteFolderResponse response = favoriteFolderService.updateName(deviceFid, favoriteFolderId, request);
         return ResponseEntity.ok(response);
     }
 }

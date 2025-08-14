@@ -10,9 +10,11 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import turip.member.domain.Member;
 
 @Getter
+@Setter
 @Entity
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -37,6 +39,10 @@ public class FavoriteFolder {
 
     public static FavoriteFolder customFolderOf(Member member, String name) {
         return new FavoriteFolder(member, name, false);
+    }
+
+    public boolean isOwner(Member member) {
+        return this.member.isSameDeviceId(member);
     }
 
     private FavoriteFolder(Member member, String name, boolean isDefault) {
