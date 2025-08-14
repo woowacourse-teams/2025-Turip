@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -241,5 +242,79 @@ public class FavoriteFolderController {
     ) {
         FavoriteFolderResponse response = favoriteFolderService.updateName(deviceFid, favoriteFolderId, request);
         return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "장소 찜 폴더 삭제 api",
+            description = "장소 찜 폴더를 삭제한다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "성공 예시"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "member_not_found",
+                                            summary = "device-fid에 대한 회원을 찾을 수 없는 경우",
+                                            value = """
+                                                    {
+                                                        "message" : "해당 id에 대한 회원이 존재하지 않습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "folder_not_found",
+                                            summary = "id에 대한 폴더를 찾을 수 없는 경우",
+                                            value = """
+                                                    {
+                                                        "message" : "해당 id에 대한 폴더가 존재하지 않습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "not_folder_owner",
+                                            summary = "폴더 소유자의 기기id와 요청자의 기기id가 같지 않은 경우",
+                                            value = """
+                                                    {
+                                                        "message" : "폴더 소유자의 기기id와 요청자의 기기id가 같지 않습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            )
+    })
+    @DeleteMapping("/{favoriteFolderId}")
+    public ResponseEntity<Void> delete(@RequestHeader("device-fid") String deviceFid,
+                                       @PathVariable Long favoriteFolderId) {
+        favoriteFolderService.remove(deviceFid, favoriteFolderId);
+        return ResponseEntity.noContent().build();
     }
 }
