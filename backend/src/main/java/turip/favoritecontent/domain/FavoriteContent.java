@@ -5,12 +5,11 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PreRemove;
-import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import turip.content.domain.Content;
 import turip.domain.TimeStamp;
@@ -21,6 +20,7 @@ import turip.member.domain.Member;
 @EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SQLRestriction("deleted_at is Null")
+@SQLDelete(sql = "UPDATE favorite_content SET deleted_at = NOW() WHERE id = ?")
 public class FavoriteContent extends TimeStamp {
 
     @Id
@@ -37,10 +37,5 @@ public class FavoriteContent extends TimeStamp {
     public FavoriteContent(Member member, Content content) {
         this.member = member;
         this.content = content;
-    }
-
-    @PreRemove
-    public void preRemove() {
-        this.setDeletedAt(LocalDateTime.now());
     }
 }
