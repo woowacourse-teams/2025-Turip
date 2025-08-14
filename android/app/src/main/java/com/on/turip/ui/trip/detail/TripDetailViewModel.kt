@@ -107,7 +107,6 @@ class TripDetailViewModel(
                     _tripModel.value = trip.toUiModel()
                     Timber.d("여행 일정 불러오기 성공")
                 }.onFailure {
-                    Timber.e("${it.message}")
                 }
         }
     }
