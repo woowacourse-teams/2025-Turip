@@ -14,7 +14,7 @@ import com.on.turip.domain.favorite.usecase.UpdateFavoriteUseCase
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class FavoriteViewModel(
+class FavoriteContentViewModel(
     private val favoriteRepository: FavoriteRepository,
     private val updateFavoriteUseCase: UpdateFavoriteUseCase,
 ) : ViewModel() {
@@ -71,7 +71,7 @@ class FavoriteViewModel(
         ): ViewModelProvider.Factory =
             viewModelFactory {
                 initializer {
-                    FavoriteViewModel(
+                    FavoriteContentViewModel(
                         favoriteRepository = favoriteRepository,
                         updateFavoriteUseCase = updateFavoriteUseCase,
                     )

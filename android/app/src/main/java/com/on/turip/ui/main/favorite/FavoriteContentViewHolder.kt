@@ -4,35 +4,34 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.on.turip.R
-import com.on.turip.databinding.ItemFavoriteBinding
+import com.on.turip.databinding.ItemFavoriteContentBinding
 import com.on.turip.domain.content.Content
 import com.on.turip.domain.content.video.VideoData
 import com.on.turip.domain.creator.Creator
 import com.on.turip.domain.favorite.FavoriteContent
 import com.on.turip.ui.common.TuripUrlConverter
-import com.on.turip.ui.common.loadCircularImage
 import com.on.turip.ui.common.loadRoundedCornerImage
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.common.model.trip.toDisplayText
 
-class FavoriteItemViewHolder(
-    private val binding: ItemFavoriteBinding,
-    private val onFavoriteItemListener: FavoriteItemListener,
+class FavoriteContentViewHolder(
+    private val binding: ItemFavoriteContentBinding,
+    private val onFavoriteContentListener: FavoriteContentListener,
 ) : RecyclerView.ViewHolder(binding.root) {
     private var favoriteContent: FavoriteContent? = null
 
     init {
         itemView.setOnClickListener {
             favoriteContent?.content?.let { content: Content ->
-                onFavoriteItemListener.onFavoriteItemClick(
+                onFavoriteContentListener.onFavoriteItemClick(
                     content.id,
                     content.creator.id,
                 )
             }
         }
-        binding.ivFavoriteFavorite.setOnClickListener {
+        binding.ivFavoriteContentFavorite.setOnClickListener {
             favoriteContent?.let {
-                onFavoriteItemListener.onFavoriteClick(
+                onFavoriteContentListener.onFavoriteClick(
                     it.content.id,
                     it.content.isFavorite,
                 )
@@ -47,49 +46,48 @@ class FavoriteItemViewHolder(
         val creator: Creator = content.creator
 
         binding.apply {
-            tvFavoriteTitle.text = videoData.title
+            tvFavoriteContentTitle.text = videoData.title
 
-            ivFavoriteCreatorThumbnail.loadCircularImage(creator.profileImage)
-
-            tvFavoriteCreatorNameAndUploadDate.text =
+            tvFavoriteContentCreatorNameAndUploadDate.text =
                 itemView.context.getString(
                     R.string.region_result_video_description,
                     creator.channelName,
                     videoData.uploadedDate,
                 )
 
-            tvFavoriteCity.text = content.city.name
+            tvFavoriteContentRegion.text = content.city.name
 
-            tvFavoriteTotalPlaceCount.text =
+            tvFavoriteContentTotalPlaceCount.text =
                 itemView.context.getString(
                     R.string.all_total_place_count,
                     favoriteContent.tripPlaceCount,
                 )
 
-            tvFavoriteTravelDuration.text =
+            tvFavoriteContentTravelDuration.text =
                 favoriteContent.tripDuration.toUiModel().toDisplayText(itemView.context)
 
-            ivFavoriteVideoThumbnail.loadRoundedCornerImage(
+            ivFavoriteContentVideoThumbnail.loadRoundedCornerImage(
                 imageUrl = TuripUrlConverter.convertVideoThumbnailUrl(videoData.url),
                 radius = 10,
             )
 
-            ivFavoriteFavorite.isSelected = content.isFavorite
+            ivFavoriteContentFavorite.isSelected = content.isFavorite
         }
     }
 
     companion object {
         fun of(
             parent: ViewGroup,
-            favoriteItemListener: FavoriteItemListener,
-        ): FavoriteItemViewHolder {
+            favoriteContentListener: FavoriteContentListener,
+        ): FavoriteContentViewHolder {
             val inflater: LayoutInflater = LayoutInflater.from(parent.context)
-            val binding: ItemFavoriteBinding = ItemFavoriteBinding.inflate(inflater, parent, false)
-            return FavoriteItemViewHolder(binding, favoriteItemListener)
+            val binding: ItemFavoriteContentBinding =
+                ItemFavoriteContentBinding.inflate(inflater, parent, false)
+            return FavoriteContentViewHolder(binding, favoriteContentListener)
         }
     }
 
-    interface FavoriteItemListener {
+    interface FavoriteContentListener {
         fun onFavoriteClick(
             contentId: Long,
             isFavorite: Boolean,
