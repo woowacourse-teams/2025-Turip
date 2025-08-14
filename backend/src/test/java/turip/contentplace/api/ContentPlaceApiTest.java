@@ -26,7 +26,7 @@ public class ContentPlaceApiTest {
         jdbcTemplate.update("DELETE FROM content_place");
         jdbcTemplate.update("DELETE FROM place");
         jdbcTemplate.update("DELETE FROM category");
-        jdbcTemplate.update("DELETE FROM favorite");
+        jdbcTemplate.update("DELETE FROM favorite_content");
         jdbcTemplate.update("DELETE FROM member");
         jdbcTemplate.update("DELETE FROM content");
         jdbcTemplate.update("DELETE FROM creator");

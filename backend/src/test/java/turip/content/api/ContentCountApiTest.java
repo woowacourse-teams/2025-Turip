@@ -24,14 +24,18 @@ class ContentCountApiTest {
     @BeforeEach
     void setUp() {
         jdbcTemplate.update("DELETE FROM content_place");
+        jdbcTemplate.update("DELETE FROM place_category");
         jdbcTemplate.update("DELETE FROM place");
+        jdbcTemplate.update("DELETE FROM favorite_content");
         jdbcTemplate.update("DELETE FROM content");
         jdbcTemplate.update("DELETE FROM creator");
         jdbcTemplate.update("DELETE FROM city");
         jdbcTemplate.update("DELETE FROM country");
 
         jdbcTemplate.update("ALTER TABLE content_place ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE place_category ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE place ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE favorite_content ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE content ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE creator ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE city ALTER COLUMN id RESTART WITH 1");

@@ -5,7 +5,7 @@ VALUES ('1234'),
        ('3456'),
        ('7890');
 
-INSERT INTO favorite (created_at, member_id, content_id)
+INSERT INTO favoriteContent (created_at, member_id, content_id)
 VALUES
 -- 2025-07-31 (목요일)
 ('2025-07-31', 1, 1),

@@ -1,4 +1,4 @@
-package turip.favorite.service;
+package turip.favoritecontent.service;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -16,34 +16,34 @@ import turip.content.repository.ContentRepository;
 import turip.contentplace.service.ContentPlaceService;
 import turip.exception.custom.BadRequestException;
 import turip.exception.custom.NotFoundException;
-import turip.favorite.controller.dto.request.FavoriteRequest;
-import turip.favorite.controller.dto.response.FavoriteResponse;
-import turip.favorite.domain.Favorite;
-import turip.favorite.repository.FavoriteRepository;
+import turip.favoritecontent.controller.dto.request.FavoriteContentRequest;
+import turip.favoritecontent.controller.dto.response.FavoriteContentResponse;
+import turip.favoritecontent.domain.FavoriteContent;
+import turip.favoritecontent.repository.FavoriteContentRepository;
 import turip.member.domain.Member;
 import turip.member.repository.MemberRepository;
 
 @Service
 @RequiredArgsConstructor
-public class FavoriteService {
+public class FavoriteContentService {
 
-    private final FavoriteRepository favoriteRepository;
+    private final FavoriteContentRepository favoriteContentRepository;
     private final MemberRepository memberRepository;
     private final ContentRepository contentRepository;
     private final ContentPlaceService contentPlaceService;
 
     @Transactional
-    public FavoriteResponse create(FavoriteRequest request, String deviceFid) {
+    public FavoriteContentResponse create(FavoriteContentRequest request, String deviceFid) {
         Long contentId = request.contentId();
         Content content = contentRepository.findById(contentId)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 컨텐츠입니다."));
         Member member = findOrCreateMember(deviceFid);
-        if (favoriteRepository.existsByMemberIdAndContentId(member.getId(), content.getId())) {
+        if (favoriteContentRepository.existsByMemberIdAndContentId(member.getId(), content.getId())) {
             throw new BadRequestException("이미 찜한 컨텐츠입니다.");
         }
-        Favorite favorite = new Favorite(LocalDate.now(), member, content);
-        Favorite savedFavorite = favoriteRepository.save(favorite);
-        return FavoriteResponse.from(savedFavorite);
+        FavoriteContent favoriteContent = new FavoriteContent(LocalDate.now(), member, content);
+        FavoriteContent savedFavoriteContent = favoriteContentRepository.save(favoriteContent);
+        return FavoriteContentResponse.from(savedFavoriteContent);
     }
 
     public MyFavoriteContentsResponse findMyFavoriteContents(String deviceFid, int pageSize, long lastContentId) {
@@ -53,7 +53,8 @@ public class FavoriteService {
         if (lastContentId == 0) {
             lastContentId = Long.MAX_VALUE;
         }
-        Slice<Content> contentSlice = favoriteRepository.findMyFavoriteContentsByDeviceFid(deviceFid, lastContentId,
+        Slice<Content> contentSlice = favoriteContentRepository.findMyFavoriteContentsByDeviceFid(deviceFid,
+                lastContentId,
                 PageRequest.of(0, pageSize));
         List<Content> contents = contentSlice.getContent();
         List<ContentWithTripInfoAndFavoriteResponse> contentsWithTripInfo = convertToContentWithTripInfoResponses(
@@ -69,9 +70,10 @@ public class FavoriteService {
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 컨텐츠입니다."));
         Member member = memberRepository.findByDeviceFid(deviceFid)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 사용자입니다."));
-        Favorite favorite = favoriteRepository.findByMemberIdAndContentId(member.getId(), content.getId())
+        FavoriteContent favoriteContent = favoriteContentRepository.findByMemberIdAndContentId(member.getId(),
+                        content.getId())
                 .orElseThrow(() -> new NotFoundException("해당 컨텐츠는 찜한 상태가 아닙니다."));
-        favoriteRepository.delete(favorite);
+        favoriteContentRepository.delete(favoriteContent);
     }
 
     private Member findOrCreateMember(String deviceFid) {

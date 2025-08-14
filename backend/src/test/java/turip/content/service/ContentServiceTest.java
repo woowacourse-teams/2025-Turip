@@ -28,6 +28,9 @@ import turip.contentplace.service.ContentPlaceService;
 import turip.country.domain.Country;
 import turip.creator.domain.Creator;
 import turip.exception.custom.BadRequestException;
+import turip.favoritecontent.domain.FavoriteContent;
+import turip.favoritecontent.repository.FavoriteContentRepository;
+import turip.exception.custom.BadRequestException;
 import turip.favorite.domain.Favorite;
 import turip.favorite.repository.FavoriteRepository;
 import turip.member.domain.Member;
@@ -48,7 +51,7 @@ class ContentServiceTest {
     private ContentPlaceService contentPlaceService;
 
     @Mock
-    private FavoriteRepository favoriteRepository;
+    private FavoriteContentRepository favoriteContentRepository;
 
     @Mock
     private MemberRepository memberRepository;
@@ -107,14 +110,14 @@ class ContentServiceTest {
 
             List<Content> popularContents = List.of(content1, content2);
 
-            given(favoriteRepository.findPopularContentsByFavoriteBetweenDatesWithLimit(startDate, endDate,
+            given(favoriteContentRepository.findPopularContentsByFavoriteBetweenDatesWithLimit(startDate, endDate,
                     topContentSize))
                     .willReturn(popularContents);
             given(memberRepository.findByDeviceFid("testDeviceFid"))
                     .willReturn(Optional.of(member));
-            given(favoriteRepository.findByMemberIdAndContentIdIn(1L, List.of(1L, 2L)))
-                    .willReturn(List.of(new Favorite(LocalDate.now().minusWeeks(1), member, content1),
-                            new Favorite(LocalDate.now().minusWeeks(1), member, content2)));
+            given(favoriteContentRepository.findByMemberIdAndContentIdIn(1L, List.of(1L, 2L)))
+                    .willReturn(List.of(new FavoriteContent(LocalDate.now().minusWeeks(1), member, content1),
+                            new FavoriteContent(LocalDate.now().minusWeeks(1), member, content2)));
             given(contentPlaceService.calculateDurationDays(content1.getId()))
                     .willReturn(3); // content1, 2박 3일
             given(contentPlaceService.calculateDurationDays(content2.getId()))
