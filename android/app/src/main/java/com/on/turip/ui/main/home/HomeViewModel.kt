@@ -7,6 +7,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.on.turip.data.common.onFailure
+import com.on.turip.data.common.onSuccess
 import com.on.turip.di.RepositoryModule
 import com.on.turip.domain.content.UsersLikeContent
 import com.on.turip.domain.content.repository.ContentRepository
@@ -43,7 +45,6 @@ class HomeViewModel(
                     _usersLikeContents.value = contents.map { it.toUiModel() }
                     Timber.d("인기 찜 목록: $contents")
                 }.onFailure {
-                    Timber.e("인기 찜 목록 실패: ${it.message}")
                 }
         }
     }

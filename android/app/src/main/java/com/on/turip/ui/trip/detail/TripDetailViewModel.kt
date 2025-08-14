@@ -8,6 +8,9 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.on.turip.data.common.TuripCustomResult
+import com.on.turip.data.common.onFailure
+import com.on.turip.data.common.onSuccess
 import com.on.turip.di.RepositoryModule
 import com.on.turip.domain.content.Content
 import com.on.turip.domain.content.repository.ContentRepository
@@ -66,11 +69,11 @@ class TripDetailViewModel(
         viewModelScope.launch {
             val deferredCreator: Deferred<Result<Creator>> =
                 async { creatorRepository.loadCreator(creatorId) }
-            val deferredVideoData: Deferred<Result<Content>> =
+            val deferredVideoData: Deferred<TuripCustomResult<Content>> =
                 async { contentRepository.loadContent(contentId) }
 
             val creatorResult: Result<Creator> = deferredCreator.await()
-            val videoDataResult: Result<Content> = deferredVideoData.await()
+            val videoDataResult: TuripCustomResult<Content> = deferredVideoData.await()
 
             creatorResult
                 .onSuccess { creator: Creator ->
@@ -80,7 +83,6 @@ class TripDetailViewModel(
                             _videoUri.value = result.videoData.url
                             _isFavorite.value = result.isFavorite
                         }.onFailure {
-                            Timber.e("${it.message}")
                         }
                 }.onFailure {
                     Timber.e("${it.message}")

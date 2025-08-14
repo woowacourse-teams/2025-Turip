@@ -7,6 +7,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.on.turip.data.common.TuripCustomResult
+import com.on.turip.data.common.onFailure
+import com.on.turip.data.common.onSuccess
 import com.on.turip.di.RepositoryModule
 import com.on.turip.domain.content.PagedContentsResult
 import com.on.turip.domain.content.repository.ContentRepository
@@ -64,14 +67,14 @@ class SearchViewModel(
         if (searchingWord.value?.trim() == "" || searchingWord.value?.trim() == null) return
         _loading.value = true
         viewModelScope.launch {
-            val searchResultCountResult: Deferred<Result<Int>> =
+            val searchResultCountResult: Deferred<TuripCustomResult<Int>> =
                 async {
                     contentRepository.loadContentsSizeByKeyword(
                         searchingWord.value.toString(),
                     )
                 }
 
-            val pagedContentsResult: Deferred<Result<PagedContentsResult>> =
+            val pagedContentsResult: Deferred<TuripCustomResult<PagedContentsResult>> =
                 async {
                     contentRepository.loadContentsByKeyword(
                         keyword = searchingWord.value.toString(),
@@ -89,7 +92,6 @@ class SearchViewModel(
                     _videoInformation.value = videoModels
                 }.onFailure {
                     _loading.value = false
-                    Timber.e("${it.message}")
                 }
 
             searchResultCountResult
@@ -100,7 +102,6 @@ class SearchViewModel(
                     _searchResultCount.value = result
                 }.onFailure {
                     _loading.value = false
-                    Timber.e("${it.message}")
                 }
         }
     }
