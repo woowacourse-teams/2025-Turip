@@ -2,7 +2,6 @@ package turip.favoritecontent.repository;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -51,9 +50,8 @@ class FavoriteContentRepositoryTest {
 
         Member member = memberRepository.save(new Member("testDeviceFid"));
 
-        FavoriteContent favoriteContent1 = new FavoriteContent(LocalDate.now().minusDays(2), member, content1);
-        FavoriteContent favoriteContent2 = new FavoriteContent(LocalDate.now().minusDays(1), member,
-                content2); // 최신 찜 컨텐츠
+        FavoriteContent favoriteContent1 = new FavoriteContent(member, content1);
+        FavoriteContent favoriteContent2 = new FavoriteContent(member, content2);
 
         favoriteContentRepository.save(favoriteContent1);
         favoriteContentRepository.save(favoriteContent2);
