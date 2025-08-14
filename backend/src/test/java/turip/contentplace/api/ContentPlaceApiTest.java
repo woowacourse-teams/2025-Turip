@@ -45,7 +45,7 @@ public class ContentPlaceApiTest {
         jdbcTemplate.update("ALTER TABLE place_category ALTER COLUMN id RESTART WITH 1");
     }
 
-    @DisplayName("/trip-courses GET 여행 상세 조회 테스트")
+    @DisplayName("/content-places GET 여행 상세 조회 테스트")
     @Nested
     class ReadContentPlace {
 
