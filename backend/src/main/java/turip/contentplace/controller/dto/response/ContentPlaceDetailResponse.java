@@ -8,6 +8,7 @@ public record ContentPlaceDetailResponse(
         int contentPlaceCount,
         List<ContentPlaceResponse> contentPlaces
 ) {
+    
     public static ContentPlaceDetailResponse of(
             int nights,
             int days,

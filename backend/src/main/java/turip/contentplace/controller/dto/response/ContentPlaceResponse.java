@@ -14,6 +14,7 @@ public record ContentPlaceResponse(
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "mm:ss")
         LocalTime timeLine
 ) {
+    
     public static ContentPlaceResponse of(ContentPlace contentPlace, Place place) {
         return new ContentPlaceResponse(
                 contentPlace.getId(),
