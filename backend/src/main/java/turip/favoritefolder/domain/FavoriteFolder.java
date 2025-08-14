@@ -5,17 +5,22 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PreRemove;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLRestriction;
+import turip.domain.TimeStamp;
 import turip.member.domain.Member;
 
 @Getter
 @Entity
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class FavoriteFolder {
+@SQLRestriction("deleted_at is Null")
+public class FavoriteFolder extends TimeStamp {
 
     @Id
     @EqualsAndHashCode.Include
@@ -28,4 +33,9 @@ public class FavoriteFolder {
     private String name;
 
     private boolean isDefault;
+
+    @PreRemove
+    public void preRemove() {
+        this.setDeletedAt(LocalDateTime.now());
+    }
 }
