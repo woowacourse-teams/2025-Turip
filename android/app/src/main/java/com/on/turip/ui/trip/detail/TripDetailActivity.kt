@@ -6,6 +6,7 @@ import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
+import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
@@ -13,9 +14,11 @@ import androidx.core.net.toUri
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import com.google.android.material.snackbar.Snackbar
 import com.on.turip.R
 import com.on.turip.databinding.ActivityTripDetailBinding
 import com.on.turip.domain.content.Content
+import com.on.turip.ui.common.TuripSnackbar
 import com.on.turip.ui.common.TuripUrlConverter
 import com.on.turip.ui.common.base.BaseActivity
 import com.on.turip.ui.common.loadCircularImage
@@ -167,7 +170,29 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
         }
         binding.ivTripDetailFavorite.setOnClickListener {
             viewModel.updateFavorite()
+            showFavoriteStatusSnackbar(viewModel.isFavorite.value == true)
         }
+        binding.ivTripDetailContentToggle.setOnClickListener {
+            viewModel.updateExpandTextToggle()
+        }
+    }
+
+    private fun showFavoriteStatusSnackbar(isFavorite: Boolean) {
+        val messageResource: Int =
+            if (isFavorite) R.string.trip_detail_snackbar_favorite_save else R.string.trip_detail_snackbar_favorite_remove
+        val iconResource: Int =
+            if (isFavorite) R.drawable.ic_heart_normal else R.drawable.ic_heart_empty
+
+        TuripSnackbar
+            .make(
+                rootView = binding.root,
+                messageResource = messageResource,
+                duration = Snackbar.LENGTH_LONG,
+                layoutInflater = layoutInflater,
+            ).topMarginInCoordinatorLayout(binding.tbTripDetail.height)
+            .icon(iconResource)
+            .action(R.string.all_snackbar_close)
+            .show()
     }
 
     private fun setupObservers() {
@@ -186,6 +211,7 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
             binding.tvTripDetailCreatorName.text = content.creator.channelName
             binding.tvTripDetailContentTitle.text = content.videoData.title
             binding.tvTripDetailUploadDate.text = content.videoData.uploadedDate
+            updateExpandTextToggleVisibility()
         }
         viewModel.tripModel.observe(this) { tripModel: TripModel ->
             binding.tvTripDetailTotalPlaceCount.text =
@@ -207,6 +233,29 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
         }
         viewModel.isFavorite.observe(this) { isFavorite: Boolean ->
             binding.ivTripDetailFavorite.isSelected = isFavorite
+        }
+        viewModel.isExpandTextToggleVisible.observe(this) { isVisible ->
+            binding.ivTripDetailContentToggle.visibility =
+                if (isVisible) View.VISIBLE else View.GONE
+        }
+
+        viewModel.isExpandTextToggleSelected.observe(this) { isSelected ->
+            binding.ivTripDetailContentToggle.isSelected = isSelected
+        }
+
+        viewModel.bodyMaxLines.observe(this) { maxLines ->
+            binding.tvTripDetailContentTitle.maxLines = maxLines
+        }
+    }
+
+    private fun updateExpandTextToggleVisibility() {
+        if (viewModel.isExpandTextToggleVisible.value == true) return
+
+        val bodyTextView: TextView = binding.tvTripDetailContentTitle
+        bodyTextView.post {
+            val lineCount: Int = bodyTextView.layout.lineCount
+            val ellipsisCount: Int = bodyTextView.layout.getEllipsisCount(lineCount - 1)
+            viewModel.updateExpandTextToggleVisibility(lineCount, ellipsisCount)
         }
     }
 

@@ -25,7 +25,7 @@ class DomesticRegionCategoryPagingApiTest {
 
     @BeforeEach
     void setUp() {
-        jdbcTemplate.update("DELETE FROM trip_course");
+        jdbcTemplate.update("DELETE FROM content_place");
         jdbcTemplate.update("DELETE FROM place_category");
         jdbcTemplate.update("DELETE FROM place");
         jdbcTemplate.update("DELETE FROM favorite_content");
@@ -35,8 +35,8 @@ class DomesticRegionCategoryPagingApiTest {
         jdbcTemplate.update("DELETE FROM country");
         jdbcTemplate.update("DELETE FROM province");
 
-        jdbcTemplate.update("ALTER TABLE trip_course ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE place_category ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE content_place ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE place ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE favorite_content ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE content ALTER COLUMN id RESTART WITH 1");

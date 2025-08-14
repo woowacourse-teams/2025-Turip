@@ -1,4 +1,4 @@
-package turip.tripcourse.api;
+package turip.contentplace.api;
 
 import static org.hamcrest.Matchers.is;
 
@@ -15,7 +15,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class TripCourseApiTest {
+public class ContentPlaceApiTest {
 
     @LocalServerPort
     private int port;
@@ -25,7 +25,7 @@ public class TripCourseApiTest {
     @BeforeEach
     void setUp() {
         jdbcTemplate.update("DELETE FROM place_category");
-        jdbcTemplate.update("DELETE FROM trip_course");
+        jdbcTemplate.update("DELETE FROM content_place");
         jdbcTemplate.update("DELETE FROM place");
         jdbcTemplate.update("DELETE FROM category");
         jdbcTemplate.update("DELETE FROM favorite_content");
@@ -37,7 +37,7 @@ public class TripCourseApiTest {
         jdbcTemplate.update("DELETE FROM country");
         jdbcTemplate.update("DELETE FROM province");
 
-        jdbcTemplate.update("ALTER TABLE trip_course ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE content_place ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE place ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE content ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE creator ALTER COLUMN id RESTART WITH 1");
@@ -48,13 +48,13 @@ public class TripCourseApiTest {
         jdbcTemplate.update("ALTER TABLE place_category ALTER COLUMN id RESTART WITH 1");
     }
 
-    @DisplayName("/trip-courses GET 여행 상세 조회 테스트")
+    @DisplayName("/content-places GET 여행 상세 조회 테스트")
     @Nested
-    class ReadTripCourse {
+    class ReadContentPlace {
 
         @DisplayName("성공 시 200 OK 코드와 여행 상세 정보를 응답한다")
         @Test
-        void readTripCourseDetails() {
+        void readContentPlaceDetails() {
             // given
             jdbcTemplate.update(
                     "INSERT INTO creator (profile_image, channel_name) VALUES ('https://image.example.com/creator1.jpg', 'TravelMate')");
@@ -75,17 +75,25 @@ public class TripCourseApiTest {
             jdbcTemplate.update(
                     "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 1, 'https://youtube.com/watch?v=abcd1', '서촌 당일치기 코스 추천', '2025-06-18')");
             jdbcTemplate.update(
-                    "INSERT INTO trip_course (content_id, place_id, visit_day, visit_order) VALUES (1, 1, 1, 1)");
+                    "INSERT INTO content_place (content_id, place_id, visit_day, visit_order, time_line) VALUES (1, 1, 1, 1, '00:11:00')");
             jdbcTemplate.update(
-                    "INSERT INTO trip_course (content_id, place_id, visit_day, visit_order) VALUES (1, 2, 2, 1)");
+                    "INSERT INTO content_place (content_id, place_id, visit_day, visit_order, time_line) VALUES (1, 2, 2, 1, '00:12:00')");
 
             // when & then
             RestAssured.given().port(port)
                     .queryParam("contentId", "1")
-                    .when().get("/trip-courses")
+                    .when().get("/content-places")
                     .then()
                     .statusCode(200)
-                    .body("tripPlaceCount", is(2));
+                    .body("contentPlaceCount", is(2))
+                    .body("contentPlaces[0].timeLine", is("11:00"))
+                    .body("contentPlaces[1].timeLine", is("12:00"))
+                    .body("contentPlaces[0].visitDay", is(1))
+                    .body("contentPlaces[1].visitDay", is(2))
+                    .body("contentPlaces[0].visitOrder", is(1))
+                    .body("contentPlaces[1].visitOrder", is(1))
+                    .body("contentPlaces[0].place.name", is("루터회관"))
+                    .body("contentPlaces[1].place.name", is("테디뵈르하우스"));
         }
     }
 }

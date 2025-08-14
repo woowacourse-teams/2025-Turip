@@ -13,6 +13,7 @@ import turip.content.controller.dto.response.MyFavoriteContentsResponse;
 import turip.content.controller.dto.response.TripDurationResponse;
 import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
+import turip.contentplace.service.ContentPlaceService;
 import turip.exception.custom.BadRequestException;
 import turip.exception.custom.NotFoundException;
 import turip.favoritecontent.controller.dto.request.FavoriteContentRequest;
@@ -23,7 +24,6 @@ import turip.favoritefolder.domain.FavoriteFolder;
 import turip.favoritefolder.repository.FavoriteFolderRepository;
 import turip.member.domain.Member;
 import turip.member.repository.MemberRepository;
-import turip.tripcourse.service.TripCourseService;
 
 @Service
 @RequiredArgsConstructor
@@ -32,8 +32,8 @@ public class FavoriteContentService {
     private final FavoriteContentRepository favoriteContentRepository;
     private final MemberRepository memberRepository;
     private final ContentRepository contentRepository;
-    private final TripCourseService tripCourseService;
     private final FavoriteFolderRepository favoriteFolderRepository;
+    private final ContentPlaceService contentPlaceService;
 
     @Transactional
     public FavoriteContentResponse create(FavoriteContentRequest request, String deviceFid) {
@@ -90,7 +90,7 @@ public class FavoriteContentService {
     }
 
     private TripDurationResponse calculateTripDuration(Content content) {
-        int totalTripDay = tripCourseService.calculateDurationDays(content.getId());
+        int totalTripDay = contentPlaceService.calculateDurationDays(content.getId());
         return TripDurationResponse.of(totalTripDay - 1, totalTripDay);
     }
 
@@ -99,7 +99,7 @@ public class FavoriteContentService {
                 .map(content -> {
                     ContentResponse contentWithCreatorAndCity = ContentResponse.of(content, true);
                     TripDurationResponse tripDuration = calculateTripDuration(content);
-                    int tripPlaceCount = tripCourseService.countByContentId(content.getId());
+                    int tripPlaceCount = contentPlaceService.countByContentId(content.getId());
                     return ContentWithTripInfoAndFavoriteResponse.of(contentWithCreatorAndCity, tripDuration,
                             tripPlaceCount);
                 })

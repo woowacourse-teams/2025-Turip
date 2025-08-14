@@ -54,6 +54,16 @@ class TripDetailViewModel(
     private val _isFavorite: MutableLiveData<Boolean> = MutableLiveData(false)
     val isFavorite: LiveData<Boolean> get() = _isFavorite
 
+    private val _isExpandTextToggleVisible: MutableLiveData<Boolean> = MutableLiveData(false)
+    val isExpandTextToggleVisible: LiveData<Boolean> get() = _isExpandTextToggleVisible
+
+    private val _isExpandTextToggleSelected: MutableLiveData<Boolean> = MutableLiveData(false)
+    val isExpandTextToggleSelected: LiveData<Boolean> get() = _isExpandTextToggleSelected
+
+    private val _bodyMaxLines: MutableLiveData<Int> =
+        MutableLiveData(DEFAULT_CONTENT_TITLE_MAX_LINES)
+    val bodyMaxLines: LiveData<Int> get() = _bodyMaxLines
+
     private var placeCacheByDay: Map<Int, List<PlaceModel>> = emptyMap()
 
     init {
@@ -129,15 +139,6 @@ class TripDetailViewModel(
             }
     }
 
-    fun updateDay(dayModel: DayModel) {
-        _days.value = days.value?.map { it.copy(isSelected = it.day == dayModel.day) }
-        _places.value = placeCacheByDay[dayModel.day].orEmpty()
-    }
-
-    fun updateFavorite() {
-        _isFavorite.value = isFavorite.value?.not()
-    }
-
     @OptIn(FlowPreview::class)
     private fun handleFavoriteWithDebounce() {
         viewModelScope.launch {
@@ -156,7 +157,42 @@ class TripDetailViewModel(
         }
     }
 
+    fun updateDay(dayModel: DayModel) {
+        _days.value = days.value?.map { it.copy(isSelected = it.day == dayModel.day) }
+        _places.value = placeCacheByDay[dayModel.day].orEmpty()
+    }
+
+    fun updateFavorite() {
+        _isFavorite.value = isFavorite.value?.not()
+    }
+
+    fun updateExpandTextToggle() {
+        val currentSelected: Boolean = _isExpandTextToggleSelected.value == true
+        val newSelected: Boolean = !currentSelected
+
+        _isExpandTextToggleSelected.value = newSelected
+        _bodyMaxLines.value =
+            if (newSelected) {
+                Int.MAX_VALUE
+            } else {
+                DEFAULT_CONTENT_TITLE_MAX_LINES
+            }
+    }
+
+    fun updateExpandTextToggleVisibility(
+        lineCount: Int,
+        ellipsisCount: Int,
+    ) {
+        _isExpandTextToggleVisible.value =
+            lineCount >= DEFAULT_CONTENT_TITLE_MAX_LINES &&
+            ellipsisCount > 0
+        _isExpandTextToggleSelected.value = false
+        _bodyMaxLines.value = DEFAULT_CONTENT_TITLE_MAX_LINES
+    }
+
     companion object {
+        private const val DEFAULT_CONTENT_TITLE_MAX_LINES = 2
+
         fun provideFactory(
             contentId: Long,
             creatorId: Long,

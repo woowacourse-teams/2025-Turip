@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_gray300_radius_10dp">
+
+    <ImageView
+        android:id="@+id/iv_snackbar_icon"
+        android:layout_width="12dp"
+        android:layout_height="12dp"
+        android:layout_marginStart="20dp"
+        android:contentDescription="@null"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/ic_heart_normal" />
+
+    <TextView
+        android:id="@+id/tv_snackbar_message"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:textAppearance="@style/title3"
+        android:textColor="@color/pure_white_ffffff"
+        app:layout_constraintBottom_toBottomOf="@id/iv_snackbar_icon"
+        app:layout_constraintEnd_toStartOf="@id/tv_snackbar_button"
+        app:layout_constraintStart_toEndOf="@id/iv_snackbar_icon"
+        app:layout_constraintTop_toTopOf="@id/iv_snackbar_icon"
+        tools:text="컨텐츠 찜 목록에 저장했어요" />
+
+    <TextView
+        android:id="@+id/tv_snackbar_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="10dp"
+        android:padding="12dp"
+        android:textAppearance="@style/info1"
+        android:textColor="@color/pure_white_ffffff"
+        app:layout_constraintBottom_toBottomOf="@id/tv_snackbar_message"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/tv_snackbar_message"
+        app:layout_constraintTop_toTopOf="@id/tv_snackbar_message"
+        tools:text="닫기" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

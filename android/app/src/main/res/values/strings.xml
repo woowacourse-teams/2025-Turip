@@ -7,6 +7,7 @@
     <string name="all_travel_day_trip_duration">당일치기</string>
     <string name="all_loading">로딩 중…</string>
     <string name="all_video_description">%s · %s</string>
+    <string name="all_snackbar_close">닫기</string>
 
     <!-- 바텀 네비게이션 -->
     <string name="bottom_navigation_home">홈</string>
@@ -28,7 +29,7 @@
     <string name="home_where_should_we_go_highlighting">떠나볼까요?</string>
     <string name="home_domestic">국내</string>
     <string name="home_abroad">해외</string>
-    <string name="home_users_like_content_title">🩵 이번 주, 유저들이 가장 많이 찜한 콘텐츠!</string>
+    <string name="home_users_like_content_title">🩵 한 주간 가장 많이 찜 된 콘텐츠</string>
 
     <!-- 찜 목록 페이지 -->
     <string name="favorite_empty_suggest_title">컨텐츠를 찜 해보세요!</string>
@@ -41,5 +42,9 @@
     <string name="trip_detail_video_error">해당 영상은 제작자의 요청으로 유튜브로만 시청할 수 있습니다.\n클릭 시 유튜브로 이동합니다.</string>
     <string name="trip_detail_day_place_count">일정 %d개</string>
     <string name="trip_detail_travel_day">%d일차</string>
+    <string name="trip_detail_snackbar_favorite_save">컨텐츠 찜 목록에 저장했어요</string>
+    <string name="trip_detail_snackbar_favorite_remove">컨텐츠 찜 목록에서 삭제했어요</string>
+
+
     <string name="main_double_back_pressed_to_exit">한 번 더 누르면 종료됩니다.</string>
 </resources>
