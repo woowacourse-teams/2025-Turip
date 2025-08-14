@@ -1,5 +1,6 @@
 package com.on.turip.data.common
 
+import com.on.turip.domain.ErrorEvent
 import timber.log.Timber
 
 sealed class TuripCustomResult<out T> {
@@ -46,3 +47,43 @@ sealed class TuripCustomResult<out T> {
         }
     }
 }
+
+inline fun <T> TuripCustomResult<T>.onSuccess(action: (value: T) -> Unit): TuripCustomResult<T> {
+    if (this is TuripCustomResult.Success) action(data)
+    return this
+}
+
+inline fun <T> TuripCustomResult<T>.onFailure(action: (ErrorEvent) -> Unit): TuripCustomResult<T> {
+    when (this) {
+        is TuripCustomResult.ParseError -> ErrorEvent.PARSER_ERROR
+        is TuripCustomResult.NetworkError -> ErrorEvent.NETWORK_ERROR
+        is TuripCustomResult.HttpError ->
+            action(
+                when (whatError()) {
+                    HttpEvent.USER_NOT_HAVE_PERMISSION -> ErrorEvent.USER_NOT_HAVE_PERMISSION
+                    HttpEvent.NOT_FOUND -> ErrorEvent.UNEXPECTED_PROBLEM
+                    HttpEvent.DUPLICATION_FOLDER -> ErrorEvent.DUPLICATION_FOLDER
+                    HttpEvent.UNEXPECTED_PROBLEM -> ErrorEvent.UNEXPECTED_PROBLEM
+                    HttpEvent.UNKNOWN -> ErrorEvent.UNEXPECTED_PROBLEM
+                },
+            )
+
+        is TuripCustomResult.Success -> this
+    }
+    return this
+}
+
+inline fun <R, T> TuripCustomResult<T>.mapCatching(transform: (value: T) -> R): TuripCustomResult<R> =
+    when (this) {
+        is TuripCustomResult.Success ->
+            runCatching {
+                transform(data)
+            }.fold(
+                onSuccess = { TuripCustomResult.Success(it) },
+                onFailure = { e -> TuripCustomResult.ParseError(e) },
+            )
+
+        is TuripCustomResult.ParseError -> this
+        is TuripCustomResult.NetworkError -> this
+        is TuripCustomResult.HttpError -> this
+    }
