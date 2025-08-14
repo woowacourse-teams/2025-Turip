@@ -83,6 +83,44 @@ public class FavoriteFolderController {
                 .body(response);
     }
 
+    @Operation(
+            summary = "장소 찜 폴더 조회 api",
+            description = "특정 회원의 장소 찜 폴더 목록을 조회한다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "성공 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = FavoriteFoldersWithPlaceCountResponse.class),
+                            examples = @ExampleObject(
+                                    name = "success",
+                                    summary = "장소 찜 폴더 조회 성공",
+                                    value = """
+                                            {
+                                                "favoriteFolders": [
+                                                    {
+                                                        "id": 5,
+                                                        "memberId": 8,
+                                                        "name": "기본 폴더",
+                                                        "isDefault": false,
+                                                        "placeCount": 0
+                                                    },
+                                                    {
+                                                        "id": 6,
+                                                        "memberId": 8,
+                                                        "name": "뭉치가 가고싶은 맛집들",
+                                                        "isDefault": false,
+                                                        "placeCount": 0
+                                                    }
+                                                ]
+                                            }
+                                            """
+                            )
+                    )
+            )
+    })
     @GetMapping
     public ResponseEntity<FavoriteFoldersWithPlaceCountResponse> readAllByMember(
             @RequestHeader("device-fid") String deviceFid) {
