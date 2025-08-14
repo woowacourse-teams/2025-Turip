@@ -271,14 +271,18 @@ public class CsvDataImportService {
         int visitDay = parseIntegerOrDefault(csvData.visitDay(), "방문 일차");
         int visitOrder = parseIntegerOrDefault(csvData.visitOrder(), "방문 순서");
 
-        String[] parts = csvData.timeline().split(":");
-        int minute = Integer.parseInt(parts[0]);
-        int second = Integer.parseInt(parts[1]);
-        LocalTime timeLine = LocalTime.of(0, minute, second);
+        LocalTime timeLine = parseTimeLine(csvData.timeline());
 
         return contentPlaceRepository
                 .findByContentAndPlaceAndVisitDayAndVisitOrder(content, place, visitDay, visitOrder)
                 .orElseGet(() -> createAndSaveContentPlace(content, place, timeLine, visitDay, visitOrder));
+    }
+
+    private LocalTime parseTimeLine(String timeLine) {
+        String[] parts = timeLine.split(":");
+        int minute = Integer.parseInt(parts[0]);
+        int second = Integer.parseInt(parts[1]);
+        return LocalTime.of(0, minute, second);
     }
 
     private int parseIntegerOrDefault(String value, String label) {
