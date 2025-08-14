@@ -34,6 +34,12 @@ public class FavoriteFolder extends TimeStamp {
 
     private boolean isDefault;
 
+    public FavoriteFolder(Member member, String name, boolean isDefault) {
+        this.member = member;
+        this.name = name;
+        this.isDefault = isDefault;
+    }
+
     @PreRemove
     public void preRemove() {
         this.setDeletedAt(LocalDateTime.now());
