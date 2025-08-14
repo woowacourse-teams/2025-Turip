@@ -27,14 +27,14 @@ import turip.favoritecontent.service.FavoriteContentService;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/favorite-contents")
-@Tag(name = "FavoriteContent", description = "찜 API")
+@Tag(name = "FavoriteContent", description = "컨텐츠 찜 API")
 public class FavoriteContentController {
 
     private final FavoriteContentService favoriteContentService;
 
     @Operation(
-            summary = "찜 생성 api",
-            description = "찜을 생성한다."
+            summary = "컨텐츠 찜 생성 api",
+            description = "컨텐츠를 찜한다."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -45,7 +45,7 @@ public class FavoriteContentController {
                             schema = @Schema(implementation = FavoriteContentResponse.class),
                             examples = @ExampleObject(
                                     name = "success",
-                                    summary = "찜 생성 성공",
+                                    summary = "컨텐츠 찜 생성 성공",
                                     value = """
                                             {
                                                 "id": 1,
@@ -119,8 +119,8 @@ public class FavoriteContentController {
     }
 
     @Operation(
-            summary = "내 찜 목록 조회 api",
-            description = "내 찜 목록을 조회한다."
+            summary = "내 컨텐츠 찜 목록 조회 api",
+            description = "내가 찜한 컨텐츠 목록을 조회한다."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -131,7 +131,7 @@ public class FavoriteContentController {
                             schema = @Schema(implementation = MyFavoriteContentsResponse.class),
                             examples = @ExampleObject(
                                     name = "success",
-                                    summary = "내 찜 목록 조회 성공",
+                                    summary = "내가 찜한 컨텐츠 목록 조회 성공",
                                     value = """
                                             {
                                                 "contents": [
@@ -195,8 +195,8 @@ public class FavoriteContentController {
     }
 
     @Operation(
-            summary = "찜 삭제 api",
-            description = "찜을 삭제한다."
+            summary = "컨텐츠 찜 삭제 api",
+            description = "컨텐츠 찜을 취소한다."
     )
     @ApiResponses(value = {
             @ApiResponse(
