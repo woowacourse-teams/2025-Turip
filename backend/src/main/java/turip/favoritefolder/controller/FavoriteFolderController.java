@@ -131,6 +131,108 @@ public class FavoriteFolderController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(
+            summary = "장소 찜 폴더 이름 수정 api",
+            description = "장소 찜 폴더의 이름을 수정한다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "성공 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = FavoriteFolderResponse.class),
+                            examples = @ExampleObject(
+                                    name = "success",
+                                    summary = "장소 찜 폴더 이름 수정 성공",
+                                    value = """
+                                            {
+                                                "id": 1,
+                                                "memberId": 1,
+                                                "name": "수정된 폴더명",
+                                                "isDefault": false
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "member_not_found",
+                                            summary = "device-fid에 대한 회원을 찾을 수 없는 경우",
+                                            value = """
+                                                    {
+                                                        "message" : "해당 id에 대한 회원이 존재하지 않습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "folder_not_found",
+                                            summary = "id에 대한 폴더를 찾을 수 없는 경우",
+                                            value = """
+                                                    {
+                                                        "message" : "해당 id에 대한 폴더가 존재하지 않습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "folder_name_already_exists",
+                                            summary = "중복되는 폴더 이름이 존재하는 경우",
+                                            value = """
+                                                    {
+                                                        "message" : "중복된 폴더 이름이 존재합니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "not_folder_owner",
+                                            summary = "폴더 소유자의 기기id와 요청자의 기기id가 같지 않은 경우",
+                                            value = """
+                                                    {
+                                                        "message" : "폴더 소유자의 기기id와 요청자의 기기id가 같지 않습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            )
+    })
     @PatchMapping("/{favoriteFolderId}")
     public ResponseEntity<FavoriteFolderResponse> updateName(
             @RequestHeader("device-fid") String deviceFid,
