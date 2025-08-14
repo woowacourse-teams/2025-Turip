@@ -1,4 +1,3 @@
-#file: noinspection SpringBootApplicationYaml
 spring:
   profiles:
     active: dev
@@ -9,10 +8,3 @@ spring:
       hibernate:
         format_sql: true
     defer-datasource-initialization: false # 데이터베이스 초기화 지연
-
-    flyway:
-      enabled: true                       # Flyway migration 기능 활성화 여부
-      baseline-on-migrate: true          # 기존 DB에 baseline 버전 생성해서 migration 시작 가능
-      validate-on-migrate: true          # migration 전에 SQL 스크립트와 데이터 일치 여부 검증
-      locations: classpath:db/migration  # migration 스크립트 위치
-      encoding: UTF-8                    # SQL 파일 인코딩

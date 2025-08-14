@@ -18,3 +18,7 @@ spring:
     hibernate:
       ddl-auto: create-drop
     defer-datasource-initialization: true
+
+  # 테스트 환경에서 Flyway 비활성화
+  flyway:
+    enabled: false
