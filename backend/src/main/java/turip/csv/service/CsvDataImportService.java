@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,8 @@ import turip.city.domain.City;
 import turip.city.repository.CityRepository;
 import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
+import turip.contentplace.domain.ContentPlace;
+import turip.contentplace.repository.ContentPlaceRepository;
 import turip.country.domain.Country;
 import turip.country.repository.CountryRepository;
 import turip.creator.domain.Creator;
@@ -26,8 +29,6 @@ import turip.placecategory.domain.PlaceCategory;
 import turip.placecategory.repository.PlaceCategoryRepository;
 import turip.province.domain.Province;
 import turip.province.repository.ProvinceRepository;
-import turip.tripcourse.domain.TripCourse;
-import turip.tripcourse.repository.TripCourseRepository;
 
 @Slf4j
 @Service
@@ -45,7 +46,7 @@ public class CsvDataImportService {
     private final PlaceRepository placeRepository;
     private final CategoryRepository categoryRepository;
     private final PlaceCategoryRepository placeCategoryRepository;
-    private final TripCourseRepository tripCourseRepository;
+    private final ContentPlaceRepository contentPlaceRepository;
 
     public void importCsvData(String csvFilePath) {
         try (BufferedReader reader = new BufferedReader(new FileReader(csvFilePath))) {
@@ -139,9 +140,9 @@ public class CsvDataImportService {
 
         if (csvData.visitDay() != null && !csvData.visitDay().isEmpty() &&
                 csvData.visitOrder() != null && !csvData.visitOrder().isEmpty()) {
-            TripCourse tripCourse = getOrCreateTripCourse(csvData, place, content);
-            if (tripCourse != null) {
-                log.info("TripCourse 처리: day={}, order={}", tripCourse.getVisitDay(), tripCourse.getVisitOrder());
+            ContentPlace contentPlace = getOrCreateContentPlace(csvData, place, content);
+            if (contentPlace != null) {
+                log.info("ContentPlace 처리: day={}, order={}", contentPlace.getVisitDay(), contentPlace.getVisitOrder());
             }
         }
 
@@ -263,16 +264,25 @@ public class CsvDataImportService {
                 .orElseGet(() -> placeCategoryRepository.save(new PlaceCategory(place, category)));
     }
 
-    private TripCourse getOrCreateTripCourse(CsvDataDto csvData, Place place, Content content) {
+    private ContentPlace getOrCreateContentPlace(CsvDataDto csvData, Place place, Content content) {
         if (place == null || content == null) {
             return null;
         }
         int visitDay = parseIntegerOrDefault(csvData.visitDay(), "방문 일차");
         int visitOrder = parseIntegerOrDefault(csvData.visitOrder(), "방문 순서");
 
-        return tripCourseRepository
+        LocalTime timeLine = parseTimeLine(csvData.timeline());
+
+        return contentPlaceRepository
                 .findByContentAndPlaceAndVisitDayAndVisitOrder(content, place, visitDay, visitOrder)
-                .orElseGet(() -> createAndSaveTripCourse(content, place, visitDay, visitOrder));
+                .orElseGet(() -> createAndSaveContentPlace(content, place, timeLine, visitDay, visitOrder));
+    }
+
+    private LocalTime parseTimeLine(String timeLine) {
+        String[] parts = timeLine.split(":");
+        int minute = Integer.parseInt(parts[0]);
+        int second = Integer.parseInt(parts[1]);
+        return LocalTime.of(0, minute, second);
     }
 
     private int parseIntegerOrDefault(String value, String label) {
@@ -287,9 +297,10 @@ public class CsvDataImportService {
         }
     }
 
-    private TripCourse createAndSaveTripCourse(Content content, Place place, int visitDay, int visitOrder) {
-        TripCourse newTripCourse = new TripCourse(visitDay, visitOrder, place, content);
-        return tripCourseRepository.save(newTripCourse);
+    private ContentPlace createAndSaveContentPlace(Content content, Place place, LocalTime timeLine, int visitDay,
+                                                   int visitOrder) {
+        ContentPlace newContentPlace = new ContentPlace(visitDay, visitOrder, timeLine, place, content);
+        return contentPlaceRepository.save(newContentPlace);
     }
 
     private boolean isNullOrEmpty(String value) {
