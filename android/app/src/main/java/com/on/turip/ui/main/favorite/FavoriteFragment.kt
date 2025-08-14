@@ -1,53 +1,29 @@
 package com.on.turip.ui.main.favorite
 
-import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
-import androidx.core.net.toUri
-import androidx.fragment.app.viewModels
+import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.google.android.material.tabs.TabLayoutMediator
 import com.on.turip.BuildConfig
-import com.on.turip.R
 import com.on.turip.databinding.FragmentFavoriteBinding
-import com.on.turip.ui.common.ItemDividerDecoration
 import com.on.turip.ui.common.base.BaseFragment
-import com.on.turip.ui.trip.detail.TripDetailActivity
-import timber.log.Timber
 
 class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>() {
-    private val viewModel: FavoriteViewModel by viewModels { FavoriteViewModel.provideFactory() }
-    private val inquireMailUri: Uri by lazy {
-        "mailto:$EMAIL_RECIPIENT?subject=${Uri.encode(EMAIL_SUBJECT)}&body=${Uri.encode(EMAIL_BODY)}".toUri()
-    }
-    private val favoriteItemAdapter: FavoriteItemAdapter by lazy {
-        FavoriteItemAdapter(
-            object : FavoriteItemViewHolder.FavoriteItemListener {
-                override fun onFavoriteClick(
-                    contentId: Long,
-                    isFavorite: Boolean,
-                ) {
-                    Timber.d("찜 목록의 찜 버튼을 클릭(contentId=$contentId)\n업데이트 된 찜 상태 =${!isFavorite}")
-                    viewModel.updateFavorite(contentId, isFavorite)
-                }
+//    private val viewModel: FavoriteViewModel by viewModels { FavoriteViewModel.provideFactory() }
+//    private val inquireMailUri: Uri by lazy {
+//        "mailto:$EMAIL_RECIPIENT?subject=${Uri.encode(EMAIL_SUBJECT)}&body=${Uri.encode(EMAIL_BODY)}".toUri()
+//    }
 
-                override fun onFavoriteItemClick(
-                    contentId: Long,
-                    creatorId: Long,
-                ) {
-                    Timber.d("찜 목록의 아이템 클릭(contentId=$contentId)")
-                    val intent =
-                        TripDetailActivity.newIntent(
-                            context = requireContext(),
-                            contentId = contentId,
-                            creatorId = creatorId,
-                        )
-                    startActivity(intent)
-                }
-            },
+    private val favoriteStateAdapter: FragmentStateAdapter by lazy {
+        FavoriteStateAdapter(
+            this,
+            listOf(
+                FavoriteContentFragment(),
+                FavoritePlaceFragment(),
+            ),
         )
     }
 
@@ -63,63 +39,37 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>() {
         super.onViewCreated(view, savedInstanceState)
 
         setupAdapters()
-        setupListeners()
-        setupObservers()
+        setupTabDisplayName()
     }
 
     private fun setupAdapters() {
-        binding.rvFavoriteContent.apply {
-            adapter = favoriteItemAdapter
-            itemAnimator = null
-            addItemDecoration(
-                ItemDividerDecoration(
-                    height = 8,
-                    color = ContextCompat.getColor(context, R.color.gray_100_f0f0ee),
-                ),
-            )
-        }
+        binding.vpFavorite.adapter = favoriteStateAdapter
     }
 
-    private fun setupListeners() {
-        binding.ivFavoriteInquire.setOnClickListener {
-            val intent: Intent =
-                Intent(Intent.ACTION_SENDTO).apply {
-                    data = inquireMailUri
+    private fun setupTabDisplayName() {
+        TabLayoutMediator(binding.tlFavorite, binding.vpFavorite) { tab, position ->
+            tab.text =
+                when (position) {
+                    0 -> FAVORITE_CONTENT_TAB_NAME
+                    else -> FAVORITE_PLACE_TAB_NAME
                 }
-            startActivity(intent)
-        }
+        }.attach()
     }
 
-    private fun setupObservers() {
-        viewModel.favoriteContents.observe(viewLifecycleOwner) {
-            handleVisibleByHasContent()
-            favoriteItemAdapter.submitList(it)
-        }
-    }
-
-    private fun handleVisibleByHasContent() {
-        if (viewModel.favoriteContents.value == null || viewModel.favoriteContents.value?.isEmpty() == true) {
-            binding.clFavoriteEmpty.visibility = View.VISIBLE
-            binding.clFavoriteNotEmpty.visibility = View.GONE
-        } else {
-            binding.clFavoriteEmpty.visibility = View.GONE
-            binding.clFavoriteNotEmpty.visibility = View.VISIBLE
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        viewModel.loadFavoriteContents()
-    }
-
-    override fun onHiddenChanged(hidden: Boolean) {
-        super.onHiddenChanged(hidden)
-        if (!hidden) {
-            viewModel.loadFavoriteContents()
-        }
-    }
+//    private fun setupListeners() {
+//        binding.ivFavoriteInquire.setOnClickListener {
+//            val intent: Intent =
+//                Intent(Intent.ACTION_SENDTO).apply {
+//                    data = inquireMailUri
+//                }
+//            startActivity(intent)
+//        }
+//    }
 
     companion object {
+        private const val FAVORITE_CONTENT_TAB_NAME = "컨텐츠 찜"
+        private const val FAVORITE_PLACE_TAB_NAME = "장소 찜"
+
         private const val EMAIL_RECIPIENT: String = "team.turip@gmail.com"
         private const val EMAIL_SUBJECT: String = "튜립 사용 문의 및 불편 사항 건의 "
         private val EMAIL_BODY: String =
