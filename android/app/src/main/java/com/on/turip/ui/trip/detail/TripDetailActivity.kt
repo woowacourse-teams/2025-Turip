@@ -6,6 +6,7 @@ import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
+import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
@@ -171,6 +172,9 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
             viewModel.updateFavorite()
             showFavoriteStatusSnackbar(viewModel.isFavorite.value == true)
         }
+        binding.ivTripDetailContentToggle.setOnClickListener {
+            viewModel.updateExpandTextToggle()
+        }
     }
 
     private fun showFavoriteStatusSnackbar(isFavorite: Boolean) {
@@ -207,6 +211,7 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
             binding.tvTripDetailCreatorName.text = content.creator.channelName
             binding.tvTripDetailContentTitle.text = content.videoData.title
             binding.tvTripDetailUploadDate.text = content.videoData.uploadedDate
+            updateExpandTextToggleVisibility()
         }
         viewModel.tripModel.observe(this) { tripModel: TripModel ->
             binding.tvTripDetailTotalPlaceCount.text =
@@ -228,6 +233,29 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
         }
         viewModel.isFavorite.observe(this) { isFavorite: Boolean ->
             binding.ivTripDetailFavorite.isSelected = isFavorite
+        }
+        viewModel.isExpandTextToggleVisible.observe(this) { isVisible ->
+            binding.ivTripDetailContentToggle.visibility =
+                if (isVisible) View.VISIBLE else View.GONE
+        }
+
+        viewModel.isExpandTextToggleSelected.observe(this) { isSelected ->
+            binding.ivTripDetailContentToggle.isSelected = isSelected
+        }
+
+        viewModel.bodyMaxLines.observe(this) { maxLines ->
+            binding.tvTripDetailContentTitle.maxLines = maxLines
+        }
+    }
+
+    private fun updateExpandTextToggleVisibility() {
+        if (viewModel.isExpandTextToggleVisible.value == true) return
+
+        val bodyTextView: TextView = binding.tvTripDetailContentTitle
+        bodyTextView.post {
+            val lineCount: Int = bodyTextView.layout.lineCount
+            val ellipsisCount: Int = bodyTextView.layout.getEllipsisCount(lineCount - 1)
+            viewModel.updateExpandTextToggleVisibility(lineCount, ellipsisCount)
         }
     }
 
