@@ -9,9 +9,9 @@ import turip.place.domain.Place;
 
 public interface ContentPlaceRepository extends JpaRepository<ContentPlace, Long> {
 
-    List<ContentPlace> findAllByContent_Id(Long contentId);
+    List<ContentPlace> findAllByContentId(Long contentId);
 
-    int countByContent_Id(Long contentId);
+    int countByContentId(Long contentId);
 
     Optional<ContentPlace> findByContentAndPlaceAndVisitDayAndVisitOrder(Content content, Place place, int visitDay,
                                                                          int visitOrder);

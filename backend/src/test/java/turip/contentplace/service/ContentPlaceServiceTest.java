@@ -33,7 +33,7 @@ class ContentPlaceServiceTest {
     void countByContentId() {
         // given
         long contentId = 1L;
-        given(contentPlaceRepository.countByContent_Id(contentId))
+        given(contentPlaceRepository.countByContentId(contentId))
                 .willThrow(new IllegalArgumentException());
 
         // when & then
@@ -76,7 +76,7 @@ class ContentPlaceServiceTest {
         ContentPlace secondContentPlace = new ContentPlace(secondVisitDay, visitOrder, secondDayTimeLine, place2, null);
 
         // when
-        given(contentPlaceRepository.findAllByContent_Id(contentId))
+        given(contentPlaceRepository.findAllByContentId(contentId))
                 .willReturn(List.of(firstContentPlace, secondContentPlace));
         ContentPlaceDetailResponse response = contentPlaceService.findContentPlaceDetails(contentId);
 
@@ -104,7 +104,7 @@ class ContentPlaceServiceTest {
                     null);
 
             // when
-            given(contentPlaceRepository.findAllByContent_Id(contentId))
+            given(contentPlaceRepository.findAllByContentId(contentId))
                     .willReturn(List.of(firstContentPlace, secondContentPlace));
 
             // then
@@ -119,7 +119,7 @@ class ContentPlaceServiceTest {
             long contentId = 1L;
 
             // when
-            given(contentPlaceRepository.findAllByContent_Id(contentId))
+            given(contentPlaceRepository.findAllByContentId(contentId))
                     .willReturn(List.of());
 
             // then

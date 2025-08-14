@@ -16,14 +16,14 @@ public class ContentPlaceService {
 
     public int countByContentId(Long contentId) {
         try {
-            return contentPlaceRepository.countByContent_Id(contentId);
+            return contentPlaceRepository.countByContentId(contentId);
         } catch (IllegalArgumentException e) {
             throw new NotFoundException("컨텐츠를 찾을 수 없습니다.");
         }
     }
 
     public ContentPlaceDetailResponse findContentPlaceDetails(Long contentId) {
-        List<ContentPlace> contentPlaces = contentPlaceRepository.findAllByContent_Id(contentId);
+        List<ContentPlace> contentPlaces = contentPlaceRepository.findAllByContentId(contentId);
         int days = calculateDurationDays(contentId);
         int nights = days - 1;
         int contentPlaceCount = calculatePlaceCount(contentPlaces);
@@ -31,7 +31,7 @@ public class ContentPlaceService {
     }
 
     public int calculateDurationDays(Long contentId) {
-        return contentPlaceRepository.findAllByContent_Id(contentId)
+        return contentPlaceRepository.findAllByContentId(contentId)
                 .stream()
                 .mapToInt(ContentPlace::getVisitDay)
                 .max()
