@@ -1,5 +1,6 @@
 package com.on.turip.ui.main.favorite
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -33,7 +34,7 @@ class FavoriteContentFragment : BaseFragment<FragmentFavoriteContentBinding>() {
                     creatorId: Long,
                 ) {
                     Timber.d("찜 목록의 아이템 클릭(contentId=$contentId)")
-                    val intent =
+                    val intent: Intent =
                         TripDetailActivity.newIntent(
                             context = requireContext(),
                             contentId = contentId,
@@ -99,5 +100,8 @@ class FavoriteContentFragment : BaseFragment<FragmentFavoriteContentBinding>() {
         if (!hidden) {
             viewModel.loadFavoriteContents()
         }
+    }
+
+    companion object {
     }
 }
