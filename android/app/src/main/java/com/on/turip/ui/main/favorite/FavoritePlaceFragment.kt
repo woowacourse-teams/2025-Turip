@@ -1,5 +1,6 @@
 package com.on.turip.ui.main.favorite
 
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -15,6 +16,22 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
         FavoritePlaceFolderAdapter { favoritePlaceFolderModel: FavoritePlaceFolderModel ->
             // TODO: viewModel에서 선택한 찜 폴더에 해당하는 아이템을 불러오기
         }
+    }
+    private val placeAdapter: FavoritePlaceAdapter by lazy {
+        FavoritePlaceAdapter(
+            object : FavoritePlaceViewHolder.FavoritePlaceListener {
+                override fun onFavoriteClick(
+                    placeId: Long,
+                    isFavorite: Boolean,
+                ) {
+                    // TODO: 장소 찜 클릭 시 로직
+                }
+
+                override fun onMapClick(uri: Uri) {
+                    // TODO: 지도 버튼 클릭 시 로직
+                }
+            },
+        )
     }
 
     override fun inflateBinding(
@@ -36,6 +53,7 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
             adapter = folderAdapter
             addOnItemTouchListener(RecyclerViewTouchInterceptor)
         }
+        binding.rvFavoritePlacePlace.adapter = placeAdapter
     }
 }
 
