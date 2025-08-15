@@ -4,7 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginVertical="30dp">
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground"
+    android:paddingVertical="15dp">
 
     <TextView
         android:id="@+id/tv_favorite_content_title"
@@ -39,7 +42,7 @@
         android:id="@+id/tv_favorite_content_region"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="6dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="12dp"
         android:background="@drawable/bg_turip_lemon_radius_24dp"
         android:paddingHorizontal="8dp"

@@ -64,7 +64,7 @@ class FavoriteContentFragment : BaseFragment<FragmentFavoriteContentBinding>() {
             itemAnimator = null
             addItemDecoration(
                 ItemDividerDecoration(
-                    height = 8,
+                    height = 1,
                     color = ContextCompat.getColor(context, R.color.gray_100_f0f0ee),
                 ),
             )
