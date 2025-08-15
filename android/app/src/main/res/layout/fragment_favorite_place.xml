@@ -12,10 +12,25 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:orientation="horizontal"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintEnd_toStartOf="@id/iv_favorite_place_folder"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:listitem="@layout/item_place_folder" />
+
+    <ImageView
+        android:id="@+id/iv_favorite_place_folder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="12dp"
+        android:background="@drawable/bg_gray300_radius_10dp"
+        android:contentDescription="@null"
+        android:padding="10dp"
+        android:src="@drawable/ic_folder"
+        app:layout_constraintBottom_toBottomOf="@id/rv_favorite_place_folder"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/rv_favorite_place_folder"
+        app:layout_constraintTop_toTopOf="@id/rv_favorite_place_folder" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
