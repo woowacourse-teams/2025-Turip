@@ -1,5 +1,7 @@
 package com.on.turip.data.content.datasource
 
+import com.on.turip.data.common.TuripCustomResult
+import com.on.turip.data.common.safeApiCall
 import com.on.turip.data.content.dto.ContentDetailResponse
 import com.on.turip.data.content.dto.ContentInformationCountResponse
 import com.on.turip.data.content.dto.ContentsInformationResponse
@@ -14,23 +16,23 @@ class DefaultContentRemoteDataSource(
     private val contentService: ContentService,
     private val coroutineContext: CoroutineContext = Dispatchers.IO,
 ) : ContentRemoteDataSource {
-    override suspend fun getContentsSizeByRegion(regionCategoryName: String): Result<ContentInformationCountResponse> =
+    override suspend fun getContentsSizeByRegion(regionCategoryName: String): TuripCustomResult<ContentInformationCountResponse> =
         withContext(coroutineContext) {
-            runCatching { contentService.getContentsCountByRegion(regionCategoryName) }
+            safeApiCall { contentService.getContentsCountByRegion(regionCategoryName) }
         }
 
-    override suspend fun getContentsSizeByKeyword(keyword: String): Result<ContentInformationCountResponse> =
+    override suspend fun getContentsSizeByKeyword(keyword: String): TuripCustomResult<ContentInformationCountResponse> =
         withContext(coroutineContext) {
-            runCatching { contentService.getContentsCountByKeyword(keyword) }
+            safeApiCall { contentService.getContentsCountByKeyword(keyword) }
         }
 
     override suspend fun getContentsByRegion(
         regionCategoryName: String,
         size: Int,
         lastId: Long,
-    ): Result<ContentsInformationResponse> =
+    ): TuripCustomResult<ContentsInformationResponse> =
         withContext(coroutineContext) {
-            runCatching {
+            safeApiCall {
                 contentService.getContentsByRegion(
                     regionCategoryName = regionCategoryName,
                     size = size,
@@ -43,9 +45,9 @@ class DefaultContentRemoteDataSource(
         regionCategoryName: String,
         size: Int,
         lastId: Long,
-    ): Result<ContentsInformationResponse2> =
+    ): TuripCustomResult<ContentsInformationResponse2> =
         withContext(coroutineContext) {
-            runCatching {
+            safeApiCall {
                 contentService.getContentsByRegion2(
                     regionCategoryName = regionCategoryName,
                     size = size,
@@ -58,9 +60,9 @@ class DefaultContentRemoteDataSource(
         keyword: String,
         size: Int,
         lastId: Long,
-    ): Result<ContentsInformationResponse> =
+    ): TuripCustomResult<ContentsInformationResponse> =
         withContext(coroutineContext) {
-            runCatching {
+            safeApiCall {
                 contentService.getContentsByKeyword(
                     keyword = keyword,
                     size = size,
@@ -72,13 +74,13 @@ class DefaultContentRemoteDataSource(
     override suspend fun getContentDetail(
         contentId: Long,
         fid: String,
-    ): Result<ContentDetailResponse> =
+    ): TuripCustomResult<ContentDetailResponse> =
         withContext(coroutineContext) {
-            runCatching { contentService.getContentDetail(contentId, fid) }
+            safeApiCall { contentService.getContentDetail(contentId, fid) }
         }
 
-    override suspend fun getUsersLikeContents(size: Int): Result<UsersLikeContentsResponse> =
+    override suspend fun getUsersLikeContents(size: Int): TuripCustomResult<UsersLikeContentsResponse> =
         withContext(coroutineContext) {
-            runCatching { contentService.getUsersLikeContents(size) }
+            safeApiCall { contentService.getUsersLikeContents(size) }
         }
 }

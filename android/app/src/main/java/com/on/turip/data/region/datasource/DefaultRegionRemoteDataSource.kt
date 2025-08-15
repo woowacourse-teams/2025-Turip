@@ -1,5 +1,7 @@
 package com.on.turip.data.region.datasource
 
+import com.on.turip.data.common.TuripCustomResult
+import com.on.turip.data.common.safeApiCall
 import com.on.turip.data.region.dto.RegionCategoriesResponse
 import com.on.turip.data.region.service.RegionService
 import kotlinx.coroutines.Dispatchers
@@ -10,8 +12,8 @@ class DefaultRegionRemoteDataSource(
     private val regionService: RegionService,
     private val coroutineContext: CoroutineContext = Dispatchers.IO,
 ) : RegionRemoteDataSource {
-    override suspend fun getRegionCategories(isDomestic: Boolean): Result<RegionCategoriesResponse> =
+    override suspend fun getRegionCategories(isDomestic: Boolean): TuripCustomResult<RegionCategoriesResponse> =
         withContext(coroutineContext) {
-            runCatching { regionService.getRegionCategories(isDomestic) }
+            safeApiCall { regionService.getRegionCategories(isDomestic) }
         }
 }
