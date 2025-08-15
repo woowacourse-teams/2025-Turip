@@ -54,7 +54,7 @@ class FavoriteHelpInformationBottomSheetFragment : BottomSheetDialogFragment() {
         val intent: Intent =
             Intent(
                 Intent.ACTION_VIEW,
-                "https://agate-bandana-491.notion.site/23aeabcebdc180299e11d3bb2fbfaf67?source=copy_link".toUri(),
+                PRIVACY_POLICY_LINK.toUri(),
             )
         startActivity(intent)
     }
@@ -114,5 +114,7 @@ class FavoriteHelpInformationBottomSheetFragment : BottomSheetDialogFragment() {
             사용자의 OS: Android ${Build.VERSION.RELEASE} (SDK ${Build.VERSION.SDK_INT})
             사용자 기기: ${Build.MANUFACTURER} ${Build.MODEL}
             """.trimIndent()
+        private const val PRIVACY_POLICY_LINK =
+            "https://agate-bandana-491.notion.site/23aeabcebdc180299e11d3bb2fbfaf67?source=copy_link"
     }
 }
