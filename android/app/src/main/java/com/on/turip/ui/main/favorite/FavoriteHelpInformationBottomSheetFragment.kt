@@ -8,29 +8,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.net.toUri
+import androidx.fragment.app.viewModels
 import com.on.turip.BuildConfig
 import com.on.turip.R
 import com.on.turip.databinding.BottomSheetFragmentFavoriteHelpInformationBinding
 import com.on.turip.ui.common.base.BaseBottomSheetFragment
 import com.on.turip.ui.main.favorite.model.HelpInformationModel
+import com.on.turip.ui.main.favorite.model.HelpInformationModelType
 
 class FavoriteHelpInformationBottomSheetFragment : BaseBottomSheetFragment<BottomSheetFragmentFavoriteHelpInformationBinding>() {
+    private val viewModel: FavoriteHelpInformationViewModel by viewModels()
     private val inquireMailUri: Uri by lazy {
         "mailto:$EMAIL_RECIPIENT?subject=${Uri.encode(EMAIL_SUBJECT)}&body=${Uri.encode(EMAIL_BODY)}".toUri()
     }
-
-    private val helpInformationModels: List<HelpInformationModel>
-        get() =
-            listOf(
-                HelpInformationModel(
-                    R.drawable.ic_inquire,
-                    R.string.bottom_sheet_favorite_help_information_inquiry,
-                ) { openInquiryForm() },
-                HelpInformationModel(
-                    R.drawable.ic_document,
-                    R.string.bottom_sheet_favorite_help_information_privacy_policy,
-                ) { openPrivacyPolicy() },
-            )
 
     private val helpInformationAdapter: FavoriteHelpInformationAdapter by lazy {
         FavoriteHelpInformationAdapter { helpInformationModel: HelpInformationModel ->
@@ -68,11 +58,34 @@ class FavoriteHelpInformationBottomSheetFragment : BaseBottomSheetFragment<Botto
         super.onViewCreated(view, savedInstanceState)
 
         setupAdapters()
-        helpInformationAdapter.submitList(helpInformationModels)
+        setupObservers()
     }
 
     private fun setupAdapters() {
         binding.rvBottomSheetFavoriteHelpInformation.adapter = helpInformationAdapter
+    }
+
+    private fun setupObservers() {
+        viewModel.helpInformationItems.observe(viewLifecycleOwner) { helpInformationModelTypes: List<HelpInformationModelType> ->
+            val helpInformationModels: List<HelpInformationModel> =
+                helpInformationModelTypes.map { helpInformationModelType: HelpInformationModelType ->
+                    when (helpInformationModelType) {
+                        HelpInformationModelType.INQUIRY ->
+                            HelpInformationModel(
+                                R.drawable.ic_inquire,
+                                R.string.bottom_sheet_favorite_help_information_inquiry,
+                            ) { openInquiryForm() }
+
+                        HelpInformationModelType.PRIVACY_POLICY ->
+                            HelpInformationModel(
+                                R.drawable.ic_document,
+                                R.string.bottom_sheet_favorite_help_information_privacy_policy,
+                            ) { openPrivacyPolicy() }
+                    }
+                }
+
+            helpInformationAdapter.submitList(helpInformationModels)
+        }
     }
 
     companion object {
