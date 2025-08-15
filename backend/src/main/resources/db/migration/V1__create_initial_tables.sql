@@ -83,6 +83,7 @@ CREATE TABLE IF NOT EXISTS place
     latitude  DOUBLE       NOT NULL,
     longitude DOUBLE       NOT NULL,
 
+    -- 위도 경도 중복 방지
     CONSTRAINT uq_place_lat_lng UNIQUE (latitude, longitude)
 );
 
