@@ -21,14 +21,14 @@ sealed class TuripCustomResult<out T> {
             }
         }
 
-        val error: HttpEvent
+        val error: ServerError
             get() =
                 when (statusCode) {
-                    403 -> HttpEvent.USER_NOT_HAVE_PERMISSION
-                    404 -> HttpEvent.NOT_FOUND
-                    409 -> HttpEvent.DUPLICATION_FOLDER
-                    500 -> HttpEvent.UNEXPECTED_PROBLEM
-                    else -> HttpEvent.UNKNOWN
+                    403 -> ServerError.USER_NOT_HAVE_PERMISSION
+                    404 -> ServerError.NOT_FOUND
+                    409 -> ServerError.DUPLICATION_FOLDER
+                    500 -> ServerError.UNEXPECTED_PROBLEM
+                    else -> ServerError.UNKNOWN
                 }
     }
 
@@ -65,11 +65,11 @@ inline fun <T> TuripCustomResult<T>.onFailure(action: (ErrorEvent) -> Unit): Tur
         is TuripCustomResult.HttpError ->
             action(
                 when (error) {
-                    HttpEvent.USER_NOT_HAVE_PERMISSION -> ErrorEvent.USER_NOT_HAVE_PERMISSION
-                    HttpEvent.NOT_FOUND -> ErrorEvent.UNEXPECTED_PROBLEM
-                    HttpEvent.DUPLICATION_FOLDER -> ErrorEvent.DUPLICATION_FOLDER
-                    HttpEvent.UNEXPECTED_PROBLEM -> ErrorEvent.UNEXPECTED_PROBLEM
-                    HttpEvent.UNKNOWN -> ErrorEvent.UNEXPECTED_PROBLEM
+                    ServerError.USER_NOT_HAVE_PERMISSION -> ErrorEvent.USER_NOT_HAVE_PERMISSION
+                    ServerError.NOT_FOUND -> ErrorEvent.UNEXPECTED_PROBLEM
+                    ServerError.DUPLICATION_FOLDER -> ErrorEvent.DUPLICATION_FOLDER
+                    ServerError.UNEXPECTED_PROBLEM -> ErrorEvent.UNEXPECTED_PROBLEM
+                    ServerError.UNKNOWN -> ErrorEvent.UNEXPECTED_PROBLEM
                 },
             )
 
