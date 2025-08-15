@@ -8,17 +8,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.net.toUri
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.on.turip.BuildConfig
 import com.on.turip.R
 import com.on.turip.databinding.BottomSheetFragmentFavoriteHelpInformationBinding
+import com.on.turip.ui.common.base.BaseBottomSheetFragment
 import com.on.turip.ui.main.favorite.model.HelpInformationModel
 
-class FavoriteHelpInformationBottomSheetFragment : BottomSheetDialogFragment() {
-    private var _binding: BottomSheetFragmentFavoriteHelpInformationBinding? = null
-    val binding: BottomSheetFragmentFavoriteHelpInformationBinding get() = _binding!!
-    // TODO : backingProperty 사용할 때 public으로 열어놓지 않으면 ktlint 경고문구 나오는데 무시하는 게 좋을 지, 퍼블릭으로 여는게 좋을지 ?
-
+class FavoriteHelpInformationBottomSheetFragment : BaseBottomSheetFragment<BottomSheetFragmentFavoriteHelpInformationBinding>() {
     private val inquireMailUri: Uri by lazy {
         "mailto:$EMAIL_RECIPIENT?subject=${Uri.encode(EMAIL_SUBJECT)}&body=${Uri.encode(EMAIL_BODY)}".toUri()
     }
@@ -59,15 +55,11 @@ class FavoriteHelpInformationBottomSheetFragment : BottomSheetDialogFragment() {
         startActivity(intent)
     }
 
-    override fun onCreateView(
+    override fun inflateBinding(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        _binding =
-            BottomSheetFragmentFavoriteHelpInformationBinding.inflate(inflater, container, false)
-        return binding.root
-    }
+    ): BottomSheetFragmentFavoriteHelpInformationBinding =
+        BottomSheetFragmentFavoriteHelpInformationBinding.inflate(inflater, container, false)
 
     override fun onViewCreated(
         view: View,
@@ -81,11 +73,6 @@ class FavoriteHelpInformationBottomSheetFragment : BottomSheetDialogFragment() {
 
     private fun setupAdapters() {
         binding.rvBottomSheetFavoriteHelpInformation.adapter = helpInformationAdapter
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 
     companion object {
