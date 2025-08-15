@@ -21,14 +21,15 @@ sealed class TuripCustomResult<out T> {
             }
         }
 
-        fun whatError(): HttpEvent =
-            when (statusCode) {
-                403 -> HttpEvent.USER_NOT_HAVE_PERMISSION
-                404 -> HttpEvent.NOT_FOUND
-                409 -> HttpEvent.DUPLICATION_FOLDER
-                500 -> HttpEvent.UNEXPECTED_PROBLEM
-                else -> HttpEvent.UNKNOWN
-            }
+        val error: HttpEvent
+            get() =
+                when (statusCode) {
+                    403 -> HttpEvent.USER_NOT_HAVE_PERMISSION
+                    404 -> HttpEvent.NOT_FOUND
+                    409 -> HttpEvent.DUPLICATION_FOLDER
+                    500 -> HttpEvent.UNEXPECTED_PROBLEM
+                    else -> HttpEvent.UNKNOWN
+                }
     }
 
     data class ParseError(
@@ -63,7 +64,7 @@ inline fun <T> TuripCustomResult<T>.onFailure(action: (ErrorEvent) -> Unit): Tur
         is TuripCustomResult.NetworkError -> ErrorEvent.NETWORK_ERROR
         is TuripCustomResult.HttpError ->
             action(
-                when (whatError()) {
+                when (error) {
                     HttpEvent.USER_NOT_HAVE_PERMISSION -> ErrorEvent.USER_NOT_HAVE_PERMISSION
                     HttpEvent.NOT_FOUND -> ErrorEvent.UNEXPECTED_PROBLEM
                     HttpEvent.DUPLICATION_FOLDER -> ErrorEvent.DUPLICATION_FOLDER
