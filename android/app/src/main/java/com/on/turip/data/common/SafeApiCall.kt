@@ -8,9 +8,9 @@ suspend inline fun <T> safeApiCall(apiCall: suspend () -> Response<T>): TuripCus
     runCatching { apiCall() }
         .mapCatching { response: Response<T> ->
             TuripCustomResult.success(response.body() as T)
-        }.getOrElse { e: Throwable ->
-            when (e) {
-                is HttpException -> TuripCustomResult.HttpError(e.code())
-                else -> TuripCustomResult.NetworkError(e)
+        }.getOrElse { error: Throwable ->
+            when (error) {
+                is HttpException -> TuripCustomResult.HttpError(error.code())
+                else -> TuripCustomResult.NetworkError(error)
             }
         }
