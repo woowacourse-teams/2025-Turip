@@ -7,6 +7,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.on.turip.data.common.onFailure
+import com.on.turip.data.common.onSuccess
 import com.on.turip.di.RepositoryModule
 import com.on.turip.domain.favorite.FavoriteContent
 import com.on.turip.domain.favorite.repository.FavoriteRepository
@@ -35,7 +37,6 @@ class FavoriteContentViewModel(
                     _favoriteContents.value = it.favoriteContents
                 }.onFailure {
                     Timber.e("찜 목록 데이터 조회 에러 발생")
-                    Timber.e("${it.message}")
                 }
         }
     }

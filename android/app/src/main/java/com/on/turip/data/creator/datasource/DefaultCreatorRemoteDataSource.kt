@@ -1,5 +1,7 @@
 package com.on.turip.data.creator.datasource
 
+import com.on.turip.data.common.TuripCustomResult
+import com.on.turip.data.common.safeApiCall
 import com.on.turip.data.creator.dto.CreatorResponse
 import com.on.turip.data.creator.service.CreatorService
 import kotlinx.coroutines.Dispatchers
@@ -10,8 +12,8 @@ class DefaultCreatorRemoteDataSource(
     private val creatorService: CreatorService,
     private val coroutineContext: CoroutineContext = Dispatchers.IO,
 ) : CreatorRemoteDataSource {
-    override suspend fun getCreator(creatorId: Long): Result<CreatorResponse> =
+    override suspend fun getCreator(creatorId: Long): TuripCustomResult<CreatorResponse> =
         withContext(coroutineContext) {
-            runCatching { creatorService.getCreator(creatorId) }
+            safeApiCall { creatorService.getCreator(creatorId) }
         }
 }
