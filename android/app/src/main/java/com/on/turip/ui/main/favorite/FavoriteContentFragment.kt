@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import com.on.turip.R
 import com.on.turip.databinding.FragmentFavoriteContentBinding
@@ -67,7 +66,7 @@ class FavoriteContentFragment : BaseFragment<FragmentFavoriteContentBinding>() {
             addItemDecoration(
                 ItemDividerDecoration(
                     height = 1,
-                    color = ContextCompat.getColor(context, R.color.gray_100_f0f0ee),
+                    color = requireContext().getColor(R.color.gray_100_f0f0ee),
                 ),
             )
         }
