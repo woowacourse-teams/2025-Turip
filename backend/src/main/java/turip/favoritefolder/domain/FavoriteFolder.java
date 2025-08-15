@@ -33,10 +33,4 @@ public class FavoriteFolder extends TimeStamp {
     private String name;
 
     private boolean isDefault;
-
-    public FavoriteFolder(Member member, String name, boolean isDefault) {
-        this.member = member;
-        this.name = name;
-        this.isDefault = isDefault;
-    }
 }

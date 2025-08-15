@@ -33,9 +33,4 @@ public class FavoritePlace extends TimeStamp {
 
     @ManyToOne
     private Place place;
-
-    public FavoritePlace(FavoriteFolder favoriteFolder, Place place) {
-        this.favoriteFolder = favoriteFolder;
-        this.place = place;
-    }
 }
