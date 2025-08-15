@@ -85,7 +85,7 @@ inline fun <R, T> TuripCustomResult<T>.mapCatching(transform: (value: T) -> R): 
                 transform(data)
             }.fold(
                 onSuccess = { TuripCustomResult.Success(it) },
-                onFailure = { e -> TuripCustomResult.ParseError(e) },
+                onFailure = { error -> TuripCustomResult.ParseError(error) },
             )
 
         is TuripCustomResult.ParseError -> this
