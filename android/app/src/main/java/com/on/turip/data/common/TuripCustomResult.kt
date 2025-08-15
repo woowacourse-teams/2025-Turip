@@ -60,8 +60,8 @@ inline fun <T> TuripCustomResult<T>.onSuccess(action: (value: T) -> Unit): Turip
 
 inline fun <T> TuripCustomResult<T>.onFailure(action: (ErrorEvent) -> Unit): TuripCustomResult<T> {
     when (this) {
-        is TuripCustomResult.ParseError -> ErrorEvent.PARSER_ERROR
-        is TuripCustomResult.NetworkError -> ErrorEvent.NETWORK_ERROR
+        is TuripCustomResult.ParseError -> action(ErrorEvent.PARSER_ERROR)
+        is TuripCustomResult.NetworkError -> action(ErrorEvent.NETWORK_ERROR)
         is TuripCustomResult.HttpError ->
             action(
                 when (error) {
