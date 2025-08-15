@@ -103,5 +103,6 @@ class FavoriteContentFragment : BaseFragment<FragmentFavoriteContentBinding>() {
     }
 
     companion object {
+        fun instance(): FavoriteContentFragment = FavoriteContentFragment()
     }
 }

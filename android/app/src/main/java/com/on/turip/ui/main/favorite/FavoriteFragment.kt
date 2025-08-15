@@ -15,8 +15,8 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>() {
         FavoriteStateAdapter(
             this,
             listOf(
-                FavoriteContentFragment(),
-                FavoritePlaceFragment(),
+                FavoriteContentFragment.instance(),
+                FavoritePlaceFragment.instance(),
             ),
         )
     }
@@ -57,7 +57,7 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>() {
     private fun setupListeners() {
         binding.ivFavoriteMoreOptions.setOnClickListener {
             val bottomSheetDialog: FavoriteHelpInformationBottomSheetFragment =
-                FavoriteHelpInformationBottomSheetFragment()
+                FavoriteHelpInformationBottomSheetFragment.instance()
             bottomSheetDialog.show(parentFragmentManager, "favorite_help_information")
         }
     }

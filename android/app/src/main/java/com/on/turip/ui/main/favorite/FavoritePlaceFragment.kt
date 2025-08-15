@@ -13,4 +13,8 @@ class FavoritePlaceFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? = inflater.inflate(R.layout.fragment_favorite_place, container, false)
+
+    companion object {
+        fun instance(): FavoritePlaceFragment = FavoritePlaceFragment()
+    }
 }
