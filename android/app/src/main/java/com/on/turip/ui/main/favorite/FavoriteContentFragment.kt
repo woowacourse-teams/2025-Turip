@@ -8,6 +8,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import com.on.turip.R
 import com.on.turip.databinding.FragmentFavoriteContentBinding
+import com.on.turip.domain.favorite.FavoriteContent
 import com.on.turip.ui.common.ItemDividerDecoration
 import com.on.turip.ui.common.base.BaseFragment
 import com.on.turip.ui.trip.detail.TripDetailActivity
@@ -72,14 +73,14 @@ class FavoriteContentFragment : BaseFragment<FragmentFavoriteContentBinding>() {
     }
 
     private fun setupObservers() {
-        viewModel.favoriteContents.observe(viewLifecycleOwner) {
-            handleVisibleByHasContent()
-            favoriteContentAdapter.submitList(it)
+        viewModel.favoriteContents.observe(viewLifecycleOwner) { favoriteContents: List<FavoriteContent> ->
+            handleVisibleByHasContent(favoriteContents)
+            favoriteContentAdapter.submitList(favoriteContents)
         }
     }
 
-    private fun handleVisibleByHasContent() {
-        if (viewModel.favoriteContents.value == null || viewModel.favoriteContents.value?.isEmpty() == true) {
+    private fun handleVisibleByHasContent(favoriteContents: List<FavoriteContent>) {
+        if (favoriteContents.isEmpty()) {
             binding.clFavoriteContentEmpty.visibility = View.VISIBLE
             binding.clFavoriteContentNotEmpty.visibility = View.GONE
         } else {

@@ -18,7 +18,8 @@ class FavoriteContentViewModel(
     private val favoriteRepository: FavoriteRepository,
     private val updateFavoriteUseCase: UpdateFavoriteUseCase,
 ) : ViewModel() {
-    private val _favoriteContents: MutableLiveData<List<FavoriteContent>> = MutableLiveData()
+    private val _favoriteContents: MutableLiveData<List<FavoriteContent>> =
+        MutableLiveData(emptyList())
     val favoriteContents: LiveData<List<FavoriteContent>> get() = _favoriteContents
 
     init {
