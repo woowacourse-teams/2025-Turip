@@ -1,5 +1,7 @@
 package com.on.turip.data.favorite.repository
 
+import com.on.turip.data.common.TuripCustomResult
+import com.on.turip.data.common.mapCatching
 import com.on.turip.data.favorite.datasource.FavoriteRemoteDataSource
 import com.on.turip.data.favorite.toDomain
 import com.on.turip.data.favorite.toRequestDto
@@ -16,7 +18,7 @@ class DefaultFavoriteRepository(
     private val favoriteRemoteDataSource: FavoriteRemoteDataSource,
     private val userStorageRepository: UserStorageRepository,
 ) : FavoriteRepository {
-    override suspend fun createFavorite(contentId: Long): Result<Unit> {
+    override suspend fun createFavorite(contentId: Long): TuripCustomResult<Unit> {
         val turipDeviceIdentifier: TuripDeviceIdentifier =
             CoroutineScope(Dispatchers.IO)
                 .async {
@@ -33,7 +35,7 @@ class DefaultFavoriteRepository(
         )
     }
 
-    override suspend fun deleteFavorite(contentId: Long): Result<Unit> {
+    override suspend fun deleteFavorite(contentId: Long): TuripCustomResult<Unit> {
         val turipDeviceIdentifier: TuripDeviceIdentifier =
             CoroutineScope(Dispatchers.IO)
                 .async {
@@ -50,7 +52,7 @@ class DefaultFavoriteRepository(
     override suspend fun loadFavoriteContents(
         size: Int,
         lastId: Long,
-    ): Result<PagedFavoriteContents> {
+    ): TuripCustomResult<PagedFavoriteContents> {
         val turipDeviceIdentifier: TuripDeviceIdentifier =
             CoroutineScope(Dispatchers.IO)
                 .async {

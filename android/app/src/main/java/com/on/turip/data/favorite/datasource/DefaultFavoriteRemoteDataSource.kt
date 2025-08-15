@@ -1,5 +1,7 @@
 package com.on.turip.data.favorite.datasource
 
+import com.on.turip.data.common.TuripCustomResult
+import com.on.turip.data.common.safeApiCall
 import com.on.turip.data.favorite.dto.FavoriteAddRequest
 import com.on.turip.data.favorite.dto.FavoriteContentsResponse
 import com.on.turip.data.favorite.service.FavoriteService
@@ -14,9 +16,9 @@ class DefaultFavoriteRemoteDataSource(
     override suspend fun postFavorite(
         fid: String,
         favoriteAddRequest: FavoriteAddRequest,
-    ): Result<Unit> =
+    ): TuripCustomResult<Unit> =
         withContext(coroutineContext) {
-            runCatching {
+            safeApiCall {
                 favoriteService.postFavorite(fid, favoriteAddRequest)
             }
         }
@@ -24,9 +26,9 @@ class DefaultFavoriteRemoteDataSource(
     override suspend fun deleteFavorite(
         fid: String,
         contentId: Long,
-    ): Result<Unit> =
+    ): TuripCustomResult<Unit> =
         withContext(coroutineContext) {
-            runCatching {
+            safeApiCall {
                 favoriteService.deleteFavorite(fid, contentId)
             }
         }
@@ -35,10 +37,8 @@ class DefaultFavoriteRemoteDataSource(
         fid: String,
         size: Int,
         lastId: Long,
-    ): Result<FavoriteContentsResponse> =
+    ): TuripCustomResult<FavoriteContentsResponse> =
         withContext(coroutineContext) {
-            runCatching {
-                favoriteService.getFavoriteContents(fid, size, lastId)
-            }
+            safeApiCall { favoriteService.getFavoriteContents(fid, size, lastId) }
         }
 }
