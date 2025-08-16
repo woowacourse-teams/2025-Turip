@@ -4,7 +4,7 @@
 CREATE TABLE IF NOT EXISTS country
 (
     id        BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name      VARCHAR(100) NOT NULL,
+    name      VARCHAR(100) NOT NULL UNIQUE,
     image_url VARCHAR(255) NOT NULL
 );
 
@@ -19,10 +19,10 @@ CREATE TABLE IF NOT EXISTS province
 CREATE TABLE IF NOT EXISTS city
 (
     id          BIGINT AUTO_INCREMENT PRIMARY KEY,
-    country_id  BIGINT NOT NULL,
-    province_id BIGINT NULL, -- 해외는 주를 표기하지 않는다.
-    name        VARCHAR(255),
-    image_url   VARCHAR(255),
+    country_id  BIGINT       NOT NULL,
+    province_id BIGINT       NULL, -- 해외는 주를 표기하지 않는다.
+    name        VARCHAR(255) NOT NULL,
+    image_url   VARCHAR(255) NOT NULL,
     CONSTRAINT fk_city_country
         FOREIGN KEY (country_id) REFERENCES country (id),
     CONSTRAINT fk_city_province
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS city
 CREATE TABLE IF NOT EXISTS creator
 (
     id            BIGINT AUTO_INCREMENT PRIMARY KEY,
-    channel_name  VARCHAR(255) NOT NULL,
+    channel_name  VARCHAR(255) NOT NULL UNIQUE,
     profile_image VARCHAR(255) NOT NULL
 );
 
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS creator
 CREATE TABLE IF NOT EXISTS category
 (
     id   BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL
+    name VARCHAR(255) NOT NULL UNIQUE
 );
 
 
@@ -69,7 +69,10 @@ CREATE TABLE IF NOT EXISTS content
     CONSTRAINT fk_content_creator
         FOREIGN KEY (creator_id) REFERENCES creator (id),
     CONSTRAINT fk_content_city
-        FOREIGN KEY (city_id) REFERENCES city (id)
+        FOREIGN KEY (city_id) REFERENCES city (id),
+
+    CONSTRAINT uq_content_creator_title
+        UNIQUE (creator_id, title)
 );
 
 -- 장소 테이블
@@ -77,14 +80,11 @@ CREATE TABLE IF NOT EXISTS place
 (
     id        BIGINT AUTO_INCREMENT PRIMARY KEY,
     name      VARCHAR(255) NOT NULL,
-    url       VARCHAR(500) NOT NULL,
+    url       VARCHAR(500) NOT NULL UNIQUE,
     address   VARCHAR(255) NOT NULL,
 
     latitude  DOUBLE       NOT NULL,
-    longitude DOUBLE       NOT NULL,
-
-    -- 위도 경도 중복 방지
-    CONSTRAINT uq_place_lat_lng UNIQUE (latitude, longitude)
+    longitude DOUBLE       NOT NULL
 );
 
 -- 장소 카테고리 테이블
@@ -139,7 +139,10 @@ CREATE TABLE IF NOT EXISTS favorite_folder
     deleted_at  DATETIME(6)  NULL,     -- soft delete
 
     CONSTRAINT fk_favorite_folder__member
-        FOREIGN KEY (member_id) REFERENCES member (id)
+        FOREIGN KEY (member_id) REFERENCES member (id),
+
+    -- 사용자별 폴더 이름 중복 방지
+    CONSTRAINT uq_favorite_folder__member_name UNIQUE (member_id, name)
 );
 
 -- 찜 장소 테이블
