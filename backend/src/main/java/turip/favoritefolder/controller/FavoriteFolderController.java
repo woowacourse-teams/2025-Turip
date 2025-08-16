@@ -162,6 +162,61 @@ public class FavoriteFolderController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(
+            summary = "장소 찜 폴더 목록과 장소 찜 여부 조회 api",
+            description = "특정 회원의 장소 찜 폴더 목록과, 특정 장소에 대한 찜 여부를 조회한다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "성공 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = FavoriteFoldersWithFavoriteStatusResponse.class),
+                            examples = @ExampleObject(
+                                    name = "success",
+                                    summary = "장소 찜 폴더 조회 성공",
+                                    value = """
+                                            {
+                                                "favoriteFolders": [
+                                                    {
+                                                        "id": 5,
+                                                        "memberId": 1,
+                                                        "name": "기본 폴더",
+                                                        "isDefault": true,
+                                                        "isFavoritePlace": true
+                                                    },
+                                                    {
+                                                        "id": 6,
+                                                        "memberId": 1,
+                                                        "name": "잠실 맛집들",
+                                                        "isDefault": false,
+                                                        "isFavoritePlace": false
+                                                    }
+                                                ]
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "success",
+                                    summary = "placeId에 대한 장소가 존재하지 않는 경우",
+                                    value = """
+                                            {
+                                                "message": "해당 id에 대한 장소가 존재하지 않습니다."
+                                            }
+                                            """
+                            )
+                    )
+            )
+    })
     @GetMapping("/favorite-status")
     public ResponseEntity<FavoriteFoldersWithFavoriteStatusResponse> readAllWithFavoriteStatusByDeviceId(
             @RequestHeader("device-fid") String deviceFid, @RequestParam("placeId") Long placeId) {
