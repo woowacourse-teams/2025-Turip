@@ -99,10 +99,18 @@ public class FavoriteContentService {
                 .map(content -> {
                     ContentResponse contentWithCreatorAndCity = ContentResponse.of(content, true);
                     TripDurationResponse tripDuration = calculateTripDuration(content);
+                    validateContentExists(content.getId());
                     int tripPlaceCount = contentPlaceService.countByContentId(content.getId());
                     return ContentWithTripInfoAndFavoriteResponse.of(contentWithCreatorAndCity, tripDuration,
                             tripPlaceCount);
                 })
                 .toList();
+    }
+
+    private void validateContentExists(Long contentId) {
+        boolean isContentExists = contentRepository.existsById(contentId);
+        if (!isContentExists) {
+            throw new NotFoundException("컨텐츠를 찾을 수 없습니다.");
+        }
     }
 }
