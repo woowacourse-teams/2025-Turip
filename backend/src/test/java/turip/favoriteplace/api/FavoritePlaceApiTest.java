@@ -154,4 +154,122 @@ public class FavoritePlaceApiTest {
                     .statusCode(409);
         }
     }
+
+    @DisplayName("/favorites-places DELETE 장소 찜 삭제 테스트")
+    @Nested
+    class Delete {
+
+        @DisplayName("장소 찜 삭제에 성공한 경우 204 NO CONTENT를 응답한다")
+        @Test
+        void delete1() {
+            jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('testDeviceFid')");
+            jdbcTemplate.update(
+                    "INSERT INTO favorite_folder (member_id, name, is_default) VALUES (1, '잠실캠 맛집 모음', false)");
+            jdbcTemplate.update(
+                    "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('루터회관','https://naver.me/5UrZAIeY', '루터회관의 도로명 주소', 38.1234, 127.23123)");
+            jdbcTemplate.update("INSERT INTO favorite_place (favorite_folder_id, place_id) VALUES (1, 1)");
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("placeId", 1L)
+                    .contentType(ContentType.JSON)
+                    .when().delete("/favorite-places")
+                    .then()
+                    .statusCode(204);
+        }
+
+        @DisplayName("폴더 소유자의 기기id와 요청자의 기기id가 같지 않은 경우 403 FORBIDDEN을 응답한다")
+        @Test
+        void delete2() {
+            jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('may')");
+            jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('cool')");
+            jdbcTemplate.update(
+                    "INSERT INTO favorite_folder (member_id, name, is_default) VALUES (1, '잠실캠 맛집 모음', false)");
+            jdbcTemplate.update(
+                    "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('루터회관','https://naver.me/5UrZAIeY', '루터회관의 도로명 주소', 38.1234, 127.23123)");
+            jdbcTemplate.update("INSERT INTO favorite_place (favorite_folder_id, place_id) VALUES (1, 1)");
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("device-fid", "cool")
+                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("placeId", 1L)
+                    .contentType(ContentType.JSON)
+                    .when().delete("/favorite-places")
+                    .then()
+                    .statusCode(403);
+        }
+
+        @DisplayName("deviceFid에 대한 회원이 존재하지 않는 경우 404 NOT FOUND를 응답한다")
+        @Test
+        void delete3() {
+            // when & then
+            RestAssured.given().port(port)
+                    .header("device-fid", "nonExistentDeviceFid")
+                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("placeId", 1L)
+                    .contentType(ContentType.JSON)
+                    .when().delete("/favorite-places")
+                    .then()
+                    .statusCode(404);
+        }
+
+        @DisplayName("favoriteFolderId에 대한 폴더가 존재하지 않는 경우 404 NOT FOUND를 응답한다")
+        @Test
+        void delete4() {
+            jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('testDeviceFid')");
+            jdbcTemplate.update(
+                    "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('루터회관','https://naver.me/5UrZAIeY', '루터회관의 도로명 주소', 38.1234, 127.23123)");
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .queryParam("favoriteFolderId", 999L)
+                    .queryParam("placeId", 1L)
+                    .contentType(ContentType.JSON)
+                    .when().delete("/favorite-places")
+                    .then()
+                    .statusCode(404);
+        }
+
+        @DisplayName("placeId에 대한 장소가 존재하지 않는 경우 404 NOT FOUND를 응답한다")
+        @Test
+        void delete5() {
+            jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('testDeviceFid')");
+            jdbcTemplate.update(
+                    "INSERT INTO favorite_folder (member_id, name, is_default) VALUES (1, '잠실캠 맛집 모음', false)");
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("placeId", 999L)
+                    .contentType(ContentType.JSON)
+                    .when().delete("/favorite-places")
+                    .then()
+                    .statusCode(404);
+        }
+
+        @DisplayName("삭제하려는 장소 찜이 존재하지 않는 경우 404 NOT FOUND를 응답한다")
+        @Test
+        void delete6() {
+            jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('testDeviceFid')");
+            jdbcTemplate.update(
+                    "INSERT INTO favorite_folder (member_id, name, is_default) VALUES (1, '잠실캠 맛집 모음', false)");
+            jdbcTemplate.update(
+                    "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('루터회관','https://naver.me/5UrZAIeY', '루터회관의 도로명 주소', 38.1234, 127.23123)");
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("placeId", 1L)
+                    .contentType(ContentType.JSON)
+                    .when().delete("/favorite-places")
+                    .then()
+                    .statusCode(404);
+        }
+    }
 }
