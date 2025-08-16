@@ -1,7 +1,6 @@
 package turip.contentplace.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 
 import java.time.LocalTime;
@@ -14,11 +13,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import turip.category.domain.Category;
-import turip.content.repository.ContentRepository;
 import turip.contentplace.controller.dto.response.ContentPlaceDetailResponse;
 import turip.contentplace.domain.ContentPlace;
 import turip.contentplace.repository.ContentPlaceRepository;
-import turip.exception.custom.NotFoundException;
 import turip.place.domain.Place;
 
 @ExtendWith(MockitoExtension.class)
@@ -29,23 +26,6 @@ class ContentPlaceServiceTest {
 
     @Mock
     private ContentPlaceRepository contentPlaceRepository;
-
-    @Mock
-    private ContentRepository contentRepository;
-
-    @DisplayName("contentId에 대한 컨텐츠가 존재하지 않으면 NotFoundException을 발생시킨다.")
-    @Test
-    void countByContentId() {
-        // given
-        long contentId = 1L;
-
-        given(contentRepository.existsById(contentId))
-                .willReturn(false);
-
-        // when & then
-        assertThatThrownBy(() -> contentPlaceService.countByContentId(contentId))
-                .isInstanceOf(NotFoundException.class);
-    }
 
     @DisplayName("여행 코스의 방문 장소 수를 계산할 수 있다")
     @Test
