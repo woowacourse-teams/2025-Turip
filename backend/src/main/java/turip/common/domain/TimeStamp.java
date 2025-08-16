@@ -1,4 +1,4 @@
-package turip.domain;
+package turip.common.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;

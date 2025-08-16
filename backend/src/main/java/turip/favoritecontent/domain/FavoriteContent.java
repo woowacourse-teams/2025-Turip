@@ -11,8 +11,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
+import turip.common.domain.TimeStamp;
 import turip.content.domain.Content;
-import turip.domain.TimeStamp;
 import turip.member.domain.Member;
 
 @Getter
