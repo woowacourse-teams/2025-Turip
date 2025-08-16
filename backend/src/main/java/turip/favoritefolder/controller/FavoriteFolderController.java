@@ -60,6 +60,34 @@ public class FavoriteFolderController {
                     )
             ),
             @ApiResponse(
+                    responseCode = "400",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "folder_name_blank",
+                                            summary = "장소 찜 폴더 이름이 공백인 경우",
+                                            value = """
+                                                    {
+                                                        "message": "장소 찜 폴더 이름은 빈 칸이 될 수 없습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "folder_name_length_over",
+                                            summary = "장소 찜 폴더 이름이 20글자를 초과하는 경우",
+                                            value = """
+                                                    {
+                                                        "message": "장소 찜 폴더 이름은 최대 20글자 입니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
                     responseCode = "409",
                     description = "실패 예시",
                     content = @Content(

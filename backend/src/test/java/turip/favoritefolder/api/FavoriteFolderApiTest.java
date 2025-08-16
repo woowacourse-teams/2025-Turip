@@ -91,6 +91,20 @@ public class FavoriteFolderApiTest {
                     .then()
                     .statusCode(409);
         }
+
+        @DisplayName("폴더 이름이 형식에 맞지 않는 경우 400 BAD REQUEST 코드를 응답한다")
+        @Test
+        void create3() {
+            // when & then
+            Map<String, String> request = new HashMap<>(Map.of("name", "21글자폴더입니다용21글자폴더입니다용~"));
+            RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .body(request)
+                    .contentType(ContentType.JSON)
+                    .when().post("/favorite-folders")
+                    .then()
+                    .statusCode(400);
+        }
     }
 
     @DisplayName("/favorites-folders GET 특정 회원의 장소 찜 폴더 조회 테스트")
@@ -244,6 +258,25 @@ public class FavoriteFolderApiTest {
                     .when().patch("/favorite-folders/1")
                     .then()
                     .statusCode(409);
+        }
+
+        @DisplayName("변경하려는 폴더 이름이 형식에 맞지 않는 경우 400 BAD REQUEST 코드를 응답한다")
+        @Test
+        void updateName6() {
+            // given
+            jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('testDeviceFid')");
+            jdbcTemplate.update(
+                    "INSERT INTO favorite_folder (member_id, name, is_default) VALUES (1, '기존 폴더', false)");
+
+            // when & then
+            Map<String, String> request = new HashMap<>(Map.of("name", "21글자폴더입니다용21글자폴더입니다용~"));
+            RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .body(request)
+                    .contentType(ContentType.JSON)
+                    .when().patch("/favorite-folders/1")
+                    .then()
+                    .statusCode(400);
         }
     }
 

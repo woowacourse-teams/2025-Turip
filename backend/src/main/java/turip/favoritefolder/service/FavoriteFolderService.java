@@ -29,9 +29,9 @@ public class FavoriteFolderService {
     @Transactional
     public FavoriteFolderResponse createCustomFavoriteFolder(FavoriteFolderRequest request, String deviceFid) {
         Member member = findOrCreateMember(deviceFid);
-        validateDuplicatedName(request.name(), member);
-
         FavoriteFolder favoriteFolder = FavoriteFolder.customFolderOf(member, request.name());
+
+        validateDuplicatedName(favoriteFolder.getName(), member);
         FavoriteFolder savedFavoriteFolder = favoriteFolderRepository.save(favoriteFolder);
 
         return FavoriteFolderResponse.from(savedFavoriteFolder);
@@ -55,11 +55,11 @@ public class FavoriteFolderService {
                                              FavoriteFolderNameRequest request) {
         Member member = getMemberByDeviceId(deviceFid);
         FavoriteFolder favoriteFolder = getById(favoriteFolderId);
+        String newName = FavoriteFolder.formatName(request.name());
 
         validateOwnership(member, favoriteFolder);
-        validateDuplicatedName(request.name(), member);
-
-        favoriteFolder.setName(request.name());
+        validateDuplicatedName(newName, member);
+        favoriteFolder.rename(newName);
 
         return FavoriteFolderResponse.from(favoriteFolder);
     }

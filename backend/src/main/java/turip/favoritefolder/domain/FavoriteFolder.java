@@ -10,11 +10,9 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import turip.member.domain.Member;
 
 @Getter
-@Setter
 @Entity
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -38,6 +36,8 @@ public class FavoriteFolder {
     }
 
     public static FavoriteFolder customFolderOf(Member member, String name) {
+        String formattedName = formatName(name);
+        validateName(formattedName);
         return new FavoriteFolder(member, name, false);
     }
 
@@ -45,9 +45,27 @@ public class FavoriteFolder {
         return this.member.isSameDeviceId(member);
     }
 
+    public void rename(String newName) {
+        validateName(newName);
+        this.name = newName;
+    }
+
+    public static String formatName(String unformattedName) {
+        return unformattedName.trim();
+    }
+
     private FavoriteFolder(Member member, String name, boolean isDefault) {
         this.member = member;
         this.name = name;
         this.isDefault = isDefault;
+    }
+
+    private static void validateName(String name) {
+        if (name.isBlank()) {
+            throw new IllegalArgumentException("장소 찜 폴더 이름은 빈 칸이 될 수 없습니다.");
+        }
+        if (name.length() > 20) {
+            throw new IllegalArgumentException("장소 찜 폴더 이름은 최대 20글자 입니다.");
+        }
     }
 }

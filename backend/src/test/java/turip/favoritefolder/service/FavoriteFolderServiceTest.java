@@ -12,6 +12,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -45,11 +47,11 @@ class FavoriteFolderServiceTest {
 
     @DisplayName("커스텀 장소 찜 폴더 생성 테스트")
     @Nested
-    class CreateDefaultFavoriteFolder {
+    class CreateCustomFavoriteFolder {
 
         @DisplayName("커스텀 찜 폴더를 생성할 수 있다")
         @Test
-        void createDefaultFavoriteFolder1() {
+        void createCustomFavoriteFolder1() {
             // given
             String folderName = "괜찮은 소품샵 모음";
             String deviceFid = "123";
@@ -82,7 +84,7 @@ class FavoriteFolderServiceTest {
 
         @DisplayName("해당 회원이 이미 같은 이름의 폴더를 소유하고 있는 경우 ConflictException을 발생시킨다")
         @Test
-        void createDefaultFavoriteFolder2() {
+        void createCustomFavoriteFolder2() {
             // given
             String folderName = "괜찮은 소품샵 모음";
             String deviceFid = "123";
@@ -99,6 +101,25 @@ class FavoriteFolderServiceTest {
             // when & then
             assertThatThrownBy(() -> favoriteFolderService.createCustomFavoriteFolder(request, deviceFid))
                     .isInstanceOf(ConflictException.class);
+        }
+
+        @DisplayName("폴더 이름이 형식에 맞지 않는 경우 IllegalArgumentException이 발생한다")
+        @ParameterizedTest
+        @ValueSource(strings = {"", " ", "21글자폴더입니다용21글자폴더입니다용~"})
+        void createCustomFavoriteFolder3(String folderName) {
+            // given
+            String deviceFid = "123";
+            Long memberId = 1L;
+
+            FavoriteFolderRequest request = new FavoriteFolderRequest(folderName);
+            Member member = new Member(memberId, null);
+
+            given(memberRepository.findByDeviceFid(deviceFid))
+                    .willReturn(Optional.of(member));
+
+            // when & then
+            assertThatThrownBy(() -> favoriteFolderService.createCustomFavoriteFolder(request, deviceFid))
+                    .isInstanceOf(IllegalArgumentException.class);
         }
     }
 
@@ -295,6 +316,31 @@ class FavoriteFolderServiceTest {
             // when & then
             assertThatThrownBy(() -> favoriteFolderService.updateName(deviceFid, folderId, request))
                     .isInstanceOf(ConflictException.class);
+        }
+
+        @DisplayName("폴더 이름이 형식에 맞지 않는 경우 IllegalArgumentException이 발생한다")
+        @ParameterizedTest
+        @ValueSource(strings = {"", " ", "21글자폴더입니다용21글자폴더입니다용~"})
+        void updateName6(String newName) {
+            // given
+            String deviceFid = "testDeviceFid";
+            Long memberId = 1L;
+            Long folderId = 1L;
+            String oldName = "기존 폴더 이름";
+            boolean isDefault = false;
+
+            Member member = new Member(memberId, deviceFid);
+            FavoriteFolder favoriteFolder = new FavoriteFolder(folderId, member, oldName, isDefault);
+            FavoriteFolderNameRequest request = new FavoriteFolderNameRequest(newName);
+
+            given(memberRepository.findByDeviceFid(deviceFid))
+                    .willReturn(Optional.of(member));
+            given(favoriteFolderRepository.findById(folderId))
+                    .willReturn(Optional.of(favoriteFolder));
+
+            // when & then
+            assertThatThrownBy(() -> favoriteFolderService.updateName(deviceFid, folderId, request))
+                    .isInstanceOf(IllegalArgumentException.class);
         }
     }
 
