@@ -8,6 +8,9 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.on.turip.data.common.TuripCustomResult
+import com.on.turip.data.common.onFailure
+import com.on.turip.data.common.onSuccess
 import com.on.turip.di.RepositoryModule
 import com.on.turip.domain.content.Content
 import com.on.turip.domain.content.repository.ContentRepository
@@ -74,13 +77,13 @@ class TripDetailViewModel(
 
     private fun loadContent() {
         viewModelScope.launch {
-            val deferredCreator: Deferred<Result<Creator>> =
+            val deferredCreator: Deferred<TuripCustomResult<Creator>> =
                 async { creatorRepository.loadCreator(creatorId) }
-            val deferredVideoData: Deferred<Result<Content>> =
+            val deferredVideoData: Deferred<TuripCustomResult<Content>> =
                 async { contentRepository.loadContent(contentId) }
 
-            val creatorResult: Result<Creator> = deferredCreator.await()
-            val videoDataResult: Result<Content> = deferredVideoData.await()
+            val creatorResult: TuripCustomResult<Creator> = deferredCreator.await()
+            val videoDataResult: TuripCustomResult<Content> = deferredVideoData.await()
 
             creatorResult
                 .onSuccess { creator: Creator ->
@@ -90,10 +93,8 @@ class TripDetailViewModel(
                             _videoUri.value = result.videoData.url
                             _isFavorite.value = result.isFavorite
                         }.onFailure {
-                            Timber.e("${it.message}")
                         }
                 }.onFailure {
-                    Timber.e("${it.message}")
                 }
         }
     }
@@ -115,7 +116,6 @@ class TripDetailViewModel(
                     _tripModel.value = trip.toUiModel()
                     Timber.d("여행 일정 불러오기 성공")
                 }.onFailure {
-                    Timber.e("${it.message}")
                 }
         }
     }
@@ -151,7 +151,6 @@ class TripDetailViewModel(
                         .onSuccess {
                             Timber.d("찜 API 통신 성공")
                         }.onFailure {
-                            Timber.e("${it.message}")
                         }
                 }
         }

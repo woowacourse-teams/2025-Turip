@@ -7,6 +7,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.on.turip.data.common.TuripCustomResult
+import com.on.turip.data.common.onFailure
+import com.on.turip.data.common.onSuccess
 import com.on.turip.di.RepositoryModule
 import com.on.turip.domain.content.PagedContentsResult
 import com.on.turip.domain.content.repository.ContentRepository
@@ -16,7 +19,6 @@ import com.on.turip.ui.search.model.VideoInformationModel
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 class RegionResultViewModel(
     private val regionCategoryName: String,
@@ -33,7 +35,7 @@ class RegionResultViewModel(
 
     private fun loadContentsFromRegion() {
         viewModelScope.launch {
-            val pagedContentsResult: Deferred<Result<PagedContentsResult>> =
+            val pagedContentsResult: Deferred<TuripCustomResult<PagedContentsResult>> =
                 async {
                     contentRepository.loadContentsByRegion(
                         regionCategoryName = regionCategoryName,
@@ -41,7 +43,7 @@ class RegionResultViewModel(
                         lastId = 0L,
                     )
                 }
-            val contentsSize: Deferred<Result<Int>> =
+            val contentsSize: Deferred<TuripCustomResult<Int>> =
                 async {
                     contentRepository.loadContentsSizeByRegion(regionCategoryName)
                 }
@@ -56,7 +58,6 @@ class RegionResultViewModel(
                             videoInformations = videoModels,
                         )
                 }.onFailure {
-                    Timber.e("${it.message}")
                 }
             contentsSize
                 .await()
@@ -65,7 +66,6 @@ class RegionResultViewModel(
                     updateLoading(false)
                 }.onFailure {
                     updateLoading(false)
-                    Timber.e("${it.message}")
                 }
         }
     }

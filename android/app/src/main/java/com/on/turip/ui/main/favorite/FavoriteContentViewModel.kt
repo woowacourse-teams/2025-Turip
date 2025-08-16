@@ -7,6 +7,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.on.turip.data.common.onFailure
+import com.on.turip.data.common.onSuccess
 import com.on.turip.di.RepositoryModule
 import com.on.turip.domain.favorite.FavoriteContent
 import com.on.turip.domain.favorite.repository.FavoriteRepository
@@ -14,11 +16,12 @@ import com.on.turip.domain.favorite.usecase.UpdateFavoriteUseCase
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class FavoriteViewModel(
+class FavoriteContentViewModel(
     private val favoriteRepository: FavoriteRepository,
     private val updateFavoriteUseCase: UpdateFavoriteUseCase,
 ) : ViewModel() {
-    private val _favoriteContents: MutableLiveData<List<FavoriteContent>> = MutableLiveData()
+    private val _favoriteContents: MutableLiveData<List<FavoriteContent>> =
+        MutableLiveData(emptyList())
     val favoriteContents: LiveData<List<FavoriteContent>> get() = _favoriteContents
 
     init {
@@ -34,7 +37,6 @@ class FavoriteViewModel(
                     _favoriteContents.value = it.favoriteContents
                 }.onFailure {
                     Timber.e("찜 목록 데이터 조회 에러 발생")
-                    Timber.e("${it.message}")
                 }
         }
     }
@@ -71,7 +73,7 @@ class FavoriteViewModel(
         ): ViewModelProvider.Factory =
             viewModelFactory {
                 initializer {
-                    FavoriteViewModel(
+                    FavoriteContentViewModel(
                         favoriteRepository = favoriteRepository,
                         updateFavoriteUseCase = updateFavoriteUseCase,
                     )

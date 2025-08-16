@@ -32,4 +32,8 @@ public class Member extends TimeStamp {
     public Member(String deviceFid) {
         this.deviceFid = deviceFid;
     }
+
+    public boolean isSameDeviceId(Member other) {
+        return this.deviceFid.equals(other.deviceFid);
+    }
 }

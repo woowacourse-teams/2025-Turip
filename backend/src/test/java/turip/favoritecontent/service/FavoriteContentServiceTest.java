@@ -123,7 +123,7 @@ class FavoriteContentServiceTest {
 
     @DisplayName("내 찜 목록을 페이징 조회할 수 있다")
     @Test
-    void findMyFavoriteContents() {
+    void findMyFavoriteContents1() {
         // given
         String deviceFid = "testDeviceFid";
         int pageSize = 2;
@@ -141,6 +141,10 @@ class FavoriteContentServiceTest {
                 .willReturn(2); // content1 1박 2일
         given(contentPlaceService.calculateDurationDays(2L))
                 .willReturn(3); // content2 2박 3일
+        given(contentRepository.existsById(1L))
+                .willReturn(true);
+        given(contentRepository.existsById(2L))
+                .willReturn(true);
 
         MyFavoriteContentsResponse response = favoriteContentService.findMyFavoriteContents(deviceFid, pageSize,
                 lastContentId);
@@ -152,6 +156,36 @@ class FavoriteContentServiceTest {
                 () -> assertThat(response.contents().getFirst().tripDuration().days()).isEqualTo(2),
                 () -> assertThat(response.contents().get(1).tripDuration().days()).isEqualTo(3)
         );
+    }
+
+    @DisplayName("내 찜 목록을 페이징 조회할 때, 컨텐츠 id에 대한 컨텐츠가 존재하지 않는 경우 NotFoundException을 발생시킨다.")
+    @Test
+    void findMyFavoriteContents2() {
+        // given
+        String deviceFid = "testDeviceFid";
+        int pageSize = 2;
+        long lastContentId = 0L;
+
+        Creator creator = new Creator(null, null);
+        City city = new City(null, null, null, null);
+        Content content1 = new Content(1L, creator, city, null, null, null);
+        Content content2 = new Content(2L, creator, city, null, null, null);
+        List<Content> contents = List.of(content1, content2);
+
+        given(favoriteContentRepository.findMyFavoriteContentsByDeviceFid(eq(deviceFid), eq(Long.MAX_VALUE), any()))
+                .willReturn(new SliceImpl<>(contents));
+        given(contentPlaceService.calculateDurationDays(1L))
+                .willReturn(2); // content1 1박 2일
+        given(contentPlaceService.calculateDurationDays(2L))
+                .willReturn(3); // content2 2박 3일
+        given(contentRepository.existsById(1L))
+                .willReturn(true);
+        given(contentRepository.existsById(2L))
+                .willReturn(false);
+
+        // when & then
+        assertThatThrownBy(() -> favoriteContentService.findMyFavoriteContents(deviceFid, pageSize, lastContentId))
+                .isInstanceOf(NotFoundException.class);
     }
 
     @DisplayName("찜 삭제 테스트")

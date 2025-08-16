@@ -19,6 +19,8 @@ import turip.favoritecontent.controller.dto.request.FavoriteContentRequest;
 import turip.favoritecontent.controller.dto.response.FavoriteContentResponse;
 import turip.favoritecontent.domain.FavoriteContent;
 import turip.favoritecontent.repository.FavoriteContentRepository;
+import turip.favoritefolder.domain.FavoriteFolder;
+import turip.favoritefolder.repository.FavoriteFolderRepository;
 import turip.member.domain.Member;
 import turip.member.repository.MemberRepository;
 
@@ -29,6 +31,7 @@ public class FavoriteContentService {
     private final FavoriteContentRepository favoriteContentRepository;
     private final MemberRepository memberRepository;
     private final ContentRepository contentRepository;
+    private final FavoriteFolderRepository favoriteFolderRepository;
     private final ContentPlaceService contentPlaceService;
 
     @Transactional
@@ -77,7 +80,12 @@ public class FavoriteContentService {
 
     private Member findOrCreateMember(String deviceFid) {
         return memberRepository.findByDeviceFid(deviceFid)
-                .orElseGet(() -> memberRepository.save(new Member(deviceFid)));
+                .orElseGet(() -> {
+                    Member savedMember = memberRepository.save(new Member(deviceFid));
+                    FavoriteFolder defaultFolder = FavoriteFolder.defaultFolderOf(savedMember);
+                    favoriteFolderRepository.save(defaultFolder);
+                    return savedMember;
+                });
     }
 
     private TripDurationResponse calculateTripDuration(Content content) {
@@ -90,10 +98,18 @@ public class FavoriteContentService {
                 .map(content -> {
                     ContentResponse contentWithCreatorAndCity = ContentResponse.of(content, true);
                     TripDurationResponse tripDuration = calculateTripDuration(content);
+                    validateContentExists(content.getId());
                     int tripPlaceCount = contentPlaceService.countByContentId(content.getId());
                     return ContentWithTripInfoAndFavoriteResponse.of(contentWithCreatorAndCity, tripDuration,
                             tripPlaceCount);
                 })
                 .toList();
+    }
+
+    private void validateContentExists(Long contentId) {
+        boolean isContentExists = contentRepository.existsById(contentId);
+        if (!isContentExists) {
+            throw new NotFoundException("컨텐츠를 찾을 수 없습니다.");
+        }
     }
 }

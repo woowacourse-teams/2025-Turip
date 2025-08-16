@@ -5,22 +5,22 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.on.turip.domain.favorite.FavoriteContent
 
-class FavoriteItemAdapter(
-    private val onFavoriteItemListener: FavoriteItemViewHolder.FavoriteItemListener,
-) : ListAdapter<FavoriteContent, FavoriteItemViewHolder>(FavoriteItemDiffUtil) {
+class FavoriteContentAdapter(
+    private val onFavoriteContentListener: FavoriteContentViewHolder.FavoriteContentListener,
+) : ListAdapter<FavoriteContent, FavoriteContentViewHolder>(FavoriteContentDiffUtil) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): FavoriteItemViewHolder = FavoriteItemViewHolder.of(parent, onFavoriteItemListener)
+    ): FavoriteContentViewHolder = FavoriteContentViewHolder.of(parent, onFavoriteContentListener)
 
     override fun onBindViewHolder(
-        holder: FavoriteItemViewHolder,
+        holder: FavoriteContentViewHolder,
         position: Int,
     ) {
         holder.bind(getItem(position))
     }
 
-    private object FavoriteItemDiffUtil : DiffUtil.ItemCallback<FavoriteContent>() {
+    private object FavoriteContentDiffUtil : DiffUtil.ItemCallback<FavoriteContent>() {
         override fun areItemsTheSame(
             oldItem: FavoriteContent,
             newItem: FavoriteContent,

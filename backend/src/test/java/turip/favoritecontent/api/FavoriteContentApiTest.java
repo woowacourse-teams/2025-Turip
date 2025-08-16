@@ -15,7 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.ActiveProfiles;
 
+@ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class FavoriteContentApiTest {
 
@@ -28,6 +30,7 @@ class FavoriteContentApiTest {
     void setUp() {
         jdbcTemplate.update("DELETE FROM place_category");
         jdbcTemplate.update("DELETE FROM content_place");
+        jdbcTemplate.update("DELETE FROM favorite_folder");
         jdbcTemplate.update("DELETE FROM place");
         jdbcTemplate.update("DELETE FROM category");
         jdbcTemplate.update("DELETE FROM favorite_content");
