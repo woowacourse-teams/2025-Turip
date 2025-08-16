@@ -186,6 +186,53 @@ public class FavoriteFolderController {
                     )
             ),
             @ApiResponse(
+                    responseCode = "400",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "folder_name_blank",
+                                            summary = "장소 찜 폴더 이름이 공백인 경우",
+                                            value = """
+                                                    {
+                                                        "message": "장소 찜 폴더 이름은 빈 칸이 될 수 없습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "folder_name_length_over",
+                                            summary = "장소 찜 폴더 이름이 20글자를 초과하는 경우",
+                                            value = """
+                                                    {
+                                                        "message": "장소 찜 폴더 이름은 최대 20글자 입니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "not_folder_owner",
+                                            summary = "폴더 소유자의 기기id와 요청자의 기기id가 같지 않은 경우",
+                                            value = """
+                                                    {
+                                                        "message" : "폴더 소유자의 기기id와 요청자의 기기id가 같지 않습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
                     responseCode = "404",
                     description = "실패 예시",
                     content = @Content(
@@ -200,17 +247,7 @@ public class FavoriteFolderController {
                                                         "message" : "해당 id에 대한 회원이 존재하지 않습니다."
                                                     }
                                                     """
-                                    )
-                            }
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "실패 예시",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class),
-                            examples = {
+                                    ),
                                     @ExampleObject(
                                             name = "folder_not_found",
                                             summary = "id에 대한 폴더를 찾을 수 없는 경우",
@@ -241,25 +278,6 @@ public class FavoriteFolderController {
                                     )
                             }
                     )
-            ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = "실패 예시",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class),
-                            examples = {
-                                    @ExampleObject(
-                                            name = "not_folder_owner",
-                                            summary = "폴더 소유자의 기기id와 요청자의 기기id가 같지 않은 경우",
-                                            value = """
-                                                    {
-                                                        "message" : "폴더 소유자의 기기id와 요청자의 기기id가 같지 않습니다."
-                                                    }
-                                                    """
-                                    )
-                            }
-                    )
             )
     })
     @PatchMapping("/{favoriteFolderId}")
@@ -282,6 +300,25 @@ public class FavoriteFolderController {
                     description = "성공 예시"
             ),
             @ApiResponse(
+                    responseCode = "403",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "not_folder_owner",
+                                            summary = "폴더 소유자의 기기id와 요청자의 기기id가 같지 않은 경우",
+                                            value = """
+                                                    {
+                                                        "message" : "폴더 소유자의 기기id와 요청자의 기기id가 같지 않습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
                     responseCode = "404",
                     description = "실패 예시",
                     content = @Content(
@@ -296,42 +333,13 @@ public class FavoriteFolderController {
                                                         "message" : "해당 id에 대한 회원이 존재하지 않습니다."
                                                     }
                                                     """
-                                    )
-                            }
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "실패 예시",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class),
-                            examples = {
+                                    ),
                                     @ExampleObject(
                                             name = "folder_not_found",
                                             summary = "id에 대한 폴더를 찾을 수 없는 경우",
                                             value = """
                                                     {
                                                         "message" : "해당 id에 대한 폴더가 존재하지 않습니다."
-                                                    }
-                                                    """
-                                    )
-                            }
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = "실패 예시",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class),
-                            examples = {
-                                    @ExampleObject(
-                                            name = "not_folder_owner",
-                                            summary = "폴더 소유자의 기기id와 요청자의 기기id가 같지 않은 경우",
-                                            value = """
-                                                    {
-                                                        "message" : "폴더 소유자의 기기id와 요청자의 기기id가 같지 않습니다."
                                                     }
                                                     """
                                     )

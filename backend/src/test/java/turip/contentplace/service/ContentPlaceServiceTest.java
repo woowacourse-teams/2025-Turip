@@ -14,6 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import turip.category.domain.Category;
+import turip.content.repository.ContentRepository;
 import turip.contentplace.controller.dto.response.ContentPlaceDetailResponse;
 import turip.contentplace.domain.ContentPlace;
 import turip.contentplace.repository.ContentPlaceRepository;
@@ -25,16 +26,21 @@ class ContentPlaceServiceTest {
 
     @InjectMocks
     private ContentPlaceService contentPlaceService;
+
     @Mock
     private ContentPlaceRepository contentPlaceRepository;
+
+    @Mock
+    private ContentRepository contentRepository;
 
     @DisplayName("contentId에 대한 컨텐츠가 존재하지 않으면 NotFoundException을 발생시킨다.")
     @Test
     void countByContentId() {
         // given
         long contentId = 1L;
-        given(contentPlaceRepository.countByContentId(contentId))
-                .willThrow(new IllegalArgumentException());
+
+        given(contentRepository.existsById(contentId))
+                .willReturn(false);
 
         // when & then
         assertThatThrownBy(() -> contentPlaceService.countByContentId(contentId))
