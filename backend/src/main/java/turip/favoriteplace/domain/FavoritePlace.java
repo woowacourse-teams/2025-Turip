@@ -28,4 +28,9 @@ public class FavoritePlace {
 
     @ManyToOne
     private Place place;
+
+    public FavoritePlace(FavoriteFolder favoriteFolder, Place place) {
+        this.favoriteFolder = favoriteFolder;
+        this.place = place;
+    }
 }
