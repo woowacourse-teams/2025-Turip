@@ -154,7 +154,7 @@ public class CsvDataImportService {
             return null;
         }
         return countryRepository.findByName(countryName)
-                .orElseGet(() -> countryRepository.save(new Country(countryName, null)));
+                .orElseGet(() -> countryRepository.save(new Country(countryName, "")));
     }
 
     private Province findOrCreateProvince(String provinceName) {
@@ -170,7 +170,7 @@ public class CsvDataImportService {
             return null;
         }
         return cityRepository.findByName(cityName)
-                .orElseGet(() -> cityRepository.save(new City(country, province, cityName, null)));
+                .orElseGet(() -> cityRepository.save(new City(country, province, cityName, "")));
     }
 
     private Creator findOrCreateCreator(String channelName) {
@@ -178,7 +178,7 @@ public class CsvDataImportService {
             return null;
         }
         return creatorRepository.findByChannelName(channelName)
-                .orElseGet(() -> creatorRepository.save(new Creator(channelName, null)));
+                .orElseGet(() -> creatorRepository.save(new Creator(channelName, "")));
     }
 
     private Content findOrCreateContent(Creator creator, City city, CsvDataDto csvData) {
@@ -212,11 +212,11 @@ public class CsvDataImportService {
     }
 
     private Place findOrCreatePlace(CsvDataDto csvData) {
-        String placeName = csvData.placeName();
-        if (isNullOrEmpty(placeName)) {
+        String placeUrl = csvData.mapUrl();
+        if (isNullOrEmpty(placeUrl)) {
             return null;
         }
-        return placeRepository.findByName(placeName)
+        return placeRepository.findByUrl(placeUrl)
                 .orElseGet(() -> createAndSavePlace(csvData));
     }
 
