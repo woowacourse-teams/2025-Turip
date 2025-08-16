@@ -16,7 +16,7 @@ import turip.common.domain.TimeStamp;
 @Getter
 @Entity
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
+@EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SQLRestriction("deleted_at is Null")
 @SQLDelete(sql = "UPDATE member SET deleted_at = NOW() WHERE id = ?")

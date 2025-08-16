@@ -17,7 +17,7 @@ import turip.member.domain.Member;
 
 @Getter
 @Entity
-@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
+@EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SQLRestriction("deleted_at is Null")
 @SQLDelete(sql = "UPDATE favorite_content SET deleted_at = NOW() WHERE id = ?")
