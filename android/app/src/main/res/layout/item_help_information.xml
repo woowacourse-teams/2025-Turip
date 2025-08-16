@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground"
+    android:paddingVertical="16dp">
+
+    <ImageView
+        android:id="@+id/iv_help_information_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:contentDescription="@null"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/ic_inquire" />
+
+    <TextView
+        android:id="@+id/tv_help_information_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:gravity="center_vertical"
+        android:textAppearance="@style/body2"
+        android:textColor="@color/pure_black_151515"
+        app:layout_constraintBottom_toBottomOf="@id/iv_help_information_icon"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/iv_help_information_icon"
+        app:layout_constraintTop_toTopOf="@id/iv_help_information_icon"
+        tools:text="문의하기" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -16,11 +16,12 @@ import com.on.turip.domain.favorite.usecase.UpdateFavoriteUseCase
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class FavoriteViewModel(
+class FavoriteContentViewModel(
     private val favoriteRepository: FavoriteRepository,
     private val updateFavoriteUseCase: UpdateFavoriteUseCase,
 ) : ViewModel() {
-    private val _favoriteContents: MutableLiveData<List<FavoriteContent>> = MutableLiveData()
+    private val _favoriteContents: MutableLiveData<List<FavoriteContent>> =
+        MutableLiveData(emptyList())
     val favoriteContents: LiveData<List<FavoriteContent>> get() = _favoriteContents
 
     init {
@@ -72,7 +73,7 @@ class FavoriteViewModel(
         ): ViewModelProvider.Factory =
             viewModelFactory {
                 initializer {
-                    FavoriteViewModel(
+                    FavoriteContentViewModel(
                         favoriteRepository = favoriteRepository,
                         updateFavoriteUseCase = updateFavoriteUseCase,
                     )
