@@ -14,12 +14,15 @@ class FolderActivity : BaseActivity<ActivityFolderBinding>() {
             object : FolderViewHolder.FolderListener {
                 override fun onRemoveClick(folderId: Long) {
                     // TODO: 폴더 삭제 바텀 시트 다이얼로그 보여주기
+                    val bottomSheet: FolderRemoveBottomSheetFragment =
+                        FolderRemoveBottomSheetFragment.instance()
+                    bottomSheet.show(supportFragmentManager, "folder_remove")
                 }
 
                 override fun onItemClick(folderId: Long) {
                     // TODO: 폴더명 편집 바텀 시트 다이얼로그 보여주기
                     val bottomSheet: FolderModifyBottomSheetFragment =
-                        FolderModifyBottomSheetFragment()
+                        FolderModifyBottomSheetFragment.instance()
                     bottomSheet.show(supportFragmentManager, "folder_modify")
                 }
             },
@@ -39,7 +42,7 @@ class FolderActivity : BaseActivity<ActivityFolderBinding>() {
 
     private fun setupListeners() {
         binding.ivFolderFolderPlus.setOnClickListener {
-            val bottomSheet: FolderAddBottomSheetFragment = FolderAddBottomSheetFragment()
+            val bottomSheet: FolderAddBottomSheetFragment = FolderAddBottomSheetFragment.instance()
             bottomSheet.show(supportFragmentManager, "folder_add")
         }
     }
