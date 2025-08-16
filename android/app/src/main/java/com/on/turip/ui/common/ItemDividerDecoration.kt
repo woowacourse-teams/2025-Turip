@@ -10,7 +10,7 @@ class ItemDividerDecoration(
     private val padding: Int = 0,
     private val color: Int,
 ) : RecyclerView.ItemDecoration() {
-    override fun onDrawOver(
+    override fun onDraw(
         c: Canvas,
         parent: RecyclerView,
         state: RecyclerView.State,
