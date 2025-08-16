@@ -1,13 +1,14 @@
 package com.on.turip.ui.main.favorite
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import com.on.turip.R
 import com.on.turip.databinding.FragmentFavoriteContentBinding
+import com.on.turip.domain.favorite.FavoriteContent
 import com.on.turip.ui.common.ItemDividerDecoration
 import com.on.turip.ui.common.base.BaseFragment
 import com.on.turip.ui.trip.detail.TripDetailActivity
@@ -32,7 +33,7 @@ class FavoriteContentFragment : BaseFragment<FragmentFavoriteContentBinding>() {
                     creatorId: Long,
                 ) {
                     Timber.d("찜 목록의 아이템 클릭(contentId=$contentId)")
-                    val intent =
+                    val intent: Intent =
                         TripDetailActivity.newIntent(
                             context = requireContext(),
                             contentId = contentId,
@@ -65,21 +66,21 @@ class FavoriteContentFragment : BaseFragment<FragmentFavoriteContentBinding>() {
             addItemDecoration(
                 ItemDividerDecoration(
                     height = 1,
-                    color = ContextCompat.getColor(context, R.color.gray_100_f0f0ee),
+                    color = requireContext().getColor(R.color.gray_100_f0f0ee),
                 ),
             )
         }
     }
 
     private fun setupObservers() {
-        viewModel.favoriteContents.observe(viewLifecycleOwner) {
-            handleVisibleByHasContent()
-            favoriteContentAdapter.submitList(it)
+        viewModel.favoriteContents.observe(viewLifecycleOwner) { favoriteContents: List<FavoriteContent> ->
+            handleVisibleByHasContent(favoriteContents)
+            favoriteContentAdapter.submitList(favoriteContents)
         }
     }
 
-    private fun handleVisibleByHasContent() {
-        if (viewModel.favoriteContents.value == null || viewModel.favoriteContents.value?.isEmpty() == true) {
+    private fun handleVisibleByHasContent(favoriteContents: List<FavoriteContent>) {
+        if (favoriteContents.isEmpty()) {
             binding.clFavoriteContentEmpty.visibility = View.VISIBLE
             binding.clFavoriteContentNotEmpty.visibility = View.GONE
         } else {
@@ -98,5 +99,9 @@ class FavoriteContentFragment : BaseFragment<FragmentFavoriteContentBinding>() {
         if (!hidden) {
             viewModel.loadFavoriteContents()
         }
+    }
+
+    companion object {
+        fun instance(): FavoriteContentFragment = FavoriteContentFragment()
     }
 }

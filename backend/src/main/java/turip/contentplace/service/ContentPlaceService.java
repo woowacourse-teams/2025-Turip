@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import turip.contentplace.controller.dto.response.ContentPlaceDetailResponse;
 import turip.contentplace.domain.ContentPlace;
 import turip.contentplace.repository.ContentPlaceRepository;
-import turip.exception.custom.NotFoundException;
 
 @Service
 @RequiredArgsConstructor
@@ -15,11 +14,7 @@ public class ContentPlaceService {
     private final ContentPlaceRepository contentPlaceRepository;
 
     public int countByContentId(Long contentId) {
-        try {
-            return contentPlaceRepository.countByContentId(contentId);
-        } catch (IllegalArgumentException e) {
-            throw new NotFoundException("컨텐츠를 찾을 수 없습니다.");
-        }
+        return contentPlaceRepository.countByContentId(contentId);
     }
 
     public ContentPlaceDetailResponse findContentPlaceDetails(Long contentId) {

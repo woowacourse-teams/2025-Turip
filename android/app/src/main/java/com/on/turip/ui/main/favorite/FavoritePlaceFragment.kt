@@ -55,6 +55,10 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
         }
         binding.rvFavoritePlacePlace.adapter = placeAdapter
     }
+
+    companion object {
+        fun instance(): FavoritePlaceFragment = FavoritePlaceFragment()
+    }
 }
 
 private object RecyclerViewTouchInterceptor : RecyclerView.OnItemTouchListener {

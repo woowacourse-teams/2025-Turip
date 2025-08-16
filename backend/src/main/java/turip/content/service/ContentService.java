@@ -231,7 +231,8 @@ public class ContentService {
     private ContentDetailsByRegionCategoryResponse toContentDetailsByRegionResponse(Content content) {
         ContentByCityResponse contentWithCity = ContentByCityResponse.from(content);
         TripDurationResponse tripDuration = calculateTripDuration(content);
-        int tripPlaceCount = contentPlaceService.countByContentId(content.getId());
+
+        int tripPlaceCount = getTripPlaceCount(content);
 
         return ContentDetailsByRegionCategoryResponse.of(contentWithCity, tripDuration, tripPlaceCount);
     }
@@ -243,7 +244,7 @@ public class ContentService {
     }
 
     private ContentWithTripInfoResponse toContentSearchResultResponse(Content content) {
-        int placeCount = contentPlaceService.countByContentId(content.getId());
+        int placeCount = getTripPlaceCount(content);
 
         return ContentWithTripInfoResponse.of(
                 ContentWithCreatorAndCityResponse.from(content),
@@ -255,6 +256,14 @@ public class ContentService {
     private TripDurationResponse calculateTripDuration(Content content) {
         int totalTripDay = contentPlaceService.calculateDurationDays(content.getId());
         return TripDurationResponse.of(totalTripDay - 1, totalTripDay);
+    }
+
+    private int getTripPlaceCount(Content content) {
+        boolean isContentExists = contentRepository.existsById(content.getId());
+        if (!isContentExists) {
+            throw new NotFoundException("컨텐츠를 찾을 수 없습니다.");
+        }
+        return contentPlaceService.countByContentId(content.getId());
     }
 
     private List<LocalDate> getLastWeekPeriod() {

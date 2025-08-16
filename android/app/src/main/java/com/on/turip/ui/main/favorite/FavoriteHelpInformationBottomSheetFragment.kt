@@ -8,33 +8,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.net.toUri
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import androidx.fragment.app.viewModels
 import com.on.turip.BuildConfig
 import com.on.turip.R
 import com.on.turip.databinding.BottomSheetFragmentFavoriteHelpInformationBinding
+import com.on.turip.ui.common.base.BaseBottomSheetFragment
 import com.on.turip.ui.main.favorite.model.HelpInformationModel
+import com.on.turip.ui.main.favorite.model.HelpInformationModelType
 
-class FavoriteHelpInformationBottomSheetFragment : BottomSheetDialogFragment() {
-    private var _binding: BottomSheetFragmentFavoriteHelpInformationBinding? = null
-    val binding: BottomSheetFragmentFavoriteHelpInformationBinding get() = _binding!!
-    // TODO : backingProperty 사용할 때 public으로 열어놓지 않으면 ktlint 경고문구 나오는데 무시하는 게 좋을 지, 퍼블릭으로 여는게 좋을지 ?
-
+class FavoriteHelpInformationBottomSheetFragment : BaseBottomSheetFragment<BottomSheetFragmentFavoriteHelpInformationBinding>() {
+    private val viewModel: FavoriteHelpInformationViewModel by viewModels()
     private val inquireMailUri: Uri by lazy {
         "mailto:$EMAIL_RECIPIENT?subject=${Uri.encode(EMAIL_SUBJECT)}&body=${Uri.encode(EMAIL_BODY)}".toUri()
     }
-
-    private val helpInformationModels: List<HelpInformationModel>
-        get() =
-            listOf(
-                HelpInformationModel(
-                    R.drawable.ic_inquire,
-                    R.string.bottom_sheet_favorite_help_information_inquiry,
-                ) { openInquiryForm() },
-                HelpInformationModel(
-                    R.drawable.ic_document,
-                    R.string.bottom_sheet_favorite_help_information_privacy_policy,
-                ) { openPrivacyPolicy() },
-            )
 
     private val helpInformationAdapter: FavoriteHelpInformationAdapter by lazy {
         FavoriteHelpInformationAdapter { helpInformationModel: HelpInformationModel ->
@@ -59,15 +45,11 @@ class FavoriteHelpInformationBottomSheetFragment : BottomSheetDialogFragment() {
         startActivity(intent)
     }
 
-    override fun onCreateView(
+    override fun inflateBinding(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        _binding =
-            BottomSheetFragmentFavoriteHelpInformationBinding.inflate(inflater, container, false)
-        return binding.root
-    }
+    ): BottomSheetFragmentFavoriteHelpInformationBinding =
+        BottomSheetFragmentFavoriteHelpInformationBinding.inflate(inflater, container, false)
 
     override fun onViewCreated(
         view: View,
@@ -76,16 +58,34 @@ class FavoriteHelpInformationBottomSheetFragment : BottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupAdapters()
-        helpInformationAdapter.submitList(helpInformationModels)
+        setupObservers()
     }
 
     private fun setupAdapters() {
         binding.rvBottomSheetFavoriteHelpInformation.adapter = helpInformationAdapter
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+    private fun setupObservers() {
+        viewModel.helpInformationItems.observe(viewLifecycleOwner) { helpInformationModelTypes: List<HelpInformationModelType> ->
+            val helpInformationModels: List<HelpInformationModel> =
+                helpInformationModelTypes.map { helpInformationModelType: HelpInformationModelType ->
+                    when (helpInformationModelType) {
+                        HelpInformationModelType.INQUIRY ->
+                            HelpInformationModel(
+                                R.drawable.ic_inquire,
+                                R.string.bottom_sheet_favorite_help_information_inquiry,
+                            ) { openInquiryForm() }
+
+                        HelpInformationModelType.PRIVACY_POLICY ->
+                            HelpInformationModel(
+                                R.drawable.ic_document,
+                                R.string.bottom_sheet_favorite_help_information_privacy_policy,
+                            ) { openPrivacyPolicy() }
+                    }
+                }
+
+            helpInformationAdapter.submitList(helpInformationModels)
+        }
     }
 
     companion object {
@@ -116,5 +116,7 @@ class FavoriteHelpInformationBottomSheetFragment : BottomSheetDialogFragment() {
             """.trimIndent()
         private const val PRIVACY_POLICY_LINK =
             "https://agate-bandana-491.notion.site/23aeabcebdc180299e11d3bb2fbfaf67?source=copy_link"
+
+        fun instance(): FavoriteHelpInformationBottomSheetFragment = FavoriteHelpInformationBottomSheetFragment()
     }
 }
