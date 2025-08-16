@@ -209,6 +209,15 @@ public class FavoriteFolderController {
                                                         "message": "장소 찜 폴더 이름은 최대 20글자 입니다."
                                                     }
                                                     """
+                                    ),
+                                    @ExampleObject(
+                                            name = "is_default_folder",
+                                            summary = "장소 찜 폴더가 기본 폴더인 경우",
+                                            value = """
+                                                    {
+                                                        "message": "기본 폴더는 수정할 수 없습니다."
+                                                    }
+                                                    """
                                     )
                             }
                     )
@@ -306,6 +315,15 @@ public class FavoriteFolderController {
                             mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = {
+                                    @ExampleObject(
+                                            name = "is_default_folder",
+                                            summary = "삭제하려는 폴더가 기본 폴더인 경우",
+                                            value = """
+                                                    {
+                                                        "message" : "기본 폴더는 삭제할 수 없습니다."
+                                                    }
+                                                    """
+                                    ),
                                     @ExampleObject(
                                             name = "not_folder_owner",
                                             summary = "폴더 소유자의 기기id와 요청자의 기기id가 같지 않은 경우",

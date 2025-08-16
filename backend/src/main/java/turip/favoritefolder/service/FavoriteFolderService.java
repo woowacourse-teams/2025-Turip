@@ -4,6 +4,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import turip.exception.custom.BadRequestException;
 import turip.exception.custom.ConflictException;
 import turip.exception.custom.ForbiddenException;
 import turip.exception.custom.NotFoundException;
@@ -55,8 +56,11 @@ public class FavoriteFolderService {
                                              FavoriteFolderNameRequest request) {
         Member member = getMemberByDeviceId(deviceFid);
         FavoriteFolder favoriteFolder = getById(favoriteFolderId);
-        String newName = FavoriteFolder.formatName(request.name());
+        if (favoriteFolder.isDefault()) {
+            throw new BadRequestException("기본 폴더는 수정할 수 없습니다.");
+        }
 
+        String newName = FavoriteFolder.formatName(request.name());
         validateOwnership(member, favoriteFolder);
         validateDuplicatedName(newName, member);
         favoriteFolder.rename(newName);
@@ -69,6 +73,9 @@ public class FavoriteFolderService {
         Member member = getMemberByDeviceId(deviceFid);
         FavoriteFolder favoriteFolder = getById(favoriteFolderId);
 
+        if (favoriteFolder.isDefault()) {
+            throw new BadRequestException("기본 폴더는 삭제할 수 없습니다.");
+        }
         validateOwnership(member, favoriteFolder);
 
         favoriteFolderRepository.deleteById(favoriteFolderId);

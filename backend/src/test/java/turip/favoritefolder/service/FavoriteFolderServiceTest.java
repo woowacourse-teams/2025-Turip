@@ -17,6 +17,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import turip.exception.custom.BadRequestException;
 import turip.exception.custom.ConflictException;
 import turip.exception.custom.ForbiddenException;
 import turip.exception.custom.NotFoundException;
@@ -342,6 +343,32 @@ class FavoriteFolderServiceTest {
             assertThatThrownBy(() -> favoriteFolderService.updateName(deviceFid, folderId, request))
                     .isInstanceOf(IllegalArgumentException.class);
         }
+
+        @DisplayName("기본 찜 폴더를 수정하려는 경우 BadRequestException을 발생시킨다")
+        @Test
+        void updateName7() {
+            // given
+            String deviceFid = "testDeviceFid";
+            Long memberId = 1L;
+            Long folderId = 1L;
+            String oldName = "기본 폴더";
+            String newName = "새로운 폴더 이름";
+            boolean isDefault = true;
+
+            Member member = new Member(memberId, deviceFid);
+            FavoriteFolder favoriteFolder = new FavoriteFolder(folderId, member, oldName, isDefault);
+            FavoriteFolderNameRequest request = new FavoriteFolderNameRequest(newName);
+
+            given(memberRepository.findByDeviceFid(deviceFid))
+                    .willReturn(Optional.of(member));
+            given(favoriteFolderRepository.findById(folderId))
+                    .willReturn(Optional.of(favoriteFolder));
+
+            // when & then
+            assertThatThrownBy(() -> favoriteFolderService.updateName(deviceFid, folderId, request))
+                    .isInstanceOf(BadRequestException.class)
+                    .hasMessage("기본 폴더는 수정할 수 없습니다.");
+        }
     }
 
     @DisplayName("장소 찜 폴더 삭제 테스트")
@@ -434,6 +461,30 @@ class FavoriteFolderServiceTest {
             // when & then
             assertThatThrownBy(() -> favoriteFolderService.remove(requestDeviceFid, folderId))
                     .isInstanceOf(ForbiddenException.class);
+        }
+
+        @DisplayName("기본 찜 폴더를 삭제하려는 경우 BadRequestException을 발생시킨다")
+        @Test
+        void remove5() {
+            // given
+            String deviceFid = "testDeviceFid";
+            Long memberId = 1L;
+            Long folderId = 1L;
+            String folderName = "기본 폴더";
+            boolean isDefault = true;
+
+            Member member = new Member(memberId, deviceFid);
+            FavoriteFolder favoriteFolder = new FavoriteFolder(folderId, member, folderName, isDefault);
+
+            given(memberRepository.findByDeviceFid(deviceFid))
+                    .willReturn(Optional.of(member));
+            given(favoriteFolderRepository.findById(folderId))
+                    .willReturn(Optional.of(favoriteFolder));
+
+            // when & then
+            assertThatThrownBy(() -> favoriteFolderService.remove(deviceFid, folderId))
+                    .isInstanceOf(BadRequestException.class)
+                    .hasMessage("기본 폴더는 삭제할 수 없습니다.");
         }
     }
 }

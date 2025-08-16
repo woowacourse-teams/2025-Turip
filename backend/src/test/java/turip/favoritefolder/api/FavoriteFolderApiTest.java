@@ -164,7 +164,7 @@ public class FavoriteFolderApiTest {
             // given
             jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('testDeviceFid')");
             jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (member_id, name, is_default) VALUES (1, '기존 폴더', false)");
+                    "INSERT INTO favorite_folder (member_id, name, is_default) VALUES (1, '변경 전 폴더', false)");
 
             // when & then
             Map<String, String> request = new HashMap<>(Map.of("name", "변경된 폴더"));
@@ -187,7 +187,7 @@ public class FavoriteFolderApiTest {
             // given
             jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('existingDeviceFid')");
             jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (member_id, name, is_default) VALUES (1, '기존 폴더', false)");
+                    "INSERT INTO favorite_folder (member_id, name, is_default) VALUES (1, '변경 전 폴더', false)");
 
             // when & then
             Map<String, String> request = new HashMap<>(Map.of("name", "변경된 폴더"));
@@ -206,7 +206,7 @@ public class FavoriteFolderApiTest {
             // given
             jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('testDeviceFid')");
             jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (member_id, name, is_default) VALUES (1, '기존 폴더', false)");
+                    "INSERT INTO favorite_folder (member_id, name, is_default) VALUES (1, '변경 전 폴더', false)");
 
             // when & then
             Map<String, String> request = new HashMap<>(Map.of("name", "변경된 폴더"));
@@ -226,7 +226,7 @@ public class FavoriteFolderApiTest {
             jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('ownerDeviceFid')");
             jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('requestDeviceFid')");
             jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (member_id, name, is_default) VALUES (1, '기존 폴더', false)");
+                    "INSERT INTO favorite_folder (member_id, name, is_default) VALUES (1, '변경 전 폴더', false)");
 
             // when & then
             Map<String, String> request = new HashMap<>(Map.of("name", "변경된 폴더"));
@@ -245,7 +245,7 @@ public class FavoriteFolderApiTest {
             // given
             jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('testDeviceFid')");
             jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (member_id, name, is_default) VALUES (1, '기존 폴더', false)");
+                    "INSERT INTO favorite_folder (member_id, name, is_default) VALUES (1, '변경 전 폴더', false)");
             jdbcTemplate.update(
                     "INSERT INTO favorite_folder (member_id, name, is_default) VALUES (1, '다른 폴더', false)");
 
@@ -266,10 +266,29 @@ public class FavoriteFolderApiTest {
             // given
             jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('testDeviceFid')");
             jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (member_id, name, is_default) VALUES (1, '기존 폴더', false)");
+                    "INSERT INTO favorite_folder (member_id, name, is_default) VALUES (1, '변경 전 폴더', false)");
 
             // when & then
             Map<String, String> request = new HashMap<>(Map.of("name", "21글자폴더입니다용21글자폴더입니다용~"));
+            RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .body(request)
+                    .contentType(ContentType.JSON)
+                    .when().patch("/favorite-folders/1")
+                    .then()
+                    .statusCode(400);
+        }
+
+        @DisplayName("변경하려는 폴더가 기본 폴더인 경우 400 BAD REQUEST 코드를 응답한다")
+        @Test
+        void updateName7() {
+            // given
+            jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('testDeviceFid')");
+            jdbcTemplate.update(
+                    "INSERT INTO favorite_folder (member_id, name, is_default) VALUES (1, '기본 폴더', true)");
+
+            // when & then
+            Map<String, String> request = new HashMap<>(Map.of("name", "변경된 폴더"));
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
                     .body(request)
@@ -347,6 +366,22 @@ public class FavoriteFolderApiTest {
                     .when().delete("/favorite-folders/1")
                     .then()
                     .statusCode(403);
+        }
+
+        @DisplayName("삭제하려는 폴더가 기본 폴더인 경우 400 BAD REQUEST를 응답한다")
+        @Test
+        void delete5() {
+            // given
+            jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('testDeviceFid')");
+            jdbcTemplate.update(
+                    "INSERT INTO favorite_folder (member_id, name, is_default) VALUES (1, '기본 폴더', true)");
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .when().delete("/favorite-folders/1")
+                    .then()
+                    .statusCode(400);
         }
     }
 }
