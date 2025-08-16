@@ -1,4 +1,4 @@
-package turip.csv.service;
+package turip.data.service;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -22,7 +22,7 @@ import turip.country.domain.Country;
 import turip.country.repository.CountryRepository;
 import turip.creator.domain.Creator;
 import turip.creator.repository.CreatorRepository;
-import turip.csv.dto.CsvDataDto;
+import turip.data.dto.CsvDataDto;
 import turip.place.domain.Place;
 import turip.place.repository.PlaceRepository;
 import turip.placecategory.domain.PlaceCategory;
@@ -32,8 +32,8 @@ import turip.province.repository.ProvinceRepository;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 @Transactional
+@RequiredArgsConstructor
 public class CsvDataImportService {
 
     private static final String QUOTATION_MARKS = "\"";

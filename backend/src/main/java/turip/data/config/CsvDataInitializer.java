@@ -1,4 +1,4 @@
-package turip.csv.config;
+package turip.data.config;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -14,13 +14,13 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StreamUtils;
-import turip.csv.service.CsvDataImportService;
+import turip.data.service.CsvDataImportService;
 
 @Slf4j
 @Component
+@Profile("!test")
 @RequiredArgsConstructor
 @ConditionalOnProperty(name = "spring.profiles.active", havingValue = "dev")
-@Profile("!test")
 public class CsvDataInitializer implements CommandLineRunner {
 
     private final CsvDataImportService csvDataImportService;
