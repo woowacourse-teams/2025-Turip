@@ -58,6 +58,8 @@
     <string name="folder_title">폴더 편집</string>
     <string name="bottom_sheet_folder_add_title">폴더 추가</string>
     <string name="bottom_sheet_folder_add_folder_name_hint">폴더명을 입력해주세요.</string>
+    <string name="bottom_sheet_folder_modify_title">폴더 수정</string>
+    <string name="bottom_sheet_folder_modify_folder_name_hint">폴더명을 입력해주세요.</string>
 
     <string name="main_double_back_pressed_to_exit">한 번 더 누르면 종료됩니다.</string>
 
