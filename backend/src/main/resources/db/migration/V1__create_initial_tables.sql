@@ -52,8 +52,8 @@ CREATE TABLE IF NOT EXISTS member
     device_fid  VARCHAR(255) NOT NULL UNIQUE,
 
     created_at  DATETIME(6)  NOT NULL,
-    modified_at DATETIME(6)  NOT NULL,
-    deleted_at  DATETIME(6)  NULL -- soft delete
+    modified_at DATETIME(6)  NULL, -- 수정일은 null 가능
+    deleted_at  DATETIME(6)  NULL  -- soft delete
 );
 
 -- 컨텐츠 테이블
@@ -135,7 +135,7 @@ CREATE TABLE IF NOT EXISTS favorite_folder
     is_default  BOOLEAN      NOT NULL, -- 기본 폴더 여부
 
     created_at  DATETIME(6)  NOT NULL,
-    modified_at DATETIME(6)  NOT NULL,
+    modified_at DATETIME(6)  NULL,     -- 수정일은 null 가능
     deleted_at  DATETIME(6)  NULL,     -- soft delete
 
     CONSTRAINT fk_favorite_folder__member
@@ -153,7 +153,7 @@ CREATE TABLE IF NOT EXISTS favorite_place
     place_id           BIGINT      NOT NULL,
 
     created_at         DATETIME(6) NOT NULL,
-    modified_at        DATETIME(6) NOT NULL,
+    modified_at        DATETIME(6) NULL, -- 수정일은 null 가능
     deleted_at         DATETIME(6) NULL, -- soft delete
 
     CONSTRAINT fk_favorite_place__folder
@@ -174,7 +174,7 @@ CREATE TABLE IF NOT EXISTS favorite_content
     content_id  BIGINT      NOT NULL,
 
     created_at  DATETIME(6) NOT NULL,
-    modified_at DATETIME(6) NOT NULL,
+    modified_at DATETIME(6) NULL, -- 수정일은 null 가능
     deleted_at  DATETIME(6) NULL, -- soft delete
 
     CONSTRAINT fk_favorite_content__member
