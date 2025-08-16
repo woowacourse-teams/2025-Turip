@@ -28,4 +28,8 @@ public class Member {
     public Member(String deviceFid) {
         this.deviceFid = deviceFid;
     }
+
+    public boolean isSameDeviceId(Member other) {
+        return this.deviceFid.equals(other.deviceFid);
+    }
 }

@@ -74,6 +74,10 @@ class ContentServiceTest {
                     new Content(2L, creator, seoul, null, null, null));
             given(contentRepository.findByKeywordContaining(keyword, maxId, PageRequest.of(0, pageSize)))
                     .willReturn(new SliceImpl<>(contents));
+            given(contentRepository.existsById(1L))
+                    .willReturn(true);
+            given(contentRepository.existsById(2L))
+                    .willReturn(true);
 
             // when
             ContentSearchResponse contentsByKeyword = contentService.searchContentsByKeyword(keyword, pageSize,
