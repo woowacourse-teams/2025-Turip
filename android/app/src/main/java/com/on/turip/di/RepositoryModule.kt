@@ -1,11 +1,11 @@
 package com.on.turip.di
 
+import com.on.turip.data.content.place.repository.DefaultContentPlaceRepository
 import com.on.turip.data.content.repository.DefaultContentRepository
 import com.on.turip.data.creator.repository.DefaultCreatorRepository
 import com.on.turip.data.favorite.repository.DefaultFavoriteRepository
 import com.on.turip.data.region.repository.DefaultRegionRepository
 import com.on.turip.data.searchhistory.repository.DefaultSearchHistoryRepository
-import com.on.turip.data.content.place.repository.DefaultContentPlaceRepository
 import com.on.turip.data.userstorage.repository.DefaultUserStorageRepository
 import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.creator.repository.CreatorRepository

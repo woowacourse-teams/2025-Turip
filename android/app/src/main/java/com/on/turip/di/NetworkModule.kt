@@ -1,11 +1,11 @@
 package com.on.turip.di
 
+import com.on.turip.data.content.place.service.ContentPlaceService
 import com.on.turip.data.content.service.ContentService
 import com.on.turip.data.creator.service.CreatorService
 import com.on.turip.data.favorite.service.FavoriteService
 import com.on.turip.data.network.NetworkClient
 import com.on.turip.data.region.service.RegionService
-import com.on.turip.data.content.place.service.ContentPlaceService
 
 object NetworkModule {
     val contentService: ContentService by lazy {

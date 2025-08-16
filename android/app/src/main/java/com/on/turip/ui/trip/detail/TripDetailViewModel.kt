@@ -17,8 +17,8 @@ import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.creator.Creator
 import com.on.turip.domain.creator.repository.CreatorRepository
 import com.on.turip.domain.favorite.usecase.UpdateFavoriteUseCase
-import com.on.turip.domain.trip.Trip
 import com.on.turip.domain.trip.ContentPlace
+import com.on.turip.domain.trip.Trip
 import com.on.turip.domain.trip.repository.ContentPlaceRepository
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.common.model.trip.TripModel
