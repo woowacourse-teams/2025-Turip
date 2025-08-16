@@ -40,6 +40,18 @@ public class FavoritePlaceService {
         return FavoritePlaceResponse.from(savedFavoritePlace);
     }
 
+    @Transactional
+    public void remove(String deviceFid, Long favoriteFolderId, Long placeId) {
+        Member member = memberService.getMemberByDeviceId(deviceFid);
+        FavoriteFolder favoriteFolder = getFavoriteFolderById(favoriteFolderId);
+        Place place = getPlaceById(placeId);
+
+        validateOwnership(member, favoriteFolder);
+        FavoritePlace favoritePlace = getByFavoriteFolderAndPlace(favoriteFolder, place);
+
+        favoritePlaceRepository.delete(favoritePlace);
+    }
+
     private FavoriteFolder getFavoriteFolderById(Long favoriteFolderId) {
         return favoriteFolderRepository.findById(favoriteFolderId)
                 .orElseThrow(() -> new NotFoundException("해당 id에 대한 폴더가 존재하지 않습니다."));
@@ -61,5 +73,10 @@ public class FavoritePlaceService {
         if (isAlreadyFavorite) {
             throw new ConflictException("이미 해당 폴더에 찜한 장소입니다.");
         }
+    }
+
+    private FavoritePlace getByFavoriteFolderAndPlace(FavoriteFolder favoriteFolder, Place place) {
+        return favoritePlaceRepository.findByFavoriteFolderAndPlace(favoriteFolder, place)
+                .orElseThrow(() -> new NotFoundException("삭제하려는 장소 찜이 존재하지 않습니다."));
     }
 }

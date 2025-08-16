@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -127,5 +128,15 @@ public class FavoritePlaceController {
         FavoritePlaceResponse response = favoritePlaceService.create(deviceFid, favoriteFolderId, placeId);
         return ResponseEntity.created(URI.create("/favorite-places/" + response.id()))
                 .body(response);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Void> delete(
+            @RequestHeader("device-fid") String deviceFid,
+            @RequestParam("favoriteFolderId") Long favoriteFolderId,
+            @RequestParam("placeId") Long placeId
+    ) {
+        favoritePlaceService.remove(deviceFid, favoriteFolderId, placeId);
+        return ResponseEntity.noContent().build();
     }
 }
