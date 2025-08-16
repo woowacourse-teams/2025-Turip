@@ -97,7 +97,7 @@ public class FavoriteFolderController {
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = {
                                     @ExampleObject(
-                                            name = "already_favorite",
+                                            name = "already_exists_folder_name",
                                             summary = "같은 이름의 폴더가 이미 존재하는 경우",
                                             value = """
                                                     {
@@ -138,7 +138,7 @@ public class FavoriteFolderController {
                                                         "id": 5,
                                                         "memberId": 8,
                                                         "name": "기본 폴더",
-                                                        "isDefault": false,
+                                                        "isDefault": true,
                                                         "placeCount": 0
                                                     },
                                                     {
@@ -374,31 +374,37 @@ public class FavoriteFolderController {
                     description = "성공 예시"
             ),
             @ApiResponse(
+                    responseCode = "400",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "is_default_folder",
+                                    summary = "삭제하려는 폴더가 기본 폴더인 경우",
+                                    value = """
+                                            {
+                                                "message" : "기본 폴더는 삭제할 수 없습니다."
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
                     responseCode = "403",
                     description = "실패 예시",
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
-                            examples = {
-                                    @ExampleObject(
-                                            name = "is_default_folder",
-                                            summary = "삭제하려는 폴더가 기본 폴더인 경우",
-                                            value = """
-                                                    {
-                                                        "message" : "기본 폴더는 삭제할 수 없습니다."
-                                                    }
-                                                    """
-                                    ),
-                                    @ExampleObject(
-                                            name = "not_folder_owner",
-                                            summary = "폴더 소유자의 기기id와 요청자의 기기id가 같지 않은 경우",
-                                            value = """
-                                                    {
-                                                        "message" : "폴더 소유자의 기기id와 요청자의 기기id가 같지 않습니다."
-                                                    }
-                                                    """
-                                    )
-                            }
+                            examples = @ExampleObject(
+                                    name = "not_folder_owner",
+                                    summary = "폴더 소유자의 기기id와 요청자의 기기id가 같지 않은 경우",
+                                    value = """
+                                            {
+                                                "message" : "폴더 소유자의 기기id와 요청자의 기기id가 같지 않습니다."
+                                            }
+                                            """
+                            )
                     )
             ),
             @ApiResponse(

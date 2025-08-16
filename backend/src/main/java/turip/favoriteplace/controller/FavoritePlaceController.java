@@ -43,7 +43,7 @@ public class FavoritePlaceController {
                             schema = @Schema(implementation = FavoritePlaceResponse.class),
                             examples = @ExampleObject(
                                     name = "success",
-                                    summary = "장소 찜 폴더 생성 성공",
+                                    summary = "장소 찜 생성 성공",
                                     value = """
                                             {
                                                 "id": 1,
