@@ -130,6 +130,81 @@ public class FavoritePlaceController {
                 .body(response);
     }
 
+    @Operation(
+            summary = "장소 찜 삭제 api",
+            description = "장소 찜을 취소한다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "성공 예시"
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "not_folder_owner",
+                                            summary = "폴더 소유자의 기기id와 요청자의 기기id가 같지 않은 경우",
+                                            value = """
+                                                    {
+                                                        "message" : "폴더 소유자의 기기id와 요청자의 기기id가 같지 않습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "member_not_found",
+                                            summary = "deviceFid에 대한 회원을 찾을 수 없는 경우",
+                                            value = """
+                                                    {
+                                                        "message" : "해당 id에 대한 회원이 존재하지 않습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "folder_not_found",
+                                            summary = "favoriteFolderId에 대한 폴더를 찾을 수 없는 경우",
+                                            value = """
+                                                    {
+                                                        "message" : "해당 id에 대한 폴더가 존재하지 않습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "place_not_found",
+                                            summary = "placeId에 대한 장소를 찾을 수 없는 경우",
+                                            value = """
+                                                    {
+                                                        "message" : "해당 id에 대한 장소가 존재하지 않습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "favorite_place_not_found",
+                                            summary = "해당 폴더에 장소 찜이 되어있지 않은 경우",
+                                            value = """
+                                                    {
+                                                        "message" : "삭제하려는 장소 찜이 존재하지 않습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            )
+    })
     @DeleteMapping
     public ResponseEntity<Void> delete(
             @RequestHeader("device-fid") String deviceFid,
