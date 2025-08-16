@@ -31,5 +31,4 @@ public class MemberService {
         return memberRepository.findByDeviceFid(deviceFid)
                 .orElseThrow(() -> new NotFoundException("해당 id에 대한 회원이 존재하지 않습니다."));
     }
-
 }
