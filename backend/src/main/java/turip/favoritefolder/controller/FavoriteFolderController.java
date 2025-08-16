@@ -18,11 +18,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import turip.exception.ErrorResponse;
 import turip.favoritefolder.controller.dto.request.FavoriteFolderNameRequest;
 import turip.favoritefolder.controller.dto.request.FavoriteFolderRequest;
 import turip.favoritefolder.controller.dto.response.FavoriteFolderResponse;
+import turip.favoritefolder.controller.dto.response.FavoriteFoldersWithFavoriteStatusResponse;
 import turip.favoritefolder.controller.dto.response.FavoriteFoldersWithPlaceCountResponse;
 import turip.favoritefolder.service.FavoriteFolderService;
 
@@ -157,6 +159,14 @@ public class FavoriteFolderController {
     public ResponseEntity<FavoriteFoldersWithPlaceCountResponse> readAllByMember(
             @RequestHeader("device-fid") String deviceFid) {
         FavoriteFoldersWithPlaceCountResponse response = favoriteFolderService.findAllByDeviceFid(deviceFid);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/favorite-status")
+    public ResponseEntity<FavoriteFoldersWithFavoriteStatusResponse> readAllWithFavoriteStatusByDeviceId(
+            @RequestHeader("device-fid") String deviceFid, @RequestParam("placeId") Long placeId) {
+        FavoriteFoldersWithFavoriteStatusResponse response = favoriteFolderService.findAllWithFavoriteStatusByDeviceId(
+                deviceFid, placeId);
         return ResponseEntity.ok(response);
     }
 
