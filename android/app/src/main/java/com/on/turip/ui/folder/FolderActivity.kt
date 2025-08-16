@@ -25,6 +25,19 @@ class FolderActivity : BaseActivity<ActivityFolderBinding>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        setupAdapters()
+        setupListeners()
+    }
+
+    private fun setupAdapters() {
         binding.rvFolder.adapter = folderAdapter
+    }
+
+    private fun setupListeners() {
+        binding.ivFolderFolderPlus.setOnClickListener {
+            val bottomSheet: FolderAddBottomSheetFragment = FolderAddBottomSheetFragment()
+            bottomSheet.show(supportFragmentManager, "folder_add")
+        }
     }
 }
