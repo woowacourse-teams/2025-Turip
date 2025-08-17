@@ -2,18 +2,18 @@ package turip.log;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 @Slf4j
 @Component
+@Profile("dev")
 public class LoggingInterceptor implements HandlerInterceptor {
 
     private static final String REQUEST_START_TIME_ATTRIBUTE = "requestStartTime";
-    private static final String REQUEST_ID_ATTRIBUTE = "traceId";
     private static final String DURATION_TIME_UNIT = "ms";
 
     @Override
@@ -23,14 +23,9 @@ public class LoggingInterceptor implements HandlerInterceptor {
         if ("/error".equals(request.getRequestURI())) {
             return true;
         }
-        String traceId = UUID.randomUUID().toString().substring(0, 8);
-
-        request.setAttribute(REQUEST_ID_ATTRIBUTE, traceId);
         request.setAttribute(REQUEST_START_TIME_ATTRIBUTE, System.currentTimeMillis());
 
-        MDC.put("traceId", traceId);
-        MDC.put("remoteAddr", request.getRemoteAddr());
-        MDC.put("userAgent", request.getHeader("User-Agent"));
+        MDC.put("traceId", request.getHeader("device-fid"));
         MDC.put("method", request.getMethod());
         MDC.put("uri", request.getRequestURI());
 
@@ -59,8 +54,7 @@ public class LoggingInterceptor implements HandlerInterceptor {
         }
 
         MDC.remove("traceId");
-        MDC.remove("remoteAddr");
-        MDC.remove("userAgent");
+        MDC.remove("device-fid");
         MDC.remove("method");
         MDC.remove("uri");
         MDC.remove("httpStatus");
