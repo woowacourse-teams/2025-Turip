@@ -58,10 +58,22 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
     }
 
     private val tripPlaceAdapter by lazy {
-        TripPlaceAdapter { placeModel ->
-            val intent: Intent = Intent(Intent.ACTION_VIEW, placeModel.placeUri)
-            startActivity(intent)
-        }
+        TripPlaceAdapter(
+            object : TripPlaceViewHolder.OnPlaceListener {
+                override fun onPlaceClick(placeModel: PlaceModel) {
+                    val intent: Intent = Intent(Intent.ACTION_VIEW, placeModel.placeUri)
+                    startActivity(intent)
+                }
+
+                override fun onTimeLineClick(placeModel: PlaceModel) {
+                    // TODO: 타임라인 이동 구현
+                }
+
+                override fun onFavoriteClick(placeModel: PlaceModel) {
+                    // TODO: 찜 선택 구현
+                }
+            },
+        )
     }
 
     private val stickyVideoManager by lazy {

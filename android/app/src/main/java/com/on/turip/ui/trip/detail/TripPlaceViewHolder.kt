@@ -2,7 +2,6 @@ package com.on.turip.ui.trip.detail
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.on.turip.databinding.ItemTravelPlaceBinding
 
@@ -13,9 +12,19 @@ class TripPlaceViewHolder(
     private var placeModel: PlaceModel? = null
 
     init {
-        itemView.setOnClickListener {
+        binding.clTravelPlaceMap.setOnClickListener {
             placeModel?.let {
                 onClickListener.onPlaceClick(it)
+            }
+        }
+        binding.clTravelPlaceTimeLine.setOnClickListener {
+            placeModel?.let {
+                onClickListener.onTimeLineClick(it)
+            }
+        }
+        binding.clTravelPlaceFavorite.setOnClickListener {
+            placeModel?.let {
+                onClickListener.onFavoriteClick(it)
             }
         }
     }
@@ -24,7 +33,6 @@ class TripPlaceViewHolder(
         this.placeModel = placeModel
         binding.tvTravelPlaceName.text = placeModel.name
         binding.tvTravelPlaceCategory.text = placeModel.turipCategory
-        binding.ivTravelPlaceLink.isVisible = placeModel.mapLink != "nan"
     }
 
     companion object {
@@ -39,7 +47,11 @@ class TripPlaceViewHolder(
         }
     }
 
-    fun interface OnPlaceListener {
+    interface OnPlaceListener {
         fun onPlaceClick(placeModel: PlaceModel)
+
+        fun onTimeLineClick(placeModel: PlaceModel)
+
+        fun onFavoriteClick(placeModel: PlaceModel)
     }
 }

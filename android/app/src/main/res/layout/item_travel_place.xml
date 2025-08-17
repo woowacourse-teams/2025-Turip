@@ -44,7 +44,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         app:layout_constraintEnd_toStartOf="@id/view_travel_place_divider1"
-        app:layout_constraintHorizontal_chainStyle="spread_inside"
+        app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintStart_toStartOf="@id/tv_travel_place_name"
         app:layout_constraintTop_toBottomOf="@id/tv_travel_place_name">
 
@@ -141,8 +141,8 @@
 
         <ImageView
             android:id="@+id/iv_travel_place_favorite"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
             android:contentDescription="@null"
             android:src="@drawable/btn_favorite_lemon"
             app:layout_constraintBottom_toBottomOf="parent"
