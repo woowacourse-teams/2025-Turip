@@ -48,12 +48,8 @@ CREATE TABLE IF NOT EXISTS category
 -- 멤버 테이블
 CREATE TABLE IF NOT EXISTS member
 (
-    id          BIGINT AUTO_INCREMENT PRIMARY KEY,
-    device_fid  VARCHAR(255) NOT NULL UNIQUE,
-
-    created_at  DATETIME(6)  NOT NULL,
-    modified_at DATETIME(6)  NULL, -- 수정일은 null 가능
-    deleted_at  DATETIME(6)  NULL  -- soft delete
+    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
+    device_fid VARCHAR(255) NOT NULL UNIQUE
 );
 
 -- 컨텐츠 테이블
@@ -129,14 +125,10 @@ CREATE TABLE IF NOT EXISTS content_place
 -- 찜 폴더 테이블
 CREATE TABLE IF NOT EXISTS favorite_folder
 (
-    id          BIGINT AUTO_INCREMENT PRIMARY KEY,
-    member_id   BIGINT       NOT NULL,
-    name        VARCHAR(100) NOT NULL,
-    is_default  BOOLEAN      NOT NULL, -- 기본 폴더 여부
-
-    created_at  DATETIME(6)  NOT NULL,
-    modified_at DATETIME(6)  NULL,     -- 수정일은 null 가능
-    deleted_at  DATETIME(6)  NULL,     -- soft delete
+    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
+    member_id  BIGINT       NOT NULL,
+    name       VARCHAR(100) NOT NULL,
+    is_default BOOLEAN      NOT NULL, -- 기본 폴더 여부
 
     CONSTRAINT fk_favorite_folder__member
         FOREIGN KEY (member_id) REFERENCES member (id),
@@ -148,13 +140,9 @@ CREATE TABLE IF NOT EXISTS favorite_folder
 -- 찜 장소 테이블
 CREATE TABLE IF NOT EXISTS favorite_place
 (
-    id                 BIGINT      NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    favorite_folder_id BIGINT      NOT NULL,
-    place_id           BIGINT      NOT NULL,
-
-    created_at         DATETIME(6) NOT NULL,
-    modified_at        DATETIME(6) NULL, -- 수정일은 null 가능
-    deleted_at         DATETIME(6) NULL, -- soft delete
+    id                 BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    favorite_folder_id BIGINT NOT NULL,
+    place_id           BIGINT NOT NULL,
 
     CONSTRAINT fk_favorite_place__folder
         FOREIGN KEY (favorite_folder_id) REFERENCES favorite_folder (id),
@@ -169,13 +157,10 @@ CREATE TABLE IF NOT EXISTS favorite_place
 -- 찜 컨텐츠 테이블
 CREATE TABLE IF NOT EXISTS favorite_content
 (
-    id          BIGINT      NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    member_id   BIGINT      NOT NULL,
-    content_id  BIGINT      NOT NULL,
-
-    created_at  DATETIME(6) NOT NULL,
-    modified_at DATETIME(6) NULL, -- 수정일은 null 가능
-    deleted_at  DATETIME(6) NULL, -- soft delete
+    id         BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    created_at DATE   NOT NULL,
+    member_id  BIGINT NOT NULL,
+    content_id BIGINT NOT NULL,
 
     CONSTRAINT fk_favorite_content__member
         FOREIGN KEY (member_id) REFERENCES member (id),

@@ -1,6 +1,6 @@
-INSERT INTO member (created_at, device_fid)
-VALUES (NOW(), 'dummy_fid_1'),
-       (NOW(), 'dummy_fid_2');
+INSERT INTO member (device_fid)
+VALUES ('dummy_fid_1'),
+       ('dummy_fid_2');
 
 INSERT INTO favorite_content (created_at, member_id, content_id)
 VALUES (DATEADD('DAY', -7, NOW()), 1, 1),

@@ -64,8 +64,9 @@ class FavoriteContentRepositoryTest {
 
         Member member = memberRepository.save(new Member("testDeviceFid"));
 
-        FavoriteContent favoriteContent1 = new FavoriteContent(member, content1);
-        FavoriteContent favoriteContent2 = new FavoriteContent(member, content2);
+        FavoriteContent favoriteContent1 = new FavoriteContent(LocalDate.now().minusDays(2), member, content1);
+        FavoriteContent favoriteContent2 = new FavoriteContent(LocalDate.now().minusDays(1), member,
+                content2); // 최신 찜 컨텐츠
 
         favoriteContentRepository.save(favoriteContent1);
         favoriteContentRepository.save(favoriteContent2);

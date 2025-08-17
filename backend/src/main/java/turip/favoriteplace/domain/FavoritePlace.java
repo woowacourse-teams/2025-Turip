@@ -9,19 +9,14 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
-import turip.common.domain.TimeStamp;
 import turip.favoritefolder.domain.FavoriteFolder;
 import turip.place.domain.Place;
 
 @Getter
 @Entity
-@EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@SQLRestriction("deleted_at is Null")
-@SQLDelete(sql = "UPDATE favorite_place SET deleted_at = NOW() WHERE id = ?")
-public class FavoritePlace extends TimeStamp {
+public class FavoritePlace {
 
     @Id
     @EqualsAndHashCode.Include

@@ -5,28 +5,26 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
-import turip.common.domain.TimeStamp;
 import turip.content.domain.Content;
 import turip.member.domain.Member;
 
 @Getter
 @Entity
-@EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@SQLRestriction("deleted_at is Null")
-@SQLDelete(sql = "UPDATE favorite_content SET deleted_at = NOW() WHERE id = ?")
-public class FavoriteContent extends TimeStamp {
+public class FavoriteContent {
 
     @Id
     @EqualsAndHashCode.Include
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    private LocalDate createdAt;
 
     @ManyToOne
     private Member member;
@@ -34,7 +32,8 @@ public class FavoriteContent extends TimeStamp {
     @ManyToOne
     private Content content;
 
-    public FavoriteContent(Member member, Content content) {
+    public FavoriteContent(LocalDate createdAt, Member member, Content content) {
+        this.createdAt = createdAt;
         this.member = member;
         this.content = content;
     }

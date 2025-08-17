@@ -1,5 +1,6 @@
 package turip.favoritecontent.service;
 
+import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -43,7 +44,7 @@ public class FavoriteContentService {
         if (favoriteContentRepository.existsByMemberIdAndContentId(member.getId(), content.getId())) {
             throw new BadRequestException("이미 찜한 컨텐츠입니다.");
         }
-        FavoriteContent favoriteContent = new FavoriteContent(member, content);
+        FavoriteContent favoriteContent = new FavoriteContent(LocalDate.now(), member, content);
         FavoriteContent savedFavoriteContent = favoriteContentRepository.save(favoriteContent);
         return FavoriteContentResponse.from(savedFavoriteContent);
     }

@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.any;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -62,7 +63,7 @@ class FavoriteContentServiceTest {
         City city = new City(null, null, null, null);
         Content content = new Content(contentId, creator, city, null, null, null);
         Member member = new Member(deviceFid);
-        FavoriteContent favoriteContent = new FavoriteContent(member, content);
+        FavoriteContent favoriteContent = new FavoriteContent(LocalDate.now(), member, content);
 
         given(contentRepository.findById(contentId))
                 .willReturn(Optional.of(content));
@@ -202,7 +203,7 @@ class FavoriteContentServiceTest {
             City city = new City(null, null, null, null);
             Content content = new Content(contentId, creator, city, null, null, null);
             Member member = new Member(deviceFid);
-            FavoriteContent favoriteContent = new FavoriteContent(member, content);
+            FavoriteContent favoriteContent = new FavoriteContent(LocalDate.now(), member, content);
 
             given(contentRepository.findById(contentId))
                     .willReturn(Optional.of(content));
