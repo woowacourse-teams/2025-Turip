@@ -2,8 +2,11 @@ package com.on.turip.data.network
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.on.turip.BuildConfig
+import com.on.turip.di.RepositoryModule
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
+import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -24,6 +27,7 @@ object NetworkClient {
     private val client: OkHttpClient by lazy {
         OkHttpClient
             .Builder()
+            .addInterceptor(createHeaderInterceptor())
             .addInterceptor(createLoggingInterceptor())
             .build()
     }
@@ -36,6 +40,27 @@ object NetworkClient {
                 } else {
                     HttpLoggingInterceptor.Level.NONE
                 }
+        }
+
+    private fun createHeaderInterceptor(): Interceptor =
+        Interceptor { chain ->
+            val fid =
+                runBlocking {
+                    RepositoryModule.userStorageRepository
+                        .loadId()
+                        .getOrNull()
+                        ?.fid ?: ""
+                }
+            Timber.d("FID: $fid")
+
+            val newRequest =
+                chain
+                    .request()
+                    .newBuilder()
+                    .header("X-Turip-Device-Id", fid)
+                    .build()
+
+            chain.proceed(newRequest)
         }
 
     private fun logHttpMessage(message: String) {
