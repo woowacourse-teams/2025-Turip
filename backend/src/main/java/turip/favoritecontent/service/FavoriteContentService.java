@@ -43,14 +43,11 @@ public class FavoriteContentService {
         return FavoriteContentResponse.from(savedFavoriteContent);
     }
 
-    public MyFavoriteContentsResponse findMyFavoriteContents(String deviceFid, int pageSize, long lastContentId) {
-        if (deviceFid == null) {
-            throw new BadRequestException("사용자 정보를 조회할 수 없습니다.");
-        }
+    public MyFavoriteContentsResponse findMyFavoriteContents(Member member, int pageSize, long lastContentId) {
         if (lastContentId == 0) {
             lastContentId = Long.MAX_VALUE;
         }
-        Slice<Content> contentSlice = favoriteContentRepository.findMyFavoriteContentsByDeviceFid(deviceFid,
+        Slice<Content> contentSlice = favoriteContentRepository.findMyFavoriteContentsByDeviceFid(member.getDeviceFid(),
                 lastContentId,
                 PageRequest.of(0, pageSize));
         List<Content> contents = contentSlice.getContent();

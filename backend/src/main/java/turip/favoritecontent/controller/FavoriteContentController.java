@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -190,11 +189,11 @@ public class FavoriteContentController {
     })
     @GetMapping
     public ResponseEntity<MyFavoriteContentsResponse> readMyFavoriteContents(
-            @RequestHeader("device-fid") String deviceFid,
+            @Parameter(hidden = true) @AuthMember(policy = MemberResolvePolicy.CREATE_IF_ABSENT) Member member,
             @RequestParam(name = "size") Integer pageSize,
             @RequestParam(name = "lastId") Long lastContentId
     ) {
-        MyFavoriteContentsResponse response = favoriteContentService.findMyFavoriteContents(deviceFid, pageSize,
+        MyFavoriteContentsResponse response = favoriteContentService.findMyFavoriteContents(member, pageSize,
                 lastContentId);
         return ResponseEntity.ok(response);
     }
