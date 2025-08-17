@@ -54,6 +54,7 @@
     <string name="trip_detail_snackbar_favorite_remove">컨텐츠 찜 목록에서 삭제했어요</string>
     <string name="travel_place_map">지도</string>
     <string name="travel_place_favorite">장소찜</string>
+    <string name="travel_place_time_line">%s~</string>
 
     <!-- 폴더 페이지 -->
     <string name="folder_title">폴더 편집</string>

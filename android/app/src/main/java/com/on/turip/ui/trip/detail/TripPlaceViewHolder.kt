@@ -3,6 +3,7 @@ package com.on.turip.ui.trip.detail
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.on.turip.R
 import com.on.turip.databinding.ItemTravelPlaceBinding
 
 class TripPlaceViewHolder(
@@ -33,6 +34,11 @@ class TripPlaceViewHolder(
         this.placeModel = placeModel
         binding.tvTravelPlaceName.text = placeModel.name
         binding.tvTravelPlaceCategory.text = placeModel.turipCategory
+        binding.tvTravelPlaceTimeLine.text =
+            itemView.context.getString(
+                R.string.travel_place_time_line,
+                placeModel.timeLine,
+            )
     }
 
     companion object {

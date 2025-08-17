@@ -12,3 +12,10 @@ fun WebView.applyVideoSettings() {
         allowFileAccess = false
     }
 }
+
+fun WebView.navigateToTimeLine(seconds: Int) {
+    evaluateJavascript(
+        "seekToSecond($seconds);",
+        null,
+    )
+}

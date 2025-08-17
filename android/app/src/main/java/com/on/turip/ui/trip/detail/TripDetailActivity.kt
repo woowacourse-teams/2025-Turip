@@ -26,6 +26,7 @@ import com.on.turip.ui.common.model.trip.toDisplayText
 import com.on.turip.ui.trip.detail.webview.TuripWebChromeClient
 import com.on.turip.ui.trip.detail.webview.TuripWebViewClient
 import com.on.turip.ui.trip.detail.webview.applyVideoSettings
+import com.on.turip.ui.trip.detail.webview.navigateToTimeLine
 
 class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
     override val binding: ActivityTripDetailBinding by lazy {
@@ -66,7 +67,7 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
                 }
 
                 override fun onTimeLineClick(placeModel: PlaceModel) {
-                    // TODO: 타임라인 이동 구현
+                    binding.wvTripDetailVideo.navigateToTimeLine(placeModel.contentTimeLine)
                 }
 
                 override fun onFavoriteClick(placeModel: PlaceModel) {
