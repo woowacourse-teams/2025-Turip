@@ -213,6 +213,33 @@ public class ContentApiTest {
                     .body("contents.size()", is(1))
                     .body("loadable", is(true));
         }
+
+        @DisplayName("place 이름으로 검색 시, 해당 place가 포함된 컨텐츠를 반환한다")
+        @Test
+        void readByKeyword_withPlaceName() {
+            // given
+            jdbcTemplate.update(
+                    "INSERT INTO creator (profile_image, channel_name) VALUES ('', '라젤')");
+            jdbcTemplate.update("INSERT INTO country (name) VALUES ('일본')");
+            jdbcTemplate.update("INSERT INTO city (name, country_id) VALUES ('도쿄', 1)");
+            jdbcTemplate.update(
+                    "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 1, '', '라젤의 여행 가이드', '2025-07-01')");
+            jdbcTemplate.update(
+                    "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('도쿄타워', '', '일본 도쿄', 1, 1)");
+            jdbcTemplate.update(
+                    "INSERT INTO content_place (visit_day, visit_order, time_line, place_id, content_id) VALUES (1, 1, '00:10:00', 1, 1)");
+
+            // when & then
+            RestAssured.given().port(port)
+                    .queryParam("keyword", "도쿄타워")
+                    .queryParam("size", 2)
+                    .queryParam("lastId", 0)
+                    .when().get("/contents/keyword")
+                    .then()
+                    .statusCode(200)
+                    .body("contents.size()", is(1))
+                    .body("loadable", is(false));
+        }
     }
 
     @DisplayName("/contents/popular/favorites GET 주간 인기 컨텐츠 조회 테스트")
