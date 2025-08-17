@@ -1,6 +1,7 @@
 package turip.favoritecontent.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -18,11 +19,14 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import turip.auth.AuthMember;
+import turip.auth.MemberResolvePolicy;
 import turip.content.controller.dto.response.MyFavoriteContentsResponse;
 import turip.exception.ErrorResponse;
 import turip.favoritecontent.controller.dto.request.FavoriteContentRequest;
 import turip.favoritecontent.controller.dto.response.FavoriteContentResponse;
 import turip.favoritecontent.service.FavoriteContentService;
+import turip.member.domain.Member;
 
 @RestController
 @RequiredArgsConstructor
@@ -111,9 +115,10 @@ public class FavoriteContentController {
             )
     })
     @PostMapping
-    public ResponseEntity<FavoriteContentResponse> create(@RequestHeader("device-fid") String deviceFid,
-                                                          @RequestBody FavoriteContentRequest request) {
-        FavoriteContentResponse response = favoriteContentService.create(request, deviceFid);
+    public ResponseEntity<FavoriteContentResponse> create(
+            @Parameter(hidden = true) @AuthMember(policy = MemberResolvePolicy.CREATE_IF_ABSENT) Member member,
+            @RequestBody FavoriteContentRequest request) {
+        FavoriteContentResponse response = favoriteContentService.create(request, member);
         return ResponseEntity.created(URI.create("/favorite-contents/" + response.id()))
                 .body(response);
     }
@@ -242,9 +247,10 @@ public class FavoriteContentController {
             )
     })
     @DeleteMapping
-    public ResponseEntity<Void> delete(@RequestHeader("device-fid") String deviceFid,
-                                       @RequestParam(name = "contentId") Long contentId) {
-        favoriteContentService.remove(deviceFid, contentId);
+    public ResponseEntity<Void> delete(
+            @Parameter(hidden = true) @AuthMember(policy = MemberResolvePolicy.REQUIRED) Member member,
+            @RequestParam(name = "contentId") Long contentId) {
+        favoriteContentService.remove(member, contentId);
         return ResponseEntity.noContent().build();
     }
 }

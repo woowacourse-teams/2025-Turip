@@ -21,23 +21,20 @@ import turip.favoritecontent.controller.dto.response.FavoriteContentResponse;
 import turip.favoritecontent.domain.FavoriteContent;
 import turip.favoritecontent.repository.FavoriteContentRepository;
 import turip.member.domain.Member;
-import turip.member.service.MemberService;
 
 @Service
 @RequiredArgsConstructor
 public class FavoriteContentService {
 
     private final FavoriteContentRepository favoriteContentRepository;
-    private final MemberService memberService;
     private final ContentRepository contentRepository;
     private final ContentPlaceService contentPlaceService;
 
     @Transactional
-    public FavoriteContentResponse create(FavoriteContentRequest request, String deviceFid) {
+    public FavoriteContentResponse create(FavoriteContentRequest request, Member member) {
         Long contentId = request.contentId();
         Content content = contentRepository.findById(contentId)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 컨텐츠입니다."));
-        Member member = memberService.findOrCreateMember(deviceFid);
         if (favoriteContentRepository.existsByMemberIdAndContentId(member.getId(), content.getId())) {
             throw new BadRequestException("이미 찜한 컨텐츠입니다.");
         }
@@ -65,10 +62,9 @@ public class FavoriteContentService {
     }
 
     @Transactional
-    public void remove(String deviceFid, Long contentId) {
+    public void remove(Member member, Long contentId) {
         Content content = contentRepository.findById(contentId)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 컨텐츠입니다."));
-        Member member = memberService.getMemberByDeviceId(deviceFid);
         FavoriteContent favoriteContent = favoriteContentRepository.findByMemberIdAndContentId(member.getId(),
                         content.getId())
                 .orElseThrow(() -> new NotFoundException("해당 컨텐츠는 찜한 상태가 아닙니다."));

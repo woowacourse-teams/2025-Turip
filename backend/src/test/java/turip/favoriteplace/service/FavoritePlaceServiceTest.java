@@ -23,7 +23,6 @@ import turip.favoriteplace.controller.dto.response.FavoritePlaceResponse;
 import turip.favoriteplace.domain.FavoritePlace;
 import turip.favoriteplace.repository.FavoritePlaceRepository;
 import turip.member.domain.Member;
-import turip.member.service.MemberService;
 import turip.place.domain.Place;
 import turip.place.repository.PlaceRepository;
 
@@ -42,9 +41,6 @@ class FavoritePlaceServiceTest {
     @Mock
     private PlaceRepository placeRepository;
 
-    @Mock
-    private MemberService memberService;
-
     @DisplayName("장소 찜 생성 테스트")
     @Nested
     class Create {
@@ -62,8 +58,6 @@ class FavoritePlaceServiceTest {
             Place place = new Place(placeId, null, null, null, 1, 1);
             FavoritePlace favoritePlace = new FavoritePlace(favoriteFolder, place);
 
-            given(memberService.findOrCreateMember(deviceFid))
-                    .willReturn(member);
             given(favoriteFolderRepository.findById(favoriteFolderId))
                     .willReturn(Optional.of(favoriteFolder));
             given(placeRepository.findById(placeId))
@@ -74,7 +68,7 @@ class FavoritePlaceServiceTest {
                     .willReturn(new FavoritePlace(1L, favoriteFolder, place));
 
             // when
-            FavoritePlaceResponse response = favoritePlaceService.create(deviceFid, favoriteFolderId, placeId);
+            FavoritePlaceResponse response = favoritePlaceService.create(member, favoriteFolderId, placeId);
 
             // then
             assertAll(
@@ -98,15 +92,13 @@ class FavoritePlaceServiceTest {
             FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, owner, null, true);
             Place place = new Place(placeId, null, null, null, 1, 1);
 
-            given(memberService.findOrCreateMember(requestDeviceFid))
-                    .willReturn(requestMember);
             given(favoriteFolderRepository.findById(favoriteFolderId))
                     .willReturn(Optional.of(favoriteFolder));
             given(placeRepository.findById(placeId))
                     .willReturn(Optional.of(place));
 
             // when & then
-            assertThatThrownBy(() -> favoritePlaceService.create(requestDeviceFid, favoriteFolderId, placeId))
+            assertThatThrownBy(() -> favoritePlaceService.create(requestMember, favoriteFolderId, placeId))
                     .isInstanceOf(ForbiddenException.class);
         }
 
@@ -120,13 +112,11 @@ class FavoritePlaceServiceTest {
 
             Member member = new Member(1L, deviceFid);
 
-            given(memberService.findOrCreateMember(deviceFid))
-                    .willReturn(member);
             given(favoriteFolderRepository.findById(favoriteFolderId))
                     .willReturn(Optional.empty());
 
             // when & then
-            assertThatThrownBy(() -> favoritePlaceService.create(deviceFid, favoriteFolderId, placeId))
+            assertThatThrownBy(() -> favoritePlaceService.create(member, favoriteFolderId, placeId))
                     .isInstanceOf(NotFoundException.class)
                     .hasMessage("해당 id에 대한 폴더가 존재하지 않습니다.");
         }
@@ -142,15 +132,13 @@ class FavoritePlaceServiceTest {
             Member member = new Member(1L, deviceFid);
             FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, member, null, true);
 
-            given(memberService.findOrCreateMember(deviceFid))
-                    .willReturn(member);
             given(favoriteFolderRepository.findById(favoriteFolderId))
                     .willReturn(Optional.of(favoriteFolder));
             given(placeRepository.findById(placeId))
                     .willReturn(Optional.empty());
 
             // when & then
-            assertThatThrownBy(() -> favoritePlaceService.create(deviceFid, favoriteFolderId, placeId))
+            assertThatThrownBy(() -> favoritePlaceService.create(member, favoriteFolderId, placeId))
                     .isInstanceOf(NotFoundException.class)
                     .hasMessage("해당 id에 대한 장소가 존재하지 않습니다.");
         }
@@ -167,8 +155,6 @@ class FavoritePlaceServiceTest {
             FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, member, null, true);
             Place place = new Place(placeId, null, null, null, 1, 1);
 
-            given(memberService.findOrCreateMember(deviceFid))
-                    .willReturn(member);
             given(favoriteFolderRepository.findById(favoriteFolderId))
                     .willReturn(Optional.of(favoriteFolder));
             given(placeRepository.findById(placeId))
@@ -177,7 +163,7 @@ class FavoritePlaceServiceTest {
                     .willReturn(true);
 
             // when & then
-            assertThatThrownBy(() -> favoritePlaceService.create(deviceFid, favoriteFolderId, placeId))
+            assertThatThrownBy(() -> favoritePlaceService.create(member, favoriteFolderId, placeId))
                     .isInstanceOf(ConflictException.class);
         }
     }
@@ -199,8 +185,6 @@ class FavoritePlaceServiceTest {
             Place place = new Place(placeId, null, null, null, 1, 1);
             FavoritePlace favoritePlace = new FavoritePlace(favoriteFolder, place);
 
-            given(memberService.getMemberByDeviceId(deviceFid))
-                    .willReturn(member);
             given(favoriteFolderRepository.findById(favoriteFolderId))
                     .willReturn(Optional.of(favoriteFolder));
             given(placeRepository.findById(placeId))
@@ -209,7 +193,7 @@ class FavoritePlaceServiceTest {
                     .willReturn(Optional.of(favoritePlace));
 
             // when & then
-            assertDoesNotThrow(() -> favoritePlaceService.remove(deviceFid, favoriteFolderId, placeId));
+            assertDoesNotThrow(() -> favoritePlaceService.remove(member, favoriteFolderId, placeId));
         }
 
         @DisplayName("폴더 소유자의 기기id와 요청자의 기기id가 같지 않은 경우 ForbiddenException을 발생시킨다")
@@ -226,15 +210,13 @@ class FavoritePlaceServiceTest {
             FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, owner, null, true);
             Place place = new Place(placeId, null, null, null, 1, 1);
 
-            given(memberService.getMemberByDeviceId(requestDeviceFid))
-                    .willReturn(requestMember);
             given(favoriteFolderRepository.findById(favoriteFolderId))
                     .willReturn(Optional.of(favoriteFolder));
             given(placeRepository.findById(placeId))
                     .willReturn(Optional.of(place));
 
             // when & then
-            assertThatThrownBy(() -> favoritePlaceService.remove(requestDeviceFid, favoriteFolderId, placeId))
+            assertThatThrownBy(() -> favoritePlaceService.remove(requestMember, favoriteFolderId, placeId))
                     .isInstanceOf(ForbiddenException.class);
         }
 
@@ -248,13 +230,11 @@ class FavoritePlaceServiceTest {
 
             Member member = new Member(1L, deviceFid);
 
-            given(memberService.getMemberByDeviceId(deviceFid))
-                    .willReturn(member);
             given(favoriteFolderRepository.findById(favoriteFolderId))
                     .willReturn(Optional.empty());
 
             // when & then
-            assertThatThrownBy(() -> favoritePlaceService.remove(deviceFid, favoriteFolderId, placeId))
+            assertThatThrownBy(() -> favoritePlaceService.remove(member, favoriteFolderId, placeId))
                     .isInstanceOf(NotFoundException.class)
                     .hasMessage("해당 id에 대한 폴더가 존재하지 않습니다.");
         }
@@ -270,15 +250,13 @@ class FavoritePlaceServiceTest {
             Member member = new Member(1L, deviceFid);
             FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, member, null, true);
 
-            given(memberService.getMemberByDeviceId(deviceFid))
-                    .willReturn(member);
             given(favoriteFolderRepository.findById(favoriteFolderId))
                     .willReturn(Optional.of(favoriteFolder));
             given(placeRepository.findById(placeId))
                     .willReturn(Optional.empty());
 
             // when & then
-            assertThatThrownBy(() -> favoritePlaceService.remove(deviceFid, favoriteFolderId, placeId))
+            assertThatThrownBy(() -> favoritePlaceService.remove(member, favoriteFolderId, placeId))
                     .isInstanceOf(NotFoundException.class)
                     .hasMessage("해당 id에 대한 장소가 존재하지 않습니다.");
         }
@@ -295,8 +273,6 @@ class FavoritePlaceServiceTest {
             FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, member, null, true);
             Place place = new Place(placeId, null, null, null, 1, 1);
 
-            given(memberService.getMemberByDeviceId(deviceFid))
-                    .willReturn(member);
             given(favoriteFolderRepository.findById(favoriteFolderId))
                     .willReturn(Optional.of(favoriteFolder));
             given(placeRepository.findById(placeId))
@@ -305,7 +281,7 @@ class FavoritePlaceServiceTest {
                     .willReturn(Optional.empty());
 
             // when & then
-            assertThatThrownBy(() -> favoritePlaceService.remove(deviceFid, favoriteFolderId, placeId))
+            assertThatThrownBy(() -> favoritePlaceService.remove(member, favoriteFolderId, placeId))
                     .isInstanceOf(NotFoundException.class)
                     .hasMessage("삭제하려는 장소 찜이 존재하지 않습니다.");
         }
