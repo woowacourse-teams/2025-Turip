@@ -13,11 +13,11 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.on.turip.R
 import com.on.turip.databinding.BottomSheetFragmentFavoritePlaceFolderBinding
 import com.on.turip.ui.common.base.BaseBottomSheetFragment
-import com.on.turip.ui.main.favorite.model.FavoriteFolderModel
+import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
 
 class FavoritePlaceFolderBottomSheetFragment : BaseBottomSheetFragment<BottomSheetFragmentFavoritePlaceFolderBinding>() {
     private val favoritePlaceFolderAdapter: FavoritePlaceFolderAdapter by lazy {
-        FavoritePlaceFolderAdapter { favoriteFolderModel: FavoriteFolderModel ->
+        FavoritePlaceFolderAdapter { favoritePlaceFolderModel: FavoritePlaceFolderModel ->
             // TODO : 폴더명과 함께 스낵바 띄우기
         }
     }

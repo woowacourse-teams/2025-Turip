@@ -3,41 +3,40 @@ package com.on.turip.ui.main.favorite
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.on.turip.databinding.ItemFavoritePlaceFolderBinding
-import com.on.turip.ui.main.favorite.model.FavoriteFolderModel
+import com.on.turip.databinding.ItemPlaceFolderBinding
+import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
 
 class FavoritePlaceFolderViewHolder(
-    private val binding: ItemFavoritePlaceFolderBinding,
-    onFavoritePlaceFolderListener: OnFavoritePlaceFolderListener,
+    private val binding: ItemPlaceFolderBinding,
+    onPlaceFolderListener: OnPlaceFolderListener,
 ) : RecyclerView.ViewHolder(binding.root) {
-    private var favoriteFolderModel: FavoriteFolderModel? = null
+    private var favoritePlaceFolderModel: FavoritePlaceFolderModel? = null
 
     init {
-        binding.ivFavoritePlaceFolderFavorite.setOnClickListener {
-            favoriteFolderModel?.let { onFavoritePlaceFolderListener.onFavoriteClick(it) }
+        itemView.setOnClickListener {
+            favoritePlaceFolderModel?.let { onPlaceFolderListener.onPlaceFolderClick(it) }
         }
     }
 
-    fun bind(favoriteFolderModel: FavoriteFolderModel) {
-        this.favoriteFolderModel = favoriteFolderModel
-
-        binding.tvFavoritePlaceFolderName.text = favoriteFolderModel.name
-        binding.ivFavoritePlaceFolderFavorite.isSelected = favoriteFolderModel.isFavorite
+    fun bind(favoritePlaceFolderModel: FavoritePlaceFolderModel) {
+        this.favoritePlaceFolderModel = favoritePlaceFolderModel
+        binding.tvPlaceFolder.text = favoritePlaceFolderModel.name
+        itemView.isSelected = favoritePlaceFolderModel.isSelected
     }
 
     companion object {
         fun of(
             parent: ViewGroup,
-            onFavoritePlaceFolderListener: OnFavoritePlaceFolderListener,
+            onPlaceFolderListener: OnPlaceFolderListener,
         ): FavoritePlaceFolderViewHolder {
             val inflater: LayoutInflater = LayoutInflater.from(parent.context)
-            val binding: ItemFavoritePlaceFolderBinding =
-                ItemFavoritePlaceFolderBinding.inflate(inflater, parent, false)
-            return FavoritePlaceFolderViewHolder(binding, onFavoritePlaceFolderListener)
+            val binding: ItemPlaceFolderBinding =
+                ItemPlaceFolderBinding.inflate(inflater, parent, false)
+            return FavoritePlaceFolderViewHolder(binding, onPlaceFolderListener)
         }
     }
 
-    fun interface OnFavoritePlaceFolderListener {
-        fun onFavoriteClick(favoriteFolderModel: FavoriteFolderModel)
+    fun interface OnPlaceFolderListener {
+        fun onPlaceFolderClick(favoritePlaceFolderModel: FavoritePlaceFolderModel)
     }
 }
