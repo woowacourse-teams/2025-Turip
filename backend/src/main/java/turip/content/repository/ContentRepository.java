@@ -76,15 +76,23 @@ public interface ContentRepository extends JpaRepository<Content, Long> {
     @Query("""
                 SELECT count(c) FROM Content c
                 JOIN c.creator cr
-                WHERE c.title LIKE %:keyword% OR cr.channelName LIKE %:keyword%
+                LEFT JOIN ContentPlace cp ON c.id = cp.content.id
+                LEFT JOIN cp.place p
+                WHERE c.title LIKE %:keyword% 
+                   OR cr.channelName LIKE %:keyword%
+                   OR p.name LIKE %:keyword%
             """)
     int countByKeywordContaining(String keyword);
 
     @Query("""
-                SELECT c FROM Content c
+                SELECT DISTINCT c FROM Content c
                 JOIN c.creator cr
+                LEFT JOIN ContentPlace cp ON c.id = cp.content.id
+                LEFT JOIN cp.place p
                 WHERE c.id < :lastId
-                AND (c.title LIKE %:keyword% OR cr.channelName LIKE %:keyword%)
+                AND (c.title LIKE %:keyword% 
+                     OR cr.channelName LIKE %:keyword%
+                     OR p.name LIKE %:keyword%)
                 ORDER BY c.id DESC
             """)
     Slice<Content> findByKeywordContaining(String keyword, Long lastId, Pageable pageable);
