@@ -74,8 +74,4 @@ class FolderModifyBottomSheetFragment : BaseBottomSheetFragment<BottomSheetFragm
     companion object {
         fun instance(): FolderModifyBottomSheetFragment = FolderModifyBottomSheetFragment()
     }
-
-    companion object {
-        fun instance(): FolderModifyBottomSheetFragment = FolderModifyBottomSheetFragment()
-    }
 }
