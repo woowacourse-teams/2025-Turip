@@ -57,7 +57,7 @@ object NetworkClient {
                 chain
                     .request()
                     .newBuilder()
-                    .header("X-Turip-Device-Id", fid)
+                    .header("device-fid", fid)
                     .build()
 
             chain.proceed(newRequest)
