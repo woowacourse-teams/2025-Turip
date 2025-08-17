@@ -7,6 +7,9 @@ import com.on.turip.common.TuripReleaseTree
 import com.on.turip.data.initializer.FirebaseInstallationsInitializer
 import com.on.turip.di.ApplicationContextProvider
 import com.on.turip.di.RepositoryModule
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class TuripApplication : Application() {
@@ -15,13 +18,26 @@ class TuripApplication : Application() {
 
         FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(!BuildConfig.DEBUG)
 
+        CoroutineScope(Dispatchers.IO).launch {
+            ApplicationContextProvider.setupApplicationContext(this@TuripApplication)
+
+            FirebaseInstallationsInitializer(RepositoryModule.userStorageRepository)
+                .setupFirebaseInstallationId()
+
+            val fid =
+                RepositoryModule.userStorageRepository
+                    .loadId()
+                    .getOrNull()
+                    ?.fid
+                    ?: "unknown"
+
+            FirebaseCrashlytics.getInstance().setUserId(fid)
+        }
+
         if (BuildConfig.DEBUG) {
             Timber.plant(TuripDebugTree())
         } else {
             Timber.plant(TuripReleaseTree())
         }
-
-        ApplicationContextProvider.setupApplicationContext(this)
-        FirebaseInstallationsInitializer(RepositoryModule.userStorageRepository).setupFirebaseInstallationId()
     }
 }
