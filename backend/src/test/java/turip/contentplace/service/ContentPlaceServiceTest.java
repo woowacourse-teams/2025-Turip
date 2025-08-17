@@ -1,6 +1,7 @@
 package turip.contentplace.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 
 import java.time.LocalDate;
@@ -16,11 +17,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import turip.category.domain.Category;
 import turip.city.domain.City;
 import turip.content.domain.Content;
+import turip.content.repository.ContentRepository;
 import turip.contentplace.controller.dto.response.ContentPlaceDetailResponse;
 import turip.contentplace.domain.ContentPlace;
 import turip.contentplace.repository.ContentPlaceRepository;
 import turip.country.domain.Country;
 import turip.creator.domain.Creator;
+import turip.exception.custom.NotFoundException;
 import turip.place.domain.Place;
 import turip.province.domain.Province;
 
@@ -32,6 +35,9 @@ class ContentPlaceServiceTest {
 
     @Mock
     private ContentPlaceRepository contentPlaceRepository;
+
+    @Mock
+    private ContentRepository contentRepository;
 
     @DisplayName("여행 코스의 방문 장소 수를 계산할 수 있다")
     @Test
@@ -75,12 +81,13 @@ class ContentPlaceServiceTest {
         ContentPlace secondContentPlace = new ContentPlace(secondVisitDay, visitOrder, secondDayTimeLine, place2,
                 content);
 
-        // when
+        given(contentRepository.existsById(contentId))
+                .willReturn(true);
         given(contentPlaceRepository.findAllByContentId(contentId))
                 .willReturn(List.of(firstContentPlace, secondContentPlace));
         ContentPlaceDetailResponse response = contentPlaceService.findContentPlaceDetails(contentId);
 
-        // then
+        // when & then
         assertThat(response.contentPlaceCount()).isEqualTo(2);
     }
 
@@ -126,12 +133,13 @@ class ContentPlaceServiceTest {
         ContentPlace secondContentPlace = new ContentPlace(secondVisitDay, visitOrder, secondDayTimeLine, place2,
                 content);
 
-        // when
+        given(contentRepository.existsById(contentId))
+                .willReturn(true);
         given(contentPlaceRepository.findAllByContentId(contentId))
                 .willReturn(List.of(firstContentPlace, secondContentPlace));
         ContentPlaceDetailResponse response = contentPlaceService.findContentPlaceDetails(contentId);
 
-        // then
+        // when & then
         assertThat(response.contentPlaces().get(0).timeLine()).isEqualTo(LocalTime.parse("00:11:30"));
         assertThat(response.contentPlaces().get(1).timeLine()).isEqualTo(LocalTime.parse("00:13:30"));
     }
@@ -182,11 +190,10 @@ class ContentPlaceServiceTest {
             ContentPlace secondContentPlace = new ContentPlace(secondVisitDay, visitOrder, secondDayTimeLine, place2,
                     content);
 
-            // when
             given(contentPlaceRepository.findAllByContentId(contentId))
                     .willReturn(List.of(firstContentPlace, secondContentPlace));
 
-            // then
+            // when & then
             assertThat(contentPlaceService.calculateDurationDays(contentId))
                     .isEqualTo(2);
         }
@@ -196,14 +203,25 @@ class ContentPlaceServiceTest {
         void calculateDurationDays2() {
             // given
             long contentId = 1L;
-
-            // when
             given(contentPlaceRepository.findAllByContentId(contentId))
                     .willReturn(List.of());
 
-            // then
+            // when & then
             assertThat(contentPlaceService.calculateDurationDays(contentId))
                     .isEqualTo(0);
         }
+    }
+
+    @DisplayName("contentId에 대한 컨텐츠가 존재하지 않는 경우 NotFoundException을 발생시킨다")
+    @Test
+    void validateContentExists() {
+        // given
+        Long contentId = 1L;
+        given(contentRepository.existsById(contentId))
+                .willReturn(false);
+
+        // when & then
+        assertThatThrownBy(() -> contentPlaceService.findContentPlaceDetails(contentId))
+                .isInstanceOf(NotFoundException.class);
     }
 }

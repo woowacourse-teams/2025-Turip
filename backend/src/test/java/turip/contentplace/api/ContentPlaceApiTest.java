@@ -54,7 +54,7 @@ public class ContentPlaceApiTest {
 
         @DisplayName("성공 시 200 OK 코드와 여행 상세 정보를 응답한다")
         @Test
-        void readContentPlaceDetails() {
+        void readContentPlaceDetails1() {
             // given
             jdbcTemplate.update(
                     "INSERT INTO creator (profile_image, channel_name) VALUES ('https://image.example.com/creator1.jpg', 'TravelMate')");
@@ -94,6 +94,17 @@ public class ContentPlaceApiTest {
                     .body("contentPlaces[1].visitOrder", is(1))
                     .body("contentPlaces[0].place.name", is("루터회관"))
                     .body("contentPlaces[1].place.name", is("테디뵈르하우스"));
+        }
+
+        @DisplayName("contentId에 대한 컨텐츠가 존재하지 않는 경우 404 NOT FOUND를 응답한다")
+        @Test
+        void readContentPlaceDetails2() {
+            // when & then
+            RestAssured.given().port(port)
+                    .queryParam("contentId", "1")
+                    .when().get("/content-places")
+                    .then()
+                    .statusCode(404);
         }
     }
 }

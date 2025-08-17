@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import turip.contentplace.controller.dto.response.ContentPlaceDetailResponse;
 import turip.contentplace.service.ContentPlaceService;
+import turip.exception.ErrorResponse;
 
 @RestController
 @RequiredArgsConstructor
@@ -72,7 +73,7 @@ public class ContentPlaceController {
                                                         "place": {
                                                             "id": 2,
                                                             "name": "해운대",
-                                                            "url": "https://naver.me/FfeOimOk"
+                                                            "url": "https://naver.me/FfeOimOk",
                                                             "address": "부산 해운대구 해운대해변로 264",
                                                             "latitude": 35.160936,
                                                             "longitude": 129.16004,
@@ -85,6 +86,23 @@ public class ContentPlaceController {
                                                         "timeLine": "12:12"
                                                     }
                                                 ]
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "content_not_found",
+                                    summary = "컨텐츠를 찾을 수 없음",
+                                    value = """
+                                            {
+                                                "message": "해당 id에 대한 컨텐츠가 존재하지 않습니다."
                                             }
                                             """
                             )
