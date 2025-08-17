@@ -26,8 +26,9 @@ public class ContentPlaceApiTest {
     void setUp() {
         jdbcTemplate.update("DELETE FROM place_category");
         jdbcTemplate.update("DELETE FROM content_place");
-        jdbcTemplate.update("DELETE FROM place");
         jdbcTemplate.update("DELETE FROM category");
+        jdbcTemplate.update("DELETE FROM favorite_place");
+        jdbcTemplate.update("DELETE FROM place");
         jdbcTemplate.update("DELETE FROM favorite_content");
         jdbcTemplate.update("DELETE FROM favorite_folder");
         jdbcTemplate.update("DELETE FROM member");
@@ -37,6 +38,7 @@ public class ContentPlaceApiTest {
         jdbcTemplate.update("DELETE FROM country");
         jdbcTemplate.update("DELETE FROM province");
 
+        jdbcTemplate.update("ALTER TABLE favorite_place ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE content_place ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE place ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE content ALTER COLUMN id RESTART WITH 1");
@@ -78,14 +80,23 @@ public class ContentPlaceApiTest {
                     "INSERT INTO content_place (content_id, place_id, visit_day, visit_order, time_line) VALUES (1, 1, 1, 1, '00:11:00')");
             jdbcTemplate.update(
                     "INSERT INTO content_place (content_id, place_id, visit_day, visit_order, time_line) VALUES (1, 2, 2, 1, '00:12:00')");
+            jdbcTemplate.update(
+                    "INSERT INTO member (device_fid) VALUES ('testDeviceFid')");
+            jdbcTemplate.update(
+                    "INSERT INTO favorite_folder (member_id, name, is_default) VALUES (1, '기본 폴더', true)");
+            jdbcTemplate.update(
+                    "INSERT INTO favorite_place (favorite_folder_id, place_id) VALUES (1, 1)");
 
             // when & then
             RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
                     .queryParam("contentId", "1")
                     .when().get("/content-places")
                     .then()
                     .statusCode(200)
                     .body("contentPlaceCount", is(2))
+                    .body("contentPlaces[0].isFavoritePlace", is(true))
+                    .body("contentPlaces[1].isFavoritePlace", is(false))
                     .body("contentPlaces[0].timeLine", is("11:00"))
                     .body("contentPlaces[1].timeLine", is("12:00"))
                     .body("contentPlaces[0].visitDay", is(1))
@@ -101,6 +112,7 @@ public class ContentPlaceApiTest {
         void readContentPlaceDetails2() {
             // when & then
             RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
                     .queryParam("contentId", "1")
                     .when().get("/content-places")
                     .then()

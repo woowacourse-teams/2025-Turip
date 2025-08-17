@@ -24,6 +24,8 @@ import turip.contentplace.repository.ContentPlaceRepository;
 import turip.country.domain.Country;
 import turip.creator.domain.Creator;
 import turip.exception.custom.NotFoundException;
+import turip.favoriteplace.repository.FavoritePlaceRepository;
+import turip.member.domain.Member;
 import turip.place.domain.Place;
 import turip.province.domain.Province;
 
@@ -38,6 +40,9 @@ class ContentPlaceServiceTest {
 
     @Mock
     private ContentRepository contentRepository;
+
+    @Mock
+    private FavoritePlaceRepository favoritePlaceRepository;
 
     @DisplayName("여행 코스의 방문 장소 수를 계산할 수 있다")
     @Test
@@ -80,12 +85,17 @@ class ContentPlaceServiceTest {
         ContentPlace firstContentPlace = new ContentPlace(firstVisitDay, visitOrder, firstDayTimeLine, place1, content);
         ContentPlace secondContentPlace = new ContentPlace(secondVisitDay, visitOrder, secondDayTimeLine, place2,
                 content);
+        Member member = new Member(1L, "deviceFid");
 
         given(contentRepository.existsById(contentId))
                 .willReturn(true);
         given(contentPlaceRepository.findAllByContentId(contentId))
                 .willReturn(List.of(firstContentPlace, secondContentPlace));
-        ContentPlaceDetailResponse response = contentPlaceService.findContentPlaceDetails(contentId);
+        given(favoritePlaceRepository.existsByFavoriteFolderMemberAndPlace(member, place1))
+                .willReturn(false);
+        given(favoritePlaceRepository.existsByFavoriteFolderMemberAndPlace(member, place2))
+                .willReturn(false);
+        ContentPlaceDetailResponse response = contentPlaceService.findContentPlaceDetails(member, contentId);
 
         // when & then
         assertThat(response.contentPlaceCount()).isEqualTo(2);
@@ -132,12 +142,17 @@ class ContentPlaceServiceTest {
         ContentPlace firstContentPlace = new ContentPlace(firstVisitDay, visitOrder, firstDayTimeLine, place1, content);
         ContentPlace secondContentPlace = new ContentPlace(secondVisitDay, visitOrder, secondDayTimeLine, place2,
                 content);
+        Member member = new Member(1L, "deviceFid");
 
         given(contentRepository.existsById(contentId))
                 .willReturn(true);
         given(contentPlaceRepository.findAllByContentId(contentId))
                 .willReturn(List.of(firstContentPlace, secondContentPlace));
-        ContentPlaceDetailResponse response = contentPlaceService.findContentPlaceDetails(contentId);
+        given(favoritePlaceRepository.existsByFavoriteFolderMemberAndPlace(member, place1))
+                .willReturn(false);
+        given(favoritePlaceRepository.existsByFavoriteFolderMemberAndPlace(member, place2))
+                .willReturn(false);
+        ContentPlaceDetailResponse response = contentPlaceService.findContentPlaceDetails(member, contentId);
 
         // when & then
         assertThat(response.contentPlaces().get(0).timeLine()).isEqualTo(LocalTime.parse("00:11:30"));
@@ -219,9 +234,10 @@ class ContentPlaceServiceTest {
         Long contentId = 1L;
         given(contentRepository.existsById(contentId))
                 .willReturn(false);
+        Member member = new Member(1L, "deviceFid");
 
         // when & then
-        assertThatThrownBy(() -> contentPlaceService.findContentPlaceDetails(contentId))
+        assertThatThrownBy(() -> contentPlaceService.findContentPlaceDetails(member, contentId))
                 .isInstanceOf(NotFoundException.class);
     }
 }

@@ -1,6 +1,7 @@
 package turip.contentplace.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -13,9 +14,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import turip.auth.AuthMember;
+import turip.auth.MemberResolvePolicy;
 import turip.contentplace.controller.dto.response.ContentPlaceDetailResponse;
 import turip.contentplace.service.ContentPlaceService;
 import turip.exception.ErrorResponse;
+import turip.member.domain.Member;
 
 @RestController
 @RequiredArgsConstructor
@@ -64,7 +68,8 @@ public class ContentPlaceController {
                                                                 }
                                                             ]
                                                         },
-                                                        "timeLine": "11:11"
+                                                        "timeLine": "11:11",
+                                                        "isFavoritePlace" : true
                                                     },
                                                     {
                                                         "id": 2,
@@ -83,7 +88,8 @@ public class ContentPlaceController {
                                                                 }
                                                             ]
                                                         },
-                                                        "timeLine": "12:12"
+                                                        "timeLine": "12:12",
+                                                        "isFavoritePlace" : false
                                                     }
                                                 ]
                                             }
@@ -111,8 +117,9 @@ public class ContentPlaceController {
     })
     @GetMapping
     public ResponseEntity<ContentPlaceDetailResponse> readContentPlaceDetails(
+            @Parameter(hidden = true) @AuthMember(policy = MemberResolvePolicy.CREATE_IF_ABSENT) Member member,
             @RequestParam(name = "contentId") Long contentId) {
-        ContentPlaceDetailResponse response = contentPlaceService.findContentPlaceDetails(contentId);
+        ContentPlaceDetailResponse response = contentPlaceService.findContentPlaceDetails(member, contentId);
         return ResponseEntity.ok(response);
     }
 }
