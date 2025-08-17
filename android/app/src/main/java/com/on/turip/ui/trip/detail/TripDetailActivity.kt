@@ -3,38 +3,28 @@ package com.on.turip.ui.trip.detail
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
-import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
-import android.view.ViewTreeObserver
-import android.webkit.WebResourceError
-import android.webkit.WebResourceRequest
-import android.webkit.WebView
-import android.webkit.WebViewClient
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
-import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.core.widget.NestedScrollView
 import com.google.android.material.snackbar.Snackbar
 import com.on.turip.R
 import com.on.turip.databinding.ActivityTripDetailBinding
 import com.on.turip.domain.content.Content
 import com.on.turip.ui.common.TuripSnackbar
-import com.on.turip.ui.common.TuripUrlConverter
 import com.on.turip.ui.common.base.BaseActivity
 import com.on.turip.ui.common.loadCircularImage
 import com.on.turip.ui.common.model.trip.TripModel
 import com.on.turip.ui.common.model.trip.toDisplayText
 import com.on.turip.ui.trip.detail.webview.TuripWebChromeClient
-import com.on.turip.ui.trip.detail.webview.WebViewVideoBridge
+import com.on.turip.ui.trip.detail.webview.TuripWebViewClient
 import com.on.turip.ui.trip.detail.webview.applyVideoSettings
 
 class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
@@ -57,6 +47,10 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
         )
     }
 
+    private val turipWebViewClient: TuripWebViewClient by lazy {
+        TuripWebViewClient(progressBar = binding.pbTripDetailVideo)
+    }
+
     private val tripDayAdapter by lazy {
         TripDayAdapter { dayModel ->
             viewModel.updateDay(dayModel)
@@ -70,13 +64,14 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
         }
     }
 
-    private var originalVideoContainer: CardView? = null
-    private var stickyVideoContainer: CardView? = null
-    private var nestedScrollView: NestedScrollView? = null
-    private var stickyThreshold = 0
-    private var currentVideoUrl: String? = null
-    private var isVideoLoaded = false
-    private var isVideoInStickyMode = false
+    private val stickyVideoManager by lazy {
+        StickyVideoManager(
+            originalVideoContainer = binding.cvTripDetailVideoContainer,
+            stickyVideoContainer = binding.cvTripDetailVideoContainerSticky,
+            nestedScrollView = binding.nsvTripDetail,
+            webView = binding.wvTripDetailVideo,
+        )
+    }
 
     private fun enableFullscreen() {
         WindowCompat.setDecorFitsSystemWindows(this.window, false)
@@ -165,120 +160,12 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
         binding.wvTripDetailVideo.apply {
             applyVideoSettings()
             webChromeClient = turipWebChromeClient
-            webViewClient = createWebViewClient()
+            webViewClient = turipWebViewClient
         }
     }
-
-    private fun createWebViewClient(): WebViewClient =
-        object : WebViewClient() {
-            override fun onPageStarted(
-                view: WebView?,
-                url: String?,
-                favicon: Bitmap?,
-            ) {
-                super.onPageStarted(view, url, favicon)
-                binding.pbTripDetailVideo.visibility = View.VISIBLE
-            }
-
-            override fun onPageFinished(
-                view: WebView?,
-                url: String?,
-            ) {
-                super.onPageFinished(view, url)
-                binding.pbTripDetailVideo.visibility = View.GONE
-                isVideoLoaded = true
-            }
-
-            override fun onReceivedError(
-                view: WebView?,
-                request: WebResourceRequest?,
-                error: WebResourceError?,
-            ) {
-                super.onReceivedError(view, request, error)
-                showWebViewErrorView()
-            }
-        }
 
     private fun setupStickyVideo() {
-        originalVideoContainer = binding.cvTripDetailVideoContainer
-        stickyVideoContainer = binding.cvTripDetailVideoContainerSticky
-        nestedScrollView = binding.nsvTripDetail
-
-        nestedScrollView?.viewTreeObserver?.addOnGlobalLayoutListener(
-            object : ViewTreeObserver.OnGlobalLayoutListener {
-                override fun onGlobalLayout() {
-                    nestedScrollView?.viewTreeObserver?.removeOnGlobalLayoutListener(this)
-                    calculateStickyThreshold()
-                }
-            },
-        )
-
-        nestedScrollView?.setOnScrollChangeListener { _, _, scrollY, _, _ ->
-            handleStickyVideo(scrollY)
-        }
-    }
-
-    private fun calculateStickyThreshold() {
-        originalVideoContainer?.post {
-            val location = IntArray(2)
-            originalVideoContainer?.getLocationInWindow(location)
-
-            val scrollViewLocation = IntArray(2)
-            nestedScrollView?.getLocationInWindow(scrollViewLocation)
-
-            stickyThreshold = location[1] - scrollViewLocation[1]
-        }
-    }
-
-    private fun handleStickyVideo(scrollY: Int) {
-        if (!isVideoLoaded || currentVideoUrl.isNullOrEmpty()) {
-            return
-        }
-
-        if (scrollY >= stickyThreshold && !isVideoInStickyMode) {
-            showStickyVideo()
-            isVideoInStickyMode = true
-        } else if (scrollY < stickyThreshold && isVideoInStickyMode) {
-            hideStickyVideo()
-            isVideoInStickyMode = false
-        }
-    }
-
-    private fun showStickyVideo() {
-        val webView = binding.wvTripDetailVideo
-        val layoutParams = webView.layoutParams
-
-        (webView.parent as? ViewGroup)?.removeView(webView)
-
-        stickyVideoContainer?.addView(webView, layoutParams)
-
-        originalVideoContainer?.visibility = View.INVISIBLE
-
-        stickyVideoContainer?.visibility = View.VISIBLE
-        stickyVideoContainer?.alpha = 0f
-        stickyVideoContainer
-            ?.animate()
-            ?.alpha(1f)
-            ?.setDuration(200)
-            ?.start()
-    }
-
-    private fun hideStickyVideo() {
-        val webView = binding.wvTripDetailVideo
-        val layoutParams = webView.layoutParams
-
-        stickyVideoContainer?.removeView(webView)
-
-        originalVideoContainer?.addView(webView, layoutParams)
-        originalVideoContainer?.visibility = View.VISIBLE
-
-        stickyVideoContainer
-            ?.animate()
-            ?.alpha(0f)
-            ?.setDuration(200)
-            ?.withEndAction {
-                stickyVideoContainer?.visibility = View.GONE
-            }?.start()
+        stickyVideoManager.initialize()
     }
 
     private fun showWebViewErrorView() {
@@ -360,16 +247,8 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
                 tripModel.tripDurationModel.toDisplayText(this)
         }
         viewModel.videoUri.observe(this) { url: String ->
-            currentVideoUrl = url
-
-            binding.wvTripDetailVideo.apply {
-                addJavascriptInterface(
-                    WebViewVideoBridge(
-                        TuripUrlConverter.extractVideoId(url),
-                    ) { showWebViewErrorView() },
-                    BRIDGE_NAME_IN_JS_FILE,
-                )
-                loadUrl(LOAD_URL_FILE_PATH)
+            stickyVideoManager.loadVideo(url) {
+                showWebViewErrorView()
             }
         }
         viewModel.isFavorite.observe(this) { isFavorite: Boolean ->
@@ -406,8 +285,6 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
     }
 
     companion object {
-        private const val BRIDGE_NAME_IN_JS_FILE = "videoBridge"
-        private const val LOAD_URL_FILE_PATH = "file:///android_asset/iframe.html"
         private const val CREATOR_KEY: String = "com.on.turip.CREATOR_KEY"
         private const val CONTENT_KEY: String = "com.on.turip.CONTENT_KEY"
 
