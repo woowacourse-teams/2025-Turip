@@ -5,7 +5,9 @@ import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.webkit.WebView
 import androidx.cardview.widget.CardView
+import androidx.core.view.isVisible
 import androidx.core.widget.NestedScrollView
+import com.on.turip.R
 import com.on.turip.ui.common.TuripUrlConverter
 import com.on.turip.ui.trip.detail.webview.WebViewVideoBridge
 
@@ -19,8 +21,11 @@ class StickyVideoManager(
     private var currentVideoUrl: String? = null
     private var isVideoLoaded = false
     private var isVideoInStickyMode = false
+    private lateinit var videoErrorLayout: View
 
     fun initialize() {
+        videoErrorLayout = originalVideoContainer.findViewById(R.id.cl_trip_detail_video_error)
+
         nestedScrollView.viewTreeObserver.addOnGlobalLayoutListener(
             object : ViewTreeObserver.OnGlobalLayoutListener {
                 override fun onGlobalLayout() {
@@ -66,7 +71,12 @@ class StickyVideoManager(
 
         (webView.parent as? ViewGroup)?.removeView(webView)
 
-        stickyVideoContainer.addView(webView, layoutParams)
+        if (videoErrorLayout.isVisible) {
+            (videoErrorLayout.parent as? ViewGroup)?.removeView(videoErrorLayout)
+            stickyVideoContainer.addView(videoErrorLayout, layoutParams)
+        } else {
+            stickyVideoContainer.addView(webView, layoutParams)
+        }
 
         originalVideoContainer.visibility = View.INVISIBLE
 
@@ -80,11 +90,14 @@ class StickyVideoManager(
     }
 
     private fun hideStickyVideo() {
-        val layoutParams = webView.layoutParams
+        stickyVideoContainer.removeAllViews()
 
-        stickyVideoContainer.removeView(webView)
+        if (videoErrorLayout.parent == null) {
+            originalVideoContainer.addView(videoErrorLayout)
+        } else {
+            originalVideoContainer.addView(webView)
+        }
 
-        originalVideoContainer.addView(webView, layoutParams)
         originalVideoContainer.visibility = View.VISIBLE
 
         stickyVideoContainer
