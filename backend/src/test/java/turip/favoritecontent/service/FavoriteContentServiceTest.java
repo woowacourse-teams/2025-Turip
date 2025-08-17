@@ -134,6 +134,7 @@ class FavoriteContentServiceTest {
         Content content1 = new Content(1L, creator, city, "뭉치의 속초 브이로그 1편", "속초 브이로그 Url 1", LocalDate.of(2025, 7, 8));
         Content content2 = new Content(2L, creator, city, "뭉치의 속초 브이로그 2편", "속초 브이로그 Url 2", LocalDate.of(2025, 7, 8));
         List<Content> contents = List.of(content1, content2);
+        Member member = new Member(1L, deviceFid);
 
         given(favoriteContentRepository.findMyFavoriteContentsByDeviceFid(eq(deviceFid), eq(Long.MAX_VALUE), any()))
                 .willReturn(new SliceImpl<>(contents));
@@ -146,7 +147,7 @@ class FavoriteContentServiceTest {
         given(contentRepository.existsById(2L))
                 .willReturn(true);
 
-        MyFavoriteContentsResponse response = favoriteContentService.findMyFavoriteContents(deviceFid, pageSize,
+        MyFavoriteContentsResponse response = favoriteContentService.findMyFavoriteContents(member, pageSize,
                 lastContentId);
 
         // then
@@ -173,6 +174,7 @@ class FavoriteContentServiceTest {
         Content content1 = new Content(1L, creator, city, "뭉치의 속초 브이로그 1편", "속초 브이로그 Url 1", LocalDate.of(2025, 7, 8));
         Content content2 = new Content(2L, creator, city, "뭉치의 속초 브이로그 2편", "속초 브이로그 Url 2", LocalDate.of(2025, 7, 8));
         List<Content> contents = List.of(content1, content2);
+        Member member = new Member(1L, deviceFid);
 
         given(favoriteContentRepository.findMyFavoriteContentsByDeviceFid(eq(deviceFid), eq(Long.MAX_VALUE), any()))
                 .willReturn(new SliceImpl<>(contents));
@@ -186,7 +188,7 @@ class FavoriteContentServiceTest {
                 .willReturn(false);
 
         // when & then
-        assertThatThrownBy(() -> favoriteContentService.findMyFavoriteContents(deviceFid, pageSize, lastContentId))
+        assertThatThrownBy(() -> favoriteContentService.findMyFavoriteContents(member, pageSize, lastContentId))
                 .isInstanceOf(NotFoundException.class);
     }
 
