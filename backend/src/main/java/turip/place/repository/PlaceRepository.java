@@ -6,5 +6,5 @@ import turip.place.domain.Place;
 
 public interface PlaceRepository extends JpaRepository<Place, Long> {
 
-    Optional<Place> findByName(String name);
+    Optional<Place> findByUrl(String url);
 }

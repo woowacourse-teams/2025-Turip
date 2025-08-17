@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
+import org.springframework.test.context.ActiveProfiles;
 import turip.city.domain.City;
 import turip.city.repository.CityRepository;
 import turip.content.domain.Content;
@@ -25,6 +26,7 @@ import turip.province.domain.Province;
 import turip.province.repository.ProvinceRepository;
 
 @DataJpaTest
+@ActiveProfiles("test")
 class ContentRepositoryTest {
 
     @Autowired
@@ -34,13 +36,10 @@ class ContentRepositoryTest {
     private ContentRepository contentRepository;
 
     @Autowired
-    private CountryRepository countryRepository;
-
-    @Autowired
     private CityRepository cityRepository;
 
     @Autowired
-    private ProvinceRepository provinceRepository;
+    private CountryRepository countryRepository;
 
     @DisplayName("키워드로 콘텐츠 및 크리에이터 이름을 검색해 개수를 반환하는 메서드 테스트")
     @Nested
@@ -55,24 +54,21 @@ class ContentRepositoryTest {
         })
         void countByKeyword1(String keyword, int expected) {
             // given
-            Creator may = new Creator("여행하는 메이", "프사1");
-            Creator moong = new Creator("여행하는 뭉치", "프사2");
-            Country country = new Country("대한민국", "대한민국 사진 경로");
-            Province province1 = new Province("대구광역시");
-            Province province2 = new Province("부산광역시");
-            City city1 = new City(country, province1, "수성구", "시 이미지 경로");
-            City city2 = new City(country, province2, "해운대구", "시 이미지 경로");
-            City city3 = new City(country, null, "서울특별시", "시 이미지 경로");
+            // 기존 데이터가 있으면 사용하고, 없으면 새로 생성
+            Country country = countryRepository.findByName("대한민국")
+                    .orElseGet(() -> countryRepository.save(new Country("대한민국", "https://example.com/korea.jpg")));
 
-            Content mayContent1 = new Content(may, city1, "메이의 대구 여행", "url1", LocalDate.of(2025, 7, 8));
-            Content mayContent2 = new Content(may, city2, "메이의 부산 여행", "url2", LocalDate.of(2025, 7, 8));
-            Content moongAndMayContent = new Content(moong, city3, "뭉치와 메이의 서울 여행", "url3", LocalDate.of(2025, 7, 8));
-            Content moongContent = new Content(moong, city1, "뭉치의 대구 여행", "url4", LocalDate.of(2025, 7, 8));
+            City city = cityRepository.findByName("서울")
+                    .orElseGet(() -> cityRepository.save(new City(country, null, "서울", "https://example.com/seoul.jpg")));
+
+            Creator may = new Creator("여행하는 메이", "https://example.com/may.jpg");
+            Creator moong = new Creator("여행하는 뭉치", "https://example.com/moong.jpg");
+            Content mayContent1 = new Content(may, city, "메이의 대구 여행", "https://example.com/may1", LocalDate.now());
+            Content mayContent2 = new Content(may, city, "메이의 부산 여행", "https://example.com/may2", LocalDate.now());
+            Content moongAndMayContent = new Content(moong, city, "뭉치와 메이의 서울 여행", "https://example.com/moong1", LocalDate.now());
+            Content moongContent = new Content(moong, city, "뭉치의 대구 여행", "https://example.com/moong2", LocalDate.now());
 
             creatorRepository.saveAll(List.of(may, moong));
-            countryRepository.save(country);
-            provinceRepository.saveAll(List.of(province1, province2));
-            cityRepository.saveAll(List.of(city1, city2, city3));
             contentRepository.saveAll(List.of(mayContent1, mayContent2, moongAndMayContent, moongContent));
 
             // when
@@ -97,24 +93,21 @@ class ContentRepositoryTest {
         })
         void findByKeyword1(String keyword, int expected) {
             // given
-            Creator may = new Creator("여행하는 메이", "프사1");
-            Creator moong = new Creator("여행하는 뭉치", "프사2");
-            Country country = new Country("대한민국", "대한민국 사진 경로");
-            Province province1 = new Province("대구광역시");
-            Province province2 = new Province("부산광역시");
-            City city1 = new City(country, province1, "수성구", "시 이미지 경로");
-            City city2 = new City(country, province2, "해운대구", "시 이미지 경로");
-            City city3 = new City(country, null, "서울특별시", "시 이미지 경로");
+            // 기존 데이터가 있으면 사용하고, 없으면 새로 생성
+            Country country = countryRepository.findByName("대한민국")
+                    .orElseGet(() -> countryRepository.save(new Country("대한민국", "https://example.com/korea.jpg")));
 
-            Content mayContent1 = new Content(may, city1, "메이의 대구 여행", "url1", LocalDate.of(2025, 7, 8));
-            Content mayContent2 = new Content(may, city2, "메이의 부산 여행", "url2", LocalDate.of(2025, 7, 8));
-            Content moongAndMayContent = new Content(moong, city3, "뭉치와 메이의 서울 여행", "url3", LocalDate.of(2025, 7, 8));
-            Content moongContent = new Content(moong, city1, "뭉치의 대구 여행", "url4", LocalDate.of(2025, 7, 8));
+            City city = cityRepository.findByName("서울")
+                    .orElseGet(() -> cityRepository.save(new City(country, null, "서울", "https://example.com/seoul.jpg")));
+
+            Creator may = new Creator("여행하는 메이", "https://example.com/may.jpg");
+            Creator moong = new Creator("여행하는 뭉치", "https://example.com/moong.jpg");
+            Content mayContent1 = new Content(may, city, "메이의 대구 여행", "https://example.com/may1", LocalDate.now());
+            Content mayContent2 = new Content(may, city, "메이의 부산 여행", "https://example.com/may2", LocalDate.now());
+            Content moongAndMayContent = new Content(moong, city, "뭉치와 메이의 서울 여행", "https://example.com/moong1", LocalDate.now());
+            Content moongContent = new Content(moong, city, "뭉치의 대구 여행", "https://example.com/moong2", LocalDate.now());
 
             creatorRepository.saveAll(List.of(may, moong));
-            countryRepository.save(country);
-            provinceRepository.saveAll(List.of(province1, province2));
-            cityRepository.saveAll(List.of(city1, city2, city3));
             contentRepository.saveAll(List.of(mayContent1, mayContent2, moongAndMayContent, moongContent));
 
             // when
@@ -131,22 +124,23 @@ class ContentRepositoryTest {
         void findByKeyword2() {
             // given
             String keyword = "메이";
-            Creator creator = new Creator("여행하는 " + keyword, "사람 이미지");
-            Country country = new Country("대한민국", "대한민국 사진 경로");
-            Province province = new Province("도");
-            City city = new City(country, province, "시", "시 이미지 경로");
-            Content content1 = new Content(creator, city, keyword + "의 대구 여행", "url 1", LocalDate.of(2025, 7, 8));
-            Content content2 = new Content(creator, city, keyword + "의 부산 여행", "url 2", LocalDate.of(2025, 7, 8));
-            Content content3 = new Content(creator, city, keyword + "의 서울 여행", "url 3", LocalDate.of(2025, 7, 8));
-            Content content4 = new Content(creator, city, keyword + "의 춘천 여행", "url 4", LocalDate.of(2025, 7, 8));
-            Content content5 = new Content(creator, city, keyword + "의 강릉 여행", "url 5", LocalDate.of(2025, 7, 8));
-            Content content6 = new Content(creator, city, keyword + "의 후쿠오카 여행", "url 6", LocalDate.of(2025, 7, 8));
-            Content content7 = new Content(creator, city, keyword + "의 다낭 여행", "url 7", LocalDate.of(2025, 7, 8));
+            // 기존 데이터가 있으면 사용하고, 없으면 새로 생성
+            Country country = countryRepository.findByName("대한민국")
+                    .orElseGet(() -> countryRepository.save(new Country("대한민국", "https://example.com/korea.jpg")));
+
+            City city = cityRepository.findByName("서울")
+                    .orElseGet(() -> cityRepository.save(new City(country, null, "서울", "https://example.com/seoul.jpg")));
+
+            Creator creator = new Creator("여행하는 " + keyword, "https://example.com/creator.jpg");
+            Content content1 = new Content(creator, city, keyword + "의 대구 여행", "https://example.com/content1", LocalDate.now());
+            Content content2 = new Content(creator, city, keyword + "의 부산 여행", "https://example.com/content2", LocalDate.now());
+            Content content3 = new Content(creator, city, keyword + "의 서울 여행", "https://example.com/content3", LocalDate.now());
+            Content content4 = new Content(creator, city, keyword + "의 춘천 여행", "https://example.com/content4", LocalDate.now());
+            Content content5 = new Content(creator, city, keyword + "의 강릉 여행", "https://example.com/content5", LocalDate.now());
+            Content content6 = new Content(creator, city, keyword + "의 후쿠오카 여행", "https://example.com/content6", LocalDate.now());
+            Content content7 = new Content(creator, city, keyword + "의 다낭 여행", "https://example.com/content7", LocalDate.now());
 
             creatorRepository.save(creator);
-            countryRepository.save(country);
-            provinceRepository.save(province);
-            cityRepository.save(city);
             List<Content> savedContents = contentRepository.saveAll(
                     List.of(content1, content2, content3, content4, content5, content6, content7));
 

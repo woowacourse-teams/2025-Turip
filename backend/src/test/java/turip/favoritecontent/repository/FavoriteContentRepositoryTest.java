@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
+import org.springframework.test.context.ActiveProfiles;
 import turip.city.domain.City;
 import turip.city.repository.CityRepository;
 import turip.content.domain.Content;
@@ -21,10 +22,9 @@ import turip.creator.repository.CreatorRepository;
 import turip.favoritecontent.domain.FavoriteContent;
 import turip.member.domain.Member;
 import turip.member.repository.MemberRepository;
-import turip.province.domain.Province;
-import turip.province.repository.ProvinceRepository;
 
 @DataJpaTest
+@ActiveProfiles("test")
 class FavoriteContentRepositoryTest {
 
     @Autowired
@@ -40,32 +40,27 @@ class FavoriteContentRepositoryTest {
     private CreatorRepository creatorRepository;
 
     @Autowired
-    private CountryRepository countryRepository;
-
-    @Autowired
-    private ProvinceRepository provinceRepository;
-
-    @Autowired
     private CityRepository cityRepository;
 
+    @Autowired
+    private CountryRepository countryRepository;
 
     @Test
     @DisplayName("컨텐츠를 최신 찜 기준으로 정렬하여 반환한다")
     void findMyFavoriteContentsByDeviceFid() {
         // given
-        Creator creator = new Creator("여행하는 뭉치", "프로필 사진 경로");
-        Country country = new Country("대한민국", "대한민국 사진 경로");
-        Province province = new Province("강원도");
+        Country country = countryRepository.findByName("대한민국")
+                .orElseGet(() -> countryRepository.save(new Country("대한민국", "https://example.com/korea.jpg")));
 
-        Creator savedCreator = creatorRepository.save(creator);
-        Country savedCountry = countryRepository.save(country);
-        Province savedProvince = provinceRepository.save(province);
-        City city = cityRepository.save(new City(savedCountry, savedProvince, "속초", "속초 이미지 경로"));
+        City city = cityRepository.findByName("서울")
+                .orElseGet(() -> cityRepository.save(new City(country, null, "서울", "https://example.com/seoul.jpg")));
+
+        Creator creator = creatorRepository.save(new Creator("테스트 크리에이터", "https://example.com/profile.jpg"));
 
         Content content1 = contentRepository.save(
-                new Content(savedCreator, city, "뭉치의 속초 브이로그 1편", "속초 브이로그 Url 1", LocalDate.of(2025, 7, 8)));
+                new Content(creator, city, "테스트 컨텐츠 1", "https://example.com/content1", LocalDate.now()));
         Content content2 = contentRepository.save(
-                new Content(savedCreator, city, "뭉치의 속초 브이로그 2편", "속초 브이로그 Url 2", LocalDate.of(2025, 7, 8)));
+                new Content(creator, city, "테스트 컨텐츠 2", "https://example.com/content2", LocalDate.now()));
 
         Member member = memberRepository.save(new Member("testDeviceFid"));
 

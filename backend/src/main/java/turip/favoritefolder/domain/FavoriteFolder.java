@@ -31,6 +31,12 @@ public class FavoriteFolder {
 
     private boolean isDefault;
 
+    private FavoriteFolder(Member member, String name, boolean isDefault) {
+        this.member = member;
+        this.name = name;
+        this.isDefault = isDefault;
+    }
+
     public static FavoriteFolder defaultFolderOf(Member member) {
         return new FavoriteFolder(member, "기본 폴더", true);
     }
@@ -41,23 +47,8 @@ public class FavoriteFolder {
         return new FavoriteFolder(member, name, false);
     }
 
-    public boolean isOwner(Member member) {
-        return this.member.isSameDeviceId(member);
-    }
-
-    public void rename(String newName) {
-        validateName(newName);
-        this.name = newName;
-    }
-
     public static String formatName(String unformattedName) {
         return unformattedName.trim();
-    }
-
-    private FavoriteFolder(Member member, String name, boolean isDefault) {
-        this.member = member;
-        this.name = name;
-        this.isDefault = isDefault;
     }
 
     private static void validateName(String name) {
@@ -67,5 +58,14 @@ public class FavoriteFolder {
         if (name.length() > 20) {
             throw new IllegalArgumentException("장소 찜 폴더 이름은 최대 20글자 입니다.");
         }
+    }
+
+    public boolean isOwner(Member member) {
+        return this.member.isSameDeviceId(member);
+    }
+
+    public void rename(String newName) {
+        validateName(newName);
+        this.name = newName;
     }
 }
