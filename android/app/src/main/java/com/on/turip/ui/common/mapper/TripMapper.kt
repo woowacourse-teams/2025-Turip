@@ -11,7 +11,7 @@ fun Trip.toUiModel(): TripModel =
     TripModel(
         tripDurationModel = tripDuration.toUiModel(),
         tripPlaceCount = tripPlaceCount,
-        tripCourses = tripCourses,
+        contentPlaces = this@toUiModel.contentPlaces,
     )
 
 fun TripDuration.toUiModel(): TripDurationModel =
