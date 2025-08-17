@@ -3,17 +3,26 @@ package com.on.turip.ui.trip.detail
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
+import android.view.ViewTreeObserver
+import android.webkit.WebResourceError
+import android.webkit.WebResourceRequest
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
+import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.widget.NestedScrollView
 import com.google.android.material.snackbar.Snackbar
 import com.on.turip.R
 import com.on.turip.databinding.ActivityTripDetailBinding
@@ -25,7 +34,6 @@ import com.on.turip.ui.common.loadCircularImage
 import com.on.turip.ui.common.model.trip.TripModel
 import com.on.turip.ui.common.model.trip.toDisplayText
 import com.on.turip.ui.trip.detail.webview.TuripWebChromeClient
-import com.on.turip.ui.trip.detail.webview.TuripWebViewClient
 import com.on.turip.ui.trip.detail.webview.WebViewVideoBridge
 import com.on.turip.ui.trip.detail.webview.applyVideoSettings
 
@@ -33,12 +41,14 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
     override val binding: ActivityTripDetailBinding by lazy {
         ActivityTripDetailBinding.inflate(layoutInflater)
     }
+
     val viewModel: TripDetailViewModel by viewModels {
         TripDetailViewModel.provideFactory(
             intent.getLongExtra(CONTENT_KEY, 0),
             intent.getLongExtra(CREATOR_KEY, 0),
         )
     }
+
     private val turipWebChromeClient: TuripWebChromeClient by lazy {
         TuripWebChromeClient(
             fullScreenView = binding.flTripDetailVideoFullscreen,
@@ -59,6 +69,14 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
             startActivity(intent)
         }
     }
+
+    private var originalVideoContainer: CardView? = null
+    private var stickyVideoContainer: CardView? = null
+    private var nestedScrollView: NestedScrollView? = null
+    private var stickyThreshold = 0
+    private var currentVideoUrl: String? = null
+    private var isVideoLoaded = false
+    private var isVideoInStickyMode = false
 
     private fun enableFullscreen() {
         WindowCompat.setDecorFitsSystemWindows(this.window, false)
@@ -100,6 +118,7 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
         setupToolbar()
         setupOnBackPressedDispatcher()
         setupWebView()
+        setupStickyVideo()
         setupAdapters()
         setupListeners()
         setupObservers()
@@ -124,12 +143,18 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
             this,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    if (turipWebChromeClient.isFullScreen()) {
-                        turipWebChromeClient.onHideCustomView()
-                    } else if (binding.wvTripDetailVideo.canGoBack()) {
-                        binding.wvTripDetailVideo.goBack()
-                    } else {
-                        finish()
+                    when {
+                        turipWebChromeClient.isFullScreen() -> {
+                            turipWebChromeClient.onHideCustomView()
+                        }
+
+                        binding.wvTripDetailVideo.canGoBack() -> {
+                            binding.wvTripDetailVideo.goBack()
+                        }
+
+                        else -> {
+                            finish()
+                        }
                     }
                 }
             },
@@ -140,14 +165,127 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
         binding.wvTripDetailVideo.apply {
             applyVideoSettings()
             webChromeClient = turipWebChromeClient
-            webViewClient = TuripWebViewClient(binding.pbTripDetailVideo)
+            webViewClient = createWebViewClient()
         }
+    }
+
+    private fun createWebViewClient(): WebViewClient =
+        object : WebViewClient() {
+            override fun onPageStarted(
+                view: WebView?,
+                url: String?,
+                favicon: Bitmap?,
+            ) {
+                super.onPageStarted(view, url, favicon)
+                binding.pbTripDetailVideo.visibility = View.VISIBLE
+            }
+
+            override fun onPageFinished(
+                view: WebView?,
+                url: String?,
+            ) {
+                super.onPageFinished(view, url)
+                binding.pbTripDetailVideo.visibility = View.GONE
+                isVideoLoaded = true
+            }
+
+            override fun onReceivedError(
+                view: WebView?,
+                request: WebResourceRequest?,
+                error: WebResourceError?,
+            ) {
+                super.onReceivedError(view, request, error)
+                showWebViewErrorView()
+            }
+        }
+
+    private fun setupStickyVideo() {
+        originalVideoContainer = binding.cvTripDetailVideoContainer
+        stickyVideoContainer = binding.cvTripDetailVideoContainerSticky
+        nestedScrollView = binding.nsvTripDetail
+
+        nestedScrollView?.viewTreeObserver?.addOnGlobalLayoutListener(
+            object : ViewTreeObserver.OnGlobalLayoutListener {
+                override fun onGlobalLayout() {
+                    nestedScrollView?.viewTreeObserver?.removeOnGlobalLayoutListener(this)
+                    calculateStickyThreshold()
+                }
+            },
+        )
+
+        nestedScrollView?.setOnScrollChangeListener { _, _, scrollY, _, _ ->
+            handleStickyVideo(scrollY)
+        }
+    }
+
+    private fun calculateStickyThreshold() {
+        originalVideoContainer?.post {
+            val location = IntArray(2)
+            originalVideoContainer?.getLocationInWindow(location)
+
+            val scrollViewLocation = IntArray(2)
+            nestedScrollView?.getLocationInWindow(scrollViewLocation)
+
+            stickyThreshold = location[1] - scrollViewLocation[1]
+        }
+    }
+
+    private fun handleStickyVideo(scrollY: Int) {
+        if (!isVideoLoaded || currentVideoUrl.isNullOrEmpty()) {
+            return
+        }
+
+        if (scrollY >= stickyThreshold && !isVideoInStickyMode) {
+            showStickyVideo()
+            isVideoInStickyMode = true
+        } else if (scrollY < stickyThreshold && isVideoInStickyMode) {
+            hideStickyVideo()
+            isVideoInStickyMode = false
+        }
+    }
+
+    private fun showStickyVideo() {
+        val webView = binding.wvTripDetailVideo
+        val layoutParams = webView.layoutParams
+
+        (webView.parent as? ViewGroup)?.removeView(webView)
+
+        stickyVideoContainer?.addView(webView, layoutParams)
+
+        originalVideoContainer?.visibility = View.INVISIBLE
+
+        stickyVideoContainer?.visibility = View.VISIBLE
+        stickyVideoContainer?.alpha = 0f
+        stickyVideoContainer
+            ?.animate()
+            ?.alpha(1f)
+            ?.setDuration(200)
+            ?.start()
+    }
+
+    private fun hideStickyVideo() {
+        val webView = binding.wvTripDetailVideo
+        val layoutParams = webView.layoutParams
+
+        stickyVideoContainer?.removeView(webView)
+
+        originalVideoContainer?.addView(webView, layoutParams)
+        originalVideoContainer?.visibility = View.VISIBLE
+
+        stickyVideoContainer
+            ?.animate()
+            ?.alpha(0f)
+            ?.setDuration(200)
+            ?.withEndAction {
+                stickyVideoContainer?.visibility = View.GONE
+            }?.start()
     }
 
     private fun showWebViewErrorView() {
         runOnUiThread {
             binding.wvTripDetailVideo.visibility = View.GONE
             binding.clTripDetailVideoError.visibility = View.VISIBLE
+            binding.pbTripDetailVideo.visibility = View.GONE
         }
     }
 
@@ -168,10 +306,12 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
                 )
             startActivity(intent)
         }
+
         binding.ivTripDetailFavorite.setOnClickListener {
             viewModel.updateFavorite()
             showFavoriteStatusSnackbar(viewModel.isFavorite.value == true)
         }
+
         binding.ivTripDetailContentToggle.setOnClickListener {
             viewModel.updateExpandTextToggle()
         }
@@ -220,6 +360,8 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
                 tripModel.tripDurationModel.toDisplayText(this)
         }
         viewModel.videoUri.observe(this) { url: String ->
+            currentVideoUrl = url
+
             binding.wvTripDetailVideo.apply {
                 addJavascriptInterface(
                     WebViewVideoBridge(
@@ -227,9 +369,8 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
                     ) { showWebViewErrorView() },
                     BRIDGE_NAME_IN_JS_FILE,
                 )
+                loadUrl(LOAD_URL_FILE_PATH)
             }
-
-            binding.wvTripDetailVideo.loadUrl(LOAD_URL_FILE_PATH)
         }
         viewModel.isFavorite.observe(this) { isFavorite: Boolean ->
             binding.ivTripDetailFavorite.isSelected = isFavorite

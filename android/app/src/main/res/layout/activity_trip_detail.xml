@@ -39,6 +39,65 @@
         </com.google.android.material.appbar.MaterialToolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cv_trip_detail_video_container_sticky"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:elevation="8dp"
+        android:visibility="gone"
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
+
+        <WebView
+            android:id="@+id/wv_trip_detail_video_sticky"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible" />
+
+        <ProgressBar
+            android:id="@+id/pb_trip_detail_video_sticky"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_gravity="center"
+            android:indeterminateTint="@color/pure_white_ffffff" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_trip_detail_video_error_sticky"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/pure_black_151515"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/tv_trip_detail_video_error_sticky"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@null"
+                android:gravity="center"
+                android:text="@string/trip_detail_video_error"
+                android:textAppearance="@style/body2"
+                android:textColor="@color/pure_white_ffffff"
+                app:layout_constraintBottom_toTopOf="@id/iv_trip_detail_video_error_play_button_sticky"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_chainStyle="packed"
+                tools:text="해당 영상은 제작자의 요청으로 유튜브로만 시청할 수 있습니다.\n클릭 시 유튜브로 이동합니다." />
+
+            <ImageView
+                android:id="@+id/iv_trip_detail_video_error_play_button_sticky"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_play_button"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_trip_detail_video_error_sticky" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nsv_trip_detail"
         android:layout_width="match_parent"
@@ -129,6 +188,7 @@
                 app:layout_constraintTop_toBottomOf="@id/iv_trip_detail_content_toggle"
                 tools:text="2025-07-20" />
 
+            <!-- Original Video Container -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/cv_trip_detail_video_container"
                 android:layout_width="match_parent"
