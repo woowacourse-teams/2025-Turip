@@ -1,5 +1,7 @@
 package com.on.turip.ui.folder
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import com.on.turip.databinding.ActivityFolderBinding
 import com.on.turip.ui.common.base.BaseActivity
@@ -42,5 +44,9 @@ class FolderActivity : BaseActivity<ActivityFolderBinding>() {
             val bottomSheet: FolderAddBottomSheetFragment = FolderAddBottomSheetFragment()
             bottomSheet.show(supportFragmentManager, "folder_add")
         }
+    }
+
+    companion object {
+        fun newIntent(context: Context): Intent = Intent(context, FolderActivity::class.java)
     }
 }
