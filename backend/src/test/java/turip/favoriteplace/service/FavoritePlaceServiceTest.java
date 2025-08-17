@@ -54,8 +54,8 @@ class FavoritePlaceServiceTest {
             Long placeId = 1L;
 
             Member member = new Member(1L, deviceFid);
-            FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, member, null, true);
-            Place place = new Place(placeId, null, null, null, 1, 1);
+            FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, member, "폴더 이름 1", true);
+            Place place = new Place(placeId, "장소 이름", "장소 url", "주소", 1, 1);
             FavoritePlace favoritePlace = new FavoritePlace(favoriteFolder, place);
 
             given(favoriteFolderRepository.findById(favoriteFolderId))
@@ -89,8 +89,8 @@ class FavoritePlaceServiceTest {
 
             Member owner = new Member(1L, ownerDeviceFid);
             Member requestMember = new Member(2L, requestDeviceFid);
-            FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, owner, null, true);
-            Place place = new Place(placeId, null, null, null, 1, 1);
+            FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, owner, "폴더 이름 1", true);
+            Place place = new Place(placeId, "장소 이름", "장소 url", "주소", 1, 1);
 
             given(favoriteFolderRepository.findById(favoriteFolderId))
                     .willReturn(Optional.of(favoriteFolder));
@@ -130,7 +130,7 @@ class FavoritePlaceServiceTest {
             Long placeId = 1L;
 
             Member member = new Member(1L, deviceFid);
-            FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, member, null, true);
+            FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, member, "폴더 이름 1", true);
 
             given(favoriteFolderRepository.findById(favoriteFolderId))
                     .willReturn(Optional.of(favoriteFolder));
@@ -152,8 +152,8 @@ class FavoritePlaceServiceTest {
             Long placeId = 1L;
 
             Member member = new Member(1L, deviceFid);
-            FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, member, null, true);
-            Place place = new Place(placeId, null, null, null, 1, 1);
+            FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, member, "폴더 이름 1", true);
+            Place place = new Place(placeId, "장소 이름", "장소 url", "주소", 1, 1);
 
             given(favoriteFolderRepository.findById(favoriteFolderId))
                     .willReturn(Optional.of(favoriteFolder));
@@ -181,8 +181,8 @@ class FavoritePlaceServiceTest {
             Long placeId = 1L;
 
             Member member = new Member(1L, deviceFid);
-            FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, member, null, true);
-            Place place = new Place(placeId, null, null, null, 1, 1);
+            FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, member, "폴더 이름 1", true);
+            Place place = new Place(placeId, "장소 이름", "장소 url", "주소", 1, 1);
             FavoritePlace favoritePlace = new FavoritePlace(favoriteFolder, place);
 
             given(favoriteFolderRepository.findById(favoriteFolderId))
@@ -207,8 +207,8 @@ class FavoritePlaceServiceTest {
 
             Member owner = new Member(1L, ownerDeviceFid);
             Member requestMember = new Member(2L, requestDeviceFid);
-            FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, owner, null, true);
-            Place place = new Place(placeId, null, null, null, 1, 1);
+            FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, owner, "폴더 이름 1", true);
+            Place place = new Place(placeId, "장소 이름", "장소 url", "주소", 1, 1);
 
             given(favoriteFolderRepository.findById(favoriteFolderId))
                     .willReturn(Optional.of(favoriteFolder));
@@ -248,7 +248,7 @@ class FavoritePlaceServiceTest {
             Long placeId = 1L;
 
             Member member = new Member(1L, deviceFid);
-            FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, member, null, true);
+            FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, member, "폴더 이름 1", true);
 
             given(favoriteFolderRepository.findById(favoriteFolderId))
                     .willReturn(Optional.of(favoriteFolder));
@@ -270,8 +270,8 @@ class FavoritePlaceServiceTest {
             Long placeId = 1L;
 
             Member member = new Member(1L, deviceFid);
-            FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, member, null, true);
-            Place place = new Place(placeId, null, null, null, 1, 1);
+            FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, member, "폴더 이름 1", true);
+            Place place = new Place(placeId, "장소 이름", "장소 url", "주소", 1, 1);
 
             given(favoriteFolderRepository.findById(favoriteFolderId))
                     .willReturn(Optional.of(favoriteFolder));

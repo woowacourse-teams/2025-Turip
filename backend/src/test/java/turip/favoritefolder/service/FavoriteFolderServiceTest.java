@@ -57,7 +57,7 @@ class FavoriteFolderServiceTest {
             Long folderId = 1L;
 
             FavoriteFolderRequest request = new FavoriteFolderRequest(folderName);
-            Member member = new Member(memberId, null);
+            Member member = new Member(memberId, deviceFid);
 
             given(favoriteFolderRepository.existsByNameAndMember(folderName, member))
                     .willReturn(false);
@@ -85,7 +85,7 @@ class FavoriteFolderServiceTest {
             Long memberId = 1L;
 
             FavoriteFolderRequest request = new FavoriteFolderRequest(folderName);
-            Member member = new Member(memberId, null);
+            Member member = new Member(memberId, deviceFid);
 
             given(favoriteFolderRepository.existsByNameAndMember(folderName, member))
                     .willReturn(true);

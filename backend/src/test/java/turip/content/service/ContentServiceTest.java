@@ -32,6 +32,7 @@ import turip.favoritecontent.domain.FavoriteContent;
 import turip.favoritecontent.repository.FavoriteContentRepository;
 import turip.member.domain.Member;
 import turip.member.repository.MemberRepository;
+import turip.province.domain.Province;
 import turip.regioncategory.domain.DomesticRegionCategory;
 import turip.regioncategory.domain.OverseasRegionCategory;
 
@@ -66,12 +67,14 @@ class ContentServiceTest {
             int pageSize = 2;
             Long maxId = Long.MAX_VALUE;
 
-            Creator creator = new Creator("메이", null);
-            Country korea = new Country("대한민국", null);
-            City seoul = new City(korea, null, "서울", null);
+            Creator creator = new Creator("여행하는 메이", "프로필 사진 경로");
+            Country country = new Country("대한민국", "대한민국 사진 경로");
+            Province province = new Province("강원도");
+            City city = new City(country, province, "속초", "시 이미지 경로");
 
-            List<Content> contents = List.of(new Content(1L, creator, seoul, null, null, null),
-                    new Content(2L, creator, seoul, null, null, null));
+            List<Content> contents = List.of(
+                    new Content(1L, creator, city, "메이의 속초 브이로그 1편", "속초 브이로그 Url 1", LocalDate.of(2025, 7, 8)),
+                    new Content(2L, creator, city, "메이의 속초 브이로그 2편", "속초 브이로그 Url 2", LocalDate.of(2025, 7, 8)));
             given(contentRepository.findByKeywordContaining(keyword, maxId, PageRequest.of(0, pageSize)))
                     .willReturn(new SliceImpl<>(contents));
             given(contentRepository.existsById(1L))
@@ -100,12 +103,15 @@ class ContentServiceTest {
             LocalDate endDate = startDate.plusDays(6);
             int topContentSize = 2;
 
-            Creator creator = new Creator("하루", null);
-            Country korea = new Country("대한민국", null);
-            City seoul = new City(korea, null, "서울", null);
+            Creator creator = new Creator(1L, "여행하는 뭉치", "프로필 사진 경로");
+            Country country = new Country(1L, "대한민국", "대한민국 사진 경로");
+            Province province = new Province(1L, "강원도");
+            City city = new City(1L, country, province, "속초", "시 이미지 경로");
 
-            Content content1 = new Content(1L, creator, seoul, null, null, null);
-            Content content2 = new Content(2L, creator, seoul, null, null, null);
+            Content content1 = new Content(1L, creator, city, "뭉치의 속초 브이로그 1편", "속초 브이로그 Url 1",
+                    LocalDate.of(2025, 7, 8));
+            Content content2 = new Content(2L, creator, city, "뭉치의 속초 브이로그 2편", "속초 브이로그 Url 2",
+                    LocalDate.of(2025, 7, 8));
 
             Member member = new Member(1L, "testDeviceFid");
 

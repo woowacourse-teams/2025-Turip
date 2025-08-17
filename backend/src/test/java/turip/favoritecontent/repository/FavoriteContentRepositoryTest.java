@@ -14,11 +14,15 @@ import turip.city.domain.City;
 import turip.city.repository.CityRepository;
 import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
+import turip.country.domain.Country;
+import turip.country.repository.CountryRepository;
 import turip.creator.domain.Creator;
 import turip.creator.repository.CreatorRepository;
 import turip.favoritecontent.domain.FavoriteContent;
 import turip.member.domain.Member;
 import turip.member.repository.MemberRepository;
+import turip.province.domain.Province;
+import turip.province.repository.ProvinceRepository;
 
 @DataJpaTest
 class FavoriteContentRepositoryTest {
@@ -36,6 +40,12 @@ class FavoriteContentRepositoryTest {
     private CreatorRepository creatorRepository;
 
     @Autowired
+    private CountryRepository countryRepository;
+
+    @Autowired
+    private ProvinceRepository provinceRepository;
+
+    @Autowired
     private CityRepository cityRepository;
 
 
@@ -43,11 +53,19 @@ class FavoriteContentRepositoryTest {
     @DisplayName("컨텐츠를 최신 찜 기준으로 정렬하여 반환한다")
     void findMyFavoriteContentsByDeviceFid() {
         // given
-        Creator creator = creatorRepository.save(new Creator(null, null));
-        City city = cityRepository.save(new City(null, null, null, null));
+        Creator creator = new Creator("여행하는 뭉치", "프로필 사진 경로");
+        Country country = new Country("대한민국", "대한민국 사진 경로");
+        Province province = new Province("강원도");
 
-        Content content1 = contentRepository.save(new Content(creator, city, null, null, null));
-        Content content2 = contentRepository.save(new Content(creator, city, null, null, null));
+        Creator savedCreator = creatorRepository.save(creator);
+        Country savedCountry = countryRepository.save(country);
+        Province savedProvince = provinceRepository.save(province);
+        City city = cityRepository.save(new City(savedCountry, savedProvince, "속초", "속초 이미지 경로"));
+
+        Content content1 = contentRepository.save(
+                new Content(savedCreator, city, "뭉치의 속초 브이로그 1편", "속초 브이로그 Url 1", LocalDate.of(2025, 7, 8)));
+        Content content2 = contentRepository.save(
+                new Content(savedCreator, city, "뭉치의 속초 브이로그 2편", "속초 브이로그 Url 2", LocalDate.of(2025, 7, 8)));
 
         Member member = memberRepository.save(new Member("testDeviceFid"));
 
