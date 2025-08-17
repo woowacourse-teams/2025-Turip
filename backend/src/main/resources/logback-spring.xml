@@ -25,15 +25,7 @@
                     <fieldName>stacktrace</fieldName>
                 </stackTrace>
 
-                <mdc>
-                    <includeMdcKeyName>traceId</includeMdcKeyName>
-                    <includeMdcKeyName>remoteAddr</includeMdcKeyName>
-                    <includeMdcKeyName>userAgent</includeMdcKeyName>
-                    <includeMdcKeyName>method</includeMdcKeyName>
-                    <includeMdcKeyName>uri</includeMdcKeyName>
-                    <includeMdcKeyName>httpStatus</includeMdcKeyName>
-                    <includeMdcKeyName>duration</includeMdcKeyName>
-                </mdc>
+                <mdc/>
             </providers>
         </encoder>
     </appender>
@@ -60,15 +52,7 @@
                     <fieldName>stacktrace</fieldName>
                 </stackTrace>
 
-                <mdc>
-                    <includeMdcKeyName>traceId</includeMdcKeyName>
-                    <includeMdcKeyName>remoteAddr</includeMdcKeyName>
-                    <includeMdcKeyName>userAgent</includeMdcKeyName>
-                    <includeMdcKeyName>method</includeMdcKeyName>
-                    <includeMdcKeyName>uri</includeMdcKeyName>
-                    <includeMdcKeyName>httpStatus</includeMdcKeyName>
-                    <includeMdcKeyName>duration</includeMdcKeyName>
-                </mdc>
+                <mdc/>
             </providers>
         </encoder>
 
@@ -77,6 +61,10 @@
             <maxHistory>30</maxHistory>
         </rollingPolicy>
     </appender>
+
+    <logger name="turip.csv" level="INFO" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
 
     <root level="INFO">
         <appender-ref ref="FILE"/>
