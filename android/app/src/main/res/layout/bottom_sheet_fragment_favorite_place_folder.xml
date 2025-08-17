@@ -24,6 +24,7 @@
         android:layout_marginTop="20dp"
         android:text="@string/bottom_sheet_favorite_place_folder_title"
         android:textAppearance="@style/title3"
+        android:textColor="@color/pure_black_151515"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/iv_bottom_sheet_folder_favorite_place_drag_handle"
         tools:text="폴더 목록" />
