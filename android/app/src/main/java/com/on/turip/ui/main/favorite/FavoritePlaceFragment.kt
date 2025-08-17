@@ -1,5 +1,6 @@
 package com.on.turip.ui.main.favorite
 
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,6 +10,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.on.turip.databinding.FragmentFavoritePlaceBinding
 import com.on.turip.ui.common.base.BaseFragment
+import com.on.turip.ui.folder.FolderActivity
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
 
 class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
@@ -46,6 +48,7 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
         super.onViewCreated(view, savedInstanceState)
 
         setupAdapters()
+        setupListeners()
     }
 
     private fun setupAdapters() {
@@ -54,6 +57,13 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
             addOnItemTouchListener(RecyclerViewTouchInterceptor)
         }
         binding.rvFavoritePlacePlace.adapter = placeAdapter
+    }
+
+    private fun setupListeners() {
+        binding.ivFavoritePlaceFolder.setOnClickListener {
+            val intent: Intent = FolderActivity.newIntent(requireContext())
+            startActivity(intent)
+        }
     }
 
     companion object {
