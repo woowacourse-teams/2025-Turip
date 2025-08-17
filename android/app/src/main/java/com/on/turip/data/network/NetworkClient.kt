@@ -3,6 +3,7 @@ package com.on.turip.data.network
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.on.turip.BuildConfig
 import com.on.turip.di.RepositoryModule
+import com.on.turip.domain.userstorage.repository.UserStorageRepository
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
@@ -27,7 +28,7 @@ object NetworkClient {
     private val client: OkHttpClient by lazy {
         OkHttpClient
             .Builder()
-            .addInterceptor(createHeaderInterceptor())
+            .addInterceptor(createHeaderInterceptor(RepositoryModule.userStorageRepository))
             .addInterceptor(createLoggingInterceptor())
             .build()
     }
@@ -42,17 +43,15 @@ object NetworkClient {
                 }
         }
 
-    private fun createHeaderInterceptor(): Interceptor =
+    private fun createHeaderInterceptor(userStorageRepository: UserStorageRepository): Interceptor =
         Interceptor { chain ->
             val fid =
                 runBlocking {
-                    RepositoryModule.userStorageRepository
+                    userStorageRepository
                         .loadId()
                         .getOrNull()
                         ?.fid ?: ""
                 }
-            Timber.d("FID: $fid")
-
             val newRequest =
                 chain
                     .request()
