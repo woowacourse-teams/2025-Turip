@@ -71,12 +71,9 @@ class DefaultContentRemoteDataSource(
             }
         }
 
-    override suspend fun getContentDetail(
-        contentId: Long,
-        fid: String,
-    ): TuripCustomResult<ContentDetailResponse> =
+    override suspend fun getContentDetail(contentId: Long): TuripCustomResult<ContentDetailResponse> =
         withContext(coroutineContext) {
-            safeApiCall { contentService.getContentDetail(contentId, fid) }
+            safeApiCall { contentService.getContentDetail(contentId) }
         }
 
     override suspend fun getUsersLikeContents(size: Int): TuripCustomResult<UsersLikeContentsResponse> =

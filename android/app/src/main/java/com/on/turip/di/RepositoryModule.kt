@@ -17,7 +17,7 @@ import com.on.turip.domain.userstorage.repository.UserStorageRepository
 
 object RepositoryModule {
     val contentRepository: ContentRepository by lazy {
-        DefaultContentRepository(DataSourceModule.contentRemoteDataSource, userStorageRepository)
+        DefaultContentRepository(DataSourceModule.contentRemoteDataSource)
     }
     val creatorRepository: CreatorRepository by lazy {
         DefaultCreatorRepository(DataSourceModule.creatorRemoteDataSource)
@@ -32,7 +32,7 @@ object RepositoryModule {
         DefaultUserStorageRepository(DataSourceModule.userStorageLocalDataSource)
     }
     val favoriteRepository: FavoriteRepository by lazy {
-        DefaultFavoriteRepository(DataSourceModule.favoriteRemoteDataSource, userStorageRepository)
+        DefaultFavoriteRepository(DataSourceModule.favoriteRemoteDataSource)
     }
     val searchHistoryRepository: SearchHistoryRepository by lazy {
         DefaultSearchHistoryRepository(DataSourceModule.searchHistoryDataSource)
