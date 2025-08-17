@@ -13,21 +13,21 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpStatusException.class)
     public ResponseEntity<ErrorResponse> handleHttpStatusException(HttpStatusException e) {
-        log.warn(e.getMessage());
+        log.warn(e.getMessage(), e);
         return ResponseEntity.status(e.getStatus())
                 .body(new ErrorResponse(e.getMessage()));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException e) {
-        log.warn(e.getMessage());
+        log.warn(e.getMessage(), e);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponse(e.getMessage()));
     }
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ErrorResponse> handleNotCaughtExceptions(final RuntimeException e) {
-        log.error(e.getMessage());
+        log.error(e.getMessage(), e);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ErrorResponse("서버에서 예기치 못한 예외가 발생하였습니다."));
     }
