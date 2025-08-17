@@ -70,4 +70,8 @@ class FolderModifyBottomSheetFragment : BaseBottomSheetFragment<BottomSheetFragm
             viewModel.updateFolderName(text.toString())
         }
     }
+
+    companion object {
+        fun instance(): FolderModifyBottomSheetFragment = FolderModifyBottomSheetFragment()
+    }
 }

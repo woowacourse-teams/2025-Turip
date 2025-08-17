@@ -70,4 +70,8 @@ class FolderAddBottomSheetFragment : BaseBottomSheetFragment<BottomSheetFragment
             viewModel.updateFolderName(text.toString())
         }
     }
+
+    companion object {
+        fun instance(): FolderAddBottomSheetFragment = FolderAddBottomSheetFragment()
+    }
 }
