@@ -26,7 +26,7 @@ class FolderViewHolder(
     fun bind(folderModel: FolderModel) {
         this.folderModel = folderModel
 
-        binding.tvFolderTitle.text = folderModel.title
+        binding.tvFolderName.text = folderModel.name
         binding.tvFolderPlaceCount.text =
             itemView.context.getString(R.string.all_total_place_count, folderModel.count)
     }

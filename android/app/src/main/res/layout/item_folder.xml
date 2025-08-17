@@ -30,7 +30,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
-            android:id="@+id/tv_folder_title"
+            android:id="@+id/tv_folder_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="8dp"
@@ -50,9 +50,9 @@
             android:layout_marginEnd="10dp"
             android:textAppearance="@style/info2"
             android:textColor="@color/gray_300_5b5b5b"
-            app:layout_constraintBottom_toBottomOf="@id/tv_folder_title"
+            app:layout_constraintBottom_toBottomOf="@id/tv_folder_name"
             app:layout_constraintEnd_toEndOf="@id/cl_folder_item"
-            app:layout_constraintTop_toTopOf="@id/tv_folder_title"
+            app:layout_constraintTop_toTopOf="@id/tv_folder_name"
             tools:text="장소 10개" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
