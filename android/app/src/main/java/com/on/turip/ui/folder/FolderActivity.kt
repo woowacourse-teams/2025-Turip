@@ -47,6 +47,9 @@ class FolderActivity : BaseActivity<ActivityFolderBinding>() {
             val bottomSheet: FolderAddBottomSheetFragment = FolderAddBottomSheetFragment.instance()
             bottomSheet.show(supportFragmentManager, "folder_add")
         }
+        binding.ivFavoriteBack.setOnClickListener {
+            finish()
+        }
     }
 
     companion object {
