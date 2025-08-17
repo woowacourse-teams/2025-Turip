@@ -24,11 +24,14 @@ import turip.exception.custom.NotFoundException;
 import turip.favoritefolder.controller.dto.request.FavoriteFolderNameRequest;
 import turip.favoritefolder.controller.dto.request.FavoriteFolderRequest;
 import turip.favoritefolder.controller.dto.response.FavoriteFolderResponse;
+import turip.favoritefolder.controller.dto.response.FavoriteFoldersWithFavoriteStatusResponse;
 import turip.favoritefolder.controller.dto.response.FavoriteFoldersWithPlaceCountResponse;
 import turip.favoritefolder.domain.FavoriteFolder;
 import turip.favoritefolder.repository.FavoriteFolderRepository;
 import turip.favoriteplace.repository.FavoritePlaceRepository;
 import turip.member.domain.Member;
+import turip.place.domain.Place;
+import turip.place.repository.PlaceRepository;
 
 @ExtendWith(MockitoExtension.class)
 class FavoriteFolderServiceTest {
@@ -41,6 +44,9 @@ class FavoriteFolderServiceTest {
 
     @Mock
     private FavoritePlaceRepository favoritePlaceRepository;
+
+    @Mock
+    private PlaceRepository placeRepository;
 
     @DisplayName("커스텀 장소 찜 폴더 생성 테스트")
     @Nested
@@ -147,6 +153,63 @@ class FavoriteFolderServiceTest {
                             favoriteFolderPlaceCount),
                     () -> assertThat(response.favoriteFolders().get(1).name()).isEqualTo("커스텀 폴더 1")
             );
+        }
+    }
+
+    @DisplayName("특정 회원의 장소 찜 폴더 목록과 장소 찜 여부 조회 테스트")
+    @Nested
+    class FindAllWithFavoriteStatusByDeviceId {
+
+        @DisplayName("기기 id에 대한 찜 폴더 목록과 찜 여부를 조회할 수 있다")
+        @Test
+        void findAllWithFavoriteStatusByDeviceId1() {
+            // given
+            String deviceFid = "testDeviceFid";
+            Member member = new Member(deviceFid);
+            Member savedMember = new Member(1L, member.getDeviceFid());
+
+            FavoriteFolder defaultFolder = new FavoriteFolder(1L, savedMember, "기본 폴더", true);
+            FavoriteFolder favoriteFolder = new FavoriteFolder(2L, savedMember, "커스텀 폴더 1", true);
+            given(favoriteFolderRepository.findAllByMember(savedMember))
+                    .willReturn(List.of(defaultFolder, favoriteFolder));
+
+            Long placeId = 1L;
+            Place place = new Place(placeId, "장소", "url", "주소", 1, 1);
+            given(placeRepository.findById(placeId))
+                    .willReturn(Optional.of(place));
+
+            given(favoritePlaceRepository.existsByFavoriteFolderAndPlace(defaultFolder, place))
+                    .willReturn(true);
+            given(favoritePlaceRepository.existsByFavoriteFolderAndPlace(favoriteFolder, place))
+                    .willReturn(false);
+
+            // when
+            FavoriteFoldersWithFavoriteStatusResponse response = favoriteFolderService.findAllWithFavoriteStatusByDeviceId(
+                    savedMember, placeId);
+
+            // then
+            assertAll(
+                    () -> assertThat(response.favoriteFolders().get(0).isFavoritePlace()).isTrue(),
+                    () -> assertThat(response.favoriteFolders().get(1).isFavoritePlace()).isFalse()
+            );
+        }
+
+        @DisplayName("placeId에 대한 장소를 찾지 못한 경우 NotFoundException을 발생시킨다")
+        @Test
+        void findAllWithFavoriteStatusByDeviceId2() {
+            // given
+            String deviceFid = "testDeviceFid";
+            Member member = new Member(deviceFid);
+            Member savedMember = new Member(1L, member.getDeviceFid());
+
+            Long placeId = 1L;
+            given(placeRepository.findById(placeId))
+                    .willReturn(Optional.empty());
+
+            // when
+            assertThatThrownBy(() -> favoriteFolderService.findAllWithFavoriteStatusByDeviceId(savedMember, placeId))
+                    .isInstanceOf(NotFoundException.class)
+                    .hasMessage("해당 id에 대한 장소가 존재하지 않습니다.");
         }
     }
 

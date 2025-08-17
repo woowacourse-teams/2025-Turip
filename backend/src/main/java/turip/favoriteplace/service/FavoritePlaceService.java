@@ -1,5 +1,6 @@
 package turip.favoriteplace.service;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,6 +10,8 @@ import turip.exception.custom.NotFoundException;
 import turip.favoritefolder.domain.FavoriteFolder;
 import turip.favoritefolder.repository.FavoriteFolderRepository;
 import turip.favoriteplace.controller.dto.response.FavoritePlaceResponse;
+import turip.favoriteplace.controller.dto.response.FavoritePlaceWithDetailPlaceInformationResponse;
+import turip.favoriteplace.controller.dto.response.FavoritePlacesWithDetailPlaceInformationResponse;
 import turip.favoriteplace.domain.FavoritePlace;
 import turip.favoriteplace.repository.FavoritePlaceRepository;
 import turip.member.domain.Member;
@@ -35,6 +38,17 @@ public class FavoritePlaceService {
         FavoritePlace savedFavoritePlace = favoritePlaceRepository.save(favoritePlace);
 
         return FavoritePlaceResponse.from(savedFavoritePlace);
+    }
+
+    public FavoritePlacesWithDetailPlaceInformationResponse findAllByFolder(Long favoriteFolderId) {
+        FavoriteFolder favoriteFolder = getFavoriteFolderById(favoriteFolderId);
+
+        List<FavoritePlaceWithDetailPlaceInformationResponse> favoritePlaces = favoritePlaceRepository.findAllByFavoriteFolder(
+                        favoriteFolder).stream()
+                .map(FavoritePlaceWithDetailPlaceInformationResponse::from)
+                .toList();
+
+        return FavoritePlacesWithDetailPlaceInformationResponse.from(favoritePlaces);
     }
 
     @Transactional

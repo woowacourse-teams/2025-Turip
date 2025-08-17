@@ -11,12 +11,16 @@ import turip.exception.custom.NotFoundException;
 import turip.favoritefolder.controller.dto.request.FavoriteFolderNameRequest;
 import turip.favoritefolder.controller.dto.request.FavoriteFolderRequest;
 import turip.favoritefolder.controller.dto.response.FavoriteFolderResponse;
+import turip.favoritefolder.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse;
 import turip.favoritefolder.controller.dto.response.FavoriteFolderWithPlaceCountResponse;
+import turip.favoritefolder.controller.dto.response.FavoriteFoldersWithFavoriteStatusResponse;
 import turip.favoritefolder.controller.dto.response.FavoriteFoldersWithPlaceCountResponse;
 import turip.favoritefolder.domain.FavoriteFolder;
 import turip.favoritefolder.repository.FavoriteFolderRepository;
 import turip.favoriteplace.repository.FavoritePlaceRepository;
 import turip.member.domain.Member;
+import turip.place.domain.Place;
+import turip.place.repository.PlaceRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +28,7 @@ public class FavoriteFolderService {
 
     private final FavoriteFolderRepository favoriteFolderRepository;
     private final FavoritePlaceRepository favoritePlaceRepository;
+    private final PlaceRepository placeRepository;
 
     @Transactional
     public FavoriteFolderResponse createCustomFavoriteFolder(FavoriteFolderRequest request, Member member) {
@@ -45,6 +50,21 @@ public class FavoriteFolderService {
                 .toList();
 
         return FavoriteFoldersWithPlaceCountResponse.from(favoriteFoldersWithPlaceCount);
+    }
+
+    public FavoriteFoldersWithFavoriteStatusResponse findAllWithFavoriteStatusByDeviceId(Member member, Long placeId) {
+        Place place = getPlaceById(placeId);
+
+        List<FavoriteFolderWithFavoriteStatusResponse> favoriteFoldersWithFavoriteStatus = favoriteFolderRepository.findAllByMember(
+                        member).stream()
+                .map(favoriteFolder -> {
+                    boolean isFavoritePlace = favoritePlaceRepository.existsByFavoriteFolderAndPlace(favoriteFolder,
+                            place);
+                    return FavoriteFolderWithFavoriteStatusResponse.of(favoriteFolder, isFavoritePlace);
+                })
+                .toList();
+
+        return FavoriteFoldersWithFavoriteStatusResponse.from(favoriteFoldersWithFavoriteStatus);
     }
 
     @Transactional
@@ -79,6 +99,11 @@ public class FavoriteFolderService {
         if (favoriteFolderRepository.existsByNameAndMember(folderName, member)) {
             throw new ConflictException("중복된 폴더 이름이 존재합니다.");
         }
+    }
+
+    private Place getPlaceById(Long id) {
+        return placeRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("해당 id에 대한 장소가 존재하지 않습니다."));
     }
 
     private FavoriteFolder getById(Long favoriteFolderId) {
