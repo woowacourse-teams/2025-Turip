@@ -28,34 +28,138 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="28dp"
         android:ellipsize="end"
         android:maxLines="1"
         android:textAppearance="@style/title1"
         android:textColor="@color/pure_white_ffffff"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/iv_travel_place_link"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@id/tv_travel_place_category"
         app:layout_constraintTop_toBottomOf="@id/tv_travel_place_category"
         tools:text="경포대 해수욕장경포대 해수욕장경포대 해수욕장경포대 해수욕장" />
 
-    <ImageView
-        android:id="@+id/iv_travel_place_link"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_travel_place_time_line"
         android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_marginEnd="10dp"
-        android:contentDescription="@null"
-        android:padding="15dp"
-        android:src="@drawable/btn_map_link"
-        app:layout_constraintBottom_toBottomOf="@id/tv_travel_place_category"
-        app:layout_constraintDimensionRatio="1:1"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/tv_travel_place_name"
-        app:tint="@color/turip_lemon_faff60" />
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        app:layout_constraintEnd_toStartOf="@id/view_travel_place_divider1"
+        app:layout_constraintHorizontal_chainStyle="spread_inside"
+        app:layout_constraintStart_toStartOf="@id/tv_travel_place_name"
+        app:layout_constraintTop_toBottomOf="@id/tv_travel_place_name">
+
+        <ImageView
+            android:id="@+id/iv_travel_place_time_line"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@null"
+            android:paddingVertical="8dp"
+            android:src="@drawable/ic_youtuber_badge"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/turip_lemon_faff60" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:textAppearance="@style/info1"
+            android:textColor="@color/pure_white_ffffff"
+            app:layout_constraintBottom_toBottomOf="@id/iv_travel_place_time_line"
+            app:layout_constraintStart_toEndOf="@id/iv_travel_place_time_line"
+            app:layout_constraintTop_toTopOf="@id/iv_travel_place_time_line"
+            tools:text="33:03~" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <View
-        android:layout_width="match_parent"
-        android:layout_height="23dp"
-        app:layout_constraintStart_toStartOf="@id/tv_travel_place_category"
-        app:layout_constraintTop_toBottomOf="@id/tv_travel_place_category" />
+        android:id="@+id/view_travel_place_divider1"
+        android:layout_width="1dp"
+        android:layout_height="0dp"
+        android:layout_marginVertical="8dp"
+        android:background="@color/pure_white_ffffff"
+        app:layout_constraintBottom_toBottomOf="@id/cl_travel_place_time_line"
+        app:layout_constraintEnd_toStartOf="@id/cl_travel_place_map"
+        app:layout_constraintStart_toEndOf="@id/cl_travel_place_time_line"
+        app:layout_constraintTop_toTopOf="@id/cl_travel_place_time_line" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_travel_place_map"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        app:layout_constraintBottom_toBottomOf="@id/cl_travel_place_time_line"
+        app:layout_constraintEnd_toStartOf="@id/view_travel_place_divider2"
+        app:layout_constraintStart_toEndOf="@id/view_travel_place_divider1"
+        app:layout_constraintTop_toTopOf="@id/cl_travel_place_time_line">
+
+        <ImageView
+            android:id="@+id/iv_travel_place_map"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_map"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/turip_lemon_faff60" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="@string/travel_place_map"
+            android:textAppearance="@style/info1"
+            android:textColor="@color/pure_white_ffffff"
+            app:layout_constraintBottom_toBottomOf="@id/iv_travel_place_map"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/iv_travel_place_map"
+            app:layout_constraintTop_toTopOf="@id/iv_travel_place_map" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <View
+        android:id="@+id/view_travel_place_divider2"
+        android:layout_width="1dp"
+        android:layout_height="0dp"
+        android:layout_marginVertical="8dp"
+        android:background="@color/pure_white_ffffff"
+        app:layout_constraintBottom_toBottomOf="@id/cl_travel_place_map"
+        app:layout_constraintEnd_toStartOf="@id/cl_travel_place_favorite"
+        app:layout_constraintStart_toEndOf="@id/cl_travel_place_map"
+        app:layout_constraintTop_toTopOf="@id/cl_travel_place_map" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_travel_place_favorite"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingVertical="8dp"
+        app:layout_constraintBottom_toBottomOf="@id/view_travel_place_divider2"
+        app:layout_constraintEnd_toEndOf="@id/tv_travel_place_name"
+        app:layout_constraintStart_toEndOf="@id/view_travel_place_divider2"
+        app:layout_constraintTop_toTopOf="@id/view_travel_place_divider2">
+
+        <ImageView
+            android:id="@+id/iv_travel_place_favorite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@null"
+            android:src="@drawable/btn_favorite_lemon"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="@string/travel_place_favorite"
+            android:textAppearance="@style/info1"
+            android:textColor="@color/pure_white_ffffff"
+            app:layout_constraintBottom_toBottomOf="@id/iv_travel_place_favorite"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/iv_travel_place_favorite"
+            app:layout_constraintTop_toTopOf="@id/iv_travel_place_favorite" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
