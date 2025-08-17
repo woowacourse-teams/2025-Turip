@@ -197,7 +197,7 @@ class TripDetailViewModel(
             creatorId: Long,
             contentRepository: ContentRepository = RepositoryModule.contentRepository,
             creatorRepository: CreatorRepository = RepositoryModule.creatorRepository,
-            travelRepository: ContentPlaceRepository = RepositoryModule.contentPlaceRepository,
+            contentPlaceRepository: ContentPlaceRepository = RepositoryModule.contentPlaceRepository,
             updateFavoriteUseCase: UpdateFavoriteUseCase = UpdateFavoriteUseCase(RepositoryModule.favoriteRepository),
         ): ViewModelProvider.Factory =
             viewModelFactory {
@@ -207,7 +207,7 @@ class TripDetailViewModel(
                         creatorId,
                         contentRepository,
                         creatorRepository,
-                        travelRepository,
+                        contentPlaceRepository,
                         updateFavoriteUseCase,
                     )
                 }

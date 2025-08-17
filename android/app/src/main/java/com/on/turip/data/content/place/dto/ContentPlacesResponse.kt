@@ -4,9 +4,9 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class TripResponse(
+data class ContentPlacesResponse(
     @SerialName("contentPlaces")
-    val tripCourses: List<TripCourseResponse>,
+    val contentPlaces: List<ContentPlaceResponse>,
     @SerialName("tripDuration")
     val tripDuration: TripDurationResponse,
     @SerialName("contentPlaceCount")

@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class TripCourseResponse(
+data class ContentPlaceResponse(
     @SerialName("id")
     val id: Long,
     @SerialName("place")

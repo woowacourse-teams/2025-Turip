@@ -1,20 +1,21 @@
 package com.on.turip.data.content.place
 
 import com.on.turip.data.content.place.dto.CategoryResponse
+import com.on.turip.data.content.place.dto.ContentPlaceResponse
+import com.on.turip.data.content.place.dto.ContentPlacesResponse
 import com.on.turip.data.content.place.dto.PlaceResponse
-import com.on.turip.data.content.place.dto.TripCourseResponse
 import com.on.turip.data.content.place.dto.TripDurationResponse
-import com.on.turip.data.content.place.dto.TripResponse
 import com.on.turip.domain.trip.ContentPlace
 import com.on.turip.domain.trip.Place
 import com.on.turip.domain.trip.Trip
 import com.on.turip.domain.trip.TripDuration
+import kotlin.collections.map
 
-fun TripResponse.toDomain(): Trip =
+fun ContentPlacesResponse.toDomain(): Trip =
     Trip(
         tripDuration = tripDuration.toDomain(),
         tripPlaceCount = contentPlaceCount,
-        contentPlaces = tripCourses.map(TripCourseResponse::toDomain),
+        contentPlaces = contentPlaces.map(ContentPlaceResponse::toDomain),
     )
 
 fun TripDurationResponse.toDomain(): TripDuration =
@@ -23,7 +24,7 @@ fun TripDurationResponse.toDomain(): TripDuration =
         days = days,
     )
 
-fun TripCourseResponse.toDomain(): ContentPlace =
+fun ContentPlaceResponse.toDomain(): ContentPlace =
     ContentPlace(
         tripCourseId = id,
         visitDay = visitDay,
