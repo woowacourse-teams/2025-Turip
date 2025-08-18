@@ -10,6 +10,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,6 +19,7 @@ import turip.place.domain.Place;
 
 @Getter
 @Entity
+@AllArgsConstructor
 @Table(name = "favorite_place", uniqueConstraints = {
     @UniqueConstraint(name = "uq_favorite_place__folder_place", columnNames = {"favorite_folder_id", "place_id"})
 })
@@ -37,4 +39,9 @@ public class FavoritePlace {
     @ManyToOne
     @JoinColumn(name = "place_id", nullable = false, foreignKey = @ForeignKey(name = "fk_favorite_place__place"))
     private Place place;
+
+    public FavoritePlace(FavoriteFolder favoriteFolder, Place place) {
+        this.favoriteFolder = favoriteFolder;
+        this.place = place;
+    }
 }

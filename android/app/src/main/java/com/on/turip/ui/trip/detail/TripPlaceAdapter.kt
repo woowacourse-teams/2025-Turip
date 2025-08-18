@@ -5,7 +5,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 
 class TripPlaceAdapter(
-    private val onClickListener: TripPlaceViewHolder.OnPlaceListener,
+    private val onClickListener: TripPlaceViewHolder.PlaceListener,
 ) : ListAdapter<PlaceModel, TripPlaceViewHolder>(TravelPlaceDiffUtil) {
     override fun onCreateViewHolder(
         parent: ViewGroup,

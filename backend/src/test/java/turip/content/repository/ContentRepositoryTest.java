@@ -22,6 +22,8 @@ import turip.country.domain.Country;
 import turip.country.repository.CountryRepository;
 import turip.creator.domain.Creator;
 import turip.creator.repository.CreatorRepository;
+import turip.province.domain.Province;
+import turip.province.repository.ProvinceRepository;
 
 @DataJpaTest
 @ActiveProfiles("test")
@@ -55,10 +57,10 @@ class ContentRepositoryTest {
             // 기존 데이터가 있으면 사용하고, 없으면 새로 생성
             Country country = countryRepository.findByName("대한민국")
                     .orElseGet(() -> countryRepository.save(new Country("대한민국", "https://example.com/korea.jpg")));
-            
+
             City city = cityRepository.findByName("서울")
                     .orElseGet(() -> cityRepository.save(new City(country, null, "서울", "https://example.com/seoul.jpg")));
-            
+
             Creator may = new Creator("여행하는 메이", "https://example.com/may.jpg");
             Creator moong = new Creator("여행하는 뭉치", "https://example.com/moong.jpg");
             Content mayContent1 = new Content(may, city, "메이의 대구 여행", "https://example.com/may1", LocalDate.now());
@@ -94,10 +96,10 @@ class ContentRepositoryTest {
             // 기존 데이터가 있으면 사용하고, 없으면 새로 생성
             Country country = countryRepository.findByName("대한민국")
                     .orElseGet(() -> countryRepository.save(new Country("대한민국", "https://example.com/korea.jpg")));
-            
+
             City city = cityRepository.findByName("서울")
                     .orElseGet(() -> cityRepository.save(new City(country, null, "서울", "https://example.com/seoul.jpg")));
-            
+
             Creator may = new Creator("여행하는 메이", "https://example.com/may.jpg");
             Creator moong = new Creator("여행하는 뭉치", "https://example.com/moong.jpg");
             Content mayContent1 = new Content(may, city, "메이의 대구 여행", "https://example.com/may1", LocalDate.now());
@@ -125,10 +127,10 @@ class ContentRepositoryTest {
             // 기존 데이터가 있으면 사용하고, 없으면 새로 생성
             Country country = countryRepository.findByName("대한민국")
                     .orElseGet(() -> countryRepository.save(new Country("대한민국", "https://example.com/korea.jpg")));
-            
+
             City city = cityRepository.findByName("서울")
                     .orElseGet(() -> cityRepository.save(new City(country, null, "서울", "https://example.com/seoul.jpg")));
-            
+
             Creator creator = new Creator("여행하는 " + keyword, "https://example.com/creator.jpg");
             Content content1 = new Content(creator, city, keyword + "의 대구 여행", "https://example.com/content1", LocalDate.now());
             Content content2 = new Content(creator, city, keyword + "의 부산 여행", "https://example.com/content2", LocalDate.now());

@@ -1,6 +1,7 @@
 package turip.favoritefolder.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -16,15 +17,17 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import turip.auth.AuthMember;
+import turip.auth.MemberResolvePolicy;
 import turip.exception.ErrorResponse;
 import turip.favoritefolder.controller.dto.request.FavoriteFolderNameRequest;
 import turip.favoritefolder.controller.dto.request.FavoriteFolderRequest;
 import turip.favoritefolder.controller.dto.response.FavoriteFolderResponse;
 import turip.favoritefolder.controller.dto.response.FavoriteFoldersWithPlaceCountResponse;
 import turip.favoritefolder.service.FavoriteFolderService;
+import turip.member.domain.Member;
 
 @RestController
 @RequiredArgsConstructor
@@ -108,9 +111,10 @@ public class FavoriteFolderController {
             )
     })
     @PostMapping
-    public ResponseEntity<FavoriteFolderResponse> create(@RequestHeader("device-fid") String deviceFid,
-                                                         @RequestBody FavoriteFolderRequest request) {
-        FavoriteFolderResponse response = favoriteFolderService.createCustomFavoriteFolder(request, deviceFid);
+    public ResponseEntity<FavoriteFolderResponse> create(
+            @Parameter(hidden = true) @AuthMember(policy = MemberResolvePolicy.CREATE_IF_ABSENT) Member member,
+            @RequestBody FavoriteFolderRequest request) {
+        FavoriteFolderResponse response = favoriteFolderService.createCustomFavoriteFolder(request, member);
         return ResponseEntity.created(URI.create("/favorite-folders/" + response.id()))
                 .body(response);
     }
@@ -155,8 +159,8 @@ public class FavoriteFolderController {
     })
     @GetMapping
     public ResponseEntity<FavoriteFoldersWithPlaceCountResponse> readAllByMember(
-            @RequestHeader("device-fid") String deviceFid) {
-        FavoriteFoldersWithPlaceCountResponse response = favoriteFolderService.findAllByDeviceFid(deviceFid);
+            @Parameter(hidden = true) @AuthMember(policy = MemberResolvePolicy.CREATE_IF_ABSENT) Member member) {
+        FavoriteFoldersWithPlaceCountResponse response = favoriteFolderService.findAllByMember(member);
         return ResponseEntity.ok(response);
     }
 
@@ -291,11 +295,11 @@ public class FavoriteFolderController {
     })
     @PatchMapping("/{favoriteFolderId}")
     public ResponseEntity<FavoriteFolderResponse> updateName(
-            @RequestHeader("device-fid") String deviceFid,
+            @Parameter(hidden = true) @AuthMember(policy = MemberResolvePolicy.REQUIRED) Member member,
             @PathVariable Long favoriteFolderId,
             @RequestBody FavoriteFolderNameRequest request
     ) {
-        FavoriteFolderResponse response = favoriteFolderService.updateName(deviceFid, favoriteFolderId, request);
+        FavoriteFolderResponse response = favoriteFolderService.updateName(member, favoriteFolderId, request);
         return ResponseEntity.ok(response);
     }
 
@@ -366,9 +370,10 @@ public class FavoriteFolderController {
             )
     })
     @DeleteMapping("/{favoriteFolderId}")
-    public ResponseEntity<Void> delete(@RequestHeader("device-fid") String deviceFid,
-                                       @PathVariable Long favoriteFolderId) {
-        favoriteFolderService.remove(deviceFid, favoriteFolderId);
+    public ResponseEntity<Void> delete(
+            @Parameter(hidden = true) @AuthMember(policy = MemberResolvePolicy.REQUIRED) Member member,
+            @PathVariable Long favoriteFolderId) {
+        favoriteFolderService.remove(member, favoriteFolderId);
         return ResponseEntity.noContent().build();
     }
 }

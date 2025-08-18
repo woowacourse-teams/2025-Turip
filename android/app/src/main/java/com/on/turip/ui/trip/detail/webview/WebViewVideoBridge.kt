@@ -15,4 +15,7 @@ class WebViewVideoBridge(
             onError()
         }
     }
+
+    @JavascriptInterface
+    fun seekToSecond(seconds: Int): Int = seconds
 }
