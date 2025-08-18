@@ -82,7 +82,7 @@ public interface ContentRepository extends JpaRepository<Content, Long> {
                    OR cr.channelName LIKE %:keyword%
                    OR p.name LIKE %:keyword%
             """)
-    int countByKeywordContaining(String keyword);
+    int countByKeywordContaining(@Param("keyword") String keyword);
 
     @Query("""
                 SELECT DISTINCT c FROM Content c
@@ -95,5 +95,5 @@ public interface ContentRepository extends JpaRepository<Content, Long> {
                      OR p.name LIKE %:keyword%)
                 ORDER BY c.id DESC
             """)
-    Slice<Content> findByKeywordContaining(String keyword, Long lastId, Pageable pageable);
+    Slice<Content> findByKeywordContaining(@Param("keyword") String keyword, @Param("lastId") Long lastId, Pageable pageable);
 }
