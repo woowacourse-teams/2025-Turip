@@ -70,13 +70,20 @@ public class DevDataInitializer implements CommandLineRunner {
 
             // CSV 파일에서 링크들 읽기
             List<String> lines = Files.readAllLines(tempFile, StandardCharsets.UTF_8);
-
+            
             for (String line : lines) {
                 String trimmedLine = line.trim();
-                if (!trimmedLine.isEmpty() && (trimmedLine.startsWith("http://") || trimmedLine.startsWith(
-                        "https://"))) {
-                    csvUrls.add(trimmedLine);
-                    log.debug("CSV 링크 추가: {}", trimmedLine);
+                if (!trimmedLine.isEmpty()) {
+                    // 꺾쇠 괄호(<>) 제거
+                    String cleanUrl = trimmedLine.replaceAll("[<>]", "");
+                    
+                    // HTTP/HTTPS로 시작하는지 확인
+                    if (cleanUrl.startsWith("http://") || cleanUrl.startsWith("https://")) {
+                        csvUrls.add(cleanUrl);
+                        log.debug("CSV 링크 추가: {}", cleanUrl);
+                    } else {
+                        log.debug("유효하지 않은 링크 형식 무시: {}", trimmedLine);
+                    }
                 }
             }
 
