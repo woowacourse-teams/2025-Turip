@@ -216,6 +216,91 @@ class ContentApiTest {
                     .body("contents.size()", is(1))
                     .body("loadable", is(true));
         }
+
+        @DisplayName("place name 조건이 추가된 findByKeywordContaining 테스트 - 연관 장소가 있을 때만 반환")
+        @Test
+        void readByKeyword_placeNameConditionTest() {
+            // given
+            jdbcTemplate.update(
+                    "INSERT INTO creator (profile_image, channel_name) VALUES ('', '여행블로거')");
+            jdbcTemplate.update("INSERT INTO country (name) VALUES ('대한민국')");
+            jdbcTemplate.update("INSERT INTO city (name, country_id) VALUES ('서울', 1)");
+
+            // 장소가 포함된 컨텐츠
+            jdbcTemplate.update(
+                    "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 1, '', '서울 맛집 투어', '2025-07-01')");
+            jdbcTemplate.update(
+                    "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('명동교자', '', '서울 중구', 1, 1)");
+            jdbcTemplate.update(
+                    "INSERT INTO content_place (visit_day, visit_order, time_line, place_id, content_id) VALUES (1, 1, '00:10:00', 1, 1)");
+
+            // 장소가 포함되지 않은 컨텐츠
+            jdbcTemplate.update(
+                    "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 1, '', '서울 관광 가이드', '2025-07-02')");
+
+            // when & then
+            // 1. place name으로 검색 시
+            RestAssured.given().port(port)
+                    .queryParam("keyword", "명동교자")
+                    .queryParam("size", 2)
+                    .queryParam("lastId", 0)
+                    .when().get("/contents/keyword")
+                    .then()
+                    .statusCode(200)
+                    .body("contents.size()", is(1));
+
+            // 2. title로 검색 시
+            RestAssured.given().port(port)
+                    .queryParam("keyword", "서울")
+                    .queryParam("size", 2)
+                    .queryParam("lastId", 0)
+                    .when().get("/contents/keyword")
+                    .then()
+                    .statusCode(200)
+                    .body("contents.size()", is(2));
+
+            // 3. creator name으로 검색 시
+            RestAssured.given().port(port)
+                    .queryParam("keyword", "여행블로거")
+                    .queryParam("size", 2)
+                    .queryParam("lastId", 0)
+                    .when().get("/contents/keyword")
+                    .then()
+                    .statusCode(200)
+                    .body("contents.size()", is(2));
+        }
+
+        @DisplayName("place name 검색 시 연관 장소가 없으면 반환되지 않음")
+        @Test
+        void readByKeyword_placeNameWithoutRelatedPlace() {
+            // given
+            jdbcTemplate.update(
+                    "INSERT INTO creator (profile_image, channel_name) VALUES ('', '맛집탐방가')");
+            jdbcTemplate.update("INSERT INTO country (name, image_url) VALUES ('대한민국', '')");
+            jdbcTemplate.update("INSERT INTO city (name, country_id, image_url) VALUES ('부산', 1, '')");
+            jdbcTemplate.update(
+                    "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 1, '', '부산 여행 후기', '2025-07-01')");
+
+            // when & then
+            RestAssured.given().port(port)
+                    .queryParam("keyword", "해운대해수욕장")
+                    .queryParam("size", 2)
+                    .queryParam("lastId", 0)
+                    .when().get("/contents/keyword")
+                    .then()
+                    .statusCode(200)
+                    .body("contents.size()", is(0))
+                    .body("loadable", is(false));
+
+            RestAssured.given().port(port)
+                    .queryParam("keyword", "부산")
+                    .queryParam("size", 2)
+                    .queryParam("lastId", 0)
+                    .when().get("/contents/keyword")
+                    .then()
+                    .statusCode(200)
+                    .body("contents.size()", is(1));
+        }
     }
 
     @DisplayName("/contents/popular/favorites GET 주간 인기 컨텐츠 조회 테스트")
