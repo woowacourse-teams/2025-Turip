@@ -4,8 +4,8 @@
 CREATE TABLE IF NOT EXISTS country
 (
     id        BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name      VARCHAR(255)   NOT NULL UNIQUE,
-    image_url VARCHAR(65535) NOT NULL
+    name      VARCHAR(100) NOT NULL UNIQUE,
+    image_url VARCHAR(255) NOT NULL
 );
 
 -- 주 테이블
@@ -19,10 +19,10 @@ CREATE TABLE IF NOT EXISTS province
 CREATE TABLE IF NOT EXISTS city
 (
     id          BIGINT AUTO_INCREMENT PRIMARY KEY,
-    country_id  BIGINT         NOT NULL,
-    province_id BIGINT         NULL, -- 해외는 주를 표기하지 않는다.
-    name        VARCHAR(255)   NOT NULL,
-    image_url   VARCHAR(65535) NOT NULL,
+    country_id  BIGINT       NOT NULL,
+    province_id BIGINT       NULL, -- 해외는 주를 표기하지 않는다.
+    name        VARCHAR(255) NOT NULL,
+    image_url   VARCHAR(255) NOT NULL,
     CONSTRAINT fk_city_country
         FOREIGN KEY (country_id) REFERENCES country (id),
     CONSTRAINT fk_city_province
@@ -33,8 +33,8 @@ CREATE TABLE IF NOT EXISTS city
 CREATE TABLE IF NOT EXISTS creator
 (
     id            BIGINT AUTO_INCREMENT PRIMARY KEY,
-    channel_name  VARCHAR(50)    NOT NULL UNIQUE,
-    profile_image VARCHAR(65535) NOT NULL
+    channel_name  VARCHAR(255) NOT NULL UNIQUE,
+    profile_image VARCHAR(255) NOT NULL
 );
 
 -- 카테고리 테이블
@@ -56,11 +56,11 @@ CREATE TABLE IF NOT EXISTS member
 CREATE TABLE IF NOT EXISTS content
 (
     id            BIGINT AUTO_INCREMENT PRIMARY KEY,
-    creator_id    BIGINT         NOT NULL,
-    city_id       BIGINT         NOT NULL,
-    title         VARCHAR(100)   NOT NULL,
-    url           VARCHAR(65535) NOT NULL,
-    uploaded_date DATE           NOT NULL,
+    creator_id    BIGINT       NOT NULL,
+    city_id       BIGINT       NOT NULL,
+    title         VARCHAR(255) NOT NULL,
+    url           VARCHAR(255) NOT NULL,
+    uploaded_date DATE         NOT NULL,
 
     CONSTRAINT fk_content_creator
         FOREIGN KEY (creator_id) REFERENCES creator (id),
@@ -75,12 +75,12 @@ CREATE TABLE IF NOT EXISTS content
 CREATE TABLE IF NOT EXISTS place
 (
     id        BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name      VARCHAR(255)   NOT NULL,
-    url       VARCHAR(65535) NOT NULL UNIQUE,
-    address   VARCHAR(255)   NOT NULL,
+    name      VARCHAR(255) NOT NULL,
+    url       VARCHAR(500) NOT NULL UNIQUE,
+    address   VARCHAR(255) NOT NULL,
 
-    latitude  DOUBLE         NOT NULL,
-    longitude DOUBLE         NOT NULL
+    latitude  DOUBLE       NOT NULL,
+    longitude DOUBLE       NOT NULL
 );
 
 -- 장소 카테고리 테이블
@@ -127,7 +127,7 @@ CREATE TABLE IF NOT EXISTS favorite_folder
 (
     id         BIGINT AUTO_INCREMENT PRIMARY KEY,
     member_id  BIGINT       NOT NULL,
-    name       VARCHAR(255) NOT NULL,
+    name       VARCHAR(100) NOT NULL,
     is_default BOOLEAN      NOT NULL, -- 기본 폴더 여부
 
     CONSTRAINT fk_favorite_folder__member
