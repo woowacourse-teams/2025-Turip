@@ -7,4 +7,9 @@ interface FolderRepository {
     suspend fun loadFavoriteFolders(): TuripCustomResult<List<Folder>>
 
     suspend fun createFavoriteFolder(name: String): TuripCustomResult<Unit>
+
+    suspend fun updateFavoriteFolder(
+        folderId: Long,
+        updateName: String,
+    ): TuripCustomResult<Unit>
 }
