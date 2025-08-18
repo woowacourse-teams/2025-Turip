@@ -236,8 +236,8 @@ class ContentApiTest {
             // given
             jdbcTemplate.update(
                     "INSERT INTO creator (profile_image, channel_name) VALUES ('', '여행블로거')");
-            jdbcTemplate.update("INSERT INTO country (name) VALUES ('대한민국')");
-            jdbcTemplate.update("INSERT INTO city (name, country_id) VALUES ('서울', 1)");
+            jdbcTemplate.update("INSERT INTO country (name, image_url) VALUES ('대한민국', '')");
+            jdbcTemplate.update("INSERT INTO city (name, country_id, image_url) VALUES ('서울', 1, '')");
 
             // 장소가 포함된 컨텐츠
             jdbcTemplate.update(
