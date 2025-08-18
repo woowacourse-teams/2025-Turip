@@ -17,10 +17,17 @@ import com.on.turip.ui.main.favorite.model.HelpInformationModel
 import com.on.turip.ui.main.favorite.model.HelpInformationModelType
 
 class FavoriteHelpInformationBottomSheetFragment : BaseBottomSheetFragment<BottomSheetFragmentFavoriteHelpInformationBinding>() {
-    private val viewModel: FavoriteHelpInformationViewModel by viewModels()
-    private val inquireMailUri: Uri by lazy {
-        "mailto:$EMAIL_RECIPIENT?subject=${Uri.encode(EMAIL_SUBJECT)}&body=${Uri.encode(EMAIL_BODY)}".toUri()
+    private val viewModel: FavoriteHelpInformationViewModel by viewModels {
+        FavoriteHelpInformationViewModel.provideFactory()
     }
+
+    private val inquireMailUri: Uri
+        get() {
+            val fid = viewModel.userId.value?.fid ?: ""
+            return "mailto:$EMAIL_RECIPIENT?subject=${Uri.encode(EMAIL_SUBJECT)}&body=${
+                Uri.encode(String.format(EMAIL_BODY, fid))
+            }".toUri()
+        }
 
     private val helpInformationAdapter: FavoriteHelpInformationAdapter by lazy {
         FavoriteHelpInformationAdapter { helpInformationModel: HelpInformationModel ->
@@ -30,9 +37,8 @@ class FavoriteHelpInformationBottomSheetFragment : BaseBottomSheetFragment<Botto
 
     private fun openInquiryForm() {
         val intent: Intent =
-            Intent(Intent.ACTION_SENDTO).apply {
-                data = inquireMailUri
-            }
+            Intent(Intent.ACTION_SENDTO).apply { data = inquireMailUri }
+
         startActivity(intent)
     }
 
@@ -113,6 +119,7 @@ class FavoriteHelpInformationBottomSheetFragment : BaseBottomSheetFragment<Botto
             사용자의 튜립 앱 버전: ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})
             사용자의 OS: Android ${Build.VERSION.RELEASE} (SDK ${Build.VERSION.SDK_INT})
             사용자 기기: ${Build.MANUFACTURER} ${Build.MODEL}
+            사용자 ID: %s
             """.trimIndent()
         private const val PRIVACY_POLICY_LINK =
             "https://agate-bandana-491.notion.site/23aeabcebdc180299e11d3bb2fbfaf67?source=copy_link"
