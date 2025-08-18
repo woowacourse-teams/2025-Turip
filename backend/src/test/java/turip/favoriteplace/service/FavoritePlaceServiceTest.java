@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.BDDMockito.given;
 
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -20,6 +21,7 @@ import turip.exception.custom.NotFoundException;
 import turip.favoritefolder.domain.FavoriteFolder;
 import turip.favoritefolder.repository.FavoriteFolderRepository;
 import turip.favoriteplace.controller.dto.response.FavoritePlaceResponse;
+import turip.favoriteplace.controller.dto.response.FavoritePlacesWithDetailPlaceInformationResponse;
 import turip.favoriteplace.domain.FavoritePlace;
 import turip.favoriteplace.repository.FavoritePlaceRepository;
 import turip.member.domain.Member;
@@ -165,6 +167,54 @@ class FavoritePlaceServiceTest {
             // when & then
             assertThatThrownBy(() -> favoritePlaceService.create(member, favoriteFolderId, placeId))
                     .isInstanceOf(ConflictException.class);
+        }
+    }
+
+    @DisplayName("특정 폴더의 장소 찜 조회 테스트")
+    @Nested
+    class FindAllByFolder {
+
+        @DisplayName("특정 폴더의 장소 찜 폴더를 조회할 수 있다")
+        @Test
+        void findAllByFolder1() {
+            // given
+            Long favoriteFolderId = 1L;
+            Member member = new Member(1L, "testDeviceFid");
+            FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, member, "테스트 폴더", false);
+            Place place1 = new Place(1L, null, null, null, 1, 1);
+            Place place2 = new Place(2L, null, null, null, 2, 2);
+            FavoritePlace favoritePlace1 = new FavoritePlace(1L, favoriteFolder, place1);
+            FavoritePlace favoritePlace2 = new FavoritePlace(2L, favoriteFolder, place2);
+
+            given(favoriteFolderRepository.findById(favoriteFolderId))
+                    .willReturn(Optional.of(favoriteFolder));
+            given(favoritePlaceRepository.findAllByFavoriteFolder(favoriteFolder))
+                    .willReturn(List.of(favoritePlace1, favoritePlace2));
+
+            // when
+            FavoritePlacesWithDetailPlaceInformationResponse response = favoritePlaceService.findAllByFolder(
+                    favoriteFolderId);
+
+            // then
+            assertAll(
+                    () -> assertThat(response.favoritePlaceCount()).isEqualTo(2),
+                    () -> assertThat(response.favoritePlaces().get(0).id()).isEqualTo(1L),
+                    () -> assertThat(response.favoritePlaces().get(1).id()).isEqualTo(2L)
+            );
+        }
+
+        @DisplayName("favoriteFolderId에 대한 폴더가 존재하지 않는 경우 NotFoundException을 발생시킨다")
+        @Test
+        void findAllByFolder2() {
+            // given
+            Long favoriteFolderId = 1L;
+            given(favoriteFolderRepository.findById(favoriteFolderId))
+                    .willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> favoritePlaceService.findAllByFolder(favoriteFolderId))
+                    .isInstanceOf(NotFoundException.class)
+                    .hasMessage("해당 id에 대한 폴더가 존재하지 않습니다.");
         }
     }
 
