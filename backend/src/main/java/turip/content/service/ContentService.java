@@ -32,7 +32,6 @@ import turip.exception.custom.BadRequestException;
 import turip.exception.custom.NotFoundException;
 import turip.favoritecontent.repository.FavoriteContentRepository;
 import turip.member.domain.Member;
-import turip.member.repository.MemberRepository;
 import turip.regioncategory.domain.DomesticRegionCategory;
 import turip.regioncategory.domain.OverseasRegionCategory;
 
@@ -46,19 +45,12 @@ public class ContentService {
 
     private final ContentRepository contentRepository;
     private final ContentPlaceService contentPlaceService;
-    private final MemberRepository memberRepository;
     private final FavoriteContentRepository favoriteContentRepository;
 
-    public ContentResponse getContentWithFavoriteStatus(Long contentId, String deviceFid) {
+    public ContentResponse getContentWithFavoriteStatus(Long contentId, Member member) {
         Content content = contentRepository.findById(contentId)
                 .orElseThrow(() -> new NotFoundException("컨텐츠를 찾을 수 없습니다."));
-        if (deviceFid == null) {
-            return ContentResponse.of(content, false);
-        }
-        boolean isFavorite = memberRepository.findByDeviceFid(deviceFid)
-                .map(member -> favoriteContentRepository.existsByMemberIdAndContentId(member.getId(), content.getId()))
-                .orElse(false);
-
+        boolean isFavorite = favoriteContentRepository.existsByMemberIdAndContentId(member.getId(), content.getId());
         return ContentResponse.of(content, isFavorite);
     }
 
@@ -82,22 +74,14 @@ public class ContentService {
         return ContentsByRegionCategoryResponse.of(contentDetails, loadable, regionCategory);
     }
 
-    public WeeklyPopularFavoriteContentsResponse findWeeklyPopularFavoriteContents(String deviceFid,
-                                                                                   int topContentSize) {
+    public WeeklyPopularFavoriteContentsResponse findWeeklyPopularFavoriteContents(Member member, int topContentSize) {
         List<LocalDate> lastWeekPeriod = getLastWeekPeriod();
         LocalDate startDate = lastWeekPeriod.getFirst();
         LocalDate endDate = lastWeekPeriod.getLast();
 
         List<Content> popularContents = favoriteContentRepository.findPopularContentsByFavoriteBetweenDatesWithLimit(
                 startDate, endDate, topContentSize);
-        if (deviceFid == null) {
-            return convertContentsToPopularContentsResponse(popularContents, false);
-        }
-        Member member = memberRepository.findByDeviceFid(deviceFid)
-                .orElse(null);
-        if (member == null) {
-            return convertContentsToPopularContentsResponse(popularContents, false);
-        }
+
         Set<Long> favoritedContentIds = findFavoritedContentIds(member, popularContents);
 
         return WeeklyPopularFavoriteContentsResponse.from(

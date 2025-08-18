@@ -126,13 +126,15 @@ class TripDetailViewModel(
         placeCacheByDay =
             dayModels.associate { dayModel ->
                 val day: Int = dayModel.day
-                val coursesForDay: List<ContentPlace> = trip.contentPlaces.filter { it.visitDay == day }
+                val coursesForDay: List<ContentPlace> =
+                    trip.contentPlaces.filter { it.visitDay == day }
                 val placeModels: List<PlaceModel> =
                     coursesForDay.map { course ->
                         PlaceModel(
                             name = course.place.name,
                             category = course.place.category.joinToString(),
                             mapLink = course.place.url,
+                            timeLine = course.timeLine,
                         )
                     }
                 day to placeModels

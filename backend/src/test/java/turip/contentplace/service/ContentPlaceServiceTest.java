@@ -3,6 +3,7 @@ package turip.contentplace.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -13,10 +14,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import turip.category.domain.Category;
+import turip.city.domain.City;
+import turip.content.domain.Content;
 import turip.contentplace.controller.dto.response.ContentPlaceDetailResponse;
 import turip.contentplace.domain.ContentPlace;
 import turip.contentplace.repository.ContentPlaceRepository;
+import turip.country.domain.Country;
+import turip.creator.domain.Creator;
 import turip.place.domain.Place;
+import turip.province.domain.Province;
 
 @ExtendWith(MockitoExtension.class)
 class ContentPlaceServiceTest {
@@ -58,8 +64,16 @@ class ContentPlaceServiceTest {
 
         LocalTime firstDayTimeLine = LocalTime.parse("00:11:30");
         LocalTime secondDayTimeLine = LocalTime.parse("00:13:30");
-        ContentPlace firstContentPlace = new ContentPlace(firstVisitDay, visitOrder, firstDayTimeLine, place1, null);
-        ContentPlace secondContentPlace = new ContentPlace(secondVisitDay, visitOrder, secondDayTimeLine, place2, null);
+
+        Creator creator = new Creator(1L, "여행하는 뭉치", "프로필 사진 경로");
+        Country country = new Country(1L, "대한민국", "대한민국 사진 경로");
+        Province province = new Province(1L, "강원도");
+        City city = new City(1L, country, province, "속초", "시 이미지 경로");
+        Content content = new Content(contentId, creator, city, "뭉치의 속초 브이로그", "속초 브이로그 Url", LocalDate.of(2025, 7, 8));
+
+        ContentPlace firstContentPlace = new ContentPlace(firstVisitDay, visitOrder, firstDayTimeLine, place1, content);
+        ContentPlace secondContentPlace = new ContentPlace(secondVisitDay, visitOrder, secondDayTimeLine, place2,
+                content);
 
         // when
         given(contentPlaceRepository.findAllByContentId(contentId))
@@ -101,8 +115,16 @@ class ContentPlaceServiceTest {
 
         LocalTime firstDayTimeLine = LocalTime.parse("00:11:30");
         LocalTime secondDayTimeLine = LocalTime.parse("00:13:30");
-        ContentPlace firstContentPlace = new ContentPlace(firstVisitDay, visitOrder, firstDayTimeLine, place1, null);
-        ContentPlace secondContentPlace = new ContentPlace(secondVisitDay, visitOrder, secondDayTimeLine, place2, null);
+
+        Creator creator = new Creator(1L, "여행하는 뭉치", "프로필 사진 경로");
+        Country country = new Country(1L, "대한민국", "대한민국 사진 경로");
+        Province province = new Province(1L, "강원도");
+        City city = new City(1L, country, province, "속초", "시 이미지 경로");
+        Content content = new Content(contentId, creator, city, "뭉치의 속초 브이로그", "속초 브이로그 Url", LocalDate.of(2025, 7, 8));
+
+        ContentPlace firstContentPlace = new ContentPlace(firstVisitDay, visitOrder, firstDayTimeLine, place1, content);
+        ContentPlace secondContentPlace = new ContentPlace(secondVisitDay, visitOrder, secondDayTimeLine, place2,
+                content);
 
         // when
         given(contentPlaceRepository.findAllByContentId(contentId))
@@ -112,7 +134,6 @@ class ContentPlaceServiceTest {
         // then
         assertThat(response.contentPlaces().get(0).timeLine()).isEqualTo(LocalTime.parse("00:11:30"));
         assertThat(response.contentPlaces().get(1).timeLine()).isEqualTo(LocalTime.parse("00:13:30"));
-        ;
     }
 
     @DisplayName("여행 코스의 여행 기간 계산")
@@ -128,11 +149,38 @@ class ContentPlaceServiceTest {
             int visitOrder = 1;
             long contentId = 1L;
 
+            Place place1 = new Place(
+                    1L,
+                    "경포대 해수욕장",
+                    "https://naver.me/5UrZAIeY",
+                    "경포대 해수욕장의 도로명 주소",
+                    38.1234,
+                    127.23123
+            );
+            place1.addCategory(new Category("관광지"));
+            Place place2 = new Place(
+                    2L,
+                    "하우스멜",
+                    "https://naver.me/test",
+                    "하우스멜의 도로명 주소",
+                    38.0001,
+                    127.12345
+            );
+
             LocalTime firstDayTimeLine = LocalTime.parse("11:30");
             LocalTime secondDayTimeLine = LocalTime.parse("13:30");
-            ContentPlace firstContentPlace = new ContentPlace(firstVisitDay, visitOrder, firstDayTimeLine, null, null);
-            ContentPlace secondContentPlace = new ContentPlace(secondVisitDay, visitOrder, secondDayTimeLine, null,
-                    null);
+
+            Creator creator = new Creator(1L, "여행하는 뭉치", "프로필 사진 경로");
+            Country country = new Country(1L, "대한민국", "대한민국 사진 경로");
+            Province province = new Province(1L, "강원도");
+            City city = new City(1L, country, province, "속초", "시 이미지 경로");
+            Content content = new Content(contentId, creator, city, "뭉치의 속초 브이로그", "속초 브이로그 Url",
+                    LocalDate.of(2025, 7, 8));
+
+            ContentPlace firstContentPlace = new ContentPlace(firstVisitDay, visitOrder, firstDayTimeLine, place1,
+                    content);
+            ContentPlace secondContentPlace = new ContentPlace(secondVisitDay, visitOrder, secondDayTimeLine, place2,
+                    content);
 
             // when
             given(contentPlaceRepository.findAllByContentId(contentId))
