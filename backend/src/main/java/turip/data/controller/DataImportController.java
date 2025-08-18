@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import turip.data.service.CsvDataImportService;
 
@@ -28,14 +27,6 @@ public class DataImportController {
 
     @Value("${csv.import.password:}")
     private String csvImportPassword;
-
-    @PostMapping("/import")
-    public ResponseEntity<String> importCsvData(
-            @RequestParam String csvUrl,
-            @RequestParam String password) {
-
-        return processCsvImport(csvUrl, password);
-    }
 
     @PostMapping("/import-body")
     public ResponseEntity<String> importCsvDataFromBody(
@@ -87,15 +78,12 @@ public class DataImportController {
         }
     }
 
-    /**
-     * CSV URL 형식이 유효한지 검증
-     */
     private boolean isValidCsvUrl(String csvUrl) {
         if (csvUrl == null || csvUrl.trim().isEmpty()) {
             return false;
         }
 
-        // HTTPS URL인지 확인
+        // HTTPS URL 인지 확인
         if (!csvUrl.startsWith("https://")) {
             return false;
         }
@@ -104,9 +92,6 @@ public class DataImportController {
         return csvUrl.toLowerCase().endsWith(".csv");
     }
 
-    /**
-     * 다운로드된 파일이 유효한 CSV 파일인지 검증
-     */
     private boolean isValidCsvFile(Path filePath) throws IOException {
         if (!Files.exists(filePath)) {
             return false;
@@ -129,9 +114,6 @@ public class DataImportController {
         return true;
     }
 
-    /**
-     * HTTP URL에서 CSV 파일 다운로드
-     */
     private Path downloadCsvFromUrl(String urlString) throws IOException {
         log.info("CSV 파일 다운로드 시작: {}", urlString);
 
@@ -143,7 +125,6 @@ public class DataImportController {
             log.info("CSV 파일 다운로드 완료: {} -> {} ({} bytes)", urlString, tempFile, bytesCopied);
         } catch (IOException e) {
             log.error("CSV 파일 다운로드 중 오류 발생: {} - {}", urlString, e.getMessage());
-            // 임시 파일 정리
             Files.deleteIfExists(tempFile);
             throw e;
         }
