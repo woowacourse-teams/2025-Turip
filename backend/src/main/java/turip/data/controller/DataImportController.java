@@ -22,7 +22,7 @@ import turip.data.service.CsvDataImportService;
 @Profile("!test")
 @RequiredArgsConstructor
 @RequestMapping("/api/csv")
-public class CsvImportController {
+public class DataImportController {
 
     private final CsvDataImportService csvDataImportService;
 
@@ -94,12 +94,12 @@ public class CsvImportController {
         if (csvUrl == null || csvUrl.trim().isEmpty()) {
             return false;
         }
-        
+
         // HTTPS URL인지 확인
         if (!csvUrl.startsWith("https://")) {
             return false;
         }
-        
+
         // CSV 파일 확장자인지 확인
         return csvUrl.toLowerCase().endsWith(".csv");
     }
@@ -134,7 +134,7 @@ public class CsvImportController {
      */
     private Path downloadCsvFromUrl(String urlString) throws IOException {
         log.info("CSV 파일 다운로드 시작: {}", urlString);
-        
+
         URL url = new URL(urlString);
         Path tempFile = Files.createTempFile("csv_import_", ".csv");
 
@@ -152,5 +152,6 @@ public class CsvImportController {
     }
 
     // Request DTO
-    public record CsvImportRequest(String csvUrl, String password) {}
+    public record CsvImportRequest(String csvUrl, String password) {
+    }
 } 

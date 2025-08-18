@@ -21,7 +21,7 @@ import turip.data.service.CsvDataImportService;
 @Profile("!test")
 @RequiredArgsConstructor
 @ConditionalOnProperty(name = "spring.profiles.active", havingValue = "dev")
-public class CsvDataInitializer implements CommandLineRunner {
+public class DevDataInitializer implements CommandLineRunner {
 
     private final CsvDataImportService csvDataImportService;
     private final JdbcTemplate jdbcTemplate;
