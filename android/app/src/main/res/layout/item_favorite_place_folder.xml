@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="14dp"
+    android:background="@color/pure_white_ffffff">
+
+    <ImageView
+        android:id="@+id/iv_favorite_place_folder_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:background="@drawable/bg_gray300_radius_10dp"
+        android:contentDescription="@null"
+        android:paddingHorizontal="10dp"
+        android:paddingVertical="8dp"
+        android:src="@drawable/ic_folder"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_favorite_place_folder_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="20dp"
+        android:textAppearance="@style/info1"
+        android:textColor="@color/pure_black_151515"
+        app:layout_constraintBottom_toBottomOf="@id/iv_favorite_place_folder_icon"
+        app:layout_constraintEnd_toStartOf="@id/iv_favorite_place_folder_favorite"
+        app:layout_constraintStart_toEndOf="@id/iv_favorite_place_folder_icon"
+        app:layout_constraintTop_toTopOf="@id/iv_favorite_place_folder_icon"
+        tools:text="튜립 수원 여행 후보지!" />
+
+    <ImageView
+        android:id="@+id/iv_favorite_place_folder_favorite"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="20dp"
+        android:contentDescription="@null"
+        android:padding="10dp"
+        android:src="@drawable/btn_favorite_red"
+        app:layout_constraintBottom_toBottomOf="@id/iv_favorite_place_folder_icon"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/iv_favorite_place_folder_icon" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
