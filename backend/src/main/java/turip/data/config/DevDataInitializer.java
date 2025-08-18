@@ -3,6 +3,8 @@ package turip.data.config;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -23,10 +25,9 @@ import turip.data.service.DataImportService;
 @ConditionalOnProperty(name = "spring.profiles.active", havingValue = "dev")
 public class DevDataInitializer implements CommandLineRunner {
 
-    // CSV 파일 링크 상수 정의
-    private static final String CSV_URL_1 = "https://example.com/data1.csv";
-    private static final String CSV_URL_2 = "https://example.com/data2.csv";
-    private static final String CSV_URL_3 = "https://example.com/data3.csv";
+    // CSV 파일 링크 모음집 URL
+    private static final String CSV_LINKS_COLLECTION_URL = "https://example.com/csv파일링크모음집.csv";
+    
     private final DataImportService dataImportService;
     private final CsvFileService csvFileService;
     private final JdbcTemplate jdbcTemplate;
@@ -34,8 +35,16 @@ public class DevDataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) {
         try {
+            // CSV 파일 링크 모음집 다운로드 및 링크 추출
+            List<String> csvUrls = downloadAndExtractCsvLinks();
+            
+            if (csvUrls.isEmpty()) {
+                log.warn("CSV 링크를 찾을 수 없습니다. CSV 파일 링크 모음집을 확인해주세요.");
+                return;
+            }
+
             // CSV 파일들 import 실행
-            importCsvFiles();
+            importCsvFiles(csvUrls);
 
             // CSV import 완료 후 favorite_content_data.sql 실행
             executeDataSql();
@@ -45,9 +54,44 @@ public class DevDataInitializer implements CommandLineRunner {
         }
     }
 
-    private void importCsvFiles() {
-        String[] csvUrls = {CSV_URL_1, CSV_URL_2, CSV_URL_3};
+    private List<String> downloadAndExtractCsvLinks() {
+        List<String> csvUrls = new ArrayList<>();
+        
+        try {
+            log.info("CSV 파일 링크 모음집 다운로드 시작: {}", CSV_LINKS_COLLECTION_URL);
+            
+            // CSV 파일 링크 모음집 다운로드
+            Path tempFile = csvFileService.downloadCsvFromUrl(CSV_LINKS_COLLECTION_URL);
+            
+            if (!csvFileService.isValidCsvFile(tempFile)) {
+                log.error("유효하지 않은 CSV 파일 링크 모음집: {}", CSV_LINKS_COLLECTION_URL);
+                return csvUrls;
+            }
+            
+            // CSV 파일에서 링크들 읽기
+            List<String> lines = Files.readAllLines(tempFile, StandardCharsets.UTF_8);
+            
+            for (String line : lines) {
+                String trimmedLine = line.trim();
+                if (!trimmedLine.isEmpty() && (trimmedLine.startsWith("http://") || trimmedLine.startsWith("https://"))) {
+                    csvUrls.add(trimmedLine);
+                    log.debug("CSV 링크 추가: {}", trimmedLine);
+                }
+            }
+            
+            // 임시 파일 삭제
+            Files.deleteIfExists(tempFile);
+            
+            log.info("CSV 파일 링크 {}개를 성공적으로 추출했습니다.", csvUrls.size());
+            
+        } catch (Exception e) {
+            log.error("CSV 파일 링크 모음집 다운로드 및 링크 추출 실패: {}", e.getMessage(), e);
+        }
+        
+        return csvUrls;
+    }
 
+    private void importCsvFiles(List<String> csvUrls) {
         for (String csvUrl : csvUrls) {
             try {
                 log.info("CSV 파일 import 시작: {}", csvUrl);
