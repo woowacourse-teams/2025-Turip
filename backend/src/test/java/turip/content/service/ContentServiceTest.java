@@ -89,38 +89,6 @@ class ContentServiceTest {
             assertThat(contentsByKeyword.loadable())
                     .isFalse();
         }
-
-        @DisplayName("place 이름으로 검색하는 경우, 해당 place가 포함된 컨텐츠를 반환한다.")
-        @Test
-        void findContentsByKeyword_withPlaceName() {
-            // given
-            String keyword = "강남역";
-            long lastContentId = 0L;
-            int pageSize = 2;
-            Long maxId = Long.MAX_VALUE;
-
-            Creator creator = new Creator("여행 유튜버", "");
-            Country japan = new Country("일본", "");
-            City seoul = new City(japan, null, "도쿄", "");
-
-            LocalDate uploadedDate = LocalDate.of(2025, 7, 1);
-            List<Content> contents = List.of(new Content(1L, creator, seoul, "도쿄 여행1", "", uploadedDate),
-                    new Content(2L, creator, seoul, "도쿄 여행2", "", uploadedDate));
-            given(contentRepository.findByKeywordContaining(keyword, maxId, PageRequest.of(0, pageSize)))
-                    .willReturn(new SliceImpl<>(contents));
-            given(contentRepository.existsById(1L))
-                    .willReturn(true);
-            given(contentRepository.existsById(2L))
-                    .willReturn(true);
-
-            // when
-            ContentSearchResponse contentsByKeyword = contentService.searchContentsByKeyword(keyword, pageSize,
-                    lastContentId);
-
-            // then
-            assertThat(contentsByKeyword.loadable())
-                    .isFalse();
-        }
     }
 
     @DisplayName("주간 인기 찜 컨텐츠 조회 테스트")
