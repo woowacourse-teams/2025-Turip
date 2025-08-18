@@ -8,7 +8,7 @@ import com.on.turip.databinding.ItemTravelPlaceBinding
 
 class TripPlaceViewHolder(
     private val binding: ItemTravelPlaceBinding,
-    onClickListener: OnPlaceListener,
+    onClickListener: PlaceListener,
 ) : RecyclerView.ViewHolder(binding.root) {
     private var placeModel: PlaceModel? = null
 
@@ -44,7 +44,7 @@ class TripPlaceViewHolder(
     companion object {
         fun of(
             parent: ViewGroup,
-            onClickListener: OnPlaceListener,
+            onClickListener: PlaceListener,
         ): TripPlaceViewHolder {
             val inflater: LayoutInflater = LayoutInflater.from(parent.context)
             val binding: ItemTravelPlaceBinding =
@@ -53,7 +53,7 @@ class TripPlaceViewHolder(
         }
     }
 
-    interface OnPlaceListener {
+    interface PlaceListener {
         fun onPlaceClick(placeModel: PlaceModel)
 
         fun onTimeLineClick(placeModel: PlaceModel)
