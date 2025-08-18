@@ -28,6 +28,11 @@
             }
         });
     }
+    function seekToSecond(seconds) {
+        if(player && typeof player.seekTo == 'function') {
+            player.seekTo(seconds, true);
+        }
+    }
 
     function onPlayerReady(event) {
         event.target.playVideo();
@@ -38,6 +43,7 @@
             window.videoBridge.onPlayerError(event.data);
         }
     }
+
 </script>
 </body>
 </html>
