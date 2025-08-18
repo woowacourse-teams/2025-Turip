@@ -1,9 +1,11 @@
 package turip.data.config;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
+import java.io.IOException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -23,46 +25,95 @@ import turip.data.service.CsvDataImportService;
 @ConditionalOnProperty(name = "spring.profiles.active", havingValue = "dev")
 public class DevDataInitializer implements CommandLineRunner {
 
+    // CSV 파일 링크 상수 정의
+    private static final String CSV_URL_1 = "https://example.com/data1.csv";
+    private static final String CSV_URL_2 = "https://example.com/data2.csv";
+    private static final String CSV_URL_3 = "https://example.com/data3.csv";
     private final CsvDataImportService csvDataImportService;
     private final JdbcTemplate jdbcTemplate;
 
     @Override
     public void run(String... args) {
         try {
-            // 리소스 패턴으로 CSV 찾기 (resources 하위 모든 폴더 포함)
-            Resource[] csvResources = new PathMatchingResourcePatternResolver()
-                    .getResources("classpath*:/**/*.csv");
-
-            if (csvResources.length == 0) {
-                log.warn("import 할 CSV 파일이 없습니다.");
-            } else {
-                log.info("찾은 CSV 파일 개수: {}", csvResources.length);
-                for (Resource resource : csvResources) {
-                    log.info("import 대상 CSV 파일: {}", resource.getFilename());
-
-                    // 임시 파일로 복사
-                    File tempFile = File.createTempFile("csv_import_", ".csv");
-                    tempFile.deleteOnExit();
-
-                    try (InputStream inputStream = resource.getInputStream();
-                         FileOutputStream outputStream = new FileOutputStream(tempFile)) {
-                        inputStream.transferTo(outputStream);
-                    }
-
-                    // CSV 데이터 import 실행
-                    csvDataImportService.importCsvData(tempFile.getAbsolutePath());
-                    log.info("CSV 파일 import 완료: {}", resource.getFilename());
-                }
-
-                log.info("모든 CSV 파일 import 완료되었습니다.");
-            }
+            // CSV 파일들 import 실행
+            importCsvFiles();
 
             // CSV import 완료 후 favorite_content_data.sql 실행
             executeDataSql();
 
         } catch (Exception e) {
-            log.error("CSV import 중 오류 발생: {}", e.getMessage(), e);
+            log.error("데이터 초기화 중 오류 발생: {}", e.getMessage(), e);
         }
+    }
+
+    private void importCsvFiles() {
+        String[] csvUrls = {CSV_URL_1, CSV_URL_2, CSV_URL_3};
+
+        for (String csvUrl : csvUrls) {
+            try {
+                log.info("CSV 파일 import 시작: {}", csvUrl);
+
+                // CSV 파일 다운로드
+                Path tempFile = downloadCsvFromUrl(csvUrl);
+
+                // CSV 파일 검증
+                if (isValidCsvFile(tempFile)) {
+                    // CSV 데이터 import 실행
+                    csvDataImportService.importCsvData(tempFile.toString());
+                    log.info("CSV 파일 import 완료: {}", csvUrl);
+                } else {
+                    log.warn("유효하지 않은 CSV 파일: {}", csvUrl);
+                }
+
+                // 임시 파일 삭제
+                Files.deleteIfExists(tempFile);
+
+            } catch (Exception e) {
+                log.error("CSV 파일 import 실패: {} - {}", csvUrl, e.getMessage(), e);
+            }
+        }
+
+        log.info("모든 CSV 파일 import 완료되었습니다.");
+    }
+
+    private boolean isValidCsvFile(Path filePath) throws IOException {
+        if (!Files.exists(filePath)) {
+            return false;
+        }
+
+        // 파일 크기 검증 (최소 10바이트)
+        long fileSize = Files.size(filePath);
+        if (fileSize < 10) {
+            log.warn("CSV 파일이 너무 작습니다: {} bytes", fileSize);
+            return false;
+        }
+
+        // 파일 확장자 검증
+        String fileName = filePath.getFileName().toString().toLowerCase();
+        if (!fileName.endsWith(".csv")) {
+            log.warn("CSV 파일 확장자가 아닙니다: {}", fileName);
+            return false;
+        }
+
+        return true;
+    }
+
+    private Path downloadCsvFromUrl(String urlString) throws IOException {
+        log.info("CSV 파일 다운로드 시작: {}", urlString);
+
+        URL url = new URL(urlString);
+        Path tempFile = Files.createTempFile("csv_import_", ".csv");
+
+        try (var inputStream = url.openStream()) {
+            long bytesCopied = Files.copy(inputStream, tempFile, StandardCopyOption.REPLACE_EXISTING);
+            log.info("CSV 파일 다운로드 완료: {} -> {} ({} bytes)", urlString, tempFile, bytesCopied);
+        } catch (IOException e) {
+            log.error("CSV 파일 다운로드 중 오류 발생: {} - {}", urlString, e.getMessage());
+            Files.deleteIfExists(tempFile);
+            throw e;
+        }
+
+        return tempFile;
     }
 
     private void executeDataSql() {
