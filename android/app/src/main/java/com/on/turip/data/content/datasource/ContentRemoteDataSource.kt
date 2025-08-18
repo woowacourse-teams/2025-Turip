@@ -30,10 +30,7 @@ interface ContentRemoteDataSource {
         lastId: Long,
     ): TuripCustomResult<ContentsInformationResponse>
 
-    suspend fun getContentDetail(
-        contentId: Long,
-        fid: String,
-    ): TuripCustomResult<ContentDetailResponse>
+    suspend fun getContentDetail(contentId: Long): TuripCustomResult<ContentDetailResponse>
 
     suspend fun getUsersLikeContents(size: Int): TuripCustomResult<UsersLikeContentsResponse>
 }
