@@ -1,5 +1,6 @@
 package turip.favoriteplace.repository;
 
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import turip.favoritefolder.domain.FavoriteFolder;
@@ -13,4 +14,6 @@ public interface FavoritePlaceRepository extends JpaRepository<FavoritePlace, Lo
     boolean existsByFavoriteFolderAndPlace(FavoriteFolder favoriteFolder, Place place);
 
     Optional<FavoritePlace> findByFavoriteFolderAndPlace(FavoriteFolder favoriteFolder, Place place);
+
+    List<FavoritePlace> findAllByFavoriteFolder(FavoriteFolder favoriteFolder);
 }

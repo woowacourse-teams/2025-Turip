@@ -1,5 +1,7 @@
 package turip.favoriteplace.api;
 
+import static org.hamcrest.Matchers.is;
+
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,7 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class FavoritePlaceApiTest {
+class FavoritePlaceApiTest {
 
     @LocalServerPort
     private int port;
@@ -152,6 +154,49 @@ public class FavoritePlaceApiTest {
                     .when().post("/favorite-places")
                     .then()
                     .statusCode(409);
+        }
+    }
+
+    @DisplayName("/favorites-places GET 장소 찜 폴더의 장소 찜 목록 조회 테스트")
+    @Nested
+    class ReadAllByFolder {
+
+        @DisplayName("조회에 성공한 경우 200 OK 코드와 장소 찜 목록을 응답한다")
+        @Test
+        void readAllByFolder1() {
+            // given
+            jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('testDeviceFid')");
+            jdbcTemplate.update(
+                    "INSERT INTO favorite_folder (member_id, name, is_default) VALUES (1, '잠실캠 맛집 모음', false)");
+            jdbcTemplate.update(
+                    "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('루터회관','https://naver.me/5UrZAIeY', '루터회관의 도로명 주소', 38.1234, 127.23123)");
+            jdbcTemplate.update(
+                    "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('스타벅스','https://naver.me/abc123', '스타벅스의 도로명 주소', 37.5678, 126.9876)");
+            jdbcTemplate.update("INSERT INTO favorite_place (favorite_folder_id, place_id) VALUES (1, 1)");
+            jdbcTemplate.update("INSERT INTO favorite_place (favorite_folder_id, place_id) VALUES (1, 2)");
+
+            // when & then
+            RestAssured.given().port(port)
+                    .queryParam("favoriteFolderId", 1L)
+                    .contentType(ContentType.JSON)
+                    .when().get("/favorite-places")
+                    .then()
+                    .statusCode(200)
+                    .body("favoritePlaceCount", is(2))
+                    .body("favoritePlaces[0].place.name", is("루터회관"))
+                    .body("favoritePlaces[1].place.name", is("스타벅스"));
+        }
+
+        @DisplayName("favoriteFolderId에 대한 폴더가 존재하지 않는 경우 404 NOT FOUND를 응답한다")
+        @Test
+        void readAllByFolder2() {
+            // when & then
+            RestAssured.given().port(port)
+                    .queryParam("favoriteFolderId", 1L)
+                    .contentType(ContentType.JSON)
+                    .when().get("/favorite-places")
+                    .then()
+                    .statusCode(404);
         }
     }
 
