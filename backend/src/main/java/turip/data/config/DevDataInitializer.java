@@ -13,8 +13,8 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StreamUtils;
-import turip.data.service.CsvDataImportService;
 import turip.data.service.CsvFileService;
+import turip.data.service.DataImportService;
 
 @Slf4j
 @Component
@@ -27,7 +27,7 @@ public class DevDataInitializer implements CommandLineRunner {
     private static final String CSV_URL_1 = "https://example.com/data1.csv";
     private static final String CSV_URL_2 = "https://example.com/data2.csv";
     private static final String CSV_URL_3 = "https://example.com/data3.csv";
-    private final CsvDataImportService csvDataImportService;
+    private final DataImportService dataImportService;
     private final CsvFileService csvFileService;
     private final JdbcTemplate jdbcTemplate;
 
@@ -58,7 +58,7 @@ public class DevDataInitializer implements CommandLineRunner {
                 // CSV 파일 검증
                 if (csvFileService.isValidCsvFile(tempFile)) {
                     // CSV 데이터 import 실행
-                    csvDataImportService.importCsvData(tempFile.toString());
+                    dataImportService.importCsvData(tempFile.toString());
                     log.info("CSV 파일 import 완료: {}", csvUrl);
                 } else {
                     log.warn("유효하지 않은 CSV 파일: {}", csvUrl);

@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import turip.data.service.CsvDataImportService;
 import turip.data.service.CsvFileService;
+import turip.data.service.DataImportService;
 
 @Slf4j
 @RestController
@@ -22,7 +22,7 @@ import turip.data.service.CsvFileService;
 @RequestMapping("/api/csv")
 public class DataImportController {
 
-    private final CsvDataImportService csvDataImportService;
+    private final DataImportService dataImportService;
     private final CsvFileService csvFileService;
 
     @Value("${csv.import.password:}")
@@ -61,7 +61,7 @@ public class DataImportController {
             }
 
             // CSV 데이터 import 실행
-            csvDataImportService.importCsvData(tempFile.toString());
+            dataImportService.importCsvData(tempFile.toString());
 
             // 임시 파일 삭제
             Files.deleteIfExists(tempFile);
