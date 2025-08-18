@@ -1,10 +1,15 @@
 package turip.favoritefolder.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -14,6 +19,9 @@ import turip.member.domain.Member;
 
 @Getter
 @Entity
+@Table(name = "favorite_folder", uniqueConstraints = {
+        @UniqueConstraint(name = "uq_favorite_folder__member_name", columnNames = {"member_id", "name"})
+})
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -25,10 +33,13 @@ public class FavoriteFolder {
     private Long id;
 
     @ManyToOne
+    @JoinColumn(name = "member_id", nullable = false, foreignKey = @ForeignKey(name = "fk_favorite_folder__member"))
     private Member member;
 
+    @Column(name = "name", nullable = false)
     private String name;
 
+    @Column(name = "is_default", nullable = false)
     private boolean isDefault;
 
     private FavoriteFolder(Member member, String name, boolean isDefault) {
