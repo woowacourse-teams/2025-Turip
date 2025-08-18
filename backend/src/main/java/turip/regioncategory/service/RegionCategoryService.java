@@ -40,8 +40,7 @@ public class RegionCategoryService {
     private List<RegionCategoryResponse> findDomesticRegionCategories() {
         List<City> cities = cityService.findCitiesByCountryName(KOREA_COUNTRY_NAME);
 
-        List<RegionCategoryResponse> supportedCities = findSupportedCitiesWithContent(cities);
-        List<RegionCategoryResponse> results = new ArrayList<>(supportedCities);
+        List<RegionCategoryResponse> results = findSupportedCitiesWithContent(cities);
 
         addDomesticEtcCategoryIfHasContent(cities, results);
 
