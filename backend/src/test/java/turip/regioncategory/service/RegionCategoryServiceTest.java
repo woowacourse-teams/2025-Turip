@@ -1,6 +1,7 @@
 package turip.regioncategory.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
@@ -63,9 +64,11 @@ class RegionCategoryServiceTest {
         RegionCategoriesResponse response = regionCategoryService.findRegionCategoriesByCountryType(true);
 
         // then
-        assertThat(response.regionCategories()).hasSize(2); // 서울, 부산만 (국내 기타는 컨텐츠가 0개라서 제외)
-        assertThat(response.regionCategories().get(0).name()).isEqualTo("서울"); // 컨텐츠 3개
-        assertThat(response.regionCategories().get(1).name()).isEqualTo("부산"); // 컨텐츠 1개
+        assertAll(
+                () -> assertThat(response.regionCategories()).hasSize(2),
+                () -> assertThat(response.regionCategories().get(0).name()).isEqualTo("서울"),
+                () -> assertThat(response.regionCategories().get(1).name()).isEqualTo("부산")
+        );
     }
 
     @DisplayName("해외 지역 카테고리 조회 시 해외 국가 목록과 기타 카테고리를 반환한다")
@@ -94,9 +97,12 @@ class RegionCategoryServiceTest {
         RegionCategoriesResponse response = regionCategoryService.findRegionCategoriesByCountryType(false);
 
         // then
-        assertThat(response.regionCategories()).hasSize(2); // 일본, 중국만 (해외 기타는 컨텐츠가 0개라서 제외)
-        assertThat(response.regionCategories().get(0).name()).isEqualTo("일본"); // 컨텐츠 2개
-        assertThat(response.regionCategories().get(1).name()).isEqualTo("중국"); // 컨텐츠 1개
+        assertAll(
+                () -> assertThat(response.regionCategories()).hasSize(2),
+                () -> assertThat(response.regionCategories().get(0).name()).isEqualTo("일본"),
+                () -> assertThat(response.regionCategories().get(1).name()).isEqualTo("중국")
+        );
+
     }
 
     @DisplayName("지원하지 않는 도시명은 필터링되어 기타 카테고리만 반환된다")
