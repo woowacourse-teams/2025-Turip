@@ -20,27 +20,21 @@ import turip.favoritecontent.controller.dto.request.FavoriteContentRequest;
 import turip.favoritecontent.controller.dto.response.FavoriteContentResponse;
 import turip.favoritecontent.domain.FavoriteContent;
 import turip.favoritecontent.repository.FavoriteContentRepository;
-import turip.favoritefolder.domain.FavoriteFolder;
-import turip.favoritefolder.repository.FavoriteFolderRepository;
 import turip.member.domain.Member;
-import turip.member.repository.MemberRepository;
 
 @Service
 @RequiredArgsConstructor
 public class FavoriteContentService {
 
     private final FavoriteContentRepository favoriteContentRepository;
-    private final MemberRepository memberRepository;
     private final ContentRepository contentRepository;
-    private final FavoriteFolderRepository favoriteFolderRepository;
     private final ContentPlaceService contentPlaceService;
 
     @Transactional
-    public FavoriteContentResponse create(FavoriteContentRequest request, String deviceFid) {
+    public FavoriteContentResponse create(FavoriteContentRequest request, Member member) {
         Long contentId = request.contentId();
         Content content = contentRepository.findById(contentId)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 컨텐츠입니다."));
-        Member member = findOrCreateMember(deviceFid);
         if (favoriteContentRepository.existsByMemberIdAndContentId(member.getId(), content.getId())) {
             throw new BadRequestException("이미 찜한 컨텐츠입니다.");
         }
@@ -49,14 +43,11 @@ public class FavoriteContentService {
         return FavoriteContentResponse.from(savedFavoriteContent);
     }
 
-    public MyFavoriteContentsResponse findMyFavoriteContents(String deviceFid, int pageSize, long lastContentId) {
-        if (deviceFid == null) {
-            throw new BadRequestException("사용자 정보를 조회할 수 없습니다.");
-        }
+    public MyFavoriteContentsResponse findMyFavoriteContents(Member member, int pageSize, long lastContentId) {
         if (lastContentId == 0) {
             lastContentId = Long.MAX_VALUE;
         }
-        Slice<Content> contentSlice = favoriteContentRepository.findMyFavoriteContentsByDeviceFid(deviceFid,
+        Slice<Content> contentSlice = favoriteContentRepository.findMyFavoriteContentsByDeviceFid(member.getDeviceFid(),
                 lastContentId,
                 PageRequest.of(0, pageSize));
         List<Content> contents = contentSlice.getContent();
@@ -68,25 +59,13 @@ public class FavoriteContentService {
     }
 
     @Transactional
-    public void remove(String deviceFid, Long contentId) {
+    public void remove(Member member, Long contentId) {
         Content content = contentRepository.findById(contentId)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 컨텐츠입니다."));
-        Member member = memberRepository.findByDeviceFid(deviceFid)
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 사용자입니다."));
         FavoriteContent favoriteContent = favoriteContentRepository.findByMemberIdAndContentId(member.getId(),
                         content.getId())
                 .orElseThrow(() -> new NotFoundException("해당 컨텐츠는 찜한 상태가 아닙니다."));
         favoriteContentRepository.delete(favoriteContent);
-    }
-
-    private Member findOrCreateMember(String deviceFid) {
-        return memberRepository.findByDeviceFid(deviceFid)
-                .orElseGet(() -> {
-                    Member savedMember = memberRepository.save(new Member(deviceFid));
-                    FavoriteFolder defaultFolder = FavoriteFolder.defaultFolderOf(savedMember);
-                    favoriteFolderRepository.save(defaultFolder);
-                    return savedMember;
-                });
     }
 
     private TripDurationResponse calculateTripDuration(Content content) {

@@ -29,6 +29,9 @@
     <string name="region_result_video_description">%1$s · %2$s</string>
     <string name="region_result_exist_result">검색결과 %d개</string>
 
+    <!-- 컨텐츠 상세 페이지 -->
+    <string name="bottom_sheet_favorite_place_folder_title">폴더 목록</string>
+
     <!-- 홈 페이지 -->
     <string name="home_where_should_we_go_title">✈️어디로 떠나볼까요?</string>
     <string name="home_where_should_we_go_highlighting">떠나볼까요?</string>
@@ -57,6 +60,9 @@
     <string name="trip_detail_travel_day">%d일차</string>
     <string name="trip_detail_snackbar_favorite_save">컨텐츠 찜 목록에 저장했어요</string>
     <string name="trip_detail_snackbar_favorite_remove">컨텐츠 찜 목록에서 삭제했어요</string>
+    <string name="travel_place_map">지도</string>
+    <string name="travel_place_favorite">장소찜</string>
+    <string name="travel_place_time_line">%s~</string>
 
     <!-- 폴더 페이지 -->
     <string name="folder_title">폴더 편집</string>
