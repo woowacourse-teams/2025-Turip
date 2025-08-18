@@ -45,7 +45,7 @@ class DomesticRegionCategoryPagingApiTest {
         jdbcTemplate.update("ALTER TABLE country ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE province ALTER COLUMN id RESTART WITH 1");
 
-        // 크리에이터, 도시 데이터 설정
+        // 크리에이터, 도시 데이터 설정 
         jdbcTemplate.update(
                 "INSERT INTO creator (profile_image, channel_name) VALUES ('https://image.example.com/creator1.jpg', 'TravelMate')");
         jdbcTemplate.update("INSERT INTO country (name) VALUES ('대한민국')");
