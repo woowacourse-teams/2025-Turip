@@ -1,12 +1,17 @@
 package turip.data.controller;
 
-import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,30 +19,138 @@ import turip.data.service.CsvDataImportService;
 
 @Slf4j
 @RestController
+@Profile("!test")
 @RequiredArgsConstructor
 @RequestMapping("/api/csv")
 public class CsvImportController {
 
     private final CsvDataImportService csvDataImportService;
 
-    @PostMapping("/import")
-    public ResponseEntity<String> importCsvData(@RequestParam String fileName) {
-        try {
-            // resources 폴더에서 CSV 파일 찾기
-            ClassPathResource resource = new ClassPathResource(fileName);
-            File csvFile = resource.getFile();
+    @Value("${csv.import.password:}")
+    private String csvImportPassword;
 
-            if (!csvFile.exists()) {
-                return ResponseEntity.badRequest().body("CSV 파일을 찾을 수 없습니다: " + fileName);
+    @PostMapping("/import")
+    public ResponseEntity<String> importCsvData(
+            @RequestParam String csvUrl,
+            @RequestParam String password) {
+
+        return processCsvImport(csvUrl, password);
+    }
+
+    @PostMapping("/import-body")
+    public ResponseEntity<String> importCsvDataFromBody(
+            @RequestBody CsvImportRequest request) {
+
+        return processCsvImport(request.csvUrl(), request.password());
+    }
+
+    private ResponseEntity<String> processCsvImport(String csvUrl, String password) {
+        // 비밀번호 검증
+        if (!csvImportPassword.equals(password)) {
+            log.warn("잘못된 비밀번호로 CSV import 시도: {}", csvUrl);
+            return ResponseEntity.status(401).body("인증 실패: 잘못된 비밀번호입니다.");
+        }
+
+        // CSV URL 검증
+        if (!isValidCsvUrl(csvUrl)) {
+            log.warn("잘못된 CSV URL 형식: {}", csvUrl);
+            return ResponseEntity.badRequest().body("잘못된 CSV URL 형식입니다. HTTPS URL이어야 하며 .csv 확장자를 가져야 합니다.");
+        }
+
+        try {
+            log.info("CSV import 시작: {}", csvUrl);
+
+            // CSV 파일 다운로드
+            Path tempFile = downloadCsvFromUrl(csvUrl);
+
+            // CSV 파일 검증
+            if (!isValidCsvFile(tempFile)) {
+                Files.deleteIfExists(tempFile);
+                return ResponseEntity.badRequest().body("유효하지 않은 CSV 파일입니다.");
             }
 
-            csvDataImportService.importCsvData(csvFile.getAbsolutePath());
-            return ResponseEntity.ok("CSV 데이터 import 완료되었습니다.");
+            // CSV 데이터 import 실행
+            csvDataImportService.importCsvData(tempFile.toString());
+
+            // 임시 파일 삭제
+            Files.deleteIfExists(tempFile);
+
+            log.info("CSV 데이터 import 완료: {}", csvUrl);
+            return ResponseEntity.ok("CSV 데이터 import가 완료되었습니다.");
 
         } catch (IOException e) {
-            return ResponseEntity.badRequest().body("CSV 파일 읽기 실패: " + e.getMessage());
+            log.error("CSV 파일 다운로드 실패: {} - {}", csvUrl, e.getMessage(), e);
+            return ResponseEntity.badRequest().body("CSV 파일 다운로드 실패: " + e.getMessage());
         } catch (Exception e) {
+            log.error("CSV 데이터 import 실패: {} - {}", csvUrl, e.getMessage(), e);
             return ResponseEntity.internalServerError().body("CSV 데이터 import 실패: " + e.getMessage());
         }
     }
+
+    /**
+     * CSV URL 형식이 유효한지 검증
+     */
+    private boolean isValidCsvUrl(String csvUrl) {
+        if (csvUrl == null || csvUrl.trim().isEmpty()) {
+            return false;
+        }
+        
+        // HTTPS URL인지 확인
+        if (!csvUrl.startsWith("https://")) {
+            return false;
+        }
+        
+        // CSV 파일 확장자인지 확인
+        return csvUrl.toLowerCase().endsWith(".csv");
+    }
+
+    /**
+     * 다운로드된 파일이 유효한 CSV 파일인지 검증
+     */
+    private boolean isValidCsvFile(Path filePath) throws IOException {
+        if (!Files.exists(filePath)) {
+            return false;
+        }
+
+        // 파일 크기 검증 (최소 10바이트)
+        long fileSize = Files.size(filePath);
+        if (fileSize < 10) {
+            log.warn("CSV 파일이 너무 작습니다: {} bytes", fileSize);
+            return false;
+        }
+
+        // 파일 확장자 검증
+        String fileName = filePath.getFileName().toString().toLowerCase();
+        if (!fileName.endsWith(".csv")) {
+            log.warn("CSV 파일 확장자가 아닙니다: {}", fileName);
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * HTTP URL에서 CSV 파일 다운로드
+     */
+    private Path downloadCsvFromUrl(String urlString) throws IOException {
+        log.info("CSV 파일 다운로드 시작: {}", urlString);
+        
+        URL url = new URL(urlString);
+        Path tempFile = Files.createTempFile("csv_import_", ".csv");
+
+        try (var inputStream = url.openStream()) {
+            long bytesCopied = Files.copy(inputStream, tempFile, StandardCopyOption.REPLACE_EXISTING);
+            log.info("CSV 파일 다운로드 완료: {} -> {} ({} bytes)", urlString, tempFile, bytesCopied);
+        } catch (IOException e) {
+            log.error("CSV 파일 다운로드 중 오류 발생: {} - {}", urlString, e.getMessage());
+            // 임시 파일 정리
+            Files.deleteIfExists(tempFile);
+            throw e;
+        }
+
+        return tempFile;
+    }
+
+    // Request DTO
+    public record CsvImportRequest(String csvUrl, String password) {}
 } 

@@ -23,6 +23,11 @@ spring:
     validate-on-migrate: true         # migration 전에 SQL 스크립트와 데이터 일치 여부 검증
     encoding: UTF-8                   # SQL 파일 인코딩
 
+# CSV Import 설정
+csv:
+  import:
+    password: ${CSV_IMPORT_PASSWORD}
+
 logging:
   level:
     root: INFO

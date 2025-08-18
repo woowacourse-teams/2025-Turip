@@ -23,3 +23,8 @@ spring:
   # 테스트 환경에서 Flyway 비활성화
   flyway:
     enabled: false
+
+# CSV Import 설정
+csv:
+  import:
+    password: test_password_123

@@ -20,6 +20,11 @@ spring:
   flyway:
     enabled: true
 
+# CSV Import 설정
+csv:
+  import:
+    password: ${CSV_IMPORT_PASSWORD:dev_password_123}
+
 logging:
   level:
     root: INFO
