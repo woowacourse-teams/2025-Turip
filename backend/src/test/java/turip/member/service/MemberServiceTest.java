@@ -19,7 +19,7 @@ import turip.member.domain.Member;
 import turip.member.repository.MemberRepository;
 
 @ExtendWith(MockitoExtension.class)
-public class MemberServiceTest {
+class MemberServiceTest {
 
     @InjectMocks
     private MemberService memberService;

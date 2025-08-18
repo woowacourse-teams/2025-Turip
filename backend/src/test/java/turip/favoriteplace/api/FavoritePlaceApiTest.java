@@ -16,7 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class FavoritePlaceApiTest {
+class FavoritePlaceApiTest {
 
     @LocalServerPort
     private int port;
