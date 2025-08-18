@@ -1,11 +1,8 @@
 package turip.data.config;
 
-import java.io.IOException;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -17,6 +14,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StreamUtils;
 import turip.data.service.CsvDataImportService;
+import turip.data.service.CsvFileService;
 
 @Slf4j
 @Component
@@ -30,6 +28,7 @@ public class DevDataInitializer implements CommandLineRunner {
     private static final String CSV_URL_2 = "https://example.com/data2.csv";
     private static final String CSV_URL_3 = "https://example.com/data3.csv";
     private final CsvDataImportService csvDataImportService;
+    private final CsvFileService csvFileService;
     private final JdbcTemplate jdbcTemplate;
 
     @Override
@@ -54,10 +53,10 @@ public class DevDataInitializer implements CommandLineRunner {
                 log.info("CSV 파일 import 시작: {}", csvUrl);
 
                 // CSV 파일 다운로드
-                Path tempFile = downloadCsvFromUrl(csvUrl);
+                Path tempFile = csvFileService.downloadCsvFromUrl(csvUrl);
 
                 // CSV 파일 검증
-                if (isValidCsvFile(tempFile)) {
+                if (csvFileService.isValidCsvFile(tempFile)) {
                     // CSV 데이터 import 실행
                     csvDataImportService.importCsvData(tempFile.toString());
                     log.info("CSV 파일 import 완료: {}", csvUrl);
@@ -74,46 +73,6 @@ public class DevDataInitializer implements CommandLineRunner {
         }
 
         log.info("모든 CSV 파일 import 완료되었습니다.");
-    }
-
-    private boolean isValidCsvFile(Path filePath) throws IOException {
-        if (!Files.exists(filePath)) {
-            return false;
-        }
-
-        // 파일 크기 검증 (최소 10바이트)
-        long fileSize = Files.size(filePath);
-        if (fileSize < 10) {
-            log.warn("CSV 파일이 너무 작습니다: {} bytes", fileSize);
-            return false;
-        }
-
-        // 파일 확장자 검증
-        String fileName = filePath.getFileName().toString().toLowerCase();
-        if (!fileName.endsWith(".csv")) {
-            log.warn("CSV 파일 확장자가 아닙니다: {}", fileName);
-            return false;
-        }
-
-        return true;
-    }
-
-    private Path downloadCsvFromUrl(String urlString) throws IOException {
-        log.info("CSV 파일 다운로드 시작: {}", urlString);
-
-        URL url = new URL(urlString);
-        Path tempFile = Files.createTempFile("csv_import_", ".csv");
-
-        try (var inputStream = url.openStream()) {
-            long bytesCopied = Files.copy(inputStream, tempFile, StandardCopyOption.REPLACE_EXISTING);
-            log.info("CSV 파일 다운로드 완료: {} -> {} ({} bytes)", urlString, tempFile, bytesCopied);
-        } catch (IOException e) {
-            log.error("CSV 파일 다운로드 중 오류 발생: {} - {}", urlString, e.getMessage());
-            Files.deleteIfExists(tempFile);
-            throw e;
-        }
-
-        return tempFile;
     }
 
     private void executeDataSql() {
