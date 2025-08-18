@@ -24,6 +24,8 @@ spring:
 csv:
   import:
     password: ${CSV_IMPORT_PASSWORD:dev_password_123}
+  links:
+    collection-url: ${CSV_LINKS_COLLECTION_URL}
 
 logging:
   level:
