@@ -24,7 +24,7 @@ class TuripApplication : Application() {
             FirebaseInstallationsInitializer(RepositoryModule.userStorageRepository)
                 .setupFirebaseInstallationId()
 
-            val fid =
+            val fid: String =
                 RepositoryModule.userStorageRepository
                     .loadId()
                     .getOrNull()
