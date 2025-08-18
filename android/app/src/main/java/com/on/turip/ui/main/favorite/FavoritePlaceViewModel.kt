@@ -44,7 +44,7 @@ class FavoritePlaceViewModel(
 
     fun updateFolderWithPlaces(folderId: Long) {
         val isDeleted: Boolean = folders.value?.all { it.id != folderId } ?: true
-        selectedFolderId = if (isDeleted) folders.value?.get(0)!!.id else folderId
+        selectedFolderId = if (isDeleted) folders.value?.get(0)?.id ?: NOT_INITIALIZED else folderId
 
         _folders.value =
             folders.value?.map { favoriteFolder: FavoritePlaceFolderModel ->
