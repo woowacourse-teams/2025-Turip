@@ -181,8 +181,8 @@ class FavoritePlaceServiceTest {
             Long favoriteFolderId = 1L;
             Member member = new Member(1L, "testDeviceFid");
             FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, member, "테스트 폴더", false);
-            Place place1 = new Place(1L, null, null, null, 1, 1);
-            Place place2 = new Place(2L, null, null, null, 2, 2);
+            Place place1 = new Place(1L, "장소1", "url1", "주소1", 1, 1);
+            Place place2 = new Place(2L, "장소2", "url2", "주소2", 2, 2);
             FavoritePlace favoritePlace1 = new FavoritePlace(1L, favoriteFolder, place1);
             FavoritePlace favoritePlace2 = new FavoritePlace(2L, favoriteFolder, place2);
 

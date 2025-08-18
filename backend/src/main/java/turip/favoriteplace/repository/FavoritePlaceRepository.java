@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import turip.favoritefolder.domain.FavoriteFolder;
 import turip.favoriteplace.domain.FavoritePlace;
+import turip.member.domain.Member;
 import turip.place.domain.Place;
 
 public interface FavoritePlaceRepository extends JpaRepository<FavoritePlace, Long> {
@@ -16,4 +17,6 @@ public interface FavoritePlaceRepository extends JpaRepository<FavoritePlace, Lo
     Optional<FavoritePlace> findByFavoriteFolderAndPlace(FavoriteFolder favoriteFolder, Place place);
 
     List<FavoritePlace> findAllByFavoriteFolder(FavoriteFolder favoriteFolder);
+
+    boolean existsByFavoriteFolderMemberAndPlace(Member member, Place place);
 }

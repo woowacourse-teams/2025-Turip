@@ -54,9 +54,9 @@ class ContentCountApiTest {
             // given
             jdbcTemplate.update(
                     "INSERT INTO creator (profile_image, channel_name) VALUES ('https://image.example.com/creator1.jpg', 'TravelMate')");
-            jdbcTemplate.update("INSERT INTO country (name) VALUES ('대한민국')");
-            jdbcTemplate.update("INSERT INTO city (name, country_id) VALUES ('서울', 1)");
-            jdbcTemplate.update("INSERT INTO city (name, country_id) VALUES ('부산', 1)");
+            jdbcTemplate.update("INSERT INTO country (name, image_url) VALUES ('대한민국', 'https://image.example.com/korea.jpg')");
+            jdbcTemplate.update("INSERT INTO city (name, country_id, image_url) VALUES ('서울', 1, 'https://image.example.com/seoul.jpg')");
+            jdbcTemplate.update("INSERT INTO city (name, country_id, image_url) VALUES ('부산', 1, 'https://image.example.com/busan.jpg')");
             jdbcTemplate.update(
                     "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 1, 'https://youtube.com/watch?v=abcd1', '서울 데이트 코스 추천', '2024-07-01')");
             jdbcTemplate.update(
@@ -79,11 +79,11 @@ class ContentCountApiTest {
             // given
             jdbcTemplate.update(
                     "INSERT INTO creator (profile_image, channel_name) VALUES ('https://image.example.com/creator1.jpg', 'TravelMate')");
-            jdbcTemplate.update("INSERT INTO country (name) VALUES ('일본')");
-            jdbcTemplate.update("INSERT INTO country (name) VALUES ('중국')");
-            jdbcTemplate.update("INSERT INTO city (name, country_id) VALUES ('도쿄', 1)");
-            jdbcTemplate.update("INSERT INTO city (name, country_id) VALUES ('오사카', 1)");
-            jdbcTemplate.update("INSERT INTO city (name, country_id) VALUES ('베이징', 2)");
+            jdbcTemplate.update("INSERT INTO country (name, image_url) VALUES ('일본', 'https://image.example.com/japan.jpg')");
+            jdbcTemplate.update("INSERT INTO country (name, image_url) VALUES ('중국', 'https://image.example.com/china.jpg')");
+            jdbcTemplate.update("INSERT INTO city (name, country_id, image_url) VALUES ('도쿄', 1, 'https://image.example.com/tokyo.jpg')");
+            jdbcTemplate.update("INSERT INTO city (name, country_id, image_url) VALUES ('오사카', 1, 'https://image.example.com/osaka.jpg')");
+            jdbcTemplate.update("INSERT INTO city (name, country_id, image_url) VALUES ('베이징', 2, 'https://image.example.com/beijing.jpg')");
             jdbcTemplate.update(
                     "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 1, 'https://youtube.com/watch?v=abcd1', '도쿄 여행 가이드', '2024-07-01')");
             jdbcTemplate.update(
@@ -106,10 +106,10 @@ class ContentCountApiTest {
             // given
             jdbcTemplate.update(
                     "INSERT INTO creator (profile_image, channel_name) VALUES ('https://image.example.com/creator1.jpg', 'TravelMate')");
-            jdbcTemplate.update("INSERT INTO country (name) VALUES ('대한민국')");
-            jdbcTemplate.update("INSERT INTO city (name, country_id) VALUES ('서울', 1)");
-            jdbcTemplate.update("INSERT INTO city (name, country_id) VALUES ('대구', 1)");
-            jdbcTemplate.update("INSERT INTO city (name, country_id) VALUES ('울산', 1)");
+            jdbcTemplate.update("INSERT INTO country (name, image_url) VALUES ('대한민국', 'https://image.example.com/korea.jpg')");
+            jdbcTemplate.update("INSERT INTO city (name, country_id, image_url) VALUES ('서울', 1, 'https://image.example.com/seoul.jpg')");
+            jdbcTemplate.update("INSERT INTO city (name, country_id, image_url) VALUES ('대구', 1, 'https://image.example.com/daegu.jpg')");
+            jdbcTemplate.update("INSERT INTO city (name, country_id, image_url) VALUES ('울산', 1, 'https://image.example.com/ulsan.jpg')");
             jdbcTemplate.update(
                     "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 1, 'https://youtube.com/watch?v=abcd1', '서울 여행', '2024-07-01')");
             jdbcTemplate.update(
@@ -132,12 +132,12 @@ class ContentCountApiTest {
             // given
             jdbcTemplate.update(
                     "INSERT INTO creator (profile_image, channel_name) VALUES ('https://image.example.com/creator1.jpg', 'TravelMate')");
-            jdbcTemplate.update("INSERT INTO country (name) VALUES ('일본')");
-            jdbcTemplate.update("INSERT INTO country (name) VALUES ('태국')");
-            jdbcTemplate.update("INSERT INTO country (name) VALUES ('싱가포르')");
-            jdbcTemplate.update("INSERT INTO city (name, country_id) VALUES ('도쿄', 1)");
-            jdbcTemplate.update("INSERT INTO city (name, country_id) VALUES ('방콕', 2)");
-            jdbcTemplate.update("INSERT INTO city (name, country_id) VALUES ('싱가포르시티', 3)");
+            jdbcTemplate.update("INSERT INTO country (name, image_url) VALUES ('일본', 'https://image.example.com/japan.jpg')");
+            jdbcTemplate.update("INSERT INTO country (name, image_url) VALUES ('태국', 'https://image.example.com/thailand.jpg')");
+            jdbcTemplate.update("INSERT INTO country (name, image_url) VALUES ('싱가포르', 'https://image.example.com/singapore.jpg')");
+            jdbcTemplate.update("INSERT INTO city (name, country_id, image_url) VALUES ('도쿄', 1, 'https://image.example.com/tokyo.jpg')");
+            jdbcTemplate.update("INSERT INTO city (name, country_id, image_url) VALUES ('방콕', 2, 'https://image.example.com/bangkok.jpg')");
+            jdbcTemplate.update("INSERT INTO city (name, country_id, image_url) VALUES ('싱가포르시티', 3, 'https://image.example.com/singapore-city.jpg')");
             jdbcTemplate.update(
                     "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 1, 'https://youtube.com/watch?v=abcd1', '도쿄 여행', '2024-07-01')");
             jdbcTemplate.update(
@@ -160,12 +160,12 @@ class ContentCountApiTest {
             // given
             jdbcTemplate.update(
                     "INSERT INTO creator (profile_image, channel_name) VALUES ('https://image.example.com/creator1.jpg', 'TravelMate')");
-            jdbcTemplate.update("INSERT INTO country (name) VALUES ('일본')");
-            jdbcTemplate.update("INSERT INTO country (name) VALUES ('태국')");
-            jdbcTemplate.update("INSERT INTO country (name) VALUES ('싱가포르')");
-            jdbcTemplate.update("INSERT INTO city (name, country_id) VALUES ('도쿄', 1)");
-            jdbcTemplate.update("INSERT INTO city (name, country_id) VALUES ('방콕', 2)");
-            jdbcTemplate.update("INSERT INTO city (name, country_id) VALUES ('싱가포르시티', 3)");
+            jdbcTemplate.update("INSERT INTO country (name, image_url) VALUES ('일본', 'https://image.example.com/japan.jpg')");
+            jdbcTemplate.update("INSERT INTO country (name, image_url) VALUES ('태국', 'https://image.example.com/thailand.jpg')");
+            jdbcTemplate.update("INSERT INTO country (name, image_url) VALUES ('싱가포르', 'https://image.example.com/singapore.jpg')");
+            jdbcTemplate.update("INSERT INTO city (name, country_id, image_url) VALUES ('도쿄', 1, 'https://image.example.com/tokyo.jpg')");
+            jdbcTemplate.update("INSERT INTO city (name, country_id, image_url) VALUES ('방콕', 2, 'https://image.example.com/bangkok.jpg')");
+            jdbcTemplate.update("INSERT INTO city (name, country_id, image_url) VALUES ('싱가포르시티', 3, 'https://image.example.com/singapore-city.jpg')");
 
             // when & then
             RestAssured.given().port(port)

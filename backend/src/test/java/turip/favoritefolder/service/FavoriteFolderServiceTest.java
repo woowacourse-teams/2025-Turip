@@ -174,7 +174,7 @@ class FavoriteFolderServiceTest {
                     .willReturn(List.of(defaultFolder, favoriteFolder));
 
             Long placeId = 1L;
-            Place place = new Place(placeId, null, null, null, 1, 1);
+            Place place = new Place(placeId, "장소", "url", "주소", 1, 1);
             given(placeRepository.findById(placeId))
                     .willReturn(Optional.of(place));
 
@@ -199,7 +199,8 @@ class FavoriteFolderServiceTest {
         void findAllWithFavoriteStatusByDeviceId2() {
             // given
             String deviceFid = "testDeviceFid";
-            Member savedMember = new Member(1L, deviceFid);
+            Member member = new Member(deviceFid);
+            Member savedMember = new Member(1L, member.getDeviceFid());
 
             Long placeId = 1L;
             given(placeRepository.findById(placeId))
