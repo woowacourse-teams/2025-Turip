@@ -5,4 +5,6 @@ import com.on.turip.domain.folder.Folder
 
 interface FolderRepository {
     suspend fun loadFavoriteFolders(): TuripCustomResult<List<Folder>>
+
+    suspend fun createFavoriteFolder(name: String): TuripCustomResult<Unit>
 }

@@ -15,7 +15,7 @@ import com.on.turip.ui.common.base.BaseBottomSheetFragment
 import com.on.turip.ui.folder.model.FolderNameStatusModel
 
 class FolderAddBottomSheetFragment : BaseBottomSheetFragment<BottomSheetFragmentFolderAddBinding>() {
-    private val viewModel: FolderAddBottomSheetViewModel by viewModels()
+    private val viewModel: FolderAddBottomSheetViewModel by viewModels { FolderAddBottomSheetViewModel.provideFactory() }
 
     override fun inflateBinding(
         inflater: LayoutInflater,
@@ -63,7 +63,7 @@ class FolderAddBottomSheetFragment : BaseBottomSheetFragment<BottomSheetFragment
 
     private fun setupListeners() {
         binding.tvBottomSheetFolderAddConfirm.setOnClickListener {
-            // TODO : 폴더 추가 api 호출 필요
+            viewModel.createFolder()
             dismiss()
         }
         binding.etBottomSheetFolderAddFolderName.addTextChangedListener { text: Editable? ->
