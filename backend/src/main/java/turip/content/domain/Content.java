@@ -42,7 +42,7 @@ public class Content {
     @JoinColumn(name = "city_id", nullable = false, foreignKey = @ForeignKey(name = "fk_content_city"))
     private City city;
 
-    @Column(name = "title", nullable = false, length = 100)
+    @Column(name = "title", nullable = false)
     private String title;
 
     @Column(name = "url", nullable = false, length = 65535)

@@ -30,9 +30,9 @@ ALTER TABLE creator
     MODIFY profile_image TEXT NOT NULL;
 
 -- 5) content
--- title 255 -> 100 (길이 축소: 100 초과 데이터가 있으면 실패합니다)
+-- title 255 -> 500
 ALTER TABLE content
-    MODIFY title VARCHAR(100) NOT NULL;
+    MODIFY title VARCHAR(500) NOT NULL;
 
 -- url 255 -> TEXT
 ALTER TABLE content

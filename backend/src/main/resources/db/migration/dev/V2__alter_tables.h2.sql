@@ -1,5 +1,5 @@
 -- V2__alter_tables.h2.sql
--- 스키마 변경: 길이 확장/축소 및 URL 칼럼 CLOB 전환(+유니크 보장)
+-- 스키마 변경: H2 제약에 맞게 TEXT→CLOB, url은 VARCHAR(2048)+UNIQUE로 타협
 
 -- 1) country
 ALTER TABLE country
@@ -35,7 +35,7 @@ ALTER TABLE creator
 
 -- 5) content
 ALTER TABLE content
-    ALTER COLUMN title TYPE VARCHAR(100);
+    ALTER COLUMN title TYPE VARCHAR(500);
 ALTER TABLE content
     ALTER COLUMN title SET NOT NULL;
 
@@ -45,15 +45,16 @@ ALTER TABLE content
     ALTER COLUMN url SET NOT NULL;
 
 -- 6) place
--- ⚠️ H2는 TEXT/CLOB에 UNIQUE 인덱스를 직접 걸 수 없음
---    SHA2() 함수와 STORED GENERATED COLUMN도 지원 안 함
---    → H2에서는 단순히 URL 컬럼 확장만 처리 (유니크는 생략)
+-- MySQL은 TEXT+SHA2 해시, H2는 VARCHAR+UNIQUE로 대체
+DROP INDEX IF EXISTS url;
 
--- url을 CLOB으로 확장
 ALTER TABLE place
-    ALTER COLUMN url TYPE CLOB;
+    ALTER COLUMN url TYPE VARCHAR(2048);
 ALTER TABLE place
     ALTER COLUMN url SET NOT NULL;
+
+ALTER TABLE place
+    ADD CONSTRAINT uq_place_url UNIQUE (url);
 
 -- 7) favorite_folder
 ALTER TABLE favorite_folder
