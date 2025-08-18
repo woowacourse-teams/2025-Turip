@@ -30,14 +30,8 @@ public class ContentPlaceService {
         int days = calculateDurationDays(contentId);
         int nights = days - 1;
         int contentPlaceCount = calculatePlaceCount(contentPlaces);
-
-        List<ContentPlaceResponse> contentPlaceResponse = contentPlaces.stream()
-                .map(contentPlace -> {
-                    boolean isFavoritePlace = favoritePlaceRepository.existsByFavoriteFolderMemberAndPlace(member,
-                            contentPlace.getPlace());
-                    return ContentPlaceResponse.of(contentPlace, isFavoritePlace);
-                })
-                .toList();
+        List<ContentPlaceResponse> contentPlaceResponse = parseContentPlaceToContentPlaceResponse(member,
+                contentPlaces);
 
         return ContentPlaceDetailResponse.of(nights, days, contentPlaceCount, contentPlaceResponse);
     }
@@ -62,5 +56,16 @@ public class ContentPlaceService {
                 .map(ContentPlace::getPlace)
                 .distinct()
                 .count();
+    }
+
+    private List<ContentPlaceResponse> parseContentPlaceToContentPlaceResponse(Member member,
+                                                                               List<ContentPlace> contentPlaces) {
+        return contentPlaces.stream()
+                .map(contentPlace -> {
+                    boolean isFavoritePlace = favoritePlaceRepository.existsByFavoriteFolderMemberAndPlace(member,
+                            contentPlace.getPlace());
+                    return ContentPlaceResponse.of(contentPlace, isFavoritePlace);
+                })
+                .toList();
     }
 }
