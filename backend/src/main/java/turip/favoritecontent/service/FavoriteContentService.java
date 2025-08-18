@@ -15,6 +15,7 @@ import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
 import turip.contentplace.service.ContentPlaceService;
 import turip.exception.custom.BadRequestException;
+import turip.exception.custom.ConflictException;
 import turip.exception.custom.NotFoundException;
 import turip.favoritecontent.controller.dto.request.FavoriteContentRequest;
 import turip.favoritecontent.controller.dto.response.FavoriteContentResponse;
@@ -36,7 +37,7 @@ public class FavoriteContentService {
         Content content = contentRepository.findById(contentId)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 컨텐츠입니다."));
         if (favoriteContentRepository.existsByMemberIdAndContentId(member.getId(), content.getId())) {
-            throw new BadRequestException("이미 찜한 컨텐츠입니다.");
+            throw new ConflictException("이미 찜한 컨텐츠입니다.");
         }
         FavoriteContent favoriteContent = new FavoriteContent(LocalDate.now(), member, content);
         FavoriteContent savedFavoriteContent = favoriteContentRepository.save(favoriteContent);

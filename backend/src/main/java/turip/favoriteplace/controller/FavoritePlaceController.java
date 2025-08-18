@@ -12,6 +12,7 @@ import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,6 +21,7 @@ import turip.auth.AuthMember;
 import turip.auth.MemberResolvePolicy;
 import turip.exception.ErrorResponse;
 import turip.favoriteplace.controller.dto.response.FavoritePlaceResponse;
+import turip.favoriteplace.controller.dto.response.FavoritePlacesWithDetailPlaceInformationResponse;
 import turip.favoriteplace.service.FavoritePlaceService;
 import turip.member.domain.Member;
 
@@ -131,6 +133,90 @@ public class FavoritePlaceController {
         FavoritePlaceResponse response = favoritePlaceService.create(member, favoriteFolderId, placeId);
         return ResponseEntity.created(URI.create("/favorite-places/" + response.id()))
                 .body(response);
+    }
+
+    @Operation(
+            summary = "장소 찜 폴더의 장소 찜 조회 api",
+            description = "장소 찜 폴더의 장소 찜 목록을 조회한다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "성공 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = FavoritePlacesWithDetailPlaceInformationResponse.class),
+                            examples = @ExampleObject(
+                                    name = "success",
+                                    summary = "장소 찜 폴더의 장소 찜 목록 조회 성공",
+                                    value = """
+                                            {
+                                                "favoritePlaces": [
+                                                    {
+                                                        "id": 1,
+                                                        "place": {
+                                                            "id": 5,
+                                                            "name": "니넨자카",
+                                                            "url": "https://maps.google.com/?cid=16622321643655642677",
+                                                            "address": "일본 〒605-0826 Kyoto, Higashiyama Ward, Masuyacho, 清水2丁目",
+                                                            "latitude": 34.9981744,
+                                                            "longitude": 135.7808578,
+                                                            "categories": [
+                                                                {
+                                                                    "name": "tourist_attraction"
+                                                                }
+                                                            ]
+                                                        }
+                                                    },
+                                                    {
+                                                        "id": 2,
+                                                        "place": {
+                                                            "id": 11,
+                                                            "name": "기막힌 닭",
+                                                            "url": "https://place.map.kakao.com/1423754025",
+                                                            "address": "강원특별자치도 양양군 현남면 인구리 1-51",
+                                                            "latitude": 37.9705767151489,
+                                                            "longitude": 128.761802013276,
+                                                            "categories": [
+                                                                {
+                                                                    "name": "음식점 > 한식 > 육류,고기 > 닭요리"
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                ],
+                                                "favoritePlaceCount": 2
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "folder_not_found",
+                                            summary = "favoriteFolderId에 대한 폴더가 존재하지 않는 경우",
+                                            value = """
+                                                    {
+                                                        "message" : "해당 id에 대한 폴더가 존재하지 않습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            )
+    })
+    @GetMapping
+    public ResponseEntity<FavoritePlacesWithDetailPlaceInformationResponse> readAllByFolder(
+            @RequestParam("favoriteFolderId") Long favoriteFolderId) {
+        FavoritePlacesWithDetailPlaceInformationResponse response = favoritePlaceService.findAllByFolder(
+                favoriteFolderId);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(

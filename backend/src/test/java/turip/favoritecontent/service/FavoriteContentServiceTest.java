@@ -25,7 +25,7 @@ import turip.content.repository.ContentRepository;
 import turip.contentplace.service.ContentPlaceService;
 import turip.country.domain.Country;
 import turip.creator.domain.Creator;
-import turip.exception.custom.BadRequestException;
+import turip.exception.custom.ConflictException;
 import turip.exception.custom.NotFoundException;
 import turip.favoritecontent.controller.dto.request.FavoriteContentRequest;
 import turip.favoritecontent.controller.dto.response.FavoriteContentResponse;
@@ -116,7 +116,7 @@ class FavoriteContentServiceTest {
 
         // when & then
         assertThatThrownBy(() -> favoriteContentService.create(request, member))
-                .isInstanceOf(BadRequestException.class);
+                .isInstanceOf(ConflictException.class);
     }
 
     @DisplayName("내 찜 목록을 페이징 조회할 수 있다")

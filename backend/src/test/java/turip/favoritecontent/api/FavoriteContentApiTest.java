@@ -137,7 +137,7 @@ class FavoriteContentApiTest {
                     .statusCode(404);
         }
 
-        @DisplayName("이미 찜한 컨텐츠인 경우 400 Bad Request를 응답한다")
+        @DisplayName("이미 찜한 컨텐츠인 경우 409 CONFLICT를 응답한다")
         @Test
         void duplicateFavoriteException() {
             // given
@@ -167,7 +167,7 @@ class FavoriteContentApiTest {
                     .body(request)
                     .when().post("/favorite-contents")
                     .then()
-                    .statusCode(400);
+                    .statusCode(409);
         }
     }
 
