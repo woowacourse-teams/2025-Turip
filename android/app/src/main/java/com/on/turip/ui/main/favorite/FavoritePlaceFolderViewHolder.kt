@@ -14,7 +14,7 @@ class FavoritePlaceFolderViewHolder(
 
     init {
         itemView.setOnClickListener {
-            favoritePlaceFolderModel?.let { onPlaceFolderListener.onPlaceFolderClick(it) }
+            favoritePlaceFolderModel?.let { onPlaceFolderListener.onPlaceFolderClick(it.id) }
         }
     }
 
@@ -37,6 +37,6 @@ class FavoritePlaceFolderViewHolder(
     }
 
     fun interface OnPlaceFolderListener {
-        fun onPlaceFolderClick(favoritePlaceFolderModel: FavoritePlaceFolderModel)
+        fun onPlaceFolderClick(folderId: Long)
     }
 }
