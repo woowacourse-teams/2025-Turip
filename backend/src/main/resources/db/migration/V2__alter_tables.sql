@@ -10,12 +10,17 @@ ALTER TABLE country
 ALTER TABLE country
     MODIFY image_url TEXT NOT NULL;
 
--- 2) city
+-- 2) province
+-- 이름에 유니크 제약 조건 추가
+ALTER TABLE province
+    ADD CONSTRAINT uq_province_name UNIQUE (name);
+
+-- 3) city
 -- image_url 255 -> TEXT
 ALTER TABLE city
     MODIFY image_url TEXT NOT NULL;
 
--- 3) creator
+-- 4) creator
 -- channel_name 255 -> 50 (길이 축소: 50 초과 데이터가 있으면 실패합니다)
 ALTER TABLE creator
     MODIFY channel_name VARCHAR(50) NOT NULL;
@@ -24,7 +29,7 @@ ALTER TABLE creator
 ALTER TABLE creator
     MODIFY profile_image TEXT NOT NULL;
 
--- 4) content
+-- 5) content
 -- title 255 -> 100 (길이 축소: 100 초과 데이터가 있으면 실패합니다)
 ALTER TABLE content
     MODIFY title VARCHAR(100) NOT NULL;
@@ -33,7 +38,7 @@ ALTER TABLE content
 ALTER TABLE content
     MODIFY url TEXT NOT NULL;
 
--- 5) place
+-- 6) place
 -- 기존 UNIQUE(url) 인덱스 제거
 ALTER TABLE place
     DROP INDEX url;
@@ -51,7 +56,7 @@ ALTER TABLE place
 ALTER TABLE place
     ADD UNIQUE KEY url (url_sha);
 
--- 6) favorite_folder
+-- 7) favorite_folder
 -- name 100 -> 255 (복합 UNIQUE(member_id, name)은 자동 유지)
 ALTER TABLE favorite_folder
     MODIFY name VARCHAR(255) NOT NULL;
