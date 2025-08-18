@@ -1,6 +1,7 @@
 package turip.favoriteplace.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -13,14 +14,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import turip.auth.AuthMember;
+import turip.auth.MemberResolvePolicy;
 import turip.exception.ErrorResponse;
 import turip.favoriteplace.controller.dto.response.FavoritePlaceResponse;
 import turip.favoriteplace.controller.dto.response.FavoritePlacesWithDetailPlaceInformationResponse;
 import turip.favoriteplace.service.FavoritePlaceService;
+import turip.member.domain.Member;
 
 @RestController
 @RequiredArgsConstructor
@@ -123,11 +126,11 @@ public class FavoritePlaceController {
     })
     @PostMapping
     public ResponseEntity<FavoritePlaceResponse> create(
-            @RequestHeader("device-fid") String deviceFid,
+            @Parameter(hidden = true) @AuthMember(policy = MemberResolvePolicy.CREATE_IF_ABSENT) Member member,
             @RequestParam("favoriteFolderId") Long favoriteFolderId,
             @RequestParam("placeId") Long placeId
     ) {
-        FavoritePlaceResponse response = favoritePlaceService.create(deviceFid, favoriteFolderId, placeId);
+        FavoritePlaceResponse response = favoritePlaceService.create(member, favoriteFolderId, placeId);
         return ResponseEntity.created(URI.create("/favorite-places/" + response.id()))
                 .body(response);
     }
@@ -293,11 +296,11 @@ public class FavoritePlaceController {
     })
     @DeleteMapping
     public ResponseEntity<Void> delete(
-            @RequestHeader("device-fid") String deviceFid,
+            @Parameter(hidden = true) @AuthMember(policy = MemberResolvePolicy.REQUIRED) Member member,
             @RequestParam("favoriteFolderId") Long favoriteFolderId,
             @RequestParam("placeId") Long placeId
     ) {
-        favoritePlaceService.remove(deviceFid, favoriteFolderId, placeId);
+        favoritePlaceService.remove(member, favoriteFolderId, placeId);
         return ResponseEntity.noContent().build();
     }
 }

@@ -15,7 +15,6 @@ import turip.favoriteplace.controller.dto.response.FavoritePlacesWithDetailPlace
 import turip.favoriteplace.domain.FavoritePlace;
 import turip.favoriteplace.repository.FavoritePlaceRepository;
 import turip.member.domain.Member;
-import turip.member.service.MemberService;
 import turip.place.domain.Place;
 import turip.place.repository.PlaceRepository;
 
@@ -26,11 +25,9 @@ public class FavoritePlaceService {
     private final FavoritePlaceRepository favoritePlaceRepository;
     private final FavoriteFolderRepository favoriteFolderRepository;
     private final PlaceRepository placeRepository;
-    private final MemberService memberService;
 
     @Transactional
-    public FavoritePlaceResponse create(String deviceFid, Long favoriteFolderId, Long placeId) {
-        Member member = memberService.findOrCreateMember(deviceFid);
+    public FavoritePlaceResponse create(Member member, Long favoriteFolderId, Long placeId) {
         FavoriteFolder favoriteFolder = getFavoriteFolderById(favoriteFolderId);
         Place place = getPlaceById(placeId);
 
@@ -55,8 +52,7 @@ public class FavoritePlaceService {
     }
 
     @Transactional
-    public void remove(String deviceFid, Long favoriteFolderId, Long placeId) {
-        Member member = memberService.getMemberByDeviceId(deviceFid);
+    public void remove(Member member, Long favoriteFolderId, Long placeId) {
         FavoriteFolder favoriteFolder = getFavoriteFolderById(favoriteFolderId);
         Place place = getPlaceById(placeId);
 

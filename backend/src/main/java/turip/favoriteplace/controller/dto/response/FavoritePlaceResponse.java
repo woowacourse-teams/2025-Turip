@@ -8,8 +8,8 @@ public record FavoritePlaceResponse(
         Long placeId
 ) {
 
-    public static FavoritePlaceResponse from(FavoritePlace savedFavoritePlace) {
-        return new FavoritePlaceResponse(savedFavoritePlace.getId(), savedFavoritePlace.getFavoriteFolder().getId(),
-                savedFavoritePlace.getPlace().getId());
+    public static FavoritePlaceResponse from(FavoritePlace favoritePlace) {
+        return new FavoritePlaceResponse(favoritePlace.getId(), favoritePlace.getFavoriteFolder().getId(),
+                favoritePlace.getPlace().getId());
     }
 }

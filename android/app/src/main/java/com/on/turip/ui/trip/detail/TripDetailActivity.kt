@@ -19,32 +19,37 @@ import com.on.turip.R
 import com.on.turip.databinding.ActivityTripDetailBinding
 import com.on.turip.domain.content.Content
 import com.on.turip.ui.common.TuripSnackbar
-import com.on.turip.ui.common.TuripUrlConverter
 import com.on.turip.ui.common.base.BaseActivity
 import com.on.turip.ui.common.loadCircularImage
 import com.on.turip.ui.common.model.trip.TripModel
 import com.on.turip.ui.common.model.trip.toDisplayText
 import com.on.turip.ui.trip.detail.webview.TuripWebChromeClient
 import com.on.turip.ui.trip.detail.webview.TuripWebViewClient
-import com.on.turip.ui.trip.detail.webview.WebViewVideoBridge
 import com.on.turip.ui.trip.detail.webview.applyVideoSettings
+import com.on.turip.ui.trip.detail.webview.navigateToTimeLine
 
 class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
     override val binding: ActivityTripDetailBinding by lazy {
         ActivityTripDetailBinding.inflate(layoutInflater)
     }
+
     val viewModel: TripDetailViewModel by viewModels {
         TripDetailViewModel.provideFactory(
             intent.getLongExtra(CONTENT_KEY, 0),
             intent.getLongExtra(CREATOR_KEY, 0),
         )
     }
+
     private val turipWebChromeClient: TuripWebChromeClient by lazy {
         TuripWebChromeClient(
             fullScreenView = binding.flTripDetailVideoFullscreen,
             onEnterFullScreen = ::enableFullscreen,
             onExitFullScreen = ::disableFullscreen,
         )
+    }
+
+    private val turipWebViewClient: TuripWebViewClient by lazy {
+        TuripWebViewClient(progressBar = binding.pbTripDetailVideo)
     }
 
     private val tripDayAdapter by lazy {
@@ -54,10 +59,31 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
     }
 
     private val tripPlaceAdapter by lazy {
-        TripPlaceAdapter { placeModel ->
-            val intent: Intent = Intent(Intent.ACTION_VIEW, placeModel.placeUri)
-            startActivity(intent)
-        }
+        TripPlaceAdapter(
+            object : TripPlaceViewHolder.PlaceListener {
+                override fun onPlaceClick(placeModel: PlaceModel) {
+                    val intent: Intent = Intent(Intent.ACTION_VIEW, placeModel.placeUri)
+                    startActivity(intent)
+                }
+
+                override fun onTimeLineClick(placeModel: PlaceModel) {
+                    binding.wvTripDetailVideo.navigateToTimeLine(placeModel.contentTimeLine)
+                }
+
+                override fun onFavoriteClick(placeModel: PlaceModel) {
+                    // TODO: 찜 선택 구현
+                }
+            },
+        )
+    }
+
+    private val stickyVideoManager by lazy {
+        StickyVideoManager(
+            originalVideoContainer = binding.cvTripDetailVideoContainer,
+            stickyVideoContainer = binding.cvTripDetailVideoContainerSticky,
+            nestedScrollView = binding.nsvTripDetail,
+            webView = binding.wvTripDetailVideo,
+        )
     }
 
     private fun enableFullscreen() {
@@ -100,6 +126,7 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
         setupToolbar()
         setupOnBackPressedDispatcher()
         setupWebView()
+        setupStickyVideo()
         setupAdapters()
         setupListeners()
         setupObservers()
@@ -124,12 +151,18 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
             this,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    if (turipWebChromeClient.isFullScreen()) {
-                        turipWebChromeClient.onHideCustomView()
-                    } else if (binding.wvTripDetailVideo.canGoBack()) {
-                        binding.wvTripDetailVideo.goBack()
-                    } else {
-                        finish()
+                    when {
+                        turipWebChromeClient.isFullScreen() -> {
+                            turipWebChromeClient.onHideCustomView()
+                        }
+
+                        binding.wvTripDetailVideo.canGoBack() -> {
+                            binding.wvTripDetailVideo.goBack()
+                        }
+
+                        else -> {
+                            finish()
+                        }
                     }
                 }
             },
@@ -140,14 +173,19 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
         binding.wvTripDetailVideo.apply {
             applyVideoSettings()
             webChromeClient = turipWebChromeClient
-            webViewClient = TuripWebViewClient(binding.pbTripDetailVideo)
+            webViewClient = turipWebViewClient
         }
+    }
+
+    private fun setupStickyVideo() {
+        stickyVideoManager.initialize()
     }
 
     private fun showWebViewErrorView() {
         runOnUiThread {
             binding.wvTripDetailVideo.visibility = View.GONE
             binding.clTripDetailVideoError.visibility = View.VISIBLE
+            binding.pbTripDetailVideo.visibility = View.GONE
         }
     }
 
@@ -168,10 +206,12 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
                 )
             startActivity(intent)
         }
+
         binding.ivTripDetailFavorite.setOnClickListener {
             viewModel.updateFavorite()
             showFavoriteStatusSnackbar(viewModel.isFavorite.value == true)
         }
+
         binding.ivTripDetailContentToggle.setOnClickListener {
             viewModel.updateExpandTextToggle()
         }
@@ -220,16 +260,9 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
                 tripModel.tripDurationModel.toDisplayText(this)
         }
         viewModel.videoUri.observe(this) { url: String ->
-            binding.wvTripDetailVideo.apply {
-                addJavascriptInterface(
-                    WebViewVideoBridge(
-                        TuripUrlConverter.extractVideoId(url),
-                    ) { showWebViewErrorView() },
-                    BRIDGE_NAME_IN_JS_FILE,
-                )
+            stickyVideoManager.loadVideo(url) {
+                showWebViewErrorView()
             }
-
-            binding.wvTripDetailVideo.loadUrl(LOAD_URL_FILE_PATH)
         }
         viewModel.isFavorite.observe(this) { isFavorite: Boolean ->
             binding.ivTripDetailFavorite.isSelected = isFavorite
@@ -265,8 +298,6 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
     }
 
     companion object {
-        private const val BRIDGE_NAME_IN_JS_FILE = "videoBridge"
-        private const val LOAD_URL_FILE_PATH = "file:///android_asset/iframe.html"
         private const val CREATOR_KEY: String = "com.on.turip.CREATOR_KEY"
         private const val CONTENT_KEY: String = "com.on.turip.CONTENT_KEY"
 

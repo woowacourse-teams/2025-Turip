@@ -33,8 +33,7 @@ public class FavoriteFolderService {
     private final PlaceRepository placeRepository;
 
     @Transactional
-    public FavoriteFolderResponse createCustomFavoriteFolder(FavoriteFolderRequest request, String deviceFid) {
-        Member member = memberService.findOrCreateMember(deviceFid);
+    public FavoriteFolderResponse createCustomFavoriteFolder(FavoriteFolderRequest request, Member member) {
         FavoriteFolder favoriteFolder = FavoriteFolder.customFolderOf(member, request.name());
 
         validateDuplicatedName(favoriteFolder.getName(), member);
@@ -43,8 +42,7 @@ public class FavoriteFolderService {
         return FavoriteFolderResponse.from(savedFavoriteFolder);
     }
 
-    public FavoriteFoldersWithPlaceCountResponse findAllByDeviceFid(String deviceFid) {
-        Member member = memberService.findOrCreateMember(deviceFid);
+    public FavoriteFoldersWithPlaceCountResponse findAllByMember(Member member) {
         List<FavoriteFolderWithPlaceCountResponse> favoriteFoldersWithPlaceCount = favoriteFolderRepository.findAllByMember(
                         member).stream()
                 .map(favoriteFolder -> {
@@ -56,9 +54,8 @@ public class FavoriteFolderService {
         return FavoriteFoldersWithPlaceCountResponse.from(favoriteFoldersWithPlaceCount);
     }
 
-    public FavoriteFoldersWithFavoriteStatusResponse findAllWithFavoriteStatusByDeviceId(String deviceFid,
+    public FavoriteFoldersWithFavoriteStatusResponse findAllWithFavoriteStatusByDeviceId(Member member,
                                                                                          Long placeId) {
-        Member member = memberService.findOrCreateMember(deviceFid);
         Place place = getPlaceById(placeId);
 
         List<FavoriteFolderWithFavoriteStatusResponse> favoriteFoldersWithFavoriteStatus = favoriteFolderRepository.findAllByMember(
@@ -74,9 +71,8 @@ public class FavoriteFolderService {
     }
 
     @Transactional
-    public FavoriteFolderResponse updateName(String deviceFid, Long favoriteFolderId,
+    public FavoriteFolderResponse updateName(Member member, Long favoriteFolderId,
                                              FavoriteFolderNameRequest request) {
-        Member member = memberService.getMemberByDeviceId(deviceFid);
         FavoriteFolder favoriteFolder = getById(favoriteFolderId);
         if (favoriteFolder.isDefault()) {
             throw new BadRequestException("기본 폴더는 수정할 수 없습니다.");
@@ -91,8 +87,7 @@ public class FavoriteFolderService {
     }
 
     @Transactional
-    public void remove(String deviceFid, Long favoriteFolderId) {
-        Member member = memberService.getMemberByDeviceId(deviceFid);
+    public void remove(Member member, Long favoriteFolderId) {
         FavoriteFolder favoriteFolder = getById(favoriteFolderId);
 
         if (favoriteFolder.isDefault()) {
