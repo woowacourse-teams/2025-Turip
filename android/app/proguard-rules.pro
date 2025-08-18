@@ -24,13 +24,6 @@
 -keep public class * extends android.app.Activity
 -keep public class * extends androidx.fragment.app.Fragment
 
-# View (XML inflate 시 필요)
--keepclassmembers class * extends android.view.View {
-    public <init>(android.content.Context);
-    public <init>(android.content.Context, android.util.AttributeSet);
-    public <init>(android.content.Context, android.util.AttributeSet, int);
-}
-
 # Annotation 유지
 -keep @interface **
 -keepattributes Signature, Exceptions, EnclosingMethod, RuntimeVisibleAnnotations, RuntimeVisibleParameterAnnotations
@@ -51,7 +44,6 @@
 
 # OkHttp
 -dontwarn okhttp3.**
--dontwarn okio.**
 
 # kotlinx.serialization
 -keep class kotlinx.serialization.** { *; }
