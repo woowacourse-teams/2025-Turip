@@ -17,10 +17,10 @@ class StickyVideoManager(
     private val nestedScrollView: NestedScrollView,
     private val webView: WebView,
 ) {
-    private var stickyThreshold = 0
+    private var stickyThreshold: Int = 0
     private var currentVideoUrl: String? = null
-    private var isVideoLoaded = false
-    private var isVideoInStickyMode = false
+    private var isVideoLoaded: Boolean = false
+    private var isVideoInStickyMode: Boolean = false
     private lateinit var videoErrorLayout: View
 
     fun initialize() {
@@ -42,10 +42,10 @@ class StickyVideoManager(
 
     private fun calculateStickyThreshold() {
         originalVideoContainer.post {
-            val location = IntArray(2)
+            val location: IntArray = IntArray(2)
             originalVideoContainer.getLocationInWindow(location)
 
-            val scrollViewLocation = IntArray(2)
+            val scrollViewLocation: IntArray = IntArray(2)
             nestedScrollView.getLocationInWindow(scrollViewLocation)
 
             stickyThreshold = location[1] - scrollViewLocation[1]
@@ -67,7 +67,7 @@ class StickyVideoManager(
     }
 
     private fun showStickyVideo() {
-        val layoutParams = webView.layoutParams
+        val layoutParams: ViewGroup.LayoutParams = webView.layoutParams
 
         (webView.parent as? ViewGroup)?.removeView(webView)
 
@@ -128,7 +128,7 @@ class StickyVideoManager(
     }
 
     companion object {
-        private const val BRIDGE_NAME_IN_JS_FILE = "videoBridge"
-        private const val LOAD_URL_FILE_PATH = "file:///android_asset/iframe.html"
+        private const val BRIDGE_NAME_IN_JS_FILE: String = "videoBridge"
+        private const val LOAD_URL_FILE_PATH: String = "file:///android_asset/iframe.html"
     }
 }
