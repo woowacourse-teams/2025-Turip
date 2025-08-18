@@ -3,10 +3,13 @@ package com.on.turip.ui.folder
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.viewModels
 import com.on.turip.databinding.ActivityFolderBinding
 import com.on.turip.ui.common.base.BaseActivity
 
 class FolderActivity : BaseActivity<ActivityFolderBinding>() {
+    private val viewModel: FolderViewModel by viewModels { FolderViewModel.provideFactory() }
+
     override val binding: ActivityFolderBinding by lazy {
         ActivityFolderBinding.inflate(layoutInflater)
     }
@@ -22,7 +25,7 @@ class FolderActivity : BaseActivity<ActivityFolderBinding>() {
                 }
 
                 override fun onItemClick(folderId: Long) {
-                    // TODO: 폴더명 편집 바텀 시트 다이얼로그 보여주기
+                    viewModel.selectFolder(folderId)
                     val bottomSheet: FolderModifyBottomSheetFragment =
                         FolderModifyBottomSheetFragment.instance()
                     bottomSheet.show(supportFragmentManager, "folder_modify")
@@ -36,6 +39,7 @@ class FolderActivity : BaseActivity<ActivityFolderBinding>() {
 
         setupAdapters()
         setupListeners()
+        setupObservers()
     }
 
     private fun setupAdapters() {
@@ -49,6 +53,12 @@ class FolderActivity : BaseActivity<ActivityFolderBinding>() {
         }
         binding.ivFolderBack.setOnClickListener {
             finish()
+        }
+    }
+
+    private fun setupObservers() {
+        viewModel.folders.observe(this) {
+            folderEditAdapter.submitList(it)
         }
     }
 

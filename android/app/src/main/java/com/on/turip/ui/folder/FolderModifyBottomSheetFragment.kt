@@ -9,13 +9,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.core.widget.addTextChangedListener
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import com.on.turip.databinding.BottomSheetFragmentFolderModifyBinding
 import com.on.turip.ui.common.base.BaseBottomSheetFragment
 import com.on.turip.ui.folder.model.FolderNameStatusModel
 
 class FolderModifyBottomSheetFragment : BaseBottomSheetFragment<BottomSheetFragmentFolderModifyBinding>() {
-    private val viewModel: FolderModifyBottomSheetViewModel by viewModels()
+    private val sharedViewModel: FolderViewModel by activityViewModels()
 
     override fun inflateBinding(
         inflater: LayoutInflater,
@@ -46,7 +46,7 @@ class FolderModifyBottomSheetFragment : BaseBottomSheetFragment<BottomSheetFragm
     }
 
     private fun setupObservers() {
-        viewModel.folderNameStatus.observe(this) { folderNameStatusModel: FolderNameStatusModel ->
+        sharedViewModel.folderNameStatus.observe(this) { folderNameStatusModel: FolderNameStatusModel ->
             binding.tvBottomSheetFolderModifyConfirm.isEnabled =
                 (folderNameStatusModel == FolderNameStatusModel.OK || folderNameStatusModel == FolderNameStatusModel.MAX_LENGTH_FOLDER_NAME)
 
@@ -63,11 +63,11 @@ class FolderModifyBottomSheetFragment : BaseBottomSheetFragment<BottomSheetFragm
 
     private fun setupListeners() {
         binding.tvBottomSheetFolderModifyConfirm.setOnClickListener {
-            // TODO : 폴더 수정 api 호출 필요
+            sharedViewModel.updateFolderName()
             dismiss()
         }
         binding.etBottomSheetFolderModifyFolderName.addTextChangedListener { text: Editable? ->
-            viewModel.updateFolderName(text.toString())
+            sharedViewModel.updateInputFolderName(text.toString())
         }
     }
 
