@@ -11,9 +11,9 @@ class FolderActivity : BaseActivity<ActivityFolderBinding>() {
         ActivityFolderBinding.inflate(layoutInflater)
     }
 
-    private val folderAdapter: FolderAdapter by lazy {
-        FolderAdapter(
-            object : FolderViewHolder.FolderListener {
+    private val folderEditAdapter: FolderEditAdapter by lazy {
+        FolderEditAdapter(
+            object : FolderEditViewHolder.FolderEditListener {
                 override fun onRemoveClick(folderId: Long) {
                     // TODO: 폴더 삭제 바텀 시트 다이얼로그 보여주기
                     val bottomSheet: FolderRemoveBottomSheetFragment =
@@ -39,7 +39,7 @@ class FolderActivity : BaseActivity<ActivityFolderBinding>() {
     }
 
     private fun setupAdapters() {
-        binding.rvFolder.adapter = folderAdapter
+        binding.rvFolder.adapter = folderEditAdapter
     }
 
     private fun setupListeners() {
@@ -47,7 +47,7 @@ class FolderActivity : BaseActivity<ActivityFolderBinding>() {
             val bottomSheet: FolderAddBottomSheetFragment = FolderAddBottomSheetFragment.instance()
             bottomSheet.show(supportFragmentManager, "folder_add")
         }
-        binding.ivFavoriteBack.setOnClickListener {
+        binding.ivFolderBack.setOnClickListener {
             finish()
         }
     }

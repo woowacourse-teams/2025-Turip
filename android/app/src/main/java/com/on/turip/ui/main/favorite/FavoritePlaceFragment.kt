@@ -7,16 +7,19 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
+import com.on.turip.R
 import com.on.turip.databinding.FragmentFavoritePlaceBinding
 import com.on.turip.ui.common.base.BaseFragment
 import com.on.turip.ui.folder.FolderActivity
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
 
 class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
-    private val folderAdapter: FavoritePlaceFolderAdapter by lazy {
-        FavoritePlaceFolderAdapter { favoritePlaceFolderModel: FavoritePlaceFolderModel ->
-            // TODO: viewModel에서 선택한 찜 폴더에 해당하는 아이템을 불러오기
+    private val viewModel: FavoritePlaceViewModel by viewModels { FavoritePlaceViewModel.provideFactory() }
+    private val folderNameAdapter: FavoritePlaceFolderNameAdapter by lazy {
+        FavoritePlaceFolderNameAdapter { folderId: Long ->
+            viewModel.updateFolderWithPlaces(folderId)
         }
     }
     private val placeAdapter: FavoritePlaceAdapter by lazy {
@@ -49,11 +52,13 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
 
         setupAdapters()
         setupListeners()
+        setupObservers()
     }
 
     private fun setupAdapters() {
-        binding.rvFavoritePlaceFolder.apply {
-            adapter = folderAdapter
+        binding.rvFavoritePlaceFolderName.apply {
+            adapter = folderNameAdapter
+            itemAnimator = null
             addOnItemTouchListener(RecyclerViewTouchInterceptor)
         }
         binding.rvFavoritePlacePlace.adapter = placeAdapter
@@ -64,6 +69,29 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
             val intent: Intent = FolderActivity.newIntent(requireContext())
             startActivity(intent)
         }
+    }
+
+    private fun setupObservers() {
+        viewModel.folders.observe(viewLifecycleOwner) { favoritePlaceFolders: List<FavoritePlaceFolderModel> ->
+            folderNameAdapter.submitList(favoritePlaceFolders)
+        }
+
+        viewModel.placeCount.observe(viewLifecycleOwner) { placeCount: Int ->
+            if (placeCount == 0) {
+                binding.clFavoritePlaceEmpty.visibility = View.VISIBLE
+                binding.groupFavoritePlaceNotEmpty.visibility = View.GONE
+            } else {
+                binding.clFavoritePlaceEmpty.visibility = View.GONE
+                binding.groupFavoritePlaceNotEmpty.visibility = View.VISIBLE
+                binding.tvFavoritePlacePlaceCount.text =
+                    getString(R.string.all_total_place_count, placeCount)
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.loadFoldersAndPlaces()
     }
 
     companion object {

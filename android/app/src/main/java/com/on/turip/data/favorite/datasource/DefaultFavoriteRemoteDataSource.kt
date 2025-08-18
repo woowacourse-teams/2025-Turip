@@ -13,32 +13,25 @@ class DefaultFavoriteRemoteDataSource(
     private val favoriteService: FavoriteService,
     private val coroutineContext: CoroutineContext = Dispatchers.IO,
 ) : FavoriteRemoteDataSource {
-    override suspend fun postFavorite(
-        fid: String,
-        favoriteAddRequest: FavoriteAddRequest,
-    ): TuripCustomResult<Unit> =
+    override suspend fun postFavorite(favoriteAddRequest: FavoriteAddRequest): TuripCustomResult<Unit> =
         withContext(coroutineContext) {
             safeApiCall {
-                favoriteService.postFavorite(fid, favoriteAddRequest)
+                favoriteService.postFavorite(favoriteAddRequest)
             }
         }
 
-    override suspend fun deleteFavorite(
-        fid: String,
-        contentId: Long,
-    ): TuripCustomResult<Unit> =
+    override suspend fun deleteFavorite(contentId: Long): TuripCustomResult<Unit> =
         withContext(coroutineContext) {
             safeApiCall {
-                favoriteService.deleteFavorite(fid, contentId)
+                favoriteService.deleteFavorite(contentId)
             }
         }
 
     override suspend fun getFavoriteContents(
-        fid: String,
         size: Int,
         lastId: Long,
     ): TuripCustomResult<FavoriteContentsResponse> =
         withContext(coroutineContext) {
-            safeApiCall { favoriteService.getFavoriteContents(fid, size, lastId) }
+            safeApiCall { favoriteService.getFavoriteContents(size, lastId) }
         }
 }

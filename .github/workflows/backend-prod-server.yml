@@ -1,12 +1,12 @@
-name: dev CI Build and Test, EC2 CD
+name: prod CI Build and Test, EC2 CD
 
 on:
   push:
-    branches: [ develop ]
+    branches: [ main ]
     paths:
       - 'backend/**'
   pull_request:
-    branches: [ develop ]
+    branches: [ main ]
     paths:
       - 'backend/**'
 
@@ -49,7 +49,7 @@ jobs:
 
   deploy:
     needs: build_and_test
-    runs-on: [self-hosted, turip-server-dev]
+    runs-on: [self-hosted, turip-server-prod]
     environment: production
     if: github.event_name == 'push'
 
@@ -71,15 +71,15 @@ jobs:
           echo "JAR_NAME=$(basename $JAR_FILE)" >> $GITHUB_OUTPUT
           echo "JAR file located at: $JAR_FILE"
 
-      - name: Kill Existing Server On Port 80
+      - name: Kill Existing Server On Port 8080
         run: |
-          PID=$(sudo lsof -t -i :80 || true)
+          PID=$(sudo lsof -t -i :8080 || true)
           if [ -n "$PID" ]; then
             echo "Killing existing process: $PID"
             sudo kill -9 $PID
           fi
     
-      - name: Run App On Port 80
+      - name: Run App On Port 8080
         run: |
           JAR_NAME="${{ steps.get_jar_name.outputs.JAR_NAME }}"
           DOWNLOADED_JAR="./downloaded-artifact/$JAR_NAME"
@@ -90,4 +90,4 @@ jobs:
           chmod +x "$TARGET_JAR"
 
           echo "Starting application..."
-          sudo nohup java -jar "$TARGET_JAR" --server.port=80 > /dev/null 2>&1 &
+          sudo nohup java -jar -Dspring.profiles.active=prod "$TARGET_JAR" &
