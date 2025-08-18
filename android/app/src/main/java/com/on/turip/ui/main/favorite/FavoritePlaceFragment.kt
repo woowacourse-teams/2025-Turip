@@ -17,8 +17,8 @@ import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
 
 class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
     private val viewModel: FavoritePlaceViewModel by viewModels { FavoritePlaceViewModel.provideFactory() }
-    private val folderAdapter: FavoritePlaceFolderAdapter by lazy {
-        FavoritePlaceFolderAdapter { folderId: Long ->
+    private val folderNameAdapter: FavoritePlaceFolderNameAdapter by lazy {
+        FavoritePlaceFolderNameAdapter { folderId: Long ->
             viewModel.updateFolderWithPlaces(folderId)
         }
     }
@@ -56,8 +56,8 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
     }
 
     private fun setupAdapters() {
-        binding.rvFavoritePlaceFolder.apply {
-            adapter = folderAdapter
+        binding.rvFavoritePlaceFolderName.apply {
+            adapter = folderNameAdapter
             itemAnimator = null
             addOnItemTouchListener(RecyclerViewTouchInterceptor)
         }
@@ -73,7 +73,7 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
 
     private fun setupObservers() {
         viewModel.folders.observe(viewLifecycleOwner) { favoritePlaceFolders: List<FavoritePlaceFolderModel> ->
-            folderAdapter.submitList(favoritePlaceFolders)
+            folderNameAdapter.submitList(favoritePlaceFolders)
         }
 
         viewModel.placeCount.observe(viewLifecycleOwner) { placeCount: Int ->

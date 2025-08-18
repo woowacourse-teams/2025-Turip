@@ -5,16 +5,18 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
 
-class FavoritePlaceFolderAdapter(
-    private val onPlaceFolderListener: FavoritePlaceFolderViewHolder.OnPlaceFolderListener,
-) : ListAdapter<FavoritePlaceFolderModel, FavoritePlaceFolderViewHolder>(FavoritePlaceFolderDiffUtil) {
+class FavoritePlaceFolderNameAdapter(
+    private val onPlaceFolderNameListener: FavoritePlaceFolderNameViewHolder.OnPlaceFolderNameListener,
+) : ListAdapter<FavoritePlaceFolderModel, FavoritePlaceFolderNameViewHolder>(
+        FavoritePlaceFolderDiffUtil,
+    ) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): FavoritePlaceFolderViewHolder = FavoritePlaceFolderViewHolder.of(parent, onPlaceFolderListener)
+    ): FavoritePlaceFolderNameViewHolder = FavoritePlaceFolderNameViewHolder.of(parent, onPlaceFolderNameListener)
 
     override fun onBindViewHolder(
-        holder: FavoritePlaceFolderViewHolder,
+        holder: FavoritePlaceFolderNameViewHolder,
         position: Int,
     ) {
         holder.bind(getItem(position))
