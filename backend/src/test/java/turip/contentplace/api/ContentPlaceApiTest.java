@@ -15,7 +15,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class ContentPlaceApiTest {
+class ContentPlaceApiTest {
 
     @LocalServerPort
     private int port;
@@ -42,6 +42,8 @@ public class ContentPlaceApiTest {
         jdbcTemplate.update("ALTER TABLE content_place ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE place ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE content ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE member ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE favorite_folder ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE creator ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE country ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE city ALTER COLUMN id RESTART WITH 1");

@@ -15,7 +15,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class ContentApiTest {
+class ContentApiTest {
 
     @LocalServerPort
     private int port;
@@ -29,6 +29,7 @@ public class ContentApiTest {
         jdbcTemplate.update("DELETE FROM content_place");
         jdbcTemplate.update("DELETE FROM place");
         jdbcTemplate.update("DELETE FROM category");
+        jdbcTemplate.update("DELETE FROM favorite_folder");
         jdbcTemplate.update("DELETE FROM favorite_content");
         jdbcTemplate.update("DELETE FROM member");
         jdbcTemplate.update("DELETE FROM content");
@@ -68,6 +69,7 @@ public class ContentApiTest {
 
             // when & then
             RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
                     .when().get("/contents/{id}", 1)
                     .then()
                     .statusCode(200)
@@ -127,6 +129,7 @@ public class ContentApiTest {
 
             // when & then
             RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
                     .when().get("/contents/{id}", 20)
                     .then()
                     .statusCode(404);
@@ -219,7 +222,7 @@ public class ContentApiTest {
     @Nested
     class ReadWeeklyPopularFavoriteContentContents {
 
-        @DisplayName("device-fid 헤더가 존재하지 않는 경우 컨텐츠 목록과 찜 상태 false를 응답한다. 성공 시 200 OK 코드를 응답한다")
+        @DisplayName("device-fid 헤더가 존재하지 않는 경우 400 BAD REQUEST 코드를 응답한다")
         @Test
         void getPopularContentsWithoutDeviceFid() {
             // given
@@ -238,16 +241,12 @@ public class ContentApiTest {
                     .queryParam("size", 5)
                     .when().log().all().get("/contents/popular/favorites")
                     .then().log().all()
-                    .statusCode(200)
-                    .body("contents[0].content.id", is(1))
-                    .body("contents[0].content.title", is("서울 여행"))
-                    .body("contents[0].content.city.name", is("서울"))
-                    .body("contents[0].content.isFavorite", is(false));
+                    .statusCode(400);
         }
 
         @DisplayName("device-fid 헤더가 존재하면 컨텐츠 목록과 찜 여부를 응답한다. 성공 시 200 OK 코드를 응답한다")
         @Test
-        void getPopularContentsWithDeviceFid() {
+        void getPopularContentsWithDeviceFid2() {
             // given
             jdbcTemplate.update(
                     "INSERT INTO creator (profile_image, channel_name) VALUES ('https://image.example.com/creator.jpg', '여행채널')");

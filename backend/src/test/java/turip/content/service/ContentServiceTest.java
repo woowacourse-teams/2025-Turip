@@ -7,7 +7,6 @@ import static org.mockito.BDDMockito.given;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -120,8 +119,6 @@ class ContentServiceTest {
             given(favoriteContentRepository.findPopularContentsByFavoriteBetweenDatesWithLimit(startDate, endDate,
                     topContentSize))
                     .willReturn(popularContents);
-            given(memberRepository.findByDeviceFid("testDeviceFid"))
-                    .willReturn(Optional.of(member));
             given(favoriteContentRepository.findByMemberIdAndContentIdIn(1L, List.of(1L, 2L)))
                     .willReturn(List.of(new FavoriteContent(LocalDate.now().minusWeeks(1), member, content1),
                             new FavoriteContent(LocalDate.now().minusWeeks(1), member, content2)));
@@ -131,8 +128,8 @@ class ContentServiceTest {
                     .willReturn(2); // content2, 1박 2일
 
             // when
-            WeeklyPopularFavoriteContentsResponse response = contentService.findWeeklyPopularFavoriteContents(
-                    "testDeviceFid", topContentSize);
+            WeeklyPopularFavoriteContentsResponse response = contentService.findWeeklyPopularFavoriteContents(member,
+                    topContentSize);
 
             // then
             Assertions.assertAll(
