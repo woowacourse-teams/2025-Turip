@@ -1,4 +1,4 @@
--- V2__alter_tables.sql
+-- V2__alter_tables.mysql.sql
 -- 스키마 변경: 길이 확장/축소 및 URL 칼럼 TEXT 전환(+유니크 보장)
 
 -- 1) country
