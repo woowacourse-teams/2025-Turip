@@ -32,7 +32,7 @@ public class Place {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "url", nullable = false, unique = true, length = 500)
+    @Column(name = "url", nullable = false, unique = true, length = 65535)
     private String url;
 
     @Column(name = "address", nullable = false)

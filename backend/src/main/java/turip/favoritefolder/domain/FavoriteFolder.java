@@ -20,7 +20,7 @@ import turip.member.domain.Member;
 @Getter
 @Entity
 @Table(name = "favorite_folder", uniqueConstraints = {
-    @UniqueConstraint(name = "uq_favorite_folder__member_name", columnNames = {"member_id", "name"})
+        @UniqueConstraint(name = "uq_favorite_folder__member_name", columnNames = {"member_id", "name"})
 })
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -36,7 +36,7 @@ public class FavoriteFolder {
     @JoinColumn(name = "member_id", nullable = false, foreignKey = @ForeignKey(name = "fk_favorite_folder__member"))
     private Member member;
 
-    @Column(name = "name", nullable = false, length = 100)
+    @Column(name = "name", nullable = false)
     private String name;
 
     @Column(name = "is_default", nullable = false)

@@ -41,7 +41,7 @@ public class City {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "image_url", nullable = false)
+    @Column(name = "image_url", nullable = false, length = 65535)
     private String imageUrl;
 
     public City(Country country, Province province, String name, String imageUrl) {

@@ -25,10 +25,10 @@ public class Creator {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "channel_name", nullable = false, unique = true)
+    @Column(name = "channel_name", nullable = false, unique = true, length = 50)
     private String channelName;
 
-    @Column(name = "profile_image", nullable = false)
+    @Column(name = "profile_image", nullable = false, length = 65535)
     private String profileImage;
 
     public Creator(String channelName, String profileImage) {
