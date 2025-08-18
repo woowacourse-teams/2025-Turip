@@ -10,7 +10,7 @@ import turip.log.LoggingInterceptor;
 @Configuration
 @Profile("dev")
 @RequiredArgsConstructor
-public class DevWebMvcConfiguration implements WebMvcConfigurer {
+public class LoggingConfiguration implements WebMvcConfigurer {
 
     private final LoggingInterceptor loggingInterceptor;
 
