@@ -22,4 +22,7 @@ class DefaultFolderRepository(
         folderId: Long,
         updateName: String,
     ): TuripCustomResult<Unit> = folderRemoteDataSource.patchFavoriteFolder(folderId, updateName.toPatchRequestDto())
+
+    override suspend fun deleteFavoriteFolder(folderId: Long): TuripCustomResult<Unit> =
+        folderRemoteDataSource.deleteFavoriteFolder(folderId)
 }

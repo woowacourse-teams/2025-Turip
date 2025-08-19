@@ -73,6 +73,8 @@
     <string name="bottom_sheet_folder_remove_title">%s을 삭제하시겠습니까?</string>
     <string name="bottom_sheet_folder_remove_cancel">취소</string>
     <string name="bottom_sheet_folder_remove_remove">삭제</string>
+    <string name="folder_empty_suggest_title">나만의 폴더를 만들어보세요!</string>
+    <string name="folder_empty_suggest_description">폴더를 만들면 다양한 장소들을\n내 마음대로 나누어 보관할 수 있어요.</string>
 
     <string name="main_double_back_pressed_to_exit">한 번 더 누르면 종료됩니다.</string>
 

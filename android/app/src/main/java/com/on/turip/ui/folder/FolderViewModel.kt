@@ -31,6 +31,11 @@ class FolderViewModel(
     val folderNameStatus: LiveData<FolderNameStatusModel> =
         inputFolderName.map { FolderNameStatusModel.of(it, LinkedHashSet()) }
 
+    val selectFolder: LiveData<FolderEditModel> =
+        folders.map { folders: List<FolderEditModel> ->
+            folders.first { folder: FolderEditModel -> folder.isSelected }
+        }
+
     init {
         loadFolders()
     }
@@ -42,7 +47,9 @@ class FolderViewModel(
                 .onSuccess { folders: List<Folder> ->
                     Timber.d("찜 폴더 목록 설정 화면 폴더 불러오기 성공")
                     _folders.value =
-                        folders.filter { !it.isDefault }.map { folder -> folder.toEditUiModel() }
+                        folders
+                            .filter { !it.isDefault }
+                            .map { folder -> folder.toEditUiModel() }
                 }.onFailure { Timber.e("찜 폴더 목록 설정 화면 폴더 불러오기 API 호출 실패") }
         }
     }
@@ -57,7 +64,7 @@ class FolderViewModel(
                 folderRepository
                     .createFavoriteFolder(folderName)
                     .onSuccess {
-                        Timber.d("폴더 생성 완료(폴더명 = $folderName")
+                        Timber.d("폴더 생성 완료(폴더명 = $folderName)")
                         _folders.value =
                             folders.value?.plus(FolderEditModel(name = folderName))
                     }.onFailure { Timber.e("폴더 생성 실패") }
@@ -67,22 +74,42 @@ class FolderViewModel(
 
     fun selectFolder(folderId: Long) {
         _folders.value =
-            folders.value?.map { if (it.id == folderId) it.copy(isSelected = true) else it }
+            folders.value?.map { folderModel: FolderEditModel ->
+                if (folderModel.id == folderId) {
+                    folderModel.copy(isSelected = true)
+                } else {
+                    folderModel.copy(isSelected = false)
+                }
+            }
     }
 
     fun updateFolderName() {
         viewModelScope.launch {
-            val folder: FolderEditModel? = folders.value?.first { it.isSelected }
-            if (folder != null) {
+            selectFolder.value?.let { selectFolder: FolderEditModel ->
                 inputFolderName.value?.let { updateFolderName: String ->
                     folderRepository
-                        .updateFavoriteFolder(folder.id, updateFolderName)
+                        .updateFavoriteFolder(selectFolder.id, updateFolderName)
                         .onSuccess {
-                            Timber.d("폴더 수정 완료(폴더명 = $updateFolderName}")
+                            Timber.d("폴더 수정 완료(폴더명 = $updateFolderName})")
                             _folders.value =
-                                folders.value?.map { if (it.id == folder.id) it.copy(name = updateFolderName) else it }
+                                folders.value?.map { if (it.id == selectFolder.id) it.copy(name = updateFolderName) else it }
                         }.onFailure { Timber.e("폴더 수정 실패") }
                 }
+            }
+        }
+    }
+
+    fun deleteFolder() {
+        viewModelScope.launch {
+            selectFolder.value?.let { selectFolder: FolderEditModel ->
+                folderRepository
+                    .deleteFavoriteFolder(selectFolder.id)
+                    .onSuccess {
+                        _folders.value = folders.value?.filter { it.id != selectFolder.id }
+                        Timber.d("폴더 삭제 완료(폴더명 = ${selectFolder.name})")
+                    }.onFailure {
+                        Timber.d("폴더 삭제 실패")
+                    }
             }
         }
     }

@@ -37,4 +37,11 @@ class DefaultFolderRemoteDataSource(
                 folderService.patchFavoriteFolder(folderId, favoriteFolderPatchRequest)
             }
         }
+
+    override suspend fun deleteFavoriteFolder(folderId: Long): TuripCustomResult<Unit> =
+        withContext(coroutineContext) {
+            safeApiCall {
+                folderService.deleteFavoriteFolder(folderId)
+            }
+        }
 }
