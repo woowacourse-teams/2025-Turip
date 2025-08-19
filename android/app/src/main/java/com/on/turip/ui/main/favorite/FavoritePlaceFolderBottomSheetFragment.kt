@@ -1,6 +1,7 @@
 package com.on.turip.ui.main.favorite
 
 import android.app.Dialog
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -16,6 +17,7 @@ import com.on.turip.R
 import com.on.turip.databinding.BottomSheetFragmentFavoritePlaceFolderBinding
 import com.on.turip.ui.common.TuripSnackbar
 import com.on.turip.ui.common.base.BaseBottomSheetFragment
+import com.on.turip.ui.folder.FolderActivity
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
 
 class FavoritePlaceFolderBottomSheetFragment : BaseBottomSheetFragment<BottomSheetFragmentFavoritePlaceFolderBinding>() {
@@ -94,11 +96,19 @@ class FavoritePlaceFolderBottomSheetFragment : BaseBottomSheetFragment<BottomShe
     ) {
         super.onViewCreated(view, savedInstanceState)
         setupAdapters()
+        setupListeners()
         setupObservers()
     }
 
     private fun setupAdapters() {
         binding.rvBottomSheetFavoritePlaceFolderFolder.adapter = favoritePlaceFolderAdapter
+    }
+
+    private fun setupListeners() {
+        binding.ivBottomSheetFolderFavoritePlaceAddFolder.setOnClickListener {
+            val intent: Intent = FolderActivity.newIntent(requireContext())
+            startActivity(intent)
+        }
     }
 
     private fun setupObservers() {
