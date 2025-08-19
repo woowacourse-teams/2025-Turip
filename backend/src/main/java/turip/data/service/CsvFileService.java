@@ -2,6 +2,7 @@ package turip.data.service;
 
 import java.io.IOException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -37,7 +38,12 @@ public class CsvFileService {
         URL url = new URL(urlString);
         Path tempFile = Files.createTempFile("csv_import_", ".csv");
 
-        try (var inputStream = url.openStream()) {
+        URLConnection connection = url.openConnection();
+        connection.setConnectTimeout(30000); // 30초
+        connection.setReadTimeout(60000); // 60초
+        connection.setRequestProperty("User-Agent", "Turip-DataImporter/1.0");
+
+        try (var inputStream = connection.getInputStream()) {
             long bytesCopied = Files.copy(inputStream, tempFile, StandardCopyOption.REPLACE_EXISTING);
             log.info("CSV 파일 다운로드 완료: {} -> {} ({} bytes)", urlString, tempFile, bytesCopied);
         } catch (IOException e) {
