@@ -3,9 +3,11 @@ package com.on.turip.ui.folder
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.activity.viewModels
 import com.on.turip.databinding.ActivityFolderBinding
 import com.on.turip.ui.common.base.BaseActivity
+import com.on.turip.ui.folder.model.FolderEditModel
 
 class FolderActivity : BaseActivity<ActivityFolderBinding>() {
     private val viewModel: FolderViewModel by viewModels { FolderViewModel.provideFactory() }
@@ -57,8 +59,15 @@ class FolderActivity : BaseActivity<ActivityFolderBinding>() {
     }
 
     private fun setupObservers() {
-        viewModel.folders.observe(this) {
-            folderEditAdapter.submitList(it)
+        viewModel.folders.observe(this) { folders: List<FolderEditModel> ->
+            if (folders.isEmpty()) {
+                binding.clFolderEmpty.visibility = View.VISIBLE
+                binding.rvFolder.visibility = View.GONE
+            } else {
+                binding.clFolderEmpty.visibility = View.GONE
+                binding.rvFolder.visibility = View.VISIBLE
+            }
+            folderEditAdapter.submitList(folders)
         }
     }
 
