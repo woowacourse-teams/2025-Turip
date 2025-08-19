@@ -80,4 +80,9 @@
 
     <string name="main_double_back_pressed_to_exit">한 번 더 누르면 종료됩니다.</string>
 
+    <!-- 네트워크 오류 -->
+    <string name="cannot_connect_network">네트워크에 연결할 수 없습니다.</string>
+    <string name="check_connection_status">연결 상태를 확인해주세요</string>
+    <string name="retry">다시시도</string>
+
 </resources>
