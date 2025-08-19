@@ -7,7 +7,7 @@ interface FavoritePlaceRepository {
     suspend fun loadFavoritePlaces(favoriteFolderId: Long): TuripCustomResult<List<Place>>
 
     suspend fun createFavoritePlace(
-        favoritePlaceId: Long,
+        favoriteFolderId: Long,
         placeId: Long,
     ): TuripCustomResult<Unit>
 }

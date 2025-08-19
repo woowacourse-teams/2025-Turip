@@ -7,7 +7,7 @@ interface FavoritePlaceDataSource {
     suspend fun getFavoritePlaces(favoriteFolderId: Long): TuripCustomResult<FavoritePlacesResponse>
 
     suspend fun createFavoritePlace(
-        favoritePlaceId: Long,
+        favoriteFolderId: Long,
         placeId: Long,
     ): TuripCustomResult<Unit>
 }
