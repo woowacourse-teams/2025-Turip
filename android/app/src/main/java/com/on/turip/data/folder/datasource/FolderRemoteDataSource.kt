@@ -14,4 +14,6 @@ interface FolderRemoteDataSource {
         folderId: Long,
         favoriteFolderPatchRequest: FavoriteFolderPatchRequest,
     ): TuripCustomResult<Unit>
+
+    suspend fun deleteFavoriteFolder(folderId: Long): TuripCustomResult<Unit>
 }

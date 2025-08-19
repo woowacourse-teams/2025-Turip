@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import turip.city.domain.City;
 import turip.city.service.CityService;
@@ -23,8 +24,12 @@ public class RegionCategoryService {
     private static final String KOREA_COUNTRY_NAME = "대한민국";
     private static final String DOMESTIC_ETC_NAME = "국내 기타";
     private static final String OVERSEAS_ETC_NAME = "해외 기타";
-    private static final String DOMESTIC_ETC_IMAGE_URL = "https://drive.google.com/uc?export=view&id=1NLfO_raehCOaO_6I3TIUKL9mF4bPQw2C";
-    private static final String OVERSEAS_ETC_IMAGE_URL = "https://drive.google.com/uc?export=view&id=10Ci4DNJ9yG0USvdmlLwpx9soUoKRoy2f";
+
+    @Value("${region.category.domestic.etc.image-url}")
+    private String domesticEtcImageUrl;
+
+    @Value("${region.category.overseas.etc.image-url}")
+    private String overseasEtcImageUrl;
 
     private final CityService cityService;
     private final CountryService countryService;
@@ -71,7 +76,7 @@ public class RegionCategoryService {
         int domesticEtcCount = contentRepository.countDomesticEtcContents(supportedCityNames);
 
         if (domesticEtcCount > 0) {
-            results.add(RegionCategoryResponse.of(DOMESTIC_ETC_NAME, DOMESTIC_ETC_IMAGE_URL));
+            results.add(RegionCategoryResponse.of(DOMESTIC_ETC_NAME, domesticEtcImageUrl));
         }
     }
 
@@ -117,7 +122,7 @@ public class RegionCategoryService {
         int overseasEtcCount = contentRepository.countOverseasEtcContents(supportedCountryNames);
 
         if (overseasEtcCount > 0) {
-            results.add(RegionCategoryResponse.of(OVERSEAS_ETC_NAME, OVERSEAS_ETC_IMAGE_URL));
+            results.add(RegionCategoryResponse.of(OVERSEAS_ETC_NAME, overseasEtcImageUrl));
         }
     }
 

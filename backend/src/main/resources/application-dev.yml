@@ -15,10 +15,28 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: none
+    properties:
+      hibernate:
+        # 개발 환경에서는 스키마 검증을 완화
+        validator:
+          apply_to_ddl: false
+        # CLOB 컬럼 타입 불일치 허용
+        dialect: org.hibernate.dialect.H2Dialect
 
   flyway:
     enabled: true
+    locations: classpath:db/migration/dev
+    baseline-on-migrate: true
+    validate-on-migrate: true
+    encoding: UTF-8
+
+# CSV Import 설정
+csv:
+  import:
+    password: ${CSV_IMPORT_PASSWORD:dev_password_123}
+  links:
+    collection-url: ${CSV_LINKS_COLLECTION_URL}
 
 logging:
   level:

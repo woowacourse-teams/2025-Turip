@@ -34,7 +34,7 @@ import turip.province.repository.ProvinceRepository;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class CsvDataImportService {
+public class DataImportService {
 
     private static final String QUOTATION_MARKS = "\"";
     private static final String COMMA_SPLIT_REGEX = ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)";
