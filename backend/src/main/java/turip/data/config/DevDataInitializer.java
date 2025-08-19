@@ -35,6 +35,10 @@ public class DevDataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) {
         try {
+            if (csvLinksCollectionUrl == null || csvLinksCollectionUrl.isBlank()) {
+                log.warn("csv.links.collection-url 이 설정되지 않아 DevDataInitializer를 건너뜁니다.");
+                return;
+            }
             // CSV 파일 링크 모음집 다운로드 및 링크 추출
             List<String> csvUrls = downloadAndExtractCsvLinks();
 
