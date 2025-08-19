@@ -28,7 +28,10 @@ class FavoritePlaceFolderBottomSheetFragment : BaseBottomSheetFragment<BottomShe
     }
     private val favoritePlaceFolderAdapter: FavoritePlaceFolderAdapter by lazy {
         FavoritePlaceFolderAdapter { favoritePlaceFolderModel: FavoritePlaceFolderModel ->
-            viewModel.updateFolder(folderId = favoritePlaceFolderModel.id)
+            viewModel.updateFolder(
+                folderId = favoritePlaceFolderModel.id,
+                isFavorite = favoritePlaceFolderModel.isSelected,
+            )
             showSnackbar(favoritePlaceFolderModel)
         }
     }
