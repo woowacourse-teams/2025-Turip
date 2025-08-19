@@ -28,3 +28,13 @@ spring:
 csv:
   import:
     password: test_password_123
+
+# Region Category 기타 이미지 설정 (테스트용 더미 값)
+region:
+  category:
+    domestic:
+      etc:
+        image-url: https://test.example.com/domestic-etc.jpg
+    overseas:
+      etc:
+        image-url: https://test.example.com/overseas-etc.jpg
