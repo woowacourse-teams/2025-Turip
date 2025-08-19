@@ -9,17 +9,46 @@ import android.widget.FrameLayout
 import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.fragment.app.viewModels
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.snackbar.Snackbar
 import com.on.turip.R
 import com.on.turip.databinding.BottomSheetFragmentFavoritePlaceFolderBinding
+import com.on.turip.ui.common.TuripSnackbar
 import com.on.turip.ui.common.base.BaseBottomSheetFragment
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
 
 class FavoritePlaceFolderBottomSheetFragment : BaseBottomSheetFragment<BottomSheetFragmentFavoritePlaceFolderBinding>() {
+    private val viewModel: FavoritePlaceFolderViewModel by viewModels {
+        FavoritePlaceFolderViewModel.provideFactory(
+            placeId = arguments?.getLong(ARGUMENTS_PLACE_ID) ?: 0L,
+        )
+    }
     private val favoritePlaceFolderAdapter: FavoritePlaceFolderAdapter by lazy {
         FavoritePlaceFolderAdapter { favoritePlaceFolderModel: FavoritePlaceFolderModel ->
-            // TODO : 폴더명과 함께 스낵바 띄우기
+            viewModel.updateFolder(folderId = favoritePlaceFolderModel.id)
+            showSnackbar(favoritePlaceFolderModel)
         }
+    }
+
+    private fun showSnackbar(favoritePlaceFolderModel: FavoritePlaceFolderModel) {
+        val updatedFavorites: Boolean = !favoritePlaceFolderModel.isSelected
+
+        val messageResource: Int =
+            if (updatedFavorites) R.string.bottom_sheet_favorite_place_folder_save_with_folder_name else R.string.bottom_sheet_favorite_place_folder_remove_with_folder_name
+        val message: String = getString(messageResource, favoritePlaceFolderModel.name)
+        val iconResource: Int =
+            if (updatedFavorites) R.drawable.ic_heart_normal else R.drawable.ic_heart_empty
+
+        TuripSnackbar
+            .make(
+                rootView = binding.root,
+                message = message,
+                duration = Snackbar.LENGTH_LONG,
+                layoutInflater = layoutInflater,
+            ).icon(iconResource)
+            .action(R.string.all_snackbar_close)
+            .show()
     }
 
     override fun inflateBinding(
@@ -65,15 +94,29 @@ class FavoritePlaceFolderBottomSheetFragment : BaseBottomSheetFragment<BottomShe
     ) {
         super.onViewCreated(view, savedInstanceState)
         setupAdapters()
+        setupObservers()
     }
 
     private fun setupAdapters() {
         binding.rvBottomSheetFavoritePlaceFolderFolder.adapter = favoritePlaceFolderAdapter
     }
 
+    private fun setupObservers() {
+        viewModel.favoritePlaceFolders.observe(viewLifecycleOwner) { folders: List<FavoritePlaceFolderModel> ->
+            favoritePlaceFolderAdapter.submitList(folders)
+        }
+    }
+
     companion object {
         private const val BASIC_VIEW_PERCENT: Float = 0.5f
+        private const val ARGUMENTS_PLACE_ID = "PLACE_ID"
 
-        fun instance(): FavoritePlaceFolderBottomSheetFragment = FavoritePlaceFolderBottomSheetFragment()
+        fun instance(placeId: Long): FavoritePlaceFolderBottomSheetFragment =
+            FavoritePlaceFolderBottomSheetFragment().apply {
+                arguments =
+                    Bundle().apply {
+                        putLong(ARGUMENTS_PLACE_ID, placeId)
+                    }
+            }
     }
 }

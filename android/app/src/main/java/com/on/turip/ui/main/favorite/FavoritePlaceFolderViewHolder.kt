@@ -13,8 +13,11 @@ class FavoritePlaceFolderViewHolder(
     private var favoritePlaceFolderModel: FavoritePlaceFolderModel? = null
 
     init {
-        favoritePlaceFolderModel?.let {
-            onFavoritePlaceFolderListener.onFavoriteFolderClick(it)
+
+        binding.ivFavoritePlaceFolderFavorite.setOnClickListener {
+            favoritePlaceFolderModel?.let { placeFolder: FavoritePlaceFolderModel ->
+                onFavoritePlaceFolderListener.onFavoriteFolderClick(placeFolder)
+            }
         }
     }
 
