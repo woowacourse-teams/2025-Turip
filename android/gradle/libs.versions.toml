@@ -1,6 +1,6 @@
 [versions]
-versionName = "1.0.2"
-versionCode = "102"
+versionName = "1.1.0"
+versionCode = "111"
 lifecycleLivedataKtx = "2.9.2"
 roomRuntime = "2.7.2"
 datastorePreferences = "1.1.7"

@@ -8,16 +8,9 @@ import com.on.turip.domain.content.Content
 import com.on.turip.domain.content.PagedContentsResult
 import com.on.turip.domain.content.UsersLikeContent
 import com.on.turip.domain.content.repository.ContentRepository
-import com.on.turip.domain.userstorage.TuripDeviceIdentifier
-import com.on.turip.domain.userstorage.repository.UserStorageRepository
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import timber.log.Timber
 
 class DefaultContentRepository(
     private val contentRemoteDataSource: ContentRemoteDataSource,
-    private val userStorageRepository: UserStorageRepository,
 ) : ContentRepository {
     override suspend fun loadContentsSizeByRegion(regionCategoryName: String): TuripCustomResult<Int> =
         contentRemoteDataSource
@@ -47,22 +40,10 @@ class DefaultContentRepository(
             .getContentsByKeyword(keyword, size, lastId)
             .mapCatching { it.toDomain() }
 
-    override suspend fun loadContent(contentId: Long): TuripCustomResult<Content> {
-        val turipDeviceIdentifier: TuripDeviceIdentifier =
-            CoroutineScope(Dispatchers.IO)
-                .async {
-                    userStorageRepository
-                        .loadId()
-                        .onFailure {
-                            Timber.e("${it.message}")
-                        }
-                }.await()
-                .getOrThrow()
-
-        return contentRemoteDataSource
-            .getContentDetail(contentId, turipDeviceIdentifier.fid)
+    override suspend fun loadContent(contentId: Long): TuripCustomResult<Content> =
+        contentRemoteDataSource
+            .getContentDetail(contentId)
             .mapCatching { it.toDomain() }
-    }
 
     override suspend fun loadPopularFavoriteContents(size: Int): TuripCustomResult<List<UsersLikeContent>> =
         contentRemoteDataSource

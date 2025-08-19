@@ -7,7 +7,6 @@ import com.on.turip.data.content.dto.ContentsInformationResponse2
 import com.on.turip.data.content.dto.UsersLikeContentsResponse
 import retrofit2.Response
 import retrofit2.http.GET
-import retrofit2.http.Header
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -46,7 +45,6 @@ interface ContentService {
     @GET("contents/{contentId}")
     suspend fun getContentDetail(
         @Path("contentId") contentId: Long,
-        @Header("device-fid") fid: String,
     ): Response<ContentDetailResponse>
 
     @GET("/contents/popular/favorites")

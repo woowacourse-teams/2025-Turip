@@ -19,7 +19,6 @@ import turip.favoritefolder.domain.FavoriteFolder;
 import turip.favoritefolder.repository.FavoriteFolderRepository;
 import turip.favoriteplace.repository.FavoritePlaceRepository;
 import turip.member.domain.Member;
-import turip.member.service.MemberService;
 import turip.place.domain.Place;
 import turip.place.repository.PlaceRepository;
 
@@ -28,7 +27,6 @@ import turip.place.repository.PlaceRepository;
 public class FavoriteFolderService {
 
     private final FavoriteFolderRepository favoriteFolderRepository;
-    private final MemberService memberService;
     private final FavoritePlaceRepository favoritePlaceRepository;
     private final PlaceRepository placeRepository;
 
@@ -54,8 +52,7 @@ public class FavoriteFolderService {
         return FavoriteFoldersWithPlaceCountResponse.from(favoriteFoldersWithPlaceCount);
     }
 
-    public FavoriteFoldersWithFavoriteStatusResponse findAllWithFavoriteStatusByDeviceId(Member member,
-                                                                                         Long placeId) {
+    public FavoriteFoldersWithFavoriteStatusResponse findAllWithFavoriteStatusByDeviceId(Member member, Long placeId) {
         Place place = getPlaceById(placeId);
 
         List<FavoriteFolderWithFavoriteStatusResponse> favoriteFoldersWithFavoriteStatus = favoriteFolderRepository.findAllByMember(

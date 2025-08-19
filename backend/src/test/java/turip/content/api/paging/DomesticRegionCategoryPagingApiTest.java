@@ -45,14 +45,14 @@ class DomesticRegionCategoryPagingApiTest {
         jdbcTemplate.update("ALTER TABLE country ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE province ALTER COLUMN id RESTART WITH 1");
 
-        // 크리에이터, 도시 데이터 설정
+        // 크리에이터, 도시 데이터 설정 
         jdbcTemplate.update(
                 "INSERT INTO creator (profile_image, channel_name) VALUES ('https://image.example.com/creator1.jpg', 'TravelMate')");
-        jdbcTemplate.update("INSERT INTO country (name) VALUES ('대한민국')");
-        jdbcTemplate.update("INSERT INTO country (name) VALUES ('일본')");
-        jdbcTemplate.update("INSERT INTO city (name, country_id, province_id) VALUES ('서울', 1, null)");
-        jdbcTemplate.update("INSERT INTO city (name, country_id, province_id) VALUES ('세종', 1, null)");
-        jdbcTemplate.update("INSERT INTO city (name, country_id, province_id) VALUES ('오사카', 2, null)");
+        jdbcTemplate.update("INSERT INTO country (name, image_url) VALUES ('대한민국', 'https://image.example.com/korea.jpg')");
+        jdbcTemplate.update("INSERT INTO country (name, image_url) VALUES ('일본', 'https://image.example.com/japan.jpg')");
+        jdbcTemplate.update("INSERT INTO city (name, country_id, province_id, image_url) VALUES ('서울', 1, null, 'https://image.example.com/seoul.jpg')");
+        jdbcTemplate.update("INSERT INTO city (name, country_id, province_id, image_url) VALUES ('세종', 1, null, 'https://image.example.com/sejong.jpg')");
+        jdbcTemplate.update("INSERT INTO city (name, country_id, province_id, image_url) VALUES ('오사카', 2, null, 'https://image.example.com/osaka.jpg')");
 
         // 서울 컨텐츠 데이터 설정
         for (int i = 1; i <= 9; i++) {

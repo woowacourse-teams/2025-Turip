@@ -3,17 +3,20 @@ package com.on.turip.ui.folder
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.viewModels
 import com.on.turip.databinding.ActivityFolderBinding
 import com.on.turip.ui.common.base.BaseActivity
 
 class FolderActivity : BaseActivity<ActivityFolderBinding>() {
+    private val viewModel: FolderViewModel by viewModels { FolderViewModel.provideFactory() }
+
     override val binding: ActivityFolderBinding by lazy {
         ActivityFolderBinding.inflate(layoutInflater)
     }
 
-    private val folderAdapter: FolderAdapter by lazy {
-        FolderAdapter(
-            object : FolderViewHolder.FolderListener {
+    private val folderEditAdapter: FolderEditAdapter by lazy {
+        FolderEditAdapter(
+            object : FolderEditViewHolder.FolderEditListener {
                 override fun onRemoveClick(folderId: Long) {
                     // TODO: 폴더 삭제 바텀 시트 다이얼로그 보여주기
                     val bottomSheet: FolderRemoveBottomSheetFragment =
@@ -22,7 +25,7 @@ class FolderActivity : BaseActivity<ActivityFolderBinding>() {
                 }
 
                 override fun onItemClick(folderId: Long) {
-                    // TODO: 폴더명 편집 바텀 시트 다이얼로그 보여주기
+                    viewModel.selectFolder(folderId)
                     val bottomSheet: FolderModifyBottomSheetFragment =
                         FolderModifyBottomSheetFragment.instance()
                     bottomSheet.show(supportFragmentManager, "folder_modify")
@@ -36,10 +39,11 @@ class FolderActivity : BaseActivity<ActivityFolderBinding>() {
 
         setupAdapters()
         setupListeners()
+        setupObservers()
     }
 
     private fun setupAdapters() {
-        binding.rvFolder.adapter = folderAdapter
+        binding.rvFolder.adapter = folderEditAdapter
     }
 
     private fun setupListeners() {
@@ -47,8 +51,14 @@ class FolderActivity : BaseActivity<ActivityFolderBinding>() {
             val bottomSheet: FolderAddBottomSheetFragment = FolderAddBottomSheetFragment.instance()
             bottomSheet.show(supportFragmentManager, "folder_add")
         }
-        binding.ivFavoriteBack.setOnClickListener {
+        binding.ivFolderBack.setOnClickListener {
             finish()
+        }
+    }
+
+    private fun setupObservers() {
+        viewModel.folders.observe(this) {
+            folderEditAdapter.submitList(it)
         }
     }
 

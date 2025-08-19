@@ -17,7 +17,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:id="@+id/iv_favorite_back"
+            android:id="@+id/iv_folder_back"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
@@ -35,10 +35,10 @@
             android:text="@string/folder_title"
             android:textAppearance="@style/title1"
             android:textColor="@color/pure_black_151515"
-            app:layout_constraintBottom_toBottomOf="@id/iv_favorite_back"
+            app:layout_constraintBottom_toBottomOf="@id/iv_folder_back"
             app:layout_constraintEnd_toStartOf="@id/iv_folder_folder_plus"
-            app:layout_constraintStart_toEndOf="@id/iv_favorite_back"
-            app:layout_constraintTop_toTopOf="@id/iv_favorite_back" />
+            app:layout_constraintStart_toEndOf="@id/iv_folder_back"
+            app:layout_constraintTop_toTopOf="@id/iv_folder_back" />
 
         <ImageView
             android:id="@+id/iv_folder_folder_plus"
@@ -65,6 +65,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/cl_folder_toolbar"
-        tools:listitem="@layout/item_folder" />
+        tools:listitem="@layout/item_folder_edit" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
