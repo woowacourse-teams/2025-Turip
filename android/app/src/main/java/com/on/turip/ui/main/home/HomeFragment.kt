@@ -107,6 +107,12 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         viewModel.usersLikeContents.observe(viewLifecycleOwner) { usersLikeContents: List<UsersLikeContentModel> ->
             usersLikeContentAdapter.submitList(usersLikeContents)
         }
+        viewModel.networkError.observe(viewLifecycleOwner) { networkError: Boolean ->
+            binding.gpHomeErrorNot.visibility =
+                if (networkError) View.GONE else View.VISIBLE
+            binding.icHomeNetworkError.root.visibility =
+                if (networkError) View.VISIBLE else View.GONE
+        }
     }
 
     private fun setupListeners() {
@@ -122,6 +128,10 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             Timber.d("검색 화면 클릭")
             val intent: Intent = SearchActivity.newIntent(requireContext())
             startActivity(intent)
+        }
+        val bindingNetworkError = binding.icHomeNetworkError
+        bindingNetworkError.root.setOnClickListener {
+            viewModel.reload()
         }
     }
 }

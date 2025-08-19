@@ -10,6 +10,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.on.turip.data.common.onFailure
 import com.on.turip.data.common.onSuccess
 import com.on.turip.di.RepositoryModule
+import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.content.UsersLikeContent
 import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.region.RegionCategory
@@ -32,7 +33,15 @@ class HomeViewModel(
         MutableLiveData()
     val usersLikeContents: LiveData<List<UsersLikeContentModel>> get() = _usersLikeContents
 
+    private val _networkError: MutableLiveData<Boolean> = MutableLiveData()
+    val networkError: LiveData<Boolean> get() = _networkError
+
     init {
+        loadUsersLikeContents()
+        loadRegionCategories(isDomestic = true)
+    }
+
+    fun reload() {
         loadUsersLikeContents()
         loadRegionCategories(isDomestic = true)
     }
@@ -43,9 +52,25 @@ class HomeViewModel(
                 .loadPopularFavoriteContents()
                 .onSuccess { contents: List<UsersLikeContent> ->
                     _usersLikeContents.value = contents.map { it.toUiModel() }
+                    _networkError.value = false
                     Timber.d("인기 찜 목록: $contents")
-                }.onFailure {
+                }.onFailure { errorEvent: ErrorEvent ->
+                    checkError(errorEvent)
+                    Timber.e("인기 찜 목록 불러오기 실패")
                 }
+        }
+    }
+
+    private fun checkError(errorEvent: ErrorEvent) {
+        when (errorEvent) {
+            ErrorEvent.USER_NOT_HAVE_PERMISSION -> TODO()
+            ErrorEvent.DUPLICATION_FOLDER -> TODO()
+            ErrorEvent.UNEXPECTED_PROBLEM -> TODO()
+            ErrorEvent.NETWORK_ERROR -> {
+                _networkError.value = true
+            }
+
+            ErrorEvent.PARSER_ERROR -> TODO()
         }
     }
 
