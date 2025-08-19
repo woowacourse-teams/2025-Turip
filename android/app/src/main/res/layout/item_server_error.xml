@@ -9,18 +9,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="@null"
-        android:src="@drawable/ic_network_error"
+        android:src="@drawable/ic_server_error"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.40" />
+        app:layout_constraintVertical_bias="0.45" />
 
     <TextView
         android:id="@+id/tv_server_error"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/cannot_connect_network"
+        android:text="@string/server_error"
         android:textAppearance="@style/title1"
         android:textColor="@color/gray_300_5b5b5b"
         app:layout_constraintTop_toBottomOf="@id/iv_server_error"
@@ -31,25 +31,11 @@
         android:id="@+id/tv_server_error_retry"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/check_connection_status"
+        android:text="@string/retry_later"
         android:textAppearance="@style/title1"
         android:textColor="@color/gray_200_c1c1c1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_server_error" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/retry"
-        android:textColor="@color/pure_black_151515"
-        android:background="@drawable/bg_gray200_radius_40dp"
-        app:layout_constraintTop_toBottomOf="@id/tv_server_error_retry"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="27dp"
-        android:paddingVertical="4dp"
-        android:paddingHorizontal="10dp" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

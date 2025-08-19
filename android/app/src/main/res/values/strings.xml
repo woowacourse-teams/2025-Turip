@@ -85,4 +85,8 @@
     <string name="check_connection_status">연결 상태를 확인해주세요</string>
     <string name="retry">다시시도</string>
 
+    <!-- 서버 오류 -->
+    <string name="server_error">서버에 오류가 발생했습니다.</string>
+    <string name="retry_later">나중에 다시 시도해주세요</string>
+
 </resources>
