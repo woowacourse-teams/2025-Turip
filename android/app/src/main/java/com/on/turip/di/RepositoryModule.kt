@@ -45,6 +45,6 @@ object RepositoryModule {
         DefaultFolderRepository(DataSourceModule.folderRemoteDataSource)
     }
     val favoritePlaceRepository: FavoritePlaceRepository by lazy {
-        DefaultFavoritePlaceRepository(DataSourceModule.favoritePlaceDataSource)
+        DefaultFavoritePlaceRepository(DataSourceModule.favoritePlaceRemoteDataSource)
     }
 }

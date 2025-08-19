@@ -5,9 +5,9 @@ import com.on.turip.data.common.safeApiCall
 import com.on.turip.data.place.dto.FavoritePlacesResponse
 import com.on.turip.data.place.service.PlaceService
 
-class DefaultFavoritePlaceDataSource(
+class DefaultFavoritePlaceRemoteDataSource(
     private val placeService: PlaceService,
-) : FavoritePlaceDataSource {
+) : FavoritePlaceRemoteDataSource {
     override suspend fun getFavoritePlaces(favoriteFolderId: Long): TuripCustomResult<FavoritePlacesResponse> =
         safeApiCall { placeService.getFavoritePlaces(favoriteFolderId) }
 

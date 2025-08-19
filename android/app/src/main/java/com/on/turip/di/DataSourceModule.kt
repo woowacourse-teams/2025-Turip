@@ -10,8 +10,8 @@ import com.on.turip.data.favorite.datasource.DefaultFavoriteRemoteDataSource
 import com.on.turip.data.favorite.datasource.FavoriteRemoteDataSource
 import com.on.turip.data.folder.datasource.DefaultFolderRemoteDataSource
 import com.on.turip.data.folder.datasource.FolderRemoteDataSource
-import com.on.turip.data.place.datasource.DefaultFavoritePlaceDataSource
-import com.on.turip.data.place.datasource.FavoritePlaceDataSource
+import com.on.turip.data.place.datasource.DefaultFavoritePlaceRemoteDataSource
+import com.on.turip.data.place.datasource.FavoritePlaceRemoteDataSource
 import com.on.turip.data.region.datasource.DefaultRegionRemoteDataSource
 import com.on.turip.data.region.datasource.RegionRemoteDataSource
 import com.on.turip.data.searchhistory.datasource.DefaultSearchHistoryDataSource
@@ -44,7 +44,7 @@ object DataSourceModule {
     val folderRemoteDataSource: FolderRemoteDataSource by lazy {
         DefaultFolderRemoteDataSource(NetworkModule.folderService)
     }
-    val favoritePlaceDataSource: FavoritePlaceDataSource by lazy {
-        DefaultFavoritePlaceDataSource(NetworkModule.favoritePlaceService)
+    val favoritePlaceRemoteDataSource: FavoritePlaceRemoteDataSource by lazy {
+        DefaultFavoritePlaceRemoteDataSource(NetworkModule.favoritePlaceService)
     }
 }
