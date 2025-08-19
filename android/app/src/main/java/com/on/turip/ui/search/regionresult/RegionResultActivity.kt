@@ -79,11 +79,11 @@ class RegionResultActivity : BaseActivity<ActivityRegionResultBinding>() {
 
             regionResultAdapter.submitList(searchResultState.videoInformations)
 
-            setupVisible(searchResultState)
+            handleVisibility(searchResultState)
         }
     }
 
-    private fun setupVisible(searchResultState: RegionResultViewModel.SearchResultState) {
+    private fun handleVisibility(searchResultState: RegionResultViewModel.SearchResultState) {
         when (searchResultState.loading) {
             true -> {
                 binding.pbSearchRegionResult.visibility = View.VISIBLE
