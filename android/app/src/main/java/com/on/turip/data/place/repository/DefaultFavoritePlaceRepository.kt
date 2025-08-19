@@ -23,4 +23,13 @@ class DefaultFavoritePlaceRepository(
             favoriteFolderId = favoriteFolderId,
             placeId = placeId,
         )
+
+    override suspend fun deleteFavoritePlace(
+        favoriteFolderId: Long,
+        placeId: Long,
+    ): TuripCustomResult<Unit> =
+        favoritePlaceDataSource.deleteFavoritePlace(
+            favoriteFolderId = favoriteFolderId,
+            placeId = placeId,
+        )
 }

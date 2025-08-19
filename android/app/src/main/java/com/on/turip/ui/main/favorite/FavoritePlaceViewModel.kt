@@ -64,7 +64,15 @@ class FavoritePlaceViewModel(
                         Timber.e("장소 찜에 넣기 실패")
                     }
             } else {
-                // TODO 장소 찜에서 빼기 기능 추가
+                favoritePlaceRepository
+                    .deleteFavoritePlace(
+                        favoriteFolderId = selectedFolderId,
+                        placeId = placeId,
+                    ).onSuccess {
+                        Timber.d("장소 찜에 빼기 성공")
+                    }.onFailure {
+                        Timber.e("장소 찜에 빼기 실패")
+                    }
             }
         }
     }

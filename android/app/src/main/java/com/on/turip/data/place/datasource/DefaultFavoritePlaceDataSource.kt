@@ -15,4 +15,9 @@ class DefaultFavoritePlaceDataSource(
         favoriteFolderId: Long,
         placeId: Long,
     ): TuripCustomResult<Unit> = safeApiCall { placeService.postFavoritePlace(favoriteFolderId, placeId) }
+
+    override suspend fun deleteFavoritePlace(
+        favoriteFolderId: Long,
+        placeId: Long,
+    ): TuripCustomResult<Unit> = safeApiCall { placeService.deleteFavoritePlace(favoriteFolderId, placeId) }
 }

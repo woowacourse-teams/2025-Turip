@@ -10,4 +10,9 @@ interface FavoritePlaceRepository {
         favoriteFolderId: Long,
         placeId: Long,
     ): TuripCustomResult<Unit>
+
+    suspend fun deleteFavoritePlace(
+        favoriteFolderId: Long,
+        placeId: Long,
+    ): TuripCustomResult<Unit>
 }
