@@ -2,6 +2,7 @@ package com.on.turip.data.folder.datasource
 
 import com.on.turip.data.common.TuripCustomResult
 import com.on.turip.data.common.safeApiCall
+import com.on.turip.data.folder.dto.FavoriteFolderAddRequest
 import com.on.turip.data.folder.dto.FavoriteFoldersResponse
 import com.on.turip.data.folder.service.FolderService
 import kotlinx.coroutines.Dispatchers
@@ -16,6 +17,13 @@ class DefaultFolderRemoteDataSource(
         withContext(coroutineContext) {
             safeApiCall {
                 folderService.getFavoriteFolders()
+            }
+        }
+
+    override suspend fun postFavoriteFolder(favoriteFolderAddRequest: FavoriteFolderAddRequest): TuripCustomResult<Unit> =
+        withContext(coroutineContext) {
+            safeApiCall {
+                folderService.postFavoriteFolder(favoriteFolderAddRequest)
             }
         }
 }
