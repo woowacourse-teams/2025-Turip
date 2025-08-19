@@ -18,7 +18,7 @@ class FolderActivity : BaseActivity<ActivityFolderBinding>() {
         FolderEditAdapter(
             object : FolderEditViewHolder.FolderEditListener {
                 override fun onRemoveClick(folderId: Long) {
-                    // TODO: 폴더 삭제 바텀 시트 다이얼로그 보여주기
+                    viewModel.selectFolder(folderId)
                     val bottomSheet: FolderRemoveBottomSheetFragment =
                         FolderRemoveBottomSheetFragment.instance()
                     bottomSheet.show(supportFragmentManager, "folder_remove")

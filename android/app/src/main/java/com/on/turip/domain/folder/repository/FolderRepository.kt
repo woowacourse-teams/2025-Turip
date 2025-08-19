@@ -12,4 +12,6 @@ interface FolderRepository {
         folderId: Long,
         updateName: String,
     ): TuripCustomResult<Unit>
+
+    suspend fun deleteFavoriteFolder(folderId: Long): TuripCustomResult<Unit>
 }
