@@ -84,13 +84,13 @@ jobs:
         if: ${{ success() }}
         run: |
           curl -H "Content-Type: application/json" \
-            -d '{"username": "Plantory Android", "content": "✅ Plantory Android PR Check Success 🎉"}' \
+            -d '{"username": "Turip Android", "content": "✅ Turip Android PR Check Success 🎉"}' \
             ${{ secrets.DISCORD_WEBHOOK_URL }}
 
       - name: If Fail, Send notification on Discord
         if: ${{ failure() }}
         run: |
           curl -H "Content-Type: application/json" \
-            -d '{"username": "Plantory Android", "content": "❌ Plantory Android PR Check Failure - Please Check!"}' \
+            -d '{"username": "Turip Android", "content": "❌ Turip Android PR Check Failure - Please Check!"}' \
             ${{ secrets.DISCORD_WEBHOOK_URL }}
 
