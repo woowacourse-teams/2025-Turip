@@ -9,6 +9,7 @@ data class PlaceModel(
     val category: String,
     val mapLink: String,
     val timeLine: String,
+    val isFavorite: Boolean,
 ) {
     val placeUri: Uri
         get() = mapLink.toUri()
