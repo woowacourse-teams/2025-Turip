@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -21,9 +20,8 @@ import turip.data.service.DataImportService;
 
 @Slf4j
 @Component
-@Profile("!test")
+@Profile("dev")
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "spring.profiles.active", havingValue = "dev")
 public class DevDataInitializer implements CommandLineRunner {
 
     private final DataImportService dataImportService;
