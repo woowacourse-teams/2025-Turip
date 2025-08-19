@@ -3,6 +3,7 @@ package turip.data.controller;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.MessageDigest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,7 +38,7 @@ public class DataImportController {
 
     private ResponseEntity<String> processCsvImport(String csvUrl, String password) {
         // 비밀번호 검증
-        if (!csvImportPassword.equals(password)) {
+        if (!isPasswordValid(password)) {
             log.warn("잘못된 비밀번호로 CSV import 시도: {}", csvUrl);
             return ResponseEntity.status(401).body("인증 실패: 잘못된 비밀번호입니다.");
         }
@@ -77,6 +78,13 @@ public class DataImportController {
             log.error("CSV 데이터 import 실패: {} - {}", csvUrl, e.getMessage(), e);
             return ResponseEntity.internalServerError().body("CSV 데이터 import 실패: " + e.getMessage());
         }
+    }
+    
+    private boolean isPasswordValid(String inputPassword) {
+        if (csvImportPassword == null || inputPassword == null) {
+            return false;
+        }
+        return MessageDigest.isEqual(csvImportPassword.getBytes(), inputPassword.getBytes());
     }
 
     // Request DTO
