@@ -46,7 +46,7 @@ class FolderAddBottomSheetFragment : BaseBottomSheetFragment<BottomSheetFragment
     }
 
     private fun setupObservers() {
-        sharedViewModel.folderNameStatus.observe(this) { folderNameStatusModel: FolderNameStatusModel ->
+        sharedViewModel.folderNameStatus.observe(viewLifecycleOwner) { folderNameStatusModel: FolderNameStatusModel ->
             binding.tvBottomSheetFolderAddConfirm.isEnabled =
                 (folderNameStatusModel == FolderNameStatusModel.OK || folderNameStatusModel == FolderNameStatusModel.MAX_LENGTH_FOLDER_NAME)
 

@@ -46,7 +46,7 @@ class FolderModifyBottomSheetFragment : BaseBottomSheetFragment<BottomSheetFragm
     }
 
     private fun setupObservers() {
-        sharedViewModel.folderNameStatus.observe(this) { folderNameStatusModel: FolderNameStatusModel ->
+        sharedViewModel.folderNameStatus.observe(viewLifecycleOwner) { folderNameStatusModel: FolderNameStatusModel ->
             binding.tvBottomSheetFolderModifyConfirm.isEnabled =
                 (folderNameStatusModel == FolderNameStatusModel.OK || folderNameStatusModel == FolderNameStatusModel.MAX_LENGTH_FOLDER_NAME)
 
