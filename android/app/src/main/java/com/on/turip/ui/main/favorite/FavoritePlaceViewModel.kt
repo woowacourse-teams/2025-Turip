@@ -42,18 +42,20 @@ class FavoritePlaceViewModel(
                     if (selectedFolderId == NOT_INITIALIZED) selectedFolderId = folders[0].id
                     _folders.value =
                         folders.map { folder: Folder -> folder.toUiModel(selectedFolderId) }
+
+                    loadPlacesInSelectFolder()
                 }.onFailure { Timber.e("장소 찜 목록 화면 폴더 불러오기 API 호출 실패") }
         }
+    }
 
-        viewModelScope.launch {
-            favoritePlaceRepository
-                .loadFavoritePlaces(selectedFolderId)
-                .onSuccess { places: List<Place> ->
-                    _places.value = places.map { place: Place -> place.toUiModel() }
-                }.onFailure {
-                    Timber.e("폴더에 담긴 장소들을 불러오는 API 호출 실패")
-                }
-        }
+    private suspend fun loadPlacesInSelectFolder() {
+        favoritePlaceRepository
+            .loadFavoritePlaces(selectedFolderId)
+            .onSuccess { places: List<Place> ->
+                _places.value = places.map { place: Place -> place.toUiModel() }
+            }.onFailure {
+                Timber.e("폴더에 담긴 장소들을 불러오는 API 호출 실패")
+            }
     }
 
     fun updateFavoritePlace(
