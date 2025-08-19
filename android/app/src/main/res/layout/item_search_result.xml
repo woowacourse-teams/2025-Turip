@@ -17,17 +17,19 @@
         android:contentDescription="@null"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@mipmap/ic_launcher" />
+        tools:src="@mipmap/ic_turip_launcher_round" />
 
     <TextView
         android:id="@+id/tv_search_result_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
+        android:layout_marginEnd="20dp"
         android:ellipsize="end"
         android:maxLines="1"
         android:textAppearance="@style/title2"
         android:textColor="@color/pure_black_151515"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/iv_search_result_thumbnail"
         app:layout_constraintTop_toTopOf="@id/iv_search_result_thumbnail"
         tools:text="느좋 감성 대구 여행 어쩌구.." />
@@ -95,6 +97,5 @@
         app:layout_constraintStart_toEndOf="@id/iv_search_result_calendar"
         app:layout_constraintTop_toTopOf="@id/iv_search_result_calendar"
         tools:text="2박 3일" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

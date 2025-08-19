@@ -1,4 +1,12 @@
 package turip.tripcourse.repository;
 
-public interface TripCourseRepository {
+import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
+import turip.tripcourse.domain.TripCourse;
+
+public interface TripCourseRepository extends JpaRepository<TripCourse, Long> {
+
+    List<TripCourse> findAllByContent_Id(Long contentId);
+
+    int countByContent_Id(Long contentId);
 }

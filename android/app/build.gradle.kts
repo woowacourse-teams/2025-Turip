@@ -1,3 +1,5 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -15,14 +17,19 @@ android {
         //noinspection OldTargetApi
         targetSdk = 35
         versionCode = 1
-        versionName = "1.0"
+        versionName = libs.versions.versionName.get()
+        versionCode =
+            libs.versions.versionCode
+                .get()
+                .toInt()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
+        val baseUrl: String = gradleLocalProperties(rootDir, providers).getProperty("base_url")
         buildConfigField(
             "String",
             "BASE_URL",
-            "\"${project.findProperty("base_url") ?: ""}\"",
+            "\"$baseUrl\"",
         )
     }
 
@@ -55,6 +62,7 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     testImplementation(libs.junit)
+    testImplementation(libs.assertj.core)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     // coroutine
@@ -72,4 +80,8 @@ dependencies {
     // okhttp
     implementation(libs.okhttp)
     implementation(libs.logging.interceptor)
+    // coil
+    implementation(libs.coil)
+    // WebView
+    implementation(libs.androidx.webkit)
 }
