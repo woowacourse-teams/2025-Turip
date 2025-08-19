@@ -14,20 +14,21 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import turip.category.domain.Category;
-import turip.city.domain.City;
+import turip.common.exception.custom.NotFoundException;
+import turip.content.controller.dto.response.MyFavoriteContentsResponse.ContentPlaceDetailResponse;
 import turip.content.domain.Content;
+import turip.content.domain.ContentPlace;
+import turip.content.repository.ContentPlaceRepository;
 import turip.content.repository.ContentRepository;
-import turip.contentplace.controller.dto.response.ContentPlaceDetailResponse;
-import turip.contentplace.domain.ContentPlace;
-import turip.contentplace.repository.ContentPlaceRepository;
-import turip.country.domain.Country;
+import turip.content.service.ContentPlaceService;
 import turip.creator.domain.Creator;
-import turip.exception.custom.NotFoundException;
-import turip.favoriteplace.repository.FavoritePlaceRepository;
+import turip.favorite.repository.FavoritePlaceRepository;
 import turip.member.domain.Member;
+import turip.place.domain.Category;
 import turip.place.domain.Place;
-import turip.province.domain.Province;
+import turip.region.domain.City;
+import turip.region.domain.Country;
+import turip.region.domain.Province;
 
 @ExtendWith(MockitoExtension.class)
 class ContentPlaceServiceTest {
@@ -159,6 +160,20 @@ class ContentPlaceServiceTest {
         assertThat(response.contentPlaces().get(1).timeLine()).isEqualTo(LocalTime.parse("00:13:30"));
     }
 
+    @DisplayName("contentId에 대한 컨텐츠가 존재하지 않는 경우 NotFoundException을 발생시킨다")
+    @Test
+    void validateContentExists() {
+        // given
+        Long contentId = 1L;
+        given(contentRepository.existsById(contentId))
+                .willReturn(false);
+        Member member = new Member(1L, "deviceFid");
+
+        // when & then
+        assertThatThrownBy(() -> contentPlaceService.findContentPlaceDetails(member, contentId))
+                .isInstanceOf(NotFoundException.class);
+    }
+
     @DisplayName("여행 코스의 여행 기간 계산")
     @Nested
     class CalculateDurationDays {
@@ -225,19 +240,5 @@ class ContentPlaceServiceTest {
             assertThat(contentPlaceService.calculateDurationDays(contentId))
                     .isEqualTo(0);
         }
-    }
-
-    @DisplayName("contentId에 대한 컨텐츠가 존재하지 않는 경우 NotFoundException을 발생시킨다")
-    @Test
-    void validateContentExists() {
-        // given
-        Long contentId = 1L;
-        given(contentRepository.existsById(contentId))
-                .willReturn(false);
-        Member member = new Member(1L, "deviceFid");
-
-        // when & then
-        assertThatThrownBy(() -> contentPlaceService.findContentPlaceDetails(member, contentId))
-                .isInstanceOf(NotFoundException.class);
     }
 }

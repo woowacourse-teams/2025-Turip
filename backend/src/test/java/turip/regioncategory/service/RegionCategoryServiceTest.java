@@ -12,12 +12,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import turip.city.domain.City;
-import turip.city.service.CityService;
+import turip.region.domain.City;
+import turip.region.service.CityService;
 import turip.content.repository.ContentRepository;
-import turip.country.domain.Country;
-import turip.country.service.CountryService;
-import turip.regioncategory.controller.dto.response.RegionCategoriesResponse;
+import turip.region.domain.Country;
+import turip.region.service.CountryService;
+import turip.region.controller.dto.response.RegionCategoriesResponse;
+import turip.region.service.RegionCategoryService;
 
 @ExtendWith(MockitoExtension.class)
 class RegionCategoryServiceTest {
