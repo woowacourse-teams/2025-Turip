@@ -10,4 +10,9 @@ class DefaultFavoritePlaceDataSource(
 ) : FavoritePlaceDataSource {
     override suspend fun getFavoritePlaces(favoriteFolderId: Long): TuripCustomResult<FavoritePlacesResponse> =
         safeApiCall { placeService.getFavoritePlaces(favoriteFolderId) }
+
+    override suspend fun createFavoritePlace(
+        favoriteFolderId: Long,
+        placeId: Long,
+    ): TuripCustomResult<Unit> = safeApiCall { placeService.postFavoritePlace(favoriteFolderId, placeId) }
 }

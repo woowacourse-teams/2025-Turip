@@ -5,4 +5,9 @@ import com.on.turip.domain.trip.Place
 
 interface FavoritePlaceRepository {
     suspend fun loadFavoritePlaces(favoriteFolderId: Long): TuripCustomResult<List<Place>>
+
+    suspend fun createFavoritePlace(
+        favoritePlaceId: Long,
+        placeId: Long,
+    ): TuripCustomResult<Unit>
 }

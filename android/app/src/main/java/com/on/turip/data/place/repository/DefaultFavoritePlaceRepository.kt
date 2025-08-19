@@ -14,4 +14,13 @@ class DefaultFavoritePlaceRepository(
         favoritePlaceDataSource.getFavoritePlaces(favoriteFolderId).mapCatching {
             it.toDomain()
         }
+
+    override suspend fun createFavoritePlace(
+        favoritePlaceId: Long,
+        placeId: Long,
+    ): TuripCustomResult<Unit> =
+        favoritePlaceDataSource.createFavoritePlace(
+            favoritePlaceId = favoritePlaceId,
+            placeId = placeId,
+        )
 }
