@@ -1,8 +1,8 @@
 package turip.regioncategory.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 
 import java.util.List;
@@ -14,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import turip.city.domain.City;
 import turip.city.service.CityService;
+import turip.content.repository.ContentRepository;
 import turip.country.domain.Country;
 import turip.country.service.CountryService;
 import turip.regioncategory.controller.dto.response.RegionCategoriesResponse;
@@ -29,6 +30,9 @@ class RegionCategoryServiceTest {
 
     @Mock
     private CountryService countryService;
+
+    @Mock
+    private ContentRepository contentRepository;
 
     @DisplayName("국내 지역 카테고리 조회 시 국내 도시 목록과 기타 카테고리를 반환한다")
     @Test
@@ -52,14 +56,19 @@ class RegionCategoryServiceTest {
         given(cityService.findCitiesByCountryName(CountryService.KOREA_COUNTRY_NAME))
                 .willReturn(cities);
 
+        given(contentRepository.countByCityName("서울")).willReturn(3);
+        given(contentRepository.countByCityName("부산")).willReturn(1);
+        given(contentRepository.countDomesticEtcContents(List.of("서울", "부산"))).willReturn(0);
+
         // when
         RegionCategoriesResponse response = regionCategoryService.findRegionCategoriesByCountryType(true);
 
         // then
-        assertThat(response.regionCategories()).hasSize(3);
-        assertThat(response.regionCategories().get(0).name()).isEqualTo("서울");
-        assertThat(response.regionCategories().get(1).name()).isEqualTo("부산");
-        assertThat(response.regionCategories().get(2).name()).isEqualTo("국내 기타");
+        assertAll(
+                () -> assertThat(response.regionCategories()).hasSize(2),
+                () -> assertThat(response.regionCategories().get(0).name()).isEqualTo("서울"),
+                () -> assertThat(response.regionCategories().get(1).name()).isEqualTo("부산")
+        );
     }
 
     @DisplayName("해외 지역 카테고리 조회 시 해외 국가 목록과 기타 카테고리를 반환한다")
@@ -80,14 +89,20 @@ class RegionCategoryServiceTest {
         given(countryService.findOverseasCountries())
                 .willReturn(countries);
 
+        given(contentRepository.countByCityCountryName("일본")).willReturn(2);
+        given(contentRepository.countByCityCountryName("중국")).willReturn(1);
+        given(contentRepository.countOverseasEtcContents(List.of("일본", "중국"))).willReturn(0);
+
         // when
         RegionCategoriesResponse response = regionCategoryService.findRegionCategoriesByCountryType(false);
 
         // then
-        assertThat(response.regionCategories()).hasSize(3);
-        assertThat(response.regionCategories().get(0).name()).isEqualTo("일본");
-        assertThat(response.regionCategories().get(1).name()).isEqualTo("중국");
-        assertThat(response.regionCategories().get(2).name()).isEqualTo("해외 기타");
+        assertAll(
+                () -> assertThat(response.regionCategories()).hasSize(2),
+                () -> assertThat(response.regionCategories().get(0).name()).isEqualTo("일본"),
+                () -> assertThat(response.regionCategories().get(1).name()).isEqualTo("중국")
+        );
+
     }
 
     @DisplayName("지원하지 않는 도시명은 필터링되어 기타 카테고리만 반환된다")
@@ -97,12 +112,12 @@ class RegionCategoryServiceTest {
         City unsupportedCity = mock(City.class);
         List<City> cities = List.of(unsupportedCity);
 
-        lenient().when(unsupportedCity.getId()).thenReturn(1L);
-        lenient().when(unsupportedCity.getName()).thenReturn("지원하지않는도시");
-        lenient().when(unsupportedCity.getImageUrl()).thenReturn("https://example.com/unsupported.jpg");
+        given(unsupportedCity.getName()).willReturn("지원하지않는도시");
 
         given(cityService.findCitiesByCountryName(CountryService.KOREA_COUNTRY_NAME))
                 .willReturn(cities);
+
+        given(contentRepository.countDomesticEtcContents(List.of())).willReturn(1);
 
         // when
         RegionCategoriesResponse response = regionCategoryService.findRegionCategoriesByCountryType(true);
@@ -119,11 +134,11 @@ class RegionCategoryServiceTest {
         Country unsupportedCountry = mock(Country.class);
         List<Country> countries = List.of(unsupportedCountry);
 
-        lenient().when(unsupportedCountry.getId()).thenReturn(1L);
-        lenient().when(unsupportedCountry.getName()).thenReturn("지원하지않는국가");
-        lenient().when(unsupportedCountry.getImageUrl()).thenReturn("https://example.com/unsupported.jpg");
+        given(unsupportedCountry.getName()).willReturn("지원하지않는국가");
 
         given(countryService.findOverseasCountries()).willReturn(countries);
+
+        given(contentRepository.countOverseasEtcContents(List.of())).willReturn(1);
 
         // when
         RegionCategoriesResponse response = regionCategoryService.findRegionCategoriesByCountryType(false);
