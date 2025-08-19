@@ -29,7 +29,7 @@ public class DevDataInitializer implements CommandLineRunner {
     private final DataImportService dataImportService;
     private final CsvFileService csvFileService;
     private final JdbcTemplate jdbcTemplate;
-    @Value("${csv.links.collection-url}")
+    @Value("${csv.links.collection-url:}")
     private String csvLinksCollectionUrl;
 
     @Override
@@ -70,13 +70,13 @@ public class DevDataInitializer implements CommandLineRunner {
 
             // CSV 파일에서 링크들 읽기
             List<String> lines = Files.readAllLines(tempFile, StandardCharsets.UTF_8);
-            
+
             for (String line : lines) {
                 String trimmedLine = line.trim();
                 if (!trimmedLine.isEmpty()) {
                     // 꺾쇠 괄호(<>) 제거
                     String cleanUrl = trimmedLine.replaceAll("[<>]", "");
-                    
+
                     // HTTP/HTTPS로 시작하는지 확인
                     if (cleanUrl.startsWith("http://") || cleanUrl.startsWith("https://")) {
                         csvUrls.add(cleanUrl);
