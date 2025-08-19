@@ -12,6 +12,7 @@ import com.on.turip.data.common.onFailure
 import com.on.turip.data.common.onSuccess
 import com.on.turip.di.RepositoryModule
 import com.on.turip.domain.favorite.repository.FavoritePlaceRepository
+import com.on.turip.domain.favorite.usecase.UpdateFavoritePlaceUseCase
 import com.on.turip.domain.folder.Folder
 import com.on.turip.domain.folder.repository.FolderRepository
 import com.on.turip.domain.trip.Place
@@ -24,6 +25,7 @@ import timber.log.Timber
 class FavoritePlaceViewModel(
     private val folderRepository: FolderRepository,
     private val favoritePlaceRepository: FavoritePlaceRepository,
+    private val updateFavoritePlaceUseCase: UpdateFavoritePlaceUseCase,
 ) : ViewModel() {
     private val _folders: MutableLiveData<List<FavoritePlaceFolderModel>> = MutableLiveData()
     val folders: LiveData<List<FavoritePlaceFolderModel>> get() = _folders
@@ -52,28 +54,9 @@ class FavoritePlaceViewModel(
         placeId: Long,
         isFavorite: Boolean,
     ) {
+        val updateFavorite: Boolean = !isFavorite
         viewModelScope.launch {
-            if (!isFavorite) {
-                favoritePlaceRepository
-                    .createFavoritePlace(
-                        favoriteFolderId = selectedFolderId,
-                        placeId = placeId,
-                    ).onSuccess {
-                        Timber.d("장소 찜에 넣기 성공")
-                    }.onFailure {
-                        Timber.e("장소 찜에 넣기 실패")
-                    }
-            } else {
-                favoritePlaceRepository
-                    .deleteFavoritePlace(
-                        favoriteFolderId = selectedFolderId,
-                        placeId = placeId,
-                    ).onSuccess {
-                        Timber.d("장소 찜에 빼기 성공")
-                    }.onFailure {
-                        Timber.e("장소 찜에 빼기 실패")
-                    }
-            }
+            updateFavoritePlaceUseCase(selectedFolderId, placeId, updateFavorite)
         }
     }
 
@@ -102,12 +85,17 @@ class FavoritePlaceViewModel(
         fun provideFactory(
             folderRepository: FolderRepository = RepositoryModule.folderRepository,
             favoritePlaceRepository: FavoritePlaceRepository = RepositoryModule.favoritePlaceRepository,
+            updateFavoritePlaceUseCase: UpdateFavoritePlaceUseCase =
+                UpdateFavoritePlaceUseCase(
+                    favoritePlaceRepository,
+                ),
         ): ViewModelProvider.Factory =
             viewModelFactory {
                 initializer {
                     FavoritePlaceViewModel(
                         folderRepository,
                         favoritePlaceRepository,
+                        updateFavoritePlaceUseCase,
                     )
                 }
             }
