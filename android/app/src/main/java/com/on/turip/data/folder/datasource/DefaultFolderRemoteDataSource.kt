@@ -5,10 +5,11 @@ import com.on.turip.data.common.safeApiCall
 import com.on.turip.data.folder.dto.FavoriteFolderAddRequest
 import com.on.turip.data.folder.dto.FavoriteFolderPatchRequest
 import com.on.turip.data.folder.dto.FavoriteFoldersResponse
+import com.on.turip.data.folder.dto.FavoriteFoldersStatusByPlaceResponse
 import com.on.turip.data.folder.service.FolderService
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlin.coroutines.CoroutineContext
 
 class DefaultFolderRemoteDataSource(
     private val folderService: FolderService,
@@ -42,6 +43,13 @@ class DefaultFolderRemoteDataSource(
         withContext(coroutineContext) {
             safeApiCall {
                 folderService.deleteFavoriteFolder(folderId)
+            }
+        }
+
+    override suspend fun getFavoriteFoldersStatusByPlaceId(placeId: Long): TuripCustomResult<FavoriteFoldersStatusByPlaceResponse> =
+        withContext(coroutineContext) {
+            safeApiCall {
+                folderService.getFavoriteFoldersStatusByPlaceId(placeId)
             }
         }
 }
