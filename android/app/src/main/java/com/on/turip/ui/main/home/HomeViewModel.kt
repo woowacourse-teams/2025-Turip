@@ -36,6 +36,9 @@ class HomeViewModel(
     private val _networkError: MutableLiveData<Boolean> = MutableLiveData()
     val networkError: LiveData<Boolean> get() = _networkError
 
+    private val _serverError: MutableLiveData<Boolean> = MutableLiveData()
+    val serverError: LiveData<Boolean> = _serverError
+
     init {
         loadUsersLikeContents()
         loadRegionCategories(isDomestic = true)
@@ -53,6 +56,7 @@ class HomeViewModel(
                 .onSuccess { contents: List<UsersLikeContent> ->
                     _usersLikeContents.value = contents.map { it.toUiModel() }
                     _networkError.value = false
+                    _serverError.value = false
                     Timber.d("인기 찜 목록: $contents")
                 }.onFailure { errorEvent: ErrorEvent ->
                     checkError(errorEvent)
@@ -63,14 +67,22 @@ class HomeViewModel(
 
     private fun checkError(errorEvent: ErrorEvent) {
         when (errorEvent) {
-            ErrorEvent.USER_NOT_HAVE_PERMISSION -> TODO()
-            ErrorEvent.DUPLICATION_FOLDER -> TODO()
-            ErrorEvent.UNEXPECTED_PROBLEM -> TODO()
+            ErrorEvent.USER_NOT_HAVE_PERMISSION -> {
+                _serverError.value = true
+            }
+
+            ErrorEvent.DUPLICATION_FOLDER -> throw IllegalArgumentException("발생할 수 없는 오류")
+            ErrorEvent.UNEXPECTED_PROBLEM -> {
+                _serverError.value = true
+            }
+
             ErrorEvent.NETWORK_ERROR -> {
                 _networkError.value = true
             }
 
-            ErrorEvent.PARSER_ERROR -> TODO()
+            ErrorEvent.PARSER_ERROR -> {
+                _serverError.value = true
+            }
         }
     }
 
@@ -81,8 +93,12 @@ class HomeViewModel(
                 .onSuccess { regionCategories: List<RegionCategory> ->
                     _regionCategories.value = regionCategories
                     _isSelectedDomestic.value = isDomestic
+                    _networkError.value = false
+                    _serverError.value = false
                     Timber.d("지역 카테고리 조회: $regionCategories")
-                }.onFailure {
+                }.onFailure { errorEvent: ErrorEvent ->
+                    checkError(errorEvent)
+                    Timber.e("지역 카테고리 조회 실패")
                 }
         }
     }

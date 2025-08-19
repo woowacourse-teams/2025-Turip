@@ -113,6 +113,12 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             binding.icHomeNetworkError.root.visibility =
                 if (networkError) View.VISIBLE else View.GONE
         }
+        viewModel.serverError.observe(viewLifecycleOwner) { serverError: Boolean ->
+            binding.gpHomeErrorNot.visibility =
+                if (serverError) View.GONE else View.VISIBLE
+            binding.icHomeServerError.root.visibility =
+                if (serverError) View.VISIBLE else View.GONE
+        }
     }
 
     private fun setupListeners() {
