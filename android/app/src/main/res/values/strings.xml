@@ -7,6 +7,12 @@
     <string name="all_travel_day_trip_duration">당일치기</string>
     <string name="all_loading">로딩 중…</string>
     <string name="all_video_description">%s · %s</string>
+    <string name="all_snackbar_close">닫기</string>
+    <string name="all_confirm">확인</string>
+    <string name="all_folder_name_error_duplicate">중복된 폴더명이 존재합니다.</string>
+    <string name="all_folder_name_error_default_folder">기본 폴더 라는 이름이 존재합니다.</string>
+    <string name="all_folder_name_error_out_of_bound">폴더명은 1 ~ 20 글자 범위 입니다.</string>
+    <string name="all_folder_name_warning_max_length">폴더명은 최대 20글자 입니다.(현재 20 글자)</string>
 
     <!-- 바텀 네비게이션 -->
     <string name="bottom_navigation_home">홈</string>
@@ -23,23 +29,51 @@
     <string name="region_result_video_description">%1$s · %2$s</string>
     <string name="region_result_exist_result">검색결과 %d개</string>
 
+    <!-- 컨텐츠 상세 페이지 -->
+    <string name="bottom_sheet_favorite_place_folder_title">폴더 목록</string>
+
     <!-- 홈 페이지 -->
     <string name="home_where_should_we_go_title">✈️어디로 떠나볼까요?</string>
     <string name="home_where_should_we_go_highlighting">떠나볼까요?</string>
     <string name="home_domestic">국내</string>
     <string name="home_abroad">해외</string>
-    <string name="home_users_like_content_title">🩵 이번 주, 유저들이 가장 많이 찜한 콘텐츠!</string>
+    <string name="home_users_like_content_title">🩵 한 주간 가장 많이 찜 된 콘텐츠</string>
 
     <!-- 찜 목록 페이지 -->
-    <string name="favorite_empty_suggest_title">컨텐츠를 찜 해보세요!</string>
-    <string name="favorite_empty_suggest_description">원하는 동선이 담긴\n여행 일정을 저장해 보세요.</string>
+    <string name="bottom_sheet_favorite_help_information_inquiry">문의하기</string>
+    <string name="bottom_sheet_favorite_help_information_privacy_policy">개인 정보 처리 방침</string>
+
+    <!-- 찜 컨텐츠 목록 페이지 -->
+    <string name="favorite_content_empty_suggest_title">컨텐츠를 찜 해보세요!</string>
+    <string name="favorite_content_empty_suggest_description">원하는 동선이 담긴\n여행 일정을 저장해 보세요.</string>
+
+    <!-- 찜 장소 목록 페이지 -->
+    <string name="favorite_place_empty_suggest_title">장소를 찜 해보세요!</string>
+    <string name="favorite_place_empty_suggest_description">장소에 하트를 눌러\n마음에 드는 장소 목록을 만들어 보세요.</string>
 
     <!-- 스플래시 페이지 -->
     <string name="splash_description">직진만 남은 여행</string>
 
     <!-- 검색 상세 페이지 -->
-    <string name="trip_detail_video_error">해당 영상은 제작자의 요청으로 유튜브를 이용해야만 시청할 수 있습니다.\n클릭 시 유튜브로 이동합니다.</string>
+    <string name="trip_detail_video_error">해당 영상은 제작자의 요청으로 유튜브로만 시청할 수 있습니다.\n클릭 시 유튜브로 이동합니다.</string>
     <string name="trip_detail_day_place_count">일정 %d개</string>
     <string name="trip_detail_travel_day">%d일차</string>
+    <string name="trip_detail_snackbar_favorite_save">컨텐츠 찜 목록에 저장했어요</string>
+    <string name="trip_detail_snackbar_favorite_remove">컨텐츠 찜 목록에서 삭제했어요</string>
+    <string name="travel_place_map">지도</string>
+    <string name="travel_place_favorite">장소찜</string>
+    <string name="travel_place_time_line">%s~</string>
+
+    <!-- 폴더 페이지 -->
+    <string name="folder_title">폴더 편집</string>
+    <string name="bottom_sheet_folder_add_title">폴더 추가</string>
+    <string name="bottom_sheet_folder_add_folder_name_hint">폴더명을 입력해주세요.</string>
+    <string name="bottom_sheet_folder_modify_title">폴더 수정</string>
+    <string name="bottom_sheet_folder_modify_folder_name_hint">폴더명을 입력해주세요.</string>
+    <string name="bottom_sheet_folder_remove_title">%s을 삭제하시겠습니까?</string>
+    <string name="bottom_sheet_folder_remove_cancel">취소</string>
+    <string name="bottom_sheet_folder_remove_remove">삭제</string>
+
     <string name="main_double_back_pressed_to_exit">한 번 더 누르면 종료됩니다.</string>
+
 </resources>

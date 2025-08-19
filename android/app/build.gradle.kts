@@ -47,6 +47,7 @@ android {
 
         release {
             isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
@@ -110,4 +111,8 @@ dependencies {
     // Room
     implementation(libs.androidx.room.runtime)
     kapt(libs.androidx.room.compiler)
+    // viewpager2
+    implementation(libs.androidx.viewpager2)
+    // livedata
+    implementation(libs.androidx.lifecycle.livedata.ktx)
 }

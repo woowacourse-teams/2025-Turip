@@ -2,20 +2,26 @@ package com.on.turip.data.network
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.on.turip.BuildConfig
+import com.on.turip.di.RepositoryModule
+import com.on.turip.domain.userstorage.repository.UserStorageRepository
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
+import okhttp3.Interceptor
+import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
+import okhttp3.Request
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import timber.log.Timber
 
 object NetworkClient {
-    private const val BASE_URL = BuildConfig.BASE_URL
-    private const val LOG_PREFIX = "moongjenut"
-    private val contentType = "application/json".toMediaType()
+    private const val BASE_URL: String = BuildConfig.BASE_URL
+    private const val LOG_PREFIX: String = "moongjenut"
+    private val contentType: MediaType = "application/json".toMediaType()
 
-    private val json =
+    private val json: Json =
         Json {
             ignoreUnknownKeys = true
             prettyPrint = true
@@ -24,6 +30,7 @@ object NetworkClient {
     private val client: OkHttpClient by lazy {
         OkHttpClient
             .Builder()
+            .addInterceptor(createHeaderInterceptor(RepositoryModule.userStorageRepository))
             .addInterceptor(createLoggingInterceptor())
             .build()
     }
@@ -38,10 +45,29 @@ object NetworkClient {
                 }
         }
 
+    private fun createHeaderInterceptor(userStorageRepository: UserStorageRepository): Interceptor =
+        Interceptor { chain ->
+            val fid: String =
+                runBlocking {
+                    userStorageRepository
+                        .loadId()
+                        .getOrNull()
+                        ?.fid ?: ""
+                }
+            val newRequest: Request =
+                chain
+                    .request()
+                    .newBuilder()
+                    .header("device-fid", fid)
+                    .build()
+
+            chain.proceed(newRequest)
+        }
+
     private fun logHttpMessage(message: String) {
         if (message.startsWith("{") || message.startsWith("[")) {
             try {
-                val prettyJson =
+                val prettyJson: String =
                     json.encodeToString(
                         JsonElement.serializer(),
                         Json.parseToJsonElement(message),

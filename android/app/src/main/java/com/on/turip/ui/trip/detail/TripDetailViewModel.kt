@@ -8,15 +8,18 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.on.turip.data.common.TuripCustomResult
+import com.on.turip.data.common.onFailure
+import com.on.turip.data.common.onSuccess
 import com.on.turip.di.RepositoryModule
 import com.on.turip.domain.content.Content
 import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.creator.Creator
 import com.on.turip.domain.creator.repository.CreatorRepository
 import com.on.turip.domain.favorite.usecase.UpdateFavoriteUseCase
+import com.on.turip.domain.trip.ContentPlace
 import com.on.turip.domain.trip.Trip
-import com.on.turip.domain.trip.TripCourse
-import com.on.turip.domain.trip.repository.TripRepository
+import com.on.turip.domain.trip.repository.ContentPlaceRepository
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.common.model.trip.TripModel
 import kotlinx.coroutines.Deferred
@@ -33,7 +36,7 @@ class TripDetailViewModel(
     private val creatorId: Long,
     private val contentRepository: ContentRepository,
     private val creatorRepository: CreatorRepository,
-    private val tripRepository: TripRepository,
+    private val contentPlaceRepository: ContentPlaceRepository,
     private val updateFavoriteUseCase: UpdateFavoriteUseCase,
 ) : ViewModel() {
     private val _content: MutableLiveData<Content> = MutableLiveData()
@@ -54,6 +57,16 @@ class TripDetailViewModel(
     private val _isFavorite: MutableLiveData<Boolean> = MutableLiveData(false)
     val isFavorite: LiveData<Boolean> get() = _isFavorite
 
+    private val _isExpandTextToggleVisible: MutableLiveData<Boolean> = MutableLiveData(false)
+    val isExpandTextToggleVisible: LiveData<Boolean> get() = _isExpandTextToggleVisible
+
+    private val _isExpandTextToggleSelected: MutableLiveData<Boolean> = MutableLiveData(false)
+    val isExpandTextToggleSelected: LiveData<Boolean> get() = _isExpandTextToggleSelected
+
+    private val _bodyMaxLines: MutableLiveData<Int> =
+        MutableLiveData(DEFAULT_CONTENT_TITLE_MAX_LINES)
+    val bodyMaxLines: LiveData<Int> get() = _bodyMaxLines
+
     private var placeCacheByDay: Map<Int, List<PlaceModel>> = emptyMap()
 
     init {
@@ -64,13 +77,13 @@ class TripDetailViewModel(
 
     private fun loadContent() {
         viewModelScope.launch {
-            val deferredCreator: Deferred<Result<Creator>> =
+            val deferredCreator: Deferred<TuripCustomResult<Creator>> =
                 async { creatorRepository.loadCreator(creatorId) }
-            val deferredVideoData: Deferred<Result<Content>> =
+            val deferredVideoData: Deferred<TuripCustomResult<Content>> =
                 async { contentRepository.loadContent(contentId) }
 
-            val creatorResult: Result<Creator> = deferredCreator.await()
-            val videoDataResult: Result<Content> = deferredVideoData.await()
+            val creatorResult: TuripCustomResult<Creator> = deferredCreator.await()
+            val videoDataResult: TuripCustomResult<Content> = deferredVideoData.await()
 
             creatorResult
                 .onSuccess { creator: Creator ->
@@ -80,17 +93,15 @@ class TripDetailViewModel(
                             _videoUri.value = result.videoData.url
                             _isFavorite.value = result.isFavorite
                         }.onFailure {
-                            Timber.e("${it.message}")
                         }
                 }.onFailure {
-                    Timber.e("${it.message}")
                 }
         }
     }
 
     private fun loadTrip() {
         viewModelScope.launch {
-            tripRepository
+            contentPlaceRepository
                 .loadTripInfo(contentId)
                 .onSuccess { trip: Trip ->
                     setupCached(trip)
@@ -105,7 +116,6 @@ class TripDetailViewModel(
                     _tripModel.value = trip.toUiModel()
                     Timber.d("여행 일정 불러오기 성공")
                 }.onFailure {
-                    Timber.e("${it.message}")
                 }
         }
     }
@@ -116,26 +126,19 @@ class TripDetailViewModel(
         placeCacheByDay =
             dayModels.associate { dayModel ->
                 val day: Int = dayModel.day
-                val coursesForDay: List<TripCourse> = trip.tripCourses.filter { it.visitDay == day }
+                val coursesForDay: List<ContentPlace> =
+                    trip.contentPlaces.filter { it.visitDay == day }
                 val placeModels: List<PlaceModel> =
                     coursesForDay.map { course ->
                         PlaceModel(
                             name = course.place.name,
                             category = course.place.category.joinToString(),
                             mapLink = course.place.url,
+                            timeLine = course.timeLine,
                         )
                     }
                 day to placeModels
             }
-    }
-
-    fun updateDay(dayModel: DayModel) {
-        _days.value = days.value?.map { it.copy(isSelected = it.day == dayModel.day) }
-        _places.value = placeCacheByDay[dayModel.day].orEmpty()
-    }
-
-    fun updateFavorite() {
-        _isFavorite.value = isFavorite.value?.not()
     }
 
     @OptIn(FlowPreview::class)
@@ -150,19 +153,53 @@ class TripDetailViewModel(
                         .onSuccess {
                             Timber.d("찜 API 통신 성공")
                         }.onFailure {
-                            Timber.e("${it.message}")
                         }
                 }
         }
     }
 
+    fun updateDay(dayModel: DayModel) {
+        _days.value = days.value?.map { it.copy(isSelected = it.day == dayModel.day) }
+        _places.value = placeCacheByDay[dayModel.day].orEmpty()
+    }
+
+    fun updateFavorite() {
+        _isFavorite.value = isFavorite.value?.not()
+    }
+
+    fun updateExpandTextToggle() {
+        val currentSelected: Boolean = _isExpandTextToggleSelected.value == true
+        val newSelected: Boolean = !currentSelected
+
+        _isExpandTextToggleSelected.value = newSelected
+        _bodyMaxLines.value =
+            if (newSelected) {
+                Int.MAX_VALUE
+            } else {
+                DEFAULT_CONTENT_TITLE_MAX_LINES
+            }
+    }
+
+    fun updateExpandTextToggleVisibility(
+        lineCount: Int,
+        ellipsisCount: Int,
+    ) {
+        _isExpandTextToggleVisible.value =
+            lineCount >= DEFAULT_CONTENT_TITLE_MAX_LINES &&
+            ellipsisCount > 0
+        _isExpandTextToggleSelected.value = false
+        _bodyMaxLines.value = DEFAULT_CONTENT_TITLE_MAX_LINES
+    }
+
     companion object {
+        private const val DEFAULT_CONTENT_TITLE_MAX_LINES = 2
+
         fun provideFactory(
             contentId: Long,
             creatorId: Long,
             contentRepository: ContentRepository = RepositoryModule.contentRepository,
             creatorRepository: CreatorRepository = RepositoryModule.creatorRepository,
-            travelRepository: TripRepository = RepositoryModule.tripRepository,
+            contentPlaceRepository: ContentPlaceRepository = RepositoryModule.contentPlaceRepository,
             updateFavoriteUseCase: UpdateFavoriteUseCase = UpdateFavoriteUseCase(RepositoryModule.favoriteRepository),
         ): ViewModelProvider.Factory =
             viewModelFactory {
@@ -172,7 +209,7 @@ class TripDetailViewModel(
                         creatorId,
                         contentRepository,
                         creatorRepository,
-                        travelRepository,
+                        contentPlaceRepository,
                         updateFavoriteUseCase,
                     )
                 }

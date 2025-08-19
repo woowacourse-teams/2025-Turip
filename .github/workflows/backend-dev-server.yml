@@ -1,4 +1,4 @@
-name: CI Build and Test, EC2 CD
+name: dev CI Build and Test, EC2 CD
 
 on:
   push:
@@ -49,7 +49,7 @@ jobs:
 
   deploy:
     needs: build_and_test
-    runs-on: self-hosted
+    runs-on: [self-hosted, turip-server-dev]
     environment: production
     if: github.event_name == 'push'
 
