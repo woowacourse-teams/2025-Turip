@@ -1,6 +1,7 @@
 package com.on.turip.data.folder
 
 import com.on.turip.data.folder.dto.FavoriteFolderAddRequest
+import com.on.turip.data.folder.dto.FavoriteFolderPatchRequest
 import com.on.turip.data.folder.dto.FavoriteFolderResponse
 import com.on.turip.data.folder.dto.FavoriteFoldersResponse
 import com.on.turip.domain.folder.Folder
@@ -15,4 +16,6 @@ fun FavoriteFolderResponse.toDomain(): Folder =
         placeCount = placeCount,
     )
 
-fun String.toRequestDto(): FavoriteFolderAddRequest = FavoriteFolderAddRequest(name = this)
+fun String.toAddRequestDto(): FavoriteFolderAddRequest = FavoriteFolderAddRequest(name = this)
+
+fun String.toPatchRequestDto(): FavoriteFolderPatchRequest = FavoriteFolderPatchRequest(name = this)
