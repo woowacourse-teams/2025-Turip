@@ -54,20 +54,21 @@ public class DataImportController {
             // CSV 파일 다운로드
             Path tempFile = csvFileService.downloadCsvFromUrl(csvUrl);
 
-            // CSV 파일 검증
-            if (!csvFileService.isValidCsvFile(tempFile)) {
+            try {
+                // CSV 파일 검증
+                if (!csvFileService.isValidCsvFile(tempFile)) {
+                    return ResponseEntity.badRequest().body("유효하지 않은 CSV 파일입니다.");
+                }
+
+                // CSV 데이터 import 실행
+                dataImportService.importCsvData(tempFile.toString());
+
+                log.info("CSV 데이터 import 완료: {}", csvUrl);
+                return ResponseEntity.ok("CSV 데이터 import가 완료되었습니다.");
+            } finally {
+                // 임시 파일 삭제
                 Files.deleteIfExists(tempFile);
-                return ResponseEntity.badRequest().body("유효하지 않은 CSV 파일입니다.");
             }
-
-            // CSV 데이터 import 실행
-            dataImportService.importCsvData(tempFile.toString());
-
-            // 임시 파일 삭제
-            Files.deleteIfExists(tempFile);
-
-            log.info("CSV 데이터 import 완료: {}", csvUrl);
-            return ResponseEntity.ok("CSV 데이터 import가 완료되었습니다.");
 
         } catch (IOException e) {
             log.error("CSV 파일 다운로드 실패: {} - {}", csvUrl, e.getMessage(), e);
