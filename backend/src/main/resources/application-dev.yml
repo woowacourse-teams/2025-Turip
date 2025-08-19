@@ -31,6 +31,13 @@ spring:
     validate-on-migrate: true
     encoding: UTF-8
 
+# CSV Import 설정
+csv:
+  import:
+    password: ${CSV_IMPORT_PASSWORD:dev_password_123}
+  links:
+    collection-url: ${CSV_LINKS_COLLECTION_URL}
+
 logging:
   level:
     root: INFO
