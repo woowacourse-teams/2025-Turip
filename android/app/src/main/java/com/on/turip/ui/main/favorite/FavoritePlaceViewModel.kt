@@ -34,7 +34,7 @@ class FavoritePlaceViewModel(
             favoritePlaceFolders.firstOrNull { it.isSelected }?.placeCount ?: 0
         }
     private val _places: MutableLiveData<List<FavoritePlaceModel>> = MutableLiveData()
-    val places: LiveData<List<FavoritePlaceModel>> = _places
+    val places: LiveData<List<FavoritePlaceModel>> get() = _places
 
     private var selectedFolderId: Long = NOT_INITIALIZED
 
@@ -57,6 +57,12 @@ class FavoritePlaceViewModel(
         val updateFavorite: Boolean = !isFavorite
         viewModelScope.launch {
             updateFavoritePlaceUseCase(selectedFolderId, placeId, updateFavorite)
+                .onSuccess {
+                    _folders.value =
+                        folders.value?.map { if (it.id == placeId) it.copy(isSelected = updateFavorite) else it }
+                }.onFailure {
+                    Timber.e("장소 찜 업데이트 실패")
+                }
         }
     }
 
