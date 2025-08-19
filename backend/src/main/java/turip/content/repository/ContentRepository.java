@@ -74,7 +74,7 @@ public interface ContentRepository extends JpaRepository<Content, Long> {
                                                      @Param("lastId") Long lastId, Pageable pageable);
 
     @Query("""
-                SELECT count(c) FROM Content c
+               SELECT COUNT(DISTINCT c) FROM Content c
                 JOIN c.creator cr
                 LEFT JOIN ContentPlace cp ON c.id = cp.content.id
                 LEFT JOIN cp.place p
@@ -95,5 +95,6 @@ public interface ContentRepository extends JpaRepository<Content, Long> {
                      OR p.name LIKE %:keyword%)
                 ORDER BY c.id DESC
             """)
-    Slice<Content> findByKeywordContaining(@Param("keyword") String keyword, @Param("lastId") Long lastId, Pageable pageable);
+    Slice<Content> findByKeywordContaining(@Param("keyword") String keyword, @Param("lastId") Long lastId,
+                                           Pageable pageable);
 }
