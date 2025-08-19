@@ -6,17 +6,17 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class PlaceResponse(
     @SerialName("address")
-    val address: String?,
+    val address: String,
     @SerialName("categories")
-    val categories: List<CategoryResponse?>?,
+    val categories: List<CategoryResponse>,
     @SerialName("id")
-    val id: Int?,
+    val id: Long,
     @SerialName("latitude")
-    val latitude: Double?,
+    val latitude: Double,
     @SerialName("longitude")
-    val longitude: Double?,
+    val longitude: Double,
     @SerialName("name")
-    val name: String?,
+    val name: String,
     @SerialName("url")
-    val url: String?,
+    val url: String,
 )

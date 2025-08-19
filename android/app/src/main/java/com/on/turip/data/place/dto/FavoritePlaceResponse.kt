@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class FavoritePlaceResponse(
     @SerialName("id")
-    val id: Int?,
+    val id: Long,
     @SerialName("place")
-    val placeResponse: PlaceResponse?,
+    val placeResponse: PlaceResponse,
 )

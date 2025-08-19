@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class FavoritePlacesResponse(
     @SerialName("favoritePlaceCount")
-    val favoritePlaceCount: Int?,
+    val favoritePlaceCount: Int,
     @SerialName("favoritePlaces")
-    val favoritePlaceResponses: List<FavoritePlaceResponse?>?,
+    val favoritePlaceResponses: List<FavoritePlaceResponse>,
 )
