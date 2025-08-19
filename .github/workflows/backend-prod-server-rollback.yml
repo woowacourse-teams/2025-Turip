@@ -1,0 +1,64 @@
+name: prod Manual Rollback
+
+on:
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: "롤백할 Release SHA ( /home/ubuntu/app/releases 안에 존재해야 함 )"
+        required: true
+
+jobs:
+  rollback:
+    runs-on: [self-hosted, turip-server-prod]
+    environment: production
+
+    steps:
+      - name: Rollback to input SHA
+        run: |
+          set -euo pipefail
+          BASE=/home/ubuntu/app
+          SHA=${{ github.event.inputs.sha }}
+
+          echo "Requested rollback to: $SHA"
+
+          # 대상 SHA 존재 확인
+          if [ ! -d "$BASE/releases/$SHA" ]; then
+            echo "Error: No such release found at $BASE/releases/$SHA"
+            exit 1
+          fi
+
+          # 현재 -> previous 백업
+          if [ -L "$BASE/current" ]; then
+            ln -sfn "$(readlink -f $BASE/current)" "$BASE/previous"
+          fi
+
+          # current → 입력된 SHA로 전환
+          ln -sfn "$BASE/releases/$SHA" "$BASE/current"
+
+          # 실행 중 프로세스 종료
+          PID=$(sudo lsof -t -i :8080 || true)
+          if [ -n "$PID" ]; then
+            echo "Killing existing process: $PID"
+            sudo kill -9 $PID || true
+          fi
+
+          # 재기동
+          echo "Starting application from SHA=$SHA ..."
+          sudo nohup java -jar -Dspring.profiles.active=prod "$BASE/current/app.jar" \
+            > "$BASE/app.out" 2>&1 &
+
+          # 헬스 체크 (최대 60초)
+          ok=0
+          for i in {1..20}; do
+            if curl -fsS http://localhost:8080/actuator/health | grep -q '"status":"UP"'; then
+              ok=1; break
+            fi
+            sleep 3
+          done
+
+          if [ $ok -ne 1 ]; then
+            echo "[FAIL] Rollback target unhealthy."
+            exit 1
+          fi
+
+          echo "[SUCCESS] Rollback completed to SHA=$SHA"
