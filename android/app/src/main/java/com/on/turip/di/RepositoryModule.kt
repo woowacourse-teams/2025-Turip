@@ -5,11 +5,13 @@ import com.on.turip.data.content.repository.DefaultContentRepository
 import com.on.turip.data.creator.repository.DefaultCreatorRepository
 import com.on.turip.data.favorite.repository.DefaultFavoriteRepository
 import com.on.turip.data.folder.repository.DefaultFolderRepository
+import com.on.turip.data.place.repository.DefaultFavoritePlaceRepository
 import com.on.turip.data.region.repository.DefaultRegionRepository
 import com.on.turip.data.searchhistory.repository.DefaultSearchHistoryRepository
 import com.on.turip.data.userstorage.repository.DefaultUserStorageRepository
 import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.creator.repository.CreatorRepository
+import com.on.turip.domain.favorite.repository.FavoritePlaceRepository
 import com.on.turip.domain.favorite.repository.FavoriteRepository
 import com.on.turip.domain.folder.repository.FolderRepository
 import com.on.turip.domain.region.repository.RegionRepository
@@ -41,5 +43,8 @@ object RepositoryModule {
     }
     val folderRepository: FolderRepository by lazy {
         DefaultFolderRepository(DataSourceModule.folderRemoteDataSource)
+    }
+    val favoritePlaceRepository: FavoritePlaceRepository by lazy {
+        DefaultFavoritePlaceRepository(DataSourceModule.favoritePlaceRemoteDataSource)
     }
 }

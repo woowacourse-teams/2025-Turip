@@ -35,11 +35,11 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="14dp"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         android:orientation="vertical"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_region_result_count"
-        app:layout_constraintBottom_toBottomOf="parent"
         tools:itemCount="10"
         tools:listitem="@layout/item_result" />
 
@@ -75,13 +75,15 @@
         android:visibility="gone"
         app:constraint_referenced_ids="iv_region_result_empty,tv_region_result_empty" />
 
-    <TextView
-        android:id="@+id/tv_region_result_loading"
+    <ProgressBar
+        android:id="@+id/pb_search_region_result"
+        style="?android:attr/progressBarStyleLarge"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/all_loading"
-        android:gravity="center"
-        android:textColor="@color/pure_black_151515"
-        android:textAppearance="@style/display"
-        android:background="@color/pure_white_ffffff" />
+        android:layout_height="wrap_content"
+        android:background="@color/pure_white_ffffff"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

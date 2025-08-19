@@ -6,6 +6,7 @@ import com.on.turip.data.creator.service.CreatorService
 import com.on.turip.data.favorite.service.FavoriteService
 import com.on.turip.data.folder.service.FolderService
 import com.on.turip.data.network.NetworkClient
+import com.on.turip.data.place.service.PlaceService
 import com.on.turip.data.region.service.RegionService
 
 object NetworkModule {
@@ -26,5 +27,8 @@ object NetworkModule {
     }
     val folderService: FolderService by lazy {
         NetworkClient.turipNetwork.create(FolderService::class.java)
+    }
+    val favoritePlaceService: PlaceService by lazy {
+        NetworkClient.turipNetwork.create(PlaceService::class.java)
     }
 }

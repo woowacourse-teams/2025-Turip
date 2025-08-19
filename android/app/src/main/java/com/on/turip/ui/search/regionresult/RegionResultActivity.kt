@@ -79,19 +79,32 @@ class RegionResultActivity : BaseActivity<ActivityRegionResultBinding>() {
 
             regionResultAdapter.submitList(searchResultState.videoInformations)
 
-            setupVisible(searchResultState)
+            handleVisibility(searchResultState)
         }
     }
 
-    private fun setupVisible(searchResultState: RegionResultViewModel.SearchResultState) {
-        binding.rvRegionResult.visibility =
-            if (searchResultState.isExist) View.VISIBLE else View.GONE
+    private fun handleVisibility(searchResultState: RegionResultViewModel.SearchResultState) {
+        when (searchResultState.loading) {
+            true -> {
+                binding.pbSearchRegionResult.visibility = View.VISIBLE
+                binding.groupRegionResultEmpty.visibility = View.GONE
+                binding.tvRegionResultCount.visibility = View.GONE
+                binding.rvRegionResult.visibility = View.GONE
+            }
 
-        binding.groupRegionResultEmpty.visibility =
-            if (searchResultState.isExist) View.GONE else View.VISIBLE
-
-        binding.tvRegionResultLoading.visibility =
-            if (searchResultState.loading) View.VISIBLE else View.GONE
+            false -> {
+                binding.pbSearchRegionResult.visibility = View.GONE
+                if (searchResultState.isExist) {
+                    binding.groupRegionResultEmpty.visibility = View.GONE
+                    binding.tvRegionResultCount.visibility = View.VISIBLE
+                    binding.rvRegionResult.visibility = View.VISIBLE
+                } else {
+                    binding.groupRegionResultEmpty.visibility = View.VISIBLE
+                    binding.tvRegionResultCount.visibility = View.GONE
+                    binding.rvRegionResult.visibility = View.GONE
+                }
+            }
+        }
     }
 
     companion object {
