@@ -105,11 +105,12 @@ public class DevDataInitializer implements CommandLineRunner {
 
     private void importCsvFiles(List<String> csvUrls) {
         for (String csvUrl : csvUrls) {
+            Path tempFile = null;
             try {
                 log.info("CSV 파일 import 시작: {}", csvUrl);
 
                 // CSV 파일 다운로드
-                Path tempFile = csvFileService.downloadCsvFromUrl(csvUrl);
+                tempFile = csvFileService.downloadCsvFromUrl(csvUrl);
 
                 // CSV 파일 검증
                 if (csvFileService.isValidCsvFile(tempFile)) {
@@ -120,11 +121,17 @@ public class DevDataInitializer implements CommandLineRunner {
                     log.warn("유효하지 않은 CSV 파일: {}", csvUrl);
                 }
 
-                // 임시 파일 삭제
-                Files.deleteIfExists(tempFile);
 
             } catch (Exception e) {
                 log.error("CSV 파일 import 실패: {} - {}", csvUrl, e.getMessage(), e);
+            } finally {
+                try {
+                    if (tempFile != null) {
+                        Files.deleteIfExists(tempFile);
+                    }
+                } catch (Exception ex) {
+                    log.warn("임시 파일 삭제 실패: {}", ex.getMessage());
+                }
             }
         }
 
