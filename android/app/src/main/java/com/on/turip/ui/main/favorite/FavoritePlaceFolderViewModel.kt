@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -25,6 +26,11 @@ class FavoritePlaceFolderViewModel(
     private val _favoritePlaceFolders: MutableLiveData<List<FavoritePlaceFolderModel>> =
         MutableLiveData(emptyList())
     val favoritePlaceFolders: LiveData<List<FavoritePlaceFolderModel>> get() = _favoritePlaceFolders
+
+    val hasFavoriteFolderWithPlaceId: LiveData<Boolean> =
+        favoritePlaceFolders.map { folders: List<FavoritePlaceFolderModel> ->
+            folders.any { folder: FavoritePlaceFolderModel -> folder.isSelected }
+        }
 
     init {
         loadFavoriteFoldersByPlaceId(placeId)

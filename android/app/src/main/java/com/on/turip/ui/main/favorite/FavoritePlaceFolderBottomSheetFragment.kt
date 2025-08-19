@@ -10,6 +10,7 @@ import android.widget.FrameLayout
 import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
@@ -19,6 +20,7 @@ import com.on.turip.ui.common.TuripSnackbar
 import com.on.turip.ui.common.base.BaseBottomSheetFragment
 import com.on.turip.ui.folder.FolderActivity
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
+import com.on.turip.ui.trip.detail.TripDetailViewModel
 
 class FavoritePlaceFolderBottomSheetFragment : BaseBottomSheetFragment<BottomSheetFragmentFavoritePlaceFolderBinding>() {
     private val viewModel: FavoritePlaceFolderViewModel by viewModels {
@@ -26,6 +28,8 @@ class FavoritePlaceFolderBottomSheetFragment : BaseBottomSheetFragment<BottomShe
             placeId = arguments?.getLong(ARGUMENTS_PLACE_ID) ?: 0L,
         )
     }
+    private val sharedViewModel: TripDetailViewModel by activityViewModels()
+
     private val favoritePlaceFolderAdapter: FavoritePlaceFolderAdapter by lazy {
         FavoritePlaceFolderAdapter { favoritePlaceFolderModel: FavoritePlaceFolderModel ->
             viewModel.updateFolder(
@@ -117,6 +121,12 @@ class FavoritePlaceFolderBottomSheetFragment : BaseBottomSheetFragment<BottomShe
     private fun setupObservers() {
         viewModel.favoritePlaceFolders.observe(viewLifecycleOwner) { folders: List<FavoritePlaceFolderModel> ->
             favoritePlaceFolderAdapter.submitList(folders)
+        }
+        viewModel.hasFavoriteFolderWithPlaceId.observe(viewLifecycleOwner) { hasFavoriteFolder: Boolean ->
+            sharedViewModel.updateHasFavoriteFolderInPlace(
+                hasFavoriteFolder,
+                arguments?.getLong(ARGUMENTS_PLACE_ID) ?: 0L,
+            )
         }
     }
 

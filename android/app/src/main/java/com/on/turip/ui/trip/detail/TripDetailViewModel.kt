@@ -192,6 +192,16 @@ class TripDetailViewModel(
         _bodyMaxLines.value = DEFAULT_CONTENT_TITLE_MAX_LINES
     }
 
+    fun updateHasFavoriteFolderInPlace(
+        hasFavoriteFolder: Boolean,
+        placeId: Long,
+    ) {
+        _places.value =
+            places.value?.map { place: PlaceModel ->
+                if (place.id == placeId) place.copy(isFavorite = hasFavoriteFolder) else place
+            }
+    }
+
     companion object {
         private const val DEFAULT_CONTENT_TITLE_MAX_LINES = 2
 
