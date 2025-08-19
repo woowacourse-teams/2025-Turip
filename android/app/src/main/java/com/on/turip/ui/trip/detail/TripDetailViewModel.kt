@@ -131,6 +131,7 @@ class TripDetailViewModel(
                 val placeModels: List<PlaceModel> =
                     coursesForDay.map { course ->
                         PlaceModel(
+                            id = course.place.placeId,
                             name = course.place.name,
                             category = course.place.category.joinToString(),
                             mapLink = course.place.url,

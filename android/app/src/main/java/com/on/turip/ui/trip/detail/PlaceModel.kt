@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.core.net.toUri
 
 data class PlaceModel(
+    val id: Long,
     val name: String,
     val category: String,
     val mapLink: String,

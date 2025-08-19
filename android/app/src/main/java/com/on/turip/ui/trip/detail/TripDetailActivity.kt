@@ -23,6 +23,7 @@ import com.on.turip.ui.common.base.BaseActivity
 import com.on.turip.ui.common.loadCircularImage
 import com.on.turip.ui.common.model.trip.TripModel
 import com.on.turip.ui.common.model.trip.toDisplayText
+import com.on.turip.ui.main.favorite.FavoritePlaceFolderBottomSheetFragment
 import com.on.turip.ui.trip.detail.webview.TuripWebChromeClient
 import com.on.turip.ui.trip.detail.webview.TuripWebViewClient
 import com.on.turip.ui.trip.detail.webview.applyVideoSettings
@@ -71,7 +72,9 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
                 }
 
                 override fun onFavoriteClick(placeModel: PlaceModel) {
-                    // TODO: 찜 선택 구현
+                    val bottomSheet: FavoritePlaceFolderBottomSheetFragment =
+                        FavoritePlaceFolderBottomSheetFragment.instance(placeModel.id)
+                    bottomSheet.show(supportFragmentManager, "favorite_place_folder")
                 }
             },
         )
@@ -226,7 +229,7 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
         TuripSnackbar
             .make(
                 rootView = binding.root,
-                messageResource = messageResource,
+                message = getString(messageResource),
                 duration = Snackbar.LENGTH_LONG,
                 layoutInflater = layoutInflater,
             ).topMarginInCoordinatorLayout(binding.tbTripDetail.height)
