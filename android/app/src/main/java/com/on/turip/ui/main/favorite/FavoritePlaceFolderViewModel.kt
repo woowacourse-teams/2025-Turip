@@ -32,11 +32,7 @@ class FavoritePlaceFolderViewModel(
             folders.any { folder: FavoritePlaceFolderModel -> folder.isSelected }
         }
 
-    init {
-        loadFavoriteFoldersByPlaceId(placeId)
-    }
-
-    fun loadFavoriteFoldersByPlaceId(placeId: Long) {
+    fun loadFavoriteFoldersByPlaceId(placeId: Long = this.placeId) {
         viewModelScope.launch {
             folderRepository
                 .loadFavoriteFoldersStatusByPlaceId(placeId)

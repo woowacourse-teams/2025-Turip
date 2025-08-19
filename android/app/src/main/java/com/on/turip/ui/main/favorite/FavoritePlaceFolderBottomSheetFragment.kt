@@ -130,6 +130,11 @@ class FavoritePlaceFolderBottomSheetFragment : BaseBottomSheetFragment<BottomShe
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.loadFavoriteFoldersByPlaceId()
+    }
+
     companion object {
         private const val BASIC_VIEW_PERCENT: Float = 0.5f
         private const val ARGUMENTS_PLACE_ID = "PLACE_ID"
