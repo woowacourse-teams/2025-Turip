@@ -144,10 +144,10 @@ public class DevDataInitializer implements CommandLineRunner {
                 return;
             }
 
-            String sqlContent = StreamUtils.copyToString(
-                    dataSqlResource.getInputStream(),
-                    StandardCharsets.UTF_8
-            );
+            String sqlContent;
+            try (var is = dataSqlResource.getInputStream()) {
+                sqlContent = StreamUtils.copyToString(is, StandardCharsets.UTF_8);
+            }
 
             // SQL 문장들을 세미콜론으로 분리하여 실행
             String[] sqlStatements = sqlContent.split(";");
