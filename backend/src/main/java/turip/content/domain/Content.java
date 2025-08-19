@@ -7,14 +7,16 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDate;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import turip.city.domain.City;
 import turip.creator.domain.Creator;
-import turip.region.domain.Region;
 
 @Getter
 @Entity
+@AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Content {
@@ -28,7 +30,7 @@ public class Content {
     private Creator creator;
 
     @ManyToOne
-    private Region region;
+    private City city;
 
     private String title;
 
@@ -38,13 +40,13 @@ public class Content {
 
     public Content(
             Creator creator,
-            Region region,
+            City city,
             String title,
             String url,
             LocalDate uploadedDate
     ) {
         this.creator = creator;
-        this.region = region;
+        this.city = city;
         this.title = title;
         this.url = url;
         this.uploadedDate = uploadedDate;

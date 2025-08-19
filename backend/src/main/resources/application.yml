@@ -9,7 +9,10 @@ spring:
   sql:
     init:
       mode: always
-      data-locations: classpath:data.sql
+      data-locations:
+        - classpath:Region/region_data.sql
+        - classpath:Creator/creator_data.sql
+
 
   jpa:
     show-sql: true

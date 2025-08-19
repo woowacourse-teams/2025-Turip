@@ -46,6 +46,16 @@ jobs:
 
     - name: Create local.properties
       run: echo "base_url=${{ secrets.BASE_URL }}" > local.properties  
+
+    - name: Write google-services.json for debug
+      run: |
+        mkdir -p ./app/src/debug
+        echo '${{ secrets.GOOGLE_SERVICES_JSON_DEBUG }}' > ./app/src/debug/google-services.json
+    
+    - name: Write google-services.json for release
+      run: |
+        mkdir -p ./app
+        echo '${{ secrets.GOOGLE_SERVICES_JSON_RELEASE }}' > ./app/google-services.json
       
     - name: Build with Gradle
       run: ./gradlew build --stacktrace
@@ -111,6 +121,16 @@ jobs:
     - name: Create local.properties
       run: echo "base_url=${{ secrets.BASE_URL }}" > local.properties
     
+    - name: Write google-services.json for debug
+      run: |
+        mkdir -p ./app/src/debug
+        echo '${{ secrets.GOOGLE_SERVICES_JSON_DEBUG }}' > ./app/src/debug/google-services.json
+    
+    - name: Write google-services.json for release
+      run: |
+        mkdir -p ./app
+        echo '${{ secrets.GOOGLE_SERVICES_JSON_RELEASE }}' > ./app/google-services.json
+      
     - name: Run tests
       run: ./gradlew test --stacktrace
 

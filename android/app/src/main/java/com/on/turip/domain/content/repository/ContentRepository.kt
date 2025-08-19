@@ -1,16 +1,27 @@
 package com.on.turip.domain.content.repository
 
+import com.on.turip.domain.content.Content
 import com.on.turip.domain.content.PagedContentsResult
-import com.on.turip.domain.content.video.VideoData
+import com.on.turip.domain.content.UsersLikeContent
 
 interface ContentRepository {
-    suspend fun loadContentsSize(region: String): Result<Int>
+    suspend fun loadContentsSizeByRegion(regionCategoryName: String): Result<Int>
 
-    suspend fun loadContents(
-        region: String,
+    suspend fun loadContentsSizeByKeyword(keyword: String): Result<Int>
+
+    suspend fun loadContentsByRegion(
+        regionCategoryName: String,
         size: Int,
         lastId: Long,
     ): Result<PagedContentsResult>
 
-    suspend fun loadContent(contentId: Long): Result<VideoData>
+    suspend fun loadContentsByKeyword(
+        keyword: String,
+        size: Int,
+        lastId: Long,
+    ): Result<PagedContentsResult>
+
+    suspend fun loadContent(contentId: Long): Result<Content>
+
+    suspend fun loadPopularFavoriteContents(size: Int = 5): Result<List<UsersLikeContent>>
 }

@@ -13,7 +13,7 @@ class TripPlaceViewHolder(
     private var placeModel: PlaceModel? = null
 
     init {
-        binding.ivTravelPlaceLink.setOnClickListener {
+        itemView.setOnClickListener {
             placeModel?.let {
                 onClickListener.onPlaceClick(it)
             }
@@ -23,7 +23,7 @@ class TripPlaceViewHolder(
     fun bind(placeModel: PlaceModel) {
         this.placeModel = placeModel
         binding.tvTravelPlaceName.text = placeModel.name
-        binding.tvTravelPlaceCategory.text = placeModel.category
+        binding.tvTravelPlaceCategory.text = placeModel.turipCategory
         binding.ivTravelPlaceLink.isVisible = placeModel.mapLink != "nan"
     }
 

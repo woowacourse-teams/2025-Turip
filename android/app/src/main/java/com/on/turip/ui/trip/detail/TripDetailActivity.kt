@@ -15,19 +15,22 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.on.turip.R
 import com.on.turip.databinding.ActivityTripDetailBinding
+import com.on.turip.domain.content.Content
+import com.on.turip.ui.common.TuripUrlConverter
 import com.on.turip.ui.common.base.BaseActivity
 import com.on.turip.ui.common.loadCircularImage
+import com.on.turip.ui.common.model.trip.TripModel
+import com.on.turip.ui.common.model.trip.toDisplayText
 import com.on.turip.ui.trip.detail.webview.TuripWebChromeClient
 import com.on.turip.ui.trip.detail.webview.TuripWebViewClient
 import com.on.turip.ui.trip.detail.webview.WebViewVideoBridge
 import com.on.turip.ui.trip.detail.webview.applyVideoSettings
-import com.on.turip.ui.trip.detail.webview.extractVideoId
 
-class TripDetailActivity : BaseActivity<TripDetailViewModel, ActivityTripDetailBinding>() {
+class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
     override val binding: ActivityTripDetailBinding by lazy {
         ActivityTripDetailBinding.inflate(layoutInflater)
     }
-    override val viewModel: TripDetailViewModel by viewModels {
+    val viewModel: TripDetailViewModel by viewModels {
         TripDetailViewModel.provideFactory(
             intent.getLongExtra(CONTENT_KEY, 0),
             intent.getLongExtra(CREATOR_KEY, 0),
@@ -49,7 +52,7 @@ class TripDetailActivity : BaseActivity<TripDetailViewModel, ActivityTripDetailB
 
     private val tripPlaceAdapter by lazy {
         TripPlaceAdapter { placeModel ->
-            val intent = Intent(Intent.ACTION_VIEW, placeModel.placeUri)
+            val intent: Intent = Intent(Intent.ACTION_VIEW, placeModel.placeUri)
             startActivity(intent)
         }
     }
@@ -155,54 +158,55 @@ class TripDetailActivity : BaseActivity<TripDetailViewModel, ActivityTripDetailB
 
     private fun setupListeners() {
         binding.tvTripDetailVideoError.setOnClickListener {
-            val intent =
+            val intent: Intent =
                 Intent(
                     Intent.ACTION_VIEW,
-                    viewModel.tripDetailState.value
-                        ?.content
-                        ?.videoData
-                        ?.url
-                        ?.toUri(),
+                    viewModel.videoUri.value?.toUri(),
                 )
             startActivity(intent)
+        }
+        binding.ivTripDetailFavorite.setOnClickListener {
+            viewModel.updateFavorite()
         }
     }
 
     private fun setupObservers() {
-        viewModel.tripDetailState.observe(this) { tripDetailState ->
-            tripDayAdapter.submitList(tripDetailState.days)
-            tripPlaceAdapter.submitList(tripDetailState.places)
-            binding.ivTripDetailCreatorThumbnail.loadCircularImage(
-                tripDetailState.content?.creator?.profileImage ?: "",
-            )
-            binding.tvTripDetailCreatorName.text = tripDetailState.content?.creator?.channelName
-            binding.tvTripDetailContentTitle.text = tripDetailState.content?.videoData?.title
-            binding.tvTripDetailUploadDate.text = tripDetailState.content?.videoData?.uploadedDate
-            binding.tvTripDetailTotalPlaceCount.text =
-                getString(R.string.all_total_place_count, tripDetailState.trip.tripPlaceCount)
-            binding.tvTripDetailTravelDuration.text =
-                getString(
-                    R.string.all_travel_duration,
-                    tripDetailState.trip.tripDuration.nights,
-                    tripDetailState.trip.tripDuration.days,
-                )
-            binding.tvTripDetailDayPlaceCount.text =
-                getString(
-                    R.string.trip_detail_day_place_count,
-                    tripDetailState.places.size,
-                )
+        viewModel.days.observe(this) { days: List<DayModel> ->
+            tripDayAdapter.submitList(days)
         }
-        viewModel.videoUri.observe(this) { url ->
+        viewModel.places.observe(this) { places: List<PlaceModel> ->
+            tripPlaceAdapter.submitList(places)
+            binding.tvTripDetailDayPlaceCount.text =
+                getString(R.string.trip_detail_day_place_count, places.size)
+        }
+        viewModel.content.observe(this) { content: Content ->
+            binding.ivTripDetailCreatorThumbnail.loadCircularImage(
+                content.creator.profileImage,
+            )
+            binding.tvTripDetailCreatorName.text = content.creator.channelName
+            binding.tvTripDetailContentTitle.text = content.videoData.title
+            binding.tvTripDetailUploadDate.text = content.videoData.uploadedDate
+        }
+        viewModel.tripModel.observe(this) { tripModel: TripModel ->
+            binding.tvTripDetailTotalPlaceCount.text =
+                getString(R.string.all_total_place_count, tripModel.tripPlaceCount)
+            binding.tvTripDetailTravelDuration.text =
+                tripModel.tripDurationModel.toDisplayText(this)
+        }
+        viewModel.videoUri.observe(this) { url: String ->
             binding.wvTripDetailVideo.apply {
                 addJavascriptInterface(
                     WebViewVideoBridge(
-                        url.extractVideoId(),
+                        TuripUrlConverter.extractVideoId(url),
                     ) { showWebViewErrorView() },
                     BRIDGE_NAME_IN_JS_FILE,
                 )
             }
 
             binding.wvTripDetailVideo.loadUrl(LOAD_URL_FILE_PATH)
+        }
+        viewModel.isFavorite.observe(this) { isFavorite: Boolean ->
+            binding.ivTripDetailFavorite.isSelected = isFavorite
         }
     }
 

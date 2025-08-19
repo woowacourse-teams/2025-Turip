@@ -15,4 +15,8 @@ data class ContentResponse(
     val uploadedDate: String,
     @SerialName("url")
     val url: String,
+    @SerialName("city")
+    val city: CityResponse,
+    @SerialName("isFavorite")
+    val isFavorite: Boolean = false,
 )
