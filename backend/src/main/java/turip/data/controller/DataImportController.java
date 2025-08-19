@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import turip.data.controller.dto.CsvImportRequest;
 import turip.data.service.CsvFileService;
 import turip.data.service.DataImportService;
 
@@ -79,15 +80,11 @@ public class DataImportController {
             return ResponseEntity.internalServerError().body("CSV 데이터 import 실패: " + e.getMessage());
         }
     }
-    
+
     private boolean isPasswordValid(String inputPassword) {
         if (csvImportPassword == null || inputPassword == null) {
             return false;
         }
         return MessageDigest.isEqual(csvImportPassword.getBytes(), inputPassword.getBytes());
-    }
-
-    // Request DTO
-    public record CsvImportRequest(String csvUrl, String password) {
     }
 } 
