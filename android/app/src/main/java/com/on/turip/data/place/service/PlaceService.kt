@@ -1,8 +1,11 @@
 package com.on.turip.data.place.service
 
+import com.on.turip.data.place.dto.FavoritePlaceRequest
 import com.on.turip.data.place.dto.FavoritePlacesResponse
 import retrofit2.Response
+import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Query
 
 interface PlaceService {
@@ -10,4 +13,9 @@ interface PlaceService {
     suspend fun getFavoritePlaces(
         @Query("favoriteFolderId") favoriteFolderId: Long,
     ): Response<FavoritePlacesResponse>
+
+    @POST("favorite-places")
+    suspend fun postFavoritePlace(
+        @Body favoritePlaceRequest: FavoritePlaceRequest,
+    ): Response<Unit>
 }
