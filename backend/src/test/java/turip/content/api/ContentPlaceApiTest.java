@@ -1,4 +1,4 @@
-package turip.contentplace.api;
+package turip.content.api;
 
 import static org.hamcrest.Matchers.is;
 

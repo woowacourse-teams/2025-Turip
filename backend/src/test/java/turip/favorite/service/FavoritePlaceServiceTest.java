@@ -1,4 +1,4 @@
-package turip.favoriteplace.service;
+package turip.favorite.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -24,7 +24,6 @@ import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.domain.FavoritePlace;
 import turip.favorite.repository.FavoriteFolderRepository;
 import turip.favorite.repository.FavoritePlaceRepository;
-import turip.favorite.service.FavoritePlaceService;
 import turip.member.domain.Member;
 import turip.place.domain.Place;
 import turip.place.repository.PlaceRepository;

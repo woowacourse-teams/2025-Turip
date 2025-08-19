@@ -1,4 +1,4 @@
-package turip.regioncategory.api;
+package turip.region.api;
 
 import static org.hamcrest.Matchers.is;
 

@@ -1,4 +1,4 @@
-package turip.favoritefolder.api;
+package turip.favorite.api;
 
 import static org.hamcrest.Matchers.is;
 

@@ -1,4 +1,4 @@
-package turip.regioncategory.service;
+package turip.region.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -12,13 +12,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import turip.region.domain.City;
-import turip.region.service.CityService;
 import turip.content.repository.ContentRepository;
-import turip.region.domain.Country;
-import turip.region.service.CountryService;
 import turip.region.controller.dto.response.RegionCategoriesResponse;
-import turip.region.service.RegionCategoryService;
+import turip.region.domain.City;
+import turip.region.domain.Country;
 
 @ExtendWith(MockitoExtension.class)
 class RegionCategoryServiceTest {

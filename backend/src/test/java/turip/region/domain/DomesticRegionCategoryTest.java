@@ -1,4 +1,4 @@
-package turip.regioncategory.domain;
+package turip.region.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -9,21 +9,20 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import turip.region.domain.OverseasRegionCategory;
 
-class OverseasRegionCategoryTest {
+class DomesticRegionCategoryTest {
 
-    @DisplayName("해외에 존재하는 나라인지 아닌지 확인할 수 있다.")
+    @DisplayName("국내에 존재하는 도시인지 아닌지 확인할 수 있다.")
     @ParameterizedTest
     @CsvSource({
-            "서울, false",
-            "서울시, false",
-            "일본, true",
-            "해외 기타, true"
+            "서울, true",
+            "서울시, true",
+            "국내 기타, true",
+            "일본, false"
     })
     void containsName(String category, boolean expected) {
         // when & then
-        Assertions.assertThat(OverseasRegionCategory.containsName(category))
+        Assertions.assertThat(DomesticRegionCategory.containsName(category))
                 .isEqualTo(expected);
     }
 
@@ -32,15 +31,15 @@ class OverseasRegionCategoryTest {
     @ValueSource(strings = {"", " "})
     void containsName_withBlank_throwsIllegalArgumentException(String category) {
         // when & then
-        assertThatThrownBy(() -> OverseasRegionCategory.containsName(category))
+        assertThatThrownBy(() -> DomesticRegionCategory.containsName(category))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("해외 기타를 제외한 카테고리를 확인할 수 있다.")
+    @DisplayName("국내 기타를 제외한 카테고리를 확인할 수 있다.")
     @Test
     void getDisplayNamesExcludingEtc() {
         // when & then
-        assertThat(OverseasRegionCategory.getDisplayNamesExcludingEtc())
-                .doesNotContain(OverseasRegionCategory.OTHER_OVERSEAS.getDisplayName());
+        assertThat(DomesticRegionCategory.getDisplayNamesExcludingEtc())
+                .doesNotContain(DomesticRegionCategory.OTHER_DOMESTIC.getDisplayName());
     }
 }

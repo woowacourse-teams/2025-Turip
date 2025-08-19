@@ -1,4 +1,4 @@
-package turip.favoritefolder.domain;
+package turip.favorite.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import turip.favorite.domain.FavoriteFolder;
 import turip.member.domain.Member;
 
 class FavoriteFolderTest {

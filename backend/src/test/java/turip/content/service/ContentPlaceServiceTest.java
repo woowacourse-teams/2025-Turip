@@ -1,4 +1,4 @@
-package turip.contentplace.service;
+package turip.content.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -20,7 +20,6 @@ import turip.content.domain.Content;
 import turip.content.domain.ContentPlace;
 import turip.content.repository.ContentPlaceRepository;
 import turip.content.repository.ContentRepository;
-import turip.content.service.ContentPlaceService;
 import turip.creator.domain.Creator;
 import turip.favorite.repository.FavoritePlaceRepository;
 import turip.member.domain.Member;
