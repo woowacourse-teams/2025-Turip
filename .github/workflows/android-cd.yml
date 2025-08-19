@@ -8,7 +8,8 @@ env:
 # release 브랜치에 PR을 올릴 시 트리거
 on:
   pull_request:
-    branches: ["test" ]
+    branches:
+      - "release/*"
     paths:
       - "android/**"
 
