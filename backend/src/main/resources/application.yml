@@ -8,3 +8,13 @@ spring:
       hibernate:
         format_sql: true
     defer-datasource-initialization: false # 데이터베이스 초기화 지연
+
+# Region Category 기타 이미지 설정
+region:
+  category:
+    domestic:
+      etc:
+        image-url: ${DOMESTIC_ETC_IMAGE_URL}
+    overseas:
+      etc:
+        image-url: ${OVERSEAS_ETC_IMAGE_URL}
