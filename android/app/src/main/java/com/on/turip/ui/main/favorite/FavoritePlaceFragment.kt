@@ -14,6 +14,7 @@ import com.on.turip.databinding.FragmentFavoritePlaceBinding
 import com.on.turip.ui.common.base.BaseFragment
 import com.on.turip.ui.folder.FolderActivity
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
+import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
 
 class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
     private val viewModel: FavoritePlaceViewModel by viewModels { FavoritePlaceViewModel.provideFactory() }
@@ -29,7 +30,7 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
                     placeId: Long,
                     isFavorite: Boolean,
                 ) {
-                    // TODO: 장소 찜 클릭 시 로직
+                    viewModel.updateFavoritePlace(placeId, isFavorite)
                 }
 
                 override fun onMapClick(uri: Uri) {
@@ -86,6 +87,9 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
                 binding.tvFavoritePlacePlaceCount.text =
                     getString(R.string.all_total_place_count, placeCount)
             }
+        }
+        viewModel.places.observe(viewLifecycleOwner) { places: List<FavoritePlaceModel> ->
+            placeAdapter.submitList(places)
         }
     }
 
