@@ -30,7 +30,7 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
                     placeId: Long,
                     isFavorite: Boolean,
                 ) {
-                    // TODO: 장소 찜 클릭 시 로직
+                    viewModel.updateFavoritePlace(placeId, isFavorite)
                 }
 
                 override fun onMapClick(uri: Uri) {
