@@ -31,6 +31,11 @@ class FolderViewModel(
     val folderNameStatus: LiveData<FolderNameStatusModel> =
         inputFolderName.map { FolderNameStatusModel.of(it, LinkedHashSet()) }
 
+    val selectFolder: LiveData<FolderEditModel> =
+        folders.map { folders: List<FolderEditModel> ->
+            folders.first { folder: FolderEditModel -> folder.isSelected }
+        }
+
     init {
         loadFolders()
     }
@@ -72,15 +77,14 @@ class FolderViewModel(
 
     fun updateFolderName() {
         viewModelScope.launch {
-            val folder: FolderEditModel? = folders.value?.first { it.isSelected }
-            if (folder != null) {
+            selectFolder.value?.let { selectFolder: FolderEditModel ->
                 inputFolderName.value?.let { updateFolderName: String ->
                     folderRepository
-                        .updateFavoriteFolder(folder.id, updateFolderName)
+                        .updateFavoriteFolder(selectFolder.id, updateFolderName)
                         .onSuccess {
-                            Timber.d("폴더 수정 완료(폴더명 = $updateFolderName}")
+                            Timber.d("폴더 수정 완료(폴더명 = $updateFolderName})")
                             _folders.value =
-                                folders.value?.map { if (it.id == folder.id) it.copy(name = updateFolderName) else it }
+                                folders.value?.map { if (it.id == selectFolder.id) it.copy(name = updateFolderName) else it }
                         }.onFailure { Timber.e("폴더 수정 실패") }
                 }
             }
