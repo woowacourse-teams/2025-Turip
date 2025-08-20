@@ -164,7 +164,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         }
 
         binding.etSearchResult.setOnFocusChangeListener { view, hasFocus ->
-            if (hasFocus) {
+            if (hasFocus && viewModel.serverError.value?.not() == true && viewModel.networkError.value?.not() == true) {
                 Timber.d("검색창 포커싱")
                 binding.rvSearchResultSearchHistory.visibility = View.VISIBLE
             }
@@ -251,6 +251,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
             binding.tvSearchResultCount.visibility = View.GONE
             binding.rvSearchResult.visibility = View.GONE
             binding.groupSearchResultEmpty.visibility = View.GONE
+            binding.rvSearchResultSearchHistory.visibility = View.GONE
         } else {
             binding.customErrorView.visibility = View.GONE
             binding.tvSearchResultCount.visibility = View.VISIBLE
