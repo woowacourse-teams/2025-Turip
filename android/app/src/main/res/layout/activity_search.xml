@@ -23,7 +23,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginEnd="20dp"
-            android:background="@drawable/bg_gray100_radius_24dp"
+            android:background="@drawable/bg_stroke_gray200_radius_20dp"
             android:paddingHorizontal="16dp">
 
             <EditText
@@ -34,7 +34,7 @@
                 android:hint="@string/search_result_hint_text"
                 android:imeOptions="actionSearch"
                 android:inputType="text"
-                android:paddingVertical="8dp"
+                android:paddingVertical="12dp"
                 android:textAppearance="@style/title3"
                 android:textColor="@color/pure_black_151515"
                 android:textColorHint="@color/gray_200_c1c1c1"
@@ -133,6 +133,7 @@
         android:background="@color/pure_white_ffffff"
         android:orientation="vertical"
         android:paddingHorizontal="20dp"
+        android:visibility="gone"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
