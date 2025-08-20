@@ -20,6 +20,7 @@ import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.on.turip.R
 import com.on.turip.databinding.ActivitySearchBinding
+import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.searchhistory.SearchHistory
 import com.on.turip.ui.common.base.BaseActivity
 import com.on.turip.ui.search.model.VideoInformationModel
@@ -74,6 +75,17 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         setupAdapters()
         setupOnBackPressedDispatcher()
         binding.etSearchResult.requestFocus()
+        showNetworkError()
+    }
+
+    private fun showNetworkError() {
+        binding.customErrorView.apply {
+            visibility = View.VISIBLE
+            setupError(ErrorEvent.NETWORK_ERROR)
+            setOnRetryClickListener {
+                viewModel.loadByKeyword()
+            }
+        }
     }
 
     private fun setupAdapters() {
@@ -193,6 +205,12 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         viewModel.searchHistory.observe(this) { searchHistories: List<SearchHistory> ->
             searchHistoryAdapter.submitList(searchHistories)
         }
+        viewModel.serverError.observe(this) { serverError ->
+            handleVisibleByError(serverError)
+        }
+        viewModel.networkError.observe(this) { networkError ->
+            handleVisibleByError(networkError)
+        }
     }
 
     private fun handleVisibleBySearchResult(searchResultCount: Int) {
@@ -213,8 +231,22 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
             binding.tvSearchResultCount.visibility = View.GONE
             binding.rvSearchResult.visibility = View.GONE
             binding.groupSearchResultEmpty.visibility = View.GONE
+            binding.customErrorView.visibility = View.GONE
         } else {
             binding.pbSearchResult.visibility = View.GONE
+            binding.tvSearchResultCount.visibility = View.VISIBLE
+            binding.rvSearchResult.visibility = View.VISIBLE
+        }
+    }
+
+    private fun handleVisibleByError(loading: Boolean) {
+        if (loading) {
+            binding.customErrorView.visibility = View.VISIBLE
+            binding.tvSearchResultCount.visibility = View.GONE
+            binding.rvSearchResult.visibility = View.GONE
+            binding.groupSearchResultEmpty.visibility = View.GONE
+        } else {
+            binding.customErrorView.visibility = View.GONE
             binding.tvSearchResultCount.visibility = View.VISIBLE
             binding.rvSearchResult.visibility = View.VISIBLE
         }
