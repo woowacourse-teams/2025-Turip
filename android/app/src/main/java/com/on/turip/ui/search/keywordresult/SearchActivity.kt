@@ -239,8 +239,8 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         }
     }
 
-    private fun handleVisibleByError(loading: Boolean) {
-        if (loading) {
+    private fun handleVisibleByError(error: Boolean) {
+        if (error) {
             binding.customErrorView.visibility = View.VISIBLE
             binding.tvSearchResultCount.visibility = View.GONE
             binding.rvSearchResult.visibility = View.GONE
