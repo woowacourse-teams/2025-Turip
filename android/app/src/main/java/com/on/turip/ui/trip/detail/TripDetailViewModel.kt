@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -23,11 +22,7 @@ import com.on.turip.domain.trip.repository.ContentPlaceRepository
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.common.model.trip.TripModel
 import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -149,23 +144,18 @@ class TripDetailViewModel(
 
     fun updateFavorite() {
         _isFavorite.value = isFavorite.value?.not()
-        handleFavoriteContentWithDebounce()
+        handleFavoriteContent()
     }
 
-    @OptIn(FlowPreview::class)
-    private fun handleFavoriteContentWithDebounce() {
+    private fun handleFavoriteContent() {
         viewModelScope.launch {
-            _isFavorite
-                .asFlow()
-                .debounce(500L)
-                .filterNotNull()
-                .collectLatest { favoriteStatus: Boolean ->
-                    updateFavoriteUseCase(favoriteStatus, contentId)
-                        .onSuccess {
-                            Timber.d("찜 API 통신 성공")
-                        }.onFailure {
-                        }
-                }
+            isFavorite.value?.let { isFavorite: Boolean ->
+                updateFavoriteUseCase(
+                    isFavorite,
+                    contentId,
+                ).onSuccess { Timber.d("컨텐츠 찜 API 통신 성공") }
+                    .onFailure { Timber.d("컨텐츠 찜 API 통신 실패") }
+            }
         }
     }
 
