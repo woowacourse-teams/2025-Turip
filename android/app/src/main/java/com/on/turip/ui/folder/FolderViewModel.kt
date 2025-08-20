@@ -29,7 +29,7 @@ class FolderViewModel(
     val inputFolderName: LiveData<String> get() = _inputFolderName
 
     val folderNameStatus: LiveData<FolderNameStatusModel> =
-        inputFolderName.map { FolderNameStatusModel.of(it, LinkedHashSet()) }
+        inputFolderName.map { FolderNameStatusModel.of(it, folders.value ?: emptyList()) }
 
     val selectFolder: LiveData<FolderEditModel> =
         folders.map { folders: List<FolderEditModel> ->
