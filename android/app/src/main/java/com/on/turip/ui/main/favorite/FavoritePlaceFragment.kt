@@ -11,6 +11,7 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import com.on.turip.R
 import com.on.turip.databinding.FragmentFavoritePlaceBinding
+import com.on.turip.domain.ErrorEvent
 import com.on.turip.ui.common.base.BaseFragment
 import com.on.turip.ui.folder.FolderActivity
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
@@ -55,6 +56,17 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
         setupAdapters()
         setupListeners()
         setupObservers()
+        showNetworkError()
+    }
+
+    private fun showNetworkError() {
+        binding.customErrorView.apply {
+            visibility = View.VISIBLE
+            setupError(ErrorEvent.NETWORK_ERROR)
+            setOnRetryClickListener {
+                viewModel.loadFoldersAndPlaces()
+            }
+        }
     }
 
     private fun setupAdapters() {
@@ -94,6 +106,25 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
                 binding.tvFavoritePlacePlaceCount.text =
                     getString(R.string.all_total_place_count, places.size)
             }
+        }
+        viewModel.networkError.observe(viewLifecycleOwner) { networkError ->
+            handleErrorOrContentView(networkError || (viewModel.serverError.value == true))
+        }
+
+        viewModel.serverError.observe(viewLifecycleOwner) { serverError ->
+            handleErrorOrContentView(serverError || (viewModel.networkError.value == true))
+        }
+    }
+
+    private fun handleErrorOrContentView(isError: Boolean) {
+        if (isError) {
+            binding.customErrorView.visibility = View.VISIBLE
+            binding.groupFavoritePlaceNotEmpty.visibility = View.GONE
+            binding.groupFavoritePlaceNotError.visibility = View.GONE
+        } else {
+            binding.customErrorView.visibility = View.GONE
+            binding.groupFavoritePlaceNotEmpty.visibility = View.VISIBLE
+            binding.groupFavoritePlaceNotError.visibility = View.VISIBLE
         }
     }
 
