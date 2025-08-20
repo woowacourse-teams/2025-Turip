@@ -33,11 +33,11 @@ class HomeViewModel(
         MutableLiveData()
     val usersLikeContents: LiveData<List<UsersLikeContentModel>> get() = _usersLikeContents
 
-    private val _networkError: MutableLiveData<Boolean> = MutableLiveData()
+    private val _networkError: MutableLiveData<Boolean> = MutableLiveData(false)
     val networkError: LiveData<Boolean> get() = _networkError
 
-    private val _serverError: MutableLiveData<Boolean> = MutableLiveData()
-    val serverError: LiveData<Boolean> = _serverError
+    private val _serverError: MutableLiveData<Boolean> = MutableLiveData(false)
+    val serverError: LiveData<Boolean> get() = _serverError
 
     init {
         loadUsersLikeContents()
