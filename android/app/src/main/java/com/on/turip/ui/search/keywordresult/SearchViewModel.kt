@@ -24,7 +24,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class SearchViewModel(
-    private val searchKeyword: String,
+    searchKeyword: String,
     private val contentRepository: ContentRepository,
     private val searchHistoryRepository: SearchHistoryRepository,
 ) : ViewModel() {
@@ -40,7 +40,7 @@ class SearchViewModel(
     private val _loading: MutableLiveData<Boolean> = MutableLiveData()
     val loading: LiveData<Boolean> get() = _loading
 
-    private val _searchHistory: MutableLiveData<List<SearchHistory>> = MutableLiveData()
+    private val _searchHistory: MutableLiveData<List<SearchHistory>> = MutableLiveData(emptyList())
     val searchHistory: LiveData<List<SearchHistory>> get() = _searchHistory
 
     init {
