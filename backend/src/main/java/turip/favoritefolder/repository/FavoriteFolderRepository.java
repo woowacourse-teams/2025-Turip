@@ -9,5 +9,5 @@ public interface FavoriteFolderRepository extends JpaRepository<FavoriteFolder, 
 
     boolean existsByNameAndMember(String name, Member member);
 
-    List<FavoriteFolder> findAllByMember(Member member);
+    List<FavoriteFolder> findAllByMemberOrderByIdAsc(Member member);
 }
