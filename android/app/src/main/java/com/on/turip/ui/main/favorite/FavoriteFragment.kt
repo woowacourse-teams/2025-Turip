@@ -15,8 +15,8 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>() {
         FavoriteStateAdapter(
             this,
             listOf(
-                FavoriteContentFragment.instance(),
                 FavoritePlaceFragment.instance(),
+                FavoriteContentFragment.instance(),
             ),
         )
     }
@@ -48,8 +48,8 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>() {
         ) { tab: TabLayout.Tab, position: Int ->
             tab.text =
                 when (position) {
-                    0 -> FAVORITE_CONTENT_TAB_NAME
-                    else -> FAVORITE_PLACE_TAB_NAME
+                    0 -> FAVORITE_PLACE_TAB_NAME
+                    else -> FAVORITE_CONTENT_TAB_NAME
                 }
         }.attach()
     }
