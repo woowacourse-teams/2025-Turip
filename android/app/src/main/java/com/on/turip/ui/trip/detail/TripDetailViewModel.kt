@@ -72,7 +72,6 @@ class TripDetailViewModel(
     init {
         loadContent()
         loadTrip()
-        handleFavoriteContentWithDebounce()
     }
 
     private fun loadContent() {
@@ -143,6 +142,16 @@ class TripDetailViewModel(
             }
     }
 
+    fun updateDay(dayModel: DayModel) {
+        _days.value = days.value?.map { it.copy(isSelected = it.day == dayModel.day) }
+        _places.value = placeCacheByDay[dayModel.day].orEmpty()
+    }
+
+    fun updateFavorite() {
+        _isFavorite.value = isFavorite.value?.not()
+        handleFavoriteContentWithDebounce()
+    }
+
     @OptIn(FlowPreview::class)
     private fun handleFavoriteContentWithDebounce() {
         viewModelScope.launch {
@@ -158,15 +167,6 @@ class TripDetailViewModel(
                         }
                 }
         }
-    }
-
-    fun updateDay(dayModel: DayModel) {
-        _days.value = days.value?.map { it.copy(isSelected = it.day == dayModel.day) }
-        _places.value = placeCacheByDay[dayModel.day].orEmpty()
-    }
-
-    fun updateFavorite() {
-        _isFavorite.value = isFavorite.value?.not()
     }
 
     fun updateExpandTextToggle() {
