@@ -12,9 +12,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import turip.exception.custom.NotFoundException;
-import turip.favoritefolder.domain.FavoriteFolder;
-import turip.favoritefolder.repository.FavoriteFolderRepository;
+import turip.common.exception.custom.NotFoundException;
+import turip.favorite.domain.FavoriteFolder;
+import turip.favorite.repository.FavoriteFolderRepository;
 import turip.member.domain.Member;
 import turip.member.repository.MemberRepository;
 

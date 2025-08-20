@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import turip.common.exception.ErrorResponse;
 import turip.creator.controller.dto.response.CreatorResponse;
 import turip.creator.service.CreatorService;
-import turip.exception.ErrorResponse;
 
 @RestController
 @RequiredArgsConstructor

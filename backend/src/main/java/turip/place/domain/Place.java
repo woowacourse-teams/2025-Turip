@@ -14,8 +14,6 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import turip.category.domain.Category;
-import turip.placecategory.domain.PlaceCategory;
 
 @Getter
 @Entity
