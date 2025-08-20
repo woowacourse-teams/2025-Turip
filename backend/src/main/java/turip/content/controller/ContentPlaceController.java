@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import turip.auth.AuthMember;
 import turip.auth.MemberResolvePolicy;
 import turip.common.exception.ErrorResponse;
-import turip.content.controller.dto.response.MyFavoriteContentsResponse.ContentPlaceDetailResponse;
+import turip.content.controller.dto.response.ContentPlaceDetailResponse;
 import turip.content.service.ContentPlaceService;
 import turip.member.domain.Member;
 
