@@ -132,7 +132,7 @@ class FavoriteFolderServiceTest {
 
             FavoriteFolder defaultFolder = new FavoriteFolder(1L, savedMember, "기본 폴더", true);
             FavoriteFolder favoriteFolder = new FavoriteFolder(2L, savedMember, "커스텀 폴더 1", true);
-            given(favoriteFolderRepository.findAllByMember(savedMember))
+            given(favoriteFolderRepository.findAllByMemberOrderByIdAsc(savedMember))
                     .willReturn(List.of(defaultFolder, favoriteFolder));
 
             int defaultFolderPlaceCount = 3;
@@ -170,7 +170,7 @@ class FavoriteFolderServiceTest {
 
             FavoriteFolder defaultFolder = new FavoriteFolder(1L, savedMember, "기본 폴더", true);
             FavoriteFolder favoriteFolder = new FavoriteFolder(2L, savedMember, "커스텀 폴더 1", true);
-            given(favoriteFolderRepository.findAllByMember(savedMember))
+            given(favoriteFolderRepository.findAllByMemberOrderByIdAsc(savedMember))
                     .willReturn(List.of(defaultFolder, favoriteFolder));
 
             Long placeId = 1L;
