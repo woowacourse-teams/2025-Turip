@@ -25,6 +25,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class SearchViewModel(
+    searchKeyword: String,
     private val contentRepository: ContentRepository,
     private val searchHistoryRepository: SearchHistoryRepository,
 ) : ViewModel() {
@@ -40,7 +41,7 @@ class SearchViewModel(
     private val _loading: MutableLiveData<Boolean> = MutableLiveData()
     val loading: LiveData<Boolean> get() = _loading
 
-    private val _searchHistory: MutableLiveData<List<SearchHistory>> = MutableLiveData()
+    private val _searchHistory: MutableLiveData<List<SearchHistory>> = MutableLiveData(emptyList())
     val searchHistory: LiveData<List<SearchHistory>> get() = _searchHistory
 
     private val _networkError: MutableLiveData<Boolean> = MutableLiveData(false)
@@ -50,7 +51,10 @@ class SearchViewModel(
     val serverError: LiveData<Boolean> get() = _serverError
 
     init {
+        _searchingWord.value = searchKeyword
         loadSearchHistory()
+        loadByKeyword(searchKeyword)
+        createSearchHistory(searchKeyword)
     }
 
     private fun loadSearchHistory() {
@@ -70,21 +74,21 @@ class SearchViewModel(
         _searchingWord.value = newWord
     }
 
-    fun loadByKeyword() {
-        if (searchingWord.value?.trim() == "" || searchingWord.value?.trim() == null) return
+    fun loadByKeyword(searchingKeyword: String = searchingWord.value.orEmpty()) {
+        if (searchingKeyword.isBlank()) return
         _loading.value = true
         viewModelScope.launch {
             val searchResultCountResult: Deferred<TuripCustomResult<Int>> =
                 async {
                     contentRepository.loadContentsSizeByKeyword(
-                        searchingWord.value.toString(),
+                        searchingKeyword,
                     )
                 }
 
             val pagedContentsResult: Deferred<TuripCustomResult<PagedContentsResult>> =
                 async {
                     contentRepository.loadContentsByKeyword(
-                        keyword = searchingWord.value.toString(),
+                        keyword = searchingKeyword,
                         size = 100,
                         lastId = 0L,
                     )
@@ -138,15 +142,15 @@ class SearchViewModel(
         }
     }
 
-    fun createSearchHistory() {
-        if (searchingWord.value?.trim() == "" || searchingWord.value?.trim() == null) return
+    fun createSearchHistory(searchingKeyword: String = searchingWord.value.orEmpty()) {
+        if (searchingKeyword.isBlank()) return
         viewModelScope.launch {
             searchHistoryRepository
-                .createSearchHistory(searchingWord.value.toString())
+                .createSearchHistory(searchingKeyword)
                 .onSuccess {
                     addSearchHistory(
                         SearchHistory(
-                            keyword = searchingWord.value.toString(),
+                            keyword = searchingKeyword,
                             historyTime = System.currentTimeMillis(),
                         ),
                         MAX_SEARCH_HISTORY_COUNT,
@@ -186,12 +190,14 @@ class SearchViewModel(
         private const val FIRST_INDEX = 0
 
         fun provideFactory(
+            searchKeyword: String = "",
             contentRepository: ContentRepository = RepositoryModule.contentRepository,
             searchHistoryRepository: SearchHistoryRepository = RepositoryModule.searchHistoryRepository,
         ): ViewModelProvider.Factory =
             viewModelFactory {
                 initializer {
                     SearchViewModel(
+                        searchKeyword,
                         contentRepository,
                         searchHistoryRepository,
                     )

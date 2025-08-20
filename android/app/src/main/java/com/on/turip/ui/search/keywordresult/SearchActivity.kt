@@ -29,7 +29,10 @@ import timber.log.Timber
 
 class SearchActivity : BaseActivity<ActivitySearchBinding>() {
     private val viewModel: SearchViewModel by viewModels {
-        SearchViewModel.provideFactory()
+        val searchKeyword: String = intent.getStringExtra(SEARCH_KEYWORD_KEY) ?: ""
+        SearchViewModel.provideFactory(
+            searchKeyword = searchKeyword,
+        )
     }
 
     override val binding: ActivitySearchBinding by lazy {
@@ -190,6 +193,10 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         viewModel.searchingWord.observe(this) { searchWord: String ->
             binding.ivSearchResultClear.visibility =
                 if (searchWord.isNotEmpty()) View.VISIBLE else View.GONE
+            if (binding.etSearchResult.text.toString() != searchWord) {
+                binding.etSearchResult.setText(searchWord)
+                binding.etSearchResult.setSelection(searchWord.length)
+            }
         }
         viewModel.videoInformation.observe(this) { videoInformationModels: List<VideoInformationModel> ->
             searchAdapter.submitList(videoInformationModels)
@@ -273,6 +280,14 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
     }
 
     companion object {
-        fun newIntent(context: Context): Intent = Intent(context, SearchActivity::class.java)
+        private const val SEARCH_KEYWORD_KEY: String = "com.on.turip.SEARCH_KEYWORD_KEY"
+
+        fun newIntent(
+            context: Context,
+            searchKeyword: String,
+        ): Intent =
+            Intent(context, SearchActivity::class.java).apply {
+                putExtra(SEARCH_KEYWORD_KEY, searchKeyword)
+            }
     }
 }

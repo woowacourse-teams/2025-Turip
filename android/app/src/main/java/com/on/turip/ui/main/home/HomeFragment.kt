@@ -2,15 +2,10 @@ package com.on.turip.ui.main.home
 
 import android.content.Intent
 import android.os.Bundle
-import android.text.SpannableString
-import android.text.Spanned
-import android.text.style.BackgroundColorSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
-import com.on.turip.R
 import com.on.turip.databinding.FragmentHomeBinding
 import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.content.Content
@@ -56,35 +51,10 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        setupTextHighlighting()
         setupAdapters()
         setupObservers()
         setupListeners()
         showNetworkError()
-    }
-
-    private fun setupTextHighlighting() {
-        val originalText: String = getString(R.string.home_where_should_we_go_title)
-        val highlightText: String = getString(R.string.home_where_should_we_go_highlighting)
-        val startIndex: Int = originalText.indexOf(highlightText)
-        val endIndex: Int = startIndex + highlightText.length
-
-        val spannableText =
-            SpannableString(originalText).apply {
-                setSpan(
-                    BackgroundColorSpan(
-                        ContextCompat.getColor(
-                            requireContext(),
-                            R.color.turip_lemon_faff60_50,
-                        ),
-                    ),
-                    startIndex,
-                    endIndex,
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
-                )
-            }
-
-        binding.tvHomeWhereShouldWeGoTitle.text = spannableText
     }
 
     private fun setupAdapters() {
@@ -133,8 +103,13 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             viewModel.loadRegionCategories(isDomestic = false)
         }
         binding.ivHomeSearch.setOnClickListener {
+            if (binding.etHomeSearchResult.text.isBlank()) return@setOnClickListener
             Timber.d("검색 화면 클릭")
-            val intent: Intent = SearchActivity.newIntent(requireContext())
+            val intent: Intent =
+                SearchActivity.newIntent(
+                    requireContext(),
+                    binding.etHomeSearchResult.text.toString(),
+                )
             startActivity(intent)
         }
     }
