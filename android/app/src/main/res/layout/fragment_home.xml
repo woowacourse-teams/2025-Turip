@@ -9,7 +9,8 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:minHeight="500dp">
 
         <ImageView
             android:id="@+id/iv_home_logo"
@@ -130,20 +131,15 @@
             rv_users_like_content,
             " />
 
-        <include
-            android:id="@+id/ic_home_network_error"
-            layout="@layout/item_network_error"
+        <com.on.turip.ui.common.errorview.CustomErrorView
+            android:id="@+id/custom_error_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
             android:visibility="gone" />
-
-        <include
-            android:id="@+id/ic_home_server_error"
-            layout="@layout/item_server_error"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone" />
-
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

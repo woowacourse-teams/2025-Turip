@@ -12,6 +12,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import com.on.turip.R
 import com.on.turip.databinding.FragmentHomeBinding
+import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.content.Content
 import com.on.turip.domain.region.RegionCategory
 import com.on.turip.ui.common.ItemSpaceDecoration
@@ -59,6 +60,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         setupAdapters()
         setupObservers()
         setupListeners()
+        showNetworkError()
     }
 
     private fun setupTextHighlighting() {
@@ -110,13 +112,13 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         viewModel.networkError.observe(viewLifecycleOwner) { networkError: Boolean ->
             binding.gpHomeErrorNot.visibility =
                 if (networkError) View.GONE else View.VISIBLE
-            binding.icHomeNetworkError.root.visibility =
+            binding.customErrorView.visibility =
                 if (networkError) View.VISIBLE else View.GONE
         }
         viewModel.serverError.observe(viewLifecycleOwner) { serverError: Boolean ->
             binding.gpHomeErrorNot.visibility =
                 if (serverError) View.GONE else View.VISIBLE
-            binding.icHomeServerError.root.visibility =
+            binding.customErrorView.visibility =
                 if (serverError) View.VISIBLE else View.GONE
         }
     }
@@ -135,9 +137,15 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             val intent: Intent = SearchActivity.newIntent(requireContext())
             startActivity(intent)
         }
-        val bindingNetworkError = binding.icHomeNetworkError
-        bindingNetworkError.root.setOnClickListener {
-            viewModel.reload()
+    }
+
+    private fun showNetworkError() {
+        binding.customErrorView.apply {
+            visibility = View.VISIBLE
+            setupError(ErrorEvent.NETWORK_ERROR)
+            setOnRetryClickListener {
+                viewModel.reload()
+            }
         }
     }
 }
