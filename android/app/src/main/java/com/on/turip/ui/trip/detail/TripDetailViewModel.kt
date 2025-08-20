@@ -72,7 +72,7 @@ class TripDetailViewModel(
     init {
         loadContent()
         loadTrip()
-        handleFavoriteWithDebounce()
+        handleFavoriteContentWithDebounce()
     }
 
     private fun loadContent() {
@@ -129,12 +129,14 @@ class TripDetailViewModel(
                 val coursesForDay: List<ContentPlace> =
                     trip.contentPlaces.filter { it.visitDay == day }
                 val placeModels: List<PlaceModel> =
-                    coursesForDay.map { course ->
+                    coursesForDay.map { course: ContentPlace ->
                         PlaceModel(
+                            id = course.place.placeId,
                             name = course.place.name,
                             category = course.place.category.joinToString(),
                             mapLink = course.place.url,
                             timeLine = course.timeLine,
+                            isFavorite = course.isFavoritePlace,
                         )
                     }
                 day to placeModels
@@ -142,7 +144,7 @@ class TripDetailViewModel(
     }
 
     @OptIn(FlowPreview::class)
-    private fun handleFavoriteWithDebounce() {
+    private fun handleFavoriteContentWithDebounce() {
         viewModelScope.launch {
             _isFavorite
                 .asFlow()
@@ -189,6 +191,16 @@ class TripDetailViewModel(
             ellipsisCount > 0
         _isExpandTextToggleSelected.value = false
         _bodyMaxLines.value = DEFAULT_CONTENT_TITLE_MAX_LINES
+    }
+
+    fun updateHasFavoriteFolderInPlace(
+        hasFavoriteFolder: Boolean,
+        placeId: Long,
+    ) {
+        _places.value =
+            places.value?.map { place: PlaceModel ->
+                if (place.id == placeId) place.copy(isFavorite = hasFavoriteFolder) else place
+            }
     }
 
     companion object {

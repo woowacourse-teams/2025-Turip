@@ -69,7 +69,6 @@
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/md_favorite_place_icon_divider"
-        app:layout_constraintTop_toBottomOf="@id/tv_favorite_place_name"
-        app:tint="@color/turip_lemon_faff60" />
+        app:layout_constraintTop_toBottomOf="@id/tv_favorite_place_name" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -34,7 +34,8 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
                 }
 
                 override fun onMapClick(uri: Uri) {
-                    // TODO: 지도 버튼 클릭 시 로직
+                    val intent: Intent = Intent(Intent.ACTION_VIEW, uri)
+                    startActivity(intent)
                 }
             },
         )
@@ -62,7 +63,11 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
             itemAnimator = null
             addOnItemTouchListener(RecyclerViewTouchInterceptor)
         }
-        binding.rvFavoritePlacePlace.adapter = placeAdapter
+
+        binding.rvFavoritePlacePlace.apply {
+            adapter = placeAdapter
+            itemAnimator = null
+        }
     }
 
     private fun setupListeners() {
@@ -77,25 +82,31 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
             folderNameAdapter.submitList(favoritePlaceFolders)
         }
 
-        viewModel.placeCount.observe(viewLifecycleOwner) { placeCount: Int ->
-            if (placeCount == 0) {
+        viewModel.places.observe(viewLifecycleOwner) { places: List<FavoritePlaceModel> ->
+            placeAdapter.submitList(places)
+
+            if (places.isEmpty()) {
                 binding.clFavoritePlaceEmpty.visibility = View.VISIBLE
                 binding.groupFavoritePlaceNotEmpty.visibility = View.GONE
             } else {
                 binding.clFavoritePlaceEmpty.visibility = View.GONE
                 binding.groupFavoritePlaceNotEmpty.visibility = View.VISIBLE
                 binding.tvFavoritePlacePlaceCount.text =
-                    getString(R.string.all_total_place_count, placeCount)
+                    getString(R.string.all_total_place_count, places.size)
             }
-        }
-        viewModel.places.observe(viewLifecycleOwner) { places: List<FavoritePlaceModel> ->
-            placeAdapter.submitList(places)
         }
     }
 
     override fun onResume() {
         super.onResume()
         viewModel.loadFoldersAndPlaces()
+    }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (!hidden) {
+            viewModel.loadFoldersAndPlaces()
+        }
     }
 
     companion object {

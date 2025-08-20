@@ -39,6 +39,7 @@ class TripPlaceViewHolder(
                 R.string.travel_place_time_line,
                 placeModel.timeLine,
             )
+        binding.ivTravelPlaceFavorite.isSelected = placeModel.isFavorite
     }
 
     companion object {
