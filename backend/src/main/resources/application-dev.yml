@@ -30,6 +30,11 @@ spring:
     baseline-on-migrate: true
     validate-on-migrate: true
     encoding: UTF-8
+    
+management:
+  endpoint:
+    health:
+      show-details: always
 
 # CSV Import 설정
 csv:
