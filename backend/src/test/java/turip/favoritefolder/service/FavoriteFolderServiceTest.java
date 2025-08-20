@@ -169,7 +169,7 @@ class FavoriteFolderServiceTest {
             Member savedMember = new Member(1L, member.getDeviceFid());
 
             FavoriteFolder defaultFolder = new FavoriteFolder(1L, savedMember, "기본 폴더", true);
-            FavoriteFolder favoriteFolder = new FavoriteFolder(2L, savedMember, "커스텀 폴더 1", true);
+            FavoriteFolder favoriteFolder = new FavoriteFolder(2L, savedMember, "커스텀 폴더 1", false);
             given(favoriteFolderRepository.findAllByMemberOrderByIdAsc(savedMember))
                     .willReturn(List.of(defaultFolder, favoriteFolder));
 
