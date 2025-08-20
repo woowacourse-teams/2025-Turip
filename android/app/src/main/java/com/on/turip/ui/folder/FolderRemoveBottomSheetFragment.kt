@@ -39,7 +39,7 @@ class FolderRemoveBottomSheetFragment : BaseBottomSheetFragment<BottomSheetFragm
     }
 
     private fun setupObservers() {
-        sharedViewModel.selectFolder.observe(viewLifecycleOwner) { selectedFolder: FolderEditModel ->
+        sharedViewModel.selectedFolder.observe(viewLifecycleOwner) { selectedFolder: FolderEditModel ->
             binding.tvBottomSheetFolderRemoveTitle.text =
                 getString(R.string.bottom_sheet_folder_remove_title, selectedFolder.name)
             binding.tvBottomSheetFolderRemovePlaceCount.text =

@@ -7,9 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import androidx.core.graphics.Insets
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -78,24 +75,16 @@ class FavoritePlaceFolderBottomSheetFragment : BaseBottomSheetFragment<BottomShe
 
             bottomSheetView.setBackgroundResource(R.drawable.bg_pure_white_top_radius_20dp)
 
-            var isInitialized: Boolean = false
-            ViewCompat.setOnApplyWindowInsetsListener(bottomSheetView) { view: View, insets: WindowInsetsCompat ->
-                val systemBars: Insets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-                val availableHeight: Int = view.rootView.height - systemBars.top - systemBars.bottom
+            val screenHeight = resources.displayMetrics.heightPixels
+            val halfHeight = (screenHeight * 0.5f).toInt()
 
-                bottomSheetView.layoutParams.height = availableHeight
-                behavior.expandedOffset = systemBars.top
+            bottomSheetView.layoutParams.height = halfHeight
 
-                if (!isInitialized) {
-                    behavior.apply {
-                        isFitToContents = false
-                        peekHeight = (availableHeight * BASIC_VIEW_PERCENT).toInt()
-                        isDraggable = true
-                        state = BottomSheetBehavior.STATE_COLLAPSED
-                    }
-                    isInitialized = true
-                }
-                insets
+            behavior.apply {
+                isFitToContents = false
+                peekHeight = halfHeight
+                isDraggable = false
+                state = BottomSheetBehavior.STATE_COLLAPSED
             }
         }
         return dialog
