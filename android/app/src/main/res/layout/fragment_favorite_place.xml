@@ -27,7 +27,7 @@
         android:background="@drawable/bg_gray300_radius_10dp"
         android:contentDescription="@null"
         android:padding="10dp"
-        android:src="@drawable/ic_folder"
+        android:src="@drawable/ic_folder_setting"
         app:layout_constraintBottom_toBottomOf="@id/rv_favorite_place_folder_name"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/rv_favorite_place_folder_name"
