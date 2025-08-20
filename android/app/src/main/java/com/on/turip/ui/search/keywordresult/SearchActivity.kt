@@ -77,7 +77,6 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         setupObservers()
         setupAdapters()
         setupOnBackPressedDispatcher()
-        binding.etSearchResult.requestFocus()
         showNetworkError()
     }
 
