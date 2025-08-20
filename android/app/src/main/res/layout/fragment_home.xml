@@ -22,58 +22,88 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-            android:id="@+id/iv_home_search"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="6dp"
-            android:contentDescription="@null"
-            android:padding="14dp"
-            android:src="@drawable/btn_search"
-            app:layout_constraintBottom_toBottomOf="@id/iv_home_logo"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/iv_home_logo"
-            app:tint="@color/gray_300_5b5b5b" />
-
         <TextView
-            android:id="@+id/tv_home_where_should_we_go_title"
+            android:id="@+id/tv_home_app_description"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="10dp"
             android:text="@string/home_where_should_we_go_title"
             android:textAppearance="@style/title1"
             android:textColor="@color/gray_500_1e1e1e"
             app:layout_constraintStart_toStartOf="@id/iv_home_logo"
             app:layout_constraintTop_toBottomOf="@id/iv_home_logo" />
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_home_search_bar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:layout_marginEnd="20dp"
+            android:background="@drawable/bg_stroke_gray200_radius_24dp"
+            android:paddingHorizontal="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/tv_home_app_description"
+            app:layout_constraintTop_toBottomOf="@id/tv_home_app_description">
+
+            <EditText
+                android:id="@+id/et_home_search_result"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:hint="@string/search_result_hint_text"
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                android:paddingVertical="10dp"
+                android:textAppearance="@style/title3"
+                android:textColor="@color/pure_black_151515"
+                android:textColorHint="@color/gray_200_c1c1c1"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/iv_home_search"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/iv_home_search"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:contentDescription="@null"
+                android:paddingHorizontal="4dp"
+                android:src="@drawable/btn_search"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/gray_300_5b5b5b" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
         <TextView
             android:id="@+id/tv_home_domestic_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="26dp"
             android:background="@drawable/btn_region_filter"
             android:paddingHorizontal="24dp"
             android:paddingVertical="8dp"
             android:text="@string/home_domestic"
             android:textAppearance="@style/title3"
             android:textColor="@color/pure_white_ffffff"
-            app:layout_constraintStart_toStartOf="@id/tv_home_where_should_we_go_title"
-            app:layout_constraintTop_toBottomOf="@id/tv_home_where_should_we_go_title" />
+            app:layout_constraintStart_toStartOf="@id/tv_home_app_description"
+            app:layout_constraintTop_toBottomOf="@id/cl_home_search_bar" />
 
         <TextView
             android:id="@+id/tv_home_abroad_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="16dp"
             android:background="@drawable/btn_region_filter"
             android:paddingHorizontal="24dp"
             android:paddingVertical="8dp"
             android:text="@string/home_abroad"
             android:textAppearance="@style/title3"
             android:textColor="@color/pure_white_ffffff"
+            app:layout_constraintBottom_toBottomOf="@id/tv_home_domestic_button"
             app:layout_constraintStart_toEndOf="@id/tv_home_domestic_button"
-            app:layout_constraintTop_toBottomOf="@id/tv_home_where_should_we_go_title" />
+            app:layout_constraintTop_toTopOf="@id/tv_home_domestic_button" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_home_region"
@@ -94,7 +124,7 @@
             android:id="@+id/tv_home_users_like_content_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="26dp"
             android:text="@string/home_users_like_content_title"
             android:textAppearance="@style/title1"
             android:textColor="@color/gray_400_2b2b2b"
