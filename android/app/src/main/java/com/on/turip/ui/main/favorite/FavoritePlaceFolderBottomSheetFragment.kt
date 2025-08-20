@@ -44,7 +44,11 @@ class FavoritePlaceFolderBottomSheetFragment : BaseBottomSheetFragment<BottomShe
         val updatedFavorites: Boolean = !favoritePlaceFolderModel.isSelected
 
         val messageResource: Int =
-            if (updatedFavorites) R.string.bottom_sheet_favorite_place_folder_save_with_folder_name else R.string.bottom_sheet_favorite_place_folder_remove_with_folder_name
+            if (updatedFavorites) {
+                R.string.bottom_sheet_favorite_place_folder_save_with_folder_name
+            } else {
+                R.string.bottom_sheet_favorite_place_folder_remove_with_folder_name
+            }
         val message: String = getString(messageResource, favoritePlaceFolderModel.name)
         val iconResource: Int =
             if (updatedFavorites) R.drawable.ic_heart_normal else R.drawable.ic_heart_empty
