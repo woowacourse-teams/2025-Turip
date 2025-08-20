@@ -11,6 +11,7 @@ import com.on.turip.data.common.TuripCustomResult
 import com.on.turip.data.common.onFailure
 import com.on.turip.data.common.onSuccess
 import com.on.turip.di.RepositoryModule
+import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.content.PagedContentsResult
 import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.content.video.VideoInformation
@@ -42,6 +43,12 @@ class SearchViewModel(
 
     private val _searchHistory: MutableLiveData<List<SearchHistory>> = MutableLiveData(emptyList())
     val searchHistory: LiveData<List<SearchHistory>> get() = _searchHistory
+
+    private val _networkError: MutableLiveData<Boolean> = MutableLiveData(false)
+    val networkError: LiveData<Boolean> get() = _networkError
+
+    private val _serverError: MutableLiveData<Boolean> = MutableLiveData(false)
+    val serverError: LiveData<Boolean> get() = _serverError
 
     init {
         _searchingWord.value = searchKeyword
@@ -94,8 +101,9 @@ class SearchViewModel(
                     val videoModels: List<VideoInformationModel> =
                         result.videos.map { videoInformation: VideoInformation -> videoInformation.toUiModel() }
                     _videoInformation.value = videoModels
-                }.onFailure {
+                }.onFailure { errorEvent: ErrorEvent ->
                     _loading.value = false
+                    checkError(errorEvent)
                 }
 
             searchResultCountResult
@@ -104,9 +112,33 @@ class SearchViewModel(
                     Timber.d("최근 검색 목록 갯수를 받아옴 $result")
                     _loading.value = false
                     _searchResultCount.value = result
-                }.onFailure {
+                    _serverError.value = false
+                    _networkError.value = false
+                }.onFailure { errorEvent: ErrorEvent ->
                     _loading.value = false
+                    checkError(errorEvent)
                 }
+        }
+    }
+
+    private fun checkError(errorEvent: ErrorEvent) {
+        when (errorEvent) {
+            ErrorEvent.USER_NOT_HAVE_PERMISSION -> {
+                _serverError.value = true
+            }
+
+            ErrorEvent.DUPLICATION_FOLDER -> throw IllegalArgumentException("발생할 수 없는 오류")
+            ErrorEvent.UNEXPECTED_PROBLEM -> {
+                _serverError.value = true
+            }
+
+            ErrorEvent.NETWORK_ERROR -> {
+                _networkError.value = true
+            }
+
+            ErrorEvent.PARSER_ERROR -> {
+                _serverError.value = true
+            }
         }
     }
 

@@ -11,6 +11,7 @@ import com.on.turip.data.common.TuripCustomResult
 import com.on.turip.data.common.onFailure
 import com.on.turip.data.common.onSuccess
 import com.on.turip.di.RepositoryModule
+import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.content.Content
 import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.creator.Creator
@@ -64,7 +65,18 @@ class TripDetailViewModel(
 
     private var placeCacheByDay: Map<Int, List<PlaceModel>> = emptyMap()
 
+    private val _networkError: MutableLiveData<Boolean> = MutableLiveData(false)
+    val networkError: LiveData<Boolean> get() = _networkError
+
+    private val _serverError: MutableLiveData<Boolean> = MutableLiveData(false)
+    val serverError: LiveData<Boolean> get() = _serverError
+
     init {
+        loadContent()
+        loadTrip()
+    }
+
+    fun reload() {
         loadContent()
         loadTrip()
     }
@@ -86,11 +98,41 @@ class TripDetailViewModel(
                             _content.value = result
                             _videoUri.value = result.videoData.url
                             _isFavorite.value = result.isFavorite
-                        }.onFailure {
+                            _serverError.value = false
+                            _networkError.value = false
+                        }.onFailure { errorEvent: ErrorEvent ->
+                            checkError(errorEvent)
                         }
-                }.onFailure {
+                }.onFailure { errorEvent: ErrorEvent ->
+                    checkError(errorEvent)
                 }
         }
+    }
+
+    private fun checkError(errorEvent: ErrorEvent) {
+        when (errorEvent) {
+            ErrorEvent.USER_NOT_HAVE_PERMISSION -> {
+                _serverError.value = true
+            }
+
+            ErrorEvent.DUPLICATION_FOLDER -> throw IllegalArgumentException("발생할 수 없는 오류")
+            ErrorEvent.UNEXPECTED_PROBLEM -> {
+                _serverError.value = true
+            }
+
+            ErrorEvent.NETWORK_ERROR -> {
+                _networkError.value = true
+            }
+
+            ErrorEvent.PARSER_ERROR -> {
+                _serverError.value = true
+            }
+        }
+    }
+
+    private fun clearErrors() {
+        _serverError.value = false
+        _networkError.value = false
     }
 
     private fun loadTrip() {
@@ -109,7 +151,10 @@ class TripDetailViewModel(
                     _places.value = placeCacheByDay[1] ?: emptyList()
                     _tripModel.value = trip.toUiModel()
                     Timber.d("여행 일정 불러오기 성공")
-                }.onFailure {
+                    _serverError.value = false
+                    _networkError.value = false
+                }.onFailure { errorEvent: ErrorEvent ->
+                    checkError(errorEvent)
                 }
         }
     }
@@ -153,8 +198,14 @@ class TripDetailViewModel(
                 updateFavoriteUseCase(
                     isFavorite,
                     contentId,
-                ).onSuccess { Timber.d("컨텐츠 찜 API 통신 성공") }
-                    .onFailure { Timber.d("컨텐츠 찜 API 통신 실패") }
+                ).onSuccess {
+                    Timber.d("컨텐츠 찜 API 통신 성공")
+                    _serverError.value = false
+                    _networkError.value = false
+                }.onFailure { errorEvent: ErrorEvent ->
+                    checkError(errorEvent)
+                    Timber.d("컨텐츠 찜 API 통신 실패")
+                }
             }
         }
     }
