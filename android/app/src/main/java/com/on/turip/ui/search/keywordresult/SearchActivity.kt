@@ -61,6 +61,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
                     viewModel.loadByKeyword()
                     viewModel.createSearchHistory()
                     binding.rvSearchResultSearchHistory.visibility = View.GONE
+                    binding.rvSearchResult.scrollToPosition(0)
                 }
             },
         )
@@ -139,6 +140,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
                     binding.rvSearchResultSearchHistory.visibility = View.GONE
                     binding.etSearchResult.clearFocus()
                     hideKeyBoard(binding.etSearchResult)
+                    binding.rvSearchResult.scrollToPosition(0)
                     Timber.d("검색창 클릭")
                     true
                 }
