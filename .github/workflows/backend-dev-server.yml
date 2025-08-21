@@ -90,4 +90,4 @@ jobs:
           chmod +x "$TARGET_JAR"
 
           echo "Starting application..."
-          sudo sh -lc 'nohup java -jar "$TARGET_JAR" --server.port=80 > /dev/null 2>&1 &'
+          sudo sh -lc "nohup java -jar '$TARGET_JAR' --server.port=80 > /dev/null 2>&1 &"
