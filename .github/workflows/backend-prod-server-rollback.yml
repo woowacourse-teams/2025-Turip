@@ -33,6 +33,12 @@ jobs:
             exit 1
           fi
 
+          #  대상 JAR 존재 확인
+          if [ ! -f "$BASE/releases/$SHA/app.jar" ]; then
+            echo "Error: app.jar not found at $BASE/releases/$SHA/app.jar"
+            exit 1
+          fi
+
           # 현재 -> previous 백업
           if [ -L "$BASE/current" ]; then
             ln -sfn "$(readlink -f $BASE/current)" "$BASE/previous"
