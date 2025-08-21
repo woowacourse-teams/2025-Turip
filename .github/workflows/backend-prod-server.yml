@@ -41,11 +41,17 @@ jobs:
      - name: Run Unit Tests
        run: ./gradlew test
 
+     - name: Rename Jar with SHA
+       run: |
+         JAR_PATH=$(ls build/libs/*SNAPSHOT.jar | head -n 1)
+         cp "$JAR_PATH" "turip-${GITHUB_SHA}.jar"
+    
      - name: Upload Jar
        uses: actions/upload-artifact@v4
        with:
-         name: turip
-         path: backend/build/libs/*SNAPSHOT.jar
+         name: turip-${{ github.sha }}
+         path: backend/turip-${{ github.sha }}.jar
+         retention-days: 30
 
   deploy:
     needs: build_and_test
@@ -57,7 +63,7 @@ jobs:
       - name: Download artifact from CI workflow
         uses: actions/download-artifact@v4
         with:
-          name: turip
+          name: turip-${{ github.sha }}
           path: ./downloaded-artifact
 
       - name: Get JAR file name
@@ -70,24 +76,65 @@ jobs:
           fi
           echo "JAR_NAME=$(basename $JAR_FILE)" >> $GITHUB_OUTPUT
           echo "JAR file located at: $JAR_FILE"
-
-      - name: Kill Existing Server On Port 8080
+          
+      - name: Prepare release & switch symlink
         run: |
+          set -euo pipefail
+          BASE=/home/ubuntu/app
+          SHA=${GITHUB_SHA}
+          JAR_NAME="${{ steps.get_jar_name.outputs.JAR_NAME }}"
+          SRC="./downloaded-artifact/$JAR_NAME"
+
+          # 디렉터리 구성
+          mkdir -p "$BASE/releases/$SHA"
+          mv "$SRC" "$BASE/releases/$SHA/app.jar"
+          chmod +x "$BASE/releases/$SHA/app.jar"
+
+          # 이전 버전 링크 저장(previous), current는 새 버전으로 전환
+          if [ -L "$BASE/current" ]; then
+            ln -sfn "$(readlink -f $BASE/current)" "$BASE/previous"
+          fi
+          ln -sfn "$BASE/releases/$SHA" "$BASE/current"
+
+      - name: Kill Existing Server On Port 8080 and Run App On Port 8080
+        run: |
+          set -euo pipefail
+          BASE=/home/ubuntu/app
+
+          # 기존 프로세스 종료
           PID=$(sudo lsof -t -i :8080 || true)
           if [ -n "$PID" ]; then
             echo "Killing existing process: $PID"
             sudo kill -9 $PID
           fi
-    
-      - name: Run App On Port 8080
-        run: |
-          JAR_NAME="${{ steps.get_jar_name.outputs.JAR_NAME }}"
-          DOWNLOADED_JAR="./downloaded-artifact/$JAR_NAME"
-          TARGET_JAR="/home/ubuntu/app/$JAR_NAME"
-
-          echo "Moving new JAR to $TARGET_JAR"
-          mv "$DOWNLOADED_JAR" "$TARGET_JAR"
-          chmod +x "$TARGET_JAR"
-
+          
           echo "Starting application..."
-          sudo nohup java -jar -Dspring.profiles.active=prod "$TARGET_JAR" &
+          sudo sh -lc "nohup java -jar -Dspring.profiles.active=prod '$BASE/current/app.jar' > '$BASE/app.out' 2>&1 &"
+
+          # 헬스 체크
+          ok=0
+          for i in {1..20}; do
+            if curl -fsS http://localhost:8080/actuator/health | grep -q '"status":"UP"'; then
+              ok=1; break
+            fi
+            sleep 3
+          done
+
+          if [ $ok -ne 1 ]; then
+            echo "[FAIL] Health check failed. Rolling back to previous..."
+            if [ -L "$BASE/previous" ]; then
+              ln -sfn "$(readlink -f $BASE/previous)" "$BASE/current"
+              # 재기동
+              PID=$(sudo lsof -t -i :8080 || true)
+              if [ -n "$PID" ]; then sudo kill -9 $PID || true; fi
+              sudo sh -lc "nohup java -jar -Dspring.profiles.active=prod '$BASE/current/app.jar' > '$BASE/app.out' 2>&1 &"
+            else
+              echo "No previous link found. Manual intervention needed."
+            fi
+            exit 1
+          fi
+
+      - name: Keep last 10 releases
+        run: |
+          BASE=/home/ubuntu/app/releases
+          ls -1dt $BASE/* | tail -n +11 | xargs -r rm -rf
