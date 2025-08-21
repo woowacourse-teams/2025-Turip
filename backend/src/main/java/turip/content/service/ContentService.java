@@ -1,7 +1,7 @@
 package turip.content.service;
 
-import static turip.regioncategory.domain.DomesticRegionCategory.OTHER_DOMESTIC;
-import static turip.regioncategory.domain.OverseasRegionCategory.OTHER_OVERSEAS;
+import static turip.region.domain.DomesticRegionCategory.OTHER_DOMESTIC;
+import static turip.region.domain.OverseasRegionCategory.OTHER_OVERSEAS;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -14,6 +14,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
+import turip.common.exception.custom.BadRequestException;
+import turip.common.exception.custom.NotFoundException;
 import turip.content.controller.dto.response.ContentByCityResponse;
 import turip.content.controller.dto.response.ContentCountResponse;
 import turip.content.controller.dto.response.ContentDetailsByRegionCategoryResponse;
@@ -27,13 +29,10 @@ import turip.content.controller.dto.response.WeeklyPopularFavoriteContentRespons
 import turip.content.controller.dto.response.WeeklyPopularFavoriteContentsResponse;
 import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
-import turip.contentplace.service.ContentPlaceService;
-import turip.exception.custom.BadRequestException;
-import turip.exception.custom.NotFoundException;
-import turip.favoritecontent.repository.FavoriteContentRepository;
+import turip.favorite.repository.FavoriteContentRepository;
 import turip.member.domain.Member;
-import turip.regioncategory.domain.DomesticRegionCategory;
-import turip.regioncategory.domain.OverseasRegionCategory;
+import turip.region.domain.DomesticRegionCategory;
+import turip.region.domain.OverseasRegionCategory;
 
 @Service
 @RequiredArgsConstructor

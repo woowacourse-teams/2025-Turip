@@ -4,6 +4,7 @@ import com.on.turip.data.common.TuripCustomResult
 import com.on.turip.data.folder.dto.FavoriteFolderAddRequest
 import com.on.turip.data.folder.dto.FavoriteFolderPatchRequest
 import com.on.turip.data.folder.dto.FavoriteFoldersResponse
+import com.on.turip.data.folder.dto.FavoriteFoldersStatusByPlaceResponse
 
 interface FolderRemoteDataSource {
     suspend fun getFavoriteFolders(): TuripCustomResult<FavoriteFoldersResponse>
@@ -16,4 +17,6 @@ interface FolderRemoteDataSource {
     ): TuripCustomResult<Unit>
 
     suspend fun deleteFavoriteFolder(folderId: Long): TuripCustomResult<Unit>
+
+    suspend fun getFavoriteFoldersStatusByPlaceId(placeId: Long): TuripCustomResult<FavoriteFoldersStatusByPlaceResponse>
 }

@@ -62,7 +62,7 @@
         </rollingPolicy>
     </appender>
 
-    <logger name="turip.csv" level="INFO" additivity="false">
+    <logger name="turip.data" level="INFO" additivity="false">
         <appender-ref ref="CONSOLE"/>
     </logger>
 

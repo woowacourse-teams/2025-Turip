@@ -1,25 +1,64 @@
 package com.on.turip.ui.main.favorite
 
 import android.app.Dialog
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import androidx.core.graphics.Insets
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.snackbar.Snackbar
 import com.on.turip.R
 import com.on.turip.databinding.BottomSheetFragmentFavoritePlaceFolderBinding
+import com.on.turip.ui.common.TuripSnackbar
 import com.on.turip.ui.common.base.BaseBottomSheetFragment
+import com.on.turip.ui.folder.FolderActivity
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
+import com.on.turip.ui.trip.detail.TripDetailViewModel
 
 class FavoritePlaceFolderBottomSheetFragment : BaseBottomSheetFragment<BottomSheetFragmentFavoritePlaceFolderBinding>() {
+    private val viewModel: FavoritePlaceFolderViewModel by viewModels {
+        FavoritePlaceFolderViewModel.provideFactory(
+            placeId = arguments?.getLong(ARGUMENTS_PLACE_ID) ?: 0L,
+        )
+    }
+    private val sharedViewModel: TripDetailViewModel by activityViewModels()
+
     private val favoritePlaceFolderAdapter: FavoritePlaceFolderAdapter by lazy {
         FavoritePlaceFolderAdapter { favoritePlaceFolderModel: FavoritePlaceFolderModel ->
-            // TODO : 폴더명과 함께 스낵바 띄우기
+            viewModel.updateFolder(
+                folderId = favoritePlaceFolderModel.id,
+                isFavorite = favoritePlaceFolderModel.isSelected,
+            )
+            showSnackbar(favoritePlaceFolderModel)
         }
+    }
+
+    private fun showSnackbar(favoritePlaceFolderModel: FavoritePlaceFolderModel) {
+        val updatedFavorites: Boolean = !favoritePlaceFolderModel.isSelected
+
+        val messageResource: Int =
+            if (updatedFavorites) {
+                R.string.bottom_sheet_favorite_place_folder_save_with_folder_name
+            } else {
+                R.string.bottom_sheet_favorite_place_folder_remove_with_folder_name
+            }
+        val message: String = getString(messageResource, favoritePlaceFolderModel.name)
+        val iconResource: Int =
+            if (updatedFavorites) R.drawable.ic_heart_normal else R.drawable.ic_heart_empty
+
+        TuripSnackbar
+            .make(
+                rootView = binding.root,
+                message = message,
+                duration = Snackbar.LENGTH_LONG,
+                layoutInflater = layoutInflater,
+            ).icon(iconResource)
+            .action(R.string.all_snackbar_close)
+            .show()
     }
 
     override fun inflateBinding(
@@ -36,24 +75,16 @@ class FavoritePlaceFolderBottomSheetFragment : BaseBottomSheetFragment<BottomShe
 
             bottomSheetView.setBackgroundResource(R.drawable.bg_pure_white_top_radius_20dp)
 
-            var isInitialized: Boolean = false
-            ViewCompat.setOnApplyWindowInsetsListener(bottomSheetView) { view: View, insets: WindowInsetsCompat ->
-                val systemBars: Insets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-                val availableHeight: Int = view.rootView.height - systemBars.top - systemBars.bottom
+            val screenHeight = resources.displayMetrics.heightPixels
+            val halfHeight = (screenHeight * 0.5f).toInt()
 
-                bottomSheetView.layoutParams.height = availableHeight
-                behavior.expandedOffset = systemBars.top
+            bottomSheetView.layoutParams.height = halfHeight
 
-                if (!isInitialized) {
-                    behavior.apply {
-                        isFitToContents = false
-                        peekHeight = (availableHeight * BASIC_VIEW_PERCENT).toInt()
-                        isDraggable = true
-                        state = BottomSheetBehavior.STATE_COLLAPSED
-                    }
-                    isInitialized = true
-                }
-                insets
+            behavior.apply {
+                isFitToContents = false
+                peekHeight = halfHeight
+                isDraggable = false
+                state = BottomSheetBehavior.STATE_COLLAPSED
             }
         }
         return dialog
@@ -65,15 +96,48 @@ class FavoritePlaceFolderBottomSheetFragment : BaseBottomSheetFragment<BottomShe
     ) {
         super.onViewCreated(view, savedInstanceState)
         setupAdapters()
+        setupListeners()
+        setupObservers()
     }
 
     private fun setupAdapters() {
         binding.rvBottomSheetFavoritePlaceFolderFolder.adapter = favoritePlaceFolderAdapter
     }
 
+    private fun setupListeners() {
+        binding.ivBottomSheetFolderFavoritePlaceAddFolder.setOnClickListener {
+            val intent: Intent = FolderActivity.newIntent(requireContext())
+            startActivity(intent)
+        }
+    }
+
+    private fun setupObservers() {
+        viewModel.favoritePlaceFolders.observe(viewLifecycleOwner) { folders: List<FavoritePlaceFolderModel> ->
+            favoritePlaceFolderAdapter.submitList(folders)
+        }
+        viewModel.hasFavoriteFolderWithPlaceId.observe(viewLifecycleOwner) { hasFavoriteFolder: Boolean ->
+            sharedViewModel.updateHasFavoriteFolderInPlace(
+                hasFavoriteFolder,
+                arguments?.getLong(ARGUMENTS_PLACE_ID) ?: 0L,
+            )
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.loadFavoriteFoldersByPlaceId()
+    }
+
     companion object {
         private const val BASIC_VIEW_PERCENT: Float = 0.5f
+        private const val ARGUMENTS_PLACE_ID = "PLACE_ID"
 
-        fun instance(): FavoritePlaceFolderBottomSheetFragment = FavoritePlaceFolderBottomSheetFragment()
+        fun instance(placeId: Long): FavoritePlaceFolderBottomSheetFragment =
+            FavoritePlaceFolderBottomSheetFragment().apply {
+                arguments =
+                    Bundle().apply {
+                        putLong(ARGUMENTS_PLACE_ID, placeId)
+                    }
+            }
     }
 }

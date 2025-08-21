@@ -17,12 +17,14 @@ import androidx.core.view.WindowInsetsControllerCompat
 import com.google.android.material.snackbar.Snackbar
 import com.on.turip.R
 import com.on.turip.databinding.ActivityTripDetailBinding
+import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.content.Content
 import com.on.turip.ui.common.TuripSnackbar
 import com.on.turip.ui.common.base.BaseActivity
 import com.on.turip.ui.common.loadCircularImage
 import com.on.turip.ui.common.model.trip.TripModel
 import com.on.turip.ui.common.model.trip.toDisplayText
+import com.on.turip.ui.main.favorite.FavoritePlaceFolderBottomSheetFragment
 import com.on.turip.ui.trip.detail.webview.TuripWebChromeClient
 import com.on.turip.ui.trip.detail.webview.TuripWebViewClient
 import com.on.turip.ui.trip.detail.webview.applyVideoSettings
@@ -71,7 +73,9 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
                 }
 
                 override fun onFavoriteClick(placeModel: PlaceModel) {
-                    // TODO: 찜 선택 구현
+                    val bottomSheet: FavoritePlaceFolderBottomSheetFragment =
+                        FavoritePlaceFolderBottomSheetFragment.instance(placeModel.id)
+                    bottomSheet.show(supportFragmentManager, "favorite_place_folder")
                 }
             },
         )
@@ -130,6 +134,17 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
         setupAdapters()
         setupListeners()
         setupObservers()
+        showNetworkError()
+    }
+
+    private fun showNetworkError() {
+        binding.customErrorView.apply {
+            visibility = View.VISIBLE
+            setupError(ErrorEvent.NETWORK_ERROR)
+            setOnRetryClickListener {
+                viewModel.reload()
+            }
+        }
     }
 
     private fun setupToolbar() {
@@ -226,7 +241,7 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
         TuripSnackbar
             .make(
                 rootView = binding.root,
-                messageResource = messageResource,
+                message = getString(messageResource),
                 duration = Snackbar.LENGTH_LONG,
                 layoutInflater = layoutInflater,
             ).topMarginInCoordinatorLayout(binding.tbTripDetail.height)
@@ -278,6 +293,22 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
 
         viewModel.bodyMaxLines.observe(this) { maxLines ->
             binding.tvTripDetailContentTitle.maxLines = maxLines
+        }
+        viewModel.networkError.observe(this) { networkError: Boolean ->
+            binding.nsvTripDetail.visibility =
+                if (networkError) View.GONE else View.VISIBLE
+            binding.tbTripDetail.visibility =
+                if (networkError) View.GONE else View.VISIBLE
+            binding.customErrorView.visibility =
+                if (networkError) View.VISIBLE else View.GONE
+        }
+        viewModel.serverError.observe(this) { serverError: Boolean ->
+            binding.nsvTripDetail.visibility =
+                if (serverError) View.GONE else View.VISIBLE
+            binding.tbTripDetail.visibility =
+                if (serverError) View.GONE else View.VISIBLE
+            binding.customErrorView.visibility =
+                if (serverError) View.VISIBLE else View.GONE
         }
     }
 

@@ -28,13 +28,15 @@ class FolderViewModel(
     private val _inputFolderName: MutableLiveData<String> = MutableLiveData("")
     val inputFolderName: LiveData<String> get() = _inputFolderName
 
-    val folderNameStatus: LiveData<FolderNameStatusModel> =
-        inputFolderName.map { FolderNameStatusModel.of(it, LinkedHashSet()) }
+    val folderNameStatus: LiveData<FolderNameStatusModel>
+        get() =
+            inputFolderName.map { FolderNameStatusModel.of(it, folders.value ?: emptyList()) }
 
-    val selectFolder: LiveData<FolderEditModel> =
-        folders.map { folders: List<FolderEditModel> ->
-            folders.first { folder: FolderEditModel -> folder.isSelected }
-        }
+    val selectedFolder: LiveData<FolderEditModel>
+        get() =
+            folders.map { folders: List<FolderEditModel> ->
+                folders.first { folder: FolderEditModel -> folder.isSelected }
+            }
 
     init {
         loadFolders()
@@ -75,17 +77,13 @@ class FolderViewModel(
     fun selectFolder(folderId: Long) {
         _folders.value =
             folders.value?.map { folderModel: FolderEditModel ->
-                if (folderModel.id == folderId) {
-                    folderModel.copy(isSelected = true)
-                } else {
-                    folderModel.copy(isSelected = false)
-                }
+                folderModel.copy(isSelected = folderModel.id == folderId)
             }
     }
 
     fun updateFolderName() {
         viewModelScope.launch {
-            selectFolder.value?.let { selectFolder: FolderEditModel ->
+            selectedFolder.value?.let { selectFolder: FolderEditModel ->
                 inputFolderName.value?.let { updateFolderName: String ->
                     folderRepository
                         .updateFavoriteFolder(selectFolder.id, updateFolderName)
@@ -101,7 +99,7 @@ class FolderViewModel(
 
     fun deleteFolder() {
         viewModelScope.launch {
-            selectFolder.value?.let { selectFolder: FolderEditModel ->
+            selectedFolder.value?.let { selectFolder: FolderEditModel ->
                 folderRepository
                     .deleteFavoriteFolder(selectFolder.id)
                     .onSuccess {

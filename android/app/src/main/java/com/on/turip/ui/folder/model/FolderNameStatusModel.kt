@@ -18,8 +18,11 @@ enum class FolderNameStatusModel(
     companion object {
         fun of(
             folderName: String,
-            originFolderNames: LinkedHashSet<String>,
+            originFolders: List<FolderEditModel>,
         ): FolderNameStatusModel {
+            val originFolderNames: LinkedHashSet<String> =
+                originFolders.map { it.name }.toCollection(LinkedHashSet())
+
             val folderNameStatus: FolderNameStatus =
                 FolderNameStatus.of(folderName, originFolderNames)
             return when (folderNameStatus) {

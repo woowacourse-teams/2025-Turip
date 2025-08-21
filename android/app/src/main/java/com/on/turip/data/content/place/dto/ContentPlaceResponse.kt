@@ -15,4 +15,6 @@ data class ContentPlaceResponse(
     val visitOrder: Int,
     @SerialName("timeLine")
     val timeLine: String,
+    @SerialName("isFavoritePlace")
+    val isFavoritePlace: Boolean,
 )
