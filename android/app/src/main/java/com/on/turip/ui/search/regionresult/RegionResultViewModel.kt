@@ -7,7 +7,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.on.turip.data.common.TuripCustomResult
+import com.on.turip.data.common.onFailure
+import com.on.turip.data.common.onSuccess
 import com.on.turip.di.RepositoryModule
+import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.content.PagedContentsResult
 import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.content.video.VideoInformation
@@ -16,7 +20,6 @@ import com.on.turip.ui.search.model.VideoInformationModel
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 class RegionResultViewModel(
     private val regionCategoryName: String,
@@ -26,14 +29,25 @@ class RegionResultViewModel(
         MutableLiveData(SearchResultState())
     val searchResultState: LiveData<SearchResultState> get() = _searchResultState
 
+    private val _networkError: MutableLiveData<Boolean> = MutableLiveData(false)
+    val networkError: LiveData<Boolean> get() = _networkError
+
+    private val _serverError: MutableLiveData<Boolean> = MutableLiveData(false)
+    val serverError: LiveData<Boolean> get() = _serverError
+
     init {
+        loadContentsFromRegion()
+        setTitle()
+    }
+
+    fun reload() {
         loadContentsFromRegion()
         setTitle()
     }
 
     private fun loadContentsFromRegion() {
         viewModelScope.launch {
-            val pagedContentsResult: Deferred<Result<PagedContentsResult>> =
+            val pagedContentsResult: Deferred<TuripCustomResult<PagedContentsResult>> =
                 async {
                     contentRepository.loadContentsByRegion(
                         regionCategoryName = regionCategoryName,
@@ -41,7 +55,7 @@ class RegionResultViewModel(
                         lastId = 0L,
                     )
                 }
-            val contentsSize: Deferred<Result<Int>> =
+            val contentsSize: Deferred<TuripCustomResult<Int>> =
                 async {
                     contentRepository.loadContentsSizeByRegion(regionCategoryName)
                 }
@@ -55,17 +69,21 @@ class RegionResultViewModel(
                         searchResultState.value?.copy(
                             videoInformations = videoModels,
                         )
-                }.onFailure {
-                    Timber.e("${it.message}")
+                    _networkError.value = false
+                    _serverError.value = false
+                }.onFailure { errorEvent: ErrorEvent ->
+                    checkError(errorEvent)
                 }
             contentsSize
                 .await()
                 .onSuccess { result: Int ->
                     setSearchResultExistence(result)
                     updateLoading(false)
-                }.onFailure {
+                    _networkError.value = false
+                    _serverError.value = false
+                }.onFailure { errorEvent: ErrorEvent ->
                     updateLoading(false)
-                    Timber.e("${it.message}")
+                    checkError(errorEvent)
                 }
         }
     }
@@ -112,6 +130,27 @@ class RegionResultViewModel(
                     )
                 }
             }
+    }
+
+    private fun checkError(errorEvent: ErrorEvent) {
+        when (errorEvent) {
+            ErrorEvent.USER_NOT_HAVE_PERMISSION -> {
+                _serverError.value = true
+            }
+
+            ErrorEvent.DUPLICATION_FOLDER -> throw IllegalArgumentException("발생할 수 없는 오류")
+            ErrorEvent.UNEXPECTED_PROBLEM -> {
+                _serverError.value = true
+            }
+
+            ErrorEvent.NETWORK_ERROR -> {
+                _networkError.value = true
+            }
+
+            ErrorEvent.PARSER_ERROR -> {
+                _serverError.value = true
+            }
+        }
     }
 
     data class SearchResultState(

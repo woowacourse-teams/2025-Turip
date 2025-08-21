@@ -2,16 +2,13 @@ package com.on.turip.ui.main.home
 
 import android.content.Intent
 import android.os.Bundle
-import android.text.SpannableString
-import android.text.Spanned
-import android.text.style.BackgroundColorSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
+import android.view.inputmethod.EditorInfo
 import androidx.fragment.app.viewModels
-import com.on.turip.R
 import com.on.turip.databinding.FragmentHomeBinding
+import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.content.Content
 import com.on.turip.domain.region.RegionCategory
 import com.on.turip.ui.common.ItemSpaceDecoration
@@ -55,34 +52,10 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        setupTextHighlighting()
         setupAdapters()
         setupObservers()
         setupListeners()
-    }
-
-    private fun setupTextHighlighting() {
-        val originalText: String = getString(R.string.home_where_should_we_go_title)
-        val highlightText: String = getString(R.string.home_where_should_we_go_highlighting)
-        val startIndex: Int = originalText.indexOf(highlightText)
-        val endIndex: Int = startIndex + highlightText.length
-
-        val spannableText =
-            SpannableString(originalText).apply {
-                setSpan(
-                    BackgroundColorSpan(
-                        ContextCompat.getColor(
-                            requireContext(),
-                            R.color.turip_lemon_faff60_50,
-                        ),
-                    ),
-                    startIndex,
-                    endIndex,
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
-                )
-            }
-
-        binding.tvHomeWhereShouldWeGoTitle.text = spannableText
+        showNetworkError()
     }
 
     private fun setupAdapters() {
@@ -107,6 +80,18 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         viewModel.usersLikeContents.observe(viewLifecycleOwner) { usersLikeContents: List<UsersLikeContentModel> ->
             usersLikeContentAdapter.submitList(usersLikeContents)
         }
+        viewModel.networkError.observe(viewLifecycleOwner) { networkError: Boolean ->
+            binding.gpHomeErrorNot.visibility =
+                if (networkError) View.GONE else View.VISIBLE
+            binding.customErrorView.visibility =
+                if (networkError) View.VISIBLE else View.GONE
+        }
+        viewModel.serverError.observe(viewLifecycleOwner) { serverError: Boolean ->
+            binding.gpHomeErrorNot.visibility =
+                if (serverError) View.GONE else View.VISIBLE
+            binding.customErrorView.visibility =
+                if (serverError) View.VISIBLE else View.GONE
+        }
     }
 
     private fun setupListeners() {
@@ -119,9 +104,45 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             viewModel.loadRegionCategories(isDomestic = false)
         }
         binding.ivHomeSearch.setOnClickListener {
-            Timber.d("검색 화면 클릭")
-            val intent: Intent = SearchActivity.newIntent(requireContext())
+            if (binding.etHomeSearchResult.text.isBlank()) return@setOnClickListener
+            val input: String = binding.etHomeSearchResult.text.toString()
+            Timber.d("검색 버튼 클릭 $input")
+            val intent: Intent =
+                SearchActivity.newIntent(
+                    requireContext(),
+                    binding.etHomeSearchResult.text.toString(),
+                )
             startActivity(intent)
+        }
+        binding.etHomeSearchResult.setOnEditorActionListener { input, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                val input: String = input.text.toString()
+                return@setOnEditorActionListener if (input.isBlank()) {
+                    true
+                } else {
+                    val input: String = binding.etHomeSearchResult.text.toString()
+                    Timber.d("검색 버튼 클릭 $input")
+                    val intent: Intent =
+                        SearchActivity.newIntent(
+                            requireContext(),
+                            input,
+                        )
+                    startActivity(intent)
+                    true
+                }
+            } else {
+                false
+            }
+        }
+    }
+
+    private fun showNetworkError() {
+        binding.customErrorView.apply {
+            visibility = View.VISIBLE
+            setupError(ErrorEvent.NETWORK_ERROR)
+            setOnRetryClickListener {
+                viewModel.reload()
+            }
         }
     }
 }

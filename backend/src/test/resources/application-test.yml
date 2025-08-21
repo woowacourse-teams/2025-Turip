@@ -1,0 +1,40 @@
+spring:
+  h2:
+    console:
+      enabled: true
+
+  datasource:
+    url: jdbc:h2:mem:database
+
+  sql:
+    init:
+      mode: never
+      data-locations: [ ]
+
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    hibernate:
+      ddl-auto: create-drop
+    defer-datasource-initialization: true
+
+  # 테스트 환경에서 Flyway 비활성화
+  flyway:
+    enabled: false
+
+# CSV Import 설정
+csv:
+  import:
+    password: test_password_123
+
+# Region Category 기타 이미지 설정 (테스트용 더미 값)
+region:
+  category:
+    domestic:
+      etc:
+        image-url: https://test.example.com/domestic-etc.jpg
+    overseas:
+      etc:
+        image-url: https://test.example.com/overseas-etc.jpg

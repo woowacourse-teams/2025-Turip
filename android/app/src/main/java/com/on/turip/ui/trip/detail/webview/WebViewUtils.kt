@@ -10,5 +10,13 @@ fun WebView.applyVideoSettings() {
         javaScriptCanOpenWindowsAutomatically = true
         domStorageEnabled = true
         allowFileAccess = false
+        mediaPlaybackRequiresUserGesture = false
     }
+}
+
+fun WebView.navigateToTimeLine(seconds: Int) {
+    evaluateJavascript(
+        "seekToSecond($seconds);",
+        null,
+    )
 }

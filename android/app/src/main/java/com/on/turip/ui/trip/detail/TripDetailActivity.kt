@@ -6,6 +6,7 @@ import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
+import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
@@ -13,35 +14,44 @@ import androidx.core.net.toUri
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import com.google.android.material.snackbar.Snackbar
 import com.on.turip.R
 import com.on.turip.databinding.ActivityTripDetailBinding
+import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.content.Content
-import com.on.turip.ui.common.TuripUrlConverter
+import com.on.turip.ui.common.TuripSnackbar
 import com.on.turip.ui.common.base.BaseActivity
 import com.on.turip.ui.common.loadCircularImage
 import com.on.turip.ui.common.model.trip.TripModel
 import com.on.turip.ui.common.model.trip.toDisplayText
+import com.on.turip.ui.main.favorite.FavoritePlaceFolderBottomSheetFragment
 import com.on.turip.ui.trip.detail.webview.TuripWebChromeClient
 import com.on.turip.ui.trip.detail.webview.TuripWebViewClient
-import com.on.turip.ui.trip.detail.webview.WebViewVideoBridge
 import com.on.turip.ui.trip.detail.webview.applyVideoSettings
+import com.on.turip.ui.trip.detail.webview.navigateToTimeLine
 
 class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
     override val binding: ActivityTripDetailBinding by lazy {
         ActivityTripDetailBinding.inflate(layoutInflater)
     }
+
     val viewModel: TripDetailViewModel by viewModels {
         TripDetailViewModel.provideFactory(
             intent.getLongExtra(CONTENT_KEY, 0),
             intent.getLongExtra(CREATOR_KEY, 0),
         )
     }
+
     private val turipWebChromeClient: TuripWebChromeClient by lazy {
         TuripWebChromeClient(
             fullScreenView = binding.flTripDetailVideoFullscreen,
             onEnterFullScreen = ::enableFullscreen,
             onExitFullScreen = ::disableFullscreen,
         )
+    }
+
+    private val turipWebViewClient: TuripWebViewClient by lazy {
+        TuripWebViewClient(progressBar = binding.pbTripDetailVideo)
     }
 
     private val tripDayAdapter by lazy {
@@ -51,10 +61,33 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
     }
 
     private val tripPlaceAdapter by lazy {
-        TripPlaceAdapter { placeModel ->
-            val intent: Intent = Intent(Intent.ACTION_VIEW, placeModel.placeUri)
-            startActivity(intent)
-        }
+        TripPlaceAdapter(
+            object : TripPlaceViewHolder.PlaceListener {
+                override fun onPlaceClick(placeModel: PlaceModel) {
+                    val intent: Intent = Intent(Intent.ACTION_VIEW, placeModel.placeUri)
+                    startActivity(intent)
+                }
+
+                override fun onTimeLineClick(placeModel: PlaceModel) {
+                    binding.wvTripDetailVideo.navigateToTimeLine(placeModel.contentTimeLine)
+                }
+
+                override fun onFavoriteClick(placeModel: PlaceModel) {
+                    val bottomSheet: FavoritePlaceFolderBottomSheetFragment =
+                        FavoritePlaceFolderBottomSheetFragment.instance(placeModel.id)
+                    bottomSheet.show(supportFragmentManager, "favorite_place_folder")
+                }
+            },
+        )
+    }
+
+    private val stickyVideoManager by lazy {
+        StickyVideoManager(
+            originalVideoContainer = binding.cvTripDetailVideoContainer,
+            stickyVideoContainer = binding.cvTripDetailVideoContainerSticky,
+            nestedScrollView = binding.nsvTripDetail,
+            webView = binding.wvTripDetailVideo,
+        )
     }
 
     private fun enableFullscreen() {
@@ -97,9 +130,21 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
         setupToolbar()
         setupOnBackPressedDispatcher()
         setupWebView()
+        setupStickyVideo()
         setupAdapters()
         setupListeners()
         setupObservers()
+        showNetworkError()
+    }
+
+    private fun showNetworkError() {
+        binding.customErrorView.apply {
+            visibility = View.VISIBLE
+            setupError(ErrorEvent.NETWORK_ERROR)
+            setOnRetryClickListener {
+                viewModel.reload()
+            }
+        }
     }
 
     private fun setupToolbar() {
@@ -121,12 +166,18 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
             this,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    if (turipWebChromeClient.isFullScreen()) {
-                        turipWebChromeClient.onHideCustomView()
-                    } else if (binding.wvTripDetailVideo.canGoBack()) {
-                        binding.wvTripDetailVideo.goBack()
-                    } else {
-                        finish()
+                    when {
+                        turipWebChromeClient.isFullScreen() -> {
+                            turipWebChromeClient.onHideCustomView()
+                        }
+
+                        binding.wvTripDetailVideo.canGoBack() -> {
+                            binding.wvTripDetailVideo.goBack()
+                        }
+
+                        else -> {
+                            finish()
+                        }
                     }
                 }
             },
@@ -137,14 +188,19 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
         binding.wvTripDetailVideo.apply {
             applyVideoSettings()
             webChromeClient = turipWebChromeClient
-            webViewClient = TuripWebViewClient(binding.pbTripDetailVideo)
+            webViewClient = turipWebViewClient
         }
+    }
+
+    private fun setupStickyVideo() {
+        stickyVideoManager.initialize()
     }
 
     private fun showWebViewErrorView() {
         runOnUiThread {
             binding.wvTripDetailVideo.visibility = View.GONE
-            binding.tvTripDetailVideoError.visibility = View.VISIBLE
+            binding.clTripDetailVideoError.visibility = View.VISIBLE
+            binding.pbTripDetailVideo.visibility = View.GONE
         }
     }
 
@@ -157,7 +213,7 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
     }
 
     private fun setupListeners() {
-        binding.tvTripDetailVideoError.setOnClickListener {
+        binding.clTripDetailVideoError.setOnClickListener {
             val intent: Intent =
                 Intent(
                     Intent.ACTION_VIEW,
@@ -165,9 +221,33 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
                 )
             startActivity(intent)
         }
+
         binding.ivTripDetailFavorite.setOnClickListener {
             viewModel.updateFavorite()
+            showFavoriteStatusSnackbar(viewModel.isFavorite.value == true)
         }
+
+        binding.ivTripDetailContentToggle.setOnClickListener {
+            viewModel.updateExpandTextToggle()
+        }
+    }
+
+    private fun showFavoriteStatusSnackbar(isFavorite: Boolean) {
+        val messageResource: Int =
+            if (isFavorite) R.string.trip_detail_snackbar_favorite_save else R.string.trip_detail_snackbar_favorite_remove
+        val iconResource: Int =
+            if (isFavorite) R.drawable.ic_heart_normal else R.drawable.ic_heart_empty
+
+        TuripSnackbar
+            .make(
+                rootView = binding.root,
+                message = getString(messageResource),
+                duration = Snackbar.LENGTH_LONG,
+                layoutInflater = layoutInflater,
+            ).topMarginInCoordinatorLayout(binding.tbTripDetail.height)
+            .icon(iconResource)
+            .action(R.string.all_snackbar_close)
+            .show()
     }
 
     private fun setupObservers() {
@@ -186,6 +266,7 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
             binding.tvTripDetailCreatorName.text = content.creator.channelName
             binding.tvTripDetailContentTitle.text = content.videoData.title
             binding.tvTripDetailUploadDate.text = content.videoData.uploadedDate
+            updateExpandTextToggleVisibility()
         }
         viewModel.tripModel.observe(this) { tripModel: TripModel ->
             binding.tvTripDetailTotalPlaceCount.text =
@@ -194,19 +275,51 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
                 tripModel.tripDurationModel.toDisplayText(this)
         }
         viewModel.videoUri.observe(this) { url: String ->
-            binding.wvTripDetailVideo.apply {
-                addJavascriptInterface(
-                    WebViewVideoBridge(
-                        TuripUrlConverter.extractVideoId(url),
-                    ) { showWebViewErrorView() },
-                    BRIDGE_NAME_IN_JS_FILE,
-                )
+            stickyVideoManager.loadVideo(url) {
+                showWebViewErrorView()
             }
-
-            binding.wvTripDetailVideo.loadUrl(LOAD_URL_FILE_PATH)
         }
         viewModel.isFavorite.observe(this) { isFavorite: Boolean ->
             binding.ivTripDetailFavorite.isSelected = isFavorite
+        }
+        viewModel.isExpandTextToggleVisible.observe(this) { isVisible ->
+            binding.ivTripDetailContentToggle.visibility =
+                if (isVisible) View.VISIBLE else View.GONE
+        }
+
+        viewModel.isExpandTextToggleSelected.observe(this) { isSelected ->
+            binding.ivTripDetailContentToggle.isSelected = isSelected
+        }
+
+        viewModel.bodyMaxLines.observe(this) { maxLines ->
+            binding.tvTripDetailContentTitle.maxLines = maxLines
+        }
+        viewModel.networkError.observe(this) { networkError: Boolean ->
+            binding.nsvTripDetail.visibility =
+                if (networkError) View.GONE else View.VISIBLE
+            binding.tbTripDetail.visibility =
+                if (networkError) View.GONE else View.VISIBLE
+            binding.customErrorView.visibility =
+                if (networkError) View.VISIBLE else View.GONE
+        }
+        viewModel.serverError.observe(this) { serverError: Boolean ->
+            binding.nsvTripDetail.visibility =
+                if (serverError) View.GONE else View.VISIBLE
+            binding.tbTripDetail.visibility =
+                if (serverError) View.GONE else View.VISIBLE
+            binding.customErrorView.visibility =
+                if (serverError) View.VISIBLE else View.GONE
+        }
+    }
+
+    private fun updateExpandTextToggleVisibility() {
+        if (viewModel.isExpandTextToggleVisible.value == true) return
+
+        val bodyTextView: TextView = binding.tvTripDetailContentTitle
+        bodyTextView.post {
+            val lineCount: Int = bodyTextView.layout.lineCount
+            val ellipsisCount: Int = bodyTextView.layout.getEllipsisCount(lineCount - 1)
+            viewModel.updateExpandTextToggleVisibility(lineCount, ellipsisCount)
         }
     }
 
@@ -216,8 +329,6 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
     }
 
     companion object {
-        private const val BRIDGE_NAME_IN_JS_FILE = "videoBridge"
-        private const val LOAD_URL_FILE_PATH = "file:///android_asset/iframe.html"
         private const val CREATOR_KEY: String = "com.on.turip.CREATOR_KEY"
         private const val CONTENT_KEY: String = "com.on.turip.CONTENT_KEY"
 

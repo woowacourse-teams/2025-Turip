@@ -9,6 +9,7 @@ import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import com.on.turip.R
 import com.on.turip.databinding.ActivityRegionResultBinding
+import com.on.turip.domain.ErrorEvent
 import com.on.turip.ui.common.base.BaseActivity
 import com.on.turip.ui.trip.detail.TripDetailActivity
 import timber.log.Timber
@@ -41,6 +42,17 @@ class RegionResultActivity : BaseActivity<ActivityRegionResultBinding>() {
         setupToolbar()
         setupAdapters()
         setupObservers()
+        showNetworkError()
+    }
+
+    private fun showNetworkError() {
+        binding.customErrorView.apply {
+            visibility = View.VISIBLE
+            setupError(ErrorEvent.NETWORK_ERROR)
+            setOnRetryClickListener {
+                viewModel.reload()
+            }
+        }
     }
 
     private fun setupToolbar() {
@@ -74,24 +86,58 @@ class RegionResultActivity : BaseActivity<ActivityRegionResultBinding>() {
                     R.string.region_result_exist_result,
                     searchResultState.searchResultCount,
                 )
-
             supportActionBar?.title = searchResultState.region
-
             regionResultAdapter.submitList(searchResultState.videoInformations)
+            updateUIVisibility()
+        }
 
-            setupVisible(searchResultState)
+        viewModel.networkError.observe(this) {
+            updateUIVisibility()
+        }
+
+        viewModel.serverError.observe(this) {
+            updateUIVisibility()
         }
     }
 
-    private fun setupVisible(searchResultState: RegionResultViewModel.SearchResultState) {
-        binding.rvRegionResult.visibility =
-            if (searchResultState.isExist) View.VISIBLE else View.GONE
+    private fun updateUIVisibility() {
+        val searchResultState = viewModel.searchResultState.value
+        val hasNetworkError = viewModel.networkError.value == true
+        val hasServerError = viewModel.serverError.value == true
 
-        binding.groupRegionResultEmpty.visibility =
-            if (searchResultState.isExist) View.GONE else View.VISIBLE
+        when {
+            hasNetworkError || hasServerError -> {
+                binding.customErrorView.visibility = View.VISIBLE
+                binding.pbSearchRegionResult.visibility = View.GONE
+                binding.groupRegionResultEmpty.visibility = View.GONE
+                binding.tvRegionResultCount.visibility = View.GONE
+                binding.rvRegionResult.visibility = View.GONE
+            }
 
-        binding.tvRegionResultLoading.visibility =
-            if (searchResultState.loading) View.VISIBLE else View.GONE
+            searchResultState?.loading == true -> {
+                binding.customErrorView.visibility = View.GONE
+                binding.pbSearchRegionResult.visibility = View.VISIBLE
+                binding.groupRegionResultEmpty.visibility = View.GONE
+                binding.tvRegionResultCount.visibility = View.GONE
+                binding.rvRegionResult.visibility = View.GONE
+            }
+
+            searchResultState?.isExist == true -> {
+                binding.customErrorView.visibility = View.GONE
+                binding.pbSearchRegionResult.visibility = View.GONE
+                binding.groupRegionResultEmpty.visibility = View.GONE
+                binding.tvRegionResultCount.visibility = View.VISIBLE
+                binding.rvRegionResult.visibility = View.VISIBLE
+            }
+
+            else -> {
+                binding.customErrorView.visibility = View.GONE
+                binding.pbSearchRegionResult.visibility = View.GONE
+                binding.groupRegionResultEmpty.visibility = View.VISIBLE
+                binding.tvRegionResultCount.visibility = View.GONE
+                binding.rvRegionResult.visibility = View.GONE
+            }
+        }
     }
 
     companion object {

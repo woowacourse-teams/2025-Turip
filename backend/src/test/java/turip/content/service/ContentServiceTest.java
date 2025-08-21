@@ -7,7 +7,6 @@ import static org.mockito.BDDMockito.given;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -24,16 +23,17 @@ import turip.content.controller.dto.response.ContentSearchResponse;
 import turip.content.controller.dto.response.WeeklyPopularFavoriteContentsResponse;
 import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
+import turip.contentplace.service.ContentPlaceService;
 import turip.country.domain.Country;
 import turip.creator.domain.Creator;
-import turip.favorite.domain.Favorite;
-import turip.favorite.repository.FavoriteRepository;
+import turip.exception.custom.BadRequestException;
+import turip.favoritecontent.domain.FavoriteContent;
+import turip.favoritecontent.repository.FavoriteContentRepository;
 import turip.member.domain.Member;
 import turip.member.repository.MemberRepository;
-import turip.exception.custom.BadRequestException;
+import turip.province.domain.Province;
 import turip.regioncategory.domain.DomesticRegionCategory;
 import turip.regioncategory.domain.OverseasRegionCategory;
-import turip.tripcourse.service.TripCourseService;
 
 @ExtendWith(MockitoExtension.class)
 class ContentServiceTest {
@@ -45,10 +45,10 @@ class ContentServiceTest {
     private ContentRepository contentRepository;
 
     @Mock
-    private TripCourseService tripCourseService;
+    private ContentPlaceService contentPlaceService;
 
     @Mock
-    private FavoriteRepository favoriteRepository;
+    private FavoriteContentRepository favoriteContentRepository;
 
     @Mock
     private MemberRepository memberRepository;
@@ -66,14 +66,20 @@ class ContentServiceTest {
             int pageSize = 2;
             Long maxId = Long.MAX_VALUE;
 
-            Creator creator = new Creator("메이", null);
-            Country korea = new Country("대한민국", null);
-            City seoul = new City(korea, null, "서울", null);
+            Creator creator = new Creator("여행하는 메이", "프로필 사진 경로");
+            Country country = new Country("대한민국", "대한민국 사진 경로");
+            Province province = new Province("강원도");
+            City city = new City(country, province, "속초", "시 이미지 경로");
 
-            List<Content> contents = List.of(new Content(1L, creator, seoul, null, null, null),
-                    new Content(2L, creator, seoul, null, null, null));
+            List<Content> contents = List.of(
+                    new Content(1L, creator, city, "메이의 속초 브이로그 1편", "속초 브이로그 Url 1", LocalDate.of(2025, 7, 8)),
+                    new Content(2L, creator, city, "메이의 속초 브이로그 2편", "속초 브이로그 Url 2", LocalDate.of(2025, 7, 8)));
             given(contentRepository.findByKeywordContaining(keyword, maxId, PageRequest.of(0, pageSize)))
                     .willReturn(new SliceImpl<>(contents));
+            given(contentRepository.existsById(1L))
+                    .willReturn(true);
+            given(contentRepository.existsById(2L))
+                    .willReturn(true);
 
             // when
             ContentSearchResponse contentsByKeyword = contentService.searchContentsByKeyword(keyword, pageSize,
@@ -96,33 +102,34 @@ class ContentServiceTest {
             LocalDate endDate = startDate.plusDays(6);
             int topContentSize = 2;
 
-            Creator creator = new Creator("하루", null);
-            Country korea = new Country("대한민국", null);
-            City seoul = new City(korea, null, "서울", null);
+            Creator creator = new Creator(1L, "여행하는 뭉치", "프로필 사진 경로");
+            Country country = new Country(1L, "대한민국", "대한민국 사진 경로");
+            Province province = new Province(1L, "강원도");
+            City city = new City(1L, country, province, "속초", "시 이미지 경로");
 
-            Content content1 = new Content(1L, creator, seoul, null, null, null);
-            Content content2 = new Content(2L, creator, seoul, null, null, null);
+            Content content1 = new Content(1L, creator, city, "뭉치의 속초 브이로그 1편", "속초 브이로그 Url 1",
+                    LocalDate.of(2025, 7, 8));
+            Content content2 = new Content(2L, creator, city, "뭉치의 속초 브이로그 2편", "속초 브이로그 Url 2",
+                    LocalDate.of(2025, 7, 8));
 
             Member member = new Member(1L, "testDeviceFid");
 
             List<Content> popularContents = List.of(content1, content2);
 
-            given(favoriteRepository.findPopularContentsByFavoriteBetweenDatesWithLimit(startDate, endDate,
+            given(favoriteContentRepository.findPopularContentsByFavoriteBetweenDatesWithLimit(startDate, endDate,
                     topContentSize))
                     .willReturn(popularContents);
-            given(memberRepository.findByDeviceFid("testDeviceFid"))
-                    .willReturn(Optional.of(member));
-            given(favoriteRepository.findByMemberIdAndContentIdIn(1L, List.of(1L, 2L)))
-                    .willReturn(List.of(new Favorite(LocalDate.now().minusWeeks(1), member, content1),
-                            new Favorite(LocalDate.now().minusWeeks(1), member, content2)));
-            given(tripCourseService.calculateDurationDays(content1.getId()))
+            given(favoriteContentRepository.findByMemberIdAndContentIdIn(1L, List.of(1L, 2L)))
+                    .willReturn(List.of(new FavoriteContent(LocalDate.now().minusWeeks(1), member, content1),
+                            new FavoriteContent(LocalDate.now().minusWeeks(1), member, content2)));
+            given(contentPlaceService.calculateDurationDays(content1.getId()))
                     .willReturn(3); // content1, 2박 3일
-            given(tripCourseService.calculateDurationDays(content2.getId()))
+            given(contentPlaceService.calculateDurationDays(content2.getId()))
                     .willReturn(2); // content2, 1박 2일
 
             // when
-            WeeklyPopularFavoriteContentsResponse response = contentService.findWeeklyPopularFavoriteContents(
-                    "testDeviceFid", topContentSize);
+            WeeklyPopularFavoriteContentsResponse response = contentService.findWeeklyPopularFavoriteContents(member,
+                    topContentSize);
 
             // then
             Assertions.assertAll(

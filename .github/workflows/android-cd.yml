@@ -1,0 +1,96 @@
+name: Android CD
+
+# JVM 옵션을 설정, 최대 힙 메모리를 4GB로
+env:
+  GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4g -Dorg.gradle.daemon=false"
+  GRADLE_BUILD_ACTION_CACHE_DEBUG_ENABLED: true
+
+# release 브랜치에 PR을 올릴 시 트리거
+on:
+  pull_request:
+    branches:
+      - "release/*"
+    paths:
+      - "android/**"
+
+# 전체 워크플로우에 대한 권한 설정
+permissions:
+  contents: write
+
+jobs:
+  cd-build:
+    name: Build & Release APK/AAB
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./android
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+          cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+
+      - name: Create local.properties
+        run: |
+          echo "base_url=${{ secrets.BASE_URL }}" > local.properties
+          echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> local.properties
+          echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> local.properties
+          echo "storePassword=${{ secrets.STORE_PASSWORD }}" >> local.properties
+
+      - name: Write google-services.json for release
+        run: |
+          mkdir -p ./app
+          echo '${{ secrets.GOOGLE_SERVICES_JSON_RELEASE }}' > ./app/google-services.json
+
+      - name: Generate Keystore
+        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > ./app/release-keystore.jks
+
+      - name: Build Release AAB
+        run: ./gradlew bundleRelease --stacktrace
+
+      - name: Build Release APK
+        run: ./gradlew assembleRelease --stacktrace
+
+      - name: Upload Release Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-release-builds
+          path: |
+            android/app/build/outputs/bundle/release/app-release.aab
+            android/app/build/outputs/apk/release/app-release.apk
+          if-no-files-found: error
+
+      - name: Upload APK to Firebase App Distribution
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{ secrets.FIREBASE_APP_ID }}
+          serviceCredentialsFileContent: ${{ secrets.CREDENTIAL_FILE_CONTENT }}
+          groups: testers
+          file: android/app/build/outputs/apk/release/app-release.apk
+
+      - name: If Success, Send notification on Discord
+        if: ${{ success() }}
+        run: |
+          curl -H "Content-Type: application/json" \
+            -d '{"username": "Turip Android", "content": "✅ Turip Android PR Check Success 🎉"}' \
+            ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+      - name: If Fail, Send notification on Discord
+        if: ${{ failure() }}
+        run: |
+          curl -H "Content-Type: application/json" \
+            -d '{"username": "Turip Android", "content": "❌ Turip Android PR Check Failure - Please Check!"}' \
+            ${{ secrets.DISCORD_WEBHOOK_URL }}
+

@@ -1,6 +1,7 @@
 package turip.content.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -11,10 +12,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import turip.auth.AuthMember;
+import turip.auth.MemberResolvePolicy;
 import turip.content.controller.dto.response.ContentCountResponse;
 import turip.content.controller.dto.response.ContentResponse;
 import turip.content.controller.dto.response.ContentSearchResponse;
@@ -22,6 +24,7 @@ import turip.content.controller.dto.response.ContentsByRegionCategoryResponse;
 import turip.content.controller.dto.response.WeeklyPopularFavoriteContentsResponse;
 import turip.content.service.ContentService;
 import turip.exception.ErrorResponse;
+import turip.member.domain.Member;
 
 @RestController
 @RequiredArgsConstructor
@@ -331,10 +334,10 @@ public class ContentController {
     })
     @GetMapping("/{contentId}")
     public ResponseEntity<ContentResponse> readContent(
-            @RequestHeader(value = "device-fid", required = false) String deviceFid,
+            @Parameter(hidden = true) @AuthMember(policy = MemberResolvePolicy.CREATE_IF_ABSENT) Member member,
             @PathVariable Long contentId
     ) {
-        ContentResponse response = contentService.getContentWithFavoriteStatus(contentId, deviceFid);
+        ContentResponse response = contentService.getContentWithFavoriteStatus(contentId, member);
         return ResponseEntity.ok(response);
     }
 
@@ -408,10 +411,10 @@ public class ContentController {
     })
     @GetMapping("/popular/favorites")
     public ResponseEntity<WeeklyPopularFavoriteContentsResponse> readWeeklyPopularFavoriteContents(
-            @RequestHeader(value = "device-fid", required = false) String deviceFid,
+            @Parameter(hidden = true) @AuthMember(policy = MemberResolvePolicy.CREATE_IF_ABSENT) Member member,
             @RequestParam("size") int topContentSize) {
         WeeklyPopularFavoriteContentsResponse weeklyPopularFavoriteContents = contentService.findWeeklyPopularFavoriteContents(
-                deviceFid, topContentSize);
+                member, topContentSize);
         return ResponseEntity.ok(weeklyPopularFavoriteContents);
     }
 }

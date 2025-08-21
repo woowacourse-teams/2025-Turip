@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
 
     <application
         android:name=".TuripApplication"
@@ -16,6 +17,9 @@
         android:theme="@style/Theme.Turip"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+        <activity
+            android:name=".ui.folder.FolderActivity"
+            android:exported="false" />
         <activity
             android:name=".ui.search.keywordresult.SearchActivity"
             android:exported="false" />
