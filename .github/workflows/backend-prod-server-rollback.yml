@@ -50,7 +50,7 @@ jobs:
 
           # 재기동
           echo "Starting application from SHA=$SHA ..."
-          sudo sh -lc 'nohup java -jar -Dspring.profiles.active=prod "$BASE/current/app.jar" > "$BASE/app.out" 2>&1 &'
+          sudo sh -lc "nohup java -jar -Dspring.profiles.active=prod '$BASE/current/app.jar' > '$BASE/app.out' 2>&1 &"
 
           # 헬스 체크 (최대 60초)
           ok=0
@@ -68,7 +68,7 @@ jobs:
               # 재기동
               PID=$(sudo lsof -t -i :8080 || true)
               if [ -n "$PID" ]; then sudo kill -9 $PID || true; fi
-              sudo sh -lc 'nohup java -jar -Dspring.profiles.active=prod "$BASE/current/app.jar" > "$BASE/app.out" 2>&1 &'
+              sudo sh -lc "nohup java -jar -Dspring.profiles.active=prod '$BASE/current/app.jar' > '$BASE/app.out' 2>&1 &"
               echo "[INFO] Reverted to previous release."
             else
               echo "[WARN] No previous link found. Manual intervention needed."
