@@ -109,7 +109,7 @@ jobs:
           fi
           
           echo "Starting application..."
-          sudo sh -lc 'nohup java -jar -Dspring.profiles.active=prod "$BASE/current/app.jar" > "$BASE/app.out" 2>&1 &'
+          sudo sh -lc "nohup java -jar -Dspring.profiles.active=prod '$BASE/current/app.jar' > '$BASE/app.out' 2>&1 &"
 
           # 헬스 체크
           ok=0
@@ -127,7 +127,7 @@ jobs:
               # 재기동
               PID=$(sudo lsof -t -i :8080 || true)
               if [ -n "$PID" ]; then sudo kill -9 $PID || true; fi
-              sudo sh -lc 'nohup java -jar -Dspring.profiles.active=prod "$BASE/current/app.jar" > "$BASE/app.out" 2>&1 &'
+              sudo sh -lc "nohup java -jar -Dspring.profiles.active=prod '$BASE/current/app.jar' > '$BASE/app.out' 2>&1 &"
             else
               echo "No previous link found. Manual intervention needed."
             fi
