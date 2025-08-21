@@ -17,6 +17,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import com.google.android.material.snackbar.Snackbar
 import com.on.turip.R
 import com.on.turip.databinding.ActivityTripDetailBinding
+import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.content.Content
 import com.on.turip.ui.common.TuripSnackbar
 import com.on.turip.ui.common.base.BaseActivity
@@ -133,6 +134,17 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
         setupAdapters()
         setupListeners()
         setupObservers()
+        showNetworkError()
+    }
+
+    private fun showNetworkError() {
+        binding.customErrorView.apply {
+            visibility = View.VISIBLE
+            setupError(ErrorEvent.NETWORK_ERROR)
+            setOnRetryClickListener {
+                viewModel.reload()
+            }
+        }
     }
 
     private fun setupToolbar() {
@@ -281,6 +293,22 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
 
         viewModel.bodyMaxLines.observe(this) { maxLines ->
             binding.tvTripDetailContentTitle.maxLines = maxLines
+        }
+        viewModel.networkError.observe(this) { networkError: Boolean ->
+            binding.nsvTripDetail.visibility =
+                if (networkError) View.GONE else View.VISIBLE
+            binding.tbTripDetail.visibility =
+                if (networkError) View.GONE else View.VISIBLE
+            binding.customErrorView.visibility =
+                if (networkError) View.VISIBLE else View.GONE
+        }
+        viewModel.serverError.observe(this) { serverError: Boolean ->
+            binding.nsvTripDetail.visibility =
+                if (serverError) View.GONE else View.VISIBLE
+            binding.tbTripDetail.visibility =
+                if (serverError) View.GONE else View.VISIBLE
+            binding.customErrorView.visibility =
+                if (serverError) View.VISIBLE else View.GONE
         }
     }
 

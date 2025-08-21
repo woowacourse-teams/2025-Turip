@@ -20,6 +20,7 @@ import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.on.turip.R
 import com.on.turip.databinding.ActivitySearchBinding
+import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.searchhistory.SearchHistory
 import com.on.turip.ui.common.base.BaseActivity
 import com.on.turip.ui.search.model.VideoInformationModel
@@ -28,7 +29,10 @@ import timber.log.Timber
 
 class SearchActivity : BaseActivity<ActivitySearchBinding>() {
     private val viewModel: SearchViewModel by viewModels {
-        SearchViewModel.provideFactory()
+        val searchKeyword: String = intent.getStringExtra(SEARCH_KEYWORD_KEY) ?: ""
+        SearchViewModel.provideFactory(
+            searchKeyword = searchKeyword,
+        )
     }
 
     override val binding: ActivitySearchBinding by lazy {
@@ -61,6 +65,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
                     viewModel.loadByKeyword()
                     viewModel.createSearchHistory()
                     binding.rvSearchResultSearchHistory.visibility = View.GONE
+                    binding.rvSearchResult.scrollToPosition(0)
                 }
             },
         )
@@ -72,7 +77,17 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         setupObservers()
         setupAdapters()
         setupOnBackPressedDispatcher()
-        binding.etSearchResult.requestFocus()
+        showNetworkError()
+    }
+
+    private fun showNetworkError() {
+        binding.customErrorView.apply {
+            visibility = View.VISIBLE
+            setupError(ErrorEvent.NETWORK_ERROR)
+            setOnRetryClickListener {
+                viewModel.loadByKeyword()
+            }
+        }
     }
 
     private fun setupAdapters() {
@@ -139,6 +154,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
                     binding.rvSearchResultSearchHistory.visibility = View.GONE
                     binding.etSearchResult.clearFocus()
                     hideKeyBoard(binding.etSearchResult)
+                    binding.rvSearchResult.scrollToPosition(0)
                     Timber.d("검색창 클릭")
                     true
                 }
@@ -148,7 +164,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         }
 
         binding.etSearchResult.setOnFocusChangeListener { view, hasFocus ->
-            if (hasFocus) {
+            if (hasFocus && viewModel.serverError.value?.not() == true && viewModel.networkError.value?.not() == true) {
                 Timber.d("검색창 포커싱")
                 binding.rvSearchResultSearchHistory.visibility = View.VISIBLE
             }
@@ -176,6 +192,10 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         viewModel.searchingWord.observe(this) { searchWord: String ->
             binding.ivSearchResultClear.visibility =
                 if (searchWord.isNotEmpty()) View.VISIBLE else View.GONE
+            if (binding.etSearchResult.text.toString() != searchWord) {
+                binding.etSearchResult.setText(searchWord)
+                binding.etSearchResult.setSelection(searchWord.length)
+            }
         }
         viewModel.videoInformation.observe(this) { videoInformationModels: List<VideoInformationModel> ->
             searchAdapter.submitList(videoInformationModels)
@@ -190,6 +210,12 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         }
         viewModel.searchHistory.observe(this) { searchHistories: List<SearchHistory> ->
             searchHistoryAdapter.submitList(searchHistories)
+        }
+        viewModel.serverError.observe(this) { serverError ->
+            handleVisibleByError(serverError)
+        }
+        viewModel.networkError.observe(this) { networkError ->
+            handleVisibleByError(networkError)
         }
     }
 
@@ -211,8 +237,23 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
             binding.tvSearchResultCount.visibility = View.GONE
             binding.rvSearchResult.visibility = View.GONE
             binding.groupSearchResultEmpty.visibility = View.GONE
+            binding.customErrorView.visibility = View.GONE
         } else {
             binding.pbSearchResult.visibility = View.GONE
+            binding.tvSearchResultCount.visibility = View.VISIBLE
+            binding.rvSearchResult.visibility = View.VISIBLE
+        }
+    }
+
+    private fun handleVisibleByError(error: Boolean) {
+        if (error) {
+            binding.customErrorView.visibility = View.VISIBLE
+            binding.tvSearchResultCount.visibility = View.GONE
+            binding.rvSearchResult.visibility = View.GONE
+            binding.groupSearchResultEmpty.visibility = View.GONE
+            binding.rvSearchResultSearchHistory.visibility = View.GONE
+        } else {
+            binding.customErrorView.visibility = View.GONE
             binding.tvSearchResultCount.visibility = View.VISIBLE
             binding.rvSearchResult.visibility = View.VISIBLE
         }
@@ -239,6 +280,14 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
     }
 
     companion object {
-        fun newIntent(context: Context): Intent = Intent(context, SearchActivity::class.java)
+        private const val SEARCH_KEYWORD_KEY: String = "com.on.turip.SEARCH_KEYWORD_KEY"
+
+        fun newIntent(
+            context: Context,
+            searchKeyword: String,
+        ): Intent =
+            Intent(context, SearchActivity::class.java).apply {
+                putExtra(SEARCH_KEYWORD_KEY, searchKeyword)
+            }
     }
 }

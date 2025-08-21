@@ -75,6 +75,16 @@
         android:visibility="gone"
         app:constraint_referenced_ids="iv_region_result_empty,tv_region_result_empty" />
 
+    <com.on.turip.ui.common.errorview.CustomErrorView
+        android:id="@+id/custom_error_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:visibility="gone" />
+
     <ProgressBar
         android:id="@+id/pb_search_region_result"
         style="?android:attr/progressBarStyleLarge"

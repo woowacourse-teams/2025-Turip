@@ -10,6 +10,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.on.turip.data.common.onFailure
 import com.on.turip.data.common.onSuccess
 import com.on.turip.di.RepositoryModule
+import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.content.UsersLikeContent
 import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.region.RegionCategory
@@ -32,7 +33,18 @@ class HomeViewModel(
         MutableLiveData()
     val usersLikeContents: LiveData<List<UsersLikeContentModel>> get() = _usersLikeContents
 
+    private val _networkError: MutableLiveData<Boolean> = MutableLiveData(false)
+    val networkError: LiveData<Boolean> get() = _networkError
+
+    private val _serverError: MutableLiveData<Boolean> = MutableLiveData(false)
+    val serverError: LiveData<Boolean> get() = _serverError
+
     init {
+        loadUsersLikeContents()
+        loadRegionCategories(isDomestic = true)
+    }
+
+    fun reload() {
         loadUsersLikeContents()
         loadRegionCategories(isDomestic = true)
     }
@@ -43,9 +55,34 @@ class HomeViewModel(
                 .loadPopularFavoriteContents()
                 .onSuccess { contents: List<UsersLikeContent> ->
                     _usersLikeContents.value = contents.map { it.toUiModel() }
+                    _networkError.value = false
+                    _serverError.value = false
                     Timber.d("인기 찜 목록: $contents")
-                }.onFailure {
+                }.onFailure { errorEvent: ErrorEvent ->
+                    checkError(errorEvent)
+                    Timber.e("인기 찜 목록 불러오기 실패")
                 }
+        }
+    }
+
+    private fun checkError(errorEvent: ErrorEvent) {
+        when (errorEvent) {
+            ErrorEvent.USER_NOT_HAVE_PERMISSION -> {
+                _serverError.value = true
+            }
+
+            ErrorEvent.DUPLICATION_FOLDER -> throw IllegalArgumentException("발생할 수 없는 오류")
+            ErrorEvent.UNEXPECTED_PROBLEM -> {
+                _serverError.value = true
+            }
+
+            ErrorEvent.NETWORK_ERROR -> {
+                _networkError.value = true
+            }
+
+            ErrorEvent.PARSER_ERROR -> {
+                _serverError.value = true
+            }
         }
     }
 
@@ -56,8 +93,12 @@ class HomeViewModel(
                 .onSuccess { regionCategories: List<RegionCategory> ->
                     _regionCategories.value = regionCategories
                     _isSelectedDomestic.value = isDomestic
+                    _networkError.value = false
+                    _serverError.value = false
                     Timber.d("지역 카테고리 조회: $regionCategories")
-                }.onFailure {
+                }.onFailure { errorEvent: ErrorEvent ->
+                    checkError(errorEvent)
+                    Timber.e("지역 카테고리 조회 실패")
                 }
         }
     }

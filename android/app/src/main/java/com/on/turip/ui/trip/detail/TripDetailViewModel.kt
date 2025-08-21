@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -12,6 +11,7 @@ import com.on.turip.data.common.TuripCustomResult
 import com.on.turip.data.common.onFailure
 import com.on.turip.data.common.onSuccess
 import com.on.turip.di.RepositoryModule
+import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.content.Content
 import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.creator.Creator
@@ -23,11 +23,7 @@ import com.on.turip.domain.trip.repository.ContentPlaceRepository
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.common.model.trip.TripModel
 import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -69,10 +65,20 @@ class TripDetailViewModel(
 
     private var placeCacheByDay: Map<Int, List<PlaceModel>> = emptyMap()
 
+    private val _networkError: MutableLiveData<Boolean> = MutableLiveData(false)
+    val networkError: LiveData<Boolean> get() = _networkError
+
+    private val _serverError: MutableLiveData<Boolean> = MutableLiveData(false)
+    val serverError: LiveData<Boolean> get() = _serverError
+
     init {
         loadContent()
         loadTrip()
-        handleFavoriteContentWithDebounce()
+    }
+
+    fun reload() {
+        loadContent()
+        loadTrip()
     }
 
     private fun loadContent() {
@@ -92,11 +98,41 @@ class TripDetailViewModel(
                             _content.value = result
                             _videoUri.value = result.videoData.url
                             _isFavorite.value = result.isFavorite
-                        }.onFailure {
+                            _serverError.value = false
+                            _networkError.value = false
+                        }.onFailure { errorEvent: ErrorEvent ->
+                            checkError(errorEvent)
                         }
-                }.onFailure {
+                }.onFailure { errorEvent: ErrorEvent ->
+                    checkError(errorEvent)
                 }
         }
+    }
+
+    private fun checkError(errorEvent: ErrorEvent) {
+        when (errorEvent) {
+            ErrorEvent.USER_NOT_HAVE_PERMISSION -> {
+                _serverError.value = true
+            }
+
+            ErrorEvent.DUPLICATION_FOLDER -> throw IllegalArgumentException("발생할 수 없는 오류")
+            ErrorEvent.UNEXPECTED_PROBLEM -> {
+                _serverError.value = true
+            }
+
+            ErrorEvent.NETWORK_ERROR -> {
+                _networkError.value = true
+            }
+
+            ErrorEvent.PARSER_ERROR -> {
+                _serverError.value = true
+            }
+        }
+    }
+
+    private fun clearErrors() {
+        _serverError.value = false
+        _networkError.value = false
     }
 
     private fun loadTrip() {
@@ -115,7 +151,10 @@ class TripDetailViewModel(
                     _places.value = placeCacheByDay[1] ?: emptyList()
                     _tripModel.value = trip.toUiModel()
                     Timber.d("여행 일정 불러오기 성공")
-                }.onFailure {
+                    _serverError.value = false
+                    _networkError.value = false
+                }.onFailure { errorEvent: ErrorEvent ->
+                    checkError(errorEvent)
                 }
         }
     }
@@ -143,23 +182,6 @@ class TripDetailViewModel(
             }
     }
 
-    @OptIn(FlowPreview::class)
-    private fun handleFavoriteContentWithDebounce() {
-        viewModelScope.launch {
-            _isFavorite
-                .asFlow()
-                .debounce(500L)
-                .filterNotNull()
-                .collectLatest { favoriteStatus: Boolean ->
-                    updateFavoriteUseCase(favoriteStatus, contentId)
-                        .onSuccess {
-                            Timber.d("찜 API 통신 성공")
-                        }.onFailure {
-                        }
-                }
-        }
-    }
-
     fun updateDay(dayModel: DayModel) {
         _days.value = days.value?.map { it.copy(isSelected = it.day == dayModel.day) }
         _places.value = placeCacheByDay[dayModel.day].orEmpty()
@@ -167,6 +189,25 @@ class TripDetailViewModel(
 
     fun updateFavorite() {
         _isFavorite.value = isFavorite.value?.not()
+        handleFavoriteContent()
+    }
+
+    private fun handleFavoriteContent() {
+        viewModelScope.launch {
+            isFavorite.value?.let { isFavorite: Boolean ->
+                updateFavoriteUseCase(
+                    isFavorite,
+                    contentId,
+                ).onSuccess {
+                    Timber.d("컨텐츠 찜 API 통신 성공")
+                    _serverError.value = false
+                    _networkError.value = false
+                }.onFailure { errorEvent: ErrorEvent ->
+                    checkError(errorEvent)
+                    Timber.d("컨텐츠 찜 API 통신 실패")
+                }
+            }
+        }
     }
 
     fun updateExpandTextToggle() {
