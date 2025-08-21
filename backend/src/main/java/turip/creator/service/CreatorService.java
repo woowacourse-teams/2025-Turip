@@ -2,10 +2,10 @@ package turip.creator.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import turip.common.exception.custom.NotFoundException;
 import turip.creator.controller.dto.response.CreatorResponse;
 import turip.creator.domain.Creator;
 import turip.creator.repository.CreatorRepository;
-import turip.exception.custom.NotFoundException;
 
 @Service
 @RequiredArgsConstructor

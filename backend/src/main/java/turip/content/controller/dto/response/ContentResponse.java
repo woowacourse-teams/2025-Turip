@@ -1,7 +1,7 @@
 package turip.content.controller.dto.response;
 
 import java.time.LocalDate;
-import turip.city.controller.dto.response.CityNameResponse;
+import turip.region.controller.dto.response.CityNameResponse;
 import turip.content.domain.Content;
 import turip.creator.controller.dto.response.CreatorResponse;
 
