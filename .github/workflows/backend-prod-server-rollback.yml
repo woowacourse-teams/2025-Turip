@@ -18,6 +18,12 @@ jobs:
           set -euo pipefail
           BASE=/home/ubuntu/app
           SHA=${{ github.event.inputs.sha }}
+          
+          # SHA 포맷 검증 (7~40자리 16진)
+          if ! [[ "$SHA" =~ ^[0-9a-fA-F]{7,40}$ ]]; then
+            echo "Error: Invalid SHA format: $SHA"
+            exit 1
+          fi
 
           echo "Requested rollback to: $SHA"
 
@@ -44,8 +50,7 @@ jobs:
 
           # 재기동
           echo "Starting application from SHA=$SHA ..."
-          sudo nohup java -jar -Dspring.profiles.active=prod "$BASE/current/app.jar" \
-            > "$BASE/app.out" 2>&1 &
+          sudo sh -lc 'nohup java -jar -Dspring.profiles.active=prod "$BASE/current/app.jar" > "$BASE/app.out" 2>&1 &'
 
           # 헬스 체크 (최대 60초)
           ok=0
@@ -57,8 +62,18 @@ jobs:
           done
 
           if [ $ok -ne 1 ]; then
-            echo "[FAIL] Rollback target unhealthy."
+            echo "[FAIL] Rollback target unhealthy. Reverting to previous..."
+            if [ -L "$BASE/previous" ]; then
+              ln -sfn "$(readlink -f "$BASE/previous")" "$BASE/current"
+              # 재기동
+              PID=$(sudo lsof -t -i :8080 || true)
+              if [ -n "$PID" ]; then sudo kill -9 $PID || true; fi
+              sudo sh -lc 'nohup java -jar -Dspring.profiles.active=prod "$BASE/current/app.jar" > "$BASE/app.out" 2>&1 &'
+              echo "[INFO] Reverted to previous release."
+            else
+              echo "[WARN] No previous link found. Manual intervention needed."
+            fi
             exit 1
           fi
-
+                
           echo "[SUCCESS] Rollback completed to SHA=$SHA"
