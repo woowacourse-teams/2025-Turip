@@ -25,6 +25,7 @@ import com.on.turip.ui.common.loadCircularImage
 import com.on.turip.ui.common.model.trip.TripModel
 import com.on.turip.ui.common.model.trip.toDisplayText
 import com.on.turip.ui.main.favorite.FavoritePlaceFolderBottomSheetFragment
+import com.on.turip.ui.search.keywordresult.SearchActivity
 import com.on.turip.ui.trip.detail.webview.TuripWebChromeClient
 import com.on.turip.ui.trip.detail.webview.TuripWebViewClient
 import com.on.turip.ui.trip.detail.webview.applyVideoSettings
@@ -63,6 +64,12 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
     private val tripPlaceAdapter by lazy {
         TripPlaceAdapter(
             object : TripPlaceViewHolder.PlaceListener {
+                override fun onPlaceNameClick(placeModel: PlaceModel) {
+                    val intent: Intent =
+                        SearchActivity.newIntent(this@TripDetailActivity, placeModel.name)
+                    startActivity(intent)
+                }
+
                 override fun onPlaceClick(placeModel: PlaceModel) {
                     val intent: Intent = Intent(Intent.ACTION_VIEW, placeModel.placeUri)
                     startActivity(intent)

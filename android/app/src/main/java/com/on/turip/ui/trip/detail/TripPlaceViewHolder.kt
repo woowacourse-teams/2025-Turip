@@ -13,6 +13,12 @@ class TripPlaceViewHolder(
     private var placeModel: PlaceModel? = null
 
     init {
+        binding.tvTravelPlaceName.setOnClickListener {
+            placeModel?.let {
+                onClickListener.onPlaceNameClick(it)
+            }
+        }
+
         binding.clTravelPlaceMap.setOnClickListener {
             placeModel?.let {
                 onClickListener.onPlaceClick(it)
@@ -55,6 +61,8 @@ class TripPlaceViewHolder(
     }
 
     interface PlaceListener {
+        fun onPlaceNameClick(placeModel: PlaceModel)
+
         fun onPlaceClick(placeModel: PlaceModel)
 
         fun onTimeLineClick(placeModel: PlaceModel)
