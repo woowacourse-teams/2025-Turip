@@ -23,7 +23,6 @@ import turip.content.controller.dto.response.WeeklyPopularFavoriteContentRespons
 import turip.content.controller.dto.response.WeeklyPopularFavoriteContentsResponse;
 import turip.content.controller.dto.response.todo.ContentDetailsByRegionCategoryResponse;
 import turip.content.controller.dto.response.todo.ContentResponse;
-import turip.content.controller.dto.response.todo.ContentWithCreatorAndCityResponse;
 import turip.content.controller.dto.response.todo.ContentWithTripInfoResponse;
 import turip.content.controller.dto.response.todo.ContentsByRegionCategoryResponse;
 import turip.content.domain.Content;
@@ -210,12 +209,13 @@ public class ContentService {
     }
 
     private ContentDetailsByRegionCategoryResponse toContentDetailsByRegionResponse(Content content) {
-        ContentWithCreatorAndCityResponse contentWithCity = ContentWithCreatorAndCityResponse.from(content);
+        // TODO: 찜 여부 조회
+        ContentResponse contentResponse = ContentResponse.of(content, false);
         TripDurationResponse tripDuration = calculateTripDuration(content);
 
         int tripPlaceCount = getTripPlaceCount(content);
 
-        return ContentDetailsByRegionCategoryResponse.of(contentWithCity, tripDuration, tripPlaceCount);
+        return ContentDetailsByRegionCategoryResponse.of(contentResponse, tripDuration, tripPlaceCount);
     }
 
     private List<ContentWithTripInfoResponse> convertContentsToContentSearchResultResponse(Slice<Content> contents) {
@@ -227,8 +227,9 @@ public class ContentService {
     private ContentWithTripInfoResponse toContentSearchResultResponse(Content content) {
         int placeCount = getTripPlaceCount(content);
 
+        // TODO: 찜 여부 조회
         return ContentWithTripInfoResponse.of(
-                ContentWithCreatorAndCityResponse.from(content),
+                ContentResponse.of(content, false),
                 calculateTripDuration(content),
                 placeCount
         );

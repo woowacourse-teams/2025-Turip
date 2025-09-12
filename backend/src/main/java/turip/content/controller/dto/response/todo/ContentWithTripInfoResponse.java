@@ -3,18 +3,18 @@ package turip.content.controller.dto.response.todo;
 import turip.content.controller.dto.response.TripDurationResponse;
 
 public record ContentWithTripInfoResponse(
-        ContentWithCreatorAndCityResponse content,
+        ContentResponse content,
         TripDurationResponse tripDuration,
         int tripPlaceCount
 ) {
 
     public static ContentWithTripInfoResponse of(
-            ContentWithCreatorAndCityResponse contentWithCreatorAndCityResponse,
+            ContentResponse contentResponse,
             TripDurationResponse tripDurationResponse,
             int tripPlaceCount
     ) {
         return new ContentWithTripInfoResponse(
-                contentWithCreatorAndCityResponse,
+                contentResponse,
                 tripDurationResponse,
                 tripPlaceCount
         );

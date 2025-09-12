@@ -5,19 +5,19 @@ import turip.content.controller.dto.response.TripDurationResponse;
 
 public record ContentDetailsByRegionCategoryResponse(
         @JsonProperty("content")
-        ContentWithCreatorAndCityResponse contentWithCreatorAndCityResponse,
+        ContentResponse contentResponse,
         @JsonProperty("tripDuration")
         TripDurationResponse tripDurationResponse,
         int tripPlaceCount
 ) {
 
     public static ContentDetailsByRegionCategoryResponse of(
-            ContentWithCreatorAndCityResponse contentWithCreatorAndCityResponse,
+            ContentResponse contentResponse,
             TripDurationResponse tripDurationResponse,
             int tripPlaceCount
     ) {
         return new ContentDetailsByRegionCategoryResponse(
-                contentWithCreatorAndCityResponse,
+                contentResponse,
                 tripDurationResponse,
                 tripPlaceCount
         );
