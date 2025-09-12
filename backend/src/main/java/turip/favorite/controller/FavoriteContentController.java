@@ -86,7 +86,7 @@ public class FavoriteContentController {
                                             summary = "컨텐츠를 찾을 수 없음",
                                             value = """
                                                     {
-                                                        "message": "존재하지 않는 컨텐츠입니다."
+                                                        "tag": "CONTENT_NOT_FOUND"
                                                     }
                                                     """
                                     )
@@ -105,7 +105,7 @@ public class FavoriteContentController {
                                             summary = "이미 찜 한 컨텐츠",
                                             value = """
                                                     {
-                                                        "message": "이미 찜한 컨텐츠입니다."
+                                                        "tag": "FAVORITE_CONTENT_CONFLICT"
                                                     }
                                                     """
                                     )
@@ -179,7 +179,7 @@ public class FavoriteContentController {
                                             summary = "올바르지 않은 device-fid",
                                             value = """
                                                     {
-                                                        "message": "사용자 정보를 조회할 수 없습니다."
+                                                        "tag": "MEMBER_NOT_FOUND"
                                                     }
                                                     """
                                     )
@@ -219,7 +219,7 @@ public class FavoriteContentController {
                                             summary = "컨텐츠를 찾을 수 없음",
                                             value = """
                                                     {
-                                                        "message": "존재하지 않는 컨텐츠입니다."
+                                                        "tag": "CONTENT_NOT_FOUND"
                                                     }
                                                     """
                                     ),
@@ -228,7 +228,7 @@ public class FavoriteContentController {
                                             summary = "존재하지 않는 사용자",
                                             value = """
                                                     {
-                                                        "message": "존재하지 않는 사용자입니다."
+                                                        "tag": "MEMBER_NOT_FOUND"
                                                     }
                                                     """
                                     ),
@@ -237,7 +237,7 @@ public class FavoriteContentController {
                                             summary = "찜하지 않은 컨텐츠",
                                             value = """
                                                     {
-                                                        "message": "해당 컨텐츠는 찜한 상태가 아닙니다."
+                                                        "tag": "FAVORITE_CONTENT_NOT_FOUND"
                                                     }
                                                     """
                                     )

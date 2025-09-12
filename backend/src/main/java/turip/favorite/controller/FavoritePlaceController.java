@@ -69,7 +69,7 @@ public class FavoritePlaceController {
                                             summary = "폴더 소유자의 기기id와 요청자의 기기id가 같지 않은 경우",
                                             value = """
                                                     {
-                                                        "message" : "폴더 소유자의 기기id와 요청자의 기기id가 같지 않습니다."
+                                                        "tag" : "FORBIDDEN"
                                                     }
                                                     """
                                     )
@@ -88,7 +88,7 @@ public class FavoritePlaceController {
                                             summary = "favoriteFolderId에 대한 폴더를 찾을 수 없는 경우",
                                             value = """
                                                     {
-                                                        "message" : "해당 id에 대한 폴더가 존재하지 않습니다."
+                                                        "tag" : "FAVORITE_FOLDER_NOT_FOUND"
                                                     }
                                                     """
                                     ),
@@ -97,7 +97,7 @@ public class FavoritePlaceController {
                                             summary = "placeId에 대한 장소를 찾을 수 없는 경우",
                                             value = """
                                                     {
-                                                        "message" : "해당 id에 대한 장소가 존재하지 않습니다."
+                                                        "tag" : "FAVORITE_PLACE_NOT_FOUND"
                                                     }
                                                     """
                                     )
@@ -116,7 +116,7 @@ public class FavoritePlaceController {
                                             summary = "이미 해당 폴더에 찜한 상태인 경우",
                                             value = """
                                                     {
-                                                        "message": "이미 해당 폴더에 찜한 장소입니다."
+                                                        "tag": "FAVORITE_PLACE_CONFLICT"
                                                     }
                                                     """
                                     )
@@ -203,7 +203,7 @@ public class FavoritePlaceController {
                                             summary = "favoriteFolderId에 대한 폴더가 존재하지 않는 경우",
                                             value = """
                                                     {
-                                                        "message" : "해당 id에 대한 폴더가 존재하지 않습니다."
+                                                        "tag" : "FAVORITE_FOLDER_NOT_FOUND"
                                                     }
                                                     """
                                     )
@@ -240,7 +240,7 @@ public class FavoritePlaceController {
                                             summary = "폴더 소유자의 기기id와 요청자의 기기id가 같지 않은 경우",
                                             value = """
                                                     {
-                                                        "message" : "폴더 소유자의 기기id와 요청자의 기기id가 같지 않습니다."
+                                                        "tag" : "FORBIDDEN"
                                                     }
                                                     """
                                     )
@@ -259,7 +259,7 @@ public class FavoritePlaceController {
                                             summary = "deviceFid에 대한 회원을 찾을 수 없는 경우",
                                             value = """
                                                     {
-                                                        "message" : "해당 id에 대한 회원이 존재하지 않습니다."
+                                                        "tag" : "MEMBER_NOT_FOUND"
                                                     }
                                                     """
                                     ),
@@ -268,7 +268,7 @@ public class FavoritePlaceController {
                                             summary = "favoriteFolderId에 대한 폴더를 찾을 수 없는 경우",
                                             value = """
                                                     {
-                                                        "message" : "해당 id에 대한 폴더가 존재하지 않습니다."
+                                                        "tag" : "FAVORITE_FOLDER_NOT_FOUND"
                                                     }
                                                     """
                                     ),
@@ -277,7 +277,7 @@ public class FavoritePlaceController {
                                             summary = "placeId에 대한 장소를 찾을 수 없는 경우",
                                             value = """
                                                     {
-                                                        "message" : "해당 id에 대한 장소가 존재하지 않습니다."
+                                                        "tag" : "PLACE_NOT_FOUND"
                                                     }
                                                     """
                                     ),
@@ -286,7 +286,7 @@ public class FavoritePlaceController {
                                             summary = "해당 폴더에 장소 찜이 되어있지 않은 경우",
                                             value = """
                                                     {
-                                                        "message" : "삭제하려는 장소 찜이 존재하지 않습니다."
+                                                        "tag" : "FAVORITE_PLACE_NOT_FOUND"
                                                     }
                                                     """
                                     )
