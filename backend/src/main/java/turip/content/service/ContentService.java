@@ -22,7 +22,6 @@ import turip.content.controller.dto.response.WeeklyPopularFavoriteContentRespons
 import turip.content.controller.dto.response.WeeklyPopularFavoriteContentsResponse;
 import turip.content.controller.dto.response.todo.ContentDetailsResponse;
 import turip.content.controller.dto.response.todo.ContentResponse;
-import turip.content.controller.dto.response.todo.ContentsByRegionCategoryResponse;
 import turip.content.controller.dto.response.todo.ContentsWithLoadable;
 import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
@@ -54,7 +53,7 @@ public class ContentService {
         return ContentCountResponse.from(count);
     }
 
-    public ContentsByRegionCategoryResponse findContentsByRegionCategory(
+    public ContentsWithLoadable findContentsByRegionCategory(
             String regionCategory,
             int size,
             long lastId
@@ -66,7 +65,7 @@ public class ContentService {
                 = convertContentsToContentDetailsByRegionResponses(contents);
         boolean loadable = contentSlice.hasNext();
 
-        return ContentsByRegionCategoryResponse.of(contentDetails, loadable);
+        return ContentsWithLoadable.of(contentDetails, loadable);
     }
 
     public WeeklyPopularFavoriteContentsResponse findWeeklyPopularFavoriteContents(Member member, int topContentSize) {
