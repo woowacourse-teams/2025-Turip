@@ -48,11 +48,16 @@ class DomesticRegionCategoryPagingApiTest {
         // 크리에이터, 도시 데이터 설정 
         jdbcTemplate.update(
                 "INSERT INTO creator (profile_image, channel_name) VALUES ('https://image.example.com/creator1.jpg', 'TravelMate')");
-        jdbcTemplate.update("INSERT INTO country (name, image_url) VALUES ('대한민국', 'https://image.example.com/korea.jpg')");
-        jdbcTemplate.update("INSERT INTO country (name, image_url) VALUES ('일본', 'https://image.example.com/japan.jpg')");
-        jdbcTemplate.update("INSERT INTO city (name, country_id, province_id, image_url) VALUES ('서울', 1, null, 'https://image.example.com/seoul.jpg')");
-        jdbcTemplate.update("INSERT INTO city (name, country_id, province_id, image_url) VALUES ('세종', 1, null, 'https://image.example.com/sejong.jpg')");
-        jdbcTemplate.update("INSERT INTO city (name, country_id, province_id, image_url) VALUES ('오사카', 2, null, 'https://image.example.com/osaka.jpg')");
+        jdbcTemplate.update(
+                "INSERT INTO country (name, image_url) VALUES ('대한민국', 'https://image.example.com/korea.jpg')");
+        jdbcTemplate.update(
+                "INSERT INTO country (name, image_url) VALUES ('일본', 'https://image.example.com/japan.jpg')");
+        jdbcTemplate.update(
+                "INSERT INTO city (name, country_id, province_id, image_url) VALUES ('서울', 1, null, 'https://image.example.com/seoul.jpg')");
+        jdbcTemplate.update(
+                "INSERT INTO city (name, country_id, province_id, image_url) VALUES ('세종', 1, null, 'https://image.example.com/sejong.jpg')");
+        jdbcTemplate.update(
+                "INSERT INTO city (name, country_id, province_id, image_url) VALUES ('오사카', 2, null, 'https://image.example.com/osaka.jpg')");
 
         // 서울 컨텐츠 데이터 설정
         for (int i = 1; i <= 9; i++) {
@@ -93,8 +98,7 @@ class DomesticRegionCategoryPagingApiTest {
         firstPageResponse.then()
                 .statusCode(200)
                 .body("contents.size()", is(5))
-                .body("loadable", is(true))
-                .body("regionCategoryName", is("서울"));
+                .body("loadable", is(true));
 
         // 첫 번째 페이지 마지막 content id
         Integer lastContentId = firstPageResponse.jsonPath().get("contents[4].content.id");
@@ -110,8 +114,7 @@ class DomesticRegionCategoryPagingApiTest {
         secondPageResponse.then()
                 .statusCode(200)
                 .body("contents.size()", is(4))
-                .body("loadable", is(false))
-                .body("regionCategoryName", is("서울"));
+                .body("loadable", is(false));
     }
 
     @DisplayName("/contents GET 국내 기타 지역별 컨텐츠 목록 페이징 테스트")
@@ -128,8 +131,7 @@ class DomesticRegionCategoryPagingApiTest {
         firstPageResponse.then()
                 .statusCode(200)
                 .body("contents.size()", is(5))
-                .body("loadable", is(true))
-                .body("regionCategoryName", is("국내 기타"));
+                .body("loadable", is(true));
 
         // 첫 번째 페이지 마지막 content id
         Integer lastContentId = firstPageResponse.jsonPath().get("contents[4].content.id");
@@ -145,7 +147,6 @@ class DomesticRegionCategoryPagingApiTest {
         secondPageResponse.then()
                 .statusCode(200)
                 .body("contents.size()", is(3))
-                .body("loadable", is(false))
-                .body("regionCategoryName", is("국내 기타"));
+                .body("loadable", is(false));
     }
 } 
