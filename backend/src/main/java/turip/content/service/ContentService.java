@@ -16,7 +16,6 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import turip.common.exception.custom.BadRequestException;
 import turip.common.exception.custom.NotFoundException;
-import turip.content.controller.dto.response.ContentByCityResponse;
 import turip.content.controller.dto.response.ContentCountResponse;
 import turip.content.controller.dto.response.ContentDetailsByRegionCategoryResponse;
 import turip.content.controller.dto.response.ContentResponse;
@@ -38,7 +37,6 @@ import turip.region.domain.OverseasRegionCategory;
 @RequiredArgsConstructor
 public class ContentService {
 
-    private static final int EXTRA_FETCH_COUNT = 1;
     private static final int DAYS_UNTIL_SUNDAY = 6;
     private static final int ONE_WEEK = 1;
 
@@ -212,7 +210,7 @@ public class ContentService {
     }
 
     private ContentDetailsByRegionCategoryResponse toContentDetailsByRegionResponse(Content content) {
-        ContentByCityResponse contentWithCity = ContentByCityResponse.from(content);
+        ContentWithCreatorAndCityResponse contentWithCity = ContentWithCreatorAndCityResponse.from(content);
         TripDurationResponse tripDuration = calculateTripDuration(content);
 
         int tripPlaceCount = getTripPlaceCount(content);
