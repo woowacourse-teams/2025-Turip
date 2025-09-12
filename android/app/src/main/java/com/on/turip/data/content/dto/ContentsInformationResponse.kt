@@ -9,6 +9,4 @@ data class ContentsInformationResponse(
     val contentsInformation: List<ContentInformationResponse>,
     @SerialName("loadable")
     val loadable: Boolean,
-    @SerialName("regionCategoryName")
-    val regionCategoryName: String,
 )
