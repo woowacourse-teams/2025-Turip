@@ -192,11 +192,13 @@ public class ContentController {
     })
     @GetMapping
     public ResponseEntity<ContentsDetailWithLoadableResponse> readContentsByRegionCategory(
+            @Parameter(hidden = true) @AuthMember(policy = MemberResolvePolicy.CREATE_IF_ABSENT) Member member,
             @RequestParam(name = "regionCategory") String regionCategory,
             @RequestParam(name = "size") Integer pageSize,
             @RequestParam(name = "lastId") Long lastContentId
     ) {
-        ContentsDetailWithLoadableResponse response = contentService.findContentsByRegionCategory(regionCategory,
+        ContentsDetailWithLoadableResponse response = contentService.findContentsByRegionCategory(member,
+                regionCategory,
                 pageSize, lastContentId);
         return ResponseEntity.ok(response);
     }
@@ -270,11 +272,12 @@ public class ContentController {
     })
     @GetMapping("/keyword")
     public ResponseEntity<ContentsDetailWithLoadableResponse> readContentsByKeyword(
+            @Parameter(hidden = true) @AuthMember(policy = MemberResolvePolicy.CREATE_IF_ABSENT) Member member,
             @RequestParam(name = "keyword") String keyword,
             @RequestParam(name = "size") Integer pageSize,
             @RequestParam(name = "lastId") Long lastContentId
     ) {
-        ContentsDetailWithLoadableResponse response = contentService.searchContentsByKeyword(keyword, pageSize,
+        ContentsDetailWithLoadableResponse response = contentService.searchContentsByKeyword(member, keyword, pageSize,
                 lastContentId);
         return ResponseEntity.ok(response);
     }

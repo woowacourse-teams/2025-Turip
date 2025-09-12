@@ -88,6 +88,7 @@ class OverseasRegionCategoryPagingApiTest {
     void readContentsBySeoulRegionCategory() {
         // when: 첫 번째 페이지 (lastId=0, size=5)
         Response firstPageResponse = RestAssured.given().port(port)
+                .header("device-fid", "testDeviceFid")
                 .queryParam("regionCategory", "일본")
                 .queryParam("size", 5)
                 .queryParam("lastId", 0)
@@ -104,6 +105,7 @@ class OverseasRegionCategoryPagingApiTest {
 
         // when: 두 번째 페이지
         Response secondPageResponse = RestAssured.given().port(port)
+                .header("device-fid", "testDeviceFid")
                 .queryParam("regionCategory", "일본")
                 .queryParam("size", 5)
                 .queryParam("lastId", lastContentId)
@@ -121,6 +123,7 @@ class OverseasRegionCategoryPagingApiTest {
     void readContentsByDomesticOtherRegionCategory() {
         // when: 첫 번째 페이지 (lastId=0, size=5)
         Response firstPageResponse = RestAssured.given().port(port)
+                .header("device-fid", "testDeviceFid")
                 .queryParam("regionCategory", "해외 기타")
                 .queryParam("size", 5)
                 .queryParam("lastId", 0)
@@ -137,6 +140,7 @@ class OverseasRegionCategoryPagingApiTest {
 
         // when: 두 번째 페이지
         Response secondPageResponse = RestAssured.given().port(port)
+                .header("device-fid", "testDeviceFid")
                 .queryParam("regionCategory", "해외 기타")
                 .queryParam("size", 5)
                 .queryParam("lastId", lastContentId)

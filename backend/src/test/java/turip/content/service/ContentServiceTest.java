@@ -69,6 +69,7 @@ class ContentServiceTest {
             Country country = new Country("대한민국", "대한민국 사진 경로");
             Province province = new Province("강원도");
             City city = new City(country, province, "속초", "시 이미지 경로");
+            Member member = new Member(1L, "deviceFid");
 
             List<Content> contents = List.of(
                     new Content(1L, creator, city, "메이의 속초 브이로그 1편", "속초 브이로그 Url 1", LocalDate.of(2025, 7, 8)),
@@ -81,7 +82,8 @@ class ContentServiceTest {
                     .willReturn(true);
 
             // when
-            ContentsDetailWithLoadableResponse contentsByKeyword = contentService.searchContentsByKeyword(keyword,
+            ContentsDetailWithLoadableResponse contentsByKeyword = contentService.searchContentsByKeyword(member,
+                    keyword,
                     pageSize,
                     lastContentId);
 

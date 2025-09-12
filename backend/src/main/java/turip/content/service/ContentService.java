@@ -54,6 +54,7 @@ public class ContentService {
     }
 
     public ContentsDetailWithLoadableResponse searchContentsByKeyword(
+            Member member,
             String keyword,
             int pageSize,
             long lastContentId
@@ -63,24 +64,17 @@ public class ContentService {
         }
         Slice<Content> contentSlice = contentRepository.findByKeywordContaining(keyword, lastContentId,
                 PageRequest.of(0, pageSize));
-        List<Content> contents = contentSlice.getContent();
-        List<ContentDetailResponse> contentWithTripDetailResponse = convertContentsToContentDetailResponse(contents);
-        boolean loadable = contentSlice.hasNext();
-
-        return ContentsDetailWithLoadableResponse.of(contentWithTripDetailResponse, loadable);
+        return converToContentsDetailWithLoadableResponse(member, contentSlice);
     }
 
     public ContentsDetailWithLoadableResponse findContentsByRegionCategory(
+            Member member,
             String regionCategory,
             int size,
             long lastId
     ) {
         Slice<Content> contentSlice = findContentSlicesByRegionCategory(regionCategory, lastId, size);
-        List<Content> contents = contentSlice.getContent();
-        List<ContentDetailResponse> contentDetails = convertContentsToContentDetailResponse(contents);
-        boolean loadable = contentSlice.hasNext();
-
-        return ContentsDetailWithLoadableResponse.of(contentDetails, loadable);
+        return converToContentsDetailWithLoadableResponse(member, contentSlice);
     }
 
     public WeeklyPopularFavoriteContentsResponse findWeeklyPopularFavoriteContents(Member member, int topContentSize) {
@@ -189,20 +183,36 @@ public class ContentService {
         return contentRepository.findByCityCountryNameAndIdLessThanOrderByIdDesc(countryName, lastId, pageable);
     }
 
-    private List<ContentDetailResponse> convertContentsToContentDetailResponse(List<Content> contents) {
-        return contents.stream()
-                .map(this::toContentDetailResponse)
+    private Set<Long> findFavoritedContentIds(Member member, List<Content> contents) {
+        List<Long> contentIds = contents.stream()
+                .map(Content::getId)
                 .toList();
+        return favoriteContentRepository.findByMemberIdAndContentIdIn(member.getId(), contentIds).stream()
+                .map(favorite -> favorite.getContent().getId())
+                .collect(Collectors.toSet());
     }
 
-    private ContentDetailResponse toContentDetailResponse(Content content) {
-        // TODO: 찜 여부 조회
-        ContentResponse contentResponse = ContentResponse.of(content, false);
+    private ContentsDetailWithLoadableResponse converToContentsDetailWithLoadableResponse(Member member,
+                                                                                          Slice<Content> contentSlice) {
+        List<Content> contents = contentSlice.getContent();
+        Set<Long> favoritedContentIds = findFavoritedContentIds(member, contents);
+        List<ContentDetailResponse> contentDetails = contents.stream()
+                .map(content -> toContentDetailResponse(content, favoritedContentIds.contains(content.getId())))
+                .toList();
+        boolean loadable = contentSlice.hasNext();
+        return ContentsDetailWithLoadableResponse.of(contentDetails, loadable);
+    }
+
+    private ContentDetailResponse toContentDetailResponse(Content content, boolean isFavorite) {
+        ContentResponse contentResponse = ContentResponse.of(content, isFavorite);
         TripDurationResponse tripDuration = calculateTripDuration(content);
-
         int tripPlaceCount = getTripPlaceCount(content);
-
         return ContentDetailResponse.of(contentResponse, tripDuration, tripPlaceCount);
+    }
+
+    private TripDurationResponse calculateTripDuration(Content content) {
+        int totalTripDay = contentPlaceService.calculateDurationDays(content.getId());
+        return TripDurationResponse.of(totalTripDay - 1, totalTripDay);
     }
 
     private int getTripPlaceCount(Content content) {
@@ -213,24 +223,10 @@ public class ContentService {
         return contentPlaceService.countByContentId(content.getId());
     }
 
-    private TripDurationResponse calculateTripDuration(Content content) {
-        int totalTripDay = contentPlaceService.calculateDurationDays(content.getId());
-        return TripDurationResponse.of(totalTripDay - 1, totalTripDay);
-    }
-
     private List<LocalDate> getLastWeekPeriod() {
         LocalDate thisWeekMonday = LocalDate.now().with(DayOfWeek.MONDAY);
         LocalDate lastWeekMonday = thisWeekMonday.minusWeeks(ONE_WEEK);
         LocalDate lastWeekSunday = lastWeekMonday.plusDays(DAYS_UNTIL_SUNDAY);
         return new ArrayList<>(List.of(lastWeekMonday, lastWeekSunday));
-    }
-
-    private Set<Long> findFavoritedContentIds(Member member, List<Content> contents) {
-        List<Long> contentIds = contents.stream()
-                .map(Content::getId)
-                .toList();
-        return favoriteContentRepository.findByMemberIdAndContentIdIn(member.getId(), contentIds).stream()
-                .map(favorite -> favorite.getContent().getId())
-                .collect(Collectors.toSet());
     }
 }
