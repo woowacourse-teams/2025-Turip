@@ -5,7 +5,6 @@ import com.on.turip.data.common.safeApiCall
 import com.on.turip.data.content.dto.ContentDetailResponse
 import com.on.turip.data.content.dto.ContentInformationCountResponse
 import com.on.turip.data.content.dto.ContentsInformationResponse
-import com.on.turip.data.content.dto.ContentsInformationResponse2
 import com.on.turip.data.content.dto.UsersLikeContentsResponse
 import com.on.turip.data.content.service.ContentService
 import kotlinx.coroutines.Dispatchers
@@ -34,21 +33,6 @@ class DefaultContentRemoteDataSource(
         withContext(coroutineContext) {
             safeApiCall {
                 contentService.getContentsByRegion(
-                    regionCategoryName = regionCategoryName,
-                    size = size,
-                    lastId = lastId,
-                )
-            }
-        }
-
-    override suspend fun getContentsByRegion2(
-        regionCategoryName: String,
-        size: Int,
-        lastId: Long,
-    ): TuripCustomResult<ContentsInformationResponse2> =
-        withContext(coroutineContext) {
-            safeApiCall {
-                contentService.getContentsByRegion2(
                     regionCategoryName = regionCategoryName,
                     size = size,
                     lastId = lastId,

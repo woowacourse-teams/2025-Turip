@@ -28,7 +28,7 @@ class DefaultContentRepository(
         lastId: Long,
     ): TuripCustomResult<PagedContentsResult> =
         contentRemoteDataSource
-            .getContentsByRegion2(regionCategoryName, size, lastId)
+            .getContentsByRegion(regionCategoryName, size, lastId)
             .mapCatching { it.toDomain() }
 
     override suspend fun loadContentsByKeyword(
