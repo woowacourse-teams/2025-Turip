@@ -265,7 +265,11 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
             )
             binding.tvTripDetailCreatorName.text = content.creator.channelName
             binding.tvTripDetailContentTitle.text = content.videoData.title
-            binding.tvTripDetailUploadDate.text = content.videoData.uploadedDate
+            binding.tvTripDetailUploadDate.text =
+                getString(
+                    R.string.trip_detail_uploaded_date,
+                    content.videoData.uploadedDate,
+                )
             updateExpandTextToggleVisibility()
         }
         viewModel.tripModel.observe(this) { tripModel: TripModel ->
