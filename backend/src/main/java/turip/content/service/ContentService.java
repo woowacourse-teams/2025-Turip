@@ -17,13 +17,13 @@ import org.springframework.stereotype.Service;
 import turip.common.exception.custom.BadRequestException;
 import turip.common.exception.custom.NotFoundException;
 import turip.content.controller.dto.response.ContentCountResponse;
-import turip.content.controller.dto.response.ContentSearchResponse;
 import turip.content.controller.dto.response.TripDurationResponse;
 import turip.content.controller.dto.response.WeeklyPopularFavoriteContentResponse;
 import turip.content.controller.dto.response.WeeklyPopularFavoriteContentsResponse;
 import turip.content.controller.dto.response.todo.ContentDetailsResponse;
 import turip.content.controller.dto.response.todo.ContentResponse;
 import turip.content.controller.dto.response.todo.ContentsByRegionCategoryResponse;
+import turip.content.controller.dto.response.todo.ContentsWithLoadable;
 import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
 import turip.favorite.repository.FavoriteContentRepository;
@@ -95,7 +95,7 @@ public class ContentService {
         return ContentCountResponse.from(count);
     }
 
-    public ContentSearchResponse searchContentsByKeyword(
+    public ContentsWithLoadable searchContentsByKeyword(
             String keyword,
             int pageSize,
             long lastContentId
@@ -110,7 +110,7 @@ public class ContentService {
         List<ContentDetailsResponse> contentWithTripDetailResponse = convertContentsToContentSearchResultResponse(
                 contents);
 
-        return ContentSearchResponse.of(contentWithTripDetailResponse, loadable);
+        return ContentsWithLoadable.of(contentWithTripDetailResponse, loadable);
     }
 
     private int calculateCountByRegionCategory(String regionCategory) {

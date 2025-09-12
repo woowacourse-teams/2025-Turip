@@ -19,10 +19,10 @@ import turip.auth.AuthMember;
 import turip.auth.MemberResolvePolicy;
 import turip.common.exception.ErrorResponse;
 import turip.content.controller.dto.response.ContentCountResponse;
-import turip.content.controller.dto.response.ContentSearchResponse;
 import turip.content.controller.dto.response.WeeklyPopularFavoriteContentsResponse;
 import turip.content.controller.dto.response.todo.ContentResponse;
 import turip.content.controller.dto.response.todo.ContentsByRegionCategoryResponse;
+import turip.content.controller.dto.response.todo.ContentsWithLoadable;
 import turip.content.service.ContentService;
 import turip.member.domain.Member;
 
@@ -212,7 +212,7 @@ public class ContentController {
                     description = "성공 예시",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ContentSearchResponse.class),
+                            schema = @Schema(implementation = ContentsWithLoadable.class),
                             examples = @ExampleObject(
                                     name = "success",
                                     summary = "성공적으로 컨텐츠 목록 조회",
@@ -270,12 +270,12 @@ public class ContentController {
             )
     })
     @GetMapping("/keyword")
-    public ResponseEntity<ContentSearchResponse> readContentsByKeyword(
+    public ResponseEntity<ContentsWithLoadable> readContentsByKeyword(
             @RequestParam(name = "keyword") String keyword,
             @RequestParam(name = "size") Integer pageSize,
             @RequestParam(name = "lastId") Long lastContentId
     ) {
-        ContentSearchResponse response = contentService.searchContentsByKeyword(keyword, pageSize, lastContentId);
+        ContentsWithLoadable response = contentService.searchContentsByKeyword(keyword, pageSize, lastContentId);
         return ResponseEntity.ok(response);
     }
 
