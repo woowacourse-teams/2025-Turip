@@ -12,7 +12,7 @@ import turip.common.exception.custom.NotFoundException;
 import turip.content.controller.dto.response.MyFavoriteContentsResponse;
 import turip.content.controller.dto.response.TripDurationResponse;
 import turip.content.controller.dto.response.todo.ContentResponse;
-import turip.content.controller.dto.response.todo.ContentWithTripInfoAndFavoriteResponse;
+import turip.content.controller.dto.response.todo.ContentWithTripInfo;
 import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
 import turip.content.service.ContentPlaceService;
@@ -51,7 +51,7 @@ public class FavoriteContentService {
                 lastContentId,
                 PageRequest.of(0, pageSize));
         List<Content> contents = contentSlice.getContent();
-        List<ContentWithTripInfoAndFavoriteResponse> contentsWithTripInfo = convertToContentWithTripInfoResponses(
+        List<ContentWithTripInfo> contentsWithTripInfo = convertToContentWithTripInfoResponses(
                 contents);
         boolean loadable = contentSlice.hasNext();
 
@@ -73,14 +73,14 @@ public class FavoriteContentService {
         return TripDurationResponse.of(totalTripDay - 1, totalTripDay);
     }
 
-    private List<ContentWithTripInfoAndFavoriteResponse> convertToContentWithTripInfoResponses(List<Content> contents) {
+    private List<ContentWithTripInfo> convertToContentWithTripInfoResponses(List<Content> contents) {
         return contents.stream()
                 .map(content -> {
                     ContentResponse contentWithCreatorAndCity = ContentResponse.of(content, true);
                     TripDurationResponse tripDuration = calculateTripDuration(content);
                     validateContentExists(content.getId());
                     int tripPlaceCount = contentPlaceService.countByContentId(content.getId());
-                    return ContentWithTripInfoAndFavoriteResponse.of(contentWithCreatorAndCity, tripDuration,
+                    return ContentWithTripInfo.of(contentWithCreatorAndCity, tripDuration,
                             tripPlaceCount);
                 })
                 .toList();

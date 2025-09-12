@@ -1,14 +1,14 @@
 package turip.content.controller.dto.response;
 
 import java.util.List;
-import turip.content.controller.dto.response.todo.ContentWithTripInfoAndFavoriteResponse;
+import turip.content.controller.dto.response.todo.ContentWithTripInfo;
 
 public record MyFavoriteContentsResponse(
-        List<ContentWithTripInfoAndFavoriteResponse> contents,
+        List<ContentWithTripInfo> contents,
         boolean loadable
 ) {
 
-    public static MyFavoriteContentsResponse of(List<ContentWithTripInfoAndFavoriteResponse> contents,
+    public static MyFavoriteContentsResponse of(List<ContentWithTripInfo> contents,
                                                 boolean loadable) {
         return new MyFavoriteContentsResponse(contents, loadable);
     }

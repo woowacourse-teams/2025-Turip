@@ -2,19 +2,19 @@ package turip.content.controller.dto.response.todo;
 
 import turip.content.controller.dto.response.TripDurationResponse;
 
-public record ContentWithTripInfoResponse(
+public record ContentWithTripInfo(
         ContentResponse content,
         TripDurationResponse tripDuration,
         int tripPlaceCount
 ) {
 
-    public static ContentWithTripInfoResponse of(
-            ContentResponse contentResponse,
+    public static ContentWithTripInfo of(
+            ContentResponse ContentResponse,
             TripDurationResponse tripDurationResponse,
             int tripPlaceCount
     ) {
-        return new ContentWithTripInfoResponse(
-                contentResponse,
+        return new ContentWithTripInfo(
+                ContentResponse,
                 tripDurationResponse,
                 tripPlaceCount
         );

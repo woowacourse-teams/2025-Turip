@@ -23,7 +23,7 @@ import turip.content.controller.dto.response.WeeklyPopularFavoriteContentRespons
 import turip.content.controller.dto.response.WeeklyPopularFavoriteContentsResponse;
 import turip.content.controller.dto.response.todo.ContentDetailsResponse;
 import turip.content.controller.dto.response.todo.ContentResponse;
-import turip.content.controller.dto.response.todo.ContentWithTripInfoResponse;
+import turip.content.controller.dto.response.todo.ContentWithTripInfo;
 import turip.content.controller.dto.response.todo.ContentsByRegionCategoryResponse;
 import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
@@ -108,7 +108,7 @@ public class ContentService {
                 PageRequest.of(0, pageSize));
         boolean loadable = contents.hasNext();
 
-        List<ContentWithTripInfoResponse> contentWithTripDetailResponse = convertContentsToContentSearchResultResponse(
+        List<ContentWithTripInfo> contentWithTripDetailResponse = convertContentsToContentSearchResultResponse(
                 contents);
 
         return ContentSearchResponse.of(contentWithTripDetailResponse, loadable);
@@ -218,17 +218,18 @@ public class ContentService {
         return ContentDetailsResponse.of(contentResponse, tripDuration, tripPlaceCount);
     }
 
-    private List<ContentWithTripInfoResponse> convertContentsToContentSearchResultResponse(Slice<Content> contents) {
+    private List<ContentWithTripInfo> convertContentsToContentSearchResultResponse(
+            Slice<Content> contents) {
         return contents.stream()
                 .map(this::toContentSearchResultResponse)
                 .toList();
     }
 
-    private ContentWithTripInfoResponse toContentSearchResultResponse(Content content) {
+    private ContentWithTripInfo toContentSearchResultResponse(Content content) {
         int placeCount = getTripPlaceCount(content);
 
         // TODO: 찜 여부 조회
-        return ContentWithTripInfoResponse.of(
+        return ContentWithTripInfo.of(
                 ContentResponse.of(content, false),
                 calculateTripDuration(content),
                 placeCount
