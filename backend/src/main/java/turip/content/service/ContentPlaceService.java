@@ -3,6 +3,7 @@ package turip.content.service;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.NotFoundException;
 import turip.content.controller.dto.response.place.ContentPlaceDetailResponse;
 import turip.content.controller.dto.response.place.ContentPlaceResponse;
@@ -47,7 +48,7 @@ public class ContentPlaceService {
     private void validateContentExists(Long contentId) {
         boolean isContentExists = contentRepository.existsById(contentId);
         if (!isContentExists) {
-            throw new NotFoundException("해당 id에 대한 컨텐츠가 존재하지 않습니다.");
+            throw new NotFoundException(ErrorTag.CONTENT_NOT_FOUND);
         }
     }
 

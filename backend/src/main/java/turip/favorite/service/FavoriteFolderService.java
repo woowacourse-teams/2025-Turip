@@ -4,6 +4,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.BadRequestException;
 import turip.common.exception.custom.ConflictException;
 import turip.common.exception.custom.ForbiddenException;
@@ -72,7 +73,7 @@ public class FavoriteFolderService {
                                              FavoriteFolderNameRequest request) {
         FavoriteFolder favoriteFolder = getById(favoriteFolderId);
         if (favoriteFolder.isDefault()) {
-            throw new BadRequestException("기본 폴더는 수정할 수 없습니다.");
+            throw new BadRequestException(ErrorTag.IS_DEFAULT_FAVORITE_FOLDER);
         }
 
         String newName = FavoriteFolder.formatName(request.name());
@@ -88,7 +89,7 @@ public class FavoriteFolderService {
         FavoriteFolder favoriteFolder = getById(favoriteFolderId);
 
         if (favoriteFolder.isDefault()) {
-            throw new BadRequestException("기본 폴더는 삭제할 수 없습니다.");
+            throw new BadRequestException(ErrorTag.IS_DEFAULT_FAVORITE_FOLDER);
         }
         validateOwnership(member, favoriteFolder);
 
@@ -97,23 +98,23 @@ public class FavoriteFolderService {
 
     private void validateDuplicatedName(String folderName, Member member) {
         if (favoriteFolderRepository.existsByNameAndMember(folderName, member)) {
-            throw new ConflictException("중복된 폴더 이름이 존재합니다.");
+            throw new ConflictException(ErrorTag.FAVORITE_FOLDER_NAME_CONFLICT);
         }
     }
 
     private Place getPlaceById(Long id) {
         return placeRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("해당 id에 대한 장소가 존재하지 않습니다."));
+                .orElseThrow(() -> new NotFoundException(ErrorTag.PLACE_NOT_FOUND));
     }
 
     private FavoriteFolder getById(Long favoriteFolderId) {
         return favoriteFolderRepository.findById(favoriteFolderId)
-                .orElseThrow(() -> new NotFoundException("해당 id에 대한 폴더가 존재하지 않습니다."));
+                .orElseThrow(() -> new NotFoundException(ErrorTag.FAVORITE_FOLDER_NOT_FOUND));
     }
 
     private void validateOwnership(Member requestMember, FavoriteFolder favoriteFolder) {
         if (!favoriteFolder.isOwner(requestMember)) {
-            throw new ForbiddenException("폴더 소유자의 기기id와 요청자의 기기id가 같지 않습니다.");
+            throw new ForbiddenException(ErrorTag.FORBIDDEN);
         }
     }
 }

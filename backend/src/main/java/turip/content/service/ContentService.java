@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
+import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.BadRequestException;
 import turip.common.exception.custom.NotFoundException;
 import turip.content.controller.dto.response.content.ContentCountResponse;
@@ -43,7 +44,7 @@ public class ContentService {
 
     public ContentResponse getContentWithFavoriteStatus(Long contentId, Member member) {
         Content content = contentRepository.findById(contentId)
-                .orElseThrow(() -> new NotFoundException("컨텐츠를 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException(ErrorTag.CONTENT_NOT_FOUND));
         boolean isFavorite = favoriteContentRepository.existsByMemberIdAndContentId(member.getId(), content.getId());
         return ContentResponse.of(content, isFavorite);
     }
@@ -116,7 +117,7 @@ public class ContentService {
         if (OverseasRegionCategory.containsName(regionCategory)) {
             return contentRepository.countByCityCountryName(regionCategory);
         }
-        throw new BadRequestException("지역 카테고리가 올바르지 않습니다.");
+        throw new BadRequestException(ErrorTag.PLACE_CATEGORY_WRONG);
     }
 
     private int calculateDomesticEtcCount() {
@@ -218,7 +219,7 @@ public class ContentService {
     private int getTripPlaceCount(Content content) {
         boolean isContentExists = contentRepository.existsById(content.getId());
         if (!isContentExists) {
-            throw new NotFoundException("컨텐츠를 찾을 수 없습니다.");
+            throw new NotFoundException(ErrorTag.CONTENT_NOT_FOUND);
         }
         return contentPlaceService.countByContentId(content.getId());
     }
