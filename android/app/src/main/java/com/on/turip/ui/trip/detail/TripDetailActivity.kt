@@ -64,7 +64,7 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
     private val tripPlaceAdapter by lazy {
         TripPlaceAdapter(
             object : TripPlaceViewHolder.PlaceListener {
-                override fun onPlaceNameClick(placeModel: PlaceModel) {
+                override fun onItemClick(placeModel: PlaceModel) {
                     val intent: Intent =
                         SearchActivity.newIntent(this@TripDetailActivity, placeModel.name)
                     startActivity(intent)

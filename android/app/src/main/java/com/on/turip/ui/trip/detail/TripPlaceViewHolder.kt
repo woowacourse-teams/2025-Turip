@@ -13,9 +13,9 @@ class TripPlaceViewHolder(
     private var placeModel: PlaceModel? = null
 
     init {
-        binding.tvTravelPlaceName.setOnClickListener {
+        itemView.setOnClickListener {
             placeModel?.let {
-                onClickListener.onPlaceNameClick(it)
+                onClickListener.onItemClick(it)
             }
         }
 
@@ -61,7 +61,7 @@ class TripPlaceViewHolder(
     }
 
     interface PlaceListener {
-        fun onPlaceNameClick(placeModel: PlaceModel)
+        fun onItemClick(placeModel: PlaceModel)
 
         fun onPlaceClick(placeModel: PlaceModel)
 
