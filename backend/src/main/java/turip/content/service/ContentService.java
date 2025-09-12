@@ -23,7 +23,6 @@ import turip.content.controller.dto.response.WeeklyPopularFavoriteContentRespons
 import turip.content.controller.dto.response.WeeklyPopularFavoriteContentsResponse;
 import turip.content.controller.dto.response.todo.ContentDetailsResponse;
 import turip.content.controller.dto.response.todo.ContentResponse;
-import turip.content.controller.dto.response.todo.ContentWithTripInfo;
 import turip.content.controller.dto.response.todo.ContentsByRegionCategoryResponse;
 import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
@@ -108,7 +107,7 @@ public class ContentService {
                 PageRequest.of(0, pageSize));
         boolean loadable = contents.hasNext();
 
-        List<ContentWithTripInfo> contentWithTripDetailResponse = convertContentsToContentSearchResultResponse(
+        List<ContentDetailsResponse> contentWithTripDetailResponse = convertContentsToContentSearchResultResponse(
                 contents);
 
         return ContentSearchResponse.of(contentWithTripDetailResponse, loadable);
@@ -218,18 +217,18 @@ public class ContentService {
         return ContentDetailsResponse.of(contentResponse, tripDuration, tripPlaceCount);
     }
 
-    private List<ContentWithTripInfo> convertContentsToContentSearchResultResponse(
+    private List<ContentDetailsResponse> convertContentsToContentSearchResultResponse(
             Slice<Content> contents) {
         return contents.stream()
                 .map(this::toContentSearchResultResponse)
                 .toList();
     }
 
-    private ContentWithTripInfo toContentSearchResultResponse(Content content) {
+    private ContentDetailsResponse toContentSearchResultResponse(Content content) {
         int placeCount = getTripPlaceCount(content);
 
         // TODO: 찜 여부 조회
-        return ContentWithTripInfo.of(
+        return ContentDetailsResponse.of(
                 ContentResponse.of(content, false),
                 calculateTripDuration(content),
                 placeCount
@@ -263,15 +262,5 @@ public class ContentService {
         return favoriteContentRepository.findByMemberIdAndContentIdIn(member.getId(), contentIds).stream()
                 .map(favorite -> favorite.getContent().getId())
                 .collect(Collectors.toSet());
-    }
-
-    private WeeklyPopularFavoriteContentsResponse convertContentsToPopularContentsResponse(
-            List<Content> popularContents, boolean isFavorite) {
-        return WeeklyPopularFavoriteContentsResponse.from(
-                popularContents.stream()
-                        .map(content -> WeeklyPopularFavoriteContentResponse.of(content, isFavorite,
-                                calculateTripDuration(content)))
-                        .toList()
-        );
     }
 }
