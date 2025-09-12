@@ -21,7 +21,7 @@ import turip.content.controller.dto.response.ContentSearchResponse;
 import turip.content.controller.dto.response.TripDurationResponse;
 import turip.content.controller.dto.response.WeeklyPopularFavoriteContentResponse;
 import turip.content.controller.dto.response.WeeklyPopularFavoriteContentsResponse;
-import turip.content.controller.dto.response.todo.ContentDetailsByRegionCategoryResponse;
+import turip.content.controller.dto.response.todo.ContentDetailsResponse;
 import turip.content.controller.dto.response.todo.ContentResponse;
 import turip.content.controller.dto.response.todo.ContentWithTripInfoResponse;
 import turip.content.controller.dto.response.todo.ContentsByRegionCategoryResponse;
@@ -63,11 +63,11 @@ public class ContentService {
         Slice<Content> contentSlice = findContentSlicesByRegionCategory(regionCategory, lastId, size);
 
         List<Content> contents = contentSlice.getContent();
-        List<ContentDetailsByRegionCategoryResponse> contentDetails
+        List<ContentDetailsResponse> contentDetails
                 = convertContentsToContentDetailsByRegionResponses(contents);
         boolean loadable = contentSlice.hasNext();
 
-        return ContentsByRegionCategoryResponse.of(contentDetails, loadable, regionCategory);
+        return ContentsByRegionCategoryResponse.of(contentDetails, loadable);
     }
 
     public WeeklyPopularFavoriteContentsResponse findWeeklyPopularFavoriteContents(Member member, int topContentSize) {
@@ -201,21 +201,21 @@ public class ContentService {
         return contentRepository.findByCityCountryNameAndIdLessThanOrderByIdDesc(countryName, lastId, pageable);
     }
 
-    private List<ContentDetailsByRegionCategoryResponse> convertContentsToContentDetailsByRegionResponses(
+    private List<ContentDetailsResponse> convertContentsToContentDetailsByRegionResponses(
             List<Content> contents) {
         return contents.stream()
                 .map(this::toContentDetailsByRegionResponse)
                 .toList();
     }
 
-    private ContentDetailsByRegionCategoryResponse toContentDetailsByRegionResponse(Content content) {
+    private ContentDetailsResponse toContentDetailsByRegionResponse(Content content) {
         // TODO: 찜 여부 조회
         ContentResponse contentResponse = ContentResponse.of(content, false);
         TripDurationResponse tripDuration = calculateTripDuration(content);
 
         int tripPlaceCount = getTripPlaceCount(content);
 
-        return ContentDetailsByRegionCategoryResponse.of(contentResponse, tripDuration, tripPlaceCount);
+        return ContentDetailsResponse.of(contentResponse, tripDuration, tripPlaceCount);
     }
 
     private List<ContentWithTripInfoResponse> convertContentsToContentSearchResultResponse(Slice<Content> contents) {

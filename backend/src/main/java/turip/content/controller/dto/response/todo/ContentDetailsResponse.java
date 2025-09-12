@@ -3,7 +3,7 @@ package turip.content.controller.dto.response.todo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import turip.content.controller.dto.response.TripDurationResponse;
 
-public record ContentDetailsByRegionCategoryResponse(
+public record ContentDetailsResponse(
         @JsonProperty("content")
         ContentResponse contentResponse,
         @JsonProperty("tripDuration")
@@ -11,12 +11,12 @@ public record ContentDetailsByRegionCategoryResponse(
         int tripPlaceCount
 ) {
 
-    public static ContentDetailsByRegionCategoryResponse of(
+    public static ContentDetailsResponse of(
             ContentResponse contentResponse,
             TripDurationResponse tripDurationResponse,
             int tripPlaceCount
     ) {
-        return new ContentDetailsByRegionCategoryResponse(
+        return new ContentDetailsResponse(
                 contentResponse,
                 tripDurationResponse,
                 tripPlaceCount

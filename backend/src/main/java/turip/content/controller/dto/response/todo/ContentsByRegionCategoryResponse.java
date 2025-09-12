@@ -5,16 +5,14 @@ import java.util.List;
 
 public record ContentsByRegionCategoryResponse(
         @JsonProperty("contents")
-        List<ContentDetailsByRegionCategoryResponse> contentDetailsByRegionCategoryResponse,
-        boolean loadable,
-        String regionCategoryName
+        List<ContentDetailsResponse> contentDetailsResponse,
+        boolean loadable
 ) {
 
     public static ContentsByRegionCategoryResponse of(
-            List<ContentDetailsByRegionCategoryResponse> contents,
-            boolean loadable,
-            String regionCategoryName
+            List<ContentDetailsResponse> contents,
+            boolean loadable
     ) {
-        return new ContentsByRegionCategoryResponse(contents, loadable, regionCategoryName);
+        return new ContentsByRegionCategoryResponse(contents, loadable);
     }
 } 
