@@ -1,5 +1,6 @@
 package turip.content.controller.dto.response;
 
+import turip.content.controller.dto.response.todo.ContentResponse;
 import turip.content.domain.Content;
 
 public record WeeklyPopularFavoriteContentResponse(

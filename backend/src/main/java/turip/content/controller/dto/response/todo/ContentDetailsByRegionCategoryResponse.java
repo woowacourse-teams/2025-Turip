@@ -1,6 +1,7 @@
-package turip.content.controller.dto.response;
+package turip.content.controller.dto.response.todo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import turip.content.controller.dto.response.TripDurationResponse;
 
 public record ContentDetailsByRegionCategoryResponse(
         @JsonProperty("content")

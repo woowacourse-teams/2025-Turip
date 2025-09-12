@@ -1,9 +1,9 @@
-package turip.content.controller.dto.response;
+package turip.content.controller.dto.response.todo;
 
 import java.time.LocalDate;
-import turip.region.controller.dto.response.CityNameResponse;
 import turip.content.domain.Content;
 import turip.creator.controller.dto.response.CreatorResponse;
+import turip.region.controller.dto.response.CityNameResponse;
 
 public record ContentResponse(
         Long id,

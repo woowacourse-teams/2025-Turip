@@ -1,4 +1,4 @@
-package turip.content.controller.dto.response;
+package turip.content.controller.dto.response.todo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;

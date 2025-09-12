@@ -19,10 +19,10 @@ import turip.auth.AuthMember;
 import turip.auth.MemberResolvePolicy;
 import turip.common.exception.ErrorResponse;
 import turip.content.controller.dto.response.ContentCountResponse;
-import turip.content.controller.dto.response.ContentResponse;
 import turip.content.controller.dto.response.ContentSearchResponse;
-import turip.content.controller.dto.response.ContentsByRegionCategoryResponse;
 import turip.content.controller.dto.response.WeeklyPopularFavoriteContentsResponse;
+import turip.content.controller.dto.response.todo.ContentResponse;
+import turip.content.controller.dto.response.todo.ContentsByRegionCategoryResponse;
 import turip.content.service.ContentService;
 import turip.member.domain.Member;
 

@@ -1,6 +1,7 @@
 package turip.content.controller.dto.response;
 
 import java.util.List;
+import turip.content.controller.dto.response.todo.ContentWithTripInfoAndFavoriteResponse;
 
 public record MyFavoriteContentsResponse(
         List<ContentWithTripInfoAndFavoriteResponse> contents,
