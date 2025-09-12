@@ -1,4 +1,4 @@
-package turip.content.controller.dto.response.todo;
+package turip.content.controller.dto.response.content;
 
 import java.time.LocalDate;
 import turip.content.domain.Content;

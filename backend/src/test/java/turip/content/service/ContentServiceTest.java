@@ -18,9 +18,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.SliceImpl;
 import turip.common.exception.custom.BadRequestException;
-import turip.content.controller.dto.response.ContentCountResponse;
-import turip.content.controller.dto.response.WeeklyPopularFavoriteContentsResponse;
-import turip.content.controller.dto.response.todo.ContentsWithLoadableResponse;
+import turip.content.controller.dto.response.content.ContentCountResponse;
+import turip.content.controller.dto.response.content.ContentsDetailWithLoadableResponse;
+import turip.content.controller.dto.response.favorite.WeeklyPopularFavoriteContentsResponse;
 import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
 import turip.creator.domain.Creator;
@@ -81,7 +81,8 @@ class ContentServiceTest {
                     .willReturn(true);
 
             // when
-            ContentsWithLoadableResponse contentsByKeyword = contentService.searchContentsByKeyword(keyword, pageSize,
+            ContentsDetailWithLoadableResponse contentsByKeyword = contentService.searchContentsByKeyword(keyword,
+                    pageSize,
                     lastContentId);
 
             // then

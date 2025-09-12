@@ -1,7 +1,7 @@
 package turip.favorite.controller.dto.response;
 
 import java.time.LocalDate;
-import turip.content.controller.dto.response.todo.ContentResponse;
+import turip.content.controller.dto.response.content.ContentResponse;
 import turip.favorite.domain.FavoriteContent;
 
 public record FavoriteContentResponse(

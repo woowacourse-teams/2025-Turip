@@ -9,10 +9,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import turip.common.exception.custom.ConflictException;
 import turip.common.exception.custom.NotFoundException;
-import turip.content.controller.dto.response.TripDurationResponse;
-import turip.content.controller.dto.response.todo.ContentDetailResponse;
-import turip.content.controller.dto.response.todo.ContentResponse;
-import turip.content.controller.dto.response.todo.ContentsWithLoadableResponse;
+import turip.content.controller.dto.response.content.ContentDetailResponse;
+import turip.content.controller.dto.response.content.ContentResponse;
+import turip.content.controller.dto.response.content.ContentsDetailWithLoadableResponse;
+import turip.content.controller.dto.response.content.TripDurationResponse;
 import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
 import turip.content.service.ContentPlaceService;
@@ -43,7 +43,7 @@ public class FavoriteContentService {
         return FavoriteContentResponse.from(savedFavoriteContent);
     }
 
-    public ContentsWithLoadableResponse findMyFavoriteContents(Member member, int pageSize, long lastContentId) {
+    public ContentsDetailWithLoadableResponse findMyFavoriteContents(Member member, int pageSize, long lastContentId) {
         if (lastContentId == 0) {
             lastContentId = Long.MAX_VALUE;
         }
@@ -55,7 +55,7 @@ public class FavoriteContentService {
                 contents);
         boolean loadable = contentSlice.hasNext();
 
-        return ContentsWithLoadableResponse.of(contentsWithTripInfo, loadable);
+        return ContentsDetailWithLoadableResponse.of(contentsWithTripInfo, loadable);
     }
 
     @Transactional

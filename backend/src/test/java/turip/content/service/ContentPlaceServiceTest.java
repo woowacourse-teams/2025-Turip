@@ -15,7 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import turip.common.exception.custom.NotFoundException;
-import turip.content.controller.dto.response.ContentPlaceDetailResponse;
+import turip.content.controller.dto.response.place.ContentPlaceDetailResponse;
 import turip.content.domain.Content;
 import turip.content.domain.ContentPlace;
 import turip.content.repository.ContentPlaceRepository;

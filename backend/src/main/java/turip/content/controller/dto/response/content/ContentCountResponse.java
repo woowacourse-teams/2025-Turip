@@ -1,4 +1,4 @@
-package turip.content.controller.dto.response;
+package turip.content.controller.dto.response.content;
 
 public record ContentCountResponse(
         int count

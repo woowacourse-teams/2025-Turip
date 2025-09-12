@@ -1,6 +1,7 @@
-package turip.content.controller.dto.response;
+package turip.content.controller.dto.response.place;
 
 import java.util.List;
+import turip.content.controller.dto.response.content.TripDurationResponse;
 
 public record ContentPlaceDetailResponse(
         List<ContentPlaceResponse> contentPlaces,

@@ -1,6 +1,4 @@
-package turip.content.controller.dto.response.todo;
-
-import turip.content.controller.dto.response.TripDurationResponse;
+package turip.content.controller.dto.response.content;
 
 public record ContentDetailResponse(
         ContentResponse content,

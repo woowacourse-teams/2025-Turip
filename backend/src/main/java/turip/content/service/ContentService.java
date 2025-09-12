@@ -16,13 +16,13 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import turip.common.exception.custom.BadRequestException;
 import turip.common.exception.custom.NotFoundException;
-import turip.content.controller.dto.response.ContentCountResponse;
-import turip.content.controller.dto.response.TripDurationResponse;
-import turip.content.controller.dto.response.WeeklyPopularFavoriteContentResponse;
-import turip.content.controller.dto.response.WeeklyPopularFavoriteContentsResponse;
-import turip.content.controller.dto.response.todo.ContentDetailResponse;
-import turip.content.controller.dto.response.todo.ContentResponse;
-import turip.content.controller.dto.response.todo.ContentsWithLoadableResponse;
+import turip.content.controller.dto.response.content.ContentCountResponse;
+import turip.content.controller.dto.response.content.ContentDetailResponse;
+import turip.content.controller.dto.response.content.ContentResponse;
+import turip.content.controller.dto.response.content.ContentsDetailWithLoadableResponse;
+import turip.content.controller.dto.response.content.TripDurationResponse;
+import turip.content.controller.dto.response.favorite.WeeklyPopularFavoriteContentResponse;
+import turip.content.controller.dto.response.favorite.WeeklyPopularFavoriteContentsResponse;
 import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
 import turip.favorite.repository.FavoriteContentRepository;
@@ -53,7 +53,7 @@ public class ContentService {
         return ContentCountResponse.from(count);
     }
 
-    public ContentsWithLoadableResponse searchContentsByKeyword(
+    public ContentsDetailWithLoadableResponse searchContentsByKeyword(
             String keyword,
             int pageSize,
             long lastContentId
@@ -67,10 +67,10 @@ public class ContentService {
         List<ContentDetailResponse> contentWithTripDetailResponse = convertContentsToContentDetailResponse(contents);
         boolean loadable = contentSlice.hasNext();
 
-        return ContentsWithLoadableResponse.of(contentWithTripDetailResponse, loadable);
+        return ContentsDetailWithLoadableResponse.of(contentWithTripDetailResponse, loadable);
     }
 
-    public ContentsWithLoadableResponse findContentsByRegionCategory(
+    public ContentsDetailWithLoadableResponse findContentsByRegionCategory(
             String regionCategory,
             int size,
             long lastId
@@ -80,7 +80,7 @@ public class ContentService {
         List<ContentDetailResponse> contentDetails = convertContentsToContentDetailResponse(contents);
         boolean loadable = contentSlice.hasNext();
 
-        return ContentsWithLoadableResponse.of(contentDetails, loadable);
+        return ContentsDetailWithLoadableResponse.of(contentDetails, loadable);
     }
 
     public WeeklyPopularFavoriteContentsResponse findWeeklyPopularFavoriteContents(Member member, int topContentSize) {

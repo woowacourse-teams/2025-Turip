@@ -1,6 +1,7 @@
-package turip.content.controller.dto.response;
+package turip.content.controller.dto.response.favorite;
 
-import turip.content.controller.dto.response.todo.ContentResponse;
+import turip.content.controller.dto.response.content.ContentResponse;
+import turip.content.controller.dto.response.content.TripDurationResponse;
 import turip.content.domain.Content;
 
 public record WeeklyPopularFavoriteContentResponse(
