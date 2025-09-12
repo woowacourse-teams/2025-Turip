@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import turip.auth.AuthMember;
 import turip.auth.MemberResolvePolicy;
 import turip.common.exception.ErrorResponse;
-import turip.content.controller.dto.response.todo.ContentsWithLoadable;
+import turip.content.controller.dto.response.todo.ContentsWithLoadableResponse;
 import turip.favorite.controller.dto.request.FavoriteContentRequest;
 import turip.favorite.controller.dto.response.FavoriteContentResponse;
 import turip.favorite.service.FavoriteContentService;
@@ -132,7 +132,7 @@ public class FavoriteContentController {
                     description = "성공 예시",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ContentsWithLoadable.class),
+                            schema = @Schema(implementation = ContentsWithLoadableResponse.class),
                             examples = @ExampleObject(
                                     name = "success",
                                     summary = "내가 찜한 컨텐츠 목록 조회 성공",
@@ -188,12 +188,12 @@ public class FavoriteContentController {
             )
     })
     @GetMapping
-    public ResponseEntity<ContentsWithLoadable> readMyFavoriteContents(
+    public ResponseEntity<ContentsWithLoadableResponse> readMyFavoriteContents(
             @Parameter(hidden = true) @AuthMember(policy = MemberResolvePolicy.CREATE_IF_ABSENT) Member member,
             @RequestParam(name = "size") Integer pageSize,
             @RequestParam(name = "lastId") Long lastContentId
     ) {
-        ContentsWithLoadable response = favoriteContentService.findMyFavoriteContents(member, pageSize,
+        ContentsWithLoadableResponse response = favoriteContentService.findMyFavoriteContents(member, pageSize,
                 lastContentId);
         return ResponseEntity.ok(response);
     }

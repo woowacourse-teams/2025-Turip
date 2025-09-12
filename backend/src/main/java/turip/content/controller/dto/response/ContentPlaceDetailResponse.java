@@ -3,9 +3,9 @@ package turip.content.controller.dto.response;
 import java.util.List;
 
 public record ContentPlaceDetailResponse(
-        TripDurationResponse tripDuration,
+        List<ContentPlaceResponse> contentPlaces,
         int contentPlaceCount,
-        List<ContentPlaceResponse> contentPlaces
+        TripDurationResponse tripDuration
 ) {
 
     public static ContentPlaceDetailResponse of(
@@ -15,9 +15,9 @@ public record ContentPlaceDetailResponse(
             List<ContentPlaceResponse> contentPlaces
     ) {
         return new ContentPlaceDetailResponse(
-                TripDurationResponse.of(nights, days),
+                contentPlaces,
                 contentPlaceCount,
-                contentPlaces
+                TripDurationResponse.of(nights, days)
         );
     }
 }

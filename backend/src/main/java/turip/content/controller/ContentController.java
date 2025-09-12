@@ -21,7 +21,7 @@ import turip.common.exception.ErrorResponse;
 import turip.content.controller.dto.response.ContentCountResponse;
 import turip.content.controller.dto.response.WeeklyPopularFavoriteContentsResponse;
 import turip.content.controller.dto.response.todo.ContentResponse;
-import turip.content.controller.dto.response.todo.ContentsWithLoadable;
+import turip.content.controller.dto.response.todo.ContentsWithLoadableResponse;
 import turip.content.service.ContentService;
 import turip.member.domain.Member;
 
@@ -119,7 +119,7 @@ public class ContentController {
                     description = "성공 예시",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ContentsWithLoadable.class),
+                            schema = @Schema(implementation = ContentsWithLoadableResponse.class),
                             examples = @ExampleObject(
                                     name = "success",
                                     summary = "성공적으로 컨텐츠 목록 조회",
@@ -191,12 +191,12 @@ public class ContentController {
             )
     })
     @GetMapping
-    public ResponseEntity<ContentsWithLoadable> readContentsByRegionCategory(
+    public ResponseEntity<ContentsWithLoadableResponse> readContentsByRegionCategory(
             @RequestParam(name = "regionCategory") String regionCategory,
             @RequestParam(name = "size") Integer pageSize,
             @RequestParam(name = "lastId") Long lastContentId
     ) {
-        ContentsWithLoadable response = contentService.findContentsByRegionCategory(regionCategory,
+        ContentsWithLoadableResponse response = contentService.findContentsByRegionCategory(regionCategory,
                 pageSize, lastContentId);
         return ResponseEntity.ok(response);
     }
@@ -211,7 +211,7 @@ public class ContentController {
                     description = "성공 예시",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ContentsWithLoadable.class),
+                            schema = @Schema(implementation = ContentsWithLoadableResponse.class),
                             examples = @ExampleObject(
                                     name = "success",
                                     summary = "성공적으로 컨텐츠 목록 조회",
@@ -269,12 +269,13 @@ public class ContentController {
             )
     })
     @GetMapping("/keyword")
-    public ResponseEntity<ContentsWithLoadable> readContentsByKeyword(
+    public ResponseEntity<ContentsWithLoadableResponse> readContentsByKeyword(
             @RequestParam(name = "keyword") String keyword,
             @RequestParam(name = "size") Integer pageSize,
             @RequestParam(name = "lastId") Long lastContentId
     ) {
-        ContentsWithLoadable response = contentService.searchContentsByKeyword(keyword, pageSize, lastContentId);
+        ContentsWithLoadableResponse response = contentService.searchContentsByKeyword(keyword, pageSize,
+                lastContentId);
         return ResponseEntity.ok(response);
     }
 
