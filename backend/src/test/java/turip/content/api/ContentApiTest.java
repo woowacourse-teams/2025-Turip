@@ -98,8 +98,7 @@ class ContentApiTest {
             jdbcTemplate.update(
                     "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (?, ?, ?, ?, ?)",
                     1, 1, "https://youtube.com/watch?v=abcd1", "서울 데이트 코스 추천", "2024-07-01");
-            jdbcTemplate.update(
-                    "INSERT INTO member (device_fid) VALUES (?)", "testDeviceFid");
+            jdbcTemplate.update("INSERT INTO member (device_fid) VALUES (?)", "testDeviceFid");
             jdbcTemplate.update(
                     "INSERT INTO favorite_content (created_at, member_id, content_id) VALUES (?, ?, ?)", "2025-07-01",
                     1, 1);
@@ -124,14 +123,14 @@ class ContentApiTest {
         void readContentById2() {
             // given
             jdbcTemplate.update(
-                    "INSERT INTO Creator (profile_image, channel_name) VALUES (?, ?)",
+                    "INSERT INTO creator (profile_image, channel_name) VALUES (?, ?)",
                     "https://image.example.com/creator1.jpg", "TravelMate");
             jdbcTemplate.update(
                     "INSERT INTO country (name, image_url) VALUES ('대한민국', 'https://image.example.com/korea.jpg')");
             jdbcTemplate.update(
                     "INSERT INTO city (name, country_id, image_url) VALUES ('서울', 1, 'https://image.example.com/seoul.jpg')");
             jdbcTemplate.update(
-                    "INSERT INTO Content (creator_id, city_id, url, title, uploaded_date) VALUES (?, ?, ?, ?, ?)",
+                    "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (?, ?, ?, ?, ?)",
                     1, 1, "https://youtube.com/watch?v=abcd1", "서울 데이트 코스 추천", "2024-07-01");
 
             // when & then
@@ -190,9 +189,11 @@ class ContentApiTest {
                     "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 1, 'https://youtube.com/watch?v=abcd1', '서울 데이트 코스 추천', '2024-07-01')");
             jdbcTemplate.update(
                     "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 1, 'https://youtube.com/watch?v=abcd1', '메이의 서촌 당일치기 코스 추천', '2025-06-18')");
+            jdbcTemplate.update("INSERT INTO member (device_fid) VALUES (?)", "testDeviceFid");
 
             // when & then
             RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
                     .queryParam("keyword", "메이")
                     .queryParam("size", 2)
                     .queryParam("lastId", 0)
@@ -217,9 +218,11 @@ class ContentApiTest {
                     "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 1, 'https://youtube.com/watch?v=abcd1', '서울 데이트 코스 추천', '2024-07-01')");
             jdbcTemplate.update(
                     "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 1, 'https://youtube.com/watch?v=abcd1', '메이의 서촌 당일치기 코스 추천', '2025-06-18')");
+            jdbcTemplate.update("INSERT INTO member (device_fid) VALUES (?)", "testDeviceFid");
 
             // when & then
             RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
                     .queryParam("keyword", "메이")
                     .queryParam("size", 1)
                     .queryParam("lastId", 0)
@@ -238,6 +241,7 @@ class ContentApiTest {
                     "INSERT INTO creator (profile_image, channel_name) VALUES ('', '여행블로거')");
             jdbcTemplate.update("INSERT INTO country (name, image_url) VALUES ('대한민국', '')");
             jdbcTemplate.update("INSERT INTO city (name, country_id, image_url) VALUES ('서울', 1, '')");
+            jdbcTemplate.update("INSERT INTO member (device_fid) VALUES (?)", "testDeviceFid");
 
             // 장소가 포함된 컨텐츠
             jdbcTemplate.update(
@@ -250,10 +254,11 @@ class ContentApiTest {
             // 장소가 포함되지 않은 컨텐츠
             jdbcTemplate.update(
                     "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 1, '', '서울 관광 가이드', '2025-07-02')");
-
+            
             // when & then
             // 1. place name으로 검색 시
             RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
                     .queryParam("keyword", "명동교자")
                     .queryParam("size", 2)
                     .queryParam("lastId", 0)
@@ -264,6 +269,7 @@ class ContentApiTest {
 
             // 2. title로 검색 시
             RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
                     .queryParam("keyword", "서울")
                     .queryParam("size", 2)
                     .queryParam("lastId", 0)
@@ -274,6 +280,7 @@ class ContentApiTest {
 
             // 3. creator name으로 검색 시
             RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
                     .queryParam("keyword", "여행블로거")
                     .queryParam("size", 2)
                     .queryParam("lastId", 0)
@@ -283,7 +290,7 @@ class ContentApiTest {
                     .body("contents.size()", is(2));
         }
 
-        @DisplayName("place name 검색 시 연관 장소가 없으면 반환되지 않음")
+        @DisplayName("place name 검색 시 연관 장소가 없으면 반환되지 않는다")
         @Test
         void readByKeyword_placeNameWithoutRelatedPlace() {
             // given
@@ -293,9 +300,11 @@ class ContentApiTest {
             jdbcTemplate.update("INSERT INTO city (name, country_id, image_url) VALUES ('부산', 1, '')");
             jdbcTemplate.update(
                     "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 1, '', '부산 여행 후기', '2025-07-01')");
+            jdbcTemplate.update("INSERT INTO member (device_fid) VALUES (?)", "testDeviceFid");
 
             // when & then
             RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
                     .queryParam("keyword", "해운대해수욕장")
                     .queryParam("size", 2)
                     .queryParam("lastId", 0)
@@ -306,6 +315,7 @@ class ContentApiTest {
                     .body("loadable", is(false));
 
             RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
                     .queryParam("keyword", "부산")
                     .queryParam("size", 2)
                     .queryParam("lastId", 0)

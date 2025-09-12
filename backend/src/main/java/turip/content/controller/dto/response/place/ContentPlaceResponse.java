@@ -1,4 +1,4 @@
-package turip.content.controller.dto.response;
+package turip.content.controller.dto.response.place;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;

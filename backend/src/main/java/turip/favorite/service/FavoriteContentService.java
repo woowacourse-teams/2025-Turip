@@ -9,10 +9,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import turip.common.exception.custom.ConflictException;
 import turip.common.exception.custom.NotFoundException;
-import turip.content.controller.dto.response.ContentResponse;
-import turip.content.controller.dto.response.ContentWithTripInfoAndFavoriteResponse;
-import turip.content.controller.dto.response.MyFavoriteContentsResponse;
-import turip.content.controller.dto.response.TripDurationResponse;
+import turip.content.controller.dto.response.content.ContentDetailResponse;
+import turip.content.controller.dto.response.content.ContentResponse;
+import turip.content.controller.dto.response.content.ContentsDetailWithLoadableResponse;
+import turip.content.controller.dto.response.content.TripDurationResponse;
 import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
 import turip.content.service.ContentPlaceService;
@@ -43,7 +43,7 @@ public class FavoriteContentService {
         return FavoriteContentResponse.from(savedFavoriteContent);
     }
 
-    public MyFavoriteContentsResponse findMyFavoriteContents(Member member, int pageSize, long lastContentId) {
+    public ContentsDetailWithLoadableResponse findMyFavoriteContents(Member member, int pageSize, long lastContentId) {
         if (lastContentId == 0) {
             lastContentId = Long.MAX_VALUE;
         }
@@ -51,11 +51,11 @@ public class FavoriteContentService {
                 lastContentId,
                 PageRequest.of(0, pageSize));
         List<Content> contents = contentSlice.getContent();
-        List<ContentWithTripInfoAndFavoriteResponse> contentsWithTripInfo = convertToContentWithTripInfoResponses(
+        List<ContentDetailResponse> contentsWithTripInfo = convertToContentWithTripInfoResponses(
                 contents);
         boolean loadable = contentSlice.hasNext();
 
-        return MyFavoriteContentsResponse.of(contentsWithTripInfo, loadable);
+        return ContentsDetailWithLoadableResponse.of(contentsWithTripInfo, loadable);
     }
 
     @Transactional
@@ -73,14 +73,14 @@ public class FavoriteContentService {
         return TripDurationResponse.of(totalTripDay - 1, totalTripDay);
     }
 
-    private List<ContentWithTripInfoAndFavoriteResponse> convertToContentWithTripInfoResponses(List<Content> contents) {
+    private List<ContentDetailResponse> convertToContentWithTripInfoResponses(List<Content> contents) {
         return contents.stream()
                 .map(content -> {
                     ContentResponse contentWithCreatorAndCity = ContentResponse.of(content, true);
                     TripDurationResponse tripDuration = calculateTripDuration(content);
                     validateContentExists(content.getId());
                     int tripPlaceCount = contentPlaceService.countByContentId(content.getId());
-                    return ContentWithTripInfoAndFavoriteResponse.of(contentWithCreatorAndCity, tripDuration,
+                    return ContentDetailResponse.of(contentWithCreatorAndCity, tripDuration,
                             tripPlaceCount);
                 })
                 .toList();

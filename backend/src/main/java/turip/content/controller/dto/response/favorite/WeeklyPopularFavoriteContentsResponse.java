@@ -1,4 +1,4 @@
-package turip.content.controller.dto.response;
+package turip.content.controller.dto.response.favorite;
 
 import java.util.List;
 

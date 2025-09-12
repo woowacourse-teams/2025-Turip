@@ -18,11 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 import turip.auth.AuthMember;
 import turip.auth.MemberResolvePolicy;
 import turip.common.exception.ErrorResponse;
-import turip.content.controller.dto.response.ContentCountResponse;
-import turip.content.controller.dto.response.ContentResponse;
-import turip.content.controller.dto.response.ContentSearchResponse;
-import turip.content.controller.dto.response.ContentsByRegionCategoryResponse;
-import turip.content.controller.dto.response.WeeklyPopularFavoriteContentsResponse;
+import turip.content.controller.dto.response.content.ContentCountResponse;
+import turip.content.controller.dto.response.content.ContentResponse;
+import turip.content.controller.dto.response.content.ContentsDetailWithLoadableResponse;
+import turip.content.controller.dto.response.favorite.WeeklyPopularFavoriteContentsResponse;
 import turip.content.service.ContentService;
 import turip.member.domain.Member;
 
@@ -120,7 +119,7 @@ public class ContentController {
                     description = "성공 예시",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ContentsByRegionCategoryResponse.class),
+                            schema = @Schema(implementation = ContentsDetailWithLoadableResponse.class),
                             examples = @ExampleObject(
                                     name = "success",
                                     summary = "성공적으로 컨텐츠 목록 조회",
@@ -192,12 +191,14 @@ public class ContentController {
             )
     })
     @GetMapping
-    public ResponseEntity<ContentsByRegionCategoryResponse> readContentsByRegionCategory(
+    public ResponseEntity<ContentsDetailWithLoadableResponse> readContentsByRegionCategory(
+            @Parameter(hidden = true) @AuthMember(policy = MemberResolvePolicy.CREATE_IF_ABSENT) Member member,
             @RequestParam(name = "regionCategory") String regionCategory,
             @RequestParam(name = "size") Integer pageSize,
             @RequestParam(name = "lastId") Long lastContentId
     ) {
-        ContentsByRegionCategoryResponse response = contentService.findContentsByRegionCategory(regionCategory,
+        ContentsDetailWithLoadableResponse response = contentService.findContentsByRegionCategory(member,
+                regionCategory,
                 pageSize, lastContentId);
         return ResponseEntity.ok(response);
     }
@@ -212,7 +213,7 @@ public class ContentController {
                     description = "성공 예시",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ContentSearchResponse.class),
+                            schema = @Schema(implementation = ContentsDetailWithLoadableResponse.class),
                             examples = @ExampleObject(
                                     name = "success",
                                     summary = "성공적으로 컨텐츠 목록 조회",
@@ -270,12 +271,14 @@ public class ContentController {
             )
     })
     @GetMapping("/keyword")
-    public ResponseEntity<ContentSearchResponse> readContentsByKeyword(
+    public ResponseEntity<ContentsDetailWithLoadableResponse> readContentsByKeyword(
+            @Parameter(hidden = true) @AuthMember(policy = MemberResolvePolicy.CREATE_IF_ABSENT) Member member,
             @RequestParam(name = "keyword") String keyword,
             @RequestParam(name = "size") Integer pageSize,
             @RequestParam(name = "lastId") Long lastContentId
     ) {
-        ContentSearchResponse response = contentService.searchContentsByKeyword(keyword, pageSize, lastContentId);
+        ContentsDetailWithLoadableResponse response = contentService.searchContentsByKeyword(member, keyword, pageSize,
+                lastContentId);
         return ResponseEntity.ok(response);
     }
 

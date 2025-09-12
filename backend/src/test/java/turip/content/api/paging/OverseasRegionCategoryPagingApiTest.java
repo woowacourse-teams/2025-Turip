@@ -45,12 +45,18 @@ class OverseasRegionCategoryPagingApiTest {
         // 크리에이터, 도시 데이터 설정
         jdbcTemplate.update(
                 "INSERT INTO creator (profile_image, channel_name) VALUES ('https://image.example.com/creator1.jpg', 'TravelMate')");
-        jdbcTemplate.update("INSERT INTO country (name, image_url) VALUES ('일본', 'https://image.example.com/japan.jpg')");
-        jdbcTemplate.update("INSERT INTO country (name, image_url) VALUES ('대한민국', 'https://image.example.com/korea.jpg')");
-        jdbcTemplate.update("INSERT INTO country (name, image_url) VALUES ('프랑스', 'https://image.example.com/france.jpg')");
-        jdbcTemplate.update("INSERT INTO city (name, country_id, province_id, image_url) VALUES ('오사카', 1, null, 'https://image.example.com/osaka.jpg')");
-        jdbcTemplate.update("INSERT INTO city (name, country_id, province_id, image_url) VALUES ('서울', 2, null, 'https://image.example.com/seoul.jpg')");
-        jdbcTemplate.update("INSERT INTO city (name, country_id, province_id, image_url) VALUES ('파리', 3, null, 'https://image.example.com/paris.jpg')");
+        jdbcTemplate.update(
+                "INSERT INTO country (name, image_url) VALUES ('일본', 'https://image.example.com/japan.jpg')");
+        jdbcTemplate.update(
+                "INSERT INTO country (name, image_url) VALUES ('대한민국', 'https://image.example.com/korea.jpg')");
+        jdbcTemplate.update(
+                "INSERT INTO country (name, image_url) VALUES ('프랑스', 'https://image.example.com/france.jpg')");
+        jdbcTemplate.update(
+                "INSERT INTO city (name, country_id, province_id, image_url) VALUES ('오사카', 1, null, 'https://image.example.com/osaka.jpg')");
+        jdbcTemplate.update(
+                "INSERT INTO city (name, country_id, province_id, image_url) VALUES ('서울', 2, null, 'https://image.example.com/seoul.jpg')");
+        jdbcTemplate.update(
+                "INSERT INTO city (name, country_id, province_id, image_url) VALUES ('파리', 3, null, 'https://image.example.com/paris.jpg')");
 
         // 오사카 컨텐츠 데이터 설정
         for (int i = 1; i <= 9; i++) {
@@ -82,6 +88,7 @@ class OverseasRegionCategoryPagingApiTest {
     void readContentsBySeoulRegionCategory() {
         // when: 첫 번째 페이지 (lastId=0, size=5)
         Response firstPageResponse = RestAssured.given().port(port)
+                .header("device-fid", "testDeviceFid")
                 .queryParam("regionCategory", "일본")
                 .queryParam("size", 5)
                 .queryParam("lastId", 0)
@@ -91,14 +98,14 @@ class OverseasRegionCategoryPagingApiTest {
         firstPageResponse.then()
                 .statusCode(200)
                 .body("contents.size()", is(5))
-                .body("loadable", is(true))
-                .body("regionCategoryName", is("일본"));
+                .body("loadable", is(true));
 
         // 첫 번째 페이지 마지막 content id
         Integer lastContentId = firstPageResponse.jsonPath().get("contents[4].content.id");
 
         // when: 두 번째 페이지
         Response secondPageResponse = RestAssured.given().port(port)
+                .header("device-fid", "testDeviceFid")
                 .queryParam("regionCategory", "일본")
                 .queryParam("size", 5)
                 .queryParam("lastId", lastContentId)
@@ -108,8 +115,7 @@ class OverseasRegionCategoryPagingApiTest {
         secondPageResponse.then()
                 .statusCode(200)
                 .body("contents.size()", is(4))
-                .body("loadable", is(false))
-                .body("regionCategoryName", is("일본"));
+                .body("loadable", is(false));
     }
 
     @DisplayName("/contents GET 해외 기타 지역별 컨텐츠 목록 페이징 테스트")
@@ -117,6 +123,7 @@ class OverseasRegionCategoryPagingApiTest {
     void readContentsByDomesticOtherRegionCategory() {
         // when: 첫 번째 페이지 (lastId=0, size=5)
         Response firstPageResponse = RestAssured.given().port(port)
+                .header("device-fid", "testDeviceFid")
                 .queryParam("regionCategory", "해외 기타")
                 .queryParam("size", 5)
                 .queryParam("lastId", 0)
@@ -126,14 +133,14 @@ class OverseasRegionCategoryPagingApiTest {
         firstPageResponse.then()
                 .statusCode(200)
                 .body("contents.size()", is(5))
-                .body("loadable", is(true))
-                .body("regionCategoryName", is("해외 기타"));
+                .body("loadable", is(true));
 
         // 첫 번째 페이지 마지막 content id
         Integer lastContentId = firstPageResponse.jsonPath().get("contents[4].content.id");
 
         // when: 두 번째 페이지
         Response secondPageResponse = RestAssured.given().port(port)
+                .header("device-fid", "testDeviceFid")
                 .queryParam("regionCategory", "해외 기타")
                 .queryParam("size", 5)
                 .queryParam("lastId", lastContentId)
@@ -143,7 +150,6 @@ class OverseasRegionCategoryPagingApiTest {
         secondPageResponse.then()
                 .statusCode(200)
                 .body("contents.size()", is(3))
-                .body("loadable", is(false))
-                .body("regionCategoryName", is("해외 기타"));
+                .body("loadable", is(false));
     }
 }
