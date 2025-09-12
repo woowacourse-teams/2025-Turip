@@ -266,7 +266,7 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
             binding.tvTripDetailCreatorName.text = content.creator.channelName
             binding.tvTripDetailContentTitle.text = content.videoData.title
             binding.tvTripDetailUploadDate.text =
-                binding.root.context.getString(
+                getString(
                     R.string.trip_detail_uploaded_date,
                     content.videoData.uploadedDate,
                 )
