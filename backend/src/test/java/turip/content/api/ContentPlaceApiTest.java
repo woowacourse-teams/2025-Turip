@@ -52,7 +52,7 @@ class ContentPlaceApiTest {
         jdbcTemplate.update("ALTER TABLE place_category ALTER COLUMN id RESTART WITH 1");
     }
 
-    @DisplayName("/content-places GET 여행 상세 조회 테스트")
+    @DisplayName("/contents/places GET 여행 상세 조회 테스트")
     @Nested
     class ReadContentPlace {
 
@@ -95,7 +95,7 @@ class ContentPlaceApiTest {
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
                     .queryParam("contentId", "1")
-                    .when().get("/content-places")
+                    .when().get("/contents/places")
                     .then()
                     .statusCode(200)
                     .body("contentPlaceCount", is(2))
@@ -118,7 +118,7 @@ class ContentPlaceApiTest {
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
                     .queryParam("contentId", "1")
-                    .when().get("/content-places")
+                    .when().get("/contents/places")
                     .then()
                     .statusCode(404);
         }

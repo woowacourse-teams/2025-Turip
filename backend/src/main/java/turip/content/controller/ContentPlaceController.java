@@ -23,7 +23,7 @@ import turip.member.domain.Member;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/content-places")
+@RequestMapping("/contents/places")
 @Tag(name = "ContentPlace", description = "여행 코스 API")
 public class ContentPlaceController {
 
