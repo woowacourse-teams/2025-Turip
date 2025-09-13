@@ -33,7 +33,7 @@ import turip.member.domain.Member;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/favorite-folders")
+@RequestMapping("/favorites/folders")
 @Tag(name = "FavoriteFolder", description = "장소 찜 폴더 API")
 public class FavoriteFolderController {
 
@@ -117,7 +117,7 @@ public class FavoriteFolderController {
             @Parameter(hidden = true) @AuthMember(policy = MemberResolvePolicy.CREATE_IF_ABSENT) Member member,
             @RequestBody FavoriteFolderRequest request) {
         FavoriteFolderResponse response = favoriteFolderService.createCustomFavoriteFolder(request, member);
-        return ResponseEntity.created(URI.create("/favorite-folders/" + response.id()))
+        return ResponseEntity.created(URI.create("/favorites/folders/" + response.id()))
                 .body(response);
     }
 
@@ -221,7 +221,7 @@ public class FavoriteFolderController {
                     )
             )
     })
-    @GetMapping("/favorite-status")
+    @GetMapping("/favorites/status")
     public ResponseEntity<FavoriteFoldersWithFavoriteStatusResponse> readAllWithFavoriteStatusByDeviceId(
             @Parameter(hidden = true) @AuthMember(policy = MemberResolvePolicy.CREATE_IF_ABSENT) Member member,
             @RequestParam("placeId") Long placeId) {
