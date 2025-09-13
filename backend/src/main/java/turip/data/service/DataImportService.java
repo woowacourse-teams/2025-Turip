@@ -20,6 +20,7 @@ import turip.data.controller.dto.CsvDataDto;
 import turip.place.domain.Category;
 import turip.place.domain.Place;
 import turip.place.domain.PlaceCategory;
+import turip.place.domain.PlaceCategoryMapper;
 import turip.place.repository.CategoryRepository;
 import turip.place.repository.PlaceCategoryRepository;
 import turip.place.repository.PlaceRepository;
@@ -252,8 +253,11 @@ public class DataImportService {
         if (isNullOrEmpty(categoryName)) {
             return null;
         }
-        return categoryRepository.findByName(categoryName)
-                .orElseGet(() -> categoryRepository.save(new Category(categoryName)));
+
+        String parsedCategoryName = PlaceCategoryMapper.parseCategory(categoryName);
+
+        return categoryRepository.findByName(parsedCategoryName)
+                .orElseGet(() -> categoryRepository.save(new Category(parsedCategoryName)));
     }
 
     private PlaceCategory findOrCreatePlaceCategory(Place place, Category category) {
