@@ -117,7 +117,7 @@ public class ContentService {
         if (OverseasRegionCategory.containsName(regionCategory)) {
             return contentRepository.countByCityCountryName(regionCategory);
         }
-        throw new BadRequestException(ErrorTag.PLACE_CATEGORY_WRONG);
+        throw new BadRequestException(ErrorTag.REGION_CATEGORY_WRONG);
     }
 
     private int calculateDomesticEtcCount() {

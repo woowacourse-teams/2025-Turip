@@ -66,7 +66,7 @@ public class ContentController {
                                     summary = "지역 카테고리가 올바르지 않음",
                                     value = """
                                             {
-                                                "tag": "PLACE_CATEGORY_WRONG"
+                                                "tag": "REGION_CATEGORY_WRONG"
                                             }
                                             """
                             )
@@ -183,7 +183,7 @@ public class ContentController {
                                     summary = "지역 카테고리가 올바르지 않음",
                                     value = """
                                             {
-                                                "tag": "PLACE_CATEGORY_WRONG"
+                                                "tag": "REGION_CATEGORY_WRONG"
                                             }
                                             """
                             )

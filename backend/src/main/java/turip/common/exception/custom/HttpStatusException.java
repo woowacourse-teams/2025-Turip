@@ -17,4 +17,8 @@ public class HttpStatusException extends RuntimeException {
     public HttpStatus getStatus() {
         return status;
     }
+
+    public ErrorTag getErrorTag() {
+        return errorTag;
+    }
 }

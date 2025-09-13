@@ -15,6 +15,8 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import turip.common.exception.ErrorTag;
+import turip.common.exception.custom.IllegalArgumentException;
 import turip.member.domain.Member;
 
 @Getter
@@ -64,10 +66,10 @@ public class FavoriteFolder {
 
     private static void validateName(String name) {
         if (name.isBlank()) {
-            throw new IllegalArgumentException("장소 찜 폴더 이름은 빈 칸이 될 수 없습니다.");
+            throw new IllegalArgumentException(ErrorTag.FAVORITE_FOLDER_NAME_BLANK);
         }
         if (name.length() > 20) {
-            throw new IllegalArgumentException("장소 찜 폴더 이름은 최대 20글자 입니다.");
+            throw new IllegalArgumentException(ErrorTag.FAVORITE_FOLDER_NAME_TOO_LONG);
         }
     }
 
