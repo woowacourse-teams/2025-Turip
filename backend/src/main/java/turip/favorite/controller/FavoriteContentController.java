@@ -168,7 +168,7 @@ public class FavoriteContentController {
                     )
             ),
             @ApiResponse(
-                    responseCode = "400",
+                    responseCode = "404",
                     description = "실패 예시",
                     content = @Content(
                             mediaType = "application/json",

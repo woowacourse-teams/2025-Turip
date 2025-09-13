@@ -76,7 +76,7 @@ public class FavoriteFolderController {
                                             summary = "장소 찜 폴더 이름이 공백인 경우",
                                             value = """
                                                     {
-                                                        "message": "장소 찜 폴더 이름은 빈 칸이 될 수 없습니다."
+                                                        "tag": "FAVORITE_FOLDER_NAME_BLANK"
                                                     }
                                                     """
                                     ),
@@ -85,7 +85,7 @@ public class FavoriteFolderController {
                                             summary = "장소 찜 폴더 이름이 20글자를 초과하는 경우",
                                             value = """
                                                     {
-                                                        "message": "장소 찜 폴더 이름은 최대 20글자 입니다."
+                                                        "tag": "FAVORITE_FOLDER_NAME_TOO_LONG"
                                                     }
                                                     """
                                     )
