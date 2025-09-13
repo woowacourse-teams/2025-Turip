@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import turip.common.exception.ErrorTag;
+import turip.common.exception.custom.IllegalArgumentException;
 import turip.member.domain.Member;
 
 class FavoriteFolderTest {
@@ -52,7 +54,7 @@ class FavoriteFolderTest {
             // when & then
             assertThatThrownBy(() -> FavoriteFolder.customFolderOf(null, name))
                     .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage("장소 찜 폴더 이름은 빈 칸이 될 수 없습니다.");
+                    .hasMessage(ErrorTag.FAVORITE_FOLDER_NAME_BLANK.getMessage());
         }
 
         @DisplayName("폴더 이름이 20자를 초과하는 경우 IllegalArgumentException을 발생시킨다")
@@ -67,7 +69,7 @@ class FavoriteFolderTest {
                     () -> assertDoesNotThrow(() -> FavoriteFolder.customFolderOf(null, nameOfLength20)),
                     () -> assertThatThrownBy(() -> FavoriteFolder.customFolderOf(null, nameOfLength21))
                             .isInstanceOf(IllegalArgumentException.class)
-                            .hasMessage("장소 찜 폴더 이름은 최대 20글자 입니다.")
+                            .hasMessage(ErrorTag.FAVORITE_FOLDER_NAME_TOO_LONG.getMessage())
             );
         }
     }
