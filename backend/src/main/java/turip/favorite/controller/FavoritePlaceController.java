@@ -27,7 +27,7 @@ import turip.member.domain.Member;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/favorite-places")
+@RequestMapping("/favorites/places")
 @Tag(name = "FavoritePlace", description = "장소 찜 API")
 public class FavoritePlaceController {
 
@@ -131,7 +131,7 @@ public class FavoritePlaceController {
             @RequestParam("placeId") Long placeId
     ) {
         FavoritePlaceResponse response = favoritePlaceService.create(member, favoriteFolderId, placeId);
-        return ResponseEntity.created(URI.create("/favorite-places/" + response.id()))
+        return ResponseEntity.created(URI.create("/favorites/places/" + response.id()))
                 .body(response);
     }
 
