@@ -1,4 +1,4 @@
-package turip.place.domain;
+package turip.place.service;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;

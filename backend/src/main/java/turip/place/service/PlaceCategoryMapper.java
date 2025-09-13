@@ -1,7 +1,8 @@
-package turip.place.domain;
+package turip.place.service;
 
 import java.util.Arrays;
 import java.util.List;
+import turip.place.domain.GoogleMapCategory;
 
 public class PlaceCategoryMapper {
 
