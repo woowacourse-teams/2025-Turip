@@ -66,7 +66,7 @@ public class ContentController {
                                     summary = "지역 카테고리가 올바르지 않음",
                                     value = """
                                             {
-                                                "message": "지역 카테고리가 올바르지 않습니다."
+                                                "tag": "REGION_CATEGORY_WRONG"
                                             }
                                             """
                             )
@@ -183,7 +183,7 @@ public class ContentController {
                                     summary = "지역 카테고리가 올바르지 않음",
                                     value = """
                                             {
-                                                "message": "지역 카테고리가 올바르지 않습니다."
+                                                "tag": "REGION_CATEGORY_WRONG"
                                             }
                                             """
                             )
@@ -328,7 +328,7 @@ public class ContentController {
                                     summary = "id에 대한 컨텐츠가 존재하지 않음",
                                     value = """
                                             {
-                                                "message": "컨텐츠를 찾을 수 없습니다."
+                                                "tag": "CONTENT_NOT_FOUND"
                                             }
                                             """
                             )

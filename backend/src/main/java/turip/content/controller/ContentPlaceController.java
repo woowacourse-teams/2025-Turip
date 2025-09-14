@@ -108,7 +108,7 @@ public class ContentPlaceController {
                                     summary = "컨텐츠를 찾을 수 없음",
                                     value = """
                                             {
-                                                "message": "해당 id에 대한 컨텐츠가 존재하지 않습니다."
+                                                "tag": "CONTENT_NOT_FOUND"
                                             }
                                             """
                             )

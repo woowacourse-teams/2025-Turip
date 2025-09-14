@@ -1,10 +1,11 @@
 package turip.common.exception.custom;
 
 import org.springframework.http.HttpStatus;
+import turip.common.exception.ErrorTag;
 
 public class ConflictException extends HttpStatusException {
 
-    public ConflictException(String message) {
-        super(message, HttpStatus.CONFLICT);
+    public ConflictException(ErrorTag errorTag) {
+        super(HttpStatus.CONFLICT, errorTag);
     }
 }

@@ -17,9 +17,11 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.BadRequestException;
 import turip.common.exception.custom.ConflictException;
 import turip.common.exception.custom.ForbiddenException;
+import turip.common.exception.custom.IllegalArgumentException;
 import turip.common.exception.custom.NotFoundException;
 import turip.favorite.controller.dto.request.FavoriteFolderNameRequest;
 import turip.favorite.controller.dto.request.FavoriteFolderRequest;
@@ -209,7 +211,7 @@ class FavoriteFolderServiceTest {
             // when
             assertThatThrownBy(() -> favoriteFolderService.findAllWithFavoriteStatusByDeviceId(savedMember, placeId))
                     .isInstanceOf(NotFoundException.class)
-                    .hasMessage("해당 id에 대한 장소가 존재하지 않습니다.");
+                    .hasMessage(ErrorTag.PLACE_NOT_FOUND.getMessage());
         }
     }
 
@@ -265,7 +267,7 @@ class FavoriteFolderServiceTest {
             // when & then
             assertThatThrownBy(() -> favoriteFolderService.updateName(member, nonExistentFolderId, request))
                     .isInstanceOf(NotFoundException.class)
-                    .hasMessageContaining("해당 id에 대한 폴더가 존재하지 않습니다");
+                    .hasMessageContaining(ErrorTag.FAVORITE_FOLDER_NOT_FOUND.getMessage());
         }
 
         @DisplayName("요청 회원 정보와 폴더 소유자의 정보가 일치하지 않는 경우 ForbiddenException을 발생시킨다")
@@ -363,7 +365,7 @@ class FavoriteFolderServiceTest {
             // when & then
             assertThatThrownBy(() -> favoriteFolderService.updateName(member, folderId, request))
                     .isInstanceOf(BadRequestException.class)
-                    .hasMessage("기본 폴더는 수정할 수 없습니다.");
+                    .hasMessage(ErrorTag.DEFAULT_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED.getMessage());
         }
     }
 
@@ -410,7 +412,7 @@ class FavoriteFolderServiceTest {
             // when & then
             assertThatThrownBy(() -> favoriteFolderService.remove(member, nonExistentFolderId))
                     .isInstanceOf(NotFoundException.class)
-                    .hasMessageContaining("해당 id에 대한 폴더가 존재하지 않습니다");
+                    .hasMessageContaining(ErrorTag.FAVORITE_FOLDER_NOT_FOUND.getMessage());
         }
 
         @DisplayName("요청 회원 정보와 폴더 소유자의 정보가 일치하지 않는 경우 ForbiddenException을 발생시킨다")
@@ -456,7 +458,7 @@ class FavoriteFolderServiceTest {
             // when & then
             assertThatThrownBy(() -> favoriteFolderService.remove(member, folderId))
                     .isInstanceOf(BadRequestException.class)
-                    .hasMessage("기본 폴더는 삭제할 수 없습니다.");
+                    .hasMessage(ErrorTag.DEFAULT_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED.getMessage());
         }
     }
 }

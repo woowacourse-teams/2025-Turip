@@ -76,7 +76,7 @@ public class FavoriteFolderController {
                                             summary = "장소 찜 폴더 이름이 공백인 경우",
                                             value = """
                                                     {
-                                                        "message": "장소 찜 폴더 이름은 빈 칸이 될 수 없습니다."
+                                                        "tag": "FAVORITE_FOLDER_NAME_BLANK"
                                                     }
                                                     """
                                     ),
@@ -85,7 +85,7 @@ public class FavoriteFolderController {
                                             summary = "장소 찜 폴더 이름이 20글자를 초과하는 경우",
                                             value = """
                                                     {
-                                                        "message": "장소 찜 폴더 이름은 최대 20글자 입니다."
+                                                        "tag": "FAVORITE_FOLDER_NAME_TOO_LONG"
                                                     }
                                                     """
                                     )
@@ -104,7 +104,7 @@ public class FavoriteFolderController {
                                             summary = "같은 이름의 폴더가 이미 존재하는 경우",
                                             value = """
                                                     {
-                                                        "message": "중복된 폴더 이름이 존재합니다."
+                                                        "tag": "FAVORITE_FOLDER_NAME_CONFLICT"
                                                     }
                                                     """
                                     )
@@ -214,7 +214,7 @@ public class FavoriteFolderController {
                                     summary = "placeId에 대한 장소가 존재하지 않는 경우",
                                     value = """
                                             {
-                                                "message": "해당 id에 대한 장소가 존재하지 않습니다."
+                                                "tag": "PLACE_NOT_FOUND"
                                             }
                                             """
                             )
@@ -267,7 +267,7 @@ public class FavoriteFolderController {
                                             summary = "장소 찜 폴더 이름이 공백인 경우",
                                             value = """
                                                     {
-                                                        "message": "장소 찜 폴더 이름은 빈 칸이 될 수 없습니다."
+                                                        "tag": "FAVORITE_FOLDER_NAME_BLANK"
                                                     }
                                                     """
                                     ),
@@ -276,7 +276,7 @@ public class FavoriteFolderController {
                                             summary = "장소 찜 폴더 이름이 20글자를 초과하는 경우",
                                             value = """
                                                     {
-                                                        "message": "장소 찜 폴더 이름은 최대 20글자 입니다."
+                                                        "tag": "FAVORITE_FOLDER_NAME_TOO_LONG"
                                                     }
                                                     """
                                     ),
@@ -285,7 +285,7 @@ public class FavoriteFolderController {
                                             summary = "장소 찜 폴더가 기본 폴더인 경우",
                                             value = """
                                                     {
-                                                        "message": "기본 폴더는 수정할 수 없습니다."
+                                                        "tag": "DEFAULT_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED"
                                                     }
                                                     """
                                     )
@@ -304,7 +304,7 @@ public class FavoriteFolderController {
                                             summary = "폴더 소유자의 기기id와 요청자의 기기id가 같지 않은 경우",
                                             value = """
                                                     {
-                                                        "message" : "폴더 소유자의 기기id와 요청자의 기기id가 같지 않습니다."
+                                                        "tag" : "FORBIDDEN"
                                                     }
                                                     """
                                     )
@@ -323,7 +323,7 @@ public class FavoriteFolderController {
                                             summary = "device-fid에 대한 회원을 찾을 수 없는 경우",
                                             value = """
                                                     {
-                                                        "message" : "해당 id에 대한 회원이 존재하지 않습니다."
+                                                        "tag" : "MEMBER_NOT_FOUND"
                                                     }
                                                     """
                                     ),
@@ -332,7 +332,7 @@ public class FavoriteFolderController {
                                             summary = "id에 대한 폴더를 찾을 수 없는 경우",
                                             value = """
                                                     {
-                                                        "message" : "해당 id에 대한 폴더가 존재하지 않습니다."
+                                                        "tag" : "FAVORITE_FOLDER_NOT_FOUND"
                                                     }
                                                     """
                                     )
@@ -351,7 +351,7 @@ public class FavoriteFolderController {
                                             summary = "중복되는 폴더 이름이 존재하는 경우",
                                             value = """
                                                     {
-                                                        "message" : "중복된 폴더 이름이 존재합니다."
+                                                        "tag" : "FAVORITE_FOLDER_NAME_CONFLICT"
                                                     }
                                                     """
                                     )
@@ -389,7 +389,7 @@ public class FavoriteFolderController {
                                     summary = "삭제하려는 폴더가 기본 폴더인 경우",
                                     value = """
                                             {
-                                                "message" : "기본 폴더는 삭제할 수 없습니다."
+                                                "tag" : "DEFAULT_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED"
                                             }
                                             """
                             )
@@ -406,7 +406,7 @@ public class FavoriteFolderController {
                                     summary = "폴더 소유자의 기기id와 요청자의 기기id가 같지 않은 경우",
                                     value = """
                                             {
-                                                "message" : "폴더 소유자의 기기id와 요청자의 기기id가 같지 않습니다."
+                                                "tag" : "FORBIDDEN"
                                             }
                                             """
                             )
@@ -424,7 +424,7 @@ public class FavoriteFolderController {
                                             summary = "device-fid에 대한 회원을 찾을 수 없는 경우",
                                             value = """
                                                     {
-                                                        "message" : "해당 id에 대한 회원이 존재하지 않습니다."
+                                                        "tag" : "MEMBER_NOT_FOUND"
                                                     }
                                                     """
                                     ),
@@ -433,7 +433,7 @@ public class FavoriteFolderController {
                                             summary = "id에 대한 폴더를 찾을 수 없는 경우",
                                             value = """
                                                     {
-                                                        "message" : "해당 id에 대한 폴더가 존재하지 않습니다."
+                                                        "tag" : "FAVORITE_FOLDER_NOT_FOUND"
                                                     }
                                                     """
                                     )

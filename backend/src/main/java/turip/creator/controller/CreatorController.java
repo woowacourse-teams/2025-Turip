@@ -60,7 +60,7 @@ public class CreatorController {
                                     summary = "크리에이터가 존재하지 않음",
                                     value = """
                                             {
-                                                "message": "크리에이터를 찾을 수 없습니다."
+                                                "tag": "CREATOR_NOT_FOUND"
                                             }
                                             """
                             )

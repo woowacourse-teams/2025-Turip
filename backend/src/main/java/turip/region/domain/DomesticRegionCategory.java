@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import turip.common.exception.ErrorTag;
+import turip.common.exception.custom.IllegalArgumentException;
 
 @Getter
 @RequiredArgsConstructor
@@ -24,7 +26,7 @@ public enum DomesticRegionCategory {
 
     public static boolean containsName(String regionCategoryName) {
         if (StringUtils.isBlank(regionCategoryName)) {
-            throw new IllegalArgumentException("지역 카테고리 명이 빈 값입니다.");
+            throw new IllegalArgumentException(ErrorTag.REGION_CATEGORY_INVALID);
         }
 
         for (DomesticRegionCategory category : values()) {

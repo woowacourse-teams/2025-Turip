@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import turip.common.exception.custom.HttpStatusException;
+import turip.common.exception.custom.IllegalArgumentException;
 
 @Slf4j
 @RestControllerAdvice
@@ -15,20 +16,20 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleHttpStatusException(HttpStatusException e) {
         log.warn(e.getMessage(), e);
         return ResponseEntity.status(e.getStatus())
-                .body(new ErrorResponse(e.getMessage()));
+                .body(new ErrorResponse(e.getErrorTag()));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException e) {
         log.warn(e.getMessage(), e);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(new ErrorResponse(e.getMessage()));
+                .body(new ErrorResponse(e.getErrorTag()));
     }
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ErrorResponse> handleNotCaughtExceptions(final RuntimeException e) {
         log.error(e.getMessage(), e);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new ErrorResponse("서버에서 예기치 못한 예외가 발생하였습니다."));
+                .body(new ErrorResponse(ErrorTag.INTERNAL_SERVER_ERROR));
     }
 }

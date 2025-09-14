@@ -4,6 +4,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.ConflictException;
 import turip.common.exception.custom.ForbiddenException;
 import turip.common.exception.custom.NotFoundException;
@@ -64,29 +65,29 @@ public class FavoritePlaceService {
 
     private FavoriteFolder getFavoriteFolderById(Long favoriteFolderId) {
         return favoriteFolderRepository.findById(favoriteFolderId)
-                .orElseThrow(() -> new NotFoundException("해당 id에 대한 폴더가 존재하지 않습니다."));
+                .orElseThrow(() -> new NotFoundException(ErrorTag.FAVORITE_FOLDER_NOT_FOUND));
     }
 
     private Place getPlaceById(Long placeId) {
         return placeRepository.findById(placeId)
-                .orElseThrow(() -> new NotFoundException("해당 id에 대한 장소가 존재하지 않습니다."));
+                .orElseThrow(() -> new NotFoundException(ErrorTag.PLACE_NOT_FOUND));
     }
 
     private void validateOwnership(Member requestMember, FavoriteFolder favoriteFolder) {
         if (!favoriteFolder.isOwner(requestMember)) {
-            throw new ForbiddenException("폴더 소유자의 기기id와 요청자의 기기id가 같지 않습니다.");
+            throw new ForbiddenException(ErrorTag.FORBIDDEN);
         }
     }
 
     private void validateDuplicated(FavoriteFolder favoriteFolder, Place place) {
         boolean isAlreadyFavorite = favoritePlaceRepository.existsByFavoriteFolderAndPlace(favoriteFolder, place);
         if (isAlreadyFavorite) {
-            throw new ConflictException("이미 해당 폴더에 찜한 장소입니다.");
+            throw new ConflictException(ErrorTag.FAVORITE_PLACE_IN_FOLDER_CONFLICT);
         }
     }
 
     private FavoritePlace getByFavoriteFolderAndPlace(FavoriteFolder favoriteFolder, Place place) {
         return favoritePlaceRepository.findByFavoriteFolderAndPlace(favoriteFolder, place)
-                .orElseThrow(() -> new NotFoundException("삭제하려는 장소 찜이 존재하지 않습니다."));
+                .orElseThrow(() -> new NotFoundException(ErrorTag.FAVORITE_PLACE_NOT_FOUND));
     }
 }
