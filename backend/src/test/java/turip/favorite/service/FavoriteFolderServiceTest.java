@@ -365,7 +365,7 @@ class FavoriteFolderServiceTest {
             // when & then
             assertThatThrownBy(() -> favoriteFolderService.updateName(member, folderId, request))
                     .isInstanceOf(BadRequestException.class)
-                    .hasMessage(ErrorTag.IS_DEFAULT_FAVORITE_FOLDER.getMessage());
+                    .hasMessage(ErrorTag.DEFAULT_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED.getMessage());
         }
     }
 
@@ -458,7 +458,7 @@ class FavoriteFolderServiceTest {
             // when & then
             assertThatThrownBy(() -> favoriteFolderService.remove(member, folderId))
                     .isInstanceOf(BadRequestException.class)
-                    .hasMessage(ErrorTag.IS_DEFAULT_FAVORITE_FOLDER.getMessage());
+                    .hasMessage(ErrorTag.DEFAULT_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED.getMessage());
         }
     }
 }
