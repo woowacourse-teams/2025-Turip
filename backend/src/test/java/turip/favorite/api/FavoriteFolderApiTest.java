@@ -156,7 +156,7 @@ class FavoriteFolderApiTest {
         }
     }
 
-    @DisplayName("/favorites-folders/favorites/status GET 특정 회원의 장소 찜 폴더와 찜 여부 조회 테스트")
+    @DisplayName("/favorites-folders/favorite-status GET 특정 회원의 장소 찜 폴더와 찜 여부 조회 테스트")
     @Nested
     class ReadAllWithFavoriteStatusByDeviceId {
 
@@ -177,7 +177,7 @@ class FavoriteFolderApiTest {
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
                     .queryParam("placeId", 1L)
-                    .when().get("/favorites/folders/favorites/status")
+                    .when().get("/favorites/folders/favorite-status")
                     .then()
                     .statusCode(200)
                     .body("favoriteFolders.size()", is(2))
@@ -196,7 +196,7 @@ class FavoriteFolderApiTest {
             RestAssured.given().port(port)
                     .header("device-fid", "newDeviceFid")
                     .queryParam("placeId", 1L)
-                    .when().get("/favorites/folders/favorites/status")
+                    .when().get("/favorites/folders/favorite-status")
                     .then()
                     .statusCode(200)
                     .body("favoriteFolders[0].name", is("기본 폴더"))

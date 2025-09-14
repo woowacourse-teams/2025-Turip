@@ -221,7 +221,7 @@ public class FavoriteFolderController {
                     )
             )
     })
-    @GetMapping("/favorites/status")
+    @GetMapping("/favorite-status")
     public ResponseEntity<FavoriteFoldersWithFavoriteStatusResponse> readAllWithFavoriteStatusByDeviceId(
             @Parameter(hidden = true) @AuthMember(policy = MemberResolvePolicy.CREATE_IF_ABSENT) Member member,
             @RequestParam("placeId") Long placeId) {
