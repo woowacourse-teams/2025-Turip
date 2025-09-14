@@ -82,7 +82,7 @@ public class FavoritePlaceService {
     private void validateDuplicated(FavoriteFolder favoriteFolder, Place place) {
         boolean isAlreadyFavorite = favoritePlaceRepository.existsByFavoriteFolderAndPlace(favoriteFolder, place);
         if (isAlreadyFavorite) {
-            throw new ConflictException(ErrorTag.FAVORITE_PLACE_CONFLICT);
+            throw new ConflictException(ErrorTag.FAVORITE_PLACE_IN_FOLDER_CONFLICT);
         }
     }
 

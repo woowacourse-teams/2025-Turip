@@ -285,7 +285,7 @@ public class FavoriteFolderController {
                                             summary = "장소 찜 폴더가 기본 폴더인 경우",
                                             value = """
                                                     {
-                                                        "tag": "IS_DEFAULT_FAVORITE_FOLDER"
+                                                        "tag": "DEFAULT_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED"
                                                     }
                                                     """
                                     )
@@ -389,7 +389,7 @@ public class FavoriteFolderController {
                                     summary = "삭제하려는 폴더가 기본 폴더인 경우",
                                     value = """
                                             {
-                                                "tag" : "IS_DEFAULT_FAVORITE_FOLDER"
+                                                "tag" : "DEFAULT_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED"
                                             }
                                             """
                             )

@@ -21,7 +21,7 @@ public enum OverseasRegionCategory {
 
     public static boolean containsName(String regionCategoryName) {
         if (StringUtils.isBlank(regionCategoryName)) {
-            throw new IllegalArgumentException(ErrorTag.REGION_CATEGORY_WRONG);
+            throw new IllegalArgumentException(ErrorTag.REGION_CATEGORY_INVALID);
         }
 
         for (OverseasRegionCategory category : values()) {

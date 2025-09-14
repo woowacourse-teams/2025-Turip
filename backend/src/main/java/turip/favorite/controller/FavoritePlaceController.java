@@ -116,7 +116,7 @@ public class FavoritePlaceController {
                                             summary = "이미 해당 폴더에 찜한 상태인 경우",
                                             value = """
                                                     {
-                                                        "tag": "FAVORITE_PLACE_CONFLICT"
+                                                        "tag": "FAVORITE_PLACE_IN_FOLDER_CONFLICT"
                                                     }
                                                     """
                                     )

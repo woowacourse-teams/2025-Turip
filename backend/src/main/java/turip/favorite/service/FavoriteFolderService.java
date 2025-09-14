@@ -73,7 +73,7 @@ public class FavoriteFolderService {
                                              FavoriteFolderNameRequest request) {
         FavoriteFolder favoriteFolder = getById(favoriteFolderId);
         if (favoriteFolder.isDefault()) {
-            throw new BadRequestException(ErrorTag.IS_DEFAULT_FAVORITE_FOLDER);
+            throw new BadRequestException(ErrorTag.DEFAULT_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED);
         }
 
         String newName = FavoriteFolder.formatName(request.name());
@@ -89,7 +89,7 @@ public class FavoriteFolderService {
         FavoriteFolder favoriteFolder = getById(favoriteFolderId);
 
         if (favoriteFolder.isDefault()) {
-            throw new BadRequestException(ErrorTag.IS_DEFAULT_FAVORITE_FOLDER);
+            throw new BadRequestException(ErrorTag.DEFAULT_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED);
         }
         validateOwnership(member, favoriteFolder);
 
