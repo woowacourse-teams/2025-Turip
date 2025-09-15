@@ -11,8 +11,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import turip.auth.AuthMember;
 import turip.auth.MemberResolvePolicy;
@@ -23,7 +23,7 @@ import turip.member.domain.Member;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/contents/places")
+@RequestMapping("/contents")
 @Tag(name = "ContentPlace", description = "여행 코스 API")
 public class ContentPlaceController {
 
@@ -115,10 +115,10 @@ public class ContentPlaceController {
                     )
             )
     })
-    @GetMapping
+    @GetMapping("/{contentId}/places")
     public ResponseEntity<ContentPlaceDetailResponse> readContentPlaceDetails(
             @Parameter(hidden = true) @AuthMember(policy = MemberResolvePolicy.CREATE_IF_ABSENT) Member member,
-            @RequestParam(name = "contentId") Long contentId) {
+            @PathVariable Long contentId) {
         ContentPlaceDetailResponse response = contentPlaceService.findContentPlaceDetails(member, contentId);
         return ResponseEntity.ok(response);
     }
