@@ -46,6 +46,7 @@ class TripPlaceViewHolder(
                 placeModel.timeLine,
             )
         binding.ivTravelPlaceFavorite.isSelected = placeModel.isFavorite
+        binding.ivTravelPlaceMap.setImageResource(Maps.contains(placeModel.mapLink).iconRes)
     }
 
     companion object {
