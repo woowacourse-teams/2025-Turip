@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.on.turip.databinding.ItemFavoritePlaceBinding
 import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
+import com.on.turip.ui.trip.detail.Maps
 
 class FavoritePlaceViewHolder(
     private val binding: ItemFavoritePlaceBinding,
@@ -32,6 +33,7 @@ class FavoritePlaceViewHolder(
         binding.tvFavoritePlaceCategory.text = favoritePlaceModel.turipCategory
         binding.tvFavoritePlaceName.text = favoritePlaceModel.name
         binding.ivFavoritePlaceFavorite.isSelected = favoritePlaceModel.isFavorite
+        binding.ivFavoritePlaceMapLink.setImageResource(Maps.contains(favoritePlaceModel.uri.toString()).iconRes)
     }
 
     companion object {
