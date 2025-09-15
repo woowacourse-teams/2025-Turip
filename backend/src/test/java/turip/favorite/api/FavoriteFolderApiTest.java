@@ -216,7 +216,7 @@ class FavoriteFolderApiTest {
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
                     .queryParam("placeId", 1L)
-                    .when().get("/favorites/folders/favorites/status")
+                    .when().get("/favorites/folders/favorite-status")
                     .then()
                     .statusCode(404);
         }
