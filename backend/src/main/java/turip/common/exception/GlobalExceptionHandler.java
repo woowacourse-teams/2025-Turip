@@ -18,34 +18,34 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleHttpStatusException(HttpStatusException e) {
         log.warn(e.getMessage(), e);
         return ResponseEntity.status(e.getStatus())
-                .body(new ErrorResponse(e.getErrorTag()));
+                .body(ErrorResponse.from(e.getErrorTag()));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException e) {
         log.warn(e.getMessage(), e);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(new ErrorResponse(e.getErrorTag()));
+                .body(ErrorResponse.from(e.getErrorTag()));
     }
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ErrorResponse> handleNotCaughtExceptions(final RuntimeException e) {
         log.error(e.getMessage(), e);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new ErrorResponse(ErrorTag.INTERNAL_SERVER_ERROR));
+                .body(ErrorResponse.from(ErrorTag.INTERNAL_SERVER_ERROR));
     }
 
     @ExceptionHandler(NoHandlerFoundException.class)
     public ResponseEntity<ErrorResponse> handleNoHandlerFoundException(NoHandlerFoundException e) {
         log.warn(e.getMessage(), e);
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ErrorResponse(ErrorTag.NOT_FOUND));
+                .body(ErrorResponse.from(ErrorTag.NOT_FOUND));
     }
 
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<ErrorResponse> handleNoResourceFoundException(NoResourceFoundException e) {
         log.warn(e.getMessage(), e);
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ErrorResponse(ErrorTag.NOT_FOUND));
+                .body(ErrorResponse.from(ErrorTag.NOT_FOUND));
     }
 }
