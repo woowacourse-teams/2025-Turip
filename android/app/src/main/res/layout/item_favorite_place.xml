@@ -48,7 +48,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_favorite_place_name"
         app:layout_constraintTop_toTopOf="@id/iv_favorite_place_favorite"
-        tools:src="@drawable/ic_kakao_map_basic" />
+        tools:src="@drawable/btn_kakao_map_basic" />
 
     <com.google.android.material.divider.MaterialDivider
         android:id="@+id/md_favorite_place_icon_divider"

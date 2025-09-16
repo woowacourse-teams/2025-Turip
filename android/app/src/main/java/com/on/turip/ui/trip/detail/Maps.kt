@@ -12,8 +12,8 @@ enum class Maps(
     val url: String,
     @DrawableRes val iconRes: Int,
 ) {
-    KAKAO(KAKAO_BASE_URL, R.drawable.ic_kakao_map_basic),
-    GOOGLE(GOOGLE_BASE_URL, R.drawable.ic_google_map_basic),
+    KAKAO(KAKAO_BASE_URL, R.drawable.btn_kakao_map_basic),
+    GOOGLE(GOOGLE_BASE_URL, R.drawable.btn_google_map_basic),
     BASE("", R.drawable.btn_map_link),
     ;
 
