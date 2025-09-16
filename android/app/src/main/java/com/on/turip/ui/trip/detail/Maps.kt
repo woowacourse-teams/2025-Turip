@@ -1,5 +1,6 @@
 package com.on.turip.ui.trip.detail
 
+import android.net.Uri
 import androidx.annotation.DrawableRes
 import com.on.turip.R
 import com.on.turip.ui.trip.detail.Maps.entries
@@ -18,8 +19,8 @@ enum class Maps(
     companion object {
         private const val NOT_FOUND = "%s not found"
 
-        fun contains(mapLink: String): Maps =
-            entries.find { mapLink.contains(it.url) }
+        fun contains(mapLink: Uri): Maps =
+            entries.find { mapLink.toString().contains(it.url) }
                 ?: throw IllegalArgumentException(NOT_FOUND.format(mapLink))
     }
 }
