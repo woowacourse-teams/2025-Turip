@@ -1,4 +1,4 @@
-package com.on.turip.data.dao
+package com.on.turip.data.searchhistory.dao
 
 import androidx.room.Dao
 import androidx.room.Insert

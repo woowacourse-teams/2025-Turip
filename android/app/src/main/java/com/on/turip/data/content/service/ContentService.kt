@@ -3,7 +3,6 @@ package com.on.turip.data.content.service
 import com.on.turip.data.content.dto.ContentDetailResponse
 import com.on.turip.data.content.dto.ContentInformationCountResponse
 import com.on.turip.data.content.dto.ContentsInformationResponse
-import com.on.turip.data.content.dto.ContentsInformationResponse2
 import com.on.turip.data.content.dto.UsersLikeContentsResponse
 import retrofit2.Response
 import retrofit2.http.GET
@@ -27,13 +26,6 @@ interface ContentService {
         @Query("size") size: Int,
         @Query("lastId") lastId: Long,
     ): Response<ContentsInformationResponse>
-
-    @GET("contents")
-    suspend fun getContentsByRegion2(
-        @Query("regionCategory") regionCategoryName: String,
-        @Query("size") size: Int,
-        @Query("lastId") lastId: Long,
-    ): Response<ContentsInformationResponse2>
 
     @GET("contents/keyword")
     suspend fun getContentsByKeyword(
