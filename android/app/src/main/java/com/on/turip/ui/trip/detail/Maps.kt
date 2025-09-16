@@ -19,7 +19,7 @@ enum class Maps(
     companion object {
         private const val NOT_FOUND = "%s not found"
 
-        fun contains(mapLink: Uri): Maps =
+        fun from(mapLink: Uri): Maps =
             entries.find { mapLink.toString().contains(it.url) }
                 ?: throw IllegalArgumentException(NOT_FOUND.format(mapLink))
     }

@@ -33,7 +33,7 @@ class FavoritePlaceViewHolder(
         binding.tvFavoritePlaceCategory.text = favoritePlaceModel.turipCategory
         binding.tvFavoritePlaceName.text = favoritePlaceModel.name
         binding.ivFavoritePlaceFavorite.isSelected = favoritePlaceModel.isFavorite
-        binding.ivFavoritePlaceMapLink.setImageResource(Maps.contains(favoritePlaceModel.uri).iconRes)
+        binding.ivFavoritePlaceMapLink.setImageResource(Maps.from(favoritePlaceModel.uri).iconRes)
     }
 
     companion object {
