@@ -14,26 +14,26 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface FolderService {
-    @GET("favorite-folders")
+    @GET("favorites/folders")
     suspend fun getFavoriteFolders(): Response<FavoriteFoldersResponse>
 
-    @POST("favorite-folders")
+    @POST("favorites/folders")
     suspend fun postFavoriteFolder(
         @Body favoriteFolderAddRequest: FavoriteFolderAddRequest,
     ): Response<Unit>
 
-    @PATCH("favorite-folders/{favoriteFolderId}")
+    @PATCH("favorites/folders/{favoriteFolderId}")
     suspend fun patchFavoriteFolder(
         @Path("favoriteFolderId") folderId: Long,
         @Body favoriteFolderPatchRequest: FavoriteFolderPatchRequest,
     ): Response<Unit>
 
-    @DELETE("favorite-folders/{favoriteFolderId}")
+    @DELETE("favorites/folders/{favoriteFolderId}")
     suspend fun deleteFavoriteFolder(
         @Path("favoriteFolderId") folderId: Long,
     ): Response<Unit>
 
-    @GET("favorite-folders/favorite-status")
+    @GET("favorites/folders/favorite-status")
     suspend fun getFavoriteFoldersStatusByPlaceId(
         @Query("placeId") placeId: Long,
     ): Response<FavoriteFoldersStatusByPlaceResponse>

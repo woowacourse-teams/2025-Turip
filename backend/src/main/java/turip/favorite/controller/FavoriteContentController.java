@@ -29,7 +29,7 @@ import turip.member.domain.Member;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/favorite-contents")
+@RequestMapping("/favorites/contents")
 @Tag(name = "FavoriteContent", description = "컨텐츠 찜 API")
 public class FavoriteContentController {
 
@@ -118,7 +118,7 @@ public class FavoriteContentController {
             @Parameter(hidden = true) @AuthMember(policy = MemberResolvePolicy.CREATE_IF_ABSENT) Member member,
             @RequestBody FavoriteContentRequest request) {
         FavoriteContentResponse response = favoriteContentService.create(request, member);
-        return ResponseEntity.created(URI.create("/favorite-contents/" + response.id()))
+        return ResponseEntity.created(URI.create("/favorites/contents/" + response.id()))
                 .body(response);
     }
 
