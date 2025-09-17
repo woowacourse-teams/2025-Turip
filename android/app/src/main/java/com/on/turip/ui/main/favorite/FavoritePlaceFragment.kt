@@ -14,6 +14,7 @@ import com.on.turip.databinding.FragmentFavoritePlaceBinding
 import com.on.turip.domain.ErrorEvent
 import com.on.turip.ui.common.base.BaseFragment
 import com.on.turip.ui.folder.FolderActivity
+import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
 
@@ -87,6 +88,9 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
             val intent: Intent = FolderActivity.newIntent(requireContext())
             startActivity(intent)
         }
+        binding.ivFavoritePlaceShare.setOnClickListener {
+            viewModel.shareFolder()
+        }
     }
 
     private fun setupObservers() {
@@ -107,6 +111,11 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
                     getString(R.string.all_total_place_count, places.size)
             }
         }
+
+        viewModel.shareFolder.observe(viewLifecycleOwner) { shareFolder: FavoriteFolderShareModel ->
+            makeShareIntent(shareFolder)
+        }
+
         viewModel.networkError.observe(viewLifecycleOwner) { networkError ->
             handleErrorOrContentView(networkError || (viewModel.serverError.value == true))
         }
@@ -114,6 +123,38 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
         viewModel.serverError.observe(viewLifecycleOwner) { serverError ->
             handleErrorOrContentView(serverError || (viewModel.networkError.value == true))
         }
+    }
+
+    private fun makeShareIntent(shareFolder: FavoriteFolderShareModel) {
+        val sharedContents: String = shareFolder.toShareFormat()
+
+        val intent =
+            Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                putExtra(Intent.EXTRA_TEXT, sharedContents)
+                putExtra(Intent.EXTRA_TITLE, shareFolder.name)
+            }
+        val kakaoIntent: Intent =
+            Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                `package` = KAKAO_PACKAGE
+                putExtra(Intent.EXTRA_TEXT, sharedContents)
+            }
+        val instagramIntent: Intent =
+            Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                `package` = INSTAGRAM_PACKAGE
+                putExtra(Intent.EXTRA_TEXT, sharedContents)
+            }
+        val initialIntents = arrayOf(kakaoIntent, instagramIntent)
+
+        val chooserIntent =
+            Intent.createChooser(intent, shareFolder.name).apply {
+                putExtra(Intent.EXTRA_INITIAL_INTENTS, initialIntents)
+                putExtra(Intent.EXTRA_TITLE, shareFolder.name)
+            }
+
+        startActivity(chooserIntent)
     }
 
     private fun handleErrorOrContentView(isError: Boolean) {
@@ -141,6 +182,9 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
     }
 
     companion object {
+        private const val KAKAO_PACKAGE = "com.kakao.talk"
+        private const val INSTAGRAM_PACKAGE = "com.instagram.android"
+
         fun instance(): FavoritePlaceFragment = FavoritePlaceFragment()
     }
 }
