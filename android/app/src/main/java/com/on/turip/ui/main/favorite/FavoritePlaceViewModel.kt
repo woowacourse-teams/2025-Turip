@@ -17,6 +17,7 @@ import com.on.turip.domain.folder.Folder
 import com.on.turip.domain.folder.repository.FolderRepository
 import com.on.turip.domain.trip.Place
 import com.on.turip.ui.common.mapper.toUiModel
+import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
 import kotlinx.coroutines.launch
@@ -31,6 +32,8 @@ class FavoritePlaceViewModel(
     val folders: LiveData<List<FavoritePlaceFolderModel>> get() = _folders
     private val _places: MutableLiveData<List<FavoritePlaceModel>> = MutableLiveData()
     val places: LiveData<List<FavoritePlaceModel>> get() = _places
+    private val _shareFolder: MutableLiveData<FavoriteFolderShareModel> = MutableLiveData()
+    val shareFolder: LiveData<FavoriteFolderShareModel> get() = _shareFolder
 
     private val _networkError: MutableLiveData<Boolean> = MutableLiveData(false)
     val networkError: LiveData<Boolean> get() = _networkError
@@ -135,6 +138,15 @@ class FavoritePlaceViewModel(
                 _serverError.value = true
             }
         }
+    }
+
+    fun shareFolder() {
+        val shareFolder =
+            FavoriteFolderShareModel(
+                name = _folders.value?.first { it.isSelected }?.name ?: "",
+                places = places.value?.map { it.toUiModel() } ?: emptyList(),
+            )
+        _shareFolder.value = shareFolder
     }
 
     companion object {
