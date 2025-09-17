@@ -5,6 +5,7 @@ import com.on.turip.domain.folder.FavoriteFolder
 import com.on.turip.domain.trip.Place
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
+import com.on.turip.ui.main.favorite.model.FavoritePlaceShareModel
 
 fun Place.toUiModel(): FavoritePlaceModel =
     FavoritePlaceModel(
@@ -21,4 +22,10 @@ fun FavoriteFolder.toUiModel(): FavoritePlaceFolderModel =
         name = name,
         placeCount = placeCount,
         isSelected = isFavorite,
+    )
+
+fun FavoritePlaceModel.toUiModel(): FavoritePlaceShareModel =
+    FavoritePlaceShareModel(
+        name = name,
+        uri = uri,
     )
