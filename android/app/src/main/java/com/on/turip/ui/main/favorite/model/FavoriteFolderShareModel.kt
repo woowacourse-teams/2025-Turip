@@ -6,6 +6,8 @@ data class FavoriteFolderShareModel(
 ) {
     fun toShareFormat(): String =
         buildString {
+            appendLine("폴더명 : $name")
+            appendLine()
             places.forEach { placeShareModel: FavoritePlaceShareModel -> appendLine(placeShareModel.toShareFormat()) }
         }
 }
