@@ -86,8 +86,8 @@ class FavoritePlaceViewModel(
                     _favoritePlaceUiState.value =
                         favoritePlaceUiState.value?.copy(
                             places =
-                                favoritePlaceUiState.value?.places?.map {
-                                    if (it.placeId == placeId) it.copy(isFavorite = updatedFavorite) else it
+                                favoritePlaceUiState.value?.places?.filter {
+                                    it.placeId != placeId
                                 } ?: emptyList(),
                         )
                     Timber.d("찜 목록 화면 폴더명에 해당하는 찜 장소들 업데이트 성공")
