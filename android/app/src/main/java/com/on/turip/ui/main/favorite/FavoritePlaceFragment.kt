@@ -76,10 +76,7 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
             addOnItemTouchListener(RecyclerViewTouchInterceptor)
         }
 
-        binding.rvFavoritePlacePlace.apply {
-            adapter = placeAdapter
-            itemAnimator = null
-        }
+        binding.rvFavoritePlacePlace.adapter = placeAdapter
     }
 
     private fun setupListeners() {
