@@ -10,17 +10,17 @@ import retrofit2.http.POST
 import retrofit2.http.Query
 
 interface FavoriteService {
-    @POST("favorite-contents")
+    @POST("favorites/contents")
     suspend fun postFavorite(
         @Body favoriteAddRequest: FavoriteAddRequest,
     ): Response<Unit>
 
-    @DELETE("favorite-contents")
+    @DELETE("favorites/contents")
     suspend fun deleteFavorite(
         @Query("contentId") contentId: Long,
     ): Response<Unit>
 
-    @GET("favorite-contents")
+    @GET("favorites/contents")
     suspend fun getFavoriteContents(
         @Query("size") size: Int,
         @Query("lastId") lastId: Long,
