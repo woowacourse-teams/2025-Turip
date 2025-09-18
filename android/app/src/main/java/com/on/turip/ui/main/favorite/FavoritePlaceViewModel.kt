@@ -80,11 +80,18 @@ class FavoritePlaceViewModel(
         viewModelScope.launch {
             updateFavoritePlaceUseCase(selectedFolderId, placeId, updatedFavorite)
                 .onSuccess {
-                    _places.value =
-                        places.value?.map {
-                            if (it.placeId == placeId) it.copy(isFavorite = updatedFavorite) else it
-                        }
                     Timber.d("찜 목록 화면 폴더명에 해당하는 찜 장소들 업데이트 성공")
+                    if (updatedFavorite) {
+                        _places.value =
+                            places.value?.map {
+                                if (it.placeId == placeId) it.copy(isFavorite = true) else it
+                            }
+                    } else {
+                        _places.value =
+                            _places.value
+                                ?.filter { it.placeId != placeId }
+                    }
+
                     _serverError.value = false
                     _networkError.value = false
                 }.onFailure { errorEvent: ErrorEvent ->
