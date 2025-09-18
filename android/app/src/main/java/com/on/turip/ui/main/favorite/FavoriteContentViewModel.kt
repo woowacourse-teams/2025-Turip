@@ -61,15 +61,21 @@ class FavoriteContentViewModel(
             updateFavoriteUseCase(updatedFavorite, contentId)
                 .onSuccess {
                     Timber.d("찜 목록 페이지, 찜 버튼 클릭(contentId=$contentId, updateFavorite = $updatedFavorite")
-                    _favoriteContents.value =
-                        _favoriteContents.value?.map {
-                            if (it.content.id == contentId) {
-                                val updateContent = it.content.copy(isFavorite = updatedFavorite)
-                                it.copy(content = updateContent)
-                            } else {
-                                it
+                    if (updatedFavorite) {
+                        _favoriteContents.value =
+                            _favoriteContents.value?.map {
+                                if (it.content.id == contentId) {
+                                    val updatedContent = it.content.copy(isFavorite = true)
+                                    it.copy(content = updatedContent)
+                                } else {
+                                    it
+                                }
                             }
-                        }
+                    } else {
+                        _favoriteContents.value =
+                            _favoriteContents.value
+                                ?.filter { it.content.id != contentId }
+                    }
                     _networkError.value = false
                     _serverError.value = false
                 }.onFailure { errorEvent: ErrorEvent ->
