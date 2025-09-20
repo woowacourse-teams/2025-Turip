@@ -1,7 +1,3 @@
--- favorite_place 테이블에 position 컬럼 추가
-ALTER TABLE favorite_place
-    ADD COLUMN position INT NOT NULL DEFAULT 0 AFTER place_id;
-
 -- 1) position 컬럼 추가 (우선 NULL 허용)
 ALTER TABLE favorite_place
     ADD COLUMN position INT NULL AFTER place_id;
@@ -25,8 +21,3 @@ WHERE fp.position IS NULL;                             -- 이미 값이 있는 �
 -- 3) NOT NULL 제약 적용
 ALTER TABLE favorite_place
     MODIFY COLUMN position INT NOT NULL;
-
--- 4) 폴더별 position 중복 방지 (폴더 내 고유 보장)
-ALTER TABLE favorite_place
-    ADD CONSTRAINT uq_favorite_place__folder_position
-        UNIQUE (favorite_folder_id, position);

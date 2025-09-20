@@ -21,8 +21,3 @@ WHERE fp."position" IS NULL;
 -- 3) NOT NULL 제약 적용
 ALTER TABLE favorite_place
     ALTER COLUMN "position" SET NOT NULL;
-
--- 4) 폴더별 position 중복 방지 (유니크 제약)
-ALTER TABLE favorite_place
-    ADD CONSTRAINT uq_favorite_place__folder_position
-        UNIQUE (favorite_folder_id, "position");
