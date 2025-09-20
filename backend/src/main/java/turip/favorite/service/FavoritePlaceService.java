@@ -35,7 +35,9 @@ public class FavoritePlaceService {
         validateOwnership(member, favoriteFolder);
         validateDuplicated(favoriteFolder, place);
 
-        FavoritePlace favoritePlace = new FavoritePlace(favoriteFolder, place);
+        int favoritePlaceTotalCount = favoritePlaceRepository.countByFavoriteFolder(favoriteFolder);
+
+        FavoritePlace favoritePlace = new FavoritePlace(favoriteFolder, place, favoritePlaceTotalCount + 1);
         FavoritePlace savedFavoritePlace = favoritePlaceRepository.save(favoritePlace);
 
         return FavoritePlaceResponse.from(savedFavoritePlace);
