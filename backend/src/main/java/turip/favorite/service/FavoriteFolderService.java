@@ -137,6 +137,6 @@ public class FavoriteFolderService {
 
     private FavoritePlace getFavoritePlaceById(Long favoritePlaceId) {
         return favoritePlaceRepository.findById(favoritePlaceId)
-                .orElseThrow(() -> new NotFoundException(ErrorTag.PLACE_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(ErrorTag.FAVORITE_PLACE_NOT_FOUND));
     }
 }

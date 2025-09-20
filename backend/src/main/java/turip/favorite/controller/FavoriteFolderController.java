@@ -422,6 +422,15 @@ public class FavoriteFolderController {
                                                         "tag" : "FAVORITE_FOLDER_NOT_FOUND"
                                                     }
                                                     """
+                                    ),
+                                    @ExampleObject(
+                                            name = "favorite_place_not_found",
+                                            summary = "favoritePlaceId에 대한 찜한 장소를 찾을 수 없는 경우",
+                                            value = """
+                                                    {
+                                                        "tag" : "FAVORITE_PLACE_NOT_FOUND"
+                                                    }
+                                                    """
                                     )
                             }
                     )
