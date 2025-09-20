@@ -46,7 +46,7 @@ public class FavoritePlaceService {
     public FavoritePlacesWithDetailPlaceInformationResponse findAllByFolder(Long favoriteFolderId) {
         FavoriteFolder favoriteFolder = getFavoriteFolderById(favoriteFolderId);
 
-        List<FavoritePlaceWithDetailPlaceInformationResponse> favoritePlaces = favoritePlaceRepository.findAllByFavoriteFolder(
+        List<FavoritePlaceWithDetailPlaceInformationResponse> favoritePlaces = favoritePlaceRepository.findAllByFavoriteFolderOrderByPositionAsc(
                         favoriteFolder).stream()
                 .map(FavoritePlaceWithDetailPlaceInformationResponse::from)
                 .toList();

@@ -16,7 +16,7 @@ public interface FavoritePlaceRepository extends JpaRepository<FavoritePlace, Lo
 
     Optional<FavoritePlace> findByFavoriteFolderAndPlace(FavoriteFolder favoriteFolder, Place place);
 
-    List<FavoritePlace> findAllByFavoriteFolder(FavoriteFolder favoriteFolder);
+    List<FavoritePlace> findAllByFavoriteFolderOrderByPositionAsc(FavoriteFolder favoriteFolder);
 
     boolean existsByFavoriteFolderMemberAndPlace(Member member, Place place);
 }
