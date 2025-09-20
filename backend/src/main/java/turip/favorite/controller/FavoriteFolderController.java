@@ -394,6 +394,15 @@ public class FavoriteFolderController {
                                                         "tag" : "FORBIDDEN"
                                                     }
                                                     """
+                                    ),
+                                    @ExampleObject(
+                                            name = "favorite_place_not_belongs_to_folder",
+                                            summary = "다른 폴더의 favoritePlaceId가 포함된 경우",
+                                            value = """
+                                                    {
+                                                        "tag" : "FORBIDDEN"
+                                                    }
+                                                    """
                                     )
                             }
                     )

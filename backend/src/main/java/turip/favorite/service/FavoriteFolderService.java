@@ -97,6 +97,7 @@ public class FavoriteFolderService {
         for (int index = 0; index < updatedPlaceOrders.size(); index++) {
             Long favoritePlaceId = updatedPlaceOrders.get(index);
             FavoritePlace favoritePlace = getFavoritePlaceById(favoritePlaceId);
+            validateFavoritePlaceBelongsToFolder(favoritePlace, favoriteFolder);
             favoritePlace.updatePosition(index + 1);
         }
     }
@@ -138,5 +139,11 @@ public class FavoriteFolderService {
     private FavoritePlace getFavoritePlaceById(Long favoritePlaceId) {
         return favoritePlaceRepository.findById(favoritePlaceId)
                 .orElseThrow(() -> new NotFoundException(ErrorTag.FAVORITE_PLACE_NOT_FOUND));
+    }
+
+    private void validateFavoritePlaceBelongsToFolder(FavoritePlace favoritePlace, FavoriteFolder favoriteFolder) {
+        if (!favoritePlace.getFavoriteFolder().equals(favoriteFolder)) {
+            throw new ForbiddenException(ErrorTag.FORBIDDEN);
+        }
     }
 }
