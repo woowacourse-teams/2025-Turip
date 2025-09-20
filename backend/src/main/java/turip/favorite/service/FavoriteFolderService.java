@@ -11,12 +11,14 @@ import turip.common.exception.custom.ForbiddenException;
 import turip.common.exception.custom.NotFoundException;
 import turip.favorite.controller.dto.request.FavoriteFolderNameRequest;
 import turip.favorite.controller.dto.request.FavoriteFolderRequest;
+import turip.favorite.controller.dto.request.FavoritePlaceOrderRequest;
 import turip.favorite.controller.dto.response.FavoriteFolderResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderWithPlaceCountResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithFavoriteStatusResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithPlaceCountResponse;
 import turip.favorite.domain.FavoriteFolder;
+import turip.favorite.domain.FavoritePlace;
 import turip.favorite.repository.FavoriteFolderRepository;
 import turip.favorite.repository.FavoritePlaceRepository;
 import turip.member.domain.Member;
@@ -85,6 +87,21 @@ public class FavoriteFolderService {
     }
 
     @Transactional
+    public void updatePlaceOrder(Member member, Long favoriteFolderId,
+                                 FavoritePlaceOrderRequest request) {
+        FavoriteFolder favoriteFolder = getById(favoriteFolderId);
+        validateOwnership(member, favoriteFolder);
+
+        List<Long> updatedPlaceOrders = request.updatedPlaceIdOrder();
+
+        for (int index = 0; index < updatedPlaceOrders.size(); index++) {
+            Long favoritePlaceId = updatedPlaceOrders.get(index);
+            FavoritePlace favoritePlace = getFavoritePlaceById(favoritePlaceId);
+            favoritePlace.updateOrder(index + 1);
+        }
+    }
+
+    @Transactional
     public void remove(Member member, Long favoriteFolderId) {
         FavoriteFolder favoriteFolder = getById(favoriteFolderId);
 
@@ -116,5 +133,10 @@ public class FavoriteFolderService {
         if (!favoriteFolder.isOwner(requestMember)) {
             throw new ForbiddenException(ErrorTag.FORBIDDEN);
         }
+    }
+
+    private FavoritePlace getFavoritePlaceById(Long favoritePlaceId) {
+        return favoritePlaceRepository.findById(favoritePlaceId)
+                .orElseThrow(() -> new NotFoundException(ErrorTag.PLACE_NOT_FOUND));
     }
 }
