@@ -1,5 +1,6 @@
 package turip.favorite.api;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
 
 import io.restassured.RestAssured;
@@ -79,9 +80,124 @@ class FavoritePlaceApiTest {
                     .statusCode(201);
         }
 
-        @DisplayName("폴더 소유자의 기기id와 요청자의 기기id가 같지 않은 경우 403 FORBIDDEN을 응답한다")
+        @DisplayName("첫 번째 장소 찜 생성 시 position이 1로 설정된다")
         @Test
         void create2() {
+            // given
+            jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('testDeviceFid')");
+            jdbcTemplate.update(
+                    "INSERT INTO favorite_folder (member_id, name, is_default) VALUES (1, '테스트 폴더', false)");
+            jdbcTemplate.update(
+                    "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('첫 번째 장소','https://naver.me/place1', '첫 번째 장소 주소', 37.1234, 127.1234)");
+
+            // when
+            RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("placeId", 1L)
+                    .contentType(ContentType.JSON)
+                    .when().post("/favorites/places")
+                    .then()
+                    .statusCode(201);
+
+            // then - position이 1로 설정되었는지 확인
+            Integer position = jdbcTemplate.queryForObject(
+                    "SELECT position FROM favorite_place WHERE favorite_folder_id = 1 AND place_id = 1", 
+                    Integer.class);
+            assertThat(position).isEqualTo(1);
+        }
+
+        @DisplayName("두 번째 장소 찜 생성 시 position이 2로 설정된다")
+        @Test
+        void create3() {
+            // given
+            jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('testDeviceFid')");
+            jdbcTemplate.update(
+                    "INSERT INTO favorite_folder (member_id, name, is_default) VALUES (1, '테스트 폴더', false)");
+            jdbcTemplate.update(
+                    "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('첫 번째 장소','https://naver.me/place1', '첫 번째 장소 주소', 37.1234, 127.1234)");
+            jdbcTemplate.update(
+                    "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('두 번째 장소','https://naver.me/place2', '두 번째 장소 주소', 37.5678, 127.5678)");
+            jdbcTemplate.update("INSERT INTO favorite_place (favorite_folder_id, place_id, position) VALUES (1, 1, 1)");
+
+            // when
+            RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("placeId", 2L)
+                    .contentType(ContentType.JSON)
+                    .when().post("/favorites/places")
+                    .then()
+                    .statusCode(201);
+
+            // then - position이 2로 설정되었는지 확인
+            Integer position = jdbcTemplate.queryForObject(
+                    "SELECT position FROM favorite_place WHERE favorite_folder_id = 1 AND place_id = 2", 
+                    Integer.class);
+            assertThat(position).isEqualTo(2);
+        }
+
+        @DisplayName("여러 장소 찜 생성 시 position이 순차적으로 증가한다")
+        @Test
+        void create4() {
+            // given
+            jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('testDeviceFid')");
+            jdbcTemplate.update(
+                    "INSERT INTO favorite_folder (member_id, name, is_default) VALUES (1, '테스트 폴더', false)");
+            jdbcTemplate.update(
+                    "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('장소1','https://naver.me/place1', '장소1 주소', 37.1234, 127.1234)");
+            jdbcTemplate.update(
+                    "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('장소2','https://naver.me/place2', '장소2 주소', 37.5678, 127.5678)");
+            jdbcTemplate.update(
+                    "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('장소3','https://naver.me/place3', '장소3 주소', 37.9999, 127.9999)");
+
+            // when - 3개의 장소를 순차적으로 찜
+            RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("placeId", 1L)
+                    .contentType(ContentType.JSON)
+                    .when().post("/favorites/places")
+                    .then()
+                    .statusCode(201);
+
+            RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("placeId", 2L)
+                    .contentType(ContentType.JSON)
+                    .when().post("/favorites/places")
+                    .then()
+                    .statusCode(201);
+
+            RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("placeId", 3L)
+                    .contentType(ContentType.JSON)
+                    .when().post("/favorites/places")
+                    .then()
+                    .statusCode(201);
+
+            // then - position이 1, 2, 3으로 순차적으로 설정되었는지 확인
+            Integer position1 = jdbcTemplate.queryForObject(
+                    "SELECT position FROM favorite_place WHERE favorite_folder_id = 1 AND place_id = 1", 
+                    Integer.class);
+            Integer position2 = jdbcTemplate.queryForObject(
+                    "SELECT position FROM favorite_place WHERE favorite_folder_id = 1 AND place_id = 2", 
+                    Integer.class);
+            Integer position3 = jdbcTemplate.queryForObject(
+                    "SELECT position FROM favorite_place WHERE favorite_folder_id = 1 AND place_id = 3", 
+                    Integer.class);
+
+            assertThat(position1).isEqualTo(1);
+            assertThat(position2).isEqualTo(2);
+            assertThat(position3).isEqualTo(3);
+        }
+
+        @DisplayName("폴더 소유자의 기기id와 요청자의 기기id가 같지 않은 경우 403 FORBIDDEN을 응답한다")
+        @Test
+        void create5() {
             jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('may')");
             jdbcTemplate.update(
                     "INSERT INTO favorite_folder (member_id, name, is_default) VALUES (1, '잠실캠 맛집 모음', false)");
@@ -101,7 +217,7 @@ class FavoritePlaceApiTest {
 
         @DisplayName("favoriteFolderId에 대한 폴더가 존재하지 않는 경우 404 NOT FOUND를 응답한다")
         @Test
-        void create3() {
+        void create6() {
             jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('testDeviceFid')");
             jdbcTemplate.update(
                     "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('루터회관','https://naver.me/5UrZAIeY', '루터회관의 도로명 주소', 38.1234, 127.23123)");
@@ -119,7 +235,7 @@ class FavoritePlaceApiTest {
 
         @DisplayName("placeId에 대한 장소가 존재하지 않는 경우 404 NOT FOUND를 응답한다")
         @Test
-        void create4() {
+        void create7() {
             jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('testDeviceFid')");
             jdbcTemplate.update(
                     "INSERT INTO favorite_folder (member_id, name, is_default) VALUES (1, '잠실캠 맛집 모음', false)");
@@ -137,7 +253,7 @@ class FavoritePlaceApiTest {
 
         @DisplayName("이미 해당 폴더에 찜한 장소인 경우 409 CONFLICT를 응답한다")
         @Test
-        void create5() {
+        void create8() {
             jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('testDeviceFid')");
             jdbcTemplate.update(
                     "INSERT INTO favorite_folder (member_id, name, is_default) VALUES (1, '잠실캠 맛집 모음', false)");
