@@ -97,7 +97,7 @@ public class FavoriteFolderService {
         for (int index = 0; index < updatedPlaceOrders.size(); index++) {
             Long favoritePlaceId = updatedPlaceOrders.get(index);
             FavoritePlace favoritePlace = getFavoritePlaceById(favoritePlaceId);
-            favoritePlace.updateOrder(index + 1);
+            favoritePlace.updatePosition(index + 1);
         }
     }
 
