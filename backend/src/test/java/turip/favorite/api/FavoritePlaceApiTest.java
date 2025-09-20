@@ -102,7 +102,7 @@ class FavoritePlaceApiTest {
 
             // then - position이 1로 설정되었는지 확인
             Integer position = jdbcTemplate.queryForObject(
-                    "SELECT position FROM favorite_place WHERE favorite_folder_id = 1 AND place_id = 1", 
+                    "SELECT position FROM favorite_place WHERE favorite_folder_id = 1 AND place_id = 1",
                     Integer.class);
             assertThat(position).isEqualTo(1);
         }
@@ -132,7 +132,7 @@ class FavoritePlaceApiTest {
 
             // then - position이 2로 설정되었는지 확인
             Integer position = jdbcTemplate.queryForObject(
-                    "SELECT position FROM favorite_place WHERE favorite_folder_id = 1 AND place_id = 2", 
+                    "SELECT position FROM favorite_place WHERE favorite_folder_id = 1 AND place_id = 2",
                     Integer.class);
             assertThat(position).isEqualTo(2);
         }
@@ -181,13 +181,13 @@ class FavoritePlaceApiTest {
 
             // then - position이 1, 2, 3으로 순차적으로 설정되었는지 확인
             Integer position1 = jdbcTemplate.queryForObject(
-                    "SELECT position FROM favorite_place WHERE favorite_folder_id = 1 AND place_id = 1", 
+                    "SELECT position FROM favorite_place WHERE favorite_folder_id = 1 AND place_id = 1",
                     Integer.class);
             Integer position2 = jdbcTemplate.queryForObject(
-                    "SELECT position FROM favorite_place WHERE favorite_folder_id = 1 AND place_id = 2", 
+                    "SELECT position FROM favorite_place WHERE favorite_folder_id = 1 AND place_id = 2",
                     Integer.class);
             Integer position3 = jdbcTemplate.queryForObject(
-                    "SELECT position FROM favorite_place WHERE favorite_folder_id = 1 AND place_id = 3", 
+                    "SELECT position FROM favorite_place WHERE favorite_folder_id = 1 AND place_id = 3",
                     Integer.class);
 
             assertThat(position1).isEqualTo(1);
@@ -288,8 +288,8 @@ class FavoritePlaceApiTest {
                     "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('루터회관','https://naver.me/5UrZAIeY', '루터회관의 도로명 주소', 38.1234, 127.23123)");
             jdbcTemplate.update(
                     "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('스타벅스','https://naver.me/abc123', '스타벅스의 도로명 주소', 37.5678, 126.9876)");
-            jdbcTemplate.update("INSERT INTO favorite_place (favorite_folder_id, place_id) VALUES (1, 1)");
-            jdbcTemplate.update("INSERT INTO favorite_place (favorite_folder_id, place_id) VALUES (1, 2)");
+            jdbcTemplate.update("INSERT INTO favorite_place (favorite_folder_id, place_id, position) VALUES (1, 1, 1)");
+            jdbcTemplate.update("INSERT INTO favorite_place (favorite_folder_id, place_id, position) VALUES (1, 2, 2)");
 
             // when & then
             RestAssured.given().port(port)
@@ -303,9 +303,45 @@ class FavoritePlaceApiTest {
                     .body("favoritePlaces[1].place.name", is("스타벅스"));
         }
 
-        @DisplayName("favoriteFolderId에 대한 폴더가 존재하지 않는 경우 404 NOT FOUND를 응답한다")
+        @DisplayName("장소가 position 오름차순으로 정렬되어 반환된다")
         @Test
         void readAllByFolder2() {
+            // given
+            jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('testDeviceFid')");
+            jdbcTemplate.update(
+                    "INSERT INTO favorite_folder (member_id, name, is_default) VALUES (1, '테스트 폴더', false)");
+
+            for (int i = 1; i <= 5; i++) {
+                jdbcTemplate.update(
+                        "INSERT INTO place (name, url, address, latitude, longitude) VALUES (?, ?, ?, ?, ?)",
+                        "장소" + i, "https://naver.me/place" + i, "장소" + i + " 주소", 37.0 + i, 127.0 + i);
+            }
+
+            // position을 5, 1, 3, 2, 4 순서로 삽입 (정렬 후 1,2,3,4,5)
+            jdbcTemplate.update("INSERT INTO favorite_place (favorite_folder_id, place_id, position) VALUES (1, 1, 5)");
+            jdbcTemplate.update("INSERT INTO favorite_place (favorite_folder_id, place_id, position) VALUES (1, 2, 1)");
+            jdbcTemplate.update("INSERT INTO favorite_place (favorite_folder_id, place_id, position) VALUES (1, 3, 3)");
+            jdbcTemplate.update("INSERT INTO favorite_place (favorite_folder_id, place_id, position) VALUES (1, 4, 2)");
+            jdbcTemplate.update("INSERT INTO favorite_place (favorite_folder_id, place_id, position) VALUES (1, 5, 4)");
+
+            // when & then - position 오름차순으로 정렬되어 반환되는지 확인
+            RestAssured.given().port(port)
+                    .queryParam("favoriteFolderId", 1L)
+                    .contentType(ContentType.JSON)
+                    .when().get("/favorites/places")
+                    .then()
+                    .statusCode(200)
+                    .body("favoritePlaceCount", is(5))
+                    .body("favoritePlaces[0].place.name", is("장소2"))  // position 1
+                    .body("favoritePlaces[1].place.name", is("장소4"))  // position 2
+                    .body("favoritePlaces[2].place.name", is("장소3"))  // position 3
+                    .body("favoritePlaces[3].place.name", is("장소5"))  // position 4
+                    .body("favoritePlaces[4].place.name", is("장소1")); // position 5
+        }
+
+        @DisplayName("favoriteFolderId에 대한 폴더가 존재하지 않는 경우 404 NOT FOUND를 응답한다")
+        @Test
+        void readAllByFolder3() {
             // when & then
             RestAssured.given().port(port)
                     .queryParam("favoriteFolderId", 1L)
