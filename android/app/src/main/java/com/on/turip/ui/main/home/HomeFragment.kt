@@ -6,9 +6,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.fragment.app.viewModels
+import com.on.turip.R
 import com.on.turip.databinding.FragmentHomeBinding
 import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.content.Content
@@ -17,6 +24,7 @@ import com.on.turip.ui.common.ItemSpaceDecoration
 import com.on.turip.ui.common.base.BaseFragment
 import com.on.turip.ui.compose.main.home.component.RegionList
 import com.on.turip.ui.compose.main.home.component.RegionTypeButtons
+import com.on.turip.ui.compose.theme.TuripTypography
 import com.on.turip.ui.search.keywordresult.SearchActivity
 import com.on.turip.ui.search.regionresult.RegionResultActivity
 import com.on.turip.ui.trip.detail.TripDetailActivity
@@ -53,7 +61,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         setupListeners()
         showNetworkError()
 
-        setupRegionComposeView()
+        setupComposeView()
     }
 
     private fun setupAdapters() {
@@ -125,7 +133,16 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         }
     }
 
-    private fun setupRegionComposeView() {
+    private fun setupComposeView() {
+        binding.tvHomeAppDescription.setContent {
+            Text(
+                text = stringResource(R.string.home_where_should_we_go_title),
+                modifier = Modifier.padding(top = 10.dp),
+                color = colorResource(R.color.gray_400_2b2b2b),
+                style = TuripTypography.titleLarge,
+            )
+        }
+
         binding.rvHomeRegion.setContent {
             val regions: List<RegionCategory> by viewModel.regionCategories.observeAsState(emptyList())
             RegionList(
@@ -146,6 +163,15 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                     viewModel.updateDomesticSelected(isSelectDomestic)
                 },
                 isSelectedDomestic = isSelectedDomestic,
+            )
+        }
+
+        binding.tvHomeUsersLikeContentTitle.setContent {
+            Text(
+                text = stringResource(R.string.home_users_like_content_title),
+                modifier = Modifier.padding(top = 26.dp),
+                color = colorResource(R.color.gray_400_2b2b2b),
+                style = TuripTypography.titleLarge,
             )
         }
     }
