@@ -6,6 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.fragment.app.viewModels
 import com.on.turip.databinding.FragmentHomeBinding
 import com.on.turip.domain.ErrorEvent
@@ -13,6 +15,7 @@ import com.on.turip.domain.content.Content
 import com.on.turip.domain.region.RegionCategory
 import com.on.turip.ui.common.ItemSpaceDecoration
 import com.on.turip.ui.common.base.BaseFragment
+import com.on.turip.ui.compose.main.home.component.RegionList
 import com.on.turip.ui.search.keywordresult.SearchActivity
 import com.on.turip.ui.search.regionresult.RegionResultActivity
 import com.on.turip.ui.trip.detail.TripDetailActivity
@@ -20,14 +23,6 @@ import timber.log.Timber
 
 class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     private val viewModel: HomeViewModel by viewModels { HomeViewModel.provideFactory() }
-
-    private val regionAdapter: RegionAdapter =
-        RegionAdapter { regionCategoryName: String ->
-            Timber.d("지역 선택 : $regionCategoryName")
-            val intent: Intent =
-                RegionResultActivity.newIntent(requireContext(), regionCategoryName)
-            startActivity(intent)
-        }
 
     private val usersLikeContentAdapter: UsersLikeContentAdapter =
         UsersLikeContentAdapter { content: Content ->
@@ -56,13 +51,11 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         setupObservers()
         setupListeners()
         showNetworkError()
+
+        setupRegionComposeView()
     }
 
     private fun setupAdapters() {
-        binding.rvHomeRegion.apply {
-            adapter = regionAdapter
-            addItemDecoration(ItemSpaceDecoration(end = 12))
-        }
         binding.rvUsersLikeContent.apply {
             adapter = usersLikeContentAdapter
             addItemDecoration(ItemSpaceDecoration(end = 10))
@@ -70,9 +63,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     }
 
     private fun setupObservers() {
-        viewModel.regionCategories.observe(viewLifecycleOwner) { regionCategories: List<RegionCategory> ->
-            regionAdapter.submitList(regionCategories)
-        }
         viewModel.isSelectedDomestic.observe(viewLifecycleOwner) { isSelectedDomestic: Boolean ->
             binding.tvHomeDomesticButton.isSelected = isSelectedDomestic
             binding.tvHomeAbroadButton.isSelected = isSelectedDomestic.not()
@@ -143,6 +133,21 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             setOnRetryClickListener {
                 viewModel.reload()
             }
+        }
+    }
+
+    private fun setupRegionComposeView() {
+        binding.rvHomeRegion.setContent {
+            val regions: List<RegionCategory> by viewModel.regionCategories.observeAsState(emptyList())
+            RegionList(
+                regions = regions,
+                onRegionClick = { regionCategoryName: String ->
+                    Timber.d("지역 선택 : $regionCategoryName")
+                    val intent: Intent =
+                        RegionResultActivity.newIntent(requireContext(), regionCategoryName)
+                    startActivity(intent)
+                },
+            )
         }
     }
 }
