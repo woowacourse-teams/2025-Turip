@@ -8,18 +8,18 @@ import retrofit2.http.POST
 import retrofit2.http.Query
 
 interface PlaceService {
-    @GET("favorite-places")
+    @GET("favorites/places")
     suspend fun getFavoritePlaces(
         @Query("favoriteFolderId") favoriteFolderId: Long,
     ): Response<FavoritePlacesResponse>
 
-    @POST("favorite-places")
+    @POST("favorites/places")
     suspend fun postFavoritePlace(
         @Query("favoriteFolderId") favoriteFolderId: Long,
         @Query("placeId") placeId: Long,
     ): Response<Unit>
 
-    @DELETE("favorite-places")
+    @DELETE("favorites/places")
     suspend fun deleteFavoritePlace(
         @Query("favoriteFolderId") favoriteFolderId: Long,
         @Query("placeId") placeId: Long,

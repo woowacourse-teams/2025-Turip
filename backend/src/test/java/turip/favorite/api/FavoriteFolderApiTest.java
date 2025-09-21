@@ -70,7 +70,7 @@ class FavoriteFolderApiTest {
                     .header("device-fid", "testDeviceFid")
                     .body(request)
                     .contentType(ContentType.JSON)
-                    .when().post("/favorite-folders")
+                    .when().post("/favorites/folders")
                     .then()
                     .statusCode(201);
         }
@@ -89,7 +89,7 @@ class FavoriteFolderApiTest {
                     .header("device-fid", "testDeviceFid")
                     .body(request)
                     .contentType(ContentType.JSON)
-                    .when().post("/favorite-folders")
+                    .when().post("/favorites/folders")
                     .then()
                     .statusCode(409);
         }
@@ -103,7 +103,7 @@ class FavoriteFolderApiTest {
                     .header("device-fid", "testDeviceFid")
                     .body(request)
                     .contentType(ContentType.JSON)
-                    .when().post("/favorite-folders")
+                    .when().post("/favorites/folders")
                     .then()
                     .statusCode(400);
         }
@@ -126,7 +126,7 @@ class FavoriteFolderApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .when().get("/favorite-folders")
+                    .when().get("/favorites/folders")
                     .then()
                     .statusCode(200)
                     .body("favoriteFolders.size()", is(2))
@@ -146,7 +146,7 @@ class FavoriteFolderApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "newDeviceFid")
-                    .when().get("/favorite-folders")
+                    .when().get("/favorites/folders")
                     .then()
                     .statusCode(200)
                     .body("favoriteFolders.size()", is(1))
@@ -177,7 +177,7 @@ class FavoriteFolderApiTest {
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
                     .queryParam("placeId", 1L)
-                    .when().get("/favorite-folders/favorite-status")
+                    .when().get("/favorites/folders/favorite-status")
                     .then()
                     .statusCode(200)
                     .body("favoriteFolders.size()", is(2))
@@ -196,7 +196,7 @@ class FavoriteFolderApiTest {
             RestAssured.given().port(port)
                     .header("device-fid", "newDeviceFid")
                     .queryParam("placeId", 1L)
-                    .when().get("/favorite-folders/favorite-status")
+                    .when().get("/favorites/folders/favorite-status")
                     .then()
                     .statusCode(200)
                     .body("favoriteFolders[0].name", is("기본 폴더"))
@@ -216,7 +216,7 @@ class FavoriteFolderApiTest {
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
                     .queryParam("placeId", 1L)
-                    .when().get("/favorite-folders/favorite-status")
+                    .when().get("/favorites/folders/favorite-status")
                     .then()
                     .statusCode(404);
         }
@@ -240,7 +240,7 @@ class FavoriteFolderApiTest {
                     .header("device-fid", "testDeviceFid")
                     .body(request)
                     .contentType(ContentType.JSON)
-                    .when().patch("/favorite-folders/1")
+                    .when().patch("/favorites/folders/1")
                     .then()
                     .statusCode(200)
                     .body("id", is(1))
@@ -263,7 +263,7 @@ class FavoriteFolderApiTest {
                     .header("device-fid", "nonExistentDeviceFid")
                     .body(request)
                     .contentType(ContentType.JSON)
-                    .when().patch("/favorite-folders/1")
+                    .when().patch("/favorites/folders/1")
                     .then()
                     .statusCode(404);
         }
@@ -282,7 +282,7 @@ class FavoriteFolderApiTest {
                     .header("device-fid", "testDeviceFid")
                     .body(request)
                     .contentType(ContentType.JSON)
-                    .when().patch("/favorite-folders/999")
+                    .when().patch("/favorites/folders/999")
                     .then()
                     .statusCode(404);
         }
@@ -302,7 +302,7 @@ class FavoriteFolderApiTest {
                     .header("device-fid", "requestDeviceFid")
                     .body(request)
                     .contentType(ContentType.JSON)
-                    .when().patch("/favorite-folders/1")
+                    .when().patch("/favorites/folders/1")
                     .then()
                     .statusCode(403);
         }
@@ -323,7 +323,7 @@ class FavoriteFolderApiTest {
                     .header("device-fid", "testDeviceFid")
                     .body(request)
                     .contentType(ContentType.JSON)
-                    .when().patch("/favorite-folders/1")
+                    .when().patch("/favorites/folders/1")
                     .then()
                     .statusCode(409);
         }
@@ -342,7 +342,7 @@ class FavoriteFolderApiTest {
                     .header("device-fid", "testDeviceFid")
                     .body(request)
                     .contentType(ContentType.JSON)
-                    .when().patch("/favorite-folders/1")
+                    .when().patch("/favorites/folders/1")
                     .then()
                     .statusCode(400);
         }
@@ -361,7 +361,7 @@ class FavoriteFolderApiTest {
                     .header("device-fid", "testDeviceFid")
                     .body(request)
                     .contentType(ContentType.JSON)
-                    .when().patch("/favorite-folders/1")
+                    .when().patch("/favorites/folders/1")
                     .then()
                     .statusCode(400);
         }
@@ -382,7 +382,7 @@ class FavoriteFolderApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .when().delete("/favorite-folders/1")
+                    .when().delete("/favorites/folders/1")
                     .then()
                     .statusCode(204);
         }
@@ -398,7 +398,7 @@ class FavoriteFolderApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .when().delete("/favorite-folders/999")
+                    .when().delete("/favorites/folders/999")
                     .then()
                     .statusCode(404);
         }
@@ -414,7 +414,7 @@ class FavoriteFolderApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "nonExistentDeviceFid")
-                    .when().delete("/favorite-folders/1")
+                    .when().delete("/favorites/folders/1")
                     .then()
                     .statusCode(404);
         }
@@ -431,7 +431,7 @@ class FavoriteFolderApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "requestDeviceFid")
-                    .when().delete("/favorite-folders/1")
+                    .when().delete("/favorites/folders/1")
                     .then()
                     .statusCode(403);
         }
@@ -447,7 +447,7 @@ class FavoriteFolderApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .when().delete("/favorite-folders/1")
+                    .when().delete("/favorites/folders/1")
                     .then()
                     .statusCode(400);
         }

@@ -54,7 +54,7 @@ class FavoriteContentApiTest {
         jdbcTemplate.update("ALTER TABLE member ALTER COLUMN id RESTART WITH 1");
     }
 
-    @DisplayName("/favorites-contents POST 찜 생성 테스트")
+    @DisplayName("/favorites/contents POST 찜 생성 테스트")
     @Nested
     class createFavoriteContent {
 
@@ -93,10 +93,10 @@ class FavoriteContentApiTest {
                     .header("device-fid", "testDeviceFid")
                     .contentType(ContentType.JSON)
                     .body(request)
-                    .when().post("/favorite-contents")
+                    .when().post("/favorites/contents")
                     .then()
                     .statusCode(201)
-                    .header("Location", org.hamcrest.Matchers.containsString("/favorite-contents/"))
+                    .header("Location", org.hamcrest.Matchers.containsString("/favorites/contents/"))
                     .body("id", Matchers.notNullValue())
                     .body("createdAt", Matchers.notNullValue())
                     .body("memberId", Matchers.notNullValue())
@@ -132,7 +132,7 @@ class FavoriteContentApiTest {
                     .header("device-fid", "testDeviceFid")
                     .contentType(ContentType.JSON)
                     .body(request)
-                    .when().post("/favorite-contents")
+                    .when().post("/favorites/contents")
                     .then()
                     .statusCode(404);
         }
@@ -165,13 +165,13 @@ class FavoriteContentApiTest {
                     .header("device-fid", "testDeviceFid")
                     .contentType(ContentType.JSON)
                     .body(request)
-                    .when().post("/favorite-contents")
+                    .when().post("/favorites/contents")
                     .then()
                     .statusCode(409);
         }
     }
 
-    @DisplayName("/favorite-contents DELETE 찜 삭제 테스트")
+    @DisplayName("/favorites/contents DELETE 찜 삭제 테스트")
     @Nested
     class deleteFavoriteContent {
 
@@ -195,7 +195,7 @@ class FavoriteContentApiTest {
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
                     .queryParam("contentId", 1)
-                    .when().delete("/favorite-contents")
+                    .when().delete("/favorites/contents")
                     .then()
                     .statusCode(204);
         }
@@ -220,7 +220,7 @@ class FavoriteContentApiTest {
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
                     .queryParam("contentId", 2)
-                    .when().delete("/favorite-contents")
+                    .when().delete("/favorites/contents")
                     .then()
                     .statusCode(404);
         }
@@ -245,7 +245,7 @@ class FavoriteContentApiTest {
             RestAssured.given().port(port)
                     .header("device-fid", "haruharu")
                     .queryParam("contentId", 1)
-                    .when().delete("/favorite-contents")
+                    .when().delete("/favorites/contents")
                     .then()
                     .statusCode(404);
         }
@@ -270,13 +270,13 @@ class FavoriteContentApiTest {
             RestAssured.given().port(port)
                     .header("device-fid", "haruharu")
                     .queryParam("contentId", 2)
-                    .when().delete("/favorite-contents")
+                    .when().delete("/favorites/contents")
                     .then()
                     .statusCode(404);
         }
     }
 
-    @DisplayName("/favorite-contents GET 찜 조회 테스트")
+    @DisplayName("/favorites/contents GET 찜 조회 테스트")
     @Nested
     class ReadFavoriteContent {
 
@@ -305,7 +305,7 @@ class FavoriteContentApiTest {
                     .header("device-fid", "testDeviceFid")
                     .queryParam("size", 5)
                     .queryParam("lastId", 0)
-                    .when().get("/favorite-contents")
+                    .when().get("/favorites/contents")
                     .then()
                     .statusCode(200)
                     .body("contents.size()", is(1))

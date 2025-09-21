@@ -27,18 +27,11 @@ class FavoritePlaceViewModel(
     private val favoritePlaceRepository: FavoritePlaceRepository,
     private val updateFavoritePlaceUseCase: UpdateFavoritePlaceUseCase,
 ) : ViewModel() {
-    private val _folders: MutableLiveData<List<FavoritePlaceFolderModel>> = MutableLiveData()
-    val folders: LiveData<List<FavoritePlaceFolderModel>> get() = _folders
-    private val _places: MutableLiveData<List<FavoritePlaceModel>> = MutableLiveData()
-    val places: LiveData<List<FavoritePlaceModel>> get() = _places
+    private val _favoritePlaceUiState: MutableLiveData<FavoritePlaceUiState> =
+        MutableLiveData(FavoritePlaceUiState())
+    val favoritePlaceUiState: LiveData<FavoritePlaceUiState> get() = _favoritePlaceUiState
 
-    private val _networkError: MutableLiveData<Boolean> = MutableLiveData(false)
-    val networkError: LiveData<Boolean> get() = _networkError
-
-    private val _serverError: MutableLiveData<Boolean> = MutableLiveData(false)
-    val serverError: LiveData<Boolean> get() = _serverError
-
-    private var selectedFolderId: Long = NOT_INITIALIZED
+    var selectedFolderId: Long = NOT_INITIALIZED
 
     fun loadFoldersAndPlaces() {
         viewModelScope.launch {
@@ -47,11 +40,18 @@ class FavoritePlaceViewModel(
                 .onSuccess { folders: List<Folder> ->
                     Timber.d("장소 찜 목록 화면 폴더 불러오기 성공")
                     if (selectedFolderId == NOT_INITIALIZED) selectedFolderId = folders[0].id
-                    _folders.value =
-                        folders.map { folder: Folder -> folder.toUiModel(selectedFolderId) }
+                    _favoritePlaceUiState.value =
+                        favoritePlaceUiState.value?.copy(
+                            folders =
+                                folders.map { folder: Folder ->
+                                    folder.toUiModel(selectedFolderId)
+                                },
+                        )
                     loadPlacesInSelectFolder()
-                    _serverError.value = false
-                    _networkError.value = false
+                    _favoritePlaceUiState.value =
+                        favoritePlaceUiState.value?.copy(isServerError = false)
+                    _favoritePlaceUiState.value =
+                        favoritePlaceUiState.value?.copy(isNetWorkError = false)
                 }.onFailure { errorEvent: ErrorEvent ->
                     checkError(errorEvent)
                     Timber.e("장소 찜 목록 화면 폴더 불러오기 API 호출 실패")
@@ -63,9 +63,12 @@ class FavoritePlaceViewModel(
         favoritePlaceRepository
             .loadFavoritePlaces(selectedFolderId)
             .onSuccess { places: List<Place> ->
-                _places.value = places.map { place: Place -> place.toUiModel() }
-                _serverError.value = false
-                _networkError.value = false
+                _favoritePlaceUiState.value =
+                    favoritePlaceUiState.value?.copy(places = places.map { place: Place -> place.toUiModel() })
+                _favoritePlaceUiState.value =
+                    favoritePlaceUiState.value?.copy(isServerError = false)
+                _favoritePlaceUiState.value =
+                    favoritePlaceUiState.value?.copy(isNetWorkError = false)
             }.onFailure { errorEvent: ErrorEvent ->
                 checkError(errorEvent)
                 Timber.e("폴더에 담긴 장소들을 불러오는 API 호출 실패")
@@ -80,13 +83,18 @@ class FavoritePlaceViewModel(
         viewModelScope.launch {
             updateFavoritePlaceUseCase(selectedFolderId, placeId, updatedFavorite)
                 .onSuccess {
-                    _places.value =
-                        places.value?.map {
-                            if (it.placeId == placeId) it.copy(isFavorite = updatedFavorite) else it
-                        }
+                    _favoritePlaceUiState.value =
+                        favoritePlaceUiState.value?.copy(
+                            places =
+                                favoritePlaceUiState.value?.places?.filter {
+                                    it.placeId != placeId
+                                } ?: emptyList(),
+                        )
                     Timber.d("찜 목록 화면 폴더명에 해당하는 찜 장소들 업데이트 성공")
-                    _serverError.value = false
-                    _networkError.value = false
+                    _favoritePlaceUiState.value =
+                        favoritePlaceUiState.value?.copy(isServerError = false)
+                    _favoritePlaceUiState.value =
+                        favoritePlaceUiState.value?.copy(isNetWorkError = false)
                 }.onFailure { errorEvent: ErrorEvent ->
                     checkError(errorEvent)
                     Timber.e("찜 목록 화면 폴더명에 해당하는 찜 장소들 업데이트 실패 (placeId =$placeId)")
@@ -95,20 +103,38 @@ class FavoritePlaceViewModel(
     }
 
     fun updateFolderWithPlaces(folderId: Long) {
-        val isDeleted: Boolean = folders.value?.all { it.id != folderId } ?: true
-        selectedFolderId = if (isDeleted) folders.value?.get(0)?.id ?: NOT_INITIALIZED else folderId
-
-        _folders.value =
-            folders.value?.map { favoriteFolder: FavoritePlaceFolderModel ->
-                favoriteFolder.copy(isSelected = favoriteFolder.id == selectedFolderId)
+        val isDeleted: Boolean =
+            favoritePlaceUiState.value?.folders?.all { it.id != folderId } ?: true
+        selectedFolderId =
+            if (isDeleted) {
+                favoritePlaceUiState.value
+                    ?.folders
+                    ?.get(0)
+                    ?.id
+                    ?: NOT_INITIALIZED
+            } else {
+                folderId
             }
+
+        _favoritePlaceUiState.value =
+            favoritePlaceUiState.value?.copy(
+                folders =
+                    favoritePlaceUiState.value?.folders?.map { favoriteFolder: FavoritePlaceFolderModel ->
+                        favoriteFolder.copy(isSelected = favoriteFolder.id == selectedFolderId)
+                    } ?: emptyList(),
+            )
         viewModelScope.launch {
             favoritePlaceRepository
                 .loadFavoritePlaces(folderId)
                 .onSuccess { result: List<Place> ->
-                    _places.value = result.map { it.toUiModel() }
-                    _serverError.value = false
-                    _networkError.value = false
+                    _favoritePlaceUiState.value =
+                        favoritePlaceUiState.value?.copy(
+                            places = result.map { it.toUiModel() },
+                        )
+                    _favoritePlaceUiState.value =
+                        favoritePlaceUiState.value?.copy(isServerError = false)
+                    _favoritePlaceUiState.value =
+                        favoritePlaceUiState.value?.copy(isNetWorkError = false)
                 }.onFailure { errorEvent: ErrorEvent ->
                     checkError(errorEvent)
                     Timber.e("폴더에 담긴 장소들을 불러오는 API 호출 실패")
@@ -119,23 +145,35 @@ class FavoritePlaceViewModel(
     private fun checkError(errorEvent: ErrorEvent) {
         when (errorEvent) {
             ErrorEvent.USER_NOT_HAVE_PERMISSION -> {
-                _serverError.value = true
+                _favoritePlaceUiState.value =
+                    favoritePlaceUiState.value?.copy(isServerError = true)
             }
 
             ErrorEvent.DUPLICATION_FOLDER -> throw IllegalArgumentException("발생할 수 없는 오류")
             ErrorEvent.UNEXPECTED_PROBLEM -> {
-                _serverError.value = true
+                _favoritePlaceUiState.value =
+                    favoritePlaceUiState.value?.copy(isServerError = true)
             }
 
             ErrorEvent.NETWORK_ERROR -> {
-                _networkError.value = true
+                _favoritePlaceUiState.value =
+                    favoritePlaceUiState.value?.copy(isServerError = true)
             }
 
             ErrorEvent.PARSER_ERROR -> {
-                _serverError.value = true
+                _favoritePlaceUiState.value =
+                    favoritePlaceUiState.value?.copy(isServerError = true)
             }
         }
     }
+
+    data class FavoritePlaceUiState(
+        val isLoading: Boolean = true,
+        val isNetWorkError: Boolean = false,
+        val isServerError: Boolean = false,
+        val places: List<FavoritePlaceModel> = emptyList(),
+        val folders: List<FavoritePlaceFolderModel> = emptyList(),
+    )
 
     companion object {
         private const val NOT_INITIALIZED: Long = 0L
