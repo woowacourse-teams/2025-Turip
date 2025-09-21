@@ -8,6 +8,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.on.turip.R
 import com.on.turip.databinding.FragmentFavoritePlaceBinding
@@ -75,6 +76,32 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
         }
 
         binding.rvFavoritePlacePlace.adapter = placeAdapter
+
+        val itemTouchHelper =
+            ItemTouchHelper(
+                object : ItemTouchHelper.SimpleCallback(
+                    ItemTouchHelper.UP or ItemTouchHelper.DOWN,
+                    0,
+                ) {
+                    override fun onMove(
+                        recyclerView: RecyclerView,
+                        viewHolder: RecyclerView.ViewHolder,
+                        target: RecyclerView.ViewHolder,
+                    ): Boolean {
+                        val from = viewHolder.bindingAdapterPosition
+                        val to = target.bindingAdapterPosition
+                        placeAdapter.moveItem(from, to)
+                        return true
+                    }
+
+                    override fun onSwiped(
+                        viewHolder: RecyclerView.ViewHolder,
+                        direction: Int,
+                    ) = Unit
+                },
+            )
+
+        itemTouchHelper.attachToRecyclerView(binding.rvFavoritePlacePlace)
     }
 
     private fun setupListeners() {
