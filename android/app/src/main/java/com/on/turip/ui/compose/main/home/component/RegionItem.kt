@@ -13,7 +13,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import com.on.turip.R
 import com.on.turip.domain.region.RegionCategory
-import com.on.turip.ui.compose.common.CircularImage
+import com.on.turip.ui.compose.common.component.CircularImage
 import com.on.turip.ui.compose.theme.TuripTypography
 
 @Composable

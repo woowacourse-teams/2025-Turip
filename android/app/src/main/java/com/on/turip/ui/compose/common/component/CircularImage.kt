@@ -1,4 +1,4 @@
-package com.on.turip.ui.compose.common
+package com.on.turip.ui.compose.common.component
 
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.shape.CircleShape
