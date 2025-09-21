@@ -25,7 +25,7 @@ fun RegionList(
             modifier
                 .wrapContentHeight()
                 .background(colorResource(R.color.pure_white_ffffff)),
-        contentPadding = PaddingValues(start = 20.dp, top = 14.dp),
+        contentPadding = PaddingValues(start = 20.dp, top = 14.dp, end = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         items(regions, key = { it.name }) { regionCategory: RegionCategory ->
