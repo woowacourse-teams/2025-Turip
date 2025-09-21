@@ -1,7 +1,9 @@
 package turip.place.domain;
 
 import java.util.Arrays;
+import lombok.Getter;
 
+@Getter
 public enum GoogleMapCategory {
     // 자동차
     CAR_DEALER("자동차 판매점", "car_dealer"),
