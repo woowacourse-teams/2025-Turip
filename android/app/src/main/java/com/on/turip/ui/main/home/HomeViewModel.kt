@@ -103,6 +103,12 @@ class HomeViewModel(
         }
     }
 
+    fun updateDomesticSelected(isDomesticSelected: Boolean) {
+        _isSelectedDomestic.value = isDomesticSelected
+        Timber.d(if (isSelectedDomestic.value == true) "국내 클릭" else "해외 클릭")
+        isSelectedDomestic.value?.let { loadRegionCategories(it) }
+    }
+
     companion object {
         fun provideFactory(
             regionRepository: RegionRepository = RepositoryModule.regionRepository,

@@ -16,6 +16,7 @@ import com.on.turip.domain.region.RegionCategory
 import com.on.turip.ui.common.ItemSpaceDecoration
 import com.on.turip.ui.common.base.BaseFragment
 import com.on.turip.ui.compose.main.home.component.RegionList
+import com.on.turip.ui.compose.main.home.component.RegionTypeButtons
 import com.on.turip.ui.search.keywordresult.SearchActivity
 import com.on.turip.ui.search.regionresult.RegionResultActivity
 import com.on.turip.ui.trip.detail.TripDetailActivity
@@ -63,10 +64,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     }
 
     private fun setupObservers() {
-        viewModel.isSelectedDomestic.observe(viewLifecycleOwner) { isSelectedDomestic: Boolean ->
-            binding.tvHomeDomesticButton.isSelected = isSelectedDomestic
-            binding.tvHomeAbroadButton.isSelected = isSelectedDomestic.not()
-        }
         viewModel.usersLikeContents.observe(viewLifecycleOwner) { usersLikeContents: List<UsersLikeContentModel> ->
             usersLikeContentAdapter.submitList(usersLikeContents)
         }
@@ -85,14 +82,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     }
 
     private fun setupListeners() {
-        binding.tvHomeDomesticButton.setOnClickListener {
-            Timber.d("국내 클릭")
-            viewModel.loadRegionCategories(isDomestic = true)
-        }
-        binding.tvHomeAbroadButton.setOnClickListener {
-            Timber.d("해외 클릭")
-            viewModel.loadRegionCategories(isDomestic = false)
-        }
         binding.ivHomeSearch.setOnClickListener {
             if (binding.etHomeSearchResult.text.isBlank()) return@setOnClickListener
             val input: String = binding.etHomeSearchResult.text.toString()
@@ -147,6 +136,16 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                         RegionResultActivity.newIntent(requireContext(), regionCategoryName)
                     startActivity(intent)
                 },
+            )
+        }
+
+        binding.tvHomeRegionTypes.setContent {
+            val isSelectedDomestic: Boolean by viewModel.isSelectedDomestic.observeAsState(true)
+            RegionTypeButtons(
+                onDomesticClick = { isSelectDomestic: Boolean ->
+                    viewModel.updateDomesticSelected(isSelectDomestic)
+                },
+                isSelectedDomestic = isSelectedDomestic,
             )
         }
     }
