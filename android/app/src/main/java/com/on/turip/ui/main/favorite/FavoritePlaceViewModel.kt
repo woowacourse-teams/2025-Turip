@@ -66,9 +66,10 @@ class FavoritePlaceViewModel(
                 _favoritePlaceUiState.value =
                     favoritePlaceUiState.value?.copy(
                         places =
-                            favoritePlaces.map { favoritePlace: FavoritePlace ->
-                                favoritePlace.toUiModel()
-                            },
+                            favoritePlaces
+                                .map { favoritePlace: FavoritePlace ->
+                                    favoritePlace.toUiModel()
+                                }.sortedBy { it.order },
                     )
                 _favoritePlaceUiState.value =
                     favoritePlaceUiState.value?.copy(isServerError = false)
@@ -134,7 +135,7 @@ class FavoritePlaceViewModel(
                 .onSuccess { favoritePlaces: List<FavoritePlace> ->
                     _favoritePlaceUiState.value =
                         favoritePlaceUiState.value?.copy(
-                            places = favoritePlaces.map { it.toUiModel() },
+                            places = favoritePlaces.map { it.toUiModel() }.sortedBy { it.order },
                         )
                     _favoritePlaceUiState.value =
                         favoritePlaceUiState.value?.copy(isServerError = false)
