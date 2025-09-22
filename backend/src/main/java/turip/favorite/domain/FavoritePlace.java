@@ -39,8 +39,15 @@ public class FavoritePlace {
     @JoinColumn(name = "place_id", nullable = false, foreignKey = @ForeignKey(name = "fk_favorite_place__place"))
     private Place place;
 
-    public FavoritePlace(FavoriteFolder favoriteFolder, Place place) {
+    private Integer favoriteOrder;
+
+    public FavoritePlace(FavoriteFolder favoriteFolder, Place place, Integer favoriteOrder) {
         this.favoriteFolder = favoriteFolder;
         this.place = place;
+        this.favoriteOrder = favoriteOrder;
+    }
+
+    public void updateFavoriteOrder(Integer favoriteOrder) {
+        this.favoriteOrder = favoriteOrder;
     }
 }
