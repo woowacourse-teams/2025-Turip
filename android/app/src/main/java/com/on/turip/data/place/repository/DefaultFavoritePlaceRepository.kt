@@ -3,10 +3,10 @@ package com.on.turip.data.place.repository
 import com.on.turip.data.common.TuripCustomResult
 import com.on.turip.data.common.mapCatching
 import com.on.turip.data.place.datasource.FavoritePlaceRemoteDataSource
+import com.on.turip.data.place.dto.FavoritePlaceOrderRequest
 import com.on.turip.data.place.toDomain
 import com.on.turip.domain.favorite.FavoritePlace
 import com.on.turip.domain.favorite.repository.FavoritePlaceRepository
-import com.on.turip.domain.trip.Place
 
 class DefaultFavoritePlaceRepository(
     private val favoritePlaceRemoteDataSource: FavoritePlaceRemoteDataSource,
@@ -33,4 +33,17 @@ class DefaultFavoritePlaceRepository(
             favoriteFolderId = favoriteFolderId,
             placeId = placeId,
         )
+
+    override suspend fun updateFavoritePlacesOrder(
+        favoriteFolderId: Long,
+        updatedOrder: List<Long>,
+    ) {
+        favoritePlaceRemoteDataSource.patchFavoritePlacesOrder(
+            favoriteFolderId = favoriteFolderId,
+            favoritePlaceOrderRequest =
+                FavoritePlaceOrderRequest(
+                    favoritePlaceIdsOrder = updatedOrder,
+                ),
+        )
+    }
 }

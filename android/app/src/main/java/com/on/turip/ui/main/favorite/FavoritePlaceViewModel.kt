@@ -69,7 +69,7 @@ class FavoritePlaceViewModel(
                             favoritePlaces
                                 .map { favoritePlace: FavoritePlace ->
                                     favoritePlace.toUiModel()
-                                }.sortedBy { it.order },
+                                },
                     )
                 _favoritePlaceUiState.value =
                     favoritePlaceUiState.value?.copy(isServerError = false)
@@ -135,7 +135,7 @@ class FavoritePlaceViewModel(
                 .onSuccess { favoritePlaces: List<FavoritePlace> ->
                     _favoritePlaceUiState.value =
                         favoritePlaceUiState.value?.copy(
-                            places = favoritePlaces.map { it.toUiModel() }.sortedBy { it.order },
+                            places = favoritePlaces.map { it.toUiModel() },
                         )
                     _favoritePlaceUiState.value =
                         favoritePlaceUiState.value?.copy(isServerError = false)
@@ -170,6 +170,15 @@ class FavoritePlaceViewModel(
                 _favoritePlaceUiState.value =
                     favoritePlaceUiState.value?.copy(isServerError = true)
             }
+        }
+    }
+
+    fun updateFavoritePlacesOrder(favoritePlaceIdsOrder: List<Long>) {
+        viewModelScope.launch {
+            favoritePlaceRepository.updateFavoritePlacesOrder(
+                favoriteFolderId = selectedFolderId,
+                updatedOrder = favoritePlaceIdsOrder,
+            )
         }
     }
 

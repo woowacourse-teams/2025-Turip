@@ -15,4 +15,9 @@ interface FavoritePlaceRepository {
         favoriteFolderId: Long,
         placeId: Long,
     ): TuripCustomResult<Unit>
+
+    suspend fun updateFavoritePlacesOrder(
+        favoriteFolderId: Long,
+        updatedOrder: List<Long>,
+    )
 }

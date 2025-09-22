@@ -7,6 +7,7 @@ import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
 
 class FavoritePlaceAdapter(
     private val favoritePlaceListener: FavoritePlaceViewHolder.FavoritePlaceListener,
+    private val onChangeOrder: (favoritePlaceIdsOrder: List<Long>) -> Unit,
 ) : ListAdapter<FavoritePlaceModel, FavoritePlaceViewHolder>(FavoritePlaceDiffUtil) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -28,6 +29,7 @@ class FavoritePlaceAdapter(
         val item = mutableList.removeAt(from)
         mutableList.add(to, item)
         submitList(mutableList)
+        onChangeOrder(mutableList.toList().map { it.favoritePlaceId })
     }
 
     private object FavoritePlaceDiffUtil : DiffUtil.ItemCallback<FavoritePlaceModel>() {

@@ -38,6 +38,7 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
                     startActivity(intent)
                 }
             },
+            onChangeOrder = { viewModel.updateFavoritePlacesOrder(it) },
         )
     }
 
@@ -75,7 +76,10 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
             addOnItemTouchListener(RecyclerViewTouchInterceptor)
         }
 
-        binding.rvFavoritePlacePlace.adapter = placeAdapter
+        binding.rvFavoritePlacePlace.apply {
+            adapter = placeAdapter
+            itemAnimator = null
+        }
 
         val itemTouchHelper =
             ItemTouchHelper(
