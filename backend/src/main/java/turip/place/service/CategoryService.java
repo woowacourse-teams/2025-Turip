@@ -1,7 +1,7 @@
 package turip.place.service;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,10 +16,11 @@ public class CategoryService {
 
     @Transactional
     public void updateContentPlaceCategoryLanguage() {
-        List<Category> categories = categoryRepository.findAll();
-        for (Category category : categories) {
-            String parsedCategory = PlaceCategoryMapper.parseCategory(category.getName());
-            category.updateName(parsedCategory);
+        try (Stream<Category> stream = categoryRepository.streamAll()) {
+            stream.forEach(category -> {
+                String parsedCategory = PlaceCategoryMapper.parseCategory(category.getName());
+                category.updateName(parsedCategory);
+            });
         }
     }
 
