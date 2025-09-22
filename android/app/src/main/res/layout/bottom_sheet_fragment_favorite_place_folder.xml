@@ -5,17 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ImageView
-        android:id="@+id/iv_bottom_sheet_folder_favorite_place_drag_handle"
-        android:layout_width="80dp"
-        android:layout_height="8dp"
-        android:layout_marginTop="10dp"
-        android:contentDescription="@null"
-        android:src="@drawable/bg_gray100_radius_24dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <TextView
         android:id="@+id/tv_bottom_sheet_folder_favorite_place_folder_title"
         android:layout_width="wrap_content"
@@ -26,7 +15,7 @@
         android:textAppearance="@style/title3"
         android:textColor="@color/pure_black_151515"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/iv_bottom_sheet_folder_favorite_place_drag_handle"
+        app:layout_constraintTop_toTopOf="parent"
         tools:text="폴더 목록" />
 
     <ImageView
