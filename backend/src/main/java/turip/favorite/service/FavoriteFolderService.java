@@ -98,7 +98,7 @@ public class FavoriteFolderService {
             Long favoritePlaceId = updatedPlaceOrders.get(index);
             FavoritePlace favoritePlace = getFavoritePlaceById(favoritePlaceId);
             validateFavoritePlaceBelongsToFolder(favoritePlace, favoriteFolder);
-            favoritePlace.updatePosition(index + 1);
+            favoritePlace.updateFavoriteOrder(index + 1);
         }
     }
 

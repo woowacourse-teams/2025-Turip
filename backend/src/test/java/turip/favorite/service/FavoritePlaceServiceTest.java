@@ -189,7 +189,7 @@ class FavoritePlaceServiceTest {
 
             given(favoriteFolderRepository.findById(favoriteFolderId))
                     .willReturn(Optional.of(favoriteFolder));
-            given(favoritePlaceRepository.findAllByFavoriteFolderOrderByPositionAsc(favoriteFolder))
+            given(favoritePlaceRepository.findAllByFavoriteFolderOrderByFavoriteOrderAsc(favoriteFolder))
                     .willReturn(List.of(favoritePlace1, favoritePlace2));
 
             // when

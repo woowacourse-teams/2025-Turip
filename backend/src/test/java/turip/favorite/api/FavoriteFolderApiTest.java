@@ -383,8 +383,10 @@ class FavoriteFolderApiTest {
                     "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('장소1','https://naver.me/place1', '장소1 주소', 37.1234, 127.1234)");
             jdbcTemplate.update(
                     "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('장소2','https://naver.me/place2', '장소2 주소', 37.5678, 127.5678)");
-            jdbcTemplate.update("INSERT INTO favorite_place (favorite_folder_id, place_id, position) VALUES (1, 1, 1)");
-            jdbcTemplate.update("INSERT INTO favorite_place (favorite_folder_id, place_id, position) VALUES (1, 2, 2)");
+            jdbcTemplate.update(
+                    "INSERT INTO favorite_place (favorite_folder_id, place_id, favorite_order) VALUES (1, 1, 1)");
+            jdbcTemplate.update(
+                    "INSERT INTO favorite_place (favorite_folder_id, place_id, favorite_order) VALUES (1, 2, 2)");
 
             // when & then
             Map<String, Object> request = new HashMap<>();
@@ -494,7 +496,7 @@ class FavoriteFolderApiTest {
             jdbcTemplate.update(
                     "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('장소1','https://naver.me/place1', '장소1 주소', 37.1234, 127.1234)");
             jdbcTemplate.update(
-                    "INSERT INTO favorite_place (favorite_folder_id, place_id, position) VALUES (2, 1, 1)"); // 폴더2에 속한 장소
+                    "INSERT INTO favorite_place (favorite_folder_id, place_id, favorite_order) VALUES (2, 1, 1)"); // 폴더2에 속한 장소
 
             // when & then
             Map<String, Object> request = new HashMap<>();
