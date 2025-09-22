@@ -28,8 +28,9 @@ class FavoritePlaceAdapter(
         val mutableList = currentList.toMutableList()
         val item = mutableList.removeAt(from)
         mutableList.add(to, item)
-        submitList(mutableList.toList()) {
-            onChange(mutableList.toList())
+        val updatedItems: List<FavoritePlaceModel> = mutableList.toList()
+        submitList(updatedItems) {
+            onChange(updatedItems)
         }
     }
 
