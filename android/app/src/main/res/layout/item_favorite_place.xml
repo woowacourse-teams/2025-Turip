@@ -32,23 +32,33 @@
         android:maxLines="1"
         android:textAppearance="@style/title1"
         android:textColor="@color/pure_white_ffffff"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/iv_favorite_place_move"
         app:layout_constraintStart_toStartOf="@id/tv_favorite_place_category"
         app:layout_constraintTop_toBottomOf="@id/tv_favorite_place_category"
         tools:text="경포대 해수욕장경포대 해수욕장경포대 해수욕장경포대 해수욕장" />
 
     <ImageView
-        android:id="@+id/iv_favorite_place_map_link"
+        android:id="@+id/iv_favorite_place_move"
         android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="24dp"
+        android:src="@drawable/ic_hambuger"
+        app:layout_constraintBottom_toBottomOf="@id/tv_favorite_place_name"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tv_favorite_place_name" />
+
+    <ImageView
+        android:id="@+id/iv_favorite_place_map_link"
+        android:layout_width="36dp"
         android:layout_height="0dp"
         android:contentDescription="@null"
-        android:padding="16dp"
-        android:src="@drawable/btn_map_link"
+        app:layout_constraintBottom_toBottomOf="@id/iv_favorite_place_favorite"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toStartOf="@id/md_favorite_place_icon_divider"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_favorite_place_name"
-        app:tint="@color/turip_lemon_faff60" />
+        app:layout_constraintTop_toTopOf="@id/iv_favorite_place_favorite"
+        tools:src="@drawable/btn_kakao_map_basic" />
 
     <com.google.android.material.divider.MaterialDivider
         android:id="@+id/md_favorite_place_icon_divider"

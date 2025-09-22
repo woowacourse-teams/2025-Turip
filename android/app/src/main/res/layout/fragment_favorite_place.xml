@@ -82,7 +82,7 @@
         android:id="@+id/group_favorite_place_not_error"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="gone"
+        android:visibility="visible"
         app:constraint_referenced_ids="rv_favorite_place_folder_name,iv_favorite_place_folder" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
