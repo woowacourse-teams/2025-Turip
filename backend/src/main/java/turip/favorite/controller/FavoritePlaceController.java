@@ -223,8 +223,8 @@ public class FavoritePlaceController {
     }
 
     @Operation(
-            summary = "장소 찜 폴더 정렬 순서 변경 api",
-            description = "장소 찜 폴더의 정렬 순서를 변경한다."
+            summary = "장소 찜 폴더 내의 장소 찜 정렬 순서 변경 api",
+            description = "장소 찜 폴더의 장소 찜들의 정렬 순서를 변경한다."
     )
     @ApiResponses(value = {
             @ApiResponse(
