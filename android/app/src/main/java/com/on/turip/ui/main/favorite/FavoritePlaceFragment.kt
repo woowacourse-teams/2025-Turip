@@ -8,14 +8,13 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.on.turip.R
 import com.on.turip.databinding.FragmentFavoritePlaceBinding
 import com.on.turip.domain.ErrorEvent
 import com.on.turip.ui.common.base.BaseFragment
 import com.on.turip.ui.folder.FolderActivity
-import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
-import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
 
 class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
     private val viewModel: FavoritePlaceViewModel by viewModels { FavoritePlaceViewModel.provideFactory() }
@@ -76,10 +75,33 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
             addOnItemTouchListener(RecyclerViewTouchInterceptor)
         }
 
-        binding.rvFavoritePlacePlace.apply {
-            adapter = placeAdapter
-            itemAnimator = null
-        }
+        binding.rvFavoritePlacePlace.adapter = placeAdapter
+
+        val itemTouchHelper =
+            ItemTouchHelper(
+                object : ItemTouchHelper.SimpleCallback(
+                    ItemTouchHelper.UP or ItemTouchHelper.DOWN,
+                    0,
+                ) {
+                    override fun onMove(
+                        recyclerView: RecyclerView,
+                        viewHolder: RecyclerView.ViewHolder,
+                        target: RecyclerView.ViewHolder,
+                    ): Boolean {
+                        val from = viewHolder.bindingAdapterPosition
+                        val to = target.bindingAdapterPosition
+                        placeAdapter.moveItem(from, to)
+                        return true
+                    }
+
+                    override fun onSwiped(
+                        viewHolder: RecyclerView.ViewHolder,
+                        direction: Int,
+                    ) = Unit
+                },
+            )
+
+        itemTouchHelper.attachToRecyclerView(binding.rvFavoritePlacePlace)
     }
 
     private fun setupListeners() {
@@ -90,41 +112,39 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
     }
 
     private fun setupObservers() {
-        viewModel.folders.observe(viewLifecycleOwner) { favoritePlaceFolders: List<FavoritePlaceFolderModel> ->
-            folderNameAdapter.submitList(favoritePlaceFolders)
-        }
+        viewModel.favoritePlaceUiState.observe(viewLifecycleOwner) { state ->
+            folderNameAdapter.submitList(state.folders)
+            placeAdapter.submitList(state.places)
 
-        viewModel.places.observe(viewLifecycleOwner) { places: List<FavoritePlaceModel> ->
-            placeAdapter.submitList(places)
+            binding.apply {
+                if (state.isNetWorkError || state.isServerError) {
+                    customErrorView.visibility = View.VISIBLE
+                    clFavoritePlaceEmpty.visibility = View.GONE
+                    groupFavoritePlaceNotError.visibility = View.GONE
+                    groupFavoritePlaceNotEmpty.visibility = View.GONE
+                    tvFavoritePlacePlaceCount.visibility = View.GONE
+                } else {
+                    customErrorView.visibility = View.GONE
+                    groupFavoritePlaceNotError.visibility = View.VISIBLE
 
-            if (places.isEmpty()) {
-                binding.clFavoritePlaceEmpty.visibility = View.VISIBLE
-                binding.groupFavoritePlaceNotEmpty.visibility = View.GONE
-            } else {
-                binding.clFavoritePlaceEmpty.visibility = View.GONE
-                binding.groupFavoritePlaceNotEmpty.visibility = View.VISIBLE
-                binding.tvFavoritePlacePlaceCount.text =
-                    getString(R.string.all_total_place_count, places.size)
+                    handlePlaceState(state)
+                }
             }
-        }
-        viewModel.networkError.observe(viewLifecycleOwner) { networkError ->
-            handleErrorOrContentView(networkError || (viewModel.serverError.value == true))
-        }
-
-        viewModel.serverError.observe(viewLifecycleOwner) { serverError ->
-            handleErrorOrContentView(serverError || (viewModel.networkError.value == true))
         }
     }
 
-    private fun handleErrorOrContentView(isError: Boolean) {
-        if (isError) {
-            binding.customErrorView.visibility = View.VISIBLE
-            binding.groupFavoritePlaceNotEmpty.visibility = View.GONE
-            binding.groupFavoritePlaceNotError.visibility = View.GONE
+    private fun FragmentFavoritePlaceBinding.handlePlaceState(state: FavoritePlaceViewModel.FavoritePlaceUiState) {
+        if (state.places.isEmpty()) {
+            clFavoritePlaceEmpty.visibility = View.VISIBLE
+            groupFavoritePlaceNotEmpty.visibility = View.GONE
+            tvFavoritePlacePlaceCount.visibility = View.GONE
         } else {
-            binding.customErrorView.visibility = View.GONE
-            binding.groupFavoritePlaceNotEmpty.visibility = View.VISIBLE
-            binding.groupFavoritePlaceNotError.visibility = View.VISIBLE
+            clFavoritePlaceEmpty.visibility = View.GONE
+            groupFavoritePlaceNotEmpty.visibility = View.VISIBLE
+            tvFavoritePlacePlaceCount.apply {
+                visibility = View.VISIBLE
+                text = getString(R.string.all_total_place_count, state.places.size)
+            }
         }
     }
 
