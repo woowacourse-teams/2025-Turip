@@ -210,7 +210,9 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
 
     override fun onHiddenChanged(hidden: Boolean) {
         super.onHiddenChanged(hidden)
-        viewModel.loadFoldersAndPlaces()
+        if (!hidden) {
+            viewModel.loadFoldersAndPlaces()
+        }
     }
 
     companion object {
