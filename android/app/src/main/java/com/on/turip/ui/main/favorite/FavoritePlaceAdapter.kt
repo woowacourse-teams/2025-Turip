@@ -20,6 +20,16 @@ class FavoritePlaceAdapter(
         holder.bind(getItem(position))
     }
 
+    fun moveItem(
+        from: Int,
+        to: Int,
+    ) {
+        val mutableList = currentList.toMutableList()
+        val item = mutableList.removeAt(from)
+        mutableList.add(to, item)
+        submitList(mutableList)
+    }
+
     private object FavoritePlaceDiffUtil : DiffUtil.ItemCallback<FavoritePlaceModel>() {
         override fun areItemsTheSame(
             oldItem: FavoritePlaceModel,
