@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/iv_bottom_sheet_folder_favorite_place_folder_catalog_drag_handle"
+        android:layout_width="80dp"
+        android:layout_height="8dp"
+        android:layout_marginTop="10dp"
+        android:contentDescription="@null"
+        android:src="@drawable/bg_gray100_radius_24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/btn_bottom_sheet_folder_favorite_place_folder_catalog_back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/btn_chevron_left"
+        android:contentDescription="@null"
+        android:layout_marginStart="20dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tv_bottom_sheet_folder_favorite_place_folder_catalog_title"
+        app:layout_constraintBottom_toBottomOf="@id/tv_bottom_sheet_folder_favorite_place_folder_catalog_title" />
+
+    <TextView
+        android:id="@+id/tv_bottom_sheet_folder_favorite_place_folder_catalog_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="@string/bottom_sheet_favorite_place_folder_title"
+        android:textAppearance="@style/title1"
+        android:textColor="@color/pure_black_151515"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/iv_bottom_sheet_folder_favorite_place_folder_catalog_drag_handle"
+        tools:text="뭉치의 대구 장소's" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_bottom_sheet_favorite_place_folder_catalog"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="20dp"
+        android:background="@color/pure_white_ffffff"
+        android:orientation="vertical"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_bottom_sheet_folder_favorite_place_folder_catalog_title"
+        tools:listitem="@layout/item_favorite_place" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
