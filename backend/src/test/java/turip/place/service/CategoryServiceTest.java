@@ -41,8 +41,8 @@ public class CategoryServiceTest {
                 category2,
                 category3
         );
-        given(categoryRepository.findAll())
-                .willReturn(englishCategories);
+        given(categoryRepository.streamAll())
+                .willReturn(englishCategories.stream());
 
         // when
         categoryService.updateContentPlaceCategoryLanguage();
