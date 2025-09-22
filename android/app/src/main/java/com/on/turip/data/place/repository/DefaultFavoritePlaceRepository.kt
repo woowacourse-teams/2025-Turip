@@ -37,7 +37,7 @@ class DefaultFavoritePlaceRepository(
     override suspend fun updateFavoritePlacesOrder(
         favoriteFolderId: Long,
         updatedOrder: List<Long>,
-    ) {
+    ): TuripCustomResult<Unit> =
         favoritePlaceRemoteDataSource.patchFavoritePlacesOrder(
             favoriteFolderId = favoriteFolderId,
             favoritePlaceOrderRequest =
@@ -45,5 +45,4 @@ class DefaultFavoritePlaceRepository(
                     favoritePlaceIdsOrder = updatedOrder,
                 ),
         )
-    }
 }

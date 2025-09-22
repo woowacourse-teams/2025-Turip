@@ -38,7 +38,7 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
                     startActivity(intent)
                 }
             },
-            onChangeOrder = { viewModel.updateFavoritePlacesOrder(it) },
+            onChange = { viewModel.updateFavoritePlacesOrder(it) },
         )
     }
 

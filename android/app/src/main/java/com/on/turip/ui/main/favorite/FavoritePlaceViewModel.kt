@@ -173,12 +173,22 @@ class FavoritePlaceViewModel(
         }
     }
 
-    fun updateFavoritePlacesOrder(favoritePlaceIdsOrder: List<Long>) {
+    fun updateFavoritePlacesOrder(newFavoritePlaces: List<FavoritePlaceModel>) {
         viewModelScope.launch {
-            favoritePlaceRepository.updateFavoritePlacesOrder(
-                favoriteFolderId = selectedFolderId,
-                updatedOrder = favoritePlaceIdsOrder,
-            )
+            favoritePlaceRepository
+                .updateFavoritePlacesOrder(
+                    favoriteFolderId = selectedFolderId,
+                    updatedOrder = newFavoritePlaces.map { it.favoritePlaceId },
+                ).onSuccess {
+                    _favoritePlaceUiState.value =
+                        favoritePlaceUiState.value?.copy(
+                            places = newFavoritePlaces,
+                        )
+                    Timber.d("순서 변경 완료: $newFavoritePlaces")
+                }.onFailure { errorEvent: ErrorEvent ->
+                    checkError(errorEvent)
+                    Timber.e("장소 순서 변경 API 호출 실패")
+                }
         }
     }
 

@@ -4,7 +4,7 @@ import android.net.Uri
 
 data class FavoritePlaceModel(
     val favoritePlaceId: Long,
-    val order: Int,
+    val order: Long,
     val placeId: Long,
     val name: String,
     val uri: Uri,
