@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -254,7 +255,8 @@ public class DataImportService {
             return null;
         }
 
-        String parsedCategoryName = PlaceCategoryMapper.parseCategory(categoryName);
+        String normalizedCategoryName = normalize(categoryName);
+        String parsedCategoryName = PlaceCategoryMapper.parseCategory(normalizedCategoryName);
 
         return categoryRepository.findByName(parsedCategoryName)
                 .orElseGet(() -> categoryRepository.save(new Category(parsedCategoryName)));
@@ -310,4 +312,11 @@ public class DataImportService {
     private boolean isNullOrEmpty(String value) {
         return value == null || value.isEmpty();
     }
-} 
+
+    private String normalize(final String value) {
+        if (value == null) {
+            return null;
+        }
+        return value.trim().toLowerCase(Locale.ROOT);
+    }
+}
