@@ -17,6 +17,7 @@ import com.on.turip.domain.favorite.usecase.UpdateFavoritePlaceUseCase
 import com.on.turip.domain.folder.Folder
 import com.on.turip.domain.folder.repository.FolderRepository
 import com.on.turip.ui.common.mapper.toUiModel
+import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
 import kotlinx.coroutines.launch
@@ -30,6 +31,9 @@ class FavoritePlaceViewModel(
     private val _favoritePlaceUiState: MutableLiveData<FavoritePlaceUiState> =
         MutableLiveData(FavoritePlaceUiState())
     val favoritePlaceUiState: LiveData<FavoritePlaceUiState> get() = _favoritePlaceUiState
+
+    private val _shareFolder: MutableLiveData<FavoriteFolderShareModel> = MutableLiveData()
+    val shareFolder: LiveData<FavoriteFolderShareModel> get() = _shareFolder
 
     var selectedFolderId: Long = NOT_INITIALIZED
 
@@ -199,6 +203,19 @@ class FavoritePlaceViewModel(
         val places: List<FavoritePlaceModel> = emptyList(),
         val folders: List<FavoritePlaceFolderModel> = emptyList(),
     )
+
+    fun shareFolder() {
+        val shareFolder =
+            FavoriteFolderShareModel(
+                name =
+                    favoritePlaceUiState.value
+                        ?.folders
+                        ?.first { it.isSelected }
+                        ?.name ?: "",
+                places = favoritePlaceUiState.value?.places?.map { it.toUiModel() } ?: emptyList(),
+            )
+        _shareFolder.value = shareFolder
+    }
 
     companion object {
         private const val NOT_INITIALIZED: Long = 0L
