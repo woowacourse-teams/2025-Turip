@@ -78,7 +78,6 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
 
         binding.rvFavoritePlacePlace.apply {
             adapter = placeAdapter
-            itemAnimator = null
         }
 
         val itemTouchHelper =
@@ -102,6 +101,16 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
                         viewHolder: RecyclerView.ViewHolder,
                         direction: Int,
                     ) = Unit
+
+                    override fun isLongPressDragEnabled(): Boolean = true
+
+                    override fun interpolateOutOfBoundsScroll(
+                        recyclerView: RecyclerView,
+                        viewSize: Int,
+                        viewSizeOutOfBounds: Int,
+                        totalSize: Int,
+                        msSinceStartScroll: Long,
+                    ): Int = viewSizeOutOfBounds / 10
                 },
             )
 
@@ -159,9 +168,7 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
 
     override fun onHiddenChanged(hidden: Boolean) {
         super.onHiddenChanged(hidden)
-        if (!hidden) {
-            viewModel.loadFoldersAndPlaces()
-        }
+        viewModel.loadFoldersAndPlaces()
     }
 
     companion object {

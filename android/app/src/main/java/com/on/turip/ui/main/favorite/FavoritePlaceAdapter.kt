@@ -28,8 +28,9 @@ class FavoritePlaceAdapter(
         val mutableList = currentList.toMutableList()
         val item = mutableList.removeAt(from)
         mutableList.add(to, item)
-        submitList(mutableList)
-        onChangeOrder(mutableList.toList().map { it.favoritePlaceId })
+        submitList(mutableList.toList()) {
+            onChangeOrder(mutableList.map { it.favoritePlaceId })
+        }
     }
 
     private object FavoritePlaceDiffUtil : DiffUtil.ItemCallback<FavoritePlaceModel>() {
