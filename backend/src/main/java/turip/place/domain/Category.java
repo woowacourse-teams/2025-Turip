@@ -37,6 +37,11 @@ public class Category {
         this.name = name;
     }
 
+    public Category(final Long id, final String name) {
+        this.id = id;
+        this.name = name;
+    }
+
     public void updateName(String name) {
         this.name = name;
     }

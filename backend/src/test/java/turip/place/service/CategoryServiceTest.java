@@ -8,7 +8,9 @@ import static turip.place.domain.GoogleMapCategory.HOME_GOODS_STORE;
 import static turip.place.domain.GoogleMapCategory.RESTAURANT;
 
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -52,5 +54,68 @@ public class CategoryServiceTest {
                 () -> assertThat(category2.getName()).isEqualTo(RESTAURANT.getKoreanCategoryName()),
                 () -> assertThat(category3.getName()).isEqualTo("category_not_exists")
         );
+    }
+
+    @Nested
+    class FindOrCreateCategory {
+
+        @DisplayName("한국어로 변환된 카테고리가 저장되어 있는 경우, 해당 카테고리를 리턴한다")
+        @Test
+        void findOrCreateCategory1() {
+            // given
+            String parsedCategoryName = RESTAURANT.getKoreanCategoryName();
+            given(categoryRepository.findByName(parsedCategoryName))
+                    .willReturn(Optional.of(new Category(parsedCategoryName)));
+
+            // when
+            Category category = categoryService.findOrCreateCategory(parsedCategoryName);
+
+            // then
+            assertThat(category.getName())
+                    .isEqualTo(parsedCategoryName);
+        }
+
+        @DisplayName("한국어로 변환되지 않은 카테고리가 저장되어 있는 경우, 해당 카테고리를 변환한 후 리턴한다")
+        @Test
+        void findOrCreateCategory2() {
+            // given
+            String parsedCategoryName = RESTAURANT.getKoreanCategoryName();
+            String unparsedCategoryName = RESTAURANT.getEnglishCategoryName();
+
+            given(categoryRepository.findByName(parsedCategoryName))
+                    .willReturn(Optional.empty());
+
+            given(categoryRepository.findByName(unparsedCategoryName))
+                    .willReturn(Optional.of(new Category(unparsedCategoryName)));
+
+            // when
+            Category category = categoryService.findOrCreateCategory(unparsedCategoryName);
+
+            // then
+            assertThat(category.getName())
+                    .isEqualTo(parsedCategoryName);
+        }
+
+        @DisplayName("카테고리가 존재하지 않는 경우, 새로운 카테고리를 생성하고 리턴한다")
+        @Test
+        void findOrCreateCategory3() {
+            // given
+            String parsedCategoryName = RESTAURANT.getKoreanCategoryName();
+            String unparsedCategoryName = RESTAURANT.getEnglishCategoryName();
+
+            given(categoryRepository.findByName(parsedCategoryName))
+                    .willReturn(Optional.empty());
+            given(categoryRepository.findByName(unparsedCategoryName))
+                    .willReturn(Optional.empty());
+            given(categoryRepository.save(new Category(parsedCategoryName)))
+                    .willReturn(new Category(1L, parsedCategoryName));
+
+            // when
+            Category category = categoryService.findOrCreateCategory(unparsedCategoryName);
+
+            // then
+            assertThat(category.getName())
+                    .isEqualTo(parsedCategoryName);
+        }
     }
 }

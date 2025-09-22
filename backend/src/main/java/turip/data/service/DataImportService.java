@@ -24,7 +24,7 @@ import turip.place.domain.PlaceCategory;
 import turip.place.repository.CategoryRepository;
 import turip.place.repository.PlaceCategoryRepository;
 import turip.place.repository.PlaceRepository;
-import turip.place.service.PlaceCategoryMapper;
+import turip.place.service.CategoryService;
 import turip.region.domain.City;
 import turip.region.domain.Country;
 import turip.region.domain.Province;
@@ -49,6 +49,7 @@ public class DataImportService {
     private final CategoryRepository categoryRepository;
     private final PlaceCategoryRepository placeCategoryRepository;
     private final ContentPlaceRepository contentPlaceRepository;
+    private final CategoryService categoryService;
 
     public void importCsvData(String csvFilePath) {
         try (BufferedReader reader = new BufferedReader(new FileReader(csvFilePath))) {
@@ -254,12 +255,7 @@ public class DataImportService {
         if (isNullOrEmpty(categoryName)) {
             return null;
         }
-
-        String normalizedCategoryName = normalize(categoryName);
-        String parsedCategoryName = PlaceCategoryMapper.parseCategory(normalizedCategoryName);
-
-        return categoryRepository.findByName(parsedCategoryName)
-                .orElseGet(() -> categoryRepository.save(new Category(parsedCategoryName)));
+        return categoryService.findOrCreateCategory(categoryName);
     }
 
     private PlaceCategory findOrCreatePlaceCategory(Place place, Category category) {
