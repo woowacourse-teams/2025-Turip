@@ -39,11 +39,12 @@ public record FavoriteFolderWithFavoriteStatusResponse(
         }
     }
 
-    public static record FavoritePlaceWithDetailPlaceInformationResponse(Long id, PlaceResponse place) {
+    public static record FavoritePlaceWithDetailPlaceInformationResponse(Long id, PlaceResponse place,
+                                                                         Integer favoriteOrder) {
 
         public static FavoritePlaceWithDetailPlaceInformationResponse from(FavoritePlace favoritePlace) {
             return new FavoritePlaceWithDetailPlaceInformationResponse(favoritePlace.getId(),
-                    PlaceResponse.from(favoritePlace.getPlace()));
+                    PlaceResponse.from(favoritePlace.getPlace()), favoritePlace.getFavoriteOrder());
         }
     }
 }
