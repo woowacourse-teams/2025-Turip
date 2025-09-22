@@ -8,6 +8,7 @@ import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.ConflictException;
 import turip.common.exception.custom.ForbiddenException;
 import turip.common.exception.custom.NotFoundException;
+import turip.favorite.controller.dto.request.FavoritePlaceOrderRequest;
 import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlaceResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlaceWithDetailPlaceInformationResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlacesWithDetailPlaceInformationResponse;
@@ -55,6 +56,22 @@ public class FavoritePlaceService {
     }
 
     @Transactional
+    public void updatePlaceOrder(Member member, Long favoriteFolderId,
+                                 FavoritePlaceOrderRequest request) {
+        FavoriteFolder favoriteFolder = getFavoriteFolderById(favoriteFolderId);
+        validateOwnership(member, favoriteFolder);
+
+        List<Long> favoritePlaceIdsOrder = request.favoritePlaceIdsOrder();
+
+        for (int index = 0; index < favoritePlaceIdsOrder.size(); index++) {
+            Long favoritePlaceId = favoritePlaceIdsOrder.get(index);
+            FavoritePlace favoritePlace = getFavoritePlaceById(favoritePlaceId);
+            validateFavoritePlaceBelongsToFolder(favoritePlace, favoriteFolder);
+            favoritePlace.updateFavoriteOrder(index + 1);
+        }
+    }
+
+    @Transactional
     public void remove(Member member, Long favoriteFolderId, Long placeId) {
         FavoriteFolder favoriteFolder = getFavoriteFolderById(favoriteFolderId);
         Place place = getPlaceById(placeId);
@@ -75,6 +92,11 @@ public class FavoritePlaceService {
                 .orElseThrow(() -> new NotFoundException(ErrorTag.PLACE_NOT_FOUND));
     }
 
+    private FavoritePlace getFavoritePlaceById(Long favoritePlaceId) {
+        return favoritePlaceRepository.findById(favoritePlaceId)
+                .orElseThrow(() -> new NotFoundException(ErrorTag.FAVORITE_PLACE_NOT_FOUND));
+    }
+
     private void validateOwnership(Member requestMember, FavoriteFolder favoriteFolder) {
         if (!favoriteFolder.isOwner(requestMember)) {
             throw new ForbiddenException(ErrorTag.FORBIDDEN);
@@ -85,6 +107,12 @@ public class FavoritePlaceService {
         boolean isAlreadyFavorite = favoritePlaceRepository.existsByFavoriteFolderAndPlace(favoriteFolder, place);
         if (isAlreadyFavorite) {
             throw new ConflictException(ErrorTag.FAVORITE_PLACE_IN_FOLDER_CONFLICT);
+        }
+    }
+
+    private void validateFavoritePlaceBelongsToFolder(FavoritePlace favoritePlace, FavoriteFolder favoriteFolder) {
+        if (!favoritePlace.getFavoriteFolder().equals(favoriteFolder)) {
+            throw new ForbiddenException(ErrorTag.FORBIDDEN);
         }
     }
 

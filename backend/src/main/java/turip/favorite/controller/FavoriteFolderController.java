@@ -25,7 +25,6 @@ import turip.auth.MemberResolvePolicy;
 import turip.common.exception.ErrorResponse;
 import turip.favorite.controller.dto.request.FavoriteFolderNameRequest;
 import turip.favorite.controller.dto.request.FavoriteFolderRequest;
-import turip.favorite.controller.dto.request.FavoritePlaceOrderRequest;
 import turip.favorite.controller.dto.response.FavoriteFolderResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithFavoriteStatusResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithPlaceCountResponse;
@@ -368,91 +367,6 @@ public class FavoriteFolderController {
     ) {
         FavoriteFolderResponse response = favoriteFolderService.updateName(member, favoriteFolderId, request);
         return ResponseEntity.ok(response);
-    }
-
-    @Operation(
-            summary = "장소 찜 폴더 정렬 순서 변경 api",
-            description = "장소 찜 폴더의 정렬 순서를 변경한다."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "204",
-                    description = "성공 예시"
-            ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = "실패 예시",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class),
-                            examples = {
-                                    @ExampleObject(
-                                            name = "not_folder_owner",
-                                            summary = "폴더 소유자의 기기id와 요청자의 기기id가 같지 않은 경우",
-                                            value = """
-                                                    {
-                                                        "tag" : "FORBIDDEN"
-                                                    }
-                                                    """
-                                    ),
-                                    @ExampleObject(
-                                            name = "favorite_place_not_belongs_to_folder",
-                                            summary = "다른 폴더의 favoritePlaceId가 포함된 경우",
-                                            value = """
-                                                    {
-                                                        "tag" : "FORBIDDEN"
-                                                    }
-                                                    """
-                                    )
-                            }
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "실패 예시",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class),
-                            examples = {
-                                    @ExampleObject(
-                                            name = "member_not_found",
-                                            summary = "device-fid에 대한 회원을 찾을 수 없는 경우",
-                                            value = """
-                                                    {
-                                                        "tag" : "MEMBER_NOT_FOUND"
-                                                    }
-                                                    """
-                                    ),
-                                    @ExampleObject(
-                                            name = "folder_not_found",
-                                            summary = "id에 대한 폴더를 찾을 수 없는 경우",
-                                            value = """
-                                                    {
-                                                        "tag" : "FAVORITE_FOLDER_NOT_FOUND"
-                                                    }
-                                                    """
-                                    ),
-                                    @ExampleObject(
-                                            name = "favorite_place_not_found",
-                                            summary = "favoritePlaceId에 대한 찜한 장소를 찾을 수 없는 경우",
-                                            value = """
-                                                    {
-                                                        "tag" : "FAVORITE_PLACE_NOT_FOUND"
-                                                    }
-                                                    """
-                                    )
-                            }
-                    )
-            )
-    })
-    @PatchMapping("/{favoriteFolderId}/place-orders")
-    public ResponseEntity<Void> updatePlaceOrder(
-            @Parameter(hidden = true) @AuthMember(policy = MemberResolvePolicy.REQUIRED) Member member,
-            @PathVariable Long favoriteFolderId,
-            @RequestBody FavoritePlaceOrderRequest request
-    ) {
-        favoriteFolderService.updatePlaceOrder(member, favoriteFolderId, request);
-        return ResponseEntity.noContent().build();
     }
 
     @Operation(
