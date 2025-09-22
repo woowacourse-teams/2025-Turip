@@ -9,4 +9,6 @@ data class FavoritePlaceResponse(
     val id: Long,
     @SerialName("place")
     val placeResponse: PlaceResponse,
+    @SerialName("favoriteOrder")
+    val order: Int,
 )
