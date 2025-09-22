@@ -21,7 +21,6 @@ import turip.data.controller.dto.CsvDataDto;
 import turip.place.domain.Category;
 import turip.place.domain.Place;
 import turip.place.domain.PlaceCategory;
-import turip.place.repository.CategoryRepository;
 import turip.place.repository.PlaceCategoryRepository;
 import turip.place.repository.PlaceRepository;
 import turip.place.service.CategoryService;
@@ -46,7 +45,6 @@ public class DataImportService {
     private final CreatorRepository creatorRepository;
     private final ContentRepository contentRepository;
     private final PlaceRepository placeRepository;
-    private final CategoryRepository categoryRepository;
     private final PlaceCategoryRepository placeCategoryRepository;
     private final ContentPlaceRepository contentPlaceRepository;
     private final CategoryService categoryService;
