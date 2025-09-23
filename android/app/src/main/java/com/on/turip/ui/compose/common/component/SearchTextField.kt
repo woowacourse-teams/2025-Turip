@@ -62,11 +62,12 @@ fun SearchTextField(
                 unfocusedContainerColor = colorResource(R.color.pure_white_ffffff),
                 cursorColor = colorResource(R.color.pure_black_151515),
                 focusedTextColor = colorResource(R.color.pure_black_151515),
-                unfocusedLabelColor = colorResource(R.color.pure_black_151515),
+                unfocusedTextColor = colorResource(R.color.pure_black_151515),
             ),
         trailingIcon = {
             IconButton(onClick = {
-                if (keyword.isNotBlank()) onSearch(keyword)
+                val trimmedKeyword = keyword.trim()
+                if (trimmedKeyword.isNotBlank()) onSearch(trimmedKeyword)
             }) {
                 Icon(
                     painter = painterResource(R.drawable.btn_search),
@@ -77,7 +78,10 @@ fun SearchTextField(
         },
         keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
         keyboardActions =
-            KeyboardActions(onSearch = { if (keyword.isNotBlank()) onSearch(keyword) }),
+            KeyboardActions(onSearch = {
+                val trimmedKeyword = keyword.trim()
+                if (trimmedKeyword.isNotBlank()) onSearch(trimmedKeyword)
+            }),
     )
 }
 
