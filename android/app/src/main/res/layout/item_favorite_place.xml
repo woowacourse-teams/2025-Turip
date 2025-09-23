@@ -15,10 +15,11 @@
         android:layout_width="18dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="14dp"
-        android:src="@drawable/ic_hambuger"
+        android:src="@drawable/ic_hamburger"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/gray_100_f0f0ee" />
 
     <TextView
         android:id="@+id/tv_favorite_place_category"
