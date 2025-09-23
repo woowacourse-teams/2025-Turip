@@ -8,6 +8,7 @@ import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.ConflictException;
 import turip.common.exception.custom.ForbiddenException;
 import turip.common.exception.custom.NotFoundException;
+import turip.favorite.controller.dto.request.FavoritePlaceOrderRequest;
 import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlaceResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlaceWithDetailPlaceInformationResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlacesWithDetailPlaceInformationResponse;
@@ -35,7 +36,10 @@ public class FavoritePlaceService {
         validateOwnership(member, favoriteFolder);
         validateDuplicated(favoriteFolder, place);
 
-        FavoritePlace favoritePlace = new FavoritePlace(favoriteFolder, place);
+        Integer maxOrder = favoritePlaceRepository.findMaxFavoriteOrderByFavoriteFolder(favoriteFolder)
+                .orElse(0);
+
+        FavoritePlace favoritePlace = new FavoritePlace(favoriteFolder, place, maxOrder + 1);
         FavoritePlace savedFavoritePlace = favoritePlaceRepository.save(favoritePlace);
 
         return FavoritePlaceResponse.from(savedFavoritePlace);
@@ -44,12 +48,28 @@ public class FavoritePlaceService {
     public FavoritePlacesWithDetailPlaceInformationResponse findAllByFolder(Long favoriteFolderId) {
         FavoriteFolder favoriteFolder = getFavoriteFolderById(favoriteFolderId);
 
-        List<FavoritePlaceWithDetailPlaceInformationResponse> favoritePlaces = favoritePlaceRepository.findAllByFavoriteFolder(
+        List<FavoritePlaceWithDetailPlaceInformationResponse> favoritePlaces = favoritePlaceRepository.findAllByFavoriteFolderOrderByFavoriteOrderAsc(
                         favoriteFolder).stream()
                 .map(FavoritePlaceWithDetailPlaceInformationResponse::from)
                 .toList();
 
         return FavoritePlacesWithDetailPlaceInformationResponse.from(favoritePlaces);
+    }
+
+    @Transactional
+    public void updatePlaceOrder(Member member, Long favoriteFolderId,
+                                 FavoritePlaceOrderRequest request) {
+        FavoriteFolder favoriteFolder = getFavoriteFolderById(favoriteFolderId);
+        validateOwnership(member, favoriteFolder);
+
+        List<Long> favoritePlaceIdsOrder = request.favoritePlaceIdsOrder();
+
+        for (int index = 0; index < favoritePlaceIdsOrder.size(); index++) {
+            Long favoritePlaceId = favoritePlaceIdsOrder.get(index);
+            FavoritePlace favoritePlace = getFavoritePlaceById(favoritePlaceId);
+            validateFavoritePlaceBelongsToFolder(favoritePlace, favoriteFolder);
+            favoritePlace.updateFavoriteOrder(index + 1);
+        }
     }
 
     @Transactional
@@ -73,6 +93,11 @@ public class FavoritePlaceService {
                 .orElseThrow(() -> new NotFoundException(ErrorTag.PLACE_NOT_FOUND));
     }
 
+    private FavoritePlace getFavoritePlaceById(Long favoritePlaceId) {
+        return favoritePlaceRepository.findById(favoritePlaceId)
+                .orElseThrow(() -> new NotFoundException(ErrorTag.FAVORITE_PLACE_NOT_FOUND));
+    }
+
     private void validateOwnership(Member requestMember, FavoriteFolder favoriteFolder) {
         if (!favoriteFolder.isOwner(requestMember)) {
             throw new ForbiddenException(ErrorTag.FORBIDDEN);
@@ -83,6 +108,12 @@ public class FavoritePlaceService {
         boolean isAlreadyFavorite = favoritePlaceRepository.existsByFavoriteFolderAndPlace(favoriteFolder, place);
         if (isAlreadyFavorite) {
             throw new ConflictException(ErrorTag.FAVORITE_PLACE_IN_FOLDER_CONFLICT);
+        }
+    }
+
+    private void validateFavoritePlaceBelongsToFolder(FavoritePlace favoritePlace, FavoriteFolder favoriteFolder) {
+        if (!favoritePlace.getFavoriteFolder().equals(favoriteFolder)) {
+            throw new ForbiddenException(ErrorTag.FORBIDDEN);
         }
     }
 

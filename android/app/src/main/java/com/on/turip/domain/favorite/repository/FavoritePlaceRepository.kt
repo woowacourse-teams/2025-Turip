@@ -1,10 +1,10 @@
 package com.on.turip.domain.favorite.repository
 
 import com.on.turip.data.common.TuripCustomResult
-import com.on.turip.domain.trip.Place
+import com.on.turip.domain.favorite.FavoritePlace
 
 interface FavoritePlaceRepository {
-    suspend fun loadFavoritePlaces(favoriteFolderId: Long): TuripCustomResult<List<Place>>
+    suspend fun loadFavoritePlaces(favoriteFolderId: Long): TuripCustomResult<List<FavoritePlace>>
 
     suspend fun createFavoritePlace(
         favoriteFolderId: Long,
@@ -14,5 +14,10 @@ interface FavoritePlaceRepository {
     suspend fun deleteFavoritePlace(
         favoriteFolderId: Long,
         placeId: Long,
+    ): TuripCustomResult<Unit>
+
+    suspend fun updateFavoritePlacesOrder(
+        favoriteFolderId: Long,
+        updatedOrder: List<Long>,
     ): TuripCustomResult<Unit>
 }
