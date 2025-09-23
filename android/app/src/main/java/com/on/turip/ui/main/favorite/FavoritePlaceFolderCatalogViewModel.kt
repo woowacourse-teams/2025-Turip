@@ -34,6 +34,7 @@ class FavoritePlaceFolderCatalogViewModel(
 
     init {
         loadPlacesInSelectFolder()
+        _favoritePlaceUiState.value = favoritePlaceUiState.value?.copy(folderName = folderName)
     }
 
     private fun loadPlacesInSelectFolder() {
@@ -136,6 +137,7 @@ class FavoritePlaceFolderCatalogViewModel(
         val isNetWorkError: Boolean = false,
         val isServerError: Boolean = false,
         val places: List<FavoritePlaceModel> = emptyList(),
+        val folderName: String = "",
     )
 
     fun shareFolder() {

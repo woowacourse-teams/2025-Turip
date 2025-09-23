@@ -91,6 +91,8 @@ class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavor
     private fun setupObservers() {
         viewModel.favoritePlaceUiState.observe(viewLifecycleOwner) { state ->
             placeAdapter.submitList(state.places)
+
+            binding.tvBottomSheetFolderFavoritePlaceFolderCatalogTitle.text = state.folderName
         }
     }
 
