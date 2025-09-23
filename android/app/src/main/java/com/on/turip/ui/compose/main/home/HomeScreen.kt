@@ -34,7 +34,7 @@ import com.on.turip.ui.compose.main.home.component.RegionTypeButtons
 import com.on.turip.ui.compose.main.home.component.UsersLikeList
 import com.on.turip.ui.compose.theme.TuripTypography
 import com.on.turip.ui.main.home.HomeViewModel
-import com.on.turip.ui.main.home.UsersLikeContentModel
+import com.on.turip.ui.main.home.model.UsersLikeContentModel
 
 @Composable
 fun HomeScreen(

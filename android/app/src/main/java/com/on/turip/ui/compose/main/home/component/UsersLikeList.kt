@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import com.on.turip.R
 import com.on.turip.ui.common.TuripUrlConverter
 import com.on.turip.ui.common.model.trip.toDisplayText
-import com.on.turip.ui.main.home.UsersLikeContentModel
+import com.on.turip.ui.main.home.model.UsersLikeContentModel
 
 @Composable
 fun UsersLikeList(

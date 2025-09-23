@@ -16,6 +16,7 @@ import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.region.RegionCategory
 import com.on.turip.domain.region.repository.RegionRepository
 import com.on.turip.ui.common.mapper.toUiModel
+import com.on.turip.ui.main.home.model.UsersLikeContentModel
 import kotlinx.coroutines.launch
 import timber.log.Timber
 

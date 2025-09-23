@@ -5,7 +5,7 @@ import com.on.turip.domain.trip.Trip
 import com.on.turip.domain.trip.TripDuration
 import com.on.turip.ui.common.model.trip.TripDurationModel
 import com.on.turip.ui.common.model.trip.TripModel
-import com.on.turip.ui.main.home.UsersLikeContentModel
+import com.on.turip.ui.main.home.model.UsersLikeContentModel
 
 fun Trip.toUiModel(): TripModel =
     TripModel(
