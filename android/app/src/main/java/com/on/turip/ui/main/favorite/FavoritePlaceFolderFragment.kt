@@ -13,6 +13,7 @@ import com.on.turip.databinding.BottomSheetFragmentFavoritePlaceFolderBinding
 import com.on.turip.ui.common.TuripSnackbar
 import com.on.turip.ui.common.base.BaseFragment
 import com.on.turip.ui.folder.FolderActivity
+import com.on.turip.ui.main.favorite.FavoritePlaceFolderViewHolder.FavoritePlaceFolderListener
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
 import com.on.turip.ui.trip.detail.TripDetailViewModel
 
@@ -25,13 +26,33 @@ class FavoritePlaceFolderFragment : BaseFragment<BottomSheetFragmentFavoritePlac
     private val sharedViewModel: TripDetailViewModel by activityViewModels()
 
     private val favoritePlaceFolderAdapter: FavoritePlaceFolderAdapter by lazy {
-        FavoritePlaceFolderAdapter { favoritePlaceFolderModel: FavoritePlaceFolderModel ->
-            viewModel.updateFolder(
-                folderId = favoritePlaceFolderModel.id,
-                isFavorite = favoritePlaceFolderModel.isSelected,
-            )
-            showSnackbar(favoritePlaceFolderModel)
-        }
+        FavoritePlaceFolderAdapter(
+            object : FavoritePlaceFolderListener {
+                override fun onFavoriteFolderFavoriteClick(favoritePlaceFolderModel: FavoritePlaceFolderModel) {
+                    viewModel.updateFolder(
+                        folderId = favoritePlaceFolderModel.id,
+                        isFavorite = favoritePlaceFolderModel.isSelected,
+                    )
+                    showSnackbar(favoritePlaceFolderModel)
+                }
+
+                override fun onFavoriteFolderClick(
+                    favoriteFolderId: Long,
+                    favoriteFolderName: String,
+                ) {
+                    parentFragmentManager
+                        .beginTransaction()
+                        .replace(
+                            R.id.fcv_bottom_sheet_folder_favorite_place_folder_catalog,
+                            FavoritePlaceFolderCatalogFragment.newInstance(
+                                favoriteFolderId,
+                                favoriteFolderName,
+                            ),
+                        ).addToBackStack(null)
+                        .commit()
+                }
+            },
+        )
     }
 
     private fun showSnackbar(favoritePlaceFolderModel: FavoritePlaceFolderModel) {
