@@ -16,11 +16,12 @@ import com.on.turip.R
 fun HomeTopAppBar(modifier: Modifier = Modifier) {
     TopAppBar(
         title = {},
+        modifier = modifier,
         navigationIcon = {
             Image(
                 painter = painterResource(R.drawable.ic_logo),
                 contentDescription = null,
-                modifier = modifier.padding(start = 20.dp),
+                modifier = Modifier.padding(start = 20.dp),
             )
         },
         windowInsets = WindowInsets(0),

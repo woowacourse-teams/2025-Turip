@@ -24,7 +24,7 @@ fun RegionList(
         regions.forEach { regionCategory: RegionCategory ->
             RegionItem(
                 region = regionCategory,
-                Modifier.clickable { onRegionClick(regionCategory.name) },
+                modifier = Modifier.clickable { onRegionClick(regionCategory.name) },
             )
         }
     }
