@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.on.turip.databinding.BottomSheetFragmentFavoritePlaceFolderCatalogBinding
 import com.on.turip.ui.common.base.BaseFragment
+import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
 
 class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavoritePlaceFolderCatalogBinding>() {
     private val viewModel: FavoritePlaceFolderCatalogViewModel by viewModels {
@@ -47,6 +48,7 @@ class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavor
 
         setupAdapters()
         setupObservers()
+        setupListeners()
     }
 
     private fun setupAdapters() {
@@ -99,6 +101,48 @@ class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavor
 
             binding.tvBottomSheetFolderFavoritePlaceFolderCatalogTitle.text = state.folderName
         }
+
+        viewModel.shareFolder.observe(viewLifecycleOwner) { shareFolder: FavoriteFolderShareModel ->
+            makeShareIntent(shareFolder)
+        }
+    }
+
+    private fun setupListeners() {
+        binding.ivBottomSheetFavoritePlaceFolderShare.setOnClickListener {
+            viewModel.shareFolder()
+        }
+    }
+
+    private fun makeShareIntent(shareFolder: FavoriteFolderShareModel) {
+        val sharedContents: String = shareFolder.toShareFormat()
+
+        val intent =
+            Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                putExtra(Intent.EXTRA_TEXT, sharedContents)
+                putExtra(Intent.EXTRA_TITLE, shareFolder.name)
+            }
+        val kakaoIntent: Intent =
+            Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                `package` = KAKAO_PACKAGE
+                putExtra(Intent.EXTRA_TEXT, sharedContents)
+            }
+        val instagramIntent: Intent =
+            Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                `package` = INSTAGRAM_PACKAGE
+                putExtra(Intent.EXTRA_TEXT, sharedContents)
+            }
+        val initialIntents = arrayOf(kakaoIntent, instagramIntent)
+
+        val chooserIntent =
+            Intent.createChooser(intent, shareFolder.name).apply {
+                putExtra(Intent.EXTRA_INITIAL_INTENTS, initialIntents)
+                putExtra(Intent.EXTRA_TITLE, shareFolder.name)
+            }
+
+        startActivity(chooserIntent)
     }
 
     override fun inflateBinding(
@@ -110,6 +154,8 @@ class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavor
     companion object {
         private const val ARGUMENTS_FOLDER_ID = "FOLDER_ID"
         private const val ARGUMENTS_FOLDER_NAME = "FOLDER_NAME"
+        private const val KAKAO_PACKAGE = "com.kakao.talk"
+        private const val INSTAGRAM_PACKAGE = "com.instagram.android"
 
         fun newInstance(
             folderId: Long,

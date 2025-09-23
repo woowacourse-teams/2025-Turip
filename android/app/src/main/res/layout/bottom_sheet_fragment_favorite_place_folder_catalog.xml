@@ -29,6 +29,19 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:text="뭉치의 대구 장소's" />
 
+    <ImageView
+        android:id="@+id/iv_bottom_sheet_favorite_place_folder_share"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="20dp"
+        android:background="@drawable/bg_gray300_radius_10dp"
+        android:contentDescription="@null"
+        android:padding="6dp"
+        android:src="@drawable/ic_share"
+        app:layout_constraintBottom_toBottomOf="@id/tv_bottom_sheet_folder_favorite_place_folder_catalog_title"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tv_bottom_sheet_folder_favorite_place_folder_catalog_title" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_bottom_sheet_favorite_place_folder_catalog"
         android:layout_width="match_parent"
