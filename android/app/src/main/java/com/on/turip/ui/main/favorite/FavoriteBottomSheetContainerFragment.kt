@@ -29,12 +29,12 @@ class FavoriteBottomSheetContainerFragment : BaseBottomSheetFragment<BottomSheet
             val screenHeight = resources.displayMetrics.heightPixels
             val halfHeight = (screenHeight * 0.5f).toInt()
 
-            bottomSheetView.layoutParams.height = halfHeight
+            bottomSheetView.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
 
             behavior.apply {
-                isFitToContents = false
+                isFitToContents = true
                 peekHeight = halfHeight
-                isDraggable = false
+                isDraggable = true
                 state = BottomSheetBehavior.STATE_COLLAPSED
             }
         }
