@@ -1,25 +1,23 @@
 package com.on.turip.ui.main.favorite
 
-import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
 import com.on.turip.R
 import com.on.turip.databinding.BottomSheetFragmentFavoritePlaceFolderBinding
 import com.on.turip.ui.common.TuripSnackbar
-import com.on.turip.ui.common.base.BaseBottomSheetFragment
+import com.on.turip.ui.common.base.BaseFragment
 import com.on.turip.ui.folder.FolderActivity
+import com.on.turip.ui.main.favorite.FavoritePlaceFolderViewHolder.FavoritePlaceFolderListener
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
 import com.on.turip.ui.trip.detail.TripDetailViewModel
 
-class FavoritePlaceFolderBottomSheetFragment : BaseBottomSheetFragment<BottomSheetFragmentFavoritePlaceFolderBinding>() {
+class FavoritePlaceFolderFragment : BaseFragment<BottomSheetFragmentFavoritePlaceFolderBinding>() {
     private val viewModel: FavoritePlaceFolderViewModel by viewModels {
         FavoritePlaceFolderViewModel.provideFactory(
             placeId = arguments?.getLong(ARGUMENTS_PLACE_ID) ?: 0L,
@@ -28,26 +26,46 @@ class FavoritePlaceFolderBottomSheetFragment : BaseBottomSheetFragment<BottomShe
     private val sharedViewModel: TripDetailViewModel by activityViewModels()
 
     private val favoritePlaceFolderAdapter: FavoritePlaceFolderAdapter by lazy {
-        FavoritePlaceFolderAdapter { favoritePlaceFolderModel: FavoritePlaceFolderModel ->
-            viewModel.updateFolder(
-                folderId = favoritePlaceFolderModel.id,
-                isFavorite = favoritePlaceFolderModel.isSelected,
-            )
-            showSnackbar(favoritePlaceFolderModel)
-        }
+        FavoritePlaceFolderAdapter(
+            object : FavoritePlaceFolderListener {
+                override fun onFavoriteFolderFavoriteClick(favoritePlaceFolderModel: FavoritePlaceFolderModel) {
+                    viewModel.updateFolder(
+                        folderId = favoritePlaceFolderModel.id,
+                        isFavorite = favoritePlaceFolderModel.isSelected,
+                    )
+                    showSnackbar(favoritePlaceFolderModel)
+                }
+
+                override fun onFavoriteFolderClick(
+                    favoriteFolderId: Long,
+                    favoriteFolderName: String,
+                ) {
+                    parentFragmentManager
+                        .beginTransaction()
+                        .replace(
+                            R.id.fcv_bottom_sheet_folder_favorite_place_folder_catalog,
+                            FavoritePlaceFolderCatalogFragment.newInstance(
+                                favoriteFolderId,
+                                favoriteFolderName,
+                            ),
+                        ).addToBackStack(null)
+                        .commit()
+                }
+            },
+        )
     }
 
     private fun showSnackbar(favoritePlaceFolderModel: FavoritePlaceFolderModel) {
-        val updatedFavorites: Boolean = !favoritePlaceFolderModel.isSelected
+        val updatedFavorites = !favoritePlaceFolderModel.isSelected
 
-        val messageResource: Int =
+        val messageResource =
             if (updatedFavorites) {
                 R.string.bottom_sheet_favorite_place_folder_save_with_folder_name
             } else {
                 R.string.bottom_sheet_favorite_place_folder_remove_with_folder_name
             }
-        val message: String = getString(messageResource, favoritePlaceFolderModel.name)
-        val iconResource: Int =
+        val message = getString(messageResource, favoritePlaceFolderModel.name)
+        val iconResource =
             if (updatedFavorites) R.drawable.ic_heart_normal else R.drawable.ic_heart_empty
 
         TuripSnackbar
@@ -65,30 +83,6 @@ class FavoritePlaceFolderBottomSheetFragment : BaseBottomSheetFragment<BottomShe
         inflater: LayoutInflater,
         container: ViewGroup?,
     ): BottomSheetFragmentFavoritePlaceFolderBinding = BottomSheetFragmentFavoritePlaceFolderBinding.inflate(inflater, container, false)
-
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val dialog: Dialog = super.onCreateDialog(savedInstanceState)
-        dialog.setOnShowListener {
-            val bottomSheetView: View =
-                dialog.findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)
-            val behavior: BottomSheetBehavior<View> = BottomSheetBehavior.from(bottomSheetView)
-
-            bottomSheetView.setBackgroundResource(R.drawable.bg_pure_white_top_radius_20dp)
-
-            val screenHeight = resources.displayMetrics.heightPixels
-            val halfHeight = (screenHeight * 0.5f).toInt()
-
-            bottomSheetView.layoutParams.height = halfHeight
-
-            behavior.apply {
-                isFitToContents = false
-                peekHeight = halfHeight
-                isDraggable = false
-                state = BottomSheetBehavior.STATE_COLLAPSED
-            }
-        }
-        return dialog
-    }
 
     override fun onViewCreated(
         view: View,
@@ -112,10 +106,10 @@ class FavoritePlaceFolderBottomSheetFragment : BaseBottomSheetFragment<BottomShe
     }
 
     private fun setupObservers() {
-        viewModel.favoritePlaceFolders.observe(viewLifecycleOwner) { folders: List<FavoritePlaceFolderModel> ->
+        viewModel.favoritePlaceFolders.observe(viewLifecycleOwner) { folders ->
             favoritePlaceFolderAdapter.submitList(folders)
         }
-        viewModel.hasFavoriteFolderWithPlaceId.observe(viewLifecycleOwner) { hasFavoriteFolder: Boolean ->
+        viewModel.hasFavoriteFolderWithPlaceId.observe(viewLifecycleOwner) { hasFavoriteFolder ->
             sharedViewModel.updateHasFavoriteFolderInPlace(
                 hasFavoriteFolder,
                 arguments?.getLong(ARGUMENTS_PLACE_ID) ?: 0L,
@@ -129,11 +123,10 @@ class FavoritePlaceFolderBottomSheetFragment : BaseBottomSheetFragment<BottomShe
     }
 
     companion object {
-        private const val BASIC_VIEW_PERCENT: Float = 0.5f
         private const val ARGUMENTS_PLACE_ID = "PLACE_ID"
 
-        fun instance(placeId: Long): FavoritePlaceFolderBottomSheetFragment =
-            FavoritePlaceFolderBottomSheetFragment().apply {
+        fun newInstance(placeId: Long): FavoritePlaceFolderFragment =
+            FavoritePlaceFolderFragment().apply {
                 arguments =
                     Bundle().apply {
                         putLong(ARGUMENTS_PLACE_ID, placeId)

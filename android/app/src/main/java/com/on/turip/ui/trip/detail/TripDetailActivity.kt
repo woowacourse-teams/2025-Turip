@@ -24,7 +24,7 @@ import com.on.turip.ui.common.base.BaseActivity
 import com.on.turip.ui.common.loadCircularImage
 import com.on.turip.ui.common.model.trip.TripModel
 import com.on.turip.ui.common.model.trip.toDisplayText
-import com.on.turip.ui.main.favorite.FavoritePlaceFolderBottomSheetFragment
+import com.on.turip.ui.main.favorite.FavoriteBottomSheetContainerFragment
 import com.on.turip.ui.search.keywordresult.SearchActivity
 import com.on.turip.ui.trip.detail.webview.TuripWebChromeClient
 import com.on.turip.ui.trip.detail.webview.TuripWebViewClient
@@ -80,8 +80,8 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
                 }
 
                 override fun onFavoriteClick(placeModel: PlaceModel) {
-                    val bottomSheet: FavoritePlaceFolderBottomSheetFragment =
-                        FavoritePlaceFolderBottomSheetFragment.instance(placeModel.id)
+                    val bottomSheet: FavoriteBottomSheetContainerFragment =
+                        FavoriteBottomSheetContainerFragment.instance(placeModel.id)
                     bottomSheet.show(supportFragmentManager, "favorite_place_folder")
                 }
             },
