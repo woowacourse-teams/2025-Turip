@@ -41,7 +41,6 @@ fun HomeScreen(
     onSearchClick: (String) -> Unit,
     onRegionClick: (String) -> Unit,
     onContentClick: (UsersLikeContentModel) -> Unit,
-    modifier: Modifier = Modifier,
     viewModel: HomeViewModel = viewModel(factory = HomeViewModel.provideFactory()),
 ) {
     var keyword: String by rememberSaveable { mutableStateOf("") }
@@ -75,7 +74,7 @@ fun HomeScreen(
         ) {
             Column(
                 modifier =
-                    modifier
+                    Modifier
                         .fillMaxSize()
                         .padding(innerPadding)
                         .padding(start = 20.dp)
@@ -91,7 +90,11 @@ fun HomeScreen(
                 SearchTextField(
                     keyword = keyword,
                     onKeywordChange = { newKeyword -> keyword = newKeyword },
-                    onSearch = onSearchClick,
+                    onSearch = { keyword ->
+                        onSearchClick(keyword)
+                        focusManager.clearFocus(force = true)
+                        keyboardController?.hide()
+                    },
                     modifier =
                         Modifier
                             .wrapContentSize()
