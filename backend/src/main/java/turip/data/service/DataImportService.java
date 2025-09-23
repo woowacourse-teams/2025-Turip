@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,9 +21,9 @@ import turip.data.controller.dto.CsvDataDto;
 import turip.place.domain.Category;
 import turip.place.domain.Place;
 import turip.place.domain.PlaceCategory;
-import turip.place.repository.CategoryRepository;
 import turip.place.repository.PlaceCategoryRepository;
 import turip.place.repository.PlaceRepository;
+import turip.place.service.CategoryService;
 import turip.region.domain.City;
 import turip.region.domain.Country;
 import turip.region.domain.Province;
@@ -44,9 +45,9 @@ public class DataImportService {
     private final CreatorRepository creatorRepository;
     private final ContentRepository contentRepository;
     private final PlaceRepository placeRepository;
-    private final CategoryRepository categoryRepository;
     private final PlaceCategoryRepository placeCategoryRepository;
     private final ContentPlaceRepository contentPlaceRepository;
+    private final CategoryService categoryService;
 
     public void importCsvData(String csvFilePath) {
         try (BufferedReader reader = new BufferedReader(new FileReader(csvFilePath))) {
@@ -252,8 +253,7 @@ public class DataImportService {
         if (isNullOrEmpty(categoryName)) {
             return null;
         }
-        return categoryRepository.findByName(categoryName)
-                .orElseGet(() -> categoryRepository.save(new Category(categoryName)));
+        return categoryService.findOrCreateCategory(categoryName);
     }
 
     private PlaceCategory findOrCreatePlaceCategory(Place place, Category category) {
@@ -306,4 +306,11 @@ public class DataImportService {
     private boolean isNullOrEmpty(String value) {
         return value == null || value.isEmpty();
     }
-} 
+
+    private String normalize(final String value) {
+        if (value == null) {
+            return null;
+        }
+        return value.trim().toLowerCase(Locale.ROOT);
+    }
+}
