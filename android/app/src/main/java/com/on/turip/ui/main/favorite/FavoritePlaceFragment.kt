@@ -39,6 +39,7 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
                     startActivity(intent)
                 }
             },
+            onChange = { viewModel.updateFavoritePlacesOrder(it) },
         )
     }
 
@@ -99,6 +100,16 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
                         viewHolder: RecyclerView.ViewHolder,
                         direction: Int,
                     ) = Unit
+
+                    override fun isLongPressDragEnabled(): Boolean = true
+
+                    override fun interpolateOutOfBoundsScroll(
+                        recyclerView: RecyclerView,
+                        viewSize: Int,
+                        viewSizeOutOfBounds: Int,
+                        totalSize: Int,
+                        msSinceStartScroll: Long,
+                    ): Int = viewSizeOutOfBounds / 10
                 },
             )
 
