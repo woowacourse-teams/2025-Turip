@@ -1,17 +1,12 @@
 package com.on.turip.ui.compose.main.home.component
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
-import com.on.turip.R
 import com.on.turip.domain.region.RegionCategory
 
 @Composable
@@ -20,18 +15,16 @@ fun RegionList(
     onRegionClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    LazyRow(
-        modifier =
-            modifier
-                .wrapContentHeight()
-                .background(colorResource(R.color.pure_white_ffffff)),
-        contentPadding = PaddingValues(start = 20.dp, top = 14.dp, end = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    FlowRow(
+        modifier = modifier.fillMaxWidth(),
+        maxItemsInEachRow = 4,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        items(regions, key = { it.name }) { regionCategory: RegionCategory ->
+        regions.forEach { regionCategory: RegionCategory ->
             RegionItem(
                 region = regionCategory,
-                modifier = Modifier.clickable { onRegionClick(regionCategory.name) },
+                Modifier.clickable { onRegionClick(regionCategory.name) },
             )
         }
     }
