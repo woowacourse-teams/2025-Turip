@@ -3,6 +3,7 @@ package com.on.turip.ui.compose.common.component
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
@@ -24,8 +25,11 @@ fun RoundedCornerImage(
                 .Builder(LocalContext.current)
                 .data(imageUrl)
                 .crossfade(true)
-                .transformations(RoundedCornersTransformation(cornerRadiusDp.value))
-                .build(),
+                .transformations(
+                    RoundedCornersTransformation(
+                        with(LocalDensity.current) { cornerRadiusDp.toPx() },
+                    ),
+                ).build(),
         contentDescription = contentDescription,
         contentScale = contentScale,
     )
