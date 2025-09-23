@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.on.turip.databinding.BottomSheetFragmentFavoritePlaceFolderCatalogBinding
 import com.on.turip.ui.common.base.BaseFragment
 import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
+import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
 
 class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavoritePlaceFolderCatalogBinding>() {
     private val viewModel: FavoritePlaceFolderCatalogViewModel by viewModels {
@@ -100,6 +101,12 @@ class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavor
             placeAdapter.submitList(state.places)
 
             binding.tvBottomSheetFolderFavoritePlaceFolderCatalogTitle.text = state.folderName
+
+            if (state.places == emptyList<FavoritePlaceModel>()) {
+                binding.ivBottomSheetFavoritePlaceFolderShare.visibility = View.GONE
+            } else {
+                binding.ivBottomSheetFavoritePlaceFolderShare.visibility = View.VISIBLE
+            }
         }
 
         viewModel.shareFolder.observe(viewLifecycleOwner) { shareFolder: FavoriteFolderShareModel ->

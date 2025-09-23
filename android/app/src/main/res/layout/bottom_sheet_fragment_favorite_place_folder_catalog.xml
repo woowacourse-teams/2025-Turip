@@ -38,6 +38,7 @@
         android:contentDescription="@null"
         android:padding="6dp"
         android:src="@drawable/ic_share"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/tv_bottom_sheet_folder_favorite_place_folder_catalog_title"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/tv_bottom_sheet_folder_favorite_place_folder_catalog_title" />
