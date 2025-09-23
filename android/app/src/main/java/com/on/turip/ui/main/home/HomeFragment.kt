@@ -5,174 +5,53 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.EditorInfo
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Text
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
-import androidx.fragment.app.viewModels
-import com.on.turip.R
-import com.on.turip.databinding.FragmentHomeBinding
-import com.on.turip.domain.ErrorEvent
-import com.on.turip.domain.content.Content
-import com.on.turip.domain.region.RegionCategory
-import com.on.turip.ui.common.ItemSpaceDecoration
-import com.on.turip.ui.common.base.BaseFragment
-import com.on.turip.ui.compose.main.home.component.RegionList
-import com.on.turip.ui.compose.main.home.component.RegionTypeButtons
-import com.on.turip.ui.compose.theme.TuripTypography
+import androidx.compose.ui.platform.ComposeView
+import androidx.fragment.app.Fragment
+import com.on.turip.ui.compose.main.home.HomeScreen
+import com.on.turip.ui.compose.theme.TuripTheme
 import com.on.turip.ui.search.keywordresult.SearchActivity
 import com.on.turip.ui.search.regionresult.RegionResultActivity
 import com.on.turip.ui.trip.detail.TripDetailActivity
 import timber.log.Timber
 
-class HomeFragment : BaseFragment<FragmentHomeBinding>() {
-    private val viewModel: HomeViewModel by viewModels { HomeViewModel.provideFactory() }
-
-    private val usersLikeContentAdapter: UsersLikeContentAdapter =
-        UsersLikeContentAdapter { content: Content ->
-            Timber.d("인기 컨텐츠 선택 : ContentId = ${content.id} CreatorId = ${content.creator.id}")
-            val intent: Intent =
-                TripDetailActivity.newIntent(
-                    context = requireContext(),
-                    contentId = content.id,
-                    creatorId = content.creator.id,
-                )
-            startActivity(intent)
-        }
-
-    override fun inflateBinding(
+class HomeFragment : Fragment() {
+    override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-    ): FragmentHomeBinding = FragmentHomeBinding.inflate(inflater, container, false)
-
-    override fun onViewCreated(
-        view: View,
         savedInstanceState: Bundle?,
-    ) {
-        super.onViewCreated(view, savedInstanceState)
-
-        setupAdapters()
-        setupObservers()
-        setupListeners()
-        showNetworkError()
-
-        setupComposeView()
-    }
-
-    private fun setupAdapters() {
-        binding.rvUsersLikeContent.apply {
-            adapter = usersLikeContentAdapter
-            addItemDecoration(ItemSpaceDecoration(end = 10))
-        }
-    }
-
-    private fun setupObservers() {
-        viewModel.usersLikeContents.observe(viewLifecycleOwner) { usersLikeContents: List<UsersLikeContentModel> ->
-            usersLikeContentAdapter.submitList(usersLikeContents)
-        }
-        viewModel.networkError.observe(viewLifecycleOwner) { networkError: Boolean ->
-            binding.gpHomeErrorNot.visibility =
-                if (networkError) View.GONE else View.VISIBLE
-            binding.customErrorView.visibility =
-                if (networkError) View.VISIBLE else View.GONE
-        }
-        viewModel.serverError.observe(viewLifecycleOwner) { serverError: Boolean ->
-            binding.gpHomeErrorNot.visibility =
-                if (serverError) View.GONE else View.VISIBLE
-            binding.customErrorView.visibility =
-                if (serverError) View.VISIBLE else View.GONE
-        }
-    }
-
-    private fun setupListeners() {
-        binding.ivHomeSearch.setOnClickListener {
-            if (binding.etHomeSearchResult.text.isBlank()) return@setOnClickListener
-            val input: String = binding.etHomeSearchResult.text.toString()
-            Timber.d("검색 버튼 클릭 $input")
-            val intent: Intent =
-                SearchActivity.newIntent(
-                    requireContext(),
-                    binding.etHomeSearchResult.text.toString(),
-                )
-            startActivity(intent)
-        }
-        binding.etHomeSearchResult.setOnEditorActionListener { input, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                val input: String = input.text.toString()
-                return@setOnEditorActionListener if (input.isBlank()) {
-                    true
-                } else {
-                    val input: String = binding.etHomeSearchResult.text.toString()
-                    Timber.d("검색 버튼 클릭 $input")
-                    val intent: Intent =
-                        SearchActivity.newIntent(
-                            requireContext(),
-                            input,
-                        )
-                    startActivity(intent)
-                    true
+    ): View =
+        ComposeView(requireContext()).apply {
+            setContent {
+                TuripTheme {
+                    HomeScreen(
+                        onSearchClick = { keyword: String ->
+                            if (keyword.isNotBlank()) {
+                                Timber.d("검색 버튼 클릭 $keyword")
+                                val intent: Intent =
+                                    SearchActivity.newIntent(requireContext(), keyword)
+                                startActivity(intent)
+                            }
+                        },
+                        onRegionClick = { regionCategoryName: String ->
+                            Timber.d("지역 선택 : $regionCategoryName")
+                            val intent: Intent =
+                                RegionResultActivity.newIntent(requireContext(), regionCategoryName)
+                            startActivity(intent)
+                        },
+                        onContentClick = { usersLikeContent: UsersLikeContentModel ->
+                            Timber.d(
+                                "인기 컨텐츠 선택 : ContentId = ${usersLikeContent.content.id} CreatorId = ${usersLikeContent.content.creator.id}",
+                            )
+                            val intent: Intent =
+                                TripDetailActivity.newIntent(
+                                    context = requireContext(),
+                                    contentId = usersLikeContent.content.id,
+                                    creatorId = usersLikeContent.content.creator.id,
+                                )
+                            startActivity(intent)
+                        },
+                    )
                 }
-            } else {
-                false
             }
         }
-    }
-
-    private fun showNetworkError() {
-        binding.customErrorView.apply {
-            visibility = View.VISIBLE
-            setupError(ErrorEvent.NETWORK_ERROR)
-            setOnRetryClickListener {
-                viewModel.reload()
-            }
-        }
-    }
-
-    private fun setupComposeView() {
-        binding.tvHomeAppDescription.setContent {
-            Text(
-                text = stringResource(R.string.home_where_should_we_go_title),
-                modifier = Modifier.padding(top = 10.dp),
-                color = colorResource(R.color.gray_400_2b2b2b),
-                style = TuripTypography.titleLarge,
-            )
-        }
-
-        binding.rvHomeRegion.setContent {
-            val regions: List<RegionCategory> by viewModel.regionCategories.observeAsState(emptyList())
-            RegionList(
-                regions = regions,
-                onRegionClick = { regionCategoryName: String ->
-                    Timber.d("지역 선택 : $regionCategoryName")
-                    val intent: Intent =
-                        RegionResultActivity.newIntent(requireContext(), regionCategoryName)
-                    startActivity(intent)
-                },
-            )
-        }
-
-        binding.tvHomeRegionTypes.setContent {
-            val isSelectedDomestic: Boolean by viewModel.isSelectedDomestic.observeAsState(true)
-            RegionTypeButtons(
-                onDomesticClick = { isSelectDomestic: Boolean ->
-                    viewModel.updateDomesticSelected(isSelectDomestic)
-                },
-                isSelectedDomestic = isSelectedDomestic,
-            )
-        }
-
-        binding.tvHomeUsersLikeContentTitle.setContent {
-            Text(
-                text = stringResource(R.string.home_users_like_content_title),
-                modifier = Modifier.padding(top = 26.dp),
-                color = colorResource(R.color.gray_400_2b2b2b),
-                style = TuripTypography.titleLarge,
-            )
-        }
-    }
 }
