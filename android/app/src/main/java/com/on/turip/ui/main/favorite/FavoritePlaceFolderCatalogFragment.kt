@@ -23,6 +23,7 @@ class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavor
                     startActivity(intent)
                 }
             },
+            onChange = TODO(),
         )
     }
 
