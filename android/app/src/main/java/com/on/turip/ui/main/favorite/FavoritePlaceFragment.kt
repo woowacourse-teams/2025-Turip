@@ -39,7 +39,7 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
                     startActivity(intent)
                 }
             },
-            onChange = { viewModel.updateFavoritePlacesOrder(it) },
+            onCommit = { viewModel.updateFavoritePlacesOrder(it) },
         )
     }
 
@@ -110,6 +110,14 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
                         totalSize: Int,
                         msSinceStartScroll: Long,
                     ): Int = viewSizeOutOfBounds / 10
+
+                    override fun clearView(
+                        recyclerView: RecyclerView,
+                        viewHolder: RecyclerView.ViewHolder,
+                    ) {
+                        super.clearView(recyclerView, viewHolder)
+                        placeAdapter.commitMove()
+                    }
                 },
             )
 

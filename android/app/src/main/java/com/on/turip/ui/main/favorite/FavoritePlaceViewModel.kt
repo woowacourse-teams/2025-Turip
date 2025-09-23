@@ -178,16 +178,16 @@ class FavoritePlaceViewModel(
     }
 
     fun updateFavoritePlacesOrder(newFavoritePlaces: List<FavoritePlaceModel>) {
+        _favoritePlaceUiState.value =
+            favoritePlaceUiState.value?.copy(
+                places = newFavoritePlaces,
+            )
         viewModelScope.launch {
             favoritePlaceRepository
                 .updateFavoritePlacesOrder(
                     favoriteFolderId = selectedFolderId,
                     updatedOrder = newFavoritePlaces.map { it.favoritePlaceId },
                 ).onSuccess {
-                    _favoritePlaceUiState.value =
-                        favoritePlaceUiState.value?.copy(
-                            places = newFavoritePlaces,
-                        )
                     Timber.d("순서 변경 완료: $newFavoritePlaces")
                 }.onFailure { errorEvent: ErrorEvent ->
                     checkError(errorEvent)
