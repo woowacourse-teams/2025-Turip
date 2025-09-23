@@ -32,6 +32,10 @@ class FavoritePlaceFolderCatalogViewModel(
     private val _shareFolder: MutableLiveData<FavoriteFolderShareModel> = MutableLiveData()
     val shareFolder: LiveData<FavoriteFolderShareModel> get() = _shareFolder
 
+    init {
+        loadPlacesInSelectFolder()
+    }
+
     private fun loadPlacesInSelectFolder() {
         viewModelScope.launch {
             favoritePlaceRepository
