@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.on.turip.R
 import com.on.turip.databinding.BottomSheetFragmentFavoritePlaceFolderCatalogBinding
 import com.on.turip.ui.common.base.BaseFragment
 import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
@@ -101,6 +102,9 @@ class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavor
             placeAdapter.submitList(state.places)
 
             binding.tvBottomSheetFolderFavoritePlaceFolderCatalogTitle.text = state.folderName
+
+            binding.tvBottomSheetFavoritePlaceFolderCount.text =
+                getString(R.string.all_total_place_count, state.places.size)
 
             if (state.places == emptyList<FavoritePlaceModel>()) {
                 binding.ivBottomSheetFavoritePlaceFolderShare.visibility = View.GONE

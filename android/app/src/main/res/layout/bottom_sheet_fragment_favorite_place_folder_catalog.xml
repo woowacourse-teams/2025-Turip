@@ -43,6 +43,19 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/tv_bottom_sheet_folder_favorite_place_folder_catalog_title" />
 
+    <TextView
+        android:id="@+id/tv_bottom_sheet_favorite_place_folder_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"
+        android:textAppearance="@style/info1"
+        android:textColor="@color/gray_300_5b5b5b"
+        app:layout_constraintBottom_toTopOf="@id/rv_bottom_sheet_favorite_place_folder_catalog"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_bottom_sheet_folder_favorite_place_folder_catalog_title"
+        tools:text="장소 10개" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_bottom_sheet_favorite_place_folder_catalog"
         android:layout_width="match_parent"
@@ -54,7 +67,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_bottom_sheet_folder_favorite_place_folder_catalog_title"
+        app:layout_constraintTop_toBottomOf="@id/tv_bottom_sheet_favorite_place_folder_count"
         tools:listitem="@layout/item_favorite_place" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
