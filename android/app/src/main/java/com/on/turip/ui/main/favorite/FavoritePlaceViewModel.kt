@@ -11,12 +11,13 @@ import com.on.turip.data.common.onFailure
 import com.on.turip.data.common.onSuccess
 import com.on.turip.di.RepositoryModule
 import com.on.turip.domain.ErrorEvent
+import com.on.turip.domain.favorite.FavoritePlace
 import com.on.turip.domain.favorite.repository.FavoritePlaceRepository
 import com.on.turip.domain.favorite.usecase.UpdateFavoritePlaceUseCase
 import com.on.turip.domain.folder.Folder
 import com.on.turip.domain.folder.repository.FolderRepository
-import com.on.turip.domain.trip.Place
 import com.on.turip.ui.common.mapper.toUiModel
+import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
 import kotlinx.coroutines.launch
@@ -30,6 +31,9 @@ class FavoritePlaceViewModel(
     private val _favoritePlaceUiState: MutableLiveData<FavoritePlaceUiState> =
         MutableLiveData(FavoritePlaceUiState())
     val favoritePlaceUiState: LiveData<FavoritePlaceUiState> get() = _favoritePlaceUiState
+
+    private val _shareFolder: MutableLiveData<FavoriteFolderShareModel> = MutableLiveData()
+    val shareFolder: LiveData<FavoriteFolderShareModel> get() = _shareFolder
 
     var selectedFolderId: Long = NOT_INITIALIZED
 
@@ -62,9 +66,15 @@ class FavoritePlaceViewModel(
     private suspend fun loadPlacesInSelectFolder() {
         favoritePlaceRepository
             .loadFavoritePlaces(selectedFolderId)
-            .onSuccess { places: List<Place> ->
+            .onSuccess { favoritePlaces: List<FavoritePlace> ->
                 _favoritePlaceUiState.value =
-                    favoritePlaceUiState.value?.copy(places = places.map { place: Place -> place.toUiModel() })
+                    favoritePlaceUiState.value?.copy(
+                        places =
+                            favoritePlaces
+                                .map { favoritePlace: FavoritePlace ->
+                                    favoritePlace.toUiModel()
+                                },
+                    )
                 _favoritePlaceUiState.value =
                     favoritePlaceUiState.value?.copy(isServerError = false)
                 _favoritePlaceUiState.value =
@@ -126,10 +136,10 @@ class FavoritePlaceViewModel(
         viewModelScope.launch {
             favoritePlaceRepository
                 .loadFavoritePlaces(folderId)
-                .onSuccess { result: List<Place> ->
+                .onSuccess { favoritePlaces: List<FavoritePlace> ->
                     _favoritePlaceUiState.value =
                         favoritePlaceUiState.value?.copy(
-                            places = result.map { it.toUiModel() },
+                            places = favoritePlaces.map { it.toUiModel() },
                         )
                     _favoritePlaceUiState.value =
                         favoritePlaceUiState.value?.copy(isServerError = false)
@@ -167,6 +177,25 @@ class FavoritePlaceViewModel(
         }
     }
 
+    fun updateFavoritePlacesOrder(newFavoritePlaces: List<FavoritePlaceModel>) {
+        viewModelScope.launch {
+            favoritePlaceRepository
+                .updateFavoritePlacesOrder(
+                    favoriteFolderId = selectedFolderId,
+                    updatedOrder = newFavoritePlaces.map { it.favoritePlaceId },
+                ).onSuccess {
+                    _favoritePlaceUiState.value =
+                        favoritePlaceUiState.value?.copy(
+                            places = newFavoritePlaces,
+                        )
+                    Timber.d("순서 변경 완료: $newFavoritePlaces")
+                }.onFailure { errorEvent: ErrorEvent ->
+                    checkError(errorEvent)
+                    Timber.e("장소 순서 변경 API 호출 실패")
+                }
+        }
+    }
+
     data class FavoritePlaceUiState(
         val isLoading: Boolean = true,
         val isNetWorkError: Boolean = false,
@@ -174,6 +203,19 @@ class FavoritePlaceViewModel(
         val places: List<FavoritePlaceModel> = emptyList(),
         val folders: List<FavoritePlaceFolderModel> = emptyList(),
     )
+
+    fun shareFolder() {
+        val shareFolder =
+            FavoriteFolderShareModel(
+                name =
+                    favoritePlaceUiState.value
+                        ?.folders
+                        ?.first { it.isSelected }
+                        ?.name ?: "",
+                places = favoritePlaceUiState.value?.places?.map { it.toUiModel() } ?: emptyList(),
+            )
+        _shareFolder.value = shareFolder
+    }
 
     companion object {
         private const val NOT_INITIALIZED: Long = 0L
