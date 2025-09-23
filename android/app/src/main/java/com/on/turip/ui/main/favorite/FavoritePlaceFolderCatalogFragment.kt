@@ -51,6 +51,10 @@ class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavor
     private fun setupAdapters() {
         binding.rvBottomSheetFavoritePlaceFolderCatalog.adapter = placeAdapter
 
+        binding.btnBottomSheetFolderFavoritePlaceFolderCatalogBack.setOnClickListener {
+            parentFragmentManager.popBackStack()
+        }
+
         val itemTouchHelper =
             ItemTouchHelper(
                 object : ItemTouchHelper.SimpleCallback(
