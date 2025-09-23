@@ -80,9 +80,11 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
                 }
 
                 override fun onFavoriteClick(placeModel: PlaceModel) {
-                    val bottomSheet: FavoriteBottomSheetContainerFragment =
-                        FavoriteBottomSheetContainerFragment.instance(placeModel.id)
-                    bottomSheet.show(supportFragmentManager, "favorite_place_folder")
+                    if (supportFragmentManager.findFragmentByTag("favorite_place_folder") == null) {
+                        val bottomSheet: FavoriteBottomSheetContainerFragment =
+                            FavoriteBottomSheetContainerFragment.instance(placeModel.id)
+                        bottomSheet.show(supportFragmentManager, "favorite_place_folder")
+                    }
                 }
             },
         )
