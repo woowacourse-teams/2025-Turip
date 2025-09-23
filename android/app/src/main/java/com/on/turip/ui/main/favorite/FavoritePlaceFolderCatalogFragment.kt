@@ -27,6 +27,7 @@ class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavor
                     placeId: Long,
                     isFavorite: Boolean,
                 ) {
+                    viewModel.updateFavoritePlace(placeId, isFavorite)
                 }
 
                 override fun onMapClick(uri: Uri) {
