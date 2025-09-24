@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -22,6 +23,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 @Testcontainers
 @ActiveProfiles("test")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Transactional(propagation = org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED)
 public class ContentKeywordApiTest {
@@ -31,6 +33,10 @@ public class ContentKeywordApiTest {
             .withUsername("root")
             .withPassword("rootpwd")
             .withDatabaseName("test_db");
+
+    static {
+        mySQLContainer.start();
+    }
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -46,7 +52,7 @@ public class ContentKeywordApiTest {
     }
 
     @BeforeAll
-    static void setUp(@Autowired JdbcTemplate jdbcTemplate) {
+    void setUp() {
         // Fulltext index 생성
         jdbcTemplate.execute("ALTER TABLE content ADD FULLTEXT INDEX idx_title (title) WITH PARSER ngram");
         jdbcTemplate.execute(

@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,7 @@ import turip.region.repository.CountryRepository;
 @DataJpaTest
 @ActiveProfiles("test")
 @Testcontainers
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ContentRepositoryTest {
 
     @Container
@@ -43,6 +45,10 @@ class ContentRepositoryTest {
             .withUsername("root")
             .withPassword("rootpwd")
             .withDatabaseName("test_db");
+
+    static {
+        mySQLContainer.start();
+    }
 
     @Autowired
     private CreatorRepository creatorRepository;
@@ -67,8 +73,7 @@ class ContentRepositoryTest {
     }
 
     @BeforeAll
-    static void setUp(@Autowired JdbcTemplate jdbcTemplate) {
-        // Fulltext index 생성
+    void setUp() {
         jdbcTemplate.execute("ALTER TABLE content ADD FULLTEXT INDEX idx_title (title) WITH PARSER ngram");
         jdbcTemplate.execute(
                 "ALTER TABLE creator ADD FULLTEXT INDEX idx_channel_name (channel_name) WITH PARSER ngram");
