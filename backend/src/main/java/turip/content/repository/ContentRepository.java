@@ -73,15 +73,28 @@ public interface ContentRepository extends JpaRepository<Content, Long> {
     Slice<Content> findOverseasEtcContentsWithLastId(@Param("overseasCategoryNames") List<String> overseasCategoryNames,
                                                      @Param("lastId") Long lastId, Pageable pageable);
 
-    @Query("""
-               SELECT COUNT(DISTINCT c) FROM Content c
-                JOIN c.creator cr
-                LEFT JOIN ContentPlace cp ON c.id = cp.content.id
-                LEFT JOIN cp.place p
-                WHERE c.title LIKE %:keyword% 
-                   OR cr.channelName LIKE %:keyword%
-                   OR p.name LIKE %:keyword%
-            """)
+    @Query(value = """
+            SELECT COUNT(*) FROM (
+                SELECT c.id
+                FROM content c
+                WHERE MATCH(c.title) AGAINST(:keyword IN BOOLEAN MODE)
+            
+                UNION
+            
+                SELECT c.id
+                FROM content c
+                JOIN creator cr ON c.creator_id = cr.id
+                WHERE MATCH(cr.channel_name) AGAINST(:keyword IN BOOLEAN MODE)
+            
+                UNION
+            
+                SELECT c.id
+                FROM content c
+                JOIN content_place cp ON c.id = cp.content_id
+                JOIN place p ON cp.place_id = p.id
+                WHERE MATCH(p.name) AGAINST(:keyword IN BOOLEAN MODE)
+            ) AS total
+            """, nativeQuery = true)
     int countByKeywordContaining(@Param("keyword") String keyword);
 
     @Query(value = """
