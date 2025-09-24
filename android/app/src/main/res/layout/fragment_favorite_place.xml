@@ -21,17 +21,17 @@
     <ImageView
         android:id="@+id/iv_favorite_place_folder"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_marginStart="4dp"
         android:layout_marginEnd="12dp"
         android:background="@drawable/bg_gray300_radius_10dp"
         android:contentDescription="@null"
         android:padding="10dp"
         android:src="@drawable/ic_folder_setting"
+        app:layout_constraintTop_toTopOf="@id/rv_favorite_place_folder_name"
         app:layout_constraintBottom_toBottomOf="@id/rv_favorite_place_folder_name"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/rv_favorite_place_folder_name"
-        app:layout_constraintTop_toTopOf="@id/rv_favorite_place_folder_name" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <TextView
         android:id="@+id/tv_favorite_place_place_count"
@@ -48,7 +48,7 @@
 
     <ImageView
         android:id="@+id/iv_favorite_place_share"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="12dp"
         android:background="@drawable/bg_gray300_radius_10dp"
@@ -57,6 +57,7 @@
         android:src="@drawable/ic_share"
         app:layout_constraintBottom_toBottomOf="@id/tv_favorite_place_place_count"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/iv_favorite_place_folder"
         app:layout_constraintTop_toTopOf="@id/tv_favorite_place_place_count" />
 
     <androidx.recyclerview.widget.RecyclerView
