@@ -84,17 +84,34 @@ public interface ContentRepository extends JpaRepository<Content, Long> {
             """)
     int countByKeywordContaining(@Param("keyword") String keyword);
 
-    @Query("""
-                SELECT DISTINCT c FROM Content c
-                JOIN c.creator cr
-                LEFT JOIN ContentPlace cp ON c.id = cp.content.id
-                LEFT JOIN cp.place p
-                WHERE c.id < :lastId
-                AND (c.title LIKE %:keyword% 
-                     OR cr.channelName LIKE %:keyword%
-                     OR p.name LIKE %:keyword%)
-                ORDER BY c.id DESC
-            """)
-    Slice<Content> findByKeywordContaining(@Param("keyword") String keyword, @Param("lastId") Long lastId,
-                                           Pageable pageable);
+    @Query(value = """
+            SELECT c.*
+            FROM content c
+            WHERE c.id < :lastId
+              AND MATCH(c.title) AGAINST(:keyword IN BOOLEAN MODE)
+            
+            UNION
+            
+            SELECT c.*
+            FROM content c
+            JOIN creator cr ON c.creator_id = cr.id
+            WHERE c.id < :lastId
+              AND MATCH(cr.channel_name) AGAINST(:keyword IN BOOLEAN MODE)
+            
+            UNION
+            
+            SELECT c.*
+            FROM content c
+            JOIN content_place cp ON c.id = cp.content_id
+            JOIN place p ON cp.place_id = p.id
+            WHERE c.id < :lastId
+              AND MATCH(p.name) AGAINST(:keyword IN BOOLEAN MODE)
+            
+            ORDER BY id DESC
+            """, nativeQuery = true)
+    Slice<Content> findByKeywordContaining(
+            @Param("keyword") String keyword,
+            @Param("lastId") Long lastId,
+            Pageable pageable
+    );
 }
