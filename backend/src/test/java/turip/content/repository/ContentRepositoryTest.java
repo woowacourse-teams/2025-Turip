@@ -15,17 +15,14 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.testcontainers.containers.MySQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
+import turip.container.TestContainerConfig;
 import turip.content.domain.Content;
 import turip.creator.domain.Creator;
 import turip.creator.repository.CreatorRepository;
@@ -36,19 +33,9 @@ import turip.region.repository.CountryRepository;
 
 @DataJpaTest
 @ActiveProfiles("test")
-@Testcontainers
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Import(TestContainerConfig.class)
 class ContentRepositoryTest {
-
-    @Container
-    static MySQLContainer<?> mySQLContainer = new MySQLContainer<>("mysql:8.0.42")
-            .withUsername("root")
-            .withPassword("rootpwd")
-            .withDatabaseName("test_db");
-
-    static {
-        mySQLContainer.start();
-    }
 
     @Autowired
     private CreatorRepository creatorRepository;
@@ -64,13 +51,6 @@ class ContentRepositoryTest {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
-
-    @DynamicPropertySource
-    static void overrideProps(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", mySQLContainer::getJdbcUrl);
-        registry.add("spring.datasource.username", mySQLContainer::getUsername);
-        registry.add("spring.datasource.password", mySQLContainer::getPassword);
-    }
 
     @BeforeAll
     void setUp() {
