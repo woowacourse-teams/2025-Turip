@@ -38,7 +38,7 @@ class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavor
                     startActivity(intent)
                 }
             },
-            onChange = { viewModel.updateFavoritePlacesOrder(it) },
+            onCommit = { viewModel.updateFavoritePlacesOrder(it) },
         )
     }
 
@@ -91,6 +91,14 @@ class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavor
                         totalSize: Int,
                         msSinceStartScroll: Long,
                     ): Int = viewSizeOutOfBounds / 10
+
+                    override fun clearView(
+                        recyclerView: RecyclerView,
+                        viewHolder: RecyclerView.ViewHolder,
+                    ) {
+                        super.clearView(recyclerView, viewHolder)
+                        placeAdapter.commitMove()
+                    }
                 },
             )
 
