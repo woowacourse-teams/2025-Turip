@@ -13,65 +13,64 @@ public interface ContentRepository extends JpaRepository<Content, Long> {
 
     Optional<Content> findByTitleAndUrl(String title, String url);
 
-    int countByCityName(String cityName);
+    @Query("""
+            SELECT COUNT(c) FROM Content c
+            WHERE c.city.name = :cityName
+            """)
+    int countByCityName(@Param("cityName") String cityName);
 
     @Query("""
-                SELECT COUNT(c) FROM Content c
-                JOIN c.city ct
-                JOIN ct.country co
-                WHERE ct.name NOT IN :cityNames AND co.name = '대한민국'
+            SELECT COUNT(c) FROM Content c
+            WHERE c.city.country.name = :countryName
             """)
-    int countDomesticEtcContents(List<String> cityNames);
-
     int countByCityCountryName(@Param("countryName") String countryName);
 
     @Query("""
-                SELECT COUNT(c) FROM Content c
-                JOIN c.city ct
-                JOIN ct.country co
-                WHERE co.name NOT IN :countryNames AND co.name != '대한민국'
+            SELECT COUNT(c) FROM Content c
+            JOIN c.city ct
+            JOIN ct.country co
+            WHERE ct.name NOT IN :cityNames AND co.name = '대한민국'
+            """)
+    int countDomesticEtcContents(@Param("cityNames") List<String> cityNames);
+
+    @Query("""
+            SELECT COUNT(c) FROM Content c
+            JOIN c.city ct
+            JOIN ct.country co
+            WHERE co.name NOT IN :countryNames AND co.name != '대한민국'
             """)
     int countOverseasEtcContents(@Param("countryNames") List<String> countryNames);
 
-    Slice<Content> findByCityNameOrderByIdDesc(String cityName, Pageable pageable);
-
-    Slice<Content> findByCityNameAndIdLessThanOrderByIdDesc(String cityName, Long lastId, Pageable pageable);
-
     @Query("""
-            SELECT c FROM Content c JOIN c.city ct JOIN ct.country co
-            WHERE ct.name NOT IN :domesticCategoryNames AND co.name = '대한민국'
+            SELECT c FROM Content c
+            WHERE c.city.name = :cityName AND c.id < :lastId
             ORDER BY c.id DESC
             """)
-    Slice<Content> findDomesticEtcContents(@Param("domesticCategoryNames") List<String> domesticCategoryNames,
-                                           Pageable pageable);
+    Slice<Content> findByCityName(@Param("cityName") String cityName, @Param("lastId") Long lastId, Pageable pageable);
+
+    @Query("""
+            SELECT c FROM Content c
+            WHERE c.city.country.name = :countryName AND c.id < :lastId
+            ORDER BY c.id DESC
+            """)
+    Slice<Content> findByCityCountryName(@Param("countryName") String countryName, @Param("lastId") Long lastId,
+                                         Pageable pageable);
 
     @Query("""
             SELECT c FROM Content c JOIN c.city ct JOIN ct.country co
             WHERE ct.name NOT IN :domesticCategoryNames AND co.name = '대한민국' AND c.id < :lastId
             ORDER BY c.id DESC
             """)
-    Slice<Content> findDomesticEtcContentsWithLastId(@Param("domesticCategoryNames") List<String> domesticCategoryNames,
-                                                     @Param("lastId") Long lastId, Pageable pageable);
-
-    Slice<Content> findByCityCountryNameOrderByIdDesc(String countryName, Pageable pageable);
-
-    Slice<Content> findByCityCountryNameAndIdLessThanOrderByIdDesc(String countryName, Long lastId, Pageable pageable);
-
-    @Query("""
-            SELECT c FROM Content c JOIN c.city ct JOIN ct.country co
-            WHERE co.name NOT IN :overseasCategoryNames AND co.name != '대한민국'
-            ORDER BY c.id DESC
-            """)
-    Slice<Content> findOverseasEtcContents(@Param("overseasCategoryNames") List<String> overseasCategoryNames,
-                                           Pageable pageable);
+    Slice<Content> findDomesticEtcContents(@Param("domesticCategoryNames") List<String> domesticCategoryNames,
+                                           @Param("lastId") Long lastId, Pageable pageable);
 
     @Query("""
             SELECT c FROM Content c JOIN c.city ct JOIN ct.country co
             WHERE co.name NOT IN :overseasCategoryNames AND co.name != '대한민국' AND c.id < :lastId
             ORDER BY c.id DESC
             """)
-    Slice<Content> findOverseasEtcContentsWithLastId(@Param("overseasCategoryNames") List<String> overseasCategoryNames,
-                                                     @Param("lastId") Long lastId, Pageable pageable);
+    Slice<Content> findOverseasEtcContents(@Param("overseasCategoryNames") List<String> overseasCategoryNames,
+                                           @Param("lastId") Long lastId, Pageable pageable);
 
     @Query(value = """
             SELECT COUNT(*) FROM (
