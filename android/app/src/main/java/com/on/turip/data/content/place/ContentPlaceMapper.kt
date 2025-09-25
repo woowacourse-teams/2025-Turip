@@ -9,7 +9,6 @@ import com.on.turip.domain.trip.ContentPlace
 import com.on.turip.domain.trip.Place
 import com.on.turip.domain.trip.Trip
 import com.on.turip.domain.trip.TripDuration
-import kotlin.collections.map
 
 fun ContentPlacesResponse.toDomain(): Trip =
     Trip(
@@ -31,6 +30,7 @@ fun ContentPlaceResponse.toDomain(): ContentPlace =
         visitOrder = visitOrder,
         place = place.toDomain(),
         timeLine = timeLine,
+        isFavoritePlace = isFavoritePlace,
     )
 
 fun PlaceResponse.toDomain(): Place =

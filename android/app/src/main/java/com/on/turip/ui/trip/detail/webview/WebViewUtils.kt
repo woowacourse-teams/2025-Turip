@@ -10,6 +10,7 @@ fun WebView.applyVideoSettings() {
         javaScriptCanOpenWindowsAutomatically = true
         domStorageEnabled = true
         allowFileAccess = false
+        mediaPlaybackRequiresUserGesture = false
     }
 }
 

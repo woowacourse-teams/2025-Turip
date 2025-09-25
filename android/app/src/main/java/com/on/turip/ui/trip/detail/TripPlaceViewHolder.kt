@@ -13,6 +13,12 @@ class TripPlaceViewHolder(
     private var placeModel: PlaceModel? = null
 
     init {
+        itemView.setOnClickListener {
+            placeModel?.let {
+                onClickListener.onItemClick(it)
+            }
+        }
+
         binding.clTravelPlaceMap.setOnClickListener {
             placeModel?.let {
                 onClickListener.onPlaceClick(it)
@@ -39,6 +45,8 @@ class TripPlaceViewHolder(
                 R.string.travel_place_time_line,
                 placeModel.timeLine,
             )
+        binding.ivTravelPlaceFavorite.isSelected = placeModel.isFavorite
+        binding.ivTravelPlaceMap.setImageResource(Maps.from(placeModel.placeUri).iconRes)
     }
 
     companion object {
@@ -54,6 +62,8 @@ class TripPlaceViewHolder(
     }
 
     interface PlaceListener {
+        fun onItemClick(placeModel: PlaceModel)
+
         fun onPlaceClick(placeModel: PlaceModel)
 
         fun onTimeLineClick(placeModel: PlaceModel)

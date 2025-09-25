@@ -6,4 +6,5 @@ data class ContentPlace(
     val visitOrder: Int,
     val place: Place,
     val timeLine: String,
+    val isFavoritePlace: Boolean,
 )

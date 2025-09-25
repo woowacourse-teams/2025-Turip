@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import turip.common.exception.ErrorResponse;
 import turip.creator.controller.dto.response.CreatorResponse;
 import turip.creator.service.CreatorService;
-import turip.exception.ErrorResponse;
 
 @RestController
 @RequiredArgsConstructor
@@ -60,7 +60,7 @@ public class CreatorController {
                                     summary = "크리에이터가 존재하지 않음",
                                     value = """
                                             {
-                                                "message": "크리에이터를 찾을 수 없습니다."
+                                                "tag": "CREATOR_NOT_FOUND"
                                             }
                                             """
                             )

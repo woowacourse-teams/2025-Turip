@@ -16,7 +16,7 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import turip.city.domain.City;
+import turip.region.domain.City;
 import turip.creator.domain.Creator;
 
 @Getter

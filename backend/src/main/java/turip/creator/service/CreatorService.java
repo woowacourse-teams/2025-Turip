@@ -2,10 +2,11 @@ package turip.creator.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import turip.common.exception.ErrorTag;
+import turip.common.exception.custom.NotFoundException;
 import turip.creator.controller.dto.response.CreatorResponse;
 import turip.creator.domain.Creator;
 import turip.creator.repository.CreatorRepository;
-import turip.exception.custom.NotFoundException;
 
 @Service
 @RequiredArgsConstructor
@@ -15,7 +16,7 @@ public class CreatorService {
 
     public CreatorResponse getById(Long id) {
         Creator creator = creatorRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("크리에이터를 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException(ErrorTag.CREATOR_NOT_FOUND));
         return CreatorResponse.from(creator);
     }
 }

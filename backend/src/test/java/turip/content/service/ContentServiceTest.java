@@ -17,23 +17,22 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.SliceImpl;
-import turip.city.domain.City;
-import turip.content.controller.dto.response.ContentCountResponse;
-import turip.content.controller.dto.response.ContentSearchResponse;
-import turip.content.controller.dto.response.WeeklyPopularFavoriteContentsResponse;
+import turip.common.exception.custom.BadRequestException;
+import turip.content.controller.dto.response.content.ContentCountResponse;
+import turip.content.controller.dto.response.content.ContentsDetailWithLoadableResponse;
+import turip.content.controller.dto.response.favorite.WeeklyPopularFavoriteContentsResponse;
 import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
-import turip.contentplace.service.ContentPlaceService;
-import turip.country.domain.Country;
 import turip.creator.domain.Creator;
-import turip.exception.custom.BadRequestException;
-import turip.favoritecontent.domain.FavoriteContent;
-import turip.favoritecontent.repository.FavoriteContentRepository;
+import turip.favorite.domain.FavoriteContent;
+import turip.favorite.repository.FavoriteContentRepository;
 import turip.member.domain.Member;
 import turip.member.repository.MemberRepository;
-import turip.province.domain.Province;
-import turip.regioncategory.domain.DomesticRegionCategory;
-import turip.regioncategory.domain.OverseasRegionCategory;
+import turip.region.domain.City;
+import turip.region.domain.Country;
+import turip.region.domain.DomesticRegionCategory;
+import turip.region.domain.OverseasRegionCategory;
+import turip.region.domain.Province;
 
 @ExtendWith(MockitoExtension.class)
 class ContentServiceTest {
@@ -70,6 +69,7 @@ class ContentServiceTest {
             Country country = new Country("대한민국", "대한민국 사진 경로");
             Province province = new Province("강원도");
             City city = new City(country, province, "속초", "시 이미지 경로");
+            Member member = new Member(1L, "deviceFid");
 
             List<Content> contents = List.of(
                     new Content(1L, creator, city, "메이의 속초 브이로그 1편", "속초 브이로그 Url 1", LocalDate.of(2025, 7, 8)),
@@ -82,7 +82,9 @@ class ContentServiceTest {
                     .willReturn(true);
 
             // when
-            ContentSearchResponse contentsByKeyword = contentService.searchContentsByKeyword(keyword, pageSize,
+            ContentsDetailWithLoadableResponse contentsByKeyword = contentService.searchContentsByKeyword(member,
+                    keyword,
+                    pageSize,
                     lastContentId);
 
             // then

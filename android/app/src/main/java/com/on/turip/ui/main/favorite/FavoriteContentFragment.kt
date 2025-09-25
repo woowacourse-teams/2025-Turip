@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import com.on.turip.R
 import com.on.turip.databinding.FragmentFavoriteContentBinding
+import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.favorite.FavoriteContent
 import com.on.turip.ui.common.ItemDividerDecoration
 import com.on.turip.ui.common.base.BaseFragment
@@ -57,12 +58,12 @@ class FavoriteContentFragment : BaseFragment<FragmentFavoriteContentBinding>() {
         super.onViewCreated(view, savedInstanceState)
         setupAdapters()
         setupObservers()
+        showNetworkError()
     }
 
     private fun setupAdapters() {
         binding.rvFavoriteContentContents.apply {
             adapter = favoriteContentAdapter
-            itemAnimator = null
             addItemDecoration(
                 ItemDividerDecoration(
                     height = 1,
@@ -73,9 +74,29 @@ class FavoriteContentFragment : BaseFragment<FragmentFavoriteContentBinding>() {
     }
 
     private fun setupObservers() {
-        viewModel.favoriteContents.observe(viewLifecycleOwner) { favoriteContents: List<FavoriteContent> ->
+        viewModel.favoriteContents.observe(viewLifecycleOwner) { favoriteContents ->
+            if (viewModel.networkError.value == true || viewModel.serverError.value == true) return@observe
             handleVisibleByHasContent(favoriteContents)
             favoriteContentAdapter.submitList(favoriteContents)
+        }
+
+        viewModel.networkError.observe(viewLifecycleOwner) { networkError ->
+            handleErrorOrContentView(networkError || (viewModel.serverError.value == true))
+        }
+
+        viewModel.serverError.observe(viewLifecycleOwner) { serverError ->
+            handleErrorOrContentView(serverError || (viewModel.networkError.value == true))
+        }
+    }
+
+    private fun handleErrorOrContentView(isError: Boolean) {
+        if (isError) {
+            binding.customErrorView.visibility = View.VISIBLE
+            binding.clFavoriteContentNotEmpty.visibility = View.GONE
+            binding.clFavoriteContentEmpty.visibility = View.GONE
+        } else {
+            binding.customErrorView.visibility = View.GONE
+            viewModel.favoriteContents.value?.let { handleVisibleByHasContent(it) }
         }
     }
 
@@ -86,6 +107,16 @@ class FavoriteContentFragment : BaseFragment<FragmentFavoriteContentBinding>() {
         } else {
             binding.clFavoriteContentEmpty.visibility = View.GONE
             binding.clFavoriteContentNotEmpty.visibility = View.VISIBLE
+        }
+    }
+
+    private fun showNetworkError() {
+        binding.customErrorView.apply {
+            visibility = View.VISIBLE
+            setupError(ErrorEvent.NETWORK_ERROR)
+            setOnRetryClickListener {
+                viewModel.loadFavoriteContents()
+            }
         }
     }
 

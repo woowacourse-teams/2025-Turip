@@ -15,15 +15,13 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.test.context.ActiveProfiles;
-import turip.city.domain.City;
-import turip.city.repository.CityRepository;
+import turip.region.domain.City;
+import turip.region.repository.CityRepository;
 import turip.content.domain.Content;
-import turip.country.domain.Country;
-import turip.country.repository.CountryRepository;
+import turip.region.domain.Country;
+import turip.region.repository.CountryRepository;
 import turip.creator.domain.Creator;
 import turip.creator.repository.CreatorRepository;
-import turip.province.domain.Province;
-import turip.province.repository.ProvinceRepository;
 
 @DataJpaTest
 @ActiveProfiles("test")
@@ -59,13 +57,15 @@ class ContentRepositoryTest {
                     .orElseGet(() -> countryRepository.save(new Country("대한민국", "https://example.com/korea.jpg")));
 
             City city = cityRepository.findByName("서울")
-                    .orElseGet(() -> cityRepository.save(new City(country, null, "서울", "https://example.com/seoul.jpg")));
+                    .orElseGet(
+                            () -> cityRepository.save(new City(country, null, "서울", "https://example.com/seoul.jpg")));
 
             Creator may = new Creator("여행하는 메이", "https://example.com/may.jpg");
             Creator moong = new Creator("여행하는 뭉치", "https://example.com/moong.jpg");
             Content mayContent1 = new Content(may, city, "메이의 대구 여행", "https://example.com/may1", LocalDate.now());
             Content mayContent2 = new Content(may, city, "메이의 부산 여행", "https://example.com/may2", LocalDate.now());
-            Content moongAndMayContent = new Content(moong, city, "뭉치와 메이의 서울 여행", "https://example.com/moong1", LocalDate.now());
+            Content moongAndMayContent = new Content(moong, city, "뭉치와 메이의 서울 여행", "https://example.com/moong1",
+                    LocalDate.now());
             Content moongContent = new Content(moong, city, "뭉치의 대구 여행", "https://example.com/moong2", LocalDate.now());
 
             creatorRepository.saveAll(List.of(may, moong));
@@ -98,13 +98,15 @@ class ContentRepositoryTest {
                     .orElseGet(() -> countryRepository.save(new Country("대한민국", "https://example.com/korea.jpg")));
 
             City city = cityRepository.findByName("서울")
-                    .orElseGet(() -> cityRepository.save(new City(country, null, "서울", "https://example.com/seoul.jpg")));
+                    .orElseGet(
+                            () -> cityRepository.save(new City(country, null, "서울", "https://example.com/seoul.jpg")));
 
             Creator may = new Creator("여행하는 메이", "https://example.com/may.jpg");
             Creator moong = new Creator("여행하는 뭉치", "https://example.com/moong.jpg");
             Content mayContent1 = new Content(may, city, "메이의 대구 여행", "https://example.com/may1", LocalDate.now());
             Content mayContent2 = new Content(may, city, "메이의 부산 여행", "https://example.com/may2", LocalDate.now());
-            Content moongAndMayContent = new Content(moong, city, "뭉치와 메이의 서울 여행", "https://example.com/moong1", LocalDate.now());
+            Content moongAndMayContent = new Content(moong, city, "뭉치와 메이의 서울 여행", "https://example.com/moong1",
+                    LocalDate.now());
             Content moongContent = new Content(moong, city, "뭉치의 대구 여행", "https://example.com/moong2", LocalDate.now());
 
             creatorRepository.saveAll(List.of(may, moong));
@@ -129,16 +131,24 @@ class ContentRepositoryTest {
                     .orElseGet(() -> countryRepository.save(new Country("대한민국", "https://example.com/korea.jpg")));
 
             City city = cityRepository.findByName("서울")
-                    .orElseGet(() -> cityRepository.save(new City(country, null, "서울", "https://example.com/seoul.jpg")));
+                    .orElseGet(
+                            () -> cityRepository.save(new City(country, null, "서울", "https://example.com/seoul.jpg")));
 
             Creator creator = new Creator("여행하는 " + keyword, "https://example.com/creator.jpg");
-            Content content1 = new Content(creator, city, keyword + "의 대구 여행", "https://example.com/content1", LocalDate.now());
-            Content content2 = new Content(creator, city, keyword + "의 부산 여행", "https://example.com/content2", LocalDate.now());
-            Content content3 = new Content(creator, city, keyword + "의 서울 여행", "https://example.com/content3", LocalDate.now());
-            Content content4 = new Content(creator, city, keyword + "의 춘천 여행", "https://example.com/content4", LocalDate.now());
-            Content content5 = new Content(creator, city, keyword + "의 강릉 여행", "https://example.com/content5", LocalDate.now());
-            Content content6 = new Content(creator, city, keyword + "의 후쿠오카 여행", "https://example.com/content6", LocalDate.now());
-            Content content7 = new Content(creator, city, keyword + "의 다낭 여행", "https://example.com/content7", LocalDate.now());
+            Content content1 = new Content(creator, city, keyword + "의 대구 여행", "https://example.com/content1",
+                    LocalDate.now());
+            Content content2 = new Content(creator, city, keyword + "의 부산 여행", "https://example.com/content2",
+                    LocalDate.now());
+            Content content3 = new Content(creator, city, keyword + "의 서울 여행", "https://example.com/content3",
+                    LocalDate.now());
+            Content content4 = new Content(creator, city, keyword + "의 춘천 여행", "https://example.com/content4",
+                    LocalDate.now());
+            Content content5 = new Content(creator, city, keyword + "의 강릉 여행", "https://example.com/content5",
+                    LocalDate.now());
+            Content content6 = new Content(creator, city, keyword + "의 후쿠오카 여행", "https://example.com/content6",
+                    LocalDate.now());
+            Content content7 = new Content(creator, city, keyword + "의 다낭 여행", "https://example.com/content7",
+                    LocalDate.now());
 
             creatorRepository.save(creator);
             List<Content> savedContents = contentRepository.saveAll(

@@ -18,5 +18,5 @@ data class ContentResponse(
     @SerialName("city")
     val city: CityResponse,
     @SerialName("isFavorite")
-    val isFavorite: Boolean = false,
+    val isFavorite: Boolean,
 )

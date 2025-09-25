@@ -1,7 +1,7 @@
 package turip.content.service;
 
-import static turip.regioncategory.domain.DomesticRegionCategory.OTHER_DOMESTIC;
-import static turip.regioncategory.domain.OverseasRegionCategory.OTHER_OVERSEAS;
+import static turip.region.domain.DomesticRegionCategory.OTHER_DOMESTIC;
+import static turip.region.domain.OverseasRegionCategory.OTHER_OVERSEAS;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -14,32 +14,27 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
-import turip.content.controller.dto.response.ContentByCityResponse;
-import turip.content.controller.dto.response.ContentCountResponse;
-import turip.content.controller.dto.response.ContentDetailsByRegionCategoryResponse;
-import turip.content.controller.dto.response.ContentResponse;
-import turip.content.controller.dto.response.ContentSearchResponse;
-import turip.content.controller.dto.response.ContentWithCreatorAndCityResponse;
-import turip.content.controller.dto.response.ContentWithTripInfoResponse;
-import turip.content.controller.dto.response.ContentsByRegionCategoryResponse;
-import turip.content.controller.dto.response.TripDurationResponse;
-import turip.content.controller.dto.response.WeeklyPopularFavoriteContentResponse;
-import turip.content.controller.dto.response.WeeklyPopularFavoriteContentsResponse;
+import turip.common.exception.ErrorTag;
+import turip.common.exception.custom.BadRequestException;
+import turip.common.exception.custom.NotFoundException;
+import turip.content.controller.dto.response.content.ContentCountResponse;
+import turip.content.controller.dto.response.content.ContentDetailResponse;
+import turip.content.controller.dto.response.content.ContentResponse;
+import turip.content.controller.dto.response.content.ContentsDetailWithLoadableResponse;
+import turip.content.controller.dto.response.content.TripDurationResponse;
+import turip.content.controller.dto.response.favorite.WeeklyPopularFavoriteContentResponse;
+import turip.content.controller.dto.response.favorite.WeeklyPopularFavoriteContentsResponse;
 import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
-import turip.contentplace.service.ContentPlaceService;
-import turip.exception.custom.BadRequestException;
-import turip.exception.custom.NotFoundException;
-import turip.favoritecontent.repository.FavoriteContentRepository;
+import turip.favorite.repository.FavoriteContentRepository;
 import turip.member.domain.Member;
-import turip.regioncategory.domain.DomesticRegionCategory;
-import turip.regioncategory.domain.OverseasRegionCategory;
+import turip.region.domain.DomesticRegionCategory;
+import turip.region.domain.OverseasRegionCategory;
 
 @Service
 @RequiredArgsConstructor
 public class ContentService {
 
-    private static final int EXTRA_FETCH_COUNT = 1;
     private static final int DAYS_UNTIL_SUNDAY = 6;
     private static final int ONE_WEEK = 1;
 
@@ -49,7 +44,7 @@ public class ContentService {
 
     public ContentResponse getContentWithFavoriteStatus(Long contentId, Member member) {
         Content content = contentRepository.findById(contentId)
-                .orElseThrow(() -> new NotFoundException("컨텐츠를 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException(ErrorTag.CONTENT_NOT_FOUND));
         boolean isFavorite = favoriteContentRepository.existsByMemberIdAndContentId(member.getId(), content.getId());
         return ContentResponse.of(content, isFavorite);
     }
@@ -59,19 +54,28 @@ public class ContentService {
         return ContentCountResponse.from(count);
     }
 
-    public ContentsByRegionCategoryResponse findContentsByRegionCategory(
+    public ContentsDetailWithLoadableResponse searchContentsByKeyword(
+            Member member,
+            String keyword,
+            int pageSize,
+            long lastContentId
+    ) {
+        if (lastContentId == 0) {
+            lastContentId = Long.MAX_VALUE;
+        }
+        Slice<Content> contentSlice = contentRepository.findByKeywordContaining(keyword, lastContentId,
+                PageRequest.of(0, pageSize));
+        return converToContentsDetailWithLoadableResponse(member, contentSlice);
+    }
+
+    public ContentsDetailWithLoadableResponse findContentsByRegionCategory(
+            Member member,
             String regionCategory,
             int size,
             long lastId
     ) {
         Slice<Content> contentSlice = findContentSlicesByRegionCategory(regionCategory, lastId, size);
-
-        List<Content> contents = contentSlice.getContent();
-        List<ContentDetailsByRegionCategoryResponse> contentDetails
-                = convertContentsToContentDetailsByRegionResponses(contents);
-        boolean loadable = contentSlice.hasNext();
-
-        return ContentsByRegionCategoryResponse.of(contentDetails, loadable, regionCategory);
+        return converToContentsDetailWithLoadableResponse(member, contentSlice);
     }
 
     public WeeklyPopularFavoriteContentsResponse findWeeklyPopularFavoriteContents(Member member, int topContentSize) {
@@ -100,42 +104,20 @@ public class ContentService {
         return ContentCountResponse.from(count);
     }
 
-    public ContentSearchResponse searchContentsByKeyword(
-            String keyword,
-            int pageSize,
-            long lastContentId
-    ) {
-        if (lastContentId == 0) {
-            lastContentId = Long.MAX_VALUE;
-        }
-        Slice<Content> contents = contentRepository.findByKeywordContaining(keyword, lastContentId,
-                PageRequest.of(0, pageSize));
-        boolean loadable = contents.hasNext();
-
-        List<ContentWithTripInfoResponse> contentWithTripDetailResponse = convertContentsToContentSearchResultResponse(
-                contents);
-
-        return ContentSearchResponse.of(contentWithTripDetailResponse, loadable);
-    }
-
     private int calculateCountByRegionCategory(String regionCategory) {
         if (OTHER_DOMESTIC.matchesDisplayName(regionCategory)) {
             return calculateDomesticEtcCount();
         }
-
         if (OTHER_OVERSEAS.matchesDisplayName(regionCategory)) {
             return calculateOverseasEtcCount();
         }
-
         if (DomesticRegionCategory.containsName(regionCategory)) {
             return contentRepository.countByCityName(regionCategory);
         }
-
         if (OverseasRegionCategory.containsName(regionCategory)) {
             return contentRepository.countByCityCountryName(regionCategory);
         }
-
-        throw new BadRequestException("지역 카테고리가 올바르지 않습니다.");
+        throw new BadRequestException(ErrorTag.REGION_CATEGORY_INVALID);
     }
 
     private int calculateDomesticEtcCount() {
@@ -154,107 +136,25 @@ public class ContentService {
             int size
     ) {
         Pageable pageable = PageRequest.of(0, size);
-        boolean isFirstPage = lastId == 0;
+        if (lastId == 0) {
+            lastId = Long.MAX_VALUE;
+        }
 
         if (OTHER_DOMESTIC.matchesDisplayName(regionCategory)) {
-            return findDomesticEtcContents(lastId, pageable, isFirstPage);
+            List<String> domesticCategoryNames = DomesticRegionCategory.getDisplayNamesExcludingEtc();
+            return contentRepository.findDomesticEtcContents(domesticCategoryNames, lastId, pageable);
         }
-
         if (OTHER_OVERSEAS.matchesDisplayName(regionCategory)) {
-            return findOverseasEtcContents(lastId, pageable, isFirstPage);
+            List<String> overseasCategoryNames = OverseasRegionCategory.getDisplayNamesExcludingEtc();
+            return contentRepository.findOverseasEtcContents(overseasCategoryNames, lastId, pageable);
         }
-
         if (DomesticRegionCategory.containsName(regionCategory)) {
-            return findContentsByCityName(regionCategory, lastId, pageable, isFirstPage);
+            return contentRepository.findByCityName(regionCategory, lastId, pageable);
         }
-
-        return findContentsByCountryName(regionCategory, lastId, pageable, isFirstPage);
-    }
-
-    private Slice<Content> findDomesticEtcContents(long lastId, Pageable pageable, boolean isFirstPage) {
-        List<String> domesticCategoryNames = DomesticRegionCategory.getDisplayNamesExcludingEtc();
-
-        if (isFirstPage) {
-            return contentRepository.findDomesticEtcContents(domesticCategoryNames, pageable);
+        if (OverseasRegionCategory.containsName(regionCategory)) {
+            return contentRepository.findByCityCountryName(regionCategory, lastId, pageable);
         }
-        return contentRepository.findDomesticEtcContentsWithLastId(domesticCategoryNames, lastId, pageable);
-    }
-
-    private Slice<Content> findOverseasEtcContents(long lastId, Pageable pageable, boolean isFirstPage) {
-        List<String> overseasCategoryNames = OverseasRegionCategory.getDisplayNamesExcludingEtc();
-
-        if (isFirstPage) {
-            return contentRepository.findOverseasEtcContents(overseasCategoryNames, pageable);
-        }
-        return contentRepository.findOverseasEtcContentsWithLastId(overseasCategoryNames, lastId, pageable);
-    }
-
-    private Slice<Content> findContentsByCityName(String cityName, long lastId, Pageable pageable,
-                                                  boolean isFirstPage) {
-        if (isFirstPage) {
-            return contentRepository.findByCityNameOrderByIdDesc(cityName, pageable);
-        }
-        return contentRepository.findByCityNameAndIdLessThanOrderByIdDesc(cityName, lastId, pageable);
-    }
-
-    private Slice<Content> findContentsByCountryName(String countryName, long lastId, Pageable pageable,
-                                                     boolean isFirstPage) {
-        if (isFirstPage) {
-            return contentRepository.findByCityCountryNameOrderByIdDesc(countryName, pageable);
-        }
-        return contentRepository.findByCityCountryNameAndIdLessThanOrderByIdDesc(countryName, lastId, pageable);
-    }
-
-    private List<ContentDetailsByRegionCategoryResponse> convertContentsToContentDetailsByRegionResponses(
-            List<Content> contents) {
-        return contents.stream()
-                .map(this::toContentDetailsByRegionResponse)
-                .toList();
-    }
-
-    private ContentDetailsByRegionCategoryResponse toContentDetailsByRegionResponse(Content content) {
-        ContentByCityResponse contentWithCity = ContentByCityResponse.from(content);
-        TripDurationResponse tripDuration = calculateTripDuration(content);
-
-        int tripPlaceCount = getTripPlaceCount(content);
-
-        return ContentDetailsByRegionCategoryResponse.of(contentWithCity, tripDuration, tripPlaceCount);
-    }
-
-    private List<ContentWithTripInfoResponse> convertContentsToContentSearchResultResponse(Slice<Content> contents) {
-        return contents.stream()
-                .map(this::toContentSearchResultResponse)
-                .toList();
-    }
-
-    private ContentWithTripInfoResponse toContentSearchResultResponse(Content content) {
-        int placeCount = getTripPlaceCount(content);
-
-        return ContentWithTripInfoResponse.of(
-                ContentWithCreatorAndCityResponse.from(content),
-                calculateTripDuration(content),
-                placeCount
-        );
-    }
-
-    private TripDurationResponse calculateTripDuration(Content content) {
-        int totalTripDay = contentPlaceService.calculateDurationDays(content.getId());
-        return TripDurationResponse.of(totalTripDay - 1, totalTripDay);
-    }
-
-    private int getTripPlaceCount(Content content) {
-        boolean isContentExists = contentRepository.existsById(content.getId());
-        if (!isContentExists) {
-            throw new NotFoundException("컨텐츠를 찾을 수 없습니다.");
-        }
-        return contentPlaceService.countByContentId(content.getId());
-    }
-
-    private List<LocalDate> getLastWeekPeriod() {
-        LocalDate thisWeekMonday = LocalDate.now().with(DayOfWeek.MONDAY);
-        LocalDate lastWeekMonday = thisWeekMonday.minusWeeks(ONE_WEEK);
-        LocalDate lastWeekSunday = lastWeekMonday.plusDays(DAYS_UNTIL_SUNDAY);
-        return new ArrayList<>(List.of(lastWeekMonday, lastWeekSunday));
+        throw new BadRequestException(ErrorTag.REGION_CATEGORY_INVALID);
     }
 
     private Set<Long> findFavoritedContentIds(Member member, List<Content> contents) {
@@ -266,13 +166,41 @@ public class ContentService {
                 .collect(Collectors.toSet());
     }
 
-    private WeeklyPopularFavoriteContentsResponse convertContentsToPopularContentsResponse(
-            List<Content> popularContents, boolean isFavorite) {
-        return WeeklyPopularFavoriteContentsResponse.from(
-                popularContents.stream()
-                        .map(content -> WeeklyPopularFavoriteContentResponse.of(content, isFavorite,
-                                calculateTripDuration(content)))
-                        .toList()
-        );
+    private ContentsDetailWithLoadableResponse converToContentsDetailWithLoadableResponse(Member member,
+                                                                                          Slice<Content> contentSlice) {
+        List<Content> contents = contentSlice.getContent();
+        Set<Long> favoritedContentIds = findFavoritedContentIds(member, contents);
+        List<ContentDetailResponse> contentDetails = contents.stream()
+                .map(content -> toContentDetailResponse(content, favoritedContentIds.contains(content.getId())))
+                .toList();
+        boolean loadable = contentSlice.hasNext();
+        return ContentsDetailWithLoadableResponse.of(contentDetails, loadable);
+    }
+
+    private ContentDetailResponse toContentDetailResponse(Content content, boolean isFavorite) {
+        ContentResponse contentResponse = ContentResponse.of(content, isFavorite);
+        TripDurationResponse tripDuration = calculateTripDuration(content);
+        int tripPlaceCount = getTripPlaceCount(content);
+        return ContentDetailResponse.of(contentResponse, tripDuration, tripPlaceCount);
+    }
+
+    private TripDurationResponse calculateTripDuration(Content content) {
+        int totalTripDay = contentPlaceService.calculateDurationDays(content.getId());
+        return TripDurationResponse.of(totalTripDay - 1, totalTripDay);
+    }
+
+    private int getTripPlaceCount(Content content) {
+        boolean isContentExists = contentRepository.existsById(content.getId());
+        if (!isContentExists) {
+            throw new NotFoundException(ErrorTag.CONTENT_NOT_FOUND);
+        }
+        return contentPlaceService.countByContentId(content.getId());
+    }
+
+    private List<LocalDate> getLastWeekPeriod() {
+        LocalDate thisWeekMonday = LocalDate.now().with(DayOfWeek.MONDAY);
+        LocalDate lastWeekMonday = thisWeekMonday.minusWeeks(ONE_WEEK);
+        LocalDate lastWeekSunday = lastWeekMonday.plusDays(DAYS_UNTIL_SUNDAY);
+        return new ArrayList<>(List.of(lastWeekMonday, lastWeekSunday));
     }
 }

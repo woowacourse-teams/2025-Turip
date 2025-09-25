@@ -7,6 +7,8 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
+import turip.common.exception.ErrorTag;
+import turip.common.exception.custom.IllegalArgumentException;
 import turip.member.service.MemberService;
 
 @Component
@@ -29,7 +31,7 @@ public class AuthMemberArgumentResolver implements HandlerMethodArgumentResolver
     ) {
         String deviceFid = webRequest.getHeader("device-fid");
         if (deviceFid == null || deviceFid.isBlank()) {
-            throw new IllegalArgumentException("회원 정보(device-fid 헤더)가 존재하지 않습니다.");
+            throw new IllegalArgumentException(ErrorTag.MEMBER_NOT_FOUND);
         }
 
         AuthMember ann = parameter.getParameterAnnotation(AuthMember.class);

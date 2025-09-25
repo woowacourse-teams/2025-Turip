@@ -18,7 +18,7 @@ import com.on.turip.R
  */
 class TuripSnackbar private constructor(
     private val rootView: View,
-    private val messageResource: Int,
+    private val message: String,
     private val duration: Int,
     private val layoutInflater: LayoutInflater,
 ) {
@@ -49,7 +49,7 @@ class TuripSnackbar private constructor(
     }
 
     fun show() {
-        val snackbar: Snackbar = Snackbar.make(rootView, messageResource, duration)
+        val snackbar: Snackbar = Snackbar.make(rootView, message, duration)
         snackbar.view.background = null
 
         val snackbarLayout: ViewGroup = snackbar.view as ViewGroup
@@ -57,7 +57,7 @@ class TuripSnackbar private constructor(
             layoutInflater.inflate(R.layout.layout_snackbar, snackbarLayout, false)
         snackbarLayout.addView(turipSnackbarView)
 
-        turipSnackbarView.findViewById<TextView>(R.id.tv_snackbar_message).setText(messageResource)
+        turipSnackbarView.findViewById<TextView>(R.id.tv_snackbar_message).text = message
         snackbarIconResource?.let { drawable: Int ->
             turipSnackbarView
                 .findViewById<ImageView>(R.id.iv_snackbar_icon)
@@ -85,9 +85,9 @@ class TuripSnackbar private constructor(
     companion object {
         fun make(
             rootView: View,
-            @StringRes messageResource: Int,
+            message: String,
             duration: Int,
             layoutInflater: LayoutInflater,
-        ): TuripSnackbar = TuripSnackbar(rootView, messageResource, duration, layoutInflater)
+        ): TuripSnackbar = TuripSnackbar(rootView, message, duration, layoutInflater)
     }
 }
