@@ -135,3 +135,24 @@ VALUES ('베이징', 4, null, ''),
        ('구이린', 4, null, ''),
        ('쿤밍', 4, null, ''),
        ('다리', 4, null, '');
+
+-- Creator
+INSERT INTO creator (id, channel_name, profile_image)
+VALUES (1, '연수연',
+        'https://yt3.ggpht.com/EMvavcwV96_NkCYm4V8TZIrsytHaiS2AaxS_goqR57WP7kn36qQY92Ujex8JUbBWGQ7P5VY0DA=s88-c-k-c0x00ffffff-no-rj'),
+       (2, '듀이ヂュイ♥彡',
+        'https://yt3.ggpht.com/qb5S3DAfPxEr1AUR33qY4tfBC6G7VoYFteIQY8bcKxbh4UvShQK6aFVjzUXfkAT1CgS9DDEe=s88-c-k-c0x00ffffff-no-rj'),
+       (3, '채리어 Chaerrier',
+        'https://yt3.ggpht.com/EK9Xk1iLhR_URYo-uKIVKmcLhENG2JMesba0ErNBYcDVe2x59Nro6JrZESpCg1MzxSRjZSR5=s88-c-k-c0x00ffffff-no-rj'),
+       (4, 'Ruby루비',
+        'https://yt3.ggpht.com/6LFebJqOGWczxrJavJ05XbkFD-CaJ8Zxuyaozyp9GVY5BYmf9DADJC5urCzIYB4hlghPtRfNPQ=s88-c-k-c0x00ffffff-no-rj'),
+       (5, '율모조모',
+        'https://yt3.ggpht.com/0yf3QEH-TCREkSAFpl_Q1-6pXGHQVdNMdk6c9Yi16ZHJ_BmBPDfmqu3-g7kHu_V4G6LcXooOJA=s88-c-k-c0x00ffffff-no-rj'),
+       (6, '이달래',
+        'https://yt3.ggpht.com/iizz44P2jrkT8iY8w24w_6upiKIVsd8QP5HteISzYRpAiMgjG9Ry3fZxVzYtFnXu22TnPtWa=s88-c-k-c0x00ffffff-no-rj'),
+       (7, '제주에디 Jeju Eddy',
+        'https://yt3.ggpht.com/UdF_j2R_Prv7kamTRqItI0QUgMvdbJk_xXFjjYGFUIMZUYt1EbrJpEmzJbciKbrrdoX4me8g5w=s88-c-k-c0x00ffffff-no-rj'),
+       (8, '하찬투어 hachantour',
+        'https://yt3.ggpht.com/xMc7FcCl689p_ymaijuY5WOwX9DeHaZ_WTnRHb8UajggQotOO8Bxd0P7cqsYYfubotgjlh4Qfw=s88-c-k-c0x00ffffff-no-rj'),
+       (9, '여코남 - 여행코스짜주는남자',
+        'https://yt3.ggpht.com/u-Xw8QqIlARFXXN587LDHjc26YRupa53pSXkSbCkLvSDkO_sT8Vl17oPxRAfEuns4etcGlP8=s88-c-k-c0x00ffffff-no-rj');
