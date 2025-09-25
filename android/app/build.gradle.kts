@@ -28,13 +28,6 @@ android {
                 .toInt()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
-        val baseUrl: String = gradleLocalProperties(rootDir, providers).getProperty("base_url")
-        buildConfigField(
-            "String",
-            "BASE_URL",
-            "\"$baseUrl\"",
-        )
     }
 
     buildTypes {
@@ -44,6 +37,11 @@ android {
             applicationIdSuffix = ".debug"
             versionNameSuffix = ".debug"
             manifestPlaceholders["appName"] = "튜립.debug"
+            buildConfigField(
+                "String",
+                "BASE_URL",
+                "\"${gradleLocalProperties(rootDir, providers).getProperty("debug_base_url")}\"",
+            )
         }
 
         release {
@@ -55,6 +53,11 @@ android {
             )
             signingConfig = signingConfigs.getByName("debug")
             manifestPlaceholders["appName"] = "튜립"
+            buildConfigField(
+                "String",
+                "BASE_URL",
+                "\"${gradleLocalProperties(rootDir, providers).getProperty("release_base_url")}\"",
+            )
         }
     }
 
