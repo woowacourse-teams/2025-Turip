@@ -9,6 +9,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.on.turip.domain.region.RegionCategory
 
+private const val MAX_REGION_COUNT_IN_EACH_ROW = 3
+
 @Composable
 fun RegionList(
     regions: List<RegionCategory>,
@@ -17,14 +19,16 @@ fun RegionList(
 ) {
     FlowRow(
         modifier = modifier.fillMaxWidth(),
-        maxItemsInEachRow = 4,
+        maxItemsInEachRow = MAX_REGION_COUNT_IN_EACH_ROW,
         verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         regions.forEach { regionCategory: RegionCategory ->
             RegionItem(
                 region = regionCategory,
-                modifier = Modifier.clickable { onRegionClick(regionCategory.name) },
+                modifier =
+                    Modifier
+                        .fillMaxWidth(1f / 3)
+                        .clickable { onRegionClick(regionCategory.name) },
             )
         }
     }
