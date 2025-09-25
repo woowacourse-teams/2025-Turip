@@ -1,8 +1,11 @@
+## 💚 튜립 다운받기 -> [다운로드 링크](https://play.google.com/store/apps/details?id=com.on.turip)
+
 <img width="4096" height="2304" alt="git장표" src="https://github.com/user-attachments/assets/8613bdbe-f377-41b7-a60a-2b8025d82da1" />
 
 # ✈️🧑‍🤝‍🧑 튜립 (Turip)
 
 > 유튜버의 여행 정보를 한눈에 빠르게 확인할 수 있는 서비스
+
 
 ## 📝 프로젝트 소개
 > 이 서비스는 유튜버가 실제 다녀온 여행 동선, 장소를 수집하고 영상과 함께 제공하는 앱입니다.  
