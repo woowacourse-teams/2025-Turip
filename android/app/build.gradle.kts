@@ -39,7 +39,7 @@ android {
             buildConfigField(
                 "String",
                 "BASE_URL",
-                gradleLocalProperties(rootDir, providers).getProperty("debug_base_url"),
+                "\"${gradleLocalProperties(rootDir, providers).getProperty("debug_base_url")}\"",
             )
         }
 
@@ -55,7 +55,7 @@ android {
             buildConfigField(
                 "String",
                 "BASE_URL",
-                gradleLocalProperties(rootDir, providers).getProperty("release_base_url"),
+                "\"${gradleLocalProperties(rootDir, providers).getProperty("release_base_url")}\"",
             )
         }
     }
