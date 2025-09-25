@@ -3,6 +3,8 @@ package com.on.turip.ui.main.favorite.model
 import android.net.Uri
 
 data class FavoritePlaceModel(
+    val favoritePlaceId: Long,
+    val order: Long,
     val placeId: Long,
     val name: String,
     val uri: Uri,

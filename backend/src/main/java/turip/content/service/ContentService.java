@@ -136,52 +136,25 @@ public class ContentService {
             int size
     ) {
         Pageable pageable = PageRequest.of(0, size);
-        boolean isFirstPage = lastId == 0;
+        if (lastId == 0) {
+            lastId = Long.MAX_VALUE;
+        }
 
         if (OTHER_DOMESTIC.matchesDisplayName(regionCategory)) {
-            return findDomesticEtcContents(lastId, pageable, isFirstPage);
+            List<String> domesticCategoryNames = DomesticRegionCategory.getDisplayNamesExcludingEtc();
+            return contentRepository.findDomesticEtcContents(domesticCategoryNames, lastId, pageable);
         }
         if (OTHER_OVERSEAS.matchesDisplayName(regionCategory)) {
-            return findOverseasEtcContents(lastId, pageable, isFirstPage);
+            List<String> overseasCategoryNames = OverseasRegionCategory.getDisplayNamesExcludingEtc();
+            return contentRepository.findOverseasEtcContents(overseasCategoryNames, lastId, pageable);
         }
         if (DomesticRegionCategory.containsName(regionCategory)) {
-            return findContentsByCityName(regionCategory, lastId, pageable, isFirstPage);
+            return contentRepository.findByCityName(regionCategory, lastId, pageable);
         }
-        return findContentsByCountryName(regionCategory, lastId, pageable, isFirstPage);
-    }
-
-    private Slice<Content> findDomesticEtcContents(long lastId, Pageable pageable, boolean isFirstPage) {
-        List<String> domesticCategoryNames = DomesticRegionCategory.getDisplayNamesExcludingEtc();
-
-        if (isFirstPage) {
-            return contentRepository.findDomesticEtcContents(domesticCategoryNames, pageable);
+        if (OverseasRegionCategory.containsName(regionCategory)) {
+            return contentRepository.findByCityCountryName(regionCategory, lastId, pageable);
         }
-        return contentRepository.findDomesticEtcContentsWithLastId(domesticCategoryNames, lastId, pageable);
-    }
-
-    private Slice<Content> findOverseasEtcContents(long lastId, Pageable pageable, boolean isFirstPage) {
-        List<String> overseasCategoryNames = OverseasRegionCategory.getDisplayNamesExcludingEtc();
-
-        if (isFirstPage) {
-            return contentRepository.findOverseasEtcContents(overseasCategoryNames, pageable);
-        }
-        return contentRepository.findOverseasEtcContentsWithLastId(overseasCategoryNames, lastId, pageable);
-    }
-
-    private Slice<Content> findContentsByCityName(String cityName, long lastId, Pageable pageable,
-                                                  boolean isFirstPage) {
-        if (isFirstPage) {
-            return contentRepository.findByCityNameOrderByIdDesc(cityName, pageable);
-        }
-        return contentRepository.findByCityNameAndIdLessThanOrderByIdDesc(cityName, lastId, pageable);
-    }
-
-    private Slice<Content> findContentsByCountryName(String countryName, long lastId, Pageable pageable,
-                                                     boolean isFirstPage) {
-        if (isFirstPage) {
-            return contentRepository.findByCityCountryNameOrderByIdDesc(countryName, pageable);
-        }
-        return contentRepository.findByCityCountryNameAndIdLessThanOrderByIdDesc(countryName, lastId, pageable);
+        throw new BadRequestException(ErrorTag.REGION_CATEGORY_INVALID);
     }
 
     private Set<Long> findFavoritedContentIds(Member member, List<Content> contents) {

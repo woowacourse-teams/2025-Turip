@@ -1,13 +1,15 @@
 package com.on.turip.ui.main.favorite
 
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
 import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
 
 class FavoritePlaceAdapter(
     private val favoritePlaceListener: FavoritePlaceViewHolder.FavoritePlaceListener,
-) : ListAdapter<FavoritePlaceModel, FavoritePlaceViewHolder>(FavoritePlaceDiffUtil) {
+    private val onCommit: (List<FavoritePlaceModel>) -> Unit,
+) : RecyclerView.Adapter<FavoritePlaceViewHolder>() {
+    private val items = mutableListOf<FavoritePlaceModel>()
+
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -17,18 +19,28 @@ class FavoritePlaceAdapter(
         holder: FavoritePlaceViewHolder,
         position: Int,
     ) {
-        holder.bind(getItem(position))
+        holder.bind(items[position])
     }
 
-    private object FavoritePlaceDiffUtil : DiffUtil.ItemCallback<FavoritePlaceModel>() {
-        override fun areItemsTheSame(
-            oldItem: FavoritePlaceModel,
-            newItem: FavoritePlaceModel,
-        ): Boolean = oldItem.placeId == newItem.placeId
+    override fun getItemCount(): Int = items.size
 
-        override fun areContentsTheSame(
-            oldItem: FavoritePlaceModel,
-            newItem: FavoritePlaceModel,
-        ): Boolean = oldItem == newItem
+    fun submitList(newItems: List<FavoritePlaceModel>) {
+        items.clear()
+        items.addAll(newItems)
+        notifyDataSetChanged()
+    }
+
+    fun moveItem(
+        from: Int,
+        to: Int,
+    ) {
+        if (from == to) return
+        val item = items.removeAt(from)
+        items.add(to, item)
+        notifyItemMoved(from, to)
+    }
+
+    fun commitMove() {
+        onCommit(items.toList())
     }
 }

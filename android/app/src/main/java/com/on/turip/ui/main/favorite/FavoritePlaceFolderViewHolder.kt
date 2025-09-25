@@ -8,15 +8,30 @@ import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
 
 class FavoritePlaceFolderViewHolder(
     private val binding: ItemFavoritePlaceFolderBinding,
-    onFavoritePlaceFolderListener: OnFavoritePlaceFolderListener,
+    favoritePlaceFolderListener: FavoritePlaceFolderListener,
 ) : RecyclerView.ViewHolder(binding.root) {
     private var favoritePlaceFolderModel: FavoritePlaceFolderModel? = null
 
     init {
-
         binding.ivFavoritePlaceFolderFavorite.setOnClickListener {
             favoritePlaceFolderModel?.let { placeFolder: FavoritePlaceFolderModel ->
-                onFavoritePlaceFolderListener.onFavoriteFolderClick(placeFolder)
+                favoritePlaceFolderListener.onFavoriteFolderFavoriteClick(placeFolder)
+            }
+        }
+        binding.ivFavoritePlaceFolderIcon.setOnClickListener {
+            favoritePlaceFolderModel?.let {
+                favoritePlaceFolderListener.onFavoriteFolderClick(
+                    favoriteFolderId = it.id,
+                    favoriteFolderName = it.name,
+                )
+            }
+        }
+        binding.tvFavoritePlaceFolderName.setOnClickListener {
+            favoritePlaceFolderModel?.let {
+                favoritePlaceFolderListener.onFavoriteFolderClick(
+                    favoriteFolderId = it.id,
+                    favoriteFolderName = it.name,
+                )
             }
         }
     }
@@ -30,16 +45,21 @@ class FavoritePlaceFolderViewHolder(
     companion object {
         fun of(
             parent: ViewGroup,
-            onFavoritePlaceFolderListener: OnFavoritePlaceFolderListener,
+            favoritePlaceFolderListener: FavoritePlaceFolderListener,
         ): FavoritePlaceFolderViewHolder {
             val inflater: LayoutInflater = LayoutInflater.from(parent.context)
             val binding: ItemFavoritePlaceFolderBinding =
                 ItemFavoritePlaceFolderBinding.inflate(inflater, parent, false)
-            return FavoritePlaceFolderViewHolder(binding, onFavoritePlaceFolderListener)
+            return FavoritePlaceFolderViewHolder(binding, favoritePlaceFolderListener)
         }
     }
 
-    fun interface OnFavoritePlaceFolderListener {
-        fun onFavoriteFolderClick(favoritePlaceFolderModel: FavoritePlaceFolderModel)
+    interface FavoritePlaceFolderListener {
+        fun onFavoriteFolderFavoriteClick(favoritePlaceFolderModel: FavoritePlaceFolderModel)
+
+        fun onFavoriteFolderClick(
+            favoriteFolderId: Long,
+            favoriteFolderName: String,
+        )
     }
 }

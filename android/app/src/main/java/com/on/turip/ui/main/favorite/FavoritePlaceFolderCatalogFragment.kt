@@ -4,26 +4,25 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.on.turip.R
-import com.on.turip.databinding.FragmentFavoritePlaceBinding
-import com.on.turip.domain.ErrorEvent
+import com.on.turip.databinding.BottomSheetFragmentFavoritePlaceFolderCatalogBinding
 import com.on.turip.ui.common.base.BaseFragment
-import com.on.turip.ui.folder.FolderActivity
 import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
+import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
 
-class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
-    private val viewModel: FavoritePlaceViewModel by viewModels { FavoritePlaceViewModel.provideFactory() }
-    private val folderNameAdapter: FavoritePlaceFolderNameAdapter by lazy {
-        FavoritePlaceFolderNameAdapter { folderId: Long ->
-            viewModel.updateFolderWithPlaces(folderId)
-        }
+class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavoritePlaceFolderCatalogBinding>() {
+    private val viewModel: FavoritePlaceFolderCatalogViewModel by viewModels {
+        FavoritePlaceFolderCatalogViewModel.provideFactory(
+            folderId = arguments?.getLong(ARGUMENTS_FOLDER_ID) ?: 0L,
+            folderName = arguments?.getString(ARGUMENTS_FOLDER_NAME) ?: "",
+        )
     }
+
     private val placeAdapter: FavoritePlaceAdapter by lazy {
         FavoritePlaceAdapter(
             object : FavoritePlaceViewHolder.FavoritePlaceListener {
@@ -43,11 +42,6 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
         )
     }
 
-    override fun inflateBinding(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-    ): FragmentFavoritePlaceBinding = FragmentFavoritePlaceBinding.inflate(inflater, container, false)
-
     override fun onViewCreated(
         view: View,
         savedInstanceState: Bundle?,
@@ -55,29 +49,16 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
         super.onViewCreated(view, savedInstanceState)
 
         setupAdapters()
-        setupListeners()
         setupObservers()
-        showNetworkError()
-    }
-
-    private fun showNetworkError() {
-        binding.customErrorView.apply {
-            visibility = View.VISIBLE
-            setupError(ErrorEvent.NETWORK_ERROR)
-            setOnRetryClickListener {
-                viewModel.loadFoldersAndPlaces()
-            }
-        }
+        setupListeners()
     }
 
     private fun setupAdapters() {
-        binding.rvFavoritePlaceFolderName.apply {
-            adapter = folderNameAdapter
-            itemAnimator = null
-            addOnItemTouchListener(RecyclerViewTouchInterceptor)
-        }
+        binding.rvBottomSheetFavoritePlaceFolderCatalog.adapter = placeAdapter
 
-        binding.rvFavoritePlacePlace.adapter = placeAdapter
+        binding.btnBottomSheetFolderFavoritePlaceFolderCatalogBack.setOnClickListener {
+            parentFragmentManager.popBackStack()
+        }
 
         val itemTouchHelper =
             ItemTouchHelper(
@@ -121,37 +102,22 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
                 },
             )
 
-        itemTouchHelper.attachToRecyclerView(binding.rvFavoritePlacePlace)
-    }
-
-    private fun setupListeners() {
-        binding.ivFavoritePlaceFolder.setOnClickListener {
-            val intent: Intent = FolderActivity.newIntent(requireContext())
-            startActivity(intent)
-        }
-        binding.ivFavoritePlaceShare.setOnClickListener {
-            viewModel.shareFolder()
-        }
+        itemTouchHelper.attachToRecyclerView(binding.rvBottomSheetFavoritePlaceFolderCatalog)
     }
 
     private fun setupObservers() {
         viewModel.favoritePlaceUiState.observe(viewLifecycleOwner) { state ->
-            folderNameAdapter.submitList(state.folders)
             placeAdapter.submitList(state.places)
 
-            binding.apply {
-                if (state.isNetWorkError || state.isServerError) {
-                    customErrorView.visibility = View.VISIBLE
-                    clFavoritePlaceEmpty.visibility = View.GONE
-                    groupFavoritePlaceNotError.visibility = View.GONE
-                    groupFavoritePlaceNotEmpty.visibility = View.GONE
-                    tvFavoritePlacePlaceCount.visibility = View.GONE
-                } else {
-                    customErrorView.visibility = View.GONE
-                    groupFavoritePlaceNotError.visibility = View.VISIBLE
+            binding.tvBottomSheetFolderFavoritePlaceFolderCatalogTitle.text = state.folderName
 
-                    handlePlaceState(state)
-                }
+            binding.tvBottomSheetFavoritePlaceFolderCount.text =
+                getString(R.string.all_total_place_count, state.places.size)
+
+            if (state.places == emptyList<FavoritePlaceModel>()) {
+                binding.ivBottomSheetFavoritePlaceFolderShare.visibility = View.GONE
+            } else {
+                binding.ivBottomSheetFavoritePlaceFolderShare.visibility = View.VISIBLE
             }
         }
 
@@ -160,20 +126,9 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
         }
     }
 
-    private fun FragmentFavoritePlaceBinding.handlePlaceState(state: FavoritePlaceViewModel.FavoritePlaceUiState) {
-        if (state.places.isEmpty()) {
-            clFavoritePlaceEmpty.visibility = View.VISIBLE
-            groupFavoritePlaceNotEmpty.visibility = View.GONE
-            tvFavoritePlacePlaceCount.visibility = View.GONE
-            ivFavoritePlaceShare.visibility = View.GONE
-        } else {
-            clFavoritePlaceEmpty.visibility = View.GONE
-            groupFavoritePlaceNotEmpty.visibility = View.VISIBLE
-            tvFavoritePlacePlaceCount.apply {
-                visibility = View.VISIBLE
-                text = getString(R.string.all_total_place_count, state.places.size)
-            }
-            ivFavoritePlaceShare.visibility = View.VISIBLE
+    private fun setupListeners() {
+        binding.ivBottomSheetFavoritePlaceFolderShare.setOnClickListener {
+            viewModel.shareFolder()
         }
     }
 
@@ -209,48 +164,28 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
         startActivity(chooserIntent)
     }
 
-    override fun onResume() {
-        super.onResume()
-        viewModel.loadFoldersAndPlaces()
-    }
-
-    override fun onHiddenChanged(hidden: Boolean) {
-        super.onHiddenChanged(hidden)
-        if (!hidden) {
-            viewModel.loadFoldersAndPlaces()
-        }
-    }
+    override fun inflateBinding(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+    ): BottomSheetFragmentFavoritePlaceFolderCatalogBinding =
+        BottomSheetFragmentFavoritePlaceFolderCatalogBinding.inflate(inflater, container, false)
 
     companion object {
+        private const val ARGUMENTS_FOLDER_ID = "FOLDER_ID"
+        private const val ARGUMENTS_FOLDER_NAME = "FOLDER_NAME"
         private const val KAKAO_PACKAGE = "com.kakao.talk"
         private const val INSTAGRAM_PACKAGE = "com.instagram.android"
 
-        fun instance(): FavoritePlaceFragment = FavoritePlaceFragment()
-    }
-}
-
-private object RecyclerViewTouchInterceptor : RecyclerView.OnItemTouchListener {
-    override fun onInterceptTouchEvent(
-        recyclerView: RecyclerView,
-        motionEvent: MotionEvent,
-    ): Boolean {
-        when (motionEvent.action) {
-            MotionEvent.ACTION_DOWN -> {
-                recyclerView.parent.requestDisallowInterceptTouchEvent(true)
+        fun newInstance(
+            folderId: Long,
+            folderName: String,
+        ): FavoritePlaceFolderCatalogFragment =
+            FavoritePlaceFolderCatalogFragment().apply {
+                arguments =
+                    Bundle().apply {
+                        putLong(ARGUMENTS_FOLDER_ID, folderId)
+                        putString(ARGUMENTS_FOLDER_NAME, folderName)
+                    }
             }
-
-            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                recyclerView.parent.requestDisallowInterceptTouchEvent(false)
-            }
-        }
-        return false
     }
-
-    override fun onTouchEvent(
-        recyclerView: RecyclerView,
-        motionEvent: MotionEvent,
-    ) {
-    }
-
-    override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {}
 }
