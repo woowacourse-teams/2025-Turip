@@ -1,9 +1,24 @@
+## 💚 튜립 다운받기 -> [다운로드 링크](https://play.google.com/store/apps/details?id=com.on.turip)
+
+<img width="4096" height="2304" alt="git장표" src="https://github.com/user-attachments/assets/8613bdbe-f377-41b7-a60a-2b8025d82da1" />
+
 # ✈️🧑‍🤝‍🧑 튜립 (Turip)
+
 > 유튜버의 여행 정보를 한눈에 빠르게 확인할 수 있는 서비스
 
+
 ## 📝 프로젝트 소개
-> 이 서비스는 유튜버가 실제 다녀온 여행 동선, 장소, 후기, 영상 등을 수집하고 정리해서 제공하는 앱입니다.  
-사용자는 지역을 기준으로 여행 루트를 검색할 수 있습니다.
+> 이 서비스는 유튜버가 실제 다녀온 여행 동선, 장소를 수집하고 영상과 함께 제공하는 앱입니다.  
+사용자는 지역을 기준으로 여행 루트를 검색할 수 있으며, 원하는 장소를 내 폴더에 찜! 할 수 있습니다.
+친구, 가족, 연인과 함께 떠날 장소를 모아서 공유까지 해보세요! 💙
+
+|<img src="https://github.com/user-attachments/assets/ba8703c2-71e1-4a8c-ab88-c1332db23d66" width="320" />|<img src="https://github.com/user-attachments/assets/ed392815-74e7-49ea-89f8-ac056adda6ae" width="320" />|<img src="https://github.com/user-attachments/assets/c934ac59-df64-45be-8452-19664c3e08ab" width="320" />|
+|:---------:|:---------:|:---------:|
+|**홈 화면**|**검색 화면**|**여행 일정**|
+
+|<img src="https://github.com/user-attachments/assets/7373639d-3b53-4aa8-bacd-d55750ca9422" width="320" />|<img src="https://github.com/user-attachments/assets/453ddede-5957-4da8-877f-fc0e49a73e51" width="320" />|
+|:---------:|:---------:|
+|**장소 찜**|**콘텐츠 찜**|
 
 ## 👥 팀원
 
