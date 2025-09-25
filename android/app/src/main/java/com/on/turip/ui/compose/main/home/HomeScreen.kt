@@ -3,6 +3,7 @@ package com.on.turip.ui.compose.main.home
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
@@ -19,6 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -76,9 +78,11 @@ fun HomeScreen(
                 modifier =
                     Modifier
                         .fillMaxSize()
-                        .padding(innerPadding)
-                        .padding(start = 20.dp)
-                        .verticalScroll(scrollState),
+                        .padding(
+                            top = innerPadding.calculateTopPadding(),
+                            start = 20.dp,
+                            end = innerPadding.calculateEndPadding(LocalLayoutDirection.current),
+                        ).verticalScroll(scrollState),
                 verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
                 Text(
