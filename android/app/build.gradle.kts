@@ -122,9 +122,8 @@ dependencies {
     implementation(libs.androidx.lifecycle.livedata.ktx)
 
     // compose
-    val composeBom = platform("androidx.compose:compose-bom:2025.08.00")
-    implementation(composeBom)
-    androidTestImplementation(composeBom)
+    implementation(platform(libs.compose.bom))
+    androidTestImplementation(platform(libs.compose.bom))
 
     implementation(libs.androidx.ui)
     implementation(libs.androidx.material3)

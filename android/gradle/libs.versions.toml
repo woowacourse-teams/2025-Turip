@@ -1,6 +1,7 @@
 [versions]
 versionName = "1.2.0"
 versionCode = "121"
+composeBom = "2025.08.00"
 coilCompose = "3.3.0"
 coilNetworkOkhttp = "3.3.0"
 lifecycleLivedataKtx = "2.9.2"
@@ -74,6 +75,7 @@ retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit
 retrofit2-kotlinx-serialization-converter = { module = "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter", version.ref = "serializationConverter" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
+compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
