@@ -19,7 +19,7 @@ fun RegionList(
         modifier = modifier.fillMaxWidth(),
         maxItemsInEachRow = 4,
         verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         regions.forEach { regionCategory: RegionCategory ->
             RegionItem(
