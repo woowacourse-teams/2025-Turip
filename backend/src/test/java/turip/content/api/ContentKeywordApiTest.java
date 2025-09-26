@@ -19,10 +19,10 @@ import org.springframework.transaction.annotation.Transactional;
 import turip.container.TestContainerConfig;
 
 @ActiveProfiles("test")
+@Import(TestContainerConfig.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Transactional(propagation = org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED)
-@Import(TestContainerConfig.class)
 public class ContentKeywordApiTest {
 
     @Autowired

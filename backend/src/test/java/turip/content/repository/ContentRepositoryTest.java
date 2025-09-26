@@ -33,8 +33,8 @@ import turip.region.repository.CountryRepository;
 
 @DataJpaTest
 @ActiveProfiles("test")
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Import(TestContainerConfig.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ContentRepositoryTest {
 
     @Autowired
