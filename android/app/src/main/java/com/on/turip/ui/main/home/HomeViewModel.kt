@@ -16,6 +16,7 @@ import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.region.RegionCategory
 import com.on.turip.domain.region.repository.RegionRepository
 import com.on.turip.ui.common.mapper.toUiModel
+import com.on.turip.ui.main.home.model.UsersLikeContentModel
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -101,6 +102,12 @@ class HomeViewModel(
                     Timber.e("지역 카테고리 조회 실패")
                 }
         }
+    }
+
+    fun updateDomesticSelected(isDomesticSelected: Boolean) {
+        _isSelectedDomestic.value = isDomesticSelected
+        Timber.d(if (isSelectedDomestic.value == true) "국내 클릭" else "해외 클릭")
+        isSelectedDomestic.value?.let { loadRegionCategories(it) }
     }
 
     companion object {
