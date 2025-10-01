@@ -134,4 +134,8 @@ dependencies {
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
+
+    // app update
+    implementation(libs.app.update)
+    implementation(libs.app.update.ktx)
 }
