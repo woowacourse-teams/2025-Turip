@@ -24,7 +24,9 @@ fun RegionItem(
         CircularImage(
             imageUrl = region.imageUrl,
             modifier =
-                Modifier.size(84.dp),
+                Modifier
+                    .padding(6.dp)
+                    .size(84.dp),
         )
         Text(
             text = region.name,
