@@ -2,7 +2,8 @@
 <configuration>
 
     <property name="LOG_FILE_NAME" value="turip-log.json"/>
-    <property name="LOG_FILE_PATH" value="logs/${LOG_FILE_NAME}"/>
+    <property name="LOG_DIR" value="${LOG_PATH:-logs}"/>
+    <property name="LOG_FILE_PATH" value="${LOG_DIR}/${LOG_FILE_NAME}"/>
 
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
