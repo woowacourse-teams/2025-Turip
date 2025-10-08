@@ -48,9 +48,7 @@ class FavoritePlaceViewModel(
                     _favoritePlaceUiState.value =
                         favoritePlaceUiState.value?.copy(
                             folders =
-                                folders.map { folder: Folder ->
-                                    folder.toUiModel(selectedFolderId)
-                                },
+                                folders.map { folder: Folder -> folder.toUiModel(selectFolderId = selectedFolderId) },
                         )
                     loadPlacesInSelectFolder()
                     _favoritePlaceUiState.value =
@@ -78,10 +76,7 @@ class FavoritePlaceViewModel(
                 _favoritePlaceUiState.value =
                     favoritePlaceUiState.value?.copy(
                         places =
-                            favoritePlaces
-                                .map { favoritePlace: FavoritePlace ->
-                                    favoritePlace.toUiModel()
-                                },
+                            favoritePlaces.map { favoritePlace: FavoritePlace -> favoritePlace.toUiModel() },
                     )
             }.onFailure { errorEvent: ErrorEvent ->
                 checkError(errorEvent)
@@ -100,9 +95,8 @@ class FavoritePlaceViewModel(
                     _favoritePlaceUiState.value =
                         favoritePlaceUiState.value?.copy(
                             places =
-                                favoritePlaceUiState.value?.places?.filter {
-                                    it.placeId != placeId
-                                } ?: emptyList(),
+                                favoritePlaceUiState.value?.places?.filter { it.placeId != placeId }
+                                    ?: emptyList(),
                         )
                     Timber.d("찜 목록 화면 폴더명에 해당하는 찜 장소들 업데이트 성공")
                     _favoritePlaceUiState.value =
@@ -132,9 +126,7 @@ class FavoritePlaceViewModel(
                 .loadFavoritePlaces(folderId)
                 .onSuccess { favoritePlaces: List<FavoritePlace> ->
                     _favoritePlaceUiState.value =
-                        favoritePlaceUiState.value?.copy(
-                            places = favoritePlaces.map { it.toUiModel() },
-                        )
+                        favoritePlaceUiState.value?.copy(places = favoritePlaces.map { it.toUiModel() })
                     _favoritePlaceUiState.value =
                         favoritePlaceUiState.value?.copy(
                             isServerError = false,
@@ -150,24 +142,20 @@ class FavoritePlaceViewModel(
     private fun checkError(errorEvent: ErrorEvent) {
         when (errorEvent) {
             ErrorEvent.USER_NOT_HAVE_PERMISSION -> {
-                _favoritePlaceUiState.value =
-                    favoritePlaceUiState.value?.copy(isServerError = true)
+                _favoritePlaceUiState.value = favoritePlaceUiState.value?.copy(isServerError = true)
             }
 
             ErrorEvent.DUPLICATION_FOLDER -> throw IllegalArgumentException("발생할 수 없는 오류")
             ErrorEvent.UNEXPECTED_PROBLEM -> {
-                _favoritePlaceUiState.value =
-                    favoritePlaceUiState.value?.copy(isServerError = true)
+                _favoritePlaceUiState.value = favoritePlaceUiState.value?.copy(isServerError = true)
             }
 
             ErrorEvent.NETWORK_ERROR -> {
-                _favoritePlaceUiState.value =
-                    favoritePlaceUiState.value?.copy(isServerError = true)
+                _favoritePlaceUiState.value = favoritePlaceUiState.value?.copy(isServerError = true)
             }
 
             ErrorEvent.PARSER_ERROR -> {
-                _favoritePlaceUiState.value =
-                    favoritePlaceUiState.value?.copy(isServerError = true)
+                _favoritePlaceUiState.value = favoritePlaceUiState.value?.copy(isServerError = true)
             }
         }
     }
