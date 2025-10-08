@@ -35,7 +35,7 @@ class FavoritePlaceViewModel(
     private val _shareFolder: MutableLiveData<FavoriteFolderShareModel> = MutableLiveData()
     val shareFolder: LiveData<FavoriteFolderShareModel> get() = _shareFolder
 
-    var selectedFolderId: Long = NOT_INITIALIZED
+    private var selectedFolderId: Long = NOT_INITIALIZED
 
     fun loadFoldersAndPlaces() {
         viewModelScope.launch {
@@ -43,7 +43,8 @@ class FavoritePlaceViewModel(
                 .loadFavoriteFolders()
                 .onSuccess { folders: List<Folder> ->
                     Timber.d("장소 찜 목록 화면 폴더 불러오기 성공")
-                    if (selectedFolderId == NOT_INITIALIZED) selectedFolderId = folders[0].id
+                    ensureValidSelectedFolderId(folders)
+
                     _favoritePlaceUiState.value =
                         favoritePlaceUiState.value?.copy(
                             folders =
@@ -61,6 +62,12 @@ class FavoritePlaceViewModel(
                     checkError(errorEvent)
                     Timber.e("장소 찜 목록 화면 폴더 불러오기 API 호출 실패")
                 }
+        }
+    }
+
+    private fun ensureValidSelectedFolderId(folders: List<Folder>) {
+        if (selectedFolderId == NOT_INITIALIZED || folders.all { it.id != selectedFolderId }) {
+            selectedFolderId = folders.first { it.name == DEFAULT_FOLDER_NAME }.id
         }
     }
 
@@ -207,6 +214,7 @@ class FavoritePlaceViewModel(
 
     companion object {
         private const val NOT_INITIALIZED: Long = 0L
+        private const val DEFAULT_FOLDER_NAME = "기본 폴더"
 
         fun provideFactory(
             folderRepository: FolderRepository = RepositoryModule.folderRepository,

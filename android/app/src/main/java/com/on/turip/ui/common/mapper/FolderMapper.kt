@@ -4,12 +4,12 @@ import com.on.turip.domain.folder.Folder
 import com.on.turip.ui.folder.model.FolderEditModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
 
-fun Folder.toUiModel(folderId: Long): FavoritePlaceFolderModel =
+fun Folder.toUiModel(selectFolderId: Long): FavoritePlaceFolderModel =
     FavoritePlaceFolderModel(
         id = id,
         name = name,
         placeCount = placeCount,
-        isSelected = id == folderId,
+        isSelected = id == selectFolderId,
     )
 
 fun Folder.toEditUiModel(): FolderEditModel =
