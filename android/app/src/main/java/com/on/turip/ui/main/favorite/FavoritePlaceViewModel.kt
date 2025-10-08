@@ -53,9 +53,10 @@ class FavoritePlaceViewModel(
                         )
                     loadPlacesInSelectFolder()
                     _favoritePlaceUiState.value =
-                        favoritePlaceUiState.value?.copy(isServerError = false)
-                    _favoritePlaceUiState.value =
-                        favoritePlaceUiState.value?.copy(isNetWorkError = false)
+                        favoritePlaceUiState.value?.copy(
+                            isServerError = false,
+                            isNetWorkError = false,
+                        )
                 }.onFailure { errorEvent: ErrorEvent ->
                     checkError(errorEvent)
                     Timber.e("장소 찜 목록 화면 폴더 불러오기 API 호출 실패")
@@ -75,10 +76,6 @@ class FavoritePlaceViewModel(
                                     favoritePlace.toUiModel()
                                 },
                     )
-                _favoritePlaceUiState.value =
-                    favoritePlaceUiState.value?.copy(isServerError = false)
-                _favoritePlaceUiState.value =
-                    favoritePlaceUiState.value?.copy(isNetWorkError = false)
             }.onFailure { errorEvent: ErrorEvent ->
                 checkError(errorEvent)
                 Timber.e("폴더에 담긴 장소들을 불러오는 API 호출 실패")
@@ -102,9 +99,10 @@ class FavoritePlaceViewModel(
                         )
                     Timber.d("찜 목록 화면 폴더명에 해당하는 찜 장소들 업데이트 성공")
                     _favoritePlaceUiState.value =
-                        favoritePlaceUiState.value?.copy(isServerError = false)
-                    _favoritePlaceUiState.value =
-                        favoritePlaceUiState.value?.copy(isNetWorkError = false)
+                        favoritePlaceUiState.value?.copy(
+                            isServerError = false,
+                            isNetWorkError = false,
+                        )
                 }.onFailure { errorEvent: ErrorEvent ->
                     checkError(errorEvent)
                     Timber.e("찜 목록 화면 폴더명에 해당하는 찜 장소들 업데이트 실패 (placeId =$placeId)")
@@ -142,9 +140,10 @@ class FavoritePlaceViewModel(
                             places = favoritePlaces.map { it.toUiModel() },
                         )
                     _favoritePlaceUiState.value =
-                        favoritePlaceUiState.value?.copy(isServerError = false)
-                    _favoritePlaceUiState.value =
-                        favoritePlaceUiState.value?.copy(isNetWorkError = false)
+                        favoritePlaceUiState.value?.copy(
+                            isServerError = false,
+                            isNetWorkError = false,
+                        )
                 }.onFailure { errorEvent: ErrorEvent ->
                     checkError(errorEvent)
                     Timber.e("폴더에 담긴 장소들을 불러오는 API 호출 실패")
