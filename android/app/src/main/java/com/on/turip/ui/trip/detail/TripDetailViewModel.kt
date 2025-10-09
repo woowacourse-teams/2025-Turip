@@ -111,22 +111,11 @@ class TripDetailViewModel(
 
     private fun checkError(errorEvent: ErrorEvent) {
         when (errorEvent) {
-            ErrorEvent.USER_NOT_HAVE_PERMISSION -> {
-                _serverError.value = true
-            }
-
+            ErrorEvent.USER_NOT_HAVE_PERMISSION -> _serverError.value = true
+            ErrorEvent.UNEXPECTED_PROBLEM -> _serverError.value = true
+            ErrorEvent.NETWORK_ERROR -> _networkError.value = true
+            ErrorEvent.PARSER_ERROR -> _serverError.value = true
             ErrorEvent.DUPLICATION_FOLDER -> throw IllegalArgumentException("발생할 수 없는 오류")
-            ErrorEvent.UNEXPECTED_PROBLEM -> {
-                _serverError.value = true
-            }
-
-            ErrorEvent.NETWORK_ERROR -> {
-                _networkError.value = true
-            }
-
-            ErrorEvent.PARSER_ERROR -> {
-                _serverError.value = true
-            }
         }
     }
 
