@@ -202,6 +202,14 @@ class TripDetailViewModel(
         hasFavoriteFolder: Boolean,
         placeId: Long,
     ) {
+        val updatedCachePlaces =
+            placeCacheByDay.mapValues { (_, value) ->
+                value.map { place: PlaceModel ->
+                    if (place.id == placeId) place.copy(isFavorite = hasFavoriteFolder) else place
+                }
+            }
+        placeCacheByDay = updatedCachePlaces
+
         _places.value =
             places.value?.map { place: PlaceModel ->
                 if (place.id == placeId) place.copy(isFavorite = hasFavoriteFolder) else place
