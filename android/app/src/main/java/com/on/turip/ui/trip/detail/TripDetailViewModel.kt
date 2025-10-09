@@ -86,27 +86,11 @@ class TripDetailViewModel(
                     _content.value = result
                     _videoUri.value = result.videoData.url
                     _isFavorite.value = result.isFavorite
-                    _serverError.value = false
-                    _networkError.value = false
+                    clearErrors()
                 }.onFailure { errorEvent: ErrorEvent ->
                     checkError(errorEvent)
                 }
         }
-    }
-
-    private fun checkError(errorEvent: ErrorEvent) {
-        when (errorEvent) {
-            ErrorEvent.USER_NOT_HAVE_PERMISSION -> _serverError.value = true
-            ErrorEvent.UNEXPECTED_PROBLEM -> _serverError.value = true
-            ErrorEvent.NETWORK_ERROR -> _networkError.value = true
-            ErrorEvent.PARSER_ERROR -> _serverError.value = true
-            ErrorEvent.DUPLICATION_FOLDER -> throw IllegalArgumentException("발생할 수 없는 오류")
-        }
-    }
-
-    private fun clearErrors() {
-        _serverError.value = false
-        _networkError.value = false
     }
 
     private fun loadVideoPlaces() {
@@ -126,8 +110,7 @@ class TripDetailViewModel(
                     _tripPlacesSummary.value = trip.toUiModelWithoutContentPlaces()
 
                     Timber.d("여행 일정 불러오기 성공")
-                    _serverError.value = false
-                    _networkError.value = false
+                    clearErrors()
                 }.onFailure { errorEvent: ErrorEvent ->
                     checkError(errorEvent)
                 }
@@ -164,8 +147,7 @@ class TripDetailViewModel(
                     contentId,
                 ).onSuccess {
                     Timber.d("컨텐츠 찜 API 통신 성공")
-                    _serverError.value = false
-                    _networkError.value = false
+                    clearErrors()
                 }.onFailure { errorEvent: ErrorEvent ->
                     checkError(errorEvent)
                     Timber.d("컨텐츠 찜 API 통신 실패")
@@ -179,12 +161,7 @@ class TripDetailViewModel(
         val newSelected: Boolean = !currentSelected
 
         _isExpandTextToggleSelected.value = newSelected
-        _bodyMaxLines.value =
-            if (newSelected) {
-                Int.MAX_VALUE
-            } else {
-                DEFAULT_CONTENT_TITLE_MAX_LINES
-            }
+        _bodyMaxLines.value = if (newSelected) EXPAND_TEXT else DEFAULT_CONTENT_TITLE_MAX_LINES
     }
 
     fun updateExpandTextToggleVisibility(
@@ -192,8 +169,7 @@ class TripDetailViewModel(
         ellipsisCount: Int,
     ) {
         _isExpandTextToggleVisible.value =
-            lineCount >= DEFAULT_CONTENT_TITLE_MAX_LINES &&
-            ellipsisCount > 0
+            lineCount >= DEFAULT_CONTENT_TITLE_MAX_LINES && ellipsisCount > 0
         _isExpandTextToggleSelected.value = false
         _bodyMaxLines.value = DEFAULT_CONTENT_TITLE_MAX_LINES
     }
@@ -216,8 +192,24 @@ class TripDetailViewModel(
             }
     }
 
+    private fun checkError(errorEvent: ErrorEvent) {
+        when (errorEvent) {
+            ErrorEvent.USER_NOT_HAVE_PERMISSION -> _serverError.value = true
+            ErrorEvent.UNEXPECTED_PROBLEM -> _serverError.value = true
+            ErrorEvent.NETWORK_ERROR -> _networkError.value = true
+            ErrorEvent.PARSER_ERROR -> _serverError.value = true
+            ErrorEvent.DUPLICATION_FOLDER -> throw IllegalArgumentException("발생할 수 없는 오류")
+        }
+    }
+
+    private fun clearErrors() {
+        _serverError.value = false
+        _networkError.value = false
+    }
+
     companion object {
         private const val DEFAULT_CONTENT_TITLE_MAX_LINES = 2
+        private const val EXPAND_TEXT = Int.MAX_VALUE
 
         fun provideFactory(
             contentId: Long,
