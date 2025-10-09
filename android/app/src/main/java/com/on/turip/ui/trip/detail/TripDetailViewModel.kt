@@ -7,14 +7,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.on.turip.data.common.TuripCustomResult
 import com.on.turip.data.common.onFailure
 import com.on.turip.data.common.onSuccess
 import com.on.turip.di.RepositoryModule
 import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.content.Content
 import com.on.turip.domain.content.repository.ContentRepository
-import com.on.turip.domain.creator.Creator
 import com.on.turip.domain.creator.repository.CreatorRepository
 import com.on.turip.domain.favorite.usecase.UpdateFavoriteUseCase
 import com.on.turip.domain.trip.ContentPlace
@@ -23,8 +21,6 @@ import com.on.turip.domain.trip.repository.ContentPlaceRepository
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.common.mapper.toUiModelWithoutContentPlaces
 import com.on.turip.ui.common.model.trip.TripModel
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -84,26 +80,14 @@ class TripDetailViewModel(
 
     private fun loadVideoInformation() {
         viewModelScope.launch {
-            val deferredCreator: Deferred<TuripCustomResult<Creator>> =
-                async { creatorRepository.loadCreator(creatorId) }
-            val deferredVideoData: Deferred<TuripCustomResult<Content>> =
-                async { contentRepository.loadContent(contentId) }
-
-            val creatorResult: TuripCustomResult<Creator> = deferredCreator.await()
-            val videoDataResult: TuripCustomResult<Content> = deferredVideoData.await()
-
-            creatorResult
-                .onSuccess { creator: Creator ->
-                    videoDataResult
-                        .onSuccess { result: Content ->
-                            _content.value = result
-                            _videoUri.value = result.videoData.url
-                            _isFavorite.value = result.isFavorite
-                            _serverError.value = false
-                            _networkError.value = false
-                        }.onFailure { errorEvent: ErrorEvent ->
-                            checkError(errorEvent)
-                        }
+            contentRepository
+                .loadContent(contentId)
+                .onSuccess { result: Content ->
+                    _content.value = result
+                    _videoUri.value = result.videoData.url
+                    _isFavorite.value = result.isFavorite
+                    _serverError.value = false
+                    _networkError.value = false
                 }.onFailure { errorEvent: ErrorEvent ->
                     checkError(errorEvent)
                 }
