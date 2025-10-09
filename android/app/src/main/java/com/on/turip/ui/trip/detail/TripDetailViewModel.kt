@@ -110,6 +110,8 @@ class TripDetailViewModel(
     }
 
     private fun loadVideoPlaces() {
+        if (placeCacheByDay.isNotEmpty()) return
+
         viewModelScope.launch {
             contentPlaceRepository
                 .loadTripInfo(contentId)
@@ -117,13 +119,12 @@ class TripDetailViewModel(
                     setupCached(trip)
 
                     _days.value =
-                        placeCacheByDay.keys
-                            .sorted()
-                            .mapIndexed { index, day ->
-                                DayModel(day = day, isSelected = index == 0)
-                            }
-                    _places.value = placeCacheByDay[1] ?: emptyList()
-                    _tripModel.value = trip.toUiModel()
+                        placeCacheByDay.keys.sorted().mapIndexed { index, day ->
+                            DayModel(day = day, isSelected = index == DayModel.ALL_PLACE)
+                        }
+                    _places.value = placeCacheByDay[DayModel.ALL_PLACE] ?: emptyList()
+                    _tripPlacesSummary.value = trip.toUiModelWithoutContentPlaces()
+
                     Timber.d("여행 일정 불러오기 성공")
                     _serverError.value = false
                     _networkError.value = false
