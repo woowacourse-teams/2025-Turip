@@ -72,16 +72,16 @@ class TripDetailViewModel(
     val serverError: LiveData<Boolean> get() = _serverError
 
     init {
-        loadContent()
-        loadTrip()
+        loadVideoInformation()
+        loadVideoPlaces()
     }
 
     fun reload() {
-        loadContent()
-        loadTrip()
+        loadVideoInformation()
+        loadVideoPlaces()
     }
 
-    private fun loadContent() {
+    private fun loadVideoInformation() {
         viewModelScope.launch {
             val deferredCreator: Deferred<TuripCustomResult<Creator>> =
                 async { creatorRepository.loadCreator(creatorId) }
@@ -135,7 +135,7 @@ class TripDetailViewModel(
         _networkError.value = false
     }
 
-    private fun loadTrip() {
+    private fun loadVideoPlaces() {
         viewModelScope.launch {
             contentPlaceRepository
                 .loadTripInfo(contentId)
