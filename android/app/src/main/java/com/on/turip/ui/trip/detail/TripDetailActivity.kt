@@ -281,7 +281,7 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
                 )
             updateExpandTextToggleVisibility()
         }
-        viewModel.tripModel.observe(this) { tripModel: TripModel ->
+        viewModel.tripPlacesSummary.observe(this) { tripModel: TripModel ->
             binding.tvTripDetailTotalPlaceCount.text =
                 getString(R.string.all_total_place_count, tripModel.tripPlaceCount)
             binding.tvTripDetailTravelDuration.text =

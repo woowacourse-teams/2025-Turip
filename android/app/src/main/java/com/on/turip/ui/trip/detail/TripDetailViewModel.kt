@@ -21,6 +21,7 @@ import com.on.turip.domain.trip.ContentPlace
 import com.on.turip.domain.trip.Trip
 import com.on.turip.domain.trip.repository.ContentPlaceRepository
 import com.on.turip.ui.common.mapper.toUiModel
+import com.on.turip.ui.common.mapper.toUiModelWithoutContentPlaces
 import com.on.turip.ui.common.model.trip.TripModel
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
@@ -44,8 +45,8 @@ class TripDetailViewModel(
     private val _places: MutableLiveData<List<PlaceModel>> = MutableLiveData()
     val places: LiveData<List<PlaceModel>> get() = _places
 
-    private val _tripModel: MutableLiveData<TripModel> = MutableLiveData()
-    val tripModel: LiveData<TripModel> get() = _tripModel
+    private val _tripPlacesSummary: MutableLiveData<TripModel> = MutableLiveData()
+    val tripPlacesSummary: LiveData<TripModel> get() = _tripPlacesSummary
 
     private val _videoUri: MutableLiveData<String> = MutableLiveData()
     val videoUri: LiveData<String> get() = _videoUri
