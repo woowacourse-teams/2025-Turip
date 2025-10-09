@@ -1,11 +1,13 @@
 package com.on.turip.ui.common.mapper
 
 import com.on.turip.domain.content.UsersLikeContent
+import com.on.turip.domain.trip.ContentPlace
 import com.on.turip.domain.trip.Trip
 import com.on.turip.domain.trip.TripDuration
 import com.on.turip.ui.common.model.trip.TripDurationModel
 import com.on.turip.ui.common.model.trip.TripModel
 import com.on.turip.ui.main.home.model.UsersLikeContentModel
+import com.on.turip.ui.trip.detail.PlaceModel
 
 fun Trip.toUiModel(): TripModel =
     TripModel(
@@ -19,6 +21,16 @@ fun Trip.toUiModelWithoutContentPlaces(): TripModel =
         tripDurationModel = tripDuration.toUiModel(),
         tripPlaceCount = tripPlaceCount,
         contentPlaces = emptyList(),
+    )
+
+fun ContentPlace.toUiModel(): PlaceModel =
+    PlaceModel(
+        id = this.place.placeId,
+        name = this.place.name,
+        category = this.place.category.joinToString(),
+        mapLink = this.place.url,
+        timeLine = this.timeLine,
+        isFavorite = this.isFavoritePlace,
     )
 
 fun TripDuration.toUiModel(): TripDurationModel =

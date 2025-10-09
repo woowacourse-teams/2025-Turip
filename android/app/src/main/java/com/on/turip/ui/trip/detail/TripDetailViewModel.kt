@@ -150,26 +150,15 @@ class TripDetailViewModel(
     }
 
     private fun setupCached(trip: Trip) {
-        val dayModels: List<DayModel> = trip.tripDuration.days.initDayModels()
+        val placesByDay: MutableMap<Int, List<PlaceModel>> =
+            trip.contentPlaces
+                .groupBy(
+                    keySelector = { contentPlace: ContentPlace -> contentPlace.visitDay },
+                    valueTransform = { contentPlace: ContentPlace -> contentPlace.toUiModel() },
+                ).toMutableMap()
+        placesByDay[DayModel.ALL_PLACE] = placesByDay.flatMap { it.value }
 
-        placeCacheByDay =
-            dayModels.associate { dayModel ->
-                val day: Int = dayModel.day
-                val coursesForDay: List<ContentPlace> =
-                    trip.contentPlaces.filter { it.visitDay == day }
-                val placeModels: List<PlaceModel> =
-                    coursesForDay.map { course: ContentPlace ->
-                        PlaceModel(
-                            id = course.place.placeId,
-                            name = course.place.name,
-                            category = course.place.category.joinToString(),
-                            mapLink = course.place.url,
-                            timeLine = course.timeLine,
-                            isFavorite = course.isFavoritePlace,
-                        )
-                    }
-                day to placeModels
-            }
+        placeCacheByDay = placesByDay
     }
 
     fun updateDay(dayModel: DayModel) {
