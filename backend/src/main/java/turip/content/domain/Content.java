@@ -2,6 +2,7 @@ package turip.content.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -16,8 +17,8 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import turip.region.domain.City;
 import turip.creator.domain.Creator;
+import turip.region.domain.City;
 
 @Getter
 @Entity
@@ -34,11 +35,11 @@ public class Content {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "creator_id", nullable = false, foreignKey = @ForeignKey(name = "fk_content_creator"))
     private Creator creator;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "city_id", nullable = false, foreignKey = @ForeignKey(name = "fk_content_city"))
     private City city;
 
