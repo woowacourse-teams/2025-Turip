@@ -65,7 +65,7 @@ public class ContentService {
         }
         Slice<Content> contentSlice = contentRepository.findByKeywordContaining(keyword, lastContentId,
                 PageRequest.of(0, pageSize));
-        return converToContentsDetailWithLoadableResponse(member, contentSlice);
+        return convertToContentsDetailWithLoadableResponse(member, contentSlice);
     }
 
     public ContentsDetailWithLoadableResponse findContentsByRegionCategory(
@@ -75,7 +75,7 @@ public class ContentService {
             long lastId
     ) {
         Slice<Content> contentSlice = findContentSlicesByRegionCategory(regionCategory, lastId, size);
-        return converToContentsDetailWithLoadableResponse(member, contentSlice);
+        return convertToContentsDetailWithLoadableResponse(member, contentSlice);
     }
 
     public WeeklyPopularFavoriteContentsResponse findWeeklyPopularFavoriteContents(Member member, int topContentSize) {
@@ -166,8 +166,8 @@ public class ContentService {
                 .collect(Collectors.toSet());
     }
 
-    private ContentsDetailWithLoadableResponse converToContentsDetailWithLoadableResponse(Member member,
-                                                                                          Slice<Content> contentSlice) {
+    private ContentsDetailWithLoadableResponse convertToContentsDetailWithLoadableResponse(Member member,
+                                                                                           Slice<Content> contentSlice) {
         List<Content> contents = contentSlice.getContent();
         Set<Long> favoritedContentIds = findFavoritedContentIds(member, contents);
         List<ContentDetailResponse> contentDetails = contents.stream()
