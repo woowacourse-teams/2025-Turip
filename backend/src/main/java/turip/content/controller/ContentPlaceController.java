@@ -24,14 +24,14 @@ import turip.member.domain.Member;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/contents")
-@Tag(name = "ContentPlace", description = "여행 코스 API")
+@Tag(name = "ContentPlace", description = "컨텐츠 장소 API")
 public class ContentPlaceController {
 
     private final ContentPlaceService contentPlaceService;
 
     @Operation(
-            summary = "여행 상세 조회 api",
-            description = "특정 컨텐츠에 대한 여행 코스들을 조회한다."
+            summary = "컨텐츠 상세 조회 api",
+            description = "특정 컨텐츠에 대한 장소들을 조회한다."
     )
     @ApiResponses(value = {
             @ApiResponse(
