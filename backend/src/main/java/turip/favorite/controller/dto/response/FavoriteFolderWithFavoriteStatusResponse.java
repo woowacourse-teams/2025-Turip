@@ -23,7 +23,7 @@ public record FavoriteFolderWithFavoriteStatusResponse(
         );
     }
 
-    public static record FavoritePlaceResponse(
+    public record FavoritePlaceResponse(
             Long id,
             Long favoriteFolderId,
             Long placeId
@@ -38,7 +38,7 @@ public record FavoriteFolderWithFavoriteStatusResponse(
         }
     }
 
-    public static record FavoritePlacesWithPlaceDetailResponse(
+    public record FavoritePlacesWithPlaceDetailResponse(
             List<FavoritePlaceWithPlaceDetailResponse> favoritePlaces, Integer favoritePlaceCount) {
 
         public static FavoritePlacesWithPlaceDetailResponse from(
@@ -47,7 +47,7 @@ public record FavoriteFolderWithFavoriteStatusResponse(
         }
     }
 
-    public static record FavoritePlaceWithPlaceDetailResponse(
+    public record FavoritePlaceWithPlaceDetailResponse(
             Long id,
             PlaceResponse place,
             Integer favoriteOrder
