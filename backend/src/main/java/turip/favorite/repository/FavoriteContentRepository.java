@@ -40,6 +40,8 @@ public interface FavoriteContentRepository extends JpaRepository<FavoriteContent
                 SELECT f.content
                 FROM FavoriteContent f
                 JOIN f.member m
+                JOIN FETCH f.content.creator
+                JOIN FETCH f.content.city
                 WHERE m.deviceFid = :deviceFid
                   AND f.content.id < :lastContentId
                 ORDER BY f.createdAt DESC
