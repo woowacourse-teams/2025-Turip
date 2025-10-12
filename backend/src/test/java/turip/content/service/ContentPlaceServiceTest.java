@@ -7,6 +7,7 @@ import static org.mockito.BDDMockito.given;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -91,10 +92,9 @@ class ContentPlaceServiceTest {
                 .willReturn(true);
         given(contentPlaceRepository.findAllByContentId(contentId))
                 .willReturn(List.of(firstContentPlace, secondContentPlace));
-        given(favoritePlaceRepository.existsByFavoriteFolderMemberAndPlace(member, place1))
-                .willReturn(false);
-        given(favoritePlaceRepository.existsByFavoriteFolderMemberAndPlace(member, place2))
-                .willReturn(false);
+        given(favoritePlaceRepository.findFavoritedPlaceIdsByFavoriteFolderMemberAndPlaceIn(member,
+                List.of(place1, place2)))
+                .willReturn(Set.of());
         ContentPlaceDetailResponse response = contentPlaceService.findContentPlaceDetails(member, contentId);
 
         // when & then
@@ -148,10 +148,9 @@ class ContentPlaceServiceTest {
                 .willReturn(true);
         given(contentPlaceRepository.findAllByContentId(contentId))
                 .willReturn(List.of(firstContentPlace, secondContentPlace));
-        given(favoritePlaceRepository.existsByFavoriteFolderMemberAndPlace(member, place1))
-                .willReturn(false);
-        given(favoritePlaceRepository.existsByFavoriteFolderMemberAndPlace(member, place2))
-                .willReturn(false);
+        given(favoritePlaceRepository.findFavoritedPlaceIdsByFavoriteFolderMemberAndPlaceIn(member,
+                List.of(place1, place2)))
+                .willReturn(Set.of());
         ContentPlaceDetailResponse response = contentPlaceService.findContentPlaceDetails(member, contentId);
 
         // when & then

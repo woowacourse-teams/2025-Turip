@@ -1,6 +1,7 @@
 package turip.content.service;
 
 import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import turip.common.exception.ErrorTag;
@@ -12,6 +13,7 @@ import turip.content.repository.ContentPlaceRepository;
 import turip.content.repository.ContentRepository;
 import turip.favorite.repository.FavoritePlaceRepository;
 import turip.member.domain.Member;
+import turip.place.domain.Place;
 
 @Service
 @RequiredArgsConstructor
@@ -61,10 +63,15 @@ public class ContentPlaceService {
 
     private List<ContentPlaceResponse> parseContentPlaceToContentPlaceResponse(Member member,
                                                                                List<ContentPlace> contentPlaces) {
+        List<Place> places = contentPlaces.stream()
+                .map(ContentPlace::getPlace)
+                .distinct()
+                .toList();
+        Set<Long> favoritedPlaceIds = favoritePlaceRepository.findFavoritedPlaceIdsByFavoriteFolderMemberAndPlaceIn(
+                member, places);
         return contentPlaces.stream()
                 .map(contentPlace -> {
-                    boolean isFavoritePlace = favoritePlaceRepository.existsByFavoriteFolderMemberAndPlace(member,
-                            contentPlace.getPlace());
+                    boolean isFavoritePlace = favoritedPlaceIds.contains(contentPlace.getPlace().getId());
                     return ContentPlaceResponse.of(contentPlace, isFavoritePlace);
                 })
                 .toList();
