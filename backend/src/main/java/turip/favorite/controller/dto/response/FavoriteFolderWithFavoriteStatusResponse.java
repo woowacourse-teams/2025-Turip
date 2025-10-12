@@ -38,23 +38,23 @@ public record FavoriteFolderWithFavoriteStatusResponse(
         }
     }
 
-    public static record FavoritePlacesWithDetailPlaceInformationResponse(
-            List<FavoritePlaceWithDetailPlaceInformationResponse> favoritePlaces, Integer favoritePlaceCount) {
+    public static record FavoritePlacesWithPlaceDetailResponse(
+            List<FavoritePlaceWithPlaceDetailResponse> favoritePlaces, Integer favoritePlaceCount) {
 
-        public static FavoritePlacesWithDetailPlaceInformationResponse from(
-                List<FavoritePlaceWithDetailPlaceInformationResponse> favoritePlaces) {
-            return new FavoritePlacesWithDetailPlaceInformationResponse(favoritePlaces, favoritePlaces.size());
+        public static FavoritePlacesWithPlaceDetailResponse from(
+                List<FavoritePlaceWithPlaceDetailResponse> favoritePlaces) {
+            return new FavoritePlacesWithPlaceDetailResponse(favoritePlaces, favoritePlaces.size());
         }
     }
 
-    public static record FavoritePlaceWithDetailPlaceInformationResponse(
+    public static record FavoritePlaceWithPlaceDetailResponse(
             Long id,
             PlaceResponse place,
             Integer favoriteOrder
     ) {
 
-        public static FavoritePlaceWithDetailPlaceInformationResponse from(FavoritePlace favoritePlace) {
-            return new FavoritePlaceWithDetailPlaceInformationResponse(
+        public static FavoritePlaceWithPlaceDetailResponse from(FavoritePlace favoritePlace) {
+            return new FavoritePlaceWithPlaceDetailResponse(
                     favoritePlace.getId(),
                     PlaceResponse.from(favoritePlace.getPlace()),
                     favoritePlace.getFavoriteOrder()
