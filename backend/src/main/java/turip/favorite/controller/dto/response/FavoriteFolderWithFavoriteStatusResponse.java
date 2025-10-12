@@ -14,8 +14,13 @@ public record FavoriteFolderWithFavoriteStatusResponse(
 ) {
 
     public static FavoriteFolderWithFavoriteStatusResponse of(FavoriteFolder favoriteFolder, boolean isFavoritePlace) {
-        return new FavoriteFolderWithFavoriteStatusResponse(favoriteFolder.getId(), favoriteFolder.getMember().getId(),
-                favoriteFolder.getName(), favoriteFolder.isDefault(), isFavoritePlace);
+        return new FavoriteFolderWithFavoriteStatusResponse(
+                favoriteFolder.getId(),
+                favoriteFolder.getMember().getId(),
+                favoriteFolder.getName(),
+                favoriteFolder.isDefault(),
+                isFavoritePlace
+        );
     }
 
     public static record FavoritePlaceResponse(
@@ -25,8 +30,11 @@ public record FavoriteFolderWithFavoriteStatusResponse(
     ) {
 
         public static FavoritePlaceResponse from(FavoritePlace favoritePlace) {
-            return new FavoritePlaceResponse(favoritePlace.getId(), favoritePlace.getFavoriteFolder().getId(),
-                    favoritePlace.getPlace().getId());
+            return new FavoritePlaceResponse(
+                    favoritePlace.getId(),
+                    favoritePlace.getFavoriteFolder().getId(),
+                    favoritePlace.getPlace().getId()
+            );
         }
     }
 
@@ -39,12 +47,18 @@ public record FavoriteFolderWithFavoriteStatusResponse(
         }
     }
 
-    public static record FavoritePlaceWithDetailPlaceInformationResponse(Long id, PlaceResponse place,
-                                                                         Integer favoriteOrder) {
+    public static record FavoritePlaceWithDetailPlaceInformationResponse(
+            Long id,
+            PlaceResponse place,
+            Integer favoriteOrder
+    ) {
 
         public static FavoritePlaceWithDetailPlaceInformationResponse from(FavoritePlace favoritePlace) {
-            return new FavoritePlaceWithDetailPlaceInformationResponse(favoritePlace.getId(),
-                    PlaceResponse.from(favoritePlace.getPlace()), favoritePlace.getFavoriteOrder());
+            return new FavoritePlaceWithDetailPlaceInformationResponse(
+                    favoritePlace.getId(),
+                    PlaceResponse.from(favoritePlace.getPlace()),
+                    favoritePlace.getFavoriteOrder()
+            );
         }
     }
 }
