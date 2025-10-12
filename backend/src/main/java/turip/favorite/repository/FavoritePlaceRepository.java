@@ -27,4 +27,8 @@ public interface FavoritePlaceRepository extends JpaRepository<FavoritePlace, Lo
     @Query("SELECT fp.place.id FROM FavoritePlace fp WHERE fp.favoriteFolder.member= :member AND fp.place IN :places")
     Set<Long> findFavoritedPlaceIdsByFavoriteFolderMemberAndPlaceIn(@Param("member") Member member,
                                                                     @Param("places") List<Place> places);
+
+    @Query("SELECT fp.favoriteFolder.id FROM FavoritePlace fp WHERE fp.place = :place AND fp.favoriteFolder IN :favoriteFolders")
+    Set<Long> findFavoriteFolderIdsByPlaceAndFavoriteFolderIn(@Param("place") Place place,
+                                                              @Param("favoriteFolders") List<FavoriteFolder> favoriteFolders);
 }

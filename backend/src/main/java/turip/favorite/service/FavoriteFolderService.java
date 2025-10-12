@@ -1,6 +1,7 @@
 package turip.favorite.service;
 
 import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,16 +56,16 @@ public class FavoriteFolderService {
 
     public FavoriteFoldersWithFavoriteStatusResponse findAllWithFavoriteStatusByDeviceId(Member member, Long placeId) {
         Place place = getPlaceById(placeId);
+        List<FavoriteFolder> favoriteFolders = favoriteFolderRepository.findAllByMemberOrderByIdAsc(member);
+        Set<Long> favoritedFolderIds = favoritePlaceRepository.findFavoriteFolderIdsByPlaceAndFavoriteFolderIn(
+                place, favoriteFolders);
 
-        List<FavoriteFolderWithFavoriteStatusResponse> favoriteFoldersWithFavoriteStatus = favoriteFolderRepository.findAllByMemberOrderByIdAsc(
-                        member).stream()
+        List<FavoriteFolderWithFavoriteStatusResponse> favoriteFoldersWithFavoriteStatus = favoriteFolders.stream()
                 .map(favoriteFolder -> {
-                    boolean isFavoritePlace = favoritePlaceRepository.existsByFavoriteFolderAndPlace(favoriteFolder,
-                            place);
+                    boolean isFavoritePlace = favoritedFolderIds.contains(favoriteFolder.getId());
                     return FavoriteFolderWithFavoriteStatusResponse.of(favoriteFolder, isFavoritePlace);
                 })
                 .toList();
-
         return FavoriteFoldersWithFavoriteStatusResponse.from(favoriteFoldersWithFavoriteStatus);
     }
 
