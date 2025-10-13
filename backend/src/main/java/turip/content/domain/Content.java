@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
@@ -46,7 +47,8 @@ public class Content {
     @Column(name = "title", nullable = false, length = 500)
     private String title;
 
-    @Column(name = "url", nullable = false, length = 65535)
+    @Lob
+    @Column(name = "url", nullable = false)
     private String url;
 
     @Column(name = "uploaded_date", nullable = false)
