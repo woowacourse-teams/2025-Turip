@@ -90,6 +90,6 @@ jobs:
           chmod +x "$TARGET_JAR"
 
           echo "Starting application..."
-          sudo sh -lc "nohup java -javaagent:/home/ec2-user/opentelemetry-javaagent.jar \
+          sudo sh -lc "nohup java -javaagent:/home/ubuntu/opentelemetry-javaagent.jar \
             -Xms256m -Xmx384m -jar -Dspring.profiles.active=dev '$TARGET_JAR' \
             --server.port=80 > /dev/null 2>&1 &"
