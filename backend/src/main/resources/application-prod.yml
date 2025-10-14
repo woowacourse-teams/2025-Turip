@@ -28,15 +28,6 @@ csv:
   import:
     password: ${CSV_IMPORT_PASSWORD}
 
-management:
-  tracing:
-    sampling:
-      probability: 1.0
-    enabled: true
-  otlp:
-    tracing:
-      endpoint: http://${MONITORING_SERVER_PRIVATE_IP}:4318/v1/traces
-
 logging:
   level:
     root: INFO
