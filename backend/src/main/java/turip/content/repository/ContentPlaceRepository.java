@@ -11,6 +11,9 @@ import turip.place.domain.Place;
 public interface ContentPlaceRepository extends JpaRepository<ContentPlace, Long> {
 
     @EntityGraph(attributePaths = {"place"}, type = EntityGraph.EntityGraphType.FETCH)
+    List<ContentPlace> findAllByContentIdIn(List<Long> contentIds);
+
+    @EntityGraph(attributePaths = {"place"}, type = EntityGraph.EntityGraphType.FETCH)
     List<ContentPlace> findAllByContentId(Long contentId);
 
     int countByContentId(Long contentId);
