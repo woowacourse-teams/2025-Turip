@@ -25,7 +25,9 @@ public class LoggingInterceptor implements HandlerInterceptor {
         }
         request.setAttribute(REQUEST_START_TIME_ATTRIBUTE, System.currentTimeMillis());
 
-        MDC.put("device_fid", request.getHeader("device-fid"));
+        String deviceFid = request.getHeader("device-fid");
+        MDC.put("device_fid", deviceFid != null ? deviceFid : "unknown");
+
         MDC.put("method", request.getMethod());
         MDC.put("uri", request.getRequestURI());
 
