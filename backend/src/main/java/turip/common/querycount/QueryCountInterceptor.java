@@ -15,7 +15,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 public class QueryCountInterceptor implements HandlerInterceptor {
 
     private static final String QUERY_COUNT_LOG_FORMAT = "QUERY_COUNT: {}";
-    private static final String QUERY_COUNT_WARNING_LOG_FORMAT = "하나의 요청에 쿼리가 10번 이상 발생했습니다. QUERY_COUNT: {} ";
+    private static final String QUERY_COUNT_WARNING_LOG_FORMAT = "message: [QUERY_COUNT_WARNING] 하나의 요청에 쿼리가 {}번 발생했습니다.";
     private static final int QUERY_COUNT_WARNING_STANDARD = 10;
 
     private final QueryCountInspector queryCountInspector;
@@ -34,7 +34,7 @@ public class QueryCountInterceptor implements HandlerInterceptor {
 
         log.info(QUERY_COUNT_LOG_FORMAT, queryCount);
         if (queryCount >= QUERY_COUNT_WARNING_STANDARD) {
-            log.warn(QUERY_COUNT_WARNING_LOG_FORMAT, queryCount);
+            log.info(QUERY_COUNT_WARNING_LOG_FORMAT, queryCount);
         }
         queryCountInspector.clearCounter();
     }
