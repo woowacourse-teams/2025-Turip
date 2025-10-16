@@ -5,7 +5,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -29,8 +28,7 @@ public class Creator {
     @Column(name = "channel_name", nullable = false, unique = true, length = 50)
     private String channelName;
 
-    @Lob
-    @Column(name = "profile_image", nullable = false)
+    @Column(name = "profile_image", nullable = false, length = 65535)
     private String profileImage;
 
     public Creator(String channelName, String profileImage) {

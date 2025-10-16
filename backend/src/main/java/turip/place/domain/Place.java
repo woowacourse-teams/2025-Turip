@@ -6,7 +6,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.ArrayList;
@@ -31,8 +30,7 @@ public class Place {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Lob
-    @Column(name = "url", nullable = false, unique = true)
+    @Column(name = "url", nullable = false, unique = true, length = 65535)
     private String url;
 
     @Column(name = "address", nullable = false)
