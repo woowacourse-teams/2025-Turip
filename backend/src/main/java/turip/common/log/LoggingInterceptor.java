@@ -53,7 +53,6 @@ public class LoggingInterceptor implements HandlerInterceptor {
             log.warn("요청 시작 시간을 찾을 수 없음");
         }
 
-        MDC.remove("traceId");
         MDC.remove("device_fid");
         MDC.remove("method");
         MDC.remove("uri");
