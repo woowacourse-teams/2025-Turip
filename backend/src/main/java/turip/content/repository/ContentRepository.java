@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -46,6 +47,7 @@ public interface ContentRepository extends JpaRepository<Content, Long> {
             WHERE c.city.name = :cityName AND c.id < :lastId
             ORDER BY c.id DESC
             """)
+    @EntityGraph(attributePaths = {"creator", "city"}, type = EntityGraph.EntityGraphType.FETCH)
     Slice<Content> findByCityName(@Param("cityName") String cityName, @Param("lastId") Long lastId, Pageable pageable);
 
     @Query("""
@@ -53,6 +55,7 @@ public interface ContentRepository extends JpaRepository<Content, Long> {
             WHERE c.city.country.name = :countryName AND c.id < :lastId
             ORDER BY c.id DESC
             """)
+    @EntityGraph(attributePaths = {"creator", "city"}, type = EntityGraph.EntityGraphType.FETCH)
     Slice<Content> findByCityCountryName(@Param("countryName") String countryName, @Param("lastId") Long lastId,
                                          Pageable pageable);
 
@@ -61,6 +64,7 @@ public interface ContentRepository extends JpaRepository<Content, Long> {
             WHERE ct.name NOT IN :domesticCategoryNames AND co.name = '대한민국' AND c.id < :lastId
             ORDER BY c.id DESC
             """)
+    @EntityGraph(attributePaths = {"creator", "city"})
     Slice<Content> findDomesticEtcContents(@Param("domesticCategoryNames") List<String> domesticCategoryNames,
                                            @Param("lastId") Long lastId, Pageable pageable);
 
@@ -69,6 +73,7 @@ public interface ContentRepository extends JpaRepository<Content, Long> {
             WHERE co.name NOT IN :overseasCategoryNames AND co.name != '대한민국' AND c.id < :lastId
             ORDER BY c.id DESC
             """)
+    @EntityGraph(attributePaths = {"creator", "city"})
     Slice<Content> findOverseasEtcContents(@Param("overseasCategoryNames") List<String> overseasCategoryNames,
                                            @Param("lastId") Long lastId, Pageable pageable);
 

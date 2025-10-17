@@ -7,6 +7,7 @@ import static org.mockito.BDDMockito.given;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -20,6 +21,7 @@ import org.springframework.data.domain.SliceImpl;
 import turip.common.exception.custom.BadRequestException;
 import turip.content.controller.dto.response.content.ContentCountResponse;
 import turip.content.controller.dto.response.content.ContentsDetailWithLoadableResponse;
+import turip.content.controller.dto.response.content.TripDurationResponse;
 import turip.content.controller.dto.response.favorite.WeeklyPopularFavoriteContentsResponse;
 import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
@@ -71,15 +73,21 @@ class ContentServiceTest {
             City city = new City(country, province, "속초", "시 이미지 경로");
             Member member = new Member(1L, "deviceFid");
 
-            List<Content> contents = List.of(
-                    new Content(1L, creator, city, "메이의 속초 브이로그 1편", "속초 브이로그 Url 1", LocalDate.of(2025, 7, 8)),
-                    new Content(2L, creator, city, "메이의 속초 브이로그 2편", "속초 브이로그 Url 2", LocalDate.of(2025, 7, 8)));
+            Content content1 = new Content(1L, creator, city, "메이의 속초 브이로그 1편", "url1", LocalDate.of(2025, 7, 8));
+            Content content2 = new Content(2L, creator, city, "메이의 속초 브이로그 2편", "url2", LocalDate.of(2025, 7, 8));
+            List<Content> contents = List.of(content1, content2);
             given(contentRepository.findByKeywordContaining(keyword, maxId, PageRequest.of(0, pageSize)))
                     .willReturn(new SliceImpl<>(contents));
-            given(contentRepository.existsById(1L))
-                    .willReturn(true);
-            given(contentRepository.existsById(2L))
-                    .willReturn(true);
+
+            Map<Long, TripDurationResponse> durations = Map.of(
+                    1L, TripDurationResponse.of(2, 3),
+                    2L, TripDurationResponse.of(1, 2)
+            );
+            Map<Long, Integer> placeCounts = Map.of(1L, 5, 2L, 3);
+
+            List<Long> contentIds = List.of(1L, 2L);
+            given(contentPlaceService.calculateDurations(contentIds)).willReturn(durations);
+            given(contentPlaceService.countPlacesByContentIds(contentIds)).willReturn(placeCounts);
 
             // when
             ContentsDetailWithLoadableResponse contentsByKeyword = contentService.searchContentsByKeyword(member,
@@ -124,10 +132,12 @@ class ContentServiceTest {
             given(favoriteContentRepository.findByMemberIdAndContentIdIn(1L, List.of(1L, 2L)))
                     .willReturn(List.of(new FavoriteContent(LocalDate.now().minusWeeks(1), member, content1),
                             new FavoriteContent(LocalDate.now().minusWeeks(1), member, content2)));
-            given(contentPlaceService.calculateDurationDays(content1.getId()))
-                    .willReturn(3); // content1, 2박 3일
-            given(contentPlaceService.calculateDurationDays(content2.getId()))
-                    .willReturn(2); // content2, 1박 2일
+
+            Map<Long, TripDurationResponse> durations = Map.of(
+                    1L, TripDurationResponse.of(2, 3),
+                    2L, TripDurationResponse.of(1, 2)
+            );
+            given(contentPlaceService.calculateDurations(List.of(1L, 2L))).willReturn(durations);
 
             // when
             WeeklyPopularFavoriteContentsResponse response = contentService.findWeeklyPopularFavoriteContents(member,

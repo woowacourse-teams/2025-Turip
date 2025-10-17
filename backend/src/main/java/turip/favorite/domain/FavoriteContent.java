@@ -2,6 +2,7 @@ package turip.favorite.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -35,11 +36,11 @@ public class FavoriteContent {
     @Column(name = "created_at", nullable = false)
     private LocalDate createdAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false, foreignKey = @ForeignKey(name = "fk_favorite_content__member"))
     private Member member;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "content_id", nullable = false, foreignKey = @ForeignKey(name = "fk_favorite_content__content"))
     private Content content;
 

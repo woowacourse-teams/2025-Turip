@@ -24,7 +24,7 @@ import turip.auth.MemberResolvePolicy;
 import turip.common.exception.ErrorResponse;
 import turip.favorite.controller.dto.request.FavoritePlaceOrderRequest;
 import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlaceResponse;
-import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlacesWithDetailPlaceInformationResponse;
+import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlacesWithPlaceDetailResponse;
 import turip.favorite.service.FavoritePlaceService;
 import turip.member.domain.Member;
 
@@ -148,7 +148,7 @@ public class FavoritePlaceController {
                     description = "성공 예시",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = FavoritePlacesWithDetailPlaceInformationResponse.class),
+                            schema = @Schema(implementation = FavoritePlacesWithPlaceDetailResponse.class),
                             examples = @ExampleObject(
                                     name = "success",
                                     summary = "장소 찜 폴더의 장소 찜 목록 조회 성공",
@@ -215,9 +215,9 @@ public class FavoritePlaceController {
             )
     })
     @GetMapping
-    public ResponseEntity<FavoritePlacesWithDetailPlaceInformationResponse> readAllByFolder(
+    public ResponseEntity<FavoritePlacesWithPlaceDetailResponse> readAllByFolder(
             @RequestParam("favoriteFolderId") Long favoriteFolderId) {
-        FavoritePlacesWithDetailPlaceInformationResponse response = favoritePlaceService.findAllByFolder(
+        FavoritePlacesWithPlaceDetailResponse response = favoritePlaceService.findAllByFolder(
                 favoriteFolderId);
         return ResponseEntity.ok(response);
     }
