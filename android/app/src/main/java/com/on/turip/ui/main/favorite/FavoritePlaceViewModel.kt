@@ -65,7 +65,8 @@ class FavoritePlaceViewModel(
 
     private fun ensureValidSelectedFolderId(folders: List<Folder>) {
         if (selectedFolderId == NOT_INITIALIZED || folders.all { it.id != selectedFolderId }) {
-            selectedFolderId = folders.first { it.name == DEFAULT_FOLDER_NAME }.id
+            selectedFolderId = folders.firstOrNull { it.name == DEFAULT_FOLDER_NAME }?.id
+                ?: folders.firstOrNull()?.id ?: NOT_INITIALIZED
         }
     }
 
