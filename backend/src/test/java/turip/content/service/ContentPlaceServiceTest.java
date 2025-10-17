@@ -7,6 +7,7 @@ import static org.mockito.BDDMockito.given;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -213,13 +214,8 @@ class ContentPlaceServiceTest {
             Content content = new Content(contentId, creator, city, "뭉치의 속초 브이로그", "속초 브이로그 Url",
                     LocalDate.of(2025, 7, 8));
 
-            ContentPlace firstContentPlace = new ContentPlace(firstVisitDay, visitOrder, firstDayTimeLine, place1,
-                    content);
-            ContentPlace secondContentPlace = new ContentPlace(secondVisitDay, visitOrder, secondDayTimeLine, place2,
-                    content);
-
-            given(contentPlaceRepository.findAllByContentId(contentId))
-                    .willReturn(List.of(firstContentPlace, secondContentPlace));
+            given(contentPlaceRepository.findMaxVisitDayByContentId(contentId))
+                    .willReturn(Optional.of(2));
 
             // when & then
             assertThat(contentPlaceService.calculateDurationDays(contentId))
@@ -231,8 +227,8 @@ class ContentPlaceServiceTest {
         void calculateDurationDays2() {
             // given
             long contentId = 1L;
-            given(contentPlaceRepository.findAllByContentId(contentId))
-                    .willReturn(List.of());
+            given(contentPlaceRepository.findMaxVisitDayByContentId(contentId))
+                    .willReturn(Optional.empty());
 
             // when & then
             assertThat(contentPlaceService.calculateDurationDays(contentId))
