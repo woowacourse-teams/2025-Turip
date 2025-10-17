@@ -146,16 +146,6 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
         showNetworkError()
     }
 
-    private fun showNetworkError() {
-        binding.customErrorView.apply {
-            visibility = View.VISIBLE
-            setupError(ErrorEvent.NETWORK_ERROR)
-            setOnRetryClickListener {
-                viewModel.reload()
-            }
-        }
-    }
-
     private fun setupToolbar() {
         setSupportActionBar(binding.tbTripDetail)
         supportActionBar?.apply {
@@ -281,7 +271,7 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
                 )
             updateExpandTextToggleVisibility()
         }
-        viewModel.tripModel.observe(this) { tripModel: TripModel ->
+        viewModel.tripPlacesSummary.observe(this) { tripModel: TripModel ->
             binding.tvTripDetailTotalPlaceCount.text =
                 getString(R.string.all_total_place_count, tripModel.tripPlaceCount)
             binding.tvTripDetailTravelDuration.text =
@@ -333,6 +323,16 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
             val lineCount: Int = bodyTextView.layout.lineCount
             val ellipsisCount: Int = bodyTextView.layout.getEllipsisCount(lineCount - 1)
             viewModel.updateExpandTextToggleVisibility(lineCount, ellipsisCount)
+        }
+    }
+
+    private fun showNetworkError() {
+        binding.customErrorView.apply {
+            visibility = View.VISIBLE
+            setupError(ErrorEvent.NETWORK_ERROR)
+            setOnRetryClickListener {
+                viewModel.reload()
+            }
         }
     }
 
