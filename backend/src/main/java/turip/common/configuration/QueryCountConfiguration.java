@@ -8,8 +8,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import turip.common.querycount.QueryCountInterceptor;
 
 @Configuration
-@Profile("dev")
 @RequiredArgsConstructor
+@Profile({"local", "dev"})
 public class QueryCountConfiguration implements WebMvcConfigurer {
 
     private final QueryCountInterceptor queryCountInterceptor;

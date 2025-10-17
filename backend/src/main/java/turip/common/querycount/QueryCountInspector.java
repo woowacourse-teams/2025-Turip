@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Component
-@Profile("dev")
+@Profile({"local", "dev"})
 public class QueryCountInspector implements StatementInspector {
 
     private final ThreadLocal<QueryCounter> queryCount = new ThreadLocal<>();

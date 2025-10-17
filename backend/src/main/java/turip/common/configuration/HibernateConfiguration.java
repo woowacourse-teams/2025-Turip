@@ -11,8 +11,8 @@ import turip.common.querycount.QueryCountInspector;
 
 @Slf4j
 @Configuration
-@Profile("dev")
 @RequiredArgsConstructor
+@Profile({"local", "dev"})
 public class HibernateConfiguration {
 
     private final QueryCountInspector queryCountInspector;
