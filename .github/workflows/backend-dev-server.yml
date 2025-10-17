@@ -12,44 +12,44 @@ on:
 
 jobs:
   build_and_test:
-     runs-on: ubuntu-latest
-     
-     defaults:
+    runs-on: ubuntu-latest
+
+    defaults:
       run:
         working-directory: backend
-        
-     steps: 
-     - name: Checkout code
-       uses: actions/checkout@v4
 
-     - name: Set up Gradle
-       uses: gradle/actions/setup-gradle@v3
-             
-     - name: Grant execute permission for gradlew
-       run: chmod +x gradlew
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-     - name: Set up JDK 21
-       uses: actions/setup-java@v4
-       with:
-         java-version: '21'
-         distribution: 'temurin'
-         cache: 'gradle'
-       
-     - name: Build with Gradle
-       run: ./gradlew clean build -x test
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v3
 
-     - name: Run Unit Tests
-       run: ./gradlew test
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
 
-     - name: Upload Jar
-       uses: actions/upload-artifact@v4
-       with:
-         name: turip
-         path: backend/build/libs/*SNAPSHOT.jar
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Build with Gradle
+        run: ./gradlew clean build -x test
+
+      - name: Run Unit Tests
+        run: ./gradlew test
+
+      - name: Upload Jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: turip
+          path: backend/build/libs/*SNAPSHOT.jar
 
   deploy:
     needs: build_and_test
-    runs-on: [self-hosted, turip-server-dev]
+    runs-on: [ self-hosted, turip-server-dev ]
     environment: production
     if: github.event_name == 'push'
 
@@ -78,7 +78,7 @@ jobs:
             echo "Killing existing process: $PID"
             sudo kill -9 $PID
           fi
-    
+
       - name: Run App On Port 80
         run: |
           JAR_NAME="${{ steps.get_jar_name.outputs.JAR_NAME }}"
@@ -90,4 +90,6 @@ jobs:
           chmod +x "$TARGET_JAR"
 
           echo "Starting application..."
-          sudo sh -lc "nohup java -Xms256m -Xmx384m -jar '$TARGET_JAR' --server.port=80 > /dev/null 2>&1 &"
+          sudo sh -lc "nohup java -javaagent:/home/ubuntu/opentelemetry-javaagent.jar \
+            -Xms256m -Xmx384m -Dspring.profiles.active=dev -jar '$TARGET_JAR' \
+            --server.port=80 > /home/ubuntu/app/nohup.out 2>&1 &"

@@ -10,8 +10,8 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 @Slf4j
 @Component
-@Profile("dev")
 @RequiredArgsConstructor
+@Profile({"local", "dev"})
 public class QueryCountInterceptor implements HandlerInterceptor {
 
     private static final String QUERY_COUNT_LOG_FORMAT = "QUERY_COUNT: {}";

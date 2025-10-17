@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: dev
+    active: local
 
   jpa:
     show-sql: true
@@ -19,3 +19,9 @@ region:
     overseas:
       etc:
         image-url: ${OVERSEAS_ETC_IMAGE_URL}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus

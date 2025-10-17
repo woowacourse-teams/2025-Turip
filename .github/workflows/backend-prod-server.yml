@@ -12,50 +12,50 @@ on:
 
 jobs:
   build_and_test:
-     runs-on: ubuntu-latest
-     
-     defaults:
+    runs-on: ubuntu-latest
+
+    defaults:
       run:
         working-directory: backend
-        
-     steps: 
-     - name: Checkout code
-       uses: actions/checkout@v4
 
-     - name: Set up Gradle
-       uses: gradle/actions/setup-gradle@v3
-             
-     - name: Grant execute permission for gradlew
-       run: chmod +x gradlew
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-     - name: Set up JDK 21
-       uses: actions/setup-java@v4
-       with:
-         java-version: '21'
-         distribution: 'temurin'
-         cache: 'gradle'
-       
-     - name: Build with Gradle
-       run: ./gradlew clean build -x test
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v3
 
-     - name: Run Unit Tests
-       run: ./gradlew test
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
 
-     - name: Rename Jar with SHA
-       run: |
-         JAR_PATH=$(ls build/libs/*SNAPSHOT.jar | head -n 1)
-         cp "$JAR_PATH" "turip-${GITHUB_SHA}.jar"
-    
-     - name: Upload Jar
-       uses: actions/upload-artifact@v4
-       with:
-         name: turip-${{ github.sha }}
-         path: backend/turip-${{ github.sha }}.jar
-         retention-days: 30
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Build with Gradle
+        run: ./gradlew clean build -x test
+
+      - name: Run Unit Tests
+        run: ./gradlew test
+
+      - name: Rename Jar with SHA
+        run: |
+          JAR_PATH=$(ls build/libs/*SNAPSHOT.jar | head -n 1)
+          cp "$JAR_PATH" "turip-${GITHUB_SHA}.jar"
+
+      - name: Upload Jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: turip-${{ github.sha }}
+          path: backend/turip-${{ github.sha }}.jar
+          retention-days: 30
 
   deploy:
     needs: build_and_test
-    runs-on: [self-hosted, turip-server-prod]
+    runs-on: [ self-hosted, turip-server-prod ]
     environment: production
     if: github.event_name == 'push'
 
@@ -76,7 +76,7 @@ jobs:
           fi
           echo "JAR_NAME=$(basename $JAR_FILE)" >> $GITHUB_OUTPUT
           echo "JAR file located at: $JAR_FILE"
-          
+
       - name: Prepare release & switch symlink
         run: |
           set -euo pipefail
@@ -109,7 +109,7 @@ jobs:
           fi
           
           echo "Starting application..."
-          sudo sh -lc "nohup java -jar -Dspring.profiles.active=prod '$BASE/current/app.jar' > '$BASE/app.out' 2>&1 &"
+          sudo sh -lc "nohup java -javaagent:/home/ubuntu/opentelemetry-javaagent.jar -Xms512m -Xmx1024m -Dspring.profiles.active=prod -jar '$BASE/current/app.jar' > '$BASE/app.out' 2>&1 &"
 
           # 헬스 체크
           ok=0
@@ -127,7 +127,7 @@ jobs:
               # 재기동
               PID=$(sudo lsof -t -i :8080 || true)
               if [ -n "$PID" ]; then sudo kill -9 $PID || true; fi
-              sudo sh -lc "nohup java -jar -Dspring.profiles.active=prod '$BASE/current/app.jar' > '$BASE/app.out' 2>&1 &"
+              sudo sh -lc "nohup java -javaagent:/home/ubuntu/opentelemetry-javaagent.jar -Xms512m -Xmx1024m -Dspring.profiles.active=prod -jar '$BASE/current/app.jar' > '$BASE/app.out' 2>&1 &"
             else
               echo "No previous link found. Manual intervention needed."
             fi
