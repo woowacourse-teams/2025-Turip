@@ -10,8 +10,8 @@ import turip.common.exception.custom.ForbiddenException;
 import turip.common.exception.custom.NotFoundException;
 import turip.favorite.controller.dto.request.FavoritePlaceOrderRequest;
 import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlaceResponse;
-import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlaceWithDetailPlaceInformationResponse;
-import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlacesWithDetailPlaceInformationResponse;
+import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlaceWithPlaceDetailResponse;
+import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlacesWithPlaceDetailResponse;
 import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.domain.FavoritePlace;
 import turip.favorite.repository.FavoriteFolderRepository;
@@ -45,15 +45,15 @@ public class FavoritePlaceService {
         return FavoritePlaceResponse.from(savedFavoritePlace);
     }
 
-    public FavoritePlacesWithDetailPlaceInformationResponse findAllByFolder(Long favoriteFolderId) {
+    public FavoritePlacesWithPlaceDetailResponse findAllByFolder(Long favoriteFolderId) {
         FavoriteFolder favoriteFolder = getFavoriteFolderById(favoriteFolderId);
 
-        List<FavoritePlaceWithDetailPlaceInformationResponse> favoritePlaces = favoritePlaceRepository.findAllByFavoriteFolderOrderByFavoriteOrderAsc(
+        List<FavoritePlaceWithPlaceDetailResponse> favoritePlaces = favoritePlaceRepository.findAllByFavoriteFolderOrderByFavoriteOrderAsc(
                         favoriteFolder).stream()
-                .map(FavoritePlaceWithDetailPlaceInformationResponse::from)
+                .map(FavoritePlaceWithPlaceDetailResponse::from)
                 .toList();
 
-        return FavoritePlacesWithDetailPlaceInformationResponse.from(favoritePlaces);
+        return FavoritePlacesWithPlaceDetailResponse.from(favoritePlaces);
     }
 
     @Transactional
