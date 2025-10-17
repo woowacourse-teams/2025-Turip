@@ -20,7 +20,7 @@ import turip.common.exception.custom.ConflictException;
 import turip.common.exception.custom.ForbiddenException;
 import turip.common.exception.custom.NotFoundException;
 import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlaceResponse;
-import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlacesWithDetailPlaceInformationResponse;
+import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlacesWithPlaceDetailResponse;
 import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.domain.FavoritePlace;
 import turip.favorite.repository.FavoriteFolderRepository;
@@ -193,7 +193,7 @@ class FavoritePlaceServiceTest {
                     .willReturn(List.of(favoritePlace1, favoritePlace2));
 
             // when
-            FavoritePlacesWithDetailPlaceInformationResponse response = favoritePlaceService.findAllByFolder(
+            FavoritePlacesWithPlaceDetailResponse response = favoritePlaceService.findAllByFolder(
                     favoriteFolderId);
 
             // then

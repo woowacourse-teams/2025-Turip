@@ -8,6 +8,6 @@ import turip.member.domain.Member;
 public interface FavoriteFolderRepository extends JpaRepository<FavoriteFolder, Long> {
 
     boolean existsByNameAndMember(String name, Member member);
-
+    
     List<FavoriteFolder> findAllByMemberOrderByIdAsc(Member member);
 }

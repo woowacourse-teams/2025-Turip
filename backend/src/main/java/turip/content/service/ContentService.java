@@ -7,6 +7,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -65,7 +66,7 @@ public class ContentService {
         }
         Slice<Content> contentSlice = contentRepository.findByKeywordContaining(keyword, lastContentId,
                 PageRequest.of(0, pageSize));
-        return converToContentsDetailWithLoadableResponse(member, contentSlice);
+        return convertToContentsDetailWithLoadableResponse(member, contentSlice);
     }
 
     public ContentsDetailWithLoadableResponse findContentsByRegionCategory(
@@ -75,7 +76,7 @@ public class ContentService {
             long lastId
     ) {
         Slice<Content> contentSlice = findContentSlicesByRegionCategory(regionCategory, lastId, size);
-        return converToContentsDetailWithLoadableResponse(member, contentSlice);
+        return convertToContentsDetailWithLoadableResponse(member, contentSlice);
     }
 
     public WeeklyPopularFavoriteContentsResponse findWeeklyPopularFavoriteContents(Member member, int topContentSize) {
@@ -86,17 +87,26 @@ public class ContentService {
         List<Content> popularContents = favoriteContentRepository.findPopularContentsByFavoriteBetweenDatesWithLimit(
                 startDate, endDate, topContentSize);
 
-        Set<Long> favoritedContentIds = findFavoritedContentIds(member, popularContents);
+        if (popularContents.isEmpty()) {
+            return WeeklyPopularFavoriteContentsResponse.from(new ArrayList<>());
+        }
 
-        return WeeklyPopularFavoriteContentsResponse.from(
-                popularContents.stream()
-                        .map(content -> WeeklyPopularFavoriteContentResponse.of(
-                                content,
-                                favoritedContentIds.contains(content.getId()),
-                                calculateTripDuration(content)
-                        ))
-                        .toList()
-        );
+        List<Long> contentIds = popularContents.stream()
+                .map(Content::getId)
+                .toList();
+        Set<Long> favoritedContentIds = findFavoritedContentIds(member, popularContents);
+        Map<Long, TripDurationResponse> durations = contentPlaceService.calculateDurations(contentIds);
+
+        List<WeeklyPopularFavoriteContentResponse> weeklyPopularFavoriteContents = popularContents.stream()
+                .map(content -> {
+                    boolean isFavorite = favoritedContentIds.contains(content.getId());
+                    TripDurationResponse tripDuration = durations.getOrDefault(content.getId(),
+                            TripDurationResponse.of(0, 1));
+                    return WeeklyPopularFavoriteContentResponse.of(content, isFavorite, tripDuration);
+                })
+                .toList();
+
+        return WeeklyPopularFavoriteContentsResponse.from(weeklyPopularFavoriteContents);
     }
 
     public ContentCountResponse countByKeyword(String keyword) {
@@ -166,35 +176,33 @@ public class ContentService {
                 .collect(Collectors.toSet());
     }
 
-    private ContentsDetailWithLoadableResponse converToContentsDetailWithLoadableResponse(Member member,
-                                                                                          Slice<Content> contentSlice) {
+    private ContentsDetailWithLoadableResponse convertToContentsDetailWithLoadableResponse(Member member,
+                                                                                           Slice<Content> contentSlice) {
         List<Content> contents = contentSlice.getContent();
-        Set<Long> favoritedContentIds = findFavoritedContentIds(member, contents);
-        List<ContentDetailResponse> contentDetails = contents.stream()
-                .map(content -> toContentDetailResponse(content, favoritedContentIds.contains(content.getId())))
+        if (contents.isEmpty()) {
+            return ContentsDetailWithLoadableResponse.of(new ArrayList<>(), contentSlice.hasNext());
+        }
+        List<Long> contentIds = contents.stream()
+                .map(Content::getId)
                 .toList();
+
+        Set<Long> favoritedContentIds = findFavoritedContentIds(member, contents);
+        Map<Long, TripDurationResponse> durations = contentPlaceService.calculateDurations(contentIds);
+        Map<Long, Integer> placeCounts = contentPlaceService.countPlacesByContentIds(contentIds);
+
+        List<ContentDetailResponse> contentDetails = contents.stream()
+                .map(content -> {
+                    boolean isFavorite = favoritedContentIds.contains(content.getId());
+                    ContentResponse contentResponse = ContentResponse.of(content, isFavorite);
+                    TripDurationResponse tripDuration = durations.getOrDefault(content.getId(),
+                            TripDurationResponse.of(0, 1));
+                    int tripPlaceCount = placeCounts.getOrDefault(content.getId(), 0);
+                    return ContentDetailResponse.of(contentResponse, tripDuration, tripPlaceCount);
+                })
+                .toList();
+
         boolean loadable = contentSlice.hasNext();
         return ContentsDetailWithLoadableResponse.of(contentDetails, loadable);
-    }
-
-    private ContentDetailResponse toContentDetailResponse(Content content, boolean isFavorite) {
-        ContentResponse contentResponse = ContentResponse.of(content, isFavorite);
-        TripDurationResponse tripDuration = calculateTripDuration(content);
-        int tripPlaceCount = getTripPlaceCount(content);
-        return ContentDetailResponse.of(contentResponse, tripDuration, tripPlaceCount);
-    }
-
-    private TripDurationResponse calculateTripDuration(Content content) {
-        int totalTripDay = contentPlaceService.calculateDurationDays(content.getId());
-        return TripDurationResponse.of(totalTripDay - 1, totalTripDay);
-    }
-
-    private int getTripPlaceCount(Content content) {
-        boolean isContentExists = contentRepository.existsById(content.getId());
-        if (!isContentExists) {
-            throw new NotFoundException(ErrorTag.CONTENT_NOT_FOUND);
-        }
-        return contentPlaceService.countByContentId(content.getId());
     }
 
     private List<LocalDate> getLastWeekPeriod() {
