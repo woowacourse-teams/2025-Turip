@@ -152,7 +152,8 @@ class FavoritePlaceViewModel(
             }
 
             ErrorEvent.NETWORK_ERROR -> {
-                _favoritePlaceUiState.value = favoritePlaceUiState.value?.copy(isServerError = true)
+                _favoritePlaceUiState.value =
+                    favoritePlaceUiState.value?.copy(isNetWorkError = true)
             }
 
             ErrorEvent.PARSER_ERROR -> {
