@@ -77,10 +77,7 @@ public class ContentPlaceService {
     }
 
     public int calculateDurationDays(Long contentId) {
-        return contentPlaceRepository.findAllByContentId(contentId)
-                .stream()
-                .mapToInt(ContentPlace::getVisitDay)
-                .max()
+        return contentPlaceRepository.findMaxVisitDayByContentId(contentId)
                 .orElse(0);
     }
 
