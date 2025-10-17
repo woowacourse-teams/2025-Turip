@@ -2,17 +2,27 @@ package turip.content.repository;
 
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import turip.content.domain.Content;
 import turip.content.domain.ContentPlace;
 import turip.place.domain.Place;
 
 public interface ContentPlaceRepository extends JpaRepository<ContentPlace, Long> {
 
+    @EntityGraph(attributePaths = {"place"}, type = EntityGraph.EntityGraphType.FETCH)
+    List<ContentPlace> findAllByContentIdIn(List<Long> contentIds);
+
+    @EntityGraph(attributePaths = {"place"}, type = EntityGraph.EntityGraphType.FETCH)
     List<ContentPlace> findAllByContentId(Long contentId);
 
     int countByContentId(Long contentId);
 
     Optional<ContentPlace> findByContentAndPlaceAndVisitDayAndVisitOrder(Content content, Place place, int visitDay,
                                                                          int visitOrder);
+
+    @Query("SELECT max(cp.visitDay) FROM ContentPlace cp WHERE cp.content.id = :contentId")
+    Optional<Integer> findMaxVisitDayByContentId(@Param("contentId") Long contentId);
 }

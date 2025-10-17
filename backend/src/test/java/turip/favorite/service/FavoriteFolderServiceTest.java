@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verify;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -179,11 +180,9 @@ class FavoriteFolderServiceTest {
             Place place = new Place(placeId, "장소", "url", "주소", 1, 1);
             given(placeRepository.findById(placeId))
                     .willReturn(Optional.of(place));
-
-            given(favoritePlaceRepository.existsByFavoriteFolderAndPlace(defaultFolder, place))
-                    .willReturn(true);
-            given(favoritePlaceRepository.existsByFavoriteFolderAndPlace(favoriteFolder, place))
-                    .willReturn(false);
+            given(favoritePlaceRepository.findFavoriteFolderIdsByPlaceAndFavoriteFolderIn(place,
+                    List.of(defaultFolder, favoriteFolder)))
+                    .willReturn(Set.of(1L));
 
             // when
             FavoriteFoldersWithFavoriteStatusResponse response = favoriteFolderService.findAllWithFavoriteStatusByDeviceId(
