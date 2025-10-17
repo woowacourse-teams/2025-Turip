@@ -25,12 +25,12 @@ fun Trip.toUiModelWithoutContentPlaces(): TripModel =
 
 fun ContentPlace.toUiModel(): PlaceModel =
     PlaceModel(
-        id = this.place.placeId,
-        name = this.place.name,
-        category = this.place.category.joinToString(),
-        mapLink = this.place.url,
-        timeLine = this.timeLine,
-        isFavorite = this.isFavoritePlace,
+        id = place.placeId,
+        name = place.name,
+        category = place.category.joinToString(),
+        mapLink = place.url,
+        timeLine = timeLine,
+        isFavorite = isFavoritePlace,
     )
 
 fun TripDuration.toUiModel(): TripDurationModel =
