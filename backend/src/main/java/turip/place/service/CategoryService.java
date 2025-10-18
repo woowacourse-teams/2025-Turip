@@ -1,6 +1,8 @@
 package turip.place.service;
 
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,10 +17,13 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
 
     private MapProvider getProviderFromCategoryName(String categoryName) {
+        if (categoryName == null || categoryName.isEmpty()) {
+            return MapProvider.GOOGLE;
+        }
         for (char c : categoryName.toCharArray()) {
             if (Character.UnicodeBlock.of(c) == Character.UnicodeBlock.HANGUL_SYLLABLES ||
-                Character.UnicodeBlock.of(c) == Character.UnicodeBlock.HANGUL_JAMO ||
-                Character.UnicodeBlock.of(c) == Character.UnicodeBlock.HANGUL_COMPATIBILITY_JAMO) {
+                    Character.UnicodeBlock.of(c) == Character.UnicodeBlock.HANGUL_JAMO ||
+                    Character.UnicodeBlock.of(c) == Character.UnicodeBlock.HANGUL_COMPATIBILITY_JAMO) {
                 return MapProvider.KAKAO;
             }
         }
@@ -27,11 +32,17 @@ public class CategoryService {
 
     @Transactional
     public void updateContentPlaceCategoryLanguage() {
+        Set<String> updatedNames = new HashSet<>();
         try (Stream<Category> stream = categoryRepository.streamAll()) {
             stream.forEach(category -> {
                 MapProvider provider = getProviderFromCategoryName(category.getName());
                 String parsedCategory = PlaceCategoryMapper.parseCategory(category.getName(), provider);
+                if (updatedNames.contains(parsedCategory) || categoryRepository.findByName(parsedCategory)
+                        .isPresent()) {
+                    return;
+                }
                 category.updateName(parsedCategory);
+                updatedNames.add(parsedCategory);
             });
         }
     }
