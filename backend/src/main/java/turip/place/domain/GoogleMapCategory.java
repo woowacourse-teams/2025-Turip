@@ -1,6 +1,8 @@
 package turip.place.domain;
 
 import java.util.Arrays;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.Getter;
 
 @Getter
@@ -383,6 +385,10 @@ public enum GoogleMapCategory {
 
     NONE("🚫 없음", "none");
 
+    private static final Map<String, GoogleMapCategory> ENGLISH_TO_CATEGORY_MAP =
+            Arrays.stream(values())
+                    .filter(cat -> cat != NONE)
+                    .collect(Collectors.toMap(cat -> cat.englishCategoryName, cat -> cat));
     private final String koreanCategoryName;
     private final String englishCategoryName;
 
@@ -400,9 +406,6 @@ public enum GoogleMapCategory {
     }
 
     private static GoogleMapCategory ofEnglishCategoryName(String englishCategoryName) {
-        return Arrays.stream(GoogleMapCategory.values())
-                .filter(category -> category.englishCategoryName.equals(englishCategoryName))
-                .findFirst()
-                .orElse(NONE);
+        return ENGLISH_TO_CATEGORY_MAP.getOrDefault(englishCategoryName, NONE);
     }
 }

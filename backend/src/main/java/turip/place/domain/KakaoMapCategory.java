@@ -1,5 +1,8 @@
 package turip.place.domain;
 
+import java.util.Arrays;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.Getter;
 
 @Getter
@@ -171,6 +174,13 @@ public enum KakaoMapCategory {
 
     NONE("🚫 없음");
 
+    private static final Map<String, KakaoMapCategory> CATEGORY_MAP =
+            Arrays.stream(values())
+                    .filter(cat -> cat != NONE)
+                    .collect(Collectors.toMap(
+                            cat -> cat.koreanCategoryName.substring(cat.koreanCategoryName.indexOf(" ") + 1),
+                            cat -> cat
+                    ));
     private final String koreanCategoryName;
 
     KakaoMapCategory(final String koreanCategoryName) {
@@ -178,15 +188,10 @@ public enum KakaoMapCategory {
     }
 
     public static String parseCategoryName(String categoryName) {
-        for (KakaoMapCategory cat : values()) {
-            if (cat == NONE) {
-                continue;
-            }
-            String nameWithoutEmoji = cat.koreanCategoryName.substring(cat.koreanCategoryName.indexOf(" ") + 1);
-            if (nameWithoutEmoji.equals(categoryName)) {
-                return cat.koreanCategoryName;
-            }
+        KakaoMapCategory category = CATEGORY_MAP.get(categoryName);
+        if (category == null) {
+            return categoryName;
         }
-        return categoryName;
+        return category.koreanCategoryName;
     }
 }
