@@ -24,7 +24,11 @@ class TripDayViewHolder(
     fun bind(dayModel: DayModel) {
         this.dayModel = dayModel
         binding.tvTravelDayDay.text =
-            itemView.context.getString(R.string.trip_detail_travel_day, dayModel.day)
+            if (dayModel.day == DayModel.ALL_PLACE) {
+                itemView.context.getString(R.string.trip_detail_travel_all_place)
+            } else {
+                itemView.context.getString(R.string.trip_detail_travel_day, dayModel.day)
+            }
         binding.divTravelDayUnderline.visibility =
             if (dayModel.isSelected) View.VISIBLE else View.GONE
     }

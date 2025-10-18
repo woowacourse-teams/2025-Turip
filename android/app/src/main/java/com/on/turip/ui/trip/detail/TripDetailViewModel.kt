@@ -7,23 +7,20 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.on.turip.data.common.TuripCustomResult
 import com.on.turip.data.common.onFailure
 import com.on.turip.data.common.onSuccess
 import com.on.turip.di.RepositoryModule
 import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.content.Content
 import com.on.turip.domain.content.repository.ContentRepository
-import com.on.turip.domain.creator.Creator
 import com.on.turip.domain.creator.repository.CreatorRepository
 import com.on.turip.domain.favorite.usecase.UpdateFavoriteUseCase
 import com.on.turip.domain.trip.ContentPlace
 import com.on.turip.domain.trip.Trip
 import com.on.turip.domain.trip.repository.ContentPlaceRepository
 import com.on.turip.ui.common.mapper.toUiModel
+import com.on.turip.ui.common.mapper.toUiModelWithoutContentPlaces
 import com.on.turip.ui.common.model.trip.TripModel
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -44,8 +41,8 @@ class TripDetailViewModel(
     private val _places: MutableLiveData<List<PlaceModel>> = MutableLiveData()
     val places: LiveData<List<PlaceModel>> get() = _places
 
-    private val _tripModel: MutableLiveData<TripModel> = MutableLiveData()
-    val tripModel: LiveData<TripModel> get() = _tripModel
+    private val _tripPlacesSummary: MutableLiveData<TripModel> = MutableLiveData()
+    val tripPlacesSummary: LiveData<TripModel> get() = _tripPlacesSummary
 
     private val _videoUri: MutableLiveData<String> = MutableLiveData()
     val videoUri: LiveData<String> get() = _videoUri
@@ -72,70 +69,33 @@ class TripDetailViewModel(
     val serverError: LiveData<Boolean> get() = _serverError
 
     init {
-        loadContent()
-        loadTrip()
+        loadVideoInformation()
+        loadVideoPlaces()
     }
 
     fun reload() {
-        loadContent()
-        loadTrip()
+        loadVideoInformation()
+        loadVideoPlaces()
     }
 
-    private fun loadContent() {
+    private fun loadVideoInformation() {
         viewModelScope.launch {
-            val deferredCreator: Deferred<TuripCustomResult<Creator>> =
-                async { creatorRepository.loadCreator(creatorId) }
-            val deferredVideoData: Deferred<TuripCustomResult<Content>> =
-                async { contentRepository.loadContent(contentId) }
-
-            val creatorResult: TuripCustomResult<Creator> = deferredCreator.await()
-            val videoDataResult: TuripCustomResult<Content> = deferredVideoData.await()
-
-            creatorResult
-                .onSuccess { creator: Creator ->
-                    videoDataResult
-                        .onSuccess { result: Content ->
-                            _content.value = result
-                            _videoUri.value = result.videoData.url
-                            _isFavorite.value = result.isFavorite
-                            _serverError.value = false
-                            _networkError.value = false
-                        }.onFailure { errorEvent: ErrorEvent ->
-                            checkError(errorEvent)
-                        }
+            contentRepository
+                .loadContent(contentId)
+                .onSuccess { result: Content ->
+                    _content.value = result
+                    _videoUri.value = result.videoData.url
+                    _isFavorite.value = result.isFavorite
+                    clearErrors()
                 }.onFailure { errorEvent: ErrorEvent ->
                     checkError(errorEvent)
                 }
         }
     }
 
-    private fun checkError(errorEvent: ErrorEvent) {
-        when (errorEvent) {
-            ErrorEvent.USER_NOT_HAVE_PERMISSION -> {
-                _serverError.value = true
-            }
+    private fun loadVideoPlaces() {
+        if (placeCacheByDay.isNotEmpty()) return
 
-            ErrorEvent.DUPLICATION_FOLDER -> throw IllegalArgumentException("발생할 수 없는 오류")
-            ErrorEvent.UNEXPECTED_PROBLEM -> {
-                _serverError.value = true
-            }
-
-            ErrorEvent.NETWORK_ERROR -> {
-                _networkError.value = true
-            }
-
-            ErrorEvent.PARSER_ERROR -> {
-                _serverError.value = true
-            }
-        }
-    }
-
-    private fun clearErrors() {
-        _serverError.value = false
-        _networkError.value = false
-    }
-
-    private fun loadTrip() {
         viewModelScope.launch {
             contentPlaceRepository
                 .loadTripInfo(contentId)
@@ -143,16 +103,14 @@ class TripDetailViewModel(
                     setupCached(trip)
 
                     _days.value =
-                        placeCacheByDay.keys
-                            .sorted()
-                            .mapIndexed { index, day ->
-                                DayModel(day = day, isSelected = index == 0)
-                            }
-                    _places.value = placeCacheByDay[1] ?: emptyList()
-                    _tripModel.value = trip.toUiModel()
+                        placeCacheByDay.keys.sorted().mapIndexed { index, day ->
+                            DayModel(day = day, isSelected = index == DayModel.ALL_PLACE)
+                        }
+                    _places.value = placeCacheByDay[DayModel.ALL_PLACE] ?: emptyList()
+                    _tripPlacesSummary.value = trip.toUiModelWithoutContentPlaces()
+
                     Timber.d("여행 일정 불러오기 성공")
-                    _serverError.value = false
-                    _networkError.value = false
+                    clearErrors()
                 }.onFailure { errorEvent: ErrorEvent ->
                     checkError(errorEvent)
                 }
@@ -160,26 +118,15 @@ class TripDetailViewModel(
     }
 
     private fun setupCached(trip: Trip) {
-        val dayModels: List<DayModel> = trip.tripDuration.days.initDayModels()
+        val placesByDay: MutableMap<Int, List<PlaceModel>> =
+            trip.contentPlaces
+                .groupBy(
+                    keySelector = { contentPlace: ContentPlace -> contentPlace.visitDay },
+                    valueTransform = { contentPlace: ContentPlace -> contentPlace.toUiModel() },
+                ).toMutableMap()
+        placesByDay[DayModel.ALL_PLACE] = placesByDay.flatMap { it.value }
 
-        placeCacheByDay =
-            dayModels.associate { dayModel ->
-                val day: Int = dayModel.day
-                val coursesForDay: List<ContentPlace> =
-                    trip.contentPlaces.filter { it.visitDay == day }
-                val placeModels: List<PlaceModel> =
-                    coursesForDay.map { course: ContentPlace ->
-                        PlaceModel(
-                            id = course.place.placeId,
-                            name = course.place.name,
-                            category = course.place.category.joinToString(),
-                            mapLink = course.place.url,
-                            timeLine = course.timeLine,
-                            isFavorite = course.isFavoritePlace,
-                        )
-                    }
-                day to placeModels
-            }
+        placeCacheByDay = placesByDay
     }
 
     fun updateDay(dayModel: DayModel) {
@@ -200,8 +147,7 @@ class TripDetailViewModel(
                     contentId,
                 ).onSuccess {
                     Timber.d("컨텐츠 찜 API 통신 성공")
-                    _serverError.value = false
-                    _networkError.value = false
+                    clearErrors()
                 }.onFailure { errorEvent: ErrorEvent ->
                     checkError(errorEvent)
                     Timber.d("컨텐츠 찜 API 통신 실패")
@@ -215,12 +161,7 @@ class TripDetailViewModel(
         val newSelected: Boolean = !currentSelected
 
         _isExpandTextToggleSelected.value = newSelected
-        _bodyMaxLines.value =
-            if (newSelected) {
-                Int.MAX_VALUE
-            } else {
-                DEFAULT_CONTENT_TITLE_MAX_LINES
-            }
+        _bodyMaxLines.value = if (newSelected) EXPAND_TEXT else DEFAULT_CONTENT_TITLE_MAX_LINES
     }
 
     fun updateExpandTextToggleVisibility(
@@ -228,8 +169,7 @@ class TripDetailViewModel(
         ellipsisCount: Int,
     ) {
         _isExpandTextToggleVisible.value =
-            lineCount >= DEFAULT_CONTENT_TITLE_MAX_LINES &&
-            ellipsisCount > 0
+            lineCount >= DEFAULT_CONTENT_TITLE_MAX_LINES && ellipsisCount > 0
         _isExpandTextToggleSelected.value = false
         _bodyMaxLines.value = DEFAULT_CONTENT_TITLE_MAX_LINES
     }
@@ -238,14 +178,38 @@ class TripDetailViewModel(
         hasFavoriteFolder: Boolean,
         placeId: Long,
     ) {
+        val updatedCachePlaces =
+            placeCacheByDay.mapValues { (_, value) ->
+                value.map { place: PlaceModel ->
+                    if (place.id == placeId) place.copy(isFavorite = hasFavoriteFolder) else place
+                }
+            }
+        placeCacheByDay = updatedCachePlaces
+
         _places.value =
             places.value?.map { place: PlaceModel ->
                 if (place.id == placeId) place.copy(isFavorite = hasFavoriteFolder) else place
             }
     }
 
+    private fun checkError(errorEvent: ErrorEvent) {
+        when (errorEvent) {
+            ErrorEvent.USER_NOT_HAVE_PERMISSION -> _serverError.value = true
+            ErrorEvent.UNEXPECTED_PROBLEM -> _serverError.value = true
+            ErrorEvent.NETWORK_ERROR -> _networkError.value = true
+            ErrorEvent.PARSER_ERROR -> _serverError.value = true
+            ErrorEvent.DUPLICATION_FOLDER -> throw IllegalArgumentException("발생할 수 없는 오류")
+        }
+    }
+
+    private fun clearErrors() {
+        _serverError.value = false
+        _networkError.value = false
+    }
+
     companion object {
         private const val DEFAULT_CONTENT_TITLE_MAX_LINES = 2
+        private const val EXPAND_TEXT = Int.MAX_VALUE
 
         fun provideFactory(
             contentId: Long,
