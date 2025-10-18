@@ -14,11 +14,23 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
 
+    private MapProvider getProviderFromCategoryName(String categoryName) {
+        for (char c : categoryName.toCharArray()) {
+            if (Character.UnicodeBlock.of(c) == Character.UnicodeBlock.HANGUL_SYLLABLES ||
+                Character.UnicodeBlock.of(c) == Character.UnicodeBlock.HANGUL_JAMO ||
+                Character.UnicodeBlock.of(c) == Character.UnicodeBlock.HANGUL_COMPATIBILITY_JAMO) {
+                return MapProvider.KAKAO;
+            }
+        }
+        return MapProvider.GOOGLE;
+    }
+
     @Transactional
     public void updateContentPlaceCategoryLanguage() {
         try (Stream<Category> stream = categoryRepository.streamAll()) {
             stream.forEach(category -> {
-                String parsedCategory = PlaceCategoryMapper.parseCategory(category.getName());
+                MapProvider provider = getProviderFromCategoryName(category.getName());
+                String parsedCategory = PlaceCategoryMapper.parseCategory(category.getName(), provider);
                 category.updateName(parsedCategory);
             });
         }
@@ -26,7 +38,8 @@ public class CategoryService {
 
     @Transactional
     public Category findOrCreateCategory(String categoryName) {
-        String parsedCategoryName = PlaceCategoryMapper.parseCategory(categoryName);
+        MapProvider provider = getProviderFromCategoryName(categoryName);
+        String parsedCategoryName = PlaceCategoryMapper.parseCategory(categoryName, provider);
 
         // db에 변환된 카테고리가 존재하는 경우, 해당 카테고리 사용
         Optional<Category> parsedExistingCategory = categoryRepository.findByName(parsedCategoryName);
