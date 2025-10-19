@@ -224,7 +224,7 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
         val messageResource: Int =
             if (isFavorite) R.string.trip_detail_snackbar_favorite_save else R.string.trip_detail_snackbar_favorite_remove
         val iconResource: Int =
-            if (isFavorite) R.drawable.ic_heart_normal else R.drawable.ic_heart_empty
+            if (isFavorite) R.drawable.ic_heart_pressed else R.drawable.ic_heart_empty
 
         TuripSnackbar
             .make(
