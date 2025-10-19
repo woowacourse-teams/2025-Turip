@@ -41,55 +41,16 @@ jobs:
       - name: Run Unit Tests
         run: ./gradlew test
 
-      - name: Upload Jar
-        uses: actions/upload-artifact@v4
-        with:
-          name: turip
-          path: backend/build/libs/*SNAPSHOT.jar
-
   deploy:
     needs: build_and_test
     runs-on: [ self-hosted, turip-server-dev ]
-    environment: production
+    environment: development
     if: github.event_name == 'push'
 
     steps:
-      - name: Download artifact from CI workflow
-        uses: actions/download-artifact@v4
-        with:
-          name: turip
-          path: ./downloaded-artifact
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Get JAR file name
-        id: get_jar_name
-        run: |
-          JAR_FILE=$(find ./downloaded-artifact -name "*.jar" | head -n 1)
-          if [ -z "$JAR_FILE" ]; then
-            echo "Error: JAR file not found in downloaded-artifact directory."
-            exit 1
-          fi
-          echo "JAR_NAME=$(basename $JAR_FILE)" >> $GITHUB_OUTPUT
-          echo "JAR file located at: $JAR_FILE"
-
-      - name: Kill Existing Server On Port 80
-        run: |
-          PID=$(sudo lsof -t -i :80 || true)
-          if [ -n "$PID" ]; then
-            echo "Killing existing process: $PID"
-            sudo kill -9 $PID
-          fi
-
-      - name: Run App On Port 80
-        run: |
-          JAR_NAME="${{ steps.get_jar_name.outputs.JAR_NAME }}"
-          DOWNLOADED_JAR="./downloaded-artifact/$JAR_NAME"
-          TARGET_JAR="/home/ubuntu/app/$JAR_NAME"
-
-          echo "Moving new JAR to $TARGET_JAR"
-          mv "$DOWNLOADED_JAR" "$TARGET_JAR"
-          chmod +x "$TARGET_JAR"
-
-          echo "Starting application..."
-          sudo sh -lc "nohup java -javaagent:/home/ubuntu/opentelemetry-javaagent.jar \
-            -Xms256m -Xmx384m -Dspring.profiles.active=dev -jar '$TARGET_JAR' \
-            --server.port=80 > /home/ubuntu/app/nohup.out 2>&1 &"
+      - name: Deploy with Docker Compose
+        working-directory: backend
+        run: docker-compose up -d --build
