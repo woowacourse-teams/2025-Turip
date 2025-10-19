@@ -325,6 +325,7 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
 
     override fun onDestroy() {
         binding.wvTripDetailVideo.destroy()
+        videoManager.clear()
         super.onDestroy()
     }
 
