@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -25,7 +24,6 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/pure_white_ffffff"
-            app:layout_scrollFlags="scroll|enterAlways"
             app:titleTextAppearance="@style/title1"
             app:titleTextColor="@color/pure_black_151515">
 
@@ -39,12 +37,10 @@
                 android:src="@drawable/btn_favorite_red" />
         </com.google.android.material.appbar.MaterialToolbar>
 
-        <!-- Video Container moved here -->
         <androidx.cardview.widget.CardView
             android:id="@+id/cv_trip_detail_video_container"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            app:layout_scrollFlags="scroll|enterAlways">
+            android:layout_height="200dp">
 
             <WebView
                 android:id="@+id/wv_trip_detail_video"
@@ -123,7 +119,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="맛집여행기 - 전라도 비빔밥을 찾아서 편 \n맛집여행기 - 전라도 비빔밥을 찾아서 편 \n맛집여행기 - 전라도 비빔밥을 찾아서 편 \n맛집여행기 - 전라도 비빔밥을 찾아서 편" />
-
 
             <ImageView
                 android:id="@+id/iv_trip_detail_content_toggle"
