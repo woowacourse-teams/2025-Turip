@@ -7,16 +7,10 @@ import com.on.turip.ui.trip.detail.webview.WebViewVideoBridge
 class VideoManager(
     private val webView: WebView,
 ) {
-    private var currentVideoUrl: String? = null
-    private var isVideoLoaded: Boolean = false
-
     fun loadVideo(
         url: String,
         onError: () -> Unit,
     ) {
-        currentVideoUrl = url
-        isVideoLoaded = true
-
         webView.apply {
             addJavascriptInterface(
                 WebViewVideoBridge(
