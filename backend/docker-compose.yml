@@ -14,18 +14,6 @@ services:
     volumes:
       - ./mysql-data:/var/lib/mysql
 
-  app:
-    build: .
-    container_name: turip-app-dev
-    restart: always
-    depends_on:
-      - mysql
-    environment:
-      SPRING_PROFILES_ACTIVE: ${{SPRING_PROFILES_ACTIVE:-dev}}
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/turip_dev?useSSL=false&allowPublicKeyRetrieval=true
-      SPRING_DATASOURCE_USERNAME: turip
-      SPRING_DATASOURCE_PASSWORD: turip_pw
-
   nginx:
     image: nginx:latest
     container_name: turip-nginx-dev
@@ -39,25 +27,25 @@ services:
       - ./nginx/conf.d:/etc/nginx/conf.d
 
   blue:
-    image: ${{DOCKER_IMAGE_NAME:teamturip/turip-backend:latest}}
+    image: ${DOCKER_IMAGE_NAME:-teamturip/turip-backend:latest}
     container_name: blue
     restart: always
     ports:
       - "8080:8080"
     environment:
-      SPRING_PROFILES_ACTIVE: ${{SPRING_PROFILES_ACTIVE:-dev}}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
       SERVER_PORT: 8080
     depends_on:
       - mysql
 
   green:
-    image: ${{DOCKER_IMAGE_NAME:teamturip/turip-backend:latest}}
+    image: ${DOCKER_IMAGE_NAME:-teamturip/turip-backend:latest}
     container_name: green
     restart: always
     ports:
       - "8081:8080"
     environment:
-      SPRING_PROFILES_ACTIVE: ${{SPRING_PROFILES_ACTIVE:-dev}}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
       SERVER_PORT: 8081
     depends_on:
       - mysql

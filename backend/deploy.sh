@@ -1,3 +1,5 @@
+#!/bin/bash
+
 EXISTING_BLUE=$(docker-compose ps -q blue)
 
 if [ -n "$EXISTING_BLUE" ]; then
@@ -34,10 +36,10 @@ do
   then
     echo "### Health check 성공 ###"
     echo "\n### Nginx 리버스 프록시 -> ${IDLE_PORT}로 변경 ###"
-    echo "set \$service_url http://127.0.0.1:${IDLE_PORT};" | sudo tee /etc/nginx/conf.d/service-url.inc
+    echo "set \$service_url http://host.docker.internal:${IDLE_PORT};" | tee ./nginx/conf.d/service-url.inc
 
     echo "\n### Nginx 리로드 ###"
-    sudo nginx -s reload
+    docker-compose exec -T nginx nginx -s reload
 
     echo "\n### 이전 버전(${CURRENT_PROFILE}) 컨테이너 중지 ###"
     docker-compose stop ${CURRENT_PROFILE}
