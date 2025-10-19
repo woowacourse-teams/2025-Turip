@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -67,6 +69,17 @@ class TripDetailViewModel(
 
     private val _serverError: MutableLiveData<Boolean> = MutableLiveData(false)
     val serverError: LiveData<Boolean> get() = _serverError
+
+    val tripDetailInfo: LiveData<TripDetailInfoModel> =
+        content.switchMap { content ->
+            tripPlacesSummary.map { tripModel ->
+                TripDetailInfoModel(
+                    content.videoData.uploadedDate,
+                    tripModel.tripPlaceCount,
+                    tripModel.tripDurationModel,
+                )
+            }
+        }
 
     init {
         loadVideoInformation()
@@ -169,7 +182,8 @@ class TripDetailViewModel(
         ellipsisCount: Int,
     ) {
         _isExpandTextToggleVisible.value =
-            lineCount >= DEFAULT_CONTENT_TITLE_MAX_LINES && ellipsisCount > 0
+            lineCount >= DEFAULT_CONTENT_TITLE_MAX_LINES &&
+            ellipsisCount > 0
         _isExpandTextToggleSelected.value = false
         _bodyMaxLines.value = DEFAULT_CONTENT_TITLE_MAX_LINES
     }
