@@ -11,3 +11,27 @@ services:
       TZ: Asia/Seoul
     ports:
       - "3306:3306"
+    volumes:
+      - ./mysql-data:/var/lib/mysql
+
+  app:
+    build: .
+    container_name: turip-app-dev
+    restart: always
+    depends_on:
+      - mysql
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/turip_dev?useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: turip
+      SPRING_DATASOURCE_PASSWORD: turip_pw
+
+  nginx:
+    image: nginx:latest
+    container_name: turip-nginx-dev
+    restart: always
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
