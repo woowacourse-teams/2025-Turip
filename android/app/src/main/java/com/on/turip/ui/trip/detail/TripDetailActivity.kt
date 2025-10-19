@@ -22,7 +22,6 @@ import com.on.turip.domain.content.Content
 import com.on.turip.ui.common.TuripSnackbar
 import com.on.turip.ui.common.base.BaseActivity
 import com.on.turip.ui.common.loadCircularImage
-import com.on.turip.ui.common.model.trip.TripModel
 import com.on.turip.ui.common.model.trip.toDisplayText
 import com.on.turip.ui.main.favorite.FavoriteBottomSheetContainerFragment
 import com.on.turip.ui.search.keywordresult.SearchActivity
@@ -34,6 +33,10 @@ import com.on.turip.ui.trip.detail.webview.navigateToTimeLine
 class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
     override val binding: ActivityTripDetailBinding by lazy {
         ActivityTripDetailBinding.inflate(layoutInflater)
+    }
+
+    private val videoManager by lazy {
+        VideoManager(binding.wvTripDetailVideo)
     }
 
     val viewModel: TripDetailViewModel by viewModels {
@@ -90,15 +93,6 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
         )
     }
 
-    private val stickyVideoManager by lazy {
-        StickyVideoManager(
-            originalVideoContainer = binding.cvTripDetailVideoContainer,
-            stickyVideoContainer = binding.cvTripDetailVideoContainerSticky,
-            nestedScrollView = binding.nsvTripDetail,
-            webView = binding.wvTripDetailVideo,
-        )
-    }
-
     private fun enableFullscreen() {
         WindowCompat.setDecorFitsSystemWindows(this.window, false)
         WindowInsetsControllerCompat(window, window.decorView).apply {
@@ -139,21 +133,10 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
         setupToolbar()
         setupOnBackPressedDispatcher()
         setupWebView()
-        setupStickyVideo()
         setupAdapters()
         setupListeners()
         setupObservers()
         showNetworkError()
-    }
-
-    private fun showNetworkError() {
-        binding.customErrorView.apply {
-            visibility = View.VISIBLE
-            setupError(ErrorEvent.NETWORK_ERROR)
-            setOnRetryClickListener {
-                viewModel.reload()
-            }
-        }
     }
 
     private fun setupToolbar() {
@@ -199,10 +182,6 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
             webChromeClient = turipWebChromeClient
             webViewClient = turipWebViewClient
         }
-    }
-
-    private fun setupStickyVideo() {
-        stickyVideoManager.initialize()
     }
 
     private fun showWebViewErrorView() {
@@ -274,21 +253,19 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
             )
             binding.tvTripDetailCreatorName.text = content.creator.channelName
             binding.tvTripDetailContentTitle.text = content.videoData.title
-            binding.tvTripDetailUploadDate.text =
-                getString(
-                    R.string.trip_detail_uploaded_date,
-                    content.videoData.uploadedDate,
-                )
             updateExpandTextToggleVisibility()
         }
-        viewModel.tripModel.observe(this) { tripModel: TripModel ->
-            binding.tvTripDetailTotalPlaceCount.text =
-                getString(R.string.all_total_place_count, tripModel.tripPlaceCount)
-            binding.tvTripDetailTravelDuration.text =
-                tripModel.tripDurationModel.toDisplayText(this)
+        viewModel.tripDetailInfo.observe(this) { tripDetailInfo ->
+            binding.tvTripDetailInfo.text =
+                getString(
+                    R.string.trip_detail_info,
+                    tripDetailInfo.uploadedDate,
+                    tripDetailInfo.placeCount,
+                    tripDetailInfo.duration.toDisplayText(this),
+                )
         }
         viewModel.videoUri.observe(this) { url: String ->
-            stickyVideoManager.loadVideo(url) {
+            videoManager.loadVideo(url) {
                 showWebViewErrorView()
             }
         }
@@ -336,8 +313,19 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
         }
     }
 
+    private fun showNetworkError() {
+        binding.customErrorView.apply {
+            visibility = View.VISIBLE
+            setupError(ErrorEvent.NETWORK_ERROR)
+            setOnRetryClickListener {
+                viewModel.reload()
+            }
+        }
+    }
+
     override fun onDestroy() {
         binding.wvTripDetailVideo.destroy()
+        videoManager.clear()
         super.onDestroy()
     }
 

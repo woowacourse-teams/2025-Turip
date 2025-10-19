@@ -5,18 +5,17 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import turip.common.log.LoggingInterceptor;
+import turip.common.querycount.QueryCountInterceptor;
 
 @Configuration
-@Profile({"local", "dev"})
 @RequiredArgsConstructor
-public class LoggingConfiguration implements WebMvcConfigurer {
+@Profile({"local", "dev"})
+public class QueryCountConfiguration implements WebMvcConfigurer {
 
-    private final LoggingInterceptor loggingInterceptor;
+    private final QueryCountInterceptor queryCountInterceptor;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(loggingInterceptor)
-                .addPathPatterns("/**");
+        registry.addInterceptor(queryCountInterceptor);
     }
 }
