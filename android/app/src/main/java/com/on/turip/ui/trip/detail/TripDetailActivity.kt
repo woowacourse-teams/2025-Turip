@@ -255,13 +255,13 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
             binding.tvTripDetailContentTitle.text = content.videoData.title
             updateExpandTextToggleVisibility()
         }
-        viewModel.tripDetailInfoText.observe(this) { (uploadedDate, placeCount, duration) ->
+        viewModel.tripDetailInfo.observe(this) { tripDetailInfo ->
             binding.tvTripDetailInfo.text =
                 getString(
                     R.string.trip_detail_info,
-                    uploadedDate,
-                    placeCount,
-                    duration.toDisplayText(this),
+                    tripDetailInfo.uploadedDate,
+                    tripDetailInfo.placeCount,
+                    tripDetailInfo.duration.toDisplayText(this),
                 )
         }
         viewModel.videoUri.observe(this) { url: String ->

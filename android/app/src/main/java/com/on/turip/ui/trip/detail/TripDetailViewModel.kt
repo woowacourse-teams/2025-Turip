@@ -22,7 +22,6 @@ import com.on.turip.domain.trip.Trip
 import com.on.turip.domain.trip.repository.ContentPlaceRepository
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.common.mapper.toUiModelWithoutContentPlaces
-import com.on.turip.ui.common.model.trip.TripDurationModel
 import com.on.turip.ui.common.model.trip.TripModel
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -71,10 +70,10 @@ class TripDetailViewModel(
     private val _serverError: MutableLiveData<Boolean> = MutableLiveData(false)
     val serverError: LiveData<Boolean> get() = _serverError
 
-    val tripDetailInfoText: LiveData<Triple<String, Int, TripDurationModel>> =
+    val tripDetailInfo: LiveData<TripDetailInfoModel> =
         content.switchMap { content ->
             tripPlacesSummary.map { tripModel ->
-                Triple(
+                TripDetailInfoModel(
                     content.videoData.uploadedDate,
                     tripModel.tripPlaceCount,
                     tripModel.tripDurationModel,
