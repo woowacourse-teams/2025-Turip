@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -20,6 +22,7 @@ import com.on.turip.domain.trip.Trip
 import com.on.turip.domain.trip.repository.ContentPlaceRepository
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.common.mapper.toUiModelWithoutContentPlaces
+import com.on.turip.ui.common.model.trip.TripDurationModel
 import com.on.turip.ui.common.model.trip.TripModel
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -67,6 +70,17 @@ class TripDetailViewModel(
 
     private val _serverError: MutableLiveData<Boolean> = MutableLiveData(false)
     val serverError: LiveData<Boolean> get() = _serverError
+
+    val tripDetailInfoText: LiveData<Triple<String, Int, TripDurationModel>> =
+        content.switchMap { content ->
+            tripPlacesSummary.map { tripModel ->
+                Triple(
+                    content.videoData.uploadedDate,
+                    tripModel.tripPlaceCount,
+                    tripModel.tripDurationModel,
+                )
+            }
+        }
 
     init {
         loadVideoInformation()
@@ -169,7 +183,8 @@ class TripDetailViewModel(
         ellipsisCount: Int,
     ) {
         _isExpandTextToggleVisible.value =
-            lineCount >= DEFAULT_CONTENT_TITLE_MAX_LINES && ellipsisCount > 0
+            lineCount >= DEFAULT_CONTENT_TITLE_MAX_LINES &&
+            ellipsisCount > 0
         _isExpandTextToggleSelected.value = false
         _bodyMaxLines.value = DEFAULT_CONTENT_TITLE_MAX_LINES
     }
