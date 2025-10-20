@@ -24,6 +24,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.on.turip.R
@@ -34,6 +35,7 @@ import com.on.turip.ui.compose.main.home.component.HomeTopAppBar
 import com.on.turip.ui.compose.main.home.component.RegionList
 import com.on.turip.ui.compose.main.home.component.RegionTypeButtons
 import com.on.turip.ui.compose.main.home.component.UsersLikeList
+import com.on.turip.ui.compose.theme.TuripTheme
 import com.on.turip.ui.compose.theme.TuripTypography
 import com.on.turip.ui.main.home.HomeViewModel
 import com.on.turip.ui.main.home.model.UsersLikeContentModel
@@ -86,7 +88,7 @@ fun HomeScreen(
                 verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
                 Text(
-                    text = stringResource(R.string.home_where_should_we_go_title),
+                    text = stringResource(R.string.home_top_title),
                     color = colorResource(R.color.gray_400_2b2b2b),
                     style = TuripTypography.titleLarge,
                 )
@@ -131,5 +133,13 @@ fun HomeScreen(
                 )
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun HomeScreenPreview() {
+    TuripTheme {
+        HomeScreen({}, {}, {})
     }
 }
