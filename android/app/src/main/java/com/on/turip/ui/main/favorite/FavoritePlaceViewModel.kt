@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.google.android.gms.maps.model.LatLng
 import com.on.turip.data.common.onFailure
 import com.on.turip.data.common.onSuccess
 import com.on.turip.di.RepositoryModule
@@ -20,6 +19,7 @@ import com.on.turip.domain.folder.repository.FolderRepository
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
+import com.on.turip.ui.main.favorite.model.FavoritePlaceLatLngUiModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -195,11 +195,6 @@ class FavoritePlaceViewModel(
         val isServerError: Boolean = false,
         val places: List<FavoritePlaceModel> = emptyList(),
         val folders: List<FavoritePlaceFolderModel> = emptyList(),
-    )
-
-    data class FavoritePlaceLatLngUiModel(
-        val name: String,
-        val favoriteLatLng: LatLng,
     )
 
     fun shareFolder() {

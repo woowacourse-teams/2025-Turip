@@ -4,8 +4,8 @@ import androidx.core.net.toUri
 import com.google.android.gms.maps.model.LatLng
 import com.on.turip.domain.favorite.FavoritePlace
 import com.on.turip.domain.folder.FavoriteFolder
-import com.on.turip.ui.main.favorite.FavoritePlaceViewModel.FavoritePlaceLatLngUiModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
+import com.on.turip.ui.main.favorite.model.FavoritePlaceLatLngUiModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceShareModel
 
