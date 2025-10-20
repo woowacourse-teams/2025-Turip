@@ -1,6 +1,8 @@
 package com.on.turip.ui.compose.common.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,18 +20,25 @@ fun RegionChip(
     regionName: String,
     modifier: Modifier = Modifier,
 ) {
-    Text(
-        text = regionName,
+    Box(
         modifier =
             modifier
                 .wrapContentSize()
                 .background(
-                    color = colorResource(R.color.turip_lemon_faff60),
+                    color = colorResource(R.color.turip_light_beige_FFF4B2),
                     shape = RoundedCornerShape(24.dp),
-                ).padding(horizontal = 8.dp, vertical = 2.dp),
-        style = TuripTypography.labelLarge,
-        color = colorResource(R.color.pure_black_151515),
-    )
+                ).border(
+                    width = 1.dp,
+                    color = colorResource(R.color.turip_black_000000_06),
+                    shape = RoundedCornerShape(24.dp),
+                ).padding(horizontal = 12.dp, vertical = 4.dp),
+    ) {
+        Text(
+            text = regionName,
+            style = TuripTypography.labelLarge,
+            color = colorResource(R.color.pure_black_151515),
+        )
+    }
 }
 
 @Preview(showBackground = true)

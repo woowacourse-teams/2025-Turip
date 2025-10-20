@@ -15,7 +15,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@drawable/ic_heart_normal" />
+        tools:src="@drawable/ic_heart_empty" />
 
     <TextView
         android:id="@+id/tv_snackbar_message"

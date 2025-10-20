@@ -25,7 +25,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        app:dividerColor="@color/gray_400_2b2b2b"
+        app:dividerColor="@color/turip_gray_b4b4b4"
         app:dividerThickness="2dp"
         app:layout_constraintEnd_toEndOf="@id/tv_travel_day_day"
         app:layout_constraintStart_toStartOf="@id/tv_travel_day_day"

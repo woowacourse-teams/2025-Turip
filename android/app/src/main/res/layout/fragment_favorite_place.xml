@@ -20,18 +20,20 @@
 
     <ImageView
         android:id="@+id/iv_favorite_place_folder"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_marginStart="4dp"
         android:layout_marginEnd="12dp"
-        android:background="@drawable/bg_gray300_radius_10dp"
+        android:background="@drawable/bg_gray100_oval"
         android:contentDescription="@null"
         android:padding="10dp"
         android:src="@drawable/ic_folder_setting"
-        app:layout_constraintTop_toTopOf="@id/rv_favorite_place_folder_name"
         app:layout_constraintBottom_toBottomOf="@id/rv_favorite_place_folder_name"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/rv_favorite_place_folder_name"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toTopOf="@id/rv_favorite_place_folder_name"
+        app:tint="@color/pure_white_ffffff" />
 
     <TextView
         android:id="@+id/tv_favorite_place_place_count"
@@ -48,17 +50,19 @@
 
     <ImageView
         android:id="@+id/iv_favorite_place_share"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_marginEnd="12dp"
-        android:background="@drawable/bg_gray300_radius_10dp"
+        android:background="@drawable/bg_white_stroke_gray100_oval"
         android:contentDescription="@null"
         android:padding="6dp"
         android:src="@drawable/ic_share"
         app:layout_constraintBottom_toBottomOf="@id/tv_favorite_place_place_count"
+        app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@id/iv_favorite_place_folder"
-        app:layout_constraintTop_toTopOf="@id/tv_favorite_place_place_count" />
+        app:layout_constraintTop_toTopOf="@id/tv_favorite_place_place_count"
+        app:tint="@color/gray_300_5b5b5b" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_favorite_place_place"
