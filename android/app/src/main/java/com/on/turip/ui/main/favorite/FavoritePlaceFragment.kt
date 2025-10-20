@@ -301,7 +301,6 @@ class FavoritePlaceFragment :
                 }
                 val bounds = boundsBuilder.build()
                 googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
-                googleMap.setLatLngBoundsForCameraTarget(bounds)
                 googleMap.setMinZoomPreference(8f)
             } else {
                 binding.mapFragment.visibility = View.GONE
