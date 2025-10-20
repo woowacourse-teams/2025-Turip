@@ -10,14 +10,18 @@
     <color name="gray_200_c1c1c1">#FFC1C1C1</color>
     <color name="gray_100_f0f0ee">#FFF0F0EE</color>
 
+    <color name="turip_light_beige_FFF4B2">#FFFFF4B2</color>
     <color name="turip_lemon_faff60">#FFFAFF60</color>
     <color name="turip_lemon_faff60_50">#80FAFF60</color>
     <color name="gradient_aqua_start_60e7ff">#FF60E7FF</color>
     <color name="gradient_aqua_end_94ea53">#FF94EA53</color>
     <color name="turip_ochre_faff60">#FFFAFF60</color>
     <color name="turip_blue_11aebf">#FF11AEBF</color>
+    <color name="turip_blue_11aebf_70">#B211AEBF</color>
+    <color name="turip_light_blue_5ac3d5_11">#1C5AC3D5</color>
     <color name="turip_red_ff7474">#FFFF7474</color>
     <color name="turip_gray_b4b4b4">#FFB4B4B4</color>
+    <color name="turip_light_gray_f2f2f2">#FFF2F2F2</color>
     <color name="turip_light_gray_f2f2f2_50">#80F2F2F2</color>
     <color name="turip_black_000000_06">#0F000000</color>
 

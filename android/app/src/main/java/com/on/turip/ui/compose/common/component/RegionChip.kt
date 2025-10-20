@@ -24,7 +24,7 @@ fun RegionChip(
             modifier
                 .wrapContentSize()
                 .background(
-                    color = colorResource(R.color.turip_lemon_faff60),
+                    color = colorResource(R.color.turip_light_beige_FFF4B2),
                     shape = RoundedCornerShape(24.dp),
                 ).padding(horizontal = 8.dp, vertical = 2.dp),
         style = TuripTypography.labelLarge,
