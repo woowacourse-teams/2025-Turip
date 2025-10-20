@@ -1,6 +1,8 @@
 package turip.place.service;
 
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,17 +18,25 @@ public class CategoryService {
 
     @Transactional
     public void updateContentPlaceCategoryLanguage() {
+        Set<String> updatedNames = new HashSet<>();
         try (Stream<Category> stream = categoryRepository.streamAll()) {
             stream.forEach(category -> {
-                String parsedCategory = PlaceCategoryMapper.parseCategory(category.getName());
+                MapProvider provider = MapProvider.getProviderFromCategoryName(category.getName());
+                String parsedCategory = PlaceCategoryMapper.parseCategory(category.getName(), provider);
+                if (updatedNames.contains(parsedCategory) || categoryRepository.findByName(parsedCategory)
+                        .isPresent()) {
+                    return;
+                }
                 category.updateName(parsedCategory);
+                updatedNames.add(parsedCategory);
             });
         }
     }
 
     @Transactional
     public Category findOrCreateCategory(String categoryName) {
-        String parsedCategoryName = PlaceCategoryMapper.parseCategory(categoryName);
+        MapProvider provider = MapProvider.getProviderFromCategoryName(categoryName);
+        String parsedCategoryName = PlaceCategoryMapper.parseCategory(categoryName, provider);
 
         // db에 변환된 카테고리가 존재하는 경우, 해당 카테고리 사용
         Optional<Category> parsedExistingCategory = categoryRepository.findByName(parsedCategoryName);
