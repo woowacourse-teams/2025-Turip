@@ -237,7 +237,19 @@ class FavoritePlaceFragment :
             .replace(R.id.map_fragment, mapFragment)
             .commit()
 
-        mapFragment.getMapAsync(this)
+        mapFragment.getMapAsync { googleMap ->
+            googleMap.setOnCameraMoveStartedListener { reason ->
+                if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
+                    binding.root.parent?.requestDisallowInterceptTouchEvent(true)
+                }
+            }
+
+            googleMap.setOnCameraIdleListener {
+                binding.root.parent?.requestDisallowInterceptTouchEvent(false)
+            }
+
+            onMapReady(googleMap)
+        }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
