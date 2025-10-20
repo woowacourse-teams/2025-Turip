@@ -44,7 +44,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="12dp"
-        android:background="@drawable/bg_turip_lemon_radius_24dp"
+        android:background="@drawable/bg_turip_light_beige_radius_24dp"
         android:paddingHorizontal="8dp"
         android:paddingVertical="2dp"
         android:textAppearance="@style/title4"
