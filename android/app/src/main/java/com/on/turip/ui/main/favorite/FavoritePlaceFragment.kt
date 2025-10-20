@@ -253,6 +253,7 @@ class FavoritePlaceFragment :
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
+        googleMap.uiSettings.isZoomControlsEnabled = true
         viewModel.favoriteLatLng.observe(viewLifecycleOwner) { favoriteLatLngList ->
             if (favoriteLatLngList.isNotEmpty()) {
                 val boundsBuilder = LatLngBounds.Builder()
@@ -266,6 +267,8 @@ class FavoritePlaceFragment :
                 }
                 val bounds = boundsBuilder.build()
                 googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
+                googleMap.setLatLngBoundsForCameraTarget(bounds)
+                googleMap.setMinZoomPreference(8f)
             }
         }
     }
