@@ -1,1 +1,1 @@
-set $service_url http://127.0.0.1:8080
+set $service_url http://host.docker.internal:8080;

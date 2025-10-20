@@ -18,9 +18,6 @@ services:
     image: nginx:latest
     container_name: turip-nginx-dev
     restart: always
-    depends_on:
-      - blue
-      - green
     ports:
       - "80:80"
     volumes:
@@ -36,6 +33,7 @@ services:
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
       SERVER_PORT: 8080
     depends_on:
+      - nginx
       - mysql
 
   green:
@@ -46,6 +44,7 @@ services:
       - "8081:8080"
     environment:
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
-      SERVER_PORT: 8081
+      SERVER_PORT: 8080
     depends_on:
+      - nginx
       - mysql

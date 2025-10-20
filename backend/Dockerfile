@@ -1,4 +1,4 @@
-FROM openjdk:21-jre-slim
+FROM openjdk:21-jdk
 ARG JAR_FILE=build/libs/*.jar
 COPY opentelemetry-javaagent.jar opentelemetry-javaagent.jar
 COPY ${JAR_FILE} app.jar
