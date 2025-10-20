@@ -7,7 +7,7 @@
     android:layout_marginHorizontal="20dp"
     android:layout_marginBottom="18dp"
     android:background="@drawable/bg_stroke_turip_black_06_radius_24dp"
-    android:backgroundTint="@color/gray_300_5b5b5b"
+    android:backgroundTint="@color/turip_light_gray_f2f2f2_50"
     android:paddingVertical="14dp">
 
     <ImageView
@@ -19,7 +19,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:tint="@color/gray_100_f0f0ee" />
+        app:tint="@color/gray_400_2b2b2b" />
 
     <TextView
         android:id="@+id/tv_favorite_place_category"
@@ -27,7 +27,7 @@
         android:layout_height="0dp"
         android:layout_marginStart="12dp"
         android:textAppearance="@style/title3"
-        android:textColor="@color/pure_white_ffffff"
+        android:textColor="@color/gray_500_1e1e1e"
         app:layout_constraintStart_toEndOf="@id/iv_favorite_place_move"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="관광지" />
@@ -40,7 +40,7 @@
         android:ellipsize="end"
         android:maxLines="1"
         android:textAppearance="@style/title1"
-        android:textColor="@color/pure_white_ffffff"
+        android:textColor="@color/gray_400_2b2b2b"
         app:layout_constraintEnd_toStartOf="@id/iv_favorite_place_map_link"
         app:layout_constraintStart_toStartOf="@id/tv_favorite_place_category"
         app:layout_constraintTop_toBottomOf="@id/tv_favorite_place_category"
