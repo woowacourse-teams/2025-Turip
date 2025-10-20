@@ -256,6 +256,7 @@ class FavoritePlaceFragment :
 
     override fun onResume() {
         super.onResume()
+        binding.mapFragment.onResume()
         viewModel.loadFoldersAndPlaces()
     }
 
