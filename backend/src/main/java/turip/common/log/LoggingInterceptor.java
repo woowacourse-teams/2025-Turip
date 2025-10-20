@@ -10,7 +10,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 @Slf4j
 @Component
-@Profile({"local", "dev"})
+@Profile({"local", "dev", "prod"})
 public class LoggingInterceptor implements HandlerInterceptor {
 
     private static final String REQUEST_START_TIME_ATTRIBUTE = "requestStartTime";
