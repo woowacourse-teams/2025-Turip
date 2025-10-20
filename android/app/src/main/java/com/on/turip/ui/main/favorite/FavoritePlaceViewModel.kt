@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.google.android.gms.maps.model.LatLng
 import com.on.turip.data.common.onFailure
 import com.on.turip.data.common.onSuccess
 import com.on.turip.di.RepositoryModule
@@ -34,6 +35,10 @@ class FavoritePlaceViewModel(
 
     private val _shareFolder: MutableLiveData<FavoriteFolderShareModel> = MutableLiveData()
     val shareFolder: LiveData<FavoriteFolderShareModel> get() = _shareFolder
+
+    private val _favoriteLatLng: MutableLiveData<List<FavoritePlaceLatLngUiModel>> =
+        MutableLiveData()
+    val favoriteLatLng: LiveData<List<FavoritePlaceLatLngUiModel>> get() = _favoriteLatLng
 
     private var selectedFolderId: Long = NOT_INITIALIZED
 
@@ -79,6 +84,7 @@ class FavoritePlaceViewModel(
                         places =
                             favoritePlaces.map { favoritePlace: FavoritePlace -> favoritePlace.toUiModel() },
                     )
+                _favoriteLatLng.value = favoritePlaces.map { it.toLatLng() }
             }.onFailure { errorEvent: ErrorEvent ->
                 checkError(errorEvent)
                 Timber.e("폴더에 담긴 장소들을 불러오는 API 호출 실패")
@@ -187,6 +193,11 @@ class FavoritePlaceViewModel(
         val isServerError: Boolean = false,
         val places: List<FavoritePlaceModel> = emptyList(),
         val folders: List<FavoritePlaceFolderModel> = emptyList(),
+    )
+
+    data class FavoritePlaceLatLngUiModel(
+        val name: String,
+        val favoriteLatLng: LatLng,
     )
 
     fun shareFolder() {

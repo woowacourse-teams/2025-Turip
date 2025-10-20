@@ -14,7 +14,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
 import com.on.turip.R
 import com.on.turip.databinding.FragmentFavoritePlaceBinding
@@ -51,8 +51,6 @@ class FavoritePlaceFragment :
         )
     }
 
-    private lateinit var map: GoogleMap
-
     override fun inflateBinding(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -68,13 +66,7 @@ class FavoritePlaceFragment :
         setupListeners()
         setupObservers()
         showNetworkError()
-        val mapFragment = SupportMapFragment.newInstance()
-        childFragmentManager
-            .beginTransaction()
-            .replace(R.id.map_fragment, mapFragment)
-            .commit()
-
-        mapFragment.getMapAsync(this)
+        setupMapFragment()
     }
 
     private fun showNetworkError() {
@@ -238,11 +230,32 @@ class FavoritePlaceFragment :
         }
     }
 
+    private fun setupMapFragment() {
+        val mapFragment = SupportMapFragment.newInstance()
+        childFragmentManager
+            .beginTransaction()
+            .replace(R.id.map_fragment, mapFragment)
+            .commit()
+
+        mapFragment.getMapAsync(this)
+    }
+
     override fun onMapReady(googleMap: GoogleMap) {
-        map = googleMap
-        val seoul = LatLng(37.5665, 126.9780)
-        map.addMarker(MarkerOptions().position(seoul).title("Seoul"))
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(seoul, 12f))
+        viewModel.favoriteLatLng.observe(viewLifecycleOwner) { favoriteLatLngList ->
+            if (favoriteLatLngList.isNotEmpty()) {
+                val boundsBuilder = LatLngBounds.Builder()
+                favoriteLatLngList.forEach { favoriteLatLng ->
+                    googleMap.addMarker(
+                        MarkerOptions()
+                            .position(favoriteLatLng.favoriteLatLng)
+                            .title(favoriteLatLng.name),
+                    )
+                    boundsBuilder.include(favoriteLatLng.favoriteLatLng)
+                }
+                val bounds = boundsBuilder.build()
+                googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
+            }
+        }
     }
 
     companion object {
