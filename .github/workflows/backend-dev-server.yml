@@ -41,9 +41,6 @@ jobs:
       - name: Run Unit Tests
         run: ./gradlew test
 
-      - name: Download OpenTelemetry Agent #dockerfile에 OpenTelemetry에 대한 jar 파일 받으라고 되어있으니 이 부분 없어도 되는건가?
-        run: curl -L -o opentelemetry-javaagent.jar https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/latest/download/opentelemetry-javaagent.jar
-
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
@@ -51,7 +48,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v6 #여기서 dockerfile에 적힌대로 애플리케이션 이미지 빌드하고 도커 허브에 푸시
+        uses: docker/build-push-action@v6
         with:
           context: ./backend
           file: ./backend/Dockerfile
