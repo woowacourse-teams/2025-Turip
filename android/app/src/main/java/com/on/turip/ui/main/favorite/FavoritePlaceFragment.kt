@@ -280,6 +280,7 @@ class FavoritePlaceFragment :
         googleMap.uiSettings.isZoomControlsEnabled = true
         viewModel.favoriteLatLng.observe(viewLifecycleOwner) { favoriteLatLngList ->
             if (favoriteLatLngList.isNotEmpty()) {
+                googleMap.clear()
                 val boundsBuilder = LatLngBounds.Builder()
                 favoriteLatLngList.forEach { favoriteLatLng ->
                     googleMap.addMarker(

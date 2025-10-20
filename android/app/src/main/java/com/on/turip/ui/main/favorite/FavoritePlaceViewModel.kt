@@ -111,6 +111,7 @@ class FavoritePlaceViewModel(
                             isServerError = false,
                             isNetWorkError = false,
                         )
+                    loadPlacesInSelectFolder()
                 }.onFailure { errorEvent: ErrorEvent ->
                     checkError(errorEvent)
                     Timber.e("찜 목록 화면 폴더명에 해당하는 찜 장소들 업데이트 실패 (placeId =$placeId)")
