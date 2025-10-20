@@ -1,13 +1,7 @@
 package turip.place.service;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import turip.place.domain.Category;
 import turip.place.repository.CategoryRepository;
 
 @Service
@@ -16,44 +10,5 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
 
-    @Transactional
-    public void updateContentPlaceCategoryLanguage() {
-        Set<String> updatedNames = new HashSet<>();
-        try (Stream<Category> stream = categoryRepository.streamAll()) {
-            stream.forEach(category -> {
-                MapProvider provider = MapProvider.getProviderFromCategoryName(category.getName());
-                String parsedCategory = PlaceCategoryMapper.parseCategory(category.getName(), provider);
-                if (updatedNames.contains(parsedCategory) || categoryRepository.findByName(parsedCategory)
-                        .isPresent()) {
-                    return;
-                }
-                category.updateName(parsedCategory);
-                updatedNames.add(parsedCategory);
-            });
-        }
-    }
 
-    @Transactional
-    public Category findOrCreateCategory(String categoryName) {
-        MapProvider provider = MapProvider.getProviderFromCategoryName(categoryName);
-        String parsedCategoryName = PlaceCategoryMapper.parseCategory(categoryName, provider);
-
-        // db에 변환된 카테고리가 존재하는 경우, 해당 카테고리 사용
-        Optional<Category> parsedExistingCategory = categoryRepository.findByName(parsedCategoryName);
-        if (parsedExistingCategory.isPresent()) {
-            return parsedExistingCategory.get();
-        }
-
-        // db에 변환되지 않은 카테고리가 존재하는 경우, 해당 카테고리를 한국어로 변환
-        Optional<Category> unparsedExistingCategory = categoryRepository.findByName(categoryName);
-        if (unparsedExistingCategory.isPresent()) {
-            Category unparsedCategory = unparsedExistingCategory.get();
-            unparsedCategory.updateName(parsedCategoryName);
-            return unparsedCategory;
-        }
-
-        // db에 카테고리가 존재하지 않는 경우, 카테고리 생성 및 저장
-        Category category = new Category(parsedCategoryName);
-        return categoryRepository.save(category);
-    }
 }
