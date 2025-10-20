@@ -10,6 +10,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 import com.on.turip.R
 import com.on.turip.databinding.FragmentFavoritePlaceBinding
 import com.on.turip.domain.ErrorEvent
@@ -17,7 +23,9 @@ import com.on.turip.ui.common.base.BaseFragment
 import com.on.turip.ui.folder.FolderActivity
 import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
 
-class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
+class FavoritePlaceFragment :
+    BaseFragment<FragmentFavoritePlaceBinding>(),
+    OnMapReadyCallback {
     private val viewModel: FavoritePlaceViewModel by viewModels { FavoritePlaceViewModel.provideFactory() }
     private val folderNameAdapter: FavoritePlaceFolderNameAdapter by lazy {
         FavoritePlaceFolderNameAdapter { folderId: Long ->
@@ -43,6 +51,8 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
         )
     }
 
+    private lateinit var map: GoogleMap
+
     override fun inflateBinding(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -58,6 +68,13 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
         setupListeners()
         setupObservers()
         showNetworkError()
+        val mapFragment = SupportMapFragment.newInstance()
+        childFragmentManager
+            .beginTransaction()
+            .replace(R.id.map_fragment, mapFragment)
+            .commit()
+
+        mapFragment.getMapAsync(this)
     }
 
     private fun showNetworkError() {
@@ -219,6 +236,13 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
         if (!hidden) {
             viewModel.loadFoldersAndPlaces()
         }
+    }
+
+    override fun onMapReady(googleMap: GoogleMap) {
+        map = googleMap
+        val seoul = LatLng(37.5665, 126.9780)
+        map.addMarker(MarkerOptions().position(seoul).title("Seoul"))
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(seoul, 12f))
     }
 
     companion object {
