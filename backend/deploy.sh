@@ -21,7 +21,7 @@ docker-compose pull ${IDLE_PROFILE}
 echo "### 🟢 새 Docker 이미지 pull 완료 ###"
 
 echo "### 🚀 ${IDLE_PROFILE} 컨테이너 실행 시작 ###"
-docker-compose up -d ${IDLE_PROFILE}
+docker-compose up -d ${IDLE_PROFILE} --no-deps
 echo "### 🟢 ${IDLE_PROFILE} 컨테이너 실행 완료 ###"
 
 echo "### 🚀 Health check 시작 ###"
@@ -47,6 +47,8 @@ do
   else
     echo "### 🔴 Health check의 응답을 알 수 없거나, 실행 상태가 아닙니다. ###"
     echo "### Health check: ${response} ###"
+    echo "### 🔍 ${IDLE_PROFILE} 컨테이너 로그 출력 ###"
+    docker logs --tail 20 ${IDLE_PROFILE}
   fi
 
   if [ ${retry_count} -eq 10 ]
