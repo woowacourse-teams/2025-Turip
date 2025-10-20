@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -139,6 +140,12 @@ class FavoritePlaceFragment :
         }
         binding.ivFavoritePlaceShare.setOnClickListener {
             viewModel.shareFolder()
+        }
+
+        binding.ivFavoritePlaceMapToggle.setOnClickListener {
+            val isMapVisible = binding.mapFragment.isVisible
+            binding.mapFragment.visibility = if (isMapVisible) View.GONE else View.VISIBLE
+            it.isSelected = isMapVisible
         }
     }
 
@@ -280,7 +287,7 @@ class FavoritePlaceFragment :
         googleMap.uiSettings.isZoomControlsEnabled = true
         viewModel.favoriteLatLng.observe(viewLifecycleOwner) { favoriteLatLngList ->
             if (favoriteLatLngList.isNotEmpty()) {
-                binding.mapFragment.visibility = View.VISIBLE
+                binding.ivFavoritePlaceMapToggle.visibility = View.VISIBLE
                 googleMap.clear()
                 val boundsBuilder = LatLngBounds.Builder()
                 favoriteLatLngList.forEach { favoriteLatLng ->
@@ -297,6 +304,7 @@ class FavoritePlaceFragment :
                 googleMap.setMinZoomPreference(8f)
             } else {
                 binding.mapFragment.visibility = View.GONE
+                binding.ivFavoritePlaceMapToggle.visibility = View.GONE
             }
         }
     }
