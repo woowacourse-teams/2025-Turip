@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
 import com.on.turip.R
@@ -66,7 +65,7 @@ class FavoritePlaceFragment :
         setupListeners()
         setupObservers()
         showNetworkError()
-        setupMapFragment()
+        setupMapFragment(savedInstanceState)
     }
 
     private fun showNetworkError() {
@@ -218,6 +217,36 @@ class FavoritePlaceFragment :
         startActivity(chooserIntent)
     }
 
+    override fun onStart() {
+        super.onStart()
+        binding.mapFragment.onStart()
+    }
+
+    override fun onPause() {
+        binding.mapFragment.onPause()
+        super.onPause()
+    }
+
+    override fun onStop() {
+        binding.mapFragment.onStop()
+        super.onStop()
+    }
+
+    override fun onDestroy() {
+        binding.mapFragment.onDestroy()
+        super.onDestroy()
+    }
+
+    override fun onLowMemory() {
+        super.onLowMemory()
+        binding.mapFragment.onLowMemory()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        binding.mapFragment.onSaveInstanceState(outState)
+    }
+
     override fun onResume() {
         super.onResume()
         viewModel.loadFoldersAndPlaces()
@@ -230,14 +259,9 @@ class FavoritePlaceFragment :
         }
     }
 
-    private fun setupMapFragment() {
-        val mapFragment = SupportMapFragment.newInstance()
-        childFragmentManager
-            .beginTransaction()
-            .replace(R.id.map_fragment, mapFragment)
-            .commit()
-
-        mapFragment.getMapAsync { googleMap ->
+    private fun setupMapFragment(savedInstanceState: Bundle?) {
+        binding.mapFragment.onCreate(savedInstanceState)
+        binding.mapFragment.getMapAsync { googleMap ->
             googleMap.setOnCameraMoveStartedListener { reason ->
                 if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
                     binding.root.parent?.requestDisallowInterceptTouchEvent(true)
@@ -269,6 +293,8 @@ class FavoritePlaceFragment :
                 googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
                 googleMap.setLatLngBoundsForCameraTarget(bounds)
                 googleMap.setMinZoomPreference(8f)
+            } else {
+                binding.mapFragment.visibility = View.GONE
             }
         }
     }
