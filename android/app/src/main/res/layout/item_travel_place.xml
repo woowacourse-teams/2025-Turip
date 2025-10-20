@@ -8,7 +8,6 @@
     android:layout_marginHorizontal="20dp"
     android:layout_marginBottom="12dp"
     android:background="@drawable/bg_turip_light_gray_50_stroke_turip_black_06_radius_24dp"
-    android:backgroundTint="@color/turip_light_gray_f2f2f2_50"
     android:paddingVertical="20dp">
 
     <TextView

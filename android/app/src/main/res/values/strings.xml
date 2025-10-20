@@ -34,7 +34,7 @@
 
     <!-- 홈 페이지 -->
     <string name="home_top_title">😊 오늘의 기분은, 여행하기 딱 좋아요!</string>
-    <string name="home_users_like_content_title">🩵 한 주간 가장 많이 찜 된 콘텐츠</string>
+    <string name="home_users_like_content_title">❤️ 한 주간 가장 많이 찜 된 콘텐츠</string>
 
     <!-- 찜 목록 페이지 -->
     <string name="bottom_sheet_favorite_help_information_inquiry">문의하기</string>
