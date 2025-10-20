@@ -47,12 +47,14 @@ fun UsersLikeItem(
         Thumbnail(
             imageUrl = thumbnailUrl,
             modifier = Modifier.size(width = width, height = 140.dp),
-        ) {
-            RegionChip(
-                regionName = regionName,
-                modifier = Modifier.padding(start = 6.dp, top = 12.dp),
-            )
-        }
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        RegionChip(
+            regionName = regionName,
+            modifier = Modifier,
+        )
 
         Spacer(modifier = Modifier.height(4.dp))
 
