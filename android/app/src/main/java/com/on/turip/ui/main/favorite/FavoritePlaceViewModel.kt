@@ -140,6 +140,7 @@ class FavoritePlaceViewModel(
                             isServerError = false,
                             isNetWorkError = false,
                         )
+                    loadPlacesInSelectFolder()
                 }.onFailure { errorEvent: ErrorEvent ->
                     checkError(errorEvent)
                     Timber.e("폴더에 담긴 장소들을 불러오는 API 호출 실패")
