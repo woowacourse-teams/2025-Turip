@@ -9,6 +9,7 @@ plugins {
     id("com.google.firebase.crashlytics")
     id("kotlin-kapt")
     alias(libs.plugins.compose.compiler)
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
 
 android {
@@ -124,6 +125,9 @@ dependencies {
     // compose
     implementation(platform(libs.compose.bom))
     androidTestImplementation(platform(libs.compose.bom))
+
+    // maps
+    implementation(libs.play.services.maps)
 
     implementation(libs.androidx.ui)
     implementation(libs.androidx.material3)

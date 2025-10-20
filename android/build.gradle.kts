@@ -7,3 +7,8 @@ plugins {
     id("com.google.firebase.crashlytics") version "3.0.5" apply false
     alias(libs.plugins.compose.compiler) apply false
 }
+buildscript {
+    dependencies {
+        classpath(libs.secrets.gradle.plugin)
+    }
+}
