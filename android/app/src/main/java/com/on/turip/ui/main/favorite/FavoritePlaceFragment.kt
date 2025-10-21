@@ -256,9 +256,9 @@ class FavoritePlaceFragment :
         super.onStop()
     }
 
-    override fun onDestroy() {
+    override fun onDestroyView() {
         binding.mapFragment.onDestroy()
-        super.onDestroy()
+        super.onDestroyView()
     }
 
     override fun onLowMemory() {
