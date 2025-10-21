@@ -23,6 +23,7 @@ import com.on.turip.domain.ErrorEvent
 import com.on.turip.ui.common.base.BaseFragment
 import com.on.turip.ui.folder.FolderActivity
 import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
+import com.on.turip.ui.main.favorite.model.FavoritePlaceLatLngUiModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
 
 class FavoritePlaceFragment :
@@ -308,34 +309,67 @@ class FavoritePlaceFragment :
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
         map.uiSettings.isZoomControlsEnabled = true
-        viewModel.favoriteLatLng.observe(viewLifecycleOwner) { favoriteLatLngList ->
-            if (favoriteLatLngList.isNotEmpty()) {
-                binding.ivFavoritePlaceMapToggle.visibility = View.VISIBLE
-                binding.mapFragment.visibility = View.VISIBLE
-                map.clear()
-                markerMap.clear()
 
-                val boundsBuilder = LatLngBounds.Builder()
-                favoriteLatLngList.forEach { favoriteLatLng ->
-                    val marker =
-                        map.addMarker(
-                            MarkerOptions()
-                                .position(favoriteLatLng.favoriteLatLng)
-                                .title(favoriteLatLng.name),
-                        )
-                    marker?.let {
-                        markerMap[favoriteLatLng.placeId] = it
-                    }
-                    boundsBuilder.include(favoriteLatLng.favoriteLatLng)
-                }
-                val bounds = boundsBuilder.build()
-                map.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
-                map.setMinZoomPreference(8f)
-            } else {
-                binding.mapFragment.visibility = View.GONE
-                binding.ivFavoritePlaceMapToggle.visibility = View.GONE
-                markerMap.clear()
+        viewModel.favoriteLatLng.observe(viewLifecycleOwner) { favoriteLatLngList ->
+            when {
+                favoriteLatLngList.isEmpty() -> handleEmptyFavorites()
+                favoriteLatLngList.size == 1 -> handleSingleFavorite(favoriteLatLngList.first())
+                else -> handleMultipleFavorites(favoriteLatLngList)
             }
+        }
+    }
+
+    private fun handleEmptyFavorites() {
+        binding.mapFragment.visibility = View.GONE
+        binding.ivFavoritePlaceMapToggle.visibility = View.GONE
+        markerMap.clear()
+    }
+
+    private fun handleSingleFavorite(favoriteLatLng: FavoritePlaceLatLngUiModel) {
+        showMap()
+        clearMapMarkers()
+
+        addMarkerToMap(favoriteLatLng)
+        map.moveCamera(
+            CameraUpdateFactory.newLatLngZoom(favoriteLatLng.favoriteLatLng, 15f),
+        )
+    }
+
+    private fun handleMultipleFavorites(favoriteLatLngList: List<FavoritePlaceLatLngUiModel>) {
+        showMap()
+        clearMapMarkers()
+
+        val boundsBuilder = LatLngBounds.Builder()
+
+        favoriteLatLngList.forEach { favoriteLatLng ->
+            addMarkerToMap(favoriteLatLng)
+            boundsBuilder.include(favoriteLatLng.favoriteLatLng)
+        }
+
+        val bounds = boundsBuilder.build()
+        map.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
+        map.setMinZoomPreference(8f)
+    }
+
+    private fun showMap() {
+        binding.ivFavoritePlaceMapToggle.visibility = View.VISIBLE
+        binding.mapFragment.visibility = View.VISIBLE
+    }
+
+    private fun clearMapMarkers() {
+        map.clear()
+        markerMap.clear()
+    }
+
+    private fun addMarkerToMap(favoriteLatLng: FavoritePlaceLatLngUiModel) {
+        val marker =
+            map.addMarker(
+                MarkerOptions()
+                    .position(favoriteLatLng.favoriteLatLng)
+                    .title(favoriteLatLng.name),
+            )
+        marker?.let {
+            markerMap[favoriteLatLng.placeId] = it
         }
     }
 
