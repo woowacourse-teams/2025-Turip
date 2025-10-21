@@ -19,6 +19,7 @@ import com.on.turip.domain.folder.repository.FolderRepository
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
+import com.on.turip.ui.main.favorite.model.FavoritePlaceLatLngUiModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -34,6 +35,10 @@ class FavoritePlaceViewModel(
 
     private val _shareFolder: MutableLiveData<FavoriteFolderShareModel> = MutableLiveData()
     val shareFolder: LiveData<FavoriteFolderShareModel> get() = _shareFolder
+
+    private val _favoriteLatLng: MutableLiveData<List<FavoritePlaceLatLngUiModel>> =
+        MutableLiveData()
+    val favoriteLatLng: LiveData<List<FavoritePlaceLatLngUiModel>> get() = _favoriteLatLng
 
     private var selectedFolderId: Long = NOT_INITIALIZED
 
@@ -79,6 +84,7 @@ class FavoritePlaceViewModel(
                         places =
                             favoritePlaces.map { favoritePlace: FavoritePlace -> favoritePlace.toUiModel() },
                     )
+                _favoriteLatLng.value = favoritePlaces.map { it.toLatLng() }
             }.onFailure { errorEvent: ErrorEvent ->
                 checkError(errorEvent)
                 Timber.e("폴더에 담긴 장소들을 불러오는 API 호출 실패")
@@ -105,6 +111,7 @@ class FavoritePlaceViewModel(
                             isServerError = false,
                             isNetWorkError = false,
                         )
+                    loadPlacesInSelectFolder()
                 }.onFailure { errorEvent: ErrorEvent ->
                     checkError(errorEvent)
                     Timber.e("찜 목록 화면 폴더명에 해당하는 찜 장소들 업데이트 실패 (placeId =$placeId)")
@@ -133,6 +140,7 @@ class FavoritePlaceViewModel(
                             isServerError = false,
                             isNetWorkError = false,
                         )
+                    _favoriteLatLng.value = favoritePlaces.map { it.toLatLng() }
                 }.onFailure { errorEvent: ErrorEvent ->
                     checkError(errorEvent)
                     Timber.e("폴더에 담긴 장소들을 불러오는 API 호출 실패")

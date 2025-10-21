@@ -7,17 +7,28 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.MarkerOptions
 import com.on.turip.R
 import com.on.turip.databinding.FragmentFavoritePlaceBinding
 import com.on.turip.domain.ErrorEvent
 import com.on.turip.ui.common.base.BaseFragment
 import com.on.turip.ui.folder.FolderActivity
 import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
+import com.on.turip.ui.main.favorite.model.FavoritePlaceLatLngUiModel
+import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
 
-class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
+class FavoritePlaceFragment :
+    BaseFragment<FragmentFavoritePlaceBinding>(),
+    OnMapReadyCallback {
     private val viewModel: FavoritePlaceViewModel by viewModels { FavoritePlaceViewModel.provideFactory() }
     private val folderNameAdapter: FavoritePlaceFolderNameAdapter by lazy {
         FavoritePlaceFolderNameAdapter { folderId: Long ->
@@ -38,10 +49,29 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
                     val intent: Intent = Intent(Intent.ACTION_VIEW, uri)
                     startActivity(intent)
                 }
+
+                override fun onItemClick(favoritePlaceModel: FavoritePlaceModel) {
+                    map.animateCamera(
+                        CameraUpdateFactory.newCameraPosition(
+                            CameraPosition(
+                                favoritePlaceModel.latLng,
+                                15f,
+                                0f,
+                                0f,
+                            ),
+                        ),
+                        1000,
+                        null,
+                    )
+                    markerMap[favoritePlaceModel.placeId]?.showInfoWindow()
+                }
             },
             onCommit = { viewModel.updateFavoritePlacesOrder(it) },
         )
     }
+
+    private lateinit var map: GoogleMap
+    private val markerMap = mutableMapOf<Long, com.google.android.gms.maps.model.Marker>()
 
     override fun inflateBinding(
         inflater: LayoutInflater,
@@ -58,6 +88,7 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
         setupListeners()
         setupObservers()
         showNetworkError()
+        setupMapFragment(savedInstanceState)
     }
 
     private fun showNetworkError() {
@@ -131,6 +162,12 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
         }
         binding.ivFavoritePlaceShare.setOnClickListener {
             viewModel.shareFolder()
+        }
+
+        binding.ivFavoritePlaceMapToggle.setOnClickListener {
+            val isMapVisible = binding.mapFragment.isVisible
+            binding.mapFragment.visibility = if (isMapVisible) View.GONE else View.VISIBLE
+            it.isSelected = isMapVisible
         }
     }
 
@@ -209,8 +246,39 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
         startActivity(chooserIntent)
     }
 
+    override fun onStart() {
+        super.onStart()
+        binding.mapFragment.onStart()
+    }
+
+    override fun onPause() {
+        binding.mapFragment.onPause()
+        super.onPause()
+    }
+
+    override fun onStop() {
+        binding.mapFragment.onStop()
+        super.onStop()
+    }
+
+    override fun onDestroyView() {
+        binding.mapFragment.onDestroy()
+        super.onDestroyView()
+    }
+
+    override fun onLowMemory() {
+        super.onLowMemory()
+        binding.mapFragment.onLowMemory()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        binding.mapFragment.onSaveInstanceState(outState)
+    }
+
     override fun onResume() {
         super.onResume()
+        binding.mapFragment.onResume()
         viewModel.loadFoldersAndPlaces()
     }
 
@@ -218,6 +286,90 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
         super.onHiddenChanged(hidden)
         if (!hidden) {
             viewModel.loadFoldersAndPlaces()
+        }
+    }
+
+    private fun setupMapFragment(savedInstanceState: Bundle?) {
+        binding.mapFragment.onCreate(savedInstanceState)
+        binding.mapFragment.getMapAsync { googleMap ->
+            googleMap.setOnCameraMoveStartedListener { reason ->
+                if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
+                    binding.root.parent?.requestDisallowInterceptTouchEvent(true)
+                }
+            }
+
+            googleMap.setOnCameraIdleListener {
+                binding.root.parent?.requestDisallowInterceptTouchEvent(false)
+            }
+
+            onMapReady(googleMap)
+        }
+    }
+
+    override fun onMapReady(googleMap: GoogleMap) {
+        map = googleMap
+        map.uiSettings.isZoomControlsEnabled = true
+
+        viewModel.favoriteLatLng.observe(viewLifecycleOwner) { favoriteLatLngList ->
+            when {
+                favoriteLatLngList.isEmpty() -> handleEmptyFavorites()
+                favoriteLatLngList.size == 1 -> handleSingleFavorite(favoriteLatLngList.first())
+                else -> handleMultipleFavorites(favoriteLatLngList)
+            }
+        }
+    }
+
+    private fun handleEmptyFavorites() {
+        binding.mapFragment.visibility = View.GONE
+        binding.ivFavoritePlaceMapToggle.visibility = View.GONE
+        markerMap.clear()
+    }
+
+    private fun handleSingleFavorite(favoriteLatLng: FavoritePlaceLatLngUiModel) {
+        showMap()
+        clearMapMarkers()
+
+        addMarkerToMap(favoriteLatLng)
+        map.moveCamera(
+            CameraUpdateFactory.newLatLngZoom(favoriteLatLng.favoriteLatLng, 15f),
+        )
+    }
+
+    private fun handleMultipleFavorites(favoriteLatLngList: List<FavoritePlaceLatLngUiModel>) {
+        showMap()
+        clearMapMarkers()
+
+        val boundsBuilder = LatLngBounds.Builder()
+
+        favoriteLatLngList.forEach { favoriteLatLng ->
+            addMarkerToMap(favoriteLatLng)
+            boundsBuilder.include(favoriteLatLng.favoriteLatLng)
+        }
+
+        val bounds = boundsBuilder.build()
+        map.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
+        map.setMinZoomPreference(8f)
+    }
+
+    private fun showMap() {
+        binding.ivFavoritePlaceMapToggle.visibility = View.VISIBLE
+        binding.mapFragment.visibility = View.VISIBLE
+    }
+
+    private fun clearMapMarkers() {
+        map.clear()
+        markerMap.clear()
+    }
+
+    private fun addMarkerToMap(favoriteLatLng: FavoritePlaceLatLngUiModel) {
+        val marker =
+            map.addMarker(
+                MarkerOptions()
+                    .position(favoriteLatLng.favoriteLatLng)
+                    .title(favoriteLatLng.name),
+            )
+        marker?.let {
+            markerMap[favoriteLatLng.placeId] = it
         }
     }
 
