@@ -21,7 +21,7 @@ docker-compose pull ${IDLE_PROFILE}
 echo "### 🟢 새 Docker 이미지 pull 완료 ###"
 
 echo "### 🚀 ${IDLE_PROFILE} 컨테이너 실행 시작 ###"
-docker-compose up -d ${IDLE_PROFILE} --no-deps
+docker-compose up -d --no-deps "${IDLE_PROFILE}"
 echo "### 🟢 ${IDLE_PROFILE} 컨테이너 실행 완료 ###"
 
 echo "### 🚀 Health check 시작 ###"
