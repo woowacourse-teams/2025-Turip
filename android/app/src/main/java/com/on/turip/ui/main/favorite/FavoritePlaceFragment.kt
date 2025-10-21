@@ -50,7 +50,7 @@ class FavoritePlaceFragment :
                 }
 
                 override fun onItemClick(favoritePlaceModel: FavoritePlaceModel) {
-                    map.moveCamera(
+                    map.animateCamera(
                         CameraUpdateFactory.newCameraPosition(
                             CameraPosition(
                                 favoritePlaceModel.latLng,
@@ -59,6 +59,8 @@ class FavoritePlaceFragment :
                                 0f,
                             ),
                         ),
+                        1000,
+                        null,
                     )
                 }
             },
