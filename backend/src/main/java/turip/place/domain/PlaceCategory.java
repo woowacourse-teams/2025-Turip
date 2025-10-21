@@ -14,6 +14,7 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "place_category", uniqueConstraints = {
@@ -32,6 +33,7 @@ public class PlaceCategory {
     @JoinColumn(name = "place_id", nullable = false, foreignKey = @ForeignKey(name = "fk_place_category__place"))
     private Place place;
 
+    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false, foreignKey = @ForeignKey(name = "fk_place_category__category"))
     private Category category;

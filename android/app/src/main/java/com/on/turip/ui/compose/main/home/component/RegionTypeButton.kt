@@ -22,7 +22,9 @@ fun RegionTypeButton(
     modifier: Modifier = Modifier,
 ) {
     val backgroundColor: Color =
-        if (isSelected) colorResource(R.color.gray_400_2b2b2b) else colorResource(R.color.gray_200_c1c1c1)
+        if (isSelected) colorResource(R.color.turip_blue_11aebf_70) else colorResource(R.color.turip_light_blue_5ac3d5_11)
+    val textColor: Color =
+        if (isSelected) colorResource(R.color.turip_light_gray_f2f2f2) else colorResource(R.color.turip_gray_b4b4b4)
     Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(containerColor = backgroundColor),
@@ -33,7 +35,7 @@ fun RegionTypeButton(
         Text(
             text = text,
             style = TuripTypography.titleSmall,
-            color = colorResource(R.color.pure_white_ffffff),
+            color = textColor,
         )
     }
 }

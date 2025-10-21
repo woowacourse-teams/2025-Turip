@@ -66,7 +66,7 @@ class FavoritePlaceFolderFragment : BaseFragment<BottomSheetFragmentFavoritePlac
             }
         val message = getString(messageResource, favoritePlaceFolderModel.name)
         val iconResource =
-            if (updatedFavorites) R.drawable.ic_heart_normal else R.drawable.ic_heart_empty
+            if (updatedFavorites) R.drawable.ic_heart_pressed else R.drawable.ic_heart_empty
 
         TuripSnackbar
             .make(

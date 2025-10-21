@@ -1,6 +1,8 @@
 [versions]
 playServicesMaps = "19.2.0"
 secretsGradlePlugin = "2.0.1"
+appUpdate = "2.1.0"
+appUpdateKtx = "2.1.0"
 versionName = "1.2.0"
 versionCode = "121"
 composeBom = "2025.08.00"
@@ -54,6 +56,8 @@ androidx-ui = { module = "androidx.compose.ui:ui" }
 androidx-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 androidx-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
 androidx-viewpager2 = { module = "androidx.viewpager2:viewpager2", version.ref = "viewpager2" }
+app-update = { module = "com.google.android.play:app-update", version.ref = "appUpdate" }
+app-update-ktx = { module = "com.google.android.play:app-update-ktx", version.ref = "appUpdateKtx" }
 assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertjCore" }
 coil = { module = "io.coil-kt:coil", version.ref = "coil" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }

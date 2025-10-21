@@ -21,6 +21,7 @@ import turip.data.controller.dto.CsvDataDto;
 import turip.place.domain.Category;
 import turip.place.domain.Place;
 import turip.place.domain.PlaceCategory;
+import turip.place.repository.CategoryRepository;
 import turip.place.repository.PlaceCategoryRepository;
 import turip.place.repository.PlaceRepository;
 import turip.place.service.CategoryService;
@@ -48,6 +49,7 @@ public class DataImportService {
     private final PlaceCategoryRepository placeCategoryRepository;
     private final ContentPlaceRepository contentPlaceRepository;
     private final CategoryService categoryService;
+    private final CategoryRepository categoryRepository;
 
     public void importCsvData(String csvFilePath) {
         try (BufferedReader reader = new BufferedReader(new FileReader(csvFilePath))) {
@@ -253,7 +255,8 @@ public class DataImportService {
         if (isNullOrEmpty(categoryName)) {
             return null;
         }
-        return categoryService.findOrCreateCategory(categoryName);
+        return categoryRepository.findByName(categoryName)
+                .orElseGet(() -> categoryRepository.save(new Category(categoryName)));
     }
 
     private PlaceCategory findOrCreatePlaceCategory(Place place, Category category) {
