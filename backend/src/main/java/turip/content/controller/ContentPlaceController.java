@@ -11,27 +11,27 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import turip.auth.AuthMember;
 import turip.auth.MemberResolvePolicy;
 import turip.common.exception.ErrorResponse;
-import turip.content.controller.dto.response.ContentPlaceDetailResponse;
+import turip.content.controller.dto.response.place.ContentPlaceDetailResponse;
 import turip.content.service.ContentPlaceService;
 import turip.member.domain.Member;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/content-places")
-@Tag(name = "ContentPlace", description = "여행 코스 API")
+@RequestMapping("/contents")
+@Tag(name = "ContentPlace", description = "컨텐츠 장소 API")
 public class ContentPlaceController {
 
     private final ContentPlaceService contentPlaceService;
 
     @Operation(
-            summary = "여행 상세 조회 api",
-            description = "특정 컨텐츠에 대한 여행 코스들을 조회한다."
+            summary = "컨텐츠 상세 조회 api",
+            description = "특정 컨텐츠에 대한 장소들을 조회한다."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -108,17 +108,17 @@ public class ContentPlaceController {
                                     summary = "컨텐츠를 찾을 수 없음",
                                     value = """
                                             {
-                                                "message": "해당 id에 대한 컨텐츠가 존재하지 않습니다."
+                                                "tag": "CONTENT_NOT_FOUND"
                                             }
                                             """
                             )
                     )
             )
     })
-    @GetMapping
+    @GetMapping("/{contentId}/places")
     public ResponseEntity<ContentPlaceDetailResponse> readContentPlaceDetails(
             @Parameter(hidden = true) @AuthMember(policy = MemberResolvePolicy.CREATE_IF_ABSENT) Member member,
-            @RequestParam(name = "contentId") Long contentId) {
+            @PathVariable Long contentId) {
         ContentPlaceDetailResponse response = contentPlaceService.findContentPlaceDetails(member, contentId);
         return ResponseEntity.ok(response);
     }

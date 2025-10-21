@@ -22,7 +22,7 @@
     <string name="search_result_no_result">검색 결과가 없습니다.</string>
     <string name="search_result_video_description">%1$s · %2$s</string>
     <string name="search_result_exist_result">검색결과 %d개</string>
-    <string name="search_result_hint_text">예시 검색: 도쿄, 맛집, 감성</string>
+    <string name="search_result_hint_text">예시 검색: 1박 2일, 감성, 도쿄, 해수욕장</string>
 
     <!-- 지역 결과 페이지 -->
     <string name="region_result_no_result">검색 결과가 없습니다.</string>
@@ -33,10 +33,8 @@
     <string name="bottom_sheet_favorite_place_folder_title">폴더 목록</string>
 
     <!-- 홈 페이지 -->
-    <string name="home_where_should_we_go_title">✈️크리에이터 여행, 찜까지 간편하게</string>
-    <string name="home_domestic">국내</string>
-    <string name="home_abroad">해외</string>
-    <string name="home_users_like_content_title">🩵 한 주간 가장 많이 찜 된 콘텐츠</string>
+    <string name="home_top_title">😊 오늘의 기분은, 여행하기 딱 좋아요!</string>
+    <string name="home_users_like_content_title">❤️ 한 주간 가장 많이 찜 된 콘텐츠</string>
 
     <!-- 찜 목록 페이지 -->
     <string name="bottom_sheet_favorite_help_information_inquiry">문의하기</string>
@@ -53,12 +51,14 @@
     <!-- 스플래시 페이지 -->
     <string name="splash_description">직진만 남은 여행</string>
 
-    <!-- 검색 상세 페이지 -->
+    <!-- 여행 상세 페이지 -->
     <string name="trip_detail_video_error">해당 영상은 제작자의 요청으로 유튜브로만 시청할 수 있습니다.\n클릭 시 유튜브로 이동합니다.</string>
     <string name="trip_detail_day_place_count">일정 %d개</string>
     <string name="trip_detail_travel_day">%d일차</string>
+    <string name="trip_detail_travel_all_place">전체</string>
     <string name="trip_detail_snackbar_favorite_save">컨텐츠 찜 목록에 저장했어요</string>
     <string name="trip_detail_snackbar_favorite_remove">컨텐츠 찜 목록에서 삭제했어요</string>
+    <string name="trip_detail_info">%s • %d개 장소 • %s</string>
     <string name="bottom_sheet_favorite_place_folder_save_with_folder_name">%s에 저장했어요</string>
     <string name="bottom_sheet_favorite_place_folder_remove_with_folder_name">%s에서 삭제했어요</string>
     <string name="travel_place_map">지도</string>
@@ -87,5 +87,9 @@
     <!-- 서버 오류 -->
     <string name="server_error">서버에 오류가 발생했습니다.</string>
     <string name="retry_later">나중에 다시 시도해주세요</string>
+
+    <!-- 지역 타입(국내, 해외) 버튼 -->
+    <string name="region_type_buttons_domestic">국내</string>
+    <string name="region_type_buttons_abroad">해외</string>
 
 </resources>

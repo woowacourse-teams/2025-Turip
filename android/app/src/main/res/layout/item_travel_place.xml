@@ -7,8 +7,7 @@
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="20dp"
     android:layout_marginBottom="12dp"
-    android:background="@drawable/bg_stroke_gray200_radius_24dp"
-    android:backgroundTint="@color/gray_300_5b5b5b"
+    android:background="@drawable/bg_turip_light_gray_50_stroke_turip_black_06_radius_24dp"
     android:paddingVertical="20dp">
 
     <TextView
@@ -17,7 +16,7 @@
         android:layout_height="0dp"
         android:layout_marginHorizontal="28dp"
         android:textAppearance="@style/title3"
-        android:textColor="@color/pure_white_ffffff"
+        android:textColor="@color/gray_400_2b2b2b"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_goneMarginTop="20dp"
@@ -32,7 +31,7 @@
         android:ellipsize="end"
         android:maxLines="1"
         android:textAppearance="@style/title1"
-        android:textColor="@color/pure_white_ffffff"
+        android:textColor="@color/gray_400_2b2b2b"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@id/tv_travel_place_category"
         app:layout_constraintTop_toBottomOf="@id/tv_travel_place_category"
@@ -58,7 +57,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/turip_lemon_faff60" />
+            app:tint="@color/turip_blue_11aebf" />
 
         <TextView
             android:id="@+id/tv_travel_place_time_line"
@@ -66,7 +65,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:textAppearance="@style/info1"
-            android:textColor="@color/pure_white_ffffff"
+            android:textColor="@color/gray_400_2b2b2b"
             app:layout_constraintBottom_toBottomOf="@id/iv_travel_place_time_line"
             app:layout_constraintStart_toEndOf="@id/iv_travel_place_time_line"
             app:layout_constraintTop_toTopOf="@id/iv_travel_place_time_line"
@@ -80,10 +79,10 @@
         android:layout_height="0dp"
         android:layout_marginVertical="8dp"
         android:background="@color/pure_white_ffffff"
-        app:layout_constraintBottom_toBottomOf="@id/cl_travel_place_time_line"
+        app:layout_constraintBottom_toBottomOf="@id/cl_travel_place_map"
         app:layout_constraintEnd_toStartOf="@id/cl_travel_place_map"
         app:layout_constraintStart_toEndOf="@id/cl_travel_place_time_line"
-        app:layout_constraintTop_toTopOf="@id/cl_travel_place_time_line" />
+        app:layout_constraintTop_toTopOf="@id/cl_travel_place_map" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/cl_travel_place_map"
@@ -97,14 +96,13 @@
 
         <ImageView
             android:id="@+id/iv_travel_place_map"
-            android:layout_width="18dp"
-            android:layout_height="18dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:contentDescription="@null"
-            android:src="@drawable/btn_map_link"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/turip_lemon_faff60" />
+            tools:src="@drawable/btn_map_link" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -112,7 +110,7 @@
             android:layout_marginStart="8dp"
             android:text="@string/travel_place_map"
             android:textAppearance="@style/info1"
-            android:textColor="@color/pure_white_ffffff"
+            android:textColor="@color/gray_400_2b2b2b"
             app:layout_constraintBottom_toBottomOf="@id/iv_travel_place_map"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/iv_travel_place_map"
@@ -145,7 +143,7 @@
             android:layout_width="18dp"
             android:layout_height="18dp"
             android:contentDescription="@null"
-            android:src="@drawable/btn_favorite_lemon"
+            android:src="@drawable/btn_favorite_red"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -156,7 +154,7 @@
             android:layout_marginStart="8dp"
             android:text="@string/travel_place_favorite"
             android:textAppearance="@style/info1"
-            android:textColor="@color/pure_white_ffffff"
+            android:textColor="@color/gray_400_2b2b2b"
             app:layout_constraintBottom_toBottomOf="@id/iv_travel_place_favorite"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/iv_travel_place_favorite"

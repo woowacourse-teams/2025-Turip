@@ -8,7 +8,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import turip.common.log.LoggingInterceptor;
 
 @Configuration
-@Profile("dev")
+@Profile({"local", "dev", "prod"})
 @RequiredArgsConstructor
 public class LoggingConfiguration implements WebMvcConfigurer {
 

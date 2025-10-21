@@ -10,18 +10,31 @@
     android:paddingVertical="15dp">
 
     <TextView
+        android:id="@+id/tv_favorite_content_region"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:background="@drawable/bg_turip_light_beige_radius_24dp"
+        android:paddingHorizontal="14dp"
+        android:paddingVertical="4dp"
+        android:textAppearance="@style/title4"
+        android:textColor="@color/pure_black_151515"
+        app:layout_constraintStart_toEndOf="@id/iv_favorite_content_video_thumbnail"
+        app:layout_constraintTop_toTopOf="@id/iv_favorite_content_video_thumbnail"
+        tools:text="대구" />
+
+    <TextView
         android:id="@+id/tv_favorite_content_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginTop="4dp"
         android:ellipsize="end"
         android:maxLines="2"
         android:textAppearance="@style/body1"
         android:textColor="@color/pure_black_151515"
         app:layout_constraintEnd_toStartOf="@id/iv_favorite_content_favorite"
-        app:layout_constraintStart_toEndOf="@id/iv_favorite_content_video_thumbnail"
-        app:layout_constraintTop_toTopOf="@id/iv_favorite_content_video_thumbnail"
+        app:layout_constraintStart_toStartOf="@id/tv_favorite_content_region"
+        app:layout_constraintTop_toBottomOf="@id/tv_favorite_content_region"
         tools:text="대프리카지만 괜찮아... 느좋 대구 여행
 기 어쩌구저쩌구 ...제목이 긴 경우가 많아서..." />
 
@@ -37,21 +50,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:src="@drawable/ic_launcher_background" />
-
-    <TextView
-        android:id="@+id/tv_favorite_content_region"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="12dp"
-        android:background="@drawable/bg_turip_lemon_radius_24dp"
-        android:paddingHorizontal="8dp"
-        android:paddingVertical="2dp"
-        android:textAppearance="@style/info1"
-        android:textColor="@color/pure_black_151515"
-        app:layout_constraintStart_toStartOf="@id/iv_favorite_content_video_thumbnail"
-        app:layout_constraintTop_toTopOf="@id/iv_favorite_content_video_thumbnail"
-        tools:text="대구" />
 
     <ImageView
         android:id="@+id/iv_favorite_content_favorite"
@@ -70,7 +68,7 @@
         android:id="@+id/tv_favorite_content_creator_name_and_upload_date"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="4dp"
         android:layout_marginEnd="10dp"
         android:textAppearance="@style/info1"
         android:textColor="@color/gray_300_5b5b5b"
@@ -83,9 +81,10 @@
         android:id="@+id/tv_favorite_content_total_place_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="4dp"
         android:textAppearance="@style/info1"
         android:textColor="@color/gray_300_5b5b5b"
+        app:layout_constraintBottom_toBottomOf="@id/iv_favorite_content_video_thumbnail"
         app:layout_constraintStart_toStartOf="@id/tv_favorite_content_creator_name_and_upload_date"
         app:layout_constraintTop_toBottomOf="@id/tv_favorite_content_creator_name_and_upload_date"
         tools:text="12개 장소" />
@@ -97,6 +96,7 @@
         android:layout_marginStart="16dp"
         android:textAppearance="@style/info1"
         android:textColor="@color/gray_300_5b5b5b"
+        app:layout_constraintBottom_toBottomOf="@id/tv_favorite_content_total_place_count"
         app:layout_constraintStart_toEndOf="@id/tv_favorite_content_total_place_count"
         app:layout_constraintTop_toTopOf="@id/tv_favorite_content_total_place_count"
         tools:text="당일치기" />

@@ -7,12 +7,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.ConflictException;
 import turip.common.exception.custom.NotFoundException;
-import turip.content.controller.dto.response.ContentResponse;
-import turip.content.controller.dto.response.ContentWithTripInfoAndFavoriteResponse;
-import turip.content.controller.dto.response.MyFavoriteContentsResponse;
-import turip.content.controller.dto.response.TripDurationResponse;
+import turip.content.controller.dto.response.content.ContentDetailResponse;
+import turip.content.controller.dto.response.content.ContentResponse;
+import turip.content.controller.dto.response.content.ContentsDetailWithLoadableResponse;
+import turip.content.controller.dto.response.content.TripDurationResponse;
 import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
 import turip.content.service.ContentPlaceService;
@@ -34,16 +35,16 @@ public class FavoriteContentService {
     public FavoriteContentResponse create(FavoriteContentRequest request, Member member) {
         Long contentId = request.contentId();
         Content content = contentRepository.findById(contentId)
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 컨텐츠입니다."));
+                .orElseThrow(() -> new NotFoundException(ErrorTag.CONTENT_NOT_FOUND));
         if (favoriteContentRepository.existsByMemberIdAndContentId(member.getId(), content.getId())) {
-            throw new ConflictException("이미 찜한 컨텐츠입니다.");
+            throw new ConflictException(ErrorTag.FAVORITE_CONTENT_CONFLICT);
         }
         FavoriteContent favoriteContent = new FavoriteContent(LocalDate.now(), member, content);
         FavoriteContent savedFavoriteContent = favoriteContentRepository.save(favoriteContent);
         return FavoriteContentResponse.from(savedFavoriteContent);
     }
 
-    public MyFavoriteContentsResponse findMyFavoriteContents(Member member, int pageSize, long lastContentId) {
+    public ContentsDetailWithLoadableResponse findMyFavoriteContents(Member member, int pageSize, long lastContentId) {
         if (lastContentId == 0) {
             lastContentId = Long.MAX_VALUE;
         }
@@ -51,20 +52,20 @@ public class FavoriteContentService {
                 lastContentId,
                 PageRequest.of(0, pageSize));
         List<Content> contents = contentSlice.getContent();
-        List<ContentWithTripInfoAndFavoriteResponse> contentsWithTripInfo = convertToContentWithTripInfoResponses(
+        List<ContentDetailResponse> contentsWithTripInfo = convertToContentWithTripInfoResponses(
                 contents);
         boolean loadable = contentSlice.hasNext();
 
-        return MyFavoriteContentsResponse.of(contentsWithTripInfo, loadable);
+        return ContentsDetailWithLoadableResponse.of(contentsWithTripInfo, loadable);
     }
 
     @Transactional
     public void remove(Member member, Long contentId) {
         Content content = contentRepository.findById(contentId)
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 컨텐츠입니다."));
+                .orElseThrow(() -> new NotFoundException(ErrorTag.CONTENT_NOT_FOUND));
         FavoriteContent favoriteContent = favoriteContentRepository.findByMemberIdAndContentId(member.getId(),
                         content.getId())
-                .orElseThrow(() -> new NotFoundException("해당 컨텐츠는 찜한 상태가 아닙니다."));
+                .orElseThrow(() -> new NotFoundException(ErrorTag.FAVORITE_CONTENT_NOT_FOUND));
         favoriteContentRepository.delete(favoriteContent);
     }
 
@@ -73,14 +74,14 @@ public class FavoriteContentService {
         return TripDurationResponse.of(totalTripDay - 1, totalTripDay);
     }
 
-    private List<ContentWithTripInfoAndFavoriteResponse> convertToContentWithTripInfoResponses(List<Content> contents) {
+    private List<ContentDetailResponse> convertToContentWithTripInfoResponses(List<Content> contents) {
         return contents.stream()
                 .map(content -> {
                     ContentResponse contentWithCreatorAndCity = ContentResponse.of(content, true);
                     TripDurationResponse tripDuration = calculateTripDuration(content);
                     validateContentExists(content.getId());
                     int tripPlaceCount = contentPlaceService.countByContentId(content.getId());
-                    return ContentWithTripInfoAndFavoriteResponse.of(contentWithCreatorAndCity, tripDuration,
+                    return ContentDetailResponse.of(contentWithCreatorAndCity, tripDuration,
                             tripPlaceCount);
                 })
                 .toList();
@@ -89,7 +90,7 @@ public class FavoriteContentService {
     private void validateContentExists(Long contentId) {
         boolean isContentExists = contentRepository.existsById(contentId);
         if (!isContentExists) {
-            throw new NotFoundException("컨텐츠를 찾을 수 없습니다.");
+            throw new NotFoundException(ErrorTag.CONTENT_NOT_FOUND);
         }
     }
 }

@@ -3,6 +3,7 @@ package turip.member.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.NotFoundException;
 import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.repository.FavoriteFolderRepository;
@@ -29,6 +30,6 @@ public class MemberService {
 
     public Member getMemberByDeviceId(String deviceFid) {
         return memberRepository.findByDeviceFid(deviceFid)
-                .orElseThrow(() -> new NotFoundException("해당 id에 대한 회원이 존재하지 않습니다."));
+                .orElseThrow(() -> new NotFoundException(ErrorTag.MEMBER_NOT_FOUND));
     }
 }

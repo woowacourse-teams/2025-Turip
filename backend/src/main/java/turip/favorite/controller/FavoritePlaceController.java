@@ -13,21 +13,24 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import turip.auth.AuthMember;
 import turip.auth.MemberResolvePolicy;
 import turip.common.exception.ErrorResponse;
+import turip.favorite.controller.dto.request.FavoritePlaceOrderRequest;
 import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlaceResponse;
-import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlacesWithDetailPlaceInformationResponse;
+import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlacesWithPlaceDetailResponse;
 import turip.favorite.service.FavoritePlaceService;
 import turip.member.domain.Member;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/favorite-places")
+@RequestMapping("/favorites/places")
 @Tag(name = "FavoritePlace", description = "장소 찜 API")
 public class FavoritePlaceController {
 
@@ -69,7 +72,7 @@ public class FavoritePlaceController {
                                             summary = "폴더 소유자의 기기id와 요청자의 기기id가 같지 않은 경우",
                                             value = """
                                                     {
-                                                        "message" : "폴더 소유자의 기기id와 요청자의 기기id가 같지 않습니다."
+                                                        "tag" : "FORBIDDEN"
                                                     }
                                                     """
                                     )
@@ -88,7 +91,7 @@ public class FavoritePlaceController {
                                             summary = "favoriteFolderId에 대한 폴더를 찾을 수 없는 경우",
                                             value = """
                                                     {
-                                                        "message" : "해당 id에 대한 폴더가 존재하지 않습니다."
+                                                        "tag" : "FAVORITE_FOLDER_NOT_FOUND"
                                                     }
                                                     """
                                     ),
@@ -97,7 +100,7 @@ public class FavoritePlaceController {
                                             summary = "placeId에 대한 장소를 찾을 수 없는 경우",
                                             value = """
                                                     {
-                                                        "message" : "해당 id에 대한 장소가 존재하지 않습니다."
+                                                        "tag" : "FAVORITE_PLACE_NOT_FOUND"
                                                     }
                                                     """
                                     )
@@ -116,7 +119,7 @@ public class FavoritePlaceController {
                                             summary = "이미 해당 폴더에 찜한 상태인 경우",
                                             value = """
                                                     {
-                                                        "message": "이미 해당 폴더에 찜한 장소입니다."
+                                                        "tag": "FAVORITE_PLACE_IN_FOLDER_CONFLICT"
                                                     }
                                                     """
                                     )
@@ -131,7 +134,7 @@ public class FavoritePlaceController {
             @RequestParam("placeId") Long placeId
     ) {
         FavoritePlaceResponse response = favoritePlaceService.create(member, favoriteFolderId, placeId);
-        return ResponseEntity.created(URI.create("/favorite-places/" + response.id()))
+        return ResponseEntity.created(URI.create("/favorites/places/" + response.id()))
                 .body(response);
     }
 
@@ -145,7 +148,7 @@ public class FavoritePlaceController {
                     description = "성공 예시",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = FavoritePlacesWithDetailPlaceInformationResponse.class),
+                            schema = @Schema(implementation = FavoritePlacesWithPlaceDetailResponse.class),
                             examples = @ExampleObject(
                                     name = "success",
                                     summary = "장소 찜 폴더의 장소 찜 목록 조회 성공",
@@ -203,7 +206,7 @@ public class FavoritePlaceController {
                                             summary = "favoriteFolderId에 대한 폴더가 존재하지 않는 경우",
                                             value = """
                                                     {
-                                                        "message" : "해당 id에 대한 폴더가 존재하지 않습니다."
+                                                        "tag" : "FAVORITE_FOLDER_NOT_FOUND"
                                                     }
                                                     """
                                     )
@@ -212,11 +215,96 @@ public class FavoritePlaceController {
             )
     })
     @GetMapping
-    public ResponseEntity<FavoritePlacesWithDetailPlaceInformationResponse> readAllByFolder(
+    public ResponseEntity<FavoritePlacesWithPlaceDetailResponse> readAllByFolder(
             @RequestParam("favoriteFolderId") Long favoriteFolderId) {
-        FavoritePlacesWithDetailPlaceInformationResponse response = favoritePlaceService.findAllByFolder(
+        FavoritePlacesWithPlaceDetailResponse response = favoritePlaceService.findAllByFolder(
                 favoriteFolderId);
         return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "장소 찜 폴더 내의 장소 찜 정렬 순서 변경 api",
+            description = "장소 찜 폴더의 장소 찜들의 정렬 순서를 변경한다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "성공 예시"
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "not_folder_owner",
+                                            summary = "폴더 소유자의 기기id와 요청자의 기기id가 같지 않은 경우",
+                                            value = """
+                                                    {
+                                                        "tag" : "FORBIDDEN"
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "favorite_place_not_belongs_to_folder",
+                                            summary = "다른 폴더의 favoritePlaceId가 포함된 경우",
+                                            value = """
+                                                    {
+                                                        "tag" : "FORBIDDEN"
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "member_not_found",
+                                            summary = "device-fid에 대한 회원을 찾을 수 없는 경우",
+                                            value = """
+                                                    {
+                                                        "tag" : "MEMBER_NOT_FOUND"
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "folder_not_found",
+                                            summary = "id에 대한 폴더를 찾을 수 없는 경우",
+                                            value = """
+                                                    {
+                                                        "tag" : "FAVORITE_FOLDER_NOT_FOUND"
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "favorite_place_not_found",
+                                            summary = "favoritePlaceId에 대한 찜한 장소를 찾을 수 없는 경우",
+                                            value = """
+                                                    {
+                                                        "tag" : "FAVORITE_PLACE_NOT_FOUND"
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            )
+    })
+    @PatchMapping("/favorite-order")
+    public ResponseEntity<Void> updatePlaceOrder(
+            @Parameter(hidden = true) @AuthMember(policy = MemberResolvePolicy.REQUIRED) Member member,
+            @RequestParam("favoriteFolderId") Long favoriteFolderId,
+            @RequestBody FavoritePlaceOrderRequest request
+    ) {
+        favoritePlaceService.updatePlaceOrder(member, favoriteFolderId, request);
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(
@@ -240,7 +328,7 @@ public class FavoritePlaceController {
                                             summary = "폴더 소유자의 기기id와 요청자의 기기id가 같지 않은 경우",
                                             value = """
                                                     {
-                                                        "message" : "폴더 소유자의 기기id와 요청자의 기기id가 같지 않습니다."
+                                                        "tag" : "FORBIDDEN"
                                                     }
                                                     """
                                     )
@@ -259,7 +347,7 @@ public class FavoritePlaceController {
                                             summary = "deviceFid에 대한 회원을 찾을 수 없는 경우",
                                             value = """
                                                     {
-                                                        "message" : "해당 id에 대한 회원이 존재하지 않습니다."
+                                                        "tag" : "MEMBER_NOT_FOUND"
                                                     }
                                                     """
                                     ),
@@ -268,7 +356,7 @@ public class FavoritePlaceController {
                                             summary = "favoriteFolderId에 대한 폴더를 찾을 수 없는 경우",
                                             value = """
                                                     {
-                                                        "message" : "해당 id에 대한 폴더가 존재하지 않습니다."
+                                                        "tag" : "FAVORITE_FOLDER_NOT_FOUND"
                                                     }
                                                     """
                                     ),
@@ -277,7 +365,7 @@ public class FavoritePlaceController {
                                             summary = "placeId에 대한 장소를 찾을 수 없는 경우",
                                             value = """
                                                     {
-                                                        "message" : "해당 id에 대한 장소가 존재하지 않습니다."
+                                                        "tag" : "PLACE_NOT_FOUND"
                                                     }
                                                     """
                                     ),
@@ -286,7 +374,7 @@ public class FavoritePlaceController {
                                             summary = "해당 폴더에 장소 찜이 되어있지 않은 경우",
                                             value = """
                                                     {
-                                                        "message" : "삭제하려는 장소 찜이 존재하지 않습니다."
+                                                        "tag" : "FAVORITE_PLACE_NOT_FOUND"
                                                     }
                                                     """
                                     )

@@ -8,6 +8,8 @@ plugins {
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
     id("kotlin-kapt")
+    alias(libs.plugins.compose.compiler)
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
 
 android {
@@ -27,13 +29,6 @@ android {
                 .toInt()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
-        val baseUrl: String = gradleLocalProperties(rootDir, providers).getProperty("base_url")
-        buildConfigField(
-            "String",
-            "BASE_URL",
-            "\"$baseUrl\"",
-        )
     }
 
     buildTypes {
@@ -43,6 +38,11 @@ android {
             applicationIdSuffix = ".debug"
             versionNameSuffix = ".debug"
             manifestPlaceholders["appName"] = "튜립.debug"
+            buildConfigField(
+                "String",
+                "BASE_URL",
+                "\"${gradleLocalProperties(rootDir, providers).getProperty("debug_base_url")}\"",
+            )
         }
 
         release {
@@ -54,6 +54,11 @@ android {
             )
             signingConfig = signingConfigs.getByName("debug")
             manifestPlaceholders["appName"] = "튜립"
+            buildConfigField(
+                "String",
+                "BASE_URL",
+                "\"${gradleLocalProperties(rootDir, providers).getProperty("release_base_url")}\"",
+            )
         }
     }
 
@@ -66,6 +71,7 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        compose = true
     }
 }
 
@@ -115,4 +121,25 @@ dependencies {
     implementation(libs.androidx.viewpager2)
     // livedata
     implementation(libs.androidx.lifecycle.livedata.ktx)
+
+    // compose
+    implementation(platform(libs.compose.bom))
+    androidTestImplementation(platform(libs.compose.bom))
+
+    // maps
+    implementation(libs.play.services.maps)
+
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.ui.tooling.preview)
+    debugImplementation(libs.androidx.ui.tooling)
+    implementation(libs.androidx.runtime.livedata)
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
+
+    // app update
+    implementation(libs.app.update)
+    implementation(libs.app.update.ktx)
 }

@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.on.turip.databinding.ItemFavoritePlaceBinding
 import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
+import com.on.turip.ui.trip.detail.Maps
 
 class FavoritePlaceViewHolder(
     private val binding: ItemFavoritePlaceBinding,
@@ -24,6 +25,11 @@ class FavoritePlaceViewHolder(
                 favoritePlaceListener.onFavoriteClick(it.placeId, it.isFavorite)
             }
         }
+        binding.root.setOnClickListener {
+            favoritePlaceModel?.let {
+                favoritePlaceListener.onItemClick(it)
+            }
+        }
     }
 
     fun bind(favoritePlaceModel: FavoritePlaceModel) {
@@ -32,6 +38,7 @@ class FavoritePlaceViewHolder(
         binding.tvFavoritePlaceCategory.text = favoritePlaceModel.turipCategory
         binding.tvFavoritePlaceName.text = favoritePlaceModel.name
         binding.ivFavoritePlaceFavorite.isSelected = favoritePlaceModel.isFavorite
+        binding.ivFavoritePlaceMapLink.setImageResource(Maps.from(favoritePlaceModel.uri).iconRes)
     }
 
     companion object {
@@ -53,5 +60,7 @@ class FavoritePlaceViewHolder(
         )
 
         fun onMapClick(uri: Uri)
+
+        fun onItemClick(favoritePlaceModel: FavoritePlaceModel)
     }
 }

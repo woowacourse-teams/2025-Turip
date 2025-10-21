@@ -18,9 +18,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.SliceImpl;
+import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.ConflictException;
 import turip.common.exception.custom.NotFoundException;
-import turip.content.controller.dto.response.MyFavoriteContentsResponse;
+import turip.content.controller.dto.response.content.ContentsDetailWithLoadableResponse;
 import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
 import turip.content.service.ContentPlaceService;
@@ -147,8 +148,8 @@ class FavoriteContentServiceTest {
         given(contentRepository.existsById(2L))
                 .willReturn(true);
 
-        MyFavoriteContentsResponse response = favoriteContentService.findMyFavoriteContents(member, pageSize,
-                lastContentId);
+        ContentsDetailWithLoadableResponse response = favoriteContentService.findMyFavoriteContents(member,
+                pageSize, lastContentId);
 
         // then
         assertAll(
@@ -259,7 +260,8 @@ class FavoriteContentServiceTest {
 
             // when & then
             assertThatThrownBy(() -> favoriteContentService.remove(member, contentId))
-                    .isInstanceOf(NotFoundException.class);
+                    .isInstanceOf(NotFoundException.class)
+                    .hasMessageContaining(ErrorTag.FAVORITE_CONTENT_NOT_FOUND.getMessage());
         }
     }
 }

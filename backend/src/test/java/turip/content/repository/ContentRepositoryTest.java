@@ -5,26 +5,36 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
-import turip.region.domain.City;
-import turip.region.repository.CityRepository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import turip.container.TestContainerConfig;
 import turip.content.domain.Content;
-import turip.region.domain.Country;
-import turip.region.repository.CountryRepository;
 import turip.creator.domain.Creator;
 import turip.creator.repository.CreatorRepository;
+import turip.region.domain.City;
+import turip.region.domain.Country;
+import turip.region.repository.CityRepository;
+import turip.region.repository.CountryRepository;
 
 @DataJpaTest
 @ActiveProfiles("test")
+@Import(TestContainerConfig.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ContentRepositoryTest {
 
     @Autowired
@@ -39,8 +49,27 @@ class ContentRepositoryTest {
     @Autowired
     private CountryRepository countryRepository;
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @BeforeAll
+    void setUp() {
+        jdbcTemplate.execute("ALTER TABLE content ADD FULLTEXT INDEX idx_title (title) WITH PARSER ngram");
+        jdbcTemplate.execute(
+                "ALTER TABLE creator ADD FULLTEXT INDEX idx_channel_name (channel_name) WITH PARSER ngram");
+        jdbcTemplate.execute("ALTER TABLE place ADD FULLTEXT INDEX idx_name (name) WITH PARSER ngram");
+    }
+
+    @BeforeEach
+    void clear() {
+        jdbcTemplate.execute("DELETE FROM content");
+        jdbcTemplate.execute("DELETE FROM creator");
+        jdbcTemplate.execute("DELETE FROM place");
+    }
+
     @DisplayName("키워드로 콘텐츠 및 크리에이터 이름을 검색해 개수를 반환하는 메서드 테스트")
     @Nested
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     class CountByKeyword {
 
         @DisplayName("제목 혹은 크리에이터 이름에 키워드가 포함되는 컨텐츠들의 수를 확인할 수 있다.")
@@ -82,6 +111,7 @@ class ContentRepositoryTest {
 
     @DisplayName("페이지네이션 기반 키워드 검색 메서드 테스트")
     @Nested
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     class FindByKeyword {
 
         @DisplayName("제목 혹은 크리에이터 이름에 키워드가 포함되는 컨텐츠들을 확인할 수 있다.")

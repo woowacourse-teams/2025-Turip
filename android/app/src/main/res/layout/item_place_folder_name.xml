@@ -13,6 +13,7 @@
         android:layout_height="wrap_content"
         android:paddingHorizontal="20dp"
         android:paddingVertical="10dp"
+        android:textAppearance="@style/body2"
         android:textColor="@drawable/btn_folder_text"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

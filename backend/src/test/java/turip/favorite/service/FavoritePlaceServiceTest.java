@@ -15,11 +15,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.ConflictException;
 import turip.common.exception.custom.ForbiddenException;
 import turip.common.exception.custom.NotFoundException;
 import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlaceResponse;
-import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlacesWithDetailPlaceInformationResponse;
+import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlacesWithPlaceDetailResponse;
 import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.domain.FavoritePlace;
 import turip.favorite.repository.FavoriteFolderRepository;
@@ -58,7 +59,7 @@ class FavoritePlaceServiceTest {
             Member member = new Member(1L, deviceFid);
             FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, member, "폴더 이름 1", true);
             Place place = new Place(placeId, "장소 이름", "장소 url", "주소", 1, 1);
-            FavoritePlace favoritePlace = new FavoritePlace(favoriteFolder, place);
+            FavoritePlace favoritePlace = new FavoritePlace(favoriteFolder, place, 1);
 
             given(favoriteFolderRepository.findById(favoriteFolderId))
                     .willReturn(Optional.of(favoriteFolder));
@@ -67,7 +68,7 @@ class FavoritePlaceServiceTest {
             given(favoritePlaceRepository.existsByFavoriteFolderAndPlace(favoriteFolder, place))
                     .willReturn(false);
             given(favoritePlaceRepository.save(favoritePlace))
-                    .willReturn(new FavoritePlace(1L, favoriteFolder, place));
+                    .willReturn(new FavoritePlace(1L, favoriteFolder, place, 1));
 
             // when
             FavoritePlaceResponse response = favoritePlaceService.create(member, favoriteFolderId, placeId);
@@ -120,7 +121,7 @@ class FavoritePlaceServiceTest {
             // when & then
             assertThatThrownBy(() -> favoritePlaceService.create(member, favoriteFolderId, placeId))
                     .isInstanceOf(NotFoundException.class)
-                    .hasMessage("해당 id에 대한 폴더가 존재하지 않습니다.");
+                    .hasMessage(ErrorTag.FAVORITE_FOLDER_NOT_FOUND.getMessage());
         }
 
         @DisplayName("placeId에 대한 장소가 존재하지 않는 경우 NotFoundException을 발생시킨다")
@@ -142,7 +143,7 @@ class FavoritePlaceServiceTest {
             // when & then
             assertThatThrownBy(() -> favoritePlaceService.create(member, favoriteFolderId, placeId))
                     .isInstanceOf(NotFoundException.class)
-                    .hasMessage("해당 id에 대한 장소가 존재하지 않습니다.");
+                    .hasMessage(ErrorTag.PLACE_NOT_FOUND.getMessage());
         }
 
         @DisplayName("해당 폴더에 장소 찜이 되어있는 경우 ConflictException을 발생시킨다")
@@ -183,16 +184,16 @@ class FavoritePlaceServiceTest {
             FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, member, "테스트 폴더", false);
             Place place1 = new Place(1L, "장소1", "url1", "주소1", 1, 1);
             Place place2 = new Place(2L, "장소2", "url2", "주소2", 2, 2);
-            FavoritePlace favoritePlace1 = new FavoritePlace(1L, favoriteFolder, place1);
-            FavoritePlace favoritePlace2 = new FavoritePlace(2L, favoriteFolder, place2);
+            FavoritePlace favoritePlace1 = new FavoritePlace(1L, favoriteFolder, place1, 1);
+            FavoritePlace favoritePlace2 = new FavoritePlace(2L, favoriteFolder, place2, 2);
 
             given(favoriteFolderRepository.findById(favoriteFolderId))
                     .willReturn(Optional.of(favoriteFolder));
-            given(favoritePlaceRepository.findAllByFavoriteFolder(favoriteFolder))
+            given(favoritePlaceRepository.findAllByFavoriteFolderOrderByFavoriteOrderAsc(favoriteFolder))
                     .willReturn(List.of(favoritePlace1, favoritePlace2));
 
             // when
-            FavoritePlacesWithDetailPlaceInformationResponse response = favoritePlaceService.findAllByFolder(
+            FavoritePlacesWithPlaceDetailResponse response = favoritePlaceService.findAllByFolder(
                     favoriteFolderId);
 
             // then
@@ -214,7 +215,7 @@ class FavoritePlaceServiceTest {
             // when & then
             assertThatThrownBy(() -> favoritePlaceService.findAllByFolder(favoriteFolderId))
                     .isInstanceOf(NotFoundException.class)
-                    .hasMessage("해당 id에 대한 폴더가 존재하지 않습니다.");
+                    .hasMessage(ErrorTag.FAVORITE_FOLDER_NOT_FOUND.getMessage());
         }
     }
 
@@ -233,7 +234,7 @@ class FavoritePlaceServiceTest {
             Member member = new Member(1L, deviceFid);
             FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, member, "폴더 이름 1", true);
             Place place = new Place(placeId, "장소 이름", "장소 url", "주소", 1, 1);
-            FavoritePlace favoritePlace = new FavoritePlace(favoriteFolder, place);
+            FavoritePlace favoritePlace = new FavoritePlace(favoriteFolder, place, 1);
 
             given(favoriteFolderRepository.findById(favoriteFolderId))
                     .willReturn(Optional.of(favoriteFolder));
@@ -286,7 +287,7 @@ class FavoritePlaceServiceTest {
             // when & then
             assertThatThrownBy(() -> favoritePlaceService.remove(member, favoriteFolderId, placeId))
                     .isInstanceOf(NotFoundException.class)
-                    .hasMessage("해당 id에 대한 폴더가 존재하지 않습니다.");
+                    .hasMessage(ErrorTag.FAVORITE_FOLDER_NOT_FOUND.getMessage());
         }
 
         @DisplayName("placeId에 대한 장소가 존재하지 않는 경우 NotFoundException을 발생시킨다")
@@ -308,7 +309,7 @@ class FavoritePlaceServiceTest {
             // when & then
             assertThatThrownBy(() -> favoritePlaceService.remove(member, favoriteFolderId, placeId))
                     .isInstanceOf(NotFoundException.class)
-                    .hasMessage("해당 id에 대한 장소가 존재하지 않습니다.");
+                    .hasMessage(ErrorTag.PLACE_NOT_FOUND.getMessage());
         }
 
         @DisplayName("삭제하려는 장소 찜이 존재하지 않는 경우 NotFoundException을 발생시킨다")
@@ -333,7 +334,7 @@ class FavoritePlaceServiceTest {
             // when & then
             assertThatThrownBy(() -> favoritePlaceService.remove(member, favoriteFolderId, placeId))
                     .isInstanceOf(NotFoundException.class)
-                    .hasMessage("삭제하려는 장소 찜이 존재하지 않습니다.");
+                    .hasMessage(ErrorTag.FAVORITE_PLACE_NOT_FOUND.getMessage());
         }
     }
 }

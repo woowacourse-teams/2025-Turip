@@ -1,7 +1,7 @@
 package com.on.turip.data.searchhistory.datasource
 
-import com.on.turip.data.dao.SearchHistoryDao
 import com.on.turip.data.searchhistory.SearchHistoryEntity
+import com.on.turip.data.searchhistory.dao.SearchHistoryDao
 
 class DefaultSearchHistoryDataSource(
     private val dao: SearchHistoryDao,

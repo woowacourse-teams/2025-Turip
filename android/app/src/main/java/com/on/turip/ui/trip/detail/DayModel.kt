@@ -4,13 +4,7 @@ data class DayModel(
     val day: Int,
     val isSelected: Boolean = false,
 ) {
-    fun isSame(dayModel: DayModel): Boolean = this == dayModel
-}
-
-fun Int.initDayModels(): List<DayModel> = (1..this).map { it.initDayModel() }
-
-private fun Int.initDayModel(): DayModel =
-    when (this) {
-        1 -> DayModel(1, true)
-        else -> DayModel(this, false)
+    companion object {
+        const val ALL_PLACE = 0
     }
+}

@@ -10,7 +10,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 @Slf4j
 @Component
-@Profile("dev")
+@Profile({"local", "dev", "prod"})
 public class LoggingInterceptor implements HandlerInterceptor {
 
     private static final String REQUEST_START_TIME_ATTRIBUTE = "requestStartTime";
@@ -25,7 +25,9 @@ public class LoggingInterceptor implements HandlerInterceptor {
         }
         request.setAttribute(REQUEST_START_TIME_ATTRIBUTE, System.currentTimeMillis());
 
-        MDC.put("traceId", request.getHeader("device-fid"));
+        String deviceFid = request.getHeader("device-fid");
+        MDC.put("device_fid", deviceFid != null ? deviceFid : "unknown");
+
         MDC.put("method", request.getMethod());
         MDC.put("uri", request.getRequestURI());
 
@@ -53,8 +55,7 @@ public class LoggingInterceptor implements HandlerInterceptor {
             log.warn("요청 시작 시간을 찾을 수 없음");
         }
 
-        MDC.remove("traceId");
-        MDC.remove("device-fid");
+        MDC.remove("device_fid");
         MDC.remove("method");
         MDC.remove("uri");
         MDC.remove("httpStatus");

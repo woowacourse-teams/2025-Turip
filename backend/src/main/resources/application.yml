@@ -1,12 +1,13 @@
 spring:
   profiles:
-    active: dev
+    active: local
 
   jpa:
     show-sql: true
     properties:
       hibernate:
         format_sql: true
+        default_batch_fetch_size: 100
     defer-datasource-initialization: false # 데이터베이스 초기화 지연
 
 # Region Category 기타 이미지 설정
@@ -18,3 +19,14 @@ region:
     overseas:
       etc:
         image-url: ${OVERSEAS_ETC_IMAGE_URL}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus
+
+server:
+  tomcat:
+    mbeanregistry:
+      enabled: true

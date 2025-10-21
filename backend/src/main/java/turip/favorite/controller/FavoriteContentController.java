@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import turip.auth.AuthMember;
 import turip.auth.MemberResolvePolicy;
 import turip.common.exception.ErrorResponse;
-import turip.content.controller.dto.response.MyFavoriteContentsResponse;
+import turip.content.controller.dto.response.content.ContentsDetailWithLoadableResponse;
 import turip.favorite.controller.dto.request.FavoriteContentRequest;
 import turip.favorite.controller.dto.response.FavoriteContentResponse;
 import turip.favorite.service.FavoriteContentService;
@@ -29,7 +29,7 @@ import turip.member.domain.Member;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/favorite-contents")
+@RequestMapping("/favorites/contents")
 @Tag(name = "FavoriteContent", description = "컨텐츠 찜 API")
 public class FavoriteContentController {
 
@@ -86,7 +86,7 @@ public class FavoriteContentController {
                                             summary = "컨텐츠를 찾을 수 없음",
                                             value = """
                                                     {
-                                                        "message": "존재하지 않는 컨텐츠입니다."
+                                                        "tag": "CONTENT_NOT_FOUND"
                                                     }
                                                     """
                                     )
@@ -105,7 +105,7 @@ public class FavoriteContentController {
                                             summary = "이미 찜 한 컨텐츠",
                                             value = """
                                                     {
-                                                        "message": "이미 찜한 컨텐츠입니다."
+                                                        "tag": "FAVORITE_CONTENT_CONFLICT"
                                                     }
                                                     """
                                     )
@@ -118,7 +118,7 @@ public class FavoriteContentController {
             @Parameter(hidden = true) @AuthMember(policy = MemberResolvePolicy.CREATE_IF_ABSENT) Member member,
             @RequestBody FavoriteContentRequest request) {
         FavoriteContentResponse response = favoriteContentService.create(request, member);
-        return ResponseEntity.created(URI.create("/favorite-contents/" + response.id()))
+        return ResponseEntity.created(URI.create("/favorites/contents/" + response.id()))
                 .body(response);
     }
 
@@ -132,7 +132,7 @@ public class FavoriteContentController {
                     description = "성공 예시",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = MyFavoriteContentsResponse.class),
+                            schema = @Schema(implementation = ContentsDetailWithLoadableResponse.class),
                             examples = @ExampleObject(
                                     name = "success",
                                     summary = "내가 찜한 컨텐츠 목록 조회 성공",
@@ -168,7 +168,7 @@ public class FavoriteContentController {
                     )
             ),
             @ApiResponse(
-                    responseCode = "400",
+                    responseCode = "404",
                     description = "실패 예시",
                     content = @Content(
                             mediaType = "application/json",
@@ -179,7 +179,7 @@ public class FavoriteContentController {
                                             summary = "올바르지 않은 device-fid",
                                             value = """
                                                     {
-                                                        "message": "사용자 정보를 조회할 수 없습니다."
+                                                        "tag": "MEMBER_NOT_FOUND"
                                                     }
                                                     """
                                     )
@@ -188,12 +188,12 @@ public class FavoriteContentController {
             )
     })
     @GetMapping
-    public ResponseEntity<MyFavoriteContentsResponse> readMyFavoriteContents(
+    public ResponseEntity<ContentsDetailWithLoadableResponse> readMyFavoriteContents(
             @Parameter(hidden = true) @AuthMember(policy = MemberResolvePolicy.CREATE_IF_ABSENT) Member member,
             @RequestParam(name = "size") Integer pageSize,
             @RequestParam(name = "lastId") Long lastContentId
     ) {
-        MyFavoriteContentsResponse response = favoriteContentService.findMyFavoriteContents(member, pageSize,
+        ContentsDetailWithLoadableResponse response = favoriteContentService.findMyFavoriteContents(member, pageSize,
                 lastContentId);
         return ResponseEntity.ok(response);
     }
@@ -219,7 +219,7 @@ public class FavoriteContentController {
                                             summary = "컨텐츠를 찾을 수 없음",
                                             value = """
                                                     {
-                                                        "message": "존재하지 않는 컨텐츠입니다."
+                                                        "tag": "CONTENT_NOT_FOUND"
                                                     }
                                                     """
                                     ),
@@ -228,7 +228,7 @@ public class FavoriteContentController {
                                             summary = "존재하지 않는 사용자",
                                             value = """
                                                     {
-                                                        "message": "존재하지 않는 사용자입니다."
+                                                        "tag": "MEMBER_NOT_FOUND"
                                                     }
                                                     """
                                     ),
@@ -237,7 +237,7 @@ public class FavoriteContentController {
                                             summary = "찜하지 않은 컨텐츠",
                                             value = """
                                                     {
-                                                        "message": "해당 컨텐츠는 찜한 상태가 아닙니다."
+                                                        "tag": "FAVORITE_CONTENT_NOT_FOUND"
                                                     }
                                                     """
                                     )

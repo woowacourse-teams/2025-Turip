@@ -1,0 +1,50 @@
+services:
+  mysql:
+    image: mysql:8.0.42
+    container_name: turip-mysql-dev
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root_pw
+      MYSQL_DATABASE: turip_dev
+      MYSQL_USER: turip
+      MYSQL_PASSWORD: turip_pw
+      TZ: Asia/Seoul
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./mysql-data:/var/lib/mysql
+
+  nginx:
+    image: nginx:latest
+    container_name: turip-nginx-dev
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+
+  blue:
+    image: ${DOCKER_IMAGE_NAME:-teamturip/turip-backend:latest}
+    container_name: blue
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
+      SERVER_PORT: 8080
+    depends_on:
+      - nginx
+      - mysql
+
+  green:
+    image: ${DOCKER_IMAGE_NAME:-teamturip/turip-backend:latest}
+    container_name: green
+    restart: always
+    ports:
+      - "8081:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
+      SERVER_PORT: 8080
+    depends_on:
+      - nginx
+      - mysql

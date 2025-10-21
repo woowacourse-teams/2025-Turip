@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -16,6 +15,7 @@
         android:visibility="gone" />
 
     <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -24,7 +24,6 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/pure_white_ffffff"
-            app:layout_scrollFlags="scroll|enterAlways"
             app:titleTextAppearance="@style/title1"
             app:titleTextColor="@color/pure_black_151515">
 
@@ -37,66 +36,63 @@
                 android:padding="20dp"
                 android:src="@drawable/btn_favorite_red" />
         </com.google.android.material.appbar.MaterialToolbar>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cv_trip_detail_video_container"
+            android:layout_width="match_parent"
+            android:layout_height="200dp">
+
+            <WebView
+                android:id="@+id/wv_trip_detail_video"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="visible" />
+
+            <ProgressBar
+                android:id="@+id/pb_trip_detail_video"
+                style="?android:attr/progressBarStyleLarge"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_gravity="center"
+                android:indeterminateTint="@color/pure_white_ffffff" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cl_trip_detail_video_error"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/pure_black_151515"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/tv_trip_detail_video_error"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@null"
+                    android:gravity="center"
+                    android:text="@string/trip_detail_video_error"
+                    android:textAppearance="@style/body2"
+                    android:textColor="@color/pure_white_ffffff"
+                    app:layout_constraintBottom_toTopOf="@id/iv_trip_detail_video_error_play_button"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_chainStyle="packed"
+                    tools:text="해당 영상은 제작자의 요청으로 유튜브로만 시청할 수 있습니다.\n클릭 시 유튜브로 이동합니다." />
+
+                <ImageView
+                    android:id="@+id/iv_trip_detail_video_error_play_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_play_button"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv_trip_detail_video_error" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.cardview.widget.CardView>
     </com.google.android.material.appbar.AppBarLayout>
-
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cv_trip_detail_video_container_sticky"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:elevation="8dp"
-        android:visibility="gone"
-        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
-
-        <WebView
-            android:id="@+id/wv_trip_detail_video_sticky"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="visible" />
-
-        <ProgressBar
-            android:id="@+id/pb_trip_detail_video_sticky"
-            style="?android:attr/progressBarStyleLarge"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_gravity="center"
-            android:indeterminateTint="@color/pure_white_ffffff" />
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/cl_trip_detail_video_error_sticky"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/pure_black_151515"
-            android:visibility="gone">
-
-            <TextView
-                android:id="@+id/tv_trip_detail_video_error_sticky"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:contentDescription="@null"
-                android:gravity="center"
-                android:text="@string/trip_detail_video_error"
-                android:textAppearance="@style/body2"
-                android:textColor="@color/pure_white_ffffff"
-                app:layout_constraintBottom_toTopOf="@id/iv_trip_detail_video_error_play_button_sticky"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_chainStyle="packed"
-                tools:text="해당 영상은 제작자의 요청으로 유튜브로만 시청할 수 있습니다.\n클릭 시 유튜브로 이동합니다." />
-
-            <ImageView
-                android:id="@+id/iv_trip_detail_video_error_play_button_sticky"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:contentDescription="@null"
-                android:src="@drawable/ic_play_button"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_trip_detail_video_error_sticky" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.cardview.widget.CardView>
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nsv_trip_detail"
@@ -109,59 +105,19 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <ImageView
-                android:id="@+id/iv_trip_detail_creator_thumbnail"
-                android:layout_width="84dp"
-                android:layout_height="0dp"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="28dp"
-                android:contentDescription="@null"
-                app:layout_constraintDimensionRatio="1:1"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:src="@drawable/ic_launcher_background" />
-
-            <ImageView
-                android:id="@+id/iv_trip_detail_platform_badge"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginTop="16dp"
-                android:contentDescription="@null"
-                android:src="@drawable/ic_youtuber_badge"
-                app:layout_constraintDimensionRatio="1:1"
-                app:layout_constraintStart_toStartOf="@id/iv_trip_detail_creator_thumbnail"
-                app:layout_constraintTop_toBottomOf="@id/iv_trip_detail_creator_thumbnail"
-                tools:src="@drawable/ic_youtuber_badge" />
-
-            <TextView
-                android:id="@+id/tv_trip_detail_creator_name"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:layout_marginTop="14dp"
-                android:layout_marginEnd="50dp"
-                android:ellipsize="end"
-                android:maxLines="2"
-                android:textAppearance="@style/title2"
-                android:textColor="@color/pure_black_151515"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/iv_trip_detail_platform_badge"
-                app:layout_constraintTop_toBottomOf="@id/iv_trip_detail_creator_thumbnail"
-                tools:text="여행하는 뭉치와 함께하는 하루와 메이와 라젤과 제리 이름이 길어지면 어떻게 되나? ... 으로 잘 표시되는 지 확인해보자@@@@@" />
-
             <TextView
                 android:id="@+id/tv_trip_detail_content_title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
                 android:layout_marginTop="18dp"
-                android:layout_marginEnd="50dp"
                 android:ellipsize="end"
                 android:maxLines="2"
                 android:textAppearance="@style/title1"
                 android:textColor="@color/pure_black_151515"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="@id/iv_trip_detail_platform_badge"
-                app:layout_constraintTop_toBottomOf="@id/tv_trip_detail_creator_name"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
                 tools:text="맛집여행기 - 전라도 비빔밥을 찾아서 편 \n맛집여행기 - 전라도 비빔밥을 찾아서 편 \n맛집여행기 - 전라도 비빔밥을 찾아서 편 \n맛집여행기 - 전라도 비빔밥을 찾아서 편" />
 
             <ImageView
@@ -178,151 +134,53 @@
                 app:layout_constraintTop_toBottomOf="@id/tv_trip_detail_content_title" />
 
             <TextView
-                android:id="@+id/tv_trip_detail_upload_date"
+                android:id="@+id/tv_trip_detail_info"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
+                android:layout_marginTop="12dp"
                 android:textAppearance="@style/title3"
                 android:textColor="@color/gray_300_5b5b5b"
                 app:layout_constraintStart_toStartOf="@id/tv_trip_detail_content_title"
                 app:layout_constraintTop_toBottomOf="@id/iv_trip_detail_content_toggle"
-                tools:text="2025-07-20" />
-
-            <!-- Original Video Container -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/cv_trip_detail_video_container"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_marginTop="24dp"
-                app:layout_constraintDimensionRatio="16:9"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_trip_detail_upload_date">
-
-                <WebView
-                    android:id="@+id/wv_trip_detail_video"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:visibility="visible" />
-
-                <ProgressBar
-                    android:id="@+id/pb_trip_detail_video"
-                    style="?android:attr/progressBarStyleLarge"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:layout_gravity="center"
-                    android:indeterminateTint="@color/pure_white_ffffff" />
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/cl_trip_detail_video_error"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@color/pure_black_151515"
-                    android:visibility="gone">
-
-                    <TextView
-                        android:id="@+id/tv_trip_detail_video_error"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:contentDescription="@null"
-                        android:gravity="center"
-                        android:text="@string/trip_detail_video_error"
-                        android:textAppearance="@style/body2"
-                        android:textColor="@color/pure_white_ffffff"
-                        app:layout_constraintBottom_toTopOf="@id/iv_trip_detail_video_error_play_button"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintVertical_chainStyle="packed"
-                        tools:text="해당 영상은 제작자의 요청으로 유튜브로만 시청할 수 있습니다.\n클릭 시 유튜브로 이동합니다." />
-
-                    <ImageView
-                        android:id="@+id/iv_trip_detail_video_error_play_button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:contentDescription="@null"
-                        android:src="@drawable/ic_play_button"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/tv_trip_detail_video_error" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
-            </androidx.cardview.widget.CardView>
+                tools:text="2025-07-04 • 14개 장소 • 2박 3일" />
 
             <ImageView
-                android:id="@+id/iv_trip_detail_location"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_marginStart="72dp"
-                android:layout_marginTop="28dp"
+                android:id="@+id/iv_trip_detail_creator_thumbnail"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginTop="20dp"
                 android:contentDescription="@null"
-                android:src="@drawable/ic_location"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/cv_trip_detail_video_container"
-                app:tint="@color/gray_500_1e1e1e" />
+                app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintStart_toStartOf="@id/tv_trip_detail_info"
+                app:layout_constraintTop_toBottomOf="@id/tv_trip_detail_info"
+                tools:src="@drawable/ic_launcher_background" />
 
             <TextView
-                android:id="@+id/tv_trip_detail_total_place_count"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_marginStart="12dp"
-                android:gravity="center"
-                android:textAppearance="@style/title3"
+                android:id="@+id/tv_trip_detail_creator_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="50dp"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:textAppearance="@style/title2"
                 android:textColor="@color/pure_black_151515"
-                app:layout_constraintBottom_toBottomOf="@id/iv_trip_detail_location"
-                app:layout_constraintStart_toEndOf="@id/iv_trip_detail_location"
-                app:layout_constraintTop_toTopOf="@id/iv_trip_detail_location"
-                app:layout_constraintVertical_bias="0.0"
-                tools:text="14개 장소" />
-
-            <com.google.android.material.divider.MaterialDivider
-                android:id="@+id/div_trip_detail_vertical"
-                android:layout_width="1dp"
-                android:layout_height="0dp"
-                app:dividerColor="@color/gray_200_c1c1c1"
-                app:dividerThickness="1dp"
-                app:layout_constraintBottom_toBottomOf="@id/tv_trip_detail_total_place_count"
-                app:layout_constraintEnd_toStartOf="@id/iv_trip_detail_calendar"
-                app:layout_constraintStart_toEndOf="@id/tv_trip_detail_total_place_count"
-                app:layout_constraintTop_toTopOf="@id/tv_trip_detail_total_place_count" />
-
-            <ImageView
-                android:id="@+id/iv_trip_detail_calendar"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_marginEnd="12dp"
-                android:contentDescription="@null"
-                android:src="@drawable/ic_calendar"
-                app:layout_constraintBottom_toBottomOf="@id/tv_trip_detail_total_place_count"
-                app:layout_constraintEnd_toStartOf="@id/tv_trip_detail_travel_duration"
-                app:layout_constraintTop_toTopOf="@id/tv_trip_detail_total_place_count"
-                app:tint="@color/gray_500_1e1e1e" />
-
-            <TextView
-                android:id="@+id/tv_trip_detail_travel_duration"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_marginStart="12dp"
-                android:layout_marginEnd="72dp"
-                android:gravity="center"
-                android:textAppearance="@style/title3"
-                android:textColor="@color/pure_black_151515"
-                app:layout_constraintBottom_toBottomOf="@id/iv_trip_detail_calendar"
+                app:layout_constraintBottom_toBottomOf="@id/iv_trip_detail_creator_thumbnail"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/iv_trip_detail_calendar"
-                tools:text="2박 3일" />
+                app:layout_constraintStart_toEndOf="@id/iv_trip_detail_creator_thumbnail"
+                app:layout_constraintTop_toTopOf="@id/iv_trip_detail_creator_thumbnail"
+                tools:text="여행하는 뭉치와 함께하는 하루와 메이와 라젤과 제리 이름이 길어지면 어떻게 되나? ... 으로 잘 표시되는 지 확인해보자@@@@@" />
 
             <com.google.android.material.divider.MaterialDivider
                 android:id="@+id/div_trip_detail_horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_marginTop="30dp"
+                android:layout_marginTop="26dp"
                 app:dividerColor="@color/gray_200_c1c1c1"
                 app:dividerThickness="1dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_trip_detail_total_place_count" />
+                app:layout_constraintTop_toBottomOf="@id/tv_trip_detail_creator_name" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_trip_detail_travel_day"
@@ -367,10 +225,10 @@
         android:id="@+id/custom_error_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:visibility="gone" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

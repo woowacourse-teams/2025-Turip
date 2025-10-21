@@ -7,17 +7,28 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.MarkerOptions
 import com.on.turip.R
 import com.on.turip.databinding.FragmentFavoritePlaceBinding
 import com.on.turip.domain.ErrorEvent
 import com.on.turip.ui.common.base.BaseFragment
 import com.on.turip.ui.folder.FolderActivity
-import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
+import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
+import com.on.turip.ui.main.favorite.model.FavoritePlaceLatLngUiModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
 
-class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
+class FavoritePlaceFragment :
+    BaseFragment<FragmentFavoritePlaceBinding>(),
+    OnMapReadyCallback {
     private val viewModel: FavoritePlaceViewModel by viewModels { FavoritePlaceViewModel.provideFactory() }
     private val folderNameAdapter: FavoritePlaceFolderNameAdapter by lazy {
         FavoritePlaceFolderNameAdapter { folderId: Long ->
@@ -38,9 +49,29 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
                     val intent: Intent = Intent(Intent.ACTION_VIEW, uri)
                     startActivity(intent)
                 }
+
+                override fun onItemClick(favoritePlaceModel: FavoritePlaceModel) {
+                    map.animateCamera(
+                        CameraUpdateFactory.newCameraPosition(
+                            CameraPosition(
+                                favoritePlaceModel.latLng,
+                                15f,
+                                0f,
+                                0f,
+                            ),
+                        ),
+                        1000,
+                        null,
+                    )
+                    markerMap[favoritePlaceModel.placeId]?.showInfoWindow()
+                }
             },
+            onCommit = { viewModel.updateFavoritePlacesOrder(it) },
         )
     }
+
+    private lateinit var map: GoogleMap
+    private val markerMap = mutableMapOf<Long, com.google.android.gms.maps.model.Marker>()
 
     override fun inflateBinding(
         inflater: LayoutInflater,
@@ -57,6 +88,7 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
         setupListeners()
         setupObservers()
         showNetworkError()
+        setupMapFragment(savedInstanceState)
     }
 
     private fun showNetworkError() {
@@ -76,10 +108,51 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
             addOnItemTouchListener(RecyclerViewTouchInterceptor)
         }
 
-        binding.rvFavoritePlacePlace.apply {
-            adapter = placeAdapter
-            itemAnimator = null
-        }
+        binding.rvFavoritePlacePlace.adapter = placeAdapter
+
+        val itemTouchHelper =
+            ItemTouchHelper(
+                object : ItemTouchHelper.SimpleCallback(
+                    ItemTouchHelper.UP or ItemTouchHelper.DOWN,
+                    0,
+                ) {
+                    override fun onMove(
+                        recyclerView: RecyclerView,
+                        viewHolder: RecyclerView.ViewHolder,
+                        target: RecyclerView.ViewHolder,
+                    ): Boolean {
+                        val from = viewHolder.bindingAdapterPosition
+                        val to = target.bindingAdapterPosition
+                        placeAdapter.moveItem(from, to)
+                        return true
+                    }
+
+                    override fun onSwiped(
+                        viewHolder: RecyclerView.ViewHolder,
+                        direction: Int,
+                    ) = Unit
+
+                    override fun isLongPressDragEnabled(): Boolean = true
+
+                    override fun interpolateOutOfBoundsScroll(
+                        recyclerView: RecyclerView,
+                        viewSize: Int,
+                        viewSizeOutOfBounds: Int,
+                        totalSize: Int,
+                        msSinceStartScroll: Long,
+                    ): Int = viewSizeOutOfBounds / 10
+
+                    override fun clearView(
+                        recyclerView: RecyclerView,
+                        viewHolder: RecyclerView.ViewHolder,
+                    ) {
+                        super.clearView(recyclerView, viewHolder)
+                        placeAdapter.commitMove()
+                    }
+                },
+            )
+
+        itemTouchHelper.attachToRecyclerView(binding.rvFavoritePlacePlace)
     }
 
     private fun setupListeners() {
@@ -87,49 +160,125 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
             val intent: Intent = FolderActivity.newIntent(requireContext())
             startActivity(intent)
         }
+        binding.ivFavoritePlaceShare.setOnClickListener {
+            viewModel.shareFolder()
+        }
+
+        binding.ivFavoritePlaceMapToggle.setOnClickListener {
+            val isMapVisible = binding.mapFragment.isVisible
+            binding.mapFragment.visibility = if (isMapVisible) View.GONE else View.VISIBLE
+            it.isSelected = isMapVisible
+        }
     }
 
     private fun setupObservers() {
-        viewModel.folders.observe(viewLifecycleOwner) { favoritePlaceFolders: List<FavoritePlaceFolderModel> ->
-            folderNameAdapter.submitList(favoritePlaceFolders)
-        }
+        viewModel.favoritePlaceUiState.observe(viewLifecycleOwner) { state ->
+            folderNameAdapter.submitList(state.folders)
+            placeAdapter.submitList(state.places)
 
-        viewModel.places.observe(viewLifecycleOwner) { places: List<FavoritePlaceModel> ->
-            placeAdapter.submitList(places)
+            binding.apply {
+                if (state.isNetWorkError || state.isServerError) {
+                    customErrorView.visibility = View.VISIBLE
+                    clFavoritePlaceEmpty.visibility = View.GONE
+                    groupFavoritePlaceNotError.visibility = View.GONE
+                    groupFavoritePlaceNotEmpty.visibility = View.GONE
+                    tvFavoritePlacePlaceCount.visibility = View.GONE
+                } else {
+                    customErrorView.visibility = View.GONE
+                    groupFavoritePlaceNotError.visibility = View.VISIBLE
 
-            if (places.isEmpty()) {
-                binding.clFavoritePlaceEmpty.visibility = View.VISIBLE
-                binding.groupFavoritePlaceNotEmpty.visibility = View.GONE
-            } else {
-                binding.clFavoritePlaceEmpty.visibility = View.GONE
-                binding.groupFavoritePlaceNotEmpty.visibility = View.VISIBLE
-                binding.tvFavoritePlacePlaceCount.text =
-                    getString(R.string.all_total_place_count, places.size)
+                    handlePlaceState(state)
+                }
             }
         }
-        viewModel.networkError.observe(viewLifecycleOwner) { networkError ->
-            handleErrorOrContentView(networkError || (viewModel.serverError.value == true))
-        }
 
-        viewModel.serverError.observe(viewLifecycleOwner) { serverError ->
-            handleErrorOrContentView(serverError || (viewModel.networkError.value == true))
+        viewModel.shareFolder.observe(viewLifecycleOwner) { shareFolder: FavoriteFolderShareModel ->
+            makeShareIntent(shareFolder)
         }
     }
 
-    private fun handleErrorOrContentView(isError: Boolean) {
-        if (isError) {
-            binding.customErrorView.visibility = View.VISIBLE
-            binding.groupFavoritePlaceNotEmpty.visibility = View.GONE
-            binding.groupFavoritePlaceNotError.visibility = View.GONE
+    private fun FragmentFavoritePlaceBinding.handlePlaceState(state: FavoritePlaceViewModel.FavoritePlaceUiState) {
+        if (state.places.isEmpty()) {
+            clFavoritePlaceEmpty.visibility = View.VISIBLE
+            groupFavoritePlaceNotEmpty.visibility = View.GONE
+            tvFavoritePlacePlaceCount.visibility = View.GONE
+            ivFavoritePlaceShare.visibility = View.GONE
         } else {
-            binding.customErrorView.visibility = View.GONE
-            binding.groupFavoritePlaceNotEmpty.visibility = View.VISIBLE
-            binding.groupFavoritePlaceNotError.visibility = View.VISIBLE
+            clFavoritePlaceEmpty.visibility = View.GONE
+            groupFavoritePlaceNotEmpty.visibility = View.VISIBLE
+            tvFavoritePlacePlaceCount.apply {
+                visibility = View.VISIBLE
+                text = getString(R.string.all_total_place_count, state.places.size)
+            }
+            ivFavoritePlaceShare.visibility = View.VISIBLE
         }
+    }
+
+    private fun makeShareIntent(shareFolder: FavoriteFolderShareModel) {
+        val sharedContents: String = shareFolder.toShareFormat()
+
+        val intent =
+            Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                putExtra(Intent.EXTRA_TEXT, sharedContents)
+                putExtra(Intent.EXTRA_TITLE, shareFolder.name)
+            }
+        val kakaoIntent: Intent =
+            Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                `package` = KAKAO_PACKAGE
+                putExtra(Intent.EXTRA_TEXT, sharedContents)
+            }
+        val instagramIntent: Intent =
+            Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                `package` = INSTAGRAM_PACKAGE
+                putExtra(Intent.EXTRA_TEXT, sharedContents)
+            }
+        val initialIntents = arrayOf(kakaoIntent, instagramIntent)
+
+        val chooserIntent =
+            Intent.createChooser(intent, shareFolder.name).apply {
+                putExtra(Intent.EXTRA_INITIAL_INTENTS, initialIntents)
+                putExtra(Intent.EXTRA_TITLE, shareFolder.name)
+            }
+
+        startActivity(chooserIntent)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        binding.mapFragment.onStart()
+    }
+
+    override fun onPause() {
+        binding.mapFragment.onPause()
+        super.onPause()
+    }
+
+    override fun onStop() {
+        binding.mapFragment.onStop()
+        super.onStop()
+    }
+
+    override fun onDestroyView() {
+        binding.mapFragment.onDestroy()
+        super.onDestroyView()
+    }
+
+    override fun onLowMemory() {
+        super.onLowMemory()
+        binding.mapFragment.onLowMemory()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        binding.mapFragment.onSaveInstanceState(outState)
     }
 
     override fun onResume() {
         super.onResume()
+        binding.mapFragment.onResume()
         viewModel.loadFoldersAndPlaces()
     }
 
@@ -140,7 +289,94 @@ class FavoritePlaceFragment : BaseFragment<FragmentFavoritePlaceBinding>() {
         }
     }
 
+    private fun setupMapFragment(savedInstanceState: Bundle?) {
+        binding.mapFragment.onCreate(savedInstanceState)
+        binding.mapFragment.getMapAsync { googleMap ->
+            googleMap.setOnCameraMoveStartedListener { reason ->
+                if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
+                    binding.root.parent?.requestDisallowInterceptTouchEvent(true)
+                }
+            }
+
+            googleMap.setOnCameraIdleListener {
+                binding.root.parent?.requestDisallowInterceptTouchEvent(false)
+            }
+
+            onMapReady(googleMap)
+        }
+    }
+
+    override fun onMapReady(googleMap: GoogleMap) {
+        map = googleMap
+        map.uiSettings.isZoomControlsEnabled = true
+
+        viewModel.favoriteLatLng.observe(viewLifecycleOwner) { favoriteLatLngList ->
+            when {
+                favoriteLatLngList.isEmpty() -> handleEmptyFavorites()
+                favoriteLatLngList.size == 1 -> handleSingleFavorite(favoriteLatLngList.first())
+                else -> handleMultipleFavorites(favoriteLatLngList)
+            }
+        }
+    }
+
+    private fun handleEmptyFavorites() {
+        binding.mapFragment.visibility = View.GONE
+        binding.ivFavoritePlaceMapToggle.visibility = View.GONE
+        markerMap.clear()
+    }
+
+    private fun handleSingleFavorite(favoriteLatLng: FavoritePlaceLatLngUiModel) {
+        showMap()
+        clearMapMarkers()
+
+        addMarkerToMap(favoriteLatLng)
+        map.moveCamera(
+            CameraUpdateFactory.newLatLngZoom(favoriteLatLng.favoriteLatLng, 15f),
+        )
+    }
+
+    private fun handleMultipleFavorites(favoriteLatLngList: List<FavoritePlaceLatLngUiModel>) {
+        showMap()
+        clearMapMarkers()
+
+        val boundsBuilder = LatLngBounds.Builder()
+
+        favoriteLatLngList.forEach { favoriteLatLng ->
+            addMarkerToMap(favoriteLatLng)
+            boundsBuilder.include(favoriteLatLng.favoriteLatLng)
+        }
+
+        val bounds = boundsBuilder.build()
+        map.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
+        map.setMinZoomPreference(8f)
+    }
+
+    private fun showMap() {
+        binding.ivFavoritePlaceMapToggle.visibility = View.VISIBLE
+        binding.mapFragment.visibility = View.VISIBLE
+    }
+
+    private fun clearMapMarkers() {
+        map.clear()
+        markerMap.clear()
+    }
+
+    private fun addMarkerToMap(favoriteLatLng: FavoritePlaceLatLngUiModel) {
+        val marker =
+            map.addMarker(
+                MarkerOptions()
+                    .position(favoriteLatLng.favoriteLatLng)
+                    .title(favoriteLatLng.name),
+            )
+        marker?.let {
+            markerMap[favoriteLatLng.placeId] = it
+        }
+    }
+
     companion object {
+        private const val KAKAO_PACKAGE = "com.kakao.talk"
+        private const val INSTAGRAM_PACKAGE = "com.instagram.android"
+
         fun instance(): FavoritePlaceFragment = FavoritePlaceFragment()
     }
 }

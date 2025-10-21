@@ -4,12 +4,14 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.ConflictException;
 import turip.common.exception.custom.ForbiddenException;
 import turip.common.exception.custom.NotFoundException;
+import turip.favorite.controller.dto.request.FavoritePlaceOrderRequest;
 import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlaceResponse;
-import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlaceWithDetailPlaceInformationResponse;
-import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlacesWithDetailPlaceInformationResponse;
+import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlaceWithPlaceDetailResponse;
+import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlacesWithPlaceDetailResponse;
 import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.domain.FavoritePlace;
 import turip.favorite.repository.FavoriteFolderRepository;
@@ -34,21 +36,40 @@ public class FavoritePlaceService {
         validateOwnership(member, favoriteFolder);
         validateDuplicated(favoriteFolder, place);
 
-        FavoritePlace favoritePlace = new FavoritePlace(favoriteFolder, place);
+        Integer maxOrder = favoritePlaceRepository.findMaxFavoriteOrderByFavoriteFolder(favoriteFolder)
+                .orElse(0);
+
+        FavoritePlace favoritePlace = new FavoritePlace(favoriteFolder, place, maxOrder + 1);
         FavoritePlace savedFavoritePlace = favoritePlaceRepository.save(favoritePlace);
 
         return FavoritePlaceResponse.from(savedFavoritePlace);
     }
 
-    public FavoritePlacesWithDetailPlaceInformationResponse findAllByFolder(Long favoriteFolderId) {
+    public FavoritePlacesWithPlaceDetailResponse findAllByFolder(Long favoriteFolderId) {
         FavoriteFolder favoriteFolder = getFavoriteFolderById(favoriteFolderId);
 
-        List<FavoritePlaceWithDetailPlaceInformationResponse> favoritePlaces = favoritePlaceRepository.findAllByFavoriteFolder(
+        List<FavoritePlaceWithPlaceDetailResponse> favoritePlaces = favoritePlaceRepository.findAllByFavoriteFolderOrderByFavoriteOrderAsc(
                         favoriteFolder).stream()
-                .map(FavoritePlaceWithDetailPlaceInformationResponse::from)
+                .map(FavoritePlaceWithPlaceDetailResponse::from)
                 .toList();
 
-        return FavoritePlacesWithDetailPlaceInformationResponse.from(favoritePlaces);
+        return FavoritePlacesWithPlaceDetailResponse.from(favoritePlaces);
+    }
+
+    @Transactional
+    public void updatePlaceOrder(Member member, Long favoriteFolderId,
+                                 FavoritePlaceOrderRequest request) {
+        FavoriteFolder favoriteFolder = getFavoriteFolderById(favoriteFolderId);
+        validateOwnership(member, favoriteFolder);
+
+        List<Long> favoritePlaceIdsOrder = request.favoritePlaceIdsOrder();
+
+        for (int index = 0; index < favoritePlaceIdsOrder.size(); index++) {
+            Long favoritePlaceId = favoritePlaceIdsOrder.get(index);
+            FavoritePlace favoritePlace = getFavoritePlaceById(favoritePlaceId);
+            validateFavoritePlaceBelongsToFolder(favoritePlace, favoriteFolder);
+            favoritePlace.updateFavoriteOrder(index + 1);
+        }
     }
 
     @Transactional
@@ -64,29 +85,40 @@ public class FavoritePlaceService {
 
     private FavoriteFolder getFavoriteFolderById(Long favoriteFolderId) {
         return favoriteFolderRepository.findById(favoriteFolderId)
-                .orElseThrow(() -> new NotFoundException("해당 id에 대한 폴더가 존재하지 않습니다."));
+                .orElseThrow(() -> new NotFoundException(ErrorTag.FAVORITE_FOLDER_NOT_FOUND));
     }
 
     private Place getPlaceById(Long placeId) {
         return placeRepository.findById(placeId)
-                .orElseThrow(() -> new NotFoundException("해당 id에 대한 장소가 존재하지 않습니다."));
+                .orElseThrow(() -> new NotFoundException(ErrorTag.PLACE_NOT_FOUND));
+    }
+
+    private FavoritePlace getFavoritePlaceById(Long favoritePlaceId) {
+        return favoritePlaceRepository.findById(favoritePlaceId)
+                .orElseThrow(() -> new NotFoundException(ErrorTag.FAVORITE_PLACE_NOT_FOUND));
     }
 
     private void validateOwnership(Member requestMember, FavoriteFolder favoriteFolder) {
         if (!favoriteFolder.isOwner(requestMember)) {
-            throw new ForbiddenException("폴더 소유자의 기기id와 요청자의 기기id가 같지 않습니다.");
+            throw new ForbiddenException(ErrorTag.FORBIDDEN);
         }
     }
 
     private void validateDuplicated(FavoriteFolder favoriteFolder, Place place) {
         boolean isAlreadyFavorite = favoritePlaceRepository.existsByFavoriteFolderAndPlace(favoriteFolder, place);
         if (isAlreadyFavorite) {
-            throw new ConflictException("이미 해당 폴더에 찜한 장소입니다.");
+            throw new ConflictException(ErrorTag.FAVORITE_PLACE_IN_FOLDER_CONFLICT);
+        }
+    }
+
+    private void validateFavoritePlaceBelongsToFolder(FavoritePlace favoritePlace, FavoriteFolder favoriteFolder) {
+        if (!favoritePlace.getFavoriteFolder().equals(favoriteFolder)) {
+            throw new ForbiddenException(ErrorTag.FORBIDDEN);
         }
     }
 
     private FavoritePlace getByFavoriteFolderAndPlace(FavoriteFolder favoriteFolder, Place place) {
         return favoritePlaceRepository.findByFavoriteFolderAndPlace(favoriteFolder, place)
-                .orElseThrow(() -> new NotFoundException("삭제하려는 장소 찜이 존재하지 않습니다."));
+                .orElseThrow(() -> new NotFoundException(ErrorTag.FAVORITE_PLACE_NOT_FOUND));
     }
 }

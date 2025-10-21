@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="20dp"
     android:layout_marginVertical="6dp"
-    android:background="@drawable/bg_stroke_gray200_radius_24dp">
+    android:background="@drawable/bg_turip_light_gray_50_stroke_turip_black_06_radius_24dp">
 
     <ImageView
         android:id="@+id/iv_result_creator_thumbnail"
@@ -60,14 +60,13 @@
         android:id="@+id/tv_result_region_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/bg_turip_lemon_radius_24dp"
-        android:paddingHorizontal="10dp"
+        android:background="@drawable/bg_turip_light_beige_radius_24dp"
+        android:paddingHorizontal="12dp"
         android:paddingVertical="4dp"
-        android:textAppearance="@style/info2"
+        android:textAppearance="@style/info1"
         android:textColor="@color/gray_500_1e1e1e"
-        app:layout_constraintStart_toStartOf="@id/iv_result_video_thumbnail"
+        app:layout_constraintBottom_toTopOf="@id/iv_result_calendar"
+        app:layout_constraintStart_toStartOf="@id/iv_result_calendar"
         app:layout_constraintTop_toTopOf="@id/iv_result_video_thumbnail"
         tools:text="제주" />
 
@@ -80,7 +79,7 @@
         android:src="@drawable/ic_calendar"
         app:layout_constraintBottom_toTopOf="@id/iv_result_location"
         app:layout_constraintStart_toEndOf="@id/iv_result_video_thumbnail"
-        app:layout_constraintTop_toTopOf="@id/iv_result_video_thumbnail"
+        app:layout_constraintTop_toBottomOf="@id/tv_result_region_name"
         app:tint="@color/gray_200_c1c1c1" />
 
     <TextView

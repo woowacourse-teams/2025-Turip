@@ -1,16 +1,39 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="20dp"
-    android:height="20dp"
+    android:width="22dp"
+    android:height="22dp"
     android:viewportWidth="22"
     android:viewportHeight="22">
+
     <group>
         <clip-path android:pathData="M0,0h22v22h-22z" />
+
         <path
-            android:fillColor="#00000000"
-            android:pathData="M8.25,16.5L1.833,20.166V5.5L8.25,1.833M8.25,16.5L14.666,20.166M8.25,16.5V1.833M14.666,20.166L20.166,16.5V1.833L14.666,5.5M14.666,20.166V5.5M14.666,5.5L8.25,1.833"
-            android:strokeWidth="1.83333"
-            android:strokeColor="#151515"
-            android:strokeLineCap="round"
-            android:strokeLineJoin="round" />
+            android:fillColor="@android:color/transparent"
+            android:pathData="
+        M2,0
+        h18
+        a2,2 0 0 1 2,2
+        v18
+        a2,2 0 0 1 -2,2
+        h-18
+        a2,2 0 0 1 -2,-2
+        v-18
+        a2,2 0 0 1 2,-2z" />
+
+
+        <group
+            android:scaleX="0.7"
+            android:scaleY="0.7"
+            android:translateX="3"
+            android:translateY="3">
+
+            <path
+                android:fillColor="#00000000"
+                android:pathData="M8.25,16.5L1.833,20.166V5.5L8.25,1.833M8.25,16.5L14.666,20.166M8.25,16.5V1.833M14.666,20.166L20.166,16.5V1.833L14.666,5.5M14.666,20.166V5.5M14.666,5.5L8.25,1.833"
+                android:strokeWidth="1.83333"
+                android:strokeColor="@color/turip_blue_11aebf"
+                android:strokeLineCap="round"
+                android:strokeLineJoin="round" />
+        </group>
     </group>
 </vector>
