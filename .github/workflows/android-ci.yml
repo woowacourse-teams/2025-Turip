@@ -122,7 +122,9 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Create local.properties
-        run: echo "base_url=${{ secrets.BASE_URL }}" > local.properties
+        run: | 
+          echo "base_url=${{ secrets.BASE_URL }}" > local.properties
+          echo "google_maps_api_key=${{ secrets.GOOGLE_MAPS_API_KEY }}" >> ./local.properties
 
       - name: Write google-services.json for debug
         run: |
