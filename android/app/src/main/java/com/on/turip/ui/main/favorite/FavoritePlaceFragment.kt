@@ -62,6 +62,7 @@ class FavoritePlaceFragment :
                         1000,
                         null,
                     )
+                    markerMap[favoritePlaceModel.placeId]?.showInfoWindow()
                 }
             },
             onCommit = { viewModel.updateFavoritePlacesOrder(it) },
@@ -69,6 +70,7 @@ class FavoritePlaceFragment :
     }
 
     private lateinit var map: GoogleMap
+    private val markerMap = mutableMapOf<Long, com.google.android.gms.maps.model.Marker>()
 
     override fun inflateBinding(
         inflater: LayoutInflater,
@@ -310,13 +312,20 @@ class FavoritePlaceFragment :
             if (favoriteLatLngList.isNotEmpty()) {
                 binding.ivFavoritePlaceMapToggle.visibility = View.VISIBLE
                 map.clear()
+                markerMap.clear()
+
                 val boundsBuilder = LatLngBounds.Builder()
                 favoriteLatLngList.forEach { favoriteLatLng ->
-                    map.addMarker(
-                        MarkerOptions()
-                            .position(favoriteLatLng.favoriteLatLng)
-                            .title(favoriteLatLng.name),
-                    )
+                    val marker =
+                        map.addMarker(
+                            MarkerOptions()
+                                .position(favoriteLatLng.favoriteLatLng)
+                                .title(favoriteLatLng.name),
+                        )
+                    // 마커 참조 저장 (placeId를 key로 사용)
+                    marker?.let {
+                        markerMap[favoriteLatLng.placeId] = it
+                    }
                     boundsBuilder.include(favoriteLatLng.favoriteLatLng)
                 }
                 val bounds = boundsBuilder.build()
@@ -325,6 +334,7 @@ class FavoritePlaceFragment :
             } else {
                 binding.mapFragment.visibility = View.GONE
                 binding.ivFavoritePlaceMapToggle.visibility = View.GONE
+                markerMap.clear()
             }
         }
     }

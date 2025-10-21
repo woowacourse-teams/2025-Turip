@@ -23,6 +23,7 @@ fun FavoritePlace.toUiModel(): FavoritePlaceModel =
 
 fun FavoritePlace.toLatLng(): FavoritePlaceLatLngUiModel =
     FavoritePlaceLatLngUiModel(
+        placeId = place.placeId,
         name = place.name,
         favoriteLatLng = LatLng(place.latitude, place.longitude),
     )
