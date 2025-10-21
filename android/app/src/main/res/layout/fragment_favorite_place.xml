@@ -67,7 +67,7 @@
     <com.google.android.gms.maps.MapView
         android:id="@+id/map_fragment"
         android:layout_width="0dp"
-        android:layout_height="200dp"
+        android:layout_height="250dp"
         app:layout_constraintTop_toBottomOf="@id/iv_favorite_place_share"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
