@@ -48,6 +48,7 @@ jobs:
       run: |
         echo "debug_base_url=${{ secrets.DEBUG_BASE_URL }}" > ./local.properties
         echo "release_base_url=${{ secrets.RELEASE_BASE_URL }}" >> ./local.properties
+        echo "google_maps_api_key=${{ secrets.GOOGLE_MAPS_API_KEY }}" >> ./local.properties
 
     - name: Write google-services.json for debug
       run: |
@@ -88,9 +89,6 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x ./gradlew
 
-    - name: Create local.properties
-      run: echo "base_url=${{ secrets.BASE_URL }}" > local.properties
-
     - name: Run ktlintCheck
       run: ./gradlew ktlintCheck --stacktrace
 
@@ -119,9 +117,6 @@ jobs:
 
     - name: Grant execute permission for gradlew
       run: chmod +x ./gradlew
-
-    - name: Create local.properties
-      run: echo "base_url=${{ secrets.BASE_URL }}" > local.properties
 
     - name: Write google-services.json for debug
       run: |
