@@ -14,6 +14,7 @@ import com.on.turip.databinding.BottomSheetFragmentFavoritePlaceFolderCatalogBin
 import com.on.turip.ui.common.base.BaseFragment
 import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
+import timber.log.Timber
 
 class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavoritePlaceFolderCatalogBinding>() {
     private val viewModel: FavoritePlaceFolderCatalogViewModel by viewModels {
@@ -36,6 +37,10 @@ class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavor
                 override fun onMapClick(uri: Uri) {
                     val intent: Intent = Intent(Intent.ACTION_VIEW, uri)
                     startActivity(intent)
+                }
+
+                override fun onItemClick(favoritePlaceModel: FavoritePlaceModel) {
+                    Timber.d("아이템 클릭: $favoritePlaceModel")
                 }
             },
             onCommit = { viewModel.updateFavoritePlacesOrder(it) },

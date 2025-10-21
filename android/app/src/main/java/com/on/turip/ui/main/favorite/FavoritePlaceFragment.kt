@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
 import com.on.turip.R
@@ -22,6 +23,7 @@ import com.on.turip.domain.ErrorEvent
 import com.on.turip.ui.common.base.BaseFragment
 import com.on.turip.ui.folder.FolderActivity
 import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
+import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
 
 class FavoritePlaceFragment :
     BaseFragment<FragmentFavoritePlaceBinding>(),
@@ -46,10 +48,25 @@ class FavoritePlaceFragment :
                     val intent: Intent = Intent(Intent.ACTION_VIEW, uri)
                     startActivity(intent)
                 }
+
+                override fun onItemClick(favoritePlaceModel: FavoritePlaceModel) {
+                    map.moveCamera(
+                        CameraUpdateFactory.newCameraPosition(
+                            CameraPosition(
+                                favoritePlaceModel.latLng,
+                                15f,
+                                0f,
+                                0f,
+                            ),
+                        ),
+                    )
+                }
             },
             onCommit = { viewModel.updateFavoritePlacesOrder(it) },
         )
     }
+
+    private lateinit var map: GoogleMap
 
     override fun inflateBinding(
         inflater: LayoutInflater,
@@ -285,14 +302,15 @@ class FavoritePlaceFragment :
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
-        googleMap.uiSettings.isZoomControlsEnabled = true
+        map = googleMap
+        map.uiSettings.isZoomControlsEnabled = true
         viewModel.favoriteLatLng.observe(viewLifecycleOwner) { favoriteLatLngList ->
             if (favoriteLatLngList.isNotEmpty()) {
                 binding.ivFavoritePlaceMapToggle.visibility = View.VISIBLE
-                googleMap.clear()
+                map.clear()
                 val boundsBuilder = LatLngBounds.Builder()
                 favoriteLatLngList.forEach { favoriteLatLng ->
-                    googleMap.addMarker(
+                    map.addMarker(
                         MarkerOptions()
                             .position(favoriteLatLng.favoriteLatLng)
                             .title(favoriteLatLng.name),
@@ -300,8 +318,8 @@ class FavoritePlaceFragment :
                     boundsBuilder.include(favoriteLatLng.favoriteLatLng)
                 }
                 val bounds = boundsBuilder.build()
-                googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
-                googleMap.setMinZoomPreference(8f)
+                map.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
+                map.setMinZoomPreference(8f)
             } else {
                 binding.mapFragment.visibility = View.GONE
                 binding.ivFavoritePlaceMapToggle.visibility = View.GONE

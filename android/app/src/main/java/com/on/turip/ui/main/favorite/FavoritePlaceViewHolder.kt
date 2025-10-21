@@ -25,6 +25,11 @@ class FavoritePlaceViewHolder(
                 favoritePlaceListener.onFavoriteClick(it.placeId, it.isFavorite)
             }
         }
+        binding.root.setOnClickListener {
+            favoritePlaceModel?.let {
+                favoritePlaceListener.onItemClick(it)
+            }
+        }
     }
 
     fun bind(favoritePlaceModel: FavoritePlaceModel) {
@@ -55,5 +60,7 @@ class FavoritePlaceViewHolder(
         )
 
         fun onMapClick(uri: Uri)
+
+        fun onItemClick(favoritePlaceModel: FavoritePlaceModel)
     }
 }

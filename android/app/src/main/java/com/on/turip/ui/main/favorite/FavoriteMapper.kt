@@ -18,6 +18,7 @@ fun FavoritePlace.toUiModel(): FavoritePlaceModel =
         uri = place.url.toUri(),
         category = place.category.joinToString(),
         isFavorite = true,
+        latLng = LatLng(place.latitude, place.longitude),
     )
 
 fun FavoritePlace.toLatLng(): FavoritePlaceLatLngUiModel =
