@@ -311,6 +311,7 @@ class FavoritePlaceFragment :
         viewModel.favoriteLatLng.observe(viewLifecycleOwner) { favoriteLatLngList ->
             if (favoriteLatLngList.isNotEmpty()) {
                 binding.ivFavoritePlaceMapToggle.visibility = View.VISIBLE
+                binding.mapFragment.visibility = View.VISIBLE
                 map.clear()
                 markerMap.clear()
 
@@ -322,7 +323,6 @@ class FavoritePlaceFragment :
                                 .position(favoriteLatLng.favoriteLatLng)
                                 .title(favoriteLatLng.name),
                         )
-                    // 마커 참조 저장 (placeId를 key로 사용)
                     marker?.let {
                         markerMap[favoriteLatLng.placeId] = it
                     }
