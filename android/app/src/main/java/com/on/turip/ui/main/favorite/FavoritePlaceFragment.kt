@@ -348,7 +348,6 @@ class FavoritePlaceFragment :
 
         val bounds = boundsBuilder.build()
         map.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
-        map.setMinZoomPreference(8f)
     }
 
     private fun showMap() {
