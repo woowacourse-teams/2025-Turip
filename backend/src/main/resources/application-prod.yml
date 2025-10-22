@@ -13,7 +13,6 @@ spring:
     init:
       mode: never
 
-  # Flyway 설정 - 전용 계정 사용
   flyway:
     enabled: true                     # Flyway migration 기능 활성화 여부
     user: ${FLYWAY_USERNAME}          # Flyway 전용 계정
@@ -23,7 +22,6 @@ spring:
     validate-on-migrate: true         # migration 전에 SQL 스크립트와 데이터 일치 여부 검증
     encoding: UTF-8                   # SQL 파일 인코딩
 
-# CSV Import 설정
 csv:
   import:
     password: ${CSV_IMPORT_PASSWORD}

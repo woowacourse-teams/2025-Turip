@@ -30,7 +30,6 @@ management:
     health:
       show-details: always
 
-# CSV Import 설정
 csv:
   import:
     password: ${CSV_IMPORT_PASSWORD:dev_password_123}
