@@ -1,8 +1,8 @@
 package com.on.turip.ui.folder.model
 
 data class FolderEditModel(
-    val id: Long = 0L,
+    val id: Long,
     val name: String,
-    val count: Int = 0,
+    val count: Int,
     val isSelected: Boolean = false,
 )

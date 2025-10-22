@@ -63,3 +63,31 @@
 # Firebase
 -keep class com.google.firebase.** { *; }
 -dontwarn com.google.firebase.**
+
+# WebView JavaScript Interface
+-keepclassmembers class com.on.turip.ui.trip.detail.webview.WebViewVideoBridge {
+    @android.webkit.JavascriptInterface <methods>;
+}
+
+-keep class com.on.turip.ui.trip.detail.webview.WebViewVideoBridge {
+    public *;
+}
+
+# JavaScript Interface 일반 규칙
+-keepclassmembers class * {
+    @android.webkit.JavascriptInterface <methods>;
+}
+
+-keepattributes JavascriptInterface
+-keepattributes *Annotation*
+
+# WebView 관련
+-keep class android.webkit.JavascriptInterface
+-keep class android.webkit.WebView
+-keepclassmembers class * extends android.webkit.WebViewClient {
+    public void *(android.webkit.WebView, java.lang.String, android.graphics.Bitmap);
+    public boolean *(android.webkit.WebView, java.lang.String);
+}
+-keepclassmembers class * extends android.webkit.WebChromeClient {
+    public void *(android.webkit.WebView, java.lang.String);
+}
