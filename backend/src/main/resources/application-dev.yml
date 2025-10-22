@@ -1,7 +1,7 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/turip_dev
+    url: jdbc:mysql://mysql:3306/turip_dev
     username: turip
     password: turip_pw
 
@@ -10,7 +10,6 @@ spring:
       ddl-auto: validate
     properties:
       hibernate:
-        # 개발 환경에서는 스키마 검증을 완화
         validator:
           apply_to_ddl: false
 
@@ -25,12 +24,6 @@ spring:
     validate-on-migrate: true
     encoding: UTF-8
 
-management:
-  endpoint:
-    health:
-      show-details: always
-
-# CSV Import 설정
 csv:
   import:
     password: ${CSV_IMPORT_PASSWORD:dev_password_123}
