@@ -7,11 +7,13 @@ import com.on.turip.common.TuripReleaseTree
 import com.on.turip.data.initializer.FirebaseInstallationsInitializer
 import com.on.turip.di.ApplicationContextProvider
 import com.on.turip.di.RepositoryModule
+import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
+@HiltAndroidApp
 class TuripApplication : Application() {
     override fun onCreate() {
         super.onCreate()
