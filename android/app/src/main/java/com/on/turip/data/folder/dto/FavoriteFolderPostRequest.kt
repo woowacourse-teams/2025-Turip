@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class FavoriteFolderAddRequest(
+data class FavoriteFolderPostRequest(
     @SerialName("name")
     val name: String,
 )
