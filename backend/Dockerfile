@@ -1,6 +1,5 @@
 FROM openjdk:21-jdk
-RUN curl -L -o /opentelemetry-javaagent.jar \
-  https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/latest/download/opentelemetry-javaagent.jar
+COPY otel/opentelemetry-javaagent.jar /opentelemetry-javaagent.jar
 ARG JAR_FILE=build/libs/*.jar
 COPY ${JAR_FILE} /app.jar
 EXPOSE 8080
