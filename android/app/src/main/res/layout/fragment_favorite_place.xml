@@ -43,7 +43,7 @@
         android:layout_marginStart="20dp"
         android:textAppearance="@style/info1"
         android:textColor="@color/gray_300_5b5b5b"
-        app:layout_constraintBottom_toTopOf="@id/map_fragment"
+        app:layout_constraintBottom_toTopOf="@id/mv_favorite_place"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/rv_favorite_place_folder_name"
         tools:text="10개 장소" />
@@ -65,7 +65,7 @@
         app:tint="@color/gray_300_5b5b5b" />
 
     <com.google.android.gms.maps.MapView
-        android:id="@+id/map_fragment"
+        android:id="@+id/mv_favorite_place"
         android:layout_width="0dp"
         android:layout_height="250dp"
         app:layout_constraintTop_toBottomOf="@id/iv_favorite_place_share"
@@ -83,7 +83,7 @@
         android:src="@drawable/btn_map_toggle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/map_fragment" />
+        app:layout_constraintTop_toBottomOf="@id/mv_favorite_place" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_favorite_place_place"
