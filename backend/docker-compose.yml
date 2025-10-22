@@ -45,6 +45,8 @@ services:
       OVERSEAS_ETC_IMAGE_URL: ${OVERSEAS_ETC_IMAGE_URL}
     networks:
       - turip-network
+    volumes:
+      - /home/ubuntu/logs:/logs
 
   green:
     image: ${DOCKER_IMAGE_NAME:-teamturip/turip-backend:latest}
@@ -64,6 +66,8 @@ services:
       OVERSEAS_ETC_IMAGE_URL: ${OVERSEAS_ETC_IMAGE_URL}
     networks:
       - turip-network
+    volumes:
+      - /home/ubuntu/logs:/logs
 
 networks:
   turip-network:
