@@ -24,6 +24,11 @@ spring:
     validate-on-migrate: true
     encoding: UTF-8
 
+management:
+  endpoint:
+    health:
+      show-details: always
+
 csv:
   import:
     password: ${CSV_IMPORT_PASSWORD:dev_password_123}

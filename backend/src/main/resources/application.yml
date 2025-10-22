@@ -26,7 +26,7 @@ management:
         include: prometheus,health,info
   endpoint:
     health:
-      show-details: always
+      show-details: never
 
 server:
   tomcat:
