@@ -26,12 +26,11 @@ class RegionResultActivity : BaseActivity<ActivityRegionResultBinding>() {
         ActivityRegionResultBinding.inflate(layoutInflater)
     }
     private val regionResultAdapter: RegionResultAdapter =
-        RegionResultAdapter { contentId: Long?, creatorId: Long? ->
+        RegionResultAdapter { contentId: Long? ->
             val intent: Intent =
                 TripDetailActivity.newIntent(
                     context = this,
                     contentId = contentId ?: 0,
-                    creatorId = creatorId ?: 0,
                 )
             startActivity(intent)
         }

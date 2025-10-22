@@ -45,13 +45,12 @@ class HomeFragment : Fragment() {
                         },
                         onContentClick = { usersLikeContent: UsersLikeContentModel ->
                             Timber.d(
-                                "인기 컨텐츠 선택 : ContentId = ${usersLikeContent.content.id} CreatorId = ${usersLikeContent.content.creator.id}",
+                                "인기 컨텐츠 선택 : ContentId = ${usersLikeContent.content.id}",
                             )
                             val intent: Intent =
                                 TripDetailActivity.newIntent(
                                     context = requireContext(),
                                     contentId = usersLikeContent.content.id,
-                                    creatorId = usersLikeContent.content.creator.id,
                                 )
                             startActivity(intent)
                         },

@@ -15,7 +15,6 @@ import com.on.turip.di.RepositoryModule
 import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.content.Content
 import com.on.turip.domain.content.repository.ContentRepository
-import com.on.turip.domain.creator.repository.CreatorRepository
 import com.on.turip.domain.favorite.usecase.UpdateFavoriteUseCase
 import com.on.turip.domain.trip.ContentPlace
 import com.on.turip.domain.trip.Trip
@@ -31,9 +30,7 @@ import javax.inject.Inject
 @HiltViewModel
 class TripDetailViewModel @Inject constructor(
     private val contentId: Long,
-    private val creatorId: Long,
     private val contentRepository: ContentRepository,
-    private val creatorRepository: CreatorRepository,
     private val contentPlaceRepository: ContentPlaceRepository,
     private val updateFavoriteUseCase: UpdateFavoriteUseCase,
 ) : ViewModel() {
@@ -230,9 +227,7 @@ class TripDetailViewModel @Inject constructor(
 
         fun provideFactory(
             contentId: Long,
-            creatorId: Long,
             contentRepository: ContentRepository = RepositoryModule.contentRepository,
-            creatorRepository: CreatorRepository = RepositoryModule.creatorRepository,
             contentPlaceRepository: ContentPlaceRepository = RepositoryModule.contentPlaceRepository,
             updateFavoriteUseCase: UpdateFavoriteUseCase = UpdateFavoriteUseCase(RepositoryModule.favoriteRepository),
         ): ViewModelProvider.Factory =
@@ -240,9 +235,7 @@ class TripDetailViewModel @Inject constructor(
                 initializer {
                     TripDetailViewModel(
                         contentId,
-                        creatorId,
                         contentRepository,
-                        creatorRepository,
                         contentPlaceRepository,
                         updateFavoriteUseCase,
                     )

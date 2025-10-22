@@ -29,16 +29,12 @@ class FavoriteContentFragment : BaseFragment<FragmentFavoriteContentBinding>() {
                     viewModel.updateFavorite(contentId, isFavorite)
                 }
 
-                override fun onFavoriteItemClick(
-                    contentId: Long,
-                    creatorId: Long,
-                ) {
+                override fun onFavoriteItemClick(contentId: Long) {
                     Timber.d("찜 목록의 아이템 클릭(contentId=$contentId)")
                     val intent: Intent =
                         TripDetailActivity.newIntent(
                             context = requireContext(),
                             contentId = contentId,
-                            creatorId = creatorId,
                         )
                     startActivity(intent)
                 }

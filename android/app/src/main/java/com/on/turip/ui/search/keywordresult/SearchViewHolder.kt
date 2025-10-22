@@ -6,7 +6,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.on.turip.R
 import com.on.turip.databinding.ItemResultBinding
 import com.on.turip.domain.content.Content
-import com.on.turip.domain.creator.Creator
 import com.on.turip.ui.common.TuripUrlConverter
 import com.on.turip.ui.common.loadCircularImage
 import com.on.turip.ui.common.loadRoundedCornerImage
@@ -17,24 +16,19 @@ class SearchViewHolder(
     private val binding: ItemResultBinding,
     private val onSearchResultListener: OnSearchResultListener,
 ) : RecyclerView.ViewHolder(binding.root) {
-    private var creator: Creator? = null
     private var content: Content? = null
 
     init {
         itemView.setOnClickListener {
             content?.let { content ->
-                creator?.let { creator ->
-                    onSearchResultListener.onSearchResultClick(
-                        content.id,
-                        creator.id,
-                    )
-                }
+                onSearchResultListener.onSearchResultClick(
+                    content.id,
+                )
             }
         }
     }
 
     fun bind(videoInformationModel: VideoInformationModel) {
-        creator = videoInformationModel.content.creator
         content = videoInformationModel.content
         binding.tvResultTitle.text = videoInformationModel.content.videoData.title
         binding.tvResultDay.text =
@@ -73,9 +67,6 @@ class SearchViewHolder(
     }
 
     fun interface OnSearchResultListener {
-        fun onSearchResultClick(
-            contentId: Long,
-            creatorId: Long,
-        )
+        fun onSearchResultClick(contentId: Long)
     }
 }

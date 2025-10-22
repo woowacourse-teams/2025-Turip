@@ -42,7 +42,6 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
     val viewModel: TripDetailViewModel by viewModels {
         TripDetailViewModel.provideFactory(
             intent.getLongExtra(CONTENT_KEY, 0),
-            intent.getLongExtra(CREATOR_KEY, 0),
         )
     }
 
@@ -330,16 +329,13 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
     }
 
     companion object {
-        private const val CREATOR_KEY: String = "com.on.turip.CREATOR_KEY"
         private const val CONTENT_KEY: String = "com.on.turip.CONTENT_KEY"
 
         fun newIntent(
             context: Context,
             contentId: Long,
-            creatorId: Long,
         ): Intent =
             Intent(context, TripDetailActivity::class.java)
                 .putExtra(CONTENT_KEY, contentId)
-                .putExtra(CREATOR_KEY, creatorId)
     }
 }
