@@ -1,4 +1,4 @@
-name: dev CI Build and Test, EC2 CD
+name: dev CI/CD with Docker and Nginx
 
 on:
   push:
@@ -19,14 +19,8 @@ jobs:
         working-directory: backend
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v3
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
 
       - name: Set up JDK 21
         uses: actions/setup-java@v4
@@ -35,56 +29,69 @@ jobs:
           distribution: 'temurin'
           cache: 'gradle'
 
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
       - name: Build with Gradle
         run: ./gradlew clean build -x test
 
       - name: Run Unit Tests
         run: ./gradlew test
 
-      - name: Upload Jar
-        uses: actions/upload-artifact@v4
+      - name: Prepare OpenTelemetry agent
+        run: |
+          mkdir -p otel
+          curl -L -o otel/opentelemetry-javaagent.jar \
+          https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v2.10.0/opentelemetry-javaagent.jar
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
         with:
-          name: turip
-          path: backend/build/libs/*SNAPSHOT.jar
+          driver-opts: network=host
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          platforms: linux/arm64
+          push: true
+          tags: |
+            teamturip/turip-backend:${{ github.sha }}
+            teamturip/turip-backend:latest
 
   deploy:
     needs: build_and_test
     runs-on: [ self-hosted, turip-server-dev ]
-    environment: production
+    environment: development
     if: github.event_name == 'push'
 
     steps:
-      - name: Download artifact from CI workflow
-        uses: actions/download-artifact@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
         with:
-          name: turip
-          path: ./downloaded-artifact
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Get JAR file name
-        id: get_jar_name
-        run: |
-          JAR_FILE=$(find ./downloaded-artifact -name "*.jar" | head -n 1)
-          if [ -z "$JAR_FILE" ]; then
-            echo "Error: JAR file not found in downloaded-artifact directory."
-            exit 1
-          fi
-          echo "JAR_NAME=$(basename $JAR_FILE)" >> $GITHUB_OUTPUT
-          echo "JAR file located at: $JAR_FILE"
-      - name: Kill Existing Server On Port 80
-        run: |
-          PID=$(sudo lsof -t -i :80 || true)
-          if [ -n "$PID" ]; then
-            echo "Killing existing process: $PID"
-            sudo kill -9 $PID
-          fi
+      - name: Grant execute permission for deploy script
+        run: chmod +x /home/ubuntu/deploy/deploy.sh
 
-      - name: Run App On Port 80
-        run: |
-          JAR_NAME="${{ steps.get_jar_name.outputs.JAR_NAME }}"
-          DOWNLOADED_JAR="./downloaded-artifact/$JAR_NAME"
-          TARGET_JAR="/home/ubuntu/app/$JAR_NAME"
-          echo "Moving new JAR to $TARGET_JAR"
-          mv "$DOWNLOADED_JAR" "$TARGET_JAR"
-          chmod +x "$TARGET_JAR"
-          echo "Starting application..."
-          sudo sh -lc "nohup java -Xms256m -Xmx384m -jar '$TARGET_JAR' --server.port=80 > /dev/null 2>&1 &"
+      - name: Deploy to EC2
+        working-directory: /home/ubuntu/deploy
+        env:
+          DOCKER_IMAGE_NAME: teamturip/turip-backend:latest
+          CSV_LINKS_COLLECTION_URL: ${{ secrets.CSV_LINKS_COLLECTION_URL }}
+          OVERSEAS_ETC_IMAGE_URL: ${{ secrets.OVERSEAS_ETC_IMAGE_URL }}
+          DOMESTIC_ETC_IMAGE_URL: ${{ secrets.DOMESTIC_ETC_IMAGE_URL }}
+          OTEL_EXPORTER_OTLP_ENDPOINT: ${{ secrets.OTEL_EXPORTER_OTLP_ENDPOINT }}
+        run: ./deploy.sh
+    
