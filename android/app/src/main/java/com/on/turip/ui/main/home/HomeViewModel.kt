@@ -17,10 +17,13 @@ import com.on.turip.domain.region.RegionCategory
 import com.on.turip.domain.region.repository.RegionRepository
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.main.home.model.UsersLikeContentModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
-class HomeViewModel(
+@HiltViewModel
+class HomeViewModel @Inject constructor(
     private val regionRepository: RegionRepository,
     private val contentRepository: ContentRepository,
 ) : ViewModel() {

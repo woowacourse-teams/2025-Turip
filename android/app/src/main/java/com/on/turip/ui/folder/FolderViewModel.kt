@@ -16,10 +16,13 @@ import com.on.turip.domain.folder.repository.FolderRepository
 import com.on.turip.ui.common.mapper.toEditUiModel
 import com.on.turip.ui.folder.model.FolderEditModel
 import com.on.turip.ui.folder.model.FolderNameStatusModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
-class FolderViewModel(
+@HiltViewModel
+class FolderViewModel @Inject constructor(
     private val folderRepository: FolderRepository,
 ) : ViewModel() {
     private val _folders: MutableLiveData<List<FolderEditModel>> = MutableLiveData()

@@ -15,10 +15,13 @@ import com.on.turip.domain.favorite.usecase.UpdateFavoritePlaceUseCase
 import com.on.turip.domain.folder.FavoriteFolder
 import com.on.turip.domain.folder.repository.FolderRepository
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
-class FavoritePlaceFolderViewModel(
+@HiltViewModel
+class FavoritePlaceFolderViewModel @Inject constructor(
     private val placeId: Long,
     private val folderRepository: FolderRepository,
     private val updateFavoritePlaceUseCase: UpdateFavoritePlaceUseCase,

@@ -17,11 +17,14 @@ import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.content.video.VideoInformation
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.search.model.VideoInformationModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class RegionResultViewModel(
+@HiltViewModel
+class RegionResultViewModel @Inject constructor(
     private val regionCategoryName: String,
     private val contentRepository: ContentRepository,
 ) : ViewModel() {

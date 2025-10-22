@@ -11,10 +11,13 @@ import com.on.turip.di.RepositoryModule
 import com.on.turip.domain.userstorage.TuripDeviceIdentifier
 import com.on.turip.domain.userstorage.repository.UserStorageRepository
 import com.on.turip.ui.main.favorite.model.HelpInformationModelType
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
-class FavoriteHelpInformationViewModel(
+@HiltViewModel
+class FavoriteHelpInformationViewModel @Inject constructor(
     private val userStorageRepository: UserStorageRepository,
 ) : ViewModel() {
     private val _helpInformationItems: MutableLiveData<List<HelpInformationModelType>> =

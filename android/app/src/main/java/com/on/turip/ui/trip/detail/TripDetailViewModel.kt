@@ -23,10 +23,13 @@ import com.on.turip.domain.trip.repository.ContentPlaceRepository
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.common.mapper.toUiModelWithoutContentPlaces
 import com.on.turip.ui.common.model.trip.TripModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
-class TripDetailViewModel(
+@HiltViewModel
+class TripDetailViewModel @Inject constructor(
     private val contentId: Long,
     private val creatorId: Long,
     private val contentRepository: ContentRepository,
