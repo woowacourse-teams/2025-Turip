@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class FavoriteFoldersResponse(
     @SerialName("favoriteFolders")
-    val favoriteFolderResponses: List<FavoriteFolderResponse>,
+    val favoriteFolderResponses: List<FavoriteFolderPostResponse>,
 )
