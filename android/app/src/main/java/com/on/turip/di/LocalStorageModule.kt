@@ -2,8 +2,9 @@ package com.on.turip.di
 
 import android.content.Context
 import androidx.datastore.core.DataStore
+import androidx.datastore.dataStoreFile
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
 import com.on.turip.data.database.TuripDatabase
 import com.on.turip.data.searchhistory.dao.SearchHistoryDao
@@ -17,16 +18,17 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object LocalStorageModule {
-    private const val USER_PREFERENCES_NAME = "user_storage"
+    private const val USER_PREFERENCES_FILE_NAME = "user_storage.preferences_pb"
     private const val TURIP_DATABASE = "turip_database"
-
-    private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = USER_PREFERENCES_NAME)
 
     @Provides
     @Singleton
     fun provideUserDataStore(
         @ApplicationContext context: Context,
-    ): DataStore<Preferences> = context.dataStore
+    ): DataStore<Preferences> =
+        PreferenceDataStoreFactory.create {
+            context.dataStoreFile(USER_PREFERENCES_FILE_NAME)
+        }
 
     @Provides
     @Singleton
