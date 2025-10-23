@@ -1,6 +1,5 @@
 package com.on.turip.data.initializer
 
-import android.util.Log
 import com.google.android.gms.tasks.Task
 import com.google.firebase.installations.FirebaseInstallations
 import com.on.turip.domain.userstorage.TuripDeviceIdentifier
@@ -16,12 +15,9 @@ class FirebaseInstallationsInitializer @Inject constructor(
     fun setupFirebaseInstallationId(coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)) {
         FirebaseInstallations.getInstance().id.addOnCompleteListener { task: Task<String> ->
             if (task.isSuccessful) {
-                coroutineScope
-                    .launch {
-                        userStorageRepository.createId(TuripDeviceIdentifier(task.result))
-                    }.also {
-                        Log.d("moongchi", "setupFirebaseInstallationId: ${task.result}")
-                    }
+                coroutineScope.launch {
+                    userStorageRepository.createId(TuripDeviceIdentifier(task.result))
+                }
             } else {
                 // TODO : Firebase Installation ID 가져오지 못했을 때
             }
