@@ -33,8 +33,8 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideLoggingInterceptor(): HttpLoggingInterceptor =
-        HttpLoggingInterceptor { message -> logHttpMessage(message) }.apply {
+    fun provideLoggingInterceptor(json: Json): HttpLoggingInterceptor =
+        HttpLoggingInterceptor { message -> logHttpMessage(message, json) }.apply {
             level =
                 if (BuildConfig.DEBUG) {
                     HttpLoggingInterceptor.Level.BODY
@@ -43,13 +43,14 @@ object NetworkModule {
                 }
         }
 
-    private fun logHttpMessage(message: String) {
+    private fun logHttpMessage(
+        message: String,
+        json: Json,
+    ) {
         if (message.startsWith("{") || message.startsWith("[")) {
             try {
                 val prettyJson =
-                    Json {
-                        prettyPrint = true
-                    }.encodeToString(
+                    json.encodeToString(
                         JsonElement.serializer(),
                         Json.parseToJsonElement(message),
                     )
