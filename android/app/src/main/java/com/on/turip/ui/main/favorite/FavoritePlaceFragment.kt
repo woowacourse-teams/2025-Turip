@@ -362,12 +362,16 @@ class FavoritePlaceFragment :
         }
 
         val bounds = boundsBuilder.build()
-        map.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
+
+        binding.mvFavoritePlace.post {
+            map.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
+        }
     }
 
     private fun showMap() {
         binding.ivFavoritePlaceMapToggle.visibility = View.VISIBLE
         binding.mvFavoritePlace.visibility = View.VISIBLE
+        binding.ivFavoritePlaceMapToggle.isSelected = false
     }
 
     private fun clearMapMarkers() {
