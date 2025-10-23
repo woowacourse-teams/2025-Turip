@@ -12,7 +12,9 @@ import com.on.turip.databinding.ActivityMainBinding
 import com.on.turip.ui.common.base.BaseActivity
 import com.on.turip.ui.main.favorite.FavoriteFragment
 import com.on.turip.ui.main.home.HomeFragment
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : BaseActivity<ActivityMainBinding>() {
     override val binding: ActivityMainBinding by lazy {
         ActivityMainBinding.inflate(layoutInflater)

@@ -25,11 +25,13 @@ import com.on.turip.ui.folder.FolderActivity
 import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceLatLngUiModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class FavoritePlaceFragment :
     BaseFragment<FragmentFavoritePlaceBinding>(),
     OnMapReadyCallback {
-    private val viewModel: FavoritePlaceViewModel by viewModels { FavoritePlaceViewModel.provideFactory() }
+    private val viewModel: FavoritePlaceViewModel by viewModels()
     private val folderNameAdapter: FavoritePlaceFolderNameAdapter by lazy {
         FavoritePlaceFolderNameAdapter { folderId: Long ->
             viewModel.updateFolderWithPlaces(folderId)

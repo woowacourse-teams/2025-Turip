@@ -12,26 +12,29 @@ import com.on.turip.databinding.ActivityRegionResultBinding
 import com.on.turip.domain.ErrorEvent
 import com.on.turip.ui.common.base.BaseActivity
 import com.on.turip.ui.trip.detail.TripDetailActivity
+import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class RegionResultActivity : BaseActivity<ActivityRegionResultBinding>() {
-    val viewModel: RegionResultViewModel by viewModels {
+    @Inject
+    lateinit var regionResultViewModelFactory: RegionResultViewModel.RegionCategoryNameAssistedFactory
+
+    private val viewModel: RegionResultViewModel by viewModels {
         val regionCategoryName: String = intent.getStringExtra(REGION_CATEGORY_NAME_KEY) ?: ""
         Timber.d("선택한 지역 카테고리: $regionCategoryName")
-        RegionResultViewModel.provideFactory(
-            regionCategoryName = regionCategoryName,
-        )
+        RegionResultViewModel.provideFactory(regionResultViewModelFactory, regionCategoryName)
     }
     override val binding: ActivityRegionResultBinding by lazy {
         ActivityRegionResultBinding.inflate(layoutInflater)
     }
     private val regionResultAdapter: RegionResultAdapter =
-        RegionResultAdapter { contentId: Long?, creatorId: Long? ->
+        RegionResultAdapter { contentId: Long? ->
             val intent: Intent =
                 TripDetailActivity.newIntent(
                     context = this,
                     contentId = contentId ?: 0,
-                    creatorId = creatorId ?: 0,
                 )
             startActivity(intent)
         }

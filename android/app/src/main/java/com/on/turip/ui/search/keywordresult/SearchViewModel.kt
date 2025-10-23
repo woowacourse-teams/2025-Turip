@@ -10,7 +10,6 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.on.turip.data.common.TuripCustomResult
 import com.on.turip.data.common.onFailure
 import com.on.turip.data.common.onSuccess
-import com.on.turip.di.RepositoryModule
 import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.content.PagedContentsResult
 import com.on.turip.domain.content.repository.ContentRepository
@@ -19,13 +18,16 @@ import com.on.turip.domain.searchhistory.SearchHistory
 import com.on.turip.domain.searchhistory.SearchHistoryRepository
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.search.model.VideoInformationModel
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class SearchViewModel(
-    searchKeyword: String,
+class SearchViewModel @AssistedInject constructor(
+    @Assisted private val searchKeyword: String,
     private val contentRepository: ContentRepository,
     private val searchHistoryRepository: SearchHistoryRepository,
 ) : ViewModel() {
@@ -190,18 +192,18 @@ class SearchViewModel(
         private const val FIRST_INDEX = 0
 
         fun provideFactory(
+            searchKeywordAssistedFactory: SearchKeywordAssistedFactory,
             searchKeyword: String = "",
-            contentRepository: ContentRepository = RepositoryModule.contentRepository,
-            searchHistoryRepository: SearchHistoryRepository = RepositoryModule.searchHistoryRepository,
         ): ViewModelProvider.Factory =
             viewModelFactory {
                 initializer {
-                    SearchViewModel(
-                        searchKeyword,
-                        contentRepository,
-                        searchHistoryRepository,
-                    )
+                    searchKeywordAssistedFactory.create(searchKeyword)
                 }
             }
+    }
+
+    @AssistedFactory
+    interface SearchKeywordAssistedFactory {
+        fun create(searchKeyword: String): SearchViewModel
     }
 }

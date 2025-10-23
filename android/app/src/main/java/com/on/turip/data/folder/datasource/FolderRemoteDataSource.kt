@@ -1,9 +1,9 @@
 package com.on.turip.data.folder.datasource
 
 import com.on.turip.data.common.TuripCustomResult
+import com.on.turip.data.folder.dto.FavoriteFolderPatchRequest
 import com.on.turip.data.folder.dto.FavoriteFolderPostRequest
 import com.on.turip.data.folder.dto.FavoriteFolderPostResponse
-import com.on.turip.data.folder.dto.FavoriteFolderPatchRequest
 import com.on.turip.data.folder.dto.FavoriteFoldersResponse
 import com.on.turip.data.folder.dto.FavoriteFoldersStatusByPlaceResponse
 

@@ -9,7 +9,9 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.on.turip.databinding.FragmentFavoriteBinding
 import com.on.turip.ui.common.base.BaseFragment
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>() {
     private val favoriteStateAdapter: FragmentStateAdapter by lazy {
         FavoriteStateAdapter(

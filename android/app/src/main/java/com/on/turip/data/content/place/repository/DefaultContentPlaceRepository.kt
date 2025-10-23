@@ -6,8 +6,9 @@ import com.on.turip.data.content.place.datasource.ContentPlaceRemoteDataSource
 import com.on.turip.data.content.place.toDomain
 import com.on.turip.domain.trip.Trip
 import com.on.turip.domain.trip.repository.ContentPlaceRepository
+import javax.inject.Inject
 
-class DefaultContentPlaceRepository(
+class DefaultContentPlaceRepository @Inject constructor(
     private val contentPlaceRemoteDataSource: ContentPlaceRemoteDataSource,
 ) : ContentPlaceRepository {
     override suspend fun loadTripInfo(contentId: Long): TuripCustomResult<Trip> =

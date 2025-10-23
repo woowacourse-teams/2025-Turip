@@ -10,6 +10,7 @@ plugins {
     id("kotlin-kapt")
     alias(libs.plugins.compose.compiler)
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -125,10 +126,6 @@ dependencies {
     // compose
     implementation(platform(libs.compose.bom))
     androidTestImplementation(platform(libs.compose.bom))
-
-    // maps
-    implementation(libs.play.services.maps)
-
     implementation(libs.androidx.ui)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.activity.compose)
@@ -139,7 +136,15 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
 
+    // maps
+    implementation(libs.play.services.maps)
+
     // app update
     implementation(libs.app.update)
     implementation(libs.app.update.ktx)
+
+    // hilt
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.android.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
 }

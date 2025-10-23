@@ -9,9 +9,10 @@ import com.on.turip.data.content.dto.UsersLikeContentsResponse
 import com.on.turip.data.content.service.ContentService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
-class DefaultContentRemoteDataSource(
+class DefaultContentRemoteDataSource @Inject constructor(
     private val contentService: ContentService,
     private val coroutineContext: CoroutineContext = Dispatchers.IO,
 ) : ContentRemoteDataSource {

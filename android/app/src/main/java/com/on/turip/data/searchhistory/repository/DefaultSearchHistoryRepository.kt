@@ -5,8 +5,9 @@ import com.on.turip.data.searchhistory.datasource.SearchHistoryDataSource
 import com.on.turip.data.searchhistory.toDomain
 import com.on.turip.domain.searchhistory.SearchHistory
 import com.on.turip.domain.searchhistory.SearchHistoryRepository
+import javax.inject.Inject
 
-class DefaultSearchHistoryRepository(
+class DefaultSearchHistoryRepository @Inject constructor(
     private val searchHistoryDataSource: SearchHistoryDataSource,
 ) : SearchHistoryRepository {
     override suspend fun createSearchHistory(keyword: String): Result<Unit> =

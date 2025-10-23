@@ -7,8 +7,9 @@ import com.on.turip.data.place.dto.FavoritePlaceOrderRequest
 import com.on.turip.data.place.toDomain
 import com.on.turip.domain.favorite.FavoritePlace
 import com.on.turip.domain.favorite.repository.FavoritePlaceRepository
+import javax.inject.Inject
 
-class DefaultFavoritePlaceRepository(
+class DefaultFavoritePlaceRepository @Inject constructor(
     private val favoritePlaceRemoteDataSource: FavoritePlaceRemoteDataSource,
 ) : FavoritePlaceRepository {
     override suspend fun loadFavoritePlaces(favoriteFolderId: Long): TuripCustomResult<List<FavoritePlace>> =

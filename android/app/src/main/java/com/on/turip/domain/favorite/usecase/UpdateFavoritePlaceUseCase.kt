@@ -5,8 +5,9 @@ import com.on.turip.data.common.onFailure
 import com.on.turip.data.common.onSuccess
 import com.on.turip.domain.favorite.repository.FavoritePlaceRepository
 import timber.log.Timber
+import javax.inject.Inject
 
-class UpdateFavoritePlaceUseCase(
+class UpdateFavoritePlaceUseCase @Inject constructor(
     private val favoritePlaceRepository: FavoritePlaceRepository,
 ) {
     suspend operator fun invoke(

@@ -3,21 +3,20 @@ package com.on.turip.ui.main.favorite
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import com.on.turip.data.common.onFailure
 import com.on.turip.data.common.onSuccess
-import com.on.turip.di.RepositoryModule
 import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.favorite.FavoriteContent
 import com.on.turip.domain.favorite.repository.FavoriteRepository
 import com.on.turip.domain.favorite.usecase.UpdateFavoriteUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
-class FavoriteContentViewModel(
+@HiltViewModel
+class FavoriteContentViewModel @Inject constructor(
     private val favoriteRepository: FavoriteRepository,
     private val updateFavoriteUseCase: UpdateFavoriteUseCase,
 ) : ViewModel() {
@@ -93,20 +92,5 @@ class FavoriteContentViewModel(
                 _serverError.value = true
             }
         }
-    }
-
-    companion object {
-        fun provideFactory(
-            favoriteRepository: FavoriteRepository = RepositoryModule.favoriteRepository,
-            updateFavoriteUseCase: UpdateFavoriteUseCase = UpdateFavoriteUseCase(favoriteRepository),
-        ): ViewModelProvider.Factory =
-            viewModelFactory {
-                initializer {
-                    FavoriteContentViewModel(
-                        favoriteRepository = favoriteRepository,
-                        updateFavoriteUseCase = updateFavoriteUseCase,
-                    )
-                }
-            }
     }
 }

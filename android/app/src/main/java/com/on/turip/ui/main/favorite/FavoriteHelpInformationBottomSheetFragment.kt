@@ -15,12 +15,11 @@ import com.on.turip.databinding.BottomSheetFragmentFavoriteHelpInformationBindin
 import com.on.turip.ui.common.base.BaseBottomSheetFragment
 import com.on.turip.ui.main.favorite.model.HelpInformationModel
 import com.on.turip.ui.main.favorite.model.HelpInformationModelType
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class FavoriteHelpInformationBottomSheetFragment : BaseBottomSheetFragment<BottomSheetFragmentFavoriteHelpInformationBinding>() {
-    private val viewModel: FavoriteHelpInformationViewModel by viewModels {
-        FavoriteHelpInformationViewModel.provideFactory()
-    }
-
+    private val viewModel: FavoriteHelpInformationViewModel by viewModels()
     private val inquireMailUri: Uri
         get() {
             val fid = viewModel.userId.value?.fid ?: ""
