@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class FavoriteFolderPostResponse(
+data class FavoriteFolderCreationResponse(
     @SerialName("id")
     val id: Long,
     @SerialName("memberId")
@@ -13,6 +13,4 @@ data class FavoriteFolderPostResponse(
     val name: String,
     @SerialName("isDefault")
     val isDefault: Boolean,
-    @SerialName("placeCount")
-    val placeCount: Int,
 )
