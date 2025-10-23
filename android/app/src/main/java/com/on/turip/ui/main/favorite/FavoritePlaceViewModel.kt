@@ -82,11 +82,16 @@ class FavoritePlaceViewModel @Inject constructor(
                     favoritePlaceUiState.value?.copy(
                         places =
                             favoritePlaces.map { favoritePlace: FavoritePlace -> favoritePlace.toUiModel() },
+                        isLoading = false,
+                        isServerError = false,
+                        isNetWorkError = false,
                     )
                 _favoriteLatLng.value = favoritePlaces.map { it.toLatLng() }
             }.onFailure { errorEvent: ErrorEvent ->
                 checkError(errorEvent)
                 Timber.e("폴더에 담긴 장소들을 불러오는 API 호출 실패")
+                _favoritePlaceUiState.value =
+                    favoritePlaceUiState.value?.copy(isLoading = false)
             }
     }
 
@@ -136,6 +141,7 @@ class FavoritePlaceViewModel @Inject constructor(
                         favoritePlaceUiState.value?.copy(places = favoritePlaces.map { it.toUiModel() })
                     _favoritePlaceUiState.value =
                         favoritePlaceUiState.value?.copy(
+                            isLoading = false,
                             isServerError = false,
                             isNetWorkError = false,
                         )
@@ -143,6 +149,8 @@ class FavoritePlaceViewModel @Inject constructor(
                 }.onFailure { errorEvent: ErrorEvent ->
                     checkError(errorEvent)
                     Timber.e("폴더에 담긴 장소들을 불러오는 API 호출 실패")
+                    _favoritePlaceUiState.value =
+                        favoritePlaceUiState.value?.copy(isLoading = false)
                 }
         }
     }

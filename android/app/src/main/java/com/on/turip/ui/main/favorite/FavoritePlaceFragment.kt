@@ -179,6 +179,17 @@ class FavoritePlaceFragment :
             placeAdapter.submitList(state.places)
 
             binding.apply {
+                if (state.isLoading) {
+                    pbSearchRegionResult.visibility = View.VISIBLE
+                    clFavoritePlaceEmpty.visibility = View.GONE
+                    groupFavoritePlaceNotError.visibility = View.GONE
+                    groupFavoritePlaceNotEmpty.visibility = View.GONE
+                    tvFavoritePlacePlaceCount.visibility = View.GONE
+                } else {
+                    pbSearchRegionResult.visibility = View.GONE
+                    groupFavoritePlaceNotError.visibility = View.VISIBLE
+                }
+
                 if (state.isNetWorkError || state.isServerError) {
                     customErrorView.visibility = View.VISIBLE
                     clFavoritePlaceEmpty.visibility = View.GONE
@@ -189,7 +200,9 @@ class FavoritePlaceFragment :
                     customErrorView.visibility = View.GONE
                     groupFavoritePlaceNotError.visibility = View.VISIBLE
 
-                    handlePlaceState(state)
+                    if (!state.isLoading) {
+                        handlePlaceState(state)
+                    }
                 }
             }
         }
