@@ -48,6 +48,7 @@ jobs:
           echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> local.properties
           echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> local.properties
           echo "storePassword=${{ secrets.STORE_PASSWORD }}" >> local.properties
+          echo "google_maps_api_key=${{ secrets.GOOGLE_MAPS_API_KEY }}" >> ./local.properties
 
       - name: Write google-services.json for release
         run: |

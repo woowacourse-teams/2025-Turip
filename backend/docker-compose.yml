@@ -1,27 +1,14 @@
 services:
-  mysql:
-    image: mysql:8.0.42
-    container_name: turip-mysql-dev
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: root_pw
-      MYSQL_DATABASE: turip_dev
-      MYSQL_USER: turip
-      MYSQL_PASSWORD: turip_pw
-      TZ: Asia/Seoul
-    ports:
-      - "3306:3306"
-    volumes:
-      - ./mysql-data:/var/lib/mysql
-
   nginx:
     image: nginx:latest
-    container_name: turip-nginx-dev
+    container_name: turip-nginx
     restart: always
     ports:
       - "80:80"
     volumes:
-      - ./nginx/conf.d:/etc/nginx/conf.d
+      - /home/ubuntu/actions-runner/_work/2025-Turip/2025-Turip/backend/nginx/conf.d:/etc/nginx/conf.d
+    networks:
+      - turip-network
 
   blue:
     image: ${DOCKER_IMAGE_NAME:-teamturip/turip-backend:latest}
@@ -32,9 +19,17 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
       SERVER_PORT: 8080
-    depends_on:
-      - nginx
-      - mysql
+      OTEL_SERVICE_NAME: turip-api
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT}
+      OTEL_RESOURCE_ATTRIBUTES: env=dev
+      OTEL_INSTRUMENTATION_LOGBACK_APPENDER_EXPERIMENTAL_LOG_ATTRIBUTES: "true"
+      CSV_LINKS_COLLECTION_URL: ${CSV_LINKS_COLLECTION_URL}
+      DOMESTIC_ETC_IMAGE_URL: ${DOMESTIC_ETC_IMAGE_URL}
+      OVERSEAS_ETC_IMAGE_URL: ${OVERSEAS_ETC_IMAGE_URL}
+    networks:
+      - turip-network
+    volumes:
+      - /home/ubuntu/logs:/logs
 
   green:
     image: ${DOCKER_IMAGE_NAME:-teamturip/turip-backend:latest}
@@ -45,6 +40,18 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
       SERVER_PORT: 8080
-    depends_on:
-      - nginx
-      - mysql
+      OTEL_SERVICE_NAME: turip-api
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT}
+      OTEL_RESOURCE_ATTRIBUTES: env=dev
+      OTEL_INSTRUMENTATION_LOGBACK_APPENDER_EXPERIMENTAL_LOG_ATTRIBUTES: "true"
+      CSV_LINKS_COLLECTION_URL: ${CSV_LINKS_COLLECTION_URL}
+      DOMESTIC_ETC_IMAGE_URL: ${DOMESTIC_ETC_IMAGE_URL}
+      OVERSEAS_ETC_IMAGE_URL: ${OVERSEAS_ETC_IMAGE_URL}
+    networks:
+      - turip-network
+    volumes:
+      - /home/ubuntu/logs:/logs
+
+networks:
+  turip-network:
+    external: true

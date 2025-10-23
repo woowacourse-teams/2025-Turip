@@ -8,9 +8,8 @@ spring:
       hibernate:
         format_sql: true
         default_batch_fetch_size: 100
-    defer-datasource-initialization: false # 데이터베이스 초기화 지연
+    defer-datasource-initialization: false
 
-# Region Category 기타 이미지 설정
 region:
   category:
     domestic:
@@ -24,7 +23,10 @@ management:
   endpoints:
     web:
       exposure:
-        include: prometheus,health
+        include: prometheus,health,info
+  endpoint:
+    health:
+      show-details: never
 
 server:
   tomcat:
