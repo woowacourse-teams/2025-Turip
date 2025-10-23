@@ -66,8 +66,7 @@ class FolderViewModel @Inject constructor(
                     .createFavoriteFolder(folderName)
                     .onSuccess {
                         Timber.d("폴더 생성 완료(폴더명 = $folderName)")
-                        _folders.value =
-                            folders.value?.plus(it.toEditUiModel())
+                        _folders.value = folders.value?.plus(it.toEditUiModel())
                         _inputFolderName.value = ""
                     }.onFailure { Timber.e("폴더 생성 실패") }
             }

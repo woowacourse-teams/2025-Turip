@@ -1,8 +1,8 @@
 package com.on.turip.data.folder.service
 
+import com.on.turip.data.folder.dto.FavoriteFolderCreationResponse
 import com.on.turip.data.folder.dto.FavoriteFolderPatchRequest
 import com.on.turip.data.folder.dto.FavoriteFolderPostRequest
-import com.on.turip.data.folder.dto.FavoriteFolderPostResponse
 import com.on.turip.data.folder.dto.FavoriteFoldersResponse
 import com.on.turip.data.folder.dto.FavoriteFoldersStatusByPlaceResponse
 import retrofit2.Response
@@ -21,7 +21,7 @@ interface FolderService {
     @POST("favorites/folders")
     suspend fun postFavoriteFolder(
         @Body favoriteFolderPostRequest: FavoriteFolderPostRequest,
-    ): Response<FavoriteFolderPostResponse>
+    ): Response<FavoriteFolderCreationResponse>
 
     @PATCH("favorites/folders/{favoriteFolderId}")
     suspend fun patchFavoriteFolder(
