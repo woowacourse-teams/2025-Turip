@@ -20,36 +20,45 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class DataSourceModule {
     @Binds
+    @Singleton
     abstract fun bindContentRemoteDataSource(defaultContentRemoteDataSource: DefaultContentRemoteDataSource): ContentRemoteDataSource
 
     @Binds
+    @Singleton
     abstract fun bindContentPlaceRemoteDataSource(
         defaultContentPlaceRemoteDataSource: DefaultContentPlaceRemoteDataSource,
     ): ContentPlaceRemoteDataSource
 
     @Binds
+    @Singleton
     abstract fun bindUserStorageLocalDataSource(
         defaultUserStorageLocalDataSource: DefaultUserStorageLocalDataSource,
     ): UserStorageLocalDataSource
 
     @Binds
+    @Singleton
     abstract fun bindFavoriteRemoteDataSource(defaultFavoriteRemoteDataSource: DefaultFavoriteRemoteDataSource): FavoriteRemoteDataSource
 
     @Binds
+    @Singleton
     abstract fun bindRegionRemoteDataSource(defaultRegionRemoteDataSource: DefaultRegionRemoteDataSource): RegionRemoteDataSource
 
     @Binds
+    @Singleton
     abstract fun bindSearchHistoryDataSource(defaultSearchHistoryDataSource: DefaultSearchHistoryDataSource): SearchHistoryDataSource
 
     @Binds
+    @Singleton
     abstract fun bindFolderRemoteDataSource(defaultFolderRemoteDataSource: DefaultFolderRemoteDataSource): FolderRemoteDataSource
 
     @Binds
+    @Singleton
     abstract fun bindFavoritePlaceRemoteDataSource(
         defaultFavoritePlaceRemoteDataSource: DefaultFavoritePlaceRemoteDataSource,
     ): FavoritePlaceRemoteDataSource

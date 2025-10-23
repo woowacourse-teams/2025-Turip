@@ -20,31 +20,40 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class RepositoryModule {
     @Binds
+    @Singleton
     abstract fun bindContentRepository(defaultContentRepository: DefaultContentRepository): ContentRepository
 
     @Binds
+    @Singleton
     abstract fun bindContentPlaceRepository(defaultContentPlaceRepository: DefaultContentPlaceRepository): ContentPlaceRepository
 
     @Binds
+    @Singleton
     abstract fun bindRegionRepository(defaultRegionRepository: DefaultRegionRepository): RegionRepository
 
     @Binds
+    @Singleton
     abstract fun bindUserStorageRepository(defaultUserStorageRepository: DefaultUserStorageRepository): UserStorageRepository
 
     @Binds
+    @Singleton
     abstract fun bindFavoriteRepository(defaultFavoriteRepository: DefaultFavoriteRepository): FavoriteRepository
 
     @Binds
+    @Singleton
     abstract fun bindSearchHistoryRepository(defaultSearchHistoryRepository: DefaultSearchHistoryRepository): SearchHistoryRepository
 
     @Binds
+    @Singleton
     abstract fun bindFolderRepository(defaultFolderRepository: DefaultFolderRepository): FolderRepository
 
     @Binds
+    @Singleton
     abstract fun bindFavoritePlaceRepository(defaultFavoritePlaceRepository: DefaultFavoritePlaceRepository): FavoritePlaceRepository
 }
