@@ -84,8 +84,7 @@ fun HomeScreen(
                             top = innerPadding.calculateTopPadding(),
                             start = 20.dp,
                             end = innerPadding.calculateEndPadding(LocalLayoutDirection.current),
-                        )
-                        .verticalScroll(scrollState),
+                        ).verticalScroll(scrollState),
                 verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
                 Text(
