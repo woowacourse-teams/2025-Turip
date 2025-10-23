@@ -6,8 +6,9 @@ import com.on.turip.data.region.datasource.RegionRemoteDataSource
 import com.on.turip.data.region.toDomain
 import com.on.turip.domain.region.RegionCategory
 import com.on.turip.domain.region.repository.RegionRepository
+import javax.inject.Inject
 
-class DefaultRegionRepository(
+class DefaultRegionRepository @Inject constructor(
     private val regionRemoteDataSource: RegionRemoteDataSource,
 ) : RegionRepository {
     private val cachedDomesticRegionCategories: MutableList<RegionCategory> = mutableListOf()

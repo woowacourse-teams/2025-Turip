@@ -26,7 +26,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.on.turip.R
 import com.on.turip.domain.region.RegionCategory
 import com.on.turip.ui.compose.common.component.ErrorHandlingContainer
@@ -45,7 +45,7 @@ fun HomeScreen(
     onSearchClick: (String) -> Unit,
     onRegionClick: (String) -> Unit,
     onContentClick: (UsersLikeContentModel) -> Unit,
-    viewModel: HomeViewModel = viewModel(factory = HomeViewModel.provideFactory()),
+    viewModel: HomeViewModel = hiltViewModel(),
 ) {
     var keyword: String by rememberSaveable { mutableStateOf("") }
 

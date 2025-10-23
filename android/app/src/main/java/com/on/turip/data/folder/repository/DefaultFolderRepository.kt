@@ -9,8 +9,9 @@ import com.on.turip.data.folder.toPostRequestDto
 import com.on.turip.domain.folder.FavoriteFolder
 import com.on.turip.domain.folder.Folder
 import com.on.turip.domain.folder.repository.FolderRepository
+import javax.inject.Inject
 
-class DefaultFolderRepository(
+class DefaultFolderRepository @Inject constructor(
     private val folderRemoteDataSource: FolderRemoteDataSource,
 ) : FolderRepository {
     override suspend fun loadFavoriteFolders(): TuripCustomResult<List<Folder>> =

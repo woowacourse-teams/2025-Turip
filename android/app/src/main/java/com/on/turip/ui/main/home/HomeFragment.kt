@@ -14,8 +14,10 @@ import com.on.turip.ui.main.home.model.UsersLikeContentModel
 import com.on.turip.ui.search.keywordresult.SearchActivity
 import com.on.turip.ui.search.regionresult.RegionResultActivity
 import com.on.turip.ui.trip.detail.TripDetailActivity
+import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 
+@AndroidEntryPoint
 class HomeFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,13 +47,12 @@ class HomeFragment : Fragment() {
                         },
                         onContentClick = { usersLikeContent: UsersLikeContentModel ->
                             Timber.d(
-                                "인기 컨텐츠 선택 : ContentId = ${usersLikeContent.content.id} CreatorId = ${usersLikeContent.content.creator.id}",
+                                "인기 컨텐츠 선택 : ContentId = ${usersLikeContent.content.id}",
                             )
                             val intent: Intent =
                                 TripDetailActivity.newIntent(
                                     context = requireContext(),
                                     contentId = usersLikeContent.content.id,
-                                    creatorId = usersLikeContent.content.creator.id,
                                 )
                             startActivity(intent)
                         },

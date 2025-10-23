@@ -11,11 +11,9 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.on.turip.data.common.onFailure
 import com.on.turip.data.common.onSuccess
-import com.on.turip.di.RepositoryModule
 import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.content.Content
 import com.on.turip.domain.content.repository.ContentRepository
-import com.on.turip.domain.creator.repository.CreatorRepository
 import com.on.turip.domain.favorite.usecase.UpdateFavoriteUseCase
 import com.on.turip.domain.trip.ContentPlace
 import com.on.turip.domain.trip.Trip
@@ -23,14 +21,15 @@ import com.on.turip.domain.trip.repository.ContentPlaceRepository
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.common.mapper.toUiModelWithoutContentPlaces
 import com.on.turip.ui.common.model.trip.TripModel
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class TripDetailViewModel(
-    private val contentId: Long,
-    private val creatorId: Long,
+class TripDetailViewModel @AssistedInject constructor(
+    @Assisted private val contentId: Long,
     private val contentRepository: ContentRepository,
-    private val creatorRepository: CreatorRepository,
     private val contentPlaceRepository: ContentPlaceRepository,
     private val updateFavoriteUseCase: UpdateFavoriteUseCase,
 ) : ViewModel() {
@@ -226,24 +225,18 @@ class TripDetailViewModel(
         private const val EXPAND_TEXT = Int.MAX_VALUE
 
         fun provideFactory(
+            tripDetailAssistedFactory: TripDetailAssistedFactory,
             contentId: Long,
-            creatorId: Long,
-            contentRepository: ContentRepository = RepositoryModule.contentRepository,
-            creatorRepository: CreatorRepository = RepositoryModule.creatorRepository,
-            contentPlaceRepository: ContentPlaceRepository = RepositoryModule.contentPlaceRepository,
-            updateFavoriteUseCase: UpdateFavoriteUseCase = UpdateFavoriteUseCase(RepositoryModule.favoriteRepository),
         ): ViewModelProvider.Factory =
             viewModelFactory {
                 initializer {
-                    TripDetailViewModel(
-                        contentId,
-                        creatorId,
-                        contentRepository,
-                        creatorRepository,
-                        contentPlaceRepository,
-                        updateFavoriteUseCase,
-                    )
+                    tripDetailAssistedFactory.create(contentId)
                 }
             }
+    }
+
+    @AssistedFactory
+    interface TripDetailAssistedFactory {
+        fun create(contentId: Long): TripDetailViewModel
     }
 }

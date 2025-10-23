@@ -6,9 +6,10 @@ import com.on.turip.data.content.place.dto.ContentPlacesResponse
 import com.on.turip.data.content.place.service.ContentPlaceService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
-class DefaultContentPlaceRemoteDataSource(
+class DefaultContentPlaceRemoteDataSource @Inject constructor(
     private val contentPlaceService: ContentPlaceService,
     private val coroutineContext: CoroutineContext = Dispatchers.IO,
 ) : ContentPlaceRemoteDataSource {

@@ -3,23 +3,22 @@ package com.on.turip.ui.folder
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import com.on.turip.data.common.onFailure
 import com.on.turip.data.common.onSuccess
-import com.on.turip.di.RepositoryModule
 import com.on.turip.domain.folder.Folder
 import com.on.turip.domain.folder.repository.FolderRepository
 import com.on.turip.ui.common.mapper.toEditUiModel
 import com.on.turip.ui.folder.model.FolderEditModel
 import com.on.turip.ui.folder.model.FolderNameStatusModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
-class FolderViewModel(
+@HiltViewModel
+class FolderViewModel @Inject constructor(
     private val folderRepository: FolderRepository,
 ) : ViewModel() {
     private val _folders: MutableLiveData<List<FolderEditModel>> = MutableLiveData()
@@ -111,16 +110,5 @@ class FolderViewModel(
                     }
             }
         }
-    }
-
-    companion object {
-        fun provideFactory(folderRepository: FolderRepository = RepositoryModule.folderRepository): ViewModelProvider.Factory =
-            viewModelFactory {
-                initializer {
-                    FolderViewModel(
-                        folderRepository,
-                    )
-                }
-            }
     }
 }

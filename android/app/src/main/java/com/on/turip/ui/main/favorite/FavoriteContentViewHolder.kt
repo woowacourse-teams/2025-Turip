@@ -25,7 +25,6 @@ class FavoriteContentViewHolder(
             favoriteContent?.content?.let { content: Content ->
                 onFavoriteContentListener.onFavoriteItemClick(
                     content.id,
-                    content.creator.id,
                 )
             }
         }
@@ -93,9 +92,6 @@ class FavoriteContentViewHolder(
             isFavorite: Boolean,
         )
 
-        fun onFavoriteItemClick(
-            contentId: Long,
-            creatorId: Long,
-        )
+        fun onFavoriteItemClick(contentId: Long)
     }
 }
