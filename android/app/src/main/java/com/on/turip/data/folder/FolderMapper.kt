@@ -1,5 +1,6 @@
 package com.on.turip.data.folder
 
+import com.on.turip.data.folder.dto.FavoriteFolderCreationResponse
 import com.on.turip.data.folder.dto.FavoriteFolderPatchRequest
 import com.on.turip.data.folder.dto.FavoriteFolderPostRequest
 import com.on.turip.data.folder.dto.FavoriteFolderPostResponse
@@ -12,6 +13,14 @@ import com.on.turip.domain.folder.Folder
 fun FavoriteFoldersResponse.toDomain(): List<Folder> = favoriteFolderResponses.map { it.toDomain() }
 
 fun FavoriteFolderPostResponse.toDomain(): Folder =
+    Folder(
+        id = id,
+        name = name,
+        isDefault = isDefault,
+        placeCount = placeCount,
+    )
+
+fun FavoriteFolderCreationResponse.toDomain(): Folder =
     Folder(
         id = id,
         name = name,
