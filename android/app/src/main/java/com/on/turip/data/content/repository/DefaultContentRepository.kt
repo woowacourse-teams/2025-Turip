@@ -8,8 +8,9 @@ import com.on.turip.domain.content.Content
 import com.on.turip.domain.content.PagedContentsResult
 import com.on.turip.domain.content.UsersLikeContent
 import com.on.turip.domain.content.repository.ContentRepository
+import javax.inject.Inject
 
-class DefaultContentRepository(
+class DefaultContentRepository @Inject constructor(
     private val contentRemoteDataSource: ContentRemoteDataSource,
 ) : ContentRepository {
     override suspend fun loadContentsSizeByRegion(regionCategoryName: String): TuripCustomResult<Int> =

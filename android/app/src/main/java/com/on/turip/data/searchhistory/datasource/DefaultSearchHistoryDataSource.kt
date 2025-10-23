@@ -2,8 +2,9 @@ package com.on.turip.data.searchhistory.datasource
 
 import com.on.turip.data.searchhistory.SearchHistoryEntity
 import com.on.turip.data.searchhistory.dao.SearchHistoryDao
+import javax.inject.Inject
 
-class DefaultSearchHistoryDataSource(
+class DefaultSearchHistoryDataSource @Inject constructor(
     private val dao: SearchHistoryDao,
 ) : SearchHistoryDataSource {
     override suspend fun createSearchHistory(keyword: String): Result<Unit> =

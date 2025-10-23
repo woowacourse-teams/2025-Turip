@@ -29,7 +29,10 @@ import com.on.turip.ui.trip.detail.webview.TuripWebChromeClient
 import com.on.turip.ui.trip.detail.webview.TuripWebViewClient
 import com.on.turip.ui.trip.detail.webview.applyVideoSettings
 import com.on.turip.ui.trip.detail.webview.navigateToTimeLine
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
     override val binding: ActivityTripDetailBinding by lazy {
         ActivityTripDetailBinding.inflate(layoutInflater)
@@ -39,10 +42,12 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
         VideoManager(binding.wvTripDetailVideo)
     }
 
-    val viewModel: TripDetailViewModel by viewModels {
-        TripDetailViewModel.provideFactory(
-            intent.getLongExtra(CONTENT_KEY, 0),
-        )
+    @Inject
+    lateinit var tripDetailViewModelFactory: TripDetailViewModel.TripDetailAssistedFactory
+
+    private val viewModel: TripDetailViewModel by viewModels {
+        val contentId: Long = intent.getLongExtra(CONTENT_KEY, 0)
+        TripDetailViewModel.provideFactory(tripDetailViewModelFactory, contentId)
     }
 
     private val turipWebChromeClient: TuripWebChromeClient by lazy {

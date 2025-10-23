@@ -13,10 +13,12 @@ import com.on.turip.domain.favorite.FavoriteContent
 import com.on.turip.ui.common.ItemDividerDecoration
 import com.on.turip.ui.common.base.BaseFragment
 import com.on.turip.ui.trip.detail.TripDetailActivity
+import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 
+@AndroidEntryPoint
 class FavoriteContentFragment : BaseFragment<FragmentFavoriteContentBinding>() {
-    private val viewModel: FavoriteContentViewModel by viewModels { FavoriteContentViewModel.provideFactory() }
+    private val viewModel: FavoriteContentViewModel by viewModels()
 
     private val favoriteContentAdapter: FavoriteContentAdapter by lazy {
         FavoriteContentAdapter(

@@ -9,9 +9,10 @@ import com.on.turip.data.folder.dto.FavoriteFoldersStatusByPlaceResponse
 import com.on.turip.data.folder.service.FolderService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
-class DefaultFolderRemoteDataSource(
+class DefaultFolderRemoteDataSource @Inject constructor(
     private val folderService: FolderService,
     private val coroutineContext: CoroutineContext = Dispatchers.IO,
 ) : FolderRemoteDataSource {

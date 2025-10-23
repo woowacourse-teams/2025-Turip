@@ -14,11 +14,18 @@ import com.on.turip.databinding.BottomSheetFragmentFavoritePlaceFolderCatalogBin
 import com.on.turip.ui.common.base.BaseFragment
 import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
+import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavoritePlaceFolderCatalogBinding>() {
+    @Inject
+    lateinit var favoritePlaceFolderCatalogViewModelFactory: FavoritePlaceFolderCatalogViewModel.FolderInformationAssistedFactory
+
     private val viewModel: FavoritePlaceFolderCatalogViewModel by viewModels {
         FavoritePlaceFolderCatalogViewModel.provideFactory(
+            favoritePlaceFolderCatalogViewModelFactory,
             folderId = arguments?.getLong(ARGUMENTS_FOLDER_ID) ?: 0L,
             folderName = arguments?.getString(ARGUMENTS_FOLDER_NAME) ?: "",
         )

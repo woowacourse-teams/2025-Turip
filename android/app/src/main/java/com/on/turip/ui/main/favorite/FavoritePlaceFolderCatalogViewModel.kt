@@ -9,22 +9,21 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.on.turip.data.common.onFailure
 import com.on.turip.data.common.onSuccess
-import com.on.turip.di.RepositoryModule
 import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.favorite.FavoritePlace
 import com.on.turip.domain.favorite.repository.FavoritePlaceRepository
 import com.on.turip.domain.favorite.usecase.UpdateFavoritePlaceUseCase
 import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
-import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
-@HiltViewModel
-class FavoritePlaceFolderCatalogViewModel @Inject constructor(
-    private val folderId: Long,
-    private val folderName: String,
+class FavoritePlaceFolderCatalogViewModel @AssistedInject constructor(
+    @Assisted private val folderId: Long,
+    @Assisted private val folderName: String,
     private val favoritePlaceRepository: FavoritePlaceRepository,
     private val updateFavoritePlaceUseCase: UpdateFavoritePlaceUseCase,
 ) : ViewModel() {
@@ -154,23 +153,22 @@ class FavoritePlaceFolderCatalogViewModel @Inject constructor(
 
     companion object {
         fun provideFactory(
+            folderInformationAssistedFactory: FolderInformationAssistedFactory,
             folderId: Long,
             folderName: String,
-            favoritePlaceRepository: FavoritePlaceRepository = RepositoryModule.favoritePlaceRepository,
-            updateFavoritePlaceUseCase: UpdateFavoritePlaceUseCase =
-                UpdateFavoritePlaceUseCase(
-                    favoritePlaceRepository,
-                ),
         ): ViewModelProvider.Factory =
             viewModelFactory {
                 initializer {
-                    FavoritePlaceFolderCatalogViewModel(
-                        folderId,
-                        folderName,
-                        favoritePlaceRepository,
-                        updateFavoritePlaceUseCase,
-                    )
+                    folderInformationAssistedFactory.create(folderId, folderName)
                 }
             }
+    }
+
+    @AssistedFactory
+    interface FolderInformationAssistedFactory {
+        fun create(
+            folderId: Long,
+            folderName: String,
+        ): FavoritePlaceFolderCatalogViewModel
     }
 }

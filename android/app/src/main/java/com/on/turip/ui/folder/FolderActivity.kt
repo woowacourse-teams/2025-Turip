@@ -8,9 +8,11 @@ import androidx.activity.viewModels
 import com.on.turip.databinding.ActivityFolderBinding
 import com.on.turip.ui.common.base.BaseActivity
 import com.on.turip.ui.folder.model.FolderEditModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class FolderActivity : BaseActivity<ActivityFolderBinding>() {
-    private val viewModel: FolderViewModel by viewModels { FolderViewModel.provideFactory() }
+    private val viewModel: FolderViewModel by viewModels()
 
     override val binding: ActivityFolderBinding by lazy {
         ActivityFolderBinding.inflate(layoutInflater)

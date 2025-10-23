@@ -10,19 +10,18 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.on.turip.data.common.onFailure
 import com.on.turip.data.common.onSuccess
-import com.on.turip.di.RepositoryModule
 import com.on.turip.domain.favorite.usecase.UpdateFavoritePlaceUseCase
 import com.on.turip.domain.folder.FavoriteFolder
 import com.on.turip.domain.folder.repository.FolderRepository
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
-import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
-@HiltViewModel
-class FavoritePlaceFolderViewModel @Inject constructor(
-    private val placeId: Long,
+class FavoritePlaceFolderViewModel @AssistedInject constructor(
+    @Assisted private val placeId: Long,
     private val folderRepository: FolderRepository,
     private val updateFavoritePlaceUseCase: UpdateFavoritePlaceUseCase,
 ) : ViewModel() {
@@ -69,21 +68,18 @@ class FavoritePlaceFolderViewModel @Inject constructor(
 
     companion object {
         fun provideFactory(
+            placeIdAssistedFactory: PlaceIdAssistedFactory,
             placeId: Long,
-            folderRepository: FolderRepository = RepositoryModule.folderRepository,
-            updateFavoritePlaceUseCase: UpdateFavoritePlaceUseCase =
-                UpdateFavoritePlaceUseCase(
-                    RepositoryModule.favoritePlaceRepository,
-                ),
         ): ViewModelProvider.Factory =
             viewModelFactory {
                 initializer {
-                    FavoritePlaceFolderViewModel(
-                        placeId,
-                        folderRepository,
-                        updateFavoritePlaceUseCase,
-                    )
+                    placeIdAssistedFactory.create(placeId)
                 }
             }
+    }
+
+    @AssistedFactory
+    interface PlaceIdAssistedFactory {
+        fun create(placeId: Long): FavoritePlaceFolderViewModel
     }
 }

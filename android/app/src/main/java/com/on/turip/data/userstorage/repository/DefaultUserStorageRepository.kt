@@ -7,8 +7,9 @@ import com.on.turip.domain.userstorage.TuripDeviceIdentifier
 import com.on.turip.domain.userstorage.repository.UserStorageRepository
 import kotlinx.coroutines.tasks.await
 import timber.log.Timber
+import javax.inject.Inject
 
-class DefaultUserStorageRepository(
+class DefaultUserStorageRepository @Inject constructor(
     private val userStorageLocalDataSource: UserStorageLocalDataSource,
 ) : UserStorageRepository {
     override suspend fun createId(turipDeviceIdentifier: TuripDeviceIdentifier) {

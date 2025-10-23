@@ -10,22 +10,21 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.on.turip.data.common.TuripCustomResult
 import com.on.turip.data.common.onFailure
 import com.on.turip.data.common.onSuccess
-import com.on.turip.di.RepositoryModule
 import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.content.PagedContentsResult
 import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.content.video.VideoInformation
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.search.model.VideoInformationModel
-import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class RegionResultViewModel @Inject constructor(
-    private val regionCategoryName: String,
+class RegionResultViewModel @AssistedInject constructor(
+    @Assisted private val regionCategoryName: String,
     private val contentRepository: ContentRepository,
 ) : ViewModel() {
     private val _searchResultState: MutableLiveData<SearchResultState> =
@@ -91,6 +90,27 @@ class RegionResultViewModel @Inject constructor(
         }
     }
 
+    private fun checkError(errorEvent: ErrorEvent) {
+        when (errorEvent) {
+            ErrorEvent.USER_NOT_HAVE_PERMISSION -> {
+                _serverError.value = true
+            }
+
+            ErrorEvent.DUPLICATION_FOLDER -> throw IllegalArgumentException("발생할 수 없는 오류")
+            ErrorEvent.UNEXPECTED_PROBLEM -> {
+                _serverError.value = true
+            }
+
+            ErrorEvent.NETWORK_ERROR -> {
+                _networkError.value = true
+            }
+
+            ErrorEvent.PARSER_ERROR -> {
+                _serverError.value = true
+            }
+        }
+    }
+
     private fun updateLoading(state: Boolean) {
         _searchResultState.value =
             searchResultState.value?.copy(
@@ -122,38 +142,19 @@ class RegionResultViewModel @Inject constructor(
 
     companion object {
         fun provideFactory(
+            regionCategoryNameAssistedFactory: RegionCategoryNameAssistedFactory,
             regionCategoryName: String,
-            contentRepository: ContentRepository = RepositoryModule.contentRepository,
         ): ViewModelProvider.Factory =
             viewModelFactory {
                 initializer {
-                    RegionResultViewModel(
-                        regionCategoryName,
-                        contentRepository,
-                    )
+                    regionCategoryNameAssistedFactory.create(regionCategoryName)
                 }
             }
     }
 
-    private fun checkError(errorEvent: ErrorEvent) {
-        when (errorEvent) {
-            ErrorEvent.USER_NOT_HAVE_PERMISSION -> {
-                _serverError.value = true
-            }
-
-            ErrorEvent.DUPLICATION_FOLDER -> throw IllegalArgumentException("발생할 수 없는 오류")
-            ErrorEvent.UNEXPECTED_PROBLEM -> {
-                _serverError.value = true
-            }
-
-            ErrorEvent.NETWORK_ERROR -> {
-                _networkError.value = true
-            }
-
-            ErrorEvent.PARSER_ERROR -> {
-                _serverError.value = true
-            }
-        }
+    @AssistedFactory
+    interface RegionCategoryNameAssistedFactory {
+        fun create(regionCategoryName: String): RegionResultViewModel
     }
 
     data class SearchResultState(

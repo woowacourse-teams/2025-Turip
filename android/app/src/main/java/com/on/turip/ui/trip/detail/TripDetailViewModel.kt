@@ -11,7 +11,6 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.on.turip.data.common.onFailure
 import com.on.turip.data.common.onSuccess
-import com.on.turip.di.RepositoryModule
 import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.content.Content
 import com.on.turip.domain.content.repository.ContentRepository
@@ -22,14 +21,14 @@ import com.on.turip.domain.trip.repository.ContentPlaceRepository
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.common.mapper.toUiModelWithoutContentPlaces
 import com.on.turip.ui.common.model.trip.TripModel
-import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
-@HiltViewModel
-class TripDetailViewModel @Inject constructor(
-    private val contentId: Long,
+class TripDetailViewModel @AssistedInject constructor(
+    @Assisted private val contentId: Long,
     private val contentRepository: ContentRepository,
     private val contentPlaceRepository: ContentPlaceRepository,
     private val updateFavoriteUseCase: UpdateFavoriteUseCase,
@@ -226,20 +225,18 @@ class TripDetailViewModel @Inject constructor(
         private const val EXPAND_TEXT = Int.MAX_VALUE
 
         fun provideFactory(
+            tripDetailAssistedFactory: TripDetailAssistedFactory,
             contentId: Long,
-            contentRepository: ContentRepository = RepositoryModule.contentRepository,
-            contentPlaceRepository: ContentPlaceRepository = RepositoryModule.contentPlaceRepository,
-            updateFavoriteUseCase: UpdateFavoriteUseCase = UpdateFavoriteUseCase(RepositoryModule.favoriteRepository),
         ): ViewModelProvider.Factory =
             viewModelFactory {
                 initializer {
-                    TripDetailViewModel(
-                        contentId,
-                        contentRepository,
-                        contentPlaceRepository,
-                        updateFavoriteUseCase,
-                    )
+                    tripDetailAssistedFactory.create(contentId)
                 }
             }
+    }
+
+    @AssistedFactory
+    interface TripDetailAssistedFactory {
+        fun create(contentId: Long): TripDetailViewModel
     }
 }

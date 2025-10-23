@@ -7,9 +7,10 @@ import com.on.turip.data.favorite.dto.FavoriteContentsResponse
 import com.on.turip.data.favorite.service.FavoriteService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
-class DefaultFavoriteRemoteDataSource(
+class DefaultFavoriteRemoteDataSource @Inject constructor(
     private val favoriteService: FavoriteService,
     private val coroutineContext: CoroutineContext = Dispatchers.IO,
 ) : FavoriteRemoteDataSource {

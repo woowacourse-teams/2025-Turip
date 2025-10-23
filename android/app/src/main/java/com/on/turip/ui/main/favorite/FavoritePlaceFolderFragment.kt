@@ -16,10 +16,17 @@ import com.on.turip.ui.folder.FolderActivity
 import com.on.turip.ui.main.favorite.FavoritePlaceFolderViewHolder.FavoritePlaceFolderListener
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
 import com.on.turip.ui.trip.detail.TripDetailViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class FavoritePlaceFolderFragment : BaseFragment<BottomSheetFragmentFavoritePlaceFolderBinding>() {
+    @Inject
+    lateinit var favoritePlaceFolderViewModelFactory: FavoritePlaceFolderViewModel.PlaceIdAssistedFactory
+
     private val viewModel: FavoritePlaceFolderViewModel by viewModels {
         FavoritePlaceFolderViewModel.provideFactory(
+            favoritePlaceFolderViewModelFactory,
             placeId = arguments?.getLong(ARGUMENTS_PLACE_ID) ?: 0L,
         )
     }

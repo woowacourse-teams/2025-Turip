@@ -3,13 +3,9 @@ package com.on.turip.ui.main.favorite
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import com.on.turip.data.common.onFailure
 import com.on.turip.data.common.onSuccess
-import com.on.turip.di.RepositoryModule
 import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.favorite.FavoritePlace
 import com.on.turip.domain.favorite.repository.FavoritePlaceRepository
@@ -192,14 +188,6 @@ class FavoritePlaceViewModel @Inject constructor(
         }
     }
 
-    data class FavoritePlaceUiState(
-        val isLoading: Boolean = true,
-        val isNetWorkError: Boolean = false,
-        val isServerError: Boolean = false,
-        val places: List<FavoritePlaceModel> = emptyList(),
-        val folders: List<FavoritePlaceFolderModel> = emptyList(),
-    )
-
     fun shareFolder() {
         val shareFolder =
             FavoriteFolderShareModel(
@@ -216,23 +204,13 @@ class FavoritePlaceViewModel @Inject constructor(
     companion object {
         private const val NOT_INITIALIZED: Long = 0L
         private const val DEFAULT_FOLDER_NAME = "기본 폴더"
-
-        fun provideFactory(
-            folderRepository: FolderRepository = RepositoryModule.folderRepository,
-            favoritePlaceRepository: FavoritePlaceRepository = RepositoryModule.favoritePlaceRepository,
-            updateFavoritePlaceUseCase: UpdateFavoritePlaceUseCase =
-                UpdateFavoritePlaceUseCase(
-                    favoritePlaceRepository,
-                ),
-        ): ViewModelProvider.Factory =
-            viewModelFactory {
-                initializer {
-                    FavoritePlaceViewModel(
-                        folderRepository,
-                        favoritePlaceRepository,
-                        updateFavoritePlaceUseCase,
-                    )
-                }
-            }
     }
+
+    data class FavoritePlaceUiState(
+        val isLoading: Boolean = true,
+        val isNetWorkError: Boolean = false,
+        val isServerError: Boolean = false,
+        val places: List<FavoritePlaceModel> = emptyList(),
+        val folders: List<FavoritePlaceFolderModel> = emptyList(),
+    )
 }

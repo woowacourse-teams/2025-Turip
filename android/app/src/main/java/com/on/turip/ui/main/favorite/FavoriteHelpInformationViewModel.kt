@@ -3,11 +3,7 @@ package com.on.turip.ui.main.favorite
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.on.turip.di.RepositoryModule
 import com.on.turip.domain.userstorage.TuripDeviceIdentifier
 import com.on.turip.domain.userstorage.repository.UserStorageRepository
 import com.on.turip.ui.main.favorite.model.HelpInformationModelType
@@ -47,16 +43,5 @@ class FavoriteHelpInformationViewModel @Inject constructor(
     private fun loadHelpInformationItems() {
         _helpInformationItems.value =
             listOf(HelpInformationModelType.INQUIRY, HelpInformationModelType.PRIVACY_POLICY)
-    }
-
-    companion object {
-        fun provideFactory(
-            userStorageRepository: UserStorageRepository = RepositoryModule.userStorageRepository,
-        ): ViewModelProvider.Factory =
-            viewModelFactory {
-                initializer {
-                    FavoriteHelpInformationViewModel(userStorageRepository)
-                }
-            }
     }
 }

@@ -14,8 +14,10 @@ import com.on.turip.ui.main.home.model.UsersLikeContentModel
 import com.on.turip.ui.search.keywordresult.SearchActivity
 import com.on.turip.ui.search.regionresult.RegionResultActivity
 import com.on.turip.ui.trip.detail.TripDetailActivity
+import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 
+@AndroidEntryPoint
 class HomeFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,

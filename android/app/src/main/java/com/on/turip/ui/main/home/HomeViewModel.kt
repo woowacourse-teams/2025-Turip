@@ -3,13 +3,9 @@ package com.on.turip.ui.main.home
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import com.on.turip.data.common.onFailure
 import com.on.turip.data.common.onSuccess
-import com.on.turip.di.RepositoryModule
 import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.content.UsersLikeContent
 import com.on.turip.domain.content.repository.ContentRepository
@@ -111,20 +107,5 @@ class HomeViewModel @Inject constructor(
         _isSelectedDomestic.value = isDomesticSelected
         Timber.d(if (isSelectedDomestic.value == true) "국내 클릭" else "해외 클릭")
         isSelectedDomestic.value?.let { loadRegionCategories(it) }
-    }
-
-    companion object {
-        fun provideFactory(
-            regionRepository: RegionRepository = RepositoryModule.regionRepository,
-            contentRepository: ContentRepository = RepositoryModule.contentRepository,
-        ): ViewModelProvider.Factory =
-            viewModelFactory {
-                initializer {
-                    HomeViewModel(
-                        regionRepository,
-                        contentRepository,
-                    )
-                }
-            }
     }
 }

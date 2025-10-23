@@ -7,8 +7,9 @@ import com.on.turip.data.favorite.toDomain
 import com.on.turip.data.favorite.toRequestDto
 import com.on.turip.domain.favorite.PagedFavoriteContents
 import com.on.turip.domain.favorite.repository.FavoriteRepository
+import javax.inject.Inject
 
-class DefaultFavoriteRepository(
+class DefaultFavoriteRepository @Inject constructor(
     private val favoriteRemoteDataSource: FavoriteRemoteDataSource,
 ) : FavoriteRepository {
     override suspend fun createFavorite(contentId: Long): TuripCustomResult<Unit> =
