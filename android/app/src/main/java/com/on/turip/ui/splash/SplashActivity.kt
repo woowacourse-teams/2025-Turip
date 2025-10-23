@@ -14,7 +14,6 @@ import com.google.android.play.core.install.model.UpdateAvailability
 import com.on.turip.databinding.ActivitySplashBinding
 import com.on.turip.ui.common.base.BaseActivity
 import com.on.turip.ui.main.MainActivity
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -72,7 +71,7 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
                                 AppUpdateOptions.newBuilder(UPDATE_TYPE).build(),
                             )
                         } else {
-                            setupDuration()
+                            navigateToMain()
                         }
                     }
 
@@ -87,17 +86,16 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
                     }
 
                     else -> {
-                        setupDuration()
+                        navigateToMain()
                     }
                 }
             }.addOnFailureListener {
-                setupDuration()
+                navigateToMain()
             }
     }
 
-    private fun setupDuration() {
+    private fun navigateToMain() {
         lifecycleScope.launch {
-            delay(1500)
             startActivity(MainActivity.newIntent(this@SplashActivity))
             finish()
         }
