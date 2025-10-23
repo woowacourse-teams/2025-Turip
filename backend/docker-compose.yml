@@ -4,7 +4,7 @@ services:
     container_name: turip-nginx
     restart: always
     ports:
-      - "80:80"
+      - "8080:80"
     volumes:
       - /home/ubuntu/actions-runner/_work/2025-Turip/2025-Turip/backend/nginx/conf.d:/etc/nginx/conf.d
     networks:
@@ -14,8 +14,8 @@ services:
     image: ${DOCKER_IMAGE_NAME:-teamturip/turip-backend:latest}
     container_name: blue
     restart: always
-    ports:
-      - "8080:8080"
+    expose:
+      - "8080"
     environment:
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
       SERVER_PORT: 8080
@@ -35,8 +35,8 @@ services:
     image: ${DOCKER_IMAGE_NAME:-teamturip/turip-backend:latest}
     container_name: green
     restart: always
-    ports:
-      - "8081:8080"
+    expose:
+      - "8080"
     environment:
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
       SERVER_PORT: 8080
