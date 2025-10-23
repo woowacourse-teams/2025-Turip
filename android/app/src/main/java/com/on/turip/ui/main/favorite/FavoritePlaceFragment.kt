@@ -191,6 +191,7 @@ class FavoritePlaceFragment :
                 }
 
                 if (state.isNetWorkError || state.isServerError) {
+                    mvFavoritePlace.visibility = View.GONE
                     customErrorView.visibility = View.VISIBLE
                     clFavoritePlaceEmpty.visibility = View.GONE
                     groupFavoritePlaceNotError.visibility = View.GONE
