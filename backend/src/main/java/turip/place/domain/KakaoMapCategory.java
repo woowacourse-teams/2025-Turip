@@ -171,6 +171,10 @@ public enum KakaoMapCategory {
     HAEJANGGUK("🥣 해장국"),
     CLOSED("🚫 폐업"),
     TEMPORARILY_CLOSED("🚫 휴관"),
+    OUTBACK_STEAKHOUSE("🥩 아웃백스테이크하우스"),
+    FORTRESS("🏯 산성,성곽"),
+    RENTAL_PHOTO_STUDIO("📷 대여사진관"),
+    TOYS_STORE("🧸 장난감,완구"),
 
     NONE("🚫 없음");
 
