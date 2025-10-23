@@ -167,8 +167,8 @@ class FavoritePlaceFragment :
         }
 
         binding.ivFavoritePlaceMapToggle.setOnClickListener {
-            val isMapVisible = binding.mapFragment.isVisible
-            binding.mapFragment.visibility = if (isMapVisible) View.GONE else View.VISIBLE
+            val isMapVisible = binding.mvFavoritePlace.isVisible
+            binding.mvFavoritePlace.visibility = if (isMapVisible) View.GONE else View.VISIBLE
             it.isSelected = isMapVisible
         }
     }
@@ -250,37 +250,37 @@ class FavoritePlaceFragment :
 
     override fun onStart() {
         super.onStart()
-        binding.mapFragment.onStart()
+        binding.mvFavoritePlace.onStart()
     }
 
     override fun onPause() {
-        binding.mapFragment.onPause()
+        binding.mvFavoritePlace.onPause()
         super.onPause()
     }
 
     override fun onStop() {
-        binding.mapFragment.onStop()
+        binding.mvFavoritePlace.onStop()
         super.onStop()
     }
 
     override fun onDestroyView() {
-        binding.mapFragment.onDestroy()
+        binding.mvFavoritePlace.onDestroy()
         super.onDestroyView()
     }
 
     override fun onLowMemory() {
         super.onLowMemory()
-        binding.mapFragment.onLowMemory()
+        binding.mvFavoritePlace.onLowMemory()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        binding.mapFragment.onSaveInstanceState(outState)
+        binding.mvFavoritePlace.onSaveInstanceState(outState)
     }
 
     override fun onResume() {
         super.onResume()
-        binding.mapFragment.onResume()
+        binding.mvFavoritePlace.onResume()
         viewModel.loadFoldersAndPlaces()
     }
 
@@ -292,8 +292,8 @@ class FavoritePlaceFragment :
     }
 
     private fun setupMapFragment(savedInstanceState: Bundle?) {
-        binding.mapFragment.onCreate(savedInstanceState)
-        binding.mapFragment.getMapAsync { googleMap ->
+        binding.mvFavoritePlace.onCreate(savedInstanceState)
+        binding.mvFavoritePlace.getMapAsync { googleMap ->
             googleMap.setOnCameraMoveStartedListener { reason ->
                 if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
                     binding.root.parent?.requestDisallowInterceptTouchEvent(true)
@@ -322,7 +322,7 @@ class FavoritePlaceFragment :
     }
 
     private fun handleEmptyFavorites() {
-        binding.mapFragment.visibility = View.GONE
+        binding.mvFavoritePlace.visibility = View.GONE
         binding.ivFavoritePlaceMapToggle.visibility = View.GONE
         markerMap.clear()
     }
@@ -354,7 +354,7 @@ class FavoritePlaceFragment :
 
     private fun showMap() {
         binding.ivFavoritePlaceMapToggle.visibility = View.VISIBLE
-        binding.mapFragment.visibility = View.VISIBLE
+        binding.mvFavoritePlace.visibility = View.VISIBLE
     }
 
     private fun clearMapMarkers() {

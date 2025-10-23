@@ -10,11 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StreamUtils;
 import turip.data.service.CsvFileService;
 import turip.data.service.DataImportService;
 
@@ -47,9 +44,6 @@ public class DevDataInitializer implements CommandLineRunner {
 
             // CSV 파일들 import 실행
             importCsvFiles(csvUrls);
-
-            // CSV import 완료 후 favorite_content_data.sql 실행
-            executeDataSql();
 
         } catch (Exception e) {
             log.error("데이터 초기화 중 오류 발생: {}", e.getMessage(), e);
@@ -134,46 +128,5 @@ public class DevDataInitializer implements CommandLineRunner {
         }
 
         log.info("모든 CSV 파일 import 완료되었습니다.");
-    }
-
-    private void executeDataSql() {
-        try {
-            log.info("favorite_content_data.sql 실행을 시작합니다.");
-
-            // favorite_content_data.sql 파일 읽기
-            Resource dataSqlResource = new PathMatchingResourcePatternResolver()
-                    .getResource("classpath:favorite_content_data.sql");
-
-            if (!dataSqlResource.exists()) {
-                log.warn("favorite_content_data.sql 파일을 찾을 수 없습니다.");
-                return;
-            }
-
-            String sqlContent;
-            try (var is = dataSqlResource.getInputStream()) {
-                sqlContent = StreamUtils.copyToString(is, StandardCharsets.UTF_8);
-            }
-
-            // SQL 문장들을 세미콜론으로 분리하여 실행
-            String[] sqlStatements = sqlContent.split(";");
-
-            for (String sql : sqlStatements) {
-                sql = sql.trim();
-                if (!sql.isEmpty()) {
-                    try {
-                        jdbcTemplate.execute(sql);
-                        log.debug("SQL 실행 완료: {}", sql.substring(0, Math.min(50, sql.length())) + "...");
-                    } catch (Exception e) {
-                        log.error("SQL 실행 중 오류 발생: {}", e.getMessage());
-                        log.error("실행 실패한 SQL: {}", sql);
-                    }
-                }
-            }
-
-            log.info("favorite_content_data.sql 실행이 완료되었습니다.");
-
-        } catch (Exception e) {
-            log.error("favorite_content_data.sql 실행 중 오류 발생: {}", e.getMessage(), e);
-        }
     }
 }
