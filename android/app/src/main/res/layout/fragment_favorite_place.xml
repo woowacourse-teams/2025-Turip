@@ -68,6 +68,7 @@
         android:id="@+id/mv_favorite_place"
         android:layout_width="0dp"
         android:layout_height="250dp"
+        android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/iv_favorite_place_share"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -77,6 +78,7 @@
         android:id="@+id/iv_favorite_place_map_toggle"
         android:layout_width="match_parent"
         android:layout_height="44dp"
+        android:visibility="gone"
         android:contentDescription="@null"
         android:paddingTop="10dp"
         android:paddingBottom="18dp"
@@ -165,6 +167,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ProgressBar
+        android:id="@+id/pb_search_region_result"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
