@@ -16,9 +16,9 @@ import com.on.turip.ui.main.favorite.FavoritePlaceFolderCatalogFragment.Companio
 import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 @HiltViewModel
 class FavoritePlaceFolderCatalogViewModel @Inject constructor(
