@@ -13,19 +13,10 @@ import com.on.turip.domain.ErrorEvent
 import com.on.turip.ui.common.base.BaseActivity
 import com.on.turip.ui.trip.detail.TripDetailActivity
 import dagger.hilt.android.AndroidEntryPoint
-import timber.log.Timber
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class RegionResultActivity : BaseActivity<ActivityRegionResultBinding>() {
-    @Inject
-    lateinit var regionResultViewModelFactory: RegionResultViewModel.RegionCategoryNameAssistedFactory
-
-    private val viewModel: RegionResultViewModel by viewModels {
-        val regionCategoryName: String = intent.getStringExtra(REGION_CATEGORY_NAME_KEY) ?: ""
-        Timber.d("선택한 지역 카테고리: $regionCategoryName")
-        RegionResultViewModel.provideFactory(regionResultViewModelFactory, regionCategoryName)
-    }
+    private val viewModel: RegionResultViewModel by viewModels()
     override val binding: ActivityRegionResultBinding by lazy {
         ActivityRegionResultBinding.inflate(layoutInflater)
     }
@@ -144,13 +135,14 @@ class RegionResultActivity : BaseActivity<ActivityRegionResultBinding>() {
     }
 
     companion object {
-        private const val REGION_CATEGORY_NAME_KEY: String = "com.on.turip.REGION_CATEGORY_NAME_KEY"
+        const val REGION_RESULT_REGION_CATEGORY_NAME_KEY: String =
+            "com.on.turip.REGION_RESULT_REGION_CATEGORY_NAME_KEY"
 
         fun newIntent(
             context: Context,
             regionCategoryName: String,
         ): Intent =
             Intent(context, RegionResultActivity::class.java)
-                .putExtra(REGION_CATEGORY_NAME_KEY, regionCategoryName)
+                .putExtra(REGION_RESULT_REGION_CATEGORY_NAME_KEY, regionCategoryName)
     }
 }
