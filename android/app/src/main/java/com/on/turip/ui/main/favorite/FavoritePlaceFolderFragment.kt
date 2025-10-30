@@ -17,19 +17,10 @@ import com.on.turip.ui.main.favorite.FavoritePlaceFolderViewHolder.FavoritePlace
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
 import com.on.turip.ui.trip.detail.TripDetailViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class FavoritePlaceFolderFragment : BaseFragment<BottomSheetFragmentFavoritePlaceFolderBinding>() {
-    @Inject
-    lateinit var favoritePlaceFolderViewModelFactory: FavoritePlaceFolderViewModel.PlaceIdAssistedFactory
-
-    private val viewModel: FavoritePlaceFolderViewModel by viewModels {
-        FavoritePlaceFolderViewModel.provideFactory(
-            favoritePlaceFolderViewModelFactory,
-            placeId = arguments?.getLong(ARGUMENTS_PLACE_ID) ?: 0L,
-        )
-    }
+    private val viewModel: FavoritePlaceFolderViewModel by viewModels()
     private val sharedViewModel: TripDetailViewModel by activityViewModels()
 
     private val favoritePlaceFolderAdapter: FavoritePlaceFolderAdapter by lazy {
@@ -119,7 +110,7 @@ class FavoritePlaceFolderFragment : BaseFragment<BottomSheetFragmentFavoritePlac
         viewModel.hasFavoriteFolderWithPlaceId.observe(viewLifecycleOwner) { hasFavoriteFolder ->
             sharedViewModel.updateHasFavoriteFolderInPlace(
                 hasFavoriteFolder,
-                arguments?.getLong(ARGUMENTS_PLACE_ID) ?: 0L,
+                arguments?.getLong(FAVORITE_PLACE_FOLDER_ARGUMENTS_PLACE_ID) ?: 0L,
             )
         }
     }
@@ -130,13 +121,14 @@ class FavoritePlaceFolderFragment : BaseFragment<BottomSheetFragmentFavoritePlac
     }
 
     companion object {
-        private const val ARGUMENTS_PLACE_ID = "PLACE_ID"
+        const val FAVORITE_PLACE_FOLDER_ARGUMENTS_PLACE_ID =
+            "com.on.turip.FAVORITE_PLACE_FOLDER_ARGUMENTS_PLACE_ID"
 
         fun newInstance(placeId: Long): FavoritePlaceFolderFragment =
             FavoritePlaceFolderFragment().apply {
                 arguments =
                     Bundle().apply {
-                        putLong(ARGUMENTS_PLACE_ID, placeId)
+                        putLong(FAVORITE_PLACE_FOLDER_ARGUMENTS_PLACE_ID, placeId)
                     }
             }
     }

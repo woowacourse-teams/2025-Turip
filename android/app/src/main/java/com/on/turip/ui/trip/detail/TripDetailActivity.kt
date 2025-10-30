@@ -30,7 +30,6 @@ import com.on.turip.ui.trip.detail.webview.TuripWebViewClient
 import com.on.turip.ui.trip.detail.webview.applyVideoSettings
 import com.on.turip.ui.trip.detail.webview.navigateToTimeLine
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
@@ -38,17 +37,9 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
         ActivityTripDetailBinding.inflate(layoutInflater)
     }
 
-    private val videoManager by lazy {
-        VideoManager(binding.wvTripDetailVideo)
-    }
+    private val videoManager by lazy { VideoManager(binding.wvTripDetailVideo) }
 
-    @Inject
-    lateinit var tripDetailViewModelFactory: TripDetailViewModel.TripDetailAssistedFactory
-
-    private val viewModel: TripDetailViewModel by viewModels {
-        val contentId: Long = intent.getLongExtra(CONTENT_KEY, 0)
-        TripDetailViewModel.provideFactory(tripDetailViewModelFactory, contentId)
-    }
+    private val viewModel: TripDetailViewModel by viewModels()
 
     private val turipWebChromeClient: TuripWebChromeClient by lazy {
         TuripWebChromeClient(
@@ -334,13 +325,13 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
     }
 
     companion object {
-        private const val CONTENT_KEY: String = "com.on.turip.CONTENT_KEY"
+        const val TRIP_DETAIL_CONTENT_KEY: String = "com.on.turip.TRIP_DETAIL_CONTENT_KEY"
 
         fun newIntent(
             context: Context,
             contentId: Long,
         ): Intent =
             Intent(context, TripDetailActivity::class.java)
-                .putExtra(CONTENT_KEY, contentId)
+                .putExtra(TRIP_DETAIL_CONTENT_KEY, contentId)
     }
 }

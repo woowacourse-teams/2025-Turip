@@ -27,17 +27,10 @@ import com.on.turip.ui.search.model.VideoInformationModel
 import com.on.turip.ui.trip.detail.TripDetailActivity
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class SearchActivity : BaseActivity<ActivitySearchBinding>() {
-    @Inject
-    lateinit var searchViewModelFactory: SearchViewModel.SearchKeywordAssistedFactory
-
-    private val viewModel: SearchViewModel by viewModels {
-        val searchKeyword: String = intent.getStringExtra(SEARCH_KEYWORD_KEY) ?: ""
-        SearchViewModel.provideFactory(searchViewModelFactory, searchKeyword)
-    }
+    private val viewModel: SearchViewModel by viewModels()
 
     override val binding: ActivitySearchBinding by lazy {
         ActivitySearchBinding.inflate(layoutInflater)
@@ -283,7 +276,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
     }
 
     companion object {
-        private const val SEARCH_KEYWORD_KEY: String = "com.on.turip.SEARCH_KEYWORD_KEY"
+        const val SEARCH_KEYWORD_KEY: String = "com.on.turip.SEARCH_KEYWORD_KEY"
 
         fun newIntent(
             context: Context,

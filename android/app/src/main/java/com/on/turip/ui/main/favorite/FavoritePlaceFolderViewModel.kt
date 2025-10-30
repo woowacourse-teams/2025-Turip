@@ -2,26 +2,25 @@ package com.on.turip.ui.main.favorite
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import com.on.turip.data.common.onFailure
 import com.on.turip.data.common.onSuccess
 import com.on.turip.domain.favorite.usecase.UpdateFavoritePlaceUseCase
 import com.on.turip.domain.folder.FavoriteFolder
 import com.on.turip.domain.folder.repository.FolderRepository
+import com.on.turip.ui.main.favorite.FavoritePlaceFolderFragment.Companion.FAVORITE_PLACE_FOLDER_ARGUMENTS_PLACE_ID
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
-class FavoritePlaceFolderViewModel @AssistedInject constructor(
-    @Assisted private val placeId: Long,
+@HiltViewModel
+class FavoritePlaceFolderViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val folderRepository: FolderRepository,
     private val updateFavoritePlaceUseCase: UpdateFavoritePlaceUseCase,
 ) : ViewModel() {
@@ -33,6 +32,12 @@ class FavoritePlaceFolderViewModel @AssistedInject constructor(
         favoritePlaceFolders.map { folders: List<FavoritePlaceFolderModel> ->
             folders.any { folder: FavoritePlaceFolderModel -> folder.isSelected }
         }
+
+    private val placeId: Long by lazy {
+        checkNotNull(savedStateHandle[FAVORITE_PLACE_FOLDER_ARGUMENTS_PLACE_ID]) {
+            Timber.e("폴더 목록 화면 place ID 값이 존재하지 않습니다.")
+        }
+    }
 
     fun loadFavoriteFoldersByPlaceId(placeId: Long = this.placeId) {
         viewModelScope.launch {
@@ -64,22 +69,5 @@ class FavoritePlaceFolderViewModel @AssistedInject constructor(
                     Timber.e("장소에 대한 찜 폴더들 현황에서 장소 찜 실패")
                 }
         }
-    }
-
-    companion object {
-        fun provideFactory(
-            placeIdAssistedFactory: PlaceIdAssistedFactory,
-            placeId: Long,
-        ): ViewModelProvider.Factory =
-            viewModelFactory {
-                initializer {
-                    placeIdAssistedFactory.create(placeId)
-                }
-            }
-    }
-
-    @AssistedFactory
-    interface PlaceIdAssistedFactory {
-        fun create(placeId: Long): FavoritePlaceFolderViewModel
     }
 }

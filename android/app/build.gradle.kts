@@ -94,6 +94,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.fragment.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.savedstate)
     // retrofit2
     implementation(libs.retrofit)
     implementation(libs.retrofit2.kotlinx.serialization.converter)

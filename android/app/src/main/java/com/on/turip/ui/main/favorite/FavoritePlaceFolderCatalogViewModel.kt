@@ -2,28 +2,27 @@ package com.on.turip.ui.main.favorite
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import com.on.turip.data.common.onFailure
 import com.on.turip.data.common.onSuccess
 import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.favorite.FavoritePlace
 import com.on.turip.domain.favorite.repository.FavoritePlaceRepository
 import com.on.turip.domain.favorite.usecase.UpdateFavoritePlaceUseCase
+import com.on.turip.ui.main.favorite.FavoritePlaceFolderCatalogFragment.Companion.FAVORITE_PLACE_FOLDER_CATALOG_ARGUMENTS_FOLDER_ID
+import com.on.turip.ui.main.favorite.FavoritePlaceFolderCatalogFragment.Companion.FAVORITE_PLACE_FOLDER_CATALOG_ARGUMENTS_FOLDER_NAME
 import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
-class FavoritePlaceFolderCatalogViewModel @AssistedInject constructor(
-    @Assisted private val folderId: Long,
-    @Assisted private val folderName: String,
+@HiltViewModel
+class FavoritePlaceFolderCatalogViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val favoritePlaceRepository: FavoritePlaceRepository,
     private val updateFavoritePlaceUseCase: UpdateFavoritePlaceUseCase,
 ) : ViewModel() {
@@ -33,6 +32,17 @@ class FavoritePlaceFolderCatalogViewModel @AssistedInject constructor(
 
     private val _shareFolder: MutableLiveData<FavoriteFolderShareModel> = MutableLiveData()
     val shareFolder: LiveData<FavoriteFolderShareModel> get() = _shareFolder
+
+    private val folderId: Long by lazy {
+        checkNotNull(savedStateHandle[FAVORITE_PLACE_FOLDER_CATALOG_ARGUMENTS_FOLDER_ID]) {
+            Timber.e("찜 폴더 내 장소 목록 화면 Folder ID 값이 존재하지 않습니다.")
+        }
+    }
+    private val folderName: String by lazy {
+        checkNotNull(savedStateHandle[FAVORITE_PLACE_FOLDER_CATALOG_ARGUMENTS_FOLDER_NAME]) {
+            Timber.e("찜 폴더 내 장소 목록 화면 폴더 이름이 존재하지 않습니다.")
+        }
+    }
 
     init {
         loadPlacesInSelectFolder()
@@ -149,26 +159,5 @@ class FavoritePlaceFolderCatalogViewModel @AssistedInject constructor(
                 places = favoritePlaceUiState.value?.places?.map { it.toUiModel() } ?: emptyList(),
             )
         _shareFolder.value = shareFolder
-    }
-
-    companion object {
-        fun provideFactory(
-            folderInformationAssistedFactory: FolderInformationAssistedFactory,
-            folderId: Long,
-            folderName: String,
-        ): ViewModelProvider.Factory =
-            viewModelFactory {
-                initializer {
-                    folderInformationAssistedFactory.create(folderId, folderName)
-                }
-            }
-    }
-
-    @AssistedFactory
-    interface FolderInformationAssistedFactory {
-        fun create(
-            folderId: Long,
-            folderName: String,
-        ): FavoritePlaceFolderCatalogViewModel
     }
 }
