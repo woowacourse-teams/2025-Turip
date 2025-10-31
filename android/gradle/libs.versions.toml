@@ -1,6 +1,6 @@
 [versions]
-versionName = "1.3.2"
-versionCode = "133"
+versionName = "1.3.3"
+versionCode = "134"
 playServicesMaps = "19.2.0"
 secretsGradlePlugin = "2.0.1"
 appUpdate = "2.1.0"
