@@ -26,7 +26,7 @@ class VideoManager(
             }
 
             loadDataWithBaseURL(
-                getBaseUrl(),
+                BuildConfig.BASE_URL,
                 readLocalHtml(LOCAL_HTML_FILE_NAME),
                 DEFAULT_MIME_TYPE,
                 DEFAULT_ENCODING,
@@ -34,8 +34,6 @@ class VideoManager(
             )
         }
     }
-
-    private fun getBaseUrl(): String = if (BuildConfig.DEBUG) BuildConfig.debug_base_url else BuildConfig.release_base_url
 
     private fun readLocalHtml(fileName: String): String =
         webView.context.assets
