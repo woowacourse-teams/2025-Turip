@@ -1,4 +1,4 @@
-FROM openjdk:21-jdk
+FROM eclipse-temurin:21-jdk
 COPY otel/opentelemetry-javaagent.jar /opentelemetry-javaagent.jar
 ARG JAR_FILE=build/libs/*.jar
 COPY ${JAR_FILE} /app.jar
