@@ -1,5 +1,6 @@
 package turip.content.repository;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Pageable;
@@ -131,4 +132,16 @@ public interface ContentRepository extends JpaRepository<Content, Long> {
             @Param("lastId") Long lastId,
             Pageable pageable
     );
+
+    default String createBooleanModeKeyword(String keyword) {
+        if (keyword == null || keyword.isBlank()) {
+            return "";
+        }
+        String[] words = keyword.trim().split("\\s+");
+        return String.join(" ",
+                Arrays.stream(words)
+                        .map(word -> "+" + word)
+                        .toArray(String[]::new)
+        );
+    }
 }
