@@ -140,7 +140,9 @@ public interface ContentRepository extends JpaRepository<Content, Long> {
         String[] words = keyword.trim().split("\\s+");
         return String.join(" ",
                 Arrays.stream(words)
+                        .map(word -> word.replaceAll("[+\\-*~<>()\"@]", ""))
                         .map(word -> "+" + word)
+                        .filter(word -> word.length() > 1)
                         .toArray(String[]::new)
         );
     }
