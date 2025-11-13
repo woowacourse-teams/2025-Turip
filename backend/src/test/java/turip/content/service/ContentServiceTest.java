@@ -76,7 +76,11 @@ class ContentServiceTest {
             Content content1 = new Content(1L, creator, city, "메이의 속초 브이로그 1편", "url1", LocalDate.of(2025, 7, 8));
             Content content2 = new Content(2L, creator, city, "메이의 속초 브이로그 2편", "url2", LocalDate.of(2025, 7, 8));
             List<Content> contents = List.of(content1, content2);
-            given(contentRepository.findByKeywordContaining(keyword, maxId, PageRequest.of(0, pageSize)))
+
+            String booleanModeKeyword = "+메이";
+            given(contentRepository.createBooleanModeKeyword(keyword))
+                    .willReturn(booleanModeKeyword);
+            given(contentRepository.findByKeywordContaining(booleanModeKeyword, maxId, PageRequest.of(0, pageSize)))
                     .willReturn(new SliceImpl<>(contents));
 
             Map<Long, TripDurationResponse> durations = Map.of(

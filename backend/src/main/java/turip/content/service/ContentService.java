@@ -64,7 +64,8 @@ public class ContentService {
         if (lastContentId == 0) {
             lastContentId = Long.MAX_VALUE;
         }
-        Slice<Content> contentSlice = contentRepository.findByKeywordContaining(keyword, lastContentId,
+        String booleanModeKeyword = contentRepository.createBooleanModeKeyword(keyword);
+        Slice<Content> contentSlice = contentRepository.findByKeywordContaining(booleanModeKeyword, lastContentId,
                 PageRequest.of(0, pageSize));
         return convertToContentsDetailWithLoadableResponse(member, contentSlice);
     }
@@ -110,7 +111,8 @@ public class ContentService {
     }
 
     public ContentCountResponse countByKeyword(String keyword) {
-        int count = contentRepository.countByKeywordContaining(keyword);
+        String booleanModeKeyword = contentRepository.createBooleanModeKeyword(keyword);
+        int count = contentRepository.countByKeywordContaining(booleanModeKeyword);
         return ContentCountResponse.from(count);
     }
 
