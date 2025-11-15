@@ -27,8 +27,8 @@ fun GoogleLoginButton(modifier: Modifier = Modifier) {
     Row(
         modifier =
             modifier
-                .background(color = Color.White)
                 .border(border = BorderStroke(1.dp, Color.Black), shape = RoundedCornerShape(30.dp))
+                .background(color = Color.White, shape = RoundedCornerShape(30.dp))
                 .padding(vertical = 10.dp, horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -51,9 +51,9 @@ fun GoogleLoginButton(modifier: Modifier = Modifier) {
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = false)
 @Composable
-fun GoogleLoginButtonPreView() {
+private fun GoogleLoginButtonPreView() {
     TuripTheme {
         GoogleLoginButton(
             modifier =
