@@ -2,13 +2,11 @@ package com.on.turip.ui.trip.detail
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import com.on.turip.data.common.onFailure
 import com.on.turip.data.common.onSuccess
 import com.on.turip.domain.ErrorEvent
@@ -21,14 +19,15 @@ import com.on.turip.domain.trip.repository.ContentPlaceRepository
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.common.mapper.toUiModelWithoutContentPlaces
 import com.on.turip.ui.common.model.trip.TripModel
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
+import com.on.turip.ui.trip.detail.TripDetailActivity.Companion.TRIP_DETAIL_CONTENT_KEY
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
-class TripDetailViewModel @AssistedInject constructor(
-    @Assisted private val contentId: Long,
+@HiltViewModel
+class TripDetailViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val contentRepository: ContentRepository,
     private val contentPlaceRepository: ContentPlaceRepository,
     private val updateFavoriteUseCase: UpdateFavoriteUseCase,
@@ -79,6 +78,12 @@ class TripDetailViewModel @AssistedInject constructor(
                 )
             }
         }
+
+    private val contentId: Long by lazy {
+        checkNotNull(savedStateHandle[TRIP_DETAIL_CONTENT_KEY]) {
+            Timber.e("컨텐츠 상세 화면 Content ID 값이 존재하지 않습니다.")
+        }
+    }
 
     init {
         loadVideoInformation()
@@ -223,20 +228,5 @@ class TripDetailViewModel @AssistedInject constructor(
     companion object {
         private const val DEFAULT_CONTENT_TITLE_MAX_LINES = 2
         private const val EXPAND_TEXT = Int.MAX_VALUE
-
-        fun provideFactory(
-            tripDetailAssistedFactory: TripDetailAssistedFactory,
-            contentId: Long,
-        ): ViewModelProvider.Factory =
-            viewModelFactory {
-                initializer {
-                    tripDetailAssistedFactory.create(contentId)
-                }
-            }
-    }
-
-    @AssistedFactory
-    interface TripDetailAssistedFactory {
-        fun create(contentId: Long): TripDetailViewModel
     }
 }

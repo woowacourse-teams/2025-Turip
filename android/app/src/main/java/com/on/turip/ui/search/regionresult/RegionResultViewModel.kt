@@ -2,11 +2,9 @@ package com.on.turip.ui.search.regionresult
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import com.on.turip.data.common.TuripCustomResult
 import com.on.turip.data.common.onFailure
 import com.on.turip.data.common.onSuccess
@@ -16,20 +14,28 @@ import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.content.video.VideoInformation
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.search.model.VideoInformationModel
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
+import com.on.turip.ui.search.regionresult.RegionResultActivity.Companion.REGION_RESULT_REGION_CATEGORY_NAME_KEY
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import timber.log.Timber
+import javax.inject.Inject
 
-class RegionResultViewModel @AssistedInject constructor(
-    @Assisted private val regionCategoryName: String,
+@HiltViewModel
+class RegionResultViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val contentRepository: ContentRepository,
 ) : ViewModel() {
     private val _searchResultState: MutableLiveData<SearchResultState> =
         MutableLiveData(SearchResultState())
     val searchResultState: LiveData<SearchResultState> get() = _searchResultState
+
+    private val regionCategoryName: String by lazy {
+        checkNotNull(savedStateHandle[REGION_RESULT_REGION_CATEGORY_NAME_KEY]) {
+            Timber.e("지역 검색 화면 지역 이름이 존재하지 않습니다.")
+        }
+    }
 
     private val _networkError: MutableLiveData<Boolean> = MutableLiveData(false)
     val networkError: LiveData<Boolean> get() = _networkError
@@ -138,23 +144,6 @@ class RegionResultViewModel @AssistedInject constructor(
             searchResultState.value?.copy(
                 region = regionCategoryName,
             )
-    }
-
-    companion object {
-        fun provideFactory(
-            regionCategoryNameAssistedFactory: RegionCategoryNameAssistedFactory,
-            regionCategoryName: String,
-        ): ViewModelProvider.Factory =
-            viewModelFactory {
-                initializer {
-                    regionCategoryNameAssistedFactory.create(regionCategoryName)
-                }
-            }
-    }
-
-    @AssistedFactory
-    interface RegionCategoryNameAssistedFactory {
-        fun create(regionCategoryName: String): RegionResultViewModel
     }
 
     data class SearchResultState(

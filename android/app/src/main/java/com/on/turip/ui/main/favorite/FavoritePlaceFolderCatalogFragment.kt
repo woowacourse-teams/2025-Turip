@@ -16,20 +16,10 @@ import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavoritePlaceFolderCatalogBinding>() {
-    @Inject
-    lateinit var favoritePlaceFolderCatalogViewModelFactory: FavoritePlaceFolderCatalogViewModel.FolderInformationAssistedFactory
-
-    private val viewModel: FavoritePlaceFolderCatalogViewModel by viewModels {
-        FavoritePlaceFolderCatalogViewModel.provideFactory(
-            favoritePlaceFolderCatalogViewModelFactory,
-            folderId = arguments?.getLong(ARGUMENTS_FOLDER_ID) ?: 0L,
-            folderName = arguments?.getString(ARGUMENTS_FOLDER_NAME) ?: "",
-        )
-    }
+    private val viewModel: FavoritePlaceFolderCatalogViewModel by viewModels()
 
     private val placeAdapter: FavoritePlaceAdapter by lazy {
         FavoritePlaceAdapter(
@@ -183,8 +173,10 @@ class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavor
         BottomSheetFragmentFavoritePlaceFolderCatalogBinding.inflate(inflater, container, false)
 
     companion object {
-        private const val ARGUMENTS_FOLDER_ID = "FOLDER_ID"
-        private const val ARGUMENTS_FOLDER_NAME = "FOLDER_NAME"
+        const val FAVORITE_PLACE_FOLDER_CATALOG_ARGUMENTS_FOLDER_ID =
+            "com.on.turip.FAVORITE_PLACE_FOLDER_CATALOG_ARGUMENTS_FOLDER_ID"
+        const val FAVORITE_PLACE_FOLDER_CATALOG_ARGUMENTS_FOLDER_NAME =
+            "com.on.turip.FAVORITE_PLACE_FOLDER_CATALOG_ARGUMENTS_FOLDER_NAME"
         private const val KAKAO_PACKAGE = "com.kakao.talk"
         private const val INSTAGRAM_PACKAGE = "com.instagram.android"
 
@@ -195,8 +187,8 @@ class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavor
             FavoritePlaceFolderCatalogFragment().apply {
                 arguments =
                     Bundle().apply {
-                        putLong(ARGUMENTS_FOLDER_ID, folderId)
-                        putString(ARGUMENTS_FOLDER_NAME, folderName)
+                        putLong(FAVORITE_PLACE_FOLDER_CATALOG_ARGUMENTS_FOLDER_ID, folderId)
+                        putString(FAVORITE_PLACE_FOLDER_CATALOG_ARGUMENTS_FOLDER_NAME, folderName)
                     }
             }
     }
