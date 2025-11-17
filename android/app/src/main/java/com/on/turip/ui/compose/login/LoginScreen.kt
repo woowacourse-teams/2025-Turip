@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,11 +34,14 @@ import com.on.turip.ui.compose.theme.TuripTypography
 
 @Composable
 fun LoginScreen(modifier: Modifier = Modifier) {
-    val isHelpTextVisible by rememberSaveable { mutableStateOf(false) }
+    var isHelpTextVisible by rememberSaveable { mutableStateOf(false) }
     Scaffold { innerPadding ->
         LoginScreenContent(
             isHelpTextVisible = isHelpTextVisible,
             modifier = modifier.padding(innerPadding),
+            onClickHelpText = {
+                isHelpTextVisible = true
+            },
         )
     }
 }
@@ -45,6 +49,7 @@ fun LoginScreen(modifier: Modifier = Modifier) {
 @Composable
 fun LoginScreenContent(
     isHelpTextVisible: Boolean,
+    onClickHelpText: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -101,10 +106,12 @@ fun LoginScreenContent(
                                         colorResource(R.color.gray_200_c1c1c1),
                                     ),
                                 shape = RoundedCornerShape(10.dp),
-                            ).background(
+                            )
+                            .background(
                                 color = colorResource(R.color.gray_300_5b5b5b),
                                 shape = RoundedCornerShape(10.dp),
-                            ).fillMaxWidth()
+                            )
+                            .fillMaxWidth()
                             .padding(vertical = 20.dp),
                     textAlign = TextAlign.Center,
                 )
@@ -115,7 +122,7 @@ fun LoginScreenContent(
                 text = "게스트 모드로 시작하기",
                 style = TuripTypography.bodyLarge,
                 color = Color.White,
-                onClickHelp = {},
+                onClickHelp = onClickHelpText,
             )
         }
     }
@@ -124,11 +131,11 @@ fun LoginScreenContent(
 @Composable
 @Preview(showBackground = true, name = "HelpVisible")
 private fun HelpVisibleLoginScreenPreview() {
-    LoginScreenContent(true)
+    LoginScreenContent(true, {})
 }
 
 @Composable
 @Preview(showBackground = true, name = "HelpInvisible")
 private fun HelpInvisibleLoginScreenPreview() {
-    LoginScreenContent(false)
+    LoginScreenContent(false, {})
 }
