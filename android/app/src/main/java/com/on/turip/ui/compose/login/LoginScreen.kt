@@ -34,9 +34,18 @@ import com.on.turip.ui.compose.theme.TuripTypography
 import timber.log.Timber
 
 @Composable
-fun LoginScreen(modifier: Modifier = Modifier) {
+fun LoginScreen(
+    navigateToMain: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     var isHelpTextVisible by rememberSaveable { mutableStateOf(false) }
     Scaffold { innerPadding ->
+        Image(
+            painter = painterResource(R.drawable.bg_login),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop,
+        )
         LoginScreenContent(
             isHelpTextVisible = isHelpTextVisible,
             modifier = modifier.padding(innerPadding),
@@ -44,26 +53,21 @@ fun LoginScreen(modifier: Modifier = Modifier) {
                 isHelpTextVisible = true
                 Timber.d("도움말 버튼 클릭 $isHelpTextVisible")
             },
+            navigateToMain = navigateToMain,
         )
     }
 }
 
 @Composable
 private fun LoginScreenContent(
+    navigateToMain: () -> Unit,
     isHelpTextVisible: Boolean,
     onClickHelpText: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(
-        modifier = modifier,
+        modifier = modifier.fillMaxSize(),
     ) {
-        Image(
-            painter = painterResource(R.drawable.bg_login),
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop,
-        )
-
         Column(
             modifier =
                 Modifier
@@ -108,10 +112,12 @@ private fun LoginScreenContent(
                                         colorResource(R.color.gray_200_c1c1c1),
                                     ),
                                 shape = RoundedCornerShape(10.dp),
-                            ).background(
+                            )
+                            .background(
                                 color = colorResource(R.color.gray_300_5b5b5b),
                                 shape = RoundedCornerShape(10.dp),
-                            ).fillMaxWidth()
+                            )
+                            .fillMaxWidth()
                             .padding(vertical = 20.dp),
                     textAlign = TextAlign.Center,
                 )
@@ -122,7 +128,8 @@ private fun LoginScreenContent(
                 text = "게스트 모드로 시작하기",
                 style = TuripTypography.bodyLarge,
                 color = Color.White,
-                onClickHelp = onClickHelpText,
+                onClickIcon = onClickHelpText,
+                onClickText = navigateToMain,
             )
         }
     }
@@ -131,11 +138,11 @@ private fun LoginScreenContent(
 @Composable
 @Preview(showBackground = true, name = "HelpVisible")
 private fun HelpVisibleLoginScreenPreview() {
-    LoginScreenContent(true, {})
+    LoginScreenContent({}, true, {})
 }
 
 @Composable
 @Preview(showBackground = true, name = "HelpInvisible")
 private fun HelpInvisibleLoginScreenPreview() {
-    LoginScreenContent(false, {})
+    LoginScreenContent({}, false, {})
 }

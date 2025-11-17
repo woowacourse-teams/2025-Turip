@@ -24,7 +24,8 @@ fun HelpText(
     text: String,
     style: TextStyle,
     color: Color,
-    onClickHelp: () -> Unit,
+    onClickIcon: () -> Unit,
+    onClickText: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -36,6 +37,10 @@ fun HelpText(
             style = style,
             color = color,
             textDecoration = TextDecoration.Underline,
+            modifier =
+                Modifier.clickable {
+                    onClickText()
+                },
         )
         Spacer(modifier = Modifier.padding(4.dp))
         Image(
@@ -44,7 +49,7 @@ fun HelpText(
             colorFilter = ColorFilter.tint(color),
             modifier =
                 Modifier.clickable {
-                    onClickHelp()
+                    onClickIcon()
                 },
         )
     }
@@ -53,5 +58,5 @@ fun HelpText(
 @Preview
 @Composable
 private fun HelpTextPreview() {
-    HelpText("도움말", TuripTypography.titleLarge, Color.White, {})
+    HelpText("도움말", TuripTypography.titleLarge, Color.White, {}, {})
 }
