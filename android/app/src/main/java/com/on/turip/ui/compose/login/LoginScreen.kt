@@ -30,8 +30,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.on.turip.R
 import com.on.turip.ui.compose.common.component.HelpText
+import com.on.turip.ui.compose.common.util.noRippleClickable
 import com.on.turip.ui.compose.theme.TuripTypography
-import timber.log.Timber
 
 @Composable
 fun LoginScreen(
@@ -39,7 +39,12 @@ fun LoginScreen(
     modifier: Modifier = Modifier,
 ) {
     var isHelpTextVisible by rememberSaveable { mutableStateOf(false) }
-    Scaffold { innerPadding ->
+    Scaffold(
+        modifier =
+            modifier.noRippleClickable {
+                isHelpTextVisible = false
+            },
+    ) { innerPadding ->
         Image(
             painter = painterResource(R.drawable.bg_login),
             contentDescription = null,
@@ -51,7 +56,6 @@ fun LoginScreen(
             modifier = modifier.padding(innerPadding),
             onClickHelpText = {
                 isHelpTextVisible = true
-                Timber.d("도움말 버튼 클릭 $isHelpTextVisible")
             },
             navigateToMain = navigateToMain,
         )
