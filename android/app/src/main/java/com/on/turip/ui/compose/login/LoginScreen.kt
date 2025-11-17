@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -88,7 +89,7 @@ private fun LoginScreenContent(
             )
 
             Text(
-                text = "직진만 남은 여행",
+                text = stringResource(R.string.all_turip_description),
                 style = TuripTypography.titleSmall,
                 modifier = Modifier.padding(top = 5.dp),
             )
@@ -104,7 +105,7 @@ private fun LoginScreenContent(
         ) {
             if (isHelpTextVisible) {
                 Text(
-                    text = "게스트 모드를 이용할 경우,\n사용할 수 있는 기능이 제한돼요",
+                    text = stringResource(R.string.login_help_description),
                     color = Color.White,
                     style = TuripTypography.bodyLarge,
                     modifier =
@@ -116,12 +117,10 @@ private fun LoginScreenContent(
                                         colorResource(R.color.gray_200_c1c1c1),
                                     ),
                                 shape = RoundedCornerShape(10.dp),
-                            )
-                            .background(
+                            ).background(
                                 color = colorResource(R.color.gray_300_5b5b5b),
                                 shape = RoundedCornerShape(10.dp),
-                            )
-                            .fillMaxWidth()
+                            ).fillMaxWidth()
                             .padding(vertical = 20.dp),
                     textAlign = TextAlign.Center,
                 )
@@ -129,7 +128,7 @@ private fun LoginScreenContent(
 
             GoogleLoginButton()
             HelpText(
-                text = "게스트 모드로 시작하기",
+                text = stringResource(R.string.login_start_to_guest),
                 style = TuripTypography.bodyLarge,
                 color = Color.White,
                 onClickIcon = onClickHelpText,

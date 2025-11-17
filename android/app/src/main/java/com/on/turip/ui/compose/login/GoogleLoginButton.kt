@@ -16,10 +16,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.on.turip.R
 import com.on.turip.ui.compose.theme.TuripTheme
 import com.on.turip.ui.compose.theme.TuripTypography
@@ -29,8 +29,10 @@ fun GoogleLoginButton(modifier: Modifier = Modifier) {
     Row(
         modifier =
             modifier
-                .border(border = BorderStroke(1.dp, colorResource(R.color.turip_gray_b4b4b4)), shape = RoundedCornerShape(30.dp))
-                .background(color = Color.White, shape = RoundedCornerShape(30.dp))
+                .border(
+                    border = BorderStroke(1.dp, colorResource(R.color.turip_gray_b4b4b4)),
+                    shape = RoundedCornerShape(30.dp),
+                ).background(color = Color.White, shape = RoundedCornerShape(30.dp))
                 .padding(vertical = 16.dp, horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -42,7 +44,7 @@ fun GoogleLoginButton(modifier: Modifier = Modifier) {
             modifier = Modifier.padding(10.dp),
         )
         Text(
-            text = "구글 로그인",
+            text = stringResource(R.string.login_google_description),
             style = TuripTypography.titleMedium,
             modifier =
                 Modifier

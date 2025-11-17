@@ -21,7 +21,7 @@
         android:id="@+id/tv_splash_description"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/splash_description"
+        android:text="@string/all_turip_description"
         android:textAppearance="@style/title3"
         android:textColor="@color/pure_white_ffffff"
         app:layout_constraintBottom_toBottomOf="parent"
