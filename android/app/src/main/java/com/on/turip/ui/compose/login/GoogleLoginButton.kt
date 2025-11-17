@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -27,7 +28,7 @@ fun GoogleLoginButton(modifier: Modifier = Modifier) {
     Row(
         modifier =
             modifier
-                .border(border = BorderStroke(1.dp, Color.Black), shape = RoundedCornerShape(30.dp))
+                .border(border = BorderStroke(1.dp, colorResource(R.color.turip_gray_b4b4b4)), shape = RoundedCornerShape(30.dp))
                 .background(color = Color.White, shape = RoundedCornerShape(30.dp))
                 .padding(vertical = 10.dp, horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
