@@ -44,7 +44,7 @@ fun HelpText(
             colorFilter = ColorFilter.tint(color),
             modifier =
                 Modifier.clickable {
-                    onClickHelp
+                    onClickHelp()
                 },
         )
     }

@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import com.on.turip.R
 import com.on.turip.ui.compose.common.component.HelpText
 import com.on.turip.ui.compose.theme.TuripTypography
+import timber.log.Timber
 
 @Composable
 fun LoginScreen(modifier: Modifier = Modifier) {
@@ -41,6 +42,7 @@ fun LoginScreen(modifier: Modifier = Modifier) {
             modifier = modifier.padding(innerPadding),
             onClickHelpText = {
                 isHelpTextVisible = true
+                Timber.d("도움말 버튼 클릭 $isHelpTextVisible")
             },
         )
     }
