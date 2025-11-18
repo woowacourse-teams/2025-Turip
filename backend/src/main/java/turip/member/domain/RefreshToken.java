@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @Table(name = "refresh_token", uniqueConstraints = {
-        @UniqueConstraint(name = "uk_refresh_token__member_id_device_fid", columnNames = {"member_id", "device_fid"})
+        @UniqueConstraint(name = "uq_refresh_token__member_id_device_fid", columnNames = {"member_id", "device_fid"})
 })
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -33,7 +33,7 @@ public class RefreshToken {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false, foreignKey = @ForeignKey(name = "fk_refresh_token__member"))
-    private MemberSocial memberSocial;
+    private Member member;
 
     @Column(name = "device_fid", nullable = false)
     private String deviceFid;

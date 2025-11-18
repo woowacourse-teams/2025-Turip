@@ -1,3 +1,4 @@
+-- 1단계) 테이블 생성
 -- account 테이블
 CREATE TABLE account (
     id BIGINT AUTO_INCREMENT PRIMARY KEY
@@ -39,7 +40,7 @@ CREATE TABLE refresh_token (
         UNIQUE (member_id, device_fid)
 );
 
--- 기존 member 데이터를 account + guest로 마이그레이션
+-- 2단계) 기존 member 데이터를 account + guest로 마이그레이션
 -- 1. account 테이블에 member의 id를 그대로 사용
 INSERT INTO account (id)
 SELECT id FROM member;
@@ -56,6 +57,7 @@ PREPARE stmt FROM @sql;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
 
+-- 3단계) favorite_content, favorite_folder의 account_id 참조 추가
 -- favorite_content 테이블에 account_id 추가
 ALTER TABLE favorite_content
     ADD COLUMN account_id BIGINT,
