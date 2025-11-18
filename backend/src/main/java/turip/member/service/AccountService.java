@@ -2,6 +2,8 @@ package turip.member.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import turip.common.exception.ErrorTag;
+import turip.common.exception.custom.NotFoundException;
 import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.repository.FavoriteFolderRepository;
 import turip.member.domain.Account;
@@ -19,5 +21,10 @@ public class AccountService {
         FavoriteFolder defaultFolder = FavoriteFolder.defaultFolderOf(savedAccount);
         favoriteFolderRepository.save(defaultFolder);
         return savedAccount;
+    }
+
+    public Account getById(final Long accountId) {
+        return accountRepository.findById(accountId)
+                .orElseThrow(() -> new NotFoundException(ErrorTag.ACCOUNT_NOT_FOUND));
     }
 }
