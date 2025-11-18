@@ -174,7 +174,7 @@ public class ContentService {
         List<Long> contentIds = contents.stream()
                 .map(Content::getId)
                 .toList();
-        return favoriteContentRepository.findByMemberIdAndContentIdIn(account.getId(), contentIds).stream()
+        return favoriteContentRepository.findByAccountIdAndContentIdIn(account.getId(), contentIds).stream()
                 .map(favorite -> favorite.getContent().getId())
                 .collect(Collectors.toSet());
     }

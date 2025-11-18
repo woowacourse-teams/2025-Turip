@@ -18,12 +18,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import turip.content.domain.Content;
 import turip.member.domain.Account;
-import turip.member.domain.Member;
 
 @Getter
 @Entity
 @Table(name = "favorite_content", uniqueConstraints = {
-        @UniqueConstraint(name = "uq_favorite_content__member_content", columnNames = {"member_id", "content_id"})
+        @UniqueConstraint(name = "uq_favorite_content__account_id_content_id", columnNames = {"account_id",
+                "content_id"})
 })
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -36,10 +36,6 @@ public class FavoriteContent {
 
     @Column(name = "created_at", nullable = false)
     private LocalDate createdAt;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = true, foreignKey = @ForeignKey(name = "fk_favorite_content__member"))
-    private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id", nullable = false, foreignKey = @ForeignKey(name = "fk_favorite_content__account"))

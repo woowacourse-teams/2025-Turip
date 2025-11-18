@@ -33,7 +33,7 @@ public interface FavoriteContentRepository extends JpaRepository<FavoriteContent
             @Param("topContentSize") int topContentSize
     );
 
-    List<FavoriteContent> findByMemberIdAndContentIdIn(Long memberId, List<Long> contentIds);
+    List<FavoriteContent> findByAccountIdAndContentIdIn(Long accountId, List<Long> contentIds);
 
     @Query("""
                 SELECT f.content

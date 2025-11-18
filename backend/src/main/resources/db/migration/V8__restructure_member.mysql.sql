@@ -83,3 +83,44 @@ SET account_id = member_id;
 -- account_id를 NOT NULL로 변경
 ALTER TABLE favorite_folder
     MODIFY COLUMN account_id BIGINT NOT NULL;
+
+-- 4단계) favorite_folder와 favorite_content의 member_id 컬럼 및 제약조건 삭제 & member 테이블 삭제 & member_social 테이블명 member로 변경하기
+-- favorite_folder 테이블의 member_id 외래키 삭제
+ALTER TABLE favorite_folder
+DROP FOREIGN KEY fk_favorite_folder__member;
+
+-- favorite_folder 테이블의 (member_id, name) unique 제약조건 삭제
+ALTER TABLE favorite_folder
+DROP INDEX uq_favorite_folder__member_name;
+
+-- favorite_folder 테이블의 member_id 컬럼 삭제
+ALTER TABLE favorite_folder
+DROP COLUMN member_id;
+
+-- favorite_folder 테이블의 (account_id, name) unique 제약조건 추가
+ALTER TABLE favorite_folder
+ADD CONSTRAINT uq_favorite_folder__account_id_name
+    UNIQUE (account_id, name);
+
+-- favorite_content 테이블의 member_id 외래키 삭제
+ALTER TABLE favorite_content
+DROP FOREIGN KEY fk_favorite_content__member;
+
+-- favorite_content 테이블의 (member_id, content_id) unique 제약조건 삭제
+ALTER TABLE favorite_content
+DROP INDEX uq_favorite_content__member_content;
+
+-- favorite_content 테이블의 member_id 컬럼 삭제
+ALTER TABLE favorite_content
+DROP COLUMN member_id;
+
+-- favorite_content 테이블의 (account_id, content_id) unique 제약조건 추가
+ALTER TABLE favorite_content
+ADD CONSTRAINT uq_favorite_content__account_id_content_id
+    UNIQUE (account_id, content_id);
+
+-- member 테이블 삭제
+DROP TABLE member;
+
+-- member_social 테이블명 member로 변경하기
+RENAME TABLE member_social TO member;

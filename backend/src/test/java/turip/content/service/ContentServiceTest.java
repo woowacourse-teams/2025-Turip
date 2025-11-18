@@ -129,7 +129,7 @@ class ContentServiceTest {
             given(favoriteContentRepository.findPopularContentsByFavoriteBetweenDatesWithLimit(startDate, endDate,
                     topContentSize))
                     .willReturn(popularContents);
-            given(favoriteContentRepository.findByMemberIdAndContentIdIn(1L, List.of(1L, 2L)))
+            given(favoriteContentRepository.findByAccountIdAndContentIdIn(1L, List.of(1L, 2L)))
                     .willReturn(List.of(new FavoriteContent(LocalDate.now().minusWeeks(1), account, content1),
                             new FavoriteContent(LocalDate.now().minusWeeks(1), account, content2)));
 

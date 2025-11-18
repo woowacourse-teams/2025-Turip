@@ -19,12 +19,11 @@ import lombok.NoArgsConstructor;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.IllegalArgumentException;
 import turip.member.domain.Account;
-import turip.member.domain.Member;
 
 @Getter
 @Entity
 @Table(name = "favorite_folder", uniqueConstraints = {
-        @UniqueConstraint(name = "uq_favorite_folder__member_name", columnNames = {"member_id", "name"})
+        @UniqueConstraint(name = "uq_favorite_folder__account_id_name", columnNames = {"account_id", "name"})
 })
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -37,10 +36,6 @@ public class FavoriteFolder {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = true, foreignKey = @ForeignKey(name = "fk_favorite_folder__member"))
-    private Member member;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id", nullable = false, foreignKey = @ForeignKey(name = "fk_favorite_folder__account"))
     private Account account;
 
@@ -51,13 +46,6 @@ public class FavoriteFolder {
     private boolean isDefault;
 
     private FavoriteFolder(Account account, String name, boolean isDefault) {
-        this.account = account;
-        this.name = name;
-        this.isDefault = isDefault;
-    }
-
-    public FavoriteFolder(Long id, Account account, String name, boolean isDefault) {
-        this.id = id;
         this.account = account;
         this.name = name;
         this.isDefault = isDefault;
