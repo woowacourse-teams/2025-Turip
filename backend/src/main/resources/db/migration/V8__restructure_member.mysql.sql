@@ -38,3 +38,20 @@ CREATE TABLE refresh_token (
     CONSTRAINT uq_refresh_token__member_id_device_fid
         UNIQUE (member_id, device_fid)
 );
+
+-- 기존 member 데이터를 account + guest로 마이그레이션
+-- 1. account 테이블에 member의 id를 그대로 사용
+INSERT INTO account (id)
+SELECT id FROM member;
+
+-- 2. guest 테이블에 account_id와 device_fid 삽입
+INSERT INTO guest (account_id, device_fid)
+SELECT id, device_fid FROM member;
+
+-- 3. AUTO_INCREMENT 값을 현재 최대값 + 1로 설정 (향후 INSERT 시 중복 방지)
+SET @max_id = (SELECT IFNULL(MAX(id), 0) FROM account);
+SET @next_id = @max_id + 1;
+SET @sql = CONCAT('ALTER TABLE account AUTO_INCREMENT = ', @next_id);
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
