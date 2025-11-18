@@ -24,6 +24,12 @@ spring:
   flyway:
     enabled: false
 
+# JWT 설정 (테스트용)
+jwt:
+  secret-key: turip-test-jwt-secret-key-for-testing-purposes-only-32bytes
+  access-token-expiration-ms: 3600000  # 1시간
+  refresh-token-expiration-ms: 604800000  # 7일
+
 # CSV Import 설정
 csv:
   import:
