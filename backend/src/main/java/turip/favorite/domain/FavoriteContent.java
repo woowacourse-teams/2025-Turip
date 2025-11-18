@@ -49,9 +49,16 @@ public class FavoriteContent {
     @JoinColumn(name = "content_id", nullable = false, foreignKey = @ForeignKey(name = "fk_favorite_content__content"))
     private Content content;
 
+    @Deprecated
     public FavoriteContent(LocalDate createdAt, Member member, Content content) {
         this.createdAt = createdAt;
         this.member = member;
         this.content = content;
+    }
+
+    public FavoriteContent(LocalDate createdAt, Account account, Content content) {
+        this.content = content;
+        this.account = account;
+        this.createdAt = createdAt;
     }
 }

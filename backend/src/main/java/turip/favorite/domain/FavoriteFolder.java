@@ -50,14 +50,34 @@ public class FavoriteFolder {
     @Column(name = "is_default", nullable = false)
     private boolean isDefault;
 
+    @Deprecated
     private FavoriteFolder(Member member, String name, boolean isDefault) {
         this.member = member;
         this.name = name;
         this.isDefault = isDefault;
     }
 
+    @Deprecated
+    public FavoriteFolder(final Long id, final Member member, final String name, final boolean isDefault) {
+        this.id = id;
+        this.member = member;
+        this.name = name;
+        this.isDefault = isDefault;
+    }
+
+    private FavoriteFolder(Account account, String name, boolean isDefault) {
+        this.account = account;
+        this.name = name;
+        this.isDefault = isDefault;
+    }
+
+    @Deprecated
     public static FavoriteFolder defaultFolderOf(Member member) {
         return new FavoriteFolder(member, "기본 폴더", true);
+    }
+
+    public static FavoriteFolder defaultFolderOf(Account account) {
+        return new FavoriteFolder(account, "기본 폴더", true);
     }
 
     public static FavoriteFolder customFolderOf(Member member, String name) {

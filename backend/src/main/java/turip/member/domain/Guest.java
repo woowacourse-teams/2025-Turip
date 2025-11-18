@@ -32,4 +32,9 @@ public class Guest {
 
     @Column(name = "device_fid", nullable = false, unique = true)
     private String deviceFid;
+
+    public Guest(final Account account, final String deviceFid) {
+        this.account = account;
+        this.deviceFid = deviceFid;
+    }
 }

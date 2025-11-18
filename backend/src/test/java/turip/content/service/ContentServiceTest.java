@@ -29,7 +29,6 @@ import turip.creator.domain.Creator;
 import turip.favorite.domain.FavoriteContent;
 import turip.favorite.repository.FavoriteContentRepository;
 import turip.member.domain.Member;
-import turip.member.repository.MemberRepository;
 import turip.region.domain.City;
 import turip.region.domain.Country;
 import turip.region.domain.DomesticRegionCategory;
@@ -50,9 +49,6 @@ class ContentServiceTest {
 
     @Mock
     private FavoriteContentRepository favoriteContentRepository;
-
-    @Mock
-    private MemberRepository memberRepository;
 
     @DisplayName("키워드 기반 검색 기능 테스트")
     @Nested

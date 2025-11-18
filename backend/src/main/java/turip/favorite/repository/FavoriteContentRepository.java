@@ -13,9 +13,16 @@ import turip.favorite.domain.FavoriteContent;
 
 public interface FavoriteContentRepository extends JpaRepository<FavoriteContent, Long> {
 
+    @Deprecated
     boolean existsByMemberIdAndContentId(Long memberId, Long contentId);
 
+    boolean existsByAccountIdAndContentId(Long accountId, Long contentId);
+
+    @Deprecated
     Optional<FavoriteContent> findByMemberIdAndContentId(Long memberId, Long contentId);
+
+    Optional<FavoriteContent> findByAccountIdAndContentId(Long accountId, Long contentId);
+
 
     @Query(value = """
             SELECT c.*
@@ -34,6 +41,7 @@ public interface FavoriteContentRepository extends JpaRepository<FavoriteContent
 
     List<FavoriteContent> findByMemberIdAndContentIdIn(Long memberId, List<Long> contentIds);
 
+    @Deprecated
     @Query("""
                 SELECT f.content
                 FROM FavoriteContent f
@@ -46,6 +54,22 @@ public interface FavoriteContentRepository extends JpaRepository<FavoriteContent
             """)
     Slice<Content> findMyFavoriteContentsByDeviceFid(
             @Param("deviceFid") String deviceFid,
+            @Param("lastContentId") Long lastContentId,
+            Pageable pageable
+    );
+
+    @Query("""
+                SELECT f.content
+                FROM FavoriteContent f
+                JOIN f.account a
+                JOIN FETCH f.content.creator
+                JOIN FETCH f.content.city
+                WHERE a.id = :accountId
+                  AND f.content.id < :lastContentId
+                ORDER BY f.createdAt DESC
+            """)
+    Slice<Content> findMyFavoriteContentsByAccountId(
+            @Param("accountId") Long accountId,
             @Param("lastContentId") Long lastContentId,
             Pageable pageable
     );
