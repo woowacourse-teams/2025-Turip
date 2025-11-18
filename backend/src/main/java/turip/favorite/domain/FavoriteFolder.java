@@ -18,6 +18,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.IllegalArgumentException;
+import turip.member.domain.Account;
 import turip.member.domain.Member;
 
 @Getter
@@ -38,6 +39,10 @@ public class FavoriteFolder {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false, foreignKey = @ForeignKey(name = "fk_favorite_folder__member"))
     private Member member;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "account_id", nullable = false, foreignKey = @ForeignKey(name = "fk_favorite_folder__account"))
+    private Account account;
 
     @Column(name = "name", nullable = false)
     private String name;

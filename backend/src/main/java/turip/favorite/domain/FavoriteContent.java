@@ -17,6 +17,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import turip.content.domain.Content;
+import turip.member.domain.Account;
 import turip.member.domain.Member;
 
 @Getter
@@ -39,6 +40,10 @@ public class FavoriteContent {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false, foreignKey = @ForeignKey(name = "fk_favorite_content__member"))
     private Member member;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "account_id", nullable = false, foreignKey = @ForeignKey(name = "fk_favorite_content__account"))
+    private Account account;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "content_id", nullable = false, foreignKey = @ForeignKey(name = "fk_favorite_content__content"))

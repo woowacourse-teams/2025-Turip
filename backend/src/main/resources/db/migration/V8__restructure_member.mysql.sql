@@ -55,3 +55,31 @@ SET @sql = CONCAT('ALTER TABLE account AUTO_INCREMENT = ', @next_id);
 PREPARE stmt FROM @sql;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
+
+-- favorite_content 테이블에 account_id 추가
+ALTER TABLE favorite_content
+    ADD COLUMN account_id BIGINT,
+    ADD CONSTRAINT fk_favorite_content__account
+        FOREIGN KEY (account_id) REFERENCES account (id);
+
+-- favorite_content의 account_id에 member_id 값 복사
+UPDATE favorite_content
+SET account_id = member_id;
+
+-- account_id를 NOT NULL로 변경
+ALTER TABLE favorite_content
+    MODIFY COLUMN account_id BIGINT NOT NULL;
+
+-- favorite_folder 테이블에 account_id 추가
+ALTER TABLE favorite_folder
+    ADD COLUMN account_id BIGINT,
+    ADD CONSTRAINT fk_favorite_folder__account
+        FOREIGN KEY (account_id) REFERENCES account (id);
+
+-- favorite_folder의 account_id에 member_id 값 복사
+UPDATE favorite_folder
+SET account_id = member_id;
+
+-- account_id를 NOT NULL로 변경
+ALTER TABLE favorite_folder
+    MODIFY COLUMN account_id BIGINT NOT NULL;
