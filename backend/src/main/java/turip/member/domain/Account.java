@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Table(name = "account")
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 public class Account {
 
     @Id
