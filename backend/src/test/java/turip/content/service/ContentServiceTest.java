@@ -28,7 +28,7 @@ import turip.content.repository.ContentRepository;
 import turip.creator.domain.Creator;
 import turip.favorite.domain.FavoriteContent;
 import turip.favorite.repository.FavoriteContentRepository;
-import turip.member.domain.Member;
+import turip.member.domain.Account;
 import turip.region.domain.City;
 import turip.region.domain.Country;
 import turip.region.domain.DomesticRegionCategory;
@@ -67,7 +67,7 @@ class ContentServiceTest {
             Country country = new Country("대한민국", "대한민국 사진 경로");
             Province province = new Province("강원도");
             City city = new City(country, province, "속초", "시 이미지 경로");
-            Member member = new Member(1L, "deviceFid");
+            Account account = new Account();
 
             Content content1 = new Content(1L, creator, city, "메이의 속초 브이로그 1편", "url1", LocalDate.of(2025, 7, 8));
             Content content2 = new Content(2L, creator, city, "메이의 속초 브이로그 2편", "url2", LocalDate.of(2025, 7, 8));
@@ -90,7 +90,7 @@ class ContentServiceTest {
             given(contentPlaceService.countPlacesByContentIds(contentIds)).willReturn(placeCounts);
 
             // when
-            ContentsDetailWithLoadableResponse contentsByKeyword = contentService.searchContentsByKeyword(member,
+            ContentsDetailWithLoadableResponse contentsByKeyword = contentService.searchContentsByKeyword(account,
                     keyword,
                     pageSize,
                     lastContentId);
@@ -122,7 +122,7 @@ class ContentServiceTest {
             Content content2 = new Content(2L, creator, city, "뭉치의 속초 브이로그 2편", "속초 브이로그 Url 2",
                     LocalDate.of(2025, 7, 8));
 
-            Member member = new Member(1L, "testDeviceFid");
+            Account account = new Account(1L);
 
             List<Content> popularContents = List.of(content1, content2);
 
@@ -130,8 +130,8 @@ class ContentServiceTest {
                     topContentSize))
                     .willReturn(popularContents);
             given(favoriteContentRepository.findByMemberIdAndContentIdIn(1L, List.of(1L, 2L)))
-                    .willReturn(List.of(new FavoriteContent(LocalDate.now().minusWeeks(1), member, content1),
-                            new FavoriteContent(LocalDate.now().minusWeeks(1), member, content2)));
+                    .willReturn(List.of(new FavoriteContent(LocalDate.now().minusWeeks(1), account, content1),
+                            new FavoriteContent(LocalDate.now().minusWeeks(1), account, content2)));
 
             Map<Long, TripDurationResponse> durations = Map.of(
                     1L, TripDurationResponse.of(2, 3),
@@ -140,7 +140,7 @@ class ContentServiceTest {
             given(contentPlaceService.calculateDurations(List.of(1L, 2L))).willReturn(durations);
 
             // when
-            WeeklyPopularFavoriteContentsResponse response = contentService.findWeeklyPopularFavoriteContents(member,
+            WeeklyPopularFavoriteContentsResponse response = contentService.findWeeklyPopularFavoriteContents(account,
                     topContentSize);
 
             // then

@@ -32,7 +32,7 @@ import turip.favorite.controller.dto.response.FavoriteFoldersWithPlaceCountRespo
 import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.repository.FavoriteFolderRepository;
 import turip.favorite.repository.FavoritePlaceRepository;
-import turip.member.domain.Member;
+import turip.member.domain.Account;
 import turip.place.domain.Place;
 import turip.place.repository.PlaceRepository;
 
@@ -60,27 +60,26 @@ class FavoriteFolderServiceTest {
         void createCustomFavoriteFolder1() {
             // given
             String folderName = "괜찮은 소품샵 모음";
-            String deviceFid = "123";
-            Long memberId = 1L;
+            Long accountId = 1L;
             boolean isDefault = false;
             Long folderId = 1L;
 
             FavoriteFolderRequest request = new FavoriteFolderRequest(folderName);
-            Member member = new Member(memberId, deviceFid);
+            Account account = new Account(accountId);
 
-            given(favoriteFolderRepository.existsByNameAndMember(folderName, member))
+            given(favoriteFolderRepository.existsByNameAndAccount(folderName, account))
                     .willReturn(false);
-            given(favoriteFolderRepository.save(FavoriteFolder.customFolderOf(member, folderName)))
-                    .willReturn(new FavoriteFolder(folderId, member, folderName, isDefault));
+            given(favoriteFolderRepository.save(FavoriteFolder.customFolderOf(account, folderName)))
+                    .willReturn(new FavoriteFolder(folderId, account, folderName, isDefault));
 
             // when
-            FavoriteFolderResponse response = favoriteFolderService.createCustomFavoriteFolder(request, member);
+            FavoriteFolderResponse response = favoriteFolderService.createCustomFavoriteFolder(request, account);
 
             // then
             assertAll(
                     () -> assertThat(response.id()).isEqualTo(folderId),
                     () -> assertThat(response.name()).isEqualTo(folderName),
-                    () -> assertThat(response.memberId()).isEqualTo(memberId),
+                    () -> assertThat(response.memberId()).isEqualTo(accountId),
                     () -> assertThat(response.isDefault()).isFalse()
             );
         }
@@ -90,17 +89,16 @@ class FavoriteFolderServiceTest {
         void createCustomFavoriteFolder2() {
             // given
             String folderName = "괜찮은 소품샵 모음";
-            String deviceFid = "123";
-            Long memberId = 1L;
+            Long accountId = 1L;
 
             FavoriteFolderRequest request = new FavoriteFolderRequest(folderName);
-            Member member = new Member(memberId, deviceFid);
+            Account account = new Account(accountId);
 
-            given(favoriteFolderRepository.existsByNameAndMember(folderName, member))
+            given(favoriteFolderRepository.existsByNameAndAccount(folderName, account))
                     .willReturn(true);
 
             // when & then
-            assertThatThrownBy(() -> favoriteFolderService.createCustomFavoriteFolder(request, member))
+            assertThatThrownBy(() -> favoriteFolderService.createCustomFavoriteFolder(request, account))
                     .isInstanceOf(ConflictException.class);
         }
 
@@ -109,11 +107,10 @@ class FavoriteFolderServiceTest {
         @ValueSource(strings = {"", " ", "21글자폴더입니다용21글자폴더입니다용~"})
         void createCustomFavoriteFolder3(String folderName) {
             // given
-            String deviceFid = "123";
-            Long memberId = 1L;
+            Long accountId = 1L;
 
             FavoriteFolderRequest request = new FavoriteFolderRequest(folderName);
-            Member member = new Member(memberId, deviceFid);
+            Account member = new Account(accountId);
 
             // when & then
             assertThatThrownBy(() -> favoriteFolderService.createCustomFavoriteFolder(request, member))
@@ -129,13 +126,11 @@ class FavoriteFolderServiceTest {
         @Test
         void findAllByDeviceFid1() {
             // given
-            String deviceFid = "testDeviceFid";
-            Member member = new Member(deviceFid);
-            Member savedMember = new Member(1L, member.getDeviceFid());
+            Account savedAccount = new Account(1L);
 
-            FavoriteFolder defaultFolder = new FavoriteFolder(1L, savedMember, "기본 폴더", true);
-            FavoriteFolder favoriteFolder = new FavoriteFolder(2L, savedMember, "커스텀 폴더 1", true);
-            given(favoriteFolderRepository.findAllByMemberOrderByIdAsc(savedMember))
+            FavoriteFolder defaultFolder = new FavoriteFolder(1L, savedAccount, "기본 폴더", true);
+            FavoriteFolder favoriteFolder = new FavoriteFolder(2L, savedAccount, "커스텀 폴더 1", true);
+            given(favoriteFolderRepository.findAllByAccountOrderByIdAsc(savedAccount))
                     .willReturn(List.of(defaultFolder, favoriteFolder));
 
             int defaultFolderPlaceCount = 3;
@@ -146,7 +141,7 @@ class FavoriteFolderServiceTest {
                     .willReturn(favoriteFolderPlaceCount);
 
             // when
-            FavoriteFoldersWithPlaceCountResponse response = favoriteFolderService.findAllByMember(savedMember);
+            FavoriteFoldersWithPlaceCountResponse response = favoriteFolderService.findAllByMember(savedAccount);
 
             // then
             assertAll(
@@ -167,13 +162,11 @@ class FavoriteFolderServiceTest {
         @Test
         void findAllWithFavoriteStatusByDeviceId1() {
             // given
-            String deviceFid = "testDeviceFid";
-            Member member = new Member(deviceFid);
-            Member savedMember = new Member(1L, member.getDeviceFid());
+            Account savedAccount = new Account(1L);
 
-            FavoriteFolder defaultFolder = new FavoriteFolder(1L, savedMember, "기본 폴더", true);
-            FavoriteFolder favoriteFolder = new FavoriteFolder(2L, savedMember, "커스텀 폴더 1", false);
-            given(favoriteFolderRepository.findAllByMemberOrderByIdAsc(savedMember))
+            FavoriteFolder defaultFolder = new FavoriteFolder(1L, savedAccount, "기본 폴더", true);
+            FavoriteFolder favoriteFolder = new FavoriteFolder(2L, savedAccount, "커스텀 폴더 1", false);
+            given(favoriteFolderRepository.findAllByAccountOrderByIdAsc(savedAccount))
                     .willReturn(List.of(defaultFolder, favoriteFolder));
 
             Long placeId = 1L;
@@ -185,8 +178,8 @@ class FavoriteFolderServiceTest {
                     .willReturn(Set.of(1L));
 
             // when
-            FavoriteFoldersWithFavoriteStatusResponse response = favoriteFolderService.findAllWithFavoriteStatusByDeviceId(
-                    savedMember, placeId);
+            FavoriteFoldersWithFavoriteStatusResponse response = favoriteFolderService.findAllWithFavoriteStatusByAccountId(
+                    savedAccount, placeId);
 
             // then
             assertAll(
@@ -199,16 +192,14 @@ class FavoriteFolderServiceTest {
         @Test
         void findAllWithFavoriteStatusByDeviceId2() {
             // given
-            String deviceFid = "testDeviceFid";
-            Member member = new Member(deviceFid);
-            Member savedMember = new Member(1L, member.getDeviceFid());
+            Account savedAccount = new Account(1L);
 
             Long placeId = 1L;
             given(placeRepository.findById(placeId))
                     .willReturn(Optional.empty());
 
             // when
-            assertThatThrownBy(() -> favoriteFolderService.findAllWithFavoriteStatusByDeviceId(savedMember, placeId))
+            assertThatThrownBy(() -> favoriteFolderService.findAllWithFavoriteStatusByAccountId(savedAccount, placeId))
                     .isInstanceOf(NotFoundException.class)
                     .hasMessage(ErrorTag.PLACE_NOT_FOUND.getMessage());
         }
@@ -222,28 +213,27 @@ class FavoriteFolderServiceTest {
         @Test
         void updateName1() {
             // given
-            String deviceFid = "testDeviceFid";
-            Long memberId = 1L;
+            Long accountId = 1L;
             Long folderId = 1L;
             String oldName = "기존 폴더 이름";
             String newName = "변경된 폴더 이름";
             boolean isDefault = false;
 
-            Member member = new Member(memberId, deviceFid);
-            FavoriteFolder favoriteFolder = new FavoriteFolder(folderId, member, oldName, isDefault);
+            Account account = new Account(accountId);
+            FavoriteFolder favoriteFolder = new FavoriteFolder(folderId, account, oldName, isDefault);
             FavoriteFolderNameRequest request = new FavoriteFolderNameRequest(newName);
 
             given(favoriteFolderRepository.findById(folderId))
                     .willReturn(Optional.of(favoriteFolder));
 
             // when
-            FavoriteFolderResponse response = favoriteFolderService.updateName(member, folderId, request);
+            FavoriteFolderResponse response = favoriteFolderService.updateName(account, folderId, request);
 
             // then
             assertAll(
                     () -> assertThat(response.id()).isEqualTo(folderId),
                     () -> assertThat(response.name()).isEqualTo(newName),
-                    () -> assertThat(response.memberId()).isEqualTo(memberId),
+                    () -> assertThat(response.memberId()).isEqualTo(accountId),
                     () -> assertThat(response.isDefault()).isFalse()
             );
         }
@@ -252,12 +242,11 @@ class FavoriteFolderServiceTest {
         @Test
         void updateName3() {
             // given
-            String deviceFid = "testDeviceFid";
-            Long memberId = 1L;
+            Long accountId = 1L;
             Long nonExistentFolderId = 999L;
             String newName = "변경된 폴더 이름";
 
-            Member member = new Member(memberId, deviceFid);
+            Account member = new Account(accountId);
             FavoriteFolderNameRequest request = new FavoriteFolderNameRequest(newName);
 
             given(favoriteFolderRepository.findById(nonExistentFolderId))
@@ -273,8 +262,6 @@ class FavoriteFolderServiceTest {
         @Test
         void updateName4() {
             // given
-            String requestDeviceFid = "requestDeviceFid";
-            String ownerDeviceFid = "ownerDeviceFid";
             Long requestMemberId = 1L;
             Long ownerMemberId = 2L;
             Long folderId = 1L;
@@ -282,16 +269,16 @@ class FavoriteFolderServiceTest {
             String newName = "변경된 폴더 이름";
             boolean isDefault = false;
 
-            Member requestMember = new Member(requestMemberId, requestDeviceFid);
-            Member ownerMember = new Member(ownerMemberId, ownerDeviceFid);
-            FavoriteFolder favoriteFolder = new FavoriteFolder(folderId, ownerMember, oldName, isDefault);
+            Account requestAccount = new Account(requestMemberId);
+            Account ownerAccount = new Account(ownerMemberId);
+            FavoriteFolder favoriteFolder = new FavoriteFolder(folderId, ownerAccount, oldName, isDefault);
             FavoriteFolderNameRequest request = new FavoriteFolderNameRequest(newName);
 
             given(favoriteFolderRepository.findById(folderId))
                     .willReturn(Optional.of(favoriteFolder));
 
             // when & then
-            assertThatThrownBy(() -> favoriteFolderService.updateName(requestMember, folderId, request))
+            assertThatThrownBy(() -> favoriteFolderService.updateName(requestAccount, folderId, request))
                     .isInstanceOf(ForbiddenException.class);
         }
 
@@ -299,24 +286,23 @@ class FavoriteFolderServiceTest {
         @Test
         void updateName5() {
             // given
-            String deviceFid = "testDeviceFid";
-            Long memberId = 1L;
+            Long accountId = 1L;
             Long folderId = 1L;
             String oldName = "기존 폴더 이름";
             String newName = "중복된 폴더 이름";
             boolean isDefault = false;
 
-            Member member = new Member(memberId, deviceFid);
-            FavoriteFolder favoriteFolder = new FavoriteFolder(folderId, member, oldName, isDefault);
+            Account account = new Account(accountId);
+            FavoriteFolder favoriteFolder = new FavoriteFolder(folderId, account, oldName, isDefault);
             FavoriteFolderNameRequest request = new FavoriteFolderNameRequest(newName);
 
             given(favoriteFolderRepository.findById(folderId))
                     .willReturn(Optional.of(favoriteFolder));
-            given(favoriteFolderRepository.existsByNameAndMember(newName, member))
+            given(favoriteFolderRepository.existsByNameAndAccount(newName, account))
                     .willReturn(true);
 
             // when & then
-            assertThatThrownBy(() -> favoriteFolderService.updateName(member, folderId, request))
+            assertThatThrownBy(() -> favoriteFolderService.updateName(account, folderId, request))
                     .isInstanceOf(ConflictException.class);
         }
 
@@ -325,13 +311,12 @@ class FavoriteFolderServiceTest {
         @ValueSource(strings = {"", " ", "21글자폴더입니다용21글자폴더입니다용~"})
         void updateName6(String newName) {
             // given
-            String deviceFid = "testDeviceFid";
-            Long memberId = 1L;
+            Long accountId = 1L;
             Long folderId = 1L;
             String oldName = "기존 폴더 이름";
             boolean isDefault = false;
 
-            Member member = new Member(memberId, deviceFid);
+            Account member = new Account(accountId);
             FavoriteFolder favoriteFolder = new FavoriteFolder(folderId, member, oldName, isDefault);
             FavoriteFolderNameRequest request = new FavoriteFolderNameRequest(newName);
 
@@ -347,14 +332,13 @@ class FavoriteFolderServiceTest {
         @Test
         void updateName7() {
             // given
-            String deviceFid = "testDeviceFid";
-            Long memberId = 1L;
+            Long accountId = 1L;
             Long folderId = 1L;
             String oldName = "기본 폴더";
             String newName = "새로운 폴더 이름";
             boolean isDefault = true;
 
-            Member member = new Member(memberId, deviceFid);
+            Account member = new Account(accountId);
             FavoriteFolder favoriteFolder = new FavoriteFolder(folderId, member, oldName, isDefault);
             FavoriteFolderNameRequest request = new FavoriteFolderNameRequest(newName);
 
@@ -376,13 +360,12 @@ class FavoriteFolderServiceTest {
         @Test
         void remove1() {
             // given
-            String deviceFid = "testDeviceFid";
-            Long memberId = 1L;
+            Long accountId = 1L;
             Long folderId = 1L;
             String folderName = "삭제할 폴더";
             boolean isDefault = false;
 
-            Member member = new Member(memberId, deviceFid);
+            Account member = new Account(accountId);
             FavoriteFolder favoriteFolder = new FavoriteFolder(folderId, member, folderName, isDefault);
 
             given(favoriteFolderRepository.findById(folderId))
@@ -399,11 +382,10 @@ class FavoriteFolderServiceTest {
         @Test
         void remove3() {
             // given
-            String deviceFid = "testDeviceFid";
-            Long memberId = 1L;
+            Long accountId = 1L;
             Long nonExistentFolderId = 999L;
 
-            Member member = new Member(memberId, deviceFid);
+            Account member = new Account(accountId);
 
             given(favoriteFolderRepository.findById(nonExistentFolderId))
                     .willReturn(Optional.empty());
@@ -418,23 +400,21 @@ class FavoriteFolderServiceTest {
         @Test
         void remove4() {
             // given
-            String requestDeviceFid = "requestDeviceFid";
-            String ownerDeviceFid = "ownerDeviceFid";
-            Long requestMemberId = 1L;
+            Long requestAccountId = 1L;
             Long ownerMemberId = 2L;
             Long folderId = 1L;
             String folderName = "다른 사람의 폴더";
             boolean isDefault = false;
 
-            Member requestMember = new Member(requestMemberId, requestDeviceFid);
-            Member ownerMember = new Member(ownerMemberId, ownerDeviceFid);
-            FavoriteFolder favoriteFolder = new FavoriteFolder(folderId, ownerMember, folderName, isDefault);
+            Account requestAccount = new Account(requestAccountId);
+            Account ownerAccount = new Account(ownerMemberId);
+            FavoriteFolder favoriteFolder = new FavoriteFolder(folderId, ownerAccount, folderName, isDefault);
 
             given(favoriteFolderRepository.findById(folderId))
                     .willReturn(Optional.of(favoriteFolder));
 
             // when & then
-            assertThatThrownBy(() -> favoriteFolderService.remove(requestMember, folderId))
+            assertThatThrownBy(() -> favoriteFolderService.remove(requestAccount, folderId))
                     .isInstanceOf(ForbiddenException.class);
         }
 
@@ -442,13 +422,12 @@ class FavoriteFolderServiceTest {
         @Test
         void remove5() {
             // given
-            String deviceFid = "testDeviceFid";
-            Long memberId = 1L;
+            Long accountId = 1L;
             Long folderId = 1L;
             String folderName = "기본 폴더";
             boolean isDefault = true;
 
-            Member member = new Member(memberId, deviceFid);
+            Account member = new Account(accountId);
             FavoriteFolder favoriteFolder = new FavoriteFolder(folderId, member, folderName, isDefault);
 
             given(favoriteFolderRepository.findById(folderId))

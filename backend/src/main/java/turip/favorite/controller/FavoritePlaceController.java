@@ -20,13 +20,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import turip.auth.AuthMember;
-import turip.auth.MemberResolvePolicy;
 import turip.common.exception.ErrorResponse;
 import turip.favorite.controller.dto.request.FavoritePlaceOrderRequest;
 import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlaceResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlacesWithPlaceDetailResponse;
 import turip.favorite.service.FavoritePlaceService;
-import turip.member.domain.Member;
+import turip.member.domain.Account;
 
 @RestController
 @RequiredArgsConstructor
@@ -129,11 +128,11 @@ public class FavoritePlaceController {
     })
     @PostMapping
     public ResponseEntity<FavoritePlaceResponse> create(
-            @Parameter(hidden = true) @AuthMember(policy = MemberResolvePolicy.CREATE_IF_ABSENT) Member member,
+            @Parameter(hidden = true) @AuthMember Account account,
             @RequestParam("favoriteFolderId") Long favoriteFolderId,
             @RequestParam("placeId") Long placeId
     ) {
-        FavoritePlaceResponse response = favoritePlaceService.create(member, favoriteFolderId, placeId);
+        FavoritePlaceResponse response = favoritePlaceService.create(account, favoriteFolderId, placeId);
         return ResponseEntity.created(URI.create("/favorites/places/" + response.id()))
                 .body(response);
     }
@@ -299,11 +298,11 @@ public class FavoritePlaceController {
     })
     @PatchMapping("/favorite-order")
     public ResponseEntity<Void> updatePlaceOrder(
-            @Parameter(hidden = true) @AuthMember(policy = MemberResolvePolicy.REQUIRED) Member member,
+            @Parameter(hidden = true) @AuthMember Account account,
             @RequestParam("favoriteFolderId") Long favoriteFolderId,
             @RequestBody FavoritePlaceOrderRequest request
     ) {
-        favoritePlaceService.updatePlaceOrder(member, favoriteFolderId, request);
+        favoritePlaceService.updatePlaceOrder(account, favoriteFolderId, request);
         return ResponseEntity.noContent().build();
     }
 
@@ -384,11 +383,11 @@ public class FavoritePlaceController {
     })
     @DeleteMapping
     public ResponseEntity<Void> delete(
-            @Parameter(hidden = true) @AuthMember(policy = MemberResolvePolicy.REQUIRED) Member member,
+            @Parameter(hidden = true) @AuthMember Account account,
             @RequestParam("favoriteFolderId") Long favoriteFolderId,
             @RequestParam("placeId") Long placeId
     ) {
-        favoritePlaceService.remove(member, favoriteFolderId, placeId);
+        favoritePlaceService.remove(account, favoriteFolderId, placeId);
         return ResponseEntity.noContent().build();
     }
 }

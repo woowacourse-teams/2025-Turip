@@ -9,13 +9,14 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.IllegalArgumentException;
-import turip.member.service.MemberService;
+import turip.member.domain.Account;
+import turip.member.service.GuestService;
 
 @Component
 @RequiredArgsConstructor
-public class AuthMemberArgumentResolver implements HandlerMethodArgumentResolver {
+public class AuthAccountArgumentResolver implements HandlerMethodArgumentResolver {
 
-    private final MemberService memberService;
+    private final GuestService guestService;
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
@@ -29,17 +30,24 @@ public class AuthMemberArgumentResolver implements HandlerMethodArgumentResolver
             NativeWebRequest webRequest,
             WebDataBinderFactory binderFactory
     ) {
+        String accessToken = webRequest.getHeader("Authorization");
         String deviceFid = webRequest.getHeader("device-fid");
+
+        if (accessToken != null) {
+            return getMemberAccount(accessToken);
+        }
+        return getGuestAccount(deviceFid);
+    }
+
+    private Account getMemberAccount(String accessToken) {
+        // 추후 구현 예정
+        return null;
+    }
+
+    private Account getGuestAccount(String deviceFid) {
         if (deviceFid == null || deviceFid.isBlank()) {
             throw new IllegalArgumentException(ErrorTag.MEMBER_NOT_FOUND);
         }
-
-        AuthMember ann = parameter.getParameterAnnotation(AuthMember.class);
-        MemberResolvePolicy policy = ann.policy();
-
-        if (policy == MemberResolvePolicy.REQUIRED) {
-            return memberService.getMemberByDeviceId(deviceFid);
-        }
-        return memberService.findOrCreateMember(deviceFid);
+        return guestService.findOrCreateByDeviceFid(deviceFid).getAccount();
     }
 }

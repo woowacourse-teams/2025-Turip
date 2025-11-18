@@ -19,13 +19,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import turip.auth.AuthMember;
-import turip.auth.MemberResolvePolicy;
 import turip.common.exception.ErrorResponse;
 import turip.content.controller.dto.response.content.ContentsDetailWithLoadableResponse;
 import turip.favorite.controller.dto.request.FavoriteContentRequest;
 import turip.favorite.controller.dto.response.FavoriteContentResponse;
 import turip.favorite.service.FavoriteContentService;
-import turip.member.domain.Member;
+import turip.member.domain.Account;
 
 @RestController
 @RequiredArgsConstructor
@@ -115,9 +114,9 @@ public class FavoriteContentController {
     })
     @PostMapping
     public ResponseEntity<FavoriteContentResponse> create(
-            @Parameter(hidden = true) @AuthMember(policy = MemberResolvePolicy.CREATE_IF_ABSENT) Member member,
+            @Parameter(hidden = true) @AuthMember Account account,
             @RequestBody FavoriteContentRequest request) {
-        FavoriteContentResponse response = favoriteContentService.create(request, member);
+        FavoriteContentResponse response = favoriteContentService.create(request, account);
         return ResponseEntity.created(URI.create("/favorites/contents/" + response.id()))
                 .body(response);
     }
@@ -189,11 +188,11 @@ public class FavoriteContentController {
     })
     @GetMapping
     public ResponseEntity<ContentsDetailWithLoadableResponse> readMyFavoriteContents(
-            @Parameter(hidden = true) @AuthMember(policy = MemberResolvePolicy.CREATE_IF_ABSENT) Member member,
+            @Parameter(hidden = true) @AuthMember Account account,
             @RequestParam(name = "size") Integer pageSize,
             @RequestParam(name = "lastId") Long lastContentId
     ) {
-        ContentsDetailWithLoadableResponse response = favoriteContentService.findMyFavoriteContents(member, pageSize,
+        ContentsDetailWithLoadableResponse response = favoriteContentService.findMyFavoriteContents(account, pageSize,
                 lastContentId);
         return ResponseEntity.ok(response);
     }
@@ -247,9 +246,9 @@ public class FavoriteContentController {
     })
     @DeleteMapping
     public ResponseEntity<Void> delete(
-            @Parameter(hidden = true) @AuthMember(policy = MemberResolvePolicy.REQUIRED) Member member,
+            @Parameter(hidden = true) @AuthMember Account account,
             @RequestParam(name = "contentId") Long contentId) {
-        favoriteContentService.remove(member, contentId);
+        favoriteContentService.remove(account, contentId);
         return ResponseEntity.noContent().build();
     }
 }

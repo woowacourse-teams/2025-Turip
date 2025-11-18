@@ -9,5 +9,4 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface AuthMember {
 
-    MemberResolvePolicy policy() default MemberResolvePolicy.REQUIRED;
 }

@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.domain.FavoritePlace;
-import turip.member.domain.Member;
+import turip.member.domain.Account;
 import turip.place.domain.Place;
 
 public interface FavoritePlaceRepository extends JpaRepository<FavoritePlace, Long> {
@@ -26,9 +26,9 @@ public interface FavoritePlaceRepository extends JpaRepository<FavoritePlace, Lo
     @Query("select max(fp.favoriteOrder) from FavoritePlace fp where fp.favoriteFolder = :favoriteFolder")
     Optional<Integer> findMaxFavoriteOrderByFavoriteFolder(@Param("favoriteFolder") FavoriteFolder favoriteFolder);
 
-    @Query("SELECT fp.place.id FROM FavoritePlace fp WHERE fp.favoriteFolder.member= :member AND fp.place IN :places")
-    Set<Long> findFavoritedPlaceIdsByFavoriteFolderMemberAndPlaceIn(@Param("member") Member member,
-                                                                    @Param("places") List<Place> places);
+    @Query("SELECT fp.place.id FROM FavoritePlace fp WHERE fp.favoriteFolder.account= :account AND fp.place IN :places")
+    Set<Long> findFavoritedPlaceIdsByFavoriteFolderAccountAndPlaceIn(@Param("account") Account account,
+                                                                     @Param("places") List<Place> places);
 
     @Query("SELECT fp.favoriteFolder.id FROM FavoritePlace fp WHERE fp.place = :place AND fp.favoriteFolder IN :favoriteFolders")
     Set<Long> findFavoriteFolderIdsByPlaceAndFavoriteFolderIn(@Param("place") Place place,

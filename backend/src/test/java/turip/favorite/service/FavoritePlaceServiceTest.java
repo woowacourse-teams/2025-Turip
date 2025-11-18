@@ -25,7 +25,7 @@ import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.domain.FavoritePlace;
 import turip.favorite.repository.FavoriteFolderRepository;
 import turip.favorite.repository.FavoritePlaceRepository;
-import turip.member.domain.Member;
+import turip.member.domain.Account;
 import turip.place.domain.Place;
 import turip.place.repository.PlaceRepository;
 
@@ -52,12 +52,11 @@ class FavoritePlaceServiceTest {
         @Test
         void create1() {
             // given
-            String deviceFid = "testDeviceFid";
             Long favoriteFolderId = 1L;
             Long placeId = 1L;
 
-            Member member = new Member(1L, deviceFid);
-            FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, member, "폴더 이름 1", true);
+            Account account = new Account(1L);
+            FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, account, "폴더 이름 1", true);
             Place place = new Place(placeId, "장소 이름", "장소 url", "주소", 1, 1);
             FavoritePlace favoritePlace = new FavoritePlace(favoriteFolder, place, 1);
 
@@ -71,7 +70,7 @@ class FavoritePlaceServiceTest {
                     .willReturn(new FavoritePlace(1L, favoriteFolder, place, 1));
 
             // when
-            FavoritePlaceResponse response = favoritePlaceService.create(member, favoriteFolderId, placeId);
+            FavoritePlaceResponse response = favoritePlaceService.create(account, favoriteFolderId, placeId);
 
             // then
             assertAll(
@@ -85,13 +84,11 @@ class FavoritePlaceServiceTest {
         @Test
         void create2() {
             // given
-            String requestDeviceFid = "requestDeviceFid";
-            String ownerDeviceFid = "ownerDeviceFid";
             Long favoriteFolderId = 1L;
             Long placeId = 1L;
 
-            Member owner = new Member(1L, ownerDeviceFid);
-            Member requestMember = new Member(2L, requestDeviceFid);
+            Account owner = new Account(1L);
+            Account requestAccount = new Account(2L);
             FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, owner, "폴더 이름 1", true);
             Place place = new Place(placeId, "장소 이름", "장소 url", "주소", 1, 1);
 
@@ -101,7 +98,7 @@ class FavoritePlaceServiceTest {
                     .willReturn(Optional.of(place));
 
             // when & then
-            assertThatThrownBy(() -> favoritePlaceService.create(requestMember, favoriteFolderId, placeId))
+            assertThatThrownBy(() -> favoritePlaceService.create(requestAccount, favoriteFolderId, placeId))
                     .isInstanceOf(ForbiddenException.class);
         }
 
@@ -109,17 +106,15 @@ class FavoritePlaceServiceTest {
         @Test
         void create3() {
             // given
-            String deviceFid = "testDeviceFid";
             Long favoriteFolderId = 1L;
             Long placeId = 1L;
-
-            Member member = new Member(1L, deviceFid);
+            Account account = new Account(1L);
 
             given(favoriteFolderRepository.findById(favoriteFolderId))
                     .willReturn(Optional.empty());
 
             // when & then
-            assertThatThrownBy(() -> favoritePlaceService.create(member, favoriteFolderId, placeId))
+            assertThatThrownBy(() -> favoritePlaceService.create(account, favoriteFolderId, placeId))
                     .isInstanceOf(NotFoundException.class)
                     .hasMessage(ErrorTag.FAVORITE_FOLDER_NOT_FOUND.getMessage());
         }
@@ -128,12 +123,10 @@ class FavoritePlaceServiceTest {
         @Test
         void create4() {
             // given
-            String deviceFid = "testDeviceFid";
             Long favoriteFolderId = 1L;
             Long placeId = 1L;
-
-            Member member = new Member(1L, deviceFid);
-            FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, member, "폴더 이름 1", true);
+            Account account = new Account(1L);
+            FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, account, "폴더 이름 1", true);
 
             given(favoriteFolderRepository.findById(favoriteFolderId))
                     .willReturn(Optional.of(favoriteFolder));
@@ -141,7 +134,7 @@ class FavoritePlaceServiceTest {
                     .willReturn(Optional.empty());
 
             // when & then
-            assertThatThrownBy(() -> favoritePlaceService.create(member, favoriteFolderId, placeId))
+            assertThatThrownBy(() -> favoritePlaceService.create(account, favoriteFolderId, placeId))
                     .isInstanceOf(NotFoundException.class)
                     .hasMessage(ErrorTag.PLACE_NOT_FOUND.getMessage());
         }
@@ -150,12 +143,10 @@ class FavoritePlaceServiceTest {
         @Test
         void create5() {
             // given
-            String deviceFid = "testDeviceFid";
             Long favoriteFolderId = 1L;
             Long placeId = 1L;
-
-            Member member = new Member(1L, deviceFid);
-            FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, member, "폴더 이름 1", true);
+            Account account = new Account(1L);
+            FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, account, "폴더 이름 1", true);
             Place place = new Place(placeId, "장소 이름", "장소 url", "주소", 1, 1);
 
             given(favoriteFolderRepository.findById(favoriteFolderId))
@@ -166,7 +157,7 @@ class FavoritePlaceServiceTest {
                     .willReturn(true);
 
             // when & then
-            assertThatThrownBy(() -> favoritePlaceService.create(member, favoriteFolderId, placeId))
+            assertThatThrownBy(() -> favoritePlaceService.create(account, favoriteFolderId, placeId))
                     .isInstanceOf(ConflictException.class);
         }
     }
@@ -180,8 +171,8 @@ class FavoritePlaceServiceTest {
         void findAllByFolder1() {
             // given
             Long favoriteFolderId = 1L;
-            Member member = new Member(1L, "testDeviceFid");
-            FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, member, "테스트 폴더", false);
+            Account account = new Account(1L);
+            FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, account, "테스트 폴더", false);
             Place place1 = new Place(1L, "장소1", "url1", "주소1", 1, 1);
             Place place2 = new Place(2L, "장소2", "url2", "주소2", 2, 2);
             FavoritePlace favoritePlace1 = new FavoritePlace(1L, favoriteFolder, place1, 1);
@@ -227,12 +218,11 @@ class FavoritePlaceServiceTest {
         @Test
         void remove1() {
             // given
-            String deviceFid = "testDeviceFid";
             Long favoriteFolderId = 1L;
             Long placeId = 1L;
 
-            Member member = new Member(1L, deviceFid);
-            FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, member, "폴더 이름 1", true);
+            Account account = new Account(1L);
+            FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, account, "폴더 이름 1", true);
             Place place = new Place(placeId, "장소 이름", "장소 url", "주소", 1, 1);
             FavoritePlace favoritePlace = new FavoritePlace(favoriteFolder, place, 1);
 
@@ -244,20 +234,18 @@ class FavoritePlaceServiceTest {
                     .willReturn(Optional.of(favoritePlace));
 
             // when & then
-            assertDoesNotThrow(() -> favoritePlaceService.remove(member, favoriteFolderId, placeId));
+            assertDoesNotThrow(() -> favoritePlaceService.remove(account, favoriteFolderId, placeId));
         }
 
         @DisplayName("폴더 소유자의 기기id와 요청자의 기기id가 같지 않은 경우 ForbiddenException을 발생시킨다")
         @Test
         void remove2() {
             // given
-            String requestDeviceFid = "requestDeviceFid";
-            String ownerDeviceFid = "ownerDeviceFid";
             Long favoriteFolderId = 1L;
             Long placeId = 1L;
 
-            Member owner = new Member(1L, ownerDeviceFid);
-            Member requestMember = new Member(2L, requestDeviceFid);
+            Account owner = new Account(1L);
+            Account requestAccount = new Account(2L);
             FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, owner, "폴더 이름 1", true);
             Place place = new Place(placeId, "장소 이름", "장소 url", "주소", 1, 1);
 
@@ -267,7 +255,7 @@ class FavoritePlaceServiceTest {
                     .willReturn(Optional.of(place));
 
             // when & then
-            assertThatThrownBy(() -> favoritePlaceService.remove(requestMember, favoriteFolderId, placeId))
+            assertThatThrownBy(() -> favoritePlaceService.remove(requestAccount, favoriteFolderId, placeId))
                     .isInstanceOf(ForbiddenException.class);
         }
 
@@ -275,17 +263,15 @@ class FavoritePlaceServiceTest {
         @Test
         void remove3() {
             // given
-            String deviceFid = "testDeviceFid";
             Long favoriteFolderId = 1L;
             Long placeId = 1L;
-
-            Member member = new Member(1L, deviceFid);
+            Account account = new Account(1L);
 
             given(favoriteFolderRepository.findById(favoriteFolderId))
                     .willReturn(Optional.empty());
 
             // when & then
-            assertThatThrownBy(() -> favoritePlaceService.remove(member, favoriteFolderId, placeId))
+            assertThatThrownBy(() -> favoritePlaceService.remove(account, favoriteFolderId, placeId))
                     .isInstanceOf(NotFoundException.class)
                     .hasMessage(ErrorTag.FAVORITE_FOLDER_NOT_FOUND.getMessage());
         }
@@ -294,12 +280,10 @@ class FavoritePlaceServiceTest {
         @Test
         void remove4() {
             // given
-            String deviceFid = "testDeviceFid";
             Long favoriteFolderId = 1L;
             Long placeId = 1L;
-
-            Member member = new Member(1L, deviceFid);
-            FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, member, "폴더 이름 1", true);
+            Account account = new Account(1L);
+            FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, account, "폴더 이름 1", true);
 
             given(favoriteFolderRepository.findById(favoriteFolderId))
                     .willReturn(Optional.of(favoriteFolder));
@@ -307,7 +291,7 @@ class FavoritePlaceServiceTest {
                     .willReturn(Optional.empty());
 
             // when & then
-            assertThatThrownBy(() -> favoritePlaceService.remove(member, favoriteFolderId, placeId))
+            assertThatThrownBy(() -> favoritePlaceService.remove(account, favoriteFolderId, placeId))
                     .isInstanceOf(NotFoundException.class)
                     .hasMessage(ErrorTag.PLACE_NOT_FOUND.getMessage());
         }
@@ -316,12 +300,10 @@ class FavoritePlaceServiceTest {
         @Test
         void remove5() {
             // given
-            String deviceFid = "testDeviceFid";
             Long favoriteFolderId = 1L;
             Long placeId = 1L;
-
-            Member member = new Member(1L, deviceFid);
-            FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, member, "폴더 이름 1", true);
+            Account account = new Account(1L);
+            FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, account, "폴더 이름 1", true);
             Place place = new Place(placeId, "장소 이름", "장소 url", "주소", 1, 1);
 
             given(favoriteFolderRepository.findById(favoriteFolderId))
@@ -332,7 +314,7 @@ class FavoritePlaceServiceTest {
                     .willReturn(Optional.empty());
 
             // when & then
-            assertThatThrownBy(() -> favoritePlaceService.remove(member, favoriteFolderId, placeId))
+            assertThatThrownBy(() -> favoritePlaceService.remove(account, favoriteFolderId, placeId))
                     .isInstanceOf(NotFoundException.class)
                     .hasMessage(ErrorTag.FAVORITE_PLACE_NOT_FOUND.getMessage());
         }

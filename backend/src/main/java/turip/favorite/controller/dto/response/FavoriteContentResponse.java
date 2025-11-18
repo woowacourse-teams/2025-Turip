@@ -15,7 +15,7 @@ public record FavoriteContentResponse(
         return new FavoriteContentResponse(
                 favoriteContent.getId(),
                 favoriteContent.getCreatedAt(),
-                favoriteContent.getMember().getId(),
+                favoriteContent.getAccount().getId(),
                 ContentResponse.of(favoriteContent.getContent(), true)
         );
     }
