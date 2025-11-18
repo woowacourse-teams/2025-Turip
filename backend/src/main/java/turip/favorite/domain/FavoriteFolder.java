@@ -37,7 +37,7 @@ public class FavoriteFolder {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false, foreignKey = @ForeignKey(name = "fk_favorite_folder__member"))
+    @JoinColumn(name = "member_id", nullable = true, foreignKey = @ForeignKey(name = "fk_favorite_folder__member"))
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -38,7 +38,7 @@ public class FavoriteContent {
     private LocalDate createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false, foreignKey = @ForeignKey(name = "fk_favorite_content__member"))
+    @JoinColumn(name = "member_id", nullable = true, foreignKey = @ForeignKey(name = "fk_favorite_content__member"))
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
