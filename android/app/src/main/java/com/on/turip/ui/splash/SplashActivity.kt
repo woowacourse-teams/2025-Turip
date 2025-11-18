@@ -13,7 +13,7 @@ import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.UpdateAvailability
 import com.on.turip.databinding.ActivitySplashBinding
 import com.on.turip.ui.common.base.BaseActivity
-import com.on.turip.ui.main.MainActivity
+import com.on.turip.ui.login.LoginActivity
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -71,7 +71,7 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
                                 AppUpdateOptions.newBuilder(UPDATE_TYPE).build(),
                             )
                         } else {
-                            navigateToMain()
+                            navigateToLogin()
                         }
                     }
 
@@ -86,17 +86,17 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
                     }
 
                     else -> {
-                        navigateToMain()
+                        navigateToLogin()
                     }
                 }
             }.addOnFailureListener {
-                navigateToMain()
+                navigateToLogin()
             }
     }
 
-    private fun navigateToMain() {
+    private fun navigateToLogin() {
         lifecycleScope.launch {
-            startActivity(MainActivity.newIntent(this@SplashActivity))
+            startActivity(LoginActivity.newIntent(this@SplashActivity))
             finish()
         }
     }
