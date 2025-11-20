@@ -26,7 +26,7 @@ public class JwtProvider {
         this.refreshTokenExpireMs = refreshTokenExpireMs;
     }
 
-    public String generateAccessToken(String accountId) {
+    public String generateAccessToken(Long accountId) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + accessTokenExpiredMs);
 
@@ -41,7 +41,7 @@ public class JwtProvider {
                 .compact();
     }
 
-    public String generateRefreshToken(String accountId) {
+    public String generateRefreshToken(Long accountId) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + refreshTokenExpireMs);
 

@@ -45,4 +45,11 @@ public class Member {
 
     @Column(name = "email")
     private String email;
+
+    public Member(Account account, Provider provider, String providerId, String email) {
+        this.account = account;
+        this.provider = provider;
+        this.providerId = providerId;
+        this.email = email;
+    }
 }
