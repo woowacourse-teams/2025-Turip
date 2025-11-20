@@ -24,7 +24,7 @@ public class RefreshTokenService {
             LocalDateTime issuedAt,
             LocalDateTime expiration
     ) {
-        refreshTokenRepository.deleteByMemberIdAndDeviceFid(member.getId(), deviceFid);
+        refreshTokenRepository.deleteByMemberAndDeviceFid(member, deviceFid);
         refreshTokenRepository.flush();
         refreshTokenRepository.save(new RefreshToken(member, deviceFid, hashedRefreshToken, issuedAt, expiration));
     }
@@ -32,5 +32,9 @@ public class RefreshTokenService {
     public RefreshToken getByMemberAndDeviceFid(Member member, String deviceFid) {
         return refreshTokenRepository.findByMemberAndDeviceFid(member, deviceFid)
                 .orElseThrow(() -> new UnauthorizedException(ErrorTag.REFRESH_TOKEN_NOT_FOUND));
+    }
+
+    public void deleteByMemberAndDeviceFid(Member member, String deviceFid) {
+        refreshTokenRepository.deleteByMemberAndDeviceFid(member, deviceFid);
     }
 }

@@ -67,6 +67,12 @@ public class AuthService {
         }
     }
 
+    @Transactional
+    public void logout(Account account, String deviceFid) {
+        Member member = getMemberByAccountId(account.getId());
+        refreshTokenService.deleteByMemberAndDeviceFid(member, deviceFid);
+    }
+
     private LoginResponse loginWithGoogle(LoginRequest request, String deviceFid) {
         String idToken = request.idToken();
         Provider provider = googleTokenParser.getProvider();
