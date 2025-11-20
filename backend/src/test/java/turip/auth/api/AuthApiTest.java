@@ -19,7 +19,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import turip.auth.GoogleTokenParser;
+import turip.auth.token.GoogleTokenParser;
 import turip.member.domain.Provider;
 
 @ActiveProfiles("test")

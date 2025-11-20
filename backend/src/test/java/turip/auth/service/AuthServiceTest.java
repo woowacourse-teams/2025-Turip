@@ -23,22 +23,21 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import turip.auth.GoogleTokenParser;
-import turip.auth.JwtProvider;
 import turip.auth.controller.dto.request.LoginRequest;
 import turip.auth.controller.dto.request.RefreshTokenRequest;
 import turip.auth.controller.dto.response.LoginResponse;
 import turip.auth.controller.dto.response.RefreshTokenResponse;
+import turip.auth.domain.RefreshToken;
+import turip.auth.repository.RefreshTokenRepository;
+import turip.auth.token.GoogleTokenParser;
+import turip.auth.token.JwtProvider;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.UnauthorizedException;
 import turip.member.domain.Account;
 import turip.member.domain.Member;
 import turip.member.domain.Provider;
-import turip.member.domain.RefreshToken;
 import turip.member.repository.MemberRepository;
-import turip.member.repository.RefreshTokenRepository;
 import turip.member.service.MemberService;
-import turip.member.service.RefreshTokenService;
 
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {

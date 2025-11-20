@@ -1,4 +1,4 @@
-package turip.auth;
+package turip.auth.token;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

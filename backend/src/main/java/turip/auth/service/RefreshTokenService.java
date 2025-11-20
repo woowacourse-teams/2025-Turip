@@ -1,12 +1,12 @@
-package turip.member.service;
+package turip.auth.service;
 
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import turip.auth.domain.RefreshToken;
+import turip.auth.repository.RefreshTokenRepository;
 import turip.member.domain.Member;
-import turip.member.domain.RefreshToken;
-import turip.member.repository.RefreshTokenRepository;
 
 @Service
 @RequiredArgsConstructor

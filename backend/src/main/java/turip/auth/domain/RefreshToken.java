@@ -1,4 +1,4 @@
-package turip.member.domain;
+package turip.auth.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,6 +16,7 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import turip.member.domain.Member;
 
 @Entity
 @Getter

@@ -1,4 +1,4 @@
-package turip.auth;
+package turip.auth.token;
 
 import turip.member.domain.Provider;
 

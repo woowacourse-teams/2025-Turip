@@ -6,20 +6,19 @@ import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import turip.auth.GoogleTokenParser;
-import turip.auth.JwtProvider;
 import turip.auth.controller.dto.request.LoginRequest;
 import turip.auth.controller.dto.request.RefreshTokenRequest;
 import turip.auth.controller.dto.response.LoginResponse;
 import turip.auth.controller.dto.response.RefreshTokenResponse;
+import turip.auth.domain.RefreshToken;
+import turip.auth.repository.RefreshTokenRepository;
+import turip.auth.token.GoogleTokenParser;
+import turip.auth.token.JwtProvider;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.UnauthorizedException;
 import turip.member.domain.Member;
 import turip.member.domain.Provider;
-import turip.member.domain.RefreshToken;
-import turip.member.repository.RefreshTokenRepository;
 import turip.member.service.MemberService;
-import turip.member.service.RefreshTokenService;
 
 @Service
 @RequiredArgsConstructor

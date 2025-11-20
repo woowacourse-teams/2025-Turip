@@ -1,4 +1,4 @@
-package turip.auth;
+package turip.auth.resolver;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
