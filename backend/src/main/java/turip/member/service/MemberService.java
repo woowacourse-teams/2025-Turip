@@ -3,6 +3,8 @@ package turip.member.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import turip.common.exception.ErrorTag;
+import turip.common.exception.custom.NotFoundException;
 import turip.member.domain.Account;
 import turip.member.domain.Member;
 import turip.member.domain.Provider;
@@ -28,5 +30,10 @@ public class MemberService {
                     Member member = new Member(savedAccount, provider, providerId, email);
                     return memberRepository.save(member);
                 });
+    }
+
+    public Member getByAccountId(final Long accountId) {
+        return memberRepository.findByAccountId(accountId)
+                .orElseThrow(() -> new NotFoundException(ErrorTag.MEMBER_NOT_FOUND));
     }
 }
