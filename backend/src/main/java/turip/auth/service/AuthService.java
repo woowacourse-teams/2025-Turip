@@ -2,6 +2,7 @@ package turip.auth.service;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.SignatureException;
+import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,7 @@ public class AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final turip.member.repository.MemberRepository memberRepository;
 
+    @Transactional
     public LoginResponse login(LoginRequest request, Provider provider, String deviceFid) {
         if (provider.equals(Provider.GOOGLE)) {
             return loginWithGoogle(request, deviceFid);
@@ -36,6 +38,7 @@ public class AuthService {
         throw new UnauthorizedException(ErrorTag.UNAUTHORIZED);
     }
 
+    @Transactional
     public RefreshTokenResponse refresh(RefreshTokenRequest request, String deviceFid) {
         String refreshToken = request.refreshToken();
 
@@ -52,7 +55,6 @@ public class AuthService {
             String newAccessToken = jwtProvider.generateAccessToken(accountId);
             String newRefreshToken = jwtProvider.generateRefreshToken(accountId);
 
-            refreshTokenRepository.delete(storedRefreshToken);
             saveRefreshToken(member, newRefreshToken, deviceFid);
 
             return new RefreshTokenResponse(newAccessToken, newRefreshToken);
