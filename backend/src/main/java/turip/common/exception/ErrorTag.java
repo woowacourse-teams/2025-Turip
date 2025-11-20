@@ -11,6 +11,7 @@ public enum ErrorTag {
 
     // 401 Unauthorized
     UNAUTHORIZED("토큰 기반 인증에 실패했습니다."),
+    ID_TOKEN_NOT_VALID("유효하지 않은 id token입니다."),
     ACCESS_TOKEN_EXPIRED("access token이 만료됐습니다."),
     ACCESS_TOKEN_SIGNATURE_NOT_VALID("access token이 위조됐습니다."),
     REFRESH_TOKEN_EXPIRED("refresh token이 만료됐습니다."),

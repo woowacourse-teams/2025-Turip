@@ -23,6 +23,9 @@ jwt:
   secret-key: ${JWT_SECRET_KEY}
   refresh-token-expiration-ms: 2592000000  # 30일
 
+google:
+  client-id: ${GOOGLE_CLIENT_ID}
+
 management:
   endpoints:
     web:
