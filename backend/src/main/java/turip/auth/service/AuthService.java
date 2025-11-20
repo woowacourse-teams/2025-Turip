@@ -41,7 +41,7 @@ public class AuthService {
 
         boolean isNewMember = memberService.isFirstLogin(provider, providerId);
 
-        Member member = saveMember(provider, providerId, email);
+        Member member = findOrCreateMember(provider, providerId, email);
         String accessToken = jwtProvider.generateAccessToken(member.getAccount().getId());
         String refreshToken = jwtProvider.generateRefreshToken(member.getAccount().getId());
 
@@ -50,7 +50,7 @@ public class AuthService {
         return LoginResponse.of(accessToken, refreshToken, isNewMember);
     }
 
-    private Member saveMember(Provider provider, String providerId, String email) {
+    private Member findOrCreateMember(Provider provider, String providerId, String email) {
         return memberService.findOrCreate(provider, providerId, email);
     }
 
