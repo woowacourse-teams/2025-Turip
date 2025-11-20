@@ -61,7 +61,7 @@ class FavoritePlaceApiTest {
         jdbcTemplate.update("ALTER TABLE account ALTER COLUMN id RESTART WITH 1");
     }
 
-    @DisplayName("/favorites-places POST 장소 찜 생성 테스트")
+    @DisplayName("/favorites/places POST 장소 찜 생성 테스트")
     @Nested
     class Create {
 
@@ -287,7 +287,7 @@ class FavoritePlaceApiTest {
         }
     }
 
-    @DisplayName("/favorites-places GET 장소 찜 폴더의 장소 찜 목록 조회 테스트")
+    @DisplayName("/favorites/places GET 장소 찜 폴더의 장소 찜 목록 조회 테스트")
     @Nested
     class ReadAllByFolder {
 
@@ -509,7 +509,7 @@ class FavoritePlaceApiTest {
         }
     }
 
-    @DisplayName("/favorites-places DELETE 장소 찜 삭제 테스트")
+    @DisplayName("/favorites/places DELETE 장소 찜 삭제 테스트")
     @Nested
     class Delete {
 

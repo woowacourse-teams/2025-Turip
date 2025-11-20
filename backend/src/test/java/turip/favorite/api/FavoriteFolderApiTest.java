@@ -59,7 +59,7 @@ class FavoriteFolderApiTest {
         jdbcTemplate.update("ALTER TABLE account ALTER COLUMN id RESTART WITH 1");
     }
 
-    @DisplayName("/favorites-folders POST 장소 찜 폴더 생성 테스트")
+    @DisplayName("/favorites/folders POST 장소 찜 폴더 생성 테스트")
     @Nested
     class Create {
 
@@ -112,7 +112,7 @@ class FavoriteFolderApiTest {
         }
     }
 
-    @DisplayName("/favorites-folders GET 특정 회원의 장소 찜 폴더 조회 테스트")
+    @DisplayName("/favorites/folders GET 특정 회원의 장소 찜 폴더 조회 테스트")
     @Nested
     class ReadAllByMember {
 
@@ -160,7 +160,7 @@ class FavoriteFolderApiTest {
         }
     }
 
-    @DisplayName("/favorites-folders/favorite-status GET 특정 회원의 장소 찜 폴더와 찜 여부 조회 테스트")
+    @DisplayName("/favorites/folders/favorite-status GET 특정 회원의 장소 찜 폴더와 찜 여부 조회 테스트")
     @Nested
     class ReadAllWithFavoriteStatusByDeviceId {
 
@@ -228,7 +228,7 @@ class FavoriteFolderApiTest {
         }
     }
 
-    @DisplayName("/favorites-folders PATCH 폴더 이름 수정 테스트")
+    @DisplayName("/favorites/folders PATCH 폴더 이름 수정 테스트")
     @Nested
     class UpdateName {
 
@@ -361,7 +361,7 @@ class FavoriteFolderApiTest {
         }
     }
 
-    @DisplayName("/favorites-folders DELETE 장소 찜 폴더 삭제 테스트")
+    @DisplayName("/favorites/folders DELETE 장소 찜 폴더 삭제 테스트")
     @Nested
     class Delete {
 
