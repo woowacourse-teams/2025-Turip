@@ -307,4 +307,44 @@ class AuthServiceTest {
                     .compact();
         }
     }
+
+    @Nested
+    @DisplayName("logout 메서드 테스트")
+    class LogoutTest {
+
+        @Test
+        @DisplayName("정상적으로 로그아웃이 성공한다")
+        void logoutSuccess() {
+            // given
+            Long accountId = 1L;
+            String deviceFid = "device-123";
+            Account account = new Account(accountId);
+            Member member = new Member(account, Provider.GOOGLE, "provider-id", "test@gmail.com");
+
+            when(memberService.getByAccountId(accountId)).thenReturn(member);
+
+            // when
+            authService.logout(account, deviceFid);
+
+            // then
+            // 예외가 발생하지 않으면 성공
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 계정으로 로그아웃 시도 시 UnauthorizedException이 발생한다")
+        void logoutWithNonExistentAccount() {
+            // given
+            Long accountId = 999L;
+            String deviceFid = "device-123";
+            Account account = new Account(accountId);
+
+            when(memberService.getByAccountId(accountId))
+                    .thenThrow(new UnauthorizedException(ErrorTag.UNAUTHORIZED));
+
+            // when & then
+            assertThatThrownBy(() -> authService.logout(account, deviceFid))
+                    .isInstanceOf(UnauthorizedException.class)
+                    .hasMessage(ErrorTag.UNAUTHORIZED.getMessage());
+        }
+    }
 }

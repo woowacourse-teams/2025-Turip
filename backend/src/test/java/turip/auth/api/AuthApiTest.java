@@ -282,4 +282,135 @@ class AuthApiTest {
                     .statusCode(401);
         }
     }
+
+    @Nested
+    @DisplayName("/logout POST 로그아웃 테스트")
+    class LogoutTest {
+
+        @Test
+        @DisplayName("정상적으로 로그아웃에 성공하면 204 No Content를 응답한다")
+        void logoutSuccess() {
+            // given
+            jdbcTemplate.update("INSERT INTO account (id) VALUES (1)");
+            jdbcTemplate.update(
+                    "INSERT INTO member (id, account_id, provider, provider_id, email) VALUES (1, 1, 'GOOGLE', 'google-user-logout', 'logout@gmail.com')");
+
+            String idToken = "valid-google-id-token";
+            String deviceFid = "device-logout-123";
+
+            when(googleTokenParser.getProvider()).thenReturn(Provider.GOOGLE);
+            when(googleTokenParser.getProviderId(idToken)).thenReturn("google-user-logout");
+            when(googleTokenParser.getEmail(idToken)).thenReturn("logout@gmail.com");
+
+            Map<String, String> loginRequest = new HashMap<>();
+            loginRequest.put("idToken", idToken);
+
+            // 로그인해서 토큰 받기
+            String accessToken = RestAssured
+                    .given().log().all()
+                    .contentType(ContentType.JSON)
+                    .header("device-fid", deviceFid)
+                    .body(loginRequest)
+                    .when().post("/login/google")
+                    .then().log().all()
+                    .statusCode(200)
+                    .extract().path("accessToken");
+
+            // when & then
+            RestAssured
+                    .given().log().all()
+                    .header("device-fid", deviceFid)
+                    .header("Authorization", "Bearer " + accessToken)
+                    .when().post("/logout")
+                    .then().log().all()
+                    .statusCode(204);
+        }
+
+        @Test
+        @DisplayName("로그아웃 후 refresh token이 DB에서 삭제된다")
+        void logoutDeletesRefreshToken() {
+            // given
+            jdbcTemplate.update("INSERT INTO account (id) VALUES (1)");
+            jdbcTemplate.update(
+                    "INSERT INTO member (id, account_id, provider, provider_id, email) VALUES (1, 1, 'GOOGLE', 'google-user-logout-delete', 'logout-delete@gmail.com')");
+
+            String idToken = "valid-google-id-token";
+            String deviceFid = "device-logout-delete-123";
+
+            when(googleTokenParser.getProvider()).thenReturn(Provider.GOOGLE);
+            when(googleTokenParser.getProviderId(idToken)).thenReturn("google-user-logout-delete");
+            when(googleTokenParser.getEmail(idToken)).thenReturn("logout-delete@gmail.com");
+
+            Map<String, String> loginRequest = new HashMap<>();
+            loginRequest.put("idToken", idToken);
+
+            // 로그인해서 토큰 받기
+            String accessToken = RestAssured
+                    .given().log().all()
+                    .contentType(ContentType.JSON)
+                    .header("device-fid", deviceFid)
+                    .body(loginRequest)
+                    .when().post("/login/google")
+                    .then().log().all()
+                    .statusCode(200)
+                    .extract().path("accessToken");
+
+            // refresh token이 저장되었는지 확인
+            Integer countBefore = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM refresh_token WHERE device_fid = ?",
+                    Integer.class,
+                    deviceFid
+            );
+            assert countBefore != null && countBefore == 1;
+
+            // when - 로그아웃
+            RestAssured
+                    .given().log().all()
+                    .header("device-fid", deviceFid)
+                    .header("Authorization", "Bearer " + accessToken)
+                    .when().post("/logout")
+                    .then().log().all()
+                    .statusCode(204);
+
+            // then - refresh token이 삭제되었는지 확인
+            Integer countAfter = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM refresh_token WHERE device_fid = ?",
+                    Integer.class,
+                    deviceFid
+            );
+            assert countAfter != null && countAfter == 0;
+        }
+
+        @Test
+        @DisplayName("access token 없이 로그아웃 요청 시 401 Unauthorized를 응답한다")
+        void logoutWithoutAccessToken() {
+            // given
+            String deviceFid = "device-no-token";
+
+            // when & then
+            RestAssured
+                    .given().log().all()
+                    .header("device-fid", deviceFid)
+                    .when().post("/logout")
+                    .then().log().all()
+                    .statusCode(401);
+        }
+
+        @Test
+        @DisplayName("유효하지 않은 access token으로 로그아웃 요청 시 401 Unauthorized를 응답한다")
+        void logoutWithInvalidAccessToken() {
+            // given
+            String deviceFid = "device-invalid-token";
+            String invalidAccessToken = "invalid.access.token";
+
+            // when & then
+            RestAssured
+                    .given().log().all()
+                    .header("device-fid", deviceFid)
+                    .header("Authorization", "Bearer " + invalidAccessToken)
+                    .when().post("/logout")
+                    .then().log().all()
+                    .statusCode(401);
+        }
+    }
 }
