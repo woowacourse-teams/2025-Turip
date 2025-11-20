@@ -11,7 +11,6 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 import turip.auth.token.JwtProvider;
 import turip.common.exception.ErrorTag;
-import turip.common.exception.custom.IllegalArgumentException;
 import turip.common.exception.custom.UnauthorizedException;
 import turip.member.domain.Account;
 import turip.member.service.AccountService;
@@ -44,7 +43,7 @@ public class AuthAccountArgumentResolver implements HandlerMethodArgumentResolve
             String accessToken = bearer.substring(7); // "Bearer " 길이 = 7
             return getMemberAccount(accessToken);
         }
-        return getGuestAccount(deviceFid);
+        return findOrCreateGuestAccount(deviceFid);
     }
 
     private Account getMemberAccount(String accessToken) {
@@ -61,9 +60,9 @@ public class AuthAccountArgumentResolver implements HandlerMethodArgumentResolve
         }
     }
 
-    private Account getGuestAccount(String deviceFid) {
+    private Account findOrCreateGuestAccount(String deviceFid) {
         if (deviceFid == null || deviceFid.isBlank()) {
-            throw new IllegalArgumentException(ErrorTag.MEMBER_NOT_FOUND);
+            throw new UnauthorizedException(ErrorTag.UNAUTHORIZED);
         }
         return guestService.findOrCreateByDeviceFid(deviceFid).getAccount();
     }
