@@ -154,7 +154,7 @@ public class AuthController {
                     )
             )
     })
-    @PostMapping("/token/google")
+    @PostMapping("/token")
     public ResponseEntity<RefreshTokenResponse> refresh(@RequestHeader("device-fid") String deviceFid,
                                                         @RequestBody RefreshTokenRequest request) {
         RefreshTokenResponse response = authService.refresh(request, deviceFid);
