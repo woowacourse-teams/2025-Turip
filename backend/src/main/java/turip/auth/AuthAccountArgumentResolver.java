@@ -54,7 +54,7 @@ public class AuthAccountArgumentResolver implements HandlerMethodArgumentResolve
         } catch (ExpiredJwtException e) {
             throw new UnauthorizedException(ErrorTag.ACCESS_TOKEN_EXPIRED);
         } catch (SignatureException e) {
-            throw new UnauthorizedException(ErrorTag.ACCESS_TOKEN_SIGNATURE_NOT_VALID);
+            throw new UnauthorizedException(ErrorTag.ACCESS_TOKEN_SIGNATURE_INVALID);
         } catch (Exception e) {
             throw new UnauthorizedException(ErrorTag.UNAUTHORIZED);
         }
