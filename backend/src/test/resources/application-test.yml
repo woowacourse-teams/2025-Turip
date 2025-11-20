@@ -30,6 +30,10 @@ jwt:
   access-token-expiration-ms: 3600000  # 1시간
   refresh-token-expiration-ms: 604800000  # 7일
 
+# Google OAuth 설정 (테스트용)
+google:
+  client-id: test-google-client-id.apps.googleusercontent.com
+
 # CSV Import 설정
 csv:
   import:
