@@ -1,5 +1,6 @@
 package turip.member.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import turip.member.domain.Account;
@@ -19,6 +20,7 @@ public class MemberService {
         return !memberRepository.existsByProviderAndProviderId(provider, providerId);
     }
 
+    @Transactional
     public Member findOrCreate(Provider provider, String providerId, String email) {
         return memberRepository.findByProviderAndProviderId(provider, providerId)
                 .orElseGet(() -> {

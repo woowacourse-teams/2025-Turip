@@ -1,5 +1,6 @@
 package turip.member.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import turip.common.exception.ErrorTag;
@@ -16,6 +17,7 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final FavoriteFolderRepository favoriteFolderRepository;
 
+    @Transactional
     public Account create() {
         Account savedAccount = accountRepository.save(new Account());
         FavoriteFolder defaultFolder = FavoriteFolder.defaultFolderOf(savedAccount);
