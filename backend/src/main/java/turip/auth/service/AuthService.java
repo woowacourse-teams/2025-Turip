@@ -19,6 +19,7 @@ import turip.member.domain.Provider;
 import turip.member.domain.RefreshToken;
 import turip.member.repository.RefreshTokenRepository;
 import turip.member.service.MemberService;
+import turip.member.service.RefreshTokenService;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +29,7 @@ public class AuthService {
     private final MemberService memberService;
     private final JwtProvider jwtProvider;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final RefreshTokenService refreshTokenService;
     private final turip.member.repository.MemberRepository memberRepository;
 
     @Transactional
@@ -95,9 +97,7 @@ public class AuthService {
         try {
             LocalDateTime issuedAt = jwtProvider.getIssuedAt(refreshToken);
             LocalDateTime expiration = jwtProvider.getExpiration(refreshToken);
-            refreshTokenRepository.save(
-                    new RefreshToken(member, deviceFid, jwtProvider.hashToken(refreshToken), issuedAt, expiration));
-
+            refreshTokenService.save(member, deviceFid, jwtProvider.hashToken(refreshToken), issuedAt, expiration);
         } catch (ExpiredJwtException e) {
             throw new UnauthorizedException(ErrorTag.ACCESS_TOKEN_EXPIRED);
         } catch (SignatureException e) {
