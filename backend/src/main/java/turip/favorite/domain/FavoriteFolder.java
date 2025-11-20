@@ -75,7 +75,9 @@ public class FavoriteFolder {
     }
 
     public boolean isOwner(Account account) {
-        return this.account.isSameAccount(account);
+        System.out.println("account.id" + account.getId());
+        System.out.println("this.account.id" + this.account.getId());
+        return this.account.equals(account);
     }
 
     public void rename(String newName) {

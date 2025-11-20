@@ -23,8 +23,4 @@ public class Account {
     @EqualsAndHashCode.Include
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    public boolean isSameAccount(final Account account) {
-        return this.id.equals(account.id);
-    }
 }
