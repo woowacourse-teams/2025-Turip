@@ -8,7 +8,9 @@ import org.springframework.stereotype.Service;
 import turip.auth.GoogleTokenParser;
 import turip.auth.JwtProvider;
 import turip.auth.controller.dto.request.LoginRequest;
+import turip.auth.controller.dto.request.RefreshTokenRequest;
 import turip.auth.controller.dto.response.LoginResponse;
+import turip.auth.controller.dto.response.RefreshTokenResponse;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.UnauthorizedException;
 import turip.member.domain.Member;
@@ -25,12 +27,45 @@ public class AuthService {
     private final MemberService memberService;
     private final JwtProvider jwtProvider;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final turip.member.repository.MemberRepository memberRepository;
 
     public LoginResponse login(LoginRequest request, Provider provider, String deviceFid) {
         if (provider.equals(Provider.GOOGLE)) {
             return loginWithGoogle(request, deviceFid);
         }
         throw new UnauthorizedException(ErrorTag.UNAUTHORIZED);
+    }
+
+    public RefreshTokenResponse refresh(RefreshTokenRequest request, String deviceFid) {
+        String refreshToken = request.refreshToken();
+
+        try {
+            Long accountId = jwtProvider.parseToken(refreshToken).get("accountId", Long.class);
+            Member member = memberRepository.findByAccountId(accountId)
+                    .orElseThrow(() -> new UnauthorizedException(ErrorTag.UNAUTHORIZED));
+            RefreshToken storedRefreshToken = refreshTokenRepository.findByMemberAndDeviceFid(member, deviceFid)
+                    .orElseThrow(() -> new UnauthorizedException(ErrorTag.REFRESH_TOKEN_NOT_FOUND));
+
+            verifyRefreshTokenMatch(refreshToken, storedRefreshToken);
+            validateRefreshTokenExpiration(storedRefreshToken);
+
+            String newAccessToken = jwtProvider.generateAccessToken(accountId);
+            String newRefreshToken = jwtProvider.generateRefreshToken(accountId);
+
+            refreshTokenRepository.delete(storedRefreshToken);
+            saveRefreshToken(member, newRefreshToken, deviceFid);
+
+            return new RefreshTokenResponse(newAccessToken, newRefreshToken);
+
+        } catch (ExpiredJwtException e) {
+            throw new UnauthorizedException(ErrorTag.REFRESH_TOKEN_EXPIRED);
+        } catch (SignatureException e) {
+            throw new UnauthorizedException(ErrorTag.REFRESH_TOKEN_SIGNATURE_INVALID);
+        } catch (UnauthorizedException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new UnauthorizedException(ErrorTag.UNAUTHORIZED);
+        }
     }
 
     private LoginResponse loginWithGoogle(LoginRequest request, String deviceFid) {
@@ -67,6 +102,19 @@ public class AuthService {
             throw new UnauthorizedException(ErrorTag.ACCESS_TOKEN_SIGNATURE_NOT_VALID);
         } catch (Exception e) {
             throw new UnauthorizedException(ErrorTag.UNAUTHORIZED);
+        }
+    }
+
+    private void verifyRefreshTokenMatch(String oldRefreshToken, RefreshToken storedRefreshToken) {
+        String oldTokenHash = jwtProvider.hashToken(oldRefreshToken);
+        if (!storedRefreshToken.getTokenHash().equals(oldTokenHash)) {
+            throw new UnauthorizedException(ErrorTag.REFRESH_TOKEN_INVALID);
+        }
+    }
+
+    private void validateRefreshTokenExpiration(RefreshToken storedRefreshToken) {
+        if (storedRefreshToken.isExpired()) {
+            throw new UnauthorizedException(ErrorTag.REFRESH_TOKEN_EXPIRED);
         }
     }
 }

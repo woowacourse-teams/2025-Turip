@@ -15,6 +15,9 @@ public enum ErrorTag {
     ACCESS_TOKEN_EXPIRED("access token이 만료됐습니다."),
     ACCESS_TOKEN_SIGNATURE_NOT_VALID("access token이 위조됐습니다."),
     REFRESH_TOKEN_EXPIRED("refresh token이 만료됐습니다."),
+    REFRESH_TOKEN_NOT_FOUND("refresh token을 찾을 수 없습니다."),
+    REFRESH_TOKEN_INVALID("유효하지 않은 refresh token입니다."),
+    REFRESH_TOKEN_SIGNATURE_INVALID("refresh token이 위조됐습니다."),
 
     // 403 Forbidden
     FORBIDDEN("접근 권한이 없습니다."),

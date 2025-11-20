@@ -1,6 +1,5 @@
 package turip.auth;
 
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
@@ -49,9 +48,8 @@ public class AuthAccountArgumentResolver implements HandlerMethodArgumentResolve
 
     private Account getMemberAccount(String accessToken) {
         try {
-            Claims claims = jwtProvider.parseToken(accessToken);
-            String accountId = claims.get("accountId", String.class);
-            return accountService.getById(Long.valueOf(accountId));
+            Long accountId = jwtProvider.parseToken(accessToken).get("accountId", Long.class);
+            return accountService.getById(accountId);
 
         } catch (ExpiredJwtException e) {
             throw new UnauthorizedException(ErrorTag.ACCESS_TOKEN_EXPIRED);
