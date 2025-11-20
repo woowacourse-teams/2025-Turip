@@ -49,7 +49,7 @@ public class AuthAccountArgumentResolver implements HandlerMethodArgumentResolve
 
     private Account getMemberAccount(String accessToken) {
         try {
-            Claims claims = jwtProvider.parseAccessToken(accessToken);
+            Claims claims = jwtProvider.parseToken(accessToken);
             String accountId = claims.get("accountId", String.class);
             return accountService.getById(Long.valueOf(accountId));
 

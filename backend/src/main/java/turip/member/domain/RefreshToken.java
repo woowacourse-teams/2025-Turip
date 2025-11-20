@@ -46,4 +46,13 @@ public class RefreshToken {
 
     @Column(name = "expired_at", nullable = false)
     private LocalDateTime expiredAt;
+
+    public RefreshToken(Member member, String deviceFid, String tokenHash, LocalDateTime issuedAt,
+                        LocalDateTime expiredAt) {
+        this.member = member;
+        this.deviceFid = deviceFid;
+        this.tokenHash = tokenHash;
+        this.issuedAt = issuedAt;
+        this.expiredAt = expiredAt;
+    }
 }

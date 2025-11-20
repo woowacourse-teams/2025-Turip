@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import turip.auth.controller.dto.request.LoginRequest;
 import turip.auth.controller.dto.response.LoginResponse;
 import turip.auth.service.AuthService;
@@ -71,8 +72,9 @@ public class AuthController {
             )
     })
     @PostMapping("/login/google")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
-        LoginResponse response = authService.login(request, Provider.GOOGLE);
+    public ResponseEntity<LoginResponse> login(@RequestHeader("device-fid") String deviceFid,
+                                               @RequestBody LoginRequest request) {
+        LoginResponse response = authService.login(request, Provider.GOOGLE, deviceFid);
         return ResponseEntity.ok(response);
     }
 }
