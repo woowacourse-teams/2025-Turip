@@ -11,11 +11,11 @@ import turip.auth.controller.dto.request.RefreshTokenRequest;
 import turip.auth.controller.dto.response.LoginResponse;
 import turip.auth.controller.dto.response.RefreshTokenResponse;
 import turip.auth.domain.RefreshToken;
-import turip.auth.repository.RefreshTokenRepository;
 import turip.auth.token.GoogleTokenParser;
 import turip.auth.token.JwtProvider;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.UnauthorizedException;
+import turip.member.domain.Account;
 import turip.member.domain.Member;
 import turip.member.domain.Provider;
 import turip.member.service.MemberService;
@@ -24,12 +24,10 @@ import turip.member.service.MemberService;
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final GoogleTokenParser googleTokenParser;
-    private final MemberService memberService;
     private final JwtProvider jwtProvider;
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final GoogleTokenParser googleTokenParser;
     private final RefreshTokenService refreshTokenService;
-    private final turip.member.repository.MemberRepository memberRepository;
+    private final MemberService memberService;
 
     @Transactional
     public LoginResponse login(LoginRequest request, Provider provider, String deviceFid) {
@@ -45,10 +43,8 @@ public class AuthService {
 
         try {
             Long accountId = jwtProvider.parseToken(refreshToken).get("accountId", Long.class);
-            Member member = memberRepository.findByAccountId(accountId)
-                    .orElseThrow(() -> new UnauthorizedException(ErrorTag.UNAUTHORIZED));
-            RefreshToken storedRefreshToken = refreshTokenRepository.findByMemberAndDeviceFid(member, deviceFid)
-                    .orElseThrow(() -> new UnauthorizedException(ErrorTag.REFRESH_TOKEN_NOT_FOUND));
+            Member member = getMemberByAccountId(accountId);
+            RefreshToken storedRefreshToken = refreshTokenService.getByMemberAndDeviceFid(member, deviceFid);
 
             verifyRefreshTokenMatch(refreshToken, storedRefreshToken);
             validateRefreshTokenExpiration(storedRefreshToken);
@@ -90,6 +86,14 @@ public class AuthService {
 
     private Member findOrCreateMember(Provider provider, String providerId, String email) {
         return memberService.findOrCreate(provider, providerId, email);
+    }
+
+    private Member getMemberByAccountId(Long accountId) {
+        try {
+            return memberService.getByAccountId(accountId);
+        } catch (Exception e) {
+            throw new UnauthorizedException(ErrorTag.UNAUTHORIZED);
+        }
     }
 
     private void saveRefreshToken(Member member, String refreshToken, String deviceFid) {
