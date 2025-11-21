@@ -13,7 +13,6 @@ import io.jsonwebtoken.security.SignatureException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.Optional;
 import javax.crypto.SecretKey;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -28,7 +27,6 @@ import turip.auth.controller.dto.request.RefreshTokenRequest;
 import turip.auth.controller.dto.response.LoginResponse;
 import turip.auth.controller.dto.response.RefreshTokenResponse;
 import turip.auth.domain.RefreshToken;
-import turip.auth.repository.RefreshTokenRepository;
 import turip.auth.token.GoogleTokenParser;
 import turip.auth.token.JwtProvider;
 import turip.common.exception.ErrorTag;
@@ -36,11 +34,13 @@ import turip.common.exception.custom.UnauthorizedException;
 import turip.member.domain.Account;
 import turip.member.domain.Member;
 import turip.member.domain.Provider;
-import turip.member.repository.MemberRepository;
 import turip.member.service.MemberService;
 
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
+
+    @Mock
+    private JwtProvider jwtProvider;
 
     @Mock
     private GoogleTokenParser googleTokenParser;
@@ -49,16 +49,7 @@ class AuthServiceTest {
     private MemberService memberService;
 
     @Mock
-    private JwtProvider jwtProvider;
-
-    @Mock
-    private RefreshTokenRepository refreshTokenRepository;
-
-    @Mock
     private RefreshTokenService refreshTokenService;
-
-    @Mock
-    private MemberRepository memberRepository;
 
     @InjectMocks
     private AuthService authService;
@@ -183,9 +174,8 @@ class AuthServiceTest {
 
             Claims claims = Jwts.claims().add("accountId", accountId).build();
             when(jwtProvider.parseToken(oldRefreshToken)).thenReturn(claims);
-            when(memberRepository.findByAccountId(accountId)).thenReturn(Optional.of(member));
-            when(refreshTokenRepository.findByMemberAndDeviceFid(member, deviceFid))
-                    .thenReturn(Optional.of(storedRefreshToken));
+            when(memberService.getByAccountId(accountId)).thenReturn(member);
+            when(refreshTokenService.getByMemberAndDeviceFid(member, deviceFid)).thenReturn(storedRefreshToken);
             when(jwtProvider.hashToken(oldRefreshToken)).thenReturn(hashedToken);
             when(jwtProvider.generateAccessToken(accountId)).thenReturn("new-access-token");
             when(jwtProvider.generateRefreshToken(accountId)).thenReturn("new-refresh-token");
@@ -222,9 +212,8 @@ class AuthServiceTest {
 
             Claims claims = Jwts.claims().add("accountId", accountId).build();
             when(jwtProvider.parseToken(oldRefreshToken)).thenReturn(claims);
-            when(memberRepository.findByAccountId(accountId)).thenReturn(Optional.of(member));
-            when(refreshTokenRepository.findByMemberAndDeviceFid(member, deviceFid))
-                    .thenReturn(Optional.of(storedRefreshToken));
+            when(memberService.getByAccountId(accountId)).thenReturn(member);
+            when(refreshTokenService.getByMemberAndDeviceFid(member, deviceFid)).thenReturn(storedRefreshToken);
             when(jwtProvider.hashToken(oldRefreshToken)).thenReturn(wrongHashedToken);
 
             // when & then
@@ -248,9 +237,9 @@ class AuthServiceTest {
 
             Claims claims = Jwts.claims().add("accountId", accountId).build();
             when(jwtProvider.parseToken(oldRefreshToken)).thenReturn(claims);
-            when(memberRepository.findByAccountId(accountId)).thenReturn(Optional.of(member));
-            when(refreshTokenRepository.findByMemberAndDeviceFid(member, deviceFid))
-                    .thenReturn(Optional.empty());
+            when(memberService.getByAccountId(accountId)).thenReturn(member);
+            when(refreshTokenService.getByMemberAndDeviceFid(member, deviceFid)).thenThrow(
+                    new UnauthorizedException(ErrorTag.REFRESH_TOKEN_NOT_FOUND));
 
             // when & then
             assertThatThrownBy(() -> authService.refresh(request, deviceFid))
