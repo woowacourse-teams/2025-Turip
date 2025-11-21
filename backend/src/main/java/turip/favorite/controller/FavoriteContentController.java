@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import turip.auth.resolver.AuthMember;
+import turip.auth.resolver.AuthAccount;
 import turip.common.exception.ErrorResponse;
 import turip.content.controller.dto.response.content.ContentsDetailWithLoadableResponse;
 import turip.favorite.controller.dto.request.FavoriteContentRequest;
@@ -114,7 +114,7 @@ public class FavoriteContentController {
     })
     @PostMapping
     public ResponseEntity<FavoriteContentResponse> create(
-            @Parameter(hidden = true) @AuthMember Account account,
+            @Parameter(hidden = true) @AuthAccount Account account,
             @RequestBody FavoriteContentRequest request) {
         FavoriteContentResponse response = favoriteContentService.create(request, account);
         return ResponseEntity.created(URI.create("/favorites/contents/" + response.id()))
@@ -188,7 +188,7 @@ public class FavoriteContentController {
     })
     @GetMapping
     public ResponseEntity<ContentsDetailWithLoadableResponse> readMyFavoriteContents(
-            @Parameter(hidden = true) @AuthMember Account account,
+            @Parameter(hidden = true) @AuthAccount Account account,
             @RequestParam(name = "size") Integer pageSize,
             @RequestParam(name = "lastId") Long lastContentId
     ) {
@@ -246,7 +246,7 @@ public class FavoriteContentController {
     })
     @DeleteMapping
     public ResponseEntity<Void> delete(
-            @Parameter(hidden = true) @AuthMember Account account,
+            @Parameter(hidden = true) @AuthAccount Account account,
             @RequestParam(name = "contentId") Long contentId) {
         favoriteContentService.remove(account, contentId);
         return ResponseEntity.noContent().build();

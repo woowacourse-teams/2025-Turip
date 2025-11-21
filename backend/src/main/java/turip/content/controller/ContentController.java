@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import turip.auth.resolver.AuthMember;
+import turip.auth.resolver.AuthAccount;
 import turip.common.exception.ErrorResponse;
 import turip.content.controller.dto.response.content.ContentCountResponse;
 import turip.content.controller.dto.response.content.ContentResponse;
@@ -191,7 +191,7 @@ public class ContentController {
     })
     @GetMapping
     public ResponseEntity<ContentsDetailWithLoadableResponse> readContentsByRegionCategory(
-            @Parameter(hidden = true) @AuthMember Account account,
+            @Parameter(hidden = true) @AuthAccount Account account,
             @RequestParam(name = "regionCategory") String regionCategory,
             @RequestParam(name = "size") Integer pageSize,
             @RequestParam(name = "lastId") Long lastContentId
@@ -271,7 +271,7 @@ public class ContentController {
     })
     @GetMapping("/keyword")
     public ResponseEntity<ContentsDetailWithLoadableResponse> readContentsByKeyword(
-            @Parameter(hidden = true) @AuthMember Account account,
+            @Parameter(hidden = true) @AuthAccount Account account,
             @RequestParam(name = "keyword") String keyword,
             @RequestParam(name = "size") Integer pageSize,
             @RequestParam(name = "lastId") Long lastContentId
@@ -336,7 +336,7 @@ public class ContentController {
     })
     @GetMapping("/{contentId}")
     public ResponseEntity<ContentResponse> readContent(
-            @Parameter(hidden = true) @AuthMember Account account,
+            @Parameter(hidden = true) @AuthAccount Account account,
             @PathVariable Long contentId
     ) {
         ContentResponse response = contentService.getContentWithFavoriteStatus(contentId, account);
@@ -413,7 +413,7 @@ public class ContentController {
     })
     @GetMapping("/popular/favorites")
     public ResponseEntity<WeeklyPopularFavoriteContentsResponse> readWeeklyPopularFavoriteContents(
-            @Parameter(hidden = true) @AuthMember Account account,
+            @Parameter(hidden = true) @AuthAccount Account account,
             @RequestParam("size") int topContentSize) {
         WeeklyPopularFavoriteContentsResponse weeklyPopularFavoriteContents = contentService.findWeeklyPopularFavoriteContents(
                 account, topContentSize);

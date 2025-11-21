@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import turip.auth.resolver.AuthMember;
+import turip.auth.resolver.AuthAccount;
 import turip.common.exception.ErrorResponse;
 import turip.favorite.controller.dto.request.FavoriteFolderNameRequest;
 import turip.favorite.controller.dto.request.FavoriteFolderRequest;
@@ -113,7 +113,7 @@ public class FavoriteFolderController {
     })
     @PostMapping
     public ResponseEntity<FavoriteFolderResponse> create(
-            @Parameter(hidden = true) @AuthMember Account account,
+            @Parameter(hidden = true) @AuthAccount Account account,
             @RequestBody FavoriteFolderRequest request) {
         FavoriteFolderResponse response = favoriteFolderService.createCustomFavoriteFolder(request, account);
         return ResponseEntity.created(URI.create("/favorites/folders/" + response.id()))
@@ -160,7 +160,7 @@ public class FavoriteFolderController {
     })
     @GetMapping
     public ResponseEntity<FavoriteFoldersWithPlaceCountResponse> readAllByMember(
-            @Parameter(hidden = true) @AuthMember Account account) {
+            @Parameter(hidden = true) @AuthAccount Account account) {
         FavoriteFoldersWithPlaceCountResponse response = favoriteFolderService.findAllByMember(account);
         return ResponseEntity.ok(response);
     }
@@ -222,7 +222,7 @@ public class FavoriteFolderController {
     })
     @GetMapping("/favorite-status")
     public ResponseEntity<FavoriteFoldersWithFavoriteStatusResponse> readAllWithFavoriteStatusByDeviceId(
-            @Parameter(hidden = true) @AuthMember Account account,
+            @Parameter(hidden = true) @AuthAccount Account account,
             @RequestParam("placeId") Long placeId) {
         FavoriteFoldersWithFavoriteStatusResponse response = favoriteFolderService.findAllWithFavoriteStatusByAccountId(
                 account, placeId);
@@ -360,7 +360,7 @@ public class FavoriteFolderController {
     })
     @PatchMapping("/{favoriteFolderId}")
     public ResponseEntity<FavoriteFolderResponse> updateName(
-            @Parameter(hidden = true) @AuthMember Account account,
+            @Parameter(hidden = true) @AuthAccount Account account,
             @PathVariable Long favoriteFolderId,
             @RequestBody FavoriteFolderNameRequest request
     ) {
@@ -442,7 +442,7 @@ public class FavoriteFolderController {
     })
     @DeleteMapping("/{favoriteFolderId}")
     public ResponseEntity<Void> delete(
-            @Parameter(hidden = true) @AuthMember Account account,
+            @Parameter(hidden = true) @AuthAccount Account account,
             @PathVariable Long favoriteFolderId) {
         favoriteFolderService.remove(account, favoriteFolderId);
         return ResponseEntity.noContent().build();

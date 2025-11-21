@@ -18,7 +18,7 @@ import turip.auth.controller.dto.request.LoginRequest;
 import turip.auth.controller.dto.request.RefreshTokenRequest;
 import turip.auth.controller.dto.response.LoginResponse;
 import turip.auth.controller.dto.response.RefreshTokenResponse;
-import turip.auth.resolver.AuthMember;
+import turip.auth.resolver.AuthAccount;
 import turip.auth.service.AuthService;
 import turip.common.exception.ErrorResponse;
 import turip.member.domain.Account;
@@ -216,7 +216,7 @@ public class AuthController {
     })
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(@RequestHeader("device-fid") String deviceFid,
-                                       @Parameter(hidden = true) @AuthMember Account account) {
+                                       @Parameter(hidden = true) @AuthAccount Account account) {
         authService.logout(account, deviceFid);
         return ResponseEntity.noContent().build();
     }

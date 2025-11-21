@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import turip.auth.resolver.AuthMember;
+import turip.auth.resolver.AuthAccount;
 import turip.common.exception.ErrorResponse;
 import turip.favorite.controller.dto.request.FavoritePlaceOrderRequest;
 import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlaceResponse;
@@ -128,7 +128,7 @@ public class FavoritePlaceController {
     })
     @PostMapping
     public ResponseEntity<FavoritePlaceResponse> create(
-            @Parameter(hidden = true) @AuthMember Account account,
+            @Parameter(hidden = true) @AuthAccount Account account,
             @RequestParam("favoriteFolderId") Long favoriteFolderId,
             @RequestParam("placeId") Long placeId
     ) {
@@ -298,7 +298,7 @@ public class FavoritePlaceController {
     })
     @PatchMapping("/favorite-order")
     public ResponseEntity<Void> updatePlaceOrder(
-            @Parameter(hidden = true) @AuthMember Account account,
+            @Parameter(hidden = true) @AuthAccount Account account,
             @RequestParam("favoriteFolderId") Long favoriteFolderId,
             @RequestBody FavoritePlaceOrderRequest request
     ) {
@@ -383,7 +383,7 @@ public class FavoritePlaceController {
     })
     @DeleteMapping
     public ResponseEntity<Void> delete(
-            @Parameter(hidden = true) @AuthMember Account account,
+            @Parameter(hidden = true) @AuthAccount Account account,
             @RequestParam("favoriteFolderId") Long favoriteFolderId,
             @RequestParam("placeId") Long placeId
     ) {
