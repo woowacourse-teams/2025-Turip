@@ -10,4 +10,8 @@ public interface FavoriteFolderRepository extends JpaRepository<FavoriteFolder, 
     boolean existsByNameAndAccount(String name, Account account);
 
     List<FavoriteFolder> findAllByAccountOrderByIdAsc(Account account);
+
+    List<FavoriteFolder> findAllByAccount(Account account);
+
+    void deleteByAccountAndIsDefault(Account account, boolean isDefault);
 }

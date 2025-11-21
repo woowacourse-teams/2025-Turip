@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import turip.content.domain.Content;
 import turip.favorite.domain.FavoriteContent;
+import turip.member.domain.Account;
 
 public interface FavoriteContentRepository extends JpaRepository<FavoriteContent, Long> {
 
@@ -50,4 +51,6 @@ public interface FavoriteContentRepository extends JpaRepository<FavoriteContent
             @Param("lastContentId") Long lastContentId,
             Pageable pageable
     );
+
+    List<FavoriteContent> findAllByAccount(Account account);
 }

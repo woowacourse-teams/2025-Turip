@@ -84,4 +84,8 @@ public class FavoriteFolder {
         validateName(newName);
         this.name = newName;
     }
+
+    public void updateAccount(Account account) {
+        this.account = account;
+    }
 }

@@ -50,4 +50,8 @@ public class FavoriteContent {
         this.account = account;
         this.createdAt = createdAt;
     }
+
+    public void updateAccount(Account account) {
+        this.account = account;
+    }
 }
