@@ -1,5 +1,6 @@
 package com.on.turip.ui.compose.setting
 
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,13 +16,23 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.on.turip.R
 import com.on.turip.ui.compose.common.component.TuripAppBar
+import com.on.turip.ui.compose.theme.TuripTheme
+import com.on.turip.ui.main.favorite.SettingViewModel
 
 @Composable
 fun SettingScreen(
     loginStatus: LoginStatus,
+    onBackNavigate: () -> Unit,
+    onInquiryNavigate: (Uri) -> Unit,
+    onPrivacyPolicyNavigate: (Uri) -> Unit,
+    onLoginNavigate: () -> Unit,
+    onLogoutNavigate: () -> Unit,
+    onWithdrawClick: () -> Unit,
     modifier: Modifier = Modifier,
+    viewModel: SettingViewModel = hiltViewModel(),
 ) {
     Scaffold(
         modifier =
@@ -29,7 +40,12 @@ fun SettingScreen(
                 .fillMaxSize()
                 .background(Color.White)
                 .systemBarsPadding(),
-        topBar = { TuripAppBar(true) },
+        topBar = {
+            TuripAppBar(
+                canBack = true,
+                onBackNavigate = onBackNavigate,
+            )
+        },
     ) { innerPadding ->
         Column(
             modifier =
@@ -44,13 +60,13 @@ fun SettingScreen(
             )
 
             SettingItem(
-                onClick = {},
+                onClick = { onInquiryNavigate(viewModel.loadInquiryUri()) },
                 icon = R.drawable.ic_inquire,
                 title = "문의하기",
                 modifier = Modifier.fillMaxWidth(),
             )
             SettingItem(
-                onClick = {},
+                onClick = { onPrivacyPolicyNavigate(viewModel.loadPrivacyPolicyUri()) },
                 icon = R.drawable.ic_document,
                 title = "개인 정보 처리방침",
                 modifier = Modifier.fillMaxWidth(),
@@ -58,13 +74,13 @@ fun SettingScreen(
             when (loginStatus) {
                 LoginStatus.MEMBER -> {
                     SettingItem(
-                        onClick = {},
+                        onClick = onLogoutNavigate,
                         icon = R.drawable.ic_logout,
                         title = "로그아웃",
                         modifier = Modifier.fillMaxWidth(),
                     )
                     SettingItem(
-                        onClick = {},
+                        onClick = onWithdrawClick,
                         icon = R.drawable.ic_withdraw,
                         title = "회원 탈퇴",
                         modifier = Modifier.fillMaxWidth(),
@@ -73,7 +89,7 @@ fun SettingScreen(
 
                 LoginStatus.GUEST -> {
                     SettingItem(
-                        onClick = {},
+                        onClick = onLoginNavigate,
                         icon = R.drawable.ic_login,
                         title = "로그인",
                         modifier = Modifier.fillMaxWidth(),
