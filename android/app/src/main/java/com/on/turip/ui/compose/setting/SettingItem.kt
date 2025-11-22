@@ -26,8 +26,8 @@ fun SettingItem(
     Row(
         modifier =
             modifier
-                .padding(horizontal = 20.dp, vertical = 14.dp)
-                .clickable(onClick = onClick),
+                .clickable(onClick = onClick)
+                .padding(horizontal = 20.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
