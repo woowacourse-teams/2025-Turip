@@ -6,8 +6,12 @@ data class FavoriteFolderShareModel(
 ) {
     fun toShareFormat(): String =
         buildString {
-            appendLine("폴더명 : $name")
+            appendLine("$FOLDER_NAME_EMOJI_UNICODE 폴더명 : $name")
             appendLine()
             places.forEach { placeShareModel: FavoritePlaceShareModel -> appendLine(placeShareModel.toShareFormat()) }
         }
+
+    companion object {
+        private const val FOLDER_NAME_EMOJI_UNICODE = "\uD83D\uDCC1"
+    }
 }
