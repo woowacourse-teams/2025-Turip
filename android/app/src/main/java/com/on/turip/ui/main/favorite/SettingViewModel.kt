@@ -4,15 +4,16 @@ import android.net.Uri
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.on.turip.domain.userstorage.TuripDeviceIdentifier
 import com.on.turip.domain.userstorage.repository.UserStorageRepository
 import com.on.turip.ui.compose.common.util.SettingUtils
 import com.on.turip.ui.compose.common.util.SettingUtils.EMAIL_RECIPIENT
 import com.on.turip.ui.compose.common.util.SettingUtils.EMAIL_SUBJECT
+import com.on.turip.ui.compose.setting.SettingUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -20,20 +21,22 @@ import timber.log.Timber
 class SettingViewModel @Inject constructor(
     private val userStorageRepository: UserStorageRepository,
 ) : ViewModel() {
-    private val _deviceIdentifier: MutableStateFlow<TuripDeviceIdentifier> =
-        MutableStateFlow(TuripDeviceIdentifier.EMPTY)
-    val deviceIdentifier: StateFlow<TuripDeviceIdentifier> = _deviceIdentifier
+    private val _uiState: MutableStateFlow<SettingUiState> = MutableStateFlow(SettingUiState.EMPTY)
+    val uiState: StateFlow<SettingUiState> = _uiState
 
     init {
         loadId()
     }
 
+    // TODO : 멤버, 게스트 판별 로직 구현 필요 uiState.value.deviceIdentifier.memberStatus
     private fun loadId() {
         viewModelScope.launch {
             userStorageRepository
                 .loadId()
                 .onSuccess { result ->
-                    _deviceIdentifier.value = result
+                    _uiState.update {
+                        uiState.value.copy(deviceIdentifier = result)
+                    }
                 }.onFailure {
                     Timber.e("${it.message}")
                 }
@@ -42,7 +45,7 @@ class SettingViewModel @Inject constructor(
 
     fun loadInquiryUri(): Uri =
         "mailto:$EMAIL_RECIPIENT?subject=${Uri.encode(EMAIL_SUBJECT)}&body=${
-            Uri.encode(SettingUtils.toEmailBody(deviceIdentifier.value.fid))
+            Uri.encode(SettingUtils.toEmailBody(uiState.value.deviceIdentifier.fid))
         }".toUri()
 
     fun loadPrivacyPolicyUri(): Uri = SettingUtils.PRIVACY_POLICY_LINK.toUri()
