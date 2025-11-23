@@ -13,6 +13,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDate;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,6 +22,7 @@ import turip.member.domain.Account;
 
 @Getter
 @Entity
+@AllArgsConstructor
 @Table(name = "favorite_content", uniqueConstraints = {
         @UniqueConstraint(name = "uq_favorite_content__account_id_content_id", columnNames = {"account_id",
                 "content_id"})

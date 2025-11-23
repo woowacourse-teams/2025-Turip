@@ -14,12 +14,14 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@AllArgsConstructor
 @Table(name = "member", uniqueConstraints = {
         @UniqueConstraint(name = "uq_member__provider_provider_id", columnNames = {"provider", "provider_id"})
 })
