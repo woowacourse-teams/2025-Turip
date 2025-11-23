@@ -5,11 +5,12 @@ import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import com.on.turip.data.common.TuripCustomResult
 import com.on.turip.data.login.dto.LoginResponse
+import dagger.hilt.android.qualifiers.ActivityContext
 import javax.inject.Inject
 
 class DefaultThirdPartyLoginRemoteDatasource @Inject constructor(
-    private val context: Context,
-    private val getCredentialRequest: GetCredentialRequest,
+    @ActivityContext val context: Context,
+    val getCredentialRequest: GetCredentialRequest,
 ) : ThirdPartyLoginRemoteDatasource {
     private val credentialManager = CredentialManager.create(context)
 
@@ -20,11 +21,7 @@ class DefaultThirdPartyLoginRemoteDatasource @Inject constructor(
                 context = context,
             )
         }.fold(
-            onSuccess = { result ->
-                TuripCustomResult.success(LoginResponse.GoogleLogin(result))
-            },
-            onFailure = { error ->
-                TuripCustomResult.NetworkError(error)
-            },
+            onSuccess = { result -> TuripCustomResult.success(LoginResponse.GoogleLogin(result)) },
+            onFailure = { error -> TuripCustomResult.NetworkError(error) },
         )
 }
