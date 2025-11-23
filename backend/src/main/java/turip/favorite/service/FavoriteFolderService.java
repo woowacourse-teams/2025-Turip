@@ -107,7 +107,7 @@ public class FavoriteFolderService {
 
     @Transactional
     public void removeByAccount(Account account) {
-        favoriteFolderRepository.findAllByAccount(account).stream()
+        favoriteFolderRepository.findAllByAccount(account)
                 .forEach(favoriteFolder -> {
                     validateOwnership(account, favoriteFolder);
                     favoritePlaceRepository.deleteAllByFavoriteFolder(favoriteFolder);
