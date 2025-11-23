@@ -12,7 +12,6 @@ import turip.member.domain.Account;
 import turip.member.domain.Guest;
 import turip.member.domain.Member;
 import turip.member.domain.Provider;
-import turip.member.repository.AccountRepository;
 import turip.member.repository.MemberRepository;
 
 @Service
@@ -20,7 +19,6 @@ import turip.member.repository.MemberRepository;
 public class MemberService {
 
     private final MemberRepository memberRepository;
-    private final AccountRepository accountRepository;
     private final FavoriteContentRepository favoriteContentRepository;
     private final FavoriteFolderRepository favoriteFolderRepository;
     private final GuestService guestService;
@@ -35,7 +33,7 @@ public class MemberService {
     public Member findOrCreate(Provider provider, String providerId, String email) {
         return memberRepository.findByProviderAndProviderId(provider, providerId)
                 .orElseGet(() -> {
-                    Account savedAccount = accountRepository.save(new Account());
+                    Account savedAccount = accountService.create();
                     Member member = new Member(savedAccount, provider, providerId, email);
                     return memberRepository.save(member);
                 });
