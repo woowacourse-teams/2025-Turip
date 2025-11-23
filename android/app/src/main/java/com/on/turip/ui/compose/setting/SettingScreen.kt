@@ -11,112 +11,225 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.on.turip.R
+import com.on.turip.domain.userstorage.TuripDeviceIdentifier
+import com.on.turip.ui.common.model.MemberStatus
 import com.on.turip.ui.compose.common.component.TuripAppBar
 import com.on.turip.ui.compose.theme.TuripTheme
 import com.on.turip.ui.main.favorite.SettingViewModel
+import timber.log.Timber
 
 @Composable
 fun SettingScreen(
-    loginStatus: LoginStatus,
-    onBackNavigate: () -> Unit,
-    onInquiryNavigate: (Uri) -> Unit,
-    onPrivacyPolicyNavigate: (Uri) -> Unit,
-    onLoginNavigate: () -> Unit,
-    onLogoutNavigate: () -> Unit,
-    onWithdrawClick: () -> Unit,
-    modifier: Modifier = Modifier,
+    navigateToBack: () -> Unit,
+    navigateToInquiry: (Uri) -> Unit,
+    navigateToPrivacyPolicy: (Uri) -> Unit,
+    navigateToLoginScreen: () -> Unit,
     viewModel: SettingViewModel = hiltViewModel(),
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    SettingScreen(
+        uiState = uiState,
+        onClickBack = navigateToBack,
+        onClickInquiry = {
+            navigateToInquiry(viewModel.loadInquiryUri())
+            Timber.d("SettingScreen 문의하기 버튼 클릭")
+        },
+        onClickPrivacyPolicy = {
+            navigateToPrivacyPolicy(viewModel.loadPrivacyPolicyUri())
+            Timber.d("SettingScreen 개인정보처리 방침 버튼 클릭")
+        },
+        onClickLogin = {
+            navigateToLoginScreen()
+            Timber.d("SettingScreen 로그인 버튼 클릭")
+        },
+        onClickLogout = {
+            // TODO : ViewModel 에서 로그아웃 로직 처리 후 로그인 화면으로 이동
+            navigateToLoginScreen()
+            Timber.d("SettingScreen 로그아웃 버튼 클릭")
+        },
+        onClickWithdraw = {
+            // TODO : ViewModel 에서 회원탈퇴 로직 처리 후 로그인 화면으로 이동
+            navigateToLoginScreen()
+            Timber.d("SettingScreen 회원탈퇴 버튼 클릭")
+        },
+    )
+}
+
+@Composable
+private fun SettingScreen(
+    uiState: SettingUiState,
+    onClickBack: () -> Unit,
+    onClickInquiry: () -> Unit,
+    onClickPrivacyPolicy: () -> Unit,
+    onClickLogin: () -> Unit,
+    onClickLogout: () -> Unit,
+    onClickWithdraw: () -> Unit,
 ) {
     Scaffold(
         modifier =
-            modifier
+            Modifier
                 .fillMaxSize()
                 .background(Color.White)
                 .systemBarsPadding(),
         topBar = {
             TuripAppBar(
                 canBack = true,
-                onBackNavigate = onBackNavigate,
+                onBackNavigate = onClickBack,
             )
         },
     ) { innerPadding ->
-        Column(
-            modifier =
-                Modifier
-                    .padding(innerPadding)
-                    .fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(5.dp),
-        ) {
-            HorizontalDivider(
-                thickness = 8.dp,
-                color = colorResource(R.color.gray_100_f0f0ee),
-            )
+        SettingScreenContent(
+            uiState = uiState,
+            onClickInquiry = onClickInquiry,
+            onClickPrivacyPolicy = onClickPrivacyPolicy,
+            onClickLogin = onClickLogin,
+            onClickLogout = onClickLogout,
+            onClickWithdraw = onClickWithdraw,
+            modifier = Modifier.padding(innerPadding),
+        )
+    }
+}
 
-            SettingItem(
-                onClick = { onInquiryNavigate(viewModel.loadInquiryUri()) },
-                icon = R.drawable.ic_inquire,
-                title = "문의하기",
-                modifier = Modifier.fillMaxWidth(),
-            )
-            SettingItem(
-                onClick = { onPrivacyPolicyNavigate(viewModel.loadPrivacyPolicyUri()) },
-                icon = R.drawable.ic_document,
-                title = "개인 정보 처리방침",
-                modifier = Modifier.fillMaxWidth(),
-            )
-            when (loginStatus) {
-                LoginStatus.MEMBER -> {
-                    SettingItem(
-                        onClick = onLogoutNavigate,
-                        icon = R.drawable.ic_logout,
-                        title = "로그아웃",
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                    SettingItem(
-                        onClick = onWithdrawClick,
-                        icon = R.drawable.ic_withdraw,
-                        title = "회원 탈퇴",
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
+@Composable
+private fun SettingScreenContent(
+    uiState: SettingUiState,
+    onClickInquiry: () -> Unit,
+    onClickPrivacyPolicy: () -> Unit,
+    onClickLogin: () -> Unit,
+    onClickLogout: () -> Unit,
+    onClickWithdraw: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(5.dp),
+    ) {
+        SettingCommonScreen(onClickInquiry, onClickPrivacyPolicy)
 
-                LoginStatus.GUEST -> {
-                    SettingItem(
-                        onClick = onLoginNavigate,
-                        icon = R.drawable.ic_login,
-                        title = "로그인",
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
+        when (uiState.memberStatus) {
+            MemberStatus.MEMBER -> {
+                SettingForMemberScreen(onClickLogout, onClickWithdraw)
+            }
+
+            MemberStatus.GUEST -> {
+                SettingForGuestScreen(onClickLogin)
             }
         }
     }
 }
 
-enum class LoginStatus {
-    MEMBER,
-    GUEST,
+@Composable
+private fun SettingCommonScreen(
+    onClickInquiry: () -> Unit,
+    onClickPrivacyPolicy: () -> Unit,
+) {
+    HorizontalDivider(
+        thickness = 8.dp,
+        color = colorResource(R.color.gray_100_f0f0ee),
+    )
+
+    SettingItem(
+        uiModel =
+            SettingModel(
+                iconResource = R.drawable.ic_inquire,
+                titleResource = R.string.setting_inquiry,
+            ),
+        onClick = onClickInquiry,
+        modifier = Modifier.fillMaxWidth(),
+    )
+    SettingItem(
+        uiModel =
+            SettingModel(
+                iconResource = R.drawable.ic_document,
+                titleResource = R.string.setting_privacy_policy,
+            ),
+        onClick = onClickPrivacyPolicy,
+        modifier = Modifier.fillMaxWidth(),
+    )
+}
+
+@Composable
+private fun SettingForGuestScreen(onClickLogin: () -> Unit) {
+    SettingItem(
+        uiModel =
+            SettingModel(
+                iconResource = R.drawable.ic_login,
+                titleResource = R.string.setting_login,
+            ),
+        onClick = onClickLogin,
+        modifier = Modifier.fillMaxWidth(),
+    )
+}
+
+@Composable
+private fun SettingForMemberScreen(
+    onClickLogout: () -> Unit,
+    onClickWithdraw: () -> Unit,
+) {
+    SettingItem(
+        uiModel =
+            SettingModel(
+                iconResource = R.drawable.ic_logout,
+                titleResource = R.string.setting_logout,
+            ),
+        onClick = onClickLogout,
+        modifier = Modifier.fillMaxWidth(),
+    )
+    SettingItem(
+        uiModel =
+            SettingModel(
+                iconResource = R.drawable.ic_withdraw,
+                titleResource = R.string.setting_withdraw,
+            ),
+        onClick = onClickWithdraw,
+        modifier = Modifier.fillMaxWidth(),
+    )
 }
 
 @Preview(showBackground = true, name = "멤버")
 @Composable
 private fun MemberSettingScreenPreview() {
-    SettingScreen(
-        loginStatus = LoginStatus.MEMBER,
-    )
+    TuripTheme {
+        SettingScreenContent(
+            uiState =
+                SettingUiState(
+                    deviceIdentifier = TuripDeviceIdentifier.EMPTY,
+                    memberStatus = MemberStatus.MEMBER,
+                ),
+            onClickInquiry = {},
+            onClickPrivacyPolicy = {},
+            onClickLogin = {},
+            onClickLogout = {},
+            onClickWithdraw = {},
+        )
+    }
 }
 
 @Preview(showBackground = true, name = "게스트")
 @Composable
 private fun GuestSettingScreenPreview() {
-    SettingScreen(
-        loginStatus = LoginStatus.GUEST,
-    )
+    TuripTheme {
+        SettingScreenContent(
+            uiState =
+                SettingUiState(
+                    deviceIdentifier = TuripDeviceIdentifier.EMPTY,
+                    memberStatus = MemberStatus.GUEST,
+                ),
+            onClickInquiry = {},
+            onClickPrivacyPolicy = {},
+            onClickLogin = {},
+            onClickLogout = {},
+            onClickWithdraw = {},
+        )
+    }
 }
