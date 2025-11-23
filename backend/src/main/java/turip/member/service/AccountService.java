@@ -25,7 +25,7 @@ public class AccountService {
         return savedAccount;
     }
 
-    public Account getById(final Long accountId) {
+    public Account getById(Long accountId) {
         return accountRepository.findById(accountId)
                 .orElseThrow(() -> new NotFoundException(ErrorTag.ACCOUNT_NOT_FOUND));
     }
