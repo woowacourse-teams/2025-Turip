@@ -1,8 +1,8 @@
 package com.on.turip.data.login.datasource
 
 import com.on.turip.data.common.TuripCustomResult
-import com.on.turip.data.login.dto.LoginResponse
+import com.on.turip.data.login.dto.LoginJwtTokenResponse
 
-interface ThirdPartyLoginRemoteDatasource {
-    suspend fun getIdToken(): TuripCustomResult<LoginResponse>
+interface LoginDatasource {
+    suspend fun postIdToken(idToken: String): TuripCustomResult<LoginJwtTokenResponse>
 }
