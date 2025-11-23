@@ -31,9 +31,9 @@ import com.on.turip.R
 import com.on.turip.domain.region.RegionCategory
 import com.on.turip.ui.compose.common.component.ErrorHandlingContainer
 import com.on.turip.ui.compose.common.component.SearchTextField
+import com.on.turip.ui.compose.common.component.TuripAppBar
 import com.on.turip.ui.compose.main.home.component.RegionList
 import com.on.turip.ui.compose.main.home.component.RegionTypeButtons
-import com.on.turip.ui.compose.common.component.TuripAppBar
 import com.on.turip.ui.compose.main.home.component.UsersLikeList
 import com.on.turip.ui.compose.theme.TuripTheme
 import com.on.turip.ui.compose.theme.TuripTypography
