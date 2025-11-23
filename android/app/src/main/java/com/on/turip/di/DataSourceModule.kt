@@ -8,8 +8,6 @@ import com.on.turip.data.favorite.datasource.DefaultFavoriteRemoteDataSource
 import com.on.turip.data.favorite.datasource.FavoriteRemoteDataSource
 import com.on.turip.data.folder.datasource.DefaultFolderRemoteDataSource
 import com.on.turip.data.folder.datasource.FolderRemoteDataSource
-import com.on.turip.data.login.datasource.DefaultThirdPartyLoginRemoteDatasource
-import com.on.turip.data.login.datasource.ThirdPartyLoginRemoteDatasource
 import com.on.turip.data.place.datasource.DefaultFavoritePlaceRemoteDataSource
 import com.on.turip.data.place.datasource.FavoritePlaceRemoteDataSource
 import com.on.turip.data.region.datasource.DefaultRegionRemoteDataSource
@@ -64,10 +62,4 @@ abstract class DataSourceModule {
     abstract fun bindFavoritePlaceRemoteDataSource(
         defaultFavoritePlaceRemoteDataSource: DefaultFavoritePlaceRemoteDataSource,
     ): FavoritePlaceRemoteDataSource
-
-    @Binds
-    @Singleton
-    abstract fun bindThirdPartyLoginRemoteDatasource(
-        defaultThirdPartyLoginRemoteDatasource: DefaultThirdPartyLoginRemoteDatasource,
-    ): ThirdPartyLoginRemoteDatasource
 }
