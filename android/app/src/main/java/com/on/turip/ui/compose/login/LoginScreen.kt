@@ -38,8 +38,10 @@ import com.on.turip.ui.compose.theme.TuripTypography
 fun LoginScreen(
     navigateToMain: () -> Unit,
     modifier: Modifier = Modifier,
+    viewmodel: LoginViewmodel,
 ) {
     var isHelpTextVisible by rememberSaveable { mutableStateOf(false) }
+
     Scaffold(
         modifier =
             modifier.noRippleClickable {
@@ -59,6 +61,9 @@ fun LoginScreen(
                 isHelpTextVisible = !isHelpTextVisible
             },
             navigateToMain = navigateToMain,
+            onClickLoginButton = {
+                viewmodel.login()
+            },
         )
     }
 }
@@ -68,6 +73,7 @@ private fun LoginScreenContent(
     navigateToMain: () -> Unit,
     isHelpTextVisible: Boolean,
     onClickHelpText: () -> Unit,
+    onClickLoginButton: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -126,7 +132,7 @@ private fun LoginScreenContent(
                 )
             }
 
-            GoogleLoginButton()
+            GoogleLoginButton(onClickLoginButton = onClickLoginButton)
             HelpText(
                 text = stringResource(R.string.login_start_to_guest),
                 style = TuripTypography.bodyLarge,
@@ -141,11 +147,11 @@ private fun LoginScreenContent(
 @Composable
 @Preview(showBackground = true, name = "HelpVisible")
 private fun HelpVisibleLoginScreenPreview() {
-    LoginScreenContent({}, true, {})
+    LoginScreenContent({}, true, {}, {})
 }
 
 @Composable
 @Preview(showBackground = true, name = "HelpInvisible")
 private fun HelpInvisibleLoginScreenPreview() {
-    LoginScreenContent({}, false, {})
+    LoginScreenContent({}, false, {}, {})
 }
