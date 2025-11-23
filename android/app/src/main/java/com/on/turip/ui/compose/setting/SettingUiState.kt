@@ -9,12 +9,16 @@ import com.on.turip.ui.common.model.MemberStatus
 data class SettingUiState(
     val deviceIdentifier: TuripDeviceIdentifier,
     val memberStatus: MemberStatus,
+    val showLogoutDialog: Boolean,
+    val showWithdrawDialog: Boolean,
 ) {
     companion object {
         val EMPTY: SettingUiState =
             SettingUiState(
                 deviceIdentifier = TuripDeviceIdentifier.EMPTY,
-                memberStatus = MemberStatus.GUEST,
+                memberStatus = MemberStatus.MEMBER,
+                showLogoutDialog = false,
+                showWithdrawDialog = false,
             )
     }
 }

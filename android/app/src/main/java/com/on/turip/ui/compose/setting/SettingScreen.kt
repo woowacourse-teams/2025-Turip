@@ -11,10 +11,12 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -23,6 +25,7 @@ import com.on.turip.R
 import com.on.turip.domain.userstorage.TuripDeviceIdentifier
 import com.on.turip.ui.common.model.MemberStatus
 import com.on.turip.ui.compose.common.component.TuripAppBar
+import com.on.turip.ui.compose.common.component.TuripDialog
 import com.on.turip.ui.compose.theme.TuripTheme
 import com.on.turip.ui.main.favorite.SettingViewModel
 import timber.log.Timber
@@ -35,7 +38,37 @@ fun SettingScreen(
     navigateToLoginScreen: () -> Unit,
     viewModel: SettingViewModel = hiltViewModel(),
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState: SettingUiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        viewModel.uiEvent.collect { event ->
+            when (event) {
+                SettingUiEvent.Logout, SettingUiEvent.Withdraw -> navigateToLoginScreen()
+            }
+        }
+    }
+
+    if (uiState.showLogoutDialog) {
+        TuripDialog(
+            title = stringResource(R.string.setting_logout),
+            message = stringResource(R.string.setting_logout_dialog_message),
+            confirmText = stringResource(R.string.setting_logout_dialog_confirm),
+            dismissText = stringResource(R.string.setting_logout_dialog_dismiss),
+            onDismissRequest = { viewModel.showLogoutDialog(show = false) },
+            onConfirmation = viewModel::confirmLogout,
+        )
+    }
+
+    if (uiState.showWithdrawDialog) {
+        TuripDialog(
+            title = stringResource(R.string.setting_withdraw),
+            message = stringResource(R.string.setting_withdraw_dialog_message),
+            confirmText = stringResource(R.string.setting_withdraw_dialog_confirm),
+            dismissText = stringResource(R.string.setting_withdraw_dialog_dismiss),
+            onDismissRequest = { viewModel.showWithdrawDialog(show = false) },
+            onConfirmation = viewModel::confirmWithdraw,
+        )
+    }
 
     SettingScreen(
         uiState = uiState,
@@ -54,12 +87,12 @@ fun SettingScreen(
         },
         onClickLogout = {
             // TODO : ViewModel 에서 로그아웃 로직 처리 후 로그인 화면으로 이동
-            navigateToLoginScreen()
+            viewModel.showLogoutDialog(show = true)
             Timber.d("SettingScreen 로그아웃 버튼 클릭")
         },
         onClickWithdraw = {
             // TODO : ViewModel 에서 회원탈퇴 로직 처리 후 로그인 화면으로 이동
-            navigateToLoginScreen()
+            viewModel.showWithdrawDialog(show = true)
             Timber.d("SettingScreen 회원탈퇴 버튼 클릭")
         },
     )
@@ -205,6 +238,8 @@ private fun MemberSettingScreenPreview() {
                 SettingUiState(
                     deviceIdentifier = TuripDeviceIdentifier.EMPTY,
                     memberStatus = MemberStatus.MEMBER,
+                    showLogoutDialog = false,
+                    showWithdrawDialog = false,
                 ),
             onClickInquiry = {},
             onClickPrivacyPolicy = {},
@@ -224,6 +259,8 @@ private fun GuestSettingScreenPreview() {
                 SettingUiState(
                     deviceIdentifier = TuripDeviceIdentifier.EMPTY,
                     memberStatus = MemberStatus.GUEST,
+                    showLogoutDialog = false,
+                    showWithdrawDialog = false,
                 ),
             onClickInquiry = {},
             onClickPrivacyPolicy = {},

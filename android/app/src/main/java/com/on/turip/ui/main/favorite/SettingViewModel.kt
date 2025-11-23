@@ -8,14 +8,18 @@ import com.on.turip.domain.userstorage.repository.UserStorageRepository
 import com.on.turip.ui.compose.common.util.SettingUtils
 import com.on.turip.ui.compose.common.util.SettingUtils.EMAIL_RECIPIENT
 import com.on.turip.ui.compose.common.util.SettingUtils.EMAIL_SUBJECT
+import com.on.turip.ui.compose.setting.SettingUiEvent
 import com.on.turip.ui.compose.setting.SettingUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @HiltViewModel
 class SettingViewModel @Inject constructor(
@@ -23,6 +27,9 @@ class SettingViewModel @Inject constructor(
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<SettingUiState> = MutableStateFlow(SettingUiState.EMPTY)
     val uiState: StateFlow<SettingUiState> = _uiState
+
+    private val _uiEvent: Channel<SettingUiEvent> = Channel(Channel.BUFFERED)
+    val uiEvent: Flow<SettingUiEvent> = _uiEvent.receiveAsFlow()
 
     init {
         loadId()
@@ -49,4 +56,32 @@ class SettingViewModel @Inject constructor(
         }".toUri()
 
     fun loadPrivacyPolicyUri(): Uri = SettingUtils.PRIVACY_POLICY_LINK.toUri()
+
+    fun showLogoutDialog(show: Boolean) {
+        _uiState.update { it.copy(showLogoutDialog = show) }
+    }
+
+    fun confirmLogout() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(showLogoutDialog = false) }
+
+            // TODO : 로그아웃 처리
+
+            _uiEvent.send(SettingUiEvent.Logout)
+        }
+    }
+
+    fun showWithdrawDialog(show: Boolean) {
+        _uiState.update { it.copy(showWithdrawDialog = show) }
+    }
+
+    fun confirmWithdraw() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(showWithdrawDialog = false) }
+
+            // TODO : 회원탈퇴 처리
+
+            _uiEvent.send(SettingUiEvent.Withdraw)
+        }
+    }
 }
