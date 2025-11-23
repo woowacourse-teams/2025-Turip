@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -18,9 +19,8 @@ import com.on.turip.ui.compose.theme.TuripTypography
 
 @Composable
 fun SettingItem(
+    uiModel: SettingModel,
     onClick: () -> Unit,
-    icon: Int,
-    title: String,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -31,12 +31,12 @@ fun SettingItem(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
-            painter = painterResource(icon),
+            painter = painterResource(uiModel.iconResource),
             contentDescription = null,
             modifier = Modifier.padding(end = 14.dp),
         )
         Text(
-            text = title,
+            text = stringResource(uiModel.titleResource),
             style = TuripTypography.bodyLarge,
             textAlign = TextAlign.Center,
         )
@@ -46,10 +46,14 @@ fun SettingItem(
 @Preview(showBackground = true)
 @Composable
 private fun SettingItemPreview() {
+    val uiModel =
+        SettingModel(
+            iconResource = R.drawable.ic_heart_pressed,
+            titleResource = R.string.setting_privacy_policy,
+        )
     SettingItem(
+        uiModel = uiModel,
         onClick = {},
-        icon = R.drawable.ic_heart_pressed,
-        title = "제리에게 물어보기",
         modifier = Modifier.fillMaxSize(),
     )
 }

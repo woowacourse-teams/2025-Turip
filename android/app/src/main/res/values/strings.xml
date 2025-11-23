@@ -37,9 +37,12 @@
     <string name="home_top_title">😊 오늘의 기분은, 여행하기 딱 좋아요!</string>
     <string name="home_users_like_content_title">❤️ 한 주간 가장 많이 찜 된 콘텐츠</string>
 
-    <!-- 찜 목록 페이지 -->
-    <string name="bottom_sheet_favorite_help_information_inquiry">문의하기</string>
-    <string name="bottom_sheet_favorite_help_information_privacy_policy">개인 정보 처리 방침</string>
+    <!-- 환경 설정 화면 -->
+    <string name="setting_inquiry">문의하기</string>
+    <string name="setting_privacy_policy">개인 정보 처리 방침</string>
+    <string name="setting_login">로그인</string>
+    <string name="setting_logout">로그아웃</string>
+    <string name="setting_withdraw">회원 탈퇴</string>
 
     <!-- 찜 컨텐츠 목록 페이지 -->
     <string name="favorite_content_empty_suggest_title">컨텐츠를 찜 해보세요!</string>
