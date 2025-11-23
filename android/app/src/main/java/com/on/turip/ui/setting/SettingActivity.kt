@@ -9,6 +9,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import com.on.turip.ui.compose.setting.SettingScreen
 import com.on.turip.ui.compose.theme.TuripTheme
+import com.on.turip.ui.login.LoginActivity
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -30,6 +31,13 @@ class SettingActivity : AppCompatActivity() {
                         startActivity(intent)
                     },
                     navigateToLoginScreen = {
+                        val intent: Intent =
+                            LoginActivity.newIntent(this).apply {
+                                flags =
+                                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            }
+                        startActivity(intent)
+                        finish()
                     },
                 )
             }
