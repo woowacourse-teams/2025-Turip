@@ -7,9 +7,9 @@ import javax.inject.Inject
 class LoginViewmodel @Inject constructor(
     val loginRepository: LoginRepository,
 ) {
-    fun login() {
+    fun login(onLoginSuccess: () -> Unit) {
         runBlocking {
-            loginRepository.login()
+            loginRepository.login(onLoginSuccess)
         }
     }
 }

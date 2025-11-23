@@ -19,7 +19,7 @@ import javax.inject.Inject
 class DefaultLoginRepository @Inject constructor(
     val thirdPartyLoginRemoteDatasource: ThirdPartyLoginRemoteDatasource,
 ) : LoginRepository {
-    override fun login() {
+    override fun login(onLoginSuccess: () -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
             val idTokenResponse =
                 async {
@@ -28,13 +28,20 @@ class DefaultLoginRepository @Inject constructor(
 
             idTokenResponse.onSuccess { result: LoginResponse ->
                 when (result) {
-                    is LoginResponse.GoogleLogin -> handleSignIn(result.getCredentialResponse)
+                    is LoginResponse.GoogleLogin ->
+                        handleSignIn(
+                            result.getCredentialResponse,
+                            onLoginSuccess,
+                        )
                 }
             }
         }
     }
 
-    private fun handleSignIn(result: GetCredentialResponse) {
+    private fun handleSignIn(
+        result: GetCredentialResponse,
+        onLoginSuccess: () -> Unit,
+    ) {
         when (val credential: Credential = result.credential) {
             is CustomCredential -> {
                 if (credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
@@ -42,6 +49,7 @@ class DefaultLoginRepository @Inject constructor(
                         val googleIdTokenCredential =
                             GoogleIdTokenCredential.createFrom(credential.data)
                         Timber.d("인증 성공, id token = ${googleIdTokenCredential.idToken}")
+                        onLoginSuccess()
                     } catch (e: GoogleIdTokenParsingException) {
                         Timber.e("유효하지 않은 id token : $e")
                     }

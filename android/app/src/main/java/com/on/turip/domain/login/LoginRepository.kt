@@ -1,5 +1,5 @@
 package com.on.turip.domain.login
 
 interface LoginRepository {
-    fun login()
+    fun login(onLoginSuccess: () -> Unit)
 }
