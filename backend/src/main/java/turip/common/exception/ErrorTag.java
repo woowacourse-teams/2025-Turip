@@ -8,6 +8,7 @@ public enum ErrorTag {
     FAVORITE_FOLDER_NAME_TOO_LONG("찜폴더 이름의 최대 길이를 초과했습니다."),
     DEFAULT_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED("기본 찜폴더에는 이 작업을 수행할 수 없습니다."),
     REGION_CATEGORY_INVALID("잘못된 지역 카테고리입니다."),
+    DEVICE_FID_REQUIRED("요청 헤더에 device_fid가 존재하지 않습니다."),
 
     // 401 Unauthorized
     UNAUTHORIZED("토큰 기반 인증에 실패했습니다."),

@@ -175,6 +175,25 @@ public class AuthController {
                     description = "성공 예시"
             ),
             @ApiResponse(
+                    responseCode = "400",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "device fid not exists",
+                                    summary = "요청 헤더에 device fid가 존재하지 않는 경우",
+                                    value = """
+                                            {
+                                            	"tag": "DEVICE_FID_REQUIRED",
+                                            	"message": "요청 헤더에 device_fid가 존재하지 않습니다."
+                                            }
+                                            """
+                            )
+                    )
+
+            ),
+            @ApiResponse(
                     responseCode = "401",
                     description = "실패 예시",
                     content = @Content(

@@ -8,7 +8,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 import turip.common.exception.ErrorTag;
-import turip.common.exception.custom.UnauthorizedException;
+import turip.common.exception.custom.BadRequestException;
 import turip.member.service.GuestService;
 
 @Component
@@ -31,7 +31,7 @@ public class AuthGuestArgumentResolver implements HandlerMethodArgumentResolver 
     ) {
         String deviceFid = webRequest.getHeader("device-fid");
         if (deviceFid == null || deviceFid.isBlank()) {
-            throw new UnauthorizedException(ErrorTag.UNAUTHORIZED);
+            throw new BadRequestException(ErrorTag.DEVICE_FID_REQUIRED);
         }
         return guestService.findOrCreateByDeviceFid(deviceFid);
     }
