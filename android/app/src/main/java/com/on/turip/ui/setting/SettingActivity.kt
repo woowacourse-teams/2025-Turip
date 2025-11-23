@@ -7,7 +7,6 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import com.on.turip.ui.compose.setting.LoginStatus
 import com.on.turip.ui.compose.setting.SettingScreen
 import com.on.turip.ui.compose.theme.TuripTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -21,21 +20,23 @@ class SettingActivity : AppCompatActivity() {
         setContent {
             TuripTheme {
                 SettingScreen(
-                    loginStatus = LoginStatus.MEMBER,
-                    onBackNavigate = { finish() },
-                    onInquiryNavigate = { uri: Uri ->
+                    navigateToBack = { finish() },
+                    navigateToInquiry = { uri: Uri ->
                         val intent: Intent = Intent(Intent.ACTION_SENDTO).apply { data = uri }
                         startActivity(intent)
                     },
-                    onPrivacyPolicyNavigate = { uri: Uri ->
+                    navigateToPrivacyPolicy = { uri: Uri ->
                         val intent: Intent = Intent(Intent.ACTION_VIEW, uri)
                         startActivity(intent)
                     },
-                    onLoginNavigate = {},
-                    onLogoutNavigate = {},
-                    onWithdrawClick = {},
+                    navigateToLoginScreen = {
+                    },
                 )
             }
         }
+    }
+
+    companion object {
+        fun newIntent(context: Context): Intent = Intent(context, SettingActivity::class.java)
     }
 }
