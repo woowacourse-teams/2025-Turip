@@ -1,4 +1,4 @@
-package com.on.turip.ui.main.favorite
+package com.on.turip.ui.setting
 
 import android.content.Context
 import android.content.Intent
