@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -82,6 +83,12 @@ public class MemberController {
     public ResponseEntity<Void> migrate(@Parameter(hidden = true) @AuthMember Member member,
                                         @Parameter(hidden = true) @AuthGuest Guest guest) {
         memberService.migrate(member, guest);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/me")
+    public ResponseEntity<Void> delete(@Parameter(hidden = true) @AuthMember Member member) {
+        memberService.delete(member);
         return ResponseEntity.noContent().build();
     }
 }

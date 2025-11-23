@@ -3,6 +3,7 @@ package turip.member.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import turip.auth.service.RefreshTokenService;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.NotFoundException;
 import turip.favorite.repository.FavoriteContentRepository;
@@ -24,6 +25,7 @@ public class MemberService {
     private final FavoriteFolderRepository favoriteFolderRepository;
     private final GuestService guestService;
     private final AccountService accountService;
+    private final RefreshTokenService refreshTokenService;
 
     public boolean isFirstLogin(Provider provider, String providerId) {
         return !memberRepository.existsByProviderAndProviderId(provider, providerId);
@@ -49,6 +51,13 @@ public class MemberService {
         migrateFavoriteContents(member, guest);
         migrateFavoriteFolders(member, guest);
         guestService.delete(guest);
+    }
+
+    @Transactional
+    public void delete(Member member) {
+        refreshTokenService.deleteByMember(member);
+        memberRepository.delete(member);
+        accountService.deleteAccountAndFavorites(member.getAccount());
     }
 
     private void migrateFavoriteContents(Member member, Guest guest) {

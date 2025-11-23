@@ -34,7 +34,13 @@ public class RefreshTokenService {
                 .orElseThrow(() -> new UnauthorizedException(ErrorTag.REFRESH_TOKEN_NOT_FOUND));
     }
 
+    @Transactional
     public void deleteByMemberAndDeviceFid(Member member, String deviceFid) {
         refreshTokenRepository.deleteByMemberAndDeviceFid(member, deviceFid);
+    }
+
+    @Transactional
+    public void deleteByMember(Member member) {
+        refreshTokenRepository.deleteAllByMember(member);
     }
 }

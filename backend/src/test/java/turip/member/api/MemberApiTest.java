@@ -217,4 +217,115 @@ class MemberApiTest {
                     .statusCode(400);
         }
     }
+
+    @Nested
+    @DisplayName("/members/me DELETE 회원 탈퇴 테스트")
+    class DeleteMemberTest {
+
+        @Test
+        @DisplayName("회원 탈퇴 시 Member와 연관된 찜 데이터를 모두 삭제하고 204 No Content를 응답한다")
+        void deleteMemberSuccess() {
+            // given
+            // 1. Account와 Member 생성
+            jdbcTemplate.update("INSERT INTO account (id) VALUES (1)");
+            jdbcTemplate.update(
+                    "INSERT INTO member (id, account_id, provider, provider_id, email) VALUES (1, 1, 'GOOGLE', 'google-user-delete', 'delete@gmail.com')"
+            );
+
+            // 2. Member의 FavoriteFolder 생성
+            jdbcTemplate.update(
+                    "INSERT INTO favorite_folder (id, account_id, name, is_default) VALUES (1, 1, '기본 폴더', true)"
+            );
+            jdbcTemplate.update(
+                    "INSERT INTO favorite_folder (id, account_id, name, is_default) VALUES (2, 1, '커스텀 폴더', false)"
+            );
+
+            // 3. FavoriteContent를 위한 Content 생성
+            jdbcTemplate.update(
+                    "INSERT INTO creator (id, profile_image, channel_name) VALUES (1, 'https://image.example.com/creator1.jpg', 'TravelMate')"
+            );
+            jdbcTemplate.update(
+                    "INSERT INTO country (id, name, image_url) VALUES (1, '대한민국', 'https://image.example.com/korea.jpg')"
+            );
+            jdbcTemplate.update(
+                    "INSERT INTO city (id, name, country_id, province_id, image_url) VALUES (1, '서울', 1, null, 'https://image.example.com/seoul.jpg')"
+            );
+            jdbcTemplate.update(
+                    "INSERT INTO content (id, creator_id, city_id, url, title, uploaded_date) VALUES (1, 1, 1, 'https://youtube.com/watch?v=abcd1', '서울 데이트 코스 추천', '2024-07-01')"
+            );
+
+            // 4. Member의 FavoriteContent 생성
+            jdbcTemplate.update(
+                    "INSERT INTO favorite_content (id, account_id, content_id, created_at) VALUES (1, 1, 1, '2024-01-01')"
+            );
+
+            // 5. Member 로그인해서 access token 받기
+            String idToken = "valid-google-id-token";
+
+            when(googleTokenParser.getProvider()).thenReturn(Provider.GOOGLE);
+            when(googleTokenParser.getProviderId(idToken)).thenReturn("google-user-delete");
+            when(googleTokenParser.getEmail(idToken)).thenReturn("delete@gmail.com");
+
+            Map<String, String> loginRequest = new HashMap<>();
+            loginRequest.put("idToken", idToken);
+
+            String accessToken = RestAssured
+                    .given().log().all()
+                    .contentType(ContentType.JSON)
+                    .header("device-fid", "device-123")
+                    .body(loginRequest)
+                    .when().post("/login/google")
+                    .then().log().all()
+                    .statusCode(200)
+                    .body("accessToken", notNullValue())
+                    .extract().path("accessToken");
+
+            // when & then
+            RestAssured
+                    .given().log().all()
+                    .header("Authorization", "Bearer " + accessToken)
+                    .when().delete("/members/me")
+                    .then().log().all()
+                    .statusCode(204);
+
+            // 검증: Member가 삭제되었는지 확인
+            Integer memberCount = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM member WHERE id = 1",
+                    Integer.class
+            );
+            assert memberCount != null && memberCount == 0;
+
+            // 검증: Account가 삭제되었는지 확인
+            Integer accountCount = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM account WHERE id = 1",
+                    Integer.class
+            );
+            assert accountCount != null && accountCount == 0;
+
+            // 검증: FavoriteContent가 삭제되었는지 확인
+            Integer favoriteContentCount = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM favorite_content WHERE account_id = 1",
+                    Integer.class
+            );
+            assert favoriteContentCount != null && favoriteContentCount == 0;
+
+            // 검증: FavoriteFolder가 삭제되었는지 확인
+            Integer favoriteFolderCount = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM favorite_folder WHERE account_id = 1",
+                    Integer.class
+            );
+            assert favoriteFolderCount != null && favoriteFolderCount == 0;
+        }
+
+        @Test
+        @DisplayName("Authorization 헤더 없이 요청 시 401 Unauthorized를 응답한다")
+        void deleteMemberWithoutAuthorizationHeader() {
+            // when & then
+            RestAssured
+                    .given().log().all()
+                    .when().delete("/members/me")
+                    .then().log().all()
+                    .statusCode(401);
+        }
+    }
 }

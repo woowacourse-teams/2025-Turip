@@ -19,16 +19,21 @@ import turip.favorite.domain.FavoriteContent;
 import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.repository.FavoriteContentRepository;
 import turip.favorite.repository.FavoriteFolderRepository;
+import turip.auth.service.RefreshTokenService;
 import turip.member.domain.Account;
 import turip.member.domain.Guest;
 import turip.member.domain.Member;
 import turip.member.domain.Provider;
+import turip.member.repository.MemberRepository;
 
 @ExtendWith(MockitoExtension.class)
 class MemberServiceTest {
 
     @InjectMocks
     private MemberService memberService;
+
+    @Mock
+    private MemberRepository memberRepository;
 
     @Mock
     private FavoriteContentRepository favoriteContentRepository;
@@ -38,6 +43,12 @@ class MemberServiceTest {
 
     @Mock
     private GuestService guestService;
+
+    @Mock
+    private AccountService accountService;
+
+    @Mock
+    private RefreshTokenService refreshTokenService;
 
     @DisplayName("Guest에서 Member로 데이터 마이그레이션 테스트")
     @Nested
@@ -113,6 +124,27 @@ class MemberServiceTest {
 
             // then
             verify(guestService).delete(guest);
+        }
+    }
+
+    @DisplayName("Member 삭제(회원 탈퇴) 테스트")
+    @Nested
+    class DeleteTest {
+
+        @DisplayName("Member를 삭제하고 연관된 RefreshToken, Account, 찜 데이터를 삭제한다")
+        @Test
+        void delete() {
+            // given
+            Account account = new Account(1L);
+            Member member = new Member(1L, account, Provider.GOOGLE, "providerId", "email@test.com");
+
+            // when
+            memberService.delete(member);
+
+            // then
+            verify(refreshTokenService).deleteByMember(member);
+            verify(memberRepository).delete(member);
+            verify(accountService).deleteAccountAndFavorites(account);
         }
     }
 }
