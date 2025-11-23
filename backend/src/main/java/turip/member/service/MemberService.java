@@ -12,7 +12,6 @@ import turip.member.domain.Guest;
 import turip.member.domain.Member;
 import turip.member.domain.Provider;
 import turip.member.repository.AccountRepository;
-import turip.member.repository.GuestRepository;
 import turip.member.repository.MemberRepository;
 
 @Service
@@ -23,7 +22,8 @@ public class MemberService {
     private final AccountRepository accountRepository;
     private final FavoriteContentRepository favoriteContentRepository;
     private final FavoriteFolderRepository favoriteFolderRepository;
-    private final GuestRepository guestRepository;
+    private final GuestService guestService;
+    private final AccountService accountService;
 
     public boolean isFirstLogin(Provider provider, String providerId) {
         return !memberRepository.existsByProviderAndProviderId(provider, providerId);
@@ -48,7 +48,7 @@ public class MemberService {
     public void migrate(Member member, Guest guest) {
         migrateFavoriteContents(member, guest);
         migrateFavoriteFolders(member, guest);
-        deleteGuest(guest);
+        guestService.delete(guest);
     }
 
     private void migrateFavoriteContents(Member member, Guest guest) {
@@ -61,9 +61,5 @@ public class MemberService {
 
         favoriteFolderRepository.findAllByAccount(guest.getAccount())
                 .forEach(favoriteFolder -> favoriteFolder.updateAccount(member.getAccount()));
-    }
-
-    private void deleteGuest(Guest guest) {
-        guestRepository.delete(guest);
     }
 }

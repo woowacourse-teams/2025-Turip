@@ -33,6 +33,12 @@ public class FavoriteFolderService {
     private final PlaceRepository placeRepository;
 
     @Transactional
+    public void createDefaultFavoriteFolder(Account account) {
+        FavoriteFolder defaultFolder = FavoriteFolder.defaultFolderOf(account);
+        favoriteFolderRepository.save(defaultFolder);
+    }
+
+    @Transactional
     public FavoriteFolderResponse createCustomFavoriteFolder(FavoriteFolderRequest request, Account account) {
         FavoriteFolder favoriteFolder = FavoriteFolder.customFolderOf(account, request.name());
 
@@ -95,7 +101,18 @@ public class FavoriteFolderService {
         }
         validateOwnership(account, favoriteFolder);
 
+        favoritePlaceRepository.deleteAllByFavoriteFolder(favoriteFolder);
         favoriteFolderRepository.deleteById(favoriteFolderId);
+    }
+
+    @Transactional
+    public void removeByAccount(Account account) {
+        favoriteFolderRepository.findAllByAccount(account).stream()
+                .forEach(favoriteFolder -> {
+                    validateOwnership(account, favoriteFolder);
+                    favoritePlaceRepository.deleteAllByFavoriteFolder(favoriteFolder);
+                    favoriteFolderRepository.delete(favoriteFolder);
+                });
     }
 
     private void validateDuplicatedName(String folderName, Account account) {

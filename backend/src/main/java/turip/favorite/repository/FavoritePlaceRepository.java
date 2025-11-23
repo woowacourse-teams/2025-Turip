@@ -33,4 +33,6 @@ public interface FavoritePlaceRepository extends JpaRepository<FavoritePlace, Lo
     @Query("SELECT fp.favoriteFolder.id FROM FavoritePlace fp WHERE fp.place = :place AND fp.favoriteFolder IN :favoriteFolders")
     Set<Long> findFavoriteFolderIdsByPlaceAndFavoriteFolderIn(@Param("place") Place place,
                                                               @Param("favoriteFolders") List<FavoriteFolder> favoriteFolders);
+
+    void deleteAllByFavoriteFolder(FavoriteFolder favoriteFolder);
 }

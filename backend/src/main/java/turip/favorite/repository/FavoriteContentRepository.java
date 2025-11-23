@@ -53,4 +53,6 @@ public interface FavoriteContentRepository extends JpaRepository<FavoriteContent
     );
 
     List<FavoriteContent> findAllByAccount(Account account);
+
+    void deleteByAccount(Account account);
 }

@@ -22,4 +22,10 @@ public class GuestService {
                     return guestRepository.save(new Guest(savedAccount, deviceFid));
                 });
     }
+
+    @Transactional
+    public void delete(Guest guest) {
+        guestRepository.delete(guest);
+        accountService.deleteAccountAndFavorites(guest.getAccount());
+    }
 }

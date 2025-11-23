@@ -23,7 +23,6 @@ import turip.member.domain.Account;
 import turip.member.domain.Guest;
 import turip.member.domain.Member;
 import turip.member.domain.Provider;
-import turip.member.repository.GuestRepository;
 
 @ExtendWith(MockitoExtension.class)
 class MemberServiceTest {
@@ -38,7 +37,7 @@ class MemberServiceTest {
     private FavoriteFolderRepository favoriteFolderRepository;
 
     @Mock
-    private GuestRepository guestRepository;
+    private GuestService guestService;
 
     @DisplayName("Guest에서 Member로 데이터 마이그레이션 테스트")
     @Nested
@@ -113,7 +112,7 @@ class MemberServiceTest {
             memberService.migrate(member, guest);
 
             // then
-            verify(guestRepository).delete(guest);
+            verify(guestService).delete(guest);
         }
     }
 }

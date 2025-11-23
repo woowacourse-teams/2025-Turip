@@ -51,6 +51,25 @@ class FavoriteFolderServiceTest {
     @Mock
     private PlaceRepository placeRepository;
 
+    @DisplayName("기본 장소 찜 폴더 생성 테스트")
+    @Nested
+    class CreateDefaultFavoriteFolder {
+
+        @DisplayName("기본 찜 폴더를 생성할 수 있다")
+        @Test
+        void createDefaultFavoriteFolder() {
+            // given
+            Long accountId = 1L;
+            Account account = new Account(accountId);
+
+            // when
+            favoriteFolderService.createDefaultFavoriteFolder(account);
+
+            // then
+            verify(favoriteFolderRepository).save(FavoriteFolder.defaultFolderOf(account));
+        }
+    }
+
     @DisplayName("커스텀 장소 찜 폴더 생성 테스트")
     @Nested
     class CreateCustomFavoriteFolder {
@@ -375,6 +394,7 @@ class FavoriteFolderServiceTest {
             favoriteFolderService.remove(member, folderId);
 
             // then
+            verify(favoritePlaceRepository).deleteAllByFavoriteFolder(favoriteFolder);
             verify(favoriteFolderRepository).deleteById(folderId);
         }
 
@@ -437,6 +457,51 @@ class FavoriteFolderServiceTest {
             assertThatThrownBy(() -> favoriteFolderService.remove(member, folderId))
                     .isInstanceOf(BadRequestException.class)
                     .hasMessage(ErrorTag.DEFAULT_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED.getMessage());
+        }
+    }
+
+    @DisplayName("Account 기준 장소 찜 폴더 일괄 삭제 테스트")
+    @Nested
+    class RemoveByAccount {
+
+        @DisplayName("Account의 모든 장소 찜 폴더와 폴더 내 장소 찜들을 삭제할 수 있다")
+        @Test
+        void removeByAccount1() {
+            // given
+            Long accountId = 1L;
+            Account account = new Account(accountId);
+
+            FavoriteFolder defaultFolder = new FavoriteFolder(1L, account, "기본 폴더", true);
+            FavoriteFolder customFolder = new FavoriteFolder(2L, account, "커스텀 폴더", false);
+
+            given(favoriteFolderRepository.findAllByAccount(account))
+                    .willReturn(List.of(defaultFolder, customFolder));
+
+            // when
+            favoriteFolderService.removeByAccount(account);
+
+            // then
+            verify(favoritePlaceRepository).deleteAllByFavoriteFolder(defaultFolder);
+            verify(favoritePlaceRepository).deleteAllByFavoriteFolder(customFolder);
+            verify(favoriteFolderRepository).delete(defaultFolder);
+            verify(favoriteFolderRepository).delete(customFolder);
+        }
+
+        @DisplayName("Account에 폴더가 없는 경우에도 정상적으로 처리된다")
+        @Test
+        void removeByAccount2() {
+            // given
+            Long accountId = 1L;
+            Account account = new Account(accountId);
+
+            given(favoriteFolderRepository.findAllByAccount(account))
+                    .willReturn(List.of());
+
+            // when
+            favoriteFolderService.removeByAccount(account);
+
+            // then
+            verify(favoriteFolderRepository).findAllByAccount(account);
         }
     }
 }
