@@ -77,7 +77,7 @@ public class AuthController {
             )
     })
     @PostMapping("/login/google")
-    public ResponseEntity<LoginResponse> login(@RequestHeader("device-fid") String deviceFid,
+    public ResponseEntity<LoginResponse> login(@Parameter(hidden = true) @RequestHeader("device-fid") String deviceFid,
                                                @RequestBody LoginRequest request) {
         LoginResponse response = authService.login(request, Provider.GOOGLE, deviceFid);
         return ResponseEntity.ok(response);
@@ -158,8 +158,9 @@ public class AuthController {
             )
     })
     @PostMapping("/token")
-    public ResponseEntity<RefreshTokenResponse> refresh(@RequestHeader("device-fid") String deviceFid,
-                                                        @RequestBody RefreshTokenRequest request) {
+    public ResponseEntity<RefreshTokenResponse> refresh(
+            @Parameter(hidden = true) @RequestHeader("device-fid") String deviceFid,
+            @RequestBody RefreshTokenRequest request) {
         RefreshTokenResponse response = authService.refresh(request, deviceFid);
         return ResponseEntity.ok(response);
     }
@@ -215,7 +216,7 @@ public class AuthController {
             )
     })
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@RequestHeader("device-fid") String deviceFid,
+    public ResponseEntity<Void> logout(@Parameter(hidden = true) @RequestHeader("device-fid") String deviceFid,
                                        @Parameter(hidden = true) @AuthAccount Account account) {
         authService.logout(account, deviceFid);
         return ResponseEntity.noContent().build();
