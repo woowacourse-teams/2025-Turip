@@ -39,7 +39,7 @@ class DefaultUserStorageLocalDataSource @Inject constructor(
             }
         }
 
-    override suspend fun getAccessToken(accessToken: String): Result<String?> =
+    override suspend fun getAccessToken(): Result<String?> =
         runCatching {
             withContext(coroutineContext) {
                 userStorage.data.first()[accessTokenKey]
@@ -53,7 +53,7 @@ class DefaultUserStorageLocalDataSource @Inject constructor(
             }
         }
 
-    override suspend fun getRefreshToken(refreshToken: String): Result<String?> =
+    override suspend fun getRefreshToken(): Result<String?> =
         runCatching {
             withContext(coroutineContext) {
                 userStorage.data.first()[refreshTokenKey]

@@ -1,5 +1,7 @@
 package com.on.turip.domain.login
 
+import com.on.turip.data.common.TuripCustomResult
+
 interface LoginRepository {
-    fun login(idToken: String)
+    suspend fun login(idToken: String): TuripCustomResult<Unit>
 }
