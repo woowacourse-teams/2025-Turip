@@ -6,8 +6,8 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import com.on.turip.data.login.datasource.GoogleCredentialManager
 import com.on.turip.ui.compose.login.LoginScreen
-import com.on.turip.ui.compose.login.LoginViewmodel
 import com.on.turip.ui.compose.theme.TuripTheme
 import com.on.turip.ui.main.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
@@ -16,7 +16,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
     @Inject
-    lateinit var loginViewmodel: LoginViewmodel
+    lateinit var googleCredentialManager: GoogleCredentialManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,7 +29,7 @@ class LoginActivity : AppCompatActivity() {
                         startActivity(MainActivity.newIntent(this@LoginActivity))
                         finish()
                     },
-                    viewmodel = loginViewmodel,
+                    googleCredentialManager = googleCredentialManager,
                 )
             }
         }

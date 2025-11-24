@@ -1,61 +1,21 @@
 package com.on.turip.data.login.repository
 
-import androidx.credentials.Credential
-import androidx.credentials.CustomCredential
-import androidx.credentials.GetCredentialResponse
-import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
-import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
 import com.on.turip.data.common.onSuccess
-import com.on.turip.data.login.datasource.ThirdPartyLoginRemoteDatasource
-import com.on.turip.data.login.dto.LoginResponse
+import com.on.turip.data.login.datasource.LoginDatasource
 import com.on.turip.domain.login.LoginRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
 class DefaultLoginRepository @Inject constructor(
-    val thirdPartyLoginRemoteDatasource: ThirdPartyLoginRemoteDatasource,
+    val loginDatasource: LoginDatasource,
 ) : LoginRepository {
-    override fun login(onLoginSuccess: () -> Unit) {
+    override fun login(idToken: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            val idTokenResponse =
-                async {
-                    thirdPartyLoginRemoteDatasource.getIdToken()
-                }.await()
-
-            idTokenResponse.onSuccess { result: LoginResponse ->
-                when (result) {
-                    is LoginResponse.GoogleLogin ->
-                        handleSignIn(
-                            result.getCredentialResponse,
-                            onLoginSuccess,
-                        )
-                }
-            }
-        }
-    }
-
-    private fun handleSignIn(
-        result: GetCredentialResponse,
-        onLoginSuccess: () -> Unit,
-    ) {
-        when (val credential: Credential = result.credential) {
-            is CustomCredential -> {
-                if (credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
-                    try {
-                        val googleIdTokenCredential =
-                            GoogleIdTokenCredential.createFrom(credential.data)
-                        Timber.d("인증 성공, id token = ${googleIdTokenCredential.idToken}")
-                        onLoginSuccess()
-                    } catch (e: GoogleIdTokenParsingException) {
-                        Timber.e("유효하지 않은 id token : $e")
-                    }
-                } else {
-                    Timber.e("구글 ID TOKEN 타입이 아닌 CustomCredential , credential type = ${credential.type}")
-                }
+            loginDatasource.postIdToken(idToken).onSuccess { result ->
+                Timber.d("토큰들 $result")
             }
         }
     }

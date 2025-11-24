@@ -29,7 +29,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.on.turip.R
+import com.on.turip.data.login.datasource.GoogleCredentialManager
 import com.on.turip.ui.compose.common.component.HelpText
 import com.on.turip.ui.compose.common.util.noRippleClickable
 import com.on.turip.ui.compose.theme.TuripTypography
@@ -37,8 +39,9 @@ import com.on.turip.ui.compose.theme.TuripTypography
 @Composable
 fun LoginScreen(
     navigateToMain: () -> Unit,
+    googleCredentialManager: GoogleCredentialManager,
     modifier: Modifier = Modifier,
-    viewmodel: LoginViewmodel,
+    viewmodel: LoginViewmodel = hiltViewModel<LoginViewmodel>(),
 ) {
     var isHelpTextVisible by rememberSaveable { mutableStateOf(false) }
 
@@ -62,7 +65,7 @@ fun LoginScreen(
             },
             navigateToMain = navigateToMain,
             onClickLoginButton = {
-                viewmodel.login(navigateToMain)
+                viewmodel.login(googleCredentialManager)
             },
         )
     }
@@ -123,12 +126,10 @@ private fun LoginScreenContent(
                                         colorResource(R.color.gray_200_c1c1c1),
                                     ),
                                 shape = RoundedCornerShape(10.dp),
-                            )
-                            .background(
+                            ).background(
                                 color = colorResource(R.color.gray_300_5b5b5b),
                                 shape = RoundedCornerShape(10.dp),
-                            )
-                            .fillMaxWidth()
+                            ).fillMaxWidth()
                             .padding(vertical = 20.dp),
                     textAlign = TextAlign.Center,
                 )
