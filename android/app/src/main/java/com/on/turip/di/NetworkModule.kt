@@ -93,7 +93,7 @@ object NetworkModule {
                     chain.proceed(memberRequest)
                 }
 
-                UserType.GUEST -> {
+                UserType.GUEST, UserType.NONE -> {
                     val guestRequest: Request =
                         chain
                             .request()

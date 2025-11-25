@@ -3,12 +3,13 @@ package com.on.turip.ui.compose.login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.on.turip.common.AuthState
+import com.on.turip.common.UserType
 import com.on.turip.data.common.onFailure
 import com.on.turip.data.common.onSuccess
 import com.on.turip.data.login.datasource.GoogleCredentialManager
 import com.on.turip.domain.login.LoginRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,6 +18,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewmodel @Inject constructor(
@@ -39,6 +41,7 @@ class LoginViewmodel @Inject constructor(
                 .onSuccess { result: GoogleIdTokenCredential ->
                     // TODO : Usecase 에서 처리
                     loginRepository.login(result.idToken)
+                    AuthState.change(UserType.MEMBER)
                     _uiEvent.send(LoginUiEvent.NavigateToMain)
                 }.onFailure {
                     Timber.e("IdToken불러오기 실패")
@@ -49,6 +52,7 @@ class LoginViewmodel @Inject constructor(
     fun onGuestLogin() {
         viewModelScope.launch {
             // TODO : DataStore 에 게스트 상태 저장
+            AuthState.change(UserType.GUEST)
             _uiEvent.send(LoginUiEvent.NavigateToMain)
         }
     }
