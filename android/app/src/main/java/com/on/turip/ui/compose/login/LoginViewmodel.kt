@@ -9,6 +9,7 @@ import com.on.turip.data.common.onFailure
 import com.on.turip.data.common.onSuccess
 import com.on.turip.data.login.datasource.GoogleCredentialManager
 import com.on.turip.domain.login.LoginRepository
+import com.on.turip.domain.login.usecase.LoginUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -23,6 +24,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewmodel @Inject constructor(
     private val loginRepository: LoginRepository,
+    private val loginUserUseCase: LoginUserUseCase,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<LoginUiState> = MutableStateFlow(LoginUiState.EMPTY)
     val uiState: StateFlow<LoginUiState> = _uiState
@@ -39,10 +41,13 @@ class LoginViewmodel @Inject constructor(
             googleCredentialManager
                 .getIdToken()
                 .onSuccess { result: GoogleIdTokenCredential ->
-                    // TODO : Usecase 에서 처리
-                    loginRepository.login(result.idToken)
-                    AuthState.change(UserType.MEMBER)
-                    _uiEvent.send(LoginUiEvent.NavigateToMain)
+                    loginUserUseCase(result.idToken)
+                        .onSuccess {
+                            AuthState.change(UserType.MEMBER)
+                            _uiEvent.send(LoginUiEvent.NavigateToMain)
+                        }.onFailure {
+                            Timber.e("Token 저장 실패")
+                        }
                 }.onFailure {
                     Timber.e("IdToken불러오기 실패")
                 }
