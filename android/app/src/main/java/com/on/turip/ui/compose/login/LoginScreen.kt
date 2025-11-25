@@ -15,10 +15,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,6 +28,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.on.turip.R
 import com.on.turip.data.login.datasource.GoogleCredentialManager
 import com.on.turip.ui.compose.common.component.HelpText
@@ -40,16 +39,37 @@ import com.on.turip.ui.compose.theme.TuripTypography
 fun LoginScreen(
     navigateToMain: () -> Unit,
     googleCredentialManager: GoogleCredentialManager,
-    modifier: Modifier = Modifier,
-    viewmodel: LoginViewmodel = hiltViewModel<LoginViewmodel>(),
+    viewmodel: LoginViewmodel = hiltViewModel(),
 ) {
-    var isHelpTextVisible by rememberSaveable { mutableStateOf(false) }
+    val uiState: LoginUiState by viewmodel.uiState.collectAsStateWithLifecycle()
 
+    LaunchedEffect(Unit) {
+        viewmodel.uiEvent.collect { event ->
+            when (event) {
+                LoginUiEvent.NavigateToMain -> navigateToMain()
+            }
+        }
+    }
+
+    LoginScreen(
+        uiState = uiState,
+        onChangeHelpTextVisible = { visible: Boolean -> viewmodel.updateHelpTextVisible(visible) },
+        onClickGoogleLogin = { viewmodel.onGoogleLogin(googleCredentialManager) },
+        onClickGuestLogin = viewmodel::onGuestLogin,
+    )
+}
+
+@Composable
+private fun LoginScreen(
+    uiState: LoginUiState,
+    onChangeHelpTextVisible: (Boolean) -> Unit,
+    onClickGoogleLogin: () -> Unit,
+    onClickGuestLogin: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Scaffold(
         modifier =
-            modifier.noRippleClickable {
-                isHelpTextVisible = false
-            },
+            modifier.noRippleClickable { onChangeHelpTextVisible(false) },
     ) { innerPadding ->
         Image(
             painter = painterResource(R.drawable.bg_login),
@@ -58,25 +78,21 @@ fun LoginScreen(
             contentScale = ContentScale.Crop,
         )
         LoginScreenContent(
-            isHelpTextVisible = isHelpTextVisible,
+            isHelpTextVisible = uiState.showHelpText,
             modifier = Modifier.padding(innerPadding),
-            onClickHelpText = {
-                isHelpTextVisible = !isHelpTextVisible
-            },
-            navigateToMain = navigateToMain,
-            onClickLoginButton = {
-                viewmodel.login(googleCredentialManager)
-            },
+            onClickHelpText = { onChangeHelpTextVisible(!uiState.showHelpText) },
+            onClickGoogleLogin = onClickGoogleLogin,
+            onClickGuestLogin = onClickGuestLogin,
         )
     }
 }
 
 @Composable
 private fun LoginScreenContent(
-    navigateToMain: () -> Unit,
     isHelpTextVisible: Boolean,
     onClickHelpText: () -> Unit,
-    onClickLoginButton: () -> Unit,
+    onClickGoogleLogin: () -> Unit,
+    onClickGuestLogin: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -135,13 +151,13 @@ private fun LoginScreenContent(
                 )
             }
 
-            GoogleLoginButton(onClickLoginButton = onClickLoginButton)
+            GoogleLoginButton(onClickLoginButton = onClickGoogleLogin)
             HelpText(
                 text = stringResource(R.string.login_start_to_guest),
                 style = TuripTypography.bodyLarge,
                 color = Color.White,
                 onClickIcon = onClickHelpText,
-                onClickText = navigateToMain,
+                onClickText = onClickGuestLogin,
             )
         }
     }
@@ -150,11 +166,21 @@ private fun LoginScreenContent(
 @Composable
 @Preview(showBackground = true, name = "HelpVisible")
 private fun HelpVisibleLoginScreenPreview() {
-    LoginScreenContent({}, true, {}, {})
+    LoginScreenContent(
+        isHelpTextVisible = true,
+        onClickHelpText = {},
+        onClickGoogleLogin = {},
+        onClickGuestLogin = {},
+    )
 }
 
 @Composable
 @Preview(showBackground = true, name = "HelpInvisible")
 private fun HelpInvisibleLoginScreenPreview() {
-    LoginScreenContent({}, false, {}, {})
+    LoginScreenContent(
+        isHelpTextVisible = false,
+        onClickHelpText = {},
+        onClickGoogleLogin = {},
+        onClickGuestLogin = {},
+    )
 }
