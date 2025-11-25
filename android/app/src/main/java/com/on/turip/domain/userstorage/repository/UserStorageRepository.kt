@@ -6,4 +6,8 @@ interface UserStorageRepository {
     suspend fun createId(turipDeviceIdentifier: TuripDeviceIdentifier)
 
     suspend fun loadId(): Result<TuripDeviceIdentifier>
+
+    suspend fun loadAccessToken(): Result<String?>
+
+    suspend fun reloadAccessToken(refreshToken: String): Result<String>
 }

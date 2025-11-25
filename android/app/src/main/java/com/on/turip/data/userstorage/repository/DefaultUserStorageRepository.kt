@@ -30,4 +30,10 @@ class DefaultUserStorageRepository @Inject constructor(
         userStorageLocalDataSource.createId(newFid)
         return newFid
     }
+
+    override suspend fun loadAccessToken(): Result<String?> = userStorageLocalDataSource.getAccessToken()
+
+    override suspend fun reloadAccessToken(refreshToken: String): Result<String> {
+        TODO("Not yet implemented")
+    }
 }

@@ -2,6 +2,8 @@ package com.on.turip.di
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.on.turip.BuildConfig
+import com.on.turip.common.AuthState
+import com.on.turip.common.UserType
 import com.on.turip.domain.userstorage.repository.UserStorageRepository
 import dagger.Module
 import dagger.Provides
@@ -13,6 +15,7 @@ import kotlinx.serialization.json.JsonElement
 import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
+import okhttp3.Request
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import timber.log.Timber
@@ -72,14 +75,35 @@ object NetworkModule {
                     userStorageRepository.loadId().getOrNull()?.fid ?: ""
                 }
 
-            val newRequest =
-                chain
-                    .request()
-                    .newBuilder()
-                    .header("device-fid", fid)
-                    .build()
+            when (AuthState.type) {
+                UserType.MEMBER -> {
+                    val accessToken: String =
+                        runBlocking {
+                            userStorageRepository.loadAccessToken().getOrNull()
+                                ?: throw IllegalArgumentException("Access Token이 존재하지 않습니다.")
+                        }
 
-            chain.proceed(newRequest)
+                    val memberRequest: Request =
+                        chain
+                            .request()
+                            .newBuilder()
+                            .header("device-fid", fid)
+                            .header("Authorization", "Bearer $accessToken")
+                            .build()
+                    chain.proceed(memberRequest)
+                }
+
+                UserType.GUEST -> {
+                    val guestRequest: Request =
+                        chain
+                            .request()
+                            .newBuilder()
+                            .header("device-fid", fid)
+                            .build()
+
+                    chain.proceed(guestRequest)
+                }
+            }
         }
 
     @Provides
