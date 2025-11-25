@@ -14,9 +14,9 @@ import javax.inject.Inject
 
 class GoogleCredentialManager @Inject constructor(
     @ActivityContext val context: Context,
-    val getCredentialRequest: GetCredentialRequest,
+    private val getCredentialRequest: GetCredentialRequest,
 ) : CredentialProvider {
-    private val credentialManager = CredentialManager.create(context)
+    private val credentialManager by lazy { CredentialManager.create(context) }
 
     override suspend fun getIdToken(): TuripCustomResult<GoogleIdTokenCredential> =
         runCatching {
@@ -25,17 +25,13 @@ class GoogleCredentialManager @Inject constructor(
                 context = context,
             )
         }.fold(
-            onSuccess = { result ->
-                TuripCustomResult.success(handleSignIn(result))
-            },
+            onSuccess = { result -> TuripCustomResult.success(handleSignIn(result)) },
             onFailure = { error -> TuripCustomResult.NetworkError(error) },
         )
 
     private fun handleSignIn(result: GetCredentialResponse): GoogleIdTokenCredential {
         val credential: Credential = result.credential
-        if (credential is CustomCredential &&
-            credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
-        ) {
+        if (credential is CustomCredential && credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
             try {
                 return GoogleIdTokenCredential.createFrom(credential.data)
             } catch (e: GoogleIdTokenParsingException) {
