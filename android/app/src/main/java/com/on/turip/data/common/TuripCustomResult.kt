@@ -13,6 +13,7 @@ sealed class TuripCustomResult<out T> {
     ) : TuripCustomResult<Nothing>() {
         init {
             when (statusCode) {
+                401 -> Timber.e("$statusCode : 토큰이 만료되었습니다.")
                 403 -> Timber.e("$statusCode : 사용자의 권한이 없습니다.")
                 404 -> Timber.e("$statusCode : 찾을 수 없음")
                 409 -> Timber.e("$statusCode : 폴더명이 중복입니다.")
@@ -24,6 +25,7 @@ sealed class TuripCustomResult<out T> {
         val error: ServerError
             get() =
                 when (statusCode) {
+                    401 -> ServerError.TOKEN_EXPIRATION
                     403 -> ServerError.USER_NOT_HAVE_PERMISSION
                     404 -> ServerError.NOT_FOUND
                     409 -> ServerError.DUPLICATION_FOLDER
@@ -70,6 +72,7 @@ inline fun <T> TuripCustomResult<T>.onFailure(action: (ErrorEvent) -> Unit): Tur
                     ServerError.DUPLICATION_FOLDER -> ErrorEvent.DUPLICATION_FOLDER
                     ServerError.UNEXPECTED_PROBLEM -> ErrorEvent.UNEXPECTED_PROBLEM
                     ServerError.UNKNOWN -> ErrorEvent.UNEXPECTED_PROBLEM
+                    ServerError.TOKEN_EXPIRATION -> ErrorEvent.TOKEN_EXPIRATION
                 },
             )
 
