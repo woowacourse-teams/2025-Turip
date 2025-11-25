@@ -13,7 +13,4 @@ class DefaultLoginRepository @Inject constructor(
 ) : LoginRepository {
     override suspend fun login(idToken: String): TuripCustomResult<AuthTokens> =
         loginDatasource.postIdToken(idToken).mapCatching { it.toDomain() }
-//            userStorageLocalDataSource.createAccessToken(result.accessToken).getOrThrow()
-//            userStorageLocalDataSource.createRefreshToken(result.refreshToken).getOrThrow()
-//        }
 }
