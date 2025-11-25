@@ -8,23 +8,48 @@ import com.on.turip.data.common.onSuccess
 import com.on.turip.data.login.datasource.GoogleCredentialManager
 import com.on.turip.domain.login.LoginRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewmodel @Inject constructor(
-    val loginRepository: LoginRepository,
+    private val loginRepository: LoginRepository,
 ) : ViewModel() {
-    fun login(googleCredentialManager: GoogleCredentialManager) {
+    private val _uiState: MutableStateFlow<LoginUiState> = MutableStateFlow(LoginUiState.EMPTY)
+    val uiState: StateFlow<LoginUiState> = _uiState
+
+    private val _uiEvent: Channel<LoginUiEvent> = Channel(Channel.BUFFERED)
+    val uiEvent: Flow<LoginUiEvent> = _uiEvent.receiveAsFlow()
+
+    fun updateHelpTextVisible(show: Boolean) {
+        _uiState.update { it.copy(showHelpText = show) }
+    }
+
+    fun onGoogleLogin(googleCredentialManager: GoogleCredentialManager) {
         viewModelScope.launch {
             googleCredentialManager
                 .getIdToken()
                 .onSuccess { result: GoogleIdTokenCredential ->
+                    // TODO : Usecase 에서 처리
                     loginRepository.login(result.idToken)
+                    _uiEvent.send(LoginUiEvent.NavigateToMain)
                 }.onFailure {
                     Timber.e("IdToken불러오기 실패")
                 }
+        }
+    }
+
+    fun onGuestLogin() {
+        viewModelScope.launch {
+            // TODO : DataStore 에 게스트 상태 저장
+            _uiEvent.send(LoginUiEvent.NavigateToMain)
         }
     }
 }
