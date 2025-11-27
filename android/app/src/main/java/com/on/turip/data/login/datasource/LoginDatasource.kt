@@ -8,4 +8,6 @@ interface LoginDatasource {
     suspend fun postIdToken(idToken: String): TuripCustomResult<LoginJwtTokenResponse>
 
     suspend fun postReNewToken(refreshToken: String): TuripCustomResult<ReNewTokenResponse>
+
+    suspend fun getTokenVerification(token: String): TuripCustomResult<Unit>
 }

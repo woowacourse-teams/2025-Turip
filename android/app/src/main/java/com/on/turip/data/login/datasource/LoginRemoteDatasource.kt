@@ -29,4 +29,15 @@ class LoginRemoteDatasource @Inject constructor(
                 loginService.postRenewToken(ReNewTokenRequest(token))
             }
         }
+
+    override suspend fun getTokenVerification(token: String): TuripCustomResult<Unit> =
+        withContext(coroutineContext) {
+            safeApiCall {
+                loginService.getTokenVerification(AUTHORIZATION_PREFIX + token)
+            }
+        }
+
+    companion object {
+        private const val AUTHORIZATION_PREFIX = "Bearer "
+    }
 }
