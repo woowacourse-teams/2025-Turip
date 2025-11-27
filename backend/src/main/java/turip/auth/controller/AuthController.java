@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -19,9 +20,11 @@ import turip.auth.controller.dto.request.RefreshTokenRequest;
 import turip.auth.controller.dto.response.LoginResponse;
 import turip.auth.controller.dto.response.RefreshTokenResponse;
 import turip.auth.resolver.AuthAccount;
+import turip.auth.resolver.AuthMember;
 import turip.auth.service.AuthService;
 import turip.common.exception.ErrorResponse;
 import turip.member.domain.Account;
+import turip.member.domain.Member;
 import turip.member.domain.Provider;
 
 @Controller
@@ -238,6 +241,61 @@ public class AuthController {
     public ResponseEntity<Void> logout(@Parameter(hidden = true) @RequestHeader("device-fid") String deviceFid,
                                        @Parameter(hidden = true) @AuthAccount Account account) {
         authService.logout(account, deviceFid);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(
+            summary = "access token 유효성 검사 api",
+            description = "access token이 유효한지 확인한다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "성공 예시"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "access token expired",
+                                            summary = "만료된 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_EXPIRED",
+                                                    	"message": "access token이 만료됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "invalid signature access token",
+                                            summary = "서명값이 올바르지 않은 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_SIGNATURE_INVALID",
+                                                    	"message": "access token이 위조됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "unauthorized",
+                                            summary = "알 수 없는 이유로 인증 실패",
+                                            value = """
+                                                    {
+                                                    	"tag": "UNAUTHORIZED",
+                                                    	"message": "토큰 기반 인증에 실패했습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            )
+    })
+    @GetMapping("/token/verification")
+    public ResponseEntity<Void> verify(@Parameter(hidden = true) @AuthMember Member member) {
         return ResponseEntity.noContent().build();
     }
 }
