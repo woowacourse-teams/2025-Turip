@@ -127,6 +127,13 @@ class CustomErrorView
                     setErrorDescription(R.string.retry_later)
                     setRetryMessage(R.string.retry)
                 }
+
+                ErrorEvent.TOKEN_EXPIRATION -> {
+                    setErrorImage(R.drawable.ic_server_error)
+                    setErrorTitle(R.string.server_error)
+                    setErrorDescription(R.string.retry_later)
+                    setRetryMessage(R.string.retry)
+                }
             }
         }
     }

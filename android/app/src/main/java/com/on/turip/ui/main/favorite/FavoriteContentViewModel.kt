@@ -10,6 +10,7 @@ import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.favorite.FavoriteContent
 import com.on.turip.domain.favorite.repository.FavoriteRepository
 import com.on.turip.domain.favorite.usecase.UpdateFavoriteUseCase
+import com.on.turip.domain.login.usecase.ReNewTokenUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -19,6 +20,7 @@ import javax.inject.Inject
 class FavoriteContentViewModel @Inject constructor(
     private val favoriteRepository: FavoriteRepository,
     private val updateFavoriteUseCase: UpdateFavoriteUseCase,
+    private val reNewTokenUseCase: ReNewTokenUseCase,
 ) : ViewModel() {
     private val _favoriteContents: MutableLiveData<List<FavoriteContent>> =
         MutableLiveData(emptyList())
@@ -90,6 +92,17 @@ class FavoriteContentViewModel @Inject constructor(
 
             ErrorEvent.PARSER_ERROR -> {
                 _serverError.value = true
+            }
+
+            ErrorEvent.TOKEN_EXPIRATION -> {
+                viewModelScope.launch {
+                    reNewTokenUseCase()
+                        .onSuccess {
+                            loadFavoriteContents()
+                        }.onFailure { error ->
+                            Timber.e(error)
+                        }
+                }
             }
         }
     }

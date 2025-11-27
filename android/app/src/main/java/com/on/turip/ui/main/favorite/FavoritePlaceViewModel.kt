@@ -12,6 +12,7 @@ import com.on.turip.domain.favorite.repository.FavoritePlaceRepository
 import com.on.turip.domain.favorite.usecase.UpdateFavoritePlaceUseCase
 import com.on.turip.domain.folder.Folder
 import com.on.turip.domain.folder.repository.FolderRepository
+import com.on.turip.domain.login.usecase.ReNewTokenUseCase
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
@@ -27,6 +28,7 @@ class FavoritePlaceViewModel @Inject constructor(
     private val folderRepository: FolderRepository,
     private val favoritePlaceRepository: FavoritePlaceRepository,
     private val updateFavoritePlaceUseCase: UpdateFavoritePlaceUseCase,
+    private val reNewTokenUseCase: ReNewTokenUseCase,
 ) : ViewModel() {
     private val _favoritePlaceUiState: MutableLiveData<FavoritePlaceUiState> =
         MutableLiveData(FavoritePlaceUiState())
@@ -173,6 +175,17 @@ class FavoritePlaceViewModel @Inject constructor(
 
             ErrorEvent.PARSER_ERROR -> {
                 _favoritePlaceUiState.value = favoritePlaceUiState.value?.copy(isServerError = true)
+            }
+
+            ErrorEvent.TOKEN_EXPIRATION -> {
+                viewModelScope.launch {
+                    reNewTokenUseCase()
+                        .onSuccess {
+                            loadFoldersAndPlaces()
+                        }.onFailure { error ->
+                            Timber.e(error)
+                        }
+                }
             }
         }
     }

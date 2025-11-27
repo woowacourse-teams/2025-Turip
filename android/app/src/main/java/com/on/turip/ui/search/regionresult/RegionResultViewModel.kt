@@ -12,6 +12,7 @@ import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.content.PagedContentsResult
 import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.content.video.VideoInformation
+import com.on.turip.domain.login.usecase.ReNewTokenUseCase
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.search.model.VideoInformationModel
 import com.on.turip.ui.search.regionresult.RegionResultActivity.Companion.REGION_RESULT_REGION_CATEGORY_NAME_KEY
@@ -26,6 +27,7 @@ import javax.inject.Inject
 class RegionResultViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val contentRepository: ContentRepository,
+    private val reNewTokenUseCase: ReNewTokenUseCase,
 ) : ViewModel() {
     private val _searchResultState: MutableLiveData<SearchResultState> =
         MutableLiveData(SearchResultState())
@@ -113,6 +115,17 @@ class RegionResultViewModel @Inject constructor(
 
             ErrorEvent.PARSER_ERROR -> {
                 _serverError.value = true
+            }
+
+            ErrorEvent.TOKEN_EXPIRATION -> {
+                viewModelScope.launch {
+                    reNewTokenUseCase()
+                        .onSuccess {
+                            reload()
+                        }.onFailure { error ->
+                            Timber.e(error)
+                        }
+                }
             }
         }
     }
