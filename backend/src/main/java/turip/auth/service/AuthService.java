@@ -31,7 +31,7 @@ public class AuthService {
 
     @Transactional
     public LoginResponse login(LoginRequest request, Provider provider, String deviceFid) {
-        if (provider.equals(Provider.GOOGLE)) {
+        if (provider == Provider.GOOGLE) {
             return loginWithGoogle(request, deviceFid);
         }
         throw new UnauthorizedException(ErrorTag.UNAUTHORIZED);
