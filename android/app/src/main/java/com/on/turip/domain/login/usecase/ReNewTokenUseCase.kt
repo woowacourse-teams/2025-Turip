@@ -4,6 +4,7 @@ import com.on.turip.data.common.TuripCustomResult
 import com.on.turip.domain.login.AuthTokens
 import com.on.turip.domain.login.LoginRepository
 import com.on.turip.domain.userstorage.repository.UserStorageRepository
+import timber.log.Timber
 import javax.inject.Inject
 
 class ReNewTokenUseCase @Inject constructor(
@@ -17,6 +18,7 @@ class ReNewTokenUseCase @Inject constructor(
                 val tokens: TuripCustomResult<AuthTokens> =
                     loginRepository.requestTokens(refreshToken)
                 if (tokens is TuripCustomResult.Success) {
+                    Timber.d("토큰 재요청 성공")
                     userStorageRepository.createTokens(tokens.data)
                     Unit
                 } else {

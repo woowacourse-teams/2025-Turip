@@ -8,7 +8,6 @@ import com.on.turip.common.UserType
 import com.on.turip.data.common.onFailure
 import com.on.turip.data.common.onSuccess
 import com.on.turip.data.login.datasource.GoogleCredentialManager
-import com.on.turip.domain.login.LoginRepository
 import com.on.turip.domain.login.usecase.LoginUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -23,7 +22,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewmodel @Inject constructor(
-    private val loginRepository: LoginRepository,
     private val loginUserUseCase: LoginUserUseCase,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<LoginUiState> = MutableStateFlow(LoginUiState.EMPTY)
