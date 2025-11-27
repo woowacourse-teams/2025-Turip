@@ -23,7 +23,7 @@ class LoginRemoteDatasource @Inject constructor(
             }
         }
 
-    suspend fun postReNewToken(token: String): TuripCustomResult<ReNewTokenResponse> =
+    override suspend fun postReNewToken(token: String): TuripCustomResult<ReNewTokenResponse> =
         withContext(coroutineContext) {
             safeApiCall {
                 loginService.postRenewToken(ReNewTokenRequest(token))

@@ -11,5 +11,5 @@ interface UserStorageLocalDataSource {
 
     suspend fun createRefreshToken(refreshToken: String): Result<Unit>
 
-    suspend fun getRefreshToken(): Result<String?>
+    suspend fun getRefreshToken(): Result<String>
 }

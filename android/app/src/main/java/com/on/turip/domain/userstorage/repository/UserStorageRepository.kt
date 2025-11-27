@@ -10,7 +10,7 @@ interface UserStorageRepository {
 
     suspend fun loadAccessToken(): Result<String?>
 
-    suspend fun createTokens(tokens: AuthTokens): Result<Unit>
+    suspend fun loadRefreshToken(): Result<String>
 
-    suspend fun reloadAccessToken(refreshToken: String): Result<String>
+    suspend fun createTokens(tokens: AuthTokens): Result<Unit>
 }

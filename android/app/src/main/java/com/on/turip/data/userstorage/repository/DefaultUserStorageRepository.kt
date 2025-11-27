@@ -36,13 +36,11 @@ class DefaultUserStorageRepository @Inject constructor(
 
     override suspend fun loadAccessToken(): Result<String?> = userStorageLocalDataSource.getAccessToken()
 
+    override suspend fun loadRefreshToken(): Result<String> = userStorageLocalDataSource.getRefreshToken()
+
     override suspend fun createTokens(tokens: AuthTokens): Result<Unit> =
         withContext(Dispatchers.IO) {
             userStorageLocalDataSource.createAccessToken(tokens.accessToken)
             userStorageLocalDataSource.createRefreshToken(tokens.refreshToken)
         }
-
-    override suspend fun reloadAccessToken(refreshToken: String): Result<String> {
-        TODO("Not yet implemented")
-    }
 }

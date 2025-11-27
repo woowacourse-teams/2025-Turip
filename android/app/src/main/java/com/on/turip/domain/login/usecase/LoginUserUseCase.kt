@@ -12,7 +12,7 @@ class LoginUserUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(idToken: String): TuripCustomResult<Unit> =
         loginRepository.login(idToken).mapCatching { result ->
-            userStorageRepository.createTokens(result).fold(
+            userStorageRepository.createTokens(result.authTokens).fold(
                 onSuccess = { },
                 onFailure = { error -> throw error },
             )

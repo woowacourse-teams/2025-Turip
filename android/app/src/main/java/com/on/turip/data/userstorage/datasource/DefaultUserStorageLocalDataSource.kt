@@ -53,10 +53,11 @@ class DefaultUserStorageLocalDataSource @Inject constructor(
             }
         }
 
-    override suspend fun getRefreshToken(): Result<String?> =
+    override suspend fun getRefreshToken(): Result<String> =
         runCatching {
             withContext(coroutineContext) {
                 userStorage.data.first()[refreshTokenKey]
+                    ?: throw IllegalArgumentException("refreshToken이 존재하지 않습니다.")
             }
         }
 }
