@@ -10,7 +10,7 @@ import com.on.turip.domain.login.LoginRepository
 import javax.inject.Inject
 
 class DefaultLoginRepository @Inject constructor(
-    val loginDatasource: LoginDatasource,
+    private val loginDatasource: LoginDatasource,
 ) : LoginRepository {
     override suspend fun login(idToken: String): TuripCustomResult<AuthResult> =
         loginDatasource.postIdToken(idToken).mapCatching { it.toDomain() }

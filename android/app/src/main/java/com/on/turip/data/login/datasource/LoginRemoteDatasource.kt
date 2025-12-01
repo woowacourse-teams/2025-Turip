@@ -13,8 +13,8 @@ import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
 class LoginRemoteDatasource @Inject constructor(
-    val loginService: LoginService,
-    val coroutineContext: CoroutineContext = Dispatchers.IO,
+    private val loginService: LoginService,
+    private val coroutineContext: CoroutineContext = Dispatchers.IO,
 ) : LoginDatasource {
     override suspend fun postIdToken(idToken: String): TuripCustomResult<LoginJwtTokenResponse> =
         withContext(coroutineContext) {
