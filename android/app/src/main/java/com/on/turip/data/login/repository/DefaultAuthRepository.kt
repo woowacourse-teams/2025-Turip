@@ -9,4 +9,8 @@ class DefaultAuthRepository @Inject constructor(
     private val authDatasource: AuthDatasource,
 ) : AuthRepository {
     override suspend fun updateMigration(): TuripCustomResult<Unit> = authDatasource.postMigration()
+
+    override suspend fun logout(): TuripCustomResult<Unit> = authDatasource.postLogout()
+
+    override suspend fun withdraw(): TuripCustomResult<Unit> = authDatasource.postWithdraw()
 }

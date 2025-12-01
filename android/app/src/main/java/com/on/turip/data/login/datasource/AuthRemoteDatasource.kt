@@ -12,4 +12,14 @@ class AuthRemoteDatasource @Inject constructor(
         safeApiCall {
             authService.postMigration()
         }
+
+    override suspend fun postLogout(): TuripCustomResult<Unit> =
+        safeApiCall {
+            authService.postLogout()
+        }
+
+    override suspend fun postWithdraw(): TuripCustomResult<Unit> =
+        safeApiCall {
+            authService.postWithdraw()
+        }
 }

@@ -4,4 +4,8 @@ import com.on.turip.data.common.TuripCustomResult
 
 interface AuthDatasource {
     suspend fun postMigration(): TuripCustomResult<Unit>
+
+    suspend fun postLogout(): TuripCustomResult<Unit>
+
+    suspend fun postWithdraw(): TuripCustomResult<Unit>
 }
