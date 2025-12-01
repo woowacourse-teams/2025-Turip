@@ -133,7 +133,7 @@ public class AuthService {
     }
 
     private void validateIdToken(String idToken) {
-        if (idToken.isBlank()) {
+        if (idToken == null || idToken.isBlank()) {
             throw new BadRequestException(ErrorTag.ID_TOKEN_NOT_VALID);
         }
     }
