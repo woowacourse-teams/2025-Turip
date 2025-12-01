@@ -14,6 +14,7 @@ import turip.auth.domain.RefreshToken;
 import turip.auth.token.GoogleTokenParser;
 import turip.auth.token.JwtProvider;
 import turip.common.exception.ErrorTag;
+import turip.common.exception.custom.BadRequestException;
 import turip.common.exception.custom.UnauthorizedException;
 import turip.member.domain.Account;
 import turip.member.domain.Member;
@@ -75,6 +76,8 @@ public class AuthService {
 
     private LoginResponse loginWithGoogle(LoginRequest request, String deviceFid) {
         String idToken = request.idToken();
+        validateIdToken(idToken);
+
         Provider provider = googleTokenParser.getProvider();
         String providerId = googleTokenParser.getProviderId(idToken);
         String email = googleTokenParser.getEmail(idToken);
@@ -126,6 +129,12 @@ public class AuthService {
     private void validateRefreshTokenExpiration(RefreshToken storedRefreshToken) {
         if (storedRefreshToken.isExpired()) {
             throw new UnauthorizedException(ErrorTag.REFRESH_TOKEN_EXPIRED);
+        }
+    }
+
+    private void validateIdToken(String idToken) {
+        if (idToken.isBlank()) {
+            throw new BadRequestException(ErrorTag.ID_TOKEN_NOT_VALID);
         }
     }
 }
