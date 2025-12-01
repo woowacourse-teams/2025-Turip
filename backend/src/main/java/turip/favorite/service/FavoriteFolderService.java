@@ -20,7 +20,7 @@ import turip.favorite.controller.dto.response.FavoriteFoldersWithPlaceCountRespo
 import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.repository.FavoriteFolderRepository;
 import turip.favorite.repository.FavoritePlaceRepository;
-import turip.member.domain.Member;
+import turip.member.domain.Account;
 import turip.place.domain.Place;
 import turip.place.repository.PlaceRepository;
 
@@ -33,18 +33,24 @@ public class FavoriteFolderService {
     private final PlaceRepository placeRepository;
 
     @Transactional
-    public FavoriteFolderResponse createCustomFavoriteFolder(FavoriteFolderRequest request, Member member) {
-        FavoriteFolder favoriteFolder = FavoriteFolder.customFolderOf(member, request.name());
+    public void createDefaultFavoriteFolder(Account account) {
+        FavoriteFolder defaultFolder = FavoriteFolder.defaultFolderOf(account);
+        favoriteFolderRepository.save(defaultFolder);
+    }
 
-        validateDuplicatedName(favoriteFolder.getName(), member);
+    @Transactional
+    public FavoriteFolderResponse createCustomFavoriteFolder(FavoriteFolderRequest request, Account account) {
+        FavoriteFolder favoriteFolder = FavoriteFolder.customFolderOf(account, request.name());
+
+        validateDuplicatedName(favoriteFolder.getName(), account);
         FavoriteFolder savedFavoriteFolder = favoriteFolderRepository.save(favoriteFolder);
 
         return FavoriteFolderResponse.from(savedFavoriteFolder);
     }
 
-    public FavoriteFoldersWithPlaceCountResponse findAllByMember(Member member) {
-        List<FavoriteFolderWithPlaceCountResponse> favoriteFoldersWithPlaceCount = favoriteFolderRepository.findAllByMemberOrderByIdAsc(
-                        member).stream()
+    public FavoriteFoldersWithPlaceCountResponse findAllByMember(Account account) {
+        List<FavoriteFolderWithPlaceCountResponse> favoriteFoldersWithPlaceCount = favoriteFolderRepository.findAllByAccountOrderByIdAsc(
+                        account).stream()
                 .map(favoriteFolder -> {
                     int placeCount = favoritePlaceRepository.countByFavoriteFolder(favoriteFolder);
                     return FavoriteFolderWithPlaceCountResponse.of(favoriteFolder, placeCount);
@@ -54,9 +60,10 @@ public class FavoriteFolderService {
         return FavoriteFoldersWithPlaceCountResponse.from(favoriteFoldersWithPlaceCount);
     }
 
-    public FavoriteFoldersWithFavoriteStatusResponse findAllWithFavoriteStatusByDeviceId(Member member, Long placeId) {
+    public FavoriteFoldersWithFavoriteStatusResponse findAllWithFavoriteStatusByAccountId(Account account,
+                                                                                          Long placeId) {
         Place place = getPlaceById(placeId);
-        List<FavoriteFolder> favoriteFolders = favoriteFolderRepository.findAllByMemberOrderByIdAsc(member);
+        List<FavoriteFolder> favoriteFolders = favoriteFolderRepository.findAllByAccountOrderByIdAsc(account);
         Set<Long> favoritedFolderIds = favoritePlaceRepository.findFavoriteFolderIdsByPlaceAndFavoriteFolderIn(
                 place, favoriteFolders);
 
@@ -70,7 +77,7 @@ public class FavoriteFolderService {
     }
 
     @Transactional
-    public FavoriteFolderResponse updateName(Member member, Long favoriteFolderId,
+    public FavoriteFolderResponse updateName(Account account, Long favoriteFolderId,
                                              FavoriteFolderNameRequest request) {
         FavoriteFolder favoriteFolder = getById(favoriteFolderId);
         if (favoriteFolder.isDefault()) {
@@ -78,27 +85,38 @@ public class FavoriteFolderService {
         }
 
         String newName = FavoriteFolder.formatName(request.name());
-        validateOwnership(member, favoriteFolder);
-        validateDuplicatedName(newName, member);
+        validateOwnership(account, favoriteFolder);
+        validateDuplicatedName(newName, account);
         favoriteFolder.rename(newName);
 
         return FavoriteFolderResponse.from(favoriteFolder);
     }
 
     @Transactional
-    public void remove(Member member, Long favoriteFolderId) {
+    public void remove(Account account, Long favoriteFolderId) {
         FavoriteFolder favoriteFolder = getById(favoriteFolderId);
 
         if (favoriteFolder.isDefault()) {
             throw new BadRequestException(ErrorTag.DEFAULT_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED);
         }
-        validateOwnership(member, favoriteFolder);
+        validateOwnership(account, favoriteFolder);
 
+        favoritePlaceRepository.deleteAllByFavoriteFolder(favoriteFolder);
         favoriteFolderRepository.deleteById(favoriteFolderId);
     }
 
-    private void validateDuplicatedName(String folderName, Member member) {
-        if (favoriteFolderRepository.existsByNameAndMember(folderName, member)) {
+    @Transactional
+    public void removeByAccount(Account account) {
+        favoriteFolderRepository.findAllByAccount(account)
+                .forEach(favoriteFolder -> {
+                    validateOwnership(account, favoriteFolder);
+                    favoritePlaceRepository.deleteAllByFavoriteFolder(favoriteFolder);
+                    favoriteFolderRepository.delete(favoriteFolder);
+                });
+    }
+
+    private void validateDuplicatedName(String folderName, Account account) {
+        if (favoriteFolderRepository.existsByNameAndAccount(folderName, account)) {
             throw new ConflictException(ErrorTag.FAVORITE_FOLDER_NAME_CONFLICT);
         }
     }
@@ -113,8 +131,8 @@ public class FavoriteFolderService {
                 .orElseThrow(() -> new NotFoundException(ErrorTag.FAVORITE_FOLDER_NOT_FOUND));
     }
 
-    private void validateOwnership(Member requestMember, FavoriteFolder favoriteFolder) {
-        if (!favoriteFolder.isOwner(requestMember)) {
+    private void validateOwnership(Account requestAccount, FavoriteFolder favoriteFolder) {
+        if (!favoriteFolder.isOwner(requestAccount)) {
             throw new ForbiddenException(ErrorTag.FORBIDDEN);
         }
     }

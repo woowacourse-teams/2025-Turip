@@ -16,7 +16,7 @@ public record FavoriteFolderWithFavoriteStatusResponse(
     public static FavoriteFolderWithFavoriteStatusResponse of(FavoriteFolder favoriteFolder, boolean isFavoritePlace) {
         return new FavoriteFolderWithFavoriteStatusResponse(
                 favoriteFolder.getId(),
-                favoriteFolder.getMember().getId(),
+                favoriteFolder.getAccount().getId(),
                 favoriteFolder.getName(),
                 favoriteFolder.isDefault(),
                 isFavoritePlace

@@ -21,7 +21,7 @@ import turip.favorite.controller.dto.request.FavoriteContentRequest;
 import turip.favorite.controller.dto.response.FavoriteContentResponse;
 import turip.favorite.domain.FavoriteContent;
 import turip.favorite.repository.FavoriteContentRepository;
-import turip.member.domain.Member;
+import turip.member.domain.Account;
 
 @Service
 @RequiredArgsConstructor
@@ -32,23 +32,24 @@ public class FavoriteContentService {
     private final ContentPlaceService contentPlaceService;
 
     @Transactional
-    public FavoriteContentResponse create(FavoriteContentRequest request, Member member) {
+    public FavoriteContentResponse create(FavoriteContentRequest request, Account account) {
         Long contentId = request.contentId();
         Content content = contentRepository.findById(contentId)
                 .orElseThrow(() -> new NotFoundException(ErrorTag.CONTENT_NOT_FOUND));
-        if (favoriteContentRepository.existsByMemberIdAndContentId(member.getId(), content.getId())) {
+        if (favoriteContentRepository.existsByAccountIdAndContentId(account.getId(), content.getId())) {
             throw new ConflictException(ErrorTag.FAVORITE_CONTENT_CONFLICT);
         }
-        FavoriteContent favoriteContent = new FavoriteContent(LocalDate.now(), member, content);
+        FavoriteContent favoriteContent = new FavoriteContent(LocalDate.now(), account, content);
         FavoriteContent savedFavoriteContent = favoriteContentRepository.save(favoriteContent);
         return FavoriteContentResponse.from(savedFavoriteContent);
     }
 
-    public ContentsDetailWithLoadableResponse findMyFavoriteContents(Member member, int pageSize, long lastContentId) {
+    public ContentsDetailWithLoadableResponse findMyFavoriteContents(Account account, int pageSize,
+                                                                     long lastContentId) {
         if (lastContentId == 0) {
             lastContentId = Long.MAX_VALUE;
         }
-        Slice<Content> contentSlice = favoriteContentRepository.findMyFavoriteContentsByDeviceFid(member.getDeviceFid(),
+        Slice<Content> contentSlice = favoriteContentRepository.findMyFavoriteContentsByAccountId(account.getId(),
                 lastContentId,
                 PageRequest.of(0, pageSize));
         List<Content> contents = contentSlice.getContent();
@@ -60,10 +61,10 @@ public class FavoriteContentService {
     }
 
     @Transactional
-    public void remove(Member member, Long contentId) {
+    public void remove(Account account, Long contentId) {
         Content content = contentRepository.findById(contentId)
                 .orElseThrow(() -> new NotFoundException(ErrorTag.CONTENT_NOT_FOUND));
-        FavoriteContent favoriteContent = favoriteContentRepository.findByMemberIdAndContentId(member.getId(),
+        FavoriteContent favoriteContent = favoriteContentRepository.findByAccountIdAndContentId(account.getId(),
                         content.getId())
                 .orElseThrow(() -> new NotFoundException(ErrorTag.FAVORITE_CONTENT_NOT_FOUND));
         favoriteContentRepository.delete(favoriteContent);

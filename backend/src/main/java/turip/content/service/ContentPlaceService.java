@@ -16,7 +16,7 @@ import turip.content.domain.ContentPlace;
 import turip.content.repository.ContentPlaceRepository;
 import turip.content.repository.ContentRepository;
 import turip.favorite.repository.FavoritePlaceRepository;
-import turip.member.domain.Member;
+import turip.member.domain.Account;
 import turip.place.domain.Place;
 
 @Service
@@ -64,13 +64,13 @@ public class ContentPlaceService {
         return contentPlaceRepository.countByContentId(contentId);
     }
 
-    public ContentPlaceDetailResponse findContentPlaceDetails(Member member, Long contentId) {
+    public ContentPlaceDetailResponse findContentPlaceDetails(Account account, Long contentId) {
         validateContentExists(contentId);
         List<ContentPlace> contentPlaces = contentPlaceRepository.findAllByContentId(contentId);
         int days = calculateDurationDays(contentId);
         int nights = days - 1;
         int contentPlaceCount = calculatePlaceCount(contentPlaces);
-        List<ContentPlaceResponse> contentPlaceResponse = parseContentPlaceToContentPlaceResponse(member,
+        List<ContentPlaceResponse> contentPlaceResponse = parseContentPlaceToContentPlaceResponse(account,
                 contentPlaces);
 
         return ContentPlaceDetailResponse.of(nights, days, contentPlaceCount, contentPlaceResponse);
@@ -95,14 +95,14 @@ public class ContentPlaceService {
                 .count();
     }
 
-    private List<ContentPlaceResponse> parseContentPlaceToContentPlaceResponse(Member member,
+    private List<ContentPlaceResponse> parseContentPlaceToContentPlaceResponse(Account account,
                                                                                List<ContentPlace> contentPlaces) {
         List<Place> places = contentPlaces.stream()
                 .map(ContentPlace::getPlace)
                 .distinct()
                 .toList();
-        Set<Long> favoritedPlaceIds = favoritePlaceRepository.findFavoritedPlaceIdsByFavoriteFolderMemberAndPlaceIn(
-                member, places);
+        Set<Long> favoritedPlaceIds = favoritePlaceRepository.findFavoritedPlaceIdsByFavoriteFolderAccountAndPlaceIn(
+                account, places);
         return contentPlaces.stream()
                 .map(contentPlace -> {
                     boolean isFavoritePlace = favoritedPlaceIds.contains(contentPlace.getPlace().getId());

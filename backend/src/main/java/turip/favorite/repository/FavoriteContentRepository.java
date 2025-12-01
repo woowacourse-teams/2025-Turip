@@ -10,12 +10,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import turip.content.domain.Content;
 import turip.favorite.domain.FavoriteContent;
+import turip.member.domain.Account;
 
 public interface FavoriteContentRepository extends JpaRepository<FavoriteContent, Long> {
 
-    boolean existsByMemberIdAndContentId(Long memberId, Long contentId);
+    boolean existsByAccountIdAndContentId(Long accountId, Long contentId);
 
-    Optional<FavoriteContent> findByMemberIdAndContentId(Long memberId, Long contentId);
+    Optional<FavoriteContent> findByAccountIdAndContentId(Long accountId, Long contentId);
+
 
     @Query(value = """
             SELECT c.*
@@ -32,21 +34,25 @@ public interface FavoriteContentRepository extends JpaRepository<FavoriteContent
             @Param("topContentSize") int topContentSize
     );
 
-    List<FavoriteContent> findByMemberIdAndContentIdIn(Long memberId, List<Long> contentIds);
+    List<FavoriteContent> findByAccountIdAndContentIdIn(Long accountId, List<Long> contentIds);
 
     @Query("""
                 SELECT f.content
                 FROM FavoriteContent f
-                JOIN f.member m
+                JOIN f.account a
                 JOIN FETCH f.content.creator
                 JOIN FETCH f.content.city
-                WHERE m.deviceFid = :deviceFid
+                WHERE a.id = :accountId
                   AND f.content.id < :lastContentId
                 ORDER BY f.createdAt DESC
             """)
-    Slice<Content> findMyFavoriteContentsByDeviceFid(
-            @Param("deviceFid") String deviceFid,
+    Slice<Content> findMyFavoriteContentsByAccountId(
+            @Param("accountId") Long accountId,
             @Param("lastContentId") Long lastContentId,
             Pageable pageable
     );
+
+    List<FavoriteContent> findAllByAccount(Account account);
+
+    void deleteByAccount(Account account);
 }
