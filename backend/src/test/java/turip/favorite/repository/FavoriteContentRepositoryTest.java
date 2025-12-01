@@ -30,9 +30,6 @@ class FavoriteContentRepositoryTest {
     @Autowired
     private FavoriteContentRepository favoriteContentRepository;
 
-/*    @Autowired
-    private MemberRepository memberRepository;*/
-
     @Autowired
     private AccountRepository accountRepository;
 
