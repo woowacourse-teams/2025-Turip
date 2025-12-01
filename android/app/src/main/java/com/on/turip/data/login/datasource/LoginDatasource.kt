@@ -2,12 +2,12 @@ package com.on.turip.data.login.datasource
 
 import com.on.turip.data.common.TuripCustomResult
 import com.on.turip.data.login.dto.LoginJwtTokenResponse
-import com.on.turip.data.login.dto.ReNewTokenResponse
+import com.on.turip.data.login.dto.ReissueTokenResponse
 
 interface LoginDatasource {
     suspend fun postIdToken(idToken: String): TuripCustomResult<LoginJwtTokenResponse>
 
-    suspend fun postReNewToken(refreshToken: String): TuripCustomResult<ReNewTokenResponse>
+    suspend fun postReissueToken(refreshToken: String): TuripCustomResult<ReissueTokenResponse>
 
     suspend fun getTokenVerification(token: String): TuripCustomResult<Unit>
 }

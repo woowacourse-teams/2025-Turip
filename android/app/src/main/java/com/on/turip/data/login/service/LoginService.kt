@@ -2,8 +2,8 @@ package com.on.turip.data.login.service
 
 import com.on.turip.data.login.dto.LoginIdTokenPostRequest
 import com.on.turip.data.login.dto.LoginJwtTokenResponse
-import com.on.turip.data.login.dto.ReNewTokenRequest
-import com.on.turip.data.login.dto.ReNewTokenResponse
+import com.on.turip.data.login.dto.ReissueTokenRequest
+import com.on.turip.data.login.dto.ReissueTokenResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -17,9 +17,9 @@ interface LoginService {
     ): Response<LoginJwtTokenResponse>
 
     @POST("token")
-    suspend fun postRenewToken(
-        @Body reNewTokenRequest: ReNewTokenRequest,
-    ): Response<ReNewTokenResponse>
+    suspend fun postReissueToken(
+        @Body reissueTokenRequest: ReissueTokenRequest,
+    ): Response<ReissueTokenResponse>
 
     @GET("token/verification")
     suspend fun getTokenVerification(
