@@ -58,7 +58,7 @@ public class FavoriteFolder {
     public static FavoriteFolder customFolderOf(Account account, String name) {
         String formattedName = formatName(name);
         validateName(formattedName);
-        return new FavoriteFolder(account, name, false);
+        return new FavoriteFolder(account, formattedName, false);
     }
 
     public static String formatName(String unformattedName) {
