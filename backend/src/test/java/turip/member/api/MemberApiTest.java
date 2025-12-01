@@ -1,5 +1,6 @@
 package turip.member.api;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Mockito.when;
 
@@ -81,8 +82,7 @@ class MemberApiTest {
                     guestDeviceFid
             );
             jdbcTemplate.update(
-                    "INSERT INTO member (id, account_id, provider, provider_id, email) VALUES (1, 2, 'GOOGLE', 'google-user-migration', 'migration@gmail.com')"
-            );
+                    "INSERT INTO member (id, account_id, provider, provider_id, email) VALUES (1, 2, 'GOOGLE', 'google-user-migration', 'migration@gmail.com')");
 
             // 3. Guest의 FavoriteFolder와 FavoriteContent 생성
             jdbcTemplate.update(
@@ -150,20 +150,20 @@ class MemberApiTest {
                     "SELECT COUNT(*) FROM favorite_content WHERE account_id = 2",
                     Integer.class
             );
-            assert favoriteContentCount != null && favoriteContentCount == 1;
+            assertThat(favoriteContentCount).isEqualTo(1);
 
             Integer favoriteFolderCount = jdbcTemplate.queryForObject(
                     "SELECT COUNT(*) FROM favorite_folder WHERE account_id = 2",
                     Integer.class
             );
-            assert favoriteFolderCount != null && favoriteFolderCount == 2; // Guest의 2개 폴더
+            assertThat(favoriteFolderCount).isEqualTo(2); // Guest의 2개 폴더
 
             // 검증: Guest가 삭제되었는지 확인
             Integer guestCount = jdbcTemplate.queryForObject(
                     "SELECT COUNT(*) FROM guest WHERE id = 1",
                     Integer.class
             );
-            assert guestCount != null && guestCount == 0;
+            assertThat(guestCount).isEqualTo(0);
         }
 
         @Test
@@ -291,32 +291,24 @@ class MemberApiTest {
                     .statusCode(204);
 
             // 검증: Member가 삭제되었는지 확인
-            Integer memberCount = jdbcTemplate.queryForObject(
-                    "SELECT COUNT(*) FROM member WHERE id = 1",
-                    Integer.class
-            );
-            assert memberCount != null && memberCount == 0;
+            Integer memberCount = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM member WHERE id = 1",
+                    Integer.class);
+            assertThat(memberCount).isEqualTo(0);
 
             // 검증: Account가 삭제되었는지 확인
-            Integer accountCount = jdbcTemplate.queryForObject(
-                    "SELECT COUNT(*) FROM account WHERE id = 1",
-                    Integer.class
-            );
-            assert accountCount != null && accountCount == 0;
+            Integer accountCount = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM account WHERE id = 1",
+                    Integer.class);
+            assertThat(accountCount).isEqualTo(0);
 
             // 검증: FavoriteContent가 삭제되었는지 확인
             Integer favoriteContentCount = jdbcTemplate.queryForObject(
-                    "SELECT COUNT(*) FROM favorite_content WHERE account_id = 1",
-                    Integer.class
-            );
-            assert favoriteContentCount != null && favoriteContentCount == 0;
+                    "SELECT COUNT(*) FROM favorite_content WHERE account_id = 1", Integer.class);
+            assertThat(favoriteContentCount).isEqualTo(0);
 
             // 검증: FavoriteFolder가 삭제되었는지 확인
             Integer favoriteFolderCount = jdbcTemplate.queryForObject(
-                    "SELECT COUNT(*) FROM favorite_folder WHERE account_id = 1",
-                    Integer.class
-            );
-            assert favoriteFolderCount != null && favoriteFolderCount == 0;
+                    "SELECT COUNT(*) FROM favorite_folder WHERE account_id = 1", Integer.class);
+            assertThat(favoriteFolderCount).isEqualTo(0);
         }
 
         @Test

@@ -1,5 +1,6 @@
 package turip.auth.api;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -361,7 +362,7 @@ class AuthApiTest {
                     Integer.class,
                     deviceFid
             );
-            assert countBefore != null && countBefore == 1;
+            assertThat(countBefore).isEqualTo(1);
 
             // when - 로그아웃
             RestAssured
@@ -378,7 +379,7 @@ class AuthApiTest {
                     Integer.class,
                     deviceFid
             );
-            assert countAfter != null && countAfter == 0;
+            assertThat(countAfter).isEqualTo(0);
         }
 
         @Test
