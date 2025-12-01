@@ -22,8 +22,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.on.turip.R
+import com.on.turip.common.AuthState
+import com.on.turip.common.UserType
 import com.on.turip.domain.userstorage.TuripDeviceIdentifier
-import com.on.turip.ui.common.model.MemberStatus
 import com.on.turip.ui.compose.common.component.ErrorHandlingContainer
 import com.on.turip.ui.compose.common.component.TuripAppBar
 import com.on.turip.ui.compose.common.component.TuripDialog
@@ -164,14 +165,16 @@ private fun SettingScreenContent(
     ) {
         SettingCommonScreen(onClickInquiry, onClickPrivacyPolicy)
 
-        when (uiState.memberStatus) {
-            MemberStatus.MEMBER -> {
+        when (AuthState.type) {
+            UserType.MEMBER -> {
                 SettingForMemberScreen(onClickLogout, onClickWithdraw)
             }
 
-            MemberStatus.GUEST -> {
+            UserType.GUEST -> {
                 SettingForGuestScreen(onClickLogin)
             }
+
+            UserType.NONE -> throw IllegalArgumentException("멤버가 지정되지 않았습니다.")
         }
     }
 }
@@ -252,7 +255,6 @@ private fun MemberSettingScreenPreview() {
             uiState =
                 SettingUiState(
                     deviceIdentifier = TuripDeviceIdentifier.EMPTY,
-                    memberStatus = MemberStatus.MEMBER,
                     showLogoutDialog = false,
                     showWithdrawDialog = false,
                     isNetworkError = false,
@@ -275,7 +277,6 @@ private fun GuestSettingScreenPreview() {
             uiState =
                 SettingUiState(
                     deviceIdentifier = TuripDeviceIdentifier.EMPTY,
-                    memberStatus = MemberStatus.GUEST,
                     showLogoutDialog = false,
                     showWithdrawDialog = false,
                     isNetworkError = false,
