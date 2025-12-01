@@ -30,7 +30,7 @@ import turip.favorite.controller.dto.request.FavoriteContentRequest;
 import turip.favorite.controller.dto.response.FavoriteContentResponse;
 import turip.favorite.domain.FavoriteContent;
 import turip.favorite.repository.FavoriteContentRepository;
-import turip.member.domain.Member;
+import turip.member.domain.Account;
 import turip.region.domain.City;
 import turip.region.domain.Country;
 import turip.region.domain.Province;
@@ -55,7 +55,6 @@ class FavoriteContentServiceTest {
     void createFavoriteContent() {
         // given
         Long contentId = 1L;
-        String deviceFid = "testDeviceFid";
 
         FavoriteContentRequest request = new FavoriteContentRequest(contentId);
         Creator creator = new Creator(1L, "여행하는 뭉치", "프로필 사진 경로");
@@ -63,18 +62,18 @@ class FavoriteContentServiceTest {
         Province province = new Province(1L, "강원도");
         City city = new City(1L, country, province, "속초", "시 이미지 경로");
         Content content = new Content(contentId, creator, city, "뭉치의 속초 브이로그", "속초 브이로그 Url", LocalDate.of(2025, 7, 8));
-        Member member = new Member(1L, deviceFid);
-        FavoriteContent favoriteContent = new FavoriteContent(LocalDate.now(), member, content);
+        Account account = new Account(1L);
+        FavoriteContent favoriteContent = new FavoriteContent(LocalDate.now(), account, content);
 
         given(contentRepository.findById(contentId))
                 .willReturn(Optional.of(content));
-        given(favoriteContentRepository.existsByMemberIdAndContentId(any(), eq(contentId)))
+        given(favoriteContentRepository.existsByAccountIdAndContentId(any(), eq(contentId)))
                 .willReturn(false);
         given(favoriteContentRepository.save(any(FavoriteContent.class)))
                 .willReturn(favoriteContent);
 
         // when
-        FavoriteContentResponse response = favoriteContentService.create(request, member);
+        FavoriteContentResponse response = favoriteContentService.create(request, account);
 
         // then
         assertThat(response.content().id()).isEqualTo(contentId);
@@ -108,15 +107,15 @@ class FavoriteContentServiceTest {
         Province province = new Province(1L, "강원도");
         City city = new City(1L, country, province, "속초", "시 이미지 경로");
         Content content = new Content(contentId, creator, city, "뭉치의 속초 브이로그", "속초 브이로그 Url", LocalDate.of(2025, 7, 8));
-        Member member = new Member(1L, deviceFid);
+        Account account = new Account(1L);
 
         given(contentRepository.findById(contentId))
                 .willReturn(Optional.of(content));
-        given(favoriteContentRepository.existsByMemberIdAndContentId(any(), eq(contentId)))
+        given(favoriteContentRepository.existsByAccountIdAndContentId(any(), eq(contentId)))
                 .willReturn(true);
 
         // when & then
-        assertThatThrownBy(() -> favoriteContentService.create(request, member))
+        assertThatThrownBy(() -> favoriteContentService.create(request, account))
                 .isInstanceOf(ConflictException.class);
     }
 
@@ -124,7 +123,6 @@ class FavoriteContentServiceTest {
     @Test
     void findMyFavoriteContents1() {
         // given
-        String deviceFid = "testDeviceFid";
         int pageSize = 2;
         long lastContentId = 0L;
 
@@ -135,9 +133,10 @@ class FavoriteContentServiceTest {
         Content content1 = new Content(1L, creator, city, "뭉치의 속초 브이로그 1편", "속초 브이로그 Url 1", LocalDate.of(2025, 7, 8));
         Content content2 = new Content(2L, creator, city, "뭉치의 속초 브이로그 2편", "속초 브이로그 Url 2", LocalDate.of(2025, 7, 8));
         List<Content> contents = List.of(content1, content2);
-        Member member = new Member(1L, deviceFid);
+        Account account = new Account(1L);
 
-        given(favoriteContentRepository.findMyFavoriteContentsByDeviceFid(eq(deviceFid), eq(Long.MAX_VALUE), any()))
+        given(favoriteContentRepository.findMyFavoriteContentsByAccountId(eq(account.getId()), eq(Long.MAX_VALUE),
+                any()))
                 .willReturn(new SliceImpl<>(contents));
         given(contentPlaceService.calculateDurationDays(1L))
                 .willReturn(2); // content1 1박 2일
@@ -148,7 +147,7 @@ class FavoriteContentServiceTest {
         given(contentRepository.existsById(2L))
                 .willReturn(true);
 
-        ContentsDetailWithLoadableResponse response = favoriteContentService.findMyFavoriteContents(member,
+        ContentsDetailWithLoadableResponse response = favoriteContentService.findMyFavoriteContents(account,
                 pageSize, lastContentId);
 
         // then
@@ -164,7 +163,6 @@ class FavoriteContentServiceTest {
     @Test
     void findMyFavoriteContents2() {
         // given
-        String deviceFid = "testDeviceFid";
         int pageSize = 2;
         long lastContentId = 0L;
 
@@ -175,9 +173,10 @@ class FavoriteContentServiceTest {
         Content content1 = new Content(1L, creator, city, "뭉치의 속초 브이로그 1편", "속초 브이로그 Url 1", LocalDate.of(2025, 7, 8));
         Content content2 = new Content(2L, creator, city, "뭉치의 속초 브이로그 2편", "속초 브이로그 Url 2", LocalDate.of(2025, 7, 8));
         List<Content> contents = List.of(content1, content2);
-        Member member = new Member(1L, deviceFid);
+        Account account = new Account(1L);
 
-        given(favoriteContentRepository.findMyFavoriteContentsByDeviceFid(eq(deviceFid), eq(Long.MAX_VALUE), any()))
+        given(favoriteContentRepository.findMyFavoriteContentsByAccountId(eq(account.getId()), eq(Long.MAX_VALUE),
+                any()))
                 .willReturn(new SliceImpl<>(contents));
         given(contentPlaceService.calculateDurationDays(1L))
                 .willReturn(2); // content1 1박 2일
@@ -189,7 +188,7 @@ class FavoriteContentServiceTest {
                 .willReturn(false);
 
         // when & then
-        assertThatThrownBy(() -> favoriteContentService.findMyFavoriteContents(member, pageSize, lastContentId))
+        assertThatThrownBy(() -> favoriteContentService.findMyFavoriteContents(account, pageSize, lastContentId))
                 .isInstanceOf(NotFoundException.class);
     }
 
@@ -202,23 +201,22 @@ class FavoriteContentServiceTest {
         void deleteFavoriteContent1() {
             // given
             Long contentId = 1L;
-            String deviceFid = "testDeviceFid";
             Creator creator = new Creator(1L, "여행하는 뭉치", "프로필 사진 경로");
             Country country = new Country(1L, "대한민국", "대한민국 사진 경로");
             Province province = new Province(1L, "강원도");
             City city = new City(1L, country, province, "속초", "시 이미지 경로");
             Content content = new Content(contentId, creator, city, "뭉치의 속초 브이로그", "속초 브이로그 Url",
                     LocalDate.of(2025, 7, 8));
-            Member member = new Member(1L, deviceFid);
-            FavoriteContent favoriteContent = new FavoriteContent(LocalDate.now(), member, content);
+            Account account = new Account(1L);
+            FavoriteContent favoriteContent = new FavoriteContent(LocalDate.now(), account, content);
 
             given(contentRepository.findById(contentId))
                     .willReturn(Optional.of(content));
-            given(favoriteContentRepository.findByMemberIdAndContentId(any(), eq(contentId)))
+            given(favoriteContentRepository.findByAccountIdAndContentId(any(), eq(contentId)))
                     .willReturn(Optional.of(favoriteContent));
 
             // when
-            favoriteContentService.remove(member, contentId);
+            favoriteContentService.remove(account, contentId);
 
             // then
             assertThat(favoriteContentRepository.findById(contentId)).isEmpty();
@@ -229,13 +227,13 @@ class FavoriteContentServiceTest {
         void deleteFavoriteContent2() {
             // given
             Long contentId = 1L;
-            Member member = new Member(1L, "testDeviceFid");
+            Account account = new Account();
 
             given(contentRepository.findById(contentId))
                     .willReturn(Optional.empty());
 
             // when & then
-            assertThatThrownBy(() -> favoriteContentService.remove(member, contentId))
+            assertThatThrownBy(() -> favoriteContentService.remove(account, contentId))
                     .isInstanceOf(NotFoundException.class);
         }
 
@@ -251,15 +249,15 @@ class FavoriteContentServiceTest {
             City city = new City(1L, country, province, "속초", "시 이미지 경로");
             Content content = new Content(contentId, creator, city, "뭉치의 속초 브이로그", "속초 브이로그 Url",
                     LocalDate.of(2025, 7, 8));
-            Member member = new Member(1L, deviceFid);
+            Account account = new Account(1L);
 
             given(contentRepository.findById(contentId))
                     .willReturn(Optional.of(content));
-            given(favoriteContentRepository.findByMemberIdAndContentId(any(), eq(contentId)))
+            given(favoriteContentRepository.findByAccountIdAndContentId(any(), eq(contentId)))
                     .willReturn(Optional.empty());
 
             // when & then
-            assertThatThrownBy(() -> favoriteContentService.remove(member, contentId))
+            assertThatThrownBy(() -> favoriteContentService.remove(account, contentId))
                     .isInstanceOf(NotFoundException.class)
                     .hasMessageContaining(ErrorTag.FAVORITE_CONTENT_NOT_FOUND.getMessage());
         }

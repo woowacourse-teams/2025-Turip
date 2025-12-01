@@ -20,8 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import turip.auth.AuthMember;
-import turip.auth.MemberResolvePolicy;
+import turip.auth.resolver.AuthAccount;
 import turip.common.exception.ErrorResponse;
 import turip.favorite.controller.dto.request.FavoriteFolderNameRequest;
 import turip.favorite.controller.dto.request.FavoriteFolderRequest;
@@ -29,7 +28,7 @@ import turip.favorite.controller.dto.response.FavoriteFolderResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithFavoriteStatusResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithPlaceCountResponse;
 import turip.favorite.service.FavoriteFolderService;
-import turip.member.domain.Member;
+import turip.member.domain.Account;
 
 @RestController
 @RequiredArgsConstructor
@@ -114,9 +113,9 @@ public class FavoriteFolderController {
     })
     @PostMapping
     public ResponseEntity<FavoriteFolderResponse> create(
-            @Parameter(hidden = true) @AuthMember(policy = MemberResolvePolicy.CREATE_IF_ABSENT) Member member,
+            @Parameter(hidden = true) @AuthAccount Account account,
             @RequestBody FavoriteFolderRequest request) {
-        FavoriteFolderResponse response = favoriteFolderService.createCustomFavoriteFolder(request, member);
+        FavoriteFolderResponse response = favoriteFolderService.createCustomFavoriteFolder(request, account);
         return ResponseEntity.created(URI.create("/favorites/folders/" + response.id()))
                 .body(response);
     }
@@ -161,8 +160,8 @@ public class FavoriteFolderController {
     })
     @GetMapping
     public ResponseEntity<FavoriteFoldersWithPlaceCountResponse> readAllByMember(
-            @Parameter(hidden = true) @AuthMember(policy = MemberResolvePolicy.CREATE_IF_ABSENT) Member member) {
-        FavoriteFoldersWithPlaceCountResponse response = favoriteFolderService.findAllByMember(member);
+            @Parameter(hidden = true) @AuthAccount Account account) {
+        FavoriteFoldersWithPlaceCountResponse response = favoriteFolderService.findAllByMember(account);
         return ResponseEntity.ok(response);
     }
 
@@ -223,10 +222,10 @@ public class FavoriteFolderController {
     })
     @GetMapping("/favorite-status")
     public ResponseEntity<FavoriteFoldersWithFavoriteStatusResponse> readAllWithFavoriteStatusByDeviceId(
-            @Parameter(hidden = true) @AuthMember(policy = MemberResolvePolicy.CREATE_IF_ABSENT) Member member,
+            @Parameter(hidden = true) @AuthAccount Account account,
             @RequestParam("placeId") Long placeId) {
-        FavoriteFoldersWithFavoriteStatusResponse response = favoriteFolderService.findAllWithFavoriteStatusByDeviceId(
-                member, placeId);
+        FavoriteFoldersWithFavoriteStatusResponse response = favoriteFolderService.findAllWithFavoriteStatusByAccountId(
+                account, placeId);
         return ResponseEntity.ok(response);
     }
 
@@ -361,11 +360,11 @@ public class FavoriteFolderController {
     })
     @PatchMapping("/{favoriteFolderId}")
     public ResponseEntity<FavoriteFolderResponse> updateName(
-            @Parameter(hidden = true) @AuthMember(policy = MemberResolvePolicy.REQUIRED) Member member,
+            @Parameter(hidden = true) @AuthAccount Account account,
             @PathVariable Long favoriteFolderId,
             @RequestBody FavoriteFolderNameRequest request
     ) {
-        FavoriteFolderResponse response = favoriteFolderService.updateName(member, favoriteFolderId, request);
+        FavoriteFolderResponse response = favoriteFolderService.updateName(account, favoriteFolderId, request);
         return ResponseEntity.ok(response);
     }
 
@@ -443,9 +442,9 @@ public class FavoriteFolderController {
     })
     @DeleteMapping("/{favoriteFolderId}")
     public ResponseEntity<Void> delete(
-            @Parameter(hidden = true) @AuthMember(policy = MemberResolvePolicy.REQUIRED) Member member,
+            @Parameter(hidden = true) @AuthAccount Account account,
             @PathVariable Long favoriteFolderId) {
-        favoriteFolderService.remove(member, favoriteFolderId);
+        favoriteFolderService.remove(account, favoriteFolderId);
         return ResponseEntity.noContent().build();
     }
 }

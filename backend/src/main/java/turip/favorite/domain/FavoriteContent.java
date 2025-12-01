@@ -13,16 +13,19 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDate;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import turip.content.domain.Content;
-import turip.member.domain.Member;
+import turip.member.domain.Account;
 
 @Getter
 @Entity
+@AllArgsConstructor
 @Table(name = "favorite_content", uniqueConstraints = {
-        @UniqueConstraint(name = "uq_favorite_content__member_content", columnNames = {"member_id", "content_id"})
+        @UniqueConstraint(name = "uq_favorite_content__account_id_content_id", columnNames = {"account_id",
+                "content_id"})
 })
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -37,16 +40,20 @@ public class FavoriteContent {
     private LocalDate createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false, foreignKey = @ForeignKey(name = "fk_favorite_content__member"))
-    private Member member;
+    @JoinColumn(name = "account_id", nullable = false, foreignKey = @ForeignKey(name = "fk_favorite_content__account"))
+    private Account account;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "content_id", nullable = false, foreignKey = @ForeignKey(name = "fk_favorite_content__content"))
     private Content content;
 
-    public FavoriteContent(LocalDate createdAt, Member member, Content content) {
-        this.createdAt = createdAt;
-        this.member = member;
+    public FavoriteContent(LocalDate createdAt, Account account, Content content) {
         this.content = content;
+        this.account = account;
+        this.createdAt = createdAt;
+    }
+
+    public void updateAccount(Account account) {
+        this.account = account;
     }
 }

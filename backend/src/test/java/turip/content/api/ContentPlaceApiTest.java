@@ -31,7 +31,8 @@ class ContentPlaceApiTest {
         jdbcTemplate.update("DELETE FROM place");
         jdbcTemplate.update("DELETE FROM favorite_content");
         jdbcTemplate.update("DELETE FROM favorite_folder");
-        jdbcTemplate.update("DELETE FROM member");
+        jdbcTemplate.update("DELETE FROM guest");
+        jdbcTemplate.update("DELETE FROM account");
         jdbcTemplate.update("DELETE FROM content");
         jdbcTemplate.update("DELETE FROM creator");
         jdbcTemplate.update("DELETE FROM city");
@@ -42,7 +43,8 @@ class ContentPlaceApiTest {
         jdbcTemplate.update("ALTER TABLE content_place ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE place ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE content ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE member ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE account ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE guest ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE favorite_folder ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE creator ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE country ALTER COLUMN id RESTART WITH 1");
@@ -84,10 +86,10 @@ class ContentPlaceApiTest {
                     "INSERT INTO content_place (content_id, place_id, visit_day, visit_order, time_line) VALUES (1, 1, 1, 1, '00:11:00')");
             jdbcTemplate.update(
                     "INSERT INTO content_place (content_id, place_id, visit_day, visit_order, time_line) VALUES (1, 2, 2, 1, '00:12:00')");
+            jdbcTemplate.update("INSERT INTO account () VALUES ()");
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
             jdbcTemplate.update(
-                    "INSERT INTO member (device_fid) VALUES ('testDeviceFid')");
-            jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (member_id, name, is_default) VALUES (1, '기본 폴더', true)");
+                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '기본 폴더', true)");
             jdbcTemplate.update(
                     "INSERT INTO favorite_place (favorite_folder_id, place_id) VALUES (1, 1)");
 

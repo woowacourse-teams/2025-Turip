@@ -11,17 +11,17 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.test.context.ActiveProfiles;
-import turip.region.domain.City;
-import turip.region.repository.CityRepository;
 import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
-import turip.region.domain.Country;
-import turip.region.repository.CountryRepository;
 import turip.creator.domain.Creator;
 import turip.creator.repository.CreatorRepository;
 import turip.favorite.domain.FavoriteContent;
-import turip.member.domain.Member;
-import turip.member.repository.MemberRepository;
+import turip.member.domain.Account;
+import turip.member.repository.AccountRepository;
+import turip.region.domain.City;
+import turip.region.domain.Country;
+import turip.region.repository.CityRepository;
+import turip.region.repository.CountryRepository;
 
 @DataJpaTest
 @ActiveProfiles("test")
@@ -31,7 +31,7 @@ class FavoriteContentRepositoryTest {
     private FavoriteContentRepository favoriteContentRepository;
 
     @Autowired
-    private MemberRepository memberRepository;
+    private AccountRepository accountRepository;
 
     @Autowired
     private ContentRepository contentRepository;
@@ -62,18 +62,18 @@ class FavoriteContentRepositoryTest {
         Content content2 = contentRepository.save(
                 new Content(creator, city, "테스트 컨텐츠 2", "https://example.com/content2", LocalDate.now()));
 
-        Member member = memberRepository.save(new Member("testDeviceFid"));
+        Account account = accountRepository.save(new Account());
 
-        FavoriteContent favoriteContent1 = new FavoriteContent(LocalDate.now().minusDays(2), member, content1);
-        FavoriteContent favoriteContent2 = new FavoriteContent(LocalDate.now().minusDays(1), member,
+        FavoriteContent favoriteContent1 = new FavoriteContent(LocalDate.now().minusDays(2), account, content1);
+        FavoriteContent favoriteContent2 = new FavoriteContent(LocalDate.now().minusDays(1), account,
                 content2); // 최신 찜 컨텐츠
 
         favoriteContentRepository.save(favoriteContent1);
         favoriteContentRepository.save(favoriteContent2);
 
         // when
-        Slice<Content> result = favoriteContentRepository.findMyFavoriteContentsByDeviceFid(
-                member.getDeviceFid(), Long.MAX_VALUE, PageRequest.of(0, 10));
+        Slice<Content> result = favoriteContentRepository.findMyFavoriteContentsByAccountId(
+                account.getId(), Long.MAX_VALUE, PageRequest.of(0, 10));
         List<Content> contents = result.getContent();
 
         // then

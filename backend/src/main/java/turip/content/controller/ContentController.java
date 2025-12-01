@@ -15,15 +15,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import turip.auth.AuthMember;
-import turip.auth.MemberResolvePolicy;
+import turip.auth.resolver.AuthAccount;
 import turip.common.exception.ErrorResponse;
 import turip.content.controller.dto.response.content.ContentCountResponse;
 import turip.content.controller.dto.response.content.ContentResponse;
 import turip.content.controller.dto.response.content.ContentsDetailWithLoadableResponse;
 import turip.content.controller.dto.response.favorite.WeeklyPopularFavoriteContentsResponse;
 import turip.content.service.ContentService;
-import turip.member.domain.Member;
+import turip.member.domain.Account;
 
 @RestController
 @RequiredArgsConstructor
@@ -192,12 +191,12 @@ public class ContentController {
     })
     @GetMapping
     public ResponseEntity<ContentsDetailWithLoadableResponse> readContentsByRegionCategory(
-            @Parameter(hidden = true) @AuthMember(policy = MemberResolvePolicy.CREATE_IF_ABSENT) Member member,
+            @Parameter(hidden = true) @AuthAccount Account account,
             @RequestParam(name = "regionCategory") String regionCategory,
             @RequestParam(name = "size") Integer pageSize,
             @RequestParam(name = "lastId") Long lastContentId
     ) {
-        ContentsDetailWithLoadableResponse response = contentService.findContentsByRegionCategory(member,
+        ContentsDetailWithLoadableResponse response = contentService.findContentsByRegionCategory(account,
                 regionCategory,
                 pageSize, lastContentId);
         return ResponseEntity.ok(response);
@@ -272,12 +271,12 @@ public class ContentController {
     })
     @GetMapping("/keyword")
     public ResponseEntity<ContentsDetailWithLoadableResponse> readContentsByKeyword(
-            @Parameter(hidden = true) @AuthMember(policy = MemberResolvePolicy.CREATE_IF_ABSENT) Member member,
+            @Parameter(hidden = true) @AuthAccount Account account,
             @RequestParam(name = "keyword") String keyword,
             @RequestParam(name = "size") Integer pageSize,
             @RequestParam(name = "lastId") Long lastContentId
     ) {
-        ContentsDetailWithLoadableResponse response = contentService.searchContentsByKeyword(member, keyword, pageSize,
+        ContentsDetailWithLoadableResponse response = contentService.searchContentsByKeyword(account, keyword, pageSize,
                 lastContentId);
         return ResponseEntity.ok(response);
     }
@@ -337,10 +336,10 @@ public class ContentController {
     })
     @GetMapping("/{contentId}")
     public ResponseEntity<ContentResponse> readContent(
-            @Parameter(hidden = true) @AuthMember(policy = MemberResolvePolicy.CREATE_IF_ABSENT) Member member,
+            @Parameter(hidden = true) @AuthAccount Account account,
             @PathVariable Long contentId
     ) {
-        ContentResponse response = contentService.getContentWithFavoriteStatus(contentId, member);
+        ContentResponse response = contentService.getContentWithFavoriteStatus(contentId, account);
         return ResponseEntity.ok(response);
     }
 
@@ -414,10 +413,10 @@ public class ContentController {
     })
     @GetMapping("/popular/favorites")
     public ResponseEntity<WeeklyPopularFavoriteContentsResponse> readWeeklyPopularFavoriteContents(
-            @Parameter(hidden = true) @AuthMember(policy = MemberResolvePolicy.CREATE_IF_ABSENT) Member member,
+            @Parameter(hidden = true) @AuthAccount Account account,
             @RequestParam("size") int topContentSize) {
         WeeklyPopularFavoriteContentsResponse weeklyPopularFavoriteContents = contentService.findWeeklyPopularFavoriteContents(
-                member, topContentSize);
+                account, topContentSize);
         return ResponseEntity.ok(weeklyPopularFavoriteContents);
     }
 }
