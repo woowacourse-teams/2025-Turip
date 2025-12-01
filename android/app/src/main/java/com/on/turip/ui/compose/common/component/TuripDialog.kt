@@ -33,12 +33,14 @@ fun TuripDialog(
     message: String,
     confirmText: String,
     dismissText: String,
-    onDismissRequest: () -> Unit,
+    confirmButtonColor: Color,
+    dismissButtonColor: Color,
     onConfirmation: () -> Unit,
+    onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Dialog(
-        onDismissRequest = { onDismissRequest() },
+        onDismissRequest = onDismissRequest,
         properties = DialogProperties(usePlatformDefaultWidth = false),
     ) {
         Card(
@@ -61,10 +63,12 @@ fun TuripDialog(
                 DialogTitleText(title = title)
                 DialogMessageText(message = message)
                 DialogButtons(
-                    dismissText = dismissText,
                     confirmText = confirmText,
-                    onDismissRequest = onDismissRequest,
+                    dismissText = dismissText,
+                    confirmButtonColor = confirmButtonColor,
+                    dismissButtonColor = dismissButtonColor,
                     onConfirmation = onConfirmation,
+                    onDismissRequest = onDismissRequest,
                 )
             }
         }
@@ -93,10 +97,12 @@ private fun DialogMessageText(message: String) {
 
 @Composable
 private fun DialogButtons(
-    dismissText: String,
     confirmText: String,
-    onDismissRequest: () -> Unit,
+    dismissText: String,
+    confirmButtonColor: Color,
+    dismissButtonColor: Color,
     onConfirmation: () -> Unit,
+    onDismissRequest: () -> Unit,
 ) {
     Row(
         modifier =
@@ -115,7 +121,8 @@ private fun DialogButtons(
                     .clickable(onClick = onDismissRequest)
                     .weight(1f)
                     .background(
-                        color = colorResource(R.color.turip_gray_b4b4b4),
+                        color = dismissButtonColor,
+//                        color = colorResource(R.color.turip_gray_b4b4b4),
                         shape = RoundedCornerShape(8.dp),
                     ).padding(vertical = 16.dp),
         )
@@ -129,7 +136,8 @@ private fun DialogButtons(
                     .clickable(onClick = onConfirmation)
                     .weight(1f)
                     .background(
-                        color = colorResource(R.color.turip_blue_11aebf_70),
+                        color = confirmButtonColor,
+//                        color = colorResource(R.color.turip_blue_11aebf_70),
                         shape = RoundedCornerShape(8.dp),
                     ).padding(vertical = 16.dp),
         )
@@ -145,8 +153,10 @@ private fun TuripDialogPreview() {
             message = "정말 로그아웃 하시겠습니까?",
             confirmText = "로그아웃",
             dismissText = "취소",
-            onDismissRequest = { },
+            confirmButtonColor = colorResource(R.color.turip_blue_11aebf_70),
+            dismissButtonColor = colorResource(R.color.turip_gray_b4b4b4),
             onConfirmation = {},
+            onDismissRequest = { },
             modifier = Modifier.fillMaxSize(),
         )
     }

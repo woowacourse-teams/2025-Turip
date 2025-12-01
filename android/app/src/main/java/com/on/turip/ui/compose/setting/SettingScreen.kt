@@ -54,8 +54,10 @@ fun SettingScreen(
             message = stringResource(R.string.setting_logout_dialog_message),
             confirmText = stringResource(R.string.setting_logout_dialog_confirm),
             dismissText = stringResource(R.string.setting_logout_dialog_dismiss),
-            onDismissRequest = { viewModel.showLogoutDialog(show = false) },
+            confirmButtonColor = colorResource(R.color.turip_blue_11aebf_70),
+            dismissButtonColor = colorResource(R.color.turip_gray_b4b4b4),
             onConfirmation = viewModel::confirmLogout,
+            onDismissRequest = { viewModel.showLogoutDialog(show = false) },
         )
     }
 
@@ -65,8 +67,10 @@ fun SettingScreen(
             message = stringResource(R.string.setting_withdraw_dialog_message),
             confirmText = stringResource(R.string.setting_withdraw_dialog_confirm),
             dismissText = stringResource(R.string.setting_withdraw_dialog_dismiss),
-            onDismissRequest = { viewModel.showWithdrawDialog(show = false) },
+            confirmButtonColor = colorResource(R.color.turip_red_ff7474),
+            dismissButtonColor = colorResource(R.color.turip_gray_b4b4b4),
             onConfirmation = viewModel::confirmWithdraw,
+            onDismissRequest = { viewModel.showWithdrawDialog(show = false) },
         )
     }
 
