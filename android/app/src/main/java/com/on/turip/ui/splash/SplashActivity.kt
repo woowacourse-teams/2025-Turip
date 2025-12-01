@@ -44,8 +44,10 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        viewModel.checkAutoLogin()
-        checkUpdateAndProceed()
+        lifecycleScope.launch {
+            viewModel.checkAutoLogin()
+            checkUpdateAndProceed()
+        }
     }
 
     override fun onResume() {
