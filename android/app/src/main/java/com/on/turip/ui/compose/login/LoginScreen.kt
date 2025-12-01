@@ -32,6 +32,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.on.turip.R
 import com.on.turip.data.login.datasource.GoogleCredentialManager
 import com.on.turip.ui.compose.common.component.HelpText
+import com.on.turip.ui.compose.common.component.TuripDialog
 import com.on.turip.ui.compose.common.util.noRippleClickable
 import com.on.turip.ui.compose.theme.TuripTypography
 
@@ -49,6 +50,22 @@ fun LoginScreen(
                 LoginUiEvent.NavigateToMain -> navigateToMain()
             }
         }
+    }
+
+    if (uiState.showMigrationDialog) {
+        TuripDialog(
+            title = "동기화",
+            message = "기존의 데이터와 동기화 하시겠습니까?",
+            confirmText = "데이터 동기화",
+            dismissText = stringResource(R.string.setting_logout_dialog_dismiss),
+            confirmButtonColor = colorResource(R.color.turip_blue_11aebf_70),
+            dismissButtonColor = colorResource(R.color.turip_gray_b4b4b4),
+            onConfirmation = {
+                viewmodel.migration()
+                navigateToMain()
+            },
+            onDismissRequest = navigateToMain,
+        )
     }
 
     LoginScreen(
@@ -142,10 +159,12 @@ private fun LoginScreenContent(
                                         colorResource(R.color.gray_200_c1c1c1),
                                     ),
                                 shape = RoundedCornerShape(10.dp),
-                            ).background(
+                            )
+                            .background(
                                 color = colorResource(R.color.gray_300_5b5b5b),
                                 shape = RoundedCornerShape(10.dp),
-                            ).fillMaxWidth()
+                            )
+                            .fillMaxWidth()
                             .padding(vertical = 20.dp),
                     textAlign = TextAlign.Center,
                 )

@@ -8,6 +8,7 @@ import com.on.turip.common.UserType
 import com.on.turip.data.common.onFailure
 import com.on.turip.data.common.onSuccess
 import com.on.turip.data.login.datasource.GoogleCredentialManager
+import com.on.turip.domain.login.AuthRepository
 import com.on.turip.domain.login.usecase.LoginUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -23,6 +24,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewmodel @Inject constructor(
     private val loginUserUseCase: LoginUserUseCase,
+    private val authRepository: AuthRepository,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<LoginUiState> = MutableStateFlow(LoginUiState.EMPTY)
     val uiState: StateFlow<LoginUiState> = _uiState
@@ -40,9 +42,9 @@ class LoginViewmodel @Inject constructor(
                 .getIdToken()
                 .onSuccess { result: GoogleIdTokenCredential ->
                     loginUserUseCase(result.idToken)
-                        .onSuccess {
+                        .onSuccess { isNewMember: Boolean ->
                             AuthState.change(UserType.MEMBER)
-                            _uiEvent.send(LoginUiEvent.NavigateToMain)
+                            showLogoutDialog(isNewMember)
                         }.onFailure {
                             Timber.e("Token 저장 실패")
                         }
@@ -52,9 +54,18 @@ class LoginViewmodel @Inject constructor(
         }
     }
 
+    private fun showLogoutDialog(show: Boolean) {
+        _uiState.update { it.copy(showMigrationDialog = show) }
+    }
+
+    fun migration() {
+        viewModelScope.launch {
+            authRepository.updateMigration()
+        }
+    }
+
     fun onGuestLogin() {
         viewModelScope.launch {
-            // TODO : DataStore 에 게스트 상태 저장
             AuthState.change(UserType.GUEST)
             _uiEvent.send(LoginUiEvent.NavigateToMain)
         }

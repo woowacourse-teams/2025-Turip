@@ -10,10 +10,10 @@ class LoginUserUseCase @Inject constructor(
     private val userStorageRepository: UserStorageRepository,
     private val loginRepository: LoginRepository,
 ) {
-    suspend operator fun invoke(idToken: String): TuripCustomResult<Unit> =
+    suspend operator fun invoke(idToken: String): TuripCustomResult<Boolean> =
         loginRepository.login(idToken).mapCatching { result ->
             userStorageRepository.createTokens(result.authTokens).fold(
-                onSuccess = { },
+                onSuccess = { result.isNewMember },
                 onFailure = { error -> throw error },
             )
         }
