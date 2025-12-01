@@ -1,10 +1,13 @@
 package turip.member.service;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
-import java.util.Optional;
+import java.time.LocalDate;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -12,10 +15,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import turip.common.exception.custom.NotFoundException;
+import turip.favorite.domain.FavoriteContent;
 import turip.favorite.domain.FavoriteFolder;
+import turip.favorite.repository.FavoriteContentRepository;
 import turip.favorite.repository.FavoriteFolderRepository;
+import turip.auth.service.RefreshTokenService;
+import turip.member.domain.Account;
+import turip.member.domain.Guest;
 import turip.member.domain.Member;
+import turip.member.domain.Provider;
 import turip.member.repository.MemberRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -28,51 +36,115 @@ class MemberServiceTest {
     private MemberRepository memberRepository;
 
     @Mock
+    private FavoriteContentRepository favoriteContentRepository;
+
+    @Mock
     private FavoriteFolderRepository favoriteFolderRepository;
 
-    @DisplayName("deviceFid를 기반으로 회원을 찾거나 생성하는 기능 테스트")
-    @Nested
-    class FindOrCreateMember {
+    @Mock
+    private GuestService guestService;
 
-        @DisplayName("기기 id에 대한 회원이 존재하지 않는 경우, 회원을 생성하고 기본 폴더를 추가한다")
+    @Mock
+    private AccountService accountService;
+
+    @Mock
+    private RefreshTokenService refreshTokenService;
+
+    @DisplayName("Guest에서 Member로 데이터 마이그레이션 테스트")
+    @Nested
+    class MigrateTest {
+
+        @DisplayName("Guest의 찜 콘텐츠를 Member의 Account로 이전한다")
         @Test
-        void findOrCreateMember2() {
+        void migrateFavoriteContents() {
             // given
-            String deviceFid = "testDeviceFid";
-            Member member = new Member(deviceFid);
-            Member savedMember = new Member(1L, member.getDeviceFid());
-            given(memberRepository.findByDeviceFid(deviceFid))
-                    .willReturn(Optional.empty());
-            given(memberRepository.save(member))
-                    .willReturn(savedMember);
+            Account memberAccount = new Account(1L);
+            Account guestAccount = new Account(2L);
+            Member member = new Member(1L, memberAccount, Provider.GOOGLE, "providerId", "email@test.com");
+            Guest guest = new Guest(1L, guestAccount, "device-fid-123");
+
+            FavoriteContent guestFavoriteContent = new FavoriteContent(1L, LocalDate.now(), guestAccount, null);
+
+            given(favoriteContentRepository.findAllByAccount(guestAccount))
+                    .willReturn(List.of(guestFavoriteContent));
+            given(favoriteFolderRepository.findAllByAccount(guestAccount))
+                    .willReturn(List.of());
 
             // when
-            memberService.findOrCreateMember(deviceFid);
+            memberService.migrate(member, guest);
 
             // then
-            FavoriteFolder defaultFolder = FavoriteFolder.defaultFolderOf(savedMember);
-            verify(favoriteFolderRepository).save(defaultFolder);
+            assertThat(guestFavoriteContent.getAccount())
+                    .isEqualTo(memberAccount);
+        }
+
+        @DisplayName("Guest의 찜 폴더를 Member의 Account로 이전한다")
+        @Test
+        void migrateFavoriteFolders() {
+            // given
+            Account memberAccount = new Account(1L);
+            Account guestAccount = new Account(2L);
+            Member member = new Member(1L, memberAccount, Provider.GOOGLE, "providerId", "email@test.com");
+            Guest guest = new Guest(1L, guestAccount, "device-fid-123");
+
+            FavoriteFolder guestFolder1 = new FavoriteFolder(1L, guestAccount, "기본 폴더", true);
+            FavoriteFolder guestFolder2 = new FavoriteFolder(2L, guestAccount, "게스트 커스텀 폴더였던 것", false);
+
+            given(favoriteContentRepository.findAllByAccount(any()))
+                    .willReturn(List.of());
+            given(favoriteFolderRepository.findAllByAccount(guestAccount))
+                    .willReturn(List.of(guestFolder1, guestFolder2));
+
+            // when
+            memberService.migrate(member, guest);
+
+            // then
+            assertAll(
+                    () -> assertThat(guestFolder1.getAccount()).isEqualTo(memberAccount),
+                    () -> assertThat(guestFolder2.getAccount()).isEqualTo(memberAccount)
+            );
+        }
+
+        @DisplayName("마이그레이션이 완료되면 Guest를 삭제한다")
+        @Test
+        void deleteGuest() {
+            // given
+            Account memberAccount = new Account(1L);
+            Account guestAccount = new Account(2L);
+            Member member = new Member(1L, memberAccount, Provider.GOOGLE, "providerId", "email@test.com");
+            Guest guest = new Guest(1L, guestAccount, "device-fid-123");
+
+            given(favoriteContentRepository.findAllByAccount(any()))
+                    .willReturn(List.of());
+            given(favoriteFolderRepository.findAllByAccount(any()))
+                    .willReturn(List.of());
+
+            // when
+            memberService.migrate(member, guest);
+
+            // then
+            verify(guestService).delete(guest);
         }
     }
 
-    @DisplayName("deviceFid를 기반으로 회원을 찾는 테스트")
+    @DisplayName("Member 삭제(회원 탈퇴) 테스트")
     @Nested
-    class GetMemberByDeviceId {
+    class DeleteTest {
 
-        @DisplayName("기기 id에 대한 회원이 존재하지 않는 경우 NotFoundException을 발생시킨다.")
+        @DisplayName("Member를 삭제하고 연관된 RefreshToken, Account, 찜 데이터를 삭제한다")
         @Test
-        void getMemberByDeviceId1() {
+        void delete() {
             // given
-            String deviceFid = "testDeviceFid";
-            given(memberRepository.findByDeviceFid(deviceFid))
-                    .willReturn(Optional.empty());
+            Account account = new Account(1L);
+            Member member = new Member(1L, account, Provider.GOOGLE, "providerId", "email@test.com");
 
             // when
-            memberService.findOrCreateMember(deviceFid);
+            memberService.delete(member);
 
             // then
-            assertThatThrownBy(() -> memberService.getMemberByDeviceId(deviceFid))
-                    .isInstanceOf(NotFoundException.class);
+            verify(refreshTokenService).deleteByMember(member);
+            verify(memberRepository).delete(member);
+            verify(accountService).deleteAccountAndFavorites(account);
         }
     }
 }

@@ -9,6 +9,7 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.on.turip.databinding.FragmentFavoriteBinding
 import com.on.turip.ui.common.base.BaseFragment
+import com.on.turip.ui.setting.SettingActivity
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -58,9 +59,7 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>() {
 
     private fun setupListeners() {
         binding.ivFavoriteMoreOptions.setOnClickListener {
-            val bottomSheetDialog: FavoriteHelpInformationBottomSheetFragment =
-                FavoriteHelpInformationBottomSheetFragment.instance()
-            bottomSheetDialog.show(parentFragmentManager, "favorite_help_information")
+            startActivity(SettingActivity.newIntent(requireContext()))
         }
     }
 

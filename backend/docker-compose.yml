@@ -32,6 +32,8 @@ services:
       FLYWAY_USERNAME: ${FLYWAY_USERNAME}
       FLYWAY_PASSWORD: ${FLYWAY_PASSWORD}
       CSV_IMPORT_PASSWORD: ${CSV_IMPORT_PASSWORD}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
     networks:
       - turip-network
     volumes:
@@ -59,6 +61,8 @@ services:
       FLYWAY_USERNAME: ${FLYWAY_USERNAME}
       FLYWAY_PASSWORD: ${FLYWAY_PASSWORD}
       CSV_IMPORT_PASSWORD: ${CSV_IMPORT_PASSWORD}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
     networks:
       - turip-network
     volumes:

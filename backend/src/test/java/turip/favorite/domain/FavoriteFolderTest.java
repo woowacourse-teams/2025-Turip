@@ -12,7 +12,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.IllegalArgumentException;
-import turip.member.domain.Member;
+import turip.member.domain.Account;
 
 class FavoriteFolderTest {
 
@@ -20,8 +20,8 @@ class FavoriteFolderTest {
     @Test
     void isOwner1() {
         // given
-        Member owner = new Member("메이");
-        Member nonOwner = new Member("하루");
+        Account owner = new Account(1L);
+        Account nonOwner = new Account(2L);
         FavoriteFolder favoriteFolder = new FavoriteFolder(1L, owner, "폴더", false);
 
         // when & then

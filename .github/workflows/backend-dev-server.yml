@@ -99,4 +99,6 @@ jobs:
           FLYWAY_USERNAME: ${{ secrets.FLYWAY_USERNAME }}
           FLYWAY_PASSWORD: ${{ secrets.FLYWAY_PASSWORD }}
           CSV_IMPORT_PASSWORD: ${{ secrets.CSV_IMPORT_PASSWORD }}
+          JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
         run: ./deploy.sh

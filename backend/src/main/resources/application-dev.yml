@@ -24,6 +24,9 @@ spring:
     validate-on-migrate: true
     encoding: UTF-8
 
+jwt:
+  access-token-expiration-ms: 10800000  # 3시간
+
 management:
   endpoint:
     health:

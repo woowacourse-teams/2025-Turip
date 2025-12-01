@@ -11,7 +11,7 @@ public record FavoriteFolderWithPlaceCountResponse(
 ) {
 
     public static FavoriteFolderWithPlaceCountResponse of(FavoriteFolder favoriteFolder, int placeCount) {
-        return new FavoriteFolderWithPlaceCountResponse(favoriteFolder.getId(), favoriteFolder.getMember().getId(),
+        return new FavoriteFolderWithPlaceCountResponse(favoriteFolder.getId(), favoriteFolder.getAccount().getId(),
                 favoriteFolder.getName(), favoriteFolder.isDefault(), placeCount);
     }
 }

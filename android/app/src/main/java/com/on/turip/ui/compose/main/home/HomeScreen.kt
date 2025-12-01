@@ -33,7 +33,7 @@ import com.on.turip.domain.region.RegionCategory
 import com.on.turip.ui.common.event.CommonEvent
 import com.on.turip.ui.compose.common.component.ErrorHandlingContainer
 import com.on.turip.ui.compose.common.component.SearchTextField
-import com.on.turip.ui.compose.main.home.component.HomeTopAppBar
+import com.on.turip.ui.compose.common.component.TuripAppBar
 import com.on.turip.ui.compose.main.home.component.RegionList
 import com.on.turip.ui.compose.main.home.component.RegionTypeButtons
 import com.on.turip.ui.compose.main.home.component.UsersLikeList
@@ -73,7 +73,11 @@ fun HomeScreen(
     }
 
     Scaffold(
-        topBar = { HomeTopAppBar() },
+        topBar = {
+            TuripAppBar(
+                canBack = false,
+            )
+        },
         modifier =
             Modifier.pointerInput(Unit) {
                 detectTapGestures(onTap = {
