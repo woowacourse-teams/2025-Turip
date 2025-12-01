@@ -13,9 +13,13 @@ suspend inline fun <T> safeApiCall(apiCall: suspend () -> Response<T>): TuripCus
             if (body != null) {
                 TuripCustomResult.Success(body)
             } else {
-                TuripCustomResult.ParseError(
-                    IllegalStateException("Response의 Body가 존재하지 않습니다."),
-                )
+                if (response.code() == 204) {
+                    TuripCustomResult.Success(Unit as T)
+                } else {
+                    TuripCustomResult.ParseError(
+                        IllegalStateException("예상치 못한 빈 응답입니다."),
+                    )
+                }
             }
         } else {
             TuripCustomResult.HttpError(response.code())
