@@ -25,7 +25,7 @@ public enum ErrorTag {
 
     // 404 Not Found
     NOT_FOUND("요청 정보를 찾을 수 없습니다."),
-    MEMBER_NOT_FOUND("멤버를 찾을 수 없습니다."),
+    MEMBER_NOT_FOUND("회원을 찾을 수 없습니다."),
     ACCOUNT_NOT_FOUND("계정을 찾을 수 없습니다."),
     CONTENT_NOT_FOUND("컨텐츠를 찾을 수 없습니다."),
     FAVORITE_FOLDER_NOT_FOUND("찜폴더를 찾을 수 없습니다."),

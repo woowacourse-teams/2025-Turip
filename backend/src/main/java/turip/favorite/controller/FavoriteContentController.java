@@ -178,7 +178,8 @@ public class FavoriteContentController {
                                             summary = "올바르지 않은 device-fid",
                                             value = """
                                                     {
-                                                        "tag": "MEMBER_NOT_FOUND"
+                                                        "tag": "MEMBER_NOT_FOUND",
+                                                        "message": "회원을 찾을 수 없습니다"
                                                     }
                                                     """
                                     )
@@ -227,7 +228,8 @@ public class FavoriteContentController {
                                             summary = "존재하지 않는 사용자",
                                             value = """
                                                     {
-                                                        "tag": "MEMBER_NOT_FOUND"
+                                                        "tag": "MEMBER_NOT_FOUND",
+                                                        "message": "회원을 찾을 수 없습니다"
                                                     }
                                                     """
                                     ),
