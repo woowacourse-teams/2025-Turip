@@ -13,7 +13,7 @@ import dagger.hilt.android.qualifiers.ActivityContext
 import javax.inject.Inject
 
 class GoogleCredentialManager @Inject constructor(
-    @ActivityContext val context: Context,
+    @ActivityContext private val context: Context,
     private val getCredentialRequest: GetCredentialRequest,
 ) : CredentialProvider {
     private val credentialManager by lazy { CredentialManager.create(context) }
