@@ -26,6 +26,6 @@ suspend inline fun <T> safeApiCall(apiCall: suspend () -> Response<T>): TuripCus
         }
     } catch (e: HttpException) {
         TuripCustomResult.HttpError(e.code())
-    } catch (e: Throwable) {
+    } catch (e: Exception) {
         TuripCustomResult.NetworkError(e)
     }
