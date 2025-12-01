@@ -4,6 +4,7 @@ import com.on.turip.data.content.place.service.ContentPlaceService
 import com.on.turip.data.content.service.ContentService
 import com.on.turip.data.favorite.service.FavoriteService
 import com.on.turip.data.folder.service.FolderService
+import com.on.turip.data.login.service.AuthService
 import com.on.turip.data.login.service.LoginService
 import com.on.turip.data.place.service.PlaceService
 import com.on.turip.data.region.service.RegionService
@@ -48,4 +49,8 @@ object ServiceModule {
     fun provideLoginService(
         @Named("refreshRetrofit") retrofit: Retrofit,
     ): LoginService = retrofit.create<LoginService>()
+
+    @Provides
+    @Singleton
+    fun provideAuthService(retrofit: Retrofit): AuthService = retrofit.create<AuthService>()
 }

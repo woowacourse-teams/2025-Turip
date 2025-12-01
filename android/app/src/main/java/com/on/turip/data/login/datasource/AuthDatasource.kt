@@ -1,0 +1,7 @@
+package com.on.turip.data.login.datasource
+
+import com.on.turip.data.common.TuripCustomResult
+
+interface AuthDatasource {
+    suspend fun postMigration(): TuripCustomResult<Unit>
+}
