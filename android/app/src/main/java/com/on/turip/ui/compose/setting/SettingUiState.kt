@@ -4,13 +4,14 @@ import androidx.compose.runtime.Immutable
 import com.on.turip.domain.userstorage.TuripDeviceIdentifier
 import com.on.turip.ui.common.model.MemberStatus
 
-// TODO : Immutable vs Stable ?
 @Immutable
 data class SettingUiState(
     val deviceIdentifier: TuripDeviceIdentifier,
     val memberStatus: MemberStatus,
     val showLogoutDialog: Boolean,
     val showWithdrawDialog: Boolean,
+    val isNetworkError: Boolean,
+    val isServerError: Boolean,
 ) {
     companion object {
         val EMPTY: SettingUiState =
@@ -19,6 +20,8 @@ data class SettingUiState(
                 memberStatus = MemberStatus.MEMBER,
                 showLogoutDialog = false,
                 showWithdrawDialog = false,
+                isNetworkError = false,
+                isServerError = false,
             )
     }
 }

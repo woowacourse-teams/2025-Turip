@@ -24,6 +24,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.on.turip.R
 import com.on.turip.domain.userstorage.TuripDeviceIdentifier
 import com.on.turip.ui.common.model.MemberStatus
+import com.on.turip.ui.compose.common.component.ErrorHandlingContainer
 import com.on.turip.ui.compose.common.component.TuripAppBar
 import com.on.turip.ui.compose.common.component.TuripDialog
 import com.on.turip.ui.compose.theme.TuripTheme
@@ -99,6 +100,9 @@ fun SettingScreen(
             viewModel.showWithdrawDialog(show = true)
             Timber.d("SettingScreen 회원탈퇴 버튼 클릭")
         },
+        onClickRetry = {
+            viewModel.loadId()
+        },
     )
 }
 
@@ -111,6 +115,7 @@ private fun SettingScreen(
     onClickLogin: () -> Unit,
     onClickLogout: () -> Unit,
     onClickWithdraw: () -> Unit,
+    onClickRetry: () -> Unit,
 ) {
     Scaffold(
         modifier =
@@ -125,15 +130,21 @@ private fun SettingScreen(
             )
         },
     ) { innerPadding ->
-        SettingScreenContent(
-            uiState = uiState,
-            onClickInquiry = onClickInquiry,
-            onClickPrivacyPolicy = onClickPrivacyPolicy,
-            onClickLogin = onClickLogin,
-            onClickLogout = onClickLogout,
-            onClickWithdraw = onClickWithdraw,
-            modifier = Modifier.padding(innerPadding),
-        )
+        ErrorHandlingContainer(
+            networkError = uiState.isNetworkError,
+            serverError = uiState.isServerError,
+            onRetryClick = onClickRetry,
+        ) {
+            SettingScreenContent(
+                uiState = uiState,
+                onClickInquiry = onClickInquiry,
+                onClickPrivacyPolicy = onClickPrivacyPolicy,
+                onClickLogin = onClickLogin,
+                onClickLogout = onClickLogout,
+                onClickWithdraw = onClickWithdraw,
+                modifier = Modifier.padding(innerPadding),
+            )
+        }
     }
 }
 
@@ -244,6 +255,8 @@ private fun MemberSettingScreenPreview() {
                     memberStatus = MemberStatus.MEMBER,
                     showLogoutDialog = false,
                     showWithdrawDialog = false,
+                    isNetworkError = false,
+                    isServerError = false,
                 ),
             onClickInquiry = {},
             onClickPrivacyPolicy = {},
@@ -265,6 +278,8 @@ private fun GuestSettingScreenPreview() {
                     memberStatus = MemberStatus.GUEST,
                     showLogoutDialog = false,
                     showWithdrawDialog = false,
+                    isNetworkError = false,
+                    isServerError = false,
                 ),
             onClickInquiry = {},
             onClickPrivacyPolicy = {},

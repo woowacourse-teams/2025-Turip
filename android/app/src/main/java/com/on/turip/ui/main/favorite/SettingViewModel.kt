@@ -11,6 +11,7 @@ import com.on.turip.ui.compose.common.util.SettingUtils.EMAIL_SUBJECT
 import com.on.turip.ui.compose.setting.SettingUiEvent
 import com.on.turip.ui.compose.setting.SettingUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +20,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @HiltViewModel
 class SettingViewModel @Inject constructor(
@@ -36,7 +36,7 @@ class SettingViewModel @Inject constructor(
     }
 
     // TODO : 멤버, 게스트 판별 로직 구현 필요 uiState.value.deviceIdentifier.memberStatus
-    private fun loadId() {
+    fun loadId() {
         viewModelScope.launch {
             userStorageRepository
                 .loadId()
