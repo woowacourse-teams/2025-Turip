@@ -12,7 +12,6 @@ import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.content.PagedContentsResult
 import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.content.video.VideoInformation
-import com.on.turip.domain.login.usecase.ReNewTokenUseCase
 import com.on.turip.domain.searchhistory.SearchHistory
 import com.on.turip.domain.searchhistory.SearchHistoryRepository
 import com.on.turip.ui.common.mapper.toUiModel
@@ -30,7 +29,6 @@ class SearchViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val contentRepository: ContentRepository,
     private val searchHistoryRepository: SearchHistoryRepository,
-    private val reNewTokenUseCase: ReNewTokenUseCase,
 ) : ViewModel() {
     private val _searchingWord: MutableLiveData<String> = MutableLiveData()
     val searchingWord: LiveData<String> get() = _searchingWord
@@ -151,12 +149,7 @@ class SearchViewModel @Inject constructor(
 
             ErrorEvent.TOKEN_EXPIRATION -> {
                 viewModelScope.launch {
-                    reNewTokenUseCase()
-                        .onSuccess {
-                            loadByKeyword()
-                        }.onFailure { error ->
-                            Timber.e(error)
-                        }
+                    // TODO Login창으로 이동
                 }
             }
         }

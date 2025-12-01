@@ -12,13 +12,16 @@ import com.on.turip.domain.favorite.repository.FavoritePlaceRepository
 import com.on.turip.domain.favorite.usecase.UpdateFavoritePlaceUseCase
 import com.on.turip.domain.folder.Folder
 import com.on.turip.domain.folder.repository.FolderRepository
-import com.on.turip.domain.login.usecase.ReNewTokenUseCase
 import com.on.turip.ui.common.mapper.toUiModel
+import com.on.turip.ui.main.favorite.event.FavoriteEvent
 import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceLatLngUiModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -28,7 +31,6 @@ class FavoritePlaceViewModel @Inject constructor(
     private val folderRepository: FolderRepository,
     private val favoritePlaceRepository: FavoritePlaceRepository,
     private val updateFavoritePlaceUseCase: UpdateFavoritePlaceUseCase,
-    private val reNewTokenUseCase: ReNewTokenUseCase,
 ) : ViewModel() {
     private val _favoritePlaceUiState: MutableLiveData<FavoritePlaceUiState> =
         MutableLiveData(FavoritePlaceUiState())
@@ -40,6 +42,9 @@ class FavoritePlaceViewModel @Inject constructor(
     private val _favoriteLatLng: MutableLiveData<List<FavoritePlaceLatLngUiModel>> =
         MutableLiveData()
     val favoriteLatLng: LiveData<List<FavoritePlaceLatLngUiModel>> get() = _favoriteLatLng
+
+    private val _uiEvent: Channel<FavoriteEvent> = Channel(Channel.BUFFERED)
+    val uiEvent: Flow<FavoriteEvent> = _uiEvent.receiveAsFlow()
 
     private var selectedFolderId: Long = NOT_INITIALIZED
 
@@ -179,12 +184,7 @@ class FavoritePlaceViewModel @Inject constructor(
 
             ErrorEvent.TOKEN_EXPIRATION -> {
                 viewModelScope.launch {
-                    reNewTokenUseCase()
-                        .onSuccess {
-                            loadFoldersAndPlaces()
-                        }.onFailure { error ->
-                            Timber.e(error)
-                        }
+                    _uiEvent.send(FavoriteEvent.TokenExpiration)
                 }
             }
         }

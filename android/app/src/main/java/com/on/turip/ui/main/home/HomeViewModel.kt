@@ -9,7 +9,6 @@ import com.on.turip.data.common.onSuccess
 import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.content.UsersLikeContent
 import com.on.turip.domain.content.repository.ContentRepository
-import com.on.turip.domain.login.usecase.ReNewTokenUseCase
 import com.on.turip.domain.region.RegionCategory
 import com.on.turip.domain.region.repository.RegionRepository
 import com.on.turip.ui.common.mapper.toUiModel
@@ -23,7 +22,6 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val regionRepository: RegionRepository,
     private val contentRepository: ContentRepository,
-    private val reNewTokenUseCase: ReNewTokenUseCase,
 ) : ViewModel() {
     private val _regionCategories: MutableLiveData<List<RegionCategory>> = MutableLiveData()
     val regionCategories: LiveData<List<RegionCategory>> get() = _regionCategories
@@ -87,14 +85,7 @@ class HomeViewModel @Inject constructor(
             }
 
             ErrorEvent.TOKEN_EXPIRATION -> {
-                viewModelScope.launch {
-                    reNewTokenUseCase()
-                        .onSuccess {
-                            reload()
-                        }.onFailure { error ->
-                            Timber.e(error)
-                        }
-                }
+                // TODO Login창으로 이동
             }
         }
     }

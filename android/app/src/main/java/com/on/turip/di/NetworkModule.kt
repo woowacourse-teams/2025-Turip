@@ -4,6 +4,7 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import com.on.turip.BuildConfig
 import com.on.turip.common.AuthState
 import com.on.turip.common.UserType
+import com.on.turip.data.login.TokenAuthenticator
 import com.on.turip.domain.userstorage.repository.UserStorageRepository
 import dagger.Module
 import dagger.Provides
@@ -19,6 +20,7 @@ import okhttp3.Request
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import timber.log.Timber
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -108,13 +110,46 @@ object NetworkModule {
 
     @Provides
     @Singleton
+    @Named("noAuthInterceptor")
+    fun provideNoAuthInterceptor(userStorageRepository: UserStorageRepository): Interceptor =
+        Interceptor { chain ->
+            val fid =
+                runBlocking {
+                    userStorageRepository.loadId().getOrNull()?.fid ?: ""
+                }
+
+            chain
+                .request()
+                .newBuilder()
+                .header("device-fid", fid)
+                .build()
+                .let(chain::proceed)
+        }
+
+    @Provides
+    @Singleton
     fun provideOkHttpClient(
         headerInterceptor: Interceptor,
         loggingInterceptor: HttpLoggingInterceptor,
+        tokenAuthenticator: TokenAuthenticator,
     ): OkHttpClient =
         OkHttpClient
             .Builder()
             .addInterceptor(headerInterceptor)
+            .addInterceptor(loggingInterceptor)
+            .authenticator(tokenAuthenticator)
+            .build()
+
+    @Provides
+    @Singleton
+    @Named("refreshOkHttp")
+    fun provideRefreshOkHttp(
+        @Named("noAuthInterceptor") noAuthInterceptor: Interceptor,
+        loggingInterceptor: HttpLoggingInterceptor,
+    ): OkHttpClient =
+        OkHttpClient
+            .Builder()
+            .addInterceptor(noAuthInterceptor)
             .addInterceptor(loggingInterceptor)
             .build()
 
@@ -122,6 +157,20 @@ object NetworkModule {
     @Singleton
     fun provideRetrofit(
         okHttpClient: OkHttpClient,
+        json: Json,
+    ): Retrofit =
+        Retrofit
+            .Builder()
+            .baseUrl(BuildConfig.BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .build()
+
+    @Provides
+    @Singleton
+    @Named("refreshRetrofit")
+    fun provideRefreshRetrofit(
+        @Named("refreshOkHttp") okHttpClient: OkHttpClient,
         json: Json,
     ): Retrofit =
         Retrofit

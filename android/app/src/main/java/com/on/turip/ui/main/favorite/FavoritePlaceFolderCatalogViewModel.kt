@@ -11,7 +11,6 @@ import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.favorite.FavoritePlace
 import com.on.turip.domain.favorite.repository.FavoritePlaceRepository
 import com.on.turip.domain.favorite.usecase.UpdateFavoritePlaceUseCase
-import com.on.turip.domain.login.usecase.ReNewTokenUseCase
 import com.on.turip.ui.main.favorite.FavoritePlaceFolderCatalogFragment.Companion.FAVORITE_PLACE_FOLDER_CATALOG_ARGUMENTS_FOLDER_ID
 import com.on.turip.ui.main.favorite.FavoritePlaceFolderCatalogFragment.Companion.FAVORITE_PLACE_FOLDER_CATALOG_ARGUMENTS_FOLDER_NAME
 import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
@@ -26,7 +25,6 @@ class FavoritePlaceFolderCatalogViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val favoritePlaceRepository: FavoritePlaceRepository,
     private val updateFavoritePlaceUseCase: UpdateFavoritePlaceUseCase,
-    private val reNewTokenUseCase: ReNewTokenUseCase,
 ) : ViewModel() {
     private val _favoritePlaceUiState: MutableLiveData<FavoritePlaceUiState> =
         MutableLiveData(FavoritePlaceUiState())
@@ -126,14 +124,7 @@ class FavoritePlaceFolderCatalogViewModel @Inject constructor(
             }
 
             ErrorEvent.TOKEN_EXPIRATION -> {
-                viewModelScope.launch {
-                    reNewTokenUseCase()
-                        .onSuccess {
-                            loadPlacesInSelectFolder()
-                        }.onFailure { error ->
-                            Timber.e(error)
-                        }
-                }
+                // TODO Login창으로 이동
             }
         }
     }

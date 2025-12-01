@@ -13,7 +13,6 @@ import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.content.Content
 import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.favorite.usecase.UpdateFavoriteUseCase
-import com.on.turip.domain.login.usecase.ReNewTokenUseCase
 import com.on.turip.domain.trip.ContentPlace
 import com.on.turip.domain.trip.Trip
 import com.on.turip.domain.trip.repository.ContentPlaceRepository
@@ -32,7 +31,6 @@ class TripDetailViewModel @Inject constructor(
     private val contentRepository: ContentRepository,
     private val contentPlaceRepository: ContentPlaceRepository,
     private val updateFavoriteUseCase: UpdateFavoriteUseCase,
-    private val reNewTokenUseCase: ReNewTokenUseCase,
 ) : ViewModel() {
     private val _content: MutableLiveData<Content> = MutableLiveData()
     val content: LiveData<Content> get() = _content
@@ -220,14 +218,7 @@ class TripDetailViewModel @Inject constructor(
             ErrorEvent.PARSER_ERROR -> _serverError.value = true
             ErrorEvent.DUPLICATION_FOLDER -> throw IllegalArgumentException("발생할 수 없는 오류")
             ErrorEvent.TOKEN_EXPIRATION -> {
-                viewModelScope.launch {
-                    reNewTokenUseCase()
-                        .onSuccess {
-                            reload()
-                        }.onFailure { error ->
-                            Timber.e(error)
-                        }
-                }
+                // TODO Login창으로 이동
             }
         }
     }
