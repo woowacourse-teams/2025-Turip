@@ -118,7 +118,7 @@ public class AuthController {
                             examples = {
                                     @ExampleObject(
                                             name = "invalid refresh token",
-                                            summary = "유효하지 않은 id token",
+                                            summary = "유효하지 않은 refresh token",
                                             value = """
                                                     {
                                                       "tag": "REFRESH_TOKEN_INVALID",
