@@ -111,9 +111,9 @@ public class AuthService {
             LocalDateTime expiration = jwtProvider.getExpiration(refreshToken);
             refreshTokenService.save(member, deviceFid, jwtProvider.hashToken(refreshToken), issuedAt, expiration);
         } catch (ExpiredJwtException e) {
-            throw new UnauthorizedException(ErrorTag.ACCESS_TOKEN_EXPIRED);
+            throw new UnauthorizedException(ErrorTag.REFRESH_TOKEN_EXPIRED);
         } catch (SignatureException e) {
-            throw new UnauthorizedException(ErrorTag.ACCESS_TOKEN_SIGNATURE_INVALID);
+            throw new UnauthorizedException(ErrorTag.REFRESH_TOKEN_SIGNATURE_INVALID);
         } catch (Exception e) {
             throw new UnauthorizedException(ErrorTag.UNAUTHORIZED);
         }
