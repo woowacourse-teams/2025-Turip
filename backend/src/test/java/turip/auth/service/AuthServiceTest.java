@@ -2,7 +2,10 @@ package turip.auth.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import io.jsonwebtoken.Claims;
@@ -98,6 +101,13 @@ class AuthServiceTest {
             assertThat(response.accessToken()).isEqualTo("access-token");
             assertThat(response.refreshToken()).isEqualTo("refresh-token");
             assertThat(response.isNewMember()).isFalse();
+            verify(refreshTokenService).save(
+                    any(Member.class),
+                    anyString(),
+                    anyString(),
+                    any(LocalDateTime.class),
+                    any(LocalDateTime.class)
+            );
         }
 
         @Test
@@ -129,6 +139,13 @@ class AuthServiceTest {
 
             // then
             assertThat(response.isNewMember()).isTrue();
+            verify(refreshTokenService).save(
+                    eq(member),
+                    eq(deviceFid),
+                    eq("hashed-token"),
+                    any(LocalDateTime.class),
+                    any(LocalDateTime.class)
+            );
         }
 
         @Test
@@ -190,6 +207,13 @@ class AuthServiceTest {
             assertThat(response).isNotNull();
             assertThat(response.accessToken()).isEqualTo("new-access-token");
             assertThat(response.refreshToken()).isEqualTo("new-refresh-token");
+            verify(refreshTokenService).save(
+                    eq(member),
+                    eq(deviceFid),
+                    eq("new-hashed-token"),
+                    any(LocalDateTime.class),
+                    any(LocalDateTime.class)
+            );
         }
 
         @Test
@@ -316,7 +340,7 @@ class AuthServiceTest {
             authService.logout(account, deviceFid);
 
             // then
-            // 예외가 발생하지 않으면 성공
+            verify(refreshTokenService).deleteByMemberAndDeviceFid(member, deviceFid);
         }
 
         @Test
