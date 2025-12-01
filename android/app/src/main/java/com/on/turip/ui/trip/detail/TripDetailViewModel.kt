@@ -16,11 +16,15 @@ import com.on.turip.domain.favorite.usecase.UpdateFavoriteUseCase
 import com.on.turip.domain.trip.ContentPlace
 import com.on.turip.domain.trip.Trip
 import com.on.turip.domain.trip.repository.ContentPlaceRepository
+import com.on.turip.ui.common.event.CommonEvent
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.common.mapper.toUiModelWithoutContentPlaces
 import com.on.turip.ui.common.model.trip.TripModel
 import com.on.turip.ui.trip.detail.TripDetailActivity.Companion.TRIP_DETAIL_CONTENT_KEY
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -67,6 +71,9 @@ class TripDetailViewModel @Inject constructor(
 
     private val _serverError: MutableLiveData<Boolean> = MutableLiveData(false)
     val serverError: LiveData<Boolean> get() = _serverError
+
+    private val _uiEvent: Channel<CommonEvent> = Channel(Channel.BUFFERED)
+    val uiEvent: Flow<CommonEvent> = _uiEvent.receiveAsFlow()
 
     val tripDetailInfo: LiveData<TripDetailInfoModel> =
         content.switchMap { content ->
@@ -218,7 +225,9 @@ class TripDetailViewModel @Inject constructor(
             ErrorEvent.PARSER_ERROR -> _serverError.value = true
             ErrorEvent.DUPLICATION_FOLDER -> throw IllegalArgumentException("발생할 수 없는 오류")
             ErrorEvent.TOKEN_EXPIRATION -> {
-                // TODO Login창으로 이동
+                viewModelScope.launch {
+                    _uiEvent.send(CommonEvent.TokenExpiration)
+                }
             }
         }
     }

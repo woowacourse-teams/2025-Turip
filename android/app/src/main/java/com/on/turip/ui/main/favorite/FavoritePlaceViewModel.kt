@@ -13,7 +13,7 @@ import com.on.turip.domain.favorite.usecase.UpdateFavoritePlaceUseCase
 import com.on.turip.domain.folder.Folder
 import com.on.turip.domain.folder.repository.FolderRepository
 import com.on.turip.ui.common.mapper.toUiModel
-import com.on.turip.ui.main.favorite.event.FavoriteEvent
+import com.on.turip.ui.common.event.CommonEvent
 import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceLatLngUiModel
@@ -43,8 +43,8 @@ class FavoritePlaceViewModel @Inject constructor(
         MutableLiveData()
     val favoriteLatLng: LiveData<List<FavoritePlaceLatLngUiModel>> get() = _favoriteLatLng
 
-    private val _uiEvent: Channel<FavoriteEvent> = Channel(Channel.BUFFERED)
-    val uiEvent: Flow<FavoriteEvent> = _uiEvent.receiveAsFlow()
+    private val _uiEvent: Channel<CommonEvent> = Channel(Channel.BUFFERED)
+    val uiEvent: Flow<CommonEvent> = _uiEvent.receiveAsFlow()
 
     private var selectedFolderId: Long = NOT_INITIALIZED
 
@@ -184,7 +184,7 @@ class FavoritePlaceViewModel @Inject constructor(
 
             ErrorEvent.TOKEN_EXPIRATION -> {
                 viewModelScope.launch {
-                    _uiEvent.send(FavoriteEvent.TokenExpiration)
+                    _uiEvent.send(CommonEvent.TokenExpiration)
                 }
             }
         }

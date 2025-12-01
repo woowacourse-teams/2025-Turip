@@ -14,6 +14,7 @@ import androidx.core.net.toUri
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
 import com.on.turip.R
 import com.on.turip.databinding.ActivityTripDetailBinding
@@ -21,8 +22,10 @@ import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.content.Content
 import com.on.turip.ui.common.TuripSnackbar
 import com.on.turip.ui.common.base.BaseActivity
+import com.on.turip.ui.common.event.CommonEvent
 import com.on.turip.ui.common.loadCircularImage
 import com.on.turip.ui.common.model.trip.toDisplayText
+import com.on.turip.ui.login.LoginActivity
 import com.on.turip.ui.main.favorite.FavoriteBottomSheetContainerFragment
 import com.on.turip.ui.search.keywordresult.SearchActivity
 import com.on.turip.ui.trip.detail.webview.TuripWebChromeClient
@@ -30,6 +33,7 @@ import com.on.turip.ui.trip.detail.webview.TuripWebViewClient
 import com.on.turip.ui.trip.detail.webview.applyVideoSettings
 import com.on.turip.ui.trip.detail.webview.navigateToTimeLine
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
@@ -295,6 +299,23 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
             binding.customErrorView.visibility =
                 if (serverError) View.VISIBLE else View.GONE
         }
+        lifecycleScope.launch {
+            viewModel.uiEvent.collect { event ->
+                when (event) {
+                    CommonEvent.TokenExpiration -> navigateToLoginScreen()
+                }
+            }
+        }
+    }
+
+    private fun navigateToLoginScreen() {
+        val intent: Intent =
+            LoginActivity.newIntent(this).apply {
+                flags =
+                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+        startActivity(intent)
+        finish()
     }
 
     private fun updateExpandTextToggleVisibility() {

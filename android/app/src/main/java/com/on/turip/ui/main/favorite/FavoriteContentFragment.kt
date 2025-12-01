@@ -6,14 +6,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.on.turip.R
 import com.on.turip.databinding.FragmentFavoriteContentBinding
 import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.favorite.FavoriteContent
 import com.on.turip.ui.common.ItemDividerDecoration
 import com.on.turip.ui.common.base.BaseFragment
+import com.on.turip.ui.login.LoginActivity
+import com.on.turip.ui.common.event.CommonEvent
 import com.on.turip.ui.trip.detail.TripDetailActivity
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @AndroidEntryPoint
@@ -85,6 +89,23 @@ class FavoriteContentFragment : BaseFragment<FragmentFavoriteContentBinding>() {
         viewModel.serverError.observe(viewLifecycleOwner) { serverError ->
             handleErrorOrContentView(serverError || (viewModel.networkError.value == true))
         }
+        lifecycleScope.launch {
+            viewModel.uiEvent.collect { event ->
+                when (event) {
+                    CommonEvent.TokenExpiration -> navigateToLoginScreen()
+                }
+            }
+        }
+    }
+
+    private fun navigateToLoginScreen() {
+        val intent: Intent =
+            LoginActivity.newIntent(requireActivity()).apply {
+                flags =
+                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+        startActivity(intent)
+        requireActivity().finish()
     }
 
     private fun handleErrorOrContentView(isError: Boolean) {

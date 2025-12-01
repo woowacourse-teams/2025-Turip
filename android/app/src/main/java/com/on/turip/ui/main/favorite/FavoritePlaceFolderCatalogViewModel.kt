@@ -13,9 +13,13 @@ import com.on.turip.domain.favorite.repository.FavoritePlaceRepository
 import com.on.turip.domain.favorite.usecase.UpdateFavoritePlaceUseCase
 import com.on.turip.ui.main.favorite.FavoritePlaceFolderCatalogFragment.Companion.FAVORITE_PLACE_FOLDER_CATALOG_ARGUMENTS_FOLDER_ID
 import com.on.turip.ui.main.favorite.FavoritePlaceFolderCatalogFragment.Companion.FAVORITE_PLACE_FOLDER_CATALOG_ARGUMENTS_FOLDER_NAME
+import com.on.turip.ui.common.event.CommonEvent
 import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -43,6 +47,9 @@ class FavoritePlaceFolderCatalogViewModel @Inject constructor(
             Timber.e("찜 폴더 내 장소 목록 화면 폴더 이름이 존재하지 않습니다.")
         }
     }
+
+    private val _uiEvent: Channel<CommonEvent> = Channel(Channel.BUFFERED)
+    val uiEvent: Flow<CommonEvent> = _uiEvent.receiveAsFlow()
 
     init {
         loadPlacesInSelectFolder()
@@ -124,7 +131,9 @@ class FavoritePlaceFolderCatalogViewModel @Inject constructor(
             }
 
             ErrorEvent.TOKEN_EXPIRATION -> {
-                // TODO Login창으로 이동
+                viewModelScope.launch {
+                    _uiEvent.send(CommonEvent.TokenExpiration)
+                }
             }
         }
     }
