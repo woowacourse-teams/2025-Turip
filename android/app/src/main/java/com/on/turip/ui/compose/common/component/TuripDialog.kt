@@ -1,7 +1,5 @@
 package com.on.turip.ui.compose.common.component
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
@@ -111,36 +111,35 @@ private fun DialogButtons(
                 .padding(horizontal = 20.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Text(
-            text = dismissText,
-            color = colorResource(R.color.pure_white_ffffff),
-            textAlign = TextAlign.Center,
-            style = TuripTypography.labelLarge,
-            modifier =
-                Modifier
-                    .clickable(onClick = onDismissRequest)
-                    .weight(1f)
-                    .background(
-                        color = dismissButtonColor,
-//                        color = colorResource(R.color.turip_gray_b4b4b4),
-                        shape = RoundedCornerShape(8.dp),
-                    ).padding(vertical = 16.dp),
-        )
-        Text(
-            text = confirmText,
-            color = colorResource(R.color.pure_white_ffffff),
-            textAlign = TextAlign.Center,
-            style = TuripTypography.labelLarge,
-            modifier =
-                Modifier
-                    .clickable(onClick = onConfirmation)
-                    .weight(1f)
-                    .background(
-                        color = confirmButtonColor,
-//                        color = colorResource(R.color.turip_blue_11aebf_70),
-                        shape = RoundedCornerShape(8.dp),
-                    ).padding(vertical = 16.dp),
-        )
+        Button(
+            onClick = onDismissRequest,
+            modifier = Modifier.weight(1f),
+            shape = RoundedCornerShape(8.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = dismissButtonColor),
+        ) {
+            Text(
+                text = dismissText,
+                textAlign = TextAlign.Center,
+                color = colorResource(R.color.pure_white_ffffff),
+                style = TuripTypography.labelLarge,
+                modifier = Modifier.padding(vertical = 8.dp),
+            )
+        }
+
+        Button(
+            onClick = onConfirmation,
+            modifier = Modifier.weight(1f),
+            shape = RoundedCornerShape(8.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = confirmButtonColor),
+        ) {
+            Text(
+                text = confirmText,
+                textAlign = TextAlign.Center,
+                color = colorResource(R.color.pure_white_ffffff),
+                style = TuripTypography.labelLarge,
+                modifier = Modifier.padding(vertical = 8.dp),
+            )
+        }
     }
 }
 
