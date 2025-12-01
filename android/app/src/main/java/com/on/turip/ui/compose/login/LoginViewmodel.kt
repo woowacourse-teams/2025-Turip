@@ -44,7 +44,11 @@ class LoginViewmodel @Inject constructor(
                     loginUserUseCase(result.idToken)
                         .onSuccess { isNewMember: Boolean ->
                             AuthState.change(UserType.MEMBER)
-                            showLogoutDialog(isNewMember)
+                            if (isNewMember) {
+                                showMigrationDialog(true)
+                            } else {
+                                _uiEvent.send(LoginUiEvent.NavigateToMain)
+                            }
                         }.onFailure {
                             Timber.e("Token 저장 실패")
                         }
@@ -54,7 +58,7 @@ class LoginViewmodel @Inject constructor(
         }
     }
 
-    private fun showLogoutDialog(show: Boolean) {
+    private fun showMigrationDialog(show: Boolean) {
         _uiState.update { it.copy(showMigrationDialog = show) }
     }
 
