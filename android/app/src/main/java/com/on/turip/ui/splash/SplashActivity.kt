@@ -107,17 +107,13 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
     private fun navigateToLogin() {
         when (AuthState.type) {
             UserType.MEMBER -> {
-                lifecycleScope.launch {
-                    startActivity(MainActivity.newIntent(this@SplashActivity))
-                    finish()
-                }
+                startActivity(MainActivity.newIntent(this@SplashActivity))
+                finish()
             }
 
             UserType.GUEST, UserType.NONE -> {
-                lifecycleScope.launch {
-                    startActivity(LoginActivity.newIntent(this@SplashActivity))
-                    finish()
-                }
+                startActivity(LoginActivity.newIntent(this@SplashActivity))
+                finish()
             }
         }
     }
