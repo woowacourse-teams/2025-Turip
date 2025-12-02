@@ -12,10 +12,10 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
-class AuthRemoteDatasource @Inject constructor(
+class AuthRemoteDataSource @Inject constructor(
     private val authService: AuthService,
     private val coroutineContext: CoroutineContext = Dispatchers.IO,
-) : AuthDatasource {
+) : AuthDataSource {
     override suspend fun postIdToken(idToken: String): TuripCustomResult<LoginJwtTokenResponse> =
         withContext(coroutineContext) {
             safeApiCall {

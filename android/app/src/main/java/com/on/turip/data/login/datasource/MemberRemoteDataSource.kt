@@ -5,9 +5,9 @@ import com.on.turip.data.common.safeApiCall
 import com.on.turip.data.login.service.MemberService
 import javax.inject.Inject
 
-class MemberRemoteDatasource @Inject constructor(
+class MemberRemoteDataSource @Inject constructor(
     private val memberService: MemberService,
-) : MemberDatasource {
+) : MemberDataSource {
     override suspend fun postMigration(): TuripCustomResult<Unit> =
         safeApiCall {
             memberService.postMigration()
