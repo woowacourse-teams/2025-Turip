@@ -92,12 +92,10 @@ fun SettingScreen(
             Timber.d("SettingScreen 로그인 버튼 클릭")
         },
         onClickLogout = {
-            // TODO : ViewModel 에서 로그아웃 로직 처리 후 로그인 화면으로 이동
             viewModel.showLogoutDialog(show = true)
             Timber.d("SettingScreen 로그아웃 버튼 클릭")
         },
         onClickWithdraw = {
-            // TODO : ViewModel 에서 회원탈퇴 로직 처리 후 로그인 화면으로 이동
             viewModel.showWithdrawDialog(show = true)
             Timber.d("SettingScreen 회원탈퇴 버튼 클릭")
         },
