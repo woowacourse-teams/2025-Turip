@@ -1,19 +1,19 @@
 package com.on.turip.data.login
 
 import com.on.turip.data.common.TuripCustomResult
+import com.on.turip.domain.login.AuthRepository
 import com.on.turip.domain.login.AuthTokens
-import com.on.turip.domain.login.LoginRepository
 import com.on.turip.domain.userstorage.repository.UserStorageRepository
+import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
 import okhttp3.Authenticator
 import okhttp3.Request
 import okhttp3.Response
 import okhttp3.Route
-import javax.inject.Inject
 
 class TokenAuthenticator @Inject constructor(
     private val userStorageRepository: UserStorageRepository,
-    private val loginRepository: LoginRepository,
+    private val authRepository: AuthRepository,
 ) : Authenticator {
     override fun authenticate(
         route: Route?,
@@ -34,7 +34,7 @@ class TokenAuthenticator @Inject constructor(
                     return@runBlocking authorizedRequest(response, storedAccessToken)
                 }
                 val newTokensResult: TuripCustomResult<AuthTokens> =
-                    loginRepository.requestTokens(storedRefreshToken)
+                    authRepository.requestTokens(storedRefreshToken)
 
                 val newTokens: AuthTokens =
                     if (newTokensResult is TuripCustomResult.Success) {
