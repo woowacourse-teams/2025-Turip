@@ -64,7 +64,13 @@ class LoginViewmodel @Inject constructor(
 
     fun migration() {
         viewModelScope.launch {
-            memberRepository.updateMigration()
+            memberRepository
+                .updateMigration()
+                .onSuccess {
+                    _uiEvent.send(LoginUiEvent.NavigateToMain)
+                }.onFailure {
+                    Timber.e("마이그레이션 실패")
+                }
         }
     }
 
