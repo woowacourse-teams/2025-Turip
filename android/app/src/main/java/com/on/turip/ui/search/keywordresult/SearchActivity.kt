@@ -17,7 +17,9 @@ import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.on.turip.R
 import com.on.turip.databinding.ActivitySearchBinding
@@ -219,9 +221,11 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         }
 
         lifecycleScope.launch {
-            viewModel.uiEvent.collect { event ->
-                when (event) {
-                    CommonEvent.TokenExpiration -> navigateToLoginScreen()
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiEvent.collect { event ->
+                    when (event) {
+                        CommonEvent.TokenExpiration -> navigateToLoginScreen()
+                    }
                 }
             }
         }

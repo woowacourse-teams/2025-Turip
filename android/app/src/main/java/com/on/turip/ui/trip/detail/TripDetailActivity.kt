@@ -14,7 +14,9 @@ import androidx.core.net.toUri
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.snackbar.Snackbar
 import com.on.turip.R
 import com.on.turip.databinding.ActivityTripDetailBinding
@@ -300,9 +302,11 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
                 if (serverError) View.VISIBLE else View.GONE
         }
         lifecycleScope.launch {
-            viewModel.uiEvent.collect { event ->
-                when (event) {
-                    CommonEvent.TokenExpiration -> navigateToLoginScreen()
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiEvent.collect { event ->
+                    when (event) {
+                        CommonEvent.TokenExpiration -> navigateToLoginScreen()
+                    }
                 }
             }
         }

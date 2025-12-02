@@ -7,7 +7,9 @@ import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.on.turip.R
 import com.on.turip.databinding.ActivityRegionResultBinding
 import com.on.turip.domain.ErrorEvent
@@ -98,9 +100,11 @@ class RegionResultActivity : BaseActivity<ActivityRegionResultBinding>() {
         }
 
         lifecycleScope.launch {
-            viewModel.uiEvent.collect { event ->
-                when (event) {
-                    CommonEvent.TokenExpiration -> navigateToLoginScreen()
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiEvent.collect { event ->
+                    when (event) {
+                        CommonEvent.TokenExpiration -> navigateToLoginScreen()
+                    }
                 }
             }
         }
