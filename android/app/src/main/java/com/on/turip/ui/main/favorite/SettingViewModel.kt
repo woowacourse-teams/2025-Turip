@@ -4,6 +4,9 @@ import android.net.Uri
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.on.turip.data.common.onFailure
+import com.on.turip.data.common.onSuccess
+import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.login.MemberRepository
 import com.on.turip.domain.userstorage.repository.UserStorageRepository
 import com.on.turip.ui.compose.common.util.SettingUtils
@@ -37,7 +40,6 @@ class SettingViewModel @Inject constructor(
         loadId()
     }
 
-    // TODO : 멤버, 게스트 판별 로직 구현 필요 uiState.value.deviceIdentifier.memberStatus
     fun loadId() {
         viewModelScope.launch {
             userStorageRepository
@@ -67,10 +69,20 @@ class SettingViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(showLogoutDialog = false) }
 
-            // TODO : 로그아웃 처리
-            memberRepository.logout()
-
-            _uiEvent.send(SettingUiEvent.Logout)
+            memberRepository
+                .logout()
+                .onSuccess {
+                    userStorageRepository
+                        .clearTokens()
+                        .onSuccess {
+                            _uiEvent.send(SettingUiEvent.Logout)
+                            Timber.d("로그아웃 성공")
+                        }.onFailure {
+                            Timber.e("토큰 초기화 실패")
+                        }
+                }.onFailure { error: ErrorEvent ->
+                    Timber.e("로그아웃 실패 : $error")
+                }
         }
     }
 
@@ -82,10 +94,20 @@ class SettingViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(showWithdrawDialog = false) }
 
-            // TODO : 회원탈퇴 처리
-            memberRepository.withdraw()
-
-            _uiEvent.send(SettingUiEvent.Withdraw)
+            memberRepository
+                .withdraw()
+                .onSuccess {
+                    userStorageRepository
+                        .clearTokens()
+                        .onSuccess {
+                            _uiEvent.send(SettingUiEvent.Logout)
+                            Timber.d("로그아웃 성공")
+                        }.onFailure {
+                            Timber.e("토큰 초기화 실패")
+                        }
+                }.onFailure { error: ErrorEvent ->
+                    Timber.e("로그아웃 실패 : $error")
+                }
         }
     }
 }
