@@ -100,13 +100,13 @@ class SettingViewModel @Inject constructor(
                     userStorageRepository
                         .clearTokens()
                         .onSuccess {
-                            _uiEvent.send(SettingUiEvent.Logout)
-                            Timber.d("로그아웃 성공")
+                            _uiEvent.send(SettingUiEvent.Withdraw)
+                            Timber.d("회원탈퇴 성공")
                         }.onFailure {
                             Timber.e("토큰 초기화 실패")
                         }
                 }.onFailure { error: ErrorEvent ->
-                    Timber.e("로그아웃 실패 : $error")
+                    Timber.e("회원탈퇴 실패 : $error")
                 }
         }
     }
