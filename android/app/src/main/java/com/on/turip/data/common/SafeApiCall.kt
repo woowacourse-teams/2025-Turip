@@ -11,10 +11,10 @@ suspend inline fun <T> safeApiCall(apiCall: suspend () -> Response<T>): TuripCus
         if (response.isSuccessful) {
             val body = response.body()
             if (body != null) {
-                TuripCustomResult.Success(body)
+                TuripCustomResult.Success.WithContent(body)
             } else {
                 if (response.code() == 204) {
-                    TuripCustomResult.Success(Unit as T)
+                    TuripCustomResult.Success.NoContent
                 } else {
                     TuripCustomResult.ParseError(
                         IllegalStateException("예상치 못한 빈 응답입니다."),

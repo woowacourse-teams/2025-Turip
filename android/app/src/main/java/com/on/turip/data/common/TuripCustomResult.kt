@@ -4,9 +4,13 @@ import com.on.turip.domain.ErrorEvent
 import timber.log.Timber
 
 sealed class TuripCustomResult<out T> {
-    data class Success<out T>(
-        val data: T,
-    ) : TuripCustomResult<T>()
+    sealed class Success<out T> : TuripCustomResult<T>() {
+        data class WithContent<out T>(
+            val data: T,
+        ) : Success<T>()
+
+        data object NoContent : Success<Nothing>()
+    }
 
     data class HttpError(
         private val statusCode: Int,
@@ -51,12 +55,12 @@ sealed class TuripCustomResult<out T> {
     }
 
     companion object {
-        fun <T> success(value: T): TuripCustomResult<T> = Success(value)
+        fun <T> success(value: T): TuripCustomResult<T> = Success.WithContent(value)
     }
 }
 
 inline fun <T> TuripCustomResult<T>.onSuccess(action: (value: T) -> Unit): TuripCustomResult<T> {
-    if (this is TuripCustomResult.Success) action(data)
+    if (this is TuripCustomResult.Success.WithContent) action(data)
     return this
 }
 
@@ -84,12 +88,17 @@ inline fun <T> TuripCustomResult<T>.onFailure(action: (ErrorEvent) -> Unit): Tur
 inline fun <R, T> TuripCustomResult<T>.mapCatching(transform: (value: T) -> R): TuripCustomResult<R> =
     when (this) {
         is TuripCustomResult.Success ->
-            runCatching {
-                transform(data)
-            }.fold(
-                onSuccess = { TuripCustomResult.Success(it) },
-                onFailure = { error -> TuripCustomResult.ParseError(error) },
-            )
+            when (this) {
+                is TuripCustomResult.Success.WithContent ->
+                    runCatching {
+                        transform(data)
+                    }.fold(
+                        onSuccess = { TuripCustomResult.Success.WithContent(it) },
+                        onFailure = { error -> TuripCustomResult.ParseError(error) },
+                    )
+
+                is TuripCustomResult.Success.NoContent -> this
+            }
 
         is TuripCustomResult.ParseError -> this
         is TuripCustomResult.NetworkError -> this

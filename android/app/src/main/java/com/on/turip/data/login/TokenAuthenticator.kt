@@ -1,6 +1,7 @@
 package com.on.turip.data.login
 
 import com.on.turip.data.common.TuripCustomResult
+import com.on.turip.data.common.onSuccess
 import com.on.turip.domain.login.AuthTokens
 import com.on.turip.domain.login.LoginRepository
 import com.on.turip.domain.userstorage.repository.UserStorageRepository
@@ -39,7 +40,7 @@ class TokenAuthenticator @Inject constructor(
                     loginRepository.requestTokens(refreshToken)
 
                 val newTokens: AuthTokens =
-                    if (newTokensResult is TuripCustomResult.Success) {
+                    if (newTokensResult is TuripCustomResult.Success.WithContent) {
                         newTokensResult.data
                     } else {
                         return@runBlocking null
