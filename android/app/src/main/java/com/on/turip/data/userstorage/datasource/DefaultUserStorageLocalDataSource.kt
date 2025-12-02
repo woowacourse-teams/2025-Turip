@@ -60,4 +60,14 @@ class DefaultUserStorageLocalDataSource @Inject constructor(
                     ?: throw IllegalArgumentException("refreshToken이 존재하지 않습니다.")
             }
         }
+
+    override suspend fun deleteTokens(): Result<Unit> =
+        runCatching {
+            withContext(coroutineContext) {
+                userStorage.edit { prefs ->
+                    prefs.remove(accessTokenKey)
+                    prefs.remove(refreshTokenKey)
+                }
+            }
+        }
 }

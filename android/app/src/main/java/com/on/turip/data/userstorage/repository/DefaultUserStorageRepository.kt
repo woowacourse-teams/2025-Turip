@@ -43,4 +43,9 @@ class DefaultUserStorageRepository @Inject constructor(
             userStorageLocalDataSource.createAccessToken(tokens.accessToken)
             userStorageLocalDataSource.createRefreshToken(tokens.refreshToken)
         }
+
+    override suspend fun clearTokens(): Result<Unit> =
+        withContext(Dispatchers.IO) {
+            userStorageLocalDataSource.deleteTokens()
+        }
 }
