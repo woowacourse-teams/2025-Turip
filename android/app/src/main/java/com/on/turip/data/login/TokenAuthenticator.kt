@@ -1,7 +1,6 @@
 package com.on.turip.data.login
 
 import com.on.turip.data.common.TuripCustomResult
-import com.on.turip.data.common.onSuccess
 import com.on.turip.domain.login.AuthTokens
 import com.on.turip.domain.login.LoginRepository
 import com.on.turip.domain.userstorage.repository.UserStorageRepository

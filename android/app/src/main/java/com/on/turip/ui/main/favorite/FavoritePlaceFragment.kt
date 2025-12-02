@@ -22,9 +22,9 @@ import com.on.turip.R
 import com.on.turip.databinding.FragmentFavoritePlaceBinding
 import com.on.turip.domain.ErrorEvent
 import com.on.turip.ui.common.base.BaseFragment
+import com.on.turip.ui.common.event.CommonEvent
 import com.on.turip.ui.folder.FolderActivity
 import com.on.turip.ui.login.LoginActivity
-import com.on.turip.ui.common.event.CommonEvent
 import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceLatLngUiModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
