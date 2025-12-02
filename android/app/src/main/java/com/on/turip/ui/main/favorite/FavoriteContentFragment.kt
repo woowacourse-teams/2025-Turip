@@ -6,7 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.on.turip.R
 import com.on.turip.databinding.FragmentFavoriteContentBinding
 import com.on.turip.domain.ErrorEvent
@@ -89,10 +91,12 @@ class FavoriteContentFragment : BaseFragment<FragmentFavoriteContentBinding>() {
         viewModel.serverError.observe(viewLifecycleOwner) { serverError ->
             handleErrorOrContentView(serverError || (viewModel.networkError.value == true))
         }
-        lifecycleScope.launch {
-            viewModel.uiEvent.collect { event ->
-                when (event) {
-                    CommonEvent.TokenExpiration -> navigateToLoginScreen()
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiEvent.collect { event ->
+                    when (event) {
+                        CommonEvent.TokenExpiration -> navigateToLoginScreen()
+                    }
                 }
             }
         }

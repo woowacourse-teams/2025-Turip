@@ -9,7 +9,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -210,23 +212,18 @@ class FavoritePlaceFragment :
                     }
                 }
             }
-            lifecycleScope.launch {
-                viewModel.uiEvent.collect { event ->
-                    when (event) {
-                        CommonEvent.TokenExpiration -> navigateToLoginScreen()
-                    }
-                }
-            }
         }
 
         viewModel.shareFolder.observe(viewLifecycleOwner) { shareFolder: FavoriteFolderShareModel ->
             makeShareIntent(shareFolder)
         }
 
-        lifecycleScope.launch {
-            viewModel.uiEvent.collect { event ->
-                when (event) {
-                    CommonEvent.TokenExpiration -> navigateToLoginScreen()
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiEvent.collect { event ->
+                    when (event) {
+                        CommonEvent.TokenExpiration -> navigateToLoginScreen()
+                    }
                 }
             }
         }
