@@ -9,5 +9,5 @@ interface LoginDatasource {
 
     suspend fun postReissueToken(refreshToken: String): TuripCustomResult<ReissueTokenResponse>
 
-    suspend fun getTokenVerification(token: String): TuripCustomResult<Unit>
+    suspend fun getTokenVerification(accessToken: String): TuripCustomResult<Unit>
 }

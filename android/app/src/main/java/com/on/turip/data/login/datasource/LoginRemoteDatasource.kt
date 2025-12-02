@@ -23,17 +23,17 @@ class LoginRemoteDatasource @Inject constructor(
             }
         }
 
-    override suspend fun postReissueToken(token: String): TuripCustomResult<ReissueTokenResponse> =
+    override suspend fun postReissueToken(refreshToken: String): TuripCustomResult<ReissueTokenResponse> =
         withContext(coroutineContext) {
             safeApiCall {
-                loginService.postReissueToken(ReissueTokenRequest(token))
+                loginService.postReissueToken(ReissueTokenRequest(refreshToken))
             }
         }
 
-    override suspend fun getTokenVerification(token: String): TuripCustomResult<Unit> =
+    override suspend fun getTokenVerification(accessToken: String): TuripCustomResult<Unit> =
         withContext(coroutineContext) {
             safeApiCall {
-                loginService.getTokenVerification(AUTHORIZATION_PREFIX + token)
+                loginService.getTokenVerification(AUTHORIZATION_PREFIX + accessToken)
             }
         }
 
