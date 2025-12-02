@@ -156,9 +156,7 @@ class SearchViewModel @Inject constructor(
 
             ErrorEvent.TOKEN_EXPIRATION -> {
                 viewModelScope.launch {
-                    viewModelScope.launch {
-                        _uiEvent.send(CommonEvent.TokenExpiration)
-                    }
+                    _uiEvent.send(CommonEvent.TokenExpiration)
                 }
             }
         }
