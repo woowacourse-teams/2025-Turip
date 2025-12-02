@@ -4,7 +4,7 @@ import android.net.Uri
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.on.turip.domain.login.AuthRepository
+import com.on.turip.domain.login.MemberRepository
 import com.on.turip.domain.userstorage.repository.UserStorageRepository
 import com.on.turip.ui.compose.common.util.SettingUtils
 import com.on.turip.ui.compose.common.util.SettingUtils.EMAIL_RECIPIENT
@@ -25,7 +25,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SettingViewModel @Inject constructor(
     private val userStorageRepository: UserStorageRepository,
-    private val authRepository: AuthRepository,
+    private val memberRepository: MemberRepository,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<SettingUiState> = MutableStateFlow(SettingUiState.EMPTY)
     val uiState: StateFlow<SettingUiState> = _uiState
@@ -68,7 +68,7 @@ class SettingViewModel @Inject constructor(
             _uiState.update { it.copy(showLogoutDialog = false) }
 
             // TODO : 로그아웃 처리
-            authRepository.logout()
+            memberRepository.logout()
 
             _uiEvent.send(SettingUiEvent.Logout)
         }
@@ -83,7 +83,7 @@ class SettingViewModel @Inject constructor(
             _uiState.update { it.copy(showWithdrawDialog = false) }
 
             // TODO : 회원탈퇴 처리
-            authRepository.withdraw()
+            memberRepository.withdraw()
 
             _uiEvent.send(SettingUiEvent.Withdraw)
         }
