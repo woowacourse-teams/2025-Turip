@@ -4,7 +4,7 @@ import retrofit2.Response
 import retrofit2.http.DELETE
 import retrofit2.http.POST
 
-interface AuthService {
+interface MemberService {
     @POST("members/migration")
     suspend fun postMigration(): Response<Unit>
 
