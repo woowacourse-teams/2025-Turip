@@ -39,7 +39,7 @@ class TokenAuthenticator @Inject constructor(
                     loginRepository.requestTokens(refreshToken)
 
                 val newTokens: AuthTokens =
-                    if (newTokensResult is TuripCustomResult.Success) {
+                    if (newTokensResult is TuripCustomResult.Success.WithContent) {
                         newTokensResult.data
                     } else {
                         return@runBlocking null
