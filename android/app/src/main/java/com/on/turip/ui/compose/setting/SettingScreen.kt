@@ -174,7 +174,10 @@ private fun SettingScreenContent(
                 SettingForGuestScreen(onClickLogin)
             }
 
-            UserType.NONE -> throw IllegalArgumentException("멤버가 지정되지 않았습니다.")
+            UserType.NONE -> {
+                Timber.e("멤버가 지정되지 않았습니다.")
+                SettingForGuestScreen(onClickLogin)
+            }
         }
     }
 }
