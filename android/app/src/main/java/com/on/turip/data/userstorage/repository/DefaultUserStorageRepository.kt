@@ -3,9 +3,12 @@ package com.on.turip.data.userstorage.repository
 import com.google.firebase.installations.FirebaseInstallations
 import com.on.turip.data.userstorage.datasource.UserStorageLocalDataSource
 import com.on.turip.data.userstorage.toDomain
+import com.on.turip.domain.login.AuthTokens
 import com.on.turip.domain.userstorage.TuripDeviceIdentifier
 import com.on.turip.domain.userstorage.repository.UserStorageRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -30,4 +33,19 @@ class DefaultUserStorageRepository @Inject constructor(
         userStorageLocalDataSource.createId(newFid)
         return newFid
     }
+
+    override suspend fun loadAccessToken(): Result<String?> = userStorageLocalDataSource.getAccessToken()
+
+    override suspend fun loadRefreshToken(): Result<String> = userStorageLocalDataSource.getRefreshToken()
+
+    override suspend fun createTokens(tokens: AuthTokens): Result<Unit> =
+        withContext(Dispatchers.IO) {
+            userStorageLocalDataSource.createAccessToken(tokens.accessToken)
+            userStorageLocalDataSource.createRefreshToken(tokens.refreshToken)
+        }
+
+    override suspend fun clearTokens(): Result<Unit> =
+        withContext(Dispatchers.IO) {
+            userStorageLocalDataSource.deleteTokens()
+        }
 }

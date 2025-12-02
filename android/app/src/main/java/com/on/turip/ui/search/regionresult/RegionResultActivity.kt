@@ -7,12 +7,18 @@ import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.on.turip.R
 import com.on.turip.databinding.ActivityRegionResultBinding
 import com.on.turip.domain.ErrorEvent
 import com.on.turip.ui.common.base.BaseActivity
+import com.on.turip.ui.common.event.CommonEvent
+import com.on.turip.ui.login.LoginActivity
 import com.on.turip.ui.trip.detail.TripDetailActivity
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class RegionResultActivity : BaseActivity<ActivityRegionResultBinding>() {
@@ -92,6 +98,26 @@ class RegionResultActivity : BaseActivity<ActivityRegionResultBinding>() {
         viewModel.serverError.observe(this) {
             updateUIVisibility()
         }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiEvent.collect { event ->
+                    when (event) {
+                        CommonEvent.TokenExpiration -> navigateToLoginScreen()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun navigateToLoginScreen() {
+        val intent: Intent =
+            LoginActivity.newIntent(this).apply {
+                flags =
+                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+        startActivity(intent)
+        finish()
     }
 
     private fun updateUIVisibility() {

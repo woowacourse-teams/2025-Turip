@@ -14,12 +14,16 @@ import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.content.video.VideoInformation
 import com.on.turip.domain.searchhistory.SearchHistory
 import com.on.turip.domain.searchhistory.SearchHistoryRepository
+import com.on.turip.ui.common.event.CommonEvent
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.search.keywordresult.SearchActivity.Companion.SEARCH_KEYWORD_KEY
 import com.on.turip.ui.search.model.VideoInformationModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -50,6 +54,9 @@ class SearchViewModel @Inject constructor(
 
     private val _serverError: MutableLiveData<Boolean> = MutableLiveData(false)
     val serverError: LiveData<Boolean> get() = _serverError
+
+    private val _uiEvent: Channel<CommonEvent> = Channel(Channel.BUFFERED)
+    val uiEvent: Flow<CommonEvent> = _uiEvent.receiveAsFlow()
 
     private val searchKeyword: String by lazy {
         checkNotNull(savedStateHandle[SEARCH_KEYWORD_KEY]) {
@@ -145,6 +152,12 @@ class SearchViewModel @Inject constructor(
 
             ErrorEvent.PARSER_ERROR -> {
                 _serverError.value = true
+            }
+
+            ErrorEvent.TOKEN_EXPIRATION -> {
+                viewModelScope.launch {
+                    _uiEvent.send(CommonEvent.TokenExpiration)
+                }
             }
         }
     }

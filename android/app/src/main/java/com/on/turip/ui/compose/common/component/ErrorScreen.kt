@@ -41,6 +41,7 @@ fun ErrorScreen(
             ErrorEvent.DUPLICATION_FOLDER,
             ErrorEvent.UNEXPECTED_PROBLEM,
             ErrorEvent.PARSER_ERROR,
+            ErrorEvent.TOKEN_EXPIRATION,
             ->
                 listOf(
                     R.drawable.ic_server_error,

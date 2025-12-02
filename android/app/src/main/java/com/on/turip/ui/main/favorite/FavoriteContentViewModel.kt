@@ -10,7 +10,11 @@ import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.favorite.FavoriteContent
 import com.on.turip.domain.favorite.repository.FavoriteRepository
 import com.on.turip.domain.favorite.usecase.UpdateFavoriteUseCase
+import com.on.turip.ui.common.event.CommonEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -29,6 +33,9 @@ class FavoriteContentViewModel @Inject constructor(
 
     private val _serverError: MutableLiveData<Boolean> = MutableLiveData(false)
     val serverError: LiveData<Boolean> get() = _serverError
+
+    private val _uiEvent: Channel<CommonEvent> = Channel(Channel.BUFFERED)
+    val uiEvent: Flow<CommonEvent> = _uiEvent.receiveAsFlow()
 
     init {
         loadFavoriteContents()
@@ -90,6 +97,12 @@ class FavoriteContentViewModel @Inject constructor(
 
             ErrorEvent.PARSER_ERROR -> {
                 _serverError.value = true
+            }
+
+            ErrorEvent.TOKEN_EXPIRATION -> {
+                viewModelScope.launch {
+                    _uiEvent.send(CommonEvent.TokenExpiration)
+                }
             }
         }
     }

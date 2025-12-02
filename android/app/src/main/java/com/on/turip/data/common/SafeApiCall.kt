@@ -5,12 +5,27 @@ import retrofit2.Response
 
 @Suppress("UNCHECKED_CAST")
 suspend inline fun <T> safeApiCall(apiCall: suspend () -> Response<T>): TuripCustomResult<T> =
-    runCatching { apiCall() }
-        .mapCatching { response: Response<T> ->
-            TuripCustomResult.success(response.body() as T)
-        }.getOrElse { error: Throwable ->
-            when (error) {
-                is HttpException -> TuripCustomResult.HttpError(error.code())
-                else -> TuripCustomResult.NetworkError(error)
+    try {
+        val response: Response<T> = apiCall()
+
+        if (response.isSuccessful) {
+            val body = response.body()
+            if (body != null) {
+                TuripCustomResult.Success(body)
+            } else {
+                if (response.code() == 204) {
+                    TuripCustomResult.Success(Unit as T)
+                } else {
+                    TuripCustomResult.ParseError(
+                        IllegalStateException("예상치 못한 빈 응답입니다."),
+                    )
+                }
             }
+        } else {
+            TuripCustomResult.HttpError(response.code())
         }
+    } catch (e: HttpException) {
+        TuripCustomResult.HttpError(e.code())
+    } catch (e: Exception) {
+        TuripCustomResult.NetworkError(e)
+    }

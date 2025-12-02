@@ -4,6 +4,8 @@ import com.on.turip.data.content.place.repository.DefaultContentPlaceRepository
 import com.on.turip.data.content.repository.DefaultContentRepository
 import com.on.turip.data.favorite.repository.DefaultFavoriteRepository
 import com.on.turip.data.folder.repository.DefaultFolderRepository
+import com.on.turip.data.login.repository.DefaultLoginRepository
+import com.on.turip.data.login.repository.DefaultMemberRepository
 import com.on.turip.data.place.repository.DefaultFavoritePlaceRepository
 import com.on.turip.data.region.repository.DefaultRegionRepository
 import com.on.turip.data.searchhistory.repository.DefaultSearchHistoryRepository
@@ -12,6 +14,8 @@ import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.favorite.repository.FavoritePlaceRepository
 import com.on.turip.domain.favorite.repository.FavoriteRepository
 import com.on.turip.domain.folder.repository.FolderRepository
+import com.on.turip.domain.login.LoginRepository
+import com.on.turip.domain.login.MemberRepository
 import com.on.turip.domain.region.repository.RegionRepository
 import com.on.turip.domain.searchhistory.SearchHistoryRepository
 import com.on.turip.domain.trip.repository.ContentPlaceRepository
@@ -56,4 +60,12 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindFavoritePlaceRepository(defaultFavoritePlaceRepository: DefaultFavoritePlaceRepository): FavoritePlaceRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindLoginRepository(defaultLoginRepository: DefaultLoginRepository): LoginRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindAuthRepository(defaultMemberRepository: DefaultMemberRepository): MemberRepository
 }

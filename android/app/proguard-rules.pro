@@ -91,3 +91,17 @@
 -keepclassmembers class * extends android.webkit.WebChromeClient {
     public void *(android.webkit.WebView, java.lang.String);
 }
+
+# Jetpack Credentials
+-keep class androidx.credentials.** { *; }
+
+# Google Identity (CredentialManager + GoogleIdTokenCredential)
+-keep class com.google.android.libraries.identity.googleid.** { *; }
+-keepclassmembers class com.google.android.libraries.identity.googleid.** { *; }
+
+# JSON 관련
+-keep class org.json.** { *; }
+
+# CredentialManager 내부 Bundle 파싱 보존
+-keepclassmembers class androidx.credentials.** { *; }
+-keepclassmembers class com.google.android.libraries.identity.googleid.** { *; }

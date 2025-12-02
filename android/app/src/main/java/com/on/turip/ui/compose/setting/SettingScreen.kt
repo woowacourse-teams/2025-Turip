@@ -22,8 +22,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.on.turip.R
+import com.on.turip.common.AuthState
+import com.on.turip.common.UserType
 import com.on.turip.domain.userstorage.TuripDeviceIdentifier
-import com.on.turip.ui.common.model.MemberStatus
 import com.on.turip.ui.compose.common.component.ErrorHandlingContainer
 import com.on.turip.ui.compose.common.component.TuripAppBar
 import com.on.turip.ui.compose.common.component.TuripDialog
@@ -91,12 +92,10 @@ fun SettingScreen(
             Timber.d("SettingScreen 로그인 버튼 클릭")
         },
         onClickLogout = {
-            // TODO : ViewModel 에서 로그아웃 로직 처리 후 로그인 화면으로 이동
             viewModel.showLogoutDialog(show = true)
             Timber.d("SettingScreen 로그아웃 버튼 클릭")
         },
         onClickWithdraw = {
-            // TODO : ViewModel 에서 회원탈퇴 로직 처리 후 로그인 화면으로 이동
             viewModel.showWithdrawDialog(show = true)
             Timber.d("SettingScreen 회원탈퇴 버튼 클릭")
         },
@@ -164,12 +163,17 @@ private fun SettingScreenContent(
     ) {
         SettingCommonScreen(onClickInquiry, onClickPrivacyPolicy)
 
-        when (uiState.memberStatus) {
-            MemberStatus.MEMBER -> {
+        when (AuthState.type) {
+            UserType.MEMBER -> {
                 SettingForMemberScreen(onClickLogout, onClickWithdraw)
             }
 
-            MemberStatus.GUEST -> {
+            UserType.GUEST -> {
+                SettingForGuestScreen(onClickLogin)
+            }
+
+            UserType.NONE -> {
+                Timber.e("멤버가 지정되지 않았습니다.")
                 SettingForGuestScreen(onClickLogin)
             }
         }
@@ -252,7 +256,6 @@ private fun MemberSettingScreenPreview() {
             uiState =
                 SettingUiState(
                     deviceIdentifier = TuripDeviceIdentifier.EMPTY,
-                    memberStatus = MemberStatus.MEMBER,
                     showLogoutDialog = false,
                     showWithdrawDialog = false,
                     isNetworkError = false,
@@ -275,7 +278,6 @@ private fun GuestSettingScreenPreview() {
             uiState =
                 SettingUiState(
                     deviceIdentifier = TuripDeviceIdentifier.EMPTY,
-                    memberStatus = MemberStatus.GUEST,
                     showLogoutDialog = false,
                     showWithdrawDialog = false,
                     isNetworkError = false,

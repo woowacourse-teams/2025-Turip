@@ -44,6 +44,11 @@ android {
                 "BASE_URL",
                 "\"${gradleLocalProperties(rootDir, providers).getProperty("debug_base_url")}\"",
             )
+            buildConfigField(
+                "String",
+                "CLIENT_ID",
+                "\"${gradleLocalProperties(rootDir, providers).getProperty("client_id")}\"",
+            )
         }
 
         release {
@@ -59,6 +64,11 @@ android {
                 "String",
                 "BASE_URL",
                 "\"${gradleLocalProperties(rootDir, providers).getProperty("release_base_url")}\"",
+            )
+            buildConfigField(
+                "String",
+                "CLIENT_ID",
+                "\"${gradleLocalProperties(rootDir, providers).getProperty("client_id")}\"",
             )
         }
     }
@@ -148,4 +158,12 @@ dependencies {
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
+
+    // credential
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.googleid)
+
+    // leak
+    debugImplementation(libs.leakcanary.android)
 }
