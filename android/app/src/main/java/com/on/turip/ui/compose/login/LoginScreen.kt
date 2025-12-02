@@ -54,9 +54,9 @@ fun LoginScreen(
 
     if (uiState.showMigrationDialog) {
         TuripDialog(
-            title = "동기화",
-            message = "기존의 데이터와 동기화 하시겠습니까?",
-            confirmText = "데이터 동기화",
+            title = stringResource(R.string.login_dialog_migration_title),
+            message = stringResource(R.string.login_dialog_migration_message),
+            confirmText = stringResource(R.string.login_dialog_confirm_text),
             dismissText = stringResource(R.string.setting_logout_dialog_dismiss),
             confirmButtonColor = colorResource(R.color.turip_blue_11aebf_70),
             dismissButtonColor = colorResource(R.color.turip_gray_b4b4b4),
