@@ -21,22 +21,20 @@ class TokenAuthenticator @Inject constructor(
     ): Request? {
         synchronized(this) {
             return runBlocking {
-                val accessToken: String? = userStorageRepository.loadAccessToken().getOrNull()
-                val refreshToken: String =
-                    userStorageRepository.loadRefreshToken().getOrNull() ?: return@runBlocking null
-
-                if (accessToken !=
+                val currentAccessToken: String? =
                     response.request
                         .header("Authorization")
                         ?.removePrefix("Bearer ")
-                ) {
-                    return@runBlocking response.request
-                        .newBuilder()
-                        .header("Authorization", "Bearer $accessToken")
-                        .build()
+
+                val storedAccessToken: String? = userStorageRepository.loadAccessToken().getOrNull()
+                val storedRefreshToken: String =
+                    userStorageRepository.loadRefreshToken().getOrNull() ?: return@runBlocking null
+
+                if (storedAccessToken != currentAccessToken) {
+                    return@runBlocking authorizedRequest(response, storedAccessToken)
                 }
                 val newTokensResult: TuripCustomResult<AuthTokens> =
-                    loginRepository.requestTokens(refreshToken)
+                    loginRepository.requestTokens(storedRefreshToken)
 
                 val newTokens: AuthTokens =
                     if (newTokensResult is TuripCustomResult.Success.WithContent) {
@@ -47,11 +45,17 @@ class TokenAuthenticator @Inject constructor(
 
                 userStorageRepository.createTokens(newTokens)
 
-                response.request
-                    .newBuilder()
-                    .header("Authorization", "Bearer ${newTokens.accessToken}")
-                    .build()
+                authorizedRequest(response, newTokens.accessToken)
             }
         }
     }
+
+    private fun authorizedRequest(
+        response: Response,
+        accessToken: String?,
+    ): Request =
+        response.request
+            .newBuilder()
+            .header("Authorization", "Bearer $accessToken")
+            .build()
 }
