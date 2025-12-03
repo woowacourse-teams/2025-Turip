@@ -18,9 +18,9 @@ class MemberRemoteDataSource @Inject constructor(
             memberService.postLogout()
         }
 
-    override suspend fun postWithdraw(): TuripCustomResult<Unit> =
+    override suspend fun deleteMemberData(): TuripCustomResult<Unit> =
         safeApiCall {
-            memberService.postWithdraw()
+            memberService.deleteMemberData()
         }
 
     override suspend fun deleteGuestData(): TuripCustomResult<Unit> =
