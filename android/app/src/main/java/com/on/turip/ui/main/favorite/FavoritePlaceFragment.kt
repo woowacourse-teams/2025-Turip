@@ -406,9 +406,11 @@ class FavoritePlaceFragment :
         clearMapMarkers()
 
         addMarkerToMap(favoriteLatLng)
-        map.moveCamera(
-            CameraUpdateFactory.newLatLngZoom(favoriteLatLng.favoriteLatLng, 15f),
-        )
+        map.setOnMapLoadedCallback {
+            map.moveCamera(
+                CameraUpdateFactory.newLatLngZoom(favoriteLatLng.favoriteLatLng, 15f),
+            )
+        }
     }
 
     private fun handleMultipleFavorites(favoriteLatLngList: List<FavoritePlaceLatLngUiModel>) {
