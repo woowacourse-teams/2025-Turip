@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.on.turip.common.AuthState
+import com.on.turip.common.UserType
 import com.on.turip.data.common.onFailure
 import com.on.turip.data.common.onSuccess
 import com.on.turip.domain.ErrorEvent
@@ -18,6 +20,7 @@ import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceLatLngUiModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
+import com.on.turip.ui.main.favorite.model.FavoritePlaceUiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -43,8 +46,11 @@ class FavoritePlaceViewModel @Inject constructor(
         MutableLiveData()
     val favoriteLatLng: LiveData<List<FavoritePlaceLatLngUiModel>> get() = _favoriteLatLng
 
-    private val _uiEvent: Channel<CommonEvent> = Channel(Channel.BUFFERED)
-    val uiEvent: Flow<CommonEvent> = _uiEvent.receiveAsFlow()
+    private val _commonEvent: Channel<CommonEvent> = Channel(Channel.BUFFERED)
+    val commonEvent: Flow<CommonEvent> = _commonEvent.receiveAsFlow()
+
+    private val _uiEvent: Channel<FavoritePlaceUiEvent> = Channel(Channel.BUFFERED)
+    val uiEvent: Flow<FavoritePlaceUiEvent> = _uiEvent.receiveAsFlow()
 
     private var selectedFolderId: Long = NOT_INITIALIZED
 
@@ -184,7 +190,7 @@ class FavoritePlaceViewModel @Inject constructor(
 
             ErrorEvent.TOKEN_EXPIRATION -> {
                 viewModelScope.launch {
-                    _uiEvent.send(CommonEvent.TokenExpiration)
+                    _commonEvent.send(CommonEvent.TokenExpiration)
                 }
             }
         }
@@ -210,16 +216,28 @@ class FavoritePlaceViewModel @Inject constructor(
     }
 
     fun shareFolder() {
-        val shareFolder =
-            FavoriteFolderShareModel(
-                name =
-                    favoritePlaceUiState.value
-                        ?.folders
-                        ?.first { it.isSelected }
-                        ?.name ?: "",
-                places = favoritePlaceUiState.value?.places?.map { it.toUiModel() } ?: emptyList(),
-            )
-        _shareFolder.value = shareFolder
+        when (AuthState.type) {
+            UserType.MEMBER -> {
+                val shareFolder =
+                    FavoriteFolderShareModel(
+                        name =
+                            favoritePlaceUiState.value
+                                ?.folders
+                                ?.first { it.isSelected }
+                                ?.name ?: "",
+                        places =
+                            favoritePlaceUiState.value?.places?.map { it.toUiModel() }
+                                ?: emptyList(),
+                    )
+                _shareFolder.value = shareFolder
+            }
+
+            UserType.GUEST, UserType.NONE -> {
+                viewModelScope.launch {
+                    _uiEvent.send(FavoritePlaceUiEvent.ShowFolderShareNotAllowed)
+                }
+            }
+        }
     }
 
     companion object {
