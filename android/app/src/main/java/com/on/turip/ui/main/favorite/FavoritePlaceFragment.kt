@@ -424,7 +424,7 @@ class FavoritePlaceFragment :
 
         val bounds = boundsBuilder.build()
 
-        binding.mvFavoritePlace.post {
+        map.setOnMapLoadedCallback {
             map.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
         }
     }
