@@ -26,58 +26,58 @@ class CustomErrorView
             LayoutInflater.from(context).inflate(R.layout.item_custom_error, this, true)
 
             // 뷰 참조 초기화
-            errorImageView = findViewById(R.id.iv_server_error)
-            errorTitleTextView = findViewById(R.id.tv_server_error)
-            errorDescription = findViewById(R.id.tv_server_error_description)
-            errorRetryTextView = findViewById(R.id.tv_server_error_retry)
+            errorImageView = findViewById(R.id.iv_custom_error)
+            errorTitleTextView = findViewById(R.id.tv_custom_error_title)
+            errorDescription = findViewById(R.id.tv_custom_error_description)
+            errorRetryTextView = findViewById(R.id.tv_custom_error_retry)
         }
 
         /**
          * 에러 이미지를 설정합니다
          */
-        fun setErrorImage(drawableRes: Int) {
+        private fun setErrorImage(drawableRes: Int) {
             errorImageView.setImageResource(drawableRes)
         }
 
         /**
          * 에러 제목을 설정합니다
          */
-        fun setErrorTitle(title: String) {
+        private fun setErrorTitle(title: String) {
             errorTitleTextView.text = title
         }
 
         /**
          * 에러 제목을 리소스로 설정합니다
          */
-        fun setErrorTitle(titleRes: Int) {
+        private fun setErrorTitle(titleRes: Int) {
             errorTitleTextView.setText(titleRes)
         }
 
         /**
          * 에러 설명을 설정합니다
          */
-        fun setErrorDescription(title: String) {
-            errorTitleTextView.text = title
+        private fun setErrorDescription(description: String) {
+            errorDescription.text = description
         }
 
         /**
          * 에러 설명을 리소스로 설정합니다
          */
-        fun setErrorDescription(titleRes: Int) {
-            errorTitleTextView.setText(titleRes)
+        private fun setErrorDescription(descriptionRes: Int) {
+            errorDescription.setText(descriptionRes)
         }
 
         /**
          * 재시도 메시지를 설정합니다
          */
-        fun setRetryMessage(message: String) {
+        private fun setRetryMessage(message: String) {
             errorRetryTextView.text = message
         }
 
         /**
          * 재시도 메시지를 리소스로 설정합니다
          */
-        fun setRetryMessage(messageRes: Int) {
+        private fun setRetryMessage(messageRes: Int) {
             errorRetryTextView.setText(messageRes)
         }
 

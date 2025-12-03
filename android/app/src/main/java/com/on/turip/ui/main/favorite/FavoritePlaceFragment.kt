@@ -20,9 +20,11 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.material.snackbar.Snackbar
 import com.on.turip.R
 import com.on.turip.databinding.FragmentFavoritePlaceBinding
 import com.on.turip.domain.ErrorEvent
+import com.on.turip.ui.common.TuripSnackbar
 import com.on.turip.ui.common.base.BaseFragment
 import com.on.turip.ui.common.event.CommonEvent
 import com.on.turip.ui.folder.FolderActivity
@@ -30,6 +32,7 @@ import com.on.turip.ui.login.LoginActivity
 import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceLatLngUiModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
+import com.on.turip.ui.main.favorite.model.FavoritePlaceUiEvent
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -220,13 +223,44 @@ class FavoritePlaceFragment :
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiEvent.collect { event ->
-                    when (event) {
-                        CommonEvent.TokenExpiration -> navigateToLoginScreen()
+                launch {
+                    viewModel.commonEvent.collect { event ->
+                        when (event) {
+                            CommonEvent.TokenExpiration -> navigateToLoginScreen()
+                        }
+                    }
+                }
+
+                launch {
+                    viewModel.uiEvent.collect { event ->
+                        when (event) {
+                            FavoritePlaceUiEvent.ShowFolderShareNotAllowed -> {
+                                showSuggestLoginMessage()
+                            }
+                        }
                     }
                 }
             }
         }
+    }
+
+    private fun showSuggestLoginMessage() {
+        TuripSnackbar
+            .make(
+                rootView = binding.root,
+                message = getString(R.string.favorite_place_suggest_login_for_share),
+                duration = Snackbar.LENGTH_SHORT,
+                layoutInflater = layoutInflater,
+            ).topMarginInCoordinatorLayout(binding.clFavoritePlace.height)
+            .action(R.string.all_snackbar_redirect_login) {
+                val intent: Intent =
+                    LoginActivity.newIntent(requireActivity()).apply {
+                        flags =
+                            Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    }
+                startActivity(intent)
+                requireActivity().finish()
+            }.show()
     }
 
     private fun navigateToLoginScreen() {

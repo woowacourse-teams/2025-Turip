@@ -1,5 +1,6 @@
 package com.on.turip.ui.common
 
+import android.graphics.Paint
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -72,7 +73,10 @@ class TuripSnackbar private constructor(
             }
         }
         actionTextResource?.let { textResource: Int ->
-            turipSnackbarView.findViewById<TextView>(R.id.tv_snackbar_button).setText(textResource)
+            turipSnackbarView.findViewById<TextView>(R.id.tv_snackbar_button).apply {
+                setText(textResource)
+                paintFlags = paintFlags or Paint.UNDERLINE_TEXT_FLAG
+            }
             snackbar.setAction(textResource) {
                 actionClickListener?.invoke()
                 snackbar.dismiss()

@@ -2,24 +2,24 @@ package com.on.turip.data.login.datasource
 
 import com.on.turip.data.common.TuripCustomResult
 import com.on.turip.data.common.safeApiCall
-import com.on.turip.data.login.service.AuthService
+import com.on.turip.data.login.service.MemberService
 import javax.inject.Inject
 
-class MemberRemoteDatasource @Inject constructor(
-    private val authService: AuthService,
-) : MemberDatasource {
+class MemberRemoteDataSource @Inject constructor(
+    private val memberService: MemberService,
+) : MemberDataSource {
     override suspend fun postMigration(): TuripCustomResult<Unit> =
         safeApiCall {
-            authService.postMigration()
+            memberService.postMigration()
         }
 
     override suspend fun postLogout(): TuripCustomResult<Unit> =
         safeApiCall {
-            authService.postLogout()
+            memberService.postLogout()
         }
 
     override suspend fun postWithdraw(): TuripCustomResult<Unit> =
         safeApiCall {
-            authService.postWithdraw()
+            memberService.postWithdraw()
         }
 }

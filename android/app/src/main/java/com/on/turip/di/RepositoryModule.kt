@@ -4,7 +4,7 @@ import com.on.turip.data.content.place.repository.DefaultContentPlaceRepository
 import com.on.turip.data.content.repository.DefaultContentRepository
 import com.on.turip.data.favorite.repository.DefaultFavoriteRepository
 import com.on.turip.data.folder.repository.DefaultFolderRepository
-import com.on.turip.data.login.repository.DefaultLoginRepository
+import com.on.turip.data.login.repository.DefaultAuthRepository
 import com.on.turip.data.login.repository.DefaultMemberRepository
 import com.on.turip.data.place.repository.DefaultFavoritePlaceRepository
 import com.on.turip.data.region.repository.DefaultRegionRepository
@@ -14,7 +14,7 @@ import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.favorite.repository.FavoritePlaceRepository
 import com.on.turip.domain.favorite.repository.FavoriteRepository
 import com.on.turip.domain.folder.repository.FolderRepository
-import com.on.turip.domain.login.LoginRepository
+import com.on.turip.domain.login.AuthRepository
 import com.on.turip.domain.login.MemberRepository
 import com.on.turip.domain.region.repository.RegionRepository
 import com.on.turip.domain.searchhistory.SearchHistoryRepository
@@ -63,9 +63,9 @@ abstract class RepositoryModule {
 
     @Binds
     @Singleton
-    abstract fun bindLoginRepository(defaultLoginRepository: DefaultLoginRepository): LoginRepository
+    abstract fun bindAuthRepository(defaultAuthRepository: DefaultAuthRepository): AuthRepository
 
     @Binds
     @Singleton
-    abstract fun bindAuthRepository(defaultMemberRepository: DefaultMemberRepository): MemberRepository
+    abstract fun bindMemberRepository(defaultMemberRepository: DefaultMemberRepository): MemberRepository
 }
