@@ -60,10 +60,8 @@ fun LoginScreen(
             dismissText = stringResource(R.string.setting_logout_dialog_dismiss),
             confirmButtonColor = colorResource(R.color.turip_blue_11aebf_70),
             dismissButtonColor = colorResource(R.color.turip_gray_b4b4b4),
-            onConfirmation = {
-                viewmodel.migration()
-            },
-            onDismissRequest = navigateToMain,
+            onConfirmation = viewmodel::migration,
+            onDismissRequest = viewmodel::clearGuestData,
         )
     }
 
@@ -158,10 +156,12 @@ private fun LoginScreenContent(
                                         colorResource(R.color.gray_200_c1c1c1),
                                     ),
                                 shape = RoundedCornerShape(10.dp),
-                            ).background(
+                            )
+                            .background(
                                 color = colorResource(R.color.gray_300_5b5b5b),
                                 shape = RoundedCornerShape(10.dp),
-                            ).fillMaxWidth()
+                            )
+                            .fillMaxWidth()
                             .padding(vertical = 20.dp),
                     textAlign = TextAlign.Center,
                 )

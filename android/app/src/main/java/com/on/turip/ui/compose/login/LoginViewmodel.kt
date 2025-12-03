@@ -74,6 +74,18 @@ class LoginViewmodel @Inject constructor(
         }
     }
 
+    fun clearGuestData() {
+        viewModelScope.launch {
+            memberRepository
+                .deleteGuestData()
+                .onSuccess {
+                    _uiEvent.send(LoginUiEvent.NavigateToMain)
+                }.onFailure {
+                    Timber.e("게스트 데이터 삭제 실패")
+                }
+        }
+    }
+
     fun onGuestLogin() {
         viewModelScope.launch {
             AuthState.change(UserType.GUEST)
