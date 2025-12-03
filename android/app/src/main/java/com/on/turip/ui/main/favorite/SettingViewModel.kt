@@ -40,7 +40,7 @@ class SettingViewModel @Inject constructor(
         loadId()
     }
 
-    fun loadId() {
+    private fun loadId() {
         viewModelScope.launch {
             userStorageRepository
                 .loadId()
@@ -82,6 +82,7 @@ class SettingViewModel @Inject constructor(
                         }
                 }.onFailure { error: ErrorEvent ->
                     Timber.e("로그아웃 실패 : $error")
+                    _uiEvent.send(SettingUiEvent.ShowError(error))
                 }
         }
     }
@@ -106,6 +107,7 @@ class SettingViewModel @Inject constructor(
                             Timber.e("토큰 초기화 실패")
                         }
                 }.onFailure { error: ErrorEvent ->
+                    _uiEvent.send(SettingUiEvent.ShowError(error))
                     Timber.e("회원탈퇴 실패 : $error")
                 }
         }

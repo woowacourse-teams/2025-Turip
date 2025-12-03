@@ -10,11 +10,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -24,10 +27,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.on.turip.R
 import com.on.turip.common.AuthState
 import com.on.turip.common.UserType
-import com.on.turip.domain.userstorage.TuripDeviceIdentifier
-import com.on.turip.ui.compose.common.component.ErrorHandlingContainer
+import com.on.turip.domain.ErrorEvent
 import com.on.turip.ui.compose.common.component.TuripAppBar
 import com.on.turip.ui.compose.common.component.TuripDialog
+import com.on.turip.ui.compose.common.component.TuripSnackbar
 import com.on.turip.ui.compose.theme.TuripTheme
 import com.on.turip.ui.main.favorite.SettingViewModel
 import timber.log.Timber
@@ -41,11 +44,27 @@ fun SettingScreen(
     viewModel: SettingViewModel = hiltViewModel(),
 ) {
     val uiState: SettingUiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.uiEvent.collect { event ->
             when (event) {
-                SettingUiEvent.Logout, SettingUiEvent.Withdraw -> navigateToLoginScreen()
+                SettingUiEvent.Logout, SettingUiEvent.Withdraw -> {
+                    navigateToLoginScreen()
+                }
+
+                is SettingUiEvent.ShowError -> {
+                    when (event.errorEvent) {
+                        ErrorEvent.NETWORK_ERROR -> {
+                            snackbarHostState.showSnackbar(context.getString(R.string.cannot_connect_network))
+                        }
+
+                        else -> {
+                            snackbarHostState.showSnackbar(context.getString(R.string.server_error))
+                        }
+                    }
+                }
             }
         }
     }
@@ -77,6 +96,7 @@ fun SettingScreen(
     }
 
     SettingScreen(
+        snackbarHostState = snackbarHostState,
         onClickBack = navigateToBack,
         onClickInquiry = {
             navigateToInquiry(viewModel.loadInquiryUri())
@@ -98,21 +118,18 @@ fun SettingScreen(
             viewModel.showWithdrawDialog(show = true)
             Timber.d("SettingScreen 회원탈퇴 버튼 클릭")
         },
-        onClickRetry = {
-            viewModel.loadId()
-        },
     )
 }
 
 @Composable
 private fun SettingScreen(
+    snackbarHostState: SnackbarHostState,
     onClickBack: () -> Unit,
     onClickInquiry: () -> Unit,
     onClickPrivacyPolicy: () -> Unit,
     onClickLogin: () -> Unit,
     onClickLogout: () -> Unit,
     onClickWithdraw: () -> Unit,
-    onClickRetry: () -> Unit,
 ) {
     Scaffold(
         modifier =
@@ -126,21 +143,16 @@ private fun SettingScreen(
                 onBackNavigate = onClickBack,
             )
         },
+        snackbarHost = { TuripSnackbar(snackbarHostState = snackbarHostState) },
     ) { innerPadding ->
-        ErrorHandlingContainer(
-            networkError = uiState.isNetworkError,
-            serverError = uiState.isServerError,
-            onRetryClick = onClickRetry,
-        ) {
-            SettingScreenContent(
-                onClickInquiry = onClickInquiry,
-                onClickPrivacyPolicy = onClickPrivacyPolicy,
-                onClickLogin = onClickLogin,
-                onClickLogout = onClickLogout,
-                onClickWithdraw = onClickWithdraw,
-                modifier = Modifier.padding(innerPadding),
-            )
-        }
+        SettingScreenContent(
+            onClickInquiry = onClickInquiry,
+            onClickPrivacyPolicy = onClickPrivacyPolicy,
+            onClickLogin = onClickLogin,
+            onClickLogout = onClickLogout,
+            onClickWithdraw = onClickWithdraw,
+            modifier = Modifier.padding(innerPadding),
+        )
     }
 }
 
