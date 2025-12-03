@@ -110,7 +110,7 @@ class GuestApiTest {
         }
 
         @Test
-        @DisplayName("device-fid 헤더 없이 요청 시 404 Not Found를 응답한다")
+        @DisplayName("device-fid 헤더 없이 요청 시 400 Bad Request를 응답한다")
         void deleteGuestWithoutDeviceFidHeader() {
             // when & then
             RestAssured
