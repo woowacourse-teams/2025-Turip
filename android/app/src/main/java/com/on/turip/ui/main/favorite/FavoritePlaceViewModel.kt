@@ -62,12 +62,6 @@ class FavoritePlaceViewModel @Inject constructor(
                                 folders.map { folder: Folder -> folder.toUiModel(selectFolderId = selectedFolderId) },
                         )
                     loadPlacesInSelectFolder()
-                    _favoritePlaceUiState.value =
-                        favoritePlaceUiState.value?.copy(
-                            isLoading = false,
-                            isServerError = false,
-                            isNetWorkError = false,
-                        )
                 }.onFailure { errorEvent: ErrorEvent ->
                     _favoritePlaceUiState.value =
                         _favoritePlaceUiState.value?.copy(isLoading = false)
