@@ -77,7 +77,6 @@ fun SettingScreen(
     }
 
     SettingScreen(
-        uiState = uiState,
         onClickBack = navigateToBack,
         onClickInquiry = {
             navigateToInquiry(viewModel.loadInquiryUri())
@@ -107,7 +106,6 @@ fun SettingScreen(
 
 @Composable
 private fun SettingScreen(
-    uiState: SettingUiState,
     onClickBack: () -> Unit,
     onClickInquiry: () -> Unit,
     onClickPrivacyPolicy: () -> Unit,
@@ -135,7 +133,6 @@ private fun SettingScreen(
             onRetryClick = onClickRetry,
         ) {
             SettingScreenContent(
-                uiState = uiState,
                 onClickInquiry = onClickInquiry,
                 onClickPrivacyPolicy = onClickPrivacyPolicy,
                 onClickLogin = onClickLogin,
@@ -149,7 +146,6 @@ private fun SettingScreen(
 
 @Composable
 private fun SettingScreenContent(
-    uiState: SettingUiState,
     onClickInquiry: () -> Unit,
     onClickPrivacyPolicy: () -> Unit,
     onClickLogin: () -> Unit,
@@ -248,41 +244,11 @@ private fun SettingForMemberScreen(
     )
 }
 
-@Preview(showBackground = true, name = "멤버")
+@Preview(showBackground = true)
 @Composable
 private fun MemberSettingScreenPreview() {
     TuripTheme {
         SettingScreenContent(
-            uiState =
-                SettingUiState(
-                    deviceIdentifier = TuripDeviceIdentifier.EMPTY,
-                    showLogoutDialog = false,
-                    showWithdrawDialog = false,
-                    isNetworkError = false,
-                    isServerError = false,
-                ),
-            onClickInquiry = {},
-            onClickPrivacyPolicy = {},
-            onClickLogin = {},
-            onClickLogout = {},
-            onClickWithdraw = {},
-        )
-    }
-}
-
-@Preview(showBackground = true, name = "게스트")
-@Composable
-private fun GuestSettingScreenPreview() {
-    TuripTheme {
-        SettingScreenContent(
-            uiState =
-                SettingUiState(
-                    deviceIdentifier = TuripDeviceIdentifier.EMPTY,
-                    showLogoutDialog = false,
-                    showWithdrawDialog = false,
-                    isNetworkError = false,
-                    isServerError = false,
-                ),
             onClickInquiry = {},
             onClickPrivacyPolicy = {},
             onClickLogin = {},
