@@ -24,7 +24,7 @@ import turip.content.repository.ContentPlaceRepository;
 import turip.content.repository.ContentRepository;
 import turip.creator.domain.Creator;
 import turip.favorite.repository.FavoritePlaceRepository;
-import turip.member.domain.Account;
+import turip.account.domain.Account;
 import turip.place.domain.Category;
 import turip.place.domain.Place;
 import turip.region.domain.City;

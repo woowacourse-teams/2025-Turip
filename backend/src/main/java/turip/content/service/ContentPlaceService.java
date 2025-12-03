@@ -16,7 +16,7 @@ import turip.content.domain.ContentPlace;
 import turip.content.repository.ContentPlaceRepository;
 import turip.content.repository.ContentRepository;
 import turip.favorite.repository.FavoritePlaceRepository;
-import turip.member.domain.Account;
+import turip.account.domain.Account;
 import turip.place.domain.Place;
 
 @Service

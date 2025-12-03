@@ -18,7 +18,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import turip.content.domain.Content;
-import turip.member.domain.Account;
+import turip.account.domain.Account;
 
 @Getter
 @Entity

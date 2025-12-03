@@ -23,9 +23,9 @@ import turip.auth.resolver.AuthAccount;
 import turip.auth.resolver.AuthMember;
 import turip.auth.service.AuthService;
 import turip.common.exception.ErrorResponse;
-import turip.member.domain.Account;
-import turip.member.domain.Member;
-import turip.member.domain.Provider;
+import turip.account.domain.Account;
+import turip.account.domain.Member;
+import turip.account.domain.Provider;
 
 @Controller
 @RequiredArgsConstructor

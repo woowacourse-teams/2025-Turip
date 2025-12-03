@@ -20,7 +20,7 @@ import turip.favorite.controller.dto.response.FavoriteFoldersWithPlaceCountRespo
 import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.repository.FavoriteFolderRepository;
 import turip.favorite.repository.FavoritePlaceRepository;
-import turip.member.domain.Account;
+import turip.account.domain.Account;
 import turip.place.domain.Place;
 import turip.place.repository.PlaceRepository;
 

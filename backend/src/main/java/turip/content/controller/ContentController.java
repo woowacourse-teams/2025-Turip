@@ -22,7 +22,7 @@ import turip.content.controller.dto.response.content.ContentResponse;
 import turip.content.controller.dto.response.content.ContentsDetailWithLoadableResponse;
 import turip.content.controller.dto.response.favorite.WeeklyPopularFavoriteContentsResponse;
 import turip.content.service.ContentService;
-import turip.member.domain.Account;
+import turip.account.domain.Account;
 
 @RestController
 @RequiredArgsConstructor

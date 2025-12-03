@@ -1,11 +1,11 @@
-package turip.member.service;
+package turip.account.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import turip.member.domain.Account;
-import turip.member.domain.Guest;
-import turip.member.repository.GuestRepository;
+import turip.account.domain.Account;
+import turip.account.domain.Guest;
+import turip.account.repository.GuestRepository;
 
 @Service
 @RequiredArgsConstructor

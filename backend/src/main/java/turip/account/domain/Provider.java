@@ -1,4 +1,4 @@
-package turip.member.domain;
+package turip.account.domain;
 
 public enum Provider {
 

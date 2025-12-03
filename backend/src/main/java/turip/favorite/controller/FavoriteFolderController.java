@@ -28,7 +28,7 @@ import turip.favorite.controller.dto.response.FavoriteFolderResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithFavoriteStatusResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithPlaceCountResponse;
 import turip.favorite.service.FavoriteFolderService;
-import turip.member.domain.Account;
+import turip.account.domain.Account;
 
 @RestController
 @RequiredArgsConstructor

@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.domain.FavoritePlace;
-import turip.member.domain.Account;
+import turip.account.domain.Account;
 import turip.place.domain.Place;
 
 public interface FavoritePlaceRepository extends JpaRepository<FavoritePlace, Long> {
