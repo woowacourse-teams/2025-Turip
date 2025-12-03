@@ -1,4 +1,4 @@
-package turip.member.controller;
+package turip.account.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 import turip.auth.resolver.AuthGuest;
 import turip.auth.resolver.AuthMember;
 import turip.common.exception.ErrorResponse;
-import turip.member.domain.Guest;
-import turip.member.domain.Member;
-import turip.member.service.MemberService;
+import turip.account.domain.Guest;
+import turip.account.domain.Member;
+import turip.account.service.MemberService;
 
 @RestController
 @RequiredArgsConstructor

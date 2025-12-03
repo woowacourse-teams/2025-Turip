@@ -21,7 +21,7 @@ import turip.favorite.controller.dto.request.FavoriteContentRequest;
 import turip.favorite.controller.dto.response.FavoriteContentResponse;
 import turip.favorite.domain.FavoriteContent;
 import turip.favorite.repository.FavoriteContentRepository;
-import turip.member.domain.Account;
+import turip.account.domain.Account;
 
 @Service
 @RequiredArgsConstructor

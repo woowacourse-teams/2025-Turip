@@ -1,4 +1,4 @@
-package turip.member.api;
+package turip.account.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
@@ -19,7 +19,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import turip.auth.token.GoogleTokenParser;
-import turip.member.domain.Provider;
+import turip.account.domain.Provider;
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)

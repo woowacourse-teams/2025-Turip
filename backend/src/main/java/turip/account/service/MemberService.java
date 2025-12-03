@@ -1,4 +1,4 @@
-package turip.member.service;
+package turip.account.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -8,11 +8,11 @@ import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.NotFoundException;
 import turip.favorite.repository.FavoriteContentRepository;
 import turip.favorite.repository.FavoriteFolderRepository;
-import turip.member.domain.Account;
-import turip.member.domain.Guest;
-import turip.member.domain.Member;
-import turip.member.domain.Provider;
-import turip.member.repository.MemberRepository;
+import turip.account.domain.Account;
+import turip.account.domain.Guest;
+import turip.account.domain.Member;
+import turip.account.domain.Provider;
+import turip.account.repository.MemberRepository;
 
 @Service
 @RequiredArgsConstructor

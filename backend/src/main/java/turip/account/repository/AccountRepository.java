@@ -1,7 +1,7 @@
-package turip.member.repository;
+package turip.account.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import turip.member.domain.Account;
+import turip.account.domain.Account;
 
 public interface AccountRepository extends JpaRepository<Account, Long> {
 

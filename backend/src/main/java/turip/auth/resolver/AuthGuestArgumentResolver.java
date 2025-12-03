@@ -9,7 +9,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.BadRequestException;
-import turip.member.service.GuestService;
+import turip.account.service.GuestService;
 
 @Component
 @RequiredArgsConstructor

@@ -34,10 +34,10 @@ import turip.auth.token.GoogleTokenParser;
 import turip.auth.token.JwtProvider;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.UnauthorizedException;
-import turip.member.domain.Account;
-import turip.member.domain.Member;
-import turip.member.domain.Provider;
-import turip.member.service.MemberService;
+import turip.account.domain.Account;
+import turip.account.domain.Member;
+import turip.account.domain.Provider;
+import turip.account.service.MemberService;
 
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {

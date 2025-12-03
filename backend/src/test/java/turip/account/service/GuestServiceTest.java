@@ -1,4 +1,4 @@
-package turip.member.service;
+package turip.account.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -14,9 +14,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import turip.member.domain.Account;
-import turip.member.domain.Guest;
-import turip.member.repository.GuestRepository;
+import turip.account.domain.Account;
+import turip.account.domain.Guest;
+import turip.account.repository.GuestRepository;
 
 @ExtendWith(MockitoExtension.class)
 class GuestServiceTest {

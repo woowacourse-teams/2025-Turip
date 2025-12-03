@@ -1,4 +1,4 @@
-package turip.member.domain;
+package turip.account.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

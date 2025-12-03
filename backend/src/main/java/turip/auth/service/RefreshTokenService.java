@@ -8,7 +8,7 @@ import turip.auth.domain.RefreshToken;
 import turip.auth.repository.RefreshTokenRepository;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.UnauthorizedException;
-import turip.member.domain.Member;
+import turip.account.domain.Member;
 
 @Service
 @RequiredArgsConstructor
