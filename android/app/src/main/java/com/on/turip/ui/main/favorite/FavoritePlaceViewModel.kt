@@ -64,10 +64,13 @@ class FavoritePlaceViewModel @Inject constructor(
                     loadPlacesInSelectFolder()
                     _favoritePlaceUiState.value =
                         favoritePlaceUiState.value?.copy(
+                            isLoading = false,
                             isServerError = false,
                             isNetWorkError = false,
                         )
                 }.onFailure { errorEvent: ErrorEvent ->
+                    _favoritePlaceUiState.value =
+                        _favoritePlaceUiState.value?.copy(isLoading = false)
                     checkError(errorEvent)
                     Timber.e("장소 찜 목록 화면 폴더 불러오기 API 호출 실패")
                 }
@@ -168,7 +171,10 @@ class FavoritePlaceViewModel @Inject constructor(
                 _favoritePlaceUiState.value = favoritePlaceUiState.value?.copy(isServerError = true)
             }
 
-            ErrorEvent.DUPLICATION_FOLDER -> throw IllegalArgumentException("발생할 수 없는 오류")
+            ErrorEvent.DUPLICATION_FOLDER -> {
+                throw IllegalArgumentException("발생할 수 없는 오류")
+            }
+
             ErrorEvent.UNEXPECTED_PROBLEM -> {
                 _favoritePlaceUiState.value = favoritePlaceUiState.value?.copy(isServerError = true)
             }
