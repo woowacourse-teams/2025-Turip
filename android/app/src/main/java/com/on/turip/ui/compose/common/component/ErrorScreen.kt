@@ -9,10 +9,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -29,26 +31,28 @@ fun ErrorScreen(
 ) {
     val (imageRes, titleRes, descriptionRes, retryTextRes) =
         when (errorEvent) {
-            ErrorEvent.NETWORK_ERROR ->
+            ErrorEvent.NETWORK_ERROR -> {
                 listOf(
                     R.drawable.ic_network_error,
                     R.string.cannot_connect_network,
                     R.string.check_connection_status,
                     R.string.retry,
                 )
+            }
 
             ErrorEvent.USER_NOT_HAVE_PERMISSION,
             ErrorEvent.DUPLICATION_FOLDER,
             ErrorEvent.UNEXPECTED_PROBLEM,
             ErrorEvent.PARSER_ERROR,
             ErrorEvent.TOKEN_EXPIRATION,
-            ->
+            -> {
                 listOf(
                     R.drawable.ic_server_error,
                     R.string.server_error,
                     R.string.retry_later,
                     R.string.retry,
                 )
+            }
         }
 
     Column(
@@ -81,7 +85,16 @@ fun ErrorScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(onClick = onRetryClick) {
+        Button(
+            colors =
+                ButtonColors(
+                    contentColor = colorResource(R.color.pure_white_ffffff),
+                    containerColor = colorResource(R.color.turip_blue_11aebf_70),
+                    disabledContentColor = colorResource(R.color.pure_white_ffffff),
+                    disabledContainerColor = colorResource(R.color.gray_300_5b5b5b),
+                ),
+            onClick = onRetryClick,
+        ) {
             Text(text = stringResource(id = retryTextRes))
         }
     }
