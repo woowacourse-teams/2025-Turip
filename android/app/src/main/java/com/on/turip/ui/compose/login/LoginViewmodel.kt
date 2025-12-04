@@ -77,7 +77,7 @@ class LoginViewmodel @Inject constructor(
     fun clearGuestData() {
         viewModelScope.launch {
             memberRepository
-                .deleteGuestData()
+                .deleteGuest()
                 .onSuccess {
                     _uiEvent.send(LoginUiEvent.NavigateToMain)
                 }.onFailure {

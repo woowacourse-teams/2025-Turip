@@ -7,7 +7,7 @@ interface MemberDataSource {
 
     suspend fun postLogout(): TuripCustomResult<Unit>
 
-    suspend fun deleteMemberData(): TuripCustomResult<Unit>
+    suspend fun deleteMember(): TuripCustomResult<Unit>
 
-    suspend fun deleteGuestData(): TuripCustomResult<Unit>
+    suspend fun deleteGuest(): TuripCustomResult<Unit>
 }
