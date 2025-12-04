@@ -7,15 +7,15 @@ import android.view.ViewGroup
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import com.on.turip.databinding.FragmentFavoriteBinding
+import com.on.turip.databinding.FragmentMyPageBinding
 import com.on.turip.ui.common.base.BaseFragment
 import com.on.turip.ui.setting.SettingActivity
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>() {
-    private val favoriteStateAdapter: FragmentStateAdapter by lazy {
-        FavoriteStateAdapter(
+class MyPageFragment : BaseFragment<FragmentMyPageBinding>() {
+    private val myPageStateAdapter: FragmentStateAdapter by lazy {
+        MyPageStateAdapter(
             this,
             listOf(
                 FavoritePlaceFragment.instance(),
@@ -27,7 +27,7 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>() {
     override fun inflateBinding(
         inflater: LayoutInflater,
         container: ViewGroup?,
-    ): FragmentFavoriteBinding = FragmentFavoriteBinding.inflate(inflater, container, false)
+    ): FragmentMyPageBinding = FragmentMyPageBinding.inflate(inflater, container, false)
 
     override fun onViewCreated(
         view: View,
@@ -41,13 +41,13 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>() {
     }
 
     private fun setupAdapters() {
-        binding.vpFavorite.adapter = favoriteStateAdapter
+        binding.vpMyPage.adapter = myPageStateAdapter
     }
 
     private fun setupTabDisplayName() {
         TabLayoutMediator(
-            binding.tlFavorite,
-            binding.vpFavorite,
+            binding.tlMyPage,
+            binding.vpMyPage,
         ) { tab: TabLayout.Tab, position: Int ->
             tab.text =
                 when (position) {
@@ -58,7 +58,7 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>() {
     }
 
     private fun setupListeners() {
-        binding.ivFavoriteMoreOptions.setOnClickListener {
+        binding.ivMyPageMoreOptions.setOnClickListener {
             startActivity(SettingActivity.newIntent(requireContext()))
         }
     }

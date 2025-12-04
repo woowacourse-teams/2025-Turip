@@ -18,7 +18,7 @@
 
     <!-- 바텀 네비게이션 -->
     <string name="bottom_navigation_home">홈</string>
-    <string name="bottom_navigation_selected_catalog">찜 목록</string>
+    <string name="bottom_navigation_my_page">마이페이지</string>
 
     <!-- 검색 결과 페이지 -->
     <string name="search_result_no_result">검색 결과가 없습니다.</string>
