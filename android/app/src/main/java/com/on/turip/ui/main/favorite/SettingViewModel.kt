@@ -96,7 +96,7 @@ class SettingViewModel @Inject constructor(
             _uiState.update { it.copy(showWithdrawDialog = false) }
 
             memberRepository
-                .withdraw()
+                .deleteMember()
                 .onSuccess {
                     userStorageRepository
                         .clearTokens()
