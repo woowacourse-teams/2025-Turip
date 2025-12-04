@@ -25,7 +25,7 @@ import turip.favorite.controller.dto.request.FavoritePlaceOrderRequest;
 import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlaceResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlacesWithPlaceDetailResponse;
 import turip.favorite.service.FavoritePlaceService;
-import turip.member.domain.Account;
+import turip.account.domain.Account;
 
 @RestController
 @RequiredArgsConstructor

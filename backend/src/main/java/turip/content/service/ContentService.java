@@ -28,7 +28,7 @@ import turip.content.controller.dto.response.favorite.WeeklyPopularFavoriteConte
 import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
 import turip.favorite.repository.FavoriteContentRepository;
-import turip.member.domain.Account;
+import turip.account.domain.Account;
 import turip.region.domain.DomesticRegionCategory;
 import turip.region.domain.OverseasRegionCategory;
 

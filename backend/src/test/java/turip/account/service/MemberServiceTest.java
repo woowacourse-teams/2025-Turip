@@ -1,4 +1,4 @@
-package turip.member.service;
+package turip.account.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -20,11 +20,11 @@ import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.repository.FavoriteContentRepository;
 import turip.favorite.repository.FavoriteFolderRepository;
 import turip.auth.service.RefreshTokenService;
-import turip.member.domain.Account;
-import turip.member.domain.Guest;
-import turip.member.domain.Member;
-import turip.member.domain.Provider;
-import turip.member.repository.MemberRepository;
+import turip.account.domain.Account;
+import turip.account.domain.Guest;
+import turip.account.domain.Member;
+import turip.account.domain.Provider;
+import turip.account.repository.MemberRepository;
 
 @ExtendWith(MockitoExtension.class)
 class MemberServiceTest {

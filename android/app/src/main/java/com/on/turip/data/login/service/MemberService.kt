@@ -12,5 +12,8 @@ interface MemberService {
     suspend fun postLogout(): Response<Unit>
 
     @DELETE("members/me")
-    suspend fun postWithdraw(): Response<Unit>
+    suspend fun deleteMember(): Response<Unit>
+
+    @DELETE("guests/me")
+    suspend fun deleteGuest(): Response<Unit>
 }

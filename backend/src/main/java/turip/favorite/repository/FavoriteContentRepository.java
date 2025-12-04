@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import turip.content.domain.Content;
 import turip.favorite.domain.FavoriteContent;
-import turip.member.domain.Account;
+import turip.account.domain.Account;
 
 public interface FavoriteContentRepository extends JpaRepository<FavoriteContent, Long> {
 

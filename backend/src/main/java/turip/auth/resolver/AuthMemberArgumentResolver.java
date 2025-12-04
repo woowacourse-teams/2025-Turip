@@ -12,8 +12,8 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 import turip.auth.token.JwtProvider;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.UnauthorizedException;
-import turip.member.domain.Member;
-import turip.member.service.MemberService;
+import turip.account.domain.Member;
+import turip.account.service.MemberService;
 
 @Component
 @RequiredArgsConstructor

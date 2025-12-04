@@ -18,7 +18,7 @@ import turip.auth.resolver.AuthAccount;
 import turip.common.exception.ErrorResponse;
 import turip.content.controller.dto.response.place.ContentPlaceDetailResponse;
 import turip.content.service.ContentPlaceService;
-import turip.member.domain.Account;
+import turip.account.domain.Account;
 
 @RestController
 @RequiredArgsConstructor

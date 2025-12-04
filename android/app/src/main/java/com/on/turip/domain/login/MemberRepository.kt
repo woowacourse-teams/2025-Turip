@@ -7,5 +7,7 @@ interface MemberRepository {
 
     suspend fun logout(): TuripCustomResult<Unit>
 
-    suspend fun withdraw(): TuripCustomResult<Unit>
+    suspend fun deleteMember(): TuripCustomResult<Unit>
+
+    suspend fun deleteGuest(): TuripCustomResult<Unit>
 }

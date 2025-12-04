@@ -1,6 +1,6 @@
 package turip.auth.token;
 
-import turip.member.domain.Provider;
+import turip.account.domain.Provider;
 
 public interface IdTokenParser {
 

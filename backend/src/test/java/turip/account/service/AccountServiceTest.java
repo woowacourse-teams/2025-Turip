@@ -1,4 +1,4 @@
-package turip.member.service;
+package turip.account.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -18,8 +18,8 @@ import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.NotFoundException;
 import turip.favorite.repository.FavoriteContentRepository;
 import turip.favorite.service.FavoriteFolderService;
-import turip.member.domain.Account;
-import turip.member.repository.AccountRepository;
+import turip.account.domain.Account;
+import turip.account.repository.AccountRepository;
 
 @ExtendWith(MockitoExtension.class)
 class AccountServiceTest {

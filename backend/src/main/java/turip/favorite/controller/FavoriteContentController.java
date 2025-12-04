@@ -24,7 +24,7 @@ import turip.content.controller.dto.response.content.ContentsDetailWithLoadableR
 import turip.favorite.controller.dto.request.FavoriteContentRequest;
 import turip.favorite.controller.dto.response.FavoriteContentResponse;
 import turip.favorite.service.FavoriteContentService;
-import turip.member.domain.Account;
+import turip.account.domain.Account;
 
 @RestController
 @RequiredArgsConstructor

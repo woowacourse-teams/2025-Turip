@@ -12,9 +12,9 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 import turip.auth.token.JwtProvider;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.UnauthorizedException;
-import turip.member.domain.Account;
-import turip.member.service.AccountService;
-import turip.member.service.GuestService;
+import turip.account.domain.Account;
+import turip.account.service.AccountService;
+import turip.account.service.GuestService;
 
 @Component
 @RequiredArgsConstructor
