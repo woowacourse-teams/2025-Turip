@@ -251,8 +251,7 @@ class FavoritePlaceFragment :
                 message = getString(R.string.favorite_place_suggest_login_for_share),
                 duration = Snackbar.LENGTH_SHORT,
                 layoutInflater = layoutInflater,
-            ).topMarginInCoordinatorLayout(binding.clFavoritePlace.height)
-            .action(R.string.all_snackbar_redirect_login) {
+            ).action(R.string.all_snackbar_redirect_login) {
                 val intent: Intent =
                     LoginActivity.newIntent(requireActivity()).apply {
                         flags =

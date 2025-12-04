@@ -7,14 +7,23 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.on.turip.R
 import com.on.turip.databinding.BottomSheetFragmentFavoritePlaceFolderCatalogBinding
+import com.on.turip.ui.common.TuripSnackbar
 import com.on.turip.ui.common.base.BaseFragment
+import com.on.turip.ui.common.event.CommonEvent
+import com.on.turip.ui.login.LoginActivity
+import com.on.turip.ui.main.favorite.FavoritePlaceFolderCatalogViewModel.FavoritePlaceFolderCatalogUiEvent
 import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @AndroidEntryPoint
@@ -108,7 +117,7 @@ class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavor
     }
 
     private fun setupObservers() {
-        viewModel.favoritePlaceUiState.observe(viewLifecycleOwner) { state ->
+        viewModel.favoritePlaceFolderCatalogUiState.observe(viewLifecycleOwner) { state ->
             placeAdapter.submitList(state.places)
 
             binding.tvBottomSheetFolderFavoritePlaceFolderCatalogTitle.text = state.folderName
@@ -126,6 +135,56 @@ class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavor
         viewModel.shareFolder.observe(viewLifecycleOwner) { shareFolder: FavoriteFolderShareModel ->
             makeShareIntent(shareFolder)
         }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.commonEvent.collect { event ->
+                        when (event) {
+                            CommonEvent.TokenExpiration -> navigateToLoginScreen()
+                        }
+                    }
+                }
+
+                launch {
+                    viewModel.uiEvent.collect { event ->
+                        when (event) {
+                            FavoritePlaceFolderCatalogUiEvent.ShowFolderShareNotAllowed -> {
+                                showSuggestLoginMessage()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun navigateToLoginScreen() {
+        val intent: Intent =
+            LoginActivity.newIntent(requireActivity()).apply {
+                flags =
+                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+        startActivity(intent)
+        requireActivity().finish()
+    }
+
+    private fun showSuggestLoginMessage() {
+        TuripSnackbar
+            .make(
+                rootView = binding.root,
+                message = getString(R.string.favorite_place_suggest_login_for_share),
+                duration = Snackbar.LENGTH_SHORT,
+                layoutInflater = layoutInflater,
+            ).action(R.string.all_snackbar_redirect_login) {
+                val intent: Intent =
+                    LoginActivity.newIntent(requireActivity()).apply {
+                        flags =
+                            Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    }
+                startActivity(intent)
+                requireActivity().finish()
+            }.show()
     }
 
     private fun setupListeners() {
