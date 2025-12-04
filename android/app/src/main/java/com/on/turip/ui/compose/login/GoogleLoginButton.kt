@@ -6,9 +6,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -46,9 +46,7 @@ fun GoogleLoginButton(
         Image(
             painter = painterResource(R.drawable.ic_google),
             contentDescription = null,
-        )
-        Spacer(
-            modifier = Modifier.padding(10.dp),
+            modifier = Modifier.size(28.dp),
         )
         Text(
             text = stringResource(R.string.login_google_description),
@@ -56,7 +54,7 @@ fun GoogleLoginButton(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .padding(end = 10.dp),
+                    .padding(end = 28.dp),
             textAlign = TextAlign.Center,
         )
     }
@@ -69,8 +67,7 @@ private fun GoogleLoginButtonPreView() {
         GoogleLoginButton(
             onClickLoginButton = {},
             modifier =
-                Modifier
-                    .padding(20.dp),
+                Modifier.padding(20.dp),
         )
     }
 }
