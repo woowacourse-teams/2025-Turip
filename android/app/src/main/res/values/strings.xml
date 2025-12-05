@@ -109,4 +109,11 @@
     <string name="login_dialog_migration_title">동기화</string>
     <string name="login_dialog_confirm_text">데이터 동기화</string>
 
+    <!-- 튜립 다이얼로그 -->
+    <string name="turip_dialog_login_suggest_title">로그인이 필요합니다.</string>
+    <string name="turip_dialog_login_suggest_description">로그인하고 나만의 여행 정보를 공유해보세요!</string>
+    <string name="turip_dialog_login_suggest_confirm">로그인</string>
+    <string name="turip_dialog_login_suggest_dismiss">나중에</string>
+
+
 </resources>

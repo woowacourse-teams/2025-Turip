@@ -19,12 +19,12 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.material.snackbar.Snackbar
 import com.on.turip.R
 import com.on.turip.databinding.FragmentFavoritePlaceBinding
 import com.on.turip.domain.ErrorEvent
-import com.on.turip.ui.common.TuripSnackbar
+import com.on.turip.ui.common.TuripDialogFragment
 import com.on.turip.ui.common.base.BaseFragment
 import com.on.turip.ui.common.event.CommonEvent
 import com.on.turip.ui.folder.FolderActivity
@@ -82,7 +82,7 @@ class FavoritePlaceFragment :
     }
 
     private lateinit var map: GoogleMap
-    private val markerMap = mutableMapOf<Long, com.google.android.gms.maps.model.Marker>()
+    private val markerMap = mutableMapOf<Long, Marker>()
 
     override fun inflateBinding(
         inflater: LayoutInflater,
@@ -100,6 +100,7 @@ class FavoritePlaceFragment :
         setupObservers()
         showNetworkError()
         setupMapFragment(savedInstanceState)
+        setupLoginSuggestDialog()
     }
 
     private fun showNetworkError() {
@@ -234,9 +235,7 @@ class FavoritePlaceFragment :
                 launch {
                     viewModel.uiEvent.collect { event ->
                         when (event) {
-                            FavoritePlaceUiEvent.ShowFolderShareNotAllowed -> {
-                                showSuggestLoginMessage()
-                            }
+                            FavoritePlaceUiEvent.ShowFolderShareNotAllowed -> showSuggestLoginMessage()
                         }
                     }
                 }
@@ -245,21 +244,13 @@ class FavoritePlaceFragment :
     }
 
     private fun showSuggestLoginMessage() {
-        TuripSnackbar
-            .make(
-                rootView = binding.root,
-                message = getString(R.string.favorite_place_suggest_login_for_share),
-                duration = Snackbar.LENGTH_SHORT,
-                layoutInflater = layoutInflater,
-            ).action(R.string.all_snackbar_redirect_login) {
-                val intent: Intent =
-                    LoginActivity.newIntent(requireActivity()).apply {
-                        flags =
-                            Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    }
-                startActivity(intent)
-                requireActivity().finish()
-            }.show()
+        TuripDialogFragment
+            .newInstance(
+                title = getString(R.string.turip_dialog_login_suggest_title),
+                description = getString(R.string.turip_dialog_login_suggest_description),
+                confirmText = getString(R.string.turip_dialog_login_suggest_confirm),
+                dismissText = getString(R.string.turip_dialog_login_suggest_dismiss),
+            ).show(parentFragmentManager, TuripDialogFragment::class.java.simpleName)
     }
 
     private fun navigateToLoginScreen() {
@@ -450,6 +441,19 @@ class FavoritePlaceFragment :
             )
         marker?.let {
             markerMap[favoriteLatLng.placeId] = it
+        }
+    }
+
+    private fun setupLoginSuggestDialog() {
+        parentFragmentManager.setFragmentResultListener(
+            TuripDialogFragment.REQUEST_KEY,
+            viewLifecycleOwner,
+        ) { _, bundle ->
+            when (bundle.getString(TuripDialogFragment.TURIP_DIALOG_RESULT)) {
+                TuripDialogFragment.RESULT_CONFIRM -> {
+                    navigateToLoginScreen()
+                }
+            }
         }
     }
 
