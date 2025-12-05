@@ -131,7 +131,7 @@ class FavoritePlaceFolderCatalogViewModel @Inject constructor(
 
             ErrorEvent.NETWORK_ERROR -> {
                 _favoritePlaceFolderCatalogUiState.value =
-                    favoritePlaceFolderCatalogUiState.value?.copy(isServerError = true)
+                    favoritePlaceFolderCatalogUiState.value?.copy(isNetWorkError = true)
             }
 
             ErrorEvent.PARSER_ERROR -> {
