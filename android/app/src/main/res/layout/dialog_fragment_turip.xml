@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cl_dialog_turip"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_pure_white_radius_8dp"
+    android:paddingHorizontal="18dp"
+    android:paddingVertical="20dp">
+
+    <TextView
+        android:id="@+id/tv_dialog_turip_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="20dp"
+        android:textAlignment="center"
+        android:textAppearance="@style/title1"
+        android:textColor="@color/pure_black_151515"
+        app:layout_constraintBottom_toTopOf="@id/tv_dialog_turip_description"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="로그인이 필요합니다." />
+
+    <TextView
+        android:id="@+id/tv_dialog_turip_description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="10dp"
+        android:paddingHorizontal="50dp"
+        android:textAlignment="center"
+        android:textAppearance="@style/body2"
+        android:textColor="@color/pure_black_151515"
+        app:layout_constraintBottom_toTopOf="@id/tv_dialog_dismiss"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_dialog_turip_title"
+        tools:text="로그인하고 여행 정보를\n 공유해보세요!" />
+
+    <TextView
+        android:id="@+id/tv_dialog_dismiss"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/bg_gray_b4b4b4_radius_8dp"
+        android:paddingVertical="12dp"
+        android:textAlignment="center"
+        android:textAppearance="@style/info1"
+        android:textColor="@color/pure_white_ffffff"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/tv_dialog_confirmation"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_dialog_turip_description"
+        tools:text="나중에" />
+
+    <TextView
+        android:id="@+id/tv_dialog_confirmation"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:background="@drawable/bg_turip_blue_70_radius_8dp"
+        android:paddingVertical="12dp"
+        android:textAlignment="center"
+        android:textAppearance="@style/info1"
+        android:textColor="@color/pure_white_ffffff"
+        app:layout_constraintBottom_toBottomOf="@id/tv_dialog_dismiss"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/tv_dialog_dismiss"
+        app:layout_constraintTop_toTopOf="@id/tv_dialog_dismiss"
+        tools:text="확인" />
+</androidx.constraintlayout.widget.ConstraintLayout>
