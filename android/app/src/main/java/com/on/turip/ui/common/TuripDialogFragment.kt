@@ -3,32 +3,30 @@ package com.on.turip.ui.common
 import android.app.Dialog
 import android.graphics.Color
 import android.os.Bundle
-import android.view.View
-import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.graphics.drawable.toDrawable
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
-import com.on.turip.R
+import com.on.turip.databinding.DialogFragmentTuripBinding
 
 class TuripDialogFragment : DialogFragment() {
+    private var _binding: DialogFragmentTuripBinding? = null
+    val binding get() = _binding!!
+
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val view: View =
-            requireActivity()
-                .layoutInflater
-                .inflate(R.layout.dialog_fragment_turip, null)
+        _binding = DialogFragmentTuripBinding.inflate(requireActivity().layoutInflater)
 
-        val title = requireArguments().getString(ARG_TITLE)
-        val description = requireArguments().getString(ARG_DESCRIPTION)
-        val confirm = requireArguments().getString(ARG_CONFIRM)
-        val dismiss = requireArguments().getString(ARG_DISMISS)
+        val title: String = requireArguments().getString(ARG_TITLE).orEmpty()
+        val description: String = requireArguments().getString(ARG_DESCRIPTION).orEmpty()
+        val confirm: String = requireArguments().getString(ARG_CONFIRM).orEmpty()
+        val dismiss: String = requireArguments().getString(ARG_DISMISS).orEmpty()
 
-        bind(view, title, description, confirm, dismiss)
+        bind(title, description, confirm, dismiss)
 
-        val dialog =
+        val dialog: AlertDialog =
             AlertDialog
                 .Builder(requireContext())
-                .setView(view)
+                .setView(binding.root)
                 .create()
 
         // 기존 다이얼 로그 각진 테두리 제거
@@ -38,18 +36,17 @@ class TuripDialogFragment : DialogFragment() {
     }
 
     private fun bind(
-        view: View,
-        title: String?,
-        description: String?,
-        confirm: String?,
-        dismiss: String?,
+        title: String,
+        description: String,
+        confirm: String,
+        dismiss: String,
     ) {
-        view.findViewById<TextView>(R.id.tv_dialog_turip_title).apply { text = title }
-        view.findViewById<TextView>(R.id.tv_dialog_turip_description).apply { text = description }
-        view.findViewById<TextView>(R.id.tv_dialog_confirmation).apply { text = confirm }
-        view.findViewById<TextView>(R.id.tv_dialog_dismiss).apply { text = dismiss }
+        binding.tvDialogTuripTitle.text = title
+        binding.tvDialogTuripDescription.text = description
+        binding.tvDialogConfirmation.text = confirm
+        binding.tvDialogDismiss.text = dismiss
 
-        view.findViewById<TextView>(R.id.tv_dialog_confirmation).setOnClickListener {
+        binding.tvDialogConfirmation.setOnClickListener {
             parentFragmentManager.setFragmentResult(
                 REQUEST_KEY,
                 bundleOf(TURIP_DIALOG_RESULT to RESULT_CONFIRM),
@@ -57,9 +54,14 @@ class TuripDialogFragment : DialogFragment() {
             dismiss()
         }
 
-        view.findViewById<TextView>(R.id.tv_dialog_dismiss).setOnClickListener {
+        binding.tvDialogDismiss.setOnClickListener {
             dismiss()
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     companion object {
