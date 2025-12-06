@@ -5,5 +5,6 @@ enum class ServerError {
     NOT_FOUND,
     DUPLICATION_FOLDER,
     UNEXPECTED_PROBLEM,
+    TOKEN_EXPIRATION,
     UNKNOWN,
 }

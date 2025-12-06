@@ -12,6 +12,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -29,9 +30,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.on.turip.R
 import com.on.turip.domain.region.RegionCategory
+import com.on.turip.ui.common.event.CommonEvent
 import com.on.turip.ui.compose.common.component.ErrorHandlingContainer
 import com.on.turip.ui.compose.common.component.SearchTextField
-import com.on.turip.ui.compose.main.home.component.HomeTopAppBar
+import com.on.turip.ui.compose.common.component.TuripAppBar
 import com.on.turip.ui.compose.main.home.component.RegionList
 import com.on.turip.ui.compose.main.home.component.RegionTypeButtons
 import com.on.turip.ui.compose.main.home.component.UsersLikeList
@@ -45,6 +47,7 @@ fun HomeScreen(
     onSearchClick: (String) -> Unit,
     onRegionClick: (String) -> Unit,
     onContentClick: (UsersLikeContentModel) -> Unit,
+    navigateToLoginScreen: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     var keyword: String by rememberSaveable { mutableStateOf("") }
@@ -61,8 +64,20 @@ fun HomeScreen(
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
 
+    LaunchedEffect(Unit) {
+        viewModel.uiEvent.collect { event ->
+            when (event) {
+                CommonEvent.TokenExpiration -> navigateToLoginScreen()
+            }
+        }
+    }
+
     Scaffold(
-        topBar = { HomeTopAppBar() },
+        topBar = {
+            TuripAppBar(
+                canBack = false,
+            )
+        },
         modifier =
             Modifier.pointerInput(Unit) {
                 detectTapGestures(onTap = {
@@ -140,6 +155,11 @@ fun HomeScreen(
 @Composable
 fun HomeScreenPreview() {
     TuripTheme {
-        HomeScreen({}, {}, {})
+        HomeScreen(
+            {},
+            {},
+            {},
+            navigateToLoginScreen = {},
+        )
     }
 }

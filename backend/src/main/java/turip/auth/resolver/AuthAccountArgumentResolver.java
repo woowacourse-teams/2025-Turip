@@ -1,0 +1,69 @@
+package turip.auth.resolver;
+
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.security.SignatureException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.core.MethodParameter;
+import org.springframework.stereotype.Component;
+import org.springframework.web.bind.support.WebDataBinderFactory;
+import org.springframework.web.context.request.NativeWebRequest;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.method.support.ModelAndViewContainer;
+import turip.auth.token.JwtProvider;
+import turip.common.exception.ErrorTag;
+import turip.common.exception.custom.UnauthorizedException;
+import turip.account.domain.Account;
+import turip.account.service.AccountService;
+import turip.account.service.GuestService;
+
+@Component
+@RequiredArgsConstructor
+public class AuthAccountArgumentResolver implements HandlerMethodArgumentResolver {
+
+    private final JwtProvider jwtProvider;
+    private final GuestService guestService;
+    private final AccountService accountService;
+
+    @Override
+    public boolean supportsParameter(MethodParameter parameter) {
+        return parameter.hasParameterAnnotation(AuthAccount.class);
+    }
+
+    @Override
+    public Object resolveArgument(
+            MethodParameter parameter,
+            ModelAndViewContainer mavContainer,
+            NativeWebRequest webRequest,
+            WebDataBinderFactory binderFactory
+    ) {
+        String bearer = webRequest.getHeader("Authorization");
+        String deviceFid = webRequest.getHeader("device-fid");
+
+        if (bearer != null && bearer.startsWith("Bearer ")) {
+            String accessToken = bearer.substring(7); // "Bearer " 길이 = 7
+            return getMemberAccount(accessToken);
+        }
+        return findOrCreateGuestAccount(deviceFid);
+    }
+
+    private Account getMemberAccount(String accessToken) {
+        try {
+            Long accountId = jwtProvider.parseToken(accessToken).get("accountId", Long.class);
+            return accountService.getById(accountId);
+
+        } catch (ExpiredJwtException e) {
+            throw new UnauthorizedException(ErrorTag.ACCESS_TOKEN_EXPIRED);
+        } catch (SignatureException e) {
+            throw new UnauthorizedException(ErrorTag.ACCESS_TOKEN_SIGNATURE_INVALID);
+        } catch (Exception e) {
+            throw new UnauthorizedException(ErrorTag.UNAUTHORIZED);
+        }
+    }
+
+    private Account findOrCreateGuestAccount(String deviceFid) {
+        if (deviceFid == null || deviceFid.isBlank()) {
+            throw new UnauthorizedException(ErrorTag.UNAUTHORIZED);
+        }
+        return guestService.findOrCreateByDeviceFid(deviceFid).getAccount();
+    }
+}

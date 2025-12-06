@@ -6,4 +6,5 @@ enum class ErrorEvent {
     UNEXPECTED_PROBLEM,
     NETWORK_ERROR,
     PARSER_ERROR,
+    TOKEN_EXPIRATION,
 }

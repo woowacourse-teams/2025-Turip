@@ -31,7 +31,10 @@ class ContentApiTest {
         jdbcTemplate.update("DELETE FROM category");
         jdbcTemplate.update("DELETE FROM favorite_folder");
         jdbcTemplate.update("DELETE FROM favorite_content");
+        jdbcTemplate.update("DELETE FROM guest");
+        jdbcTemplate.update("DELETE FROM refresh_token");
         jdbcTemplate.update("DELETE FROM member");
+        jdbcTemplate.update("DELETE FROM account");
         jdbcTemplate.update("DELETE FROM content");
         jdbcTemplate.update("DELETE FROM creator");
         jdbcTemplate.update("DELETE FROM city");
@@ -48,7 +51,10 @@ class ContentApiTest {
         jdbcTemplate.update("ALTER TABLE category ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE place_category ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE favorite_content ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE guest ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE member ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE refresh_token ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE account ALTER COLUMN id RESTART WITH 1");
     }
 
     @DisplayName("/contents/{contentId} GET 컨텐츠 단건 조회 테스트")
@@ -68,6 +74,8 @@ class ContentApiTest {
             jdbcTemplate.update(
                     "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (?, ?, ?, ?, ?)",
                     1, 1, "https://youtube.com/watch?v=abcd1", "서울 데이트 코스 추천", "2024-07-01");
+            jdbcTemplate.update("INSERT INTO account () VALUES ()");
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
 
             // when & then
             RestAssured.given().port(port)
@@ -84,7 +92,7 @@ class ContentApiTest {
                     .body("isFavorite", is(false));
         }
 
-        @DisplayName("device-fid 헤더가 존재하며 찜이 되어 있는 경우 isFavorite이 true로 응답된다")
+        @DisplayName("해당 계정에 찜이 되어 있는 경우 isFavorite이 true로 응답된다")
         @Test
         void readContentById_withDeviceFidHeader() {
             // given
@@ -98,9 +106,10 @@ class ContentApiTest {
             jdbcTemplate.update(
                     "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (?, ?, ?, ?, ?)",
                     1, 1, "https://youtube.com/watch?v=abcd1", "서울 데이트 코스 추천", "2024-07-01");
-            jdbcTemplate.update("INSERT INTO member (device_fid) VALUES (?)", "testDeviceFid");
+            jdbcTemplate.update("INSERT INTO account () VALUES ()");
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
             jdbcTemplate.update(
-                    "INSERT INTO favorite_content (created_at, member_id, content_id) VALUES (?, ?, ?)", "2025-07-01",
+                    "INSERT INTO favorite_content (created_at, account_id, content_id) VALUES (?, ?, ?)", "2025-07-01",
                     1, 1);
 
             // when & then
@@ -132,6 +141,8 @@ class ContentApiTest {
             jdbcTemplate.update(
                     "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (?, ?, ?, ?, ?)",
                     1, 1, "https://youtube.com/watch?v=abcd1", "서울 데이트 코스 추천", "2024-07-01");
+            jdbcTemplate.update("INSERT INTO account () VALUES ()");
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
 
             // when & then
             RestAssured.given().port(port)
@@ -146,30 +157,6 @@ class ContentApiTest {
     @Nested
     class ReadWeeklyPopularFavoriteContentContents {
 
-        @DisplayName("device-fid 헤더가 존재하지 않는 경우 400 BAD REQUEST 코드를 응답한다")
-        @Test
-        void getPopularContentsWithoutDeviceFid() {
-            // given
-            jdbcTemplate.update(
-                    "INSERT INTO creator (profile_image, channel_name) VALUES ('https://image.example.com/creator.jpg', '여행채널')");
-            jdbcTemplate.update(
-                    "INSERT INTO country (name, image_url) VALUES ('대한민국', 'https://image.example.com/korea.jpg')");
-            jdbcTemplate.update(
-                    "INSERT INTO city (name, country_id, province_id, image_url) VALUES ('서울', 1, null, 'https://image.example.com/seoul.jpg')");
-            jdbcTemplate.update("INSERT INTO content (creator_id, city_id, url, title, uploaded_date) " +
-                    "VALUES (1, 1, 'https://youtube.com/watch?v=test', '서울 여행', '2025-07-28')");
-            jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('testDeviceFid')");
-            jdbcTemplate.update(
-                    "INSERT INTO favorite_content (member_id, content_id, created_at) VALUES (1, 1, CURRENT_DATE - 7)");
-
-            // when & then
-            RestAssured.given().port(port)
-                    .queryParam("size", 5)
-                    .when().log().all().get("/contents/popular/favorites")
-                    .then().log().all()
-                    .statusCode(400);
-        }
-
         @DisplayName("device-fid 헤더가 존재하면 컨텐츠 목록과 찜 여부를 응답한다. 성공 시 200 OK 코드를 응답한다")
         @Test
         void getPopularContentsWithDeviceFid2() {
@@ -182,9 +169,10 @@ class ContentApiTest {
                     "INSERT INTO city (name, country_id, province_id, image_url) VALUES ('서울', 1, null, 'https://image.example.com/seoul.jpg')");
             jdbcTemplate.update("INSERT INTO content (creator_id, city_id, url, title, uploaded_date) " +
                     "VALUES (1, 1, 'https://youtube.com/watch?v=test', '서울 여행', '2025-07-28')");
-            jdbcTemplate.update("INSERT INTO member (device_fid) VALUES ('testDeviceFid')");
+            jdbcTemplate.update("INSERT INTO account () VALUES ()");
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
             jdbcTemplate.update(
-                    "INSERT INTO favorite_content (member_id, content_id, created_at) VALUES (1, 1, CURRENT_DATE - 7)");
+                    "INSERT INTO favorite_content (account_id, content_id, created_at) VALUES (1, 1, CURRENT_DATE - 7)");
 
             // when & then
             RestAssured.given().port(port)

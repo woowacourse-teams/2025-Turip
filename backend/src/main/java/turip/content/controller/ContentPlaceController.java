@@ -14,12 +14,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import turip.auth.AuthMember;
-import turip.auth.MemberResolvePolicy;
+import turip.auth.resolver.AuthAccount;
 import turip.common.exception.ErrorResponse;
 import turip.content.controller.dto.response.place.ContentPlaceDetailResponse;
 import turip.content.service.ContentPlaceService;
-import turip.member.domain.Member;
+import turip.account.domain.Account;
 
 @RestController
 @RequiredArgsConstructor
@@ -117,9 +116,9 @@ public class ContentPlaceController {
     })
     @GetMapping("/{contentId}/places")
     public ResponseEntity<ContentPlaceDetailResponse> readContentPlaceDetails(
-            @Parameter(hidden = true) @AuthMember(policy = MemberResolvePolicy.CREATE_IF_ABSENT) Member member,
+            @Parameter(hidden = true) @AuthAccount Account account,
             @PathVariable Long contentId) {
-        ContentPlaceDetailResponse response = contentPlaceService.findContentPlaceDetails(member, contentId);
+        ContentPlaceDetailResponse response = contentPlaceService.findContentPlaceDetails(account, contentId);
         return ResponseEntity.ok(response);
     }
 }

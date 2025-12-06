@@ -7,25 +7,22 @@ import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.on.turip.R
 import com.on.turip.databinding.ActivityRegionResultBinding
 import com.on.turip.domain.ErrorEvent
 import com.on.turip.ui.common.base.BaseActivity
+import com.on.turip.ui.common.event.CommonEvent
+import com.on.turip.ui.login.LoginActivity
 import com.on.turip.ui.trip.detail.TripDetailActivity
 import dagger.hilt.android.AndroidEntryPoint
-import timber.log.Timber
-import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class RegionResultActivity : BaseActivity<ActivityRegionResultBinding>() {
-    @Inject
-    lateinit var regionResultViewModelFactory: RegionResultViewModel.RegionCategoryNameAssistedFactory
-
-    private val viewModel: RegionResultViewModel by viewModels {
-        val regionCategoryName: String = intent.getStringExtra(REGION_CATEGORY_NAME_KEY) ?: ""
-        Timber.d("선택한 지역 카테고리: $regionCategoryName")
-        RegionResultViewModel.provideFactory(regionResultViewModelFactory, regionCategoryName)
-    }
+    private val viewModel: RegionResultViewModel by viewModels()
     override val binding: ActivityRegionResultBinding by lazy {
         ActivityRegionResultBinding.inflate(layoutInflater)
     }
@@ -101,6 +98,26 @@ class RegionResultActivity : BaseActivity<ActivityRegionResultBinding>() {
         viewModel.serverError.observe(this) {
             updateUIVisibility()
         }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiEvent.collect { event ->
+                    when (event) {
+                        CommonEvent.TokenExpiration -> navigateToLoginScreen()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun navigateToLoginScreen() {
+        val intent: Intent =
+            LoginActivity.newIntent(this).apply {
+                flags =
+                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+        startActivity(intent)
+        finish()
     }
 
     private fun updateUIVisibility() {
@@ -144,13 +161,14 @@ class RegionResultActivity : BaseActivity<ActivityRegionResultBinding>() {
     }
 
     companion object {
-        private const val REGION_CATEGORY_NAME_KEY: String = "com.on.turip.REGION_CATEGORY_NAME_KEY"
+        const val REGION_RESULT_REGION_CATEGORY_NAME_KEY: String =
+            "com.on.turip.REGION_RESULT_REGION_CATEGORY_NAME_KEY"
 
         fun newIntent(
             context: Context,
             regionCategoryName: String,
         ): Intent =
             Intent(context, RegionResultActivity::class.java)
-                .putExtra(REGION_CATEGORY_NAME_KEY, regionCategoryName)
+                .putExtra(REGION_RESULT_REGION_CATEGORY_NAME_KEY, regionCategoryName)
     }
 }

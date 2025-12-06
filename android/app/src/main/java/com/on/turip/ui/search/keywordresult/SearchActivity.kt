@@ -17,27 +17,26 @@ import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.on.turip.R
 import com.on.turip.databinding.ActivitySearchBinding
 import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.searchhistory.SearchHistory
 import com.on.turip.ui.common.base.BaseActivity
+import com.on.turip.ui.common.event.CommonEvent
+import com.on.turip.ui.login.LoginActivity
 import com.on.turip.ui.search.model.VideoInformationModel
 import com.on.turip.ui.trip.detail.TripDetailActivity
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class SearchActivity : BaseActivity<ActivitySearchBinding>() {
-    @Inject
-    lateinit var searchViewModelFactory: SearchViewModel.SearchKeywordAssistedFactory
-
-    private val viewModel: SearchViewModel by viewModels {
-        val searchKeyword: String = intent.getStringExtra(SEARCH_KEYWORD_KEY) ?: ""
-        SearchViewModel.provideFactory(searchViewModelFactory, searchKeyword)
-    }
+    private val viewModel: SearchViewModel by viewModels()
 
     override val binding: ActivitySearchBinding by lazy {
         ActivitySearchBinding.inflate(layoutInflater)
@@ -220,6 +219,26 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         viewModel.networkError.observe(this) { networkError ->
             handleVisibleByError(networkError)
         }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiEvent.collect { event ->
+                    when (event) {
+                        CommonEvent.TokenExpiration -> navigateToLoginScreen()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun navigateToLoginScreen() {
+        val intent: Intent =
+            LoginActivity.newIntent(this).apply {
+                flags =
+                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+        startActivity(intent)
+        finish()
     }
 
     private fun handleVisibleBySearchResult(searchResultCount: Int) {
@@ -283,7 +302,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
     }
 
     companion object {
-        private const val SEARCH_KEYWORD_KEY: String = "com.on.turip.SEARCH_KEYWORD_KEY"
+        const val SEARCH_KEYWORD_KEY: String = "com.on.turip.SEARCH_KEYWORD_KEY"
 
         fun newIntent(
             context: Context,

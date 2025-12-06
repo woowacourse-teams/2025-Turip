@@ -2,11 +2,9 @@ package com.on.turip.ui.search.keywordresult
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import com.on.turip.data.common.TuripCustomResult
 import com.on.turip.data.common.onFailure
 import com.on.turip.data.common.onSuccess
@@ -16,18 +14,23 @@ import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.content.video.VideoInformation
 import com.on.turip.domain.searchhistory.SearchHistory
 import com.on.turip.domain.searchhistory.SearchHistoryRepository
+import com.on.turip.ui.common.event.CommonEvent
 import com.on.turip.ui.common.mapper.toUiModel
+import com.on.turip.ui.search.keywordresult.SearchActivity.Companion.SEARCH_KEYWORD_KEY
 import com.on.turip.ui.search.model.VideoInformationModel
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
-class SearchViewModel @AssistedInject constructor(
-    @Assisted private val searchKeyword: String,
+@HiltViewModel
+class SearchViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val contentRepository: ContentRepository,
     private val searchHistoryRepository: SearchHistoryRepository,
 ) : ViewModel() {
@@ -51,6 +54,15 @@ class SearchViewModel @AssistedInject constructor(
 
     private val _serverError: MutableLiveData<Boolean> = MutableLiveData(false)
     val serverError: LiveData<Boolean> get() = _serverError
+
+    private val _uiEvent: Channel<CommonEvent> = Channel(Channel.BUFFERED)
+    val uiEvent: Flow<CommonEvent> = _uiEvent.receiveAsFlow()
+
+    private val searchKeyword: String by lazy {
+        checkNotNull(savedStateHandle[SEARCH_KEYWORD_KEY]) {
+            Timber.e("검색 완료 화면 검색 결과가 존재하지 않습니다.")
+        }
+    }
 
     init {
         _searchingWord.value = searchKeyword
@@ -141,6 +153,12 @@ class SearchViewModel @AssistedInject constructor(
             ErrorEvent.PARSER_ERROR -> {
                 _serverError.value = true
             }
+
+            ErrorEvent.TOKEN_EXPIRATION -> {
+                viewModelScope.launch {
+                    _uiEvent.send(CommonEvent.TokenExpiration)
+                }
+            }
         }
     }
 
@@ -190,20 +208,5 @@ class SearchViewModel @AssistedInject constructor(
     companion object {
         private const val MAX_SEARCH_HISTORY_COUNT = 10
         private const val FIRST_INDEX = 0
-
-        fun provideFactory(
-            searchKeywordAssistedFactory: SearchKeywordAssistedFactory,
-            searchKeyword: String = "",
-        ): ViewModelProvider.Factory =
-            viewModelFactory {
-                initializer {
-                    searchKeywordAssistedFactory.create(searchKeyword)
-                }
-            }
-    }
-
-    @AssistedFactory
-    interface SearchKeywordAssistedFactory {
-        fun create(searchKeyword: String): SearchViewModel
     }
 }

@@ -4,6 +4,8 @@ import com.on.turip.data.content.place.service.ContentPlaceService
 import com.on.turip.data.content.service.ContentService
 import com.on.turip.data.favorite.service.FavoriteService
 import com.on.turip.data.folder.service.FolderService
+import com.on.turip.data.login.service.AuthService
+import com.on.turip.data.login.service.MemberService
 import com.on.turip.data.place.service.PlaceService
 import com.on.turip.data.region.service.RegionService
 import dagger.Module
@@ -12,6 +14,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.create
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -40,4 +43,14 @@ object ServiceModule {
     @Provides
     @Singleton
     fun provideContentPlaceService(retrofit: Retrofit): ContentPlaceService = retrofit.create<ContentPlaceService>()
+
+    @Provides
+    @Singleton
+    fun provideAuthService(
+        @Named("refreshRetrofit") retrofit: Retrofit,
+    ): AuthService = retrofit.create<AuthService>()
+
+    @Provides
+    @Singleton
+    fun provideMemberService(retrofit: Retrofit): MemberService = retrofit.create<MemberService>()
 }

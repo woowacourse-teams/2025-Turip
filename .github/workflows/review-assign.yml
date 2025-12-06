@@ -2,7 +2,7 @@ name: Review Assign
 
 on:
   pull_request:
-    types: [opened, ready_for_review]
+    types: [ opened, ready_for_review ]
 
 jobs:
   assign:
@@ -18,8 +18,8 @@ jobs:
         with:
           script: |
             const androidReviewers = ['m6z1', 'yrsel', 'jerry8282'];
-            const backendReviewers = ['RaZel713', 'seaniiio', 'eunseongu'];
-            const allReviewers = ['m6z1', 'yrsel', 'jerry8282', 'RaZel713', 'seaniiio', 'eunseongu'];
+            const backendReviewers = ['seaniiio', 'eunseongu'];
+            const allReviewers = ['m6z1', 'yrsel', 'jerry8282', 'seaniiio', 'eunseongu'];
 
             const changedFiles = await github.paginate(
               github.rest.pulls.listFiles, {
@@ -42,7 +42,7 @@ jobs:
             }
 
             core.setOutput('reviewers', reviewersToAssign.join(','));
-      
+
       - name: Assign reviewers
         uses: hkusu/review-assign-action@v1
         with:

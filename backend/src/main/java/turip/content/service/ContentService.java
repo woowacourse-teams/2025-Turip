@@ -28,7 +28,7 @@ import turip.content.controller.dto.response.favorite.WeeklyPopularFavoriteConte
 import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
 import turip.favorite.repository.FavoriteContentRepository;
-import turip.member.domain.Member;
+import turip.account.domain.Account;
 import turip.region.domain.DomesticRegionCategory;
 import turip.region.domain.OverseasRegionCategory;
 
@@ -43,10 +43,10 @@ public class ContentService {
     private final ContentPlaceService contentPlaceService;
     private final FavoriteContentRepository favoriteContentRepository;
 
-    public ContentResponse getContentWithFavoriteStatus(Long contentId, Member member) {
+    public ContentResponse getContentWithFavoriteStatus(Long contentId, Account account) {
         Content content = contentRepository.findById(contentId)
                 .orElseThrow(() -> new NotFoundException(ErrorTag.CONTENT_NOT_FOUND));
-        boolean isFavorite = favoriteContentRepository.existsByMemberIdAndContentId(member.getId(), content.getId());
+        boolean isFavorite = favoriteContentRepository.existsByAccountIdAndContentId(account.getId(), content.getId());
         return ContentResponse.of(content, isFavorite);
     }
 
@@ -56,7 +56,7 @@ public class ContentService {
     }
 
     public ContentsDetailWithLoadableResponse searchContentsByKeyword(
-            Member member,
+            Account account,
             String keyword,
             int pageSize,
             long lastContentId
@@ -64,22 +64,24 @@ public class ContentService {
         if (lastContentId == 0) {
             lastContentId = Long.MAX_VALUE;
         }
-        Slice<Content> contentSlice = contentRepository.findByKeywordContaining(keyword, lastContentId,
+        String booleanModeKeyword = contentRepository.createBooleanModeKeyword(keyword);
+        Slice<Content> contentSlice = contentRepository.findByKeywordContaining(booleanModeKeyword, lastContentId,
                 PageRequest.of(0, pageSize));
-        return convertToContentsDetailWithLoadableResponse(member, contentSlice);
+        return convertToContentsDetailWithLoadableResponse(account, contentSlice);
     }
 
     public ContentsDetailWithLoadableResponse findContentsByRegionCategory(
-            Member member,
+            Account account,
             String regionCategory,
             int size,
             long lastId
     ) {
         Slice<Content> contentSlice = findContentSlicesByRegionCategory(regionCategory, lastId, size);
-        return convertToContentsDetailWithLoadableResponse(member, contentSlice);
+        return convertToContentsDetailWithLoadableResponse(account, contentSlice);
     }
 
-    public WeeklyPopularFavoriteContentsResponse findWeeklyPopularFavoriteContents(Member member, int topContentSize) {
+    public WeeklyPopularFavoriteContentsResponse findWeeklyPopularFavoriteContents(Account account,
+                                                                                   int topContentSize) {
         List<LocalDate> lastWeekPeriod = getLastWeekPeriod();
         LocalDate startDate = lastWeekPeriod.getFirst();
         LocalDate endDate = lastWeekPeriod.getLast();
@@ -94,7 +96,7 @@ public class ContentService {
         List<Long> contentIds = popularContents.stream()
                 .map(Content::getId)
                 .toList();
-        Set<Long> favoritedContentIds = findFavoritedContentIds(member, popularContents);
+        Set<Long> favoritedContentIds = findFavoritedContentIds(account, popularContents);
         Map<Long, TripDurationResponse> durations = contentPlaceService.calculateDurations(contentIds);
 
         List<WeeklyPopularFavoriteContentResponse> weeklyPopularFavoriteContents = popularContents.stream()
@@ -110,7 +112,8 @@ public class ContentService {
     }
 
     public ContentCountResponse countByKeyword(String keyword) {
-        int count = contentRepository.countByKeywordContaining(keyword);
+        String booleanModeKeyword = contentRepository.createBooleanModeKeyword(keyword);
+        int count = contentRepository.countByKeywordContaining(booleanModeKeyword);
         return ContentCountResponse.from(count);
     }
 
@@ -167,16 +170,16 @@ public class ContentService {
         throw new BadRequestException(ErrorTag.REGION_CATEGORY_INVALID);
     }
 
-    private Set<Long> findFavoritedContentIds(Member member, List<Content> contents) {
+    private Set<Long> findFavoritedContentIds(Account account, List<Content> contents) {
         List<Long> contentIds = contents.stream()
                 .map(Content::getId)
                 .toList();
-        return favoriteContentRepository.findByMemberIdAndContentIdIn(member.getId(), contentIds).stream()
+        return favoriteContentRepository.findByAccountIdAndContentIdIn(account.getId(), contentIds).stream()
                 .map(favorite -> favorite.getContent().getId())
                 .collect(Collectors.toSet());
     }
 
-    private ContentsDetailWithLoadableResponse convertToContentsDetailWithLoadableResponse(Member member,
+    private ContentsDetailWithLoadableResponse convertToContentsDetailWithLoadableResponse(Account aqccount,
                                                                                            Slice<Content> contentSlice) {
         List<Content> contents = contentSlice.getContent();
         if (contents.isEmpty()) {
@@ -186,7 +189,7 @@ public class ContentService {
                 .map(Content::getId)
                 .toList();
 
-        Set<Long> favoritedContentIds = findFavoritedContentIds(member, contents);
+        Set<Long> favoritedContentIds = findFavoritedContentIds(aqccount, contents);
         Map<Long, TripDurationResponse> durations = contentPlaceService.calculateDurations(contentIds);
         Map<Long, Integer> placeCounts = contentPlaceService.countPlacesByContentIds(contentIds);
 

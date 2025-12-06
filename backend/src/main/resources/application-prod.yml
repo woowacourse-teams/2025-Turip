@@ -22,6 +22,9 @@ spring:
     validate-on-migrate: true         # migration 전에 SQL 스크립트와 데이터 일치 여부 검증
     encoding: UTF-8                   # SQL 파일 인코딩
 
+jwt:
+  access-token-expiration-ms: 1800000  # 30분
+
 csv:
   import:
     password: ${CSV_IMPORT_PASSWORD}

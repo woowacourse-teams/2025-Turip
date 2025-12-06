@@ -18,12 +18,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.IllegalArgumentException;
-import turip.member.domain.Member;
+import turip.account.domain.Account;
 
 @Getter
 @Entity
 @Table(name = "favorite_folder", uniqueConstraints = {
-        @UniqueConstraint(name = "uq_favorite_folder__member_name", columnNames = {"member_id", "name"})
+        @UniqueConstraint(name = "uq_favorite_folder__account_id_name", columnNames = {"account_id", "name"})
 })
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -36,8 +36,8 @@ public class FavoriteFolder {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false, foreignKey = @ForeignKey(name = "fk_favorite_folder__member"))
-    private Member member;
+    @JoinColumn(name = "account_id", nullable = false, foreignKey = @ForeignKey(name = "fk_favorite_folder__account"))
+    private Account account;
 
     @Column(name = "name", nullable = false)
     private String name;
@@ -45,20 +45,20 @@ public class FavoriteFolder {
     @Column(name = "is_default", nullable = false)
     private boolean isDefault;
 
-    private FavoriteFolder(Member member, String name, boolean isDefault) {
-        this.member = member;
+    private FavoriteFolder(Account account, String name, boolean isDefault) {
+        this.account = account;
         this.name = name;
         this.isDefault = isDefault;
     }
 
-    public static FavoriteFolder defaultFolderOf(Member member) {
-        return new FavoriteFolder(member, "기본 폴더", true);
+    public static FavoriteFolder defaultFolderOf(Account account) {
+        return new FavoriteFolder(account, "기본 폴더", true);
     }
 
-    public static FavoriteFolder customFolderOf(Member member, String name) {
+    public static FavoriteFolder customFolderOf(Account account, String name) {
         String formattedName = formatName(name);
         validateName(formattedName);
-        return new FavoriteFolder(member, name, false);
+        return new FavoriteFolder(account, formattedName, false);
     }
 
     public static String formatName(String unformattedName) {
@@ -74,12 +74,16 @@ public class FavoriteFolder {
         }
     }
 
-    public boolean isOwner(Member member) {
-        return this.member.isSameDeviceId(member);
+    public boolean isOwner(Account account) {
+        return this.account.equals(account);
     }
 
     public void rename(String newName) {
         validateName(newName);
         this.name = newName;
+    }
+
+    public void updateAccount(Account account) {
+        this.account = account;
     }
 }

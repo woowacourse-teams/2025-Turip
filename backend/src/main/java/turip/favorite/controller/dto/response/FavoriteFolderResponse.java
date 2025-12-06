@@ -10,7 +10,7 @@ public record FavoriteFolderResponse(
 ) {
 
     public static FavoriteFolderResponse from(FavoriteFolder favoriteFolder) {
-        return new FavoriteFolderResponse(favoriteFolder.getId(), favoriteFolder.getMember().getId(),
+        return new FavoriteFolderResponse(favoriteFolder.getId(), favoriteFolder.getAccount().getId(),
                 favoriteFolder.getName(), favoriteFolder.isDefault()
         );
     }

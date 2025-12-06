@@ -16,7 +16,7 @@ import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.domain.FavoritePlace;
 import turip.favorite.repository.FavoriteFolderRepository;
 import turip.favorite.repository.FavoritePlaceRepository;
-import turip.member.domain.Member;
+import turip.account.domain.Account;
 import turip.place.domain.Place;
 import turip.place.repository.PlaceRepository;
 
@@ -29,11 +29,11 @@ public class FavoritePlaceService {
     private final PlaceRepository placeRepository;
 
     @Transactional
-    public FavoritePlaceResponse create(Member member, Long favoriteFolderId, Long placeId) {
+    public FavoritePlaceResponse create(Account account, Long favoriteFolderId, Long placeId) {
         FavoriteFolder favoriteFolder = getFavoriteFolderById(favoriteFolderId);
         Place place = getPlaceById(placeId);
 
-        validateOwnership(member, favoriteFolder);
+        validateOwnership(account, favoriteFolder);
         validateDuplicated(favoriteFolder, place);
 
         Integer maxOrder = favoritePlaceRepository.findMaxFavoriteOrderByFavoriteFolder(favoriteFolder)
@@ -57,10 +57,10 @@ public class FavoritePlaceService {
     }
 
     @Transactional
-    public void updatePlaceOrder(Member member, Long favoriteFolderId,
+    public void updatePlaceOrder(Account account, Long favoriteFolderId,
                                  FavoritePlaceOrderRequest request) {
         FavoriteFolder favoriteFolder = getFavoriteFolderById(favoriteFolderId);
-        validateOwnership(member, favoriteFolder);
+        validateOwnership(account, favoriteFolder);
 
         List<Long> favoritePlaceIdsOrder = request.favoritePlaceIdsOrder();
 
@@ -73,11 +73,11 @@ public class FavoritePlaceService {
     }
 
     @Transactional
-    public void remove(Member member, Long favoriteFolderId, Long placeId) {
+    public void remove(Account account, Long favoriteFolderId, Long placeId) {
         FavoriteFolder favoriteFolder = getFavoriteFolderById(favoriteFolderId);
         Place place = getPlaceById(placeId);
 
-        validateOwnership(member, favoriteFolder);
+        validateOwnership(account, favoriteFolder);
         FavoritePlace favoritePlace = getByFavoriteFolderAndPlace(favoriteFolder, place);
 
         favoritePlaceRepository.delete(favoritePlace);
@@ -98,8 +98,8 @@ public class FavoritePlaceService {
                 .orElseThrow(() -> new NotFoundException(ErrorTag.FAVORITE_PLACE_NOT_FOUND));
     }
 
-    private void validateOwnership(Member requestMember, FavoriteFolder favoriteFolder) {
-        if (!favoriteFolder.isOwner(requestMember)) {
+    private void validateOwnership(Account requestAccount, FavoriteFolder favoriteFolder) {
+        if (!favoriteFolder.isOwner(requestAccount)) {
             throw new ForbiddenException(ErrorTag.FORBIDDEN);
         }
     }

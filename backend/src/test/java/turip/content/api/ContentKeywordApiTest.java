@@ -50,7 +50,8 @@ public class ContentKeywordApiTest {
         jdbcTemplate.execute("TRUNCATE TABLE category");
         jdbcTemplate.execute("TRUNCATE TABLE favorite_folder");
         jdbcTemplate.execute("TRUNCATE TABLE favorite_content");
-        jdbcTemplate.execute("TRUNCATE TABLE member");
+        jdbcTemplate.execute("TRUNCATE TABLE guest");
+        jdbcTemplate.execute("TRUNCATE TABLE account");
         jdbcTemplate.execute("TRUNCATE TABLE content");
         jdbcTemplate.execute("TRUNCATE TABLE creator");
         jdbcTemplate.execute("TRUNCATE TABLE city");
@@ -108,7 +109,6 @@ public class ContentKeywordApiTest {
                     "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 1, 'https://youtube.com/watch?v=abcd1', '서울 데이트 코스 추천', '2024-07-01')");
             jdbcTemplate.update(
                     "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 1, 'https://youtube.com/watch?v=abcd1', '메이의 서촌 당일치기 코스 추천', '2025-06-18')");
-            jdbcTemplate.update("INSERT INTO member (device_fid) VALUES (?)", "testDeviceFid");
 
             // when & then
             RestAssured.given().port(port)
@@ -137,7 +137,6 @@ public class ContentKeywordApiTest {
                     "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 1, 'https://youtube.com/watch?v=abcd1', '서울 데이트 코스 추천', '2024-07-01')");
             jdbcTemplate.update(
                     "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 1, 'https://youtube.com/watch?v=abcd1', '메이의 서촌 당일치기 코스 추천', '2025-06-18')");
-            jdbcTemplate.update("INSERT INTO member (device_fid) VALUES (?)", "testDeviceFid");
 
             // when & then
             RestAssured.given().port(port)
@@ -160,7 +159,6 @@ public class ContentKeywordApiTest {
                     "INSERT INTO creator (profile_image, channel_name) VALUES ('', '여행블로거')");
             jdbcTemplate.update("INSERT INTO country (name, image_url) VALUES ('대한민국', '')");
             jdbcTemplate.update("INSERT INTO city (name, country_id, image_url) VALUES ('서울', 1, '')");
-            jdbcTemplate.update("INSERT INTO member (device_fid) VALUES (?)", "testDeviceFid");
 
             // 장소가 포함된 컨텐츠
             jdbcTemplate.update(
@@ -219,7 +217,6 @@ public class ContentKeywordApiTest {
             jdbcTemplate.update("INSERT INTO city (name, country_id, image_url) VALUES ('부산', 1, '')");
             jdbcTemplate.update(
                     "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 1, '', '부산 여행 후기', '2025-07-01')");
-            jdbcTemplate.update("INSERT INTO member (device_fid) VALUES (?)", "testDeviceFid");
 
             // when & then
             RestAssured.given().port(port)

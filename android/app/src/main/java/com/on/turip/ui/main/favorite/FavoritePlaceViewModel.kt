@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.on.turip.common.AuthState
+import com.on.turip.common.UserType
 import com.on.turip.data.common.onFailure
 import com.on.turip.data.common.onSuccess
 import com.on.turip.domain.ErrorEvent
@@ -12,12 +14,17 @@ import com.on.turip.domain.favorite.repository.FavoritePlaceRepository
 import com.on.turip.domain.favorite.usecase.UpdateFavoritePlaceUseCase
 import com.on.turip.domain.folder.Folder
 import com.on.turip.domain.folder.repository.FolderRepository
+import com.on.turip.ui.common.event.CommonEvent
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceLatLngUiModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
+import com.on.turip.ui.main.favorite.model.FavoritePlaceUiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -39,6 +46,12 @@ class FavoritePlaceViewModel @Inject constructor(
         MutableLiveData()
     val favoriteLatLng: LiveData<List<FavoritePlaceLatLngUiModel>> get() = _favoriteLatLng
 
+    private val _commonEvent: Channel<CommonEvent> = Channel(Channel.BUFFERED)
+    val commonEvent: Flow<CommonEvent> = _commonEvent.receiveAsFlow()
+
+    private val _uiEvent: Channel<FavoritePlaceUiEvent> = Channel(Channel.BUFFERED)
+    val uiEvent: Flow<FavoritePlaceUiEvent> = _uiEvent.receiveAsFlow()
+
     private var selectedFolderId: Long = NOT_INITIALIZED
 
     fun loadFoldersAndPlaces() {
@@ -55,12 +68,9 @@ class FavoritePlaceViewModel @Inject constructor(
                                 folders.map { folder: Folder -> folder.toUiModel(selectFolderId = selectedFolderId) },
                         )
                     loadPlacesInSelectFolder()
-                    _favoritePlaceUiState.value =
-                        favoritePlaceUiState.value?.copy(
-                            isServerError = false,
-                            isNetWorkError = false,
-                        )
                 }.onFailure { errorEvent: ErrorEvent ->
+                    _favoritePlaceUiState.value =
+                        _favoritePlaceUiState.value?.copy(isLoading = false)
                     checkError(errorEvent)
                     Timber.e("장소 찜 목록 화면 폴더 불러오기 API 호출 실패")
                 }
@@ -161,7 +171,10 @@ class FavoritePlaceViewModel @Inject constructor(
                 _favoritePlaceUiState.value = favoritePlaceUiState.value?.copy(isServerError = true)
             }
 
-            ErrorEvent.DUPLICATION_FOLDER -> throw IllegalArgumentException("발생할 수 없는 오류")
+            ErrorEvent.DUPLICATION_FOLDER -> {
+                throw IllegalArgumentException("발생할 수 없는 오류")
+            }
+
             ErrorEvent.UNEXPECTED_PROBLEM -> {
                 _favoritePlaceUiState.value = favoritePlaceUiState.value?.copy(isServerError = true)
             }
@@ -173,6 +186,12 @@ class FavoritePlaceViewModel @Inject constructor(
 
             ErrorEvent.PARSER_ERROR -> {
                 _favoritePlaceUiState.value = favoritePlaceUiState.value?.copy(isServerError = true)
+            }
+
+            ErrorEvent.TOKEN_EXPIRATION -> {
+                viewModelScope.launch {
+                    _commonEvent.send(CommonEvent.TokenExpiration)
+                }
             }
         }
     }
@@ -197,16 +216,28 @@ class FavoritePlaceViewModel @Inject constructor(
     }
 
     fun shareFolder() {
-        val shareFolder =
-            FavoriteFolderShareModel(
-                name =
-                    favoritePlaceUiState.value
-                        ?.folders
-                        ?.first { it.isSelected }
-                        ?.name ?: "",
-                places = favoritePlaceUiState.value?.places?.map { it.toUiModel() } ?: emptyList(),
-            )
-        _shareFolder.value = shareFolder
+        when (AuthState.type) {
+            UserType.MEMBER -> {
+                val shareFolder =
+                    FavoriteFolderShareModel(
+                        name =
+                            favoritePlaceUiState.value
+                                ?.folders
+                                ?.first { it.isSelected }
+                                ?.name ?: "",
+                        places =
+                            favoritePlaceUiState.value?.places?.map { it.toUiModel() }
+                                ?: emptyList(),
+                    )
+                _shareFolder.value = shareFolder
+            }
+
+            UserType.GUEST, UserType.NONE -> {
+                viewModelScope.launch {
+                    _uiEvent.send(FavoritePlaceUiEvent.ShowFolderShareNotAllowed)
+                }
+            }
+        }
     }
 
     companion object {

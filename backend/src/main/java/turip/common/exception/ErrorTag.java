@@ -8,13 +8,26 @@ public enum ErrorTag {
     FAVORITE_FOLDER_NAME_TOO_LONG("찜폴더 이름의 최대 길이를 초과했습니다."),
     DEFAULT_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED("기본 찜폴더에는 이 작업을 수행할 수 없습니다."),
     REGION_CATEGORY_INVALID("잘못된 지역 카테고리입니다."),
+    DEVICE_FID_REQUIRED("요청 헤더에 device_fid가 존재하지 않습니다."),
+
+    // 401 Unauthorized
+    UNAUTHORIZED("토큰 기반 인증에 실패했습니다."),
+    ID_TOKEN_NOT_VALID("유효하지 않은 id token입니다."),
+    ACCESS_TOKEN_EXPIRED("access token이 만료됐습니다."),
+    ACCESS_TOKEN_SIGNATURE_INVALID("access token이 위조됐습니다."),
+    REFRESH_TOKEN_EXPIRED("refresh token이 만료됐습니다."),
+    REFRESH_TOKEN_NOT_FOUND("refresh token을 찾을 수 없습니다."),
+    REFRESH_TOKEN_INVALID("유효하지 않은 refresh token입니다."),
+    REFRESH_TOKEN_SIGNATURE_INVALID("refresh token이 위조됐습니다."),
 
     // 403 Forbidden
     FORBIDDEN("접근 권한이 없습니다."),
 
     // 404 Not Found
     NOT_FOUND("요청 정보를 찾을 수 없습니다."),
-    MEMBER_NOT_FOUND("사용자를 찾을 수 없습니다."),
+    MEMBER_NOT_FOUND("회원을 찾을 수 없습니다."),
+    GUEST_NOT_FOUND("게스트를 찾을 수 없습니다."),
+    ACCOUNT_NOT_FOUND("계정을 찾을 수 없습니다."),
     CONTENT_NOT_FOUND("컨텐츠를 찾을 수 없습니다."),
     FAVORITE_FOLDER_NOT_FOUND("찜폴더를 찾을 수 없습니다."),
     PLACE_NOT_FOUND("장소를 찾을 수 없습니다."),

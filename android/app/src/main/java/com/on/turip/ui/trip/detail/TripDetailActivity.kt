@@ -14,6 +14,9 @@ import androidx.core.net.toUri
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.snackbar.Snackbar
 import com.on.turip.R
 import com.on.turip.databinding.ActivityTripDetailBinding
@@ -21,8 +24,10 @@ import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.content.Content
 import com.on.turip.ui.common.TuripSnackbar
 import com.on.turip.ui.common.base.BaseActivity
+import com.on.turip.ui.common.event.CommonEvent
 import com.on.turip.ui.common.loadCircularImage
 import com.on.turip.ui.common.model.trip.toDisplayText
+import com.on.turip.ui.login.LoginActivity
 import com.on.turip.ui.main.favorite.FavoriteBottomSheetContainerFragment
 import com.on.turip.ui.search.keywordresult.SearchActivity
 import com.on.turip.ui.trip.detail.webview.TuripWebChromeClient
@@ -30,7 +35,7 @@ import com.on.turip.ui.trip.detail.webview.TuripWebViewClient
 import com.on.turip.ui.trip.detail.webview.applyVideoSettings
 import com.on.turip.ui.trip.detail.webview.navigateToTimeLine
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
@@ -38,17 +43,9 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
         ActivityTripDetailBinding.inflate(layoutInflater)
     }
 
-    private val videoManager by lazy {
-        VideoManager(binding.wvTripDetailVideo)
-    }
+    private val videoManager by lazy { VideoManager(binding.wvTripDetailVideo) }
 
-    @Inject
-    lateinit var tripDetailViewModelFactory: TripDetailViewModel.TripDetailAssistedFactory
-
-    private val viewModel: TripDetailViewModel by viewModels {
-        val contentId: Long = intent.getLongExtra(CONTENT_KEY, 0)
-        TripDetailViewModel.provideFactory(tripDetailViewModelFactory, contentId)
-    }
+    private val viewModel: TripDetailViewModel by viewModels()
 
     private val turipWebChromeClient: TuripWebChromeClient by lazy {
         TuripWebChromeClient(
@@ -304,6 +301,25 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
             binding.customErrorView.visibility =
                 if (serverError) View.VISIBLE else View.GONE
         }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiEvent.collect { event ->
+                    when (event) {
+                        CommonEvent.TokenExpiration -> navigateToLoginScreen()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun navigateToLoginScreen() {
+        val intent: Intent =
+            LoginActivity.newIntent(this).apply {
+                flags =
+                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+        startActivity(intent)
+        finish()
     }
 
     private fun updateExpandTextToggleVisibility() {
@@ -334,13 +350,13 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
     }
 
     companion object {
-        private const val CONTENT_KEY: String = "com.on.turip.CONTENT_KEY"
+        const val TRIP_DETAIL_CONTENT_KEY: String = "com.on.turip.TRIP_DETAIL_CONTENT_KEY"
 
         fun newIntent(
             context: Context,
             contentId: Long,
         ): Intent =
             Intent(context, TripDetailActivity::class.java)
-                .putExtra(CONTENT_KEY, contentId)
+                .putExtra(TRIP_DETAIL_CONTENT_KEY, contentId)
     }
 }

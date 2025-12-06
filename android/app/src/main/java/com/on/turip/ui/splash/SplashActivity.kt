@@ -3,6 +3,7 @@ package com.on.turip.ui.splash
 import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.tasks.Task
 import com.google.android.play.core.appupdate.AppUpdateInfo
@@ -11,14 +12,20 @@ import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.appupdate.AppUpdateOptions
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.UpdateAvailability
+import com.on.turip.common.AuthState
+import com.on.turip.common.UserType
 import com.on.turip.databinding.ActivitySplashBinding
 import com.on.turip.ui.common.base.BaseActivity
+import com.on.turip.ui.login.LoginActivity
 import com.on.turip.ui.main.MainActivity
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @SuppressLint("CustomSplashScreen")
+@AndroidEntryPoint
 class SplashActivity : BaseActivity<ActivitySplashBinding>() {
+    private val viewModel: SplashViewmodel by viewModels()
     override val binding: ActivitySplashBinding by lazy {
         ActivitySplashBinding.inflate(layoutInflater)
     }
@@ -37,7 +44,10 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        checkUpdateAndProceed()
+        lifecycleScope.launch {
+            viewModel.checkAutoLogin()
+            checkUpdateAndProceed()
+        }
     }
 
     override fun onResume() {
@@ -71,7 +81,7 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
                                 AppUpdateOptions.newBuilder(UPDATE_TYPE).build(),
                             )
                         } else {
-                            navigateToMain()
+                            navigateToLogin()
                         }
                     }
 
@@ -86,18 +96,25 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
                     }
 
                     else -> {
-                        navigateToMain()
+                        navigateToLogin()
                     }
                 }
             }.addOnFailureListener {
-                navigateToMain()
+                navigateToLogin()
             }
     }
 
-    private fun navigateToMain() {
-        lifecycleScope.launch {
-            startActivity(MainActivity.newIntent(this@SplashActivity))
-            finish()
+    private fun navigateToLogin() {
+        when (AuthState.type) {
+            UserType.MEMBER -> {
+                startActivity(MainActivity.newIntent(this@SplashActivity))
+                finish()
+            }
+
+            UserType.GUEST, UserType.NONE -> {
+                startActivity(LoginActivity.newIntent(this@SplashActivity))
+                finish()
+            }
         }
     }
 

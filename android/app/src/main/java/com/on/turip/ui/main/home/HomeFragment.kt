@@ -10,6 +10,7 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import com.on.turip.ui.compose.main.home.HomeScreen
 import com.on.turip.ui.compose.theme.TuripTheme
+import com.on.turip.ui.login.LoginActivity
 import com.on.turip.ui.main.home.model.UsersLikeContentModel
 import com.on.turip.ui.search.keywordresult.SearchActivity
 import com.on.turip.ui.search.regionresult.RegionResultActivity
@@ -55,6 +56,15 @@ class HomeFragment : Fragment() {
                                     contentId = usersLikeContent.content.id,
                                 )
                             startActivity(intent)
+                        },
+                        navigateToLoginScreen = {
+                            val intent: Intent =
+                                LoginActivity.newIntent(requireActivity()).apply {
+                                    flags =
+                                        Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                }
+                            startActivity(intent)
+                            requireActivity().finish()
                         },
                     )
                 }

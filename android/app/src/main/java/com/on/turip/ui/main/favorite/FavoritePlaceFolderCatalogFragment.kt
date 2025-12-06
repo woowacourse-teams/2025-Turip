@@ -7,29 +7,27 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.on.turip.R
 import com.on.turip.databinding.BottomSheetFragmentFavoritePlaceFolderCatalogBinding
+import com.on.turip.ui.common.TuripDialogFragment
 import com.on.turip.ui.common.base.BaseFragment
+import com.on.turip.ui.common.event.CommonEvent
+import com.on.turip.ui.login.LoginActivity
+import com.on.turip.ui.main.favorite.FavoritePlaceFolderCatalogViewModel.FavoritePlaceFolderCatalogUiEvent
 import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavoritePlaceFolderCatalogBinding>() {
-    @Inject
-    lateinit var favoritePlaceFolderCatalogViewModelFactory: FavoritePlaceFolderCatalogViewModel.FolderInformationAssistedFactory
-
-    private val viewModel: FavoritePlaceFolderCatalogViewModel by viewModels {
-        FavoritePlaceFolderCatalogViewModel.provideFactory(
-            favoritePlaceFolderCatalogViewModelFactory,
-            folderId = arguments?.getLong(ARGUMENTS_FOLDER_ID) ?: 0L,
-            folderName = arguments?.getString(ARGUMENTS_FOLDER_NAME) ?: "",
-        )
-    }
+    private val viewModel: FavoritePlaceFolderCatalogViewModel by viewModels()
 
     private val placeAdapter: FavoritePlaceAdapter by lazy {
         FavoritePlaceAdapter(
@@ -63,6 +61,7 @@ class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavor
         setupAdapters()
         setupObservers()
         setupListeners()
+        setupLoginSuggestDialog()
     }
 
     private fun setupAdapters() {
@@ -118,7 +117,7 @@ class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavor
     }
 
     private fun setupObservers() {
-        viewModel.favoritePlaceUiState.observe(viewLifecycleOwner) { state ->
+        viewModel.favoritePlaceFolderCatalogUiState.observe(viewLifecycleOwner) { state ->
             placeAdapter.submitList(state.places)
 
             binding.tvBottomSheetFolderFavoritePlaceFolderCatalogTitle.text = state.folderName
@@ -136,6 +135,48 @@ class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavor
         viewModel.shareFolder.observe(viewLifecycleOwner) { shareFolder: FavoriteFolderShareModel ->
             makeShareIntent(shareFolder)
         }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.commonEvent.collect { event ->
+                        when (event) {
+                            CommonEvent.TokenExpiration -> navigateToLoginScreen()
+                        }
+                    }
+                }
+
+                launch {
+                    viewModel.uiEvent.collect { event ->
+                        when (event) {
+                            FavoritePlaceFolderCatalogUiEvent.ShowFolderShareNotAllowed -> {
+                                showSuggestLoginMessage()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun navigateToLoginScreen() {
+        val intent: Intent =
+            LoginActivity.newIntent(requireActivity()).apply {
+                flags =
+                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+        startActivity(intent)
+        requireActivity().finish()
+    }
+
+    private fun showSuggestLoginMessage() {
+        TuripDialogFragment
+            .newInstance(
+                title = getString(R.string.turip_dialog_login_suggest_title),
+                description = getString(R.string.turip_dialog_login_suggest_description),
+                confirmText = getString(R.string.turip_dialog_login_suggest_confirm),
+                dismissText = getString(R.string.turip_dialog_login_suggest_dismiss),
+            ).show(parentFragmentManager, TuripDialogFragment::class.java.simpleName)
     }
 
     private fun setupListeners() {
@@ -182,9 +223,25 @@ class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavor
     ): BottomSheetFragmentFavoritePlaceFolderCatalogBinding =
         BottomSheetFragmentFavoritePlaceFolderCatalogBinding.inflate(inflater, container, false)
 
+    private fun setupLoginSuggestDialog() {
+        parentFragmentManager.setFragmentResultListener(
+            TuripDialogFragment.REQUEST_KEY,
+            viewLifecycleOwner,
+        ) { _, bundle ->
+
+            when (bundle.getString(TuripDialogFragment.TURIP_DIALOG_RESULT)) {
+                TuripDialogFragment.RESULT_CONFIRM -> {
+                    navigateToLoginScreen()
+                }
+            }
+        }
+    }
+
     companion object {
-        private const val ARGUMENTS_FOLDER_ID = "FOLDER_ID"
-        private const val ARGUMENTS_FOLDER_NAME = "FOLDER_NAME"
+        const val FAVORITE_PLACE_FOLDER_CATALOG_ARGUMENTS_FOLDER_ID =
+            "com.on.turip.FAVORITE_PLACE_FOLDER_CATALOG_ARGUMENTS_FOLDER_ID"
+        const val FAVORITE_PLACE_FOLDER_CATALOG_ARGUMENTS_FOLDER_NAME =
+            "com.on.turip.FAVORITE_PLACE_FOLDER_CATALOG_ARGUMENTS_FOLDER_NAME"
         private const val KAKAO_PACKAGE = "com.kakao.talk"
         private const val INSTAGRAM_PACKAGE = "com.instagram.android"
 
@@ -195,8 +252,8 @@ class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavor
             FavoritePlaceFolderCatalogFragment().apply {
                 arguments =
                     Bundle().apply {
-                        putLong(ARGUMENTS_FOLDER_ID, folderId)
-                        putString(ARGUMENTS_FOLDER_NAME, folderName)
+                        putLong(FAVORITE_PLACE_FOLDER_CATALOG_ARGUMENTS_FOLDER_ID, folderId)
+                        putString(FAVORITE_PLACE_FOLDER_CATALOG_ARGUMENTS_FOLDER_NAME, folderName)
                     }
             }
     }

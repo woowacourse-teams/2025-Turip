@@ -20,6 +20,18 @@
 |:---------:|:---------:|
 |**장소 찜**|**콘텐츠 찜**|
 
+## 인프라 아키텍처
+<img width="808" height="912" alt="image" src="https://github.com/user-attachments/assets/9fb99fb9-1ca6-4321-9f53-5fed7e98d751" />
+
+
+## CI/CD 
+<img width="1894" height="970" alt="image" src="https://github.com/user-attachments/assets/dcf4b005-a4bd-4c60-a66e-375075cc9103" />
+
+
+## 모니터링
+<img width="914" height="786" alt="image" src="https://github.com/user-attachments/assets/54af9403-3c78-4951-adc6-673101133e61" />
+
+
 ## 👥 팀원
 
 |<img src="https://avatars.githubusercontent.com/u/114990782?v=4" width="125" />|<img src="https://avatars.githubusercontent.com/u/183526990?v=4" width="125" />|<img src="https://avatars.githubusercontent.com/u/171224212?v=4" width="125" />|<img src="https://avatars.githubusercontent.com/u/183483852?v=4" width="125" />|<img src="https://avatars.githubusercontent.com/u/121426422?v=4" width="125" />|<img src="https://avatars.githubusercontent.com/u/86725408?v=4" width="125" />|
