@@ -10,7 +10,7 @@ import androidx.fragment.app.commit
 import com.on.turip.R
 import com.on.turip.databinding.ActivityMainBinding
 import com.on.turip.ui.common.base.BaseActivity
-import com.on.turip.ui.main.favorite.FavoriteFragment
+import com.on.turip.ui.main.favorite.MyPageFragment
 import com.on.turip.ui.main.home.HomeFragment
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -43,12 +43,14 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
                     return@setOnItemSelectedListener true
                 }
 
-                R.id.menu_fragment_favorite -> {
-                    FavoriteFragment::class.java.let { switchFragment(it, it.simpleName) }
+                R.id.menu_fragment_my_page -> {
+                    MyPageFragment::class.java.let { switchFragment(it, it.simpleName) }
                     return@setOnItemSelectedListener true
                 }
 
-                else -> return@setOnItemSelectedListener false
+                else -> {
+                    return@setOnItemSelectedListener false
+                }
             }
         }
     }

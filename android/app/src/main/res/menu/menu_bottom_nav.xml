@@ -5,7 +5,7 @@
         android:icon="@drawable/btn_bottom_menu_home"
         android:title="@string/bottom_navigation_home" />
     <item
-        android:id="@+id/menu_fragment_favorite"
-        android:icon="@drawable/btn_bottom_menu_favorite"
-        android:title="@string/bottom_navigation_selected_catalog" />
+        android:id="@+id/menu_fragment_my_page"
+        android:icon="@drawable/btn_bottom_my_page"
+        android:title="@string/bottom_navigation_my_page" />
 </menu>

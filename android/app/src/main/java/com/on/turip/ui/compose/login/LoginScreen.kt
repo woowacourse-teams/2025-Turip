@@ -150,18 +150,12 @@ private fun LoginScreenContent(
                     modifier =
                         Modifier
                             .border(
-                                border =
-                                    BorderStroke(
-                                        1.dp,
-                                        colorResource(R.color.gray_200_c1c1c1),
-                                    ),
+                                border = BorderStroke(1.dp, colorResource(R.color.gray_200_c1c1c1)),
                                 shape = RoundedCornerShape(10.dp),
-                            )
-                            .background(
+                            ).background(
                                 color = colorResource(R.color.gray_300_5b5b5b),
                                 shape = RoundedCornerShape(10.dp),
-                            )
-                            .fillMaxWidth()
+                            ).fillMaxWidth()
                             .padding(vertical = 20.dp),
                     textAlign = TextAlign.Center,
                 )

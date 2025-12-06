@@ -18,7 +18,7 @@
 
     <!-- 바텀 네비게이션 -->
     <string name="bottom_navigation_home">홈</string>
-    <string name="bottom_navigation_selected_catalog">찜 목록</string>
+    <string name="bottom_navigation_my_page">마이페이지</string>
 
     <!-- 검색 결과 페이지 -->
     <string name="search_result_no_result">검색 결과가 없습니다.</string>
@@ -108,5 +108,12 @@
     <string name="login_dialog_migration_message">기존의 데이터와 동기화 하시겠습니까?</string>
     <string name="login_dialog_migration_title">동기화</string>
     <string name="login_dialog_confirm_text">데이터 동기화</string>
+
+    <!-- 튜립 다이얼로그 -->
+    <string name="turip_dialog_login_suggest_title">로그인이 필요합니다.</string>
+    <string name="turip_dialog_login_suggest_description">로그인하고 나만의 여행 정보를\n 공유해보세요!</string>
+    <string name="turip_dialog_login_suggest_confirm">로그인</string>
+    <string name="turip_dialog_login_suggest_dismiss">나중에</string>
+
 
 </resources>

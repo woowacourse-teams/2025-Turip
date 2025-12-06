@@ -7,14 +7,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.on.turip.R
 import com.on.turip.databinding.BottomSheetFragmentFavoritePlaceFolderCatalogBinding
+import com.on.turip.ui.common.TuripDialogFragment
 import com.on.turip.ui.common.base.BaseFragment
+import com.on.turip.ui.common.event.CommonEvent
+import com.on.turip.ui.login.LoginActivity
+import com.on.turip.ui.main.favorite.FavoritePlaceFolderCatalogViewModel.FavoritePlaceFolderCatalogUiEvent
 import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @AndroidEntryPoint
@@ -53,6 +61,7 @@ class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavor
         setupAdapters()
         setupObservers()
         setupListeners()
+        setupLoginSuggestDialog()
     }
 
     private fun setupAdapters() {
@@ -108,7 +117,7 @@ class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavor
     }
 
     private fun setupObservers() {
-        viewModel.favoritePlaceUiState.observe(viewLifecycleOwner) { state ->
+        viewModel.favoritePlaceFolderCatalogUiState.observe(viewLifecycleOwner) { state ->
             placeAdapter.submitList(state.places)
 
             binding.tvBottomSheetFolderFavoritePlaceFolderCatalogTitle.text = state.folderName
@@ -126,6 +135,48 @@ class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavor
         viewModel.shareFolder.observe(viewLifecycleOwner) { shareFolder: FavoriteFolderShareModel ->
             makeShareIntent(shareFolder)
         }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.commonEvent.collect { event ->
+                        when (event) {
+                            CommonEvent.TokenExpiration -> navigateToLoginScreen()
+                        }
+                    }
+                }
+
+                launch {
+                    viewModel.uiEvent.collect { event ->
+                        when (event) {
+                            FavoritePlaceFolderCatalogUiEvent.ShowFolderShareNotAllowed -> {
+                                showSuggestLoginMessage()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun navigateToLoginScreen() {
+        val intent: Intent =
+            LoginActivity.newIntent(requireActivity()).apply {
+                flags =
+                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+        startActivity(intent)
+        requireActivity().finish()
+    }
+
+    private fun showSuggestLoginMessage() {
+        TuripDialogFragment
+            .newInstance(
+                title = getString(R.string.turip_dialog_login_suggest_title),
+                description = getString(R.string.turip_dialog_login_suggest_description),
+                confirmText = getString(R.string.turip_dialog_login_suggest_confirm),
+                dismissText = getString(R.string.turip_dialog_login_suggest_dismiss),
+            ).show(parentFragmentManager, TuripDialogFragment::class.java.simpleName)
     }
 
     private fun setupListeners() {
@@ -171,6 +222,20 @@ class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavor
         container: ViewGroup?,
     ): BottomSheetFragmentFavoritePlaceFolderCatalogBinding =
         BottomSheetFragmentFavoritePlaceFolderCatalogBinding.inflate(inflater, container, false)
+
+    private fun setupLoginSuggestDialog() {
+        parentFragmentManager.setFragmentResultListener(
+            TuripDialogFragment.REQUEST_KEY,
+            viewLifecycleOwner,
+        ) { _, bundle ->
+
+            when (bundle.getString(TuripDialogFragment.TURIP_DIALOG_RESULT)) {
+                TuripDialogFragment.RESULT_CONFIRM -> {
+                    navigateToLoginScreen()
+                }
+            }
+        }
+    }
 
     companion object {
         const val FAVORITE_PLACE_FOLDER_CATALOG_ARGUMENTS_FOLDER_ID =

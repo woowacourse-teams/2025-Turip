@@ -3,7 +3,7 @@ package com.on.turip.ui.main.favorite
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 
-class FavoriteStateAdapter(
+class MyPageStateAdapter(
     fragment: Fragment,
     private val fragments: List<Fragment>,
 ) : FragmentStateAdapter(fragment) {
