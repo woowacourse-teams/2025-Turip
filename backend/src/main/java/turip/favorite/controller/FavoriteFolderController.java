@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import turip.account.domain.Account;
 import turip.auth.resolver.AuthAccount;
 import turip.common.exception.ErrorResponse;
 import turip.favorite.controller.dto.request.FavoriteFolderNameRequest;
@@ -28,7 +29,6 @@ import turip.favorite.controller.dto.response.FavoriteFolderResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithFavoriteStatusResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithPlaceCountResponse;
 import turip.favorite.service.FavoriteFolderService;
-import turip.account.domain.Account;
 
 @RestController
 @RequiredArgsConstructor
@@ -75,7 +75,8 @@ public class FavoriteFolderController {
                                             summary = "장소 찜 폴더 이름이 공백인 경우",
                                             value = """
                                                     {
-                                                        "tag": "FAVORITE_FOLDER_NAME_BLANK"
+                                                        "tag": "FAVORITE_FOLDER_NAME_BLANK",
+                                                        "message": "찜폴더 이름은 비워둘 수 없습니다."
                                                     }
                                                     """
                                     ),
@@ -84,7 +85,48 @@ public class FavoriteFolderController {
                                             summary = "장소 찜 폴더 이름이 20글자를 초과하는 경우",
                                             value = """
                                                     {
-                                                        "tag": "FAVORITE_FOLDER_NAME_TOO_LONG"
+                                                        "tag": "FAVORITE_FOLDER_NAME_TOO_LONG",
+                                                        "message": "찜폴더 이름의 최대 길이를 초과했습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "access token expired",
+                                            summary = "만료된 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_EXPIRED",
+                                                    	"message": "access token이 만료됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "invalid signature access token",
+                                            summary = "서명값이 올바르지 않은 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_SIGNATURE_INVALID",
+                                                    	"message": "access token이 위조됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "unauthorized",
+                                            summary = "알 수 없는 이유로 인증 실패",
+                                            value = """
+                                                    {
+                                                    	"tag": "UNAUTHORIZED",
+                                                    	"message": "토큰 기반 인증에 실패했습니다."
                                                     }
                                                     """
                                     )
@@ -103,7 +145,8 @@ public class FavoriteFolderController {
                                             summary = "같은 이름의 폴더가 이미 존재하는 경우",
                                             value = """
                                                     {
-                                                        "tag": "FAVORITE_FOLDER_NAME_CONFLICT"
+                                                        "tag": "FAVORITE_FOLDER_NAME_CONFLICT",
+                                                        "message": "이미 존재하는 찜폴더 이름입니다."
                                                     }
                                                     """
                                     )
@@ -156,6 +199,46 @@ public class FavoriteFolderController {
                                             """
                             )
                     )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "access token expired",
+                                            summary = "만료된 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_EXPIRED",
+                                                    	"message": "access token이 만료됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "invalid signature access token",
+                                            summary = "서명값이 올바르지 않은 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_SIGNATURE_INVALID",
+                                                    	"message": "access token이 위조됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "unauthorized",
+                                            summary = "알 수 없는 이유로 인증 실패",
+                                            value = """
+                                                    {
+                                                    	"tag": "UNAUTHORIZED",
+                                                    	"message": "토큰 기반 인증에 실패했습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
             )
     })
     @GetMapping
@@ -203,17 +286,58 @@ public class FavoriteFolderController {
                     )
             ),
             @ApiResponse(
+                    responseCode = "401",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "access token expired",
+                                            summary = "만료된 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_EXPIRED",
+                                                    	"message": "access token이 만료됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "invalid signature access token",
+                                            summary = "서명값이 올바르지 않은 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_SIGNATURE_INVALID",
+                                                    	"message": "access token이 위조됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "unauthorized",
+                                            summary = "알 수 없는 이유로 인증 실패",
+                                            value = """
+                                                    {
+                                                    	"tag": "UNAUTHORIZED",
+                                                    	"message": "토큰 기반 인증에 실패했습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
                     responseCode = "404",
                     description = "실패 예시",
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(
-                                    name = "success",
+                                    name = "place_not_found",
                                     summary = "placeId에 대한 장소가 존재하지 않는 경우",
                                     value = """
                                             {
-                                                "tag": "PLACE_NOT_FOUND"
+                                                "tag": "PLACE_NOT_FOUND",
+                                                "message": "장소를 찾을 수 없습니다."
                                             }
                                             """
                             )
@@ -266,7 +390,8 @@ public class FavoriteFolderController {
                                             summary = "장소 찜 폴더 이름이 공백인 경우",
                                             value = """
                                                     {
-                                                        "tag": "FAVORITE_FOLDER_NAME_BLANK"
+                                                        "tag": "FAVORITE_FOLDER_NAME_BLANK",
+                                                        "message": "찜폴더 이름은 비워둘 수 없습니다."
                                                     }
                                                     """
                                     ),
@@ -275,7 +400,8 @@ public class FavoriteFolderController {
                                             summary = "장소 찜 폴더 이름이 20글자를 초과하는 경우",
                                             value = """
                                                     {
-                                                        "tag": "FAVORITE_FOLDER_NAME_TOO_LONG"
+                                                        "tag": "FAVORITE_FOLDER_NAME_TOO_LONG",
+                                                        "message": "찜폴더 이름의 최대 길이를 초과했습니다."
                                                     }
                                                     """
                                     ),
@@ -284,7 +410,48 @@ public class FavoriteFolderController {
                                             summary = "장소 찜 폴더가 기본 폴더인 경우",
                                             value = """
                                                     {
-                                                        "tag": "DEFAULT_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED"
+                                                        "tag": "DEFAULT_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED",
+                                                        "message": "기본 찜폴더에는 이 작업을 수행할 수 없습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "access token expired",
+                                            summary = "만료된 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_EXPIRED",
+                                                    	"message": "access token이 만료됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "invalid signature access token",
+                                            summary = "서명값이 올바르지 않은 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_SIGNATURE_INVALID",
+                                                    	"message": "access token이 위조됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "unauthorized",
+                                            summary = "알 수 없는 이유로 인증 실패",
+                                            value = """
+                                                    {
+                                                    	"tag": "UNAUTHORIZED",
+                                                    	"message": "토큰 기반 인증에 실패했습니다."
                                                     }
                                                     """
                                     )
@@ -303,7 +470,8 @@ public class FavoriteFolderController {
                                             summary = "폴더 소유자의 기기id와 요청자의 기기id가 같지 않은 경우",
                                             value = """
                                                     {
-                                                        "tag" : "FORBIDDEN"
+                                                        "tag": "FORBIDDEN",
+                                                        "message": "접근 권한이 없습니다."
                                                     }
                                                     """
                                     )
@@ -316,26 +484,16 @@ public class FavoriteFolderController {
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
-                            examples = {
-                                    @ExampleObject(
-                                            name = "member_not_found",
-                                            summary = "device-fid에 대한 회원을 찾을 수 없는 경우",
-                                            value = """
-                                                    {
-                                                        "tag" : "MEMBER_NOT_FOUND"
-                                                    }
-                                                    """
-                                    ),
-                                    @ExampleObject(
-                                            name = "folder_not_found",
-                                            summary = "id에 대한 폴더를 찾을 수 없는 경우",
-                                            value = """
-                                                    {
-                                                        "tag" : "FAVORITE_FOLDER_NOT_FOUND"
-                                                    }
-                                                    """
-                                    )
-                            }
+                            examples = @ExampleObject(
+                                    name = "folder_not_found",
+                                    summary = "id에 대한 폴더를 찾을 수 없는 경우",
+                                    value = """
+                                            {
+                                                "tag": "FAVORITE_FOLDER_NOT_FOUND",
+                                                "message": "찜폴더를 찾을 수 없습니다."
+                                            }
+                                            """
+                            )
                     )
             ),
             @ApiResponse(
@@ -344,17 +502,16 @@ public class FavoriteFolderController {
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
-                            examples = {
-                                    @ExampleObject(
-                                            name = "folder_name_already_exists",
-                                            summary = "중복되는 폴더 이름이 존재하는 경우",
-                                            value = """
-                                                    {
-                                                        "tag" : "FAVORITE_FOLDER_NAME_CONFLICT"
-                                                    }
-                                                    """
-                                    )
-                            }
+                            examples = @ExampleObject(
+                                    name = "folder_name_already_exists",
+                                    summary = "중복되는 폴더 이름이 존재하는 경우",
+                                    value = """
+                                            {
+                                                "tag": "FAVORITE_FOLDER_NAME_CONFLICT",
+                                                "message": "이미 존재하는 찜폴더 이름입니다."
+                                            }
+                                            """
+                            )
                     )
             )
     })
@@ -388,10 +545,51 @@ public class FavoriteFolderController {
                                     summary = "삭제하려는 폴더가 기본 폴더인 경우",
                                     value = """
                                             {
-                                                "tag" : "DEFAULT_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED"
+                                                "tag": "DEFAULT_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED",
+                                                "message": "기본 찜폴더에는 이 작업을 수행할 수 없습니다."
                                             }
                                             """
                             )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "access token expired",
+                                            summary = "만료된 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_EXPIRED",
+                                                    	"message": "access token이 만료됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "invalid signature access token",
+                                            summary = "서명값이 올바르지 않은 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_SIGNATURE_INVALID",
+                                                    	"message": "access token이 위조됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "unauthorized",
+                                            summary = "알 수 없는 이유로 인증 실패",
+                                            value = """
+                                                    {
+                                                    	"tag": "UNAUTHORIZED",
+                                                    	"message": "토큰 기반 인증에 실패했습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
                     )
             ),
             @ApiResponse(
@@ -405,7 +603,8 @@ public class FavoriteFolderController {
                                     summary = "폴더 소유자의 기기id와 요청자의 기기id가 같지 않은 경우",
                                     value = """
                                             {
-                                                "tag" : "FORBIDDEN"
+                                                "tag": "FORBIDDEN",
+                                                "message": "접근 권한이 없습니다."
                                             }
                                             """
                             )
@@ -417,26 +616,16 @@ public class FavoriteFolderController {
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
-                            examples = {
-                                    @ExampleObject(
-                                            name = "member_not_found",
-                                            summary = "device-fid에 대한 회원을 찾을 수 없는 경우",
-                                            value = """
-                                                    {
-                                                        "tag" : "MEMBER_NOT_FOUND"
-                                                    }
-                                                    """
-                                    ),
-                                    @ExampleObject(
-                                            name = "folder_not_found",
-                                            summary = "id에 대한 폴더를 찾을 수 없는 경우",
-                                            value = """
-                                                    {
-                                                        "tag" : "FAVORITE_FOLDER_NOT_FOUND"
-                                                    }
-                                                    """
-                                    )
-                            }
+                            examples = @ExampleObject(
+                                    name = "folder_not_found",
+                                    summary = "id에 대한 폴더를 찾을 수 없는 경우",
+                                    value = """
+                                            {
+                                                "tag": "FAVORITE_FOLDER_NOT_FOUND",
+                                                "message": "찜폴더를 찾을 수 없습니다."
+                                            }
+                                            """
+                            )
                     )
             )
     })
