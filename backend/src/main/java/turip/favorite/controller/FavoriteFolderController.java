@@ -467,7 +467,7 @@ public class FavoriteFolderController {
                             examples = {
                                     @ExampleObject(
                                             name = "not_folder_owner",
-                                            summary = "폴더 소유자의 기기id와 요청자의 기기id가 같지 않은 경우",
+                                            summary = "폴더 소유 계정과 요청 계정이 같지 않은 경우",
                                             value = """
                                                     {
                                                         "tag": "FORBIDDEN",
