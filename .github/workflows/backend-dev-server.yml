@@ -22,6 +22,7 @@ jobs:
 
     steps:
       - name: Set image tag
+        working-directory: .
         id: vars
         run: |
           DATE=$(date +%Y%m%d-%H%M)
