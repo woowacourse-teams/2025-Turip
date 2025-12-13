@@ -19,13 +19,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import turip.account.domain.Account;
 import turip.auth.resolver.AuthAccount;
 import turip.common.exception.ErrorResponse;
 import turip.favorite.controller.dto.request.FavoritePlaceOrderRequest;
 import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlaceResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlacesWithPlaceDetailResponse;
 import turip.favorite.service.FavoritePlaceService;
-import turip.account.domain.Account;
 
 @RestController
 @RequiredArgsConstructor
@@ -60,22 +60,62 @@ public class FavoritePlaceController {
                     )
             ),
             @ApiResponse(
-                    responseCode = "403",
+                    responseCode = "401",
                     description = "실패 예시",
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = {
                                     @ExampleObject(
-                                            name = "not_folder_owner",
-                                            summary = "폴더 소유자의 기기id와 요청자의 기기id가 같지 않은 경우",
+                                            name = "access token expired",
+                                            summary = "만료된 access token",
                                             value = """
                                                     {
-                                                        "tag" : "FORBIDDEN"
+                                                    	"tag": "ACCESS_TOKEN_EXPIRED",
+                                                    	"message": "access token이 만료됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "invalid signature access token",
+                                            summary = "서명값이 올바르지 않은 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_SIGNATURE_INVALID",
+                                                    	"message": "access token이 위조됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "unauthorized",
+                                            summary = "알 수 없는 이유로 인증 실패",
+                                            value = """
+                                                    {
+                                                    	"tag": "UNAUTHORIZED",
+                                                    	"message": "토큰 기반 인증에 실패했습니다."
                                                     }
                                                     """
                                     )
                             }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "not_folder_owner",
+                                    summary = "폴더 소유자의 기기id와 요청자의 기기id가 같지 않은 경우",
+                                    value = """
+                                            {
+                                                "tag": "FORBIDDEN",
+                                                "message": "접근 권한이 없습니다."
+                                            }
+                                            """
+                            )
+
                     )
             ),
             @ApiResponse(
@@ -90,7 +130,8 @@ public class FavoritePlaceController {
                                             summary = "favoriteFolderId에 대한 폴더를 찾을 수 없는 경우",
                                             value = """
                                                     {
-                                                        "tag" : "FAVORITE_FOLDER_NOT_FOUND"
+                                                        "tag": "FAVORITE_FOLDER_NOT_FOUND",
+                                                        "message": "찜폴더를 찾을 수 없습니다."
                                                     }
                                                     """
                                     ),
@@ -99,7 +140,8 @@ public class FavoritePlaceController {
                                             summary = "placeId에 대한 장소를 찾을 수 없는 경우",
                                             value = """
                                                     {
-                                                        "tag" : "FAVORITE_PLACE_NOT_FOUND"
+                                                        "tag": "PLACE_NOT_FOUND",
+                                                        "message": "장소를 찾을 수 없습니다."
                                                     }
                                                     """
                                     )
@@ -118,7 +160,8 @@ public class FavoritePlaceController {
                                             summary = "이미 해당 폴더에 찜한 상태인 경우",
                                             value = """
                                                     {
-                                                        "tag": "FAVORITE_PLACE_IN_FOLDER_CONFLICT"
+                                                        "tag": "FAVORITE_PLACE_IN_FOLDER_CONFLICT",
+                                                        "message": "해당 폴더에 이미 찜한 장소입니다."
                                                     }
                                                     """
                                     )
@@ -168,7 +211,8 @@ public class FavoritePlaceController {
                                                                     "name": "tourist_attraction"
                                                                 }
                                                             ]
-                                                        }
+                                                        },
+                                                        "favoriteOrder": 1
                                                     },
                                                     {
                                                         "id": 2,
@@ -184,7 +228,8 @@ public class FavoritePlaceController {
                                                                     "name": "음식점 > 한식 > 육류,고기 > 닭요리"
                                                                 }
                                                             ]
-                                                        }
+                                                        },
+                                                        "favoriteOrder": 2
                                                     }
                                                 ],
                                                 "favoritePlaceCount": 2
@@ -205,7 +250,8 @@ public class FavoritePlaceController {
                                             summary = "favoriteFolderId에 대한 폴더가 존재하지 않는 경우",
                                             value = """
                                                     {
-                                                        "tag" : "FAVORITE_FOLDER_NOT_FOUND"
+                                                        "tag": "FAVORITE_FOLDER_NOT_FOUND",
+                                                        "message": "찜폴더를 찾을 수 없습니다."
                                                     }
                                                     """
                                     )
@@ -231,6 +277,46 @@ public class FavoritePlaceController {
                     description = "성공 예시"
             ),
             @ApiResponse(
+                    responseCode = "401",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "access token expired",
+                                            summary = "만료된 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_EXPIRED",
+                                                    	"message": "access token이 만료됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "invalid signature access token",
+                                            summary = "서명값이 올바르지 않은 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_SIGNATURE_INVALID",
+                                                    	"message": "access token이 위조됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "unauthorized",
+                                            summary = "알 수 없는 이유로 인증 실패",
+                                            value = """
+                                                    {
+                                                    	"tag": "UNAUTHORIZED",
+                                                    	"message": "토큰 기반 인증에 실패했습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
                     responseCode = "403",
                     description = "실패 예시",
                     content = @Content(
@@ -239,10 +325,11 @@ public class FavoritePlaceController {
                             examples = {
                                     @ExampleObject(
                                             name = "not_folder_owner",
-                                            summary = "폴더 소유자의 기기id와 요청자의 기기id가 같지 않은 경우",
+                                            summary = "폴더 소유자가 아닌 경우",
                                             value = """
                                                     {
-                                                        "tag" : "FORBIDDEN"
+                                                        "tag": "FORBIDDEN",
+                                                        "message": "접근 권한이 없습니다."
                                                     }
                                                     """
                                     ),
@@ -251,7 +338,8 @@ public class FavoritePlaceController {
                                             summary = "다른 폴더의 favoritePlaceId가 포함된 경우",
                                             value = """
                                                     {
-                                                        "tag" : "FORBIDDEN"
+                                                        "tag": "FORBIDDEN",
+                                                        "message": "접근 권한이 없습니다."
                                                     }
                                                     """
                                     )
@@ -266,20 +354,12 @@ public class FavoritePlaceController {
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = {
                                     @ExampleObject(
-                                            name = "member_not_found",
-                                            summary = "device-fid에 대한 회원을 찾을 수 없는 경우",
-                                            value = """
-                                                    {
-                                                        "tag" : "MEMBER_NOT_FOUND"
-                                                    }
-                                                    """
-                                    ),
-                                    @ExampleObject(
                                             name = "folder_not_found",
                                             summary = "id에 대한 폴더를 찾을 수 없는 경우",
                                             value = """
                                                     {
-                                                        "tag" : "FAVORITE_FOLDER_NOT_FOUND"
+                                                        "tag": "FAVORITE_FOLDER_NOT_FOUND",
+                                                        "message": "찜폴더를 찾을 수 없습니다."
                                                     }
                                                     """
                                     ),
@@ -288,7 +368,8 @@ public class FavoritePlaceController {
                                             summary = "favoritePlaceId에 대한 찜한 장소를 찾을 수 없는 경우",
                                             value = """
                                                     {
-                                                        "tag" : "FAVORITE_PLACE_NOT_FOUND"
+                                                        "tag": "FAVORITE_PLACE_NOT_FOUND",
+                                                        "message": "찜한 장소를 찾을 수 없습니다."
                                                     }
                                                     """
                                     )
@@ -316,6 +397,46 @@ public class FavoritePlaceController {
                     description = "성공 예시"
             ),
             @ApiResponse(
+                    responseCode = "401",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "access token expired",
+                                            summary = "만료된 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_EXPIRED",
+                                                    	"message": "access token이 만료됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "invalid signature access token",
+                                            summary = "서명값이 올바르지 않은 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_SIGNATURE_INVALID",
+                                                    	"message": "access token이 위조됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "unauthorized",
+                                            summary = "알 수 없는 이유로 인증 실패",
+                                            value = """
+                                                    {
+                                                    	"tag": "UNAUTHORIZED",
+                                                    	"message": "토큰 기반 인증에 실패했습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
                     responseCode = "403",
                     description = "실패 예시",
                     content = @Content(
@@ -324,10 +445,11 @@ public class FavoritePlaceController {
                             examples = {
                                     @ExampleObject(
                                             name = "not_folder_owner",
-                                            summary = "폴더 소유자의 기기id와 요청자의 기기id가 같지 않은 경우",
+                                            summary = "폴더 소유자가 아닌 경우",
                                             value = """
                                                     {
-                                                        "tag" : "FORBIDDEN"
+                                                        "tag": "FORBIDDEN",
+                                                        "message": "접근 권한이 없습니다."
                                                     }
                                                     """
                                     )
@@ -342,20 +464,12 @@ public class FavoritePlaceController {
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = {
                                     @ExampleObject(
-                                            name = "member_not_found",
-                                            summary = "deviceFid에 대한 회원을 찾을 수 없는 경우",
-                                            value = """
-                                                    {
-                                                        "tag" : "MEMBER_NOT_FOUND"
-                                                    }
-                                                    """
-                                    ),
-                                    @ExampleObject(
                                             name = "folder_not_found",
                                             summary = "favoriteFolderId에 대한 폴더를 찾을 수 없는 경우",
                                             value = """
                                                     {
-                                                        "tag" : "FAVORITE_FOLDER_NOT_FOUND"
+                                                        "tag": "FAVORITE_FOLDER_NOT_FOUND",
+                                                        "message": "찜폴더를 찾을 수 없습니다."
                                                     }
                                                     """
                                     ),
@@ -364,7 +478,8 @@ public class FavoritePlaceController {
                                             summary = "placeId에 대한 장소를 찾을 수 없는 경우",
                                             value = """
                                                     {
-                                                        "tag" : "PLACE_NOT_FOUND"
+                                                        "tag": "PLACE_NOT_FOUND",
+                                                        "message": "장소를 찾을 수 없습니다."
                                                     }
                                                     """
                                     ),
@@ -373,7 +488,8 @@ public class FavoritePlaceController {
                                             summary = "해당 폴더에 장소 찜이 되어있지 않은 경우",
                                             value = """
                                                     {
-                                                        "tag" : "FAVORITE_PLACE_NOT_FOUND"
+                                                        "tag": "FAVORITE_PLACE_NOT_FOUND",
+                                                        "message": "찜한 장소를 찾을 수 없습니다."
                                                     }
                                                     """
                                     )

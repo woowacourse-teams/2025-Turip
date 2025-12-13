@@ -65,7 +65,8 @@ public class ContentController {
                                     summary = "지역 카테고리가 올바르지 않음",
                                     value = """
                                             {
-                                                "tag": "REGION_CATEGORY_WRONG"
+                                                "tag": "REGION_CATEGORY_INVALID",
+                                                "message": "잘못된 지역 카테고리입니다."
                                             }
                                             """
                             )
@@ -128,15 +129,18 @@ public class ContentController {
                                                     {
                                                         "content": {
                                                             "id": 2,
+                                                            "title": "동선낭비없는 부산 3박4일 코스 대마도 당일치기 꿀팁 반드시 가봐야 할 여행지 국내 단 하나뿐인 스카이캡슐 오륙도해맞이공원 흰여울문화마을 감천문화마을 해동용궁사 송도케이블카",
+                                                            "url": "https://www.youtube.com/watch?v=1he5ed8Y5TA",
+                                                            "uploadedDate": "2025-07-10",
+                                                            "city": {
+                                                                "name": "부산"
+                                                            },
                                                             "creator": {
                                                                 "id": 2,
                                                                 "channelName": "하찬투어 hachantour",
                                                                 "profileImage": "https://yt3.googleusercontent.com/xMc7FcCl689p_ymaijuY5WOwX9DeHaZ_WTnRHb8UajggQotOO8Bxd0P7cqsYYfubotgjlh4Qfw=s160-c-k-c0x00ffffff-no-rj"
                                                             },
-                                                            "title": "동선낭비없는 부산 3박4일 코스 대마도 당일치기 꿀팁 반드시 가봐야 할 여행지 국내 단 하나뿐인 스카이캡슐 오륙도해맞이공원 흰여울문화마을 감천문화마을 해동용궁사 송도케이블카",
-                                                            "url": "https://www.youtube.com/watch?v=1he5ed8Y5TA",
-                                                            "uploadedDate": "2025-07-10",
-                                                            "city": "부산"
+                                                            "isFavorite": false
                                                         },
                                                         "tripDuration": {
                                                             "nights": 3,
@@ -147,15 +151,18 @@ public class ContentController {
                                                     {
                                                         "content": {
                                                             "id": 1,
+                                                            "title": "나혼자 기차 타고 부산 여행 vlog 🌊 | 당일치기 쌉가능한 여행코스 💌 , 200% 만족한 광안리 숙소 🏠, 부산 토박이의 단골집 추천까지,,💛 | 3박4일 부산 브이로그",
+                                                            "url": "https://www.youtube.com/watch?v=U7vwpgZlD6Q",
+                                                            "uploadedDate": "2025-07-01",
+                                                            "city": {
+                                                                "name": "부산"
+                                                            },
                                                             "creator": {
                                                                 "id": 1,
                                                                 "channelName": "연수연",
                                                                 "profileImage": "https://yt3.googleusercontent.com/EMvavcwV96_NkCYm4V8TZIrsytHaiS2AaxS_goqR57WP7kn36qQY92Ujex8JUbBWGQ7P5VY0DA=s160-c-k-c0x00ffffff-no-rj"
                                                             },
-                                                            "title": "나혼자 기차 타고 부산 여행 vlog 🌊 | 당일치기 쌉가능한 여행코스 💌 , 200% 만족한 광안리 숙소 🏠, 부산 토박이의 단골집 추천까지,,💛 | 3박4일 부산 브이로그",
-                                                            "url": "https://www.youtube.com/watch?v=U7vwpgZlD6Q",
-                                                            "uploadedDate": "2025-07-01",
-                                                            "city": "부산"
+                                                            "isFavorite": true
                                                         },
                                                         "tripDuration": {
                                                             "nights": 2,
@@ -164,8 +171,7 @@ public class ContentController {
                                                         "tripPlaceCount": 21
                                                     }
                                                 ],
-                                                "loadable": false,
-                                                "regionCategoryName": "부산"
+                                                "loadable": false
                                             }
                                             """
                             )
@@ -182,10 +188,51 @@ public class ContentController {
                                     summary = "지역 카테고리가 올바르지 않음",
                                     value = """
                                             {
-                                                "tag": "REGION_CATEGORY_WRONG"
+                                                "tag": "REGION_CATEGORY_INVALID",
+                                                "message": "잘못된 지역 카테고리입니다."
                                             }
                                             """
                             )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "access token expired",
+                                            summary = "만료된 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_EXPIRED",
+                                                    	"message": "access token이 만료됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "invalid signature access token",
+                                            summary = "서명값이 올바르지 않은 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_SIGNATURE_INVALID",
+                                                    	"message": "access token이 위조됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "unauthorized",
+                                            summary = "알 수 없는 이유로 인증 실패",
+                                            value = """
+                                                    {
+                                                    	"tag": "UNAUTHORIZED",
+                                                    	"message": "토큰 기반 인증에 실패했습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
                     )
             )
     })
@@ -222,17 +269,18 @@ public class ContentController {
                                                     {
                                                         "content": {
                                                             "id": 2,
-                                                            "creator": {
-                                                                "id": 2,
-                                                                "channelName": "하찬투어 hachantour",
-                                                                "profileImage": "https://yt3.googleusercontent.com/xMc7FcCl689p_ymaijuY5WOwX9DeHaZ_WTnRHb8UajggQotOO8Bxd0P7cqsYYfubotgjlh4Qfw=s160-c-k-c0x00ffffff-no-rj"
-                                                            },
                                                             "title": "동선낭비없는 부산 3박4일 코스 대마도 당일치기 꿀팁 반드시 가봐야 할 여행지 국내 단 하나뿐인 스카이캡슐 오륙도해맞이공원 흰여울문화마을 감천문화마을 해동용궁사 송도케이블카",
                                                             "url": "https://www.youtube.com/watch?v=1he5ed8Y5TA",
                                                             "uploadedDate": "2025-07-10",
                                                             "city": {
                                                                 "name": "부산"
-                                                            }
+                                                            },
+                                                            "creator": {
+                                                                "id": 2,
+                                                                "channelName": "하찬투어 hachantour",
+                                                                "profileImage": "https://yt3.googleusercontent.com/xMc7FcCl689p_ymaijuY5WOwX9DeHaZ_WTnRHb8UajggQotOO8Bxd0P7cqsYYfubotgjlh4Qfw=s160-c-k-c0x00ffffff-no-rj"
+                                                            },
+                                                            "isFavorite": false
                                                         },
                                                         "tripDuration": {
                                                             "nights": 3,
@@ -243,17 +291,18 @@ public class ContentController {
                                                     {
                                                         "content": {
                                                             "id": 1,
-                                                            "creator": {
-                                                                "id": 1,
-                                                                "channelName": "연수연",
-                                                                "profileImage": "https://yt3.googleusercontent.com/EMvavcwV96_NkCYm4V8TZIrsytHaiS2AaxS_goqR57WP7kn36qQY92Ujex8JUbBWGQ7P5VY0DA=s160-c-k-c0x00ffffff-no-rj"
-                                                            },
                                                             "title": "나혼자 기차 타고 부산 여행 vlog 🌊 | 당일치기 쌉가능한 여행코스 💌 , 200% 만족한 광안리 숙소 🏠, 부산 토박이의 단골집 추천까지,,💛 | 3박4일 부산 브이로그",
                                                             "url": "https://www.youtube.com/watch?v=U7vwpgZlD6Q",
                                                             "uploadedDate": "2025-07-01",
                                                             "city": {
                                                                 "name": "부산"
-                                                            }
+                                                            },
+                                                            "creator": {
+                                                                "id": 1,
+                                                                "channelName": "연수연",
+                                                                "profileImage": "https://yt3.googleusercontent.com/EMvavcwV96_NkCYm4V8TZIrsytHaiS2AaxS_goqR57WP7kn36qQY92Ujex8JUbBWGQ7P5VY0DA=s160-c-k-c0x00ffffff-no-rj"
+                                                            },
+                                                            "isFavorite": true
                                                         },
                                                         "tripDuration": {
                                                             "nights": 2,
@@ -266,6 +315,46 @@ public class ContentController {
                                             }
                                             """
                             )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "access token expired",
+                                            summary = "만료된 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_EXPIRED",
+                                                    	"message": "access token이 만료됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "invalid signature access token",
+                                            summary = "서명값이 올바르지 않은 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_SIGNATURE_INVALID",
+                                                    	"message": "access token이 위조됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "unauthorized",
+                                            summary = "알 수 없는 이유로 인증 실패",
+                                            value = """
+                                                    {
+                                                    	"tag": "UNAUTHORIZED",
+                                                    	"message": "토큰 기반 인증에 실패했습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
                     )
             )
     })
@@ -317,6 +406,46 @@ public class ContentController {
 
             ),
             @ApiResponse(
+                    responseCode = "401",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "access token expired",
+                                            summary = "만료된 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_EXPIRED",
+                                                    	"message": "access token이 만료됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "invalid signature access token",
+                                            summary = "서명값이 올바르지 않은 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_SIGNATURE_INVALID",
+                                                    	"message": "access token이 위조됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "unauthorized",
+                                            summary = "알 수 없는 이유로 인증 실패",
+                                            value = """
+                                                    {
+                                                    	"tag": "UNAUTHORIZED",
+                                                    	"message": "토큰 기반 인증에 실패했습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
                     responseCode = "404",
                     description = "실패 예시",
                     content = @Content(
@@ -327,7 +456,8 @@ public class ContentController {
                                     summary = "id에 대한 컨텐츠가 존재하지 않음",
                                     value = """
                                             {
-                                                "tag": "CONTENT_NOT_FOUND"
+                                                "tag": "CONTENT_NOT_FOUND",
+                                                "message": "컨텐츠를 찾을 수 없습니다."
                                             }
                                             """
                             )
@@ -409,6 +539,46 @@ public class ContentController {
                             )
                     )
 
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "access token expired",
+                                            summary = "만료된 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_EXPIRED",
+                                                    	"message": "access token이 만료됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "invalid signature access token",
+                                            summary = "서명값이 올바르지 않은 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_SIGNATURE_INVALID",
+                                                    	"message": "access token이 위조됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "unauthorized",
+                                            summary = "알 수 없는 이유로 인증 실패",
+                                            value = """
+                                                    {
+                                                    	"tag": "UNAUTHORIZED",
+                                                    	"message": "토큰 기반 인증에 실패했습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
             )
     })
     @GetMapping("/popular/favorites")

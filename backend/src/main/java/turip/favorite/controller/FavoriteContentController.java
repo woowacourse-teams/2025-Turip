@@ -18,13 +18,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import turip.account.domain.Account;
 import turip.auth.resolver.AuthAccount;
 import turip.common.exception.ErrorResponse;
 import turip.content.controller.dto.response.content.ContentsDetailWithLoadableResponse;
 import turip.favorite.controller.dto.request.FavoriteContentRequest;
 import turip.favorite.controller.dto.response.FavoriteContentResponse;
 import turip.favorite.service.FavoriteContentService;
-import turip.account.domain.Account;
 
 @RestController
 @RequiredArgsConstructor
@@ -74,6 +74,46 @@ public class FavoriteContentController {
                     )
             ),
             @ApiResponse(
+                    responseCode = "401",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "access token expired",
+                                            summary = "만료된 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_EXPIRED",
+                                                    	"message": "access token이 만료됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "invalid signature access token",
+                                            summary = "서명값이 올바르지 않은 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_SIGNATURE_INVALID",
+                                                    	"message": "access token이 위조됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "unauthorized",
+                                            summary = "알 수 없는 이유로 인증 실패",
+                                            value = """
+                                                    {
+                                                    	"tag": "UNAUTHORIZED",
+                                                    	"message": "토큰 기반 인증에 실패했습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
                     responseCode = "404",
                     description = "실패 예시",
                     content = @Content(
@@ -85,7 +125,8 @@ public class FavoriteContentController {
                                             summary = "컨텐츠를 찾을 수 없음",
                                             value = """
                                                     {
-                                                        "tag": "CONTENT_NOT_FOUND"
+                                                        "tag": "CONTENT_NOT_FOUND",
+                                                        "message": "컨텐츠를 찾을 수 없습니다."
                                                     }
                                                     """
                                     )
@@ -104,7 +145,8 @@ public class FavoriteContentController {
                                             summary = "이미 찜 한 컨텐츠",
                                             value = """
                                                     {
-                                                        "tag": "FAVORITE_CONTENT_CONFLICT"
+                                                        "tag": "FAVORITE_CONTENT_CONFLICT",
+                                                        "message": "이미 찜한 컨텐츠입니다."
                                                     }
                                                     """
                                     )
@@ -141,17 +183,18 @@ public class FavoriteContentController {
                                                     {
                                                         "content": {
                                                             "id": 1,
-                                                            "creator": {
-                                                                "id": 1,
-                                                                "channelName": "연수연",
-                                                                "profileImage": "https://yt3.googleusercontent.com/EMvavcwV96_NkCYm4V8TZIrsytHaiS2AaxS_goqR57WP7kn36qQY92Ujex8JUbBWGQ7P5VY0DA=s160-c-k-c0x00ffffff-no-rj"
-                                                            },
                                                             "title": "나혼자 기차 타고 부산 여행 vlog 🌊 | 당일치기 쌉가능한 여행코스 💌 , 200% 만족한 광안리 숙소 🏠, 부산 토박이의 단골집 추천까지,,💛 | 3박4일 부산 브이로그",
                                                             "url": "https://www.youtube.com/watch?v=U7vwpgZlD6Q",
                                                             "uploadedDate": "2025-07-01",
                                                             "city": {
                                                                 "name": "부산"
-                                                            }
+                                                            },
+                                                            "creator": {
+                                                                "id": 1,
+                                                                "channelName": "연수연",
+                                                                "profileImage": "https://yt3.googleusercontent.com/EMvavcwV96_NkCYm4V8TZIrsytHaiS2AaxS_goqR57WP7kn36qQY92Ujex8JUbBWGQ7P5VY0DA=s160-c-k-c0x00ffffff-no-rj"
+                                                            },
+                                                            "isFavorite": true
                                                         },
                                                         "tripDuration": {
                                                             "nights": 2,
@@ -167,19 +210,39 @@ public class FavoriteContentController {
                     )
             ),
             @ApiResponse(
-                    responseCode = "404",
+                    responseCode = "401",
                     description = "실패 예시",
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = {
                                     @ExampleObject(
-                                            name = "invalid device-fid",
-                                            summary = "올바르지 않은 device-fid",
+                                            name = "access token expired",
+                                            summary = "만료된 access token",
                                             value = """
                                                     {
-                                                        "tag": "MEMBER_NOT_FOUND",
-                                                        "message": "회원을 찾을 수 없습니다"
+                                                    	"tag": "ACCESS_TOKEN_EXPIRED",
+                                                    	"message": "access token이 만료됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "invalid signature access token",
+                                            summary = "서명값이 올바르지 않은 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_SIGNATURE_INVALID",
+                                                    	"message": "access token이 위조됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "unauthorized",
+                                            summary = "알 수 없는 이유로 인증 실패",
+                                            value = """
+                                                    {
+                                                    	"tag": "UNAUTHORIZED",
+                                                    	"message": "토큰 기반 인증에 실패했습니다."
                                                     }
                                                     """
                                     )
@@ -208,6 +271,46 @@ public class FavoriteContentController {
                     description = "성공 예시"
             ),
             @ApiResponse(
+                    responseCode = "401",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "access token expired",
+                                            summary = "만료된 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_EXPIRED",
+                                                    	"message": "access token이 만료됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "invalid signature access token",
+                                            summary = "서명값이 올바르지 않은 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_SIGNATURE_INVALID",
+                                                    	"message": "access token이 위조됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "unauthorized",
+                                            summary = "알 수 없는 이유로 인증 실패",
+                                            value = """
+                                                    {
+                                                    	"tag": "UNAUTHORIZED",
+                                                    	"message": "토큰 기반 인증에 실패했습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
                     responseCode = "404",
                     description = "실패 예시",
                     content = @Content(
@@ -219,17 +322,8 @@ public class FavoriteContentController {
                                             summary = "컨텐츠를 찾을 수 없음",
                                             value = """
                                                     {
-                                                        "tag": "CONTENT_NOT_FOUND"
-                                                    }
-                                                    """
-                                    ),
-                                    @ExampleObject(
-                                            name = "member_not_found",
-                                            summary = "존재하지 않는 사용자",
-                                            value = """
-                                                    {
-                                                        "tag": "MEMBER_NOT_FOUND",
-                                                        "message": "회원을 찾을 수 없습니다"
+                                                        "tag": "CONTENT_NOT_FOUND",
+                                                        "message": "컨텐츠를 찾을 수 없습니다."
                                                     }
                                                     """
                                     ),
@@ -238,7 +332,8 @@ public class FavoriteContentController {
                                             summary = "찜하지 않은 컨텐츠",
                                             value = """
                                                     {
-                                                        "tag": "FAVORITE_CONTENT_NOT_FOUND"
+                                                        "tag": "FAVORITE_CONTENT_NOT_FOUND",
+                                                        "message": "찜한 컨텐츠를 찾을 수 없습니다."
                                                     }
                                                     """
                                     )
