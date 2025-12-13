@@ -1,19 +1,20 @@
 package com.on.turip.ui.main.favorite
 
 import android.net.Uri
+import android.os.Build
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.on.turip.BuildConfig
 import com.on.turip.data.common.onFailure
 import com.on.turip.data.common.onSuccess
 import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.login.MemberRepository
+import com.on.turip.domain.setting.InquiryMail
+import com.on.turip.domain.setting.PrivacyPolicy
 import com.on.turip.domain.userstorage.repository.UserStorageRepository
-import com.on.turip.ui.compose.common.util.SettingUtils
-import com.on.turip.ui.compose.common.util.SettingUtils.EMAIL_RECIPIENT
-import com.on.turip.ui.compose.common.util.SettingUtils.EMAIL_SUBJECT
-import com.on.turip.ui.compose.setting.SettingUiEvent
-import com.on.turip.ui.compose.setting.SettingUiState
+import com.on.turip.ui.compose.setting.model.SettingUiEvent
+import com.on.turip.ui.compose.setting.model.SettingUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -54,12 +55,24 @@ class SettingViewModel @Inject constructor(
         }
     }
 
-    fun loadInquiryUri(): Uri =
-        "mailto:$EMAIL_RECIPIENT?subject=${Uri.encode(EMAIL_SUBJECT)}&body=${
-            Uri.encode(SettingUtils.toEmailBody(uiState.value.deviceIdentifier.fid))
-        }".toUri()
+    fun loadInquiryUri(): Uri {
+        val inquiry: InquiryMail =
+            InquiryMail(
+                appVersionName = BuildConfig.VERSION_NAME,
+                appVersionCode = BuildConfig.VERSION_CODE,
+                deviceReleaseVersion = Build.VERSION.RELEASE,
+                deviceSdkVersion = Build.VERSION.SDK_INT,
+                deviceManufacturer = Build.MANUFACTURER,
+                deviceModel = Build.MODEL,
+                fid = uiState.value.deviceIdentifier.fid,
+            )
 
-    fun loadPrivacyPolicyUri(): Uri = SettingUtils.PRIVACY_POLICY_LINK.toUri()
+        return "mailto:${InquiryMail.RECIPIENT}?subject=${Uri.encode(InquiryMail.TITLE)}&body=${
+            Uri.encode(inquiry.content)
+        }".toUri()
+    }
+
+    fun loadPrivacyPolicyLink(): String = PrivacyPolicy.LINK
 
     fun showLogoutDialog(show: Boolean) {
         _uiState.update { it.copy(showLogoutDialog = show) }

@@ -39,7 +39,7 @@ import timber.log.Timber
 fun SettingScreen(
     navigateToBack: () -> Unit,
     navigateToInquiry: (Uri) -> Unit,
-    navigateToPrivacyPolicy: (Uri) -> Unit,
+    navigateToPrivacyPolicy: (String) -> Unit,
     navigateToLoginScreen: () -> Unit,
     viewModel: SettingViewModel = hiltViewModel(),
 ) {
@@ -103,7 +103,7 @@ fun SettingScreen(
             Timber.d("SettingScreen 문의하기 버튼 클릭")
         },
         onClickPrivacyPolicy = {
-            navigateToPrivacyPolicy(viewModel.loadPrivacyPolicyUri())
+            navigateToPrivacyPolicy(viewModel.loadPrivacyPolicyLink())
             Timber.d("SettingScreen 개인정보처리 방침 버튼 클릭")
         },
         onClickLogin = {

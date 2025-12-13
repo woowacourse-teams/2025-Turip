@@ -26,8 +26,8 @@ class SettingActivity : AppCompatActivity() {
                         val intent: Intent = Intent(Intent.ACTION_SENDTO).apply { data = uri }
                         startActivity(intent)
                     },
-                    navigateToPrivacyPolicy = { uri: Uri ->
-                        val intent: Intent = Intent(Intent.ACTION_VIEW, uri)
+                    navigateToPrivacyPolicy = { privacyPolicyLink: String ->
+                        val intent: Intent = Intent(Intent.ACTION_VIEW, privacyPolicyLink.toUri())
                         startActivity(intent)
                     },
                     navigateToLoginScreen = {
