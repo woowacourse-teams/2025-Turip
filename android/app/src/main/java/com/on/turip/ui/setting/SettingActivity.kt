@@ -7,6 +7,7 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
 import com.on.turip.ui.compose.setting.SettingScreen
 import com.on.turip.ui.compose.theme.TuripTheme
 import com.on.turip.ui.login.LoginActivity
