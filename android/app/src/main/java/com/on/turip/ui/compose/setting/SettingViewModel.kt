@@ -1,11 +1,7 @@
 package com.on.turip.ui.compose.setting
 
-import android.net.Uri
-import android.os.Build
-import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.on.turip.BuildConfig
 import com.on.turip.data.common.onFailure
 import com.on.turip.data.common.onSuccess
 import com.on.turip.domain.ErrorEvent
@@ -13,10 +9,10 @@ import com.on.turip.domain.login.MemberRepository
 import com.on.turip.domain.setting.InquiryMail
 import com.on.turip.domain.setting.PrivacyPolicy
 import com.on.turip.domain.userstorage.repository.UserStorageRepository
+import com.on.turip.platform.device.DeviceInfoProvider
 import com.on.turip.ui.compose.setting.model.SettingUiEvent
 import com.on.turip.ui.compose.setting.model.SettingUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,11 +21,13 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 @HiltViewModel
 class SettingViewModel @Inject constructor(
     private val userStorageRepository: UserStorageRepository,
     private val memberRepository: MemberRepository,
+    private val deviceInfoProvider: DeviceInfoProvider,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<SettingUiState> = MutableStateFlow(SettingUiState.EMPTY)
     val uiState: StateFlow<SettingUiState> = _uiState
@@ -55,22 +53,11 @@ class SettingViewModel @Inject constructor(
         }
     }
 
-    fun loadInquiryUri(): Uri {
-        val inquiry: InquiryMail =
-            InquiryMail(
-                appVersionName = BuildConfig.VERSION_NAME,
-                appVersionCode = BuildConfig.VERSION_CODE,
-                deviceReleaseVersion = Build.VERSION.RELEASE,
-                deviceSdkVersion = Build.VERSION.SDK_INT,
-                deviceManufacturer = Build.MANUFACTURER,
-                deviceModel = Build.MODEL,
-                fid = uiState.value.deviceIdentifier.fid,
-            )
-
-        return "mailto:${InquiryMail.RECIPIENT}?subject=${Uri.encode(InquiryMail.TITLE)}&body=${
-            Uri.encode(inquiry.content)
-        }".toUri()
-    }
+    fun loadInquiryMail(): InquiryMail =
+        InquiryMail(
+            deviceInfo = deviceInfoProvider.getDeviceInfo(),
+            fid = uiState.value.deviceIdentifier.fid,
+        )
 
     fun loadPrivacyPolicyLink(): String = PrivacyPolicy.LINK
 

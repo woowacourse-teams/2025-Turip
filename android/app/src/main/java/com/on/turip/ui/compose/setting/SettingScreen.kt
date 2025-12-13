@@ -1,6 +1,5 @@
 package com.on.turip.ui.compose.setting
 
-import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -28,6 +27,7 @@ import com.on.turip.R
 import com.on.turip.common.AuthState
 import com.on.turip.common.UserType
 import com.on.turip.domain.ErrorEvent
+import com.on.turip.domain.setting.InquiryMail
 import com.on.turip.ui.compose.designsystem.component.TuripAppBar
 import com.on.turip.ui.compose.designsystem.component.TuripDialog
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
@@ -40,7 +40,7 @@ import timber.log.Timber
 @Composable
 fun SettingScreen(
     navigateToBack: () -> Unit,
-    navigateToInquiry: (Uri) -> Unit,
+    navigateToInquiry: (InquiryMail) -> Unit,
     navigateToPrivacyPolicy: (String) -> Unit,
     navigateToLoginScreen: () -> Unit,
     viewModel: SettingViewModel = hiltViewModel(),
@@ -101,7 +101,7 @@ fun SettingScreen(
         snackbarHostState = snackbarHostState,
         onClickBack = navigateToBack,
         onClickInquiry = {
-            navigateToInquiry(viewModel.loadInquiryUri())
+            navigateToInquiry(viewModel.loadInquiryMail())
             Timber.d("SettingScreen 문의하기 버튼 클릭")
         },
         onClickPrivacyPolicy = {

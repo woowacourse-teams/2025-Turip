@@ -8,6 +8,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
+import com.on.turip.domain.setting.InquiryMail
 import com.on.turip.ui.compose.setting.SettingScreen
 import com.on.turip.ui.compose.theme.TuripTheme
 import com.on.turip.ui.login.LoginActivity
@@ -23,7 +24,12 @@ class SettingActivity : AppCompatActivity() {
             TuripTheme {
                 SettingScreen(
                     navigateToBack = { finish() },
-                    navigateToInquiry = { uri: Uri ->
+                    navigateToInquiry = { inquiryMail: InquiryMail ->
+                        val uri =
+                            "mailto:${InquiryMail.RECIPIENT}?subject=${Uri.encode(InquiryMail.TITLE)}&body=${
+                                Uri.encode(inquiryMail.content)
+                            }".toUri()
+
                         val intent: Intent = Intent(Intent.ACTION_SENDTO).apply { data = uri }
                         startActivity(intent)
                     },
