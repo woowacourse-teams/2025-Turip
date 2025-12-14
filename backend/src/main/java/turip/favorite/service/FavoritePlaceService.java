@@ -62,6 +62,10 @@ public class FavoritePlaceService {
         return FavoritePlaceCountResponse.from(count);
     }
 
+    public boolean existsByAccount(Account account) {
+        return favoritePlaceRepository.existsByFavoriteFolderAccount(account);
+    }
+
     @Transactional
     public void updatePlaceOrder(Account account, Long favoriteFolderId,
                                  FavoritePlaceOrderRequest request) {

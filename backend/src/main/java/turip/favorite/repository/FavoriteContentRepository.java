@@ -8,9 +8,9 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import turip.account.domain.Account;
 import turip.content.domain.Content;
 import turip.favorite.domain.FavoriteContent;
-import turip.account.domain.Account;
 
 public interface FavoriteContentRepository extends JpaRepository<FavoriteContent, Long> {
 
@@ -53,6 +53,8 @@ public interface FavoriteContentRepository extends JpaRepository<FavoriteContent
     );
 
     List<FavoriteContent> findAllByAccount(Account account);
+
+    boolean existsByAccount(Account account);
 
     void deleteByAccount(Account account);
 }

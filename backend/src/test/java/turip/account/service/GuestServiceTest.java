@@ -14,9 +14,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import turip.account.controller.dto.response.MigrationAvailabilityResponse;
 import turip.account.domain.Account;
 import turip.account.domain.Guest;
 import turip.account.repository.GuestRepository;
+import turip.favorite.service.FavoriteContentService;
+import turip.favorite.service.FavoriteFolderService;
+import turip.favorite.service.FavoritePlaceService;
 
 @ExtendWith(MockitoExtension.class)
 class GuestServiceTest {
@@ -29,6 +33,15 @@ class GuestServiceTest {
 
     @Mock
     private GuestRepository guestRepository;
+
+    @Mock
+    private FavoriteContentService favoriteContentService;
+
+    @Mock
+    private FavoritePlaceService favoritePlaceService;
+
+    @Mock
+    private FavoriteFolderService favoriteFolderService;
 
     @DisplayName("DeviceFid로 Guest 조회 또는 생성 테스트")
     @Nested
@@ -76,6 +89,91 @@ class GuestServiceTest {
             assertThat(result).isEqualTo(newGuest);
             verify(accountService).create();
             verify(guestRepository).save(any(Guest.class));
+        }
+    }
+
+    @DisplayName("Guest의 마이그레이션 가능한 데이터 존재 여부 조회 테스트")
+    @Nested
+    class CheckMigrationAvailability {
+
+        @DisplayName("Guest의 Account에 콘텐츠 찜, 장소 찜, 커스텀 찜 폴더가 존재하지 않으면 마이그레이션을 하지 않는다")
+        @Test
+        void checkMigrationAvailability1() {
+            // given
+            Account account = new Account(1L);
+            Guest guest = new Guest(1L, account, "device-fid");
+            given(favoriteContentService.existsByAccount(account))
+                    .willReturn(false);
+            given(favoritePlaceService.existsByAccount(account))
+                    .willReturn(false);
+            given(favoriteFolderService.isCustomFolderExists(account))
+                    .willReturn(false);
+
+            // when
+            MigrationAvailabilityResponse response = guestService.checkMigrationAvailability(guest);
+
+            // then
+            assertThat(response.availability()).isFalse();
+        }
+
+        @DisplayName("Guest의 Account에 콘텐츠 찜이 존재하면 마이그레이션을 한다")
+        @Test
+        void checkMigrationAvailability2() {
+            // given
+            Account account = new Account(1L);
+            Guest guest = new Guest(1L, account, "device-fid");
+            given(favoriteContentService.existsByAccount(account))
+                    .willReturn(true);
+            given(favoritePlaceService.existsByAccount(account))
+                    .willReturn(false);
+            given(favoriteFolderService.isCustomFolderExists(account))
+                    .willReturn(false);
+
+            // when
+            MigrationAvailabilityResponse response = guestService.checkMigrationAvailability(guest);
+
+            // then
+            assertThat(response.availability()).isTrue();
+        }
+
+        @DisplayName("Guest의 Account에 장소 찜이 존재하면 마이그레이션을 한다")
+        @Test
+        void checkMigrationAvailability3() {
+            // given
+            Account account = new Account(1L);
+            Guest guest = new Guest(1L, account, "device-fid");
+            given(favoriteContentService.existsByAccount(account))
+                    .willReturn(false);
+            given(favoritePlaceService.existsByAccount(account))
+                    .willReturn(true);
+            given(favoriteFolderService.isCustomFolderExists(account))
+                    .willReturn(false);
+
+            // when
+            MigrationAvailabilityResponse response = guestService.checkMigrationAvailability(guest);
+
+            // then
+            assertThat(response.availability()).isTrue();
+        }
+
+        @DisplayName("Guest의 Account에 커스텀 찜 폴더가 존재하면 마이그레이션을 한다")
+        @Test
+        void checkMigrationAvailability4() {
+            // given
+            Account account = new Account(1L);
+            Guest guest = new Guest(1L, account, "device-fid");
+            given(favoriteContentService.existsByAccount(account))
+                    .willReturn(false);
+            given(favoritePlaceService.existsByAccount(account))
+                    .willReturn(false);
+            given(favoriteFolderService.isCustomFolderExists(account))
+                    .willReturn(true);
+
+            // when
+            MigrationAvailabilityResponse response = guestService.checkMigrationAvailability(guest);
+
+            // then
+            assertThat(response.availability()).isTrue();
         }
     }
 

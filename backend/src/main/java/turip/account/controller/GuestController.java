@@ -11,8 +11,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import turip.account.controller.dto.response.MigrationAvailabilityResponse;
 import turip.account.domain.Guest;
 import turip.account.service.GuestService;
 import turip.auth.resolver.AuthGuest;
@@ -25,6 +27,13 @@ import turip.common.exception.ErrorResponse;
 public class GuestController {
 
     private final GuestService guestService;
+
+    @GetMapping("/migration/availability")
+    public ResponseEntity<MigrationAvailabilityResponse> readMigrationAvailability(
+            @Parameter(hidden = true) @AuthGuest Guest guest) {
+        MigrationAvailabilityResponse response = guestService.checkMigrationAvailability(guest);
+        return ResponseEntity.ok(response);
+    }
 
     @Operation(
             summary = "게스트 탈퇴 api",

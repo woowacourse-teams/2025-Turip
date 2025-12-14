@@ -36,5 +36,7 @@ public interface FavoritePlaceRepository extends JpaRepository<FavoritePlace, Lo
 
     int countByFavoriteFolderAccount(Account account);
 
+    boolean existsByFavoriteFolderAccount(Account account);
+
     void deleteAllByFavoriteFolder(FavoriteFolder favoriteFolder);
 }
