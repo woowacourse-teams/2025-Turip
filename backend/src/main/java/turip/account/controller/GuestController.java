@@ -28,6 +28,47 @@ public class GuestController {
 
     private final GuestService guestService;
 
+    @Operation(
+            summary = "게스트 마이그레이션 가능 여부 조회 api",
+            description = "게스트 계정에 콘텐츠 찜, 장소 찜, 커스텀 찜 폴더가 존재하는지 확인한다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "성공 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = MigrationAvailabilityResponse.class),
+                            examples = @ExampleObject(
+                                    name = "success",
+                                    summary = "성공적으로 마이그레이션 가능 여부 조회",
+                                    value = """
+                                            {
+                                                "availability": true
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "guest not found",
+                                    summary = "요청 헤더에 device-fid가 존재하지 않는 경우",
+                                    value = """
+                                            {
+                                            	"tag": "DEVICE_FID_REQUIRED",
+                                            	"message": "요청 헤더에 device_fid가 존재하지 않습니다."
+                                            }
+                                            """
+                            )
+                    )
+            )
+    })
     @GetMapping("/migration/availability")
     public ResponseEntity<MigrationAvailabilityResponse> readMigrationAvailability(
             @Parameter(hidden = true) @AuthGuest Guest guest) {
