@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import turip.account.domain.Account;
 import turip.common.exception.ErrorTag;
+import turip.common.exception.custom.BadRequestException;
 import turip.common.exception.custom.ConflictException;
 import turip.common.exception.custom.ForbiddenException;
 import turip.common.exception.custom.NotFoundException;
@@ -123,7 +124,7 @@ public class FavoritePlaceService {
 
     private void validateFavoritePlaceBelongsToFolder(FavoritePlace favoritePlace, FavoriteFolder favoriteFolder) {
         if (!favoritePlace.getFavoriteFolder().equals(favoriteFolder)) {
-            throw new ForbiddenException(ErrorTag.FORBIDDEN);
+            throw new BadRequestException(ErrorTag.FAVORITE_PLACE_FOLDER_MISMATCH);
         }
     }
 

@@ -515,7 +515,7 @@ class FavoritePlaceApiTest {
                     .statusCode(404);
         }
 
-        @DisplayName("다른 폴더의 favoritePlaceId가 포함된 경우 403 FORBIDDEN을 응답한다")
+        @DisplayName("다른 폴더의 favoritePlaceId가 포함된 경우 400 Bad Request를 응답한다")
         @Test
         void updatePlaceOrder6() {
             // given
@@ -541,7 +541,7 @@ class FavoritePlaceApiTest {
                     .contentType(ContentType.JSON)
                     .when().patch("/favorites/places/favorite-order")
                     .then()
-                    .statusCode(403);
+                    .statusCode(400);
         }
     }
 

@@ -348,6 +348,24 @@ public class FavoritePlaceController {
                     description = "성공 예시"
             ),
             @ApiResponse(
+                    responseCode = "400",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "favorite_place_folder_mismatch",
+                                    summary = "장소 찜이 해당 폴더에 존재하지 않는 경우",
+                                    value = """
+                                            {
+                                                "tag": "FAVORITE_PLACE_FOLDER_MISMATCH",
+                                                "message": "장소 찜이 해당 폴더에 존재하지 않습니다."
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
                     responseCode = "401",
                     description = "실패 예시",
                     content = @Content(
@@ -393,28 +411,17 @@ public class FavoritePlaceController {
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
-                            examples = {
-                                    @ExampleObject(
-                                            name = "not_folder_owner",
-                                            summary = "폴더 소유자가 아닌 경우",
-                                            value = """
-                                                    {
-                                                        "tag": "FORBIDDEN",
-                                                        "message": "접근 권한이 없습니다."
-                                                    }
-                                                    """
-                                    ),
-                                    @ExampleObject(
-                                            name = "favorite_place_not_belongs_to_folder",
-                                            summary = "다른 폴더의 favoritePlaceId가 포함된 경우",
-                                            value = """
-                                                    {
-                                                        "tag": "FORBIDDEN",
-                                                        "message": "접근 권한이 없습니다."
-                                                    }
-                                                    """
-                                    )
-                            }
+                            examples = @ExampleObject(
+                                    name = "not_folder_owner",
+                                    summary = "폴더 소유자가 아닌 경우",
+                                    value = """
+                                            {
+                                                "tag": "FORBIDDEN",
+                                                "message": "접근 권한이 없습니다."
+                                            }
+                                            """
+                            )
+
                     )
             ),
             @ApiResponse(
