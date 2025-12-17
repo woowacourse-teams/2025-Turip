@@ -7,9 +7,9 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import turip.account.domain.Account;
 import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.domain.FavoritePlace;
-import turip.account.domain.Account;
 import turip.place.domain.Place;
 
 public interface FavoritePlaceRepository extends JpaRepository<FavoritePlace, Long> {
@@ -33,6 +33,10 @@ public interface FavoritePlaceRepository extends JpaRepository<FavoritePlace, Lo
     @Query("SELECT fp.favoriteFolder.id FROM FavoritePlace fp WHERE fp.place = :place AND fp.favoriteFolder IN :favoriteFolders")
     Set<Long> findFavoriteFolderIdsByPlaceAndFavoriteFolderIn(@Param("place") Place place,
                                                               @Param("favoriteFolders") List<FavoriteFolder> favoriteFolders);
+
+    int countByFavoriteFolderAccount(Account account);
+
+    boolean existsByFavoriteFolderAccount(Account account);
 
     void deleteAllByFavoriteFolder(FavoriteFolder favoriteFolder);
 }

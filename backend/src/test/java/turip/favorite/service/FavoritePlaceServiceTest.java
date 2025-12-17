@@ -15,17 +15,18 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import turip.account.domain.Account;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.ConflictException;
 import turip.common.exception.custom.ForbiddenException;
 import turip.common.exception.custom.NotFoundException;
 import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlaceResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlacesWithPlaceDetailResponse;
+import turip.favorite.controller.dto.response.FavoritePlaceCountResponse;
 import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.domain.FavoritePlace;
 import turip.favorite.repository.FavoriteFolderRepository;
 import turip.favorite.repository.FavoritePlaceRepository;
-import turip.account.domain.Account;
 import turip.place.domain.Place;
 import turip.place.repository.PlaceRepository;
 
@@ -207,6 +208,28 @@ class FavoritePlaceServiceTest {
             assertThatThrownBy(() -> favoritePlaceService.findAllByFolder(favoriteFolderId))
                     .isInstanceOf(NotFoundException.class)
                     .hasMessage(ErrorTag.FAVORITE_FOLDER_NOT_FOUND.getMessage());
+        }
+    }
+
+    @DisplayName("계정의 장소 찜 수 조회 테스트")
+    @Nested
+    class CountByAccount {
+
+        @DisplayName("특정 계정의 장소 찜 개수를 조회할 수 있다")
+        @Test
+        void countByAccount1() {
+            // given
+            Account account = new Account(1L);
+            int favoritePlaceCount = 3;
+            given(favoritePlaceRepository.countByFavoriteFolderAccount(account))
+                    .willReturn(favoritePlaceCount);
+
+            // when
+            FavoritePlaceCountResponse response = favoritePlaceService.countByAccount(account);
+
+            // then
+            assertThat(response.count())
+                    .isEqualTo(favoritePlaceCount);
         }
     }
 

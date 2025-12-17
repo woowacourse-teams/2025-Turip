@@ -25,6 +25,7 @@ import turip.common.exception.ErrorResponse;
 import turip.favorite.controller.dto.request.FavoritePlaceOrderRequest;
 import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlaceResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlacesWithPlaceDetailResponse;
+import turip.favorite.controller.dto.response.FavoritePlaceCountResponse;
 import turip.favorite.service.FavoritePlaceService;
 
 @RestController
@@ -264,6 +265,76 @@ public class FavoritePlaceController {
             @RequestParam("favoriteFolderId") Long favoriteFolderId) {
         FavoritePlacesWithPlaceDetailResponse response = favoritePlaceService.findAllByFolder(
                 favoriteFolderId);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "장소 찜 수 조회 api",
+            description = "특정 계정의 장소 찜 개수를 조회한다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "성공 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = FavoritePlaceCountResponse.class),
+                            examples = @ExampleObject(
+                                    name = "success",
+                                    summary = "장소 찜 폴더의 장소 찜 목록 조회 성공",
+                                    value = """
+                                            {
+                                               "count": 5
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "access token expired",
+                                            summary = "만료된 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_EXPIRED",
+                                                    	"message": "access token이 만료됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "invalid signature access token",
+                                            summary = "서명값이 올바르지 않은 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_SIGNATURE_INVALID",
+                                                    	"message": "access token이 위조됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "unauthorized",
+                                            summary = "알 수 없는 이유로 인증 실패",
+                                            value = """
+                                                    {
+                                                    	"tag": "UNAUTHORIZED",
+                                                    	"message": "토큰 기반 인증에 실패했습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            )
+    })
+    @GetMapping("/count")
+    public ResponseEntity<FavoritePlaceCountResponse> readCountByAccount(
+            @Parameter(hidden = true) @AuthAccount Account account) {
+        FavoritePlaceCountResponse response = favoritePlaceService.countByAccount(account);
         return ResponseEntity.ok(response);
     }
 
