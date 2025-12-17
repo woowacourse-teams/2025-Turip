@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import turip.account.domain.Account;
+import turip.account.domain.Member;
+import turip.account.domain.Provider;
 import turip.auth.controller.dto.request.LoginRequest;
 import turip.auth.controller.dto.request.RefreshTokenRequest;
 import turip.auth.controller.dto.response.LoginResponse;
@@ -23,9 +26,6 @@ import turip.auth.resolver.AuthAccount;
 import turip.auth.resolver.AuthMember;
 import turip.auth.service.AuthService;
 import turip.common.exception.ErrorResponse;
-import turip.account.domain.Account;
-import turip.account.domain.Member;
-import turip.account.domain.Provider;
 
 @Controller
 @RequiredArgsConstructor
@@ -184,7 +184,7 @@ public class AuthController {
                             mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(
-                                    name = "device fid not exists",
+                                    name = "device-fid required",
                                     summary = "요청 헤더에 device fid가 존재하지 않는 경우",
                                     value = """
                                             {

@@ -57,7 +57,7 @@ public class GuestController {
                             mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(
-                                    name = "guest not found",
+                                    name = "device-fid required",
                                     summary = "요청 헤더에 device-fid가 존재하지 않는 경우",
                                     value = """
                                             {
@@ -92,7 +92,7 @@ public class GuestController {
                             mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(
-                                    name = "guest not found",
+                                    name = "device-fid required",
                                     summary = "요청 헤더에 device-fid가 존재하지 않는 경우",
                                     value = """
                                             {
