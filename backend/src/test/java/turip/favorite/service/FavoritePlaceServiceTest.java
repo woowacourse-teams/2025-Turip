@@ -17,9 +17,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import turip.account.domain.Account;
 import turip.common.exception.ErrorTag;
+import turip.common.exception.custom.BadRequestException;
 import turip.common.exception.custom.ConflictException;
 import turip.common.exception.custom.ForbiddenException;
 import turip.common.exception.custom.NotFoundException;
+import turip.favorite.controller.dto.request.FavoritePlaceOrderRequest;
 import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlaceResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlacesWithPlaceDetailResponse;
 import turip.favorite.controller.dto.response.FavoritePlaceCountResponse;
@@ -230,6 +232,81 @@ class FavoritePlaceServiceTest {
             // then
             assertThat(response.count())
                     .isEqualTo(favoritePlaceCount);
+        }
+    }
+
+    @DisplayName("장소 찜 순서 변경 테스트")
+    @Nested
+    class UpdatePlaceOrder {
+
+        @DisplayName("장소 찜 순서를 변경할 수 있다")
+        @Test
+        void updatePlaceOrder1() {
+            // given
+            Account account = new Account(1L);
+            FavoriteFolder favoriteFolder = new FavoriteFolder(1L, account, "폴더1", false);
+            FavoritePlace firstFavoritePlace = new FavoritePlace(1L, favoriteFolder, null, 1);
+            FavoritePlace secondFavoritePlace = new FavoritePlace(2L, favoriteFolder, null, 2);
+            given(favoriteFolderRepository.findById(favoriteFolder.getId()))
+                    .willReturn(Optional.of(favoriteFolder));
+            given(favoritePlaceRepository.findById(firstFavoritePlace.getId()))
+                    .willReturn(Optional.of(firstFavoritePlace));
+            given(favoritePlaceRepository.findById(secondFavoritePlace.getId()))
+                    .willReturn(Optional.of(secondFavoritePlace));
+
+            // when
+            FavoritePlaceOrderRequest request = new FavoritePlaceOrderRequest(List.of(2L, 1L));
+            favoritePlaceService.updatePlaceOrder(account, favoriteFolder.getId(), request);
+
+            // then
+            assertAll(
+                    () -> assertThat(firstFavoritePlace.getFavoriteOrder()).isEqualTo(2),
+                    () -> assertThat(secondFavoritePlace.getFavoriteOrder()).isEqualTo(1)
+            );
+        }
+
+        @DisplayName("변경하려는 장소 찜의 폴더가 요청 계정의 소유가 아닌 경우 예외를 발생시킨다")
+        @Test
+        void updatePlaceOrder2() {
+            // given
+            Account owner = new Account(1L);
+            Account requestAccount = new Account(2L);
+            FavoriteFolder favoriteFolder = new FavoriteFolder(1L, owner, "폴더1", false);
+            given(favoriteFolderRepository.findById(favoriteFolder.getId()))
+                    .willReturn(Optional.of(favoriteFolder));
+
+            // when
+            FavoritePlaceOrderRequest request = new FavoritePlaceOrderRequest(List.of(2L, 1L));
+
+            // then
+            assertThatThrownBy(
+                    () -> favoritePlaceService.updatePlaceOrder(requestAccount, favoriteFolder.getId(), request))
+                    .isInstanceOf(ForbiddenException.class);
+        }
+
+        @DisplayName("변경하려는 장소 찜이 다른 장소 찜 폴더의 장소 찜인 경우 예외를 발생시킨다")
+        @Test
+        void updatePlaceOrder3() {
+            // given
+            Account account = new Account(1L);
+            FavoriteFolder favoriteFolder = new FavoriteFolder(1L, account, "폴더1", false);
+            FavoriteFolder otherFavoriteFolder = new FavoriteFolder(2L, account, "다른 폴더", false);
+            FavoritePlace firstFavoritePlace = new FavoritePlace(1L, favoriteFolder, null, 1);
+            FavoritePlace secondFavoritePlace = new FavoritePlace(2L, otherFavoriteFolder, null, 2);
+            given(favoriteFolderRepository.findById(favoriteFolder.getId()))
+                    .willReturn(Optional.of(favoriteFolder));
+            given(favoritePlaceRepository.findById(firstFavoritePlace.getId()))
+                    .willReturn(Optional.of(firstFavoritePlace));
+            given(favoritePlaceRepository.findById(secondFavoritePlace.getId()))
+                    .willReturn(Optional.of(secondFavoritePlace));
+
+            // when
+            FavoritePlaceOrderRequest request = new FavoritePlaceOrderRequest(List.of(1L, 2L));
+
+            // then
+            assertThatThrownBy(
+                    () -> favoritePlaceService.updatePlaceOrder(account, favoriteFolder.getId(), request))
+                    .isInstanceOf(BadRequestException.class);
         }
     }
 
