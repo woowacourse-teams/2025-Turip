@@ -338,6 +338,14 @@ public class FavoritePlaceController {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * Update the display order of favorite places within a favorite folder.
+     *
+     * Reorders the favorite places in the specified folder according to the ordering provided in the request.
+     *
+     * @param favoriteFolderId the ID of the favorite folder whose place order will be updated
+     * @param request payload containing the new ordering for favorite places in the folder
+     */
     @Operation(
             summary = "장소 찜 폴더 내의 장소 찜 정렬 순서 변경 api",
             description = "장소 찜 폴더의 장소 찜들의 정렬 순서를 변경한다."

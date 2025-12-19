@@ -122,6 +122,13 @@ public class FavoritePlaceService {
         }
     }
 
+    /**
+     * Validates that the given favorite place belongs to the specified favorite folder.
+     *
+     * @param favoritePlace the favorite place to validate
+     * @param favoriteFolder the favorite folder to validate against
+     * @throws BadRequestException if the favorite place's folder is not equal to the specified favorite folder (ErrorTag.FAVORITE_PLACE_FOLDER_MISMATCH)
+     */
     private void validateFavoritePlaceBelongsToFolder(FavoritePlace favoritePlace, FavoriteFolder favoriteFolder) {
         if (!favoritePlace.getFavoriteFolder().equals(favoriteFolder)) {
             throw new BadRequestException(ErrorTag.FAVORITE_PLACE_FOLDER_MISMATCH);
