@@ -1,6 +1,5 @@
 package com.on.turip.ui.compose.setting
 
-import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -28,18 +27,21 @@ import com.on.turip.R
 import com.on.turip.common.AuthState
 import com.on.turip.common.UserType
 import com.on.turip.domain.ErrorEvent
-import com.on.turip.ui.compose.common.component.TuripAppBar
-import com.on.turip.ui.compose.common.component.TuripDialog
-import com.on.turip.ui.compose.common.component.TuripSnackbar
+import com.on.turip.domain.setting.InquiryMail
+import com.on.turip.ui.compose.designsystem.component.TuripAppBar
+import com.on.turip.ui.compose.designsystem.component.TuripDialog
+import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
+import com.on.turip.ui.compose.setting.component.SettingItem
+import com.on.turip.ui.compose.setting.model.SettingUiEvent
+import com.on.turip.ui.compose.setting.model.SettingUiState
 import com.on.turip.ui.compose.theme.TuripTheme
-import com.on.turip.ui.main.favorite.SettingViewModel
 import timber.log.Timber
 
 @Composable
 fun SettingScreen(
     navigateToBack: () -> Unit,
-    navigateToInquiry: (Uri) -> Unit,
-    navigateToPrivacyPolicy: (Uri) -> Unit,
+    navigateToInquiry: (InquiryMail) -> Unit,
+    navigateToPrivacyPolicy: (String) -> Unit,
     navigateToLoginScreen: () -> Unit,
     viewModel: SettingViewModel = hiltViewModel(),
 ) {
@@ -99,11 +101,11 @@ fun SettingScreen(
         snackbarHostState = snackbarHostState,
         onClickBack = navigateToBack,
         onClickInquiry = {
-            navigateToInquiry(viewModel.loadInquiryUri())
+            navigateToInquiry(viewModel.loadInquiryMail())
             Timber.d("SettingScreen 문의하기 버튼 클릭")
         },
         onClickPrivacyPolicy = {
-            navigateToPrivacyPolicy(viewModel.loadPrivacyPolicyUri())
+            navigateToPrivacyPolicy(viewModel.loadPrivacyPolicyLink())
             Timber.d("SettingScreen 개인정보처리 방침 버튼 클릭")
         },
         onClickLogin = {
@@ -199,20 +201,14 @@ private fun SettingCommonScreen(
     )
 
     SettingItem(
-        uiModel =
-            SettingModel(
-                iconResource = R.drawable.ic_inquire,
-                titleResource = R.string.setting_inquiry,
-            ),
+        imageRes = R.drawable.ic_inquire,
+        titleRes = R.string.setting_inquiry,
         onClick = onClickInquiry,
         modifier = Modifier.fillMaxWidth(),
     )
     SettingItem(
-        uiModel =
-            SettingModel(
-                iconResource = R.drawable.ic_document,
-                titleResource = R.string.setting_privacy_policy,
-            ),
+        imageRes = R.drawable.ic_document,
+        titleRes = R.string.setting_privacy_policy,
         onClick = onClickPrivacyPolicy,
         modifier = Modifier.fillMaxWidth(),
     )
@@ -221,11 +217,8 @@ private fun SettingCommonScreen(
 @Composable
 private fun SettingForGuestScreen(onClickLogin: () -> Unit) {
     SettingItem(
-        uiModel =
-            SettingModel(
-                iconResource = R.drawable.ic_login,
-                titleResource = R.string.setting_login,
-            ),
+        imageRes = R.drawable.ic_login,
+        titleRes = R.string.setting_login,
         onClick = onClickLogin,
         modifier = Modifier.fillMaxWidth(),
     )
@@ -237,20 +230,14 @@ private fun SettingForMemberScreen(
     onClickWithdraw: () -> Unit,
 ) {
     SettingItem(
-        uiModel =
-            SettingModel(
-                iconResource = R.drawable.ic_logout,
-                titleResource = R.string.setting_logout,
-            ),
+        imageRes = R.drawable.ic_logout,
+        titleRes = R.string.setting_logout,
         onClick = onClickLogout,
         modifier = Modifier.fillMaxWidth(),
     )
     SettingItem(
-        uiModel =
-            SettingModel(
-                iconResource = R.drawable.ic_withdraw,
-                titleResource = R.string.setting_withdraw,
-            ),
+        imageRes = R.drawable.ic_withdraw,
+        titleRes = R.string.setting_withdraw,
         onClick = onClickWithdraw,
         modifier = Modifier.fillMaxWidth(),
     )

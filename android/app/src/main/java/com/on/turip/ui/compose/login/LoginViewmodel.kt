@@ -10,6 +10,8 @@ import com.on.turip.data.common.onSuccess
 import com.on.turip.data.login.datasource.GoogleCredentialManager
 import com.on.turip.domain.login.MemberRepository
 import com.on.turip.domain.login.usecase.LoginUserUseCase
+import com.on.turip.ui.compose.login.model.LoginUiEvent
+import com.on.turip.ui.compose.login.model.LoginUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow

@@ -31,9 +31,12 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.on.turip.R
 import com.on.turip.data.login.datasource.GoogleCredentialManager
-import com.on.turip.ui.compose.common.component.HelpText
-import com.on.turip.ui.compose.common.component.TuripDialog
-import com.on.turip.ui.compose.common.util.noRippleClickable
+import com.on.turip.ui.compose.designsystem.component.TuripDialog
+import com.on.turip.ui.compose.login.component.GoogleLoginButton
+import com.on.turip.ui.compose.login.component.HelpText
+import com.on.turip.ui.compose.login.model.LoginUiEvent
+import com.on.turip.ui.compose.login.model.LoginUiState
+import com.on.turip.ui.compose.login.util.noRippleClickable
 import com.on.turip.ui.compose.theme.TuripTypography
 
 @Composable
@@ -152,10 +155,12 @@ private fun LoginScreenContent(
                             .border(
                                 border = BorderStroke(1.dp, colorResource(R.color.gray_200_c1c1c1)),
                                 shape = RoundedCornerShape(10.dp),
-                            ).background(
+                            )
+                            .background(
                                 color = colorResource(R.color.gray_300_5b5b5b),
                                 shape = RoundedCornerShape(10.dp),
-                            ).fillMaxWidth()
+                            )
+                            .fillMaxWidth()
                             .padding(vertical = 20.dp),
                     textAlign = TextAlign.Center,
                 )
