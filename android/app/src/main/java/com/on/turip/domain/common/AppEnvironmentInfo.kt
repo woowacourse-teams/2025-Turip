@@ -1,6 +1,6 @@
 package com.on.turip.domain.common
 
-data class DeviceInfo(
+data class AppEnvironmentInfo(
     val appVersionName: String,
     val appVersionCode: Int,
     val deviceReleaseVersion: String,

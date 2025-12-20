@@ -1,9 +1,9 @@
 package com.on.turip.domain.setting
 
-import com.on.turip.domain.common.DeviceInfo
+import com.on.turip.domain.common.AppEnvironmentInfo
 
 data class InquiryMail(
-    val deviceInfo: DeviceInfo,
+    val appEnvironmentInfo: AppEnvironmentInfo,
     val fid: String,
 ) {
     val content: String
@@ -26,9 +26,9 @@ data class InquiryMail(
             
             --------------------------------------------------------
             
-            사용자의 튜립 앱 버전: ${deviceInfo.appVersionName} (${deviceInfo.appVersionCode})
-            사용자의 OS: Android ${deviceInfo.deviceReleaseVersion} (SDK ${deviceInfo.deviceSdkVersion})
-            사용자 기기: ${deviceInfo.deviceManufacturer} ${deviceInfo.deviceModel}
+            사용자의 튜립 앱 버전: ${appEnvironmentInfo.appVersionName} (${appEnvironmentInfo.appVersionCode})
+            사용자의 OS: Android ${appEnvironmentInfo.deviceReleaseVersion} (SDK ${appEnvironmentInfo.deviceSdkVersion})
+            사용자 기기: ${appEnvironmentInfo.deviceManufacturer} ${appEnvironmentInfo.deviceModel}
             사용자 ID: $fid
             """.trimIndent()
 

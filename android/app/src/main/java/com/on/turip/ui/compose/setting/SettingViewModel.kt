@@ -9,7 +9,7 @@ import com.on.turip.domain.login.MemberRepository
 import com.on.turip.domain.setting.InquiryMail
 import com.on.turip.domain.setting.PrivacyPolicy
 import com.on.turip.domain.userstorage.repository.UserStorageRepository
-import com.on.turip.platform.device.DeviceInfoProvider
+import com.on.turip.platform.device.AppEnvironmentInfoProvider
 import com.on.turip.ui.compose.setting.model.SettingUiEvent
 import com.on.turip.ui.compose.setting.model.SettingUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,7 +27,7 @@ import javax.inject.Inject
 class SettingViewModel @Inject constructor(
     private val userStorageRepository: UserStorageRepository,
     private val memberRepository: MemberRepository,
-    private val deviceInfoProvider: DeviceInfoProvider,
+    private val appEnvironmentInfoProvider: AppEnvironmentInfoProvider,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<SettingUiState> = MutableStateFlow(SettingUiState.EMPTY)
     val uiState: StateFlow<SettingUiState> = _uiState
@@ -55,7 +55,7 @@ class SettingViewModel @Inject constructor(
 
     fun loadInquiryMail(): InquiryMail =
         InquiryMail(
-            deviceInfo = deviceInfoProvider.getDeviceInfo(),
+            appEnvironmentInfo = appEnvironmentInfoProvider.getAppEnvironmentInfo(),
             fid = uiState.value.deviceIdentifier.fid,
         )
 
