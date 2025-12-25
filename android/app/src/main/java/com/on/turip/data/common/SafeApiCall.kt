@@ -1,10 +1,8 @@
 package com.on.turip.data.common
 
-import com.on.turip.data.common.data.ErrorResponse
-import com.on.turip.data.common.data.toErrorType
-import com.on.turip.data.common.domain.ErrorType
 import kotlinx.coroutines.CancellationException
 import kotlinx.serialization.json.Json
+import retrofit2.HttpException
 import retrofit2.Response
 import java.io.IOException
 
@@ -16,14 +14,35 @@ suspend fun <T> safeApiCall(apiCall: suspend () -> Response<T>): TuripCustomResu
             return TuripCustomResult.Success(response.body() as T)
         }
 
-        val errorResponse: ErrorResponse? =
-            response.errorBody()?.string()?.let { Json.decodeFromString<ErrorResponse>(it) }
-        return TuripCustomResult.Failure(errorResponse.toErrorType())
+        return TuripCustomResult.Failure(response.toErrorType(), HttpException(response))
     } catch (e: Throwable) {
         if (e is CancellationException) throw e
         return when (e) {
-            is IOException -> TuripCustomResult.Failure(ErrorType.Network)
-            else -> TuripCustomResult.Failure(ErrorType.Unknown)
+            is IOException -> TuripCustomResult.Failure(ErrorType.Network, e)
+            else -> TuripCustomResult.Failure(ErrorType.Unknown, e)
         }
+    }
+}
+
+private fun <T> Response<T>.toErrorType(): ErrorType =
+    runCatching {
+        this
+            .errorBody()
+            ?.string()
+            ?.let { Json.decodeFromString<ErrorResponse>(it) }
+            ?.toErrorType() ?: ErrorType.Unknown
+    }.getOrElse {
+        ErrorType.Unknown
+    }
+
+suspend fun <T> safeLocalApiCall(
+    errorType: ErrorType = ErrorType.Local.Unknown,
+    apiCall: suspend () -> T,
+): TuripCustomResult<T> {
+    try {
+        return TuripCustomResult.Success(apiCall())
+    } catch (e: Throwable) {
+        if (e is CancellationException) throw e
+        return TuripCustomResult.Failure(errorType, e)
     }
 }
