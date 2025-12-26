@@ -26,7 +26,7 @@ import com.on.turip.data.common.UiError
 import com.on.turip.databinding.ActivitySearchBinding
 import com.on.turip.domain.searchhistory.SearchHistory
 import com.on.turip.ui.common.base.BaseActivity
-import com.on.turip.ui.common.event.CommonEvent
+import com.on.turip.ui.common.event.CommonUiEffect
 import com.on.turip.ui.login.LoginActivity
 import com.on.turip.ui.search.model.VideoInformationModel
 import com.on.turip.ui.trip.detail.TripDetailActivity
@@ -224,7 +224,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiEvent.collect { event ->
                     when (event) {
-                        CommonEvent.TokenExpiration -> navigateToLoginScreen()
+                        CommonUiEffect.NavigateToLogin -> navigateToLoginScreen()
                     }
                 }
             }

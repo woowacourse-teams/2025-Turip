@@ -6,6 +6,7 @@ import com.on.turip.data.common.ErrorType.Creator
 import com.on.turip.data.common.ErrorType.FavoriteFolder
 import com.on.turip.data.common.ErrorType.FavoritePlace
 import com.on.turip.data.common.ErrorType.Place
+import com.on.turip.ui.common.event.CommonUiEffect
 
 fun ErrorType.toUiError(): UiError =
     when (this) {
@@ -33,4 +34,10 @@ fun ErrorType.toUiError(): UiError =
         ErrorType.Network -> UiError.Network
 
         else -> UiError.Unknown
+    }
+
+fun UiError.toCommonUiEffect(): CommonUiEffect =
+    when (this) {
+        UiError.TokenExpired -> CommonUiEffect.NavigateToLogin
+        else -> CommonUiEffect.NotifyError(this)
     }

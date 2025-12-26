@@ -11,7 +11,7 @@ import com.on.turip.domain.content.UsersLikeContent
 import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.region.RegionCategory
 import com.on.turip.domain.region.repository.RegionRepository
-import com.on.turip.ui.common.event.CommonEvent
+import com.on.turip.ui.common.event.CommonUiEffect
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.main.home.model.UsersLikeContentModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -43,8 +43,8 @@ class HomeViewModel @Inject constructor(
     private val _serverError: MutableLiveData<Boolean> = MutableLiveData(false)
     val serverError: LiveData<Boolean> get() = _serverError
 
-    private val _uiEvent: Channel<CommonEvent> = Channel(Channel.BUFFERED)
-    val uiEvent: Flow<CommonEvent> = _uiEvent.receiveAsFlow()
+    private val _uiEvent: Channel<CommonUiEffect> = Channel(Channel.BUFFERED)
+    val uiEvent: Flow<CommonUiEffect> = _uiEvent.receiveAsFlow()
 
     init {
         loadUsersLikeContents()
@@ -96,7 +96,7 @@ class HomeViewModel @Inject constructor(
 
             ErrorEvent.TOKEN_EXPIRATION -> {
                 viewModelScope.launch {
-                    _uiEvent.send(CommonEvent.TokenExpiration)
+                    _uiEvent.send(CommonUiEffect.NavigateToLogin)
                 }
             }
         }

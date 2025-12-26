@@ -16,7 +16,7 @@ import com.on.turip.R
 import com.on.turip.databinding.BottomSheetFragmentFavoritePlaceFolderCatalogBinding
 import com.on.turip.ui.common.TuripDialogFragment
 import com.on.turip.ui.common.base.BaseFragment
-import com.on.turip.ui.common.event.CommonEvent
+import com.on.turip.ui.common.event.CommonUiEffect
 import com.on.turip.ui.login.LoginActivity
 import com.on.turip.ui.main.favorite.FavoritePlaceFolderCatalogViewModel.FavoritePlaceFolderCatalogUiEvent
 import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
@@ -139,9 +139,9 @@ class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavor
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
-                    viewModel.commonEvent.collect { event ->
+                    viewModel.commonUiEffect.collect { event ->
                         when (event) {
-                            CommonEvent.TokenExpiration -> navigateToLoginScreen()
+                            CommonUiEffect.NavigateToLogin -> navigateToLoginScreen()
                         }
                     }
                 }
