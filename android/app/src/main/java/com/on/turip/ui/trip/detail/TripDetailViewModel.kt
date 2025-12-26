@@ -16,7 +16,7 @@ import com.on.turip.domain.favorite.usecase.UpdateFavoriteUseCase
 import com.on.turip.domain.trip.ContentPlace
 import com.on.turip.domain.trip.Trip
 import com.on.turip.domain.trip.repository.ContentPlaceRepository
-import com.on.turip.ui.common.event.CommonEvent
+import com.on.turip.ui.common.event.CommonUiEffect
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.common.mapper.toUiModelWithoutContentPlaces
 import com.on.turip.ui.common.model.trip.TripModel
@@ -72,8 +72,8 @@ class TripDetailViewModel @Inject constructor(
     private val _serverError: MutableLiveData<Boolean> = MutableLiveData(false)
     val serverError: LiveData<Boolean> get() = _serverError
 
-    private val _uiEvent: Channel<CommonEvent> = Channel(Channel.BUFFERED)
-    val uiEvent: Flow<CommonEvent> = _uiEvent.receiveAsFlow()
+    private val _uiEvent: Channel<CommonUiEffect> = Channel(Channel.BUFFERED)
+    val uiEvent: Flow<CommonUiEffect> = _uiEvent.receiveAsFlow()
 
     val tripDetailInfo: LiveData<TripDetailInfoModel> =
         content.switchMap { content ->
@@ -219,14 +219,29 @@ class TripDetailViewModel @Inject constructor(
 
     private fun checkError(errorEvent: ErrorEvent) {
         when (errorEvent) {
-            ErrorEvent.USER_NOT_HAVE_PERMISSION -> _serverError.value = true
-            ErrorEvent.UNEXPECTED_PROBLEM -> _serverError.value = true
-            ErrorEvent.NETWORK_ERROR -> _networkError.value = true
-            ErrorEvent.PARSER_ERROR -> _serverError.value = true
-            ErrorEvent.DUPLICATION_FOLDER -> throw IllegalArgumentException("발생할 수 없는 오류")
+            ErrorEvent.USER_NOT_HAVE_PERMISSION -> {
+                _serverError.value = true
+            }
+
+            ErrorEvent.UNEXPECTED_PROBLEM -> {
+                _serverError.value = true
+            }
+
+            ErrorEvent.NETWORK_ERROR -> {
+                _networkError.value = true
+            }
+
+            ErrorEvent.PARSER_ERROR -> {
+                _serverError.value = true
+            }
+
+            ErrorEvent.DUPLICATION_FOLDER -> {
+                throw IllegalArgumentException("발생할 수 없는 오류")
+            }
+
             ErrorEvent.TOKEN_EXPIRATION -> {
                 viewModelScope.launch {
-                    _uiEvent.send(CommonEvent.TokenExpiration)
+                    _uiEvent.send(CommonUiEffect.NavigateToLogin)
                 }
             }
         }

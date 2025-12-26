@@ -10,7 +10,7 @@ import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.favorite.FavoriteContent
 import com.on.turip.domain.favorite.repository.FavoriteRepository
 import com.on.turip.domain.favorite.usecase.UpdateFavoriteUseCase
-import com.on.turip.ui.common.event.CommonEvent
+import com.on.turip.ui.common.event.CommonUiEffect
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -34,8 +34,8 @@ class FavoriteContentViewModel @Inject constructor(
     private val _serverError: MutableLiveData<Boolean> = MutableLiveData(false)
     val serverError: LiveData<Boolean> get() = _serverError
 
-    private val _uiEvent: Channel<CommonEvent> = Channel(Channel.BUFFERED)
-    val uiEvent: Flow<CommonEvent> = _uiEvent.receiveAsFlow()
+    private val _uiEvent: Channel<CommonUiEffect> = Channel(Channel.BUFFERED)
+    val uiEvent: Flow<CommonUiEffect> = _uiEvent.receiveAsFlow()
 
     init {
         loadFavoriteContents()
@@ -86,7 +86,10 @@ class FavoriteContentViewModel @Inject constructor(
                 _serverError.value = true
             }
 
-            ErrorEvent.DUPLICATION_FOLDER -> throw IllegalArgumentException("발생할 수 없는 오류")
+            ErrorEvent.DUPLICATION_FOLDER -> {
+                throw IllegalArgumentException("발생할 수 없는 오류")
+            }
+
             ErrorEvent.UNEXPECTED_PROBLEM -> {
                 _serverError.value = true
             }
@@ -101,7 +104,7 @@ class FavoriteContentViewModel @Inject constructor(
 
             ErrorEvent.TOKEN_EXPIRATION -> {
                 viewModelScope.launch {
-                    _uiEvent.send(CommonEvent.TokenExpiration)
+                    _uiEvent.send(CommonUiEffect.NavigateToLogin)
                 }
             }
         }

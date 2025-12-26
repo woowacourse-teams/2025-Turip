@@ -24,7 +24,7 @@ import com.on.turip.databinding.ActivityTripDetailBinding
 import com.on.turip.domain.content.Content
 import com.on.turip.ui.common.TuripSnackbar
 import com.on.turip.ui.common.base.BaseActivity
-import com.on.turip.ui.common.event.CommonEvent
+import com.on.turip.ui.common.event.CommonUiEffect
 import com.on.turip.ui.common.loadCircularImage
 import com.on.turip.ui.common.model.trip.toDisplayText
 import com.on.turip.ui.login.LoginActivity
@@ -305,7 +305,7 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiEvent.collect { event ->
                     when (event) {
-                        CommonEvent.TokenExpiration -> navigateToLoginScreen()
+                        CommonUiEffect.NavigateToLogin -> navigateToLoginScreen()
                     }
                 }
             }

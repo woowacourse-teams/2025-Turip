@@ -12,7 +12,7 @@ import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.content.PagedContentsResult
 import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.content.video.VideoInformation
-import com.on.turip.ui.common.event.CommonEvent
+import com.on.turip.ui.common.event.CommonUiEffect
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.search.model.VideoInformationModel
 import com.on.turip.ui.search.regionresult.RegionResultActivity.Companion.REGION_RESULT_REGION_CATEGORY_NAME_KEY
@@ -47,8 +47,8 @@ class RegionResultViewModel @Inject constructor(
     private val _serverError: MutableLiveData<Boolean> = MutableLiveData(false)
     val serverError: LiveData<Boolean> get() = _serverError
 
-    private val _uiEvent: Channel<CommonEvent> = Channel(Channel.BUFFERED)
-    val uiEvent: Flow<CommonEvent> = _uiEvent.receiveAsFlow()
+    private val _uiEvent: Channel<CommonUiEffect> = Channel(Channel.BUFFERED)
+    val uiEvent: Flow<CommonUiEffect> = _uiEvent.receiveAsFlow()
 
     init {
         loadContentsFromRegion()
@@ -109,7 +109,10 @@ class RegionResultViewModel @Inject constructor(
                 _serverError.value = true
             }
 
-            ErrorEvent.DUPLICATION_FOLDER -> throw IllegalArgumentException("발생할 수 없는 오류")
+            ErrorEvent.DUPLICATION_FOLDER -> {
+                throw IllegalArgumentException("발생할 수 없는 오류")
+            }
+
             ErrorEvent.UNEXPECTED_PROBLEM -> {
                 _serverError.value = true
             }
@@ -124,7 +127,7 @@ class RegionResultViewModel @Inject constructor(
 
             ErrorEvent.TOKEN_EXPIRATION -> {
                 viewModelScope.launch {
-                    _uiEvent.send(CommonEvent.TokenExpiration)
+                    _uiEvent.send(CommonUiEffect.NavigateToLogin)
                 }
             }
         }

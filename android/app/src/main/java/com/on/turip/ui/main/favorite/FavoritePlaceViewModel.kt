@@ -14,7 +14,7 @@ import com.on.turip.domain.favorite.repository.FavoritePlaceRepository
 import com.on.turip.domain.favorite.usecase.UpdateFavoritePlaceUseCase
 import com.on.turip.domain.folder.Folder
 import com.on.turip.domain.folder.repository.FolderRepository
-import com.on.turip.ui.common.event.CommonEvent
+import com.on.turip.ui.common.event.CommonUiEffect
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
@@ -46,8 +46,8 @@ class FavoritePlaceViewModel @Inject constructor(
         MutableLiveData()
     val favoriteLatLng: LiveData<List<FavoritePlaceLatLngUiModel>> get() = _favoriteLatLng
 
-    private val _commonEvent: Channel<CommonEvent> = Channel(Channel.BUFFERED)
-    val commonEvent: Flow<CommonEvent> = _commonEvent.receiveAsFlow()
+    private val _commonUiEffect: Channel<CommonUiEffect> = Channel(Channel.BUFFERED)
+    val commonUiEffect: Flow<CommonUiEffect> = _commonUiEffect.receiveAsFlow()
 
     private val _uiEvent: Channel<FavoritePlaceUiEvent> = Channel(Channel.BUFFERED)
     val uiEvent: Flow<FavoritePlaceUiEvent> = _uiEvent.receiveAsFlow()
@@ -190,7 +190,7 @@ class FavoritePlaceViewModel @Inject constructor(
 
             ErrorEvent.TOKEN_EXPIRATION -> {
                 viewModelScope.launch {
-                    _commonEvent.send(CommonEvent.TokenExpiration)
+                    _commonUiEffect.send(CommonUiEffect.NavigateToLogin)
                 }
             }
         }

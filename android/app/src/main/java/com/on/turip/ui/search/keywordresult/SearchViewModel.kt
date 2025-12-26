@@ -14,7 +14,7 @@ import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.content.video.VideoInformation
 import com.on.turip.domain.searchhistory.SearchHistory
 import com.on.turip.domain.searchhistory.SearchHistoryRepository
-import com.on.turip.ui.common.event.CommonEvent
+import com.on.turip.ui.common.event.CommonUiEffect
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.search.keywordresult.SearchActivity.Companion.SEARCH_KEYWORD_KEY
 import com.on.turip.ui.search.model.VideoInformationModel
@@ -55,8 +55,8 @@ class SearchViewModel @Inject constructor(
     private val _serverError: MutableLiveData<Boolean> = MutableLiveData(false)
     val serverError: LiveData<Boolean> get() = _serverError
 
-    private val _uiEvent: Channel<CommonEvent> = Channel(Channel.BUFFERED)
-    val uiEvent: Flow<CommonEvent> = _uiEvent.receiveAsFlow()
+    private val _uiEvent: Channel<CommonUiEffect> = Channel(Channel.BUFFERED)
+    val uiEvent: Flow<CommonUiEffect> = _uiEvent.receiveAsFlow()
 
     private val searchKeyword: String by lazy {
         checkNotNull(savedStateHandle[SEARCH_KEYWORD_KEY]) {
@@ -141,7 +141,10 @@ class SearchViewModel @Inject constructor(
                 _serverError.value = true
             }
 
-            ErrorEvent.DUPLICATION_FOLDER -> throw IllegalArgumentException("발생할 수 없는 오류")
+            ErrorEvent.DUPLICATION_FOLDER -> {
+                throw IllegalArgumentException("발생할 수 없는 오류")
+            }
+
             ErrorEvent.UNEXPECTED_PROBLEM -> {
                 _serverError.value = true
             }
@@ -156,7 +159,7 @@ class SearchViewModel @Inject constructor(
 
             ErrorEvent.TOKEN_EXPIRATION -> {
                 viewModelScope.launch {
-                    _uiEvent.send(CommonEvent.TokenExpiration)
+                    _uiEvent.send(CommonUiEffect.NavigateToLogin)
                 }
             }
         }

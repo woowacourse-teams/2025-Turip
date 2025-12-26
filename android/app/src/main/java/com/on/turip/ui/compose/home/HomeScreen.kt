@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.on.turip.R
 import com.on.turip.domain.region.RegionCategory
-import com.on.turip.ui.common.event.CommonEvent
+import com.on.turip.ui.common.event.CommonUiEffect
 import com.on.turip.ui.compose.designsystem.component.ErrorHandlingContainer
 import com.on.turip.ui.compose.designsystem.component.TuripAppBar
 import com.on.turip.ui.compose.home.component.RegionList
@@ -66,7 +66,7 @@ fun HomeScreen(
     LaunchedEffect(Unit) {
         viewModel.uiEvent.collect { event ->
             when (event) {
-                CommonEvent.TokenExpiration -> navigateToLoginScreen()
+                CommonUiEffect.NavigateToLogin -> navigateToLoginScreen()
             }
         }
     }

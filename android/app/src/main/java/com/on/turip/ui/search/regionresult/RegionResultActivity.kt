@@ -14,7 +14,7 @@ import com.on.turip.R
 import com.on.turip.data.common.UiError
 import com.on.turip.databinding.ActivityRegionResultBinding
 import com.on.turip.ui.common.base.BaseActivity
-import com.on.turip.ui.common.event.CommonEvent
+import com.on.turip.ui.common.event.CommonUiEffect
 import com.on.turip.ui.login.LoginActivity
 import com.on.turip.ui.trip.detail.TripDetailActivity
 import dagger.hilt.android.AndroidEntryPoint
@@ -103,7 +103,7 @@ class RegionResultActivity : BaseActivity<ActivityRegionResultBinding>() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiEvent.collect { event ->
                     when (event) {
-                        CommonEvent.TokenExpiration -> navigateToLoginScreen()
+                        CommonUiEffect.NavigateToLogin -> navigateToLoginScreen()
                     }
                 }
             }
