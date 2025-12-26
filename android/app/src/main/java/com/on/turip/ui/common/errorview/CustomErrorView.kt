@@ -76,7 +76,7 @@ class CustomErrorView
          */
         fun render(error: UiError) {
             when (error) {
-                UiError.Network -> {
+                UiError.Global.Network -> {
                     setErrorImage(R.drawable.ic_network_error)
                     setErrorTitle(R.string.cannot_connect_network)
                     setErrorDescription(R.string.check_connection_status)

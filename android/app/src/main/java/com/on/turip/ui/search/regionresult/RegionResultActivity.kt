@@ -48,7 +48,7 @@ class RegionResultActivity : BaseActivity<ActivityRegionResultBinding>() {
     private fun showNetworkError() {
         binding.customErrorView.apply {
             visibility = View.VISIBLE
-            render(UiError.Network)
+            render(UiError.Global.Network)
             setOnRetryClickListener {
                 viewModel.reload()
             }

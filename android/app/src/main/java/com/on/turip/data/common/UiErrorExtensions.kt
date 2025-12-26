@@ -6,38 +6,31 @@ import com.on.turip.data.common.ErrorType.Creator
 import com.on.turip.data.common.ErrorType.FavoriteFolder
 import com.on.turip.data.common.ErrorType.FavoritePlace
 import com.on.turip.data.common.ErrorType.Place
-import com.on.turip.ui.common.event.CommonUiEffect
 
 fun ErrorType.toUiError(): UiError =
     when (this) {
-        Auth.TokenExpired -> UiError.TokenExpired
+        Auth.TokenExpired -> UiError.Global.TokenExpired
 
-        Auth.Forbidden -> UiError.PermissionDenied
+        Auth.Forbidden -> UiError.Feature.PermissionDenied
 
         Creator.NotFound,
         Content.NotFound,
         Place.NotFound,
         FavoritePlace.NotFound,
         FavoriteFolder.NotFound,
-        -> UiError.NotFound
+        -> UiError.Feature.NotFound
 
         FavoriteFolder.DuplicatedName,
         FavoritePlace.DuplicatePlaceInFolder,
         ErrorType.FavoriteContent.DuplicateContent,
-        -> UiError.Duplicated
+        -> UiError.Feature.Duplicated
 
         FavoriteFolder.BlankName,
         FavoriteFolder.ExceededName,
         FavoriteFolder.DefaultFolderRenameNotAllowed,
-        -> UiError.InValid
+        -> UiError.Feature.InValid
 
-        ErrorType.Network -> UiError.Network
+        ErrorType.Network -> UiError.Global.Network
 
-        else -> UiError.Unknown
-    }
-
-fun UiError.toCommonUiEffect(): CommonUiEffect =
-    when (this) {
-        UiError.TokenExpired -> CommonUiEffect.NavigateToLogin
-        else -> CommonUiEffect.NotifyError(this)
+        else -> UiError.Global.Server
     }

@@ -336,7 +336,7 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
     private fun showNetworkError() {
         binding.customErrorView.apply {
             visibility = View.VISIBLE
-            render(UiError.Network)
+            render(UiError.Global.Network)
             setOnRetryClickListener {
                 viewModel.reload()
             }
