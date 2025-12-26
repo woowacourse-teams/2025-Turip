@@ -26,13 +26,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.on.turip.R
 import com.on.turip.common.AuthState
 import com.on.turip.common.UserType
-import com.on.turip.domain.ErrorEvent
+import com.on.turip.data.common.UiError
 import com.on.turip.domain.setting.InquiryMail
+import com.on.turip.ui.common.event.CommonUiEffect
 import com.on.turip.ui.compose.designsystem.component.TuripAppBar
 import com.on.turip.ui.compose.designsystem.component.TuripDialog
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
 import com.on.turip.ui.compose.setting.component.SettingItem
-import com.on.turip.ui.compose.setting.model.SettingUiEvent
+import com.on.turip.ui.compose.setting.model.SettingUiEffect
 import com.on.turip.ui.compose.setting.model.SettingUiState
 import com.on.turip.ui.compose.theme.TuripTheme
 import timber.log.Timber
@@ -50,23 +51,34 @@ fun SettingScreen(
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        viewModel.uiEvent.collect { event ->
-            when (event) {
-                SettingUiEvent.Logout, SettingUiEvent.Withdraw -> {
+        viewModel.uiEffect.collect { effect: SettingUiEffect ->
+            when (effect) {
+                SettingUiEffect.NavigateToLogin -> {
                     navigateToLoginScreen()
                 }
 
-                is SettingUiEvent.ShowError -> {
-                    when (event.errorEvent) {
-                        ErrorEvent.NETWORK_ERROR -> {
+                is SettingUiEffect.ShowError -> {
+                    when (effect.uiError) {
+                        UiError.Global.Network -> {
                             snackbarHostState.showSnackbar(context.getString(R.string.cannot_connect_network))
                         }
 
-                        else -> {
+                        UiError.Global.Server -> {
                             snackbarHostState.showSnackbar(context.getString(R.string.server_error))
+                        }
+
+                        else -> {
+                            Unit
                         }
                     }
                 }
+            }
+        }
+    }
+    LaunchedEffect(Unit) {
+        viewModel.commonUiEffect.collect { uiEffect: CommonUiEffect ->
+            when (uiEffect) {
+                CommonUiEffect.NavigateToLogin -> navigateToLoginScreen()
             }
         }
     }

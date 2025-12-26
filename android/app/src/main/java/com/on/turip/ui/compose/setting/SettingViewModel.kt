@@ -2,15 +2,19 @@ package com.on.turip.ui.compose.setting
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.on.turip.data.common.ErrorType
+import com.on.turip.data.common.UiError
 import com.on.turip.data.common.onFailure
+import com.on.turip.data.common.onFailureWithCause
 import com.on.turip.data.common.onSuccess
-import com.on.turip.domain.ErrorEvent
+import com.on.turip.data.common.toUiError
 import com.on.turip.domain.login.MemberRepository
 import com.on.turip.domain.setting.InquiryMail
 import com.on.turip.domain.setting.PrivacyPolicy
 import com.on.turip.domain.userstorage.repository.UserStorageRepository
 import com.on.turip.platform.device.AppEnvironmentInfoProvider
-import com.on.turip.ui.compose.setting.model.SettingUiEvent
+import com.on.turip.ui.common.event.CommonUiEffect
+import com.on.turip.ui.compose.setting.model.SettingUiEffect
 import com.on.turip.ui.compose.setting.model.SettingUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -32,8 +36,11 @@ class SettingViewModel @Inject constructor(
     private val _uiState: MutableStateFlow<SettingUiState> = MutableStateFlow(SettingUiState.EMPTY)
     val uiState: StateFlow<SettingUiState> = _uiState
 
-    private val _uiEvent: Channel<SettingUiEvent> = Channel(Channel.BUFFERED)
-    val uiEvent: Flow<SettingUiEvent> = _uiEvent.receiveAsFlow()
+    private val _uiEffect: Channel<SettingUiEffect> = Channel(Channel.BUFFERED)
+    val uiEffect: Flow<SettingUiEffect> = _uiEffect.receiveAsFlow()
+
+    private val _commonUiEffect: Channel<CommonUiEffect> = Channel(Channel.BUFFERED)
+    val commonUiEffect: Flow<CommonUiEffect> = _commonUiEffect.receiveAsFlow()
 
     init {
         loadId()
@@ -75,14 +82,18 @@ class SettingViewModel @Inject constructor(
                     userStorageRepository
                         .clearTokens()
                         .onSuccess {
-                            _uiEvent.send(SettingUiEvent.Logout)
+                            _uiEffect.send(SettingUiEffect.NavigateToLogin)
                             Timber.d("로그아웃 성공")
                         }.onFailure {
                             Timber.e("토큰 초기화 실패")
                         }
-                }.onFailure { error: ErrorEvent ->
-                    Timber.e("로그아웃 실패 : $error")
-                    _uiEvent.send(SettingUiEvent.ShowError(error))
+                }.onFailure { errorType: ErrorType ->
+                    when (val uiError: UiError = errorType.toUiError()) {
+                        is UiError.Global -> handleGlobalError(uiError)
+                        is UiError.Feature -> Unit
+                    }
+                }.onFailureWithCause { errorType: ErrorType, cause: Throwable? ->
+                    Timber.e("로그아웃 실패 : $errorType / $cause")
                 }
         }
     }
@@ -101,15 +112,27 @@ class SettingViewModel @Inject constructor(
                     userStorageRepository
                         .clearTokens()
                         .onSuccess {
-                            _uiEvent.send(SettingUiEvent.Withdraw)
+                            _uiEffect.send(SettingUiEffect.NavigateToLogin)
                             Timber.d("회원탈퇴 성공")
                         }.onFailure {
                             Timber.e("토큰 초기화 실패")
                         }
-                }.onFailure { error: ErrorEvent ->
-                    _uiEvent.send(SettingUiEvent.ShowError(error))
-                    Timber.e("회원탈퇴 실패 : $error")
+                }.onFailure { errorType: ErrorType ->
+                    when (val uiError: UiError = errorType.toUiError()) {
+                        is UiError.Global -> handleGlobalError(uiError)
+                        is UiError.Feature -> Unit
+                    }
+                }.onFailureWithCause { errorType: ErrorType, cause: Throwable? ->
+                    Timber.e("회원탈퇴 실패 : $errorType / $cause")
                 }
+        }
+    }
+
+    private suspend fun handleGlobalError(uiError: UiError.Global) {
+        when (uiError) {
+            UiError.Global.Network -> _uiEffect.send(SettingUiEffect.ShowError(UiError.Global.Network))
+            UiError.Global.Server -> _uiEffect.send(SettingUiEffect.ShowError(UiError.Global.Server))
+            UiError.Global.TokenExpired -> _commonUiEffect.send(CommonUiEffect.NavigateToLogin)
         }
     }
 }
