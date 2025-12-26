@@ -61,11 +61,11 @@ class SettingViewModel @Inject constructor(
 
     fun loadPrivacyPolicyLink(): String = PrivacyPolicy.LINK
 
-    fun showLogoutDialog(show: Boolean) {
-        _uiState.update { it.copy(showLogoutDialog = show) }
+    fun onLogoutDialogVisibilityChange(visible: Boolean) {
+        _uiState.update { it.copy(showLogoutDialog = visible) }
     }
 
-    fun confirmLogout() {
+    fun onLogoutConfirm() {
         viewModelScope.launch {
             _uiState.update { it.copy(showLogoutDialog = false) }
 
@@ -87,11 +87,11 @@ class SettingViewModel @Inject constructor(
         }
     }
 
-    fun showWithdrawDialog(show: Boolean) {
-        _uiState.update { it.copy(showWithdrawDialog = show) }
+    fun onWithdrawDialogVisibilityChange(visible: Boolean) {
+        _uiState.update { it.copy(showWithdrawDialog = visible) }
     }
 
-    fun confirmWithdraw() {
+    fun onWithdrawConfirm() {
         viewModelScope.launch {
             _uiState.update { it.copy(showWithdrawDialog = false) }
 
