@@ -19,8 +19,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.snackbar.Snackbar
 import com.on.turip.R
+import com.on.turip.data.common.UiError
 import com.on.turip.databinding.ActivityTripDetailBinding
-import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.content.Content
 import com.on.turip.ui.common.TuripSnackbar
 import com.on.turip.ui.common.base.BaseActivity
@@ -336,7 +336,7 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
     private fun showNetworkError() {
         binding.customErrorView.apply {
             visibility = View.VISIBLE
-            setupError(ErrorEvent.NETWORK_ERROR)
+            render(UiError.Network)
             setOnRetryClickListener {
                 viewModel.reload()
             }

@@ -5,9 +5,12 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.on.turip.R
-import com.on.turip.domain.ErrorEvent
+import com.on.turip.data.common.UiError
+import com.on.turip.databinding.ItemCustomErrorBinding
 
 class CustomErrorView
     @JvmOverloads
@@ -16,68 +19,47 @@ class CustomErrorView
         attrs: AttributeSet? = null,
         defStyleAttr: Int = 0,
     ) : ConstraintLayout(context, attrs, defStyleAttr) {
-        private val errorImageView: ImageView
-        private val errorTitleTextView: TextView
-        private val errorDescription: TextView
-        private val errorRetryTextView: TextView
+        private val binding: ItemCustomErrorBinding =
+            ItemCustomErrorBinding.inflate(LayoutInflater.from(context), this)
 
-        init {
-            // XML 레이아웃 inflate
-            LayoutInflater.from(context).inflate(R.layout.item_custom_error, this, true)
-
-            // 뷰 참조 초기화
-            errorImageView = findViewById(R.id.iv_custom_error)
-            errorTitleTextView = findViewById(R.id.tv_custom_error_title)
-            errorDescription = findViewById(R.id.tv_custom_error_description)
-            errorRetryTextView = findViewById(R.id.tv_custom_error_retry)
-        }
+        private val errorImageView: ImageView = binding.ivCustomError
+        private val errorTitleTextView: TextView = binding.tvCustomErrorTitle
+        private val errorDescription: TextView = binding.tvCustomErrorDescription
+        private val errorRetryTextView: TextView = binding.tvCustomErrorRetry
 
         /**
          * 에러 이미지를 설정합니다
          */
-        private fun setErrorImage(drawableRes: Int) {
+        private fun setErrorImage(
+            @DrawableRes drawableRes: Int,
+        ) {
             errorImageView.setImageResource(drawableRes)
-        }
-
-        /**
-         * 에러 제목을 설정합니다
-         */
-        private fun setErrorTitle(title: String) {
-            errorTitleTextView.text = title
         }
 
         /**
          * 에러 제목을 리소스로 설정합니다
          */
-        private fun setErrorTitle(titleRes: Int) {
+        private fun setErrorTitle(
+            @StringRes titleRes: Int,
+        ) {
             errorTitleTextView.setText(titleRes)
-        }
-
-        /**
-         * 에러 설명을 설정합니다
-         */
-        private fun setErrorDescription(description: String) {
-            errorDescription.text = description
         }
 
         /**
          * 에러 설명을 리소스로 설정합니다
          */
-        private fun setErrorDescription(descriptionRes: Int) {
+        private fun setErrorDescription(
+            @StringRes descriptionRes: Int,
+        ) {
             errorDescription.setText(descriptionRes)
-        }
-
-        /**
-         * 재시도 메시지를 설정합니다
-         */
-        private fun setRetryMessage(message: String) {
-            errorRetryTextView.text = message
         }
 
         /**
          * 재시도 메시지를 리소스로 설정합니다
          */
-        private fun setRetryMessage(messageRes: Int) {
+        private fun setRetryMessage(
+            @StringRes messageRes: Int,
+        ) {
             errorRetryTextView.setText(messageRes)
         }
 
@@ -90,45 +72,18 @@ class CustomErrorView
 
         /**
          * 에러 타입에 따른 기본 설정
+         * 네트워크 에러, 서버 에러(500번대)의 경우 재시도 가능한 화면을 활성화한다.
          */
-        fun setupError(errorType: ErrorEvent) {
-            when (errorType) {
-                ErrorEvent.NETWORK_ERROR -> {
+        fun render(error: UiError) {
+            when (error) {
+                UiError.Network -> {
                     setErrorImage(R.drawable.ic_network_error)
                     setErrorTitle(R.string.cannot_connect_network)
                     setErrorDescription(R.string.check_connection_status)
                     setRetryMessage(R.string.retry)
                 }
 
-                ErrorEvent.USER_NOT_HAVE_PERMISSION -> {
-                    setErrorImage(R.drawable.ic_server_error)
-                    setErrorTitle(R.string.server_error)
-                    setErrorDescription(R.string.retry_later)
-                    setRetryMessage(R.string.retry)
-                }
-
-                ErrorEvent.DUPLICATION_FOLDER -> {
-                    setErrorImage(R.drawable.ic_server_error)
-                    setErrorTitle(R.string.server_error)
-                    setErrorDescription(R.string.retry_later)
-                    setRetryMessage(R.string.retry)
-                }
-
-                ErrorEvent.UNEXPECTED_PROBLEM -> {
-                    setErrorImage(R.drawable.ic_server_error)
-                    setErrorTitle(R.string.server_error)
-                    setErrorDescription(R.string.retry_later)
-                    setRetryMessage(R.string.retry)
-                }
-
-                ErrorEvent.PARSER_ERROR -> {
-                    setErrorImage(R.drawable.ic_server_error)
-                    setErrorTitle(R.string.server_error)
-                    setErrorDescription(R.string.retry_later)
-                    setRetryMessage(R.string.retry)
-                }
-
-                ErrorEvent.TOKEN_EXPIRATION -> {
+                else -> {
                     setErrorImage(R.drawable.ic_server_error)
                     setErrorTitle(R.string.server_error)
                     setErrorDescription(R.string.retry_later)

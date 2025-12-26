@@ -10,8 +10,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.on.turip.R
+import com.on.turip.data.common.UiError
 import com.on.turip.databinding.FragmentFavoriteContentBinding
-import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.favorite.FavoriteContent
 import com.on.turip.ui.common.ItemDividerDecoration
 import com.on.turip.ui.common.base.BaseFragment
@@ -136,7 +136,7 @@ class FavoriteContentFragment : BaseFragment<FragmentFavoriteContentBinding>() {
     private fun showNetworkError() {
         binding.customErrorView.apply {
             visibility = View.VISIBLE
-            setupError(ErrorEvent.NETWORK_ERROR)
+            render(UiError.Network)
             setOnRetryClickListener {
                 viewModel.loadFavoriteContents()
             }

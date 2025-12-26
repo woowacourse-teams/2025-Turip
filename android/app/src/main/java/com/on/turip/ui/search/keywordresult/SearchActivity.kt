@@ -22,8 +22,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.on.turip.R
+import com.on.turip.data.common.UiError
 import com.on.turip.databinding.ActivitySearchBinding
-import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.searchhistory.SearchHistory
 import com.on.turip.ui.common.base.BaseActivity
 import com.on.turip.ui.common.event.CommonEvent
@@ -85,7 +85,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
     private fun showNetworkError() {
         binding.customErrorView.apply {
             visibility = View.VISIBLE
-            setupError(ErrorEvent.NETWORK_ERROR)
+            render(UiError.Network)
             setOnRetryClickListener {
                 viewModel.loadByKeyword()
             }

@@ -22,8 +22,8 @@ import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.on.turip.R
+import com.on.turip.data.common.UiError
 import com.on.turip.databinding.FragmentFavoritePlaceBinding
-import com.on.turip.domain.ErrorEvent
 import com.on.turip.ui.common.TuripDialogFragment
 import com.on.turip.ui.common.base.BaseFragment
 import com.on.turip.ui.common.event.CommonEvent
@@ -106,7 +106,7 @@ class FavoritePlaceFragment :
     private fun showNetworkError() {
         binding.customErrorView.apply {
             visibility = View.VISIBLE
-            setupError(ErrorEvent.NETWORK_ERROR)
+            render(UiError.Network)
             setOnRetryClickListener {
                 viewModel.loadFoldersAndPlaces()
             }
