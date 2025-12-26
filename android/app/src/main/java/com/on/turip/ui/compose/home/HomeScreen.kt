@@ -28,10 +28,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.on.turip.R
+import com.on.turip.data.common.ErrorUiState
 import com.on.turip.domain.region.RegionCategory
 import com.on.turip.ui.common.event.CommonUiEffect
-import com.on.turip.ui.compose.designsystem.component.ErrorHandlingContainer
+import com.on.turip.ui.compose.designsystem.component.ErrorScreen
 import com.on.turip.ui.compose.designsystem.component.TuripAppBar
 import com.on.turip.ui.compose.home.component.RegionList
 import com.on.turip.ui.compose.home.component.RegionTypeButtons
@@ -56,16 +58,14 @@ fun HomeScreen(
     val usersLikeContents: List<UsersLikeContentModel> by viewModel.usersLikeContents.observeAsState(
         emptyList(),
     )
-    val networkError by viewModel.networkError.observeAsState(false)
-    val serverError by viewModel.serverError.observeAsState(false)
-
+    val errorUiState: ErrorUiState by viewModel.errorUiState.collectAsStateWithLifecycle()
     val scrollState = rememberScrollState()
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
 
     LaunchedEffect(Unit) {
-        viewModel.uiEvent.collect { event ->
-            when (event) {
+        viewModel.commonUiEffect.collect { uiEffect: CommonUiEffect ->
+            when (uiEffect) {
                 CommonUiEffect.NavigateToLogin -> navigateToLoginScreen()
             }
         }
@@ -85,66 +85,76 @@ fun HomeScreen(
                 })
             },
     ) { innerPadding ->
-        ErrorHandlingContainer(
-            networkError = networkError,
-            serverError = serverError,
-            onRetryClick = { viewModel.reload() },
-        ) {
-            Column(
-                modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .padding(
-                            top = innerPadding.calculateTopPadding(),
-                            start = 20.dp,
-                            end = innerPadding.calculateEndPadding(LocalLayoutDirection.current),
-                        ).verticalScroll(scrollState),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
-                Text(
-                    text = stringResource(R.string.home_top_title),
-                    color = colorResource(R.color.gray_400_2b2b2b),
-                    style = TuripTypography.titleLarge,
-                )
 
-                SearchTextField(
-                    keyword = keyword,
-                    onKeywordChange = { newKeyword -> keyword = newKeyword },
-                    onSearch = { keyword ->
-                        onSearchClick(keyword)
-                        focusManager.clearFocus(force = true)
-                        keyboardController?.hide()
-                    },
+        when (val state: ErrorUiState = errorUiState) {
+            ErrorUiState.Server, ErrorUiState.Network -> {
+                ErrorScreen(
+                    errorUiState = state,
+                    onRetryClick = { viewModel.reload() },
                     modifier =
                         Modifier
-                            .wrapContentSize()
-                            .padding(top = 4.dp, end = 20.dp),
+                            .fillMaxSize()
+                            .padding(innerPadding),
                 )
+            }
 
-                Text(
-                    text = stringResource(R.string.home_users_like_content_title),
-                    modifier = Modifier.padding(top = 14.dp),
-                    color = colorResource(R.color.gray_400_2b2b2b),
-                    style = TuripTypography.titleLarge,
-                )
+            ErrorUiState.None -> {
+                Column(
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .padding(
+                                top = innerPadding.calculateTopPadding(),
+                                start = 20.dp,
+                                end = innerPadding.calculateEndPadding(LocalLayoutDirection.current),
+                            ).verticalScroll(scrollState),
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
+                    Text(
+                        text = stringResource(R.string.home_top_title),
+                        color = colorResource(R.color.gray_400_2b2b2b),
+                        style = TuripTypography.titleLarge,
+                    )
 
-                UsersLikeList(
-                    usersLikeContents = usersLikeContents,
-                    onContentClick = onContentClick,
-                )
+                    SearchTextField(
+                        keyword = keyword,
+                        onKeywordChange = { newKeyword -> keyword = newKeyword },
+                        onSearch = { keyword ->
+                            onSearchClick(keyword)
+                            focusManager.clearFocus(force = true)
+                            keyboardController?.hide()
+                        },
+                        modifier =
+                            Modifier
+                                .wrapContentSize()
+                                .padding(top = 4.dp, end = 20.dp),
+                    )
 
-                RegionTypeButtons(
-                    onDomesticClick = { isSelectDomestic: Boolean ->
-                        viewModel.updateDomesticSelected(isSelectDomestic)
-                    },
-                    isSelectedDomestic = isSelectedDomestic,
-                )
+                    Text(
+                        text = stringResource(R.string.home_users_like_content_title),
+                        modifier = Modifier.padding(top = 14.dp),
+                        color = colorResource(R.color.gray_400_2b2b2b),
+                        style = TuripTypography.titleLarge,
+                    )
 
-                RegionList(
-                    regions = regions,
-                    onRegionClick = onRegionClick,
-                    modifier = Modifier.padding(end = 20.dp),
-                )
+                    UsersLikeList(
+                        usersLikeContents = usersLikeContents,
+                        onContentClick = onContentClick,
+                    )
+
+                    RegionTypeButtons(
+                        onDomesticClick = { isSelectDomestic: Boolean ->
+                            viewModel.updateDomesticSelected(isSelectDomestic)
+                        },
+                        isSelectedDomestic = isSelectedDomestic,
+                    )
+
+                    RegionList(
+                        regions = regions,
+                        onRegionClick = onRegionClick,
+                        modifier = Modifier.padding(end = 20.dp),
+                    )
+                }
             }
         }
     }
@@ -155,9 +165,9 @@ fun HomeScreen(
 fun HomeScreenPreview() {
     TuripTheme {
         HomeScreen(
-            {},
-            {},
-            {},
+            onSearchClick = {},
+            onRegionClick = {},
+            onContentClick = {},
             navigateToLoginScreen = {},
         )
     }
