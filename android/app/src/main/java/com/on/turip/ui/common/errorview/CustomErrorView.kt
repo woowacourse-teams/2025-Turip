@@ -8,8 +8,9 @@ import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
-import com.on.turip.R
-import com.on.turip.data.common.UiError
+import com.on.turip.data.common.ErrorUiModel
+import com.on.turip.data.common.ErrorUiState
+import com.on.turip.data.common.toUiModel
 import com.on.turip.databinding.ItemCustomErrorBinding
 
 class CustomErrorView
@@ -72,23 +73,15 @@ class CustomErrorView
 
         /**
          * 에러 타입에 따른 기본 설정
+         *
          * 네트워크 에러, 서버 에러(500번대)의 경우 재시도 가능한 화면을 활성화한다.
          */
-        fun render(error: UiError) {
-            when (error) {
-                UiError.Global.Network -> {
-                    setErrorImage(R.drawable.ic_network_error)
-                    setErrorTitle(R.string.cannot_connect_network)
-                    setErrorDescription(R.string.check_connection_status)
-                    setRetryMessage(R.string.retry)
-                }
+        fun render(errorUiState: ErrorUiState) {
+            val errorUiModel: ErrorUiModel = errorUiState.toUiModel() ?: return
 
-                else -> {
-                    setErrorImage(R.drawable.ic_server_error)
-                    setErrorTitle(R.string.server_error)
-                    setErrorDescription(R.string.retry_later)
-                    setRetryMessage(R.string.retry)
-                }
-            }
+            setErrorImage(errorUiModel.imageRes)
+            setErrorTitle(errorUiModel.titleRes)
+            setErrorDescription(errorUiModel.descriptionRes)
+            setRetryMessage(errorUiModel.retryTextRes)
         }
     }
