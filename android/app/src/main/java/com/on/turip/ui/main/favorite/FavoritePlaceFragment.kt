@@ -9,9 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -22,7 +19,7 @@ import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.on.turip.R
-import com.on.turip.data.common.UiError
+import com.on.turip.data.common.ErrorUiState
 import com.on.turip.databinding.FragmentFavoritePlaceBinding
 import com.on.turip.ui.common.TuripDialogFragment
 import com.on.turip.ui.common.base.BaseFragment
@@ -35,7 +32,6 @@ import com.on.turip.ui.main.favorite.model.FavoritePlaceLatLngUiModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceUiEffect
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class FavoritePlaceFragment :
@@ -65,12 +61,7 @@ class FavoritePlaceFragment :
                 override fun onItemClick(favoritePlaceModel: FavoritePlaceModel) {
                     map.animateCamera(
                         CameraUpdateFactory.newCameraPosition(
-                            CameraPosition(
-                                favoritePlaceModel.latLng,
-                                15f,
-                                0f,
-                                0f,
-                            ),
+                            CameraPosition(favoritePlaceModel.latLng, 15f, 0f, 0f),
                         ),
                         1000,
                         null,
@@ -99,19 +90,8 @@ class FavoritePlaceFragment :
         setupAdapters()
         setupListeners()
         setupObservers()
-        showNetworkError()
         setupMapFragment(savedInstanceState)
         setupLoginSuggestDialog()
-    }
-
-    private fun showNetworkError() {
-        binding.customErrorView.apply {
-            visibility = View.VISIBLE
-            render(UiError.Global.Network)
-            setOnRetryClickListener {
-                viewModel.loadFoldersAndPlaces()
-            }
-        }
     }
 
     private fun setupAdapters() {
@@ -186,37 +166,15 @@ class FavoritePlaceFragment :
 
     private fun setupObservers() {
         viewModel.favoritePlaceUiState.observe(viewLifecycleOwner) { state ->
-            folderNameAdapter.submitList(state.folders)
-            placeAdapter.submitList(state.places)
+            renderOrError(state, viewModel.errorUiState.value)
+        }
 
-            binding.apply {
-                if (state.isLoading) {
-                    pbSearchRegionResult.visibility = View.VISIBLE
-                    clFavoritePlaceEmpty.visibility = View.GONE
-                    groupFavoritePlaceNotError.visibility = View.GONE
-                    groupFavoritePlaceNotEmpty.visibility = View.GONE
-                    tvFavoritePlacePlaceCount.visibility = View.GONE
-                } else {
-                    pbSearchRegionResult.visibility = View.GONE
-                    groupFavoritePlaceNotError.visibility = View.VISIBLE
-                }
-
-                if (state.isNetWorkError || state.isServerError) {
-                    mvFavoritePlace.visibility = View.GONE
-                    customErrorView.visibility = View.VISIBLE
-                    clFavoritePlaceEmpty.visibility = View.GONE
-                    groupFavoritePlaceNotError.visibility = View.GONE
-                    groupFavoritePlaceNotEmpty.visibility = View.GONE
-                    tvFavoritePlacePlaceCount.visibility = View.GONE
-                } else {
-                    customErrorView.visibility = View.GONE
-                    groupFavoritePlaceNotError.visibility = View.VISIBLE
-
-                    if (!state.isLoading) {
-                        handlePlaceState(state)
-                    }
-                }
-            }
+        collectOnStarted(viewModel.errorUiState) { errorUiState: ErrorUiState ->
+            renderOrError(
+                viewModel.favoritePlaceUiState.value
+                    ?: FavoritePlaceViewModel.FavoritePlaceUiState(),
+                errorUiState,
+            )
         }
 
         collectOnStarted(viewModel.commonUiEffect) { commonUiEffect: CommonUiEffect ->
@@ -258,23 +216,6 @@ class FavoritePlaceFragment :
         requireActivity().finish()
     }
 
-    private fun FragmentFavoritePlaceBinding.handlePlaceState(state: FavoritePlaceViewModel.FavoritePlaceUiState) {
-        if (state.places.isEmpty()) {
-            clFavoritePlaceEmpty.visibility = View.VISIBLE
-            groupFavoritePlaceNotEmpty.visibility = View.GONE
-            tvFavoritePlacePlaceCount.visibility = View.GONE
-            ivFavoritePlaceShare.visibility = View.GONE
-        } else {
-            clFavoritePlaceEmpty.visibility = View.GONE
-            groupFavoritePlaceNotEmpty.visibility = View.VISIBLE
-            tvFavoritePlacePlaceCount.apply {
-                visibility = View.VISIBLE
-                text = getString(R.string.all_total_place_count, state.places.size)
-            }
-            ivFavoritePlaceShare.visibility = View.VISIBLE
-        }
-    }
-
     private fun shareFolder(folderShareModel: FavoriteFolderShareModel) {
         val sharedContents: String = folderShareModel.toShareFormat()
 
@@ -305,6 +246,75 @@ class FavoritePlaceFragment :
             }
 
         startActivity(chooserIntent)
+    }
+
+    private fun renderOrError(
+        uiState: FavoritePlaceViewModel.FavoritePlaceUiState,
+        errorUiState: ErrorUiState,
+    ) {
+        when (errorUiState) {
+            ErrorUiState.None -> {
+                binding.customErrorView.visibility = View.GONE
+
+                if (uiState.isLoading) {
+                    renderLoading()
+                } else {
+                    renderContents(uiState)
+                }
+            }
+
+            ErrorUiState.Server,
+            ErrorUiState.Network,
+            -> {
+                renderErrorView(errorUiState)
+            }
+        }
+    }
+
+    private fun renderLoading() {
+        binding.pbFavoritePlaceLoading.visibility = View.VISIBLE
+        binding.groupFavoritePlaceNotEmpty.visibility = View.GONE
+        binding.groupFavoritePlaceNotError.visibility = View.GONE
+        binding.clFavoritePlaceEmpty.visibility = View.GONE
+    }
+
+    private fun renderContents(uiState: FavoritePlaceViewModel.FavoritePlaceUiState) {
+        folderNameAdapter.submitList(uiState.folders)
+        placeAdapter.submitList(uiState.places)
+
+        binding.pbFavoritePlaceLoading.visibility = View.GONE
+        binding.groupFavoritePlaceNotError.visibility = View.VISIBLE
+
+        if (uiState.places.isEmpty()) {
+            renderEmpty()
+        } else {
+            renderPlaces(uiState)
+        }
+    }
+
+    private fun renderEmpty() {
+        binding.clFavoritePlaceEmpty.visibility = View.VISIBLE
+        binding.groupFavoritePlaceNotEmpty.visibility = View.GONE
+    }
+
+    private fun renderPlaces(uiState: FavoritePlaceViewModel.FavoritePlaceUiState) {
+        binding.clFavoritePlaceEmpty.visibility = View.GONE
+        binding.groupFavoritePlaceNotEmpty.visibility = View.VISIBLE
+        binding.tvFavoritePlacePlaceCount.text =
+            getString(R.string.all_total_place_count, uiState.places.size)
+    }
+
+    private fun renderErrorView(errorUiState: ErrorUiState) {
+        binding.groupFavoritePlaceNotError.visibility = View.GONE
+        binding.groupFavoritePlaceNotEmpty.visibility = View.GONE
+        binding.clFavoritePlaceEmpty.visibility = View.GONE
+        binding.pbFavoritePlaceLoading.visibility = View.GONE
+
+        binding.customErrorView.apply {
+            visibility = View.VISIBLE
+            render(errorUiState)
+            setOnRetryClickListener { viewModel.loadFoldersAndPlaces() }
+        }
     }
 
     override fun onStart() {
