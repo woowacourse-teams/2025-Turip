@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.on.turip.common.AuthState
 import com.on.turip.common.UserType
+import com.on.turip.data.common.ErrorUiState
 import com.on.turip.data.common.onFailure
 import com.on.turip.data.common.onSuccess
 import com.on.turip.domain.ErrorEvent
@@ -20,10 +21,13 @@ import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceLatLngUiModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
-import com.on.turip.ui.main.favorite.model.FavoritePlaceUiEvent
+import com.on.turip.ui.main.favorite.model.FavoritePlaceUiEffect
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -39,9 +43,6 @@ class FavoritePlaceViewModel @Inject constructor(
         MutableLiveData(FavoritePlaceUiState())
     val favoritePlaceUiState: LiveData<FavoritePlaceUiState> get() = _favoritePlaceUiState
 
-    private val _shareFolder: MutableLiveData<FavoriteFolderShareModel> = MutableLiveData()
-    val shareFolder: LiveData<FavoriteFolderShareModel> get() = _shareFolder
-
     private val _favoriteLatLng: MutableLiveData<List<FavoritePlaceLatLngUiModel>> =
         MutableLiveData()
     val favoriteLatLng: LiveData<List<FavoritePlaceLatLngUiModel>> get() = _favoriteLatLng
@@ -49,8 +50,8 @@ class FavoritePlaceViewModel @Inject constructor(
     private val _commonUiEffect: Channel<CommonUiEffect> = Channel(Channel.BUFFERED)
     val commonUiEffect: Flow<CommonUiEffect> = _commonUiEffect.receiveAsFlow()
 
-    private val _uiEvent: Channel<FavoritePlaceUiEvent> = Channel(Channel.BUFFERED)
-    val uiEvent: Flow<FavoritePlaceUiEvent> = _uiEvent.receiveAsFlow()
+    private val _uiEffect: Channel<FavoritePlaceUiEffect> = Channel(Channel.BUFFERED)
+    val uiEffect: Flow<FavoritePlaceUiEffect> = _uiEffect.receiveAsFlow()
 
     private var selectedFolderId: Long = NOT_INITIALIZED
 
@@ -218,7 +219,7 @@ class FavoritePlaceViewModel @Inject constructor(
     fun shareFolder() {
         when (AuthState.type) {
             UserType.MEMBER -> {
-                val shareFolder =
+                val favoriteFolderShareModel =
                     FavoriteFolderShareModel(
                         name =
                             favoritePlaceUiState.value
@@ -229,12 +230,14 @@ class FavoritePlaceViewModel @Inject constructor(
                             favoritePlaceUiState.value?.places?.map { it.toUiModel() }
                                 ?: emptyList(),
                     )
-                _shareFolder.value = shareFolder
+                viewModelScope.launch {
+                    _uiEffect.send(FavoritePlaceUiEffect.ShareFolder(favoriteFolderShareModel))
+                }
             }
 
             UserType.GUEST, UserType.NONE -> {
                 viewModelScope.launch {
-                    _uiEvent.send(FavoritePlaceUiEvent.ShowFolderShareNotAllowed)
+                    _uiEffect.send(FavoritePlaceUiEffect.ShowFolderShareNotAllowed)
                 }
             }
         }

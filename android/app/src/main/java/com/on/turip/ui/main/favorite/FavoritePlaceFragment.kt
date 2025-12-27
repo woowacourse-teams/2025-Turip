@@ -26,13 +26,14 @@ import com.on.turip.data.common.UiError
 import com.on.turip.databinding.FragmentFavoritePlaceBinding
 import com.on.turip.ui.common.TuripDialogFragment
 import com.on.turip.ui.common.base.BaseFragment
+import com.on.turip.ui.common.collectOnStarted
 import com.on.turip.ui.common.event.CommonUiEffect
 import com.on.turip.ui.folder.FolderActivity
 import com.on.turip.ui.login.LoginActivity
 import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceLatLngUiModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
-import com.on.turip.ui.main.favorite.model.FavoritePlaceUiEvent
+import com.on.turip.ui.main.favorite.model.FavoritePlaceUiEffect
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -218,26 +219,20 @@ class FavoritePlaceFragment :
             }
         }
 
-        viewModel.shareFolder.observe(viewLifecycleOwner) { shareFolder: FavoriteFolderShareModel ->
-            makeShareIntent(shareFolder)
+        collectOnStarted(viewModel.commonUiEffect) { commonUiEffect: CommonUiEffect ->
+            when (commonUiEffect) {
+                CommonUiEffect.NavigateToLogin -> navigateToLoginScreen()
+            }
         }
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch {
-                    viewModel.commonUiEffect.collect { event ->
-                        when (event) {
-                            CommonUiEffect.NavigateToLogin -> navigateToLoginScreen()
-                        }
-                    }
+        collectOnStarted(viewModel.uiEffect) { uiEffect: FavoritePlaceUiEffect ->
+            when (uiEffect) {
+                FavoritePlaceUiEffect.ShowFolderShareNotAllowed -> {
+                    showSuggestLoginMessage()
                 }
 
-                launch {
-                    viewModel.uiEvent.collect { event ->
-                        when (event) {
-                            FavoritePlaceUiEvent.ShowFolderShareNotAllowed -> showSuggestLoginMessage()
-                        }
-                    }
+                is FavoritePlaceUiEffect.ShareFolder -> {
+                    shareFolder(uiEffect.favoriteFolderShareModel)
                 }
             }
         }
@@ -280,14 +275,14 @@ class FavoritePlaceFragment :
         }
     }
 
-    private fun makeShareIntent(shareFolder: FavoriteFolderShareModel) {
-        val sharedContents: String = shareFolder.toShareFormat()
+    private fun shareFolder(folderShareModel: FavoriteFolderShareModel) {
+        val sharedContents: String = folderShareModel.toShareFormat()
 
         val intent =
             Intent(Intent.ACTION_SEND).apply {
                 type = "text/plain"
                 putExtra(Intent.EXTRA_TEXT, sharedContents)
-                putExtra(Intent.EXTRA_TITLE, shareFolder.name)
+                putExtra(Intent.EXTRA_TITLE, folderShareModel.name)
             }
         val kakaoIntent: Intent =
             Intent(Intent.ACTION_SEND).apply {
@@ -304,9 +299,9 @@ class FavoritePlaceFragment :
         val initialIntents = arrayOf(kakaoIntent, instagramIntent)
 
         val chooserIntent =
-            Intent.createChooser(intent, shareFolder.name).apply {
+            Intent.createChooser(intent, folderShareModel.name).apply {
                 putExtra(Intent.EXTRA_INITIAL_INTENTS, initialIntents)
-                putExtra(Intent.EXTRA_TITLE, shareFolder.name)
+                putExtra(Intent.EXTRA_TITLE, folderShareModel.name)
             }
 
         startActivity(chooserIntent)
