@@ -9,7 +9,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.on.turip.R
+import com.on.turip.data.common.ErrorUiEffect
+import com.on.turip.data.common.ErrorUiModel
+import com.on.turip.data.common.toUiModel
 import com.on.turip.databinding.BottomSheetFragmentFavoritePlaceFolderCatalogBinding
 import com.on.turip.ui.common.TuripDialogFragment
 import com.on.turip.ui.common.base.BaseFragment
@@ -63,10 +67,6 @@ class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavor
 
     private fun setupAdapters() {
         binding.rvBottomSheetFavoritePlaceFolderCatalog.adapter = placeAdapter
-
-        binding.btnBottomSheetFolderFavoritePlaceFolderCatalogBack.setOnClickListener {
-            parentFragmentManager.popBackStack()
-        }
 
         val itemTouchHelper =
             ItemTouchHelper(
@@ -129,19 +129,27 @@ class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavor
             }
         }
 
-        viewModel.shareFolder.observe(viewLifecycleOwner) { shareFolder: FavoriteFolderShareModel ->
-            makeShareIntent(shareFolder)
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch {
-                    viewModel.commonUiEffect.collect { event ->
-                        when (event) {
-                            CommonUiEffect.NavigateToLogin -> navigateToLoginScreen()
-                        }
+        collectOnStarted(viewModel.errorUiEffect) { errorUiEffect: ErrorUiEffect ->
+            when (errorUiEffect) {
+                is ErrorUiEffect.ShowSnackbar -> {
+                    val uiModel: ErrorUiModel =
+                        errorUiEffect.errorUiState.toUiModel() ?: return@collectOnStarted
+                    view?.let { view: View ->
+                        Snackbar
+                            .make(view, uiModel.titleRes, Snackbar.LENGTH_LONG)
+                            .apply {
+                                errorUiEffect.onRetryClick?.let { action -> setAction(uiModel.retryTextRes) { action() } }
+                            }.show()
                     }
                 }
+            }
+        }
+
+        collectOnStarted(viewModel.commonUiEffect) { commonUiEffect: CommonUiEffect ->
+            when (commonUiEffect) {
+                CommonUiEffect.NavigateToLogin -> navigateToLoginScreen()
+            }
+        }
 
         collectOnStarted(viewModel.uiEffect) { uiEffect: FavoritePlaceFolderCatalogUiEffect ->
             when (uiEffect) {
@@ -179,6 +187,10 @@ class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavor
     private fun setupListeners() {
         binding.ivBottomSheetFavoritePlaceFolderShare.setOnClickListener {
             viewModel.shareFolder()
+        }
+
+        binding.btnBottomSheetFolderFavoritePlaceFolderCatalogBack.setOnClickListener {
+            parentFragmentManager.popBackStack()
         }
     }
 
