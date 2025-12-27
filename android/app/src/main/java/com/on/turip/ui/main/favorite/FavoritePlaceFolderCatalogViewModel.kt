@@ -36,9 +36,6 @@ class FavoritePlaceFolderCatalogViewModel @Inject constructor(
         MutableLiveData(FavoritePlaceFolderCatalogUiState())
     val favoritePlaceFolderCatalogUiState: LiveData<FavoritePlaceFolderCatalogUiState> get() = _favoritePlaceFolderCatalogUiState
 
-    private val _shareFolder: MutableLiveData<FavoriteFolderShareModel> = MutableLiveData()
-    val shareFolder: LiveData<FavoriteFolderShareModel> get() = _shareFolder
-
     private val folderId: Long by lazy {
         checkNotNull(savedStateHandle[FAVORITE_PLACE_FOLDER_CATALOG_ARGUMENTS_FOLDER_ID]) {
             Timber.e("찜 폴더 내 장소 목록 화면 Folder ID 값이 존재하지 않습니다.")
@@ -53,8 +50,8 @@ class FavoritePlaceFolderCatalogViewModel @Inject constructor(
     private val _commonUiEffect: Channel<CommonUiEffect> = Channel(Channel.BUFFERED)
     val commonUiEffect: Flow<CommonUiEffect> = _commonUiEffect.receiveAsFlow()
 
-    private val _uiEvent: Channel<FavoritePlaceFolderCatalogUiEvent> = Channel(Channel.BUFFERED)
-    val uiEvent: Flow<FavoritePlaceFolderCatalogUiEvent> = _uiEvent.receiveAsFlow()
+    private val _uiEffect: Channel<FavoritePlaceFolderCatalogUiEffect> = Channel(Channel.BUFFERED)
+    val uiEffect: Flow<FavoritePlaceFolderCatalogUiEffect> = _uiEffect.receiveAsFlow()
 
     init {
         loadPlacesInSelectFolder()
@@ -167,14 +164,18 @@ class FavoritePlaceFolderCatalogViewModel @Inject constructor(
     fun shareFolder() {
         when (AuthState.type) {
             UserType.MEMBER -> {
-                val shareFolder =
+                val favoriteFolderShareModel =
                     FavoriteFolderShareModel(
                         name = folderName,
                         places =
                             favoritePlaceFolderCatalogUiState.value?.places?.map { it.toUiModel() }
                                 ?: emptyList(),
                     )
-                _shareFolder.value = shareFolder
+                viewModelScope.launch {
+                    _uiEffect.send(
+                        FavoritePlaceFolderCatalogUiEffect.ShareFolder(favoriteFolderShareModel),
+                    )
+                }
             }
 
             UserType.GUEST, UserType.NONE -> {
@@ -185,8 +186,12 @@ class FavoritePlaceFolderCatalogViewModel @Inject constructor(
         }
     }
 
-    sealed interface FavoritePlaceFolderCatalogUiEvent {
-        data object ShowFolderShareNotAllowed : FavoritePlaceFolderCatalogUiEvent
+    sealed interface FavoritePlaceFolderCatalogUiEffect {
+        data object ShowFolderShareNotAllowed : FavoritePlaceFolderCatalogUiEffect
+
+        data class ShareFolder(
+            val favoriteFolderShareModel: FavoriteFolderShareModel,
+        ) : FavoritePlaceFolderCatalogUiEffect
     }
 
     data class FavoritePlaceFolderCatalogUiState(
