@@ -7,18 +7,15 @@ import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import com.on.turip.R
-import com.on.turip.data.common.UiError
+import com.on.turip.data.common.ErrorUiState
 import com.on.turip.databinding.ActivityRegionResultBinding
 import com.on.turip.ui.common.base.BaseActivity
+import com.on.turip.ui.common.collectOnStarted
 import com.on.turip.ui.common.event.CommonUiEffect
 import com.on.turip.ui.login.LoginActivity
 import com.on.turip.ui.trip.detail.TripDetailActivity
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class RegionResultActivity : BaseActivity<ActivityRegionResultBinding>() {
@@ -42,17 +39,6 @@ class RegionResultActivity : BaseActivity<ActivityRegionResultBinding>() {
         setupToolbar()
         setupAdapters()
         setupObservers()
-        showNetworkError()
-    }
-
-    private fun showNetworkError() {
-        binding.customErrorView.apply {
-            visibility = View.VISIBLE
-            render(UiError.Global.Network)
-            setOnRetryClickListener {
-                viewModel.reload()
-            }
-        }
     }
 
     private fun setupToolbar() {
@@ -60,10 +46,7 @@ class RegionResultActivity : BaseActivity<ActivityRegionResultBinding>() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         binding.tbRegionResult.navigationIcon?.setTint(
-            ContextCompat.getColor(
-                this,
-                R.color.gray_300_5b5b5b,
-            ),
+            ContextCompat.getColor(this, R.color.gray_300_5b5b5b),
         )
     }
 
@@ -80,84 +63,68 @@ class RegionResultActivity : BaseActivity<ActivityRegionResultBinding>() {
     }
 
     private fun setupObservers() {
-        viewModel.searchResultState.observe(this) { searchResultState: RegionResultViewModel.SearchResultState ->
-            binding.tvRegionResultCount.text =
-                getString(
-                    R.string.region_result_exist_result,
-                    searchResultState.searchResultCount,
-                )
-            supportActionBar?.title = searchResultState.region
-            regionResultAdapter.submitList(searchResultState.videoInformations)
-            updateUIVisibility()
-        }
-
-        viewModel.networkError.observe(this) {
-            updateUIVisibility()
-        }
-
-        viewModel.serverError.observe(this) {
-            updateUIVisibility()
-        }
-
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiEvent.collect { event ->
-                    when (event) {
-                        CommonUiEffect.NavigateToLogin -> navigateToLoginScreen()
-                    }
-                }
+        collectOnStarted(viewModel.uiState) { uiState: RegionResultUiState ->
+            when (uiState) {
+                RegionResultUiState.Loading -> renderLoading()
+                RegionResultUiState.Empty -> renderEmptyView()
+                is RegionResultUiState.Success -> renderContents(uiState)
+                is RegionResultUiState.Error -> renderErrorView(uiState.errorUiState)
             }
+        }
+
+        collectOnStarted(viewModel.commonUiEffect) { uiEffect: CommonUiEffect ->
+            when (uiEffect) {
+                CommonUiEffect.NavigateToLogin -> navigateToLoginScreen()
+            }
+        }
+    }
+
+    private fun renderLoading() {
+        binding.pbRegionResult.visibility = View.VISIBLE
+        binding.groupRegionResultEmpty.visibility = View.GONE
+        binding.groupRegionResultNotEmpty.visibility = View.GONE
+        binding.customErrorView.visibility = View.GONE
+    }
+
+    private fun renderEmptyView() {
+        binding.groupRegionResultEmpty.visibility = View.VISIBLE
+        binding.groupRegionResultNotEmpty.visibility = View.GONE
+        binding.pbRegionResult.visibility = View.GONE
+        binding.customErrorView.visibility = View.GONE
+    }
+
+    private fun renderContents(uiState: RegionResultUiState.Success) {
+        regionResultAdapter.submitList(uiState.videos)
+
+        binding.groupRegionResultNotEmpty.visibility = View.VISIBLE
+        binding.groupRegionResultEmpty.visibility = View.GONE
+        binding.pbRegionResult.visibility = View.GONE
+        binding.customErrorView.visibility = View.GONE
+
+        binding.tvRegionResultCount.text =
+            getString(R.string.region_result_exist_result, uiState.totalCount)
+        supportActionBar?.title = uiState.region
+    }
+
+    private fun renderErrorView(errorUiState: ErrorUiState) {
+        binding.groupRegionResultEmpty.visibility = View.GONE
+        binding.groupRegionResultNotEmpty.visibility = View.GONE
+        binding.pbRegionResult.visibility = View.GONE
+
+        binding.customErrorView.apply {
+            visibility = View.VISIBLE
+            render(errorUiState)
+            setOnRetryClickListener { viewModel.reload() }
         }
     }
 
     private fun navigateToLoginScreen() {
         val intent: Intent =
-            LoginActivity.newIntent(this).apply {
-                flags =
-                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            }
+            LoginActivity
+                .newIntent(this)
+                .apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK }
         startActivity(intent)
         finish()
-    }
-
-    private fun updateUIVisibility() {
-        val searchResultState = viewModel.searchResultState.value
-        val hasNetworkError = viewModel.networkError.value == true
-        val hasServerError = viewModel.serverError.value == true
-
-        when {
-            hasNetworkError || hasServerError -> {
-                binding.customErrorView.visibility = View.VISIBLE
-                binding.pbSearchRegionResult.visibility = View.GONE
-                binding.groupRegionResultEmpty.visibility = View.GONE
-                binding.tvRegionResultCount.visibility = View.GONE
-                binding.rvRegionResult.visibility = View.GONE
-            }
-
-            searchResultState?.loading == true -> {
-                binding.customErrorView.visibility = View.GONE
-                binding.pbSearchRegionResult.visibility = View.VISIBLE
-                binding.groupRegionResultEmpty.visibility = View.GONE
-                binding.tvRegionResultCount.visibility = View.GONE
-                binding.rvRegionResult.visibility = View.GONE
-            }
-
-            searchResultState?.isExist == true -> {
-                binding.customErrorView.visibility = View.GONE
-                binding.pbSearchRegionResult.visibility = View.GONE
-                binding.groupRegionResultEmpty.visibility = View.GONE
-                binding.tvRegionResultCount.visibility = View.VISIBLE
-                binding.rvRegionResult.visibility = View.VISIBLE
-            }
-
-            else -> {
-                binding.customErrorView.visibility = View.GONE
-                binding.pbSearchRegionResult.visibility = View.GONE
-                binding.groupRegionResultEmpty.visibility = View.VISIBLE
-                binding.tvRegionResultCount.visibility = View.GONE
-                binding.rvRegionResult.visibility = View.GONE
-            }
-        }
     }
 
     companion object {

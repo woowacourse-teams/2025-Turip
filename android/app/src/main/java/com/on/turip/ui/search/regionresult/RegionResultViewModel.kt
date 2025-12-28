@@ -1,14 +1,12 @@
 package com.on.turip.ui.search.regionresult
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.on.turip.data.common.ErrorUiState
 import com.on.turip.data.common.TuripCustomResult
-import com.on.turip.data.common.onFailure
-import com.on.turip.data.common.onSuccess
-import com.on.turip.domain.ErrorEvent
+import com.on.turip.data.common.UiError
+import com.on.turip.data.common.toUiError
 import com.on.turip.domain.content.PagedContentsResult
 import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.content.video.VideoInformation
@@ -21,7 +19,11 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -31,38 +33,32 @@ class RegionResultViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val contentRepository: ContentRepository,
 ) : ViewModel() {
-    private val _searchResultState: MutableLiveData<SearchResultState> =
-        MutableLiveData(SearchResultState())
-    val searchResultState: LiveData<SearchResultState> get() = _searchResultState
-
     private val regionCategoryName: String by lazy {
         checkNotNull(savedStateHandle[REGION_RESULT_REGION_CATEGORY_NAME_KEY]) {
             Timber.e("지역 검색 화면 지역 이름이 존재하지 않습니다.")
         }
     }
 
-    private val _networkError: MutableLiveData<Boolean> = MutableLiveData(false)
-    val networkError: LiveData<Boolean> get() = _networkError
+    private val _uiState: MutableStateFlow<RegionResultUiState> =
+        MutableStateFlow(RegionResultUiState.Loading)
+    val uiState: StateFlow<RegionResultUiState> = _uiState.asStateFlow()
 
-    private val _serverError: MutableLiveData<Boolean> = MutableLiveData(false)
-    val serverError: LiveData<Boolean> get() = _serverError
-
-    private val _uiEvent: Channel<CommonUiEffect> = Channel(Channel.BUFFERED)
-    val uiEvent: Flow<CommonUiEffect> = _uiEvent.receiveAsFlow()
+    private val _commonUiEffect: Channel<CommonUiEffect> = Channel(Channel.BUFFERED)
+    val commonUiEffect: Flow<CommonUiEffect> = _commonUiEffect.receiveAsFlow()
 
     init {
         loadContentsFromRegion()
-        setTitle()
     }
 
     fun reload() {
         loadContentsFromRegion()
-        setTitle()
     }
 
     private fun loadContentsFromRegion() {
         viewModelScope.launch {
-            val pagedContentsResult: Deferred<TuripCustomResult<PagedContentsResult>> =
+            _uiState.update { RegionResultUiState.Loading }
+
+            val pagedContentsDeferred: Deferred<TuripCustomResult<PagedContentsResult>> =
                 async {
                     contentRepository.loadContentsByRegion(
                         regionCategoryName = regionCategoryName,
@@ -70,103 +66,55 @@ class RegionResultViewModel @Inject constructor(
                         lastId = 0L,
                     )
                 }
-            val contentsSize: Deferred<TuripCustomResult<Int>> =
-                async {
-                    contentRepository.loadContentsSizeByRegion(regionCategoryName)
+            val contentsSizeDeferred: Deferred<TuripCustomResult<Int>> =
+                async { contentRepository.loadContentsSizeByRegion(regionCategoryName) }
+
+            val contentsResult: TuripCustomResult<PagedContentsResult> =
+                pagedContentsDeferred.await()
+            val countResult: TuripCustomResult<Int> = contentsSizeDeferred.await()
+
+            val failure: TuripCustomResult.Failure? =
+                listOf(countResult, contentsResult)
+                    .filterIsInstance<TuripCustomResult.Failure>()
+                    .firstOrNull()
+
+            if (failure != null) {
+                handleError(failure)
+                return@launch
+            }
+
+            val count: Int = (countResult as TuripCustomResult.Success).value
+            val videosInformation: List<VideoInformationModel> =
+                (contentsResult as TuripCustomResult.Success).value.videos.map { videoInformation: VideoInformation ->
+                    videoInformation.toUiModel()
                 }
 
-            pagedContentsResult
-                .await()
-                .onSuccess { result: PagedContentsResult ->
-                    val videoModels: List<VideoInformationModel> =
-                        result.videos.map { videoInformation: VideoInformation -> videoInformation.toUiModel() }
-                    _searchResultState.value =
-                        searchResultState.value?.copy(
-                            videoInformations = videoModels,
-                        )
-                    _networkError.value = false
-                    _serverError.value = false
-                }.onFailure { errorEvent: ErrorEvent ->
-                    checkError(errorEvent)
-                }
-            contentsSize
-                .await()
-                .onSuccess { result: Int ->
-                    setSearchResultExistence(result)
-                    updateLoading(false)
-                    _networkError.value = false
-                    _serverError.value = false
-                }.onFailure { errorEvent: ErrorEvent ->
-                    updateLoading(false)
-                    checkError(errorEvent)
-                }
-        }
-    }
-
-    private fun checkError(errorEvent: ErrorEvent) {
-        when (errorEvent) {
-            ErrorEvent.USER_NOT_HAVE_PERMISSION -> {
-                _serverError.value = true
-            }
-
-            ErrorEvent.DUPLICATION_FOLDER -> {
-                throw IllegalArgumentException("발생할 수 없는 오류")
-            }
-
-            ErrorEvent.UNEXPECTED_PROBLEM -> {
-                _serverError.value = true
-            }
-
-            ErrorEvent.NETWORK_ERROR -> {
-                _networkError.value = true
-            }
-
-            ErrorEvent.PARSER_ERROR -> {
-                _serverError.value = true
-            }
-
-            ErrorEvent.TOKEN_EXPIRATION -> {
-                viewModelScope.launch {
-                    _uiEvent.send(CommonUiEffect.NavigateToLogin)
+            if (count == 0) {
+                _uiState.update { RegionResultUiState.Empty }
+            } else {
+                _uiState.update {
+                    RegionResultUiState.Success(
+                        videos = videosInformation,
+                        totalCount = count,
+                        region = regionCategoryName,
+                    )
                 }
             }
         }
     }
 
-    private fun updateLoading(state: Boolean) {
-        _searchResultState.value =
-            searchResultState.value?.copy(
-                loading = state,
-            )
-    }
-
-    private fun setSearchResultExistence(result: Int) {
-        if (result > 0) {
-            _searchResultState.value =
-                searchResultState.value?.copy(
-                    searchResultCount = result,
-                    isExist = true,
-                )
-        } else {
-            _searchResultState.value =
-                searchResultState.value?.copy(
-                    isExist = false,
-                )
+    private suspend fun handleError(failure: TuripCustomResult.Failure) {
+        when (val uiError: UiError = failure.errorType.toUiError()) {
+            is UiError.Global -> handleGlobalError(uiError)
+            is UiError.Feature -> Unit
         }
     }
 
-    private fun setTitle() {
-        _searchResultState.value =
-            searchResultState.value?.copy(
-                region = regionCategoryName,
-            )
+    private suspend fun handleGlobalError(uiError: UiError.Global) {
+        when (uiError) {
+            UiError.Global.Network -> _uiState.update { RegionResultUiState.Error(ErrorUiState.Network) }
+            UiError.Global.Server -> _uiState.update { RegionResultUiState.Error(ErrorUiState.Server) }
+            UiError.Global.TokenExpired -> _commonUiEffect.send(CommonUiEffect.NavigateToLogin)
+        }
     }
-
-    data class SearchResultState(
-        val searchResultCount: Int = 0,
-        val videoInformations: List<VideoInformationModel> = emptyList(),
-        val region: String = "",
-        val isExist: Boolean = false,
-        val loading: Boolean = true,
-    )
 }

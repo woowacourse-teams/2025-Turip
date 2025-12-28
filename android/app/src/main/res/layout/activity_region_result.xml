@@ -43,6 +43,14 @@
         tools:itemCount="10"
         tools:listitem="@layout/item_result" />
 
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/group_region_result_not_empty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        app:constraint_referenced_ids="tv_region_result_count,rv_region_result" />
+
+
     <ImageView
         android:id="@+id/iv_region_result_empty"
         android:layout_width="80dp"
@@ -79,14 +87,14 @@
         android:id="@+id/custom_error_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:visibility="gone" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ProgressBar
-        android:id="@+id/pb_search_region_result"
+        android:id="@+id/pb_region_result"
         style="?android:attr/progressBarStyleLarge"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
