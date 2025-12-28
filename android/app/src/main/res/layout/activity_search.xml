@@ -114,18 +114,7 @@
         android:layout_height="wrap_content"
         android:visibility="gone"
         app:constraint_referenced_ids="iv_search_result_empty,tv_search_result_empty" />
-
-    <TextView
-        android:id="@+id/tv_search_result_loading"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/pure_white_ffffff"
-        android:gravity="center"
-        android:text="@string/all_loading"
-        android:textAppearance="@style/display"
-        android:textColor="@color/pure_black_151515"
-        android:visibility="gone" />
-
+    
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_search_result_search_history"
         android:layout_width="match_parent"
