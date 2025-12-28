@@ -90,7 +90,7 @@
         tools:text="12개 장소" />
 
     <TextView
-        android:id="@+id/tv_favorite_content_travel_duration"
+        android:id="@+id/tv_favorite_content_trip_duration"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"

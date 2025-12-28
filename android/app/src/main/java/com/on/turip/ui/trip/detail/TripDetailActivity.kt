@@ -194,8 +194,8 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
     }
 
     private fun setupAdapters() {
-        binding.rvTripDetailTravelDay.adapter = tripDayAdapter
-        binding.rvTripDetailTravelPlace.apply {
+        binding.rvTripDetailTripDay.adapter = tripDayAdapter
+        binding.rvTripDetailTripPlace.apply {
             adapter = tripPlaceAdapter
             itemAnimator = null
         }

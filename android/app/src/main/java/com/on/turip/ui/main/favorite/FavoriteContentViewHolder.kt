@@ -62,7 +62,7 @@ class FavoriteContentViewHolder(
                     favoriteContent.tripPlaceCount,
                 )
 
-            tvFavoriteContentTravelDuration.text =
+            tvFavoriteContentTripDuration.text =
                 favoriteContent.tripDuration.toUiModel().toDisplayText(itemView.context)
 
             ivFavoriteContentVideoThumbnail.loadRoundedCornerImage(

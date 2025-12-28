@@ -183,7 +183,7 @@
                 app:layout_constraintTop_toBottomOf="@id/tv_trip_detail_creator_name" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_trip_detail_travel_day"
+                android:id="@+id/rv_trip_detail_trip_day"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:clipToPadding="false"
@@ -192,7 +192,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/div_trip_detail_horizontal"
-                tools:listitem="@layout/item_travel_day" />
+                tools:listitem="@layout/item_trip_day" />
 
             <TextView
                 android:id="@+id/tv_trip_detail_day_place_count"
@@ -203,11 +203,11 @@
                 android:textAppearance="@style/info1"
                 android:textColor="@color/gray_500_1e1e1e"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/rv_trip_detail_travel_day"
+                app:layout_constraintTop_toBottomOf="@id/rv_trip_detail_trip_day"
                 tools:text="일정 4개" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_trip_detail_travel_place"
+                android:id="@+id/rv_trip_detail_trip_place"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_marginTop="12dp"
@@ -217,7 +217,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tv_trip_detail_day_place_count"
-                tools:listitem="@layout/item_travel_place" />
+                tools:listitem="@layout/item_trip_place" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
 

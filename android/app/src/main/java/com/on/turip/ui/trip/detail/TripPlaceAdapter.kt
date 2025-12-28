@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.ListAdapter
 
 class TripPlaceAdapter(
     private val onClickListener: TripPlaceViewHolder.PlaceListener,
-) : ListAdapter<PlaceModel, TripPlaceViewHolder>(TravelPlaceDiffUtil) {
+) : ListAdapter<PlaceModel, TripPlaceViewHolder>(TripPlaceDiffUtil) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -20,7 +20,7 @@ class TripPlaceAdapter(
         holder.bind(placeModel)
     }
 
-    private object TravelPlaceDiffUtil : DiffUtil.ItemCallback<PlaceModel>() {
+    private object TripPlaceDiffUtil : DiffUtil.ItemCallback<PlaceModel>() {
         override fun areItemsTheSame(
             oldItem: PlaceModel,
             newItem: PlaceModel,
