@@ -34,15 +34,3 @@ private fun <T> Response<T>.toErrorType(): ErrorType =
     }.getOrElse {
         ErrorType.Unknown
     }
-
-suspend fun <T> safeLocalApiCall(
-    errorType: ErrorType = ErrorType.Local.Unknown,
-    apiCall: suspend () -> T,
-): TuripCustomResult<T> {
-    try {
-        return TuripCustomResult.Success(apiCall())
-    } catch (e: Throwable) {
-        if (e is CancellationException) throw e
-        return TuripCustomResult.Failure(errorType, e)
-    }
-}

@@ -91,13 +91,6 @@ sealed interface ErrorType {
     }
 
     /**
-     * 로컬 데이터베이스에 대한 에러 타입
-     */
-    sealed interface Local : ErrorType {
-        data object Unknown : Local
-    }
-
-    /**
      * 네트워크 에러에 대한 에러 타입
      */
     data object Network : ErrorType
