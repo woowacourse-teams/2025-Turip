@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -69,8 +70,6 @@ class SearchViewModel @Inject constructor(
                 .onSuccess { result: List<SearchHistory> ->
                     Timber.d("최근 검색 목록 받아옴 $result")
                     _searchHistory.value = result
-                }.onFailure {
-                    Timber.e("${it.message}")
                 }
         }
     }
@@ -87,7 +86,7 @@ class SearchViewModel @Inject constructor(
             val searchResultCountDeferred: Deferred<TuripCustomResult<Int>> =
                 async { contentRepository.loadContentsSizeByKeyword(searchingKeyword) }
 
-            val pagedContentsResult: Deferred<TuripCustomResult<PagedContentsResult>> =
+            val pagedContentsDeferred: Deferred<TuripCustomResult<PagedContentsResult>> =
                 async {
                     contentRepository.loadContentsByKeyword(
                         keyword = searchingKeyword,
@@ -116,15 +115,6 @@ class SearchViewModel @Inject constructor(
                     videoInformation.toUiModel()
                 }
 
-            ErrorEvent.PARSER_ERROR -> {
-                _serverError.value = true
-            }
-
-            ErrorEvent.TOKEN_EXPIRATION -> {
-                viewModelScope.launch {
-                    _uiEvent.send(CommonUiEffect.NavigateToLogin)
-                }
-            }
             if (count == 0) {
                 _uiState.update { SearchUiState.Empty }
             } else {
@@ -147,20 +137,19 @@ class SearchViewModel @Inject constructor(
                 .createSearchHistory(searchingKeyword)
                 .onSuccess {
                     addSearchHistory(
-                        SearchHistory(
-                            keyword = searchingKeyword,
-                            historyTime = System.currentTimeMillis(),
-                        ),
-                        MAX_SEARCH_HISTORY_COUNT,
+                        newItem =
+                            SearchHistory(
+                                keyword = searchingKeyword,
+                                historyTime = System.currentTimeMillis(),
+                            ),
+                        limit = MAX_SEARCH_HISTORY_COUNT,
                     )
                     Timber.d("최근 검색 목록에 추가됨")
-                }.onFailure {
-                    Timber.e("${it.message}")
                 }
         }
     }
 
-    fun addSearchHistory(
+    private fun addSearchHistory(
         newItem: SearchHistory,
         limit: Int,
     ) {
@@ -177,9 +166,22 @@ class SearchViewModel @Inject constructor(
                 .onSuccess {
                     _searchHistory.value = searchHistory.value?.filterNot { it.keyword == keyword }
                     Timber.d("${keyword}가 최근 검색 목록에서 삭제")
-                }.onFailure {
-                    Timber.e("${it.message}")
                 }
+        }
+    }
+
+    private suspend fun handleError(failure: TuripCustomResult.Failure) {
+        when (val uiError: UiError = failure.errorType.toUiError()) {
+            is UiError.Global -> handleGlobalError(uiError)
+            is UiError.Feature -> Unit
+        }
+    }
+
+    private suspend fun handleGlobalError(uiError: UiError.Global) {
+        when (uiError) {
+            UiError.Global.Network -> _uiState.update { SearchUiState.Error(ErrorUiState.Network) }
+            UiError.Global.Server -> _uiState.update { SearchUiState.Error(ErrorUiState.Server) }
+            UiError.Global.TokenExpired -> _commonUiEffect.send(CommonUiEffect.NavigateToLogin)
         }
     }
 
