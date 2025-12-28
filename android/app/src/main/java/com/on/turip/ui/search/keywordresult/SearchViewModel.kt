@@ -23,6 +23,9 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -34,29 +37,17 @@ class SearchViewModel @Inject constructor(
     private val contentRepository: ContentRepository,
     private val searchHistoryRepository: SearchHistoryRepository,
 ) : ViewModel() {
+    private val _uiState = MutableStateFlow<SearchUiState>(SearchUiState.Loading)
+    val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
+
     private val _searchingWord: MutableLiveData<String> = MutableLiveData()
     val searchingWord: LiveData<String> get() = _searchingWord
-
-    private val _videoInformation: MutableLiveData<List<VideoInformationModel>> = MutableLiveData()
-    val videoInformation: LiveData<List<VideoInformationModel>> get() = _videoInformation
-
-    private val _searchResultCount: MutableLiveData<Int> = MutableLiveData()
-    val searchResultCount: LiveData<Int> get() = _searchResultCount
-
-    private val _loading: MutableLiveData<Boolean> = MutableLiveData()
-    val loading: LiveData<Boolean> get() = _loading
 
     private val _searchHistory: MutableLiveData<List<SearchHistory>> = MutableLiveData(emptyList())
     val searchHistory: LiveData<List<SearchHistory>> get() = _searchHistory
 
-    private val _networkError: MutableLiveData<Boolean> = MutableLiveData(false)
-    val networkError: LiveData<Boolean> get() = _networkError
-
-    private val _serverError: MutableLiveData<Boolean> = MutableLiveData(false)
-    val serverError: LiveData<Boolean> get() = _serverError
-
-    private val _uiEvent: Channel<CommonUiEffect> = Channel(Channel.BUFFERED)
-    val uiEvent: Flow<CommonUiEffect> = _uiEvent.receiveAsFlow()
+    private val _commonUiEffect: Channel<CommonUiEffect> = Channel(Channel.BUFFERED)
+    val commonUiEffect: Flow<CommonUiEffect> = _commonUiEffect.receiveAsFlow()
 
     private val searchKeyword: String by lazy {
         checkNotNull(savedStateHandle[SEARCH_KEYWORD_KEY]) {
