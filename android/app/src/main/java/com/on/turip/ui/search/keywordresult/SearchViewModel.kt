@@ -5,10 +5,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.on.turip.data.common.ErrorUiState
 import com.on.turip.data.common.TuripCustomResult
-import com.on.turip.data.common.onFailure
-import com.on.turip.data.common.onSuccess
-import com.on.turip.domain.ErrorEvent
+import com.on.turip.data.common.UiError
+import com.on.turip.data.common.toUiError
 import com.on.turip.domain.content.PagedContentsResult
 import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.content.video.VideoInformation
@@ -81,14 +81,11 @@ class SearchViewModel @Inject constructor(
 
     fun loadByKeyword(searchingKeyword: String = searchingWord.value.orEmpty()) {
         if (searchingKeyword.isBlank()) return
-        _loading.value = true
+
+        _uiState.update { SearchUiState.Loading }
         viewModelScope.launch {
-            val searchResultCountResult: Deferred<TuripCustomResult<Int>> =
-                async {
-                    contentRepository.loadContentsSizeByKeyword(
-                        searchingKeyword,
-                    )
-                }
+            val searchResultCountDeferred: Deferred<TuripCustomResult<Int>> =
+                async { contentRepository.loadContentsSizeByKeyword(searchingKeyword) }
 
             val pagedContentsResult: Deferred<TuripCustomResult<PagedContentsResult>> =
                 async {
@@ -99,50 +96,25 @@ class SearchViewModel @Inject constructor(
                     )
                 }
 
-            pagedContentsResult
-                .await()
-                .onSuccess { result: PagedContentsResult ->
-                    Timber.d("검색결과 목록들을 받아옴 $result")
-                    val videoModels: List<VideoInformationModel> =
-                        result.videos.map { videoInformation: VideoInformation -> videoInformation.toUiModel() }
-                    _videoInformation.value = videoModels
-                }.onFailure { errorEvent: ErrorEvent ->
-                    _loading.value = false
-                    checkError(errorEvent)
+            val countResult: TuripCustomResult<Int> = searchResultCountDeferred.await()
+            val contentsResult: TuripCustomResult<PagedContentsResult> =
+                pagedContentsDeferred.await()
+
+            val failure: TuripCustomResult.Failure? =
+                listOf(countResult, contentsResult)
+                    .filterIsInstance<TuripCustomResult.Failure>()
+                    .firstOrNull()
+
+            if (failure != null) {
+                handleError(failure)
+                return@launch
+            }
+
+            val count: Int = (countResult as TuripCustomResult.Success).value
+            val videosInformation: List<VideoInformationModel> =
+                (contentsResult as TuripCustomResult.Success).value.videos.map { videoInformation: VideoInformation ->
+                    videoInformation.toUiModel()
                 }
-
-            searchResultCountResult
-                .await()
-                .onSuccess { result: Int ->
-                    Timber.d("최근 검색 목록 갯수를 받아옴 $result")
-                    _loading.value = false
-                    _searchResultCount.value = result
-                    _serverError.value = false
-                    _networkError.value = false
-                }.onFailure { errorEvent: ErrorEvent ->
-                    _loading.value = false
-                    checkError(errorEvent)
-                }
-        }
-    }
-
-    private fun checkError(errorEvent: ErrorEvent) {
-        when (errorEvent) {
-            ErrorEvent.USER_NOT_HAVE_PERMISSION -> {
-                _serverError.value = true
-            }
-
-            ErrorEvent.DUPLICATION_FOLDER -> {
-                throw IllegalArgumentException("발생할 수 없는 오류")
-            }
-
-            ErrorEvent.UNEXPECTED_PROBLEM -> {
-                _serverError.value = true
-            }
-
-            ErrorEvent.NETWORK_ERROR -> {
-                _networkError.value = true
-            }
 
             ErrorEvent.PARSER_ERROR -> {
                 _serverError.value = true
@@ -153,6 +125,18 @@ class SearchViewModel @Inject constructor(
                     _uiEvent.send(CommonUiEffect.NavigateToLogin)
                 }
             }
+            if (count == 0) {
+                _uiState.update { SearchUiState.Empty }
+            } else {
+                _uiState.update {
+                    SearchUiState.Success(
+                        videos = videosInformation,
+                        totalCount = count,
+                    )
+                }
+            }
+            Timber.d("최근 검색 목록 갯수를 받아옴 $count")
+            Timber.d("검색결과 목록들을 받아옴 $videosInformation")
         }
     }
 
