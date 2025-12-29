@@ -38,7 +38,7 @@ class TokenAuthenticator @Inject constructor(
 
                 val newTokens: AuthTokens =
                     if (newTokensResult is TuripCustomResult.Success) {
-                        newTokensResult.data
+                        newTokensResult.value
                     } else {
                         return@runBlocking null
                     }

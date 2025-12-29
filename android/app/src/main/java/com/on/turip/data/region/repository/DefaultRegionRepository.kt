@@ -19,9 +19,7 @@ class DefaultRegionRepository @Inject constructor(
             if (isDomestic) cachedDomesticRegionCategories else cachedAbroadRegionCategories
 
         if (cachedRegionCategories.isNotEmpty()) {
-            return TuripCustomResult.success(
-                cachedRegionCategories,
-            )
+            return TuripCustomResult.Success(cachedRegionCategories)
         }
 
         return regionRemoteDataSource

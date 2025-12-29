@@ -8,9 +8,12 @@ import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetCredentialResponse
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
+import com.on.turip.data.common.ErrorType
 import com.on.turip.data.common.TuripCustomResult
 import dagger.hilt.android.qualifiers.ActivityContext
+import okio.IOException
 import javax.inject.Inject
+import kotlin.coroutines.cancellation.CancellationException
 
 class GoogleCredentialManager @Inject constructor(
     @ActivityContext private val context: Context,
@@ -19,15 +22,17 @@ class GoogleCredentialManager @Inject constructor(
     private val credentialManager by lazy { CredentialManager.create(context) }
 
     override suspend fun getIdToken(): TuripCustomResult<GoogleIdTokenCredential> =
-        runCatching {
-            credentialManager.getCredential(
-                request = getCredentialRequest,
-                context = context,
-            )
-        }.fold(
-            onSuccess = { result -> TuripCustomResult.success(handleSignIn(result)) },
-            onFailure = { error -> TuripCustomResult.NetworkError(error) },
-        )
+        try {
+            val googleIdTokenCredential =
+                credentialManager.getCredential(request = getCredentialRequest, context = context)
+            TuripCustomResult.Success(handleSignIn(googleIdTokenCredential))
+        } catch (e: Throwable) {
+            if (e is CancellationException) throw e
+            when {
+                e is IOException -> TuripCustomResult.Failure(ErrorType.Network, e)
+                else -> TuripCustomResult.Failure(ErrorType.Unknown, e)
+            }
+        }
 
     private fun handleSignIn(result: GetCredentialResponse): GoogleIdTokenCredential {
         val credential: Credential = result.credential
