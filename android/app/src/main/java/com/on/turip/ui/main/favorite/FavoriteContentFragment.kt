@@ -6,8 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import com.google.android.material.snackbar.Snackbar
 import com.on.turip.R
+import com.on.turip.data.common.ErrorUiEffect
+import com.on.turip.data.common.ErrorUiModel
 import com.on.turip.data.common.ErrorUiState
+import com.on.turip.data.common.toUiModel
 import com.on.turip.databinding.FragmentFavoriteContentBinding
 import com.on.turip.domain.favorite.FavoriteContent
 import com.on.turip.ui.common.ItemDividerDecoration
@@ -15,6 +19,7 @@ import com.on.turip.ui.common.base.BaseFragment
 import com.on.turip.ui.common.collectOnStarted
 import com.on.turip.ui.common.event.CommonUiEffect
 import com.on.turip.ui.login.LoginActivity
+import com.on.turip.ui.main.favorite.model.FavoriteContentUiState
 import com.on.turip.ui.trip.detail.TripDetailActivity
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
@@ -74,18 +79,68 @@ class FavoriteContentFragment : BaseFragment<FragmentFavoriteContentBinding>() {
     }
 
     private fun setupObservers() {
-        viewModel.favoriteContents.observe(viewLifecycleOwner) { favoriteContents ->
-            renderContentOrError(favoriteContents, viewModel.errorUiState.value)
+        collectOnStarted(viewModel.uiState) { uiState: FavoriteContentUiState ->
+            when {
+                uiState.isLoading -> renderLoading()
+                uiState.errorUiState != ErrorUiState.None -> renderErrorView(uiState.errorUiState)
+                else -> renderContents(uiState.favoriteContents)
+            }
         }
 
-        collectOnStarted(viewModel.errorUiState) { errorUiState: ErrorUiState ->
-            renderContentOrError(emptyList(), errorUiState)
+        collectOnStarted(viewModel.errorUiEffect) { errorUiEffect: ErrorUiEffect ->
+            when (errorUiEffect) {
+                is ErrorUiEffect.ShowSnackbar -> {
+                    val uiModel: ErrorUiModel =
+                        errorUiEffect.errorUiState.toUiModel() ?: return@collectOnStarted
+                    view?.let { view: View ->
+                        Snackbar
+                            .make(view, uiModel.titleRes, Snackbar.LENGTH_LONG)
+                            .apply {
+                                errorUiEffect.onRetryClick?.let { action -> setAction(uiModel.retryTextRes) { action() } }
+                            }.show()
+                    }
+                }
+            }
         }
 
         collectOnStarted(viewModel.commonUiEffect) { commonUiEffect: CommonUiEffect ->
             when (commonUiEffect) {
                 CommonUiEffect.NavigateToLogin -> navigateToLoginScreen()
             }
+        }
+    }
+
+    private fun renderLoading() {
+        binding.pbFavoriteContentLoading.visibility = View.VISIBLE
+        binding.clFavoriteContentEmpty.visibility = View.GONE
+        binding.clFavoriteContentNotEmpty.visibility = View.GONE
+        binding.customErrorView.visibility = View.GONE
+    }
+
+    private fun renderErrorView(errorUiState: ErrorUiState) {
+        binding.customErrorView.visibility = View.VISIBLE
+        binding.pbFavoriteContentLoading.visibility = View.GONE
+        binding.clFavoriteContentEmpty.visibility = View.GONE
+        binding.clFavoriteContentNotEmpty.visibility = View.GONE
+
+        binding.customErrorView.apply {
+            visibility = View.VISIBLE
+            render(errorUiState)
+            setOnRetryClickListener { viewModel.loadFavoriteContents() }
+        }
+    }
+
+    private fun renderContents(favoriteContents: List<FavoriteContent>) {
+        binding.customErrorView.visibility = View.GONE
+        binding.pbFavoriteContentLoading.visibility = View.GONE
+
+        if (favoriteContents.isEmpty()) {
+            binding.clFavoriteContentEmpty.visibility = View.VISIBLE
+            binding.clFavoriteContentNotEmpty.visibility = View.GONE
+        } else {
+            binding.clFavoriteContentNotEmpty.visibility = View.VISIBLE
+            binding.clFavoriteContentEmpty.visibility = View.GONE
+            favoriteContentAdapter.submitList(favoriteContents)
         }
     }
 
@@ -97,45 +152,6 @@ class FavoriteContentFragment : BaseFragment<FragmentFavoriteContentBinding>() {
             }
         startActivity(intent)
         requireActivity().finish()
-    }
-
-    private fun renderContentOrError(
-        favoriteContents: List<FavoriteContent>,
-        errorUiState: ErrorUiState,
-    ) {
-        when (errorUiState) {
-            ErrorUiState.None -> {
-                binding.customErrorView.visibility = View.GONE
-                handleVisibleByHasContent(favoriteContents)
-                favoriteContentAdapter.submitList(favoriteContents)
-            }
-
-            else -> {
-                binding.clFavoriteContentEmpty.visibility = View.GONE
-                binding.clFavoriteContentNotEmpty.visibility = View.GONE
-
-                binding.customErrorView.visibility = View.VISIBLE
-                renderErrorView(errorUiState)
-            }
-        }
-    }
-
-    private fun handleVisibleByHasContent(favoriteContents: List<FavoriteContent>) {
-        if (favoriteContents.isEmpty()) {
-            binding.clFavoriteContentEmpty.visibility = View.VISIBLE
-            binding.clFavoriteContentNotEmpty.visibility = View.GONE
-        } else {
-            binding.clFavoriteContentEmpty.visibility = View.GONE
-            binding.clFavoriteContentNotEmpty.visibility = View.VISIBLE
-        }
-    }
-
-    private fun renderErrorView(errorUiState: ErrorUiState) {
-        binding.customErrorView.apply {
-            visibility = View.VISIBLE
-            render(errorUiState)
-            setOnRetryClickListener { viewModel.loadFavoriteContents() }
-        }
     }
 
     override fun onResume() {
