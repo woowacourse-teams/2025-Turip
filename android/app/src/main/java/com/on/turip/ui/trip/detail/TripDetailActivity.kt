@@ -14,16 +14,16 @@ import androidx.core.net.toUri
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.snackbar.Snackbar
 import com.on.turip.R
-import com.on.turip.data.common.UiError
+import com.on.turip.data.common.ErrorUiEffect
+import com.on.turip.data.common.ErrorUiModel
+import com.on.turip.data.common.ErrorUiState
+import com.on.turip.data.common.toUiModel
 import com.on.turip.databinding.ActivityTripDetailBinding
-import com.on.turip.domain.content.Content
 import com.on.turip.ui.common.TuripSnackbar
 import com.on.turip.ui.common.base.BaseActivity
+import com.on.turip.ui.common.collectOnStarted
 import com.on.turip.ui.common.event.CommonUiEffect
 import com.on.turip.ui.common.loadCircularImage
 import com.on.turip.ui.common.model.trip.toDisplayText
@@ -35,7 +35,6 @@ import com.on.turip.ui.trip.detail.webview.TuripWebViewClient
 import com.on.turip.ui.trip.detail.webview.applyVideoSettings
 import com.on.turip.ui.trip.detail.webview.navigateToTimeLine
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
@@ -60,9 +59,7 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
     }
 
     private val tripDayAdapter by lazy {
-        TripDayAdapter { dayModel ->
-            viewModel.updateDay(dayModel)
-        }
+        TripDayAdapter { dayModel -> viewModel.updateDay(dayModel) }
     }
 
     private val tripPlaceAdapter by lazy {
@@ -137,7 +134,6 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
         setupAdapters()
         setupListeners()
         setupObservers()
-        showNetworkError()
     }
 
     private fun setupToolbar() {
@@ -147,10 +143,7 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
             title = null
         }
         binding.tbTripDetail.navigationIcon?.setTint(
-            ContextCompat.getColor(
-                this,
-                R.color.gray_300_5b5b5b,
-            ),
+            ContextCompat.getColor(this, R.color.gray_300_5b5b5b),
         )
     }
 
@@ -206,18 +199,133 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
             val intent: Intent =
                 Intent(
                     Intent.ACTION_VIEW,
-                    viewModel.videoUri.value?.toUri(),
+                    viewModel.uiState.value.tripDetailInfo
+                        ?.videoLink
+                        ?.toUri(),
                 )
             startActivity(intent)
         }
 
         binding.ivTripDetailFavorite.setOnClickListener {
             viewModel.updateFavorite()
-            showFavoriteStatusSnackbar(viewModel.isFavorite.value == true)
         }
 
         binding.ivTripDetailContentToggle.setOnClickListener {
             viewModel.updateExpandTextToggle()
+            binding.tvTripDetailContentTitle.maxLines = viewModel.uiState.value.titleMaxLines
+        }
+    }
+
+    private fun setupObservers() {
+        collectOnStarted(viewModel.uiState) { uiState: TripDetailUiState ->
+            when {
+                // 로딩
+                uiState.isLoading -> renderLoading()
+
+                // 에러
+                uiState.errorUiState != ErrorUiState.None -> renderErrorView(uiState.errorUiState)
+
+                // 정상
+                else -> renderContents(uiState)
+            }
+        }
+
+        collectOnStarted(viewModel.uiEffect) { uiEffect: TripDetailUiEffect ->
+            when (uiEffect) {
+                is TripDetailUiEffect.ShowFavoriteStatus -> showFavoriteStatusSnackbar(uiEffect.isFavorite)
+            }
+        }
+
+        collectOnStarted(viewModel.errorUiEffect) { errorUiEffect: ErrorUiEffect ->
+            when (errorUiEffect) {
+                is ErrorUiEffect.ShowSnackbar -> {
+                    val uiModel: ErrorUiModel =
+                        errorUiEffect.errorUiState.toUiModel() ?: return@collectOnStarted
+                    Snackbar
+                        .make(binding.root, uiModel.titleRes, Snackbar.LENGTH_LONG)
+                        .apply {
+                            errorUiEffect.onRetryClick?.let { action -> setAction(uiModel.retryTextRes) { action() } }
+                        }.show()
+                }
+            }
+        }
+
+        collectOnStarted(viewModel.commonUiEffect) { commonUiEffect: CommonUiEffect ->
+            when (commonUiEffect) {
+                CommonUiEffect.NavigateToLogin -> navigateToLoginScreen()
+            }
+        }
+    }
+
+    private fun renderLoading() {
+        binding.pbTripDetailScreenLoading.visibility = View.VISIBLE
+        binding.appbar.visibility = View.GONE
+        binding.nsvTripDetail.visibility = View.GONE
+        binding.customErrorView.visibility = View.GONE
+    }
+
+    private fun renderErrorView(errorUiState: ErrorUiState) {
+        binding.customErrorView.visibility = View.VISIBLE
+        binding.pbTripDetailScreenLoading.visibility = View.GONE
+        binding.appbar.visibility = View.GONE
+        binding.nsvTripDetail.visibility = View.GONE
+
+        binding.customErrorView.apply {
+            visibility = View.VISIBLE
+            render(errorUiState)
+            setOnRetryClickListener { viewModel.loadTripDetails() }
+        }
+    }
+
+    private fun renderContents(uiState: TripDetailUiState) {
+        judgeExpandTextToggleVisibility(uiState.isExpandTextToggleVisible)
+
+        tripDayAdapter.submitList(uiState.days)
+        tripPlaceAdapter.submitList(uiState.places)
+
+        binding.appbar.visibility = View.VISIBLE
+        binding.nsvTripDetail.visibility = View.VISIBLE
+        binding.customErrorView.visibility = View.GONE
+        binding.pbTripDetailScreenLoading.visibility = View.GONE
+        binding.ivTripDetailContentToggle.visibility =
+            if (uiState.isExpandTextToggleVisible == true) View.VISIBLE else View.GONE
+
+        binding.ivTripDetailContentToggle.isSelected =
+            uiState.isExpandTextToggleSelected
+        binding.ivTripDetailFavorite.isSelected = uiState.isFavorite
+        binding.tvTripDetailDayPlaceCount.text =
+            getString(R.string.trip_detail_day_place_count, uiState.places.size)
+        binding.tvTripDetailContentTitle.maxLines = uiState.titleMaxLines
+
+        uiState.tripDetailInfo?.let { tripDetail: TripDetailInfoModel ->
+            binding.ivTripDetailCreatorThumbnail.loadCircularImage(tripDetail.creatorThumbnail)
+            binding.tvTripDetailCreatorName.text = tripDetail.creatorName
+            binding.tvTripDetailContentTitle.text = tripDetail.contentTitle
+            binding.tvTripDetailInfo.text =
+                getString(
+                    R.string.trip_detail_info,
+                    tripDetail.uploadedDate,
+                    tripDetail.placeTotalCount,
+                    tripDetail.duration.toDisplayText(this),
+                )
+            if (!viewModel.videoLoaded) {
+                videoManager.loadVideo(tripDetail.videoLink) { showWebViewErrorView() }
+                viewModel.updateVideoLoadStatus(isLoaded = true)
+            }
+        }
+    }
+
+    /**
+     * isVisible == null일 때만 Visibility 판단
+     */
+    private fun judgeExpandTextToggleVisibility(isVisible: Boolean?) {
+        if (isVisible == null) {
+            val bodyTextView: TextView = binding.tvTripDetailContentTitle
+            bodyTextView.post {
+                val lineCount: Int = bodyTextView.layout.lineCount
+                val ellipsisCount: Int = bodyTextView.layout.getEllipsisCount(lineCount - 1)
+                viewModel.updateExpandTextToggleVisibility(lineCount, ellipsisCount)
+            }
         }
     }
 
@@ -239,79 +347,6 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
             .show()
     }
 
-    private fun setupObservers() {
-        viewModel.days.observe(this) { days: List<DayModel> ->
-            tripDayAdapter.submitList(days)
-        }
-        viewModel.places.observe(this) { places: List<PlaceModel> ->
-            tripPlaceAdapter.submitList(places)
-            binding.tvTripDetailDayPlaceCount.text =
-                getString(R.string.trip_detail_day_place_count, places.size)
-        }
-        viewModel.content.observe(this) { content: Content ->
-            binding.ivTripDetailCreatorThumbnail.loadCircularImage(
-                content.creator.profileImage,
-            )
-            binding.tvTripDetailCreatorName.text = content.creator.channelName
-            binding.tvTripDetailContentTitle.text = content.videoData.title
-            updateExpandTextToggleVisibility()
-        }
-        viewModel.tripDetailInfo.observe(this) { tripDetailInfo ->
-            binding.tvTripDetailInfo.text =
-                getString(
-                    R.string.trip_detail_info,
-                    tripDetailInfo.uploadedDate,
-                    tripDetailInfo.placeCount,
-                    tripDetailInfo.duration.toDisplayText(this),
-                )
-        }
-        viewModel.videoUri.observe(this) { url: String ->
-            videoManager.loadVideo(url) {
-                showWebViewErrorView()
-            }
-        }
-        viewModel.isFavorite.observe(this) { isFavorite: Boolean ->
-            binding.ivTripDetailFavorite.isSelected = isFavorite
-        }
-        viewModel.isExpandTextToggleVisible.observe(this) { isVisible ->
-            binding.ivTripDetailContentToggle.visibility =
-                if (isVisible) View.VISIBLE else View.GONE
-        }
-
-        viewModel.isExpandTextToggleSelected.observe(this) { isSelected ->
-            binding.ivTripDetailContentToggle.isSelected = isSelected
-        }
-
-        viewModel.bodyMaxLines.observe(this) { maxLines ->
-            binding.tvTripDetailContentTitle.maxLines = maxLines
-        }
-        viewModel.networkError.observe(this) { networkError: Boolean ->
-            binding.nsvTripDetail.visibility =
-                if (networkError) View.GONE else View.VISIBLE
-            binding.tbTripDetail.visibility =
-                if (networkError) View.GONE else View.VISIBLE
-            binding.customErrorView.visibility =
-                if (networkError) View.VISIBLE else View.GONE
-        }
-        viewModel.serverError.observe(this) { serverError: Boolean ->
-            binding.nsvTripDetail.visibility =
-                if (serverError) View.GONE else View.VISIBLE
-            binding.tbTripDetail.visibility =
-                if (serverError) View.GONE else View.VISIBLE
-            binding.customErrorView.visibility =
-                if (serverError) View.VISIBLE else View.GONE
-        }
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiEvent.collect { event ->
-                    when (event) {
-                        CommonUiEffect.NavigateToLogin -> navigateToLoginScreen()
-                    }
-                }
-            }
-        }
-    }
-
     private fun navigateToLoginScreen() {
         val intent: Intent =
             LoginActivity.newIntent(this).apply {
@@ -320,27 +355,6 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
             }
         startActivity(intent)
         finish()
-    }
-
-    private fun updateExpandTextToggleVisibility() {
-        if (viewModel.isExpandTextToggleVisible.value == true) return
-
-        val bodyTextView: TextView = binding.tvTripDetailContentTitle
-        bodyTextView.post {
-            val lineCount: Int = bodyTextView.layout.lineCount
-            val ellipsisCount: Int = bodyTextView.layout.getEllipsisCount(lineCount - 1)
-            viewModel.updateExpandTextToggleVisibility(lineCount, ellipsisCount)
-        }
-    }
-
-    private fun showNetworkError() {
-        binding.customErrorView.apply {
-            visibility = View.VISIBLE
-            render(UiError.Global.Network)
-            setOnRetryClickListener {
-                viewModel.reload()
-            }
-        }
     }
 
     override fun onDestroy() {
