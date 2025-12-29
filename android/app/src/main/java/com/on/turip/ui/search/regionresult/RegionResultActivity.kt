@@ -48,6 +48,7 @@ class RegionResultActivity : BaseActivity<ActivityRegionResultBinding>() {
         binding.tbRegionResult.navigationIcon?.setTint(
             ContextCompat.getColor(this, R.color.gray_300_5b5b5b),
         )
+        supportActionBar?.title = viewModel.regionCategoryName
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -103,7 +104,6 @@ class RegionResultActivity : BaseActivity<ActivityRegionResultBinding>() {
 
         binding.tvRegionResultCount.text =
             getString(R.string.region_result_exist_result, uiState.totalCount)
-        supportActionBar?.title = uiState.region
     }
 
     private fun renderErrorView(errorUiState: ErrorUiState) {

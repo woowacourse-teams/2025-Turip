@@ -33,7 +33,7 @@ class RegionResultViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val contentRepository: ContentRepository,
 ) : ViewModel() {
-    private val regionCategoryName: String by lazy {
+    val regionCategoryName: String by lazy {
         checkNotNull(savedStateHandle[REGION_RESULT_REGION_CATEGORY_NAME_KEY]) {
             Timber.e("지역 검색 화면 지역 이름이 존재하지 않습니다.")
         }
