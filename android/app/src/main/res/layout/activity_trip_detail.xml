@@ -17,7 +17,8 @@
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        tools:visibility="visible">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/tb_trip_detail"
@@ -54,14 +55,16 @@
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:layout_gravity="center"
-                android:indeterminateTint="@color/pure_white_ffffff" />
+                android:indeterminateTint="@color/pure_white_ffffff"
+                tools:visibility="gone" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/cl_trip_detail_video_error"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/pure_black_151515"
-                android:visibility="gone">
+                android:visibility="gone"
+                tools:visibility="gone">
 
                 <TextView
                     android:id="@+id/tv_trip_detail_video_error"
@@ -98,7 +101,8 @@
         android:id="@+id/nsv_trip_detail"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:visibility="visible">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/cl_trip_detail"
@@ -225,10 +229,16 @@
         android:id="@+id/custom_error_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:visibility="gone" />
+
+    <ProgressBar
+        android:id="@+id/pb_trip_detail_screen_loading"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:paddingBottom="30dp"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        tools:visibility="gone" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
