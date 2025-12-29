@@ -278,17 +278,8 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
     }
 
     private fun renderContents(uiState: TripDetailUiState) {
-        judgeExpandTextToggleVisibility(uiState.isExpandTextToggleVisible)
-
         tripDayAdapter.submitList(uiState.days)
         tripPlaceAdapter.submitList(uiState.places)
-
-        binding.appbar.visibility = View.VISIBLE
-        binding.nsvTripDetail.visibility = View.VISIBLE
-        binding.customErrorView.visibility = View.GONE
-        binding.pbTripDetailScreenLoading.visibility = View.GONE
-        binding.ivTripDetailContentToggle.visibility =
-            if (uiState.isExpandTextToggleVisible == true) View.VISIBLE else View.GONE
 
         binding.ivTripDetailContentToggle.isSelected =
             uiState.isExpandTextToggleSelected
@@ -313,6 +304,15 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
                 viewModel.updateVideoLoadStatus(isLoaded = true)
             }
         }
+
+        binding.appbar.visibility = View.VISIBLE
+        binding.nsvTripDetail.visibility = View.VISIBLE
+        binding.customErrorView.visibility = View.GONE
+        binding.pbTripDetailScreenLoading.visibility = View.GONE
+        binding.ivTripDetailContentToggle.visibility =
+            if (uiState.isExpandTextToggleVisible == true) View.VISIBLE else View.GONE
+
+        judgeExpandTextToggleVisibility(uiState.isExpandTextToggleVisible)
     }
 
     /**
