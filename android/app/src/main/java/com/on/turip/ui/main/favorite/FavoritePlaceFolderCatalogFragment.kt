@@ -20,8 +20,9 @@ import com.on.turip.ui.common.base.BaseFragment
 import com.on.turip.ui.common.collectOnStarted
 import com.on.turip.ui.common.event.CommonUiEffect
 import com.on.turip.ui.login.LoginActivity
-import com.on.turip.ui.main.favorite.FavoritePlaceFolderCatalogViewModel.FavoritePlaceFolderCatalogUiEffect
 import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
+import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderCatalogUiEffect
+import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderCatalogUiState
 import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
@@ -114,15 +115,14 @@ class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavor
     }
 
     private fun setupObservers() {
-        viewModel.favoritePlaceFolderCatalogUiState.observe(viewLifecycleOwner) { state ->
-            placeAdapter.submitList(state.places)
-
-            binding.tvBottomSheetFolderFavoritePlaceFolderCatalogTitle.text = state.folderName
+        collectOnStarted(viewModel.uiState) { uiState: FavoritePlaceFolderCatalogUiState ->
+            placeAdapter.submitList(uiState.places)
+            binding.tvBottomSheetFolderFavoritePlaceFolderCatalogTitle.text = uiState.folderName
 
             binding.tvBottomSheetFavoritePlaceFolderCount.text =
-                getString(R.string.all_total_place_count, state.places.size)
+                getString(R.string.all_total_place_count, uiState.places.size)
 
-            if (state.places == emptyList<FavoritePlaceModel>()) {
+            if (uiState.places == emptyList<FavoritePlaceModel>()) {
                 binding.ivBottomSheetFavoritePlaceFolderShare.visibility = View.GONE
             } else {
                 binding.ivBottomSheetFavoritePlaceFolderShare.visibility = View.VISIBLE
