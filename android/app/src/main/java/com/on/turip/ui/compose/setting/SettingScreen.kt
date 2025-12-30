@@ -26,14 +26,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.on.turip.R
 import com.on.turip.common.AuthState
 import com.on.turip.common.UserType
-import com.on.turip.data.common.UiError
+import com.on.turip.data.common.ErrorUiEffect
+import com.on.turip.data.common.toUiModel
 import com.on.turip.domain.setting.InquiryMail
 import com.on.turip.ui.common.event.CommonUiEffect
 import com.on.turip.ui.compose.designsystem.component.TuripAppBar
 import com.on.turip.ui.compose.designsystem.component.TuripDialog
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
 import com.on.turip.ui.compose.setting.component.SettingItem
-import com.on.turip.ui.compose.setting.model.SettingUiEffect
 import com.on.turip.ui.compose.setting.model.SettingUiState
 import com.on.turip.ui.compose.theme.TuripTheme
 import timber.log.Timber
@@ -51,26 +51,11 @@ fun SettingScreen(
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        viewModel.uiEffect.collect { effect: SettingUiEffect ->
-            when (effect) {
-                SettingUiEffect.NavigateToLogin -> {
-                    navigateToLoginScreen()
-                }
-
-                is SettingUiEffect.ShowError -> {
-                    when (effect.uiError) {
-                        UiError.Global.Network -> {
-                            snackbarHostState.showSnackbar(context.getString(R.string.cannot_connect_network))
-                        }
-
-                        UiError.Global.Server -> {
-                            snackbarHostState.showSnackbar(context.getString(R.string.server_error))
-                        }
-
-                        else -> {
-                            Unit
-                        }
-                    }
+        viewModel.errorUiEffect.collect { errorUiEffect: ErrorUiEffect ->
+            when (errorUiEffect) {
+                is ErrorUiEffect.ShowSnackbar -> {
+                    val errorUiModel = errorUiEffect.errorUiState.toUiModel() ?: return@collect
+                    snackbarHostState.showSnackbar(context.getString(errorUiModel.titleRes))
                 }
             }
         }
