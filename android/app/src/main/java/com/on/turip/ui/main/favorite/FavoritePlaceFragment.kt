@@ -18,8 +18,12 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.material.snackbar.Snackbar
 import com.on.turip.R
+import com.on.turip.data.common.ErrorUiEffect
+import com.on.turip.data.common.ErrorUiModel
 import com.on.turip.data.common.ErrorUiState
+import com.on.turip.data.common.toUiModel
 import com.on.turip.databinding.FragmentFavoritePlaceBinding
 import com.on.turip.ui.common.TuripDialogFragment
 import com.on.turip.ui.common.base.BaseFragment
@@ -31,6 +35,7 @@ import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceLatLngUiModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceUiEffect
+import com.on.turip.ui.main.favorite.model.FavoritePlaceUiState
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -165,16 +170,28 @@ class FavoritePlaceFragment :
     }
 
     private fun setupObservers() {
-        viewModel.favoritePlaceUiState.observe(viewLifecycleOwner) { state ->
-            renderOrError(state, viewModel.errorUiState.value)
+        collectOnStarted(viewModel.uiState) { uiState: FavoritePlaceUiState ->
+            when {
+                uiState.isLoading -> renderLoading()
+                uiState.errorUiState != ErrorUiState.None -> renderErrorView(uiState.errorUiState)
+                else -> renderContents(uiState)
+            }
         }
 
-        collectOnStarted(viewModel.errorUiState) { errorUiState: ErrorUiState ->
-            renderOrError(
-                viewModel.favoritePlaceUiState.value
-                    ?: FavoritePlaceViewModel.FavoritePlaceUiState(),
-                errorUiState,
-            )
+        collectOnStarted(viewModel.errorUiEffect) { errorUiEffect: ErrorUiEffect ->
+            when (errorUiEffect) {
+                is ErrorUiEffect.ShowSnackbar -> {
+                    val uiModel: ErrorUiModel =
+                        errorUiEffect.errorUiState.toUiModel() ?: return@collectOnStarted
+                    view?.let { view: View ->
+                        Snackbar
+                            .make(view, uiModel.titleRes, Snackbar.LENGTH_LONG)
+                            .apply {
+                                errorUiEffect.onRetryClick?.let { action -> setAction(uiModel.retryTextRes) { action() } }
+                            }.show()
+                    }
+                }
+            }
         }
 
         collectOnStarted(viewModel.commonUiEffect) { commonUiEffect: CommonUiEffect ->
@@ -248,60 +265,37 @@ class FavoritePlaceFragment :
         startActivity(chooserIntent)
     }
 
-    private fun renderOrError(
-        uiState: FavoritePlaceViewModel.FavoritePlaceUiState,
-        errorUiState: ErrorUiState,
-    ) {
-        when (errorUiState) {
-            ErrorUiState.None -> {
-                binding.customErrorView.visibility = View.GONE
-
-                if (uiState.isLoading) {
-                    renderLoading()
-                } else {
-                    renderContents(uiState)
-                }
-            }
-
-            ErrorUiState.Server,
-            ErrorUiState.Network,
-            -> {
-                renderErrorView(errorUiState)
-            }
-        }
-    }
-
     private fun renderLoading() {
         binding.pbFavoritePlaceLoading.visibility = View.VISIBLE
         binding.groupFavoritePlaceNotEmpty.visibility = View.GONE
         binding.groupFavoritePlaceNotError.visibility = View.GONE
         binding.clFavoritePlaceEmpty.visibility = View.GONE
+        binding.customErrorView.visibility = View.GONE
     }
 
-    private fun renderContents(uiState: FavoritePlaceViewModel.FavoritePlaceUiState) {
+    private fun renderContents(uiState: FavoritePlaceUiState) {
         folderNameAdapter.submitList(uiState.folders)
         placeAdapter.submitList(uiState.places)
 
         binding.pbFavoritePlaceLoading.visibility = View.GONE
         binding.groupFavoritePlaceNotError.visibility = View.VISIBLE
+        binding.customErrorView.visibility = View.GONE
 
-        if (uiState.places.isEmpty()) {
-            renderEmpty()
+        if (uiState.isEmpty) {
+            binding.clFavoritePlaceEmpty.visibility = View.VISIBLE
+            binding.groupFavoritePlaceNotEmpty.visibility = View.GONE
         } else {
-            renderPlaces(uiState)
+            binding.clFavoritePlaceEmpty.visibility = View.GONE
+            binding.groupFavoritePlaceNotEmpty.visibility = View.VISIBLE
+            binding.tvFavoritePlacePlaceCount.text =
+                getString(R.string.all_total_place_count, uiState.places.size)
+
+            when (uiState.placesLatLng.size) {
+                0 -> handleEmptyFavorites()
+                1 -> handleSingleFavorite(uiState.placesLatLng.first())
+                else -> handleMultipleFavorites(uiState.placesLatLng)
+            }
         }
-    }
-
-    private fun renderEmpty() {
-        binding.clFavoritePlaceEmpty.visibility = View.VISIBLE
-        binding.groupFavoritePlaceNotEmpty.visibility = View.GONE
-    }
-
-    private fun renderPlaces(uiState: FavoritePlaceViewModel.FavoritePlaceUiState) {
-        binding.clFavoritePlaceEmpty.visibility = View.GONE
-        binding.groupFavoritePlaceNotEmpty.visibility = View.VISIBLE
-        binding.tvFavoritePlacePlaceCount.text =
-            getString(R.string.all_total_place_count, uiState.places.size)
     }
 
     private fun renderErrorView(errorUiState: ErrorUiState) {
@@ -380,14 +374,6 @@ class FavoritePlaceFragment :
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
         map.uiSettings.isZoomControlsEnabled = true
-
-        viewModel.favoriteLatLng.observe(viewLifecycleOwner) { favoriteLatLngList ->
-            when {
-                favoriteLatLngList.isEmpty() -> handleEmptyFavorites()
-                favoriteLatLngList.size == 1 -> handleSingleFavorite(favoriteLatLngList.first())
-                else -> handleMultipleFavorites(favoriteLatLngList)
-            }
-        }
     }
 
     private fun handleEmptyFavorites() {
