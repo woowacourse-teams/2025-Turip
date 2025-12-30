@@ -7,7 +7,6 @@ import com.on.turip.data.common.ErrorUiEffect
 import com.on.turip.data.common.ErrorUiState
 import com.on.turip.data.common.UiError
 import com.on.turip.data.common.onFailure
-import com.on.turip.data.common.onFailureWithCause
 import com.on.turip.data.common.onSuccess
 import com.on.turip.data.common.toUiError
 import com.on.turip.domain.favorite.PagedFavoriteContents
@@ -58,9 +57,11 @@ class FavoriteContentViewModel @Inject constructor(
                         it.copy(
                             isLoading = false,
                             favoriteContents = pagedFavoriteContent.favoriteContents,
+                            errorUiState = ErrorUiState.None,
                         )
                     }
                 }.onFailure { errorType: ErrorType ->
+                    Timber.e("찜 목록 데이터 조회 에러 발생")
                     val uiError: UiError = errorType.toUiError()
                     if (uiError is UiError.Global) {
                         when (uiError) {
@@ -77,12 +78,11 @@ class FavoriteContentViewModel @Inject constructor(
                             }
 
                             UiError.Global.TokenExpired -> {
+                                _uiState.update { it.copy(isLoading = false) }
                                 _commonUiEffect.send(CommonUiEffect.NavigateToLogin)
                             }
                         }
                     }
-                }.onFailureWithCause { errorType: ErrorType, cause: Throwable? ->
-                    Timber.e("찜 목록 데이터 조회 에러 발생 : $errorType / $cause")
                 }
         }
     }
@@ -106,6 +106,8 @@ class FavoriteContentViewModel @Inject constructor(
                         )
                     }
                 }.onFailure { errorType: ErrorType ->
+                    Timber.e("찜 목록에서 찜 버튼 클릭 업데이트 실패")
+                    _uiState.update { it.copy(isLoading = false) }
                     val uiError: UiError = errorType.toUiError()
                     if (uiError is UiError.Global) {
                         when (uiError) {
@@ -122,7 +124,7 @@ class FavoriteContentViewModel @Inject constructor(
                                 _errorUiEffect.send(
                                     ErrorUiEffect.ShowSnackbar(
                                         errorUiState = ErrorUiState.Server,
-                                        onRetryClick = null,
+                                        onRetryClick = { updateFavorite(contentId, isFavorite) },
                                     ),
                                 )
                             }
@@ -132,8 +134,6 @@ class FavoriteContentViewModel @Inject constructor(
                             }
                         }
                     }
-                }.onFailureWithCause { errorType: ErrorType, cause: Throwable? ->
-                    Timber.e("찜 목록에서 찜 버튼 클릭 업데이트 실패 : $errorType / $cause")
                 }
         }
     }

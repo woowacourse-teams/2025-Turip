@@ -136,7 +136,7 @@ class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavor
                         errorUiEffect.errorUiState.toUiModel() ?: return@collectOnStarted
                     view?.let { view: View ->
                         Snackbar
-                            .make(view, uiModel.titleRes, Snackbar.LENGTH_LONG)
+                            .make(view, uiModel.titleRes, Snackbar.LENGTH_INDEFINITE)
                             .apply {
                                 errorUiEffect.onRetryClick?.let { action -> setAction(uiModel.retryTextRes) { action() } }
                             }.show()
@@ -166,10 +166,9 @@ class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavor
 
     private fun navigateToLoginScreen() {
         val intent: Intent =
-            LoginActivity.newIntent(requireActivity()).apply {
-                flags =
-                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            }
+            LoginActivity
+                .newIntent(requireActivity())
+                .apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK }
         startActivity(intent)
         requireActivity().finish()
     }

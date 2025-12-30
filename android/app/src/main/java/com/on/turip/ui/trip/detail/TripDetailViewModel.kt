@@ -150,7 +150,7 @@ class TripDetailViewModel @Inject constructor(
     }
 
     fun updateFavorite() {
-        val updatedIsFavorite = uiState.value.isFavorite.not()
+        val updatedIsFavorite = !uiState.value.isFavorite
         viewModelScope.launch {
             updateFavoriteUseCase(updatedIsFavorite, contentId)
                 .onSuccess {
@@ -158,30 +158,26 @@ class TripDetailViewModel @Inject constructor(
                     _uiState.update { it.copy(isFavorite = updatedIsFavorite) }
                     _uiEffect.send(TripDetailUiEffect.ShowFavoriteStatus(updatedIsFavorite))
                 }.onFailure { errorType: ErrorType ->
-                    when (val uiError: UiError = errorType.toUiError()) {
-                        is UiError.Global -> {
-                            when (uiError) {
-                                UiError.Global.Network -> {
-                                    _errorUiEffect.send(
-                                        ErrorUiEffect.ShowSnackbar(
-                                            errorUiState = ErrorUiState.Network,
-                                            onRetryClick = { updateFavorite() },
-                                        ),
-                                    )
-                                }
-
-                                UiError.Global.Server -> {
-                                    _errorUiEffect.send(ErrorUiEffect.ShowSnackbar(errorUiState = ErrorUiState.Server))
-                                }
-
-                                UiError.Global.TokenExpired -> {
-                                    _commonUiEffect.send(CommonUiEffect.NavigateToLogin)
-                                }
+                    _uiState.update { it.copy(isLoading = false, errorUiState = ErrorUiState.None) }
+                    val uiError: UiError = errorType.toUiError()
+                    if (uiError is UiError.Global) {
+                        when (uiError) {
+                            UiError.Global.Network -> {
+                                _errorUiEffect.send(
+                                    ErrorUiEffect.ShowSnackbar(
+                                        errorUiState = ErrorUiState.Network,
+                                        onRetryClick = { updateFavorite() },
+                                    ),
+                                )
                             }
-                        }
 
-                        is UiError.Feature -> {
-                            Unit
+                            UiError.Global.Server -> {
+                                _errorUiEffect.send(ErrorUiEffect.ShowSnackbar(errorUiState = ErrorUiState.Server))
+                            }
+
+                            UiError.Global.TokenExpired -> {
+                                _commonUiEffect.send(CommonUiEffect.NavigateToLogin)
+                            }
                         }
                     }
                     Timber.d("컨텐츠 찜 API 통신 실패")
@@ -235,29 +231,25 @@ class TripDetailViewModel @Inject constructor(
     }
 
     private suspend fun handleError(failure: TuripCustomResult.Failure) {
-        when (val uiError: UiError = failure.errorType.toUiError()) {
-            is UiError.Global -> {
-                when (uiError) {
-                    UiError.Global.Network -> {
-                        _uiState.update {
-                            it.copy(isLoading = false, errorUiState = ErrorUiState.Network)
-                        }
-                    }
-
-                    UiError.Global.Server -> {
-                        _uiState.update {
-                            it.copy(isLoading = false, errorUiState = ErrorUiState.Server)
-                        }
-                    }
-
-                    UiError.Global.TokenExpired -> {
-                        _commonUiEffect.send(CommonUiEffect.NavigateToLogin)
+        val uiError: UiError = failure.errorType.toUiError()
+        if (uiError is UiError.Global) {
+            when (uiError) {
+                UiError.Global.Network -> {
+                    _uiState.update {
+                        it.copy(isLoading = false, errorUiState = ErrorUiState.Network)
                     }
                 }
-            }
 
-            is UiError.Feature -> {
-                Unit
+                UiError.Global.Server -> {
+                    _uiState.update {
+                        it.copy(isLoading = false, errorUiState = ErrorUiState.Server)
+                    }
+                }
+
+                UiError.Global.TokenExpired -> {
+                    _uiState.update { it.copy(isLoading = false) }
+                    _commonUiEffect.send(CommonUiEffect.NavigateToLogin)
+                }
             }
         }
     }

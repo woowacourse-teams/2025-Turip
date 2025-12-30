@@ -181,9 +181,9 @@ private fun LoginScreenContent(
 @Composable
 @Preview(showBackground = true, name = "HelpVisible")
 private fun HelpVisibleLoginScreenPreview() {
-    LoginScreenContent(
-        isHelpTextVisible = true,
-        onClickHelpText = {},
+    LoginScreen(
+        uiState = LoginUiState(showHelpText = true, showMigrationDialog = false),
+        onChangeHelpTextVisible = { },
         onClickGoogleLogin = {},
         onClickGuestLogin = {},
     )
@@ -192,9 +192,9 @@ private fun HelpVisibleLoginScreenPreview() {
 @Composable
 @Preview(showBackground = true, name = "HelpInvisible")
 private fun HelpInvisibleLoginScreenPreview() {
-    LoginScreenContent(
-        isHelpTextVisible = false,
-        onClickHelpText = {},
+    LoginScreen(
+        uiState = LoginUiState(showHelpText = false, showMigrationDialog = false),
+        onChangeHelpTextVisible = { },
         onClickGoogleLogin = {},
         onClickGuestLogin = {},
     )

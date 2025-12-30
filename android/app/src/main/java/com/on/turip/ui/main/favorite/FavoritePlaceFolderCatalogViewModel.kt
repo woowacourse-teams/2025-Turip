@@ -170,7 +170,7 @@ class FavoritePlaceFolderCatalogViewModel @Inject constructor(
                 _errorUiEffect.send(
                     ErrorUiEffect.ShowSnackbar(
                         errorUiState = ErrorUiState.Server,
-                        onRetryClick = null,
+                        onRetryClick = { loadPlacesInSelectFolder() },
                     ),
                 )
             }

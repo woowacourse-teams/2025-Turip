@@ -114,7 +114,7 @@ class RegionResultActivity : BaseActivity<ActivityRegionResultBinding>() {
         binding.customErrorView.apply {
             visibility = View.VISIBLE
             render(errorUiState)
-            setOnRetryClickListener { viewModel.reload() }
+            setOnRetryClickListener { viewModel.loadContentsFromRegion() }
         }
     }
 

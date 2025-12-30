@@ -7,7 +7,6 @@ import com.on.turip.data.common.ErrorUiState
 import com.on.turip.data.common.TuripCustomResult
 import com.on.turip.data.common.UiError
 import com.on.turip.data.common.onFailure
-import com.on.turip.data.common.onFailureWithCause
 import com.on.turip.data.common.onSuccess
 import com.on.turip.data.common.toUiError
 import com.on.turip.domain.content.UsersLikeContent
@@ -17,6 +16,7 @@ import com.on.turip.domain.region.repository.RegionRepository
 import com.on.turip.ui.common.event.CommonUiEffect
 import com.on.turip.ui.common.mapper.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -27,7 +27,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -85,23 +84,18 @@ class HomeViewModel @Inject constructor(
     }
 
     fun updateDomesticSelected(isDomesticSelected: Boolean) {
-        _uiState.update { it.copy(isDomesticSelected = isDomesticSelected) }
         Timber.d(if (isDomesticSelected) "국내 클릭" else "해외 클릭")
-        loadRegionCategories(isDomesticSelected)
-    }
-
-    private fun loadRegionCategories(isDomestic: Boolean) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorUiState = ErrorUiState.None) }
 
             regionRepository
-                .loadRegionCategories(isDomestic)
+                .loadRegionCategories(isDomesticSelected)
                 .onSuccess { regionCategories: List<RegionCategory> ->
                     _uiState.update { state: HomeUiState ->
                         state.copy(
                             isLoading = false,
                             regionCategories = regionCategories,
-                            isDomesticSelected = isDomestic,
+                            isDomesticSelected = isDomesticSelected,
                             errorUiState = ErrorUiState.None,
                         )
                     }
@@ -111,8 +105,7 @@ class HomeViewModel @Inject constructor(
                         is UiError.Global -> handleGlobalError(uiError)
                         is UiError.Feature -> Unit
                     }
-                }.onFailureWithCause { errorType: ErrorType, cause: Throwable? ->
-                    Timber.e("지역 카테고리 조회 실패 : $errorType / $cause")
+                    Timber.e("지역 카테고리 조회 실패")
                 }
         }
     }
@@ -133,6 +126,7 @@ class HomeViewModel @Inject constructor(
                 }
 
                 UiError.Global.TokenExpired -> {
+                    _uiState.update { it.copy(isLoading = false) }
                     _commonUiEffect.send(CommonUiEffect.NavigateToLogin)
                 }
             }

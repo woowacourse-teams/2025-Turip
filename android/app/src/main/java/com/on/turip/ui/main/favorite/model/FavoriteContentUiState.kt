@@ -11,7 +11,7 @@ data class FavoriteContentUiState(
     companion object {
         val Idle: FavoriteContentUiState =
             FavoriteContentUiState(
-                isLoading = true,
+                isLoading = false,
                 favoriteContents = emptyList(),
                 errorUiState = ErrorUiState.None,
             )

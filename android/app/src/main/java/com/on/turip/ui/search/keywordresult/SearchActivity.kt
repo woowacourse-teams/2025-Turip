@@ -243,10 +243,9 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
 
     private fun navigateToLoginScreen() {
         val intent: Intent =
-            LoginActivity.newIntent(this).apply {
-                flags =
-                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            }
+            LoginActivity
+                .newIntent(this)
+                .apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK }
         startActivity(intent)
         finish()
     }

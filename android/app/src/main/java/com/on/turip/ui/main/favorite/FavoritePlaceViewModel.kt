@@ -136,9 +136,7 @@ class FavoritePlaceViewModel @Inject constructor(
                                 _errorUiEffect.send(
                                     ErrorUiEffect.ShowSnackbar(
                                         errorUiState = ErrorUiState.Network,
-                                        onRetryClick = {
-                                            updateFavoritePlace(placeId, isFavorite)
-                                        },
+                                        onRetryClick = { updateFavoritePlace(placeId, isFavorite) },
                                     ),
                                 )
                             }
@@ -147,7 +145,7 @@ class FavoritePlaceViewModel @Inject constructor(
                                 _errorUiEffect.send(
                                     ErrorUiEffect.ShowSnackbar(
                                         errorUiState = ErrorUiState.Server,
-                                        onRetryClick = null,
+                                        onRetryClick = { updateFavoritePlace(placeId, isFavorite) },
                                     ),
                                 )
                             }

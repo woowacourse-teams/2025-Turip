@@ -50,11 +50,7 @@ class RegionResultViewModel @Inject constructor(
         loadContentsFromRegion()
     }
 
-    fun reload() {
-        loadContentsFromRegion()
-    }
-
-    private fun loadContentsFromRegion() {
+    fun loadContentsFromRegion() {
         viewModelScope.launch {
             _uiState.update { RegionResultUiState.Loading }
 
@@ -100,21 +96,19 @@ class RegionResultViewModel @Inject constructor(
                     )
                 }
             }
+
+            Timber.d("지역에 대한 데이터 불러오기 성공, 지역 카테고리명 = $regionCategoryName")
         }
     }
 
     private suspend fun handleError(failure: TuripCustomResult.Failure) {
-        when (val uiError: UiError = failure.errorType.toUiError()) {
-            is UiError.Global -> handleGlobalError(uiError)
-            is UiError.Feature -> Unit
-        }
-    }
-
-    private suspend fun handleGlobalError(uiError: UiError.Global) {
-        when (uiError) {
-            UiError.Global.Network -> _uiState.update { RegionResultUiState.Error(ErrorUiState.Network) }
-            UiError.Global.Server -> _uiState.update { RegionResultUiState.Error(ErrorUiState.Server) }
-            UiError.Global.TokenExpired -> _commonUiEffect.send(CommonUiEffect.NavigateToLogin)
+        val uiError: UiError = failure.errorType.toUiError()
+        if (uiError is UiError.Global) {
+            when (uiError) {
+                UiError.Global.Network -> _uiState.update { RegionResultUiState.Error(ErrorUiState.Network) }
+                UiError.Global.Server -> _uiState.update { RegionResultUiState.Error(ErrorUiState.Server) }
+                UiError.Global.TokenExpired -> _commonUiEffect.send(CommonUiEffect.NavigateToLogin)
+            }
         }
     }
 }
