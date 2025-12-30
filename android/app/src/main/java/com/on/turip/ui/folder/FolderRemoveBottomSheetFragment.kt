@@ -1,14 +1,20 @@
 package com.on.turip.ui.folder
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import com.google.android.material.snackbar.Snackbar
 import com.on.turip.R
+import com.on.turip.data.common.ErrorUiModel
+import com.on.turip.data.common.toUiModel
 import com.on.turip.databinding.BottomSheetFragmentFolderRemoveBinding
 import com.on.turip.ui.common.base.BaseBottomSheetFragment
-import com.on.turip.ui.folder.model.FolderEditModel
+import com.on.turip.ui.common.collectOnStarted
+import com.on.turip.ui.folder.model.FolderUiEffect
+import com.on.turip.ui.login.LoginActivity
 
 class FolderRemoveBottomSheetFragment : BaseBottomSheetFragment<BottomSheetFragmentFolderRemoveBinding>() {
     private val sharedViewModel: FolderViewModel by activityViewModels()
@@ -39,12 +45,40 @@ class FolderRemoveBottomSheetFragment : BaseBottomSheetFragment<BottomSheetFragm
     }
 
     private fun setupObservers() {
-        sharedViewModel.selectedFolder.observe(viewLifecycleOwner) { selectedFolder: FolderEditModel ->
+        sharedViewModel.getSelectedFolderOrNull()?.let { selectFolder ->
             binding.tvBottomSheetFolderRemoveTitle.text =
-                getString(R.string.bottom_sheet_folder_remove_title, selectedFolder.name)
+                getString(R.string.bottom_sheet_folder_remove_title, selectFolder.name)
             binding.tvBottomSheetFolderRemovePlaceCount.text =
-                getString(R.string.all_total_place_count, selectedFolder.count)
+                getString(R.string.all_total_place_count, selectFolder.count)
         }
+
+        collectOnStarted(sharedViewModel.uiEffect) { uiEffect: FolderUiEffect ->
+            when (uiEffect) {
+                FolderUiEffect.NavigateToLogin -> {
+                    navigateToLoginScreen()
+                }
+
+                is FolderUiEffect.ShowErrorSnackbar -> {
+                    val uiModel: ErrorUiModel =
+                        uiEffect.errorUiState.toUiModel() ?: return@collectOnStarted
+                    view?.let { view: View ->
+                        Snackbar
+                            .make(view, uiModel.titleRes, Snackbar.LENGTH_INDEFINITE)
+                            .apply { uiEffect.onRetryClick?.let { action -> setAction(uiModel.retryTextRes) { action() } } }
+                            .show()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun navigateToLoginScreen() {
+        val intent: Intent =
+            LoginActivity
+                .newIntent(requireActivity())
+                .apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK }
+        startActivity(intent)
+        requireActivity().finish()
     }
 
     companion object {
