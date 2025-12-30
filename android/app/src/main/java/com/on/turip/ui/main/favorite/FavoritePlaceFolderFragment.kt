@@ -9,12 +9,20 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.google.android.material.snackbar.Snackbar
 import com.on.turip.R
+import com.on.turip.data.common.ErrorUiEffect
+import com.on.turip.data.common.ErrorUiModel
+import com.on.turip.data.common.toUiModel
 import com.on.turip.databinding.BottomSheetFragmentFavoritePlaceFolderBinding
 import com.on.turip.ui.common.TuripSnackbar
 import com.on.turip.ui.common.base.BaseFragment
+import com.on.turip.ui.common.collectOnStarted
+import com.on.turip.ui.common.event.CommonUiEffect
 import com.on.turip.ui.folder.FolderActivity
+import com.on.turip.ui.login.LoginActivity
 import com.on.turip.ui.main.favorite.FavoritePlaceFolderViewHolder.FavoritePlaceFolderListener
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
+import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderUiEffect
+import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderUiState
 import com.on.turip.ui.trip.detail.TripDetailViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -27,11 +35,7 @@ class FavoritePlaceFolderFragment : BaseFragment<BottomSheetFragmentFavoritePlac
         FavoritePlaceFolderAdapter(
             object : FavoritePlaceFolderListener {
                 override fun onFavoriteFolderFavoriteClick(favoritePlaceFolderModel: FavoritePlaceFolderModel) {
-                    viewModel.updateFolder(
-                        folderId = favoritePlaceFolderModel.id,
-                        isFavorite = favoritePlaceFolderModel.isSelected,
-                    )
-                    showSnackbar(favoritePlaceFolderModel)
+                    viewModel.updateFolder(favoritePlaceFolderModel)
                 }
 
                 override fun onFavoriteFolderClick(
@@ -51,30 +55,6 @@ class FavoritePlaceFolderFragment : BaseFragment<BottomSheetFragmentFavoritePlac
                 }
             },
         )
-    }
-
-    private fun showSnackbar(favoritePlaceFolderModel: FavoritePlaceFolderModel) {
-        val updatedFavorites = !favoritePlaceFolderModel.isSelected
-
-        val messageResource =
-            if (updatedFavorites) {
-                R.string.bottom_sheet_favorite_place_folder_save_with_folder_name
-            } else {
-                R.string.bottom_sheet_favorite_place_folder_remove_with_folder_name
-            }
-        val message = getString(messageResource, favoritePlaceFolderModel.name)
-        val iconResource =
-            if (updatedFavorites) R.drawable.ic_heart_pressed else R.drawable.ic_heart_empty
-
-        TuripSnackbar
-            .make(
-                rootView = binding.root,
-                message = message,
-                duration = Snackbar.LENGTH_LONG,
-                layoutInflater = layoutInflater,
-            ).icon(iconResource)
-            .action(R.string.all_snackbar_close)
-            .show()
     }
 
     override fun inflateBinding(
@@ -104,20 +84,82 @@ class FavoritePlaceFolderFragment : BaseFragment<BottomSheetFragmentFavoritePlac
     }
 
     private fun setupObservers() {
-        viewModel.favoritePlaceFolders.observe(viewLifecycleOwner) { folders ->
-            favoritePlaceFolderAdapter.submitList(folders)
-        }
-        viewModel.hasFavoriteFolderWithPlaceId.observe(viewLifecycleOwner) { hasFavoriteFolder ->
+        collectOnStarted(viewModel.uiState) { uiState: FavoritePlaceFolderUiState ->
+            favoritePlaceFolderAdapter.submitList(uiState.favoritePlaceFolders)
             sharedViewModel.updateHasFavoriteFolderInPlace(
-                hasFavoriteFolder,
-                arguments?.getLong(FAVORITE_PLACE_FOLDER_ARGUMENTS_PLACE_ID) ?: 0L,
+                hasFavoriteFolder = uiState.hasFavoriteFolder,
+                placeId = uiState.placeId,
             )
         }
+
+        collectOnStarted(viewModel.uiEffect) { uiEffect: FavoritePlaceFolderUiEffect ->
+            when (uiEffect) {
+                is FavoritePlaceFolderUiEffect.ShowUpdateFavoriteState -> {
+                    showFavoriteStatus(uiEffect.folder)
+                }
+            }
+        }
+
+        collectOnStarted(viewModel.errorUiEffect) { errorUiEffect: ErrorUiEffect ->
+            when (errorUiEffect) {
+                is ErrorUiEffect.ShowSnackbar -> {
+                    val uiModel: ErrorUiModel =
+                        errorUiEffect.errorUiState.toUiModel() ?: return@collectOnStarted
+                    view?.let { view: View ->
+                        Snackbar
+                            .make(view, uiModel.titleRes, Snackbar.LENGTH_INDEFINITE)
+                            .apply {
+                                errorUiEffect.onRetryClick?.let { action -> setAction(uiModel.retryTextRes) { action() } }
+                            }.show()
+                    }
+                }
+            }
+        }
+
+        collectOnStarted(viewModel.commonUiEffect) { commonUiEffect: CommonUiEffect ->
+            when (commonUiEffect) {
+                CommonUiEffect.NavigateToLogin -> navigateToLoginScreen()
+            }
+        }
+    }
+
+    private fun showFavoriteStatus(favoritePlaceFolderModel: FavoritePlaceFolderModel) {
+        val updatedFavorites = !favoritePlaceFolderModel.isSelected
+
+        val messageResource =
+            if (updatedFavorites) {
+                R.string.bottom_sheet_favorite_place_folder_save_with_folder_name
+            } else {
+                R.string.bottom_sheet_favorite_place_folder_remove_with_folder_name
+            }
+        val message = getString(messageResource, favoritePlaceFolderModel.name)
+        val iconResource =
+            if (updatedFavorites) R.drawable.ic_heart_pressed else R.drawable.ic_heart_empty
+
+        TuripSnackbar
+            .make(
+                rootView = binding.root,
+                message = message,
+                duration = Snackbar.LENGTH_LONG,
+                layoutInflater = layoutInflater,
+            ).icon(iconResource)
+            .action(R.string.all_snackbar_close)
+            .show()
+    }
+
+    private fun navigateToLoginScreen() {
+        val intent: Intent =
+            LoginActivity.newIntent(requireActivity()).apply {
+                flags =
+                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+        startActivity(intent)
+        requireActivity().finish()
     }
 
     override fun onResume() {
         super.onResume()
-        viewModel.loadFavoriteFoldersByPlaceId()
+        viewModel.loadFavoriteFoldersForPlace()
     }
 
     companion object {
