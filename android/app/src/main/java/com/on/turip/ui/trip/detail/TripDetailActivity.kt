@@ -218,13 +218,13 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
         collectOnStarted(viewModel.uiState) { uiState: TripDetailUiState ->
             when {
                 // 로딩
-                uiState.isLoading -> renderLoading()
+                uiState.isLoading -> showLoading()
 
                 // 에러
-                uiState.errorUiState != ErrorUiState.None -> renderErrorView(uiState.errorUiState)
+                uiState.errorUiState != ErrorUiState.None -> showErrorView(uiState.errorUiState)
 
                 // 정상
-                else -> renderContents(uiState)
+                else -> showContents(uiState)
             }
         }
 
@@ -244,14 +244,14 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
         }
     }
 
-    private fun renderLoading() {
+    private fun showLoading() {
         binding.pbTripDetailScreenLoading.visibility = View.VISIBLE
         binding.appbar.visibility = View.GONE
         binding.nsvTripDetail.visibility = View.GONE
         binding.customErrorView.visibility = View.GONE
     }
 
-    private fun renderErrorView(errorUiState: ErrorUiState) {
+    private fun showErrorView(errorUiState: ErrorUiState) {
         binding.customErrorView.visibility = View.VISIBLE
         binding.pbTripDetailScreenLoading.visibility = View.GONE
         binding.appbar.visibility = View.GONE
@@ -259,12 +259,12 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
 
         binding.customErrorView.apply {
             visibility = View.VISIBLE
-            render(errorUiState)
+            showErrorView(errorUiState)
             setOnRetryClickListener { viewModel.loadTripDetails() }
         }
     }
 
-    private fun renderContents(uiState: TripDetailUiState) {
+    private fun showContents(uiState: TripDetailUiState) {
         tripDayAdapter.submitList(uiState.days)
         tripPlaceAdapter.submitList(uiState.places)
 

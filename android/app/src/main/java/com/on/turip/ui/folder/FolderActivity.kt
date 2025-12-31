@@ -88,7 +88,7 @@ class FolderActivity : BaseActivity<ActivityFolderBinding>() {
 
         binding.customErrorView.apply {
             visibility = View.VISIBLE
-            render(errorUiState)
+            showErrorView(errorUiState)
             setOnRetryClickListener { viewModel.loadFolders() }
         }
     }

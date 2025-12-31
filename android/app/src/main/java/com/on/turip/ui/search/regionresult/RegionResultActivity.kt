@@ -65,10 +65,10 @@ class RegionResultActivity : BaseActivity<ActivityRegionResultBinding>() {
     private fun setupObservers() {
         collectOnStarted(viewModel.uiState) { uiState: RegionResultUiState ->
             when (uiState) {
-                RegionResultUiState.Loading -> renderLoading()
-                RegionResultUiState.Empty -> renderEmptyView()
-                is RegionResultUiState.Success -> renderContents(uiState)
-                is RegionResultUiState.Error -> renderErrorView(uiState.errorUiState)
+                RegionResultUiState.Loading -> showLoading()
+                RegionResultUiState.Empty -> showEmptyView()
+                is RegionResultUiState.Success -> showContents(uiState)
+                is RegionResultUiState.Error -> showErrorView(uiState.errorUiState)
             }
         }
 
@@ -79,21 +79,21 @@ class RegionResultActivity : BaseActivity<ActivityRegionResultBinding>() {
         }
     }
 
-    private fun renderLoading() {
+    private fun showLoading() {
         binding.pbRegionResult.visibility = View.VISIBLE
         binding.groupRegionResultEmpty.visibility = View.GONE
         binding.groupRegionResultNotEmpty.visibility = View.GONE
         binding.customErrorView.visibility = View.GONE
     }
 
-    private fun renderEmptyView() {
+    private fun showEmptyView() {
         binding.groupRegionResultEmpty.visibility = View.VISIBLE
         binding.groupRegionResultNotEmpty.visibility = View.GONE
         binding.pbRegionResult.visibility = View.GONE
         binding.customErrorView.visibility = View.GONE
     }
 
-    private fun renderContents(uiState: RegionResultUiState.Success) {
+    private fun showContents(uiState: RegionResultUiState.Success) {
         regionResultAdapter.submitList(uiState.videos)
 
         binding.groupRegionResultNotEmpty.visibility = View.VISIBLE
@@ -105,14 +105,14 @@ class RegionResultActivity : BaseActivity<ActivityRegionResultBinding>() {
             getString(R.string.region_result_exist_result, uiState.totalCount)
     }
 
-    private fun renderErrorView(errorUiState: ErrorUiState) {
+    private fun showErrorView(errorUiState: ErrorUiState) {
         binding.groupRegionResultEmpty.visibility = View.GONE
         binding.groupRegionResultNotEmpty.visibility = View.GONE
         binding.pbRegionResult.visibility = View.GONE
 
         binding.customErrorView.apply {
             visibility = View.VISIBLE
-            render(errorUiState)
+            showErrorView(errorUiState)
             setOnRetryClickListener { viewModel.loadContentsFromRegion() }
         }
     }

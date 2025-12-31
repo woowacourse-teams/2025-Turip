@@ -76,7 +76,7 @@ constructor(
      *
      * 네트워크 에러, 서버 에러(500번대)의 경우 재시도 가능한 화면을 활성화한다.
      */
-    fun render(errorUiState: ErrorUiState) {
+    fun showErrorView(errorUiState: ErrorUiState) {
         val errorUiModel: ErrorUiModel = errorUiState.toUiModel() ?: return
 
         setErrorImage(errorUiModel.imageRes)

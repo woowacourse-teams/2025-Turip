@@ -186,10 +186,10 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
 
         collectOnStarted(viewModel.uiState) { uiState: SearchUiState ->
             when (uiState) {
-                SearchUiState.Loading -> renderLoading()
-                SearchUiState.Empty -> renderEmptyView()
-                is SearchUiState.Success -> renderContents(uiState)
-                is SearchUiState.Error -> renderErrorView(uiState.errorUiState)
+                SearchUiState.Loading -> showLoading()
+                SearchUiState.Empty -> showEmptyView()
+                is SearchUiState.Success -> showContents(uiState)
+                is SearchUiState.Error -> showErrorView(uiState.errorUiState)
             }
         }
 
@@ -200,14 +200,14 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         }
     }
 
-    private fun renderLoading() {
+    private fun showLoading() {
         binding.pbSearch.visibility = View.VISIBLE
         binding.groupSearchResultNotEmpty.visibility = View.GONE
         binding.groupSearchResultEmpty.visibility = View.GONE
         binding.customErrorView.visibility = View.GONE
     }
 
-    private fun renderEmptyView() {
+    private fun showEmptyView() {
         binding.groupSearchResultEmpty.visibility = View.VISIBLE
         binding.groupSearchResultNotEmpty.visibility = View.GONE
         binding.pbSearch.visibility = View.GONE
@@ -215,7 +215,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         binding.rvSearchResultSearchHistory.visibility = View.GONE
     }
 
-    private fun renderContents(uiState: SearchUiState.Success) {
+    private fun showContents(uiState: SearchUiState.Success) {
         binding.groupSearchResultEmpty.visibility = View.GONE
         binding.groupSearchResultNotEmpty.visibility = View.VISIBLE
         binding.pbSearch.visibility = View.GONE
@@ -227,7 +227,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
             getString(R.string.search_result_exist_result, uiState.totalCount)
     }
 
-    private fun renderErrorView(errorUiState: ErrorUiState) {
+    private fun showErrorView(errorUiState: ErrorUiState) {
         binding.groupSearchResultNotEmpty.visibility = View.GONE
         binding.groupSearchResultEmpty.visibility = View.GONE
         binding.pbSearch.visibility = View.GONE
@@ -235,7 +235,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
 
         binding.customErrorView.apply {
             visibility = View.VISIBLE
-            render(errorUiState)
+            showErrorView(errorUiState)
             setOnRetryClickListener { viewModel.loadByKeyword() }
         }
     }

@@ -171,9 +171,9 @@ class FavoritePlaceFragment :
     private fun setupObservers() {
         collectOnStarted(viewModel.uiState) { uiState: FavoritePlaceUiState ->
             when {
-                uiState.isLoading -> renderLoading()
-                uiState.errorUiState != ErrorUiState.None -> renderErrorView(uiState.errorUiState)
-                else -> renderContents(uiState)
+                uiState.isLoading -> showLoading()
+                uiState.errorUiState != ErrorUiState.None -> showErrorView(uiState.errorUiState)
+                else -> showContents(uiState)
             }
         }
 
@@ -254,7 +254,7 @@ class FavoritePlaceFragment :
         startActivity(chooserIntent)
     }
 
-    private fun renderLoading() {
+    private fun showLoading() {
         binding.pbFavoritePlaceLoading.visibility = View.VISIBLE
         binding.groupFavoritePlaceNotEmpty.visibility = View.GONE
         binding.groupFavoritePlaceNotError.visibility = View.GONE
@@ -262,7 +262,7 @@ class FavoritePlaceFragment :
         binding.customErrorView.visibility = View.GONE
     }
 
-    private fun renderContents(uiState: FavoritePlaceUiState) {
+    private fun showContents(uiState: FavoritePlaceUiState) {
         folderNameAdapter.submitList(uiState.folders)
         placeAdapter.submitList(uiState.places)
 
@@ -287,7 +287,7 @@ class FavoritePlaceFragment :
         }
     }
 
-    private fun renderErrorView(errorUiState: ErrorUiState) {
+    private fun showErrorView(errorUiState: ErrorUiState) {
         binding.groupFavoritePlaceNotError.visibility = View.GONE
         binding.groupFavoritePlaceNotEmpty.visibility = View.GONE
         binding.clFavoritePlaceEmpty.visibility = View.GONE
@@ -295,7 +295,7 @@ class FavoritePlaceFragment :
 
         binding.customErrorView.apply {
             visibility = View.VISIBLE
-            render(errorUiState)
+            showErrorView(errorUiState)
             setOnRetryClickListener { viewModel.loadFoldersAndPlaces() }
         }
     }

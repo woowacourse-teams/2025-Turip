@@ -81,9 +81,9 @@ class FavoriteContentFragment : BaseFragment<FragmentFavoriteContentBinding>() {
     private fun setupObservers() {
         collectOnStarted(viewModel.uiState) { uiState: FavoriteContentUiState ->
             when {
-                uiState.isLoading -> renderLoading()
-                uiState.errorUiState != ErrorUiState.None -> renderErrorView(uiState.errorUiState)
-                else -> renderContents(uiState.favoriteContents)
+                uiState.isLoading -> showLoading()
+                uiState.errorUiState != ErrorUiState.None -> showErrorView(uiState.errorUiState)
+                else -> showContents(uiState.favoriteContents)
             }
         }
 
@@ -105,14 +105,14 @@ class FavoriteContentFragment : BaseFragment<FragmentFavoriteContentBinding>() {
         }
     }
 
-    private fun renderLoading() {
+    private fun showLoading() {
         binding.pbFavoriteContentLoading.visibility = View.VISIBLE
         binding.clFavoriteContentEmpty.visibility = View.GONE
         binding.clFavoriteContentNotEmpty.visibility = View.GONE
         binding.customErrorView.visibility = View.GONE
     }
 
-    private fun renderErrorView(errorUiState: ErrorUiState) {
+    private fun showErrorView(errorUiState: ErrorUiState) {
         binding.customErrorView.visibility = View.VISIBLE
         binding.pbFavoriteContentLoading.visibility = View.GONE
         binding.clFavoriteContentEmpty.visibility = View.GONE
@@ -120,12 +120,12 @@ class FavoriteContentFragment : BaseFragment<FragmentFavoriteContentBinding>() {
 
         binding.customErrorView.apply {
             visibility = View.VISIBLE
-            render(errorUiState)
+            showErrorView(errorUiState)
             setOnRetryClickListener { viewModel.loadFavoriteContents() }
         }
     }
 
-    private fun renderContents(favoriteContents: List<FavoriteContent>) {
+    private fun showContents(favoriteContents: List<FavoriteContent>) {
         binding.customErrorView.visibility = View.GONE
         binding.pbFavoriteContentLoading.visibility = View.GONE
 
