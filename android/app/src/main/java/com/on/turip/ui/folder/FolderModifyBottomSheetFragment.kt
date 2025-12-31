@@ -74,6 +74,8 @@ class FolderModifyBottomSheetFragment :
                     navigateToLoginScreen()
                 }
 
+                FolderUiEffect.FolderUpdated -> dismiss()
+
                 is FolderUiEffect.ShowErrorSnackbar -> {
                     val uiModel: ErrorUiModel =
                         uiEffect.errorUiState.toUiModel() ?: return@collectOnStarted
@@ -84,6 +86,8 @@ class FolderModifyBottomSheetFragment :
                             .show()
                     }
                 }
+
+                else -> Unit
             }
         }
     }
@@ -91,7 +95,6 @@ class FolderModifyBottomSheetFragment :
     private fun setupListeners() {
         binding.tvBottomSheetFolderModifyConfirm.setOnClickListener {
             sharedViewModel.updateFolderName()
-            dismiss()
         }
         binding.etBottomSheetFolderModifyFolderName.addTextChangedListener { text: Editable? ->
             sharedViewModel.updateInputFolderName(text.toString())

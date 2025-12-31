@@ -16,13 +16,15 @@ import com.on.turip.ui.common.collectOnStarted
 import com.on.turip.ui.folder.model.FolderUiEffect
 import com.on.turip.ui.login.LoginActivity
 
-class FolderRemoveBottomSheetFragment : BaseBottomSheetFragment<BottomSheetFragmentFolderRemoveBinding>() {
+class FolderRemoveBottomSheetFragment :
+    BaseBottomSheetFragment<BottomSheetFragmentFolderRemoveBinding>() {
     private val sharedViewModel: FolderViewModel by activityViewModels()
 
     override fun inflateBinding(
         inflater: LayoutInflater,
         container: ViewGroup?,
-    ): BottomSheetFragmentFolderRemoveBinding = BottomSheetFragmentFolderRemoveBinding.inflate(inflater, container, false)
+    ): BottomSheetFragmentFolderRemoveBinding =
+        BottomSheetFragmentFolderRemoveBinding.inflate(inflater, container, false)
 
     override fun onViewCreated(
         view: View,
@@ -37,7 +39,6 @@ class FolderRemoveBottomSheetFragment : BaseBottomSheetFragment<BottomSheetFragm
     private fun setupListeners() {
         binding.tvBottomSheetFolderRemoveRemove.setOnClickListener {
             sharedViewModel.deleteFolder()
-            dismiss()
         }
         binding.tvBottomSheetFolderRemoveCancel.setOnClickListener {
             dismiss()
@@ -58,6 +59,8 @@ class FolderRemoveBottomSheetFragment : BaseBottomSheetFragment<BottomSheetFragm
                     navigateToLoginScreen()
                 }
 
+                FolderUiEffect.FolderDeleted -> dismiss()
+
                 is FolderUiEffect.ShowErrorSnackbar -> {
                     val uiModel: ErrorUiModel =
                         uiEffect.errorUiState.toUiModel() ?: return@collectOnStarted
@@ -68,6 +71,8 @@ class FolderRemoveBottomSheetFragment : BaseBottomSheetFragment<BottomSheetFragm
                             .show()
                     }
                 }
+
+                else -> Unit
             }
         }
     }

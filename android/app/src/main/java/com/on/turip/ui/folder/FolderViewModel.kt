@@ -120,8 +120,9 @@ class FolderViewModel @Inject constructor(
                         )
                     }
                     inputFolderName.update { "" }
+                    _uiEffect.send(FolderUiEffect.FolderAdded)
                 }.onFailure { errorType: ErrorType ->
-                    sendErrorEffect(errorType, { updateFolderName() })
+                    sendErrorEffect(errorType, { addFolder() })
                     Timber.e("폴더 생성 실패")
                 }
         }
@@ -155,6 +156,7 @@ class FolderViewModel @Inject constructor(
                         )
                     }
                     inputFolderName.update { "" }
+                    _uiEffect.send(FolderUiEffect.FolderUpdated)
                 }.onFailure { errorType: ErrorType ->
                     sendErrorEffect(errorType, { updateFolderName() })
                     Timber.e("폴더 수정 실패")
@@ -176,6 +178,7 @@ class FolderViewModel @Inject constructor(
                         )
                     }
                     Timber.d("폴더 삭제 완료(폴더명 = ${selectFolder.name})")
+                    _uiEffect.send(FolderUiEffect.FolderDeleted)
                 }.onFailure { errorType: ErrorType ->
                     sendErrorEffect(errorType, { deleteFolder() })
                     Timber.d("폴더 삭제 실패")

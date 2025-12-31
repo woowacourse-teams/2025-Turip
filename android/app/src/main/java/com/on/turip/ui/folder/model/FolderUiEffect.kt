@@ -5,7 +5,11 @@ import com.on.turip.data.common.ErrorUiState
 sealed interface FolderUiEffect {
     data object NavigateToLogin : FolderUiEffect
 
-    data class ShowErrorSnackbar(
+    data object FolderAdded : FolderUiEffect
+    data object FolderUpdated : FolderUiEffect
+    data object FolderDeleted : FolderUiEffect
+
+    class ShowErrorSnackbar(
         val errorUiState: ErrorUiState,
         val onRetryClick: (() -> Unit)? = null,
     ) : FolderUiEffect
