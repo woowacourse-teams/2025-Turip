@@ -246,7 +246,8 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
 
     private fun showLoading() {
         binding.pbTripDetailScreenLoading.visibility = View.VISIBLE
-        binding.appbar.visibility = View.GONE
+        binding.cvTripDetailVideoContainer.visibility = View.GONE
+        binding.ivTripDetailFavorite.visibility = View.GONE
         binding.nsvTripDetail.visibility = View.GONE
         binding.customErrorView.visibility = View.GONE
     }
@@ -254,7 +255,8 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
     private fun showErrorView(errorUiState: ErrorUiState) {
         binding.customErrorView.visibility = View.VISIBLE
         binding.pbTripDetailScreenLoading.visibility = View.GONE
-        binding.appbar.visibility = View.GONE
+        binding.cvTripDetailVideoContainer.visibility = View.GONE
+        binding.ivTripDetailFavorite.visibility = View.GONE
         binding.nsvTripDetail.visibility = View.GONE
 
         binding.customErrorView.apply {
@@ -292,7 +294,8 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
             }
         }
 
-        binding.appbar.visibility = View.VISIBLE
+        binding.cvTripDetailVideoContainer.visibility = View.VISIBLE
+        binding.ivTripDetailFavorite.visibility = View.VISIBLE
         binding.nsvTripDetail.visibility = View.VISIBLE
         binding.customErrorView.visibility = View.GONE
         binding.pbTripDetailScreenLoading.visibility = View.GONE
