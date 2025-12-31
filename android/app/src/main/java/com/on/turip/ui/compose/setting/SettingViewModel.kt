@@ -49,9 +49,7 @@ class SettingViewModel @Inject constructor(
             userStorageRepository
                 .loadId()
                 .onSuccess { result ->
-                    _uiState.update {
-                        uiState.value.copy(deviceIdentifier = result)
-                    }
+                    _uiState.update { it.copy(deviceIdentifier = result) }
                 }.onFailure {
                     Timber.e("${it.message}")
                 }

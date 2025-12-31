@@ -209,7 +209,7 @@ class TripDetailViewModel @Inject constructor(
         _uiState.update { state: TripDetailUiState ->
             state.copy(
                 places =
-                    uiState.value.places.map { place: PlaceModel ->
+                    state.places.map { place: PlaceModel ->
                         if (place.id == placeId) {
                             place.copy(isFavorite = hasFavoriteFolder)
                         } else {

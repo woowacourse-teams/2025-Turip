@@ -98,7 +98,7 @@ class FavoriteContentViewModel @Inject constructor(
                     _uiState.update { state: FavoriteContentUiState ->
                         state.copy(
                             isLoading = false,
-                            favoriteContents = uiState.value.favoriteContents.filter { it.content.id != contentId },
+                            favoriteContents = state.favoriteContents.filter { it.content.id != contentId },
                             errorUiState = ErrorUiState.None,
                         )
                     }

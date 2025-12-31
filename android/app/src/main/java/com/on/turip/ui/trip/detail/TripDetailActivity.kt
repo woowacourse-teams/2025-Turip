@@ -315,9 +315,12 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
         if (isVisible == null) {
             val bodyTextView: TextView = binding.tvTripDetailContentTitle
             bodyTextView.post {
-                val lineCount: Int = bodyTextView.layout.lineCount
-                val ellipsisCount: Int = bodyTextView.layout.getEllipsisCount(lineCount - 1)
-                viewModel.updateExpandTextToggleVisibility(lineCount, ellipsisCount)
+                val layout = bodyTextView.layout ?: return@post
+                val lineCount: Int = layout.lineCount
+                if (lineCount > 0) {
+                    val ellipsisCount: Int = layout.getEllipsisCount(lineCount - 1)
+                    viewModel.updateExpandTextToggleVisibility(lineCount, ellipsisCount)
+                }
             }
         }
     }
