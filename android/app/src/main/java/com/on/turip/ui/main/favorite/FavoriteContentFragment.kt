@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import com.google.android.material.snackbar.Snackbar
 import com.on.turip.R
-import com.on.turip.data.common.ErrorUiEffect
 import com.on.turip.data.common.ErrorUiModel
 import com.on.turip.data.common.ErrorUiState
 import com.on.turip.data.common.toUiModel
@@ -17,8 +16,8 @@ import com.on.turip.domain.favorite.FavoriteContent
 import com.on.turip.ui.common.ItemDividerDecoration
 import com.on.turip.ui.common.base.BaseFragment
 import com.on.turip.ui.common.collectOnStarted
-import com.on.turip.ui.common.event.CommonUiEffect
 import com.on.turip.ui.login.LoginActivity
+import com.on.turip.ui.main.favorite.model.FavoriteContentUiEffect
 import com.on.turip.ui.main.favorite.model.FavoriteContentUiState
 import com.on.turip.ui.trip.detail.TripDetailActivity
 import dagger.hilt.android.AndroidEntryPoint
@@ -55,7 +54,8 @@ class FavoriteContentFragment : BaseFragment<FragmentFavoriteContentBinding>() {
     override fun inflateBinding(
         inflater: LayoutInflater,
         container: ViewGroup?,
-    ): FragmentFavoriteContentBinding = FragmentFavoriteContentBinding.inflate(inflater, container, false)
+    ): FragmentFavoriteContentBinding =
+        FragmentFavoriteContentBinding.inflate(inflater, container, false)
 
     override fun onViewCreated(
         view: View,
@@ -87,25 +87,20 @@ class FavoriteContentFragment : BaseFragment<FragmentFavoriteContentBinding>() {
             }
         }
 
-        collectOnStarted(viewModel.errorUiEffect) { errorUiEffect: ErrorUiEffect ->
-            when (errorUiEffect) {
-                is ErrorUiEffect.ShowSnackbar -> {
+        collectOnStarted(viewModel.uiEffect) { uiEffect: FavoriteContentUiEffect ->
+            when (uiEffect) {
+                FavoriteContentUiEffect.NavigateToLogin -> navigateToLoginScreen()
+
+                is FavoriteContentUiEffect.ShowError -> {
                     val uiModel: ErrorUiModel =
-                        errorUiEffect.errorUiState.toUiModel() ?: return@collectOnStarted
+                        uiEffect.errorUiState.toUiModel() ?: return@collectOnStarted
                     view?.let { view: View ->
                         Snackbar
                             .make(view, uiModel.titleRes, Snackbar.LENGTH_INDEFINITE)
-                            .apply {
-                                errorUiEffect.onRetryClick?.let { action -> setAction(uiModel.retryTextRes) { action() } }
-                            }.show()
+                            .apply { uiEffect.onRetryClick?.let { action -> setAction(uiModel.retryTextRes) { action() } } }
+                            .show()
                     }
                 }
-            }
-        }
-
-        collectOnStarted(viewModel.commonUiEffect) { commonUiEffect: CommonUiEffect ->
-            when (commonUiEffect) {
-                CommonUiEffect.NavigateToLogin -> navigateToLoginScreen()
             }
         }
     }

@@ -20,7 +20,6 @@ import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.snackbar.Snackbar
 import com.on.turip.R
-import com.on.turip.data.common.ErrorUiEffect
 import com.on.turip.data.common.ErrorUiModel
 import com.on.turip.data.common.ErrorUiState
 import com.on.turip.data.common.toUiModel
@@ -28,7 +27,6 @@ import com.on.turip.databinding.FragmentFavoritePlaceBinding
 import com.on.turip.ui.common.TuripDialogFragment
 import com.on.turip.ui.common.base.BaseFragment
 import com.on.turip.ui.common.collectOnStarted
-import com.on.turip.ui.common.event.CommonUiEffect
 import com.on.turip.ui.folder.FolderActivity
 import com.on.turip.ui.login.LoginActivity
 import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
@@ -84,7 +82,8 @@ class FavoritePlaceFragment :
     override fun inflateBinding(
         inflater: LayoutInflater,
         container: ViewGroup?,
-    ): FragmentFavoritePlaceBinding = FragmentFavoritePlaceBinding.inflate(inflater, container, false)
+    ): FragmentFavoritePlaceBinding =
+        FragmentFavoritePlaceBinding.inflate(inflater, container, false)
 
     override fun onViewCreated(
         view: View,
@@ -178,28 +177,6 @@ class FavoritePlaceFragment :
             }
         }
 
-        collectOnStarted(viewModel.errorUiEffect) { errorUiEffect: ErrorUiEffect ->
-            when (errorUiEffect) {
-                is ErrorUiEffect.ShowSnackbar -> {
-                    val uiModel: ErrorUiModel =
-                        errorUiEffect.errorUiState.toUiModel() ?: return@collectOnStarted
-                    view?.let { view: View ->
-                        Snackbar
-                            .make(view, uiModel.titleRes, Snackbar.LENGTH_INDEFINITE)
-                            .apply {
-                                errorUiEffect.onRetryClick?.let { action -> setAction(uiModel.retryTextRes) { action() } }
-                            }.show()
-                    }
-                }
-            }
-        }
-
-        collectOnStarted(viewModel.commonUiEffect) { commonUiEffect: CommonUiEffect ->
-            when (commonUiEffect) {
-                CommonUiEffect.NavigateToLogin -> navigateToLoginScreen()
-            }
-        }
-
         collectOnStarted(viewModel.uiEffect) { uiEffect: FavoritePlaceUiEffect ->
             when (uiEffect) {
                 FavoritePlaceUiEffect.ShowFolderShareNotAllowed -> {
@@ -208,6 +185,19 @@ class FavoritePlaceFragment :
 
                 is FavoritePlaceUiEffect.ShareFolder -> {
                     shareFolder(uiEffect.favoriteFolderShareModel)
+                }
+
+                FavoritePlaceUiEffect.NavigateToLogin -> navigateToLoginScreen()
+
+                is FavoritePlaceUiEffect.ShowError -> {
+                    val uiModel: ErrorUiModel =
+                        uiEffect.errorUiState.toUiModel() ?: return@collectOnStarted
+                    view?.let { view: View ->
+                        Snackbar
+                            .make(view, uiModel.titleRes, Snackbar.LENGTH_INDEFINITE)
+                            .apply { uiEffect.onRetryClick?.let { action -> setAction(uiModel.retryTextRes) { action() } } }
+                            .show()
+                    }
                 }
             }
         }

@@ -13,7 +13,6 @@ import com.on.turip.domain.content.UsersLikeContent
 import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.region.RegionCategory
 import com.on.turip.domain.region.repository.RegionRepository
-import com.on.turip.ui.common.event.CommonUiEffect
 import com.on.turip.ui.common.mapper.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -36,8 +35,8 @@ class HomeViewModel @Inject constructor(
     private val _uiState: MutableStateFlow<HomeUiState> = MutableStateFlow(HomeUiState.Idle)
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
-    private val _commonUiEffect: Channel<CommonUiEffect> = Channel(Channel.BUFFERED)
-    val commonUiEffect: Flow<CommonUiEffect> = _commonUiEffect.receiveAsFlow()
+    private val _uiEffect: Channel<HomeUiEffect> = Channel(Channel.BUFFERED)
+    val uiEffect: Flow<HomeUiEffect> = _uiEffect.receiveAsFlow()
 
     init {
         loadContents()
@@ -127,7 +126,7 @@ class HomeViewModel @Inject constructor(
 
                 UiError.Global.TokenExpired -> {
                     _uiState.update { it.copy(isLoading = false) }
-                    _commonUiEffect.send(CommonUiEffect.NavigateToLogin)
+                    _uiEffect.send(HomeUiEffect.NavigateToLogin)
                 }
             }
         }

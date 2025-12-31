@@ -76,7 +76,7 @@ class FolderAddBottomSheetFragment :
 
                 FolderUiEffect.FolderAdded -> dismiss()
 
-                is FolderUiEffect.ShowErrorSnackbar -> {
+                is FolderUiEffect.ShowError -> {
                     val uiModel: ErrorUiModel =
                         uiEffect.errorUiState.toUiModel() ?: return@collectOnStarted
                     view?.let { view: View ->

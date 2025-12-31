@@ -11,14 +11,12 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.on.turip.R
-import com.on.turip.data.common.ErrorUiEffect
 import com.on.turip.data.common.ErrorUiModel
 import com.on.turip.data.common.toUiModel
 import com.on.turip.databinding.BottomSheetFragmentFavoritePlaceFolderCatalogBinding
 import com.on.turip.ui.common.TuripDialogFragment
 import com.on.turip.ui.common.base.BaseFragment
 import com.on.turip.ui.common.collectOnStarted
-import com.on.turip.ui.common.event.CommonUiEffect
 import com.on.turip.ui.login.LoginActivity
 import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderCatalogUiEffect
@@ -28,7 +26,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 
 @AndroidEntryPoint
-class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavoritePlaceFolderCatalogBinding>() {
+class FavoritePlaceFolderCatalogFragment :
+    BaseFragment<BottomSheetFragmentFavoritePlaceFolderCatalogBinding>() {
     private val viewModel: FavoritePlaceFolderCatalogViewModel by viewModels()
 
     private val placeAdapter: FavoritePlaceAdapter by lazy {
@@ -129,36 +128,27 @@ class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavor
             }
         }
 
-        collectOnStarted(viewModel.errorUiEffect) { errorUiEffect: ErrorUiEffect ->
-            when (errorUiEffect) {
-                is ErrorUiEffect.ShowSnackbar -> {
-                    val uiModel: ErrorUiModel =
-                        errorUiEffect.errorUiState.toUiModel() ?: return@collectOnStarted
-                    view?.let { view: View ->
-                        Snackbar
-                            .make(view, uiModel.titleRes, Snackbar.LENGTH_INDEFINITE)
-                            .apply {
-                                errorUiEffect.onRetryClick?.let { action -> setAction(uiModel.retryTextRes) { action() } }
-                            }.show()
-                    }
-                }
-            }
-        }
-
-        collectOnStarted(viewModel.commonUiEffect) { commonUiEffect: CommonUiEffect ->
-            when (commonUiEffect) {
-                CommonUiEffect.NavigateToLogin -> navigateToLoginScreen()
-            }
-        }
-
         collectOnStarted(viewModel.uiEffect) { uiEffect: FavoritePlaceFolderCatalogUiEffect ->
             when (uiEffect) {
+                FavoritePlaceFolderCatalogUiEffect.NavigateToLogin -> navigateToLoginScreen()
+
                 FavoritePlaceFolderCatalogUiEffect.ShowFolderShareNotAllowed -> {
                     showSuggestLoginMessage()
                 }
 
                 is FavoritePlaceFolderCatalogUiEffect.ShareFolder -> {
                     shareFolder(uiEffect.favoriteFolderShareModel)
+                }
+
+                is FavoritePlaceFolderCatalogUiEffect.ShowError -> {
+                    val uiModel: ErrorUiModel =
+                        uiEffect.errorUiState.toUiModel() ?: return@collectOnStarted
+                    view?.let { view: View ->
+                        Snackbar
+                            .make(view, uiModel.titleRes, Snackbar.LENGTH_INDEFINITE)
+                            .apply { uiEffect.onRetryClick?.let { action -> setAction(uiModel.retryTextRes) { action() } } }
+                            .show()
+                    }
                 }
             }
         }

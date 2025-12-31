@@ -24,7 +24,6 @@ import com.on.turip.databinding.ActivitySearchBinding
 import com.on.turip.domain.searchhistory.SearchHistory
 import com.on.turip.ui.common.base.BaseActivity
 import com.on.turip.ui.common.collectOnStarted
-import com.on.turip.ui.common.event.CommonUiEffect
 import com.on.turip.ui.login.LoginActivity
 import com.on.turip.ui.trip.detail.TripDetailActivity
 import dagger.hilt.android.AndroidEntryPoint
@@ -194,9 +193,9 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
             }
         }
 
-        collectOnStarted(viewModel.commonUiEffect) { commonUiEffect: CommonUiEffect ->
-            when (commonUiEffect) {
-                CommonUiEffect.NavigateToLogin -> navigateToLoginScreen()
+        collectOnStarted(viewModel.uiEffect) { uiEffect: SearchUiEffect ->
+            when (uiEffect) {
+                SearchUiEffect.NavigateToLogin -> navigateToLoginScreen()
             }
         }
     }

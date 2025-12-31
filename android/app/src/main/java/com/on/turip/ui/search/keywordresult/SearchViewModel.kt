@@ -14,11 +14,11 @@ import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.content.video.VideoInformation
 import com.on.turip.domain.searchhistory.SearchHistory
 import com.on.turip.domain.searchhistory.SearchHistoryRepository
-import com.on.turip.ui.common.event.CommonUiEffect
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.search.keywordresult.SearchActivity.Companion.SEARCH_KEYWORD_KEY
 import com.on.turip.ui.search.model.VideoInformationModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
@@ -30,7 +30,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
@@ -41,14 +40,14 @@ class SearchViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<SearchUiState>(SearchUiState.Loading)
     val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
 
+    private val _uiEffect: Channel<SearchUiEffect> = Channel(Channel.BUFFERED)
+    val uiEffect: Flow<SearchUiEffect> = _uiEffect.receiveAsFlow()
+
     private val _searchingWord: MutableLiveData<String> = MutableLiveData()
     val searchingWord: LiveData<String> get() = _searchingWord
 
     private val _searchHistory: MutableLiveData<List<SearchHistory>> = MutableLiveData(emptyList())
     val searchHistory: LiveData<List<SearchHistory>> get() = _searchHistory
-
-    private val _commonUiEffect: Channel<CommonUiEffect> = Channel(Channel.BUFFERED)
-    val commonUiEffect: Flow<CommonUiEffect> = _commonUiEffect.receiveAsFlow()
 
     private val searchKeyword: String by lazy {
         checkNotNull(savedStateHandle[SEARCH_KEYWORD_KEY]) {
@@ -177,7 +176,7 @@ class SearchViewModel @Inject constructor(
             when (uiError) {
                 UiError.Global.Network -> _uiState.update { SearchUiState.Error(ErrorUiState.Network) }
                 UiError.Global.Server -> _uiState.update { SearchUiState.Error(ErrorUiState.Server) }
-                UiError.Global.TokenExpired -> _commonUiEffect.send(CommonUiEffect.NavigateToLogin)
+                UiError.Global.TokenExpired -> _uiEffect.send(SearchUiEffect.NavigateToLogin)
             }
         }
     }

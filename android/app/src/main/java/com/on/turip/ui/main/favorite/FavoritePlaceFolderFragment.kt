@@ -9,14 +9,12 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.google.android.material.snackbar.Snackbar
 import com.on.turip.R
-import com.on.turip.data.common.ErrorUiEffect
 import com.on.turip.data.common.ErrorUiModel
 import com.on.turip.data.common.toUiModel
 import com.on.turip.databinding.BottomSheetFragmentFavoritePlaceFolderBinding
 import com.on.turip.ui.common.TuripSnackbar
 import com.on.turip.ui.common.base.BaseFragment
 import com.on.turip.ui.common.collectOnStarted
-import com.on.turip.ui.common.event.CommonUiEffect
 import com.on.turip.ui.folder.FolderActivity
 import com.on.turip.ui.login.LoginActivity
 import com.on.turip.ui.main.favorite.FavoritePlaceFolderViewHolder.FavoritePlaceFolderListener
@@ -60,7 +58,8 @@ class FavoritePlaceFolderFragment : BaseFragment<BottomSheetFragmentFavoritePlac
     override fun inflateBinding(
         inflater: LayoutInflater,
         container: ViewGroup?,
-    ): BottomSheetFragmentFavoritePlaceFolderBinding = BottomSheetFragmentFavoritePlaceFolderBinding.inflate(inflater, container, false)
+    ): BottomSheetFragmentFavoritePlaceFolderBinding =
+        BottomSheetFragmentFavoritePlaceFolderBinding.inflate(inflater, container, false)
 
     override fun onViewCreated(
         view: View,
@@ -97,28 +96,19 @@ class FavoritePlaceFolderFragment : BaseFragment<BottomSheetFragmentFavoritePlac
                 is FavoritePlaceFolderUiEffect.ShowUpdateFavoriteState -> {
                     showFavoriteStatus(uiEffect.folder)
                 }
-            }
-        }
 
-        collectOnStarted(viewModel.errorUiEffect) { errorUiEffect: ErrorUiEffect ->
-            when (errorUiEffect) {
-                is ErrorUiEffect.ShowSnackbar -> {
+                FavoritePlaceFolderUiEffect.NavigateToLogin -> navigateToLoginScreen()
+
+                is FavoritePlaceFolderUiEffect.ShowError -> {
                     val uiModel: ErrorUiModel =
-                        errorUiEffect.errorUiState.toUiModel() ?: return@collectOnStarted
+                        uiEffect.errorUiState.toUiModel() ?: return@collectOnStarted
                     view?.let { view: View ->
                         Snackbar
                             .make(view, uiModel.titleRes, Snackbar.LENGTH_INDEFINITE)
-                            .apply {
-                                errorUiEffect.onRetryClick?.let { action -> setAction(uiModel.retryTextRes) { action() } }
-                            }.show()
+                            .apply { uiEffect.onRetryClick?.let { action -> setAction(uiModel.retryTextRes) { action() } } }
+                            .show()
                     }
                 }
-            }
-        }
-
-        collectOnStarted(viewModel.commonUiEffect) { commonUiEffect: CommonUiEffect ->
-            when (commonUiEffect) {
-                CommonUiEffect.NavigateToLogin -> navigateToLoginScreen()
             }
         }
     }

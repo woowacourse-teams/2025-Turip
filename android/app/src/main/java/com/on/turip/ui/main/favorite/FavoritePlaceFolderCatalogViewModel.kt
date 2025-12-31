@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.on.turip.common.AuthState
 import com.on.turip.common.UserType
 import com.on.turip.data.common.ErrorType
-import com.on.turip.data.common.ErrorUiEffect
 import com.on.turip.data.common.ErrorUiState
 import com.on.turip.data.common.UiError
 import com.on.turip.data.common.onFailure
@@ -15,7 +14,6 @@ import com.on.turip.data.common.toUiError
 import com.on.turip.domain.favorite.FavoritePlace
 import com.on.turip.domain.favorite.repository.FavoritePlaceRepository
 import com.on.turip.domain.favorite.usecase.UpdateFavoritePlaceUseCase
-import com.on.turip.ui.common.event.CommonUiEffect
 import com.on.turip.ui.main.favorite.FavoritePlaceFolderCatalogFragment.Companion.FAVORITE_PLACE_FOLDER_CATALOG_ARGUMENTS_FOLDER_ID
 import com.on.turip.ui.main.favorite.FavoritePlaceFolderCatalogFragment.Companion.FAVORITE_PLACE_FOLDER_CATALOG_ARGUMENTS_FOLDER_NAME
 import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
@@ -23,6 +21,7 @@ import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderCatalogUiEffect
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderCatalogUiState
 import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,7 +31,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @HiltViewModel
 class FavoritePlaceFolderCatalogViewModel @Inject constructor(
@@ -55,14 +53,8 @@ class FavoritePlaceFolderCatalogViewModel @Inject constructor(
         MutableStateFlow(FavoritePlaceFolderCatalogUiState.Idle)
     val uiState: StateFlow<FavoritePlaceFolderCatalogUiState> = _uiState.asStateFlow()
 
-    private val _commonUiEffect: Channel<CommonUiEffect> = Channel(Channel.BUFFERED)
-    val commonUiEffect: Flow<CommonUiEffect> = _commonUiEffect.receiveAsFlow()
-
     private val _uiEffect: Channel<FavoritePlaceFolderCatalogUiEffect> = Channel(Channel.BUFFERED)
     val uiEffect: Flow<FavoritePlaceFolderCatalogUiEffect> = _uiEffect.receiveAsFlow()
-
-    private val _errorUiEffect: Channel<ErrorUiEffect> = Channel(Channel.BUFFERED)
-    val errorUiEffect: Flow<ErrorUiEffect> = _errorUiEffect.receiveAsFlow()
 
     init {
         loadPlacesInSelectFolder()
@@ -142,7 +134,7 @@ class FavoritePlaceFolderCatalogViewModel @Inject constructor(
                     )
                 viewModelScope.launch {
                     _uiEffect.send(
-                        FavoritePlaceFolderCatalogUiEffect.ShareFolder(favoriteFolderShareModel),
+                        FavoritePlaceFolderCatalogUiEffect.ShareFolder(favoriteFolderShareModel)
                     )
                 }
             }
@@ -158,8 +150,8 @@ class FavoritePlaceFolderCatalogViewModel @Inject constructor(
     private suspend fun handleGlobalError(uiError: UiError.Global) {
         when (uiError) {
             UiError.Global.Network -> {
-                _errorUiEffect.send(
-                    ErrorUiEffect.ShowSnackbar(
+                _uiEffect.send(
+                    FavoritePlaceFolderCatalogUiEffect.ShowError(
                         errorUiState = ErrorUiState.Network,
                         onRetryClick = { loadPlacesInSelectFolder() },
                     ),
@@ -167,8 +159,8 @@ class FavoritePlaceFolderCatalogViewModel @Inject constructor(
             }
 
             UiError.Global.Server -> {
-                _errorUiEffect.send(
-                    ErrorUiEffect.ShowSnackbar(
+                _uiEffect.send(
+                    FavoritePlaceFolderCatalogUiEffect.ShowError(
                         errorUiState = ErrorUiState.Server,
                         onRetryClick = { loadPlacesInSelectFolder() },
                     ),
@@ -176,7 +168,7 @@ class FavoritePlaceFolderCatalogViewModel @Inject constructor(
             }
 
             UiError.Global.TokenExpired -> {
-                _commonUiEffect.send(CommonUiEffect.NavigateToLogin)
+                _uiEffect.send(FavoritePlaceFolderCatalogUiEffect.NavigateToLogin)
             }
         }
     }

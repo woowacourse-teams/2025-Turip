@@ -196,7 +196,7 @@ class FolderViewModel @Inject constructor(
             when (uiError) {
                 UiError.Global.Network -> {
                     _uiEffect.send(
-                        FolderUiEffect.ShowErrorSnackbar(
+                        FolderUiEffect.ShowError(
                             errorUiState = ErrorUiState.Network,
                             onRetryClick = onRetryClick,
                         ),
@@ -205,7 +205,7 @@ class FolderViewModel @Inject constructor(
 
                 UiError.Global.Server -> {
                     _uiEffect.send(
-                        FolderUiEffect.ShowErrorSnackbar(
+                        FolderUiEffect.ShowError(
                             errorUiState = ErrorUiState.Server,
                             onRetryClick = onRetryClick,
                         ),

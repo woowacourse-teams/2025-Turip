@@ -4,7 +4,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.on.turip.data.common.ErrorType
-import com.on.turip.data.common.ErrorUiEffect
 import com.on.turip.data.common.ErrorUiState
 import com.on.turip.data.common.TuripCustomResult
 import com.on.turip.data.common.UiError
@@ -17,10 +16,10 @@ import com.on.turip.domain.favorite.usecase.UpdateFavoriteUseCase
 import com.on.turip.domain.trip.ContentPlace
 import com.on.turip.domain.trip.Trip
 import com.on.turip.domain.trip.repository.ContentPlaceRepository
-import com.on.turip.ui.common.event.CommonUiEffect
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.trip.detail.TripDetailActivity.Companion.TRIP_DETAIL_CONTENT_KEY
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -31,7 +30,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @HiltViewModel
 class TripDetailViewModel @Inject constructor(
@@ -52,12 +50,6 @@ class TripDetailViewModel @Inject constructor(
 
     private val _uiEffect: Channel<TripDetailUiEffect> = Channel(Channel.BUFFERED)
     val uiEffect: Flow<TripDetailUiEffect> = _uiEffect.receiveAsFlow()
-
-    private val _commonUiEffect: Channel<CommonUiEffect> = Channel(Channel.BUFFERED)
-    val commonUiEffect: Flow<CommonUiEffect> = _commonUiEffect.receiveAsFlow()
-
-    private val _errorUiEffect: Channel<ErrorUiEffect> = Channel(Channel.BUFFERED)
-    val errorUiEffect: Flow<ErrorUiEffect> = _errorUiEffect.receiveAsFlow()
 
     private val contentId: Long by lazy {
         checkNotNull(savedStateHandle[TRIP_DETAIL_CONTENT_KEY]) {
@@ -163,8 +155,8 @@ class TripDetailViewModel @Inject constructor(
                     if (uiError is UiError.Global) {
                         when (uiError) {
                             UiError.Global.Network -> {
-                                _errorUiEffect.send(
-                                    ErrorUiEffect.ShowSnackbar(
+                                _uiEffect.send(
+                                    TripDetailUiEffect.ShowError(
                                         errorUiState = ErrorUiState.Network,
                                         onRetryClick = { updateFavorite() },
                                     ),
@@ -172,11 +164,11 @@ class TripDetailViewModel @Inject constructor(
                             }
 
                             UiError.Global.Server -> {
-                                _errorUiEffect.send(ErrorUiEffect.ShowSnackbar(errorUiState = ErrorUiState.Server))
+                                _uiEffect.send(TripDetailUiEffect.ShowError(errorUiState = ErrorUiState.Server))
                             }
 
                             UiError.Global.TokenExpired -> {
-                                _commonUiEffect.send(CommonUiEffect.NavigateToLogin)
+                                _uiEffect.send(TripDetailUiEffect.NavigateToLogin)
                             }
                         }
                     }
@@ -248,7 +240,7 @@ class TripDetailViewModel @Inject constructor(
 
                 UiError.Global.TokenExpired -> {
                     _uiState.update { it.copy(isLoading = false) }
-                    _commonUiEffect.send(CommonUiEffect.NavigateToLogin)
+                    _uiEffect.send(TripDetailUiEffect.NavigateToLogin)
                 }
             }
         }

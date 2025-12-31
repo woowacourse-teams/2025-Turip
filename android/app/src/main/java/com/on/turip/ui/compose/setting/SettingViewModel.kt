@@ -3,7 +3,6 @@ package com.on.turip.ui.compose.setting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.on.turip.data.common.ErrorType
-import com.on.turip.data.common.ErrorUiEffect
 import com.on.turip.data.common.ErrorUiState
 import com.on.turip.data.common.UiError
 import com.on.turip.data.common.onFailure
@@ -15,9 +14,10 @@ import com.on.turip.domain.setting.InquiryMail
 import com.on.turip.domain.setting.PrivacyPolicy
 import com.on.turip.domain.userstorage.repository.UserStorageRepository
 import com.on.turip.platform.device.AppEnvironmentInfoProvider
-import com.on.turip.ui.common.event.CommonUiEffect
+import com.on.turip.ui.compose.setting.model.SettingUiEffect
 import com.on.turip.ui.compose.setting.model.SettingUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,7 +26,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @HiltViewModel
 class SettingViewModel @Inject constructor(
@@ -37,11 +36,8 @@ class SettingViewModel @Inject constructor(
     private val _uiState: MutableStateFlow<SettingUiState> = MutableStateFlow(SettingUiState.EMPTY)
     val uiState: StateFlow<SettingUiState> = _uiState
 
-    private val _commonUiEffect: Channel<CommonUiEffect> = Channel(Channel.BUFFERED)
-    val commonUiEffect: Flow<CommonUiEffect> = _commonUiEffect.receiveAsFlow()
-
-    private val _errorUiEffect: Channel<ErrorUiEffect> = Channel(Channel.BUFFERED)
-    val errorUiEffect: Flow<ErrorUiEffect> = _errorUiEffect.receiveAsFlow()
+    private val _uiEffect: Channel<SettingUiEffect> = Channel(Channel.BUFFERED)
+    val uiEffect: Flow<SettingUiEffect> = _uiEffect.receiveAsFlow()
 
     init {
         loadId()
@@ -83,7 +79,7 @@ class SettingViewModel @Inject constructor(
                     userStorageRepository
                         .clearTokens()
                         .onSuccess {
-                            _commonUiEffect.send(CommonUiEffect.NavigateToLogin)
+                            _uiEffect.send(SettingUiEffect.NavigateToLogin)
                             Timber.d("로그아웃 성공")
                         }.onFailure {
                             Timber.e("토큰 초기화 실패")
@@ -113,7 +109,7 @@ class SettingViewModel @Inject constructor(
                     userStorageRepository
                         .clearTokens()
                         .onSuccess {
-                            _commonUiEffect.send(CommonUiEffect.NavigateToLogin)
+                            _uiEffect.send(SettingUiEffect.NavigateToLogin)
                             Timber.d("회원탈퇴 성공")
                         }.onFailure {
                             Timber.e("토큰 초기화 실패")
@@ -131,9 +127,9 @@ class SettingViewModel @Inject constructor(
 
     private suspend fun handleGlobalError(uiError: UiError.Global) {
         when (uiError) {
-            UiError.Global.Network -> _errorUiEffect.send(ErrorUiEffect.ShowSnackbar(ErrorUiState.Network))
-            UiError.Global.Server -> _errorUiEffect.send(ErrorUiEffect.ShowSnackbar(ErrorUiState.Server))
-            UiError.Global.TokenExpired -> _commonUiEffect.send(CommonUiEffect.NavigateToLogin)
+            UiError.Global.Network -> _uiEffect.send(SettingUiEffect.ShowError(ErrorUiState.Network))
+            UiError.Global.Server -> _uiEffect.send(SettingUiEffect.ShowError(ErrorUiState.Server))
+            UiError.Global.TokenExpired -> _uiEffect.send(SettingUiEffect.NavigateToLogin)
         }
     }
 }

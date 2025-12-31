@@ -10,11 +10,11 @@ import com.on.turip.data.common.toUiError
 import com.on.turip.domain.content.PagedContentsResult
 import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.content.video.VideoInformation
-import com.on.turip.ui.common.event.CommonUiEffect
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.search.model.VideoInformationModel
 import com.on.turip.ui.search.regionresult.RegionResultActivity.Companion.REGION_RESULT_REGION_CATEGORY_NAME_KEY
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
@@ -26,7 +26,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @HiltViewModel
 class RegionResultViewModel @Inject constructor(
@@ -43,8 +42,8 @@ class RegionResultViewModel @Inject constructor(
         MutableStateFlow(RegionResultUiState.Loading)
     val uiState: StateFlow<RegionResultUiState> = _uiState.asStateFlow()
 
-    private val _commonUiEffect: Channel<CommonUiEffect> = Channel(Channel.BUFFERED)
-    val commonUiEffect: Flow<CommonUiEffect> = _commonUiEffect.receiveAsFlow()
+    private val _uiEffect: Channel<RegionResultUiEffect> = Channel(Channel.BUFFERED)
+    val uiEffect: Flow<RegionResultUiEffect> = _uiEffect.receiveAsFlow()
 
     init {
         loadContentsFromRegion()
@@ -107,7 +106,7 @@ class RegionResultViewModel @Inject constructor(
             when (uiError) {
                 UiError.Global.Network -> _uiState.update { RegionResultUiState.Error(ErrorUiState.Network) }
                 UiError.Global.Server -> _uiState.update { RegionResultUiState.Error(ErrorUiState.Server) }
-                UiError.Global.TokenExpired -> _commonUiEffect.send(CommonUiEffect.NavigateToLogin)
+                UiError.Global.TokenExpired -> _uiEffect.send(RegionResultUiEffect.NavigateToLogin)
             }
         }
     }

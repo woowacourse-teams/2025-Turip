@@ -33,7 +33,6 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.on.turip.R
 import com.on.turip.data.common.ErrorUiState
-import com.on.turip.ui.common.event.CommonUiEffect
 import com.on.turip.ui.compose.designsystem.component.ErrorScreen
 import com.on.turip.ui.compose.designsystem.component.TuripAppBar
 import com.on.turip.ui.compose.home.component.RegionList
@@ -56,9 +55,9 @@ fun HomeScreen(
     val uiState: HomeUiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        viewModel.commonUiEffect.collectLatest { uiEffect: CommonUiEffect ->
+        viewModel.uiEffect.collectLatest { uiEffect: HomeUiEffect ->
             when (uiEffect) {
-                CommonUiEffect.NavigateToLogin -> navigateToLoginScreen()
+                HomeUiEffect.NavigateToLogin -> navigateToLoginScreen()
             }
         }
     }
@@ -142,7 +141,8 @@ private fun HomeScreenContent(
                                 focusManager.clearFocus()
                                 keyboardController?.hide()
                             })
-                        }.padding(horizontal = 20.dp)
+                        }
+                        .padding(horizontal = 20.dp)
                         .verticalScroll(scrollState),
                 verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {

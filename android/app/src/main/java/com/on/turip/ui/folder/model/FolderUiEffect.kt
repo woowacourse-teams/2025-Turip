@@ -9,7 +9,7 @@ sealed interface FolderUiEffect {
     data object FolderUpdated : FolderUiEffect
     data object FolderDeleted : FolderUiEffect
 
-    class ShowErrorSnackbar(
+    class ShowError(
         val errorUiState: ErrorUiState,
         val onRetryClick: (() -> Unit)? = null,
     ) : FolderUiEffect
