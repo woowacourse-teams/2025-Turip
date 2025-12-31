@@ -1,7 +1,4 @@
-package com.on.turip.data.result
-
-import com.on.turip.core.result.ErrorType
-import com.on.turip.core.result.TuripResult
+package com.on.turip.core.result
 
 /**
  * 성공일 경우

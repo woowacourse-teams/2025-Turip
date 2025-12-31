@@ -5,8 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.TuripResult
-import com.on.turip.data.result.onFailure
-import com.on.turip.data.result.onSuccess
+import com.on.turip.core.result.onFailure
+import com.on.turip.core.result.onSuccess
 import com.on.turip.domain.content.Content
 import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.favorite.usecase.UpdateFavoriteUseCase

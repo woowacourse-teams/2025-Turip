@@ -1,7 +1,7 @@
 package com.on.turip.domain.login.usecase
 
 import com.on.turip.core.result.TuripResult
-import com.on.turip.data.result.mapCatching
+import com.on.turip.core.result.mapCatching
 import com.on.turip.domain.login.AuthRepository
 import com.on.turip.domain.userstorage.repository.UserStorageRepository
 import javax.inject.Inject

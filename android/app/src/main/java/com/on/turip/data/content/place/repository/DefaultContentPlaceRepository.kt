@@ -1,9 +1,9 @@
 package com.on.turip.data.content.place.repository
 
 import com.on.turip.core.result.TuripResult
+import com.on.turip.core.result.mapCatching
 import com.on.turip.data.content.place.datasource.ContentPlaceRemoteDataSource
 import com.on.turip.data.content.place.toDomain
-import com.on.turip.data.result.mapCatching
 import com.on.turip.domain.trip.Trip
 import com.on.turip.domain.trip.repository.ContentPlaceRepository
 import javax.inject.Inject

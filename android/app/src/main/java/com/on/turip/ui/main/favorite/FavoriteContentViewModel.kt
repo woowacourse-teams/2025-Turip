@@ -3,8 +3,8 @@ package com.on.turip.ui.main.favorite
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.on.turip.core.result.ErrorType
-import com.on.turip.data.result.onFailure
-import com.on.turip.data.result.onSuccess
+import com.on.turip.core.result.onFailure
+import com.on.turip.core.result.onSuccess
 import com.on.turip.domain.favorite.PagedFavoriteContents
 import com.on.turip.domain.favorite.repository.FavoriteRepository
 import com.on.turip.domain.favorite.usecase.UpdateFavoriteUseCase

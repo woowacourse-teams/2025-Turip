@@ -1,9 +1,9 @@
 package com.on.turip.data.region.repository
 
 import com.on.turip.core.result.TuripResult
+import com.on.turip.core.result.mapCatching
 import com.on.turip.data.region.datasource.RegionRemoteDataSource
 import com.on.turip.data.region.toDomain
-import com.on.turip.data.result.mapCatching
 import com.on.turip.domain.region.RegionCategory
 import com.on.turip.domain.region.repository.RegionRepository
 import javax.inject.Inject

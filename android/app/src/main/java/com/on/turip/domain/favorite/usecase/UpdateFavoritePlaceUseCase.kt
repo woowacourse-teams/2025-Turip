@@ -1,11 +1,11 @@
 package com.on.turip.domain.favorite.usecase
 
 import com.on.turip.core.result.TuripResult
-import com.on.turip.data.result.onFailure
-import com.on.turip.data.result.onSuccess
+import com.on.turip.core.result.onFailure
+import com.on.turip.core.result.onSuccess
 import com.on.turip.domain.favorite.repository.FavoritePlaceRepository
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 class UpdateFavoritePlaceUseCase @Inject constructor(
     private val favoritePlaceRepository: FavoritePlaceRepository,

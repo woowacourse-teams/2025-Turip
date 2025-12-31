@@ -6,8 +6,8 @@ import com.on.turip.common.AuthState
 import com.on.turip.common.UserType
 import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.TuripResult
-import com.on.turip.data.result.onFailure
-import com.on.turip.data.result.onSuccess
+import com.on.turip.core.result.onFailure
+import com.on.turip.core.result.onSuccess
 import com.on.turip.domain.favorite.FavoritePlace
 import com.on.turip.domain.favorite.repository.FavoritePlaceRepository
 import com.on.turip.domain.favorite.usecase.UpdateFavoritePlaceUseCase
@@ -23,6 +23,7 @@ import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceUiEffect
 import com.on.turip.ui.main.favorite.model.FavoritePlaceUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,7 +33,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @HiltViewModel
 class FavoritePlaceViewModel @Inject constructor(
