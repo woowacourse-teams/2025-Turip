@@ -13,6 +13,7 @@ import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.common.mapper.toEditUiModel
 import com.on.turip.ui.folder.model.FolderEditModel
 import com.on.turip.ui.folder.model.FolderNameStatusModel
+import com.on.turip.ui.folder.model.FolderRetryAction
 import com.on.turip.ui.folder.model.FolderUiEffect
 import com.on.turip.ui.folder.model.FolderUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -122,7 +123,7 @@ class FolderViewModel @Inject constructor(
                     inputFolderName.update { "" }
                     _uiEffect.send(FolderUiEffect.FolderAdded)
                 }.onFailure { errorType: ErrorType ->
-                    sendErrorEffect(errorType, { addFolder() })
+                    sendErrorEffect(errorType, FolderRetryAction.FolderAdd)
                     Timber.e("폴더 생성 실패")
                 }
         }
@@ -158,7 +159,7 @@ class FolderViewModel @Inject constructor(
                     inputFolderName.update { "" }
                     _uiEffect.send(FolderUiEffect.FolderUpdated)
                 }.onFailure { errorType: ErrorType ->
-                    sendErrorEffect(errorType, { updateFolderName() })
+                    sendErrorEffect(errorType, FolderRetryAction.FolderNameUpdate)
                     Timber.e("폴더 수정 실패")
                 }
         }
@@ -180,7 +181,7 @@ class FolderViewModel @Inject constructor(
                     Timber.d("폴더 삭제 완료(폴더명 = ${selectFolder.name})")
                     _uiEffect.send(FolderUiEffect.FolderDeleted)
                 }.onFailure { errorType: ErrorType ->
-                    sendErrorEffect(errorType, { deleteFolder() })
+                    sendErrorEffect(errorType, FolderRetryAction.FolderDelete)
                     Timber.d("폴더 삭제 실패")
                 }
         }
@@ -188,35 +189,31 @@ class FolderViewModel @Inject constructor(
 
     private suspend fun sendErrorEffect(
         errorType: ErrorType,
-        onRetryClick: (() -> Unit),
+        retryAction: FolderRetryAction,
     ) {
         _uiState.update { it.copy(isLoading = false, errorUiState = ErrorUiState.None) }
         val uiError: UiError = errorType.toUiError()
         if (uiError is UiError.Global) {
             when (uiError) {
-                UiError.Global.Network -> {
-                    _uiEffect.send(
-                        FolderUiEffect.ShowError(
-                            errorUiState = ErrorUiState.Network,
-                            onRetryClick = onRetryClick,
-                        ),
-                    )
-                }
+                UiError.Global.Network ->
+                    _uiEffect.send(FolderUiEffect.ShowError(ErrorUiState.Network, retryAction))
 
-                UiError.Global.Server -> {
-                    _uiEffect.send(
-                        FolderUiEffect.ShowError(
-                            errorUiState = ErrorUiState.Server,
-                            onRetryClick = onRetryClick,
-                        ),
-                    )
-                }
+                UiError.Global.Server ->
+                    _uiEffect.send(FolderUiEffect.ShowError(ErrorUiState.Server, retryAction))
 
                 UiError.Global.TokenExpired -> {
                     _uiState.update { it.copy(isLoading = false) }
                     _uiEffect.send(FolderUiEffect.NavigateToLogin)
                 }
             }
+        }
+    }
+
+    fun onErrorRetryRequested(action: FolderRetryAction) {
+        when (action) {
+            FolderRetryAction.FolderAdd -> addFolder()
+            FolderRetryAction.FolderNameUpdate -> updateFolderName()
+            FolderRetryAction.FolderDelete -> deleteFolder()
         }
     }
 }

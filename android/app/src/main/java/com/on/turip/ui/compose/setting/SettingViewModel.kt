@@ -14,6 +14,7 @@ import com.on.turip.platform.device.AppEnvironmentInfoProvider
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
+import com.on.turip.ui.compose.setting.model.SettingRetryAction
 import com.on.turip.ui.compose.setting.model.SettingUiEffect
 import com.on.turip.ui.compose.setting.model.SettingUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -86,7 +87,7 @@ class SettingViewModel @Inject constructor(
                         }
                 }.onFailure { errorType: ErrorType ->
                     when (val uiError: UiError = errorType.toUiError()) {
-                        is UiError.Global -> handleGlobalError(uiError)
+                        is UiError.Global -> handleGlobalError(uiError, SettingRetryAction.LOGOUT)
                         is UiError.Feature -> Unit
                     }
                 }.onFailureWithCause { errorType: ErrorType, cause: Throwable? ->
@@ -116,7 +117,7 @@ class SettingViewModel @Inject constructor(
                         }
                 }.onFailure { errorType: ErrorType ->
                     when (val uiError: UiError = errorType.toUiError()) {
-                        is UiError.Global -> handleGlobalError(uiError)
+                        is UiError.Global -> handleGlobalError(uiError, SettingRetryAction.WITHDRAW)
                         is UiError.Feature -> Unit
                     }
                 }.onFailureWithCause { errorType: ErrorType, cause: Throwable? ->
@@ -125,11 +126,25 @@ class SettingViewModel @Inject constructor(
         }
     }
 
-    private suspend fun handleGlobalError(uiError: UiError.Global) {
+    private suspend fun handleGlobalError(
+        uiError: UiError.Global,
+        retryAction: SettingRetryAction,
+    ) {
         when (uiError) {
-            UiError.Global.Network -> _uiEffect.send(SettingUiEffect.ShowError(ErrorUiState.Network))
-            UiError.Global.Server -> _uiEffect.send(SettingUiEffect.ShowError(ErrorUiState.Server))
+            UiError.Global.Network ->
+                _uiEffect.send(SettingUiEffect.ShowError(ErrorUiState.Network, retryAction))
+
+            UiError.Global.Server ->
+                _uiEffect.send(SettingUiEffect.ShowError(ErrorUiState.Server, retryAction))
+
             UiError.Global.TokenExpired -> _uiEffect.send(SettingUiEffect.NavigateToLogin)
+        }
+    }
+
+    fun onErrorRetryRequested(action: SettingRetryAction) {
+        when (action) {
+            SettingRetryAction.LOGOUT -> onLogoutConfirm()
+            SettingRetryAction.WITHDRAW -> onWithdrawConfirm()
         }
     }
 }

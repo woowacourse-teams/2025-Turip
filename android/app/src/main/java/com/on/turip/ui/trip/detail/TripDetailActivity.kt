@@ -237,8 +237,11 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
                         uiEffect.errorUiState.toUiModel() ?: return@collectOnStarted
                     Snackbar
                         .make(binding.root, uiModel.titleRes, Snackbar.LENGTH_INDEFINITE)
-                        .apply { setAction(uiModel.retryTextRes) { uiEffect.onRetryClick() } }
-                        .show()
+                        .apply {
+                            setAction(uiModel.retryTextRes) {
+                                viewModel.onErrorRetryRequested(uiEffect.action)
+                            }
+                        }.show()
                 }
             }
         }

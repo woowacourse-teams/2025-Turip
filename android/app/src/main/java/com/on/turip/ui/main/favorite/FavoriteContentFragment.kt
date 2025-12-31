@@ -97,8 +97,11 @@ class FavoriteContentFragment : BaseFragment<FragmentFavoriteContentBinding>() {
                     view?.let { view: View ->
                         Snackbar
                             .make(view, uiModel.titleRes, Snackbar.LENGTH_INDEFINITE)
-                            .apply { setAction(uiModel.retryTextRes) { uiEffect.onRetryClick() } }
-                            .show()
+                            .apply {
+                                setAction(uiModel.retryTextRes) {
+                                    viewModel.onErrorRetryRequested(uiEffect.action)
+                                }
+                            }.show()
                     }
                 }
             }

@@ -17,6 +17,7 @@ import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.main.favorite.FavoritePlaceFolderCatalogFragment.Companion.FAVORITE_PLACE_FOLDER_CATALOG_ARGUMENTS_FOLDER_ID
 import com.on.turip.ui.main.favorite.FavoritePlaceFolderCatalogFragment.Companion.FAVORITE_PLACE_FOLDER_CATALOG_ARGUMENTS_FOLDER_NAME
 import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
+import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderCatalogRetryAction
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderCatalogUiEffect
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderCatalogUiState
 import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
@@ -65,8 +66,8 @@ class FavoritePlaceFolderCatalogViewModel @Inject constructor(
             favoritePlaceRepository
                 .loadFavoritePlaces(folderId)
                 .onSuccess { favoritePlaces: List<FavoritePlace> ->
-                    _uiState.update {
-                        it.copy(
+                    _uiState.update { originUiState: FavoritePlaceFolderCatalogUiState ->
+                        originUiState.copy(
                             places = favoritePlaces.map { it.toUiModel() },
                             folderName = folderName,
                         )
@@ -147,29 +148,29 @@ class FavoritePlaceFolderCatalogViewModel @Inject constructor(
         }
     }
 
-    private suspend fun handleGlobalError(uiError: UiError.Global) {
+    private suspend fun handleGlobalError(
+        uiError: UiError.Global,
+        retryAction: FavoritePlaceFolderCatalogRetryAction = FavoritePlaceFolderCatalogRetryAction.LoadPlacesInFolder,
+    ) {
         when (uiError) {
-            UiError.Global.Network -> {
+            UiError.Global.Network ->
                 _uiEffect.send(
-                    FavoritePlaceFolderCatalogUiEffect.ShowError(
-                        errorUiState = ErrorUiState.Network,
-                        onRetryClick = { loadPlacesInSelectFolder() },
-                    ),
+                    FavoritePlaceFolderCatalogUiEffect.ShowError(ErrorUiState.Network, retryAction)
                 )
-            }
 
-            UiError.Global.Server -> {
+            UiError.Global.Server ->
                 _uiEffect.send(
-                    FavoritePlaceFolderCatalogUiEffect.ShowError(
-                        errorUiState = ErrorUiState.Server,
-                        onRetryClick = { loadPlacesInSelectFolder() },
-                    ),
+                    FavoritePlaceFolderCatalogUiEffect.ShowError(ErrorUiState.Server, retryAction)
                 )
-            }
 
-            UiError.Global.TokenExpired -> {
-                _uiEffect.send(FavoritePlaceFolderCatalogUiEffect.NavigateToLogin)
-            }
+
+            UiError.Global.TokenExpired -> _uiEffect.send(FavoritePlaceFolderCatalogUiEffect.NavigateToLogin)
+        }
+    }
+
+    fun onErrorRetryRequested(action: FavoritePlaceFolderCatalogRetryAction) {
+        when (action) {
+            FavoritePlaceFolderCatalogRetryAction.LoadPlacesInFolder -> loadPlacesInSelectFolder()
         }
     }
 }

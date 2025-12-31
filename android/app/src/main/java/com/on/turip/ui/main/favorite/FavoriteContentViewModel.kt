@@ -11,6 +11,7 @@ import com.on.turip.domain.favorite.usecase.UpdateFavoriteUseCase
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
+import com.on.turip.ui.main.favorite.model.FavoriteContentRetryAction
 import com.on.turip.ui.main.favorite.model.FavoriteContentUiEffect
 import com.on.turip.ui.main.favorite.model.FavoriteContentUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -111,7 +112,10 @@ class FavoriteContentViewModel @Inject constructor(
                                 _uiEffect.send(
                                     FavoriteContentUiEffect.ShowError(
                                         errorUiState = ErrorUiState.Network,
-                                        onRetryClick = { updateFavorite(contentId, isFavorite) },
+                                        action = FavoriteContentRetryAction.UpdateFavorite(
+                                            contentId,
+                                            isFavorite
+                                        ),
                                     ),
                                 )
                             }
@@ -120,7 +124,10 @@ class FavoriteContentViewModel @Inject constructor(
                                 _uiEffect.send(
                                     FavoriteContentUiEffect.ShowError(
                                         errorUiState = ErrorUiState.Server,
-                                        onRetryClick = { updateFavorite(contentId, isFavorite) },
+                                        action = FavoriteContentRetryAction.UpdateFavorite(
+                                            contentId,
+                                            isFavorite
+                                        ),
                                     ),
                                 )
                             }
@@ -131,6 +138,13 @@ class FavoriteContentViewModel @Inject constructor(
                         }
                     }
                 }
+        }
+    }
+
+    fun onErrorRetryRequested(action: FavoriteContentRetryAction) {
+        when (action) {
+            is FavoriteContentRetryAction.UpdateFavorite ->
+                updateFavorite(action.contentId, action.isFavorite)
         }
     }
 }

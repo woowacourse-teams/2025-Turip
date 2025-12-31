@@ -20,6 +20,7 @@ import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
+import com.on.turip.ui.main.favorite.model.FavoritePlaceRetryAction
 import com.on.turip.ui.main.favorite.model.FavoritePlaceUiEffect
 import com.on.turip.ui.main.favorite.model.FavoritePlaceUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -128,7 +129,10 @@ class FavoritePlaceViewModel @Inject constructor(
                                 _uiEffect.send(
                                     FavoritePlaceUiEffect.ShowError(
                                         errorUiState = ErrorUiState.Network,
-                                        onRetryClick = { updateFavoritePlace(placeId, isFavorite) },
+                                        retryAction = FavoritePlaceRetryAction.UpdateFavoritePlace(
+                                            placeId,
+                                            isFavorite
+                                        )
                                     ),
                                 )
                             }
@@ -137,7 +141,10 @@ class FavoritePlaceViewModel @Inject constructor(
                                 _uiEffect.send(
                                     FavoritePlaceUiEffect.ShowError(
                                         errorUiState = ErrorUiState.Server,
-                                        onRetryClick = { updateFavoritePlace(placeId, isFavorite) },
+                                        retryAction = FavoritePlaceRetryAction.UpdateFavoritePlace(
+                                            placeId,
+                                            isFavorite
+                                        )
                                     ),
                                 )
                             }
@@ -248,6 +255,13 @@ class FavoritePlaceViewModel @Inject constructor(
                 _uiState.update { it.copy(isLoading = false) }
                 _uiEffect.send(FavoritePlaceUiEffect.NavigateToLogin)
             }
+        }
+    }
+
+    fun onErrorRetryRequested(action: FavoritePlaceRetryAction) {
+        when (action) {
+            is FavoritePlaceRetryAction.UpdateFavoritePlace ->
+                updateFavoritePlace(action.placeId, action.isFavorite)
         }
     }
 

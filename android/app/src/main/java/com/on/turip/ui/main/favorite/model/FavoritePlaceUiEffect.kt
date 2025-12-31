@@ -13,6 +13,13 @@ sealed interface FavoritePlaceUiEffect {
 
     data class ShowError(
         val errorUiState: ErrorUiState,
-        val onRetryClick: () -> Unit,
+        val retryAction: FavoritePlaceRetryAction,
     ) : FavoritePlaceUiEffect
+}
+
+sealed interface FavoritePlaceRetryAction {
+    data class UpdateFavoritePlace(
+        val placeId: Long,
+        val isFavorite: Boolean,
+    ) : FavoritePlaceRetryAction
 }

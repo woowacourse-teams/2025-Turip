@@ -11,6 +11,15 @@ sealed interface FavoritePlaceFolderUiEffect {
 
     data class ShowError(
         val errorUiState: ErrorUiState,
-        val onRetryClick: () -> Unit
+        val retryAction: FavoritePlaceFolderRetryAction,
     ) : FavoritePlaceFolderUiEffect
 }
+
+sealed interface FavoritePlaceFolderRetryAction {
+    data object LoadFavoriteFolders : FavoritePlaceFolderRetryAction
+    
+    data class UpdateFolder(
+        val favoritePlaceFolderModel: FavoritePlaceFolderModel
+    ) : FavoritePlaceFolderRetryAction
+}
+

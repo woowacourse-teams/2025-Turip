@@ -9,7 +9,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -56,7 +58,14 @@ fun SettingScreen(
 
                 is SettingUiEffect.ShowError -> {
                     val errorUiModel = uiEffect.errorUiState.toUiModel() ?: return@collect
-                    snackbarHostState.showSnackbar(context.getString(errorUiModel.titleRes))
+                    val result: SnackbarResult = snackbarHostState.showSnackbar(
+                        message = context.getString(errorUiModel.titleRes),
+                        actionLabel = context.getString(errorUiModel.retryTextRes),
+                        duration = SnackbarDuration.Indefinite
+                    )
+                    if (result == SnackbarResult.ActionPerformed) {
+                        viewModel.onErrorRetryRequested(uiEffect.retryAction)
+                    }
                 }
             }
         }

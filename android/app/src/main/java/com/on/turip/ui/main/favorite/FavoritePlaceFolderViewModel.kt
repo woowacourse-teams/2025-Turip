@@ -14,6 +14,7 @@ import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.main.favorite.FavoritePlaceFolderFragment.Companion.FAVORITE_PLACE_FOLDER_ARGUMENTS_PLACE_ID
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
+import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderRetryAction
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderUiEffect
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -60,32 +61,10 @@ class FavoritePlaceFolderViewModel @Inject constructor(
                     }
                     Timber.d("상세 페이지에서 장소에 대한 찜 폴더 현황 데이터 불러오기 성공 ")
                 }.onFailure { errorType: ErrorType ->
-                    val uiError: UiError = errorType.toUiError()
-                    if (uiError is UiError.Global) {
-                        when (uiError) {
-                            UiError.Global.Network -> {
-                                _uiEffect.send(
-                                    FavoritePlaceFolderUiEffect.ShowError(
-                                        errorUiState = ErrorUiState.Network,
-                                        onRetryClick = { loadFavoriteFoldersForPlace() },
-                                    ),
-                                )
-                            }
-
-                            UiError.Global.Server -> {
-                                _uiEffect.send(
-                                    FavoritePlaceFolderUiEffect.ShowError(
-                                        errorUiState = ErrorUiState.Server,
-                                        onRetryClick = { loadFavoriteFoldersForPlace() },
-                                    ),
-                                )
-                            }
-
-                            UiError.Global.TokenExpired -> {
-                                _uiEffect.send(FavoritePlaceFolderUiEffect.NavigateToLogin)
-                            }
-                        }
-                    }
+                    sendErrorEffect(
+                        errorType = errorType,
+                        retryAction = FavoritePlaceFolderRetryAction.LoadFavoriteFolders
+                    )
                     Timber.e("상세 페이지에서 장소에 대한 찜 폴더 현황 데이터 불러오기 실패")
                 }
         }
@@ -110,37 +89,47 @@ class FavoritePlaceFolderViewModel @Inject constructor(
                         )
                     }
                     _uiEffect.send(
-                        FavoritePlaceFolderUiEffect.ShowUpdateFavoriteState(favoritePlaceFolderModel),
+                        FavoritePlaceFolderUiEffect.ShowUpdateFavoriteState(favoritePlaceFolderModel)
                     )
                 }.onFailure { errorType: ErrorType ->
-                    val uiError: UiError = errorType.toUiError()
-                    if (uiError is UiError.Global) {
-                        when (uiError) {
-                            UiError.Global.Network -> {
-                                _uiEffect.send(
-                                    FavoritePlaceFolderUiEffect.ShowError(
-                                        errorUiState = ErrorUiState.Network,
-                                        onRetryClick = { updateFolder(favoritePlaceFolderModel) },
-                                    ),
-                                )
-                            }
-
-                            UiError.Global.Server -> {
-                                _uiEffect.send(
-                                    FavoritePlaceFolderUiEffect.ShowError(
-                                        errorUiState = ErrorUiState.Server,
-                                        onRetryClick = { updateFolder(favoritePlaceFolderModel) },
-                                    ),
-                                )
-                            }
-
-                            UiError.Global.TokenExpired -> {
-                                _uiEffect.send(FavoritePlaceFolderUiEffect.NavigateToLogin)
-                            }
-                        }
-                    }
+                    sendErrorEffect(
+                        errorType = errorType,
+                        retryAction =
+                            FavoritePlaceFolderRetryAction.UpdateFolder(favoritePlaceFolderModel)
+                    )
                     Timber.e("장소에 대한 찜 폴더들 현황에서 장소 찜 실패")
                 }
+        }
+    }
+
+    private suspend fun sendErrorEffect(
+        errorType: ErrorType,
+        retryAction: FavoritePlaceFolderRetryAction,
+    ) {
+        val uiError: UiError = errorType.toUiError()
+        if (uiError is UiError.Global) {
+            when (uiError) {
+                UiError.Global.Network ->
+                    _uiEffect.send(
+                        FavoritePlaceFolderUiEffect.ShowError(ErrorUiState.Network, retryAction),
+                    )
+
+
+                UiError.Global.Server ->
+                    _uiEffect.send(
+                        FavoritePlaceFolderUiEffect.ShowError(ErrorUiState.Server, retryAction)
+                    )
+
+
+                UiError.Global.TokenExpired -> _uiEffect.send(FavoritePlaceFolderUiEffect.NavigateToLogin)
+            }
+        }
+    }
+
+    fun onErrorRetryRequested(action: FavoritePlaceFolderRetryAction) {
+        when (action) {
+            FavoritePlaceFolderRetryAction.LoadFavoriteFolders -> loadFavoriteFoldersForPlace()
+            is FavoritePlaceFolderRetryAction.UpdateFolder -> updateFolder(action.favoritePlaceFolderModel)
         }
     }
 }

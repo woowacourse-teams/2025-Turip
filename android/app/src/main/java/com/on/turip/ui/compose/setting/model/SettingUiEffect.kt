@@ -7,6 +7,12 @@ sealed interface SettingUiEffect {
 
     data class ShowError(
         val errorUiState: ErrorUiState,
-        val onRetryClick: () -> Unit,
+        val retryAction: SettingRetryAction,
     ) : SettingUiEffect
+}
+
+
+enum class SettingRetryAction {
+    LOGOUT,
+    WITHDRAW
 }
