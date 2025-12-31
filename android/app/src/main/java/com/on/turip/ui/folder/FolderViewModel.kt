@@ -2,14 +2,14 @@ package com.on.turip.ui.folder
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.on.turip.data.common.ErrorType
-import com.on.turip.data.common.ErrorUiState
-import com.on.turip.data.common.UiError
-import com.on.turip.data.common.onFailure
-import com.on.turip.data.common.onSuccess
-import com.on.turip.data.common.toUiError
+import com.on.turip.core.result.ErrorType
+import com.on.turip.data.result.onFailure
+import com.on.turip.data.result.onSuccess
 import com.on.turip.domain.folder.Folder
 import com.on.turip.domain.folder.repository.FolderRepository
+import com.on.turip.ui.common.error.ErrorUiState
+import com.on.turip.ui.common.error.UiError
+import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.common.mapper.toEditUiModel
 import com.on.turip.ui.folder.model.FolderEditModel
 import com.on.turip.ui.folder.model.FolderNameStatusModel

@@ -20,9 +20,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.on.turip.R
-import com.on.turip.data.common.ErrorUiModel
-import com.on.turip.data.common.ErrorUiState
-import com.on.turip.data.common.toUiModel
+import com.on.turip.ui.common.error.ErrorUiModel
+import com.on.turip.ui.common.error.ErrorUiState
+import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.compose.theme.TuripTypography
 
 @Composable

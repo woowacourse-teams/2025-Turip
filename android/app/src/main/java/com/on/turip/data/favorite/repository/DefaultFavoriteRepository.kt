@@ -1,7 +1,7 @@
 package com.on.turip.data.favorite.repository
 
-import com.on.turip.data.common.TuripCustomResult
-import com.on.turip.data.common.mapCatching
+import com.on.turip.core.result.TuripResult
+import com.on.turip.data.result.mapCatching
 import com.on.turip.data.favorite.datasource.FavoriteRemoteDataSource
 import com.on.turip.data.favorite.toDomain
 import com.on.turip.data.favorite.toRequestDto
@@ -12,17 +12,18 @@ import javax.inject.Inject
 class DefaultFavoriteRepository @Inject constructor(
     private val favoriteRemoteDataSource: FavoriteRemoteDataSource,
 ) : FavoriteRepository {
-    override suspend fun createFavorite(contentId: Long): TuripCustomResult<Unit> =
+    override suspend fun createFavorite(contentId: Long): TuripResult<Unit> =
         favoriteRemoteDataSource.postFavorite(
             contentId.toRequestDto(),
         )
 
-    override suspend fun deleteFavorite(contentId: Long): TuripCustomResult<Unit> = favoriteRemoteDataSource.deleteFavorite(contentId)
+    override suspend fun deleteFavorite(contentId: Long): TuripResult<Unit> =
+        favoriteRemoteDataSource.deleteFavorite(contentId)
 
     override suspend fun loadFavoriteContents(
         size: Int,
         lastId: Long,
-    ): TuripCustomResult<PagedFavoriteContents> =
+    ): TuripResult<PagedFavoriteContents> =
         favoriteRemoteDataSource
             .getFavoriteContents(
                 size,

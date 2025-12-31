@@ -3,13 +3,13 @@ package com.on.turip.ui.search.regionresult
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.on.turip.data.common.ErrorUiState
-import com.on.turip.data.common.TuripCustomResult
-import com.on.turip.data.common.UiError
-import com.on.turip.data.common.toUiError
+import com.on.turip.core.result.TuripResult
 import com.on.turip.domain.content.PagedContentsResult
 import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.content.video.VideoInformation
+import com.on.turip.ui.common.error.ErrorUiState
+import com.on.turip.ui.common.error.UiError
+import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.search.model.VideoInformationModel
 import com.on.turip.ui.search.regionresult.RegionResultActivity.Companion.REGION_RESULT_REGION_CATEGORY_NAME_KEY
@@ -53,7 +53,7 @@ class RegionResultViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { RegionResultUiState.Loading }
 
-            val pagedContentsDeferred: Deferred<TuripCustomResult<PagedContentsResult>> =
+            val pagedContentsDeferred: Deferred<TuripResult<PagedContentsResult>> =
                 async {
                     contentRepository.loadContentsByRegion(
                         regionCategoryName = regionCategoryName,
@@ -61,16 +61,16 @@ class RegionResultViewModel @Inject constructor(
                         lastId = 0L,
                     )
                 }
-            val contentsSizeDeferred: Deferred<TuripCustomResult<Int>> =
+            val contentsSizeDeferred: Deferred<TuripResult<Int>> =
                 async { contentRepository.loadContentsSizeByRegion(regionCategoryName) }
 
-            val contentsResult: TuripCustomResult<PagedContentsResult> =
+            val contentsResult: TuripResult<PagedContentsResult> =
                 pagedContentsDeferred.await()
-            val countResult: TuripCustomResult<Int> = contentsSizeDeferred.await()
+            val countResult: TuripResult<Int> = contentsSizeDeferred.await()
 
-            val failure: TuripCustomResult.Failure? =
+            val failure: TuripResult.Failure? =
                 listOf(countResult, contentsResult)
-                    .filterIsInstance<TuripCustomResult.Failure>()
+                    .filterIsInstance<TuripResult.Failure>()
                     .firstOrNull()
 
             if (failure != null) {
@@ -78,9 +78,9 @@ class RegionResultViewModel @Inject constructor(
                 return@launch
             }
 
-            val count: Int = (countResult as TuripCustomResult.Success).value
+            val count: Int = (countResult as TuripResult.Success).value
             val videosInformation: List<VideoInformationModel> =
-                (contentsResult as TuripCustomResult.Success).value.videos.map { videoInformation: VideoInformation ->
+                (contentsResult as TuripResult.Success).value.videos.map { videoInformation: VideoInformation ->
                     videoInformation.toUiModel()
                 }
 
@@ -100,7 +100,7 @@ class RegionResultViewModel @Inject constructor(
         }
     }
 
-    private suspend fun handleError(failure: TuripCustomResult.Failure) {
+    private suspend fun handleError(failure: TuripResult.Failure) {
         val uiError: UiError = failure.errorType.toUiError()
         if (uiError is UiError.Global) {
             when (uiError) {

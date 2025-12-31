@@ -2,18 +2,18 @@ package com.on.turip.ui.compose.setting
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.on.turip.data.common.ErrorType
-import com.on.turip.data.common.ErrorUiState
-import com.on.turip.data.common.UiError
-import com.on.turip.data.common.onFailure
-import com.on.turip.data.common.onFailureWithCause
-import com.on.turip.data.common.onSuccess
-import com.on.turip.data.common.toUiError
+import com.on.turip.core.result.ErrorType
+import com.on.turip.data.result.onFailure
+import com.on.turip.data.result.onFailureWithCause
+import com.on.turip.data.result.onSuccess
 import com.on.turip.domain.login.MemberRepository
 import com.on.turip.domain.setting.InquiryMail
 import com.on.turip.domain.setting.PrivacyPolicy
 import com.on.turip.domain.userstorage.repository.UserStorageRepository
 import com.on.turip.platform.device.AppEnvironmentInfoProvider
+import com.on.turip.ui.common.error.ErrorUiState
+import com.on.turip.ui.common.error.UiError
+import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.compose.setting.model.SettingUiEffect
 import com.on.turip.ui.compose.setting.model.SettingUiState
 import dagger.hilt.android.lifecycle.HiltViewModel

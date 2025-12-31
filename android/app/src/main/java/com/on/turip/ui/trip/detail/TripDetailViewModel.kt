@@ -3,19 +3,19 @@ package com.on.turip.ui.trip.detail
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.on.turip.data.common.ErrorType
-import com.on.turip.data.common.ErrorUiState
-import com.on.turip.data.common.TuripCustomResult
-import com.on.turip.data.common.UiError
-import com.on.turip.data.common.onFailure
-import com.on.turip.data.common.onSuccess
-import com.on.turip.data.common.toUiError
+import com.on.turip.core.result.ErrorType
+import com.on.turip.core.result.TuripResult
+import com.on.turip.data.result.onFailure
+import com.on.turip.data.result.onSuccess
 import com.on.turip.domain.content.Content
 import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.favorite.usecase.UpdateFavoriteUseCase
 import com.on.turip.domain.trip.ContentPlace
 import com.on.turip.domain.trip.Trip
 import com.on.turip.domain.trip.repository.ContentPlaceRepository
+import com.on.turip.ui.common.error.ErrorUiState
+import com.on.turip.ui.common.error.UiError
+import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.trip.detail.TripDetailActivity.Companion.TRIP_DETAIL_CONTENT_KEY
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -70,12 +70,12 @@ class TripDetailViewModel @Inject constructor(
             val contentDeferred = async { contentRepository.loadContent(contentId) }
             val tripInfoDeferred = async { contentPlaceRepository.loadTripInfo(contentId) }
 
-            val contentResult: TuripCustomResult<Content> = contentDeferred.await()
-            val tripInfoResult: TuripCustomResult<Trip> = tripInfoDeferred.await()
+            val contentResult: TuripResult<Content> = contentDeferred.await()
+            val tripInfoResult: TuripResult<Trip> = tripInfoDeferred.await()
 
-            val failure: TuripCustomResult.Failure? =
+            val failure: TuripResult.Failure? =
                 listOf(contentResult, tripInfoResult)
-                    .filterIsInstance<TuripCustomResult.Failure>()
+                    .filterIsInstance<TuripResult.Failure>()
                     .firstOrNull()
 
             if (failure != null) {
@@ -83,8 +83,8 @@ class TripDetailViewModel @Inject constructor(
                 return@launch
             }
 
-            val content: Content = (contentResult as TuripCustomResult.Success).value
-            val trip: Trip = (tripInfoResult as TuripCustomResult.Success).value
+            val content: Content = (contentResult as TuripResult.Success).value
+            val trip: Trip = (tripInfoResult as TuripResult.Success).value
 
             setupCached(trip)
 
@@ -222,7 +222,7 @@ class TripDetailViewModel @Inject constructor(
         videoLoaded = isLoaded
     }
 
-    private suspend fun handleError(failure: TuripCustomResult.Failure) {
+    private suspend fun handleError(failure: TuripResult.Failure) {
         val uiError: UiError = failure.errorType.toUiError()
         if (uiError is UiError.Global) {
             when (uiError) {

@@ -2,15 +2,15 @@ package com.on.turip.ui.main.favorite
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.on.turip.data.common.ErrorType
-import com.on.turip.data.common.ErrorUiState
-import com.on.turip.data.common.UiError
-import com.on.turip.data.common.onFailure
-import com.on.turip.data.common.onSuccess
-import com.on.turip.data.common.toUiError
+import com.on.turip.core.result.ErrorType
+import com.on.turip.data.result.onFailure
+import com.on.turip.data.result.onSuccess
 import com.on.turip.domain.favorite.PagedFavoriteContents
 import com.on.turip.domain.favorite.repository.FavoriteRepository
 import com.on.turip.domain.favorite.usecase.UpdateFavoriteUseCase
+import com.on.turip.ui.common.error.ErrorUiState
+import com.on.turip.ui.common.error.UiError
+import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.main.favorite.model.FavoriteContentUiEffect
 import com.on.turip.ui.main.favorite.model.FavoriteContentUiState
 import dagger.hilt.android.lifecycle.HiltViewModel

@@ -1,4 +1,4 @@
-package com.on.turip.data.common
+package com.on.turip.ui.common.error
 
 import androidx.compose.runtime.Immutable
 

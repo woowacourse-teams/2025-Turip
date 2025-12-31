@@ -12,11 +12,11 @@ import android.view.inputmethod.InputMethodManager
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.snackbar.Snackbar
-import com.on.turip.data.common.ErrorUiModel
-import com.on.turip.data.common.toUiModel
 import com.on.turip.databinding.BottomSheetFragmentFolderModifyBinding
 import com.on.turip.ui.common.base.BaseBottomSheetFragment
 import com.on.turip.ui.common.collectOnStarted
+import com.on.turip.ui.common.error.ErrorUiModel
+import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.folder.model.FolderNameStatusModel
 import com.on.turip.ui.folder.model.FolderUiEffect
 import com.on.turip.ui.login.LoginActivity

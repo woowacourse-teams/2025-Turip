@@ -1,6 +1,6 @@
 package com.on.turip.ui.folder.model
 
-import com.on.turip.data.common.ErrorUiState
+import com.on.turip.ui.common.error.ErrorUiState
 
 sealed interface FolderUiEffect {
     data object NavigateToLogin : FolderUiEffect

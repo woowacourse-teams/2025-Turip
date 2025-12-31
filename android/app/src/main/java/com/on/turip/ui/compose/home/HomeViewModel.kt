@@ -2,17 +2,17 @@ package com.on.turip.ui.compose.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.on.turip.data.common.ErrorType
-import com.on.turip.data.common.ErrorUiState
-import com.on.turip.data.common.TuripCustomResult
-import com.on.turip.data.common.UiError
-import com.on.turip.data.common.onFailure
-import com.on.turip.data.common.onSuccess
-import com.on.turip.data.common.toUiError
+import com.on.turip.core.result.ErrorType
+import com.on.turip.core.result.TuripResult
+import com.on.turip.data.result.onFailure
+import com.on.turip.data.result.onSuccess
 import com.on.turip.domain.content.UsersLikeContent
 import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.region.RegionCategory
 import com.on.turip.domain.region.repository.RegionRepository
+import com.on.turip.ui.common.error.ErrorUiState
+import com.on.turip.ui.common.error.UiError
+import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.common.mapper.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -53,9 +53,9 @@ class HomeViewModel @Inject constructor(
             val usersLikeContentsResult = usersLikeContentsDeferred.await()
             val regionCategoriesResult = regionCategoriesDeferred.await()
 
-            val failure: TuripCustomResult.Failure? =
+            val failure: TuripResult.Failure? =
                 listOf(usersLikeContentsResult, regionCategoriesResult)
-                    .filterIsInstance<TuripCustomResult.Failure>()
+                    .filterIsInstance<TuripResult.Failure>()
                     .firstOrNull()
 
             if (failure != null) {
@@ -64,9 +64,9 @@ class HomeViewModel @Inject constructor(
             }
 
             val usersLikeContents: List<UsersLikeContent> =
-                (usersLikeContentsResult as TuripCustomResult.Success).value
+                (usersLikeContentsResult as TuripResult.Success).value
             val regionCategories: List<RegionCategory> =
-                (regionCategoriesResult as TuripCustomResult.Success).value
+                (regionCategoriesResult as TuripResult.Success).value
 
             _uiState.update { state: HomeUiState ->
                 state.copy(

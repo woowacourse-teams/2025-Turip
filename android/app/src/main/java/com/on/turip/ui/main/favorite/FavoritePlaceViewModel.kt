@@ -4,18 +4,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.on.turip.common.AuthState
 import com.on.turip.common.UserType
-import com.on.turip.data.common.ErrorType
-import com.on.turip.data.common.ErrorUiState
-import com.on.turip.data.common.TuripCustomResult
-import com.on.turip.data.common.UiError
-import com.on.turip.data.common.onFailure
-import com.on.turip.data.common.onSuccess
-import com.on.turip.data.common.toUiError
+import com.on.turip.core.result.ErrorType
+import com.on.turip.core.result.TuripResult
+import com.on.turip.data.result.onFailure
+import com.on.turip.data.result.onSuccess
 import com.on.turip.domain.favorite.FavoritePlace
 import com.on.turip.domain.favorite.repository.FavoritePlaceRepository
 import com.on.turip.domain.favorite.usecase.UpdateFavoritePlaceUseCase
 import com.on.turip.domain.folder.Folder
 import com.on.turip.domain.folder.repository.FolderRepository
+import com.on.turip.ui.common.error.ErrorUiState
+import com.on.turip.ui.common.error.UiError
+import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
@@ -62,10 +62,10 @@ class FavoritePlaceViewModel @Inject constructor(
                         folders.map { folder: Folder -> folder.toUiModel(selectFolderId = selectedFolderId) }
 
                     when (
-                        val result: TuripCustomResult<List<FavoritePlace>> =
+                        val result: TuripResult<List<FavoritePlace>> =
                             favoritePlaceRepository.loadFavoritePlaces(selectedFolderId)
                     ) {
-                        is TuripCustomResult.Success -> {
+                        is TuripResult.Success -> {
                             _uiState.update {
                                 it.copy(
                                     isLoading = false,
@@ -77,7 +77,7 @@ class FavoritePlaceViewModel @Inject constructor(
                             }
                         }
 
-                        is TuripCustomResult.Failure -> {
+                        is TuripResult.Failure -> {
                             when (val uiError: UiError = result.errorType.toUiError()) {
                                 is UiError.Global -> handleGlobalError(uiError)
                                 is UiError.Feature -> Unit

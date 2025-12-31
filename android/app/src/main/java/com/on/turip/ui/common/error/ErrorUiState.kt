@@ -1,10 +1,9 @@
-package com.on.turip.data.common
+package com.on.turip.ui.common.error
 
 import androidx.compose.runtime.Immutable
 import com.on.turip.R
 
 /**
- * presentation/ui layer
  * 모든 ViewModel 에서 동시에 발생할 수 없는 에러 상태인 ServerError, NetworkError를 관리하는 UiState
  */
 @Immutable

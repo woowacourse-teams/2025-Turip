@@ -1,6 +1,6 @@
 package com.on.turip.ui.trip.detail
 
-import com.on.turip.data.common.ErrorUiState
+import com.on.turip.ui.common.error.ErrorUiState
 
 sealed interface TripDetailUiEffect {
     data object NavigateToLogin : TripDetailUiEffect

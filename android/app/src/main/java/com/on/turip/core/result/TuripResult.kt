@@ -1,12 +1,12 @@
-package com.on.turip.data.common
+package com.on.turip.core.result
 
-sealed class TuripCustomResult<out T> {
+sealed class TuripResult<out T> {
     data class Success<out T>(
         val value: T,
-    ) : TuripCustomResult<T>()
+    ) : TuripResult<T>()
 
     data class Failure(
         val errorType: ErrorType,
         val cause: Throwable? = null,
-    ) : TuripCustomResult<Nothing>()
+    ) : TuripResult<Nothing>()
 }

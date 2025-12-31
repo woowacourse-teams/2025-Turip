@@ -1,6 +1,6 @@
 package com.on.turip.domain.favorite.usecase
 
-import com.on.turip.data.common.TuripCustomResult
+import com.on.turip.core.result.TuripResult
 import com.on.turip.domain.favorite.repository.FavoriteRepository
 import javax.inject.Inject
 
@@ -10,7 +10,7 @@ class UpdateFavoriteUseCase @Inject constructor(
     suspend operator fun invoke(
         isFavorite: Boolean,
         contentId: Long,
-    ): TuripCustomResult<Unit> =
+    ): TuripResult<Unit> =
         if (isFavorite) {
             favoriteRepository.createFavorite(contentId)
         } else {

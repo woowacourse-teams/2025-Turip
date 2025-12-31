@@ -1,11 +1,11 @@
 package com.on.turip.domain.favorite.usecase
 
-import com.on.turip.data.common.TuripCustomResult
-import com.on.turip.data.common.onFailure
-import com.on.turip.data.common.onSuccess
+import com.on.turip.core.result.TuripResult
+import com.on.turip.data.result.onFailure
+import com.on.turip.data.result.onSuccess
 import com.on.turip.domain.favorite.repository.FavoritePlaceRepository
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 class UpdateFavoritePlaceUseCase @Inject constructor(
     private val favoritePlaceRepository: FavoritePlaceRepository,
@@ -14,7 +14,7 @@ class UpdateFavoritePlaceUseCase @Inject constructor(
         favoriteFolderId: Long,
         placeId: Long,
         isFavorite: Boolean,
-    ): TuripCustomResult<Unit> =
+    ): TuripResult<Unit> =
         if (isFavorite) {
             favoritePlaceRepository
                 .createFavoritePlace(favoriteFolderId, placeId)

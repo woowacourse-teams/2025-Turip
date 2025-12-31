@@ -16,13 +16,13 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.google.android.material.snackbar.Snackbar
 import com.on.turip.R
-import com.on.turip.data.common.ErrorUiModel
-import com.on.turip.data.common.ErrorUiState
-import com.on.turip.data.common.toUiModel
 import com.on.turip.databinding.ActivityTripDetailBinding
 import com.on.turip.ui.common.TuripSnackbar
 import com.on.turip.ui.common.base.BaseActivity
 import com.on.turip.ui.common.collectOnStarted
+import com.on.turip.ui.common.error.ErrorUiModel
+import com.on.turip.ui.common.error.ErrorUiState
+import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.common.loadCircularImage
 import com.on.turip.ui.common.model.trip.toDisplayText
 import com.on.turip.ui.login.LoginActivity

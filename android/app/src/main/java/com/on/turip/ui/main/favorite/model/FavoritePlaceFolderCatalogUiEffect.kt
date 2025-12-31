@@ -1,6 +1,6 @@
 package com.on.turip.ui.main.favorite.model
 
-import com.on.turip.data.common.ErrorUiState
+import com.on.turip.ui.common.error.ErrorUiState
 
 sealed interface FavoritePlaceFolderCatalogUiEffect {
     data object NavigateToLogin : FavoritePlaceFolderCatalogUiEffect

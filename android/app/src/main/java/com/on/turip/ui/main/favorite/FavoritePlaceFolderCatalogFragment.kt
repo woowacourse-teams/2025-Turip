@@ -11,12 +11,12 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.on.turip.R
-import com.on.turip.data.common.ErrorUiModel
-import com.on.turip.data.common.toUiModel
 import com.on.turip.databinding.BottomSheetFragmentFavoritePlaceFolderCatalogBinding
 import com.on.turip.ui.common.TuripDialogFragment
 import com.on.turip.ui.common.base.BaseFragment
 import com.on.turip.ui.common.collectOnStarted
+import com.on.turip.ui.common.error.ErrorUiModel
+import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.login.LoginActivity
 import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderCatalogUiEffect

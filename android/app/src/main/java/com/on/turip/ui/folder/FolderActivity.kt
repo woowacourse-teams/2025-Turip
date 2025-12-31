@@ -5,10 +5,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
-import com.on.turip.data.common.ErrorUiState
 import com.on.turip.databinding.ActivityFolderBinding
 import com.on.turip.ui.common.base.BaseActivity
 import com.on.turip.ui.common.collectOnStarted
+import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.folder.model.FolderUiState
 import dagger.hilt.android.AndroidEntryPoint
 

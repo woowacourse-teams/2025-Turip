@@ -5,8 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.on.turip.common.AuthState
 import com.on.turip.common.UserType
-import com.on.turip.data.common.onFailure
-import com.on.turip.data.common.onSuccess
+import com.on.turip.data.result.onFailure
+import com.on.turip.data.result.onSuccess
 import com.on.turip.data.login.datasource.GoogleCredentialManager
 import com.on.turip.domain.login.MemberRepository
 import com.on.turip.domain.login.usecase.LoginUserUseCase

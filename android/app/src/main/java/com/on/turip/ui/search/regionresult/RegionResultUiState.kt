@@ -1,6 +1,6 @@
 package com.on.turip.ui.search.regionresult
 
-import com.on.turip.data.common.ErrorUiState
+import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.search.model.VideoInformationModel
 
 sealed interface RegionResultUiState {

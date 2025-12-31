@@ -19,11 +19,11 @@ import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.on.turip.R
-import com.on.turip.data.common.ErrorUiState
 import com.on.turip.databinding.ActivitySearchBinding
 import com.on.turip.domain.searchhistory.SearchHistory
 import com.on.turip.ui.common.base.BaseActivity
 import com.on.turip.ui.common.collectOnStarted
+import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.login.LoginActivity
 import com.on.turip.ui.trip.detail.TripDetailActivity
 import dagger.hilt.android.AndroidEntryPoint

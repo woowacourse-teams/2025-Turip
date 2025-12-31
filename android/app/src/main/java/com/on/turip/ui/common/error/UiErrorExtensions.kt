@@ -1,11 +1,12 @@
-package com.on.turip.data.common
+package com.on.turip.ui.common.error
 
-import com.on.turip.data.common.ErrorType.Auth
-import com.on.turip.data.common.ErrorType.Content
-import com.on.turip.data.common.ErrorType.Creator
-import com.on.turip.data.common.ErrorType.FavoriteFolder
-import com.on.turip.data.common.ErrorType.FavoritePlace
-import com.on.turip.data.common.ErrorType.Place
+import com.on.turip.core.result.ErrorType
+import com.on.turip.core.result.ErrorType.Auth
+import com.on.turip.core.result.ErrorType.Content
+import com.on.turip.core.result.ErrorType.Creator
+import com.on.turip.core.result.ErrorType.FavoriteFolder
+import com.on.turip.core.result.ErrorType.FavoritePlace
+import com.on.turip.core.result.ErrorType.Place
 
 fun ErrorType.toUiError(): UiError =
     when (this) {
@@ -18,17 +19,17 @@ fun ErrorType.toUiError(): UiError =
         Place.NotFound,
         FavoritePlace.NotFound,
         FavoriteFolder.NotFound,
-        -> UiError.Feature.NotFound
+            -> UiError.Feature.NotFound
 
         FavoriteFolder.DuplicatedName,
         FavoritePlace.DuplicatePlaceInFolder,
         ErrorType.FavoriteContent.DuplicateContent,
-        -> UiError.Feature.Duplicated
+            -> UiError.Feature.Duplicated
 
         FavoriteFolder.BlankName,
         FavoriteFolder.ExceededName,
         FavoriteFolder.DefaultFolderRenameNotAllowed,
-        -> UiError.Feature.InValid
+            -> UiError.Feature.InValid
 
         ErrorType.Network -> UiError.Global.Network
 

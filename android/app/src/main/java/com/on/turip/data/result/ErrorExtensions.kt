@@ -1,8 +1,7 @@
-package com.on.turip.data.common
+package com.on.turip.data.result
 
-/**
- * data layer
- */
+import com.on.turip.core.result.ErrorType
+
 fun ErrorResponse?.toErrorType(): ErrorType {
     if (this == null) return ErrorType.Unknown
     return this.tag.trim().toErrorType()

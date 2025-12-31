@@ -8,10 +8,10 @@ import android.view.View
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import com.on.turip.R
-import com.on.turip.data.common.ErrorUiState
 import com.on.turip.databinding.ActivityRegionResultBinding
 import com.on.turip.ui.common.base.BaseActivity
 import com.on.turip.ui.common.collectOnStarted
+import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.login.LoginActivity
 import com.on.turip.ui.trip.detail.TripDetailActivity
 import dagger.hilt.android.AndroidEntryPoint

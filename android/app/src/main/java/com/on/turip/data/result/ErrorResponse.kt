@@ -1,11 +1,8 @@
-package com.on.turip.data.common
+package com.on.turip.data.result
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-/**
- * data layer
- */
 @Serializable
 data class ErrorResponse(
     @SerialName("tag")

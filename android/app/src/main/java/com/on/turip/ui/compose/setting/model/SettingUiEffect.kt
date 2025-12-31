@@ -1,6 +1,6 @@
 package com.on.turip.ui.compose.setting.model
 
-import com.on.turip.data.common.ErrorUiState
+import com.on.turip.ui.common.error.ErrorUiState
 
 sealed interface SettingUiEffect {
     data object NavigateToLogin : SettingUiEffect

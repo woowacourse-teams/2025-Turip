@@ -5,15 +5,15 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.on.turip.data.common.ErrorUiState
-import com.on.turip.data.common.TuripCustomResult
-import com.on.turip.data.common.UiError
-import com.on.turip.data.common.toUiError
+import com.on.turip.core.result.TuripResult
 import com.on.turip.domain.content.PagedContentsResult
 import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.content.video.VideoInformation
 import com.on.turip.domain.searchhistory.SearchHistory
 import com.on.turip.domain.searchhistory.SearchHistoryRepository
+import com.on.turip.ui.common.error.ErrorUiState
+import com.on.turip.ui.common.error.UiError
+import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.search.keywordresult.SearchActivity.Companion.SEARCH_KEYWORD_KEY
 import com.on.turip.ui.search.model.VideoInformationModel
@@ -83,10 +83,10 @@ class SearchViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { SearchUiState.Loading }
 
-            val searchResultCountDeferred: Deferred<TuripCustomResult<Int>> =
+            val searchResultCountDeferred: Deferred<TuripResult<Int>> =
                 async { contentRepository.loadContentsSizeByKeyword(searchingKeyword) }
 
-            val pagedContentsDeferred: Deferred<TuripCustomResult<PagedContentsResult>> =
+            val pagedContentsDeferred: Deferred<TuripResult<PagedContentsResult>> =
                 async {
                     contentRepository.loadContentsByKeyword(
                         keyword = searchingKeyword,
@@ -95,13 +95,13 @@ class SearchViewModel @Inject constructor(
                     )
                 }
 
-            val countResult: TuripCustomResult<Int> = searchResultCountDeferred.await()
-            val contentsResult: TuripCustomResult<PagedContentsResult> =
+            val countResult: TuripResult<Int> = searchResultCountDeferred.await()
+            val contentsResult: TuripResult<PagedContentsResult> =
                 pagedContentsDeferred.await()
 
-            val failure: TuripCustomResult.Failure? =
+            val failure: TuripResult.Failure? =
                 listOf(countResult, contentsResult)
-                    .filterIsInstance<TuripCustomResult.Failure>()
+                    .filterIsInstance<TuripResult.Failure>()
                     .firstOrNull()
 
             if (failure != null) {
@@ -109,9 +109,9 @@ class SearchViewModel @Inject constructor(
                 return@launch
             }
 
-            val count: Int = (countResult as TuripCustomResult.Success).value
+            val count: Int = (countResult as TuripResult.Success).value
             val videosInformation: List<VideoInformationModel> =
-                (contentsResult as TuripCustomResult.Success).value.videos.map { videoInformation: VideoInformation ->
+                (contentsResult as TuripResult.Success).value.videos.map { videoInformation: VideoInformation ->
                     videoInformation.toUiModel()
                 }
 
@@ -170,7 +170,7 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-    private suspend fun handleError(failure: TuripCustomResult.Failure) {
+    private suspend fun handleError(failure: TuripResult.Failure) {
         val uiError: UiError = failure.errorType.toUiError()
         if (uiError is UiError.Global) {
             when (uiError) {

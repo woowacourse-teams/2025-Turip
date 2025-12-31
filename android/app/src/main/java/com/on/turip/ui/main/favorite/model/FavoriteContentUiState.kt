@@ -1,7 +1,7 @@
 package com.on.turip.ui.main.favorite.model
 
-import com.on.turip.data.common.ErrorUiState
 import com.on.turip.domain.favorite.FavoriteContent
+import com.on.turip.ui.common.error.ErrorUiState
 
 data class FavoriteContentUiState(
     val isLoading: Boolean,

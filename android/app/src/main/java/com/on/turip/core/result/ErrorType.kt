@@ -1,8 +1,5 @@
-package com.on.turip.data.common
+package com.on.turip.core.result
 
-/**
- * domain layer
- */
 sealed interface ErrorType {
     /**
      * 401, 403
