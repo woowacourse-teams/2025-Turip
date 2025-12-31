@@ -4,7 +4,7 @@ import com.on.turip.core.result.ErrorType
 
 fun ErrorResponse?.toErrorType(): ErrorType {
     if (this == null) return ErrorType.Unknown
-    return this.tag.trim().toErrorType()
+    return tag.trim().toErrorType()
 }
 
 /**
