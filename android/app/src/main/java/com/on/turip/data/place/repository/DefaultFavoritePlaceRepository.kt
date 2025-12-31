@@ -1,10 +1,10 @@
 package com.on.turip.data.place.repository
 
 import com.on.turip.core.result.TuripResult
-import com.on.turip.data.result.mapCatching
 import com.on.turip.data.place.datasource.FavoritePlaceRemoteDataSource
 import com.on.turip.data.place.dto.FavoritePlaceOrderRequest
 import com.on.turip.data.place.toDomain
+import com.on.turip.data.result.mapCatching
 import com.on.turip.domain.favorite.FavoritePlace
 import com.on.turip.domain.favorite.repository.FavoritePlaceRepository
 import javax.inject.Inject

@@ -1,10 +1,10 @@
 package com.on.turip.data.place.datasource
 
 import com.on.turip.core.result.TuripResult
-import com.on.turip.data.result.safeApiCall
 import com.on.turip.data.place.dto.FavoritePlaceOrderRequest
 import com.on.turip.data.place.dto.FavoritePlacesResponse
 import com.on.turip.data.place.service.PlaceService
+import com.on.turip.data.result.safeApiCall
 import javax.inject.Inject
 
 class DefaultFavoritePlaceRemoteDataSource @Inject constructor(
@@ -21,8 +21,7 @@ class DefaultFavoritePlaceRemoteDataSource @Inject constructor(
     override suspend fun deleteFavoritePlace(
         favoriteFolderId: Long,
         placeId: Long,
-    ): TuripResult<Unit> =
-        safeApiCall { placeService.deleteFavoritePlace(favoriteFolderId, placeId) }
+    ): TuripResult<Unit> = safeApiCall { placeService.deleteFavoritePlace(favoriteFolderId, placeId) }
 
     override suspend fun patchFavoritePlacesOrder(
         favoriteFolderId: Long,

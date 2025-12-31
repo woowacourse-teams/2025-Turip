@@ -18,8 +18,7 @@ data class TripDetailUiState(
     fun updateExpandTextToggleVisibility(
         lineCount: Int,
         ellipsisCount: Int,
-    ): TripDetailUiState =
-        copy(isExpandTextToggleVisible = lineCount >= DEFAULT_CONTENT_TITLE_MAX_LINES && ellipsisCount > 0)
+    ): TripDetailUiState = copy(isExpandTextToggleVisible = lineCount >= DEFAULT_CONTENT_TITLE_MAX_LINES && ellipsisCount > 0)
 
     companion object {
         private const val DEFAULT_CONTENT_TITLE_MAX_LINES = 2

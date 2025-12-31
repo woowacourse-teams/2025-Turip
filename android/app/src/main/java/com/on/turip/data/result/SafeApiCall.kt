@@ -2,11 +2,11 @@ package com.on.turip.data.result
 
 import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.TuripResult
-import java.io.IOException
 import kotlinx.coroutines.CancellationException
 import kotlinx.serialization.json.Json
 import retrofit2.HttpException
 import retrofit2.Response
+import java.io.IOException
 
 suspend fun <T> safeApiCall(apiCall: suspend () -> Response<T>): TuripResult<T> {
     try {

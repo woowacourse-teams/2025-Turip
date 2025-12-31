@@ -6,7 +6,9 @@ sealed interface FolderUiEffect {
     data object NavigateToLogin : FolderUiEffect
 
     data object FolderAdded : FolderUiEffect
+
     data object FolderUpdated : FolderUiEffect
+
     data object FolderDeleted : FolderUiEffect
 
     class ShowError(

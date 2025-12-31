@@ -82,8 +82,7 @@ class FavoritePlaceFragment :
     override fun inflateBinding(
         inflater: LayoutInflater,
         container: ViewGroup?,
-    ): FragmentFavoritePlaceBinding =
-        FragmentFavoritePlaceBinding.inflate(inflater, container, false)
+    ): FragmentFavoritePlaceBinding = FragmentFavoritePlaceBinding.inflate(inflater, container, false)
 
     override fun onViewCreated(
         view: View,

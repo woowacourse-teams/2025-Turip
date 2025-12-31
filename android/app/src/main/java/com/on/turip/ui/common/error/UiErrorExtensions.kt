@@ -19,17 +19,17 @@ fun ErrorType.toUiError(): UiError =
         Place.NotFound,
         FavoritePlace.NotFound,
         FavoriteFolder.NotFound,
-            -> UiError.Feature.NotFound
+        -> UiError.Feature.NotFound
 
         FavoriteFolder.DuplicatedName,
         FavoritePlace.DuplicatePlaceInFolder,
         ErrorType.FavoriteContent.DuplicateContent,
-            -> UiError.Feature.Duplicated
+        -> UiError.Feature.Duplicated
 
         FavoriteFolder.BlankName,
         FavoriteFolder.ExceededName,
         FavoriteFolder.DefaultFolderRenameNotAllowed,
-            -> UiError.Feature.InValid
+        -> UiError.Feature.InValid
 
         ErrorType.Network -> UiError.Global.Network
 

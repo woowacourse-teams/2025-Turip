@@ -1,14 +1,14 @@
 package com.on.turip.data.favorite.datasource
 
 import com.on.turip.core.result.TuripResult
-import com.on.turip.data.result.safeApiCall
 import com.on.turip.data.favorite.dto.FavoriteAddRequest
 import com.on.turip.data.favorite.dto.FavoriteContentsResponse
 import com.on.turip.data.favorite.service.FavoriteService
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
+import com.on.turip.data.result.safeApiCall
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 
 class DefaultFavoriteRemoteDataSource @Inject constructor(
     private val favoriteService: FavoriteService,

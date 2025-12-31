@@ -1,16 +1,16 @@
 package com.on.turip.data.content.datasource
 
 import com.on.turip.core.result.TuripResult
-import com.on.turip.data.result.safeApiCall
 import com.on.turip.data.content.dto.ContentDetailResponse
 import com.on.turip.data.content.dto.ContentInformationCountResponse
 import com.on.turip.data.content.dto.ContentsInformationResponse
 import com.on.turip.data.content.dto.UsersLikeContentsResponse
 import com.on.turip.data.content.service.ContentService
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
+import com.on.turip.data.result.safeApiCall
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 
 class DefaultContentRemoteDataSource @Inject constructor(
     private val contentService: ContentService,

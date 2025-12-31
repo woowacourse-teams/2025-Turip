@@ -11,9 +11,9 @@ import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingExcept
 import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.TuripResult
 import dagger.hilt.android.qualifiers.ActivityContext
+import okio.IOException
 import javax.inject.Inject
 import kotlin.coroutines.cancellation.CancellationException
-import okio.IOException
 
 class GoogleCredentialManager @Inject constructor(
     @ActivityContext private val context: Context,

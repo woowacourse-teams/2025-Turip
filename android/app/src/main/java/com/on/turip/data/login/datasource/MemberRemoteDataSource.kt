@@ -1,8 +1,8 @@
 package com.on.turip.data.login.datasource
 
 import com.on.turip.core.result.TuripResult
-import com.on.turip.data.result.safeApiCall
 import com.on.turip.data.login.service.MemberService
+import com.on.turip.data.result.safeApiCall
 import javax.inject.Inject
 
 class MemberRemoteDataSource @Inject constructor(

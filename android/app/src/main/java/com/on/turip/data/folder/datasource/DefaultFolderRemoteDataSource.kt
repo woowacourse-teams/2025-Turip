@@ -1,17 +1,17 @@
 package com.on.turip.data.folder.datasource
 
 import com.on.turip.core.result.TuripResult
-import com.on.turip.data.result.safeApiCall
 import com.on.turip.data.folder.dto.FavoriteFolderCreationResponse
 import com.on.turip.data.folder.dto.FavoriteFolderPatchRequest
 import com.on.turip.data.folder.dto.FavoriteFolderPostRequest
 import com.on.turip.data.folder.dto.FavoriteFoldersResponse
 import com.on.turip.data.folder.dto.FavoriteFoldersStatusByPlaceResponse
 import com.on.turip.data.folder.service.FolderService
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
+import com.on.turip.data.result.safeApiCall
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 
 class DefaultFolderRemoteDataSource @Inject constructor(
     private val folderService: FolderService,

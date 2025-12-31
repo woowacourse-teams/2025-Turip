@@ -58,8 +58,7 @@ class FavoritePlaceFolderFragment : BaseFragment<BottomSheetFragmentFavoritePlac
     override fun inflateBinding(
         inflater: LayoutInflater,
         container: ViewGroup?,
-    ): BottomSheetFragmentFavoritePlaceFolderBinding =
-        BottomSheetFragmentFavoritePlaceFolderBinding.inflate(inflater, container, false)
+    ): BottomSheetFragmentFavoritePlaceFolderBinding = BottomSheetFragmentFavoritePlaceFolderBinding.inflate(inflater, container, false)
 
     override fun onViewCreated(
         view: View,

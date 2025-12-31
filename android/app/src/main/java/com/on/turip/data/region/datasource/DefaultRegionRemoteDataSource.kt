@@ -1,13 +1,13 @@
 package com.on.turip.data.region.datasource
 
 import com.on.turip.core.result.TuripResult
-import com.on.turip.data.result.safeApiCall
 import com.on.turip.data.region.dto.RegionCategoriesResponse
 import com.on.turip.data.region.service.RegionService
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
+import com.on.turip.data.result.safeApiCall
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 
 class DefaultRegionRemoteDataSource @Inject constructor(
     private val regionService: RegionService,
