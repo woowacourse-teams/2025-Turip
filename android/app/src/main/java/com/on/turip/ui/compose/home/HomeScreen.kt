@@ -124,7 +124,7 @@ private fun HomeScreenContent(
 
         uiState.isLoading -> {
             Box(
-                modifier = Modifier.fillMaxSize(),
+                modifier = modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center,
             ) {
                 CircularProgressIndicator(modifier = Modifier.size(60.dp), color = Color.Black)
