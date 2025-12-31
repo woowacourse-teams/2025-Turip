@@ -13,6 +13,6 @@ sealed interface FolderUiEffect {
 
     class ShowError(
         val errorUiState: ErrorUiState,
-        val onRetryClick: (() -> Unit)? = null,
+        val onRetryClick: () -> Unit
     ) : FolderUiEffect
 }

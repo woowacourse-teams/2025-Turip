@@ -11,6 +11,6 @@ sealed interface FavoritePlaceFolderUiEffect {
 
     data class ShowError(
         val errorUiState: ErrorUiState,
-        val onRetryClick: (() -> Unit)? = null,
+        val onRetryClick: () -> Unit
     ) : FavoritePlaceFolderUiEffect
 }

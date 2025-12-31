@@ -11,6 +11,6 @@ sealed interface TripDetailUiEffect {
 
     data class ShowError(
         val errorUiState: ErrorUiState,
-        val onRetryClick: (() -> Unit)? = null,
+        val onRetryClick: () -> Unit,
     ) : TripDetailUiEffect
 }

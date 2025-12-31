@@ -28,7 +28,8 @@ class FolderAddBottomSheetFragment :
     override fun inflateBinding(
         inflater: LayoutInflater,
         container: ViewGroup?,
-    ): BottomSheetFragmentFolderAddBinding = BottomSheetFragmentFolderAddBinding.inflate(inflater, container, false)
+    ): BottomSheetFragmentFolderAddBinding =
+        BottomSheetFragmentFolderAddBinding.inflate(inflater, container, false)
 
     override fun onViewCreated(
         view: View,
@@ -81,7 +82,7 @@ class FolderAddBottomSheetFragment :
                     view?.let { view: View ->
                         Snackbar
                             .make(view, uiModel.titleRes, Snackbar.LENGTH_INDEFINITE)
-                            .apply { uiEffect.onRetryClick?.let { action -> setAction(uiModel.retryTextRes) { action() } } }
+                            .apply { setAction(uiModel.retryTextRes) { uiEffect.onRetryClick() } }
                             .show()
                     }
                 }

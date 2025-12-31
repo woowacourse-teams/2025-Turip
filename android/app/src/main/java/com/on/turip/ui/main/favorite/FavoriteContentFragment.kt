@@ -54,7 +54,8 @@ class FavoriteContentFragment : BaseFragment<FragmentFavoriteContentBinding>() {
     override fun inflateBinding(
         inflater: LayoutInflater,
         container: ViewGroup?,
-    ): FragmentFavoriteContentBinding = FragmentFavoriteContentBinding.inflate(inflater, container, false)
+    ): FragmentFavoriteContentBinding =
+        FragmentFavoriteContentBinding.inflate(inflater, container, false)
 
     override fun onViewCreated(
         view: View,
@@ -96,7 +97,7 @@ class FavoriteContentFragment : BaseFragment<FragmentFavoriteContentBinding>() {
                     view?.let { view: View ->
                         Snackbar
                             .make(view, uiModel.titleRes, Snackbar.LENGTH_INDEFINITE)
-                            .apply { uiEffect.onRetryClick?.let { action -> setAction(uiModel.retryTextRes) { action() } } }
+                            .apply { setAction(uiModel.retryTextRes) { uiEffect.onRetryClick() } }
                             .show()
                     }
                 }

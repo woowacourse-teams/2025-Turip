@@ -146,7 +146,7 @@ class FavoritePlaceFolderCatalogFragment :
                     view?.let { view: View ->
                         Snackbar
                             .make(view, uiModel.titleRes, Snackbar.LENGTH_INDEFINITE)
-                            .apply { uiEffect.onRetryClick?.let { action -> setAction(uiModel.retryTextRes) { action() } } }
+                            .apply { setAction(uiModel.retryTextRes) { uiEffect.onRetryClick() } }
                             .show()
                     }
                 }

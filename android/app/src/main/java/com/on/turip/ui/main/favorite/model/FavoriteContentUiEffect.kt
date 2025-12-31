@@ -7,6 +7,6 @@ sealed interface FavoriteContentUiEffect {
 
     data class ShowError(
         val errorUiState: ErrorUiState,
-        val onRetryClick: (() -> Unit)? = null,
+        val onRetryClick: () -> Unit
     ) : FavoriteContentUiEffect
 }
