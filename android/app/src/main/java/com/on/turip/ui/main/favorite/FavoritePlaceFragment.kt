@@ -82,8 +82,7 @@ class FavoritePlaceFragment :
     override fun inflateBinding(
         inflater: LayoutInflater,
         container: ViewGroup?,
-    ): FragmentFavoritePlaceBinding =
-        FragmentFavoritePlaceBinding.inflate(inflater, container, false)
+    ): FragmentFavoritePlaceBinding = FragmentFavoritePlaceBinding.inflate(inflater, container, false)
 
     override fun onViewCreated(
         view: View,
@@ -198,7 +197,7 @@ class FavoritePlaceFragment :
                             .apply {
                                 setAction(uiModel.retryTextRes) {
                                     viewModel.onErrorRetryRequested(
-                                        uiEffect.retryAction
+                                        uiEffect.retryAction,
                                     )
                                 }
                             }.show()

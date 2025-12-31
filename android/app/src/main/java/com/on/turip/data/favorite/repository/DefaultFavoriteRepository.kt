@@ -17,8 +17,7 @@ class DefaultFavoriteRepository @Inject constructor(
             contentId.toRequestDto(),
         )
 
-    override suspend fun deleteFavorite(contentId: Long): TuripResult<Unit> =
-        favoriteRemoteDataSource.deleteFavorite(contentId)
+    override suspend fun deleteFavorite(contentId: Long): TuripResult<Unit> = favoriteRemoteDataSource.deleteFavorite(contentId)
 
     override suspend fun loadFavoriteContents(
         size: Int,

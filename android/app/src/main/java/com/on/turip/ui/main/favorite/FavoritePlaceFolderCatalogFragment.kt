@@ -149,7 +149,7 @@ class FavoritePlaceFolderCatalogFragment :
                             .apply {
                                 setAction(uiModel.retryTextRes) {
                                     viewModel.onErrorRetryRequested(
-                                        uiEffect.action
+                                        uiEffect.action,
                                     )
                                 }
                             }.show()

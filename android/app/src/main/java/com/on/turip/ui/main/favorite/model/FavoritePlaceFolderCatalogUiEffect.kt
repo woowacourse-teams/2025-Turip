@@ -20,5 +20,3 @@ sealed interface FavoritePlaceFolderCatalogUiEffect {
 sealed interface FavoritePlaceFolderCatalogRetryAction {
     data object LoadPlacesInFolder : FavoritePlaceFolderCatalogRetryAction
 }
-
-

@@ -30,12 +30,13 @@ fun TuripSnackbar(
                             text = label,
                             style = TuripTypography.labelMedium,
                             color = colorResource(R.color.turip_gray_b4b4b4),
-                            modifier = Modifier
-                                .clickable(onClick = snackbarData::performAction)
-                                .padding(end = 10.dp)
+                            modifier =
+                                Modifier
+                                    .clickable(onClick = snackbarData::performAction)
+                                    .padding(end = 10.dp),
                         )
                     }
-                }
+                },
             ) {
                 Text(
                     text = snackbarData.visuals.message,

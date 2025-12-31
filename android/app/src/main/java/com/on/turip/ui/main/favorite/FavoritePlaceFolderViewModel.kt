@@ -18,7 +18,6 @@ import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderRetryAction
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderUiEffect
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,6 +27,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 @HiltViewModel
 class FavoritePlaceFolderViewModel @Inject constructor(
@@ -63,7 +63,7 @@ class FavoritePlaceFolderViewModel @Inject constructor(
                 }.onFailure { errorType: ErrorType ->
                     sendErrorEffect(
                         errorType = errorType,
-                        retryAction = FavoritePlaceFolderRetryAction.LoadFavoriteFolders
+                        retryAction = FavoritePlaceFolderRetryAction.LoadFavoriteFolders,
                     )
                     Timber.e("상세 페이지에서 장소에 대한 찜 폴더 현황 데이터 불러오기 실패")
                 }
@@ -89,13 +89,13 @@ class FavoritePlaceFolderViewModel @Inject constructor(
                         )
                     }
                     _uiEffect.send(
-                        FavoritePlaceFolderUiEffect.ShowUpdateFavoriteState(favoritePlaceFolderModel)
+                        FavoritePlaceFolderUiEffect.ShowUpdateFavoriteState(favoritePlaceFolderModel),
                     )
                 }.onFailure { errorType: ErrorType ->
                     sendErrorEffect(
                         errorType = errorType,
                         retryAction =
-                            FavoritePlaceFolderRetryAction.UpdateFolder(favoritePlaceFolderModel)
+                            FavoritePlaceFolderRetryAction.UpdateFolder(favoritePlaceFolderModel),
                     )
                     Timber.e("장소에 대한 찜 폴더들 현황에서 장소 찜 실패")
                 }
@@ -114,12 +114,10 @@ class FavoritePlaceFolderViewModel @Inject constructor(
                         FavoritePlaceFolderUiEffect.ShowError(ErrorUiState.Network, retryAction),
                     )
 
-
                 UiError.Global.Server ->
                     _uiEffect.send(
-                        FavoritePlaceFolderUiEffect.ShowError(ErrorUiState.Server, retryAction)
+                        FavoritePlaceFolderUiEffect.ShowError(ErrorUiState.Server, retryAction),
                     )
-
 
                 UiError.Global.TokenExpired -> _uiEffect.send(FavoritePlaceFolderUiEffect.NavigateToLogin)
             }

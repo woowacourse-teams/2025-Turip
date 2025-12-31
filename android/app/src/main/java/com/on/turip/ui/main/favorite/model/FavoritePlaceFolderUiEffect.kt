@@ -17,9 +17,8 @@ sealed interface FavoritePlaceFolderUiEffect {
 
 sealed interface FavoritePlaceFolderRetryAction {
     data object LoadFavoriteFolders : FavoritePlaceFolderRetryAction
-    
+
     data class UpdateFolder(
-        val favoritePlaceFolderModel: FavoritePlaceFolderModel
+        val favoritePlaceFolderModel: FavoritePlaceFolderModel,
     ) : FavoritePlaceFolderRetryAction
 }
-

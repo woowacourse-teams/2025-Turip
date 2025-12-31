@@ -19,6 +19,8 @@ sealed interface FolderUiEffect {
 
 sealed interface FolderRetryAction {
     data object FolderAdd : FolderRetryAction
+
     data object FolderNameUpdate : FolderRetryAction
+
     data object FolderDelete : FolderRetryAction
 }

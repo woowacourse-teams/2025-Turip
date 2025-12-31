@@ -4,8 +4,8 @@ import com.on.turip.core.result.TuripResult
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
 import com.on.turip.domain.favorite.repository.FavoritePlaceRepository
-import javax.inject.Inject
 import timber.log.Timber
+import javax.inject.Inject
 
 class UpdateFavoritePlaceUseCase @Inject constructor(
     private val favoritePlaceRepository: FavoritePlaceRepository,

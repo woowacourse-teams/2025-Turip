@@ -25,11 +25,9 @@ class DefaultFolderRepository @Inject constructor(
     override suspend fun updateFavoriteFolder(
         folderId: Long,
         updateName: String,
-    ): TuripResult<Unit> =
-        folderRemoteDataSource.patchFavoriteFolder(folderId, updateName.toPatchRequestDto())
+    ): TuripResult<Unit> = folderRemoteDataSource.patchFavoriteFolder(folderId, updateName.toPatchRequestDto())
 
-    override suspend fun deleteFavoriteFolder(folderId: Long): TuripResult<Unit> =
-        folderRemoteDataSource.deleteFavoriteFolder(folderId)
+    override suspend fun deleteFavoriteFolder(folderId: Long): TuripResult<Unit> = folderRemoteDataSource.deleteFavoriteFolder(folderId)
 
     override suspend fun loadFavoriteFoldersStatusByPlaceId(placeId: Long): TuripResult<List<FavoriteFolder>> =
         folderRemoteDataSource

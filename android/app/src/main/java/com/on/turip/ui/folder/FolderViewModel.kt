@@ -17,7 +17,6 @@ import com.on.turip.ui.folder.model.FolderRetryAction
 import com.on.turip.ui.folder.model.FolderUiEffect
 import com.on.turip.ui.folder.model.FolderUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,6 +29,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 @HiltViewModel
 class FolderViewModel @Inject constructor(
@@ -52,8 +52,7 @@ class FolderViewModel @Inject constructor(
             initialValue = FolderNameStatusModel.EMPTY,
         )
 
-    fun getSelectedFolderOrNull(): FolderEditModel? =
-        uiState.value.folders.firstOrNull { it.isSelected }
+    fun getSelectedFolderOrNull(): FolderEditModel? = uiState.value.folders.firstOrNull { it.isSelected }
 
     init {
         loadFolders()

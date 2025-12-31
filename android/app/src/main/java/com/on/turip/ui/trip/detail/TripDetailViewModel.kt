@@ -19,7 +19,6 @@ import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.trip.detail.TripDetailActivity.Companion.TRIP_DETAIL_CONTENT_KEY
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -30,6 +29,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 @HiltViewModel
 class TripDetailViewModel @Inject constructor(
@@ -158,20 +158,19 @@ class TripDetailViewModel @Inject constructor(
                                 _uiEffect.send(
                                     TripDetailUiEffect.ShowError(
                                         ErrorUiState.Network,
-                                        TripDetailRetryAction.UpdateFavorite
-                                    )
+                                        TripDetailRetryAction.UpdateFavorite,
+                                    ),
                                 )
 
                             UiError.Global.Server ->
                                 _uiEffect.send(
                                     TripDetailUiEffect.ShowError(
                                         ErrorUiState.Server,
-                                        TripDetailRetryAction.UpdateFavorite
-                                    )
+                                        TripDetailRetryAction.UpdateFavorite,
+                                    ),
                                 )
 
                             UiError.Global.TokenExpired -> _uiEffect.send(TripDetailUiEffect.NavigateToLogin)
-
                         }
                     }
                     Timber.d("컨텐츠 찜 API 통신 실패")

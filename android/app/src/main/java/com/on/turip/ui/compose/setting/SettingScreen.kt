@@ -58,11 +58,12 @@ fun SettingScreen(
 
                 is SettingUiEffect.ShowError -> {
                     val errorUiModel = uiEffect.errorUiState.toUiModel() ?: return@collect
-                    val result: SnackbarResult = snackbarHostState.showSnackbar(
-                        message = context.getString(errorUiModel.titleRes),
-                        actionLabel = context.getString(errorUiModel.retryTextRes),
-                        duration = SnackbarDuration.Indefinite
-                    )
+                    val result: SnackbarResult =
+                        snackbarHostState.showSnackbar(
+                            message = context.getString(errorUiModel.titleRes),
+                            actionLabel = context.getString(errorUiModel.retryTextRes),
+                            duration = SnackbarDuration.Indefinite,
+                        )
                     if (result == SnackbarResult.ActionPerformed) {
                         viewModel.onErrorRetryRequested(uiEffect.retryAction)
                     }

@@ -11,8 +11,7 @@ sealed interface SettingUiEffect {
     ) : SettingUiEffect
 }
 
-
 enum class SettingRetryAction {
     LOGOUT,
-    WITHDRAW
+    WITHDRAW,
 }

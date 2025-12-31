@@ -15,7 +15,6 @@ import com.on.turip.ui.main.favorite.model.FavoriteContentRetryAction
 import com.on.turip.ui.main.favorite.model.FavoriteContentUiEffect
 import com.on.turip.ui.main.favorite.model.FavoriteContentUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,6 +24,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 @HiltViewModel
 class FavoriteContentViewModel @Inject constructor(
@@ -112,10 +112,11 @@ class FavoriteContentViewModel @Inject constructor(
                                 _uiEffect.send(
                                     FavoriteContentUiEffect.ShowError(
                                         errorUiState = ErrorUiState.Network,
-                                        action = FavoriteContentRetryAction.UpdateFavorite(
-                                            contentId,
-                                            isFavorite
-                                        ),
+                                        action =
+                                            FavoriteContentRetryAction.UpdateFavorite(
+                                                contentId,
+                                                isFavorite,
+                                            ),
                                     ),
                                 )
                             }
@@ -124,10 +125,11 @@ class FavoriteContentViewModel @Inject constructor(
                                 _uiEffect.send(
                                     FavoriteContentUiEffect.ShowError(
                                         errorUiState = ErrorUiState.Server,
-                                        action = FavoriteContentRetryAction.UpdateFavorite(
-                                            contentId,
-                                            isFavorite
-                                        ),
+                                        action =
+                                            FavoriteContentRetryAction.UpdateFavorite(
+                                                contentId,
+                                                isFavorite,
+                                            ),
                                     ),
                                 )
                             }
