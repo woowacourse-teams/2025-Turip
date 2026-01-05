@@ -2,11 +2,11 @@ name: prod CI/CD with Docker and Nginx
 
 on:
   push:
-    branches: [ main ]
+    branches: [ 'release-be/**' ]
     paths:
       - 'backend/**'
   pull_request:
-    branches: [ main ]
+    branches: [ 'release-be/**' ]
     paths:
       - 'backend/**'
 
