@@ -74,8 +74,16 @@ class FavoritePlaceFolderCatalogViewModel @Inject constructor(
                     }
                 }.onFailure { errorType: ErrorType ->
                     when (val uiError: UiError = errorType.toUiError()) {
-                        is UiError.Global -> handleGlobalError(uiError)
-                        is UiError.Feature -> Unit
+                        is UiError.Global -> {
+                            handleGlobalError(
+                                uiError = uiError,
+                                retryAction = FavoritePlaceFolderCatalogRetryAction.LoadPlacesInFolder,
+                            )
+                        }
+
+                        is UiError.Feature -> {
+                            Unit
+                        }
                     }
                     Timber.e("폴더에 담긴 장소들을 불러오는 API 호출 실패")
                 }
@@ -98,8 +106,16 @@ class FavoritePlaceFolderCatalogViewModel @Inject constructor(
                     Timber.d("찜 목록 화면 폴더명에 해당하는 찜 장소들 업데이트 성공")
                 }.onFailure { errorType: ErrorType ->
                     when (val uiError: UiError = errorType.toUiError()) {
-                        is UiError.Global -> handleGlobalError(uiError)
-                        is UiError.Feature -> Unit
+                        is UiError.Global -> {
+                            handleGlobalError(
+                                uiError = uiError,
+                                retryAction = FavoritePlaceFolderCatalogRetryAction.LoadPlacesInFolder,
+                            )
+                        }
+
+                        is UiError.Feature -> {
+                            Unit
+                        }
                     }
                     Timber.e("찜 목록 화면 폴더명에 해당하는 찜 장소들 업데이트 실패 (placeId = $placeId)")
                 }
@@ -117,8 +133,16 @@ class FavoritePlaceFolderCatalogViewModel @Inject constructor(
                     Timber.d("순서 변경 완료: $newFavoritePlaces")
                 }.onFailure { errorType: ErrorType ->
                     when (val uiError: UiError = errorType.toUiError()) {
-                        is UiError.Global -> handleGlobalError(uiError)
-                        is UiError.Feature -> Unit
+                        is UiError.Global -> {
+                            handleGlobalError(
+                                uiError = uiError,
+                                retryAction = FavoritePlaceFolderCatalogRetryAction.LoadPlacesInFolder,
+                            )
+                        }
+
+                        is UiError.Feature -> {
+                            Unit
+                        }
                     }
                     Timber.e("장소 순서 변경 API 호출 실패 ")
                 }
@@ -150,20 +174,24 @@ class FavoritePlaceFolderCatalogViewModel @Inject constructor(
 
     private suspend fun handleGlobalError(
         uiError: UiError.Global,
-        retryAction: FavoritePlaceFolderCatalogRetryAction = FavoritePlaceFolderCatalogRetryAction.LoadPlacesInFolder,
+        retryAction: FavoritePlaceFolderCatalogRetryAction,
     ) {
         when (uiError) {
-            UiError.Global.Network ->
+            UiError.Global.Network -> {
                 _uiEffect.send(
                     FavoritePlaceFolderCatalogUiEffect.ShowError(ErrorUiState.Network, retryAction),
                 )
+            }
 
-            UiError.Global.Server ->
+            UiError.Global.Server -> {
                 _uiEffect.send(
                     FavoritePlaceFolderCatalogUiEffect.ShowError(ErrorUiState.Server, retryAction),
                 )
+            }
 
-            UiError.Global.TokenExpired -> _uiEffect.send(FavoritePlaceFolderCatalogUiEffect.NavigateToLogin)
+            UiError.Global.TokenExpired -> {
+                _uiEffect.send(FavoritePlaceFolderCatalogUiEffect.NavigateToLogin)
+            }
         }
     }
 
