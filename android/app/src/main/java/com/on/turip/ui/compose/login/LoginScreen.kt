@@ -34,7 +34,7 @@ import com.on.turip.data.login.datasource.GoogleCredentialManager
 import com.on.turip.ui.compose.designsystem.component.TuripDialog
 import com.on.turip.ui.compose.login.component.GoogleLoginButton
 import com.on.turip.ui.compose.login.component.HelpText
-import com.on.turip.ui.compose.login.model.LoginUiEvent
+import com.on.turip.ui.compose.login.model.LoginUiEffect
 import com.on.turip.ui.compose.login.model.LoginUiState
 import com.on.turip.ui.compose.login.util.noRippleClickable
 import com.on.turip.ui.compose.theme.TuripTypography
@@ -48,9 +48,9 @@ fun LoginScreen(
     val uiState: LoginUiState by viewmodel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        viewmodel.uiEvent.collect { event ->
-            when (event) {
-                LoginUiEvent.NavigateToMain -> navigateToMain()
+        viewmodel.uiEffect.collect { effect: LoginUiEffect ->
+            when (effect) {
+                LoginUiEffect.NavigateToMain -> navigateToMain()
             }
         }
     }
