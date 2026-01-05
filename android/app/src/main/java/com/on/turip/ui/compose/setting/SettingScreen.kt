@@ -98,42 +98,6 @@ fun SettingScreen(
         )
     }
 
-    SettingScreen(
-        snackbarHostState = snackbarHostState,
-        onClickBack = navigateToBack,
-        onClickInquiry = {
-            navigateToInquiry(viewModel.loadInquiryMail())
-            Timber.d("SettingScreen 문의하기 버튼 클릭")
-        },
-        onClickPrivacyPolicy = {
-            navigateToPrivacyPolicy(viewModel.loadPrivacyPolicyLink())
-            Timber.d("SettingScreen 개인정보처리 방침 버튼 클릭")
-        },
-        onClickLogin = {
-            navigateToLoginScreen()
-            Timber.d("SettingScreen 로그인 버튼 클릭")
-        },
-        onClickLogout = {
-            viewModel.onLogoutDialogVisibilityChange(visible = true)
-            Timber.d("SettingScreen 로그아웃 버튼 클릭")
-        },
-        onClickWithdraw = {
-            viewModel.onWithdrawDialogVisibilityChange(visible = true)
-            Timber.d("SettingScreen 회원탈퇴 버튼 클릭")
-        },
-    )
-}
-
-@Composable
-private fun SettingScreen(
-    snackbarHostState: SnackbarHostState,
-    onClickBack: () -> Unit,
-    onClickInquiry: () -> Unit,
-    onClickPrivacyPolicy: () -> Unit,
-    onClickLogin: () -> Unit,
-    onClickLogout: () -> Unit,
-    onClickWithdraw: () -> Unit,
-) {
     Scaffold(
         modifier =
             Modifier
@@ -143,17 +107,32 @@ private fun SettingScreen(
         topBar = {
             TuripAppBar(
                 canBack = true,
-                onBackNavigate = onClickBack,
+                onBackNavigate = navigateToBack,
             )
         },
         snackbarHost = { TuripSnackbar(snackbarHostState = snackbarHostState) },
     ) { innerPadding ->
         SettingScreenContent(
-            onClickInquiry = onClickInquiry,
-            onClickPrivacyPolicy = onClickPrivacyPolicy,
-            onClickLogin = onClickLogin,
-            onClickLogout = onClickLogout,
-            onClickWithdraw = onClickWithdraw,
+            onClickInquiry = {
+                navigateToInquiry(viewModel.loadInquiryMail())
+                Timber.d("SettingScreen 문의하기 버튼 클릭")
+            },
+            onClickPrivacyPolicy = {
+                navigateToPrivacyPolicy(viewModel.loadPrivacyPolicyLink())
+                Timber.d("SettingScreen 개인정보처리 방침 버튼 클릭")
+            },
+            onClickLogin = {
+                navigateToLoginScreen()
+                Timber.d("SettingScreen 로그인 버튼 클릭")
+            },
+            onClickLogout = {
+                viewModel.onLogoutDialogVisibilityChange(visible = true)
+                Timber.d("SettingScreen 로그아웃 버튼 클릭")
+            },
+            onClickWithdraw = {
+                viewModel.onWithdrawDialogVisibilityChange(visible = true)
+                Timber.d("SettingScreen 회원탈퇴 버튼 클릭")
+            },
             modifier = Modifier.padding(innerPadding),
         )
     }
@@ -246,7 +225,7 @@ private fun SettingForMemberScreen(
 
 @Preview(showBackground = true)
 @Composable
-private fun MemberSettingScreenPreview() {
+private fun GuestSettingScreenPreview() {
     TuripTheme {
         SettingScreenContent(
             onClickInquiry = {},

@@ -62,25 +62,6 @@ fun HomeScreen(
         }
     }
 
-    HomeScreenLayout(
-        uiState = uiState,
-        onRetryLoadContents = viewModel::loadContents,
-        onSearchClick = onSearchClick,
-        onContentClick = onContentClick,
-        onRegionClick = onRegionClick,
-        onDomesticClick = { viewModel.updateDomesticSelected(it) },
-    )
-}
-
-@Composable
-private fun HomeScreenLayout(
-    uiState: HomeUiState,
-    onRetryLoadContents: () -> Unit,
-    onSearchClick: (String) -> Unit,
-    onContentClick: (UsersLikeContentModel) -> Unit,
-    onRegionClick: (String) -> Unit,
-    onDomesticClick: (Boolean) -> Unit,
-) {
     Scaffold(
         topBar = {
             TuripAppBar(canBack = false)
@@ -89,10 +70,10 @@ private fun HomeScreenLayout(
         HomeScreenContent(
             uiState = uiState,
             onSearchClick = onSearchClick,
-            onRetryLoadContents = onRetryLoadContents,
+            onRetryLoadContents = viewModel::loadContents,
             onContentClick = onContentClick,
             onRegionClick = onRegionClick,
-            onDomesticClick = onDomesticClick,
+            onDomesticClick = { viewModel.updateDomesticSelected(it) },
             modifier = Modifier.padding(innerPadding),
         )
     }
@@ -198,14 +179,21 @@ private fun HomeScreenContent(
 private fun HomeLoadingPreview() {
     val uiState = HomeUiState.Idle
     TuripTheme {
-        HomeScreenLayout(
-            uiState = uiState.copy(isLoading = true, errorUiState = ErrorUiState.None),
-            onRetryLoadContents = {},
-            onSearchClick = {},
-            onContentClick = {},
-            onRegionClick = {},
-            onDomesticClick = {},
-        )
+        Scaffold(
+            topBar = {
+                TuripAppBar(canBack = false)
+            },
+        ) { innerPadding ->
+            HomeScreenContent(
+                uiState = uiState.copy(isLoading = true, errorUiState = ErrorUiState.None),
+                onSearchClick = {},
+                onRetryLoadContents = { },
+                onContentClick = { },
+                onRegionClick = { },
+                onDomesticClick = { },
+                modifier = Modifier.padding(innerPadding),
+            )
+        }
     }
 }
 
@@ -221,14 +209,21 @@ private fun HomeSuccessPreview() {
             errorUiState = ErrorUiState.None,
         )
     TuripTheme {
-        HomeScreenLayout(
-            uiState = uiState,
-            onRetryLoadContents = {},
-            onSearchClick = {},
-            onContentClick = {},
-            onRegionClick = {},
-            onDomesticClick = {},
-        )
+        Scaffold(
+            topBar = {
+                TuripAppBar(canBack = false)
+            },
+        ) { innerPadding ->
+            HomeScreenContent(
+                uiState = uiState,
+                onSearchClick = {},
+                onRetryLoadContents = { },
+                onContentClick = { },
+                onRegionClick = { },
+                onDomesticClick = { },
+                modifier = Modifier.padding(innerPadding),
+            )
+        }
     }
 }
 
@@ -237,14 +232,21 @@ private fun HomeSuccessPreview() {
 private fun HomeServerErrorPreview() {
     val uiState = HomeUiState.Idle
     TuripTheme {
-        HomeScreenLayout(
-            uiState = uiState.copy(isLoading = false, errorUiState = ErrorUiState.Server),
-            onRetryLoadContents = {},
-            onSearchClick = {},
-            onContentClick = {},
-            onRegionClick = {},
-            onDomesticClick = {},
-        )
+        Scaffold(
+            topBar = {
+                TuripAppBar(canBack = false)
+            },
+        ) { innerPadding ->
+            HomeScreenContent(
+                uiState = uiState.copy(isLoading = false, errorUiState = ErrorUiState.Server),
+                onSearchClick = {},
+                onRetryLoadContents = { },
+                onContentClick = { },
+                onRegionClick = { },
+                onDomesticClick = { },
+                modifier = Modifier.padding(innerPadding),
+            )
+        }
     }
 }
 
@@ -253,13 +255,20 @@ private fun HomeServerErrorPreview() {
 private fun HomeNetworkErrorPreview() {
     val uiState = HomeUiState.Idle
     TuripTheme {
-        HomeScreenLayout(
-            uiState = uiState.copy(isLoading = false, errorUiState = ErrorUiState.Network),
-            onRetryLoadContents = {},
-            onSearchClick = {},
-            onContentClick = {},
-            onRegionClick = {},
-            onDomesticClick = {},
-        )
+        Scaffold(
+            topBar = {
+                TuripAppBar(canBack = false)
+            },
+        ) { innerPadding ->
+            HomeScreenContent(
+                uiState = uiState.copy(isLoading = false, errorUiState = ErrorUiState.Network),
+                onSearchClick = {},
+                onRetryLoadContents = { },
+                onContentClick = { },
+                onRegionClick = { },
+                onDomesticClick = { },
+                modifier = Modifier.padding(innerPadding),
+            )
+        }
     }
 }

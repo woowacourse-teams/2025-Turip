@@ -37,6 +37,7 @@ import com.on.turip.ui.compose.login.component.HelpText
 import com.on.turip.ui.compose.login.model.LoginUiEffect
 import com.on.turip.ui.compose.login.model.LoginUiState
 import com.on.turip.ui.compose.login.util.noRippleClickable
+import com.on.turip.ui.compose.theme.TuripTheme
 import com.on.turip.ui.compose.theme.TuripTypography
 
 @Composable
@@ -68,38 +69,16 @@ fun LoginScreen(
         )
     }
 
-    LoginScreen(
-        uiState = uiState,
-        onChangeHelpTextVisible = { visible: Boolean -> viewmodel.updateHelpTextVisible(visible) },
-        onClickGoogleLogin = { viewmodel.onGoogleLogin(googleCredentialManager) },
-        onClickGuestLogin = viewmodel::onGuestLogin,
-    )
-}
-
-@Composable
-private fun LoginScreen(
-    uiState: LoginUiState,
-    onChangeHelpTextVisible: (Boolean) -> Unit,
-    onClickGoogleLogin: () -> Unit,
-    onClickGuestLogin: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
     Scaffold(
         modifier =
-            modifier.noRippleClickable { onChangeHelpTextVisible(false) },
+            Modifier.noRippleClickable { viewmodel.updateHelpTextVisible(false) },
     ) { innerPadding ->
-        Image(
-            painter = painterResource(R.drawable.bg_login),
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop,
-        )
         LoginScreenContent(
             isHelpTextVisible = uiState.showHelpText,
             modifier = Modifier.padding(innerPadding),
-            onClickHelpText = { onChangeHelpTextVisible(!uiState.showHelpText) },
-            onClickGoogleLogin = onClickGoogleLogin,
-            onClickGuestLogin = onClickGuestLogin,
+            onClickHelpText = { viewmodel.updateHelpTextVisible(!uiState.showHelpText) },
+            onClickGoogleLogin = { viewmodel.onGoogleLogin(googleCredentialManager) },
+            onClickGuestLogin = viewmodel::onGuestLogin,
         )
     }
 }
@@ -112,6 +91,13 @@ private fun LoginScreenContent(
     onClickGuestLogin: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    Image(
+        painter = painterResource(R.drawable.bg_login),
+        contentDescription = null,
+        modifier = Modifier.fillMaxSize(),
+        contentScale = ContentScale.Crop,
+    )
+
     Box(
         modifier = modifier.fillMaxSize(),
     ) {
@@ -181,21 +167,25 @@ private fun LoginScreenContent(
 @Composable
 @Preview(showBackground = true, name = "HelpVisible")
 private fun HelpVisibleLoginScreenPreview() {
-    LoginScreen(
-        uiState = LoginUiState(showHelpText = true, showMigrationDialog = false),
-        onChangeHelpTextVisible = { },
-        onClickGoogleLogin = {},
-        onClickGuestLogin = {},
-    )
+    TuripTheme {
+        LoginScreenContent(
+            isHelpTextVisible = true,
+            onClickHelpText = { },
+            onClickGoogleLogin = { },
+            onClickGuestLogin = { },
+        )
+    }
 }
 
 @Composable
 @Preview(showBackground = true, name = "HelpInvisible")
 private fun HelpInvisibleLoginScreenPreview() {
-    LoginScreen(
-        uiState = LoginUiState(showHelpText = false, showMigrationDialog = false),
-        onChangeHelpTextVisible = { },
-        onClickGoogleLogin = {},
-        onClickGuestLogin = {},
-    )
+    TuripTheme {
+        LoginScreenContent(
+            isHelpTextVisible = false,
+            onClickHelpText = { },
+            onClickGoogleLogin = { },
+            onClickGuestLogin = { },
+        )
+    }
 }
