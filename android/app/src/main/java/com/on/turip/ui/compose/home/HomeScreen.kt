@@ -195,7 +195,7 @@ private fun HomeScreenContent(
 
 @Preview(showBackground = true, name = "로딩")
 @Composable
-fun Home_Loading_Preview() {
+private fun HomeLoadingPreview() {
     val uiState = HomeUiState.Idle
     TuripTheme {
         HomeScreenLayout(
@@ -211,7 +211,7 @@ fun Home_Loading_Preview() {
 
 @Preview(showBackground = true, name = "성공")
 @Composable
-fun Home_Success_Preview() {
+private fun HomeSuccessPreview() {
     val uiState =
         HomeUiState(
             isLoading = false,
@@ -234,7 +234,7 @@ fun Home_Success_Preview() {
 
 @Preview(showBackground = true, name = "서버 에러 발생")
 @Composable
-fun Home_Server_Error_Preview() {
+private fun HomeServerErrorPreview() {
     val uiState = HomeUiState.Idle
     TuripTheme {
         HomeScreenLayout(
@@ -250,7 +250,7 @@ fun Home_Server_Error_Preview() {
 
 @Preview(showBackground = true, name = "네트워크 에러 발생")
 @Composable
-fun Home_Network_Error_Preview() {
+private fun HomeNetworkErrorPreview() {
     val uiState = HomeUiState.Idle
     TuripTheme {
         HomeScreenLayout(
