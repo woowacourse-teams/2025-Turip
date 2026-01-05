@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.onFailure
-import com.on.turip.core.result.onFailureWithCause
 import com.on.turip.core.result.onSuccess
 import com.on.turip.domain.login.MemberRepository
 import com.on.turip.domain.setting.InquiryMail
@@ -18,6 +17,7 @@ import com.on.turip.ui.compose.setting.model.SettingRetryAction
 import com.on.turip.ui.compose.setting.model.SettingUiEffect
 import com.on.turip.ui.compose.setting.model.SettingUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,7 +26,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @HiltViewModel
 class SettingViewModel @Inject constructor(
@@ -68,7 +67,7 @@ class SettingViewModel @Inject constructor(
         _uiState.update { it.copy(showLogoutDialog = visible) }
     }
 
-    fun onLogoutConfirm() {
+    fun confirmLogout() {
         viewModelScope.launch {
             _uiState.update { it.copy(showLogoutDialog = false) }
 
@@ -88,17 +87,16 @@ class SettingViewModel @Inject constructor(
                         is UiError.Global -> handleGlobalError(uiError, SettingRetryAction.LOGOUT)
                         is UiError.Feature -> Unit
                     }
-                }.onFailureWithCause { errorType: ErrorType, cause: Throwable? ->
-                    Timber.e("로그아웃 실패 : $errorType / $cause")
+                    Timber.e("로그아웃 실패")
                 }
         }
     }
 
-    fun onWithdrawDialogVisibilityChange(visible: Boolean) {
+    fun updateWithdrawDialogVisibility(visible: Boolean) {
         _uiState.update { it.copy(showWithdrawDialog = visible) }
     }
 
-    fun onWithdrawConfirm() {
+    fun confirmWithdraw() {
         viewModelScope.launch {
             _uiState.update { it.copy(showWithdrawDialog = false) }
 
@@ -118,8 +116,7 @@ class SettingViewModel @Inject constructor(
                         is UiError.Global -> handleGlobalError(uiError, SettingRetryAction.WITHDRAW)
                         is UiError.Feature -> Unit
                     }
-                }.onFailureWithCause { errorType: ErrorType, cause: Throwable? ->
-                    Timber.e("회원탈퇴 실패 : $errorType / $cause")
+                    Timber.e("회원탈퇴 실패 ")
                 }
         }
     }
@@ -139,10 +136,10 @@ class SettingViewModel @Inject constructor(
         }
     }
 
-    fun onErrorRetryRequested(action: SettingRetryAction) {
+    fun handleErrorRetryRequest(action: SettingRetryAction) {
         when (action) {
-            SettingRetryAction.LOGOUT -> onLogoutConfirm()
-            SettingRetryAction.WITHDRAW -> onWithdrawConfirm()
+            SettingRetryAction.LOGOUT -> confirmLogout()
+            SettingRetryAction.WITHDRAW -> confirmWithdraw()
         }
     }
 }

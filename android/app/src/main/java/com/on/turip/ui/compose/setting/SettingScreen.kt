@@ -65,7 +65,7 @@ fun SettingScreen(
                             duration = SnackbarDuration.Indefinite,
                         )
                     if (result == SnackbarResult.ActionPerformed) {
-                        viewModel.onErrorRetryRequested(uiEffect.retryAction)
+                        viewModel.handleErrorRetryRequest(uiEffect.retryAction)
                     }
                 }
             }
@@ -80,7 +80,7 @@ fun SettingScreen(
             dismissText = stringResource(R.string.setting_logout_dialog_dismiss),
             confirmButtonColor = colorResource(R.color.turip_blue_11aebf_70),
             dismissButtonColor = colorResource(R.color.turip_gray_b4b4b4),
-            onConfirmation = viewModel::onLogoutConfirm,
+            onConfirmation = viewModel::confirmLogout,
             onDismissRequest = { viewModel.onLogoutDialogVisibilityChange(visible = false) },
         )
     }
@@ -93,8 +93,8 @@ fun SettingScreen(
             dismissText = stringResource(R.string.setting_withdraw_dialog_dismiss),
             confirmButtonColor = colorResource(R.color.turip_red_ff7474),
             dismissButtonColor = colorResource(R.color.turip_gray_b4b4b4),
-            onConfirmation = viewModel::onWithdrawConfirm,
-            onDismissRequest = { viewModel.onWithdrawDialogVisibilityChange(visible = false) },
+            onConfirmation = viewModel::confirmWithdraw,
+            onDismissRequest = { viewModel.updateWithdrawDialogVisibility(visible = false) },
         )
     }
 
@@ -130,7 +130,7 @@ fun SettingScreen(
                 Timber.d("SettingScreen 로그아웃 버튼 클릭")
             },
             onClickWithdraw = {
-                viewModel.onWithdrawDialogVisibilityChange(visible = true)
+                viewModel.updateWithdrawDialogVisibility(visible = true)
                 Timber.d("SettingScreen 회원탈퇴 버튼 클릭")
             },
             modifier = Modifier.padding(innerPadding),

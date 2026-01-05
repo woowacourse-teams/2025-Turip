@@ -28,7 +28,8 @@ class FolderModifyBottomSheetFragment :
     override fun inflateBinding(
         inflater: LayoutInflater,
         container: ViewGroup?,
-    ): BottomSheetFragmentFolderModifyBinding = BottomSheetFragmentFolderModifyBinding.inflate(inflater, container, false)
+    ): BottomSheetFragmentFolderModifyBinding =
+        BottomSheetFragmentFolderModifyBinding.inflate(inflater, container, false)
 
     override fun onViewCreated(
         view: View,
@@ -83,7 +84,7 @@ class FolderModifyBottomSheetFragment :
                             .make(view, uiModel.titleRes, Snackbar.LENGTH_INDEFINITE)
                             .apply {
                                 setAction(uiModel.retryTextRes) {
-                                    sharedViewModel.onErrorRetryRequested(uiEffect.action)
+                                    sharedViewModel.handleErrorRetryRequest(uiEffect.action)
                                 }
                             }.show()
                     }

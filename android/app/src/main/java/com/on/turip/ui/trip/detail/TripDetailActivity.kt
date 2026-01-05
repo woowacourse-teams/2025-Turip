@@ -239,7 +239,7 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
                         .make(binding.root, uiModel.titleRes, Snackbar.LENGTH_INDEFINITE)
                         .apply {
                             setAction(uiModel.retryTextRes) {
-                                viewModel.onErrorRetryRequested(uiEffect.action)
+                                viewModel.handleErrorRetryRequest(uiEffect.action)
                             }
                         }.show()
                 }

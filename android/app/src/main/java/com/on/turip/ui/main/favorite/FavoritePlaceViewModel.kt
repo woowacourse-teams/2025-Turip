@@ -24,6 +24,7 @@ import com.on.turip.ui.main.favorite.model.FavoritePlaceRetryAction
 import com.on.turip.ui.main.favorite.model.FavoritePlaceUiEffect
 import com.on.turip.ui.main.favorite.model.FavoritePlaceUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,7 +34,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @HiltViewModel
 class FavoritePlaceViewModel @Inject constructor(
@@ -260,7 +260,7 @@ class FavoritePlaceViewModel @Inject constructor(
         }
     }
 
-    fun onErrorRetryRequested(action: FavoritePlaceRetryAction) {
+    fun handleErrorRetryRequest(action: FavoritePlaceRetryAction) {
         when (action) {
             is FavoritePlaceRetryAction.UpdateFavoritePlace ->
                 updateFavoritePlace(action.placeId, action.isFavorite)

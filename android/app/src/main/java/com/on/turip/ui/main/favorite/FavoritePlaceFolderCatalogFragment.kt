@@ -148,7 +148,7 @@ class FavoritePlaceFolderCatalogFragment :
                             .make(view, uiModel.titleRes, Snackbar.LENGTH_INDEFINITE)
                             .apply {
                                 setAction(uiModel.retryTextRes) {
-                                    viewModel.onErrorRetryRequested(
+                                    viewModel.handleErrorRetryRequest(
                                         uiEffect.action,
                                     )
                                 }

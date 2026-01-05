@@ -58,7 +58,8 @@ class FavoritePlaceFolderFragment : BaseFragment<BottomSheetFragmentFavoritePlac
     override fun inflateBinding(
         inflater: LayoutInflater,
         container: ViewGroup?,
-    ): BottomSheetFragmentFavoritePlaceFolderBinding = BottomSheetFragmentFavoritePlaceFolderBinding.inflate(inflater, container, false)
+    ): BottomSheetFragmentFavoritePlaceFolderBinding =
+        BottomSheetFragmentFavoritePlaceFolderBinding.inflate(inflater, container, false)
 
     override fun onViewCreated(
         view: View,
@@ -106,7 +107,7 @@ class FavoritePlaceFolderFragment : BaseFragment<BottomSheetFragmentFavoritePlac
                             .make(view, uiModel.titleRes, Snackbar.LENGTH_INDEFINITE)
                             .apply {
                                 setAction(uiModel.retryTextRes) {
-                                    viewModel.onErrorRetryRequested(
+                                    viewModel.handleErrorRetryRequest(
                                         uiEffect.retryAction,
                                     )
                                 }
