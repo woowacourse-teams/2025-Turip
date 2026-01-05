@@ -30,4 +30,12 @@ public class Account {
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
     private Role role;
+
+    public Account(Role role) {
+        this.role = role;
+    }
+
+    public static Account createUserAccount() {
+        return new Account(Role.USER);
+    }
 }
