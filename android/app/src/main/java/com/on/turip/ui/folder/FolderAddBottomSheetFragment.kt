@@ -28,8 +28,7 @@ class FolderAddBottomSheetFragment :
     override fun inflateBinding(
         inflater: LayoutInflater,
         container: ViewGroup?,
-    ): BottomSheetFragmentFolderAddBinding =
-        BottomSheetFragmentFolderAddBinding.inflate(inflater, container, false)
+    ): BottomSheetFragmentFolderAddBinding = BottomSheetFragmentFolderAddBinding.inflate(inflater, container, false)
 
     override fun onViewCreated(
         view: View,

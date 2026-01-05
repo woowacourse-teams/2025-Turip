@@ -23,8 +23,7 @@ class FolderRemoveBottomSheetFragment :
     override fun inflateBinding(
         inflater: LayoutInflater,
         container: ViewGroup?,
-    ): BottomSheetFragmentFolderRemoveBinding =
-        BottomSheetFragmentFolderRemoveBinding.inflate(inflater, container, false)
+    ): BottomSheetFragmentFolderRemoveBinding = BottomSheetFragmentFolderRemoveBinding.inflate(inflater, container, false)
 
     override fun onViewCreated(
         view: View,
