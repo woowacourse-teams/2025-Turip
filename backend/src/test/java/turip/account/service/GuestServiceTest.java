@@ -21,6 +21,7 @@ import turip.account.repository.GuestRepository;
 import turip.favorite.service.FavoriteContentService;
 import turip.favorite.service.FavoriteFolderService;
 import turip.favorite.service.FavoritePlaceService;
+import turip.fixture.AccountFixture;
 
 @ExtendWith(MockitoExtension.class)
 class GuestServiceTest {
@@ -52,7 +53,7 @@ class GuestServiceTest {
         void findOrCreateByDeviceFid1() {
             // given
             String deviceFid = "existing-device-fid";
-            Account account = new Account(1L);
+            Account account = AccountFixture.createUser();
             Guest existingGuest = new Guest(1L, account, deviceFid);
 
             given(guestRepository.findByDeviceFid(deviceFid))
@@ -72,7 +73,7 @@ class GuestServiceTest {
         void findOrCreateByDeviceFid2() {
             // given
             String deviceFid = "new-device-fid";
-            Account newAccount = new Account(1L);
+            Account newAccount = AccountFixture.createUser();
             Guest newGuest = new Guest(1L, newAccount, deviceFid);
 
             given(guestRepository.findByDeviceFid(deviceFid))
@@ -100,7 +101,7 @@ class GuestServiceTest {
         @Test
         void checkMigrationAvailability1() {
             // given
-            Account account = new Account(1L);
+            Account account = AccountFixture.createUser();
             Guest guest = new Guest(1L, account, "device-fid");
             given(favoriteContentService.existsByAccount(account))
                     .willReturn(false);
@@ -120,7 +121,7 @@ class GuestServiceTest {
         @Test
         void checkMigrationAvailability2() {
             // given
-            Account account = new Account(1L);
+            Account account = AccountFixture.createUser();
             Guest guest = new Guest(1L, account, "device-fid");
             given(favoriteContentService.existsByAccount(account))
                     .willReturn(true);
@@ -140,7 +141,7 @@ class GuestServiceTest {
         @Test
         void checkMigrationAvailability3() {
             // given
-            Account account = new Account(1L);
+            Account account = AccountFixture.createUser();
             Guest guest = new Guest(1L, account, "device-fid");
             given(favoriteContentService.existsByAccount(account))
                     .willReturn(false);
@@ -160,7 +161,7 @@ class GuestServiceTest {
         @Test
         void checkMigrationAvailability4() {
             // given
-            Account account = new Account(1L);
+            Account account = AccountFixture.createUser();
             Guest guest = new Guest(1L, account, "device-fid");
             given(favoriteContentService.existsByAccount(account))
                     .willReturn(false);
@@ -185,7 +186,7 @@ class GuestServiceTest {
         @Test
         void delete() {
             // given
-            Account account = new Account(1L);
+            Account account = AccountFixture.createUser();
             Guest guest = new Guest(1L, account, "device-fid");
 
             // when

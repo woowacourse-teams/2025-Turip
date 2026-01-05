@@ -25,6 +25,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import turip.account.domain.Account;
+import turip.account.domain.Member;
+import turip.account.domain.Provider;
+import turip.account.service.MemberService;
 import turip.auth.controller.dto.request.LoginRequest;
 import turip.auth.controller.dto.request.RefreshTokenRequest;
 import turip.auth.controller.dto.response.LoginResponse;
@@ -34,10 +38,7 @@ import turip.auth.token.GoogleTokenParser;
 import turip.auth.token.JwtProvider;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.UnauthorizedException;
-import turip.account.domain.Account;
-import turip.account.domain.Member;
-import turip.account.domain.Provider;
-import turip.account.service.MemberService;
+import turip.fixture.AccountFixture;
 
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
@@ -77,7 +78,7 @@ class AuthServiceTest {
             String deviceFid = "device-123";
             String providerId = "google-user-123";
             String email = "test@gmail.com";
-            Account account = new Account(1L);
+            Account account = AccountFixture.createUser();
             Member member = new Member(account, Provider.GOOGLE, providerId, email);
 
             LoginRequest request = new LoginRequest(idToken);
@@ -118,7 +119,7 @@ class AuthServiceTest {
             String deviceFid = "device-123";
             String providerId = "google-user-new";
             String email = "newuser@gmail.com";
-            Account account = new Account(1L);
+            Account account = AccountFixture.createUser();
             Member member = new Member(account, Provider.GOOGLE, providerId, email);
 
             LoginRequest request = new LoginRequest(idToken);
@@ -180,7 +181,7 @@ class AuthServiceTest {
             String oldRefreshToken = generateValidRefreshToken(accountId);
             String hashedToken = "hashed-old-token";
 
-            Account account = new Account(accountId);
+            Account account = AccountFixture.createUser();
             Member member = new Member(account, Provider.GOOGLE, "provider-id", "test@gmail.com");
             RefreshToken storedRefreshToken = new RefreshToken(
                     member, deviceFid, hashedToken,
@@ -225,7 +226,7 @@ class AuthServiceTest {
             String oldRefreshToken = generateValidRefreshToken(accountId);
             String wrongHashedToken = "wrong-hashed-token";
 
-            Account account = new Account(accountId);
+            Account account = AccountFixture.createUser();
             Member member = new Member(account, Provider.GOOGLE, "provider-id", "test@gmail.com");
             RefreshToken storedRefreshToken = new RefreshToken(
                     member, deviceFid, "correct-hashed-token",
@@ -254,7 +255,7 @@ class AuthServiceTest {
             String deviceFid = "device-123";
             String oldRefreshToken = generateValidRefreshToken(accountId);
 
-            Account account = new Account(accountId);
+            Account account = AccountFixture.createUser();
             Member member = new Member(account, Provider.GOOGLE, "provider-id", "test@gmail.com");
 
             RefreshTokenRequest request = new RefreshTokenRequest(oldRefreshToken);
@@ -331,7 +332,7 @@ class AuthServiceTest {
             // given
             Long accountId = 1L;
             String deviceFid = "device-123";
-            Account account = new Account(accountId);
+            Account account = AccountFixture.createUser();
             Member member = new Member(account, Provider.GOOGLE, "provider-id", "test@gmail.com");
 
             when(memberService.getByAccountId(accountId)).thenReturn(member);
@@ -349,7 +350,7 @@ class AuthServiceTest {
             // given
             Long accountId = 999L;
             String deviceFid = "device-123";
-            Account account = new Account(accountId);
+            Account account = AccountFixture.createUser();
 
             when(memberService.getByAccountId(accountId))
                     .thenThrow(new UnauthorizedException(ErrorTag.UNAUTHORIZED));

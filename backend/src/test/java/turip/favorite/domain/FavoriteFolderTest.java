@@ -10,9 +10,11 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import turip.account.domain.Account;
+import turip.account.domain.Role;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.IllegalArgumentException;
-import turip.account.domain.Account;
+import turip.fixture.AccountFixture;
 
 class FavoriteFolderTest {
 
@@ -20,8 +22,8 @@ class FavoriteFolderTest {
     @Test
     void isOwner1() {
         // given
-        Account owner = new Account(1L);
-        Account nonOwner = new Account(2L);
+        Account owner = AccountFixture.createCustomAccount(1L, Role.USER);
+        Account nonOwner = AccountFixture.createCustomAccount(2L, Role.USER);
         FavoriteFolder favoriteFolder = new FavoriteFolder(1L, owner, "폴더", false);
 
         // when & then

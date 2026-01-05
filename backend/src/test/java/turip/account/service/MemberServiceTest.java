@@ -15,16 +15,18 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import turip.favorite.domain.FavoriteContent;
-import turip.favorite.domain.FavoriteFolder;
-import turip.favorite.repository.FavoriteContentRepository;
-import turip.favorite.repository.FavoriteFolderRepository;
-import turip.auth.service.RefreshTokenService;
 import turip.account.domain.Account;
 import turip.account.domain.Guest;
 import turip.account.domain.Member;
 import turip.account.domain.Provider;
+import turip.account.domain.Role;
 import turip.account.repository.MemberRepository;
+import turip.auth.service.RefreshTokenService;
+import turip.favorite.domain.FavoriteContent;
+import turip.favorite.domain.FavoriteFolder;
+import turip.favorite.repository.FavoriteContentRepository;
+import turip.favorite.repository.FavoriteFolderRepository;
+import turip.fixture.AccountFixture;
 
 @ExtendWith(MockitoExtension.class)
 class MemberServiceTest {
@@ -58,8 +60,8 @@ class MemberServiceTest {
         @Test
         void migrateFavoriteContents() {
             // given
-            Account memberAccount = new Account(1L);
-            Account guestAccount = new Account(2L);
+            Account memberAccount = AccountFixture.createCustomAccount(1L, Role.USER);
+            Account guestAccount = AccountFixture.createCustomAccount(2L, Role.USER);
             Member member = new Member(1L, memberAccount, Provider.GOOGLE, "providerId", "email@test.com");
             Guest guest = new Guest(1L, guestAccount, "device-fid-123");
 
@@ -82,8 +84,8 @@ class MemberServiceTest {
         @Test
         void migrateFavoriteFolders() {
             // given
-            Account memberAccount = new Account(1L);
-            Account guestAccount = new Account(2L);
+            Account memberAccount = AccountFixture.createCustomAccount(1L, Role.USER);
+            Account guestAccount = AccountFixture.createCustomAccount(2L, Role.USER);
             Member member = new Member(1L, memberAccount, Provider.GOOGLE, "providerId", "email@test.com");
             Guest guest = new Guest(1L, guestAccount, "device-fid-123");
 
@@ -109,8 +111,8 @@ class MemberServiceTest {
         @Test
         void deleteGuest() {
             // given
-            Account memberAccount = new Account(1L);
-            Account guestAccount = new Account(2L);
+            Account memberAccount = AccountFixture.createCustomAccount(1L, Role.USER);
+            Account guestAccount = AccountFixture.createCustomAccount(2L, Role.USER);
             Member member = new Member(1L, memberAccount, Provider.GOOGLE, "providerId", "email@test.com");
             Guest guest = new Guest(1L, guestAccount, "device-fid-123");
 
@@ -135,7 +137,7 @@ class MemberServiceTest {
         @Test
         void delete() {
             // given
-            Account account = new Account(1L);
+            Account account = AccountFixture.createUser();
             Member member = new Member(1L, account, Provider.GOOGLE, "providerId", "email@test.com");
 
             // when
