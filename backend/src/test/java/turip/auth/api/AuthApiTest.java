@@ -20,8 +20,9 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import turip.auth.token.GoogleTokenParser;
 import turip.account.domain.Provider;
+import turip.auth.token.GoogleTokenParser;
+import turip.util.helper.TestDataHelper;
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -32,6 +33,9 @@ class AuthApiTest {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private TestDataHelper testDataHelper;
 
     @MockitoBean
     private GoogleTokenParser googleTokenParser;
@@ -89,7 +93,7 @@ class AuthApiTest {
         @DisplayName("기존 회원 로그인 성공 시 200 OK와 토큰을 응답한다")
         void loginExistingMemberSuccess() {
             // given
-            jdbcTemplate.update("INSERT INTO account (id) VALUES (1)");
+            testDataHelper.insertAccount();
             jdbcTemplate.update(
                     "INSERT INTO member (id, account_id, provider, provider_id, email) VALUES (1, 1, 'GOOGLE', 'google-user-existing', 'existing@gmail.com')");
 
@@ -154,7 +158,7 @@ class AuthApiTest {
         void refreshTokenSuccess() {
             // given
             // 1. 먼저 로그인해서 토큰 받기
-            jdbcTemplate.update("INSERT INTO account (id) VALUES (1)");
+            testDataHelper.insertAccount();
             jdbcTemplate.update(
                     "INSERT INTO member (id, account_id, provider, provider_id, email) VALUES (1, 1, 'GOOGLE', 'google-user-refresh', 'refresh@gmail.com')");
 
@@ -220,9 +224,10 @@ class AuthApiTest {
         @DisplayName("DB에 저장된 토큰과 일치하지 않으면 401 Unauthorized를 응답한다")
         void refreshTokenMismatch() {
             // given
-            jdbcTemplate.update("INSERT INTO account (id) VALUES (1)");
+            Long accountId = testDataHelper.insertAccount();
             jdbcTemplate.update(
-                    "INSERT INTO member (id, account_id, provider, provider_id, email) VALUES (1, 1, 'GOOGLE', 'google-user-mismatch', 'mismatch@gmail.com')");
+                    "INSERT INTO member (id, account_id, provider, provider_id, email) VALUES (1, ?, 'GOOGLE', 'google-user-mismatch', 'mismatch@gmail.com')",
+                    accountId);
 
             String idToken = "valid-google-id-token";
             String deviceFid = "device-mismatch-123";
@@ -245,9 +250,10 @@ class AuthApiTest {
                     .statusCode(200);
 
             // 다른 사용자의 refresh token 사용 시도
-            jdbcTemplate.update("INSERT INTO account (id) VALUES (2)");
+            Long anotherAccountId = testDataHelper.insertAccount();
             jdbcTemplate.update(
-                    "INSERT INTO member (id, account_id, provider, provider_id, email) VALUES (2, 2, 'GOOGLE', 'google-user-other', 'other@gmail.com')");
+                    "INSERT INTO member (id, account_id, provider, provider_id, email) VALUES (2, ?, 'GOOGLE', 'google-user-other', 'other@gmail.com')",
+                    anotherAccountId);
 
             String otherIdToken = "other-valid-google-id-token";
             String otherDeviceFid = "device-other-123";
@@ -292,7 +298,7 @@ class AuthApiTest {
         @DisplayName("정상적으로 로그아웃에 성공하면 204 No Content를 응답한다")
         void logoutSuccess() {
             // given
-            jdbcTemplate.update("INSERT INTO account (id) VALUES (1)");
+            testDataHelper.insertAccount();
             jdbcTemplate.update(
                     "INSERT INTO member (id, account_id, provider, provider_id, email) VALUES (1, 1, 'GOOGLE', 'google-user-logout', 'logout@gmail.com')");
 
@@ -331,7 +337,7 @@ class AuthApiTest {
         @DisplayName("로그아웃 후 refresh token이 DB에서 삭제된다")
         void logoutDeletesRefreshToken() {
             // given
-            jdbcTemplate.update("INSERT INTO account (id) VALUES (1)");
+            testDataHelper.insertAccount();
             jdbcTemplate.update(
                     "INSERT INTO member (id, account_id, provider, provider_id, email) VALUES (1, 1, 'GOOGLE', 'google-user-logout-delete', 'logout-delete@gmail.com')");
 

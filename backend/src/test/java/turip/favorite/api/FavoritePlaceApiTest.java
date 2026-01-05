@@ -17,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
+import turip.util.helper.TestDataHelper;
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -27,6 +28,9 @@ class FavoritePlaceApiTest {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private TestDataHelper testDataHelper;
 
     @BeforeEach
     void setUp() {
@@ -72,10 +76,11 @@ class FavoritePlaceApiTest {
         @DisplayName("장소 찜 생성에 성공한 경우 201 CREATED 코드와 생성된 장소 찜 정보를 응답한다")
         @Test
         void create1() {
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
             jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '잠실캠 맛집 모음', false)");
+                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '잠실캠 맛집 모음', false)",
+                    accountId);
             jdbcTemplate.update(
                     "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('루터회관','https://naver.me/5UrZAIeY', '루터회관의 도로명 주소', 38.1234, 127.23123)");
 
@@ -94,10 +99,11 @@ class FavoritePlaceApiTest {
         @Test
         void create2() {
             // given
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
             jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '테스트 폴더', false)");
+                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '테스트 폴더', false)",
+                    accountId);
             jdbcTemplate.update(
                     "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('첫 번째 장소','https://naver.me/place1', '첫 번째 장소 주소', 37.1234, 127.1234)");
 
@@ -122,10 +128,11 @@ class FavoritePlaceApiTest {
         @Test
         void create3() {
             // given
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
             jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '테스트 폴더', false)");
+                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '테스트 폴더', false)",
+                    accountId);
             jdbcTemplate.update(
                     "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('첫 번째 장소','https://naver.me/place1', '첫 번째 장소 주소', 37.1234, 127.1234)");
             jdbcTemplate.update(
@@ -154,10 +161,11 @@ class FavoritePlaceApiTest {
         @Test
         void create4() {
             // given
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
             jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '테스트 폴더', false)");
+                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '테스트 폴더', false)",
+                    accountId);
             jdbcTemplate.update(
                     "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('장소1','https://naver.me/place1', '장소1 주소', 37.1234, 127.1234)");
             jdbcTemplate.update(
@@ -212,10 +220,11 @@ class FavoritePlaceApiTest {
         @DisplayName("폴더 소유자의 기기id와 요청자의 기기id가 같지 않은 경우 403 FORBIDDEN을 응답한다")
         @Test
         void create5() {
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'may')");
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'may')", accountId);
             jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '잠실캠 맛집 모음', false)");
+                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '잠실캠 맛집 모음', false)",
+                    accountId);
             jdbcTemplate.update(
                     "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('루터회관','https://naver.me/5UrZAIeY', '루터회관의 도로명 주소', 38.1234, 127.23123)");
 
@@ -233,8 +242,8 @@ class FavoritePlaceApiTest {
         @DisplayName("favoriteFolderId에 대한 폴더가 존재하지 않는 경우 404 NOT FOUND를 응답한다")
         @Test
         void create6() {
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
             jdbcTemplate.update(
                     "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('루터회관','https://naver.me/5UrZAIeY', '루터회관의 도로명 주소', 38.1234, 127.23123)");
 
@@ -252,10 +261,11 @@ class FavoritePlaceApiTest {
         @DisplayName("placeId에 대한 장소가 존재하지 않는 경우 404 NOT FOUND를 응답한다")
         @Test
         void create7() {
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
             jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '잠실캠 맛집 모음', false)");
+                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '잠실캠 맛집 모음', false)",
+                    accountId);
 
             // when & then
             RestAssured.given().port(port)
@@ -271,10 +281,11 @@ class FavoritePlaceApiTest {
         @DisplayName("이미 해당 폴더에 찜한 장소인 경우 409 CONFLICT를 응답한다")
         @Test
         void create8() {
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
             jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '잠실캠 맛집 모음', false)");
+                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '잠실캠 맛집 모음', false)",
+                    accountId);
             jdbcTemplate.update(
                     "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('루터회관','https://naver.me/5UrZAIeY', '루터회관의 도로명 주소', 38.1234, 127.23123)");
             jdbcTemplate.update("INSERT INTO favorite_place (favorite_folder_id, place_id) VALUES (1, 1)");
@@ -299,10 +310,11 @@ class FavoritePlaceApiTest {
         @Test
         void readAllByFolder1() {
             // given
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
             jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '잠실캠 맛집 모음', false)");
+                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '잠실캠 맛집 모음', false)",
+                    accountId);
             jdbcTemplate.update(
                     "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('루터회관','https://naver.me/5UrZAIeY', '루터회관의 도로명 주소', 38.1234, 127.23123)");
             jdbcTemplate.update(
@@ -328,10 +340,11 @@ class FavoritePlaceApiTest {
         @Test
         void readAllByFolder2() {
             // given
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
             jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '테스트 폴더', false)");
+                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '테스트 폴더', false)",
+                    accountId);
 
             for (int i = 1; i <= 5; i++) {
                 jdbcTemplate.update(
@@ -387,10 +400,11 @@ class FavoritePlaceApiTest {
         @Test
         void readCountByAccount1() {
             // given
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
             jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '테스트 폴더', false)");
+                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '테스트 폴더', false)",
+                    accountId);
             jdbcTemplate.update(
                     "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('장소1','https://naver.me/place1', '장소1 주소', 37.1234, 127.1234)");
             jdbcTemplate.update(
@@ -419,10 +433,11 @@ class FavoritePlaceApiTest {
         @Test
         void updatePlaceOrder1() {
             // given
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
             jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '테스트 폴더', false)");
+                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '테스트 폴더', false)",
+                    accountId);
             jdbcTemplate.update(
                     "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('장소1','https://naver.me/place1', '장소1 주소', 37.1234, 127.1234)");
             jdbcTemplate.update(
@@ -450,8 +465,8 @@ class FavoritePlaceApiTest {
         @Test
         void updatePlaceOrder3() {
             // given
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
 
             // when & then
             Map<String, Object> request = new HashMap<>();
@@ -471,12 +486,15 @@ class FavoritePlaceApiTest {
         @Test
         void updatePlaceOrder4() {
             // given
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'ownerDeviceFid')");
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (2, 'requestDeviceFid')");
+            Long ownerAccountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'ownerDeviceFid')",
+                    ownerAccountId);
+            Long requestAccountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'requestDeviceFid')",
+                    requestAccountId);
             jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '다른 사람의 폴더', false)");
+                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '다른 사람의 폴더', false)",
+                    ownerAccountId);
 
             // when & then
             Map<String, Object> request = new HashMap<>();
@@ -496,10 +514,11 @@ class FavoritePlaceApiTest {
         @Test
         void updatePlaceOrder5() {
             // given
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
             jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '테스트 폴더', false)");
+                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '테스트 폴더', false)",
+                    accountId);
 
             // when & then
             Map<String, Object> request = new HashMap<>();
@@ -519,12 +538,12 @@ class FavoritePlaceApiTest {
         @Test
         void updatePlaceOrder6() {
             // given
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
             jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '폴더1', false)");
+                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '폴더1', false)", accountId);
             jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '폴더2', false)");
+                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '폴더2', false)", accountId);
             jdbcTemplate.update(
                     "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('장소1','https://naver.me/place1', '장소1 주소', 37.1234, 127.1234)");
             jdbcTemplate.update(
@@ -552,10 +571,11 @@ class FavoritePlaceApiTest {
         @DisplayName("장소 찜 삭제에 성공한 경우 204 NO CONTENT를 응답한다")
         @Test
         void delete1() {
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
             jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '잠실캠 맛집 모음', false)");
+                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '잠실캠 맛집 모음', false)",
+                    accountId);
             jdbcTemplate.update(
                     "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('루터회관','https://naver.me/5UrZAIeY', '루터회관의 도로명 주소', 38.1234, 127.23123)");
             jdbcTemplate.update("INSERT INTO favorite_place (favorite_folder_id, place_id) VALUES (1, 1)");
@@ -575,13 +595,14 @@ class FavoritePlaceApiTest {
         @Test
         void delete2() {
             // given
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'may')");
+            Long accountId1 = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'may')", accountId1);
             // given
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (2, 'cool')");
+            Long accountId2 = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'cool')", accountId2);
             jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '잠실캠 맛집 모음', false)");
+                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '잠실캠 맛집 모음', false)",
+                    accountId1);
             jdbcTemplate.update(
                     "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('루터회관','https://naver.me/5UrZAIeY', '루터회관의 도로명 주소', 38.1234, 127.23123)");
             jdbcTemplate.update("INSERT INTO favorite_place (favorite_folder_id, place_id) VALUES (1, 1)");
@@ -614,8 +635,8 @@ class FavoritePlaceApiTest {
         @DisplayName("favoriteFolderId에 대한 폴더가 존재하지 않는 경우 404 NOT FOUND를 응답한다")
         @Test
         void delete4() {
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
             jdbcTemplate.update(
                     "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('루터회관','https://naver.me/5UrZAIeY', '루터회관의 도로명 주소', 38.1234, 127.23123)");
 
@@ -633,10 +654,11 @@ class FavoritePlaceApiTest {
         @DisplayName("placeId에 대한 장소가 존재하지 않는 경우 404 NOT FOUND를 응답한다")
         @Test
         void delete5() {
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
             jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '잠실캠 맛집 모음', false)");
+                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '잠실캠 맛집 모음', false)",
+                    accountId);
 
             // when & then
             RestAssured.given().port(port)
@@ -652,10 +674,11 @@ class FavoritePlaceApiTest {
         @DisplayName("삭제하려는 장소 찜이 존재하지 않는 경우 404 NOT FOUND를 응답한다")
         @Test
         void delete6() {
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
             jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '잠실캠 맛집 모음', false)");
+                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '잠실캠 맛집 모음', false)",
+                    accountId);
             jdbcTemplate.update(
                     "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('루터회관','https://naver.me/5UrZAIeY', '루터회관의 도로명 주소', 38.1234, 127.23123)");
 

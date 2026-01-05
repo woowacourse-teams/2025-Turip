@@ -15,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
+import turip.util.helper.TestDataHelper;
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -25,6 +26,9 @@ class FavoriteFolderApiTest {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private TestDataHelper testDataHelper;
 
     @BeforeEach
     void setUp() {
@@ -85,10 +89,11 @@ class FavoriteFolderApiTest {
         @Test
         void create2() {
             // given
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
             jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '대구 맛집 모음', false)");
+                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '대구 맛집 모음', false)",
+                    accountId);
 
             // when & then
             Map<String, String> request = new HashMap<>(Map.of("name", "대구 맛집 모음"));
@@ -124,12 +129,13 @@ class FavoriteFolderApiTest {
         @Test
         void readAllByMember1() {
             // given
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
             jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '기본 폴더', true)");
+                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '기본 폴더', true)", accountId);
             jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '대구 맛집 모음', false)");
+                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '대구 맛집 모음', false)",
+                    accountId);
 
             // when & then
             RestAssured.given().port(port)
@@ -139,11 +145,11 @@ class FavoriteFolderApiTest {
                     .statusCode(200)
                     .body("favoriteFolders.size()", is(2))
                     .body("favoriteFolders[0].id", is(1))
-                    .body("favoriteFolders[0].memberId", is(1))
+                    .body("favoriteFolders[0].memberId", is(accountId.intValue()))
                     .body("favoriteFolders[0].name", is("기본 폴더"))
                     .body("favoriteFolders[0].isDefault", is(true))
                     .body("favoriteFolders[1].id", is(2))
-                    .body("favoriteFolders[1].memberId", is(1))
+                    .body("favoriteFolders[1].memberId", is(accountId.intValue()))
                     .body("favoriteFolders[1].name", is("대구 맛집 모음"))
                     .body("favoriteFolders[1].isDefault", is(false));
         }
@@ -172,12 +178,12 @@ class FavoriteFolderApiTest {
         @Test
         void readAllWithFavoriteStatusByDeviceId1() {
             // given
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
             jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '기본 폴더', true)");
+                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '기본 폴더', true)", accountId);
             jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '맛집 모음', false)");
+                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '맛집 모음', false)", accountId);
             jdbcTemplate.update(
                     "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('루터회관','https://naver.me/5UrZAIeY', '루터회관의 도로명 주소', 38.1234, 127.23123)");
             jdbcTemplate.update("INSERT INTO favorite_place (favorite_folder_id, place_id) VALUES (2, 1)");
@@ -217,10 +223,10 @@ class FavoriteFolderApiTest {
         @Test
         void readAllWithFavoriteStatusByDeviceId3() {
             // given
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
             jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '기본 폴더', true)");
+                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '기본 폴더', true)", accountId);
 
             // when & then
             RestAssured.given().port(port)
@@ -240,10 +246,11 @@ class FavoriteFolderApiTest {
         @Test
         void updateName1() {
             // given
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
             jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '변경 전 폴더', false)");
+                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '변경 전 폴더', false)",
+                    accountId);
 
             // when & then
             Map<String, String> request = new HashMap<>(Map.of("name", "변경된 폴더"));
@@ -255,7 +262,7 @@ class FavoriteFolderApiTest {
                     .then()
                     .statusCode(200)
                     .body("id", is(1))
-                    .body("memberId", is(1))
+                    .body("memberId", is(accountId.intValue()))
                     .body("name", is("변경된 폴더"))
                     .body("isDefault", is(false));
         }
@@ -264,10 +271,11 @@ class FavoriteFolderApiTest {
         @Test
         void updateName3() {
             // given
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
             jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '변경 전 폴더', false)");
+                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '변경 전 폴더', false)",
+                    accountId);
 
             // when & then
             Map<String, String> request = new HashMap<>(Map.of("name", "변경된 폴더"));
@@ -284,12 +292,15 @@ class FavoriteFolderApiTest {
         @Test
         void updateName4() {
             // given
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'ownerDeviceFid')");
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (2, 'requestDeviceFid')");
+            Long ownerAccountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'ownerDeviceFid')",
+                    ownerAccountId);
+            Long requestAccountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'requestDeviceFid')",
+                    requestAccountId);
             jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '변경 전 폴더', false)");
+                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '변경 전 폴더', false)",
+                    ownerAccountId);
 
             // when & then
             Map<String, String> request = new HashMap<>(Map.of("name", "변경된 폴더"));
@@ -306,12 +317,13 @@ class FavoriteFolderApiTest {
         @Test
         void updateName5() {
             // given
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
             jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '변경 전 폴더', false)");
-            jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '다른 폴더', false)");
+                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '변경 전 폴더', false)",
+                    accountId);
+            jdbcTemplate.update("INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '다른 폴더', false)",
+                    accountId);
 
             // when & then
             Map<String, String> request = new HashMap<>(Map.of("name", "다른 폴더"));
@@ -328,10 +340,11 @@ class FavoriteFolderApiTest {
         @Test
         void updateName6() {
             // given
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
             jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '변경 전 폴더', false)");
+                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '변경 전 폴더', false)",
+                    accountId);
 
             // when & then
             Map<String, String> request = new HashMap<>(Map.of("name", "21글자폴더입니다용21글자폴더입니다용~"));
@@ -348,10 +361,10 @@ class FavoriteFolderApiTest {
         @Test
         void updateName7() {
             // given
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
             jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '기본 폴더', true)");
+                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '기본 폴더', true)", accountId);
 
             // when & then
             Map<String, String> request = new HashMap<>(Map.of("name", "변경된 폴더"));
@@ -373,10 +386,11 @@ class FavoriteFolderApiTest {
         @Test
         void delete1() {
             // given
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
             jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '삭제할 폴더', false)");
+                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '삭제할 폴더', false)",
+                    accountId);
 
             // when & then
             RestAssured.given().port(port)
@@ -390,10 +404,12 @@ class FavoriteFolderApiTest {
         @Test
         void delete2() {
             // given
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
             jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '존재하는 폴더', false)");
+                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '존재하는 폴더', false)",
+                    accountId);
+
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
@@ -406,12 +422,15 @@ class FavoriteFolderApiTest {
         @Test
         void delete4() {
             // given
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'ownerDeviceFid')");
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (2, 'requestDeviceFid')");
+            Long ownerAccountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'ownerDeviceFid')",
+                    ownerAccountId);
+            Long requestAccountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'requestDeviceFid')",
+                    requestAccountId);
             jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '다른 사람의 폴더', false)");
+                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '다른 사람의 폴더', false)",
+                    ownerAccountId);
 
             // when & then
             RestAssured.given().port(port)
@@ -425,10 +444,10 @@ class FavoriteFolderApiTest {
         @Test
         void delete5() {
             // given
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
-            jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '기본 폴더', true)");
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
+            jdbcTemplate.update("INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '기본 폴더', true)",
+                    accountId);
 
             // when & then
             RestAssured.given().port(port)

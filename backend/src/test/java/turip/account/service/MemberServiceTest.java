@@ -26,7 +26,7 @@ import turip.favorite.domain.FavoriteContent;
 import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.repository.FavoriteContentRepository;
 import turip.favorite.repository.FavoriteFolderRepository;
-import turip.fixture.AccountFixture;
+import turip.util.fixture.AccountFixture;
 
 @ExtendWith(MockitoExtension.class)
 class MemberServiceTest {

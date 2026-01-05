@@ -14,7 +14,7 @@ import turip.account.domain.Account;
 import turip.account.domain.Role;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.IllegalArgumentException;
-import turip.fixture.AccountFixture;
+import turip.util.fixture.AccountFixture;
 
 class FavoriteFolderTest {
 

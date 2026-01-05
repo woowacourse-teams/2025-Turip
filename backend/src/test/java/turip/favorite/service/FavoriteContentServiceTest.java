@@ -31,10 +31,10 @@ import turip.favorite.controller.dto.request.FavoriteContentRequest;
 import turip.favorite.controller.dto.response.FavoriteContentResponse;
 import turip.favorite.domain.FavoriteContent;
 import turip.favorite.repository.FavoriteContentRepository;
-import turip.fixture.AccountFixture;
 import turip.region.domain.City;
 import turip.region.domain.Country;
 import turip.region.domain.Province;
+import turip.util.fixture.AccountFixture;
 
 @ExtendWith(MockitoExtension.class)
 class FavoriteContentServiceTest {

@@ -29,12 +29,12 @@ import turip.content.repository.ContentRepository;
 import turip.creator.domain.Creator;
 import turip.favorite.domain.FavoriteContent;
 import turip.favorite.repository.FavoriteContentRepository;
-import turip.fixture.AccountFixture;
 import turip.region.domain.City;
 import turip.region.domain.Country;
 import turip.region.domain.DomesticRegionCategory;
 import turip.region.domain.OverseasRegionCategory;
 import turip.region.domain.Province;
+import turip.util.fixture.AccountFixture;
 
 @ExtendWith(MockitoExtension.class)
 class ContentServiceTest {

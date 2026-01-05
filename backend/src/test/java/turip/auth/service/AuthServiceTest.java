@@ -38,7 +38,7 @@ import turip.auth.token.GoogleTokenParser;
 import turip.auth.token.JwtProvider;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.UnauthorizedException;
-import turip.fixture.AccountFixture;
+import turip.util.fixture.AccountFixture;
 
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {

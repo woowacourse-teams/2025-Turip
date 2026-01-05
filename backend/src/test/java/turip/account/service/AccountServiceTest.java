@@ -21,7 +21,7 @@ import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.NotFoundException;
 import turip.favorite.repository.FavoriteContentRepository;
 import turip.favorite.service.FavoriteFolderService;
-import turip.fixture.AccountFixture;
+import turip.util.fixture.AccountFixture;
 
 @ExtendWith(MockitoExtension.class)
 class AccountServiceTest {

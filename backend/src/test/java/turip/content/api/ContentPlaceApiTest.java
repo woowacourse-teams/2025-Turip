@@ -12,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
+import turip.util.helper.TestDataHelper;
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -19,8 +20,12 @@ class ContentPlaceApiTest {
 
     @LocalServerPort
     private int port;
+
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private TestDataHelper testDataHelper;
 
     @BeforeEach
     void setUp() {
@@ -90,10 +95,11 @@ class ContentPlaceApiTest {
                     "INSERT INTO content_place (content_id, place_id, visit_day, visit_order, time_line) VALUES (1, 1, 1, 1, '00:11:00')");
             jdbcTemplate.update(
                     "INSERT INTO content_place (content_id, place_id, visit_day, visit_order, time_line) VALUES (1, 2, 2, 1, '00:12:00')");
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
+
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
             jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '기본 폴더', true)");
+                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '기본 폴더', true)", accountId);
             jdbcTemplate.update(
                     "INSERT INTO favorite_place (favorite_folder_id, place_id) VALUES (1, 1)");
 

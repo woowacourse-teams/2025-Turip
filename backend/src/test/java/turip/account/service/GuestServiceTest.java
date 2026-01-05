@@ -21,7 +21,7 @@ import turip.account.repository.GuestRepository;
 import turip.favorite.service.FavoriteContentService;
 import turip.favorite.service.FavoriteFolderService;
 import turip.favorite.service.FavoritePlaceService;
-import turip.fixture.AccountFixture;
+import turip.util.fixture.AccountFixture;
 
 @ExtendWith(MockitoExtension.class)
 class GuestServiceTest {

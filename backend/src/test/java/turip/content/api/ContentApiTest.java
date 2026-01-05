@@ -3,6 +3,7 @@ package turip.content.api;
 import static org.hamcrest.Matchers.is;
 
 import io.restassured.RestAssured;
+import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -12,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
+import turip.util.helper.TestDataHelper;
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -22,6 +24,9 @@ class ContentApiTest {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private TestDataHelper testDataHelper;
 
     @BeforeEach
     void setUp() {
@@ -74,8 +79,8 @@ class ContentApiTest {
             jdbcTemplate.update(
                     "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (?, ?, ?, ?, ?)",
                     1, 1, "https://youtube.com/watch?v=abcd1", "서울 데이트 코스 추천", "2024-07-01");
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, ?)", accountId, "testDeviceFid");
 
             // when & then
             RestAssured.given().port(port)
@@ -106,11 +111,10 @@ class ContentApiTest {
             jdbcTemplate.update(
                     "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (?, ?, ?, ?, ?)",
                     1, 1, "https://youtube.com/watch?v=abcd1", "서울 데이트 코스 추천", "2024-07-01");
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
-            jdbcTemplate.update(
-                    "INSERT INTO favorite_content (created_at, account_id, content_id) VALUES (?, ?, ?)", "2025-07-01",
-                    1, 1);
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, ?)", accountId, "testDeviceFid");
+            jdbcTemplate.update("INSERT INTO favorite_content (created_at, account_id, content_id) VALUES (?, ?, ?)",
+                    "2025-07-01", accountId, 1);
 
             // when & then
             RestAssured.given().port(port)
@@ -141,8 +145,8 @@ class ContentApiTest {
             jdbcTemplate.update(
                     "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (?, ?, ?, ?, ?)",
                     1, 1, "https://youtube.com/watch?v=abcd1", "서울 데이트 코스 추천", "2024-07-01");
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, ?)", accountId, "testDeviceFid");
 
             // when & then
             RestAssured.given().port(port)
@@ -169,10 +173,11 @@ class ContentApiTest {
                     "INSERT INTO city (name, country_id, province_id, image_url) VALUES ('서울', 1, null, 'https://image.example.com/seoul.jpg')");
             jdbcTemplate.update("INSERT INTO content (creator_id, city_id, url, title, uploaded_date) " +
                     "VALUES (1, 1, 'https://youtube.com/watch?v=test', '서울 여행', '2025-07-28')");
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
-            jdbcTemplate.update(
-                    "INSERT INTO favorite_content (account_id, content_id, created_at) VALUES (1, 1, CURRENT_DATE - 7)");
+
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, ?)", accountId, "testDeviceFid");
+            jdbcTemplate.update("INSERT INTO favorite_content (created_at, account_id, content_id) VALUES (?, ?, ?)",
+                    LocalDate.now().minusDays(7), accountId, 1);
 
             // when & then
             RestAssured.given().port(port)

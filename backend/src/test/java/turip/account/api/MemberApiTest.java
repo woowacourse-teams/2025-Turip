@@ -18,8 +18,9 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import turip.auth.token.GoogleTokenParser;
 import turip.account.domain.Provider;
+import turip.auth.token.GoogleTokenParser;
+import turip.util.helper.TestDataHelper;
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -30,6 +31,9 @@ class MemberApiTest {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private TestDataHelper testDataHelper;
 
     @MockitoBean
     private GoogleTokenParser googleTokenParser;
@@ -72,29 +76,35 @@ class MemberApiTest {
         void migrationSuccess() {
             // given
             // 1. Guest account와 Member account 생성
-            jdbcTemplate.update("INSERT INTO account (id) VALUES (1)"); // Guest account
-            jdbcTemplate.update("INSERT INTO account (id) VALUES (2)"); // Member account
+            Long guestAccountId = testDataHelper.insertAccount();// Guest account
+            Long memberAccountId = testDataHelper.insertAccount(); // Member account
 
             // 2. Guest와 Member 생성
             String guestDeviceFid = "guest-device-123";
             jdbcTemplate.update(
-                    "INSERT INTO guest (id, account_id, device_fid) VALUES (1, 1, ?)",
+                    "INSERT INTO guest (id, account_id, device_fid) VALUES (?, 1, ?)",
+                    guestAccountId,
                     guestDeviceFid
             );
             jdbcTemplate.update(
-                    "INSERT INTO member (id, account_id, provider, provider_id, email) VALUES (1, 2, 'GOOGLE', 'google-user-migration', 'migration@gmail.com')");
+                    "INSERT INTO member (id, account_id, provider, provider_id, email) VALUES (1, ?, 'GOOGLE', 'google-user-migration', 'migration@gmail.com')",
+                    memberAccountId
+            );
 
             // 3. Guest의 FavoriteFolder와 FavoriteContent 생성
             jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (id, account_id, name, is_default) VALUES (1, 1, '기본 폴더', true)"
+                    "INSERT INTO favorite_folder (id, account_id, name, is_default) VALUES (1, ?, '기본 폴더', true)",
+                    guestAccountId
             );
             jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (id, account_id, name, is_default) VALUES (2, 1, '커스텀 폴더', false)"
+                    "INSERT INTO favorite_folder (id, account_id, name, is_default) VALUES (2, ?, '커스텀 폴더', false)",
+                    guestAccountId
             );
 
             // Member의 기본 폴더 생성 (마이그레이션 시 삭제될 폴더)
             jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (id, account_id, name, is_default) VALUES (3, 2, '기본 폴더', true)"
+                    "INSERT INTO favorite_folder (id, account_id, name, is_default) VALUES (3, ?, '기본 폴더', true)",
+                    memberAccountId
             );
 
             // FavoriteContent를 위한 Content 생성
@@ -112,7 +122,8 @@ class MemberApiTest {
             );
 
             jdbcTemplate.update(
-                    "INSERT INTO favorite_content (id, account_id, content_id, created_at) VALUES (1, 1, 1, '2024-01-01')"
+                    "INSERT INTO favorite_content (id, account_id, content_id, created_at) VALUES (1, ?, 1, '2024-01-01')"
+                    , guestAccountId
             );
 
             // 4. Member 로그인해서 access token 받기
@@ -186,7 +197,7 @@ class MemberApiTest {
         void migrationWithoutDeviceFidHeader() {
             // given
             // Member 생성 및 로그인
-            jdbcTemplate.update("INSERT INTO account (id) VALUES (1)");
+            testDataHelper.insertAccount();
             jdbcTemplate.update(
                     "INSERT INTO member (id, account_id, provider, provider_id, email) VALUES (1, 1, 'GOOGLE', 'google-user-no-device', 'nodevice@gmail.com')"
             );
@@ -229,7 +240,7 @@ class MemberApiTest {
         void deleteMemberSuccess() {
             // given
             // 1. Account와 Member 생성
-            jdbcTemplate.update("INSERT INTO account (id) VALUES (1)");
+            testDataHelper.insertAccount();
             jdbcTemplate.update(
                     "INSERT INTO member (id, account_id, provider, provider_id, email) VALUES (1, 1, 'GOOGLE', 'google-user-delete', 'delete@gmail.com')"
             );
