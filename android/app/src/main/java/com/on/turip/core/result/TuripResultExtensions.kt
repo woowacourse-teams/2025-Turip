@@ -19,7 +19,7 @@ inline fun <T> TuripResult<T>.onFailure(action: (errorType: ErrorType) -> Unit):
 /**
  * 예외 발생한 경우(로깅용)
  */
-inline fun <T> TuripResult<T>.onFailureWithCause(action: (errorType: ErrorType, cause: Throwable?) -> Unit): TuripResult<T> {
+inline fun <T> TuripResult<T>.onFailureWithCause(action: (errorType: ErrorType, cause: Throwable) -> Unit): TuripResult<T> {
     if (this is TuripResult.Failure) action(errorType, cause)
     return this
 }

@@ -7,6 +7,6 @@ sealed class TuripResult<out T> {
 
     data class Failure(
         val errorType: ErrorType,
-        val cause: Throwable? = null,
+        val cause: Throwable,
     ) : TuripResult<Nothing>()
 }
