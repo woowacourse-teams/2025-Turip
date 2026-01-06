@@ -169,8 +169,8 @@ class FavoritePlaceFragment :
 
     private fun setupObservers() {
         collectOnStarted(viewModel.uiState) { uiState: FavoritePlaceUiState ->
+            if (uiState.isLoading) showLoading()
             when {
-                uiState.isLoading -> showLoading()
                 uiState.errorUiState != ErrorUiState.None -> showErrorView(uiState.errorUiState)
                 else -> showContents(uiState)
             }

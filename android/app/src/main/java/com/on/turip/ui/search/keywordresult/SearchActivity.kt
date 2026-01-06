@@ -185,8 +185,9 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         }
 
         collectOnStarted(viewModel.uiState) { uiState: SearchUiState ->
+            if (uiState is SearchUiState.Loading) showLoading()
             when (uiState) {
-                SearchUiState.Loading -> showLoading()
+                SearchUiState.Loading -> Unit
                 SearchUiState.Empty -> showEmptyView()
                 is SearchUiState.Success -> showContents(uiState)
                 is SearchUiState.Error -> showErrorView(uiState.errorUiState)

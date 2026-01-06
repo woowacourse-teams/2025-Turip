@@ -96,6 +96,14 @@ private fun HomeScreenContent(
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
 
+    if (uiState.isLoading) {
+        Box(
+            modifier = modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center,
+        ) {
+            CircularProgressIndicator(modifier = Modifier.size(60.dp), color = Color.Black)
+        }
+    }
     when {
         uiState.errorUiState != ErrorUiState.None -> {
             ErrorScreen(
@@ -103,15 +111,6 @@ private fun HomeScreenContent(
                 onRetryClick = onRetryLoadContents,
                 modifier = modifier.fillMaxSize(),
             )
-        }
-
-        uiState.isLoading -> {
-            Box(
-                modifier = modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center,
-            ) {
-                CircularProgressIndicator(modifier = Modifier.size(60.dp), color = Color.Black)
-            }
         }
 
         else -> {

@@ -79,8 +79,8 @@ class FavoriteContentFragment : BaseFragment<FragmentFavoriteContentBinding>() {
 
     private fun setupObservers() {
         collectOnStarted(viewModel.uiState) { uiState: FavoriteContentUiState ->
+            if (uiState.isLoading) showLoading()
             when {
-                uiState.isLoading -> showLoading()
                 uiState.errorUiState != ErrorUiState.None -> showErrorView(uiState.errorUiState)
                 else -> showContents(uiState.favoriteContents)
             }

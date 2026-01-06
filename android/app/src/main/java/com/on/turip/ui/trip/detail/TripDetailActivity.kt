@@ -216,14 +216,9 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
 
     private fun setupObservers() {
         collectOnStarted(viewModel.uiState) { uiState: TripDetailUiState ->
+            if (uiState.isLoading) showLoading()
             when {
-                // 로딩
-                uiState.isLoading -> showLoading()
-
-                // 에러
                 uiState.errorUiState != ErrorUiState.None -> showErrorView(uiState.errorUiState)
-
-                // 정상
                 else -> showContents(uiState)
             }
         }

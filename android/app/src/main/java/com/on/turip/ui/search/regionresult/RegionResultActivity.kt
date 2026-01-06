@@ -64,8 +64,9 @@ class RegionResultActivity : BaseActivity<ActivityRegionResultBinding>() {
 
     private fun setupObservers() {
         collectOnStarted(viewModel.uiState) { uiState: RegionResultUiState ->
+            if (uiState is RegionResultUiState.Loading) showLoading()
             when (uiState) {
-                RegionResultUiState.Loading -> showLoading()
+                RegionResultUiState.Loading -> Unit
                 RegionResultUiState.Empty -> showEmptyView()
                 is RegionResultUiState.Success -> showContents(uiState)
                 is RegionResultUiState.Error -> showErrorView(uiState.errorUiState)
