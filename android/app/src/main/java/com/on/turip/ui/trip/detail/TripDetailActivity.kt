@@ -225,8 +225,14 @@ class TripDetailActivity : BaseActivity<ActivityTripDetailBinding>() {
 
         collectOnStarted(viewModel.uiEffect) { uiEffect: TripDetailUiEffect ->
             when (uiEffect) {
-                is TripDetailUiEffect.ShowFavoriteStatus -> showFavoriteStatusSnackbar(uiEffect.isFavorite)
-                TripDetailUiEffect.NavigateToLogin -> navigateToLoginScreen()
+                is TripDetailUiEffect.ShowFavoriteStatus -> {
+                    showFavoriteStatusSnackbar(uiEffect.isFavorite)
+                }
+
+                TripDetailUiEffect.NavigateToLogin -> {
+                    navigateToLoginScreen()
+                }
+
                 is TripDetailUiEffect.ShowError -> {
                     val uiModel: ErrorUiModel =
                         uiEffect.errorUiState.toUiModel() ?: return@collectOnStarted

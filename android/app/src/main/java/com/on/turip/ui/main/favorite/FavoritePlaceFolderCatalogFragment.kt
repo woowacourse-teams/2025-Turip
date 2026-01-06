@@ -26,8 +26,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 
 @AndroidEntryPoint
-class FavoritePlaceFolderCatalogFragment :
-    BaseFragment<BottomSheetFragmentFavoritePlaceFolderCatalogBinding>() {
+class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavoritePlaceFolderCatalogBinding>() {
     private val viewModel: FavoritePlaceFolderCatalogViewModel by viewModels()
 
     private val placeAdapter: FavoritePlaceAdapter by lazy {
@@ -130,7 +129,9 @@ class FavoritePlaceFolderCatalogFragment :
 
         collectOnStarted(viewModel.uiEffect) { uiEffect: FavoritePlaceFolderCatalogUiEffect ->
             when (uiEffect) {
-                FavoritePlaceFolderCatalogUiEffect.NavigateToLogin -> navigateToLoginScreen()
+                FavoritePlaceFolderCatalogUiEffect.NavigateToLogin -> {
+                    navigateToLoginScreen()
+                }
 
                 FavoritePlaceFolderCatalogUiEffect.ShowFolderShareNotAllowed -> {
                     showSuggestLoginMessage()

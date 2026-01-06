@@ -36,7 +36,9 @@ inline fun <R, T> TuripResult<T>.mapCatching(transform: (value: T) -> R): TuripR
             )
         }
 
-        is TuripResult.Failure -> this
+        is TuripResult.Failure -> {
+            this
+        }
     }
 
 /**

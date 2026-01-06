@@ -109,17 +109,21 @@ class FavoritePlaceFolderViewModel @Inject constructor(
         val uiError: UiError = errorType.toUiError()
         if (uiError is UiError.Global) {
             when (uiError) {
-                UiError.Global.Network ->
+                UiError.Global.Network -> {
                     _uiEffect.send(
                         FavoritePlaceFolderUiEffect.ShowError(ErrorUiState.Network, retryAction),
                     )
+                }
 
-                UiError.Global.Server ->
+                UiError.Global.Server -> {
                     _uiEffect.send(
                         FavoritePlaceFolderUiEffect.ShowError(ErrorUiState.Server, retryAction),
                     )
+                }
 
-                UiError.Global.TokenExpired -> _uiEffect.send(FavoritePlaceFolderUiEffect.NavigateToLogin)
+                UiError.Global.TokenExpired -> {
+                    _uiEffect.send(FavoritePlaceFolderUiEffect.NavigateToLogin)
+                }
             }
         }
     }

@@ -145,8 +145,9 @@ class FavoriteContentViewModel @Inject constructor(
 
     fun handleErrorRetryRequest(action: FavoriteContentRetryAction) {
         when (action) {
-            is FavoriteContentRetryAction.UpdateFavorite ->
+            is FavoriteContentRetryAction.UpdateFavorite -> {
                 updateFavorite(action.contentId, action.isFavorite)
+            }
         }
     }
 }

@@ -186,7 +186,9 @@ class FavoritePlaceFragment :
                     shareFolder(uiEffect.favoriteFolderShareModel)
                 }
 
-                FavoritePlaceUiEffect.NavigateToLogin -> navigateToLoginScreen()
+                FavoritePlaceUiEffect.NavigateToLogin -> {
+                    navigateToLoginScreen()
+                }
 
                 is FavoritePlaceUiEffect.ShowError -> {
                     val uiModel: ErrorUiModel =

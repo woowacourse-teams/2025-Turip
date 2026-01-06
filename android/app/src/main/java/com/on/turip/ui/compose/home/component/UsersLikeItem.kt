@@ -39,8 +39,7 @@ fun UsersLikeItem(
                     width = 1.dp,
                     color = colorResource(R.color.gray_200_c1c1c1),
                     shape = RoundedCornerShape(12.dp),
-                )
-                .padding(10.dp),
+                ).padding(10.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         Thumbnail(

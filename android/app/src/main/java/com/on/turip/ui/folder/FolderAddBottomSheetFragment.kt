@@ -21,8 +21,7 @@ import com.on.turip.ui.folder.model.FolderNameStatusModel
 import com.on.turip.ui.folder.model.FolderUiEffect
 import com.on.turip.ui.login.LoginActivity
 
-class FolderAddBottomSheetFragment :
-    BaseBottomSheetFragment<BottomSheetFragmentFolderAddBinding>() {
+class FolderAddBottomSheetFragment : BaseBottomSheetFragment<BottomSheetFragmentFolderAddBinding>() {
     private val sharedViewModel: FolderViewModel by activityViewModels()
 
     override fun inflateBinding(
@@ -73,7 +72,9 @@ class FolderAddBottomSheetFragment :
                     navigateToLoginScreen()
                 }
 
-                FolderUiEffect.FolderAdded -> dismiss()
+                FolderUiEffect.FolderAdded -> {
+                    dismiss()
+                }
 
                 is FolderUiEffect.ShowError -> {
                     val uiModel: ErrorUiModel =
@@ -89,7 +90,9 @@ class FolderAddBottomSheetFragment :
                     }
                 }
 
-                else -> Unit
+                else -> {
+                    Unit
+                }
             }
         }
     }

@@ -123,8 +123,7 @@ private fun HomeScreenContent(
                                 focusManager.clearFocus()
                                 keyboardController?.hide()
                             })
-                        }
-                        .padding(horizontal = 20.dp)
+                        }.padding(horizontal = 20.dp)
                         .verticalScroll(scrollState),
                 verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {

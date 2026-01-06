@@ -16,8 +16,7 @@ import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.folder.model.FolderUiEffect
 import com.on.turip.ui.login.LoginActivity
 
-class FolderRemoveBottomSheetFragment :
-    BaseBottomSheetFragment<BottomSheetFragmentFolderRemoveBinding>() {
+class FolderRemoveBottomSheetFragment : BaseBottomSheetFragment<BottomSheetFragmentFolderRemoveBinding>() {
     private val sharedViewModel: FolderViewModel by activityViewModels()
 
     override fun inflateBinding(
@@ -58,7 +57,9 @@ class FolderRemoveBottomSheetFragment :
                     navigateToLoginScreen()
                 }
 
-                FolderUiEffect.FolderDeleted -> dismiss()
+                FolderUiEffect.FolderDeleted -> {
+                    dismiss()
+                }
 
                 is FolderUiEffect.ShowError -> {
                     val uiModel: ErrorUiModel =
@@ -74,7 +75,9 @@ class FolderRemoveBottomSheetFragment :
                     }
                 }
 
-                else -> Unit
+                else -> {
+                    Unit
+                }
             }
         }
     }

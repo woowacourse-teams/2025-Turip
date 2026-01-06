@@ -37,8 +37,7 @@ fun GoogleLoginButton(
                 .border(
                     border = BorderStroke(1.dp, colorResource(R.color.turip_gray_b4b4b4)),
                     shape = RoundedCornerShape(30.dp),
-                )
-                .background(color = Color.White, shape = RoundedCornerShape(30.dp))
+                ).background(color = Color.White, shape = RoundedCornerShape(30.dp))
                 .clip(RoundedCornerShape(30.dp))
                 .clickable { onClickLoginButton() }
                 .padding(vertical = 16.dp, horizontal = 16.dp),

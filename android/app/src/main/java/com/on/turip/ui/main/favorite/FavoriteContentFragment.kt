@@ -88,7 +88,9 @@ class FavoriteContentFragment : BaseFragment<FragmentFavoriteContentBinding>() {
 
         collectOnStarted(viewModel.uiEffect) { uiEffect: FavoriteContentUiEffect ->
             when (uiEffect) {
-                FavoriteContentUiEffect.NavigateToLogin -> navigateToLoginScreen()
+                FavoriteContentUiEffect.NavigateToLogin -> {
+                    navigateToLoginScreen()
+                }
 
                 is FavoriteContentUiEffect.ShowError -> {
                     val uiModel: ErrorUiModel =

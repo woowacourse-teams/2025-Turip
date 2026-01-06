@@ -126,13 +126,17 @@ class SettingViewModel @Inject constructor(
         retryAction: SettingRetryAction,
     ) {
         when (uiError) {
-            UiError.Global.Network ->
+            UiError.Global.Network -> {
                 _uiEffect.send(SettingUiEffect.ShowError(ErrorUiState.Network, retryAction))
+            }
 
-            UiError.Global.Server ->
+            UiError.Global.Server -> {
                 _uiEffect.send(SettingUiEffect.ShowError(ErrorUiState.Server, retryAction))
+            }
 
-            UiError.Global.TokenExpired -> _uiEffect.send(SettingUiEffect.NavigateToLogin)
+            UiError.Global.TokenExpired -> {
+                _uiEffect.send(SettingUiEffect.NavigateToLogin)
+            }
         }
     }
 

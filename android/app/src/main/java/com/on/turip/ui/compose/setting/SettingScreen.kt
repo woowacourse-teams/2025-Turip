@@ -54,7 +54,9 @@ fun SettingScreen(
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { uiEffect: SettingUiEffect ->
             when (uiEffect) {
-                SettingUiEffect.NavigateToLogin -> navigateToLoginScreen()
+                SettingUiEffect.NavigateToLogin -> {
+                    navigateToLoginScreen()
+                }
 
                 is SettingUiEffect.ShowError -> {
                     val errorUiModel = uiEffect.errorUiState.toUiModel() ?: return@collect

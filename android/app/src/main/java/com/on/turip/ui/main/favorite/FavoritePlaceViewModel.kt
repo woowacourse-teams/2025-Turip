@@ -262,8 +262,9 @@ class FavoritePlaceViewModel @Inject constructor(
 
     fun handleErrorRetryRequest(action: FavoritePlaceRetryAction) {
         when (action) {
-            is FavoritePlaceRetryAction.UpdateFavoritePlace ->
+            is FavoritePlaceRetryAction.UpdateFavoritePlace -> {
                 updateFavoritePlace(action.placeId, action.isFavorite)
+            }
         }
     }
 

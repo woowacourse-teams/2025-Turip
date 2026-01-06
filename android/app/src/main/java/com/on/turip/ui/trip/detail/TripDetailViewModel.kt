@@ -154,23 +154,27 @@ class TripDetailViewModel @Inject constructor(
                     val uiError: UiError = errorType.toUiError()
                     if (uiError is UiError.Global) {
                         when (uiError) {
-                            UiError.Global.Network ->
+                            UiError.Global.Network -> {
                                 _uiEffect.send(
                                     TripDetailUiEffect.ShowError(
                                         ErrorUiState.Network,
                                         TripDetailRetryAction.UpdateFavorite,
                                     ),
                                 )
+                            }
 
-                            UiError.Global.Server ->
+                            UiError.Global.Server -> {
                                 _uiEffect.send(
                                     TripDetailUiEffect.ShowError(
                                         ErrorUiState.Server,
                                         TripDetailRetryAction.UpdateFavorite,
                                     ),
                                 )
+                            }
 
-                            UiError.Global.TokenExpired -> _uiEffect.send(TripDetailUiEffect.NavigateToLogin)
+                            UiError.Global.TokenExpired -> {
+                                _uiEffect.send(TripDetailUiEffect.NavigateToLogin)
+                            }
                         }
                     }
                     Timber.d("컨텐츠 찜 API 통신 실패")

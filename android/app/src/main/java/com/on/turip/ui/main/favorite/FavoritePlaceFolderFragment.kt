@@ -96,7 +96,9 @@ class FavoritePlaceFolderFragment : BaseFragment<BottomSheetFragmentFavoritePlac
                     showFavoriteStatus(uiEffect.folder)
                 }
 
-                FavoritePlaceFolderUiEffect.NavigateToLogin -> navigateToLoginScreen()
+                FavoritePlaceFolderUiEffect.NavigateToLogin -> {
+                    navigateToLoginScreen()
+                }
 
                 is FavoritePlaceFolderUiEffect.ShowError -> {
                     val uiModel: ErrorUiModel =
