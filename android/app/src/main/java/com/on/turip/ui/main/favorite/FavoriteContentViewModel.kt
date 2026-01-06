@@ -44,7 +44,7 @@ class FavoriteContentViewModel @Inject constructor(
 
     fun loadFavoriteContents() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorUiState = ErrorUiState.None) }
+            _uiState.update { it.copy(isLoading = true) }
 
             favoriteRepository
                 .loadFavoriteContents(10, 0L)

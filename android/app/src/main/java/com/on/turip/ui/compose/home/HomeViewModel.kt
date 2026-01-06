@@ -44,7 +44,7 @@ class HomeViewModel @Inject constructor(
 
     fun loadContents() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorUiState = ErrorUiState.None) }
+            _uiState.update { it.copy(isLoading = true) }
             val usersLikeContentsDeferred =
                 async { contentRepository.loadPopularFavoriteContents() }
             val regionCategoriesDeferred =

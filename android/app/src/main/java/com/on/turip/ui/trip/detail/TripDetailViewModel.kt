@@ -65,7 +65,7 @@ class TripDetailViewModel @Inject constructor(
         if (uiState.value.isLoading) return
 
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorUiState = ErrorUiState.None) }
+            _uiState.update { it.copy(isLoading = true) }
 
             val contentDeferred = async { contentRepository.loadContent(contentId) }
             val tripInfoDeferred = async { contentPlaceRepository.loadTripInfo(contentId) }
@@ -150,7 +150,7 @@ class TripDetailViewModel @Inject constructor(
                     _uiState.update { it.copy(isFavorite = updatedIsFavorite) }
                     _uiEffect.send(TripDetailUiEffect.ShowFavoriteStatus(updatedIsFavorite))
                 }.onFailure { errorType: ErrorType ->
-                    _uiState.update { it.copy(isLoading = false, errorUiState = ErrorUiState.None) }
+                    _uiState.update { it.copy(isLoading = false) }
                     val uiError: UiError = errorType.toUiError()
                     if (uiError is UiError.Global) {
                         when (uiError) {

@@ -52,7 +52,7 @@ class FavoritePlaceViewModel @Inject constructor(
 
     fun loadFoldersAndPlaces() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorUiState = ErrorUiState.None) }
+            _uiState.update { it.copy(isLoading = true) }
             folderRepository
                 .loadFavoriteFolders()
                 .onSuccess { folders: List<Folder> ->
@@ -165,7 +165,7 @@ class FavoritePlaceViewModel @Inject constructor(
         if (folderId == selectedFolderId) return
 
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorUiState = ErrorUiState.None) }
+            _uiState.update { it.copy(isLoading = true) }
 
             favoritePlaceRepository
                 .loadFavoritePlaces(folderId)

@@ -60,7 +60,7 @@ class FolderViewModel @Inject constructor(
 
     fun loadFolders() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorUiState = ErrorUiState.None) }
+            _uiState.update { it.copy(isLoading = true) }
             folderRepository
                 .loadFavoriteFolders()
                 .onSuccess { folders: List<Folder> ->
@@ -190,7 +190,7 @@ class FolderViewModel @Inject constructor(
         errorType: ErrorType,
         retryAction: FolderRetryAction,
     ) {
-        _uiState.update { it.copy(isLoading = false, errorUiState = ErrorUiState.None) }
+        _uiState.update { it.copy(isLoading = false) }
         val uiError: UiError = errorType.toUiError()
         if (uiError is UiError.Global) {
             when (uiError) {
