@@ -9,12 +9,12 @@ data class FavoriteContentUiState(
     val errorUiState: ErrorUiState,
 ) {
     val isEmpty: Boolean
-        get() = favoriteContents.isEmpty()
+        get() = favoriteContents.isEmpty() && this != Idle
 
     companion object {
         val Idle: FavoriteContentUiState =
             FavoriteContentUiState(
-                isLoading = false,
+                isLoading = true,
                 favoriteContents = emptyList(),
                 errorUiState = ErrorUiState.None,
             )

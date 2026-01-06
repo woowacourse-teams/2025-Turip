@@ -10,12 +10,12 @@ data class FavoritePlaceUiState(
     val placesLatLng: List<FavoritePlaceLatLngUiModel>,
 ) {
     val isEmpty: Boolean
-        get() = places.isEmpty()
+        get() = places.isEmpty() && this != Idle
 
     companion object {
         val Idle: FavoritePlaceUiState =
             FavoritePlaceUiState(
-                isLoading = false,
+                isLoading = true,
                 errorUiState = ErrorUiState.None,
                 places = emptyList(),
                 folders = emptyList(),

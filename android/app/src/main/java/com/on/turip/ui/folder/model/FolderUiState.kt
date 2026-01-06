@@ -8,12 +8,12 @@ data class FolderUiState(
     val folders: List<FolderEditModel>,
 ) {
     val isEmpty: Boolean
-        get() = folders.isEmpty()
+        get() = folders.isEmpty() && this != Idle
 
     companion object {
         val Idle: FolderUiState =
             FolderUiState(
-                isLoading = false,
+                isLoading = true,
                 errorUiState = ErrorUiState.None,
                 folders = emptyList(),
             )
