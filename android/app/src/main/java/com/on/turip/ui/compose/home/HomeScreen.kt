@@ -144,7 +144,7 @@ private fun HomeScreenContent(
                     modifier =
                         Modifier
                             .wrapContentSize()
-                            .padding(top = 4.dp, end = 20.dp),
+                            .padding(top = 4.dp),
                 )
 
                 Text(
@@ -167,7 +167,6 @@ private fun HomeScreenContent(
                 RegionList(
                     regions = uiState.regionCategories,
                     onRegionClick = onRegionClick,
-                    modifier = Modifier.padding(end = 20.dp),
                 )
             }
         }
