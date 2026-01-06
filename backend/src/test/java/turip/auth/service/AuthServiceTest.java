@@ -87,7 +87,7 @@ class AuthServiceTest {
             when(googleTokenParser.getProviderId(idToken)).thenReturn(providerId);
             when(googleTokenParser.getEmail(idToken)).thenReturn(email);
             when(memberService.isFirstLogin(Provider.GOOGLE, providerId)).thenReturn(false);
-            when(memberService.findOrCreate(Provider.GOOGLE, providerId, email)).thenReturn(member);
+            when(memberService.findOrCreateSocialMember(Provider.GOOGLE, providerId, email)).thenReturn(member);
             when(jwtProvider.generateAccessToken(1L)).thenReturn("access-token");
             when(jwtProvider.generateRefreshToken(1L)).thenReturn("refresh-token");
             when(jwtProvider.getIssuedAt(anyString())).thenReturn(LocalDateTime.now());
@@ -128,7 +128,7 @@ class AuthServiceTest {
             when(googleTokenParser.getProviderId(idToken)).thenReturn(providerId);
             when(googleTokenParser.getEmail(idToken)).thenReturn(email);
             when(memberService.isFirstLogin(Provider.GOOGLE, providerId)).thenReturn(true);
-            when(memberService.findOrCreate(Provider.GOOGLE, providerId, email)).thenReturn(member);
+            when(memberService.findOrCreateSocialMember(Provider.GOOGLE, providerId, email)).thenReturn(member);
             when(jwtProvider.generateAccessToken(1L)).thenReturn("access-token");
             when(jwtProvider.generateRefreshToken(1L)).thenReturn("refresh-token");
             when(jwtProvider.getIssuedAt(anyString())).thenReturn(LocalDateTime.now());

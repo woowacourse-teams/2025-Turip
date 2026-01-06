@@ -6,6 +6,10 @@ import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import turip.account.domain.Account;
+import turip.account.domain.Member;
+import turip.account.domain.Provider;
+import turip.account.service.MemberService;
 import turip.auth.controller.dto.request.LoginRequest;
 import turip.auth.controller.dto.request.RefreshTokenRequest;
 import turip.auth.controller.dto.response.LoginResponse;
@@ -16,10 +20,6 @@ import turip.auth.token.JwtProvider;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.BadRequestException;
 import turip.common.exception.custom.UnauthorizedException;
-import turip.account.domain.Account;
-import turip.account.domain.Member;
-import turip.account.domain.Provider;
-import turip.account.service.MemberService;
 
 @Service
 @RequiredArgsConstructor
@@ -84,7 +84,7 @@ public class AuthService {
 
         boolean isNewMember = memberService.isFirstLogin(provider, providerId);
 
-        Member member = findOrCreateMember(provider, providerId, email);
+        Member member = findOrCreateSocialMember(provider, providerId, email);
         String accessToken = jwtProvider.generateAccessToken(member.getAccount().getId());
         String refreshToken = jwtProvider.generateRefreshToken(member.getAccount().getId());
 
@@ -93,8 +93,8 @@ public class AuthService {
         return LoginResponse.of(accessToken, refreshToken, isNewMember);
     }
 
-    private Member findOrCreateMember(Provider provider, String providerId, String email) {
-        return memberService.findOrCreate(provider, providerId, email);
+    private Member findOrCreateSocialMember(Provider provider, String providerId, String email) {
+        return memberService.findOrCreateSocialMember(provider, providerId, email);
     }
 
     private Member getMemberByAccountId(Long accountId) {
