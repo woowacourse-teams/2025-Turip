@@ -5,11 +5,15 @@ import androidx.lifecycle.viewModelScope
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.on.turip.common.AuthState
 import com.on.turip.common.UserType
+import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
 import com.on.turip.data.login.datasource.GoogleCredentialManager
 import com.on.turip.domain.login.MemberRepository
 import com.on.turip.domain.login.usecase.LoginUserUseCase
+import com.on.turip.ui.common.error.ErrorUiState
+import com.on.turip.ui.common.error.UiError
+import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.compose.login.model.LoginUiEffect
 import com.on.turip.ui.compose.login.model.LoginUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,7 +32,7 @@ class LoginViewmodel @Inject constructor(
     private val loginUserUseCase: LoginUserUseCase,
     private val memberRepository: MemberRepository,
 ) : ViewModel() {
-    private val _uiState: MutableStateFlow<LoginUiState> = MutableStateFlow(LoginUiState.EMPTY)
+    private val _uiState: MutableStateFlow<LoginUiState> = MutableStateFlow(LoginUiState.IDLE)
     val uiState: StateFlow<LoginUiState> = _uiState
 
     private val _uiEffect: Channel<LoginUiEffect> = Channel(Channel.BUFFERED)
@@ -53,8 +57,25 @@ class LoginViewmodel @Inject constructor(
                             }
                         }.onFailure {
                             Timber.e("Token 저장 실패")
+                            _uiEffect.send(LoginUiEffect.ShowError(ErrorUiState.Server))
                         }
-                }.onFailure {
+                }.onFailure { errorType: ErrorType ->
+                    val uiError: UiError = errorType.toUiError()
+                    if (uiError is UiError.Global) {
+                        when (uiError) {
+                            UiError.Global.Network -> {
+                                _uiEffect.send(LoginUiEffect.ShowError(ErrorUiState.Network))
+                            }
+
+                            UiError.Global.Server -> {
+                                _uiEffect.send(LoginUiEffect.ShowError(ErrorUiState.Server))
+                            }
+
+                            UiError.Global.TokenExpired -> {
+                                Unit
+                            }
+                        }
+                    }
                     Timber.e("IdToken불러오기 실패")
                 }
         }
