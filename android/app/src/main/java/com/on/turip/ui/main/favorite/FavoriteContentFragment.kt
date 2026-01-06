@@ -82,6 +82,7 @@ class FavoriteContentFragment : BaseFragment<FragmentFavoriteContentBinding>() {
             if (uiState.isLoading) showLoading()
             when {
                 uiState.errorUiState != ErrorUiState.None -> showErrorView(uiState.errorUiState)
+                uiState.isEmpty -> showEmptyView()
                 else -> showContents(uiState.favoriteContents)
             }
         }
@@ -129,18 +130,20 @@ class FavoriteContentFragment : BaseFragment<FragmentFavoriteContentBinding>() {
         }
     }
 
+    private fun showEmptyView() {
+        binding.customErrorView.visibility = View.GONE
+        binding.pbFavoriteContentLoading.visibility = View.GONE
+        binding.clFavoriteContentEmpty.visibility = View.VISIBLE
+        binding.clFavoriteContentNotEmpty.visibility = View.GONE
+    }
+
     private fun showContents(favoriteContents: List<FavoriteContent>) {
         binding.customErrorView.visibility = View.GONE
         binding.pbFavoriteContentLoading.visibility = View.GONE
 
-        if (favoriteContents.isEmpty()) {
-            binding.clFavoriteContentEmpty.visibility = View.VISIBLE
-            binding.clFavoriteContentNotEmpty.visibility = View.GONE
-        } else {
-            binding.clFavoriteContentNotEmpty.visibility = View.VISIBLE
-            binding.clFavoriteContentEmpty.visibility = View.GONE
-            favoriteContentAdapter.submitList(favoriteContents)
-        }
+        binding.clFavoriteContentNotEmpty.visibility = View.VISIBLE
+        binding.clFavoriteContentEmpty.visibility = View.GONE
+        favoriteContentAdapter.submitList(favoriteContents)
     }
 
     private fun navigateToLoginScreen() {

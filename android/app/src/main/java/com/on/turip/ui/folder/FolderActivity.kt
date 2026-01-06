@@ -67,6 +67,7 @@ class FolderActivity : BaseActivity<ActivityFolderBinding>() {
             if (uiState.isLoading) showLoading()
             when {
                 uiState.errorUiState != ErrorUiState.None -> showErrorView(uiState.errorUiState)
+                uiState.isEmpty -> showEmptyView()
                 else -> showContents(uiState)
             }
         }
@@ -93,6 +94,15 @@ class FolderActivity : BaseActivity<ActivityFolderBinding>() {
         }
     }
 
+    private fun showEmptyView() {
+        binding.pbFolderLoading.visibility = View.GONE
+        binding.ivFolderFolderPlus.visibility = View.VISIBLE
+        binding.customErrorView.visibility = View.GONE
+
+        binding.rvFolder.visibility = View.GONE
+        binding.clFolderEmpty.visibility = View.VISIBLE
+    }
+
     private fun showContents(uiState: FolderUiState) {
         binding.pbFolderLoading.visibility = View.GONE
         binding.ivFolderFolderPlus.visibility = View.VISIBLE
@@ -100,13 +110,8 @@ class FolderActivity : BaseActivity<ActivityFolderBinding>() {
 
         folderEditAdapter.submitList(uiState.folders)
 
-        if (uiState.isEmpty) {
-            binding.rvFolder.visibility = View.GONE
-            binding.clFolderEmpty.visibility = View.VISIBLE
-        } else {
-            binding.rvFolder.visibility = View.VISIBLE
-            binding.clFolderEmpty.visibility = View.GONE
-        }
+        binding.rvFolder.visibility = View.VISIBLE
+        binding.clFolderEmpty.visibility = View.GONE
     }
 
     companion object {
