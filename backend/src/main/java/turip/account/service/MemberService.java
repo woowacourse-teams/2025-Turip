@@ -60,6 +60,7 @@ public class MemberService {
     @Transactional
     public void delete(Member member) {
         refreshTokenService.deleteByMember(member);
+        socialMemberService.deleteByMember(member);
         memberRepository.delete(member);
         accountService.deleteAccountAndFavorites(member.getAccount());
     }

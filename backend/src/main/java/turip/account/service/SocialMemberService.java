@@ -27,4 +27,9 @@ public class SocialMemberService {
     public boolean existsByProviderAndProviderId(Provider provider, String providerId) {
         return socialMemberRepository.existsByProviderAndProviderId(provider, providerId);
     }
+
+    @Transactional
+    public void deleteByMember(Member member) {
+        socialMemberRepository.deleteByMember(member);
+    }
 }
