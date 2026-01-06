@@ -2,8 +2,8 @@ package turip.favorite.repository;
 
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
-import turip.favorite.domain.FavoriteFolder;
 import turip.account.domain.Account;
+import turip.favorite.domain.FavoriteFolder;
 
 public interface FavoriteFolderRepository extends JpaRepository<FavoriteFolder, Long> {
 

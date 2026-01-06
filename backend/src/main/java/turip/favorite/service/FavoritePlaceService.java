@@ -1,9 +1,12 @@
 package turip.favorite.service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import turip.account.domain.Account;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.ConflictException;
 import turip.common.exception.custom.ForbiddenException;
@@ -16,7 +19,6 @@ import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.domain.FavoritePlace;
 import turip.favorite.repository.FavoriteFolderRepository;
 import turip.favorite.repository.FavoritePlaceRepository;
-import turip.account.domain.Account;
 import turip.place.domain.Place;
 import turip.place.repository.PlaceRepository;
 
@@ -43,6 +45,25 @@ public class FavoritePlaceService {
         FavoritePlace savedFavoritePlace = favoritePlaceRepository.save(favoritePlace);
 
         return FavoritePlaceResponse.from(savedFavoritePlace);
+    }
+
+    @Transactional
+    public List<FavoritePlaceResponse> updateFavoriteFolders(Account account,
+                                                             List<Long> favoriteFolderIds,
+                                                             Long placeId
+    ) {
+        List<Long> requestFavoriteFolderIds = favoriteFolderIds.stream().distinct().toList();
+        List<FavoriteFolder> favoriteFolders = favoriteFolderRepository.findAllById(requestFavoriteFolderIds);
+        validateMultiFolder(account, favoriteFolders, requestFavoriteFolderIds);
+
+        Place place = getPlaceById(placeId);
+        List<FavoritePlace> existingFavoritePlaces = favoritePlaceRepository.findAllByPlaceAndAccount(place, account);
+
+        deleteRemovedFavoritePlaces(existingFavoritePlaces, requestFavoriteFolderIds);
+        List<FavoritePlace> createdFavoritePlaces = createFavoritePlaces(place, existingFavoritePlaces, favoriteFolders,
+                requestFavoriteFolderIds);
+
+        return convertToResultResponse(existingFavoritePlaces, createdFavoritePlaces, requestFavoriteFolderIds);
     }
 
     public FavoritePlacesWithPlaceDetailResponse findAllByFolder(Long favoriteFolderId) {
@@ -96,6 +117,64 @@ public class FavoritePlaceService {
     private FavoritePlace getFavoritePlaceById(Long favoritePlaceId) {
         return favoritePlaceRepository.findById(favoritePlaceId)
                 .orElseThrow(() -> new NotFoundException(ErrorTag.FAVORITE_PLACE_NOT_FOUND));
+    }
+
+    private void deleteRemovedFavoritePlaces(List<FavoritePlace> existingFavoritePlaces,
+                                             List<Long> requestFavoriteFolderIds) {
+        List<FavoritePlace> removedFavoritePlaces = existingFavoritePlaces.stream()
+                .filter(fp -> !requestFavoriteFolderIds.contains(fp.getFavoriteFolder().getId()))
+                .toList();
+        favoritePlaceRepository.deleteAll(removedFavoritePlaces);
+    }
+
+    private List<FavoritePlace> createFavoritePlaces(Place place,
+                                                     List<FavoritePlace> existingFavoritePlaces,
+                                                     List<FavoriteFolder> favoriteFolders,
+                                                     List<Long> requestFavoriteFolderIds
+    ) {
+        List<Long> existingFavoritePlaceIds = existingFavoritePlaces.stream()
+                .map(fp -> fp.getFavoriteFolder().getId())
+                .toList();
+
+        Map<Long, FavoriteFolder> favoriteFolderRegistry = favoriteFolders.stream()
+                .collect(Collectors.toMap(FavoriteFolder::getId, f -> f));
+
+        List<FavoritePlace> newFavoritePlaces = requestFavoriteFolderIds.stream()
+                .filter(id -> !existingFavoritePlaceIds.contains(id))
+                .map(id -> {
+                    FavoriteFolder folder = favoriteFolderRegistry.get(id);
+                    int nextOrder = getNextOrder(folder);
+                    return new FavoritePlace(folder, place, nextOrder);
+                })
+                .toList();
+
+        return favoritePlaceRepository.saveAll(newFavoritePlaces);
+    }
+
+    private int getNextOrder(FavoriteFolder folder) {
+        return favoritePlaceRepository.findMaxFavoriteOrderByFavoriteFolder(folder).orElse(0) + 1;
+    }
+
+    private List<FavoritePlaceResponse> convertToResultResponse(List<FavoritePlace> existingFavoritePlaces,
+                                                                List<FavoritePlace> createdFavoritePlaces,
+                                                                List<Long> requestFavoriteFolderIds
+    ) {
+        List<FavoritePlace> remainedFavoritePlaces = existingFavoritePlaces.stream()
+                .filter(fp -> requestFavoriteFolderIds.contains(fp.getFavoriteFolder().getId()))
+                .collect(Collectors.toList());
+
+        remainedFavoritePlaces.addAll(createdFavoritePlaces);
+        return remainedFavoritePlaces.stream()
+                .map(FavoritePlaceResponse::from)
+                .toList();
+    }
+
+    private void validateMultiFolder(Account account, List<FavoriteFolder> requestedFavoriteFolders,
+                                     List<Long> requestedFavoriteFolderIds) {
+        if (requestedFavoriteFolders.size() != requestedFavoriteFolderIds.size()) {
+            throw new NotFoundException(ErrorTag.FAVORITE_FOLDER_NOT_FOUND);
+        }
+        requestedFavoriteFolders.forEach(folder -> validateOwnership(account, folder));
     }
 
     private void validateOwnership(Account requestAccount, FavoriteFolder favoriteFolder) {
