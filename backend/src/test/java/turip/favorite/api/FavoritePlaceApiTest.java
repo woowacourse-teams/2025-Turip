@@ -379,6 +379,40 @@ class FavoritePlaceApiTest {
         }
     }
 
+    @DisplayName("/favorites/places PUT 여러 폴더에 장소 찜 테스트")
+    @Nested
+    class UpdateFavoriteFolders {
+
+        @DisplayName("장소 찜 폴더 업데이트에 성공한 경우 200 OK를 응답한다")
+        @Test
+        void updateFavoriteFolders() {
+            // given
+            jdbcTemplate.update("INSERT INTO account () VALUES ()");
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
+            jdbcTemplate.update("INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '폴더1', false)");
+            jdbcTemplate.update("INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '폴더2', false)");
+            jdbcTemplate.update("INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '폴더3', false)");
+            jdbcTemplate.update(
+                    "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('장소1','https://naver.me/place1', '주소', 37.1234, 127.1234)");
+
+            // 폴더 1에만 찜 되어 있는 상태
+            jdbcTemplate.update(
+                    "INSERT INTO favorite_place (favorite_folder_id, place_id, favorite_order) VALUES (1, 1, 1)");
+
+            // when & then
+            Map<String, Object> request = new HashMap<>();
+            request.put("favoriteFolderIds", List.of(1L, 2L, 3L));
+
+            RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .body(request)
+                    .contentType(ContentType.JSON)
+                    .when().put("/favorites/places/{placeId}", 1L)
+                    .then()
+                    .statusCode(200);
+        }
+    }
+
     @DisplayName("/favorites/places/favorite-order PATCH 장소 찜 폴더 정렬 순서 변경 테스트")
     @Nested
     class UpdatePlaceOrder {
