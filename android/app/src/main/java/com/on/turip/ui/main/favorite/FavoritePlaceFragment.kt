@@ -30,6 +30,7 @@ import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.folder.FolderActivity
 import com.on.turip.ui.login.LoginActivity
 import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
+import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceLatLngUiModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceUiEffect
@@ -172,6 +173,7 @@ class FavoritePlaceFragment :
             if (uiState.isLoading) showLoading()
             when {
                 uiState.errorUiState != ErrorUiState.None -> showErrorView(uiState.errorUiState)
+                uiState.isEmpty -> showEmptyView(uiState.folders)
                 else -> showContents(uiState)
             }
         }
@@ -198,9 +200,7 @@ class FavoritePlaceFragment :
                             .make(view, uiModel.titleRes, Snackbar.LENGTH_INDEFINITE)
                             .apply {
                                 setAction(uiModel.retryTextRes) {
-                                    viewModel.handleErrorRetryRequest(
-                                        uiEffect.retryAction,
-                                    )
+                                    viewModel.handleErrorRetryRequest(uiEffect.retryAction)
                                 }
                             }.show()
                     }
@@ -268,6 +268,20 @@ class FavoritePlaceFragment :
         binding.customErrorView.visibility = View.GONE
     }
 
+    private fun showEmptyView(folders: List<FavoritePlaceFolderModel>) {
+        folderNameAdapter.submitList(folders)
+
+        binding.pbFavoritePlaceLoading.visibility = View.GONE
+        binding.groupFavoritePlaceNotError.visibility = View.VISIBLE
+        binding.customErrorView.visibility = View.GONE
+
+        binding.clFavoritePlaceEmpty.visibility = View.VISIBLE
+        binding.groupFavoritePlaceNotEmpty.visibility = View.GONE
+
+        binding.ivFavoritePlaceMapToggle.visibility = View.GONE
+        binding.mvFavoritePlace.visibility = View.GONE
+    }
+
     private fun showContents(uiState: FavoritePlaceUiState) {
         folderNameAdapter.submitList(uiState.folders)
         placeAdapter.submitList(uiState.places)
@@ -276,20 +290,15 @@ class FavoritePlaceFragment :
         binding.groupFavoritePlaceNotError.visibility = View.VISIBLE
         binding.customErrorView.visibility = View.GONE
 
-        if (uiState.isEmpty) {
-            binding.clFavoritePlaceEmpty.visibility = View.VISIBLE
-            binding.groupFavoritePlaceNotEmpty.visibility = View.GONE
-        } else {
-            binding.clFavoritePlaceEmpty.visibility = View.GONE
-            binding.groupFavoritePlaceNotEmpty.visibility = View.VISIBLE
-            binding.tvFavoritePlacePlaceCount.text =
-                getString(R.string.all_total_place_count, uiState.places.size)
+        binding.clFavoritePlaceEmpty.visibility = View.GONE
+        binding.groupFavoritePlaceNotEmpty.visibility = View.VISIBLE
+        binding.tvFavoritePlacePlaceCount.text =
+            getString(R.string.all_total_place_count, uiState.places.size)
 
-            when (uiState.placesLatLng.size) {
-                0 -> handleEmptyFavorites()
-                1 -> handleSingleFavorite(uiState.placesLatLng.first())
-                else -> handleMultipleFavorites(uiState.placesLatLng)
-            }
+        when (uiState.placesLatLng.size) {
+            0 -> handleEmptyFavorites()
+            1 -> handleSingleFavorite(uiState.placesLatLng.first())
+            else -> handleMultipleFavorites(uiState.placesLatLng)
         }
     }
 

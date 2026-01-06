@@ -162,6 +162,8 @@ class FavoritePlaceViewModel @Inject constructor(
     }
 
     fun updateFolderWithPlaces(folderId: Long) {
+        if (folderId == selectedFolderId) return
+
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorUiState = ErrorUiState.None) }
 
