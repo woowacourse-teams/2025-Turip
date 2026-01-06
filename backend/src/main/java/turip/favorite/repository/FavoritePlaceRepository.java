@@ -33,10 +33,11 @@ public interface FavoritePlaceRepository extends JpaRepository<FavoritePlace, Lo
     @Query("SELECT fp.favoriteFolder.id FROM FavoritePlace fp WHERE fp.place = :place AND fp.favoriteFolder IN :favoriteFolders")
     Set<Long> findFavoriteFolderIdsByPlaceAndFavoriteFolderIn(@Param("place") Place place,
                                                               @Param("favoriteFolders") List<FavoriteFolder> favoriteFolders);
-
-
-    @Query("SELECT fp FROM FavoritePlace fp WHERE fp.favoriteFolder.account= :account")
-    List<FavoritePlace> findAllByPlaceAndAccount(Place place, @Param("account") Account account);
+    
+    @Query("SELECT fp FROM FavoritePlace fp " +
+            "JOIN fp.favoriteFolder ff " +
+            "WHERE fp.place = :place AND ff.account = :account")
+    List<FavoritePlace> findAllByPlaceAndAccount(@Param("place") Place place, @Param("account") Account account);
 
     void deleteAllByFavoriteFolder(FavoriteFolder favoriteFolder);
 }
