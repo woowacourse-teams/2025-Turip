@@ -85,8 +85,6 @@ class HomeViewModel @Inject constructor(
     fun updateDomesticSelected(isDomesticSelected: Boolean) {
         Timber.d(if (isDomesticSelected) "국내 클릭" else "해외 클릭")
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorUiState = ErrorUiState.None) }
-
             regionRepository
                 .loadRegionCategories(isDomesticSelected)
                 .onSuccess { regionCategories: List<RegionCategory> ->
