@@ -17,7 +17,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
-import turip.account.service.TuripMemberService;
 import turip.common.exception.ErrorTag;
 import turip.util.helper.TestDataHelper;
 
@@ -34,9 +33,6 @@ public class TuripMemberApiTest {
     @Autowired
     private TestDataHelper testDataHelper;
 
-    @Autowired
-    private TuripMemberService turipMemberService;
-
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
@@ -45,6 +41,7 @@ public class TuripMemberApiTest {
         jdbcTemplate.update("DELETE FROM favorite_content");
         jdbcTemplate.update("DELETE FROM favorite_place");
         jdbcTemplate.update("DELETE FROM favorite_folder");
+        jdbcTemplate.update("DELETE FROM turip_member");
         jdbcTemplate.update("DELETE FROM social_member");
         jdbcTemplate.update("DELETE FROM member");
         jdbcTemplate.update("DELETE FROM guest");
@@ -58,6 +55,7 @@ public class TuripMemberApiTest {
         jdbcTemplate.update("ALTER TABLE favorite_content ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE favorite_place ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE favorite_folder ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE turip_member ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE social_member ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE member ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE guest ALTER COLUMN id RESTART WITH 1");
