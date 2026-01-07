@@ -9,7 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.on.turip.domain.region.RegionCategory
-import com.on.turip.ui.compose.designsystem.theme.TuripTypography
+import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 
 @Composable
 fun RegionItem(
@@ -29,7 +29,7 @@ fun RegionItem(
         )
         Text(
             text = region.name,
-            style = TuripTypography.titleSmall,
+            style = TuripTheme.typography.title3,
             modifier = Modifier.padding(vertical = 4.dp),
         )
     }

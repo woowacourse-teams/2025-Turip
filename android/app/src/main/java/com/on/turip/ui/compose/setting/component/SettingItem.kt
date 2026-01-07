@@ -18,7 +18,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.on.turip.R
-import com.on.turip.ui.compose.designsystem.theme.TuripTypography
+import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 
 @Composable
 fun SettingItem(
@@ -44,7 +44,7 @@ fun SettingItem(
         )
         Text(
             text = stringResource(titleRes),
-            style = TuripTypography.bodyLarge,
+            style = TuripTheme.typography.body1,
             textAlign = TextAlign.Center,
         )
     }

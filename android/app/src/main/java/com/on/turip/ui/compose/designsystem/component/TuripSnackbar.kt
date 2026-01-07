@@ -9,10 +9,8 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
-import com.on.turip.R
-import com.on.turip.ui.compose.designsystem.theme.TuripTypography
+import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 
 @Composable
 fun TuripSnackbar(
@@ -28,8 +26,8 @@ fun TuripSnackbar(
                     snackbarData.visuals.actionLabel?.let { label ->
                         Text(
                             text = label,
-                            style = TuripTypography.labelMedium,
-                            color = colorResource(R.color.turip_gray_b4b4b4),
+                            style = TuripTheme.typography.info2,
+                            color = TuripTheme.colors.gray02,
                             modifier =
                                 Modifier
                                     .clickable(onClick = snackbarData::performAction)
@@ -40,8 +38,8 @@ fun TuripSnackbar(
             ) {
                 Text(
                     text = snackbarData.visuals.message,
-                    style = TuripTypography.labelLarge,
-                    color = colorResource(R.color.pure_white_ffffff),
+                    style = TuripTheme.typography.info1,
+                    color = TuripTheme.colors.white,
                     maxLines = 1,
                 )
             }

@@ -14,16 +14,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.on.turip.R
 import com.on.turip.ui.common.error.ErrorUiModel
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.toUiModel
-import com.on.turip.ui.compose.designsystem.theme.TuripTypography
+import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 
 @Composable
 fun ErrorScreen(
@@ -51,14 +49,14 @@ fun ErrorScreen(
 
         Text(
             text = stringResource(id = errorUiModel.titleRes),
-            style = TuripTypography.titleLarge,
+            style = TuripTheme.typography.title1,
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
             text = stringResource(id = errorUiModel.descriptionRes),
-            style = TuripTypography.bodyLarge,
+            style = TuripTheme.typography.body1,
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -66,10 +64,10 @@ fun ErrorScreen(
         Button(
             colors =
                 ButtonColors(
-                    contentColor = colorResource(R.color.pure_white_ffffff),
-                    containerColor = colorResource(R.color.turip_blue_11aebf_70),
-                    disabledContentColor = colorResource(R.color.pure_white_ffffff),
-                    disabledContainerColor = colorResource(R.color.gray_300_5b5b5b),
+                    contentColor = TuripTheme.colors.white,
+                    containerColor = TuripTheme.colors.primary,
+                    disabledContentColor = TuripTheme.colors.white,
+                    disabledContainerColor = TuripTheme.colors.gray03,
                 ),
             onClick = onRetryClick,
         ) {

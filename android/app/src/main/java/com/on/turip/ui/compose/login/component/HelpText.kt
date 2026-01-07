@@ -17,7 +17,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.on.turip.R
-import com.on.turip.ui.compose.designsystem.theme.TuripTypography
+import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 
 @Composable
 fun HelpText(
@@ -58,5 +58,11 @@ fun HelpText(
 @Preview
 @Composable
 private fun HelpTextPreview() {
-    HelpText("도움말", TuripTypography.titleLarge, Color.White, {}, {})
+    HelpText(
+        text = "도움말",
+        style = TuripTheme.typography.title1,
+        color = TuripTheme.colors.white,
+        onClickIcon = {},
+        onClickText = {},
+    )
 }

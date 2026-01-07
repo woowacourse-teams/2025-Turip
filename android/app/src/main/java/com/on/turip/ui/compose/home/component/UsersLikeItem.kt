@@ -13,12 +13,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.on.turip.R
-import com.on.turip.ui.compose.designsystem.theme.TuripTypography
+import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 
 @Composable
 fun UsersLikeItem(
@@ -37,7 +35,7 @@ fun UsersLikeItem(
                 .wrapContentSize()
                 .border(
                     width = 1.dp,
-                    color = colorResource(R.color.gray_200_c1c1c1),
+                    color = TuripTheme.colors.gray02,
                     shape = RoundedCornerShape(12.dp),
                 ).padding(10.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -58,7 +56,7 @@ fun UsersLikeItem(
 
         Text(
             text = title,
-            style = TuripTypography.bodyMedium,
+            style = TuripTheme.typography.body2,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.width(width),
@@ -68,8 +66,8 @@ fun UsersLikeItem(
 
         Text(
             text = channelName,
-            color = colorResource(R.color.gray_300_5b5b5b),
-            style = TuripTypography.labelMedium,
+            color = TuripTheme.colors.gray03,
+            style = TuripTheme.typography.info2,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.width(width),
@@ -77,8 +75,8 @@ fun UsersLikeItem(
 
         Text(
             text = contentDescription,
-            color = colorResource(R.color.gray_300_5b5b5b),
-            style = TuripTypography.labelMedium,
+            color = TuripTheme.colors.gray03,
+            style = TuripTheme.typography.info2,
         )
     }
 }

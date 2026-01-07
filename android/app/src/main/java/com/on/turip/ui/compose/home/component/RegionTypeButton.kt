@@ -8,11 +8,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.on.turip.R
-import com.on.turip.ui.compose.designsystem.theme.TuripTypography
+import com.on.turip.ui.compose.designsystem.theme.TuripColor
+import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 
 @Composable
 fun RegionTypeButton(
@@ -22,9 +21,9 @@ fun RegionTypeButton(
     modifier: Modifier = Modifier,
 ) {
     val backgroundColor: Color =
-        if (isSelected) colorResource(R.color.turip_blue_11aebf_70) else colorResource(R.color.turip_light_blue_5ac3d5_11)
+        if (isSelected) TuripTheme.colors.primary else TuripColor.LightBlue
     val textColor: Color =
-        if (isSelected) colorResource(R.color.turip_light_gray_f2f2f2) else colorResource(R.color.turip_gray_b4b4b4)
+        if (isSelected) TuripTheme.colors.gray01 else TuripTheme.colors.gray02
     Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(containerColor = backgroundColor),
@@ -34,7 +33,7 @@ fun RegionTypeButton(
     ) {
         Text(
             text = text,
-            style = TuripTypography.titleSmall,
+            style = TuripTheme.typography.title3,
             color = textColor,
         )
     }
