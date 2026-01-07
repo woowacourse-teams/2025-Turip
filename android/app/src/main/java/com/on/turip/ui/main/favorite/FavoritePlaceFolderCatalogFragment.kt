@@ -7,22 +7,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.on.turip.R
 import com.on.turip.databinding.BottomSheetFragmentFavoritePlaceFolderCatalogBinding
 import com.on.turip.ui.common.TuripDialogFragment
 import com.on.turip.ui.common.base.BaseFragment
-import com.on.turip.ui.common.event.CommonEvent
+import com.on.turip.ui.common.collectOnStarted
+import com.on.turip.ui.common.error.ErrorUiModel
+import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.login.LoginActivity
-import com.on.turip.ui.main.favorite.FavoritePlaceFolderCatalogViewModel.FavoritePlaceFolderCatalogUiEvent
 import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
+import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderCatalogUiEffect
+import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderCatalogUiState
 import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @AndroidEntryPoint
@@ -66,10 +66,6 @@ class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavor
 
     private fun setupAdapters() {
         binding.rvBottomSheetFavoritePlaceFolderCatalog.adapter = placeAdapter
-
-        binding.btnBottomSheetFolderFavoritePlaceFolderCatalogBack.setOnClickListener {
-            parentFragmentManager.popBackStack()
-        }
 
         val itemTouchHelper =
             ItemTouchHelper(
@@ -117,42 +113,47 @@ class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavor
     }
 
     private fun setupObservers() {
-        viewModel.favoritePlaceFolderCatalogUiState.observe(viewLifecycleOwner) { state ->
-            placeAdapter.submitList(state.places)
-
-            binding.tvBottomSheetFolderFavoritePlaceFolderCatalogTitle.text = state.folderName
+        collectOnStarted(viewModel.uiState) { uiState: FavoritePlaceFolderCatalogUiState ->
+            placeAdapter.submitList(uiState.places)
+            binding.tvBottomSheetFolderFavoritePlaceFolderCatalogTitle.text = uiState.folderName
 
             binding.tvBottomSheetFavoritePlaceFolderCount.text =
-                getString(R.string.all_total_place_count, state.places.size)
+                getString(R.string.all_total_place_count, uiState.places.size)
 
-            if (state.places == emptyList<FavoritePlaceModel>()) {
+            if (uiState.places == emptyList<FavoritePlaceModel>()) {
                 binding.ivBottomSheetFavoritePlaceFolderShare.visibility = View.GONE
             } else {
                 binding.ivBottomSheetFavoritePlaceFolderShare.visibility = View.VISIBLE
             }
         }
 
-        viewModel.shareFolder.observe(viewLifecycleOwner) { shareFolder: FavoriteFolderShareModel ->
-            makeShareIntent(shareFolder)
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch {
-                    viewModel.commonEvent.collect { event ->
-                        when (event) {
-                            CommonEvent.TokenExpiration -> navigateToLoginScreen()
-                        }
-                    }
+        collectOnStarted(viewModel.uiEffect) { uiEffect: FavoritePlaceFolderCatalogUiEffect ->
+            when (uiEffect) {
+                FavoritePlaceFolderCatalogUiEffect.NavigateToLogin -> {
+                    navigateToLoginScreen()
                 }
 
-                launch {
-                    viewModel.uiEvent.collect { event ->
-                        when (event) {
-                            FavoritePlaceFolderCatalogUiEvent.ShowFolderShareNotAllowed -> {
-                                showSuggestLoginMessage()
-                            }
-                        }
+                FavoritePlaceFolderCatalogUiEffect.ShowFolderShareNotAllowed -> {
+                    showSuggestLoginMessage()
+                }
+
+                is FavoritePlaceFolderCatalogUiEffect.ShareFolder -> {
+                    shareFolder(uiEffect.favoriteFolderShareModel)
+                }
+
+                is FavoritePlaceFolderCatalogUiEffect.ShowError -> {
+                    val uiModel: ErrorUiModel =
+                        uiEffect.errorUiState.toUiModel() ?: return@collectOnStarted
+                    view?.let { view: View ->
+                        Snackbar
+                            .make(view, uiModel.titleRes, Snackbar.LENGTH_INDEFINITE)
+                            .apply {
+                                setAction(uiModel.retryTextRes) {
+                                    viewModel.handleErrorRetryRequest(
+                                        uiEffect.action,
+                                    )
+                                }
+                            }.show()
                     }
                 }
             }
@@ -161,10 +162,9 @@ class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavor
 
     private fun navigateToLoginScreen() {
         val intent: Intent =
-            LoginActivity.newIntent(requireActivity()).apply {
-                flags =
-                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            }
+            LoginActivity
+                .newIntent(requireActivity())
+                .apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK }
         startActivity(intent)
         requireActivity().finish()
     }
@@ -183,16 +183,20 @@ class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavor
         binding.ivBottomSheetFavoritePlaceFolderShare.setOnClickListener {
             viewModel.shareFolder()
         }
+
+        binding.btnBottomSheetFolderFavoritePlaceFolderCatalogBack.setOnClickListener {
+            parentFragmentManager.popBackStack()
+        }
     }
 
-    private fun makeShareIntent(shareFolder: FavoriteFolderShareModel) {
-        val sharedContents: String = shareFolder.toShareFormat()
+    private fun shareFolder(folderShareModel: FavoriteFolderShareModel) {
+        val sharedContents: String = folderShareModel.toShareFormat()
 
         val intent =
             Intent(Intent.ACTION_SEND).apply {
                 type = "text/plain"
                 putExtra(Intent.EXTRA_TEXT, sharedContents)
-                putExtra(Intent.EXTRA_TITLE, shareFolder.name)
+                putExtra(Intent.EXTRA_TITLE, folderShareModel.name)
             }
         val kakaoIntent: Intent =
             Intent(Intent.ACTION_SEND).apply {
@@ -209,9 +213,9 @@ class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavor
         val initialIntents = arrayOf(kakaoIntent, instagramIntent)
 
         val chooserIntent =
-            Intent.createChooser(intent, shareFolder.name).apply {
+            Intent.createChooser(intent, folderShareModel.name).apply {
                 putExtra(Intent.EXTRA_INITIAL_INTENTS, initialIntents)
-                putExtra(Intent.EXTRA_TITLE, shareFolder.name)
+                putExtra(Intent.EXTRA_TITLE, folderShareModel.name)
             }
 
         startActivity(chooserIntent)

@@ -1,27 +1,34 @@
 package com.on.turip.ui.main.favorite
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.on.turip.common.AuthState
 import com.on.turip.common.UserType
-import com.on.turip.data.common.onFailure
-import com.on.turip.data.common.onSuccess
-import com.on.turip.domain.ErrorEvent
+import com.on.turip.core.result.ErrorType
+import com.on.turip.core.result.onFailure
+import com.on.turip.core.result.onSuccess
 import com.on.turip.domain.favorite.FavoritePlace
 import com.on.turip.domain.favorite.repository.FavoritePlaceRepository
 import com.on.turip.domain.favorite.usecase.UpdateFavoritePlaceUseCase
-import com.on.turip.ui.common.event.CommonEvent
+import com.on.turip.ui.common.error.ErrorUiState
+import com.on.turip.ui.common.error.UiError
+import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.main.favorite.FavoritePlaceFolderCatalogFragment.Companion.FAVORITE_PLACE_FOLDER_CATALOG_ARGUMENTS_FOLDER_ID
 import com.on.turip.ui.main.favorite.FavoritePlaceFolderCatalogFragment.Companion.FAVORITE_PLACE_FOLDER_CATALOG_ARGUMENTS_FOLDER_NAME
 import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
+import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderCatalogRetryAction
+import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderCatalogUiEffect
+import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderCatalogUiState
 import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -32,13 +39,6 @@ class FavoritePlaceFolderCatalogViewModel @Inject constructor(
     private val favoritePlaceRepository: FavoritePlaceRepository,
     private val updateFavoritePlaceUseCase: UpdateFavoritePlaceUseCase,
 ) : ViewModel() {
-    private val _favoritePlaceFolderCatalogUiState: MutableLiveData<FavoritePlaceFolderCatalogUiState> =
-        MutableLiveData(FavoritePlaceFolderCatalogUiState())
-    val favoritePlaceFolderCatalogUiState: LiveData<FavoritePlaceFolderCatalogUiState> get() = _favoritePlaceFolderCatalogUiState
-
-    private val _shareFolder: MutableLiveData<FavoriteFolderShareModel> = MutableLiveData()
-    val shareFolder: LiveData<FavoriteFolderShareModel> get() = _shareFolder
-
     private val folderId: Long by lazy {
         checkNotNull(savedStateHandle[FAVORITE_PLACE_FOLDER_CATALOG_ARGUMENTS_FOLDER_ID]) {
             Timber.e("찜 폴더 내 장소 목록 화면 Folder ID 값이 존재하지 않습니다.")
@@ -50,16 +50,15 @@ class FavoritePlaceFolderCatalogViewModel @Inject constructor(
         }
     }
 
-    private val _commonEvent: Channel<CommonEvent> = Channel(Channel.BUFFERED)
-    val commonEvent: Flow<CommonEvent> = _commonEvent.receiveAsFlow()
+    private val _uiState: MutableStateFlow<FavoritePlaceFolderCatalogUiState> =
+        MutableStateFlow(FavoritePlaceFolderCatalogUiState.Idle)
+    val uiState: StateFlow<FavoritePlaceFolderCatalogUiState> = _uiState.asStateFlow()
 
-    private val _uiEvent: Channel<FavoritePlaceFolderCatalogUiEvent> = Channel(Channel.BUFFERED)
-    val uiEvent: Flow<FavoritePlaceFolderCatalogUiEvent> = _uiEvent.receiveAsFlow()
+    private val _uiEffect: Channel<FavoritePlaceFolderCatalogUiEffect> = Channel(Channel.BUFFERED)
+    val uiEffect: Flow<FavoritePlaceFolderCatalogUiEffect> = _uiEffect.receiveAsFlow()
 
     init {
         loadPlacesInSelectFolder()
-        _favoritePlaceFolderCatalogUiState.value =
-            favoritePlaceFolderCatalogUiState.value?.copy(folderName = folderName)
     }
 
     private fun loadPlacesInSelectFolder() {
@@ -67,20 +66,25 @@ class FavoritePlaceFolderCatalogViewModel @Inject constructor(
             favoritePlaceRepository
                 .loadFavoritePlaces(folderId)
                 .onSuccess { favoritePlaces: List<FavoritePlace> ->
-                    _favoritePlaceFolderCatalogUiState.value =
-                        favoritePlaceFolderCatalogUiState.value?.copy(
-                            places =
-                                favoritePlaces
-                                    .map { favoritePlace: FavoritePlace ->
-                                        favoritePlace.toUiModel()
-                                    },
+                    _uiState.update { originUiState: FavoritePlaceFolderCatalogUiState ->
+                        originUiState.copy(
+                            places = favoritePlaces.map { it.toUiModel() },
+                            folderName = folderName,
                         )
-                    _favoritePlaceFolderCatalogUiState.value =
-                        favoritePlaceFolderCatalogUiState.value?.copy(isServerError = false)
-                    _favoritePlaceFolderCatalogUiState.value =
-                        favoritePlaceFolderCatalogUiState.value?.copy(isNetWorkError = false)
-                }.onFailure { errorEvent: ErrorEvent ->
-                    checkError(errorEvent)
+                    }
+                }.onFailure { errorType: ErrorType ->
+                    when (val uiError: UiError = errorType.toUiError()) {
+                        is UiError.Global -> {
+                            handleGlobalError(
+                                uiError = uiError,
+                                retryAction = FavoritePlaceFolderCatalogRetryAction.LoadPlacesInFolder,
+                            )
+                        }
+
+                        is UiError.Feature -> {
+                            Unit
+                        }
+                    }
                     Timber.e("폴더에 담긴 장소들을 불러오는 API 호출 실패")
                 }
         }
@@ -94,56 +98,27 @@ class FavoritePlaceFolderCatalogViewModel @Inject constructor(
         viewModelScope.launch {
             updateFavoritePlaceUseCase(folderId, placeId, updatedFavorite)
                 .onSuccess {
-                    _favoritePlaceFolderCatalogUiState.value =
-                        favoritePlaceFolderCatalogUiState.value?.copy(
-                            places =
-                                favoritePlaceFolderCatalogUiState.value?.places?.filter {
-                                    it.placeId != placeId
-                                } ?: emptyList(),
+                    _uiState.update { originUiState: FavoritePlaceFolderCatalogUiState ->
+                        originUiState.copy(
+                            places = originUiState.places.filter { it.placeId != placeId },
                         )
+                    }
                     Timber.d("찜 목록 화면 폴더명에 해당하는 찜 장소들 업데이트 성공")
-                    _favoritePlaceFolderCatalogUiState.value =
-                        favoritePlaceFolderCatalogUiState.value?.copy(isServerError = false)
-                    _favoritePlaceFolderCatalogUiState.value =
-                        favoritePlaceFolderCatalogUiState.value?.copy(isNetWorkError = false)
-                }.onFailure { errorEvent: ErrorEvent ->
-                    checkError(errorEvent)
-                    Timber.e("찜 목록 화면 폴더명에 해당하는 찜 장소들 업데이트 실패 (placeId =$placeId)")
+                }.onFailure { errorType: ErrorType ->
+                    when (val uiError: UiError = errorType.toUiError()) {
+                        is UiError.Global -> {
+                            handleGlobalError(
+                                uiError = uiError,
+                                retryAction = FavoritePlaceFolderCatalogRetryAction.LoadPlacesInFolder,
+                            )
+                        }
+
+                        is UiError.Feature -> {
+                            Unit
+                        }
+                    }
+                    Timber.e("찜 목록 화면 폴더명에 해당하는 찜 장소들 업데이트 실패 (placeId = $placeId)")
                 }
-        }
-    }
-
-    private fun checkError(errorEvent: ErrorEvent) {
-        when (errorEvent) {
-            ErrorEvent.USER_NOT_HAVE_PERMISSION -> {
-                _favoritePlaceFolderCatalogUiState.value =
-                    favoritePlaceFolderCatalogUiState.value?.copy(isServerError = true)
-            }
-
-            ErrorEvent.DUPLICATION_FOLDER -> {
-                throw IllegalArgumentException("발생할 수 없는 오류")
-            }
-
-            ErrorEvent.UNEXPECTED_PROBLEM -> {
-                _favoritePlaceFolderCatalogUiState.value =
-                    favoritePlaceFolderCatalogUiState.value?.copy(isServerError = true)
-            }
-
-            ErrorEvent.NETWORK_ERROR -> {
-                _favoritePlaceFolderCatalogUiState.value =
-                    favoritePlaceFolderCatalogUiState.value?.copy(isNetWorkError = true)
-            }
-
-            ErrorEvent.PARSER_ERROR -> {
-                _favoritePlaceFolderCatalogUiState.value =
-                    favoritePlaceFolderCatalogUiState.value?.copy(isServerError = true)
-            }
-
-            ErrorEvent.TOKEN_EXPIRATION -> {
-                viewModelScope.launch {
-                    _commonEvent.send(CommonEvent.TokenExpiration)
-                }
-            }
         }
     }
 
@@ -154,12 +129,22 @@ class FavoritePlaceFolderCatalogViewModel @Inject constructor(
                     favoriteFolderId = folderId,
                     updatedOrder = newFavoritePlaces.map { it.favoritePlaceId },
                 ).onSuccess {
-                    _favoritePlaceFolderCatalogUiState.value =
-                        favoritePlaceFolderCatalogUiState.value?.copy(places = newFavoritePlaces)
+                    _uiState.update { it.copy(places = newFavoritePlaces) }
                     Timber.d("순서 변경 완료: $newFavoritePlaces")
-                }.onFailure { errorEvent: ErrorEvent ->
-                    checkError(errorEvent)
-                    Timber.e("장소 순서 변경 API 호출 실패")
+                }.onFailure { errorType: ErrorType ->
+                    when (val uiError: UiError = errorType.toUiError()) {
+                        is UiError.Global -> {
+                            handleGlobalError(
+                                uiError = uiError,
+                                retryAction = FavoritePlaceFolderCatalogRetryAction.LoadPlacesInFolder,
+                            )
+                        }
+
+                        is UiError.Feature -> {
+                            Unit
+                        }
+                    }
+                    Timber.e("장소 순서 변경 API 호출 실패 ")
                 }
         }
     }
@@ -167,33 +152,52 @@ class FavoritePlaceFolderCatalogViewModel @Inject constructor(
     fun shareFolder() {
         when (AuthState.type) {
             UserType.MEMBER -> {
-                val shareFolder =
+                val favoriteFolderShareModel =
                     FavoriteFolderShareModel(
                         name = folderName,
-                        places =
-                            favoritePlaceFolderCatalogUiState.value?.places?.map { it.toUiModel() }
-                                ?: emptyList(),
+                        places = uiState.value.places.map { it.toUiModel() },
                     )
-                _shareFolder.value = shareFolder
+                viewModelScope.launch {
+                    _uiEffect.send(
+                        FavoritePlaceFolderCatalogUiEffect.ShareFolder(favoriteFolderShareModel),
+                    )
+                }
             }
 
             UserType.GUEST, UserType.NONE -> {
                 viewModelScope.launch {
-                    _uiEvent.send(FavoritePlaceFolderCatalogUiEvent.ShowFolderShareNotAllowed)
+                    _uiEffect.send(FavoritePlaceFolderCatalogUiEffect.ShowFolderShareNotAllowed)
                 }
             }
         }
     }
 
-    sealed interface FavoritePlaceFolderCatalogUiEvent {
-        data object ShowFolderShareNotAllowed : FavoritePlaceFolderCatalogUiEvent
+    private suspend fun handleGlobalError(
+        uiError: UiError.Global,
+        retryAction: FavoritePlaceFolderCatalogRetryAction,
+    ) {
+        when (uiError) {
+            UiError.Global.Network -> {
+                _uiEffect.send(
+                    FavoritePlaceFolderCatalogUiEffect.ShowError(ErrorUiState.Network, retryAction),
+                )
+            }
+
+            UiError.Global.Server -> {
+                _uiEffect.send(
+                    FavoritePlaceFolderCatalogUiEffect.ShowError(ErrorUiState.Server, retryAction),
+                )
+            }
+
+            UiError.Global.TokenExpired -> {
+                _uiEffect.send(FavoritePlaceFolderCatalogUiEffect.NavigateToLogin)
+            }
+        }
     }
 
-    data class FavoritePlaceFolderCatalogUiState(
-        val isLoading: Boolean = true,
-        val isNetWorkError: Boolean = false,
-        val isServerError: Boolean = false,
-        val places: List<FavoritePlaceModel> = emptyList(),
-        val folderName: String = "",
-    )
+    fun handleErrorRetryRequest(action: FavoritePlaceFolderCatalogRetryAction) {
+        when (action) {
+            FavoritePlaceFolderCatalogRetryAction.LoadPlacesInFolder -> loadPlacesInSelectFolder()
+        }
+    }
 }

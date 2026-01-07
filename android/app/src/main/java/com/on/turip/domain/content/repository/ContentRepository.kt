@@ -1,28 +1,28 @@
 package com.on.turip.domain.content.repository
 
-import com.on.turip.data.common.TuripCustomResult
+import com.on.turip.core.result.TuripResult
 import com.on.turip.domain.content.Content
 import com.on.turip.domain.content.PagedContentsResult
 import com.on.turip.domain.content.UsersLikeContent
 
 interface ContentRepository {
-    suspend fun loadContentsSizeByRegion(regionCategoryName: String): TuripCustomResult<Int>
+    suspend fun loadContentsSizeByRegion(regionCategoryName: String): TuripResult<Int>
 
-    suspend fun loadContentsSizeByKeyword(keyword: String): TuripCustomResult<Int>
+    suspend fun loadContentsSizeByKeyword(keyword: String): TuripResult<Int>
 
     suspend fun loadContentsByRegion(
         regionCategoryName: String,
         size: Int,
         lastId: Long,
-    ): TuripCustomResult<PagedContentsResult>
+    ): TuripResult<PagedContentsResult>
 
     suspend fun loadContentsByKeyword(
         keyword: String,
         size: Int,
         lastId: Long,
-    ): TuripCustomResult<PagedContentsResult>
+    ): TuripResult<PagedContentsResult>
 
-    suspend fun loadContent(contentId: Long): TuripCustomResult<Content>
+    suspend fun loadContent(contentId: Long): TuripResult<Content>
 
-    suspend fun loadPopularFavoriteContents(size: Int = 5): TuripCustomResult<List<UsersLikeContent>>
+    suspend fun loadPopularFavoriteContents(size: Int = 5): TuripResult<List<UsersLikeContent>>
 }

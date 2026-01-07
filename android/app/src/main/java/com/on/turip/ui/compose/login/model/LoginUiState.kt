@@ -5,6 +5,6 @@ data class LoginUiState(
     val showMigrationDialog: Boolean,
 ) {
     companion object {
-        val EMPTY: LoginUiState = LoginUiState(showHelpText = false, showMigrationDialog = false)
+        val IDLE: LoginUiState = LoginUiState(showHelpText = false, showMigrationDialog = false)
     }
 }

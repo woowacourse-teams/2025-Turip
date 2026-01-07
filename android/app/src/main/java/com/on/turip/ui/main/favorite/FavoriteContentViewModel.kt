@@ -1,20 +1,27 @@
 package com.on.turip.ui.main.favorite
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.on.turip.data.common.onFailure
-import com.on.turip.data.common.onSuccess
-import com.on.turip.domain.ErrorEvent
-import com.on.turip.domain.favorite.FavoriteContent
+import com.on.turip.core.result.ErrorType
+import com.on.turip.core.result.onFailure
+import com.on.turip.core.result.onSuccess
+import com.on.turip.domain.favorite.PagedFavoriteContents
 import com.on.turip.domain.favorite.repository.FavoriteRepository
 import com.on.turip.domain.favorite.usecase.UpdateFavoriteUseCase
-import com.on.turip.ui.common.event.CommonEvent
+import com.on.turip.ui.common.error.ErrorUiState
+import com.on.turip.ui.common.error.UiError
+import com.on.turip.ui.common.error.toUiError
+import com.on.turip.ui.main.favorite.model.FavoriteContentRetryAction
+import com.on.turip.ui.main.favorite.model.FavoriteContentUiEffect
+import com.on.turip.ui.main.favorite.model.FavoriteContentUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -24,18 +31,12 @@ class FavoriteContentViewModel @Inject constructor(
     private val favoriteRepository: FavoriteRepository,
     private val updateFavoriteUseCase: UpdateFavoriteUseCase,
 ) : ViewModel() {
-    private val _favoriteContents: MutableLiveData<List<FavoriteContent>> =
-        MutableLiveData(emptyList())
-    val favoriteContents: LiveData<List<FavoriteContent>> get() = _favoriteContents
+    private val _uiState: MutableStateFlow<FavoriteContentUiState> =
+        MutableStateFlow(FavoriteContentUiState.Idle)
+    val uiState: StateFlow<FavoriteContentUiState> = _uiState.asStateFlow()
 
-    private val _networkError: MutableLiveData<Boolean> = MutableLiveData(false)
-    val networkError: LiveData<Boolean> get() = _networkError
-
-    private val _serverError: MutableLiveData<Boolean> = MutableLiveData(false)
-    val serverError: LiveData<Boolean> get() = _serverError
-
-    private val _uiEvent: Channel<CommonEvent> = Channel(Channel.BUFFERED)
-    val uiEvent: Flow<CommonEvent> = _uiEvent.receiveAsFlow()
+    private val _uiEffect: Channel<FavoriteContentUiEffect> = Channel(Channel.BUFFERED)
+    val uiEffect: Flow<FavoriteContentUiEffect> = _uiEffect.receiveAsFlow()
 
     init {
         loadFavoriteContents()
@@ -43,16 +44,42 @@ class FavoriteContentViewModel @Inject constructor(
 
     fun loadFavoriteContents() {
         viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+
             favoriteRepository
                 .loadFavoriteContents(10, 0L)
-                .onSuccess {
+                .onSuccess { pagedFavoriteContent: PagedFavoriteContents ->
                     Timber.d("찜 목록 데이터 조회 성공")
-                    _favoriteContents.value = it.favoriteContents
-                    _networkError.value = false
-                    _serverError.value = false
-                }.onFailure { errorEvent: ErrorEvent ->
-                    checkError(errorEvent)
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            favoriteContents = pagedFavoriteContent.favoriteContents,
+                            errorUiState = ErrorUiState.None,
+                        )
+                    }
+                }.onFailure { errorType: ErrorType ->
                     Timber.e("찜 목록 데이터 조회 에러 발생")
+                    val uiError: UiError = errorType.toUiError()
+                    if (uiError is UiError.Global) {
+                        when (uiError) {
+                            UiError.Global.Network -> {
+                                _uiState.update {
+                                    it.copy(isLoading = false, errorUiState = ErrorUiState.Network)
+                                }
+                            }
+
+                            UiError.Global.Server -> {
+                                _uiState.update {
+                                    it.copy(isLoading = false, errorUiState = ErrorUiState.Server)
+                                }
+                            }
+
+                            UiError.Global.TokenExpired -> {
+                                _uiState.update { it.copy(isLoading = false) }
+                                _uiEffect.send(FavoriteContentUiEffect.NavigateToLogin)
+                            }
+                        }
+                    }
                 }
         }
     }
@@ -68,41 +95,58 @@ class FavoriteContentViewModel @Inject constructor(
                 .onSuccess {
                     Timber.d("찜 목록 페이지, 찜 버튼 클릭(contentId=$contentId, updateFavorite = $updatedFavorite")
 
-                    _favoriteContents.value =
-                        favoriteContents.value?.filter { it.content.id != contentId }
+                    _uiState.update { state: FavoriteContentUiState ->
+                        state.copy(
+                            isLoading = false,
+                            favoriteContents = state.favoriteContents.filter { it.content.id != contentId },
+                            errorUiState = ErrorUiState.None,
+                        )
+                    }
+                }.onFailure { errorType: ErrorType ->
+                    Timber.e("찜 목록에서 찜 버튼 클릭 업데이트 실패")
+                    _uiState.update { it.copy(isLoading = false) }
+                    val uiError: UiError = errorType.toUiError()
+                    if (uiError is UiError.Global) {
+                        when (uiError) {
+                            UiError.Global.Network -> {
+                                _uiEffect.send(
+                                    FavoriteContentUiEffect.ShowError(
+                                        errorUiState = ErrorUiState.Network,
+                                        action =
+                                            FavoriteContentRetryAction.UpdateFavorite(
+                                                contentId,
+                                                isFavorite,
+                                            ),
+                                    ),
+                                )
+                            }
 
-                    _networkError.value = false
-                    _serverError.value = false
-                }.onFailure { errorEvent: ErrorEvent ->
-                    checkError(errorEvent)
-                    Timber.d("찜 목록에서 찜 버튼 클릭 업데이트 실패 ")
+                            UiError.Global.Server -> {
+                                _uiEffect.send(
+                                    FavoriteContentUiEffect.ShowError(
+                                        errorUiState = ErrorUiState.Server,
+                                        action =
+                                            FavoriteContentRetryAction.UpdateFavorite(
+                                                contentId,
+                                                isFavorite,
+                                            ),
+                                    ),
+                                )
+                            }
+
+                            UiError.Global.TokenExpired -> {
+                                _uiEffect.send(FavoriteContentUiEffect.NavigateToLogin)
+                            }
+                        }
+                    }
                 }
         }
     }
 
-    private fun checkError(errorEvent: ErrorEvent) {
-        when (errorEvent) {
-            ErrorEvent.USER_NOT_HAVE_PERMISSION -> {
-                _serverError.value = true
-            }
-
-            ErrorEvent.DUPLICATION_FOLDER -> throw IllegalArgumentException("발생할 수 없는 오류")
-            ErrorEvent.UNEXPECTED_PROBLEM -> {
-                _serverError.value = true
-            }
-
-            ErrorEvent.NETWORK_ERROR -> {
-                _networkError.value = true
-            }
-
-            ErrorEvent.PARSER_ERROR -> {
-                _serverError.value = true
-            }
-
-            ErrorEvent.TOKEN_EXPIRATION -> {
-                viewModelScope.launch {
-                    _uiEvent.send(CommonEvent.TokenExpiration)
-                }
+    fun handleErrorRetryRequest(action: FavoriteContentRetryAction) {
+        when (action) {
+            is FavoriteContentRetryAction.UpdateFavorite -> {
+                updateFavorite(action.contentId, action.isFavorite)
             }
         }
     }

@@ -1,23 +1,28 @@
 package com.on.turip.ui.compose.home
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.on.turip.data.common.onFailure
-import com.on.turip.data.common.onSuccess
-import com.on.turip.domain.ErrorEvent
+import com.on.turip.core.result.ErrorType
+import com.on.turip.core.result.TuripResult
+import com.on.turip.core.result.onFailure
+import com.on.turip.core.result.onSuccess
 import com.on.turip.domain.content.UsersLikeContent
 import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.region.RegionCategory
 import com.on.turip.domain.region.repository.RegionRepository
-import com.on.turip.ui.common.event.CommonEvent
+import com.on.turip.ui.common.error.ErrorUiState
+import com.on.turip.ui.common.error.UiError
+import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.common.mapper.toUiModel
-import com.on.turip.ui.main.home.model.UsersLikeContentModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -27,101 +32,101 @@ class HomeViewModel @Inject constructor(
     private val regionRepository: RegionRepository,
     private val contentRepository: ContentRepository,
 ) : ViewModel() {
-    private val _regionCategories: MutableLiveData<List<RegionCategory>> = MutableLiveData()
-    val regionCategories: LiveData<List<RegionCategory>> get() = _regionCategories
+    private val _uiState: MutableStateFlow<HomeUiState> = MutableStateFlow(HomeUiState.Idle)
+    val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
-    private val _isSelectedDomestic: MutableLiveData<Boolean> = MutableLiveData()
-    val isSelectedDomestic: LiveData<Boolean> get() = _isSelectedDomestic
-
-    private val _usersLikeContents: MutableLiveData<List<UsersLikeContentModel>> =
-        MutableLiveData()
-    val usersLikeContents: LiveData<List<UsersLikeContentModel>> get() = _usersLikeContents
-
-    private val _networkError: MutableLiveData<Boolean> = MutableLiveData(false)
-    val networkError: LiveData<Boolean> get() = _networkError
-
-    private val _serverError: MutableLiveData<Boolean> = MutableLiveData(false)
-    val serverError: LiveData<Boolean> get() = _serverError
-
-    private val _uiEvent: Channel<CommonEvent> = Channel(Channel.BUFFERED)
-    val uiEvent: Flow<CommonEvent> = _uiEvent.receiveAsFlow()
+    private val _uiEffect: Channel<HomeUiEffect> = Channel(Channel.BUFFERED)
+    val uiEffect: Flow<HomeUiEffect> = _uiEffect.receiveAsFlow()
 
     init {
-        loadUsersLikeContents()
-        loadRegionCategories(isDomestic = true)
+        loadContents()
     }
 
-    fun reload() {
-        loadUsersLikeContents()
-        loadRegionCategories(isDomestic = true)
-    }
-
-    private fun loadUsersLikeContents() {
+    fun loadContents() {
         viewModelScope.launch {
-            contentRepository
-                .loadPopularFavoriteContents()
-                .onSuccess { contents: List<UsersLikeContent> ->
-                    _usersLikeContents.value = contents.map { it.toUiModel() }
-                    _networkError.value = false
-                    _serverError.value = false
-                    Timber.d("인기 찜 목록: $contents")
-                }.onFailure { errorEvent: ErrorEvent ->
-                    checkError(errorEvent)
-                    Timber.e("인기 찜 목록 불러오기 실패")
-                }
+            _uiState.update { it.copy(isLoading = true) }
+            val usersLikeContentsDeferred =
+                async { contentRepository.loadPopularFavoriteContents() }
+            val regionCategoriesDeferred =
+                async { regionRepository.loadRegionCategories(uiState.value.isDomesticSelected) }
+
+            val usersLikeContentsResult = usersLikeContentsDeferred.await()
+            val regionCategoriesResult = regionCategoriesDeferred.await()
+
+            val failure: TuripResult.Failure? =
+                listOf(usersLikeContentsResult, regionCategoriesResult)
+                    .filterIsInstance<TuripResult.Failure>()
+                    .firstOrNull()
+
+            if (failure != null) {
+                handleGlobalError(failure.errorType.toUiError())
+                return@launch
+            }
+
+            val usersLikeContents: List<UsersLikeContent> =
+                (usersLikeContentsResult as TuripResult.Success).value
+            val regionCategories: List<RegionCategory> =
+                (regionCategoriesResult as TuripResult.Success).value
+
+            _uiState.update { state: HomeUiState ->
+                state.copy(
+                    isLoading = false,
+                    regionCategories = regionCategories,
+                    usersLikeContents = usersLikeContents.map { it.toUiModel() },
+                    errorUiState = ErrorUiState.None,
+                )
+            }
+
+            Timber.d("인기 찜 목록: $usersLikeContents")
+            Timber.d("지역 카테고리 조회: $regionCategories")
         }
     }
 
-    private fun checkError(errorEvent: ErrorEvent) {
-        when (errorEvent) {
-            ErrorEvent.USER_NOT_HAVE_PERMISSION -> {
-                _serverError.value = true
-            }
-
-            ErrorEvent.DUPLICATION_FOLDER -> {
-                throw IllegalArgumentException("발생할 수 없는 오류")
-            }
-
-            ErrorEvent.UNEXPECTED_PROBLEM -> {
-                _serverError.value = true
-            }
-
-            ErrorEvent.NETWORK_ERROR -> {
-                _networkError.value = true
-            }
-
-            ErrorEvent.PARSER_ERROR -> {
-                _serverError.value = true
-            }
-
-            ErrorEvent.TOKEN_EXPIRATION -> {
-                viewModelScope.launch {
-                    _uiEvent.send(CommonEvent.TokenExpiration)
-                }
-            }
-        }
-    }
-
-    fun loadRegionCategories(isDomestic: Boolean) {
+    fun updateDomesticSelected(isDomesticSelected: Boolean) {
+        Timber.d(if (isDomesticSelected) "국내 클릭" else "해외 클릭")
         viewModelScope.launch {
             regionRepository
-                .loadRegionCategories(isDomestic)
+                .loadRegionCategories(isDomesticSelected)
                 .onSuccess { regionCategories: List<RegionCategory> ->
-                    _regionCategories.value = regionCategories
-                    _isSelectedDomestic.value = isDomestic
-                    _networkError.value = false
-                    _serverError.value = false
+                    _uiState.update { state: HomeUiState ->
+                        state.copy(
+                            isLoading = false,
+                            regionCategories = regionCategories,
+                            isDomesticSelected = isDomesticSelected,
+                            errorUiState = ErrorUiState.None,
+                        )
+                    }
                     Timber.d("지역 카테고리 조회: $regionCategories")
-                }.onFailure { errorEvent: ErrorEvent ->
-                    checkError(errorEvent)
+                }.onFailure { errorType: ErrorType ->
+                    when (val uiError: UiError = errorType.toUiError()) {
+                        is UiError.Global -> handleGlobalError(uiError)
+                        is UiError.Feature -> Unit
+                    }
                     Timber.e("지역 카테고리 조회 실패")
                 }
         }
     }
 
-    fun updateDomesticSelected(isDomesticSelected: Boolean) {
-        _isSelectedDomestic.value = isDomesticSelected
-        Timber.d(if (isSelectedDomestic.value == true) "국내 클릭" else "해외 클릭")
-        isSelectedDomestic.value?.let { loadRegionCategories(it) }
+    private suspend fun handleGlobalError(uiError: UiError) {
+        if (uiError is UiError.Global) {
+            when (uiError) {
+                UiError.Global.Network -> {
+                    _uiState.update {
+                        it.copy(isLoading = false, errorUiState = ErrorUiState.Network)
+                    }
+                }
+
+                UiError.Global.Server -> {
+                    _uiState.update {
+                        it.copy(isLoading = false, errorUiState = ErrorUiState.Server)
+                    }
+                }
+
+                UiError.Global.TokenExpired -> {
+                    _uiState.update { it.copy(isLoading = false) }
+                    _uiEffect.send(HomeUiEffect.NavigateToLogin)
+                }
+            }
+        }
     }
 }

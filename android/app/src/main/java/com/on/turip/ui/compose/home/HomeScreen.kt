@@ -2,36 +2,39 @@ package com.on.turip.ui.compose.home
 
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.on.turip.R
-import com.on.turip.domain.region.RegionCategory
-import com.on.turip.ui.common.event.CommonEvent
-import com.on.turip.ui.compose.designsystem.component.ErrorHandlingContainer
+import com.on.turip.ui.common.error.ErrorUiState
+import com.on.turip.ui.compose.designsystem.component.ErrorScreen
 import com.on.turip.ui.compose.designsystem.component.TuripAppBar
 import com.on.turip.ui.compose.home.component.RegionList
 import com.on.turip.ui.compose.home.component.RegionTypeButtons
@@ -40,6 +43,7 @@ import com.on.turip.ui.compose.home.component.UsersLikeList
 import com.on.turip.ui.compose.theme.TuripTheme
 import com.on.turip.ui.compose.theme.TuripTypography
 import com.on.turip.ui.main.home.model.UsersLikeContentModel
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun HomeScreen(
@@ -49,56 +53,78 @@ fun HomeScreen(
     navigateToLoginScreen: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
-    var keyword: String by rememberSaveable { mutableStateOf("") }
-
-    val regions: List<RegionCategory> by viewModel.regionCategories.observeAsState(emptyList())
-    val isSelectedDomestic: Boolean by viewModel.isSelectedDomestic.observeAsState(true)
-    val usersLikeContents: List<UsersLikeContentModel> by viewModel.usersLikeContents.observeAsState(
-        emptyList(),
-    )
-    val networkError by viewModel.networkError.observeAsState(false)
-    val serverError by viewModel.serverError.observeAsState(false)
-
-    val scrollState = rememberScrollState()
-    val focusManager = LocalFocusManager.current
-    val keyboardController = LocalSoftwareKeyboardController.current
+    val uiState: HomeUiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        viewModel.uiEvent.collect { event ->
-            when (event) {
-                CommonEvent.TokenExpiration -> navigateToLoginScreen()
+        viewModel.uiEffect.collectLatest { uiEffect: HomeUiEffect ->
+            when (uiEffect) {
+                HomeUiEffect.NavigateToLogin -> navigateToLoginScreen()
             }
         }
     }
 
     Scaffold(
+        contentWindowInsets = WindowInsets(),
         topBar = {
-            TuripAppBar(
-                canBack = false,
-            )
+            TuripAppBar(canBack = false)
         },
-        modifier =
-            Modifier.pointerInput(Unit) {
-                detectTapGestures(onTap = {
-                    focusManager.clearFocus()
-                    keyboardController?.hide()
-                })
-            },
     ) { innerPadding ->
-        ErrorHandlingContainer(
-            networkError = networkError,
-            serverError = serverError,
-            onRetryClick = { viewModel.reload() },
+        HomeScreenContent(
+            uiState = uiState,
+            onSearchClick = onSearchClick,
+            onRetryLoadContents = viewModel::loadContents,
+            onContentClick = onContentClick,
+            onRegionClick = onRegionClick,
+            onDomesticClick = { viewModel.updateDomesticSelected(it) },
+            modifier = Modifier.padding(innerPadding),
+        )
+    }
+}
+
+@Composable
+private fun HomeScreenContent(
+    uiState: HomeUiState,
+    onRetryLoadContents: () -> Unit,
+    onSearchClick: (String) -> Unit,
+    onContentClick: (UsersLikeContentModel) -> Unit,
+    onRegionClick: (String) -> Unit,
+    onDomesticClick: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var keyword: String by rememberSaveable { mutableStateOf("") }
+    val scrollState = rememberScrollState()
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    if (uiState.isLoading) {
+        Box(
+            modifier = modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center,
         ) {
+            CircularProgressIndicator(modifier = Modifier.size(60.dp), color = Color.Black)
+        }
+    }
+    when {
+        uiState.errorUiState != ErrorUiState.None -> {
+            ErrorScreen(
+                errorUiState = uiState.errorUiState,
+                onRetryClick = onRetryLoadContents,
+                modifier = modifier.fillMaxSize(),
+            )
+        }
+
+        else -> {
             Column(
                 modifier =
-                    Modifier
+                    modifier
                         .fillMaxSize()
-                        .padding(
-                            top = innerPadding.calculateTopPadding(),
-                            start = 20.dp,
-                            end = innerPadding.calculateEndPadding(LocalLayoutDirection.current),
-                        ).verticalScroll(scrollState),
+                        .pointerInput(Unit) {
+                            detectTapGestures(onTap = {
+                                focusManager.clearFocus()
+                                keyboardController?.hide()
+                            })
+                        }.padding(horizontal = 20.dp)
+                        .verticalScroll(scrollState),
                 verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
                 Text(
@@ -118,7 +144,7 @@ fun HomeScreen(
                     modifier =
                         Modifier
                             .wrapContentSize()
-                            .padding(top = 4.dp, end = 20.dp),
+                            .padding(top = 4.dp),
                 )
 
                 Text(
@@ -129,36 +155,119 @@ fun HomeScreen(
                 )
 
                 UsersLikeList(
-                    usersLikeContents = usersLikeContents,
+                    usersLikeContents = uiState.usersLikeContents,
                     onContentClick = onContentClick,
                 )
 
                 RegionTypeButtons(
-                    onDomesticClick = { isSelectDomestic: Boolean ->
-                        viewModel.updateDomesticSelected(isSelectDomestic)
-                    },
-                    isSelectedDomestic = isSelectedDomestic,
+                    onDomesticClick = { onDomesticClick(it) },
+                    isSelectedDomestic = uiState.isDomesticSelected,
                 )
 
                 RegionList(
-                    regions = regions,
+                    regions = uiState.regionCategories,
                     onRegionClick = onRegionClick,
-                    modifier = Modifier.padding(end = 20.dp),
                 )
             }
         }
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, name = "로딩")
 @Composable
-fun HomeScreenPreview() {
+private fun HomeLoadingPreview() {
+    val uiState = HomeUiState.Idle
     TuripTheme {
-        HomeScreen(
-            {},
-            {},
-            {},
-            navigateToLoginScreen = {},
+        Scaffold(
+            topBar = {
+                TuripAppBar(canBack = false)
+            },
+        ) { innerPadding ->
+            HomeScreenContent(
+                uiState = uiState.copy(isLoading = true, errorUiState = ErrorUiState.None),
+                onSearchClick = {},
+                onRetryLoadContents = { },
+                onContentClick = { },
+                onRegionClick = { },
+                onDomesticClick = { },
+                modifier = Modifier.padding(innerPadding),
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "성공")
+@Composable
+private fun HomeSuccessPreview() {
+    val uiState =
+        HomeUiState(
+            isLoading = false,
+            regionCategories = emptyList(),
+            isDomesticSelected = true,
+            usersLikeContents = emptyList(),
+            errorUiState = ErrorUiState.None,
         )
+    TuripTheme {
+        Scaffold(
+            topBar = {
+                TuripAppBar(canBack = false)
+            },
+        ) { innerPadding ->
+            HomeScreenContent(
+                uiState = uiState,
+                onSearchClick = {},
+                onRetryLoadContents = { },
+                onContentClick = { },
+                onRegionClick = { },
+                onDomesticClick = { },
+                modifier = Modifier.padding(innerPadding),
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "서버 에러 발생")
+@Composable
+private fun HomeServerErrorPreview() {
+    val uiState = HomeUiState.Idle
+    TuripTheme {
+        Scaffold(
+            topBar = {
+                TuripAppBar(canBack = false)
+            },
+        ) { innerPadding ->
+            HomeScreenContent(
+                uiState = uiState.copy(isLoading = false, errorUiState = ErrorUiState.Server),
+                onSearchClick = {},
+                onRetryLoadContents = { },
+                onContentClick = { },
+                onRegionClick = { },
+                onDomesticClick = { },
+                modifier = Modifier.padding(innerPadding),
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "네트워크 에러 발생")
+@Composable
+private fun HomeNetworkErrorPreview() {
+    val uiState = HomeUiState.Idle
+    TuripTheme {
+        Scaffold(
+            topBar = {
+                TuripAppBar(canBack = false)
+            },
+        ) { innerPadding ->
+            HomeScreenContent(
+                uiState = uiState.copy(isLoading = false, errorUiState = ErrorUiState.Network),
+                onSearchClick = {},
+                onRetryLoadContents = { },
+                onContentClick = { },
+                onRegionClick = { },
+                onDomesticClick = { },
+                modifier = Modifier.padding(innerPadding),
+            )
+        }
     }
 }

@@ -65,7 +65,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/cl_folder_toolbar"
-        tools:listitem="@layout/item_folder_edit" />
+        tools:listitem="@layout/item_folder_edit"
+        tools:visibility="gone" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/cl_folder_empty"
@@ -75,7 +76,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cl_folder_toolbar">
+        app:layout_constraintTop_toBottomOf="@id/cl_folder_toolbar"
+        tools:visibility="gone">
 
         <ImageView
             android:id="@+id/iv_folder_empty_folder"
@@ -113,7 +115,30 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_folder_empty_suggest_title" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <com.on.turip.ui.common.errorview.CustomErrorView
+        android:id="@+id/custom_error_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cl_folder_toolbar"
+        tools:visibility="gone" />
+
+    <ProgressBar
+        android:id="@+id/pb_folder_loading"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="gone" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,14 +7,9 @@ import javax.inject.Inject
 class DefaultSearchHistoryDataSource @Inject constructor(
     private val dao: SearchHistoryDao,
 ) : SearchHistoryDataSource {
-    override suspend fun createSearchHistory(keyword: String): Result<Unit> =
-        runCatching { dao.insertSearchHistory(SearchHistoryEntity(keyword = keyword)) }
+    override suspend fun createSearchHistory(keyword: String): Unit = dao.insertSearchHistory(SearchHistoryEntity(keyword = keyword))
 
-    override suspend fun getRecentSearchHistories(limit: Int): Result<List<SearchHistoryEntity>> =
-        runCatching { dao.getRecentSearchHistories(limit) }
+    override suspend fun getRecentSearchHistories(limit: Int): List<SearchHistoryEntity> = dao.getRecentSearchHistories(limit)
 
-    override suspend fun deleteSearch(keyword: String): Result<Unit> =
-        runCatching {
-            dao.deleteSearch(keyword)
-        }
+    override suspend fun deleteSearch(keyword: String): Unit = dao.deleteSearch(keyword)
 }

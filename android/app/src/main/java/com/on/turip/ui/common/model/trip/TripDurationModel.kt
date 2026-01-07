@@ -12,7 +12,7 @@ data class TripDurationModel(
 
 fun TripDurationModel.toDisplayText(context: Context): String =
     if (isDayTrip()) {
-        context.getString(R.string.all_travel_day_trip_duration)
+        context.getString(R.string.all_trip_day_trip_duration)
     } else {
-        context.getString(R.string.all_travel_duration, nights, days)
+        context.getString(R.string.all_trip_duration, nights, days)
     }
