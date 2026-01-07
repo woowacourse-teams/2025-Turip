@@ -10,14 +10,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import turip.common.exception.ErrorTag;
+import turip.common.exception.custom.IllegalArgumentException;
 
 @Entity
 @Getter
-@AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member {
@@ -34,8 +34,20 @@ public class Member {
     @Column(name = "email")
     private String email;
 
-    public Member(Account account, String email) {
+    public Member(Long id, Account account, String email) {
+        validateEmail(email);
+        this.id = id;
         this.account = account;
         this.email = email;
+    }
+
+    public Member(Account account, String email) {
+        this(null, account, email);
+    }
+
+    private void validateEmail(String email) {
+        if (!email.contains("@")) {
+            throw new IllegalArgumentException(ErrorTag.EMAIL_INVALID);
+        }
     }
 }

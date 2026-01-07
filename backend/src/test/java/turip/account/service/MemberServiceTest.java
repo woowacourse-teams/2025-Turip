@@ -1,6 +1,7 @@
 package turip.account.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -21,6 +22,8 @@ import turip.account.domain.Member;
 import turip.account.domain.Role;
 import turip.account.repository.MemberRepository;
 import turip.auth.service.RefreshTokenService;
+import turip.common.exception.ErrorTag;
+import turip.common.exception.custom.BadRequestException;
 import turip.favorite.domain.FavoriteContent;
 import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.repository.FavoriteContentRepository;
@@ -53,8 +56,24 @@ class MemberServiceTest {
     @Mock
     private RefreshTokenService refreshTokenService;
 
-    @Mock
-    private SocialMemberService socialMemberService;
+    @DisplayName("Member 생성 테스트")
+    @Nested
+    class CreateTest {
+
+        @DisplayName("이메일 형식이 올바르지 않은 경우 예외를 발생시킨다.")
+        @Test
+        void create1() {
+            // given
+            String invalidEmail = "invalid-email";
+            given(accountService.create()).willReturn(AccountFixture.createUser());
+
+            // when & then
+            assertThatThrownBy(() -> memberService.create(invalidEmail))
+                    .isInstanceOf(BadRequestException.class)
+                    .hasMessage(ErrorTag.EMAIL_INVALID.getMessage());
+
+        }
+    }
 
     @DisplayName("Guest에서 Member로 데이터 마이그레이션 테스트")
     @Nested
