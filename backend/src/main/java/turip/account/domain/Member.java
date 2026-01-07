@@ -46,7 +46,7 @@ public class Member {
     }
 
     private void validateEmail(String email) {
-        if (!email.contains("@")) {
+        if (email == null || !email.contains("@")) {
             throw new IllegalArgumentException(ErrorTag.EMAIL_INVALID);
         }
     }

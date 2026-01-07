@@ -64,12 +64,16 @@ public class TuripMember {
     }
 
     private void validateLoginId(String loginId) {
-        if (!LOGIN_ID_PATTERN.matcher(loginId).matches()) {
+        if (loginId == null || !LOGIN_ID_PATTERN.matcher(loginId).matches()) {
             throw new IllegalArgumentException(ErrorTag.LOGIN_ID_INVALID);
         }
     }
 
     private void validateLoginPassword(String loginPassword) {
+        if (loginPassword == null) {
+            throw new IllegalArgumentException(ErrorTag.LOGIN_PASSWORD_INVALID);
+        }
+
         if (loginPassword.length() < MIN_PASSWORD_LENGTH || loginPassword.length() > MAX_PASSWORD_LENGTH) {
             throw new IllegalArgumentException(ErrorTag.LOGIN_PASSWORD_INVALID);
         }
