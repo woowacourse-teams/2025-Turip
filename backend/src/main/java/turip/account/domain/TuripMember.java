@@ -23,6 +23,7 @@ import lombok.NoArgsConstructor;
 public class TuripMember {
 
     @Id
+    @EqualsAndHashCode.Include
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
