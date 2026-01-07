@@ -148,7 +148,6 @@ class MemberServiceTest {
 
             // then
             verify(refreshTokenService).deleteByMember(member);
-            verify(socialMemberService).deleteByMember(member);
             verify(memberRepository).delete(member);
             verify(accountService).deleteAccountAndFavorites(account);
         }

@@ -103,7 +103,7 @@ class AuthApiTest {
             String idToken = "valid-google-id-token";
             String deviceFid = "device-456";
 
-            when(googleTokenParser.getProvider()).thenReturn(Provider.GOOGLE);
+            when(googleTokenParser.getProvider()).thenReturn(provider);
             when(googleTokenParser.getProviderId(idToken)).thenReturn(providerId);
             when(googleTokenParser.getEmail(idToken)).thenReturn(email);
 
