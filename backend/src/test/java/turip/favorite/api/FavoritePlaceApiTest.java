@@ -404,9 +404,12 @@ class FavoritePlaceApiTest {
             // given
             Long accountId = testDataHelper.insertAccount();
             jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
-            jdbcTemplate.update("INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '폴더1', false)");
-            jdbcTemplate.update("INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '폴더2', false)");
-            jdbcTemplate.update("INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '폴더3', false)");
+            jdbcTemplate.update("INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '폴더1', false)",
+                    accountId);
+            jdbcTemplate.update("INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '폴더2', false)",
+                    accountId);
+            jdbcTemplate.update("INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '폴더3', false)",
+                    accountId);
             jdbcTemplate.update(
                     "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('장소1','https://naver.me/place1', '주소', 37.1234, 127.1234)");
 
