@@ -402,8 +402,8 @@ class FavoritePlaceApiTest {
         @Test
         void updateFavoriteFolders() {
             // given
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
             jdbcTemplate.update("INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '폴더1', false)");
             jdbcTemplate.update("INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '폴더2', false)");
             jdbcTemplate.update("INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '폴더3', false)");

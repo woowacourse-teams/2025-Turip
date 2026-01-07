@@ -84,7 +84,7 @@ class MemberApiTest {
             // 2. Guest와 Member 생성
             String guestDeviceFid = "guest-device-123";
             jdbcTemplate.update(
-                    "INSERT INTO guest (id, account_id, device_fid) VALUES (1, ?, ?)",
+                    "INSERT INTO guest (account_id, device_fid) VALUES (?, ?)",
                     guestAccountId,
                     guestDeviceFid
             );
