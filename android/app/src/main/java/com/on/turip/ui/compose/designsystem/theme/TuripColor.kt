@@ -27,7 +27,7 @@ internal object TuripColor {
     val Blue = Color(0xFF5AC3D5)
 
     @Stable
-    val LightBlue = Color(0x1F5AC3D5)
+    val LightBlue = Color(0x335AC3D5)
 
     @Stable
     val Gray05 = Color(0xFF1E1E1E)
