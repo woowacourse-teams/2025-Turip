@@ -282,7 +282,7 @@ public class FavoritePlaceController {
                     description = "성공 예시",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = FavoritePlaceResponse.class),
+                            schema = @Schema(type = "array", implementation = FavoritePlaceResponse.class),
                             examples = @ExampleObject(
                                     name = "success",
                                     summary = "장소 찜 폴더 업데이트 성공",

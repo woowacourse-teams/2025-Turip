@@ -410,6 +410,9 @@ class FavoritePlaceApiTest {
                     .when().put("/favorites/places/{placeId}", 1L)
                     .then()
                     .statusCode(200);
+        }
+    }
+
     @DisplayName("/favorites/places/count GET 계정의 장소 찜 개수 조회 테스트")
     @Nested
     class ReadCountByAccount {
