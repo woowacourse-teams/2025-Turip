@@ -18,7 +18,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import turip.account.domain.Account;
 import turip.account.domain.Guest;
 import turip.account.domain.Member;
-import turip.account.domain.Provider;
 import turip.account.domain.Role;
 import turip.account.repository.MemberRepository;
 import turip.auth.service.RefreshTokenService;
@@ -27,6 +26,8 @@ import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.repository.FavoriteContentRepository;
 import turip.favorite.repository.FavoriteFolderRepository;
 import turip.util.fixture.AccountFixture;
+import turip.util.fixture.GuestFixture;
+import turip.util.fixture.MemberFixture;
 
 @ExtendWith(MockitoExtension.class)
 class MemberServiceTest {
@@ -52,6 +53,9 @@ class MemberServiceTest {
     @Mock
     private RefreshTokenService refreshTokenService;
 
+    @Mock
+    private SocialMemberService socialMemberService;
+
     @DisplayName("Guest에서 Member로 데이터 마이그레이션 테스트")
     @Nested
     class MigrateTest {
@@ -62,8 +66,8 @@ class MemberServiceTest {
             // given
             Account memberAccount = AccountFixture.createCustomAccount(1L, Role.USER);
             Account guestAccount = AccountFixture.createCustomAccount(2L, Role.USER);
-            Member member = new Member(1L, memberAccount, Provider.GOOGLE, "providerId", "email@test.com");
-            Guest guest = new Guest(1L, guestAccount, "device-fid-123");
+            Member member = MemberFixture.createCustomMember(memberAccount, "email@test.com");
+            Guest guest = GuestFixture.createCustomGuest(guestAccount, "device-fid-123");
 
             FavoriteContent guestFavoriteContent = new FavoriteContent(1L, LocalDate.now(), guestAccount, null);
 
@@ -86,8 +90,8 @@ class MemberServiceTest {
             // given
             Account memberAccount = AccountFixture.createCustomAccount(1L, Role.USER);
             Account guestAccount = AccountFixture.createCustomAccount(2L, Role.USER);
-            Member member = new Member(1L, memberAccount, Provider.GOOGLE, "providerId", "email@test.com");
-            Guest guest = new Guest(1L, guestAccount, "device-fid-123");
+            Member member = MemberFixture.createCustomMember(memberAccount, "email@test.com");
+            Guest guest = GuestFixture.createCustomGuest(guestAccount, "device-fid-123");
 
             FavoriteFolder guestFolder1 = new FavoriteFolder(1L, guestAccount, "기본 폴더", true);
             FavoriteFolder guestFolder2 = new FavoriteFolder(2L, guestAccount, "게스트 커스텀 폴더였던 것", false);
@@ -113,8 +117,8 @@ class MemberServiceTest {
             // given
             Account memberAccount = AccountFixture.createCustomAccount(1L, Role.USER);
             Account guestAccount = AccountFixture.createCustomAccount(2L, Role.USER);
-            Member member = new Member(1L, memberAccount, Provider.GOOGLE, "providerId", "email@test.com");
-            Guest guest = new Guest(1L, guestAccount, "device-fid-123");
+            Member member = MemberFixture.createCustomMember(memberAccount, "email@test.com");
+            Guest guest = GuestFixture.createCustomGuest(guestAccount, "device-fid-123");
 
             given(favoriteContentRepository.findAllByAccount(any()))
                     .willReturn(List.of());
@@ -138,13 +142,13 @@ class MemberServiceTest {
         void delete() {
             // given
             Account account = AccountFixture.createUser();
-            Member member = new Member(1L, account, Provider.GOOGLE, "providerId", "email@test.com");
-
+            Member member = MemberFixture.createCustomMember(account, "email@test.com");
             // when
             memberService.delete(member);
 
             // then
             verify(refreshTokenService).deleteByMember(member);
+            verify(socialMemberService).deleteByMember(member);
             verify(memberRepository).delete(member);
             verify(accountService).deleteAccountAndFavorites(account);
         }

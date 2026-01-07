@@ -46,6 +46,7 @@ class MemberApiTest {
         jdbcTemplate.update("DELETE FROM favorite_content");
         jdbcTemplate.update("DELETE FROM favorite_place");
         jdbcTemplate.update("DELETE FROM favorite_folder");
+        jdbcTemplate.update("DELETE FROM social_member");
         jdbcTemplate.update("DELETE FROM member");
         jdbcTemplate.update("DELETE FROM guest");
         jdbcTemplate.update("DELETE FROM account");
@@ -58,6 +59,7 @@ class MemberApiTest {
         jdbcTemplate.update("ALTER TABLE favorite_content ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE favorite_place ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE favorite_folder ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE social_member ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE member ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE guest ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE account ALTER COLUMN id RESTART WITH 1");
@@ -86,10 +88,10 @@ class MemberApiTest {
                     guestAccountId,
                     guestDeviceFid
             );
-            jdbcTemplate.update(
-                    "INSERT INTO member (id, account_id, provider, provider_id, email) VALUES (1, ?, 'GOOGLE', 'google-user-migration', 'migration@gmail.com')",
-                    memberAccountId
-            );
+            Long memberId = testDataHelper.insertMember(memberAccountId, "migration@gmail.com");
+            Provider provider = Provider.GOOGLE;
+            String providerId = "google-user-migration";
+            testDataHelper.insertSocialMember(memberId, provider, providerId);
 
             // 3. Guest의 FavoriteFolder와 FavoriteContent 생성
             jdbcTemplate.update(
@@ -129,8 +131,8 @@ class MemberApiTest {
             // 4. Member 로그인해서 access token 받기
             String idToken = "valid-google-id-token";
 
-            when(googleTokenParser.getProvider()).thenReturn(Provider.GOOGLE);
-            when(googleTokenParser.getProviderId(idToken)).thenReturn("google-user-migration");
+            when(googleTokenParser.getProvider()).thenReturn(provider);
+            when(googleTokenParser.getProviderId(idToken)).thenReturn(providerId);
             when(googleTokenParser.getEmail(idToken)).thenReturn("migration@gmail.com");
 
             Map<String, String> loginRequest = new HashMap<>();
@@ -197,16 +199,17 @@ class MemberApiTest {
         void migrationWithoutDeviceFidHeader() {
             // given
             // Member 생성 및 로그인
-            testDataHelper.insertAccount();
-            jdbcTemplate.update(
-                    "INSERT INTO member (id, account_id, provider, provider_id, email) VALUES (1, 1, 'GOOGLE', 'google-user-no-device', 'nodevice@gmail.com')"
-            );
+            String email = "nodevice@gmail.com";
+            Provider provider = Provider.GOOGLE;
+            String providerId = "google-user-no-device";
+
+            testDataHelper.insertSocialMember(email, provider, providerId);
 
             String idToken = "valid-google-id-token";
 
-            when(googleTokenParser.getProvider()).thenReturn(Provider.GOOGLE);
-            when(googleTokenParser.getProviderId(idToken)).thenReturn("google-user-no-device");
-            when(googleTokenParser.getEmail(idToken)).thenReturn("nodevice@gmail.com");
+            when(googleTokenParser.getProvider()).thenReturn(provider);
+            when(googleTokenParser.getProviderId(idToken)).thenReturn(providerId);
+            when(googleTokenParser.getEmail(idToken)).thenReturn(email);
 
             Map<String, String> loginRequest = new HashMap<>();
             loginRequest.put("idToken", idToken);
@@ -240,10 +243,11 @@ class MemberApiTest {
         void deleteMemberSuccess() {
             // given
             // 1. Account와 Member 생성
-            testDataHelper.insertAccount();
-            jdbcTemplate.update(
-                    "INSERT INTO member (id, account_id, provider, provider_id, email) VALUES (1, 1, 'GOOGLE', 'google-user-delete', 'delete@gmail.com')"
-            );
+            String email = "delete@gmail.com";
+            Provider provider = Provider.GOOGLE;
+            String providerId = "google-user-delete";
+
+            testDataHelper.insertSocialMember(email, provider, providerId);
 
             // 2. Member의 FavoriteFolder 생성
             jdbcTemplate.update(
@@ -275,9 +279,9 @@ class MemberApiTest {
             // 5. Member 로그인해서 access token 받기
             String idToken = "valid-google-id-token";
 
-            when(googleTokenParser.getProvider()).thenReturn(Provider.GOOGLE);
-            when(googleTokenParser.getProviderId(idToken)).thenReturn("google-user-delete");
-            when(googleTokenParser.getEmail(idToken)).thenReturn("delete@gmail.com");
+            when(googleTokenParser.getProvider()).thenReturn(provider);
+            when(googleTokenParser.getProviderId(idToken)).thenReturn(providerId);
+            when(googleTokenParser.getEmail(idToken)).thenReturn(email);
 
             Map<String, String> loginRequest = new HashMap<>();
             loginRequest.put("idToken", idToken);

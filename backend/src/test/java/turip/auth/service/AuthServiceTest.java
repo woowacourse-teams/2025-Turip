@@ -39,6 +39,7 @@ import turip.auth.token.JwtProvider;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.UnauthorizedException;
 import turip.util.fixture.AccountFixture;
+import turip.util.fixture.MemberFixture;
 
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
@@ -78,8 +79,7 @@ class AuthServiceTest {
             String deviceFid = "device-123";
             String providerId = "google-user-123";
             String email = "test@gmail.com";
-            Account account = AccountFixture.createUser();
-            Member member = new Member(account, Provider.GOOGLE, providerId, email);
+            Member member = MemberFixture.createMember();
 
             LoginRequest request = new LoginRequest(idToken);
 
@@ -119,8 +119,7 @@ class AuthServiceTest {
             String deviceFid = "device-123";
             String providerId = "google-user-new";
             String email = "newuser@gmail.com";
-            Account account = AccountFixture.createUser();
-            Member member = new Member(account, Provider.GOOGLE, providerId, email);
+            Member member = MemberFixture.createMember();
 
             LoginRequest request = new LoginRequest(idToken);
 
@@ -181,8 +180,7 @@ class AuthServiceTest {
             String oldRefreshToken = generateValidRefreshToken(accountId);
             String hashedToken = "hashed-old-token";
 
-            Account account = AccountFixture.createUser();
-            Member member = new Member(account, Provider.GOOGLE, "provider-id", "test@gmail.com");
+            Member member = MemberFixture.createMember();
             RefreshToken storedRefreshToken = new RefreshToken(
                     member, deviceFid, hashedToken,
                     LocalDateTime.now(), LocalDateTime.now().plusDays(7)
@@ -226,8 +224,7 @@ class AuthServiceTest {
             String oldRefreshToken = generateValidRefreshToken(accountId);
             String wrongHashedToken = "wrong-hashed-token";
 
-            Account account = AccountFixture.createUser();
-            Member member = new Member(account, Provider.GOOGLE, "provider-id", "test@gmail.com");
+            Member member = MemberFixture.createMember();
             RefreshToken storedRefreshToken = new RefreshToken(
                     member, deviceFid, "correct-hashed-token",
                     LocalDateTime.now(), LocalDateTime.now().plusDays(7)
@@ -255,8 +252,7 @@ class AuthServiceTest {
             String deviceFid = "device-123";
             String oldRefreshToken = generateValidRefreshToken(accountId);
 
-            Account account = AccountFixture.createUser();
-            Member member = new Member(account, Provider.GOOGLE, "provider-id", "test@gmail.com");
+            Member member = MemberFixture.createMember();
 
             RefreshTokenRequest request = new RefreshTokenRequest(oldRefreshToken);
 
@@ -330,15 +326,14 @@ class AuthServiceTest {
         @DisplayName("정상적으로 로그아웃이 성공한다")
         void logoutSuccess() {
             // given
-            Long accountId = 1L;
             String deviceFid = "device-123";
-            Account account = AccountFixture.createUser();
-            Member member = new Member(account, Provider.GOOGLE, "provider-id", "test@gmail.com");
+            Member member = MemberFixture.createMember();
+            Account account = member.getAccount();
 
-            when(memberService.getByAccountId(accountId)).thenReturn(member);
+            when(memberService.getByAccountId(account.getId())).thenReturn(member);
 
             // when
-            authService.logout(account, deviceFid);
+            authService.logout(member.getAccount(), deviceFid);
 
             // then
             verify(refreshTokenService).deleteByMemberAndDeviceFid(member, deviceFid);

@@ -47,11 +47,13 @@ class AuthApiTest {
         jdbcTemplate.update("DELETE FROM refresh_token");
         jdbcTemplate.update("DELETE FROM favorite_content");
         jdbcTemplate.update("DELETE FROM favorite_folder");
+        jdbcTemplate.update("DELETE FROM social_member");
         jdbcTemplate.update("DELETE FROM member");
         jdbcTemplate.update("DELETE FROM guest");
         jdbcTemplate.update("DELETE FROM account");
 
         jdbcTemplate.update("ALTER TABLE refresh_token ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE social_member ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE member ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE guest ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE account ALTER COLUMN id RESTART WITH 1");
@@ -93,16 +95,17 @@ class AuthApiTest {
         @DisplayName("기존 회원 로그인 성공 시 200 OK와 토큰을 응답한다")
         void loginExistingMemberSuccess() {
             // given
-            testDataHelper.insertAccount();
-            jdbcTemplate.update(
-                    "INSERT INTO member (id, account_id, provider, provider_id, email) VALUES (1, 1, 'GOOGLE', 'google-user-existing', 'existing@gmail.com')");
+            String email = "existing@gmail.com";
+            Provider provider = Provider.GOOGLE;
+            String providerId = "google-user-existing";
+            testDataHelper.insertSocialMember(email, provider, providerId);
 
             String idToken = "valid-google-id-token";
             String deviceFid = "device-456";
 
             when(googleTokenParser.getProvider()).thenReturn(Provider.GOOGLE);
-            when(googleTokenParser.getProviderId(idToken)).thenReturn("google-user-existing");
-            when(googleTokenParser.getEmail(idToken)).thenReturn("existing@gmail.com");
+            when(googleTokenParser.getProviderId(idToken)).thenReturn(providerId);
+            when(googleTokenParser.getEmail(idToken)).thenReturn(email);
 
             Map<String, String> requestBody = new HashMap<>();
             requestBody.put("idToken", idToken);
@@ -158,16 +161,17 @@ class AuthApiTest {
         void refreshTokenSuccess() {
             // given
             // 1. 먼저 로그인해서 토큰 받기
-            testDataHelper.insertAccount();
-            jdbcTemplate.update(
-                    "INSERT INTO member (id, account_id, provider, provider_id, email) VALUES (1, 1, 'GOOGLE', 'google-user-refresh', 'refresh@gmail.com')");
+            String email = "refresh@gmail.com";
+            Provider provider = Provider.GOOGLE;
+            String providerId = "google-user-refresh";
+            testDataHelper.insertSocialMember(email, provider, providerId);
 
             String idToken = "valid-google-id-token";
             String deviceFid = "device-refresh-123";
 
-            when(googleTokenParser.getProvider()).thenReturn(Provider.GOOGLE);
-            when(googleTokenParser.getProviderId(idToken)).thenReturn("google-user-refresh");
-            when(googleTokenParser.getEmail(idToken)).thenReturn("refresh@gmail.com");
+            when(googleTokenParser.getProvider()).thenReturn(provider);
+            when(googleTokenParser.getProviderId(idToken)).thenReturn(providerId);
+            when(googleTokenParser.getEmail(idToken)).thenReturn(email);
 
             Map<String, String> loginRequest = new HashMap<>();
             loginRequest.put("idToken", idToken);
@@ -224,17 +228,17 @@ class AuthApiTest {
         @DisplayName("DB에 저장된 토큰과 일치하지 않으면 401 Unauthorized를 응답한다")
         void refreshTokenMismatch() {
             // given
-            Long accountId = testDataHelper.insertAccount();
-            jdbcTemplate.update(
-                    "INSERT INTO member (id, account_id, provider, provider_id, email) VALUES (1, ?, 'GOOGLE', 'google-user-mismatch', 'mismatch@gmail.com')",
-                    accountId);
+            String email = "mismatch@gmail.com";
+            Provider provider = Provider.GOOGLE;
+            String providerId = "google-user-mismatch";
+            testDataHelper.insertSocialMember(email, provider, providerId);
 
             String idToken = "valid-google-id-token";
             String deviceFid = "device-mismatch-123";
 
-            when(googleTokenParser.getProvider()).thenReturn(Provider.GOOGLE);
-            when(googleTokenParser.getProviderId(idToken)).thenReturn("google-user-mismatch");
-            when(googleTokenParser.getEmail(idToken)).thenReturn("mismatch@gmail.com");
+            when(googleTokenParser.getProvider()).thenReturn(provider);
+            when(googleTokenParser.getProviderId(idToken)).thenReturn(providerId);
+            when(googleTokenParser.getEmail(idToken)).thenReturn(email);
 
             Map<String, String> loginRequest = new HashMap<>();
             loginRequest.put("idToken", idToken);
@@ -250,16 +254,15 @@ class AuthApiTest {
                     .statusCode(200);
 
             // 다른 사용자의 refresh token 사용 시도
-            Long anotherAccountId = testDataHelper.insertAccount();
-            jdbcTemplate.update(
-                    "INSERT INTO member (id, account_id, provider, provider_id, email) VALUES (2, ?, 'GOOGLE', 'google-user-other', 'other@gmail.com')",
-                    anotherAccountId);
+            String email2 = "other@gmail.com";
+            String providerId2 = "google-user-other";
+            testDataHelper.insertSocialMember(email2, provider, providerId2);
 
             String otherIdToken = "other-valid-google-id-token";
             String otherDeviceFid = "device-other-123";
 
-            when(googleTokenParser.getProviderId(otherIdToken)).thenReturn("google-user-other");
-            when(googleTokenParser.getEmail(otherIdToken)).thenReturn("other@gmail.com");
+            when(googleTokenParser.getProviderId(otherIdToken)).thenReturn(providerId2);
+            when(googleTokenParser.getEmail(otherIdToken)).thenReturn(email2);
 
             Map<String, String> otherLoginRequest = new HashMap<>();
             otherLoginRequest.put("idToken", otherIdToken);
@@ -298,16 +301,17 @@ class AuthApiTest {
         @DisplayName("정상적으로 로그아웃에 성공하면 204 No Content를 응답한다")
         void logoutSuccess() {
             // given
-            testDataHelper.insertAccount();
-            jdbcTemplate.update(
-                    "INSERT INTO member (id, account_id, provider, provider_id, email) VALUES (1, 1, 'GOOGLE', 'google-user-logout', 'logout@gmail.com')");
+            String email = "logout@gmail.com";
+            Provider provider = Provider.GOOGLE;
+            String providerId = "google-user-logout";
+            testDataHelper.insertSocialMember(email, provider, providerId);
 
             String idToken = "valid-google-id-token";
             String deviceFid = "device-logout-123";
 
-            when(googleTokenParser.getProvider()).thenReturn(Provider.GOOGLE);
-            when(googleTokenParser.getProviderId(idToken)).thenReturn("google-user-logout");
-            when(googleTokenParser.getEmail(idToken)).thenReturn("logout@gmail.com");
+            when(googleTokenParser.getProvider()).thenReturn(provider);
+            when(googleTokenParser.getProviderId(idToken)).thenReturn(providerId);
+            when(googleTokenParser.getEmail(idToken)).thenReturn(email);
 
             Map<String, String> loginRequest = new HashMap<>();
             loginRequest.put("idToken", idToken);
@@ -337,16 +341,18 @@ class AuthApiTest {
         @DisplayName("로그아웃 후 refresh token이 DB에서 삭제된다")
         void logoutDeletesRefreshToken() {
             // given
-            testDataHelper.insertAccount();
-            jdbcTemplate.update(
-                    "INSERT INTO member (id, account_id, provider, provider_id, email) VALUES (1, 1, 'GOOGLE', 'google-user-logout-delete', 'logout-delete@gmail.com')");
+            String email = "logout-delete@gmail.com";
+            Provider provider = Provider.GOOGLE;
+            String providerId = "google-user-logout-delete";
+
+            testDataHelper.insertSocialMember(email, provider, providerId);
 
             String idToken = "valid-google-id-token";
             String deviceFid = "device-logout-delete-123";
 
-            when(googleTokenParser.getProvider()).thenReturn(Provider.GOOGLE);
-            when(googleTokenParser.getProviderId(idToken)).thenReturn("google-user-logout-delete");
-            when(googleTokenParser.getEmail(idToken)).thenReturn("logout-delete@gmail.com");
+            when(googleTokenParser.getProvider()).thenReturn(provider);
+            when(googleTokenParser.getProviderId(idToken)).thenReturn(providerId);
+            when(googleTokenParser.getEmail(idToken)).thenReturn(email);
 
             Map<String, String> loginRequest = new HashMap<>();
             loginRequest.put("idToken", idToken);
