@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+import turip.account.domain.Provider;
 import turip.account.domain.Role;
 
 @Component
@@ -20,8 +21,6 @@ public class TestDataHelper {
     }
 
     public Long insertAccount(Role role) {
-        jdbcTemplate.update("INSERT INTO account (role) VALUES (?)", role.name());
-
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
@@ -32,5 +31,41 @@ public class TestDataHelper {
         }, keyHolder);
 
         return keyHolder.getKey().longValue();
+    }
+
+    public Long insertMember(Long accountId, String email) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement("INSERT INTO member (account_id, email) VALUES (?, ?)",
+                    Statement.RETURN_GENERATED_KEYS);
+            ps.setLong(1, accountId);
+            ps.setString(2, email);
+            return ps;
+        }, keyHolder);
+
+        return keyHolder.getKey().longValue();
+    }
+
+    public Long insertSocialMember(Long memberId, Provider provider, String providerId) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(
+                    "INSERT INTO social_member (member_id, provider, provider_id) VALUES (?, ?, ?)",
+                    Statement.RETURN_GENERATED_KEYS);
+            ps.setLong(1, memberId);
+            ps.setString(2, provider.name());
+            ps.setString(3, providerId);
+            return ps;
+        }, keyHolder);
+
+        return keyHolder.getKey().longValue();
+    }
+
+    public Long insertSocialMember(String email, Provider provider, String providerId) {
+        Long accountId = insertAccount();
+        Long memberId = insertMember(accountId, email);
+        return insertSocialMember(memberId, provider, providerId);
     }
 }
