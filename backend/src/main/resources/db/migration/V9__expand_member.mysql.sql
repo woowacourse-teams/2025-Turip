@@ -22,6 +22,11 @@ CREATE TABLE turip_member (
         FOREIGN KEY (member_id) REFERENCES member (id) ON DELETE CASCADE
 );
 
+-- expand) 사용하지 않는 필드 nullable 수정
+ALTER TABLE member
+    MODIFY COLUMN provider VARCHAR(255) NULL,
+    MODIFY COLUMN provider_id VARCHAR(255) NULL;
+
 -- expand) role 필드 추가
 ALTER TABLE account ADD COLUMN role VARCHAR(255) NOT NULL DEFAULT 'USER';
 
