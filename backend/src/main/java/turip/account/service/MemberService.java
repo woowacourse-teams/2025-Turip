@@ -1,14 +1,11 @@
 package turip.account.service;
 
 import jakarta.transaction.Transactional;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import turip.account.domain.Account;
 import turip.account.domain.Guest;
 import turip.account.domain.Member;
-import turip.account.domain.Provider;
-import turip.account.domain.SocialMember;
 import turip.account.repository.MemberRepository;
 import turip.auth.service.RefreshTokenService;
 import turip.common.exception.ErrorTag;
@@ -26,23 +23,11 @@ public class MemberService {
     private final GuestService guestService;
     private final AccountService accountService;
     private final RefreshTokenService refreshTokenService;
-    private final SocialMemberService socialMemberService;
-
-    public boolean isFirstLogin(Provider provider, String providerId) {
-        return !socialMemberService.existsByProviderAndProviderId(provider, providerId);
-    }
 
     @Transactional
-    public Member findOrCreateSocialMember(Provider provider, String providerId, String email) {
-        Optional<SocialMember> socialMember = socialMemberService.findByProviderAndProviderId(provider, providerId);
-        if (socialMember.isPresent()) {
-            return socialMember.get().getMember();
-        }
-
-        Account savedAccount = accountService.create();
-        Member member = memberRepository.save(new Member(savedAccount, email));
-        socialMemberService.create(member, provider, providerId);
-        return member;
+    public Member create(String email) {
+        Account account = accountService.create();
+        return memberRepository.save(new Member(account, email));
     }
 
     public Member getByAccountId(Long accountId) {

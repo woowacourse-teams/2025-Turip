@@ -10,6 +10,7 @@ import turip.account.domain.Account;
 import turip.account.domain.Member;
 import turip.account.domain.Provider;
 import turip.account.service.MemberService;
+import turip.account.service.SocialMemberService;
 import turip.auth.controller.dto.request.LoginRequest;
 import turip.auth.controller.dto.request.RefreshTokenRequest;
 import turip.auth.controller.dto.response.LoginResponse;
@@ -29,6 +30,7 @@ public class AuthService {
     private final GoogleTokenParser googleTokenParser;
     private final RefreshTokenService refreshTokenService;
     private final MemberService memberService;
+    private final SocialMemberService socialMemberService;
 
     @Transactional
     public LoginResponse login(LoginRequest request, Provider provider, String deviceFid) {
@@ -82,7 +84,7 @@ public class AuthService {
         String providerId = googleTokenParser.getProviderId(idToken);
         String email = googleTokenParser.getEmail(idToken);
 
-        boolean isNewMember = memberService.isFirstLogin(provider, providerId);
+        boolean isNewMember = socialMemberService.isFirstLogin(provider, providerId);
 
         Member member = findOrCreateSocialMember(provider, providerId, email);
         String accessToken = jwtProvider.generateAccessToken(member.getAccount().getId());
@@ -94,7 +96,7 @@ public class AuthService {
     }
 
     private Member findOrCreateSocialMember(Provider provider, String providerId, String email) {
-        return memberService.findOrCreateSocialMember(provider, providerId, email);
+        return socialMemberService.findOrCreate(provider, providerId, email).getMember();
     }
 
     private Member getMemberByAccountId(Long accountId) {
