@@ -1,5 +1,6 @@
 package com.on.turip.ui.compose.setting
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -101,6 +102,7 @@ fun SettingScreen(
         modifier =
             Modifier
                 .fillMaxSize()
+                .background(TuripTheme.colors.white)
                 .systemBarsPadding(),
         topBar = {
             TuripAppBar(
