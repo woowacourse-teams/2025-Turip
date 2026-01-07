@@ -12,6 +12,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.on.turip.R
+import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 
 @Composable
 fun TuripAppBar(
@@ -46,15 +47,19 @@ fun TuripAppBar(
 @Preview(showBackground = true, name = "뒤로가기 버튼 O")
 @Composable
 private fun BackableTuripAppBarPreview() {
-    TuripAppBar(
-        canBack = true,
-    )
+    TuripTheme {
+        TuripAppBar(
+            canBack = true,
+        )
+    }
 }
 
 @Preview(showBackground = true, name = "뒤로가기 버튼 X")
 @Composable
 private fun NotBackableTuripAppBarPreview() {
-    TuripAppBar(
-        canBack = false,
-    )
+    TuripTheme {
+        TuripAppBar(
+            canBack = false,
+        )
+    }
 }

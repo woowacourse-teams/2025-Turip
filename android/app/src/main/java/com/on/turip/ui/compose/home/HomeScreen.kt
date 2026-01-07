@@ -184,7 +184,7 @@ private fun HomeLoadingPreview() {
             },
         ) { innerPadding ->
             HomeScreenContent(
-                uiState = uiState.copy(isLoading = true, errorUiState = ErrorUiState.None),
+                uiState = uiState.copy(isLoading = true),
                 onSearchClick = {},
                 onRetryLoadContents = { },
                 onContentClick = { },

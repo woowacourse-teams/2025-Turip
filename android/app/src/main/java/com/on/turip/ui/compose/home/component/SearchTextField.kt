@@ -86,9 +86,11 @@ fun SearchTextField(
 @Composable
 private fun SearchTextFieldPreview() {
     var keyword by remember { mutableStateOf("테스트 문자열 테스트 문자열 테스트 문자열 테스트 문자열 테스트 문자열 ") }
-    SearchTextField(
-        keyword = keyword,
-        onKeywordChange = { newKeyword -> keyword = newKeyword },
-        onSearch = {},
-    )
+    TuripTheme {
+        SearchTextField(
+            keyword = keyword,
+            onKeywordChange = { newKeyword -> keyword = newKeyword },
+            onSearch = {},
+        )
+    }
 }

@@ -42,19 +42,23 @@ fun RegionTypeButton(
 @Preview(showBackground = true, name = "선택 안된 상태")
 @Composable
 private fun NotSelectedPreview() {
-    RegionTypeButton(
-        text = "해외",
-        isSelected = false,
-        onClick = {},
-    )
+    TuripTheme {
+        RegionTypeButton(
+            text = "해외",
+            isSelected = false,
+            onClick = {},
+        )
+    }
 }
 
 @Preview(showBackground = true, name = "선택 된 상태")
 @Composable
 private fun SelectedPreview() {
-    RegionTypeButton(
-        text = "국내",
-        isSelected = true,
-        onClick = {},
-    )
+    TuripTheme {
+        RegionTypeButton(
+            text = "국내",
+            isSelected = true,
+            onClick = {},
+        )
+    }
 }

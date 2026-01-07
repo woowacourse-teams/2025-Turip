@@ -58,11 +58,13 @@ fun HelpText(
 @Preview
 @Composable
 private fun HelpTextPreview() {
-    HelpText(
-        text = "도움말",
-        style = TuripTheme.typography.title1,
-        color = TuripTheme.colors.white,
-        onClickIcon = {},
-        onClickText = {},
-    )
+    TuripTheme {
+        HelpText(
+            text = "도움말",
+            style = TuripTheme.typography.title1,
+            color = TuripTheme.colors.white,
+            onClickIcon = {},
+            onClickText = {},
+        )
+    }
 }

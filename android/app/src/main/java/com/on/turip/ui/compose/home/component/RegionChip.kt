@@ -5,7 +5,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -24,11 +23,11 @@ fun RegionChip(
                 .wrapContentSize()
                 .background(
                     color = TuripTheme.colors.chipBackground,
-                    shape = RoundedCornerShape(24.dp),
+                    shape = TuripTheme.shape.chip,
                 ).border(
                     width = 1.dp,
                     color = TuripTheme.colors.border,
-                    shape = RoundedCornerShape(24.dp),
+                    shape = TuripTheme.shape.chip,
                 ).padding(horizontal = 12.dp, vertical = 4.dp),
     ) {
         Text(
@@ -42,7 +41,9 @@ fun RegionChip(
 @Preview(showBackground = true)
 @Composable
 private fun RegionChipPreview() {
-    RegionChip(
-        regionName = "속초",
-    )
+    TuripTheme {
+        RegionChip(
+            regionName = "속초",
+        )
+    }
 }

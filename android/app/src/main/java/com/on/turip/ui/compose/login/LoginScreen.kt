@@ -22,7 +22,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -171,7 +170,7 @@ private fun LoginScreenContent(
             HelpText(
                 text = stringResource(R.string.login_start_to_guest),
                 style = TuripTheme.typography.body1,
-                color = Color.White,
+                color = TuripTheme.colors.white,
                 onClickIcon = onClickHelpText,
                 onClickText = onClickGuestLogin,
             )

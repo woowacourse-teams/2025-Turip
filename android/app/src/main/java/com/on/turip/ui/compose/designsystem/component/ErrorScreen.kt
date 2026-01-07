@@ -79,17 +79,21 @@ fun ErrorScreen(
 @Preview(showBackground = true, name = "네트워크 에러 시")
 @Composable
 private fun NetworkErrorScreenPreview() {
-    ErrorScreen(
-        errorUiState = ErrorUiState.Network,
-        onRetryClick = {},
-    )
+    TuripTheme {
+        ErrorScreen(
+            errorUiState = ErrorUiState.Network,
+            onRetryClick = {},
+        )
+    }
 }
 
 @Preview(showBackground = true, name = "커스텀 에러 외 에러 발생")
 @Composable
 private fun AppErrorScreenPreview() {
-    ErrorScreen(
-        errorUiState = ErrorUiState.Server,
-        onRetryClick = {},
-    )
+    TuripTheme {
+        ErrorScreen(
+            errorUiState = ErrorUiState.Server,
+            onRetryClick = {},
+        )
+    }
 }
