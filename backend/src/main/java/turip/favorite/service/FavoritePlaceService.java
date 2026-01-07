@@ -132,7 +132,7 @@ public class FavoritePlaceService {
                                                      List<FavoriteFolder> favoriteFolders,
                                                      List<Long> requestFavoriteFolderIds
     ) {
-        List<Long> existingFavoritePlaceIds = existingFavoritePlaces.stream()
+        List<Long> existingFavoriteFolderIds = existingFavoritePlaces.stream()
                 .map(fp -> fp.getFavoriteFolder().getId())
                 .toList();
 
@@ -140,7 +140,7 @@ public class FavoritePlaceService {
                 .collect(Collectors.toMap(FavoriteFolder::getId, f -> f));
 
         List<FavoritePlace> newFavoritePlaces = requestFavoriteFolderIds.stream()
-                .filter(id -> !existingFavoritePlaceIds.contains(id))
+                .filter(id -> !existingFavoriteFolderIds.contains(id))
                 .map(id -> {
                     FavoriteFolder folder = favoriteFolderRegistry.get(id);
                     int nextOrder = getNextOrder(folder);

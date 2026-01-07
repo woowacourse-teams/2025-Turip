@@ -290,14 +290,12 @@ public class FavoritePlaceController {
                                                 {
                                                     "id": 10,
                                                     "favoriteFolderId": 1,
-                                                    "placeId": 123,
-                                                    "favoriteOrder": 5
+                                                    "placeId": 123
                                                 },
                                                 {
                                                     "id": 11,
                                                     "favoriteFolderId": 2,
-                                                    "placeId": 123,
-                                                    "favoriteOrder": 1
+                                                    "placeId": 123
                                                 }
                                             ]
                                             """
@@ -354,16 +352,6 @@ public class FavoritePlaceController {
                                     @ExampleObject(
                                             name = "not_folder_owner",
                                             summary = "폴더 소유자가 아닌 경우",
-                                            value = """
-                                                    {
-                                                        "tag": "FORBIDDEN",
-                                                        "message": "접근 권한이 없습니다."
-                                                    }
-                                                    """
-                                    ),
-                                    @ExampleObject(
-                                            name = "favorite_place_not_belongs_to_folder",
-                                            summary = "다른 폴더의 favoritePlaceId가 포함된 경우",
                                             value = """
                                                     {
                                                         "tag": "FORBIDDEN",
