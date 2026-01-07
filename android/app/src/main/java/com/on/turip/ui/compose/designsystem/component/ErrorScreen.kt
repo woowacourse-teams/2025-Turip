@@ -20,40 +20,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.on.turip.R
-import com.on.turip.domain.ErrorEvent
+import com.on.turip.ui.common.error.ErrorUiModel
+import com.on.turip.ui.common.error.ErrorUiState
+import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.compose.theme.TuripTypography
 
 @Composable
 fun ErrorScreen(
-    errorEvent: ErrorEvent,
+    errorUiState: ErrorUiState,
     onRetryClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val (imageRes, titleRes, descriptionRes, retryTextRes) =
-        when (errorEvent) {
-            ErrorEvent.NETWORK_ERROR -> {
-                listOf(
-                    R.drawable.ic_network_error,
-                    R.string.cannot_connect_network,
-                    R.string.check_connection_status,
-                    R.string.retry,
-                )
-            }
-
-            ErrorEvent.USER_NOT_HAVE_PERMISSION,
-            ErrorEvent.DUPLICATION_FOLDER,
-            ErrorEvent.UNEXPECTED_PROBLEM,
-            ErrorEvent.PARSER_ERROR,
-            ErrorEvent.TOKEN_EXPIRATION,
-            -> {
-                listOf(
-                    R.drawable.ic_server_error,
-                    R.string.server_error,
-                    R.string.retry_later,
-                    R.string.retry,
-                )
-            }
-        }
+    val errorUiModel: ErrorUiModel = errorUiState.toUiModel() ?: return
 
     Column(
         modifier =
@@ -64,7 +42,7 @@ fun ErrorScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Image(
-            painter = painterResource(id = imageRes),
+            painter = painterResource(id = errorUiModel.imageRes),
             contentDescription = null,
             modifier = Modifier.size(120.dp),
         )
@@ -72,14 +50,14 @@ fun ErrorScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = stringResource(id = titleRes),
+            text = stringResource(id = errorUiModel.titleRes),
             style = TuripTypography.titleLarge,
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = stringResource(id = descriptionRes),
+            text = stringResource(id = errorUiModel.descriptionRes),
             style = TuripTypography.bodyLarge,
         )
 
@@ -95,7 +73,7 @@ fun ErrorScreen(
                 ),
             onClick = onRetryClick,
         ) {
-            Text(text = stringResource(id = retryTextRes))
+            Text(text = stringResource(id = errorUiModel.retryTextRes))
         }
     }
 }
@@ -104,16 +82,16 @@ fun ErrorScreen(
 @Composable
 private fun NetworkErrorScreenPreview() {
     ErrorScreen(
-        errorEvent = ErrorEvent.NETWORK_ERROR,
+        errorUiState = ErrorUiState.Network,
         onRetryClick = {},
     )
 }
 
-@Preview(showBackground = true, name = "그 외 에러 발생")
+@Preview(showBackground = true, name = "커스텀 에러 외 에러 발생")
 @Composable
-private fun OtherErrorScreenPreview() {
+private fun AppErrorScreenPreview() {
     ErrorScreen(
-        errorEvent = ErrorEvent.UNEXPECTED_PROBLEM,
+        errorUiState = ErrorUiState.Server,
         onRetryClick = {},
     )
 }

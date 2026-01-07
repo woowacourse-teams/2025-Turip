@@ -2,15 +2,19 @@ package com.on.turip.ui.compose.setting
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.on.turip.data.common.onFailure
-import com.on.turip.data.common.onSuccess
-import com.on.turip.domain.ErrorEvent
+import com.on.turip.core.result.ErrorType
+import com.on.turip.core.result.onFailure
+import com.on.turip.core.result.onSuccess
 import com.on.turip.domain.login.MemberRepository
 import com.on.turip.domain.setting.InquiryMail
 import com.on.turip.domain.setting.PrivacyPolicy
 import com.on.turip.domain.userstorage.repository.UserStorageRepository
 import com.on.turip.platform.device.AppEnvironmentInfoProvider
-import com.on.turip.ui.compose.setting.model.SettingUiEvent
+import com.on.turip.ui.common.error.ErrorUiState
+import com.on.turip.ui.common.error.UiError
+import com.on.turip.ui.common.error.toUiError
+import com.on.turip.ui.compose.setting.model.SettingRetryAction
+import com.on.turip.ui.compose.setting.model.SettingUiEffect
 import com.on.turip.ui.compose.setting.model.SettingUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -32,8 +36,8 @@ class SettingViewModel @Inject constructor(
     private val _uiState: MutableStateFlow<SettingUiState> = MutableStateFlow(SettingUiState.EMPTY)
     val uiState: StateFlow<SettingUiState> = _uiState
 
-    private val _uiEvent: Channel<SettingUiEvent> = Channel(Channel.BUFFERED)
-    val uiEvent: Flow<SettingUiEvent> = _uiEvent.receiveAsFlow()
+    private val _uiEffect: Channel<SettingUiEffect> = Channel(Channel.BUFFERED)
+    val uiEffect: Flow<SettingUiEffect> = _uiEffect.receiveAsFlow()
 
     init {
         loadId()
@@ -44,9 +48,7 @@ class SettingViewModel @Inject constructor(
             userStorageRepository
                 .loadId()
                 .onSuccess { result ->
-                    _uiState.update {
-                        uiState.value.copy(deviceIdentifier = result)
-                    }
+                    _uiState.update { it.copy(deviceIdentifier = result) }
                 }.onFailure {
                     Timber.e("${it.message}")
                 }
@@ -61,8 +63,8 @@ class SettingViewModel @Inject constructor(
 
     fun loadPrivacyPolicyLink(): String = PrivacyPolicy.LINK
 
-    fun showLogoutDialog(show: Boolean) {
-        _uiState.update { it.copy(showLogoutDialog = show) }
+    fun onLogoutDialogVisibilityChange(visible: Boolean) {
+        _uiState.update { it.copy(showLogoutDialog = visible) }
     }
 
     fun confirmLogout() {
@@ -75,20 +77,23 @@ class SettingViewModel @Inject constructor(
                     userStorageRepository
                         .clearTokens()
                         .onSuccess {
-                            _uiEvent.send(SettingUiEvent.Logout)
+                            _uiEffect.send(SettingUiEffect.NavigateToLogin)
                             Timber.d("로그아웃 성공")
                         }.onFailure {
                             Timber.e("토큰 초기화 실패")
                         }
-                }.onFailure { error: ErrorEvent ->
-                    Timber.e("로그아웃 실패 : $error")
-                    _uiEvent.send(SettingUiEvent.ShowError(error))
+                }.onFailure { errorType: ErrorType ->
+                    when (val uiError: UiError = errorType.toUiError()) {
+                        is UiError.Global -> handleGlobalError(uiError, SettingRetryAction.LOGOUT)
+                        is UiError.Feature -> Unit
+                    }
+                    Timber.e("로그아웃 실패")
                 }
         }
     }
 
-    fun showWithdrawDialog(show: Boolean) {
-        _uiState.update { it.copy(showWithdrawDialog = show) }
+    fun updateWithdrawDialogVisibility(visible: Boolean) {
+        _uiState.update { it.copy(showWithdrawDialog = visible) }
     }
 
     fun confirmWithdraw() {
@@ -101,15 +106,44 @@ class SettingViewModel @Inject constructor(
                     userStorageRepository
                         .clearTokens()
                         .onSuccess {
-                            _uiEvent.send(SettingUiEvent.Withdraw)
+                            _uiEffect.send(SettingUiEffect.NavigateToLogin)
                             Timber.d("회원탈퇴 성공")
                         }.onFailure {
                             Timber.e("토큰 초기화 실패")
                         }
-                }.onFailure { error: ErrorEvent ->
-                    _uiEvent.send(SettingUiEvent.ShowError(error))
-                    Timber.e("회원탈퇴 실패 : $error")
+                }.onFailure { errorType: ErrorType ->
+                    when (val uiError: UiError = errorType.toUiError()) {
+                        is UiError.Global -> handleGlobalError(uiError, SettingRetryAction.WITHDRAW)
+                        is UiError.Feature -> Unit
+                    }
+                    Timber.e("회원탈퇴 실패 ")
                 }
+        }
+    }
+
+    private suspend fun handleGlobalError(
+        uiError: UiError.Global,
+        retryAction: SettingRetryAction,
+    ) {
+        when (uiError) {
+            UiError.Global.Network -> {
+                _uiEffect.send(SettingUiEffect.ShowError(ErrorUiState.Network, retryAction))
+            }
+
+            UiError.Global.Server -> {
+                _uiEffect.send(SettingUiEffect.ShowError(ErrorUiState.Server, retryAction))
+            }
+
+            UiError.Global.TokenExpired -> {
+                _uiEffect.send(SettingUiEffect.NavigateToLogin)
+            }
+        }
+    }
+
+    fun handleErrorRetryRequest(action: SettingRetryAction) {
+        when (action) {
+            SettingRetryAction.LOGOUT -> confirmLogout()
+            SettingRetryAction.WITHDRAW -> confirmWithdraw()
         }
     }
 }

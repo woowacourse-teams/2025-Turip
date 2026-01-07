@@ -13,14 +13,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -31,12 +35,15 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.on.turip.R
 import com.on.turip.data.login.datasource.GoogleCredentialManager
+import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.compose.designsystem.component.TuripDialog
+import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
 import com.on.turip.ui.compose.login.component.GoogleLoginButton
 import com.on.turip.ui.compose.login.component.HelpText
-import com.on.turip.ui.compose.login.model.LoginUiEvent
+import com.on.turip.ui.compose.login.model.LoginUiEffect
 import com.on.turip.ui.compose.login.model.LoginUiState
 import com.on.turip.ui.compose.login.util.noRippleClickable
+import com.on.turip.ui.compose.theme.TuripTheme
 import com.on.turip.ui.compose.theme.TuripTypography
 
 @Composable
@@ -46,11 +53,23 @@ fun LoginScreen(
     viewmodel: LoginViewmodel = hiltViewModel(),
 ) {
     val uiState: LoginUiState by viewmodel.uiState.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        viewmodel.uiEvent.collect { event ->
-            when (event) {
-                LoginUiEvent.NavigateToMain -> navigateToMain()
+        viewmodel.uiEffect.collect { effect: LoginUiEffect ->
+            when (effect) {
+                LoginUiEffect.NavigateToMain -> {
+                    navigateToMain()
+                }
+
+                is LoginUiEffect.ShowError -> {
+                    val errorUiModel = effect.errorUiState.toUiModel() ?: return@collect
+                    snackbarHostState.showSnackbar(
+                        message = context.getString(errorUiModel.titleRes),
+                        duration = SnackbarDuration.Short,
+                    )
+                }
             }
         }
     }
@@ -68,38 +87,17 @@ fun LoginScreen(
         )
     }
 
-    LoginScreen(
-        uiState = uiState,
-        onChangeHelpTextVisible = { visible: Boolean -> viewmodel.updateHelpTextVisible(visible) },
-        onClickGoogleLogin = { viewmodel.onGoogleLogin(googleCredentialManager) },
-        onClickGuestLogin = viewmodel::onGuestLogin,
-    )
-}
-
-@Composable
-private fun LoginScreen(
-    uiState: LoginUiState,
-    onChangeHelpTextVisible: (Boolean) -> Unit,
-    onClickGoogleLogin: () -> Unit,
-    onClickGuestLogin: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
     Scaffold(
         modifier =
-            modifier.noRippleClickable { onChangeHelpTextVisible(false) },
+            Modifier.noRippleClickable { viewmodel.updateHelpTextVisible(false) },
+        snackbarHost = { TuripSnackbar(snackbarHostState = snackbarHostState) },
     ) { innerPadding ->
-        Image(
-            painter = painterResource(R.drawable.bg_login),
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop,
-        )
         LoginScreenContent(
             isHelpTextVisible = uiState.showHelpText,
             modifier = Modifier.padding(innerPadding),
-            onClickHelpText = { onChangeHelpTextVisible(!uiState.showHelpText) },
-            onClickGoogleLogin = onClickGoogleLogin,
-            onClickGuestLogin = onClickGuestLogin,
+            onClickHelpText = { viewmodel.updateHelpTextVisible(!uiState.showHelpText) },
+            onClickGoogleLogin = { viewmodel.onGoogleLogin(googleCredentialManager) },
+            onClickGuestLogin = viewmodel::onGuestLogin,
         )
     }
 }
@@ -112,6 +110,13 @@ private fun LoginScreenContent(
     onClickGuestLogin: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    Image(
+        painter = painterResource(R.drawable.bg_login),
+        contentDescription = null,
+        modifier = Modifier.fillMaxSize(),
+        contentScale = ContentScale.Crop,
+    )
+
     Box(
         modifier = modifier.fillMaxSize(),
     ) {
@@ -181,21 +186,25 @@ private fun LoginScreenContent(
 @Composable
 @Preview(showBackground = true, name = "HelpVisible")
 private fun HelpVisibleLoginScreenPreview() {
-    LoginScreenContent(
-        isHelpTextVisible = true,
-        onClickHelpText = {},
-        onClickGoogleLogin = {},
-        onClickGuestLogin = {},
-    )
+    TuripTheme {
+        LoginScreenContent(
+            isHelpTextVisible = true,
+            onClickHelpText = { },
+            onClickGoogleLogin = { },
+            onClickGuestLogin = { },
+        )
+    }
 }
 
 @Composable
 @Preview(showBackground = true, name = "HelpInvisible")
 private fun HelpInvisibleLoginScreenPreview() {
-    LoginScreenContent(
-        isHelpTextVisible = false,
-        onClickHelpText = {},
-        onClickGoogleLogin = {},
-        onClickGuestLogin = {},
-    )
+    TuripTheme {
+        LoginScreenContent(
+            isHelpTextVisible = false,
+            onClickHelpText = { },
+            onClickGoogleLogin = { },
+            onClickGuestLogin = { },
+        )
+    }
 }

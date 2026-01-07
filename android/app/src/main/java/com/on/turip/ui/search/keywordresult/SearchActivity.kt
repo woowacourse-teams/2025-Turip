@@ -17,21 +17,16 @@ import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.on.turip.R
 import com.on.turip.databinding.ActivitySearchBinding
-import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.searchhistory.SearchHistory
 import com.on.turip.ui.common.base.BaseActivity
-import com.on.turip.ui.common.event.CommonEvent
+import com.on.turip.ui.common.collectOnStarted
+import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.login.LoginActivity
-import com.on.turip.ui.search.model.VideoInformationModel
 import com.on.turip.ui.trip.detail.TripDetailActivity
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @AndroidEntryPoint
@@ -79,30 +74,18 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         setupObservers()
         setupAdapters()
         setupOnBackPressedDispatcher()
-        showNetworkError()
-    }
-
-    private fun showNetworkError() {
-        binding.customErrorView.apply {
-            visibility = View.VISIBLE
-            setupError(ErrorEvent.NETWORK_ERROR)
-            setOnRetryClickListener {
-                viewModel.loadByKeyword()
-            }
-        }
     }
 
     private fun setupAdapters() {
-        binding.rvSearchResult.adapter = searchAdapter
-        binding.rvSearchResultSearchHistory.adapter = searchHistoryAdapter
-        binding.rvSearchResult.itemAnimator = null
-        binding.rvSearchResultSearchHistory.itemAnimator = null
-        binding.rvSearchResultSearchHistory.addItemDecoration(
-            DividerItemDecoration(
-                this,
-                LinearLayout.VERTICAL,
-            ),
-        )
+        binding.rvSearchResult.apply {
+            adapter = searchAdapter
+            itemAnimator = null
+        }
+        binding.rvSearchResultSearchHistory.apply {
+            adapter = searchHistoryAdapter
+            itemAnimator = null
+            addItemDecoration(DividerItemDecoration(this@SearchActivity, LinearLayout.VERTICAL))
+        }
     }
 
     private fun setupToolbar() {
@@ -110,10 +93,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         binding.tbSearchResult.navigationIcon?.setTint(
-            ContextCompat.getColor(
-                this,
-                R.color.gray_300_5b5b5b,
-            ),
+            ContextCompat.getColor(this, R.color.gray_300_5b5b5b),
         )
     }
 
@@ -147,8 +127,8 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         }
         binding.etSearchResult.setOnEditorActionListener { input, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                val input: String = input.text.toString()
-                return@setOnEditorActionListener if (input.isBlank()) {
+                val text: String = input.text.toString()
+                return@setOnEditorActionListener if (text.isBlank()) {
                     true
                 } else {
                     viewModel.loadByKeyword()
@@ -166,7 +146,7 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
         }
 
         binding.etSearchResult.setOnFocusChangeListener { view, hasFocus ->
-            if (hasFocus && viewModel.serverError.value?.not() == true && viewModel.networkError.value?.not() == true) {
+            if (hasFocus && viewModel.uiState.value !is SearchUiState.Error) {
                 Timber.d("검색창 포커싱")
                 binding.rvSearchResultSearchHistory.visibility = View.VISIBLE
             }
@@ -199,86 +179,75 @@ class SearchActivity : BaseActivity<ActivitySearchBinding>() {
                 binding.etSearchResult.setSelection(searchWord.length)
             }
         }
-        viewModel.videoInformation.observe(this) { videoInformationModels: List<VideoInformationModel> ->
-            searchAdapter.submitList(videoInformationModels)
-        }
-        viewModel.searchResultCount.observe(this) { searchResultCount: Int ->
-            binding.tvSearchResultCount.text =
-                getString(R.string.search_result_exist_result, searchResultCount)
-            handleVisibleBySearchResult(searchResultCount)
-        }
-        viewModel.loading.observe(this) { loading: Boolean ->
-            handleVisibleByLoading(loading)
-        }
+
         viewModel.searchHistory.observe(this) { searchHistories: List<SearchHistory> ->
             searchHistoryAdapter.submitList(searchHistories)
         }
-        viewModel.serverError.observe(this) { serverError ->
-            handleVisibleByError(serverError)
-        }
-        viewModel.networkError.observe(this) { networkError ->
-            handleVisibleByError(networkError)
+
+        collectOnStarted(viewModel.uiState) { uiState: SearchUiState ->
+            if (uiState is SearchUiState.Loading) showLoading()
+            when (uiState) {
+                SearchUiState.Loading -> Unit
+                SearchUiState.Empty -> showEmptyView()
+                is SearchUiState.Success -> showContents(uiState)
+                is SearchUiState.Error -> showErrorView(uiState.errorUiState)
+            }
         }
 
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiEvent.collect { event ->
-                    when (event) {
-                        CommonEvent.TokenExpiration -> navigateToLoginScreen()
-                    }
-                }
+        collectOnStarted(viewModel.uiEffect) { uiEffect: SearchUiEffect ->
+            when (uiEffect) {
+                SearchUiEffect.NavigateToLogin -> navigateToLoginScreen()
             }
+        }
+    }
+
+    private fun showLoading() {
+        binding.pbSearch.visibility = View.VISIBLE
+        binding.groupSearchResultNotEmpty.visibility = View.GONE
+        binding.groupSearchResultEmpty.visibility = View.GONE
+        binding.customErrorView.visibility = View.GONE
+    }
+
+    private fun showEmptyView() {
+        binding.groupSearchResultEmpty.visibility = View.VISIBLE
+        binding.groupSearchResultNotEmpty.visibility = View.GONE
+        binding.pbSearch.visibility = View.GONE
+        binding.customErrorView.visibility = View.GONE
+        binding.rvSearchResultSearchHistory.visibility = View.GONE
+    }
+
+    private fun showContents(uiState: SearchUiState.Success) {
+        binding.groupSearchResultEmpty.visibility = View.GONE
+        binding.groupSearchResultNotEmpty.visibility = View.VISIBLE
+        binding.pbSearch.visibility = View.GONE
+        binding.customErrorView.visibility = View.GONE
+        binding.rvSearchResultSearchHistory.visibility = View.GONE
+
+        searchAdapter.submitList(uiState.videos)
+        binding.tvSearchResultCount.text =
+            getString(R.string.search_result_exist_result, uiState.totalCount)
+    }
+
+    private fun showErrorView(errorUiState: ErrorUiState) {
+        binding.groupSearchResultNotEmpty.visibility = View.GONE
+        binding.groupSearchResultEmpty.visibility = View.GONE
+        binding.pbSearch.visibility = View.GONE
+        binding.rvSearchResultSearchHistory.visibility = View.GONE
+
+        binding.customErrorView.apply {
+            visibility = View.VISIBLE
+            showErrorView(errorUiState)
+            setOnRetryClickListener { viewModel.loadByKeyword() }
         }
     }
 
     private fun navigateToLoginScreen() {
         val intent: Intent =
-            LoginActivity.newIntent(this).apply {
-                flags =
-                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            }
+            LoginActivity
+                .newIntent(this)
+                .apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK }
         startActivity(intent)
         finish()
-    }
-
-    private fun handleVisibleBySearchResult(searchResultCount: Int) {
-        if (searchResultCount == 0) {
-            binding.groupSearchResultEmpty.visibility = View.VISIBLE
-            binding.tvSearchResultCount.visibility = View.GONE
-            binding.rvSearchResult.visibility = View.GONE
-        } else {
-            binding.groupSearchResultEmpty.visibility = View.GONE
-            binding.tvSearchResultCount.visibility = View.VISIBLE
-            binding.rvSearchResult.visibility = View.VISIBLE
-        }
-    }
-
-    private fun handleVisibleByLoading(loading: Boolean) {
-        if (loading) {
-            binding.pbSearchResult.visibility = View.VISIBLE
-            binding.tvSearchResultCount.visibility = View.GONE
-            binding.rvSearchResult.visibility = View.GONE
-            binding.groupSearchResultEmpty.visibility = View.GONE
-            binding.customErrorView.visibility = View.GONE
-        } else {
-            binding.pbSearchResult.visibility = View.GONE
-            binding.tvSearchResultCount.visibility = View.VISIBLE
-            binding.rvSearchResult.visibility = View.VISIBLE
-        }
-    }
-
-    private fun handleVisibleByError(error: Boolean) {
-        if (error) {
-            binding.customErrorView.visibility = View.VISIBLE
-            binding.tvSearchResultCount.visibility = View.GONE
-            binding.rvSearchResult.visibility = View.GONE
-            binding.groupSearchResultEmpty.visibility = View.GONE
-            binding.rvSearchResultSearchHistory.visibility = View.GONE
-        } else {
-            binding.customErrorView.visibility = View.GONE
-            binding.tvSearchResultCount.visibility = View.VISIBLE
-            binding.rvSearchResult.visibility = View.VISIBLE
-        }
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {

@@ -1,11 +1,11 @@
 package com.on.turip.domain.login
 
-import com.on.turip.data.common.TuripCustomResult
+import com.on.turip.core.result.TuripResult
 
 interface AuthRepository {
-    suspend fun login(idToken: String): TuripCustomResult<AuthResult>
+    suspend fun login(idToken: String): TuripResult<AuthResult>
 
-    suspend fun requestTokens(refreshToken: String): TuripCustomResult<AuthTokens>
+    suspend fun requestTokens(refreshToken: String): TuripResult<AuthTokens>
 
-    suspend fun getTokenVerification(accessToken: String): TuripCustomResult<Unit>
+    suspend fun getTokenVerification(accessToken: String): TuripResult<Unit>
 }

@@ -1,7 +1,7 @@
 package com.on.turip.data.folder.repository
 
-import com.on.turip.data.common.TuripCustomResult
-import com.on.turip.data.common.mapCatching
+import com.on.turip.core.result.TuripResult
+import com.on.turip.core.result.mapCatching
 import com.on.turip.data.folder.datasource.FolderRemoteDataSource
 import com.on.turip.data.folder.toDomain
 import com.on.turip.data.folder.toPatchRequestDto
@@ -14,10 +14,10 @@ import javax.inject.Inject
 class DefaultFolderRepository @Inject constructor(
     private val folderRemoteDataSource: FolderRemoteDataSource,
 ) : FolderRepository {
-    override suspend fun loadFavoriteFolders(): TuripCustomResult<List<Folder>> =
+    override suspend fun loadFavoriteFolders(): TuripResult<List<Folder>> =
         folderRemoteDataSource.getFavoriteFolders().mapCatching { it.toDomain() }
 
-    override suspend fun createFavoriteFolder(name: String): TuripCustomResult<Folder> =
+    override suspend fun createFavoriteFolder(name: String): TuripResult<Folder> =
         folderRemoteDataSource
             .postFavoriteFolder(name.toPostRequestDto())
             .mapCatching { it.toDomain() }
@@ -25,12 +25,11 @@ class DefaultFolderRepository @Inject constructor(
     override suspend fun updateFavoriteFolder(
         folderId: Long,
         updateName: String,
-    ): TuripCustomResult<Unit> = folderRemoteDataSource.patchFavoriteFolder(folderId, updateName.toPatchRequestDto())
+    ): TuripResult<Unit> = folderRemoteDataSource.patchFavoriteFolder(folderId, updateName.toPatchRequestDto())
 
-    override suspend fun deleteFavoriteFolder(folderId: Long): TuripCustomResult<Unit> =
-        folderRemoteDataSource.deleteFavoriteFolder(folderId)
+    override suspend fun deleteFavoriteFolder(folderId: Long): TuripResult<Unit> = folderRemoteDataSource.deleteFavoriteFolder(folderId)
 
-    override suspend fun loadFavoriteFoldersStatusByPlaceId(placeId: Long): TuripCustomResult<List<FavoriteFolder>> =
+    override suspend fun loadFavoriteFoldersStatusByPlaceId(placeId: Long): TuripResult<List<FavoriteFolder>> =
         folderRemoteDataSource
             .getFavoriteFoldersStatusByPlaceId(placeId)
             .mapCatching { it.toDomain() }
