@@ -1,6 +1,7 @@
 package com.on.turip.ui.compose.designsystem.theme
 
-import androidx.compose.material3.Typography
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -8,84 +9,90 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.on.turip.R
 
-private val PretendardBold =
+private val Pretendard =
     FontFamily(
         Font(R.font.pretendard_bold, FontWeight.Bold),
-    )
-
-private val PretendardLight =
-    FontFamily(
+        Font(R.font.pretendard_semibold, FontWeight.SemiBold),
+        Font(R.font.pretendard_regular, FontWeight.Normal),
         Font(R.font.pretendard_light, FontWeight.Light),
     )
 
-private val PretendardRegular =
-    FontFamily(
-        Font(R.font.pretendard_regular, FontWeight.Normal),
+private val PretendardStyle =
+    TextStyle(
+        fontFamily = Pretendard,
+        fontWeight = FontWeight.Normal,
     )
 
-val TuripTypography =
-    Typography(
-        displayLarge =
-            TextStyle(
-                fontFamily = PretendardBold,
+@Immutable
+data class TuripTypography(
+    val display: TextStyle,
+    val title1: TextStyle,
+    val title2: TextStyle,
+    val title3: TextStyle,
+    val body1: TextStyle,
+    val body2: TextStyle,
+    val info1: TextStyle,
+    val info2: TextStyle,
+)
+
+internal val Typography =
+    TuripTypography(
+        display =
+            PretendardStyle.copy(
                 fontSize = 26.sp,
-                lineHeight = 34.sp,
+                lineHeight = 33.8.sp,
                 fontWeight = FontWeight.Bold,
+                letterSpacing = (-0.58).sp,
             ),
-        titleLarge =
-            TextStyle(
-                fontFamily = PretendardBold,
+        title1 =
+            PretendardStyle.copy(
                 fontSize = 18.sp,
-                lineHeight = 25.sp,
+                lineHeight = 25.2.sp,
                 fontWeight = FontWeight.Bold,
+                letterSpacing = (-0.75).sp,
             ),
-        titleMedium =
-            TextStyle(
-                fontFamily = PretendardBold,
+        title2 =
+            PretendardStyle.copy(
                 fontSize = 16.sp,
-                lineHeight = 22.sp,
-                fontWeight = FontWeight.Bold,
+                lineHeight = 22.4.sp,
+                fontWeight = FontWeight.SemiBold,
+                letterSpacing = (-0.58).sp,
             ),
-        titleSmall =
-            TextStyle(
-                fontFamily = PretendardBold,
+        title3 =
+            PretendardStyle.copy(
                 fontSize = 14.sp,
-                lineHeight = 20.sp,
-                fontWeight = FontWeight.Bold,
+                lineHeight = 19.6.sp,
+                fontWeight = FontWeight.SemiBold,
+                letterSpacing = (-0.58).sp,
             ),
-        bodyLarge =
-            TextStyle(
-                fontFamily = PretendardLight,
+        body1 =
+            PretendardStyle.copy(
                 fontSize = 16.sp,
                 lineHeight = 24.sp,
                 fontWeight = FontWeight.Light,
+                letterSpacing = (-0.58).sp,
             ),
-        bodyMedium =
-            TextStyle(
-                fontFamily = PretendardLight,
+        body2 =
+            PretendardStyle.copy(
                 fontSize = 14.sp,
-                lineHeight = 20.sp,
-                fontWeight = FontWeight.Light,
-            ),
-        labelLarge =
-            TextStyle(
-                fontFamily = PretendardBold,
-                fontSize = 12.sp,
-                lineHeight = 18.sp,
-                fontWeight = FontWeight.Bold,
-            ),
-        labelMedium =
-            TextStyle(
-                fontFamily = PretendardRegular,
-                fontSize = 12.sp,
-                lineHeight = 16.sp,
+                lineHeight = 19.6.sp,
                 fontWeight = FontWeight.Normal,
+                letterSpacing = (-0.75).sp,
             ),
-        labelSmall =
-            TextStyle(
-                fontFamily = PretendardRegular,
+        info1 =
+            PretendardStyle.copy(
+                fontSize = 12.sp,
+                lineHeight = 16.8.sp,
+                fontWeight = FontWeight.Normal,
+                letterSpacing = (-0.58).sp,
+            ),
+        info2 =
+            PretendardStyle.copy(
                 fontSize = 10.sp,
                 lineHeight = 14.sp,
                 fontWeight = FontWeight.Normal,
+                letterSpacing = (-0.58).sp,
             ),
     )
+
+val LocalTypography = staticCompositionLocalOf { Typography }
