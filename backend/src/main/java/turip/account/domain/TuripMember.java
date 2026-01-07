@@ -16,6 +16,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.mindrot.jbcrypt.BCrypt;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.IllegalArgumentException;
 
@@ -55,7 +56,7 @@ public class TuripMember {
         this.id = id;
         this.member = member;
         this.loginId = loginId;
-        this.loginPassword = loginPassword;
+        this.loginPassword = BCrypt.hashpw(loginPassword, BCrypt.gensalt());
     }
 
     public TuripMember(Member member, String loginId, String loginPassword) {
