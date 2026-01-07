@@ -43,6 +43,7 @@ public enum ErrorTag {
     FAVORITE_FOLDER_NAME_CONFLICT("이미 존재하는 찜폴더 이름입니다."),
     FAVORITE_CONTENT_CONFLICT("이미 찜한 컨텐츠입니다."),
     FAVORITE_PLACE_IN_FOLDER_CONFLICT("해당 폴더에 이미 찜한 장소입니다."),
+    LOGIN_ID_CONFLICT("중복 아이디가 존재합니다."),
 
     // 500 Internal Server Error
     INTERNAL_SERVER_ERROR("서버에서 예기치 못한 에러가 발생했습니다.");

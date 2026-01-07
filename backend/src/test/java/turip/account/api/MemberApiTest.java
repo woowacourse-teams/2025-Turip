@@ -78,7 +78,8 @@ class MemberApiTest {
         void migrationSuccess() {
             // given
             // 1. Guest account와 Member account 생성
-            Long guestAccountId = testDataHelper.insertAccount();// Guest account
+            Long guestAccountId =
+                    testDataHelper.insertAccount();// Guest account
             Long memberAccountId = testDataHelper.insertAccount(); // Member account
 
             // 2. Guest와 Member 생성
