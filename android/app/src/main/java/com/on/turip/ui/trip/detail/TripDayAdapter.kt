@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.ListAdapter
 
 class TripDayAdapter(
     private val onClickListener: TripDayViewHolder.OnDayListener,
-) : ListAdapter<DayModel, TripDayViewHolder>(TravelDayDiffUtil) {
+) : ListAdapter<DayModel, TripDayViewHolder>(TripDayDiffUtil) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -20,7 +20,7 @@ class TripDayAdapter(
         holder.bind(dayModel)
     }
 
-    private object TravelDayDiffUtil : DiffUtil.ItemCallback<DayModel>() {
+    private object TripDayDiffUtil : DiffUtil.ItemCallback<DayModel>() {
         override fun areItemsTheSame(
             oldItem: DayModel,
             newItem: DayModel,

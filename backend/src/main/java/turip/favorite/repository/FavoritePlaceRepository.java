@@ -39,5 +39,9 @@ public interface FavoritePlaceRepository extends JpaRepository<FavoritePlace, Lo
             "WHERE fp.place = :place AND ff.account = :account")
     List<FavoritePlace> findAllByPlaceAndAccount(@Param("place") Place place, @Param("account") Account account);
 
+    int countByFavoriteFolderAccount(Account account);
+
+    boolean existsByFavoriteFolderAccount(Account account);
+
     void deleteAllByFavoriteFolder(FavoriteFolder favoriteFolder);
 }

@@ -1,6 +1,5 @@
 package com.on.turip.ui.compose.setting
 
-import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,7 +9,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -27,19 +28,22 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.on.turip.R
 import com.on.turip.common.AuthState
 import com.on.turip.common.UserType
-import com.on.turip.domain.ErrorEvent
-import com.on.turip.ui.compose.common.component.TuripAppBar
-import com.on.turip.ui.compose.common.component.TuripDialog
-import com.on.turip.ui.compose.common.component.TuripSnackbar
+import com.on.turip.domain.setting.InquiryMail
+import com.on.turip.ui.common.error.toUiModel
+import com.on.turip.ui.compose.designsystem.component.TuripAppBar
+import com.on.turip.ui.compose.designsystem.component.TuripDialog
+import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
+import com.on.turip.ui.compose.setting.component.SettingItem
+import com.on.turip.ui.compose.setting.model.SettingUiEffect
+import com.on.turip.ui.compose.setting.model.SettingUiState
 import com.on.turip.ui.compose.theme.TuripTheme
-import com.on.turip.ui.main.favorite.SettingViewModel
 import timber.log.Timber
 
 @Composable
 fun SettingScreen(
     navigateToBack: () -> Unit,
-    navigateToInquiry: (Uri) -> Unit,
-    navigateToPrivacyPolicy: (Uri) -> Unit,
+    navigateToInquiry: (InquiryMail) -> Unit,
+    navigateToPrivacyPolicy: (String) -> Unit,
     navigateToLoginScreen: () -> Unit,
     viewModel: SettingViewModel = hiltViewModel(),
 ) {
@@ -48,21 +52,22 @@ fun SettingScreen(
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        viewModel.uiEvent.collect { event ->
-            when (event) {
-                SettingUiEvent.Logout, SettingUiEvent.Withdraw -> {
+        viewModel.uiEffect.collect { uiEffect: SettingUiEffect ->
+            when (uiEffect) {
+                SettingUiEffect.NavigateToLogin -> {
                     navigateToLoginScreen()
                 }
 
-                is SettingUiEvent.ShowError -> {
-                    when (event.errorEvent) {
-                        ErrorEvent.NETWORK_ERROR -> {
-                            snackbarHostState.showSnackbar(context.getString(R.string.cannot_connect_network))
-                        }
-
-                        else -> {
-                            snackbarHostState.showSnackbar(context.getString(R.string.server_error))
-                        }
+                is SettingUiEffect.ShowError -> {
+                    val errorUiModel = uiEffect.errorUiState.toUiModel() ?: return@collect
+                    val result: SnackbarResult =
+                        snackbarHostState.showSnackbar(
+                            message = context.getString(errorUiModel.titleRes),
+                            actionLabel = context.getString(errorUiModel.retryTextRes),
+                            duration = SnackbarDuration.Indefinite,
+                        )
+                    if (result == SnackbarResult.ActionPerformed) {
+                        viewModel.handleErrorRetryRequest(uiEffect.retryAction)
                     }
                 }
             }
@@ -78,7 +83,7 @@ fun SettingScreen(
             confirmButtonColor = colorResource(R.color.turip_blue_11aebf_70),
             dismissButtonColor = colorResource(R.color.turip_gray_b4b4b4),
             onConfirmation = viewModel::confirmLogout,
-            onDismissRequest = { viewModel.showLogoutDialog(show = false) },
+            onDismissRequest = { viewModel.onLogoutDialogVisibilityChange(visible = false) },
         )
     }
 
@@ -91,46 +96,10 @@ fun SettingScreen(
             confirmButtonColor = colorResource(R.color.turip_red_ff7474),
             dismissButtonColor = colorResource(R.color.turip_gray_b4b4b4),
             onConfirmation = viewModel::confirmWithdraw,
-            onDismissRequest = { viewModel.showWithdrawDialog(show = false) },
+            onDismissRequest = { viewModel.updateWithdrawDialogVisibility(visible = false) },
         )
     }
 
-    SettingScreen(
-        snackbarHostState = snackbarHostState,
-        onClickBack = navigateToBack,
-        onClickInquiry = {
-            navigateToInquiry(viewModel.loadInquiryUri())
-            Timber.d("SettingScreen 문의하기 버튼 클릭")
-        },
-        onClickPrivacyPolicy = {
-            navigateToPrivacyPolicy(viewModel.loadPrivacyPolicyUri())
-            Timber.d("SettingScreen 개인정보처리 방침 버튼 클릭")
-        },
-        onClickLogin = {
-            navigateToLoginScreen()
-            Timber.d("SettingScreen 로그인 버튼 클릭")
-        },
-        onClickLogout = {
-            viewModel.showLogoutDialog(show = true)
-            Timber.d("SettingScreen 로그아웃 버튼 클릭")
-        },
-        onClickWithdraw = {
-            viewModel.showWithdrawDialog(show = true)
-            Timber.d("SettingScreen 회원탈퇴 버튼 클릭")
-        },
-    )
-}
-
-@Composable
-private fun SettingScreen(
-    snackbarHostState: SnackbarHostState,
-    onClickBack: () -> Unit,
-    onClickInquiry: () -> Unit,
-    onClickPrivacyPolicy: () -> Unit,
-    onClickLogin: () -> Unit,
-    onClickLogout: () -> Unit,
-    onClickWithdraw: () -> Unit,
-) {
     Scaffold(
         modifier =
             Modifier
@@ -140,17 +109,32 @@ private fun SettingScreen(
         topBar = {
             TuripAppBar(
                 canBack = true,
-                onBackNavigate = onClickBack,
+                onBackNavigate = navigateToBack,
             )
         },
         snackbarHost = { TuripSnackbar(snackbarHostState = snackbarHostState) },
     ) { innerPadding ->
         SettingScreenContent(
-            onClickInquiry = onClickInquiry,
-            onClickPrivacyPolicy = onClickPrivacyPolicy,
-            onClickLogin = onClickLogin,
-            onClickLogout = onClickLogout,
-            onClickWithdraw = onClickWithdraw,
+            onClickInquiry = {
+                navigateToInquiry(viewModel.loadInquiryMail())
+                Timber.d("SettingScreen 문의하기 버튼 클릭")
+            },
+            onClickPrivacyPolicy = {
+                navigateToPrivacyPolicy(viewModel.loadPrivacyPolicyLink())
+                Timber.d("SettingScreen 개인정보처리 방침 버튼 클릭")
+            },
+            onClickLogin = {
+                navigateToLoginScreen()
+                Timber.d("SettingScreen 로그인 버튼 클릭")
+            },
+            onClickLogout = {
+                viewModel.onLogoutDialogVisibilityChange(visible = true)
+                Timber.d("SettingScreen 로그아웃 버튼 클릭")
+            },
+            onClickWithdraw = {
+                viewModel.updateWithdrawDialogVisibility(visible = true)
+                Timber.d("SettingScreen 회원탈퇴 버튼 클릭")
+            },
             modifier = Modifier.padding(innerPadding),
         )
     }
@@ -199,20 +183,14 @@ private fun SettingCommonScreen(
     )
 
     SettingItem(
-        uiModel =
-            SettingModel(
-                iconResource = R.drawable.ic_inquire,
-                titleResource = R.string.setting_inquiry,
-            ),
+        imageRes = R.drawable.ic_inquire,
+        titleRes = R.string.setting_inquiry,
         onClick = onClickInquiry,
         modifier = Modifier.fillMaxWidth(),
     )
     SettingItem(
-        uiModel =
-            SettingModel(
-                iconResource = R.drawable.ic_document,
-                titleResource = R.string.setting_privacy_policy,
-            ),
+        imageRes = R.drawable.ic_document,
+        titleRes = R.string.setting_privacy_policy,
         onClick = onClickPrivacyPolicy,
         modifier = Modifier.fillMaxWidth(),
     )
@@ -221,11 +199,8 @@ private fun SettingCommonScreen(
 @Composable
 private fun SettingForGuestScreen(onClickLogin: () -> Unit) {
     SettingItem(
-        uiModel =
-            SettingModel(
-                iconResource = R.drawable.ic_login,
-                titleResource = R.string.setting_login,
-            ),
+        imageRes = R.drawable.ic_login,
+        titleRes = R.string.setting_login,
         onClick = onClickLogin,
         modifier = Modifier.fillMaxWidth(),
     )
@@ -237,20 +212,14 @@ private fun SettingForMemberScreen(
     onClickWithdraw: () -> Unit,
 ) {
     SettingItem(
-        uiModel =
-            SettingModel(
-                iconResource = R.drawable.ic_logout,
-                titleResource = R.string.setting_logout,
-            ),
+        imageRes = R.drawable.ic_logout,
+        titleRes = R.string.setting_logout,
         onClick = onClickLogout,
         modifier = Modifier.fillMaxWidth(),
     )
     SettingItem(
-        uiModel =
-            SettingModel(
-                iconResource = R.drawable.ic_withdraw,
-                titleResource = R.string.setting_withdraw,
-            ),
+        imageRes = R.drawable.ic_withdraw,
+        titleRes = R.string.setting_withdraw,
         onClick = onClickWithdraw,
         modifier = Modifier.fillMaxWidth(),
     )
@@ -258,7 +227,7 @@ private fun SettingForMemberScreen(
 
 @Preview(showBackground = true)
 @Composable
-private fun MemberSettingScreenPreview() {
+private fun GuestSettingScreenPreview() {
     TuripTheme {
         SettingScreenContent(
             onClickInquiry = {},

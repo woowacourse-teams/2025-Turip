@@ -9,9 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -21,20 +18,24 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.material.snackbar.Snackbar
 import com.on.turip.R
 import com.on.turip.databinding.FragmentFavoritePlaceBinding
-import com.on.turip.domain.ErrorEvent
 import com.on.turip.ui.common.TuripDialogFragment
 import com.on.turip.ui.common.base.BaseFragment
-import com.on.turip.ui.common.event.CommonEvent
+import com.on.turip.ui.common.collectOnStarted
+import com.on.turip.ui.common.error.ErrorUiModel
+import com.on.turip.ui.common.error.ErrorUiState
+import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.folder.FolderActivity
 import com.on.turip.ui.login.LoginActivity
 import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
+import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceLatLngUiModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
-import com.on.turip.ui.main.favorite.model.FavoritePlaceUiEvent
+import com.on.turip.ui.main.favorite.model.FavoritePlaceUiEffect
+import com.on.turip.ui.main.favorite.model.FavoritePlaceUiState
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class FavoritePlaceFragment :
@@ -64,12 +65,7 @@ class FavoritePlaceFragment :
                 override fun onItemClick(favoritePlaceModel: FavoritePlaceModel) {
                     map.animateCamera(
                         CameraUpdateFactory.newCameraPosition(
-                            CameraPosition(
-                                favoritePlaceModel.latLng,
-                                15f,
-                                0f,
-                                0f,
-                            ),
+                            CameraPosition(favoritePlaceModel.latLng, 15f, 0f, 0f),
                         ),
                         1000,
                         null,
@@ -98,19 +94,8 @@ class FavoritePlaceFragment :
         setupAdapters()
         setupListeners()
         setupObservers()
-        showNetworkError()
         setupMapFragment(savedInstanceState)
         setupLoginSuggestDialog()
-    }
-
-    private fun showNetworkError() {
-        binding.customErrorView.apply {
-            visibility = View.VISIBLE
-            setupError(ErrorEvent.NETWORK_ERROR)
-            setOnRetryClickListener {
-                viewModel.loadFoldersAndPlaces()
-            }
-        }
     }
 
     private fun setupAdapters() {
@@ -184,59 +169,40 @@ class FavoritePlaceFragment :
     }
 
     private fun setupObservers() {
-        viewModel.favoritePlaceUiState.observe(viewLifecycleOwner) { state ->
-            folderNameAdapter.submitList(state.folders)
-            placeAdapter.submitList(state.places)
-
-            binding.apply {
-                if (state.isLoading) {
-                    pbSearchRegionResult.visibility = View.VISIBLE
-                    clFavoritePlaceEmpty.visibility = View.GONE
-                    groupFavoritePlaceNotError.visibility = View.GONE
-                    groupFavoritePlaceNotEmpty.visibility = View.GONE
-                    tvFavoritePlacePlaceCount.visibility = View.GONE
-                } else {
-                    pbSearchRegionResult.visibility = View.GONE
-                    groupFavoritePlaceNotError.visibility = View.VISIBLE
-                }
-
-                if (state.isNetWorkError || state.isServerError) {
-                    mvFavoritePlace.visibility = View.GONE
-                    customErrorView.visibility = View.VISIBLE
-                    clFavoritePlaceEmpty.visibility = View.GONE
-                    groupFavoritePlaceNotError.visibility = View.GONE
-                    groupFavoritePlaceNotEmpty.visibility = View.GONE
-                    tvFavoritePlacePlaceCount.visibility = View.GONE
-                } else {
-                    customErrorView.visibility = View.GONE
-                    groupFavoritePlaceNotError.visibility = View.VISIBLE
-
-                    if (!state.isLoading) {
-                        handlePlaceState(state)
-                    }
-                }
+        collectOnStarted(viewModel.uiState) { uiState: FavoritePlaceUiState ->
+            if (uiState.isLoading) showLoading()
+            when {
+                uiState.errorUiState != ErrorUiState.None -> showErrorView(uiState.errorUiState)
+                uiState.isEmpty -> showEmptyView(uiState.folders)
+                else -> showContents(uiState)
             }
         }
 
-        viewModel.shareFolder.observe(viewLifecycleOwner) { shareFolder: FavoriteFolderShareModel ->
-            makeShareIntent(shareFolder)
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch {
-                    viewModel.commonEvent.collect { event ->
-                        when (event) {
-                            CommonEvent.TokenExpiration -> navigateToLoginScreen()
-                        }
-                    }
+        collectOnStarted(viewModel.uiEffect) { uiEffect: FavoritePlaceUiEffect ->
+            when (uiEffect) {
+                FavoritePlaceUiEffect.ShowFolderShareNotAllowed -> {
+                    showSuggestLoginMessage()
                 }
 
-                launch {
-                    viewModel.uiEvent.collect { event ->
-                        when (event) {
-                            FavoritePlaceUiEvent.ShowFolderShareNotAllowed -> showSuggestLoginMessage()
-                        }
+                is FavoritePlaceUiEffect.ShareFolder -> {
+                    shareFolder(uiEffect.favoriteFolderShareModel)
+                }
+
+                FavoritePlaceUiEffect.NavigateToLogin -> {
+                    navigateToLoginScreen()
+                }
+
+                is FavoritePlaceUiEffect.ShowError -> {
+                    val uiModel: ErrorUiModel =
+                        uiEffect.errorUiState.toUiModel() ?: return@collectOnStarted
+                    view?.let { view: View ->
+                        Snackbar
+                            .make(view, uiModel.titleRes, Snackbar.LENGTH_INDEFINITE)
+                            .apply {
+                                setAction(uiModel.retryTextRes) {
+                                    viewModel.handleErrorRetryRequest(uiEffect.retryAction)
+                                }
+                            }.show()
                     }
                 }
             }
@@ -255,39 +221,21 @@ class FavoritePlaceFragment :
 
     private fun navigateToLoginScreen() {
         val intent: Intent =
-            LoginActivity.newIntent(requireActivity()).apply {
-                flags =
-                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            }
+            LoginActivity
+                .newIntent(requireActivity())
+                .apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK }
         startActivity(intent)
         requireActivity().finish()
     }
 
-    private fun FragmentFavoritePlaceBinding.handlePlaceState(state: FavoritePlaceViewModel.FavoritePlaceUiState) {
-        if (state.places.isEmpty()) {
-            clFavoritePlaceEmpty.visibility = View.VISIBLE
-            groupFavoritePlaceNotEmpty.visibility = View.GONE
-            tvFavoritePlacePlaceCount.visibility = View.GONE
-            ivFavoritePlaceShare.visibility = View.GONE
-        } else {
-            clFavoritePlaceEmpty.visibility = View.GONE
-            groupFavoritePlaceNotEmpty.visibility = View.VISIBLE
-            tvFavoritePlacePlaceCount.apply {
-                visibility = View.VISIBLE
-                text = getString(R.string.all_total_place_count, state.places.size)
-            }
-            ivFavoritePlaceShare.visibility = View.VISIBLE
-        }
-    }
-
-    private fun makeShareIntent(shareFolder: FavoriteFolderShareModel) {
-        val sharedContents: String = shareFolder.toShareFormat()
+    private fun shareFolder(folderShareModel: FavoriteFolderShareModel) {
+        val sharedContents: String = folderShareModel.toShareFormat()
 
         val intent =
             Intent(Intent.ACTION_SEND).apply {
                 type = "text/plain"
                 putExtra(Intent.EXTRA_TEXT, sharedContents)
-                putExtra(Intent.EXTRA_TITLE, shareFolder.name)
+                putExtra(Intent.EXTRA_TITLE, folderShareModel.name)
             }
         val kakaoIntent: Intent =
             Intent(Intent.ACTION_SEND).apply {
@@ -304,12 +252,67 @@ class FavoritePlaceFragment :
         val initialIntents = arrayOf(kakaoIntent, instagramIntent)
 
         val chooserIntent =
-            Intent.createChooser(intent, shareFolder.name).apply {
+            Intent.createChooser(intent, folderShareModel.name).apply {
                 putExtra(Intent.EXTRA_INITIAL_INTENTS, initialIntents)
-                putExtra(Intent.EXTRA_TITLE, shareFolder.name)
+                putExtra(Intent.EXTRA_TITLE, folderShareModel.name)
             }
 
         startActivity(chooserIntent)
+    }
+
+    private fun showLoading() {
+        binding.pbFavoritePlaceLoading.visibility = View.VISIBLE
+        binding.groupFavoritePlaceNotEmpty.visibility = View.GONE
+        binding.groupFavoritePlaceNotError.visibility = View.GONE
+        binding.clFavoritePlaceEmpty.visibility = View.GONE
+        binding.customErrorView.visibility = View.GONE
+    }
+
+    private fun showEmptyView(folders: List<FavoritePlaceFolderModel>) {
+        folderNameAdapter.submitList(folders)
+
+        binding.pbFavoritePlaceLoading.visibility = View.GONE
+        binding.groupFavoritePlaceNotError.visibility = View.VISIBLE
+        binding.customErrorView.visibility = View.GONE
+
+        binding.clFavoritePlaceEmpty.visibility = View.VISIBLE
+        binding.groupFavoritePlaceNotEmpty.visibility = View.GONE
+
+        binding.ivFavoritePlaceMapToggle.visibility = View.GONE
+        binding.mvFavoritePlace.visibility = View.GONE
+    }
+
+    private fun showContents(uiState: FavoritePlaceUiState) {
+        folderNameAdapter.submitList(uiState.folders)
+        placeAdapter.submitList(uiState.places)
+
+        binding.pbFavoritePlaceLoading.visibility = View.GONE
+        binding.groupFavoritePlaceNotError.visibility = View.VISIBLE
+        binding.customErrorView.visibility = View.GONE
+
+        binding.clFavoritePlaceEmpty.visibility = View.GONE
+        binding.groupFavoritePlaceNotEmpty.visibility = View.VISIBLE
+        binding.tvFavoritePlacePlaceCount.text =
+            getString(R.string.all_total_place_count, uiState.places.size)
+
+        when (uiState.placesLatLng.size) {
+            0 -> handleEmptyFavorites()
+            1 -> handleSingleFavorite(uiState.placesLatLng.first())
+            else -> handleMultipleFavorites(uiState.placesLatLng)
+        }
+    }
+
+    private fun showErrorView(errorUiState: ErrorUiState) {
+        binding.groupFavoritePlaceNotError.visibility = View.GONE
+        binding.groupFavoritePlaceNotEmpty.visibility = View.GONE
+        binding.clFavoritePlaceEmpty.visibility = View.GONE
+        binding.pbFavoritePlaceLoading.visibility = View.GONE
+
+        binding.customErrorView.apply {
+            visibility = View.VISIBLE
+            showErrorView(errorUiState)
+            setOnRetryClickListener { viewModel.loadFoldersAndPlaces() }
+        }
     }
 
     override fun onStart() {
@@ -375,14 +378,6 @@ class FavoritePlaceFragment :
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
         map.uiSettings.isZoomControlsEnabled = true
-
-        viewModel.favoriteLatLng.observe(viewLifecycleOwner) { favoriteLatLngList ->
-            when {
-                favoriteLatLngList.isEmpty() -> handleEmptyFavorites()
-                favoriteLatLngList.size == 1 -> handleSingleFavorite(favoriteLatLngList.first())
-                else -> handleMultipleFavorites(favoriteLatLngList)
-            }
-        }
     }
 
     private fun handleEmptyFavorites() {

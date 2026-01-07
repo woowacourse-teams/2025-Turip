@@ -1,20 +1,20 @@
 package com.on.turip.domain.folder.repository
 
-import com.on.turip.data.common.TuripCustomResult
+import com.on.turip.core.result.TuripResult
 import com.on.turip.domain.folder.FavoriteFolder
 import com.on.turip.domain.folder.Folder
 
 interface FolderRepository {
-    suspend fun loadFavoriteFolders(): TuripCustomResult<List<Folder>>
+    suspend fun loadFavoriteFolders(): TuripResult<List<Folder>>
 
-    suspend fun createFavoriteFolder(name: String): TuripCustomResult<Folder>
+    suspend fun createFavoriteFolder(name: String): TuripResult<Folder>
 
     suspend fun updateFavoriteFolder(
         folderId: Long,
         updateName: String,
-    ): TuripCustomResult<Unit>
+    ): TuripResult<Unit>
 
-    suspend fun deleteFavoriteFolder(folderId: Long): TuripCustomResult<Unit>
+    suspend fun deleteFavoriteFolder(folderId: Long): TuripResult<Unit>
 
-    suspend fun loadFavoriteFoldersStatusByPlaceId(placeId: Long): TuripCustomResult<List<FavoriteFolder>>
+    suspend fun loadFavoriteFoldersStatusByPlaceId(placeId: Long): TuripResult<List<FavoriteFolder>>
 }

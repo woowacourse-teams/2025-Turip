@@ -16,13 +16,6 @@ fun Trip.toUiModel(): TripModel =
         contentPlaces = this@toUiModel.contentPlaces,
     )
 
-fun Trip.toUiModelWithoutContentPlaces(): TripModel =
-    TripModel(
-        tripDurationModel = tripDuration.toUiModel(),
-        tripPlaceCount = tripPlaceCount,
-        contentPlaces = emptyList(),
-    )
-
 fun ContentPlace.toUiModel(): PlaceModel =
     PlaceModel(
         id = place.placeId,

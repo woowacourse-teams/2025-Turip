@@ -4,10 +4,10 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.on.turip.R
-import com.on.turip.databinding.ItemTravelPlaceBinding
+import com.on.turip.databinding.ItemTripPlaceBinding
 
 class TripPlaceViewHolder(
-    private val binding: ItemTravelPlaceBinding,
+    private val binding: ItemTripPlaceBinding,
     onClickListener: PlaceListener,
 ) : RecyclerView.ViewHolder(binding.root) {
     private var placeModel: PlaceModel? = null
@@ -19,17 +19,17 @@ class TripPlaceViewHolder(
             }
         }
 
-        binding.clTravelPlaceMap.setOnClickListener {
+        binding.clTripPlaceMap.setOnClickListener {
             placeModel?.let {
                 onClickListener.onPlaceClick(it)
             }
         }
-        binding.clTravelPlaceTimeLine.setOnClickListener {
+        binding.clTripPlaceTimeLine.setOnClickListener {
             placeModel?.let {
                 onClickListener.onTimeLineClick(it)
             }
         }
-        binding.clTravelPlaceFavorite.setOnClickListener {
+        binding.clTripPlaceFavorite.setOnClickListener {
             placeModel?.let {
                 onClickListener.onFavoriteClick(it)
             }
@@ -38,15 +38,15 @@ class TripPlaceViewHolder(
 
     fun bind(placeModel: PlaceModel) {
         this.placeModel = placeModel
-        binding.tvTravelPlaceName.text = placeModel.name
-        binding.tvTravelPlaceCategory.text = placeModel.turipCategory
-        binding.tvTravelPlaceTimeLine.text =
+        binding.tvTripPlaceName.text = placeModel.name
+        binding.tvTripPlaceCategory.text = placeModel.turipCategory
+        binding.tvTripPlaceTimeLine.text =
             itemView.context.getString(
-                R.string.travel_place_time_line,
+                R.string.trip_place_time_line,
                 placeModel.timeLine,
             )
-        binding.ivTravelPlaceFavorite.isSelected = placeModel.isFavorite
-        binding.ivTravelPlaceMap.setImageResource(Maps.from(placeModel.placeUri).iconRes)
+        binding.ivTripPlaceFavorite.isSelected = placeModel.isFavorite
+        binding.ivTripPlaceMap.setImageResource(Maps.from(placeModel.placeUri).iconRes)
     }
 
     companion object {
@@ -55,8 +55,8 @@ class TripPlaceViewHolder(
             onClickListener: PlaceListener,
         ): TripPlaceViewHolder {
             val inflater: LayoutInflater = LayoutInflater.from(parent.context)
-            val binding: ItemTravelPlaceBinding =
-                ItemTravelPlaceBinding.inflate(inflater, parent, false)
+            val binding: ItemTripPlaceBinding =
+                ItemTripPlaceBinding.inflate(inflater, parent, false)
             return TripPlaceViewHolder(binding, onClickListener)
         }
     }

@@ -1,7 +1,7 @@
 package com.on.turip.data.place.repository
 
-import com.on.turip.data.common.TuripCustomResult
-import com.on.turip.data.common.mapCatching
+import com.on.turip.core.result.TuripResult
+import com.on.turip.core.result.mapCatching
 import com.on.turip.data.place.datasource.FavoritePlaceRemoteDataSource
 import com.on.turip.data.place.dto.FavoritePlaceOrderRequest
 import com.on.turip.data.place.toDomain
@@ -12,7 +12,7 @@ import javax.inject.Inject
 class DefaultFavoritePlaceRepository @Inject constructor(
     private val favoritePlaceRemoteDataSource: FavoritePlaceRemoteDataSource,
 ) : FavoritePlaceRepository {
-    override suspend fun loadFavoritePlaces(favoriteFolderId: Long): TuripCustomResult<List<FavoritePlace>> =
+    override suspend fun loadFavoritePlaces(favoriteFolderId: Long): TuripResult<List<FavoritePlace>> =
         favoritePlaceRemoteDataSource.getFavoritePlaces(favoriteFolderId).mapCatching {
             it.toDomain()
         }
@@ -20,7 +20,7 @@ class DefaultFavoritePlaceRepository @Inject constructor(
     override suspend fun createFavoritePlace(
         favoriteFolderId: Long,
         placeId: Long,
-    ): TuripCustomResult<Unit> =
+    ): TuripResult<Unit> =
         favoritePlaceRemoteDataSource.createFavoritePlace(
             favoriteFolderId = favoriteFolderId,
             placeId = placeId,
@@ -29,7 +29,7 @@ class DefaultFavoritePlaceRepository @Inject constructor(
     override suspend fun deleteFavoritePlace(
         favoriteFolderId: Long,
         placeId: Long,
-    ): TuripCustomResult<Unit> =
+    ): TuripResult<Unit> =
         favoritePlaceRemoteDataSource.deleteFavoritePlace(
             favoriteFolderId = favoriteFolderId,
             placeId = placeId,
@@ -38,7 +38,7 @@ class DefaultFavoritePlaceRepository @Inject constructor(
     override suspend fun updateFavoritePlacesOrder(
         favoriteFolderId: Long,
         updatedOrder: List<Long>,
-    ): TuripCustomResult<Unit> =
+    ): TuripResult<Unit> =
         favoritePlaceRemoteDataSource.patchFavoritePlacesOrder(
             favoriteFolderId = favoriteFolderId,
             favoritePlaceOrderRequest =

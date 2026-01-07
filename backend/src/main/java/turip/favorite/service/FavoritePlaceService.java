@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import turip.account.domain.Account;
 import turip.common.exception.ErrorTag;
+import turip.common.exception.custom.BadRequestException;
 import turip.common.exception.custom.ConflictException;
 import turip.common.exception.custom.ForbiddenException;
 import turip.common.exception.custom.NotFoundException;
@@ -15,6 +16,7 @@ import turip.favorite.controller.dto.request.FavoritePlaceOrderRequest;
 import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlaceResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlaceWithPlaceDetailResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlacesWithPlaceDetailResponse;
+import turip.favorite.controller.dto.response.FavoritePlaceCountResponse;
 import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.domain.FavoritePlace;
 import turip.favorite.repository.FavoriteFolderRepository;
@@ -75,6 +77,15 @@ public class FavoritePlaceService {
                 .toList();
 
         return FavoritePlacesWithPlaceDetailResponse.from(favoritePlaces);
+    }
+
+    public FavoritePlaceCountResponse countByAccount(Account account) {
+        int count = favoritePlaceRepository.countByFavoriteFolderAccount(account);
+        return FavoritePlaceCountResponse.from(count);
+    }
+
+    public boolean existsByAccount(Account account) {
+        return favoritePlaceRepository.existsByFavoriteFolderAccount(account);
     }
 
     @Transactional
@@ -192,7 +203,7 @@ public class FavoritePlaceService {
 
     private void validateFavoritePlaceBelongsToFolder(FavoritePlace favoritePlace, FavoriteFolder favoriteFolder) {
         if (!favoritePlace.getFavoriteFolder().equals(favoriteFolder)) {
-            throw new ForbiddenException(ErrorTag.FORBIDDEN);
+            throw new BadRequestException(ErrorTag.FAVORITE_PLACE_FOLDER_MISMATCH);
         }
     }
 

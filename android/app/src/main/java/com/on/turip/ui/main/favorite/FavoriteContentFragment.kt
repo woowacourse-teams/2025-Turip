@@ -6,20 +6,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import com.google.android.material.snackbar.Snackbar
 import com.on.turip.R
 import com.on.turip.databinding.FragmentFavoriteContentBinding
-import com.on.turip.domain.ErrorEvent
 import com.on.turip.domain.favorite.FavoriteContent
 import com.on.turip.ui.common.ItemDividerDecoration
 import com.on.turip.ui.common.base.BaseFragment
-import com.on.turip.ui.common.event.CommonEvent
+import com.on.turip.ui.common.collectOnStarted
+import com.on.turip.ui.common.error.ErrorUiModel
+import com.on.turip.ui.common.error.ErrorUiState
+import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.login.LoginActivity
+import com.on.turip.ui.main.favorite.model.FavoriteContentUiEffect
+import com.on.turip.ui.main.favorite.model.FavoriteContentUiState
 import com.on.turip.ui.trip.detail.TripDetailActivity
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @AndroidEntryPoint
@@ -62,7 +63,6 @@ class FavoriteContentFragment : BaseFragment<FragmentFavoriteContentBinding>() {
         super.onViewCreated(view, savedInstanceState)
         setupAdapters()
         setupObservers()
-        showNetworkError()
     }
 
     private fun setupAdapters() {
@@ -78,69 +78,81 @@ class FavoriteContentFragment : BaseFragment<FragmentFavoriteContentBinding>() {
     }
 
     private fun setupObservers() {
-        viewModel.favoriteContents.observe(viewLifecycleOwner) { favoriteContents ->
-            if (viewModel.networkError.value == true || viewModel.serverError.value == true) return@observe
-            handleVisibleByHasContent(favoriteContents)
-            favoriteContentAdapter.submitList(favoriteContents)
+        collectOnStarted(viewModel.uiState) { uiState: FavoriteContentUiState ->
+            if (uiState.isLoading) showLoading()
+            when {
+                uiState.errorUiState != ErrorUiState.None -> showErrorView(uiState.errorUiState)
+                uiState.isEmpty -> showEmptyView()
+                else -> showContents(uiState.favoriteContents)
+            }
         }
 
-        viewModel.networkError.observe(viewLifecycleOwner) { networkError ->
-            handleErrorOrContentView(networkError || (viewModel.serverError.value == true))
-        }
+        collectOnStarted(viewModel.uiEffect) { uiEffect: FavoriteContentUiEffect ->
+            when (uiEffect) {
+                FavoriteContentUiEffect.NavigateToLogin -> {
+                    navigateToLoginScreen()
+                }
 
-        viewModel.serverError.observe(viewLifecycleOwner) { serverError ->
-            handleErrorOrContentView(serverError || (viewModel.networkError.value == true))
-        }
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiEvent.collect { event ->
-                    when (event) {
-                        CommonEvent.TokenExpiration -> navigateToLoginScreen()
+                is FavoriteContentUiEffect.ShowError -> {
+                    val uiModel: ErrorUiModel =
+                        uiEffect.errorUiState.toUiModel() ?: return@collectOnStarted
+                    view?.let { view: View ->
+                        Snackbar
+                            .make(view, uiModel.titleRes, Snackbar.LENGTH_INDEFINITE)
+                            .apply {
+                                setAction(uiModel.retryTextRes) {
+                                    viewModel.handleErrorRetryRequest(uiEffect.action)
+                                }
+                            }.show()
                     }
                 }
             }
         }
     }
 
-    private fun navigateToLoginScreen() {
-        val intent: Intent =
-            LoginActivity.newIntent(requireActivity()).apply {
-                flags =
-                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            }
-        startActivity(intent)
-        requireActivity().finish()
+    private fun showLoading() {
+        binding.pbFavoriteContentLoading.visibility = View.VISIBLE
+        binding.clFavoriteContentEmpty.visibility = View.GONE
+        binding.clFavoriteContentNotEmpty.visibility = View.GONE
+        binding.customErrorView.visibility = View.GONE
     }
 
-    private fun handleErrorOrContentView(isError: Boolean) {
-        if (isError) {
-            binding.customErrorView.visibility = View.VISIBLE
-            binding.clFavoriteContentNotEmpty.visibility = View.GONE
-            binding.clFavoriteContentEmpty.visibility = View.GONE
-        } else {
-            binding.customErrorView.visibility = View.GONE
-            viewModel.favoriteContents.value?.let { handleVisibleByHasContent(it) }
-        }
-    }
+    private fun showErrorView(errorUiState: ErrorUiState) {
+        binding.customErrorView.visibility = View.VISIBLE
+        binding.pbFavoriteContentLoading.visibility = View.GONE
+        binding.clFavoriteContentEmpty.visibility = View.GONE
+        binding.clFavoriteContentNotEmpty.visibility = View.GONE
 
-    private fun handleVisibleByHasContent(favoriteContents: List<FavoriteContent>) {
-        if (favoriteContents.isEmpty()) {
-            binding.clFavoriteContentEmpty.visibility = View.VISIBLE
-            binding.clFavoriteContentNotEmpty.visibility = View.GONE
-        } else {
-            binding.clFavoriteContentEmpty.visibility = View.GONE
-            binding.clFavoriteContentNotEmpty.visibility = View.VISIBLE
-        }
-    }
-
-    private fun showNetworkError() {
         binding.customErrorView.apply {
             visibility = View.VISIBLE
-            setupError(ErrorEvent.NETWORK_ERROR)
-            setOnRetryClickListener {
-                viewModel.loadFavoriteContents()
-            }
+            showErrorView(errorUiState)
+            setOnRetryClickListener { viewModel.loadFavoriteContents() }
         }
+    }
+
+    private fun showEmptyView() {
+        binding.customErrorView.visibility = View.GONE
+        binding.pbFavoriteContentLoading.visibility = View.GONE
+        binding.clFavoriteContentEmpty.visibility = View.VISIBLE
+        binding.clFavoriteContentNotEmpty.visibility = View.GONE
+    }
+
+    private fun showContents(favoriteContents: List<FavoriteContent>) {
+        binding.customErrorView.visibility = View.GONE
+        binding.pbFavoriteContentLoading.visibility = View.GONE
+
+        binding.clFavoriteContentNotEmpty.visibility = View.VISIBLE
+        binding.clFavoriteContentEmpty.visibility = View.GONE
+        favoriteContentAdapter.submitList(favoriteContents)
+    }
+
+    private fun navigateToLoginScreen() {
+        val intent: Intent =
+            LoginActivity
+                .newIntent(requireActivity())
+                .apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK }
+        startActivity(intent)
+        requireActivity().finish()
     }
 
     override fun onResume() {

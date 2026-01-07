@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import turip.account.domain.Account;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.ConflictException;
 import turip.common.exception.custom.NotFoundException;
@@ -21,7 +22,6 @@ import turip.favorite.controller.dto.request.FavoriteContentRequest;
 import turip.favorite.controller.dto.response.FavoriteContentResponse;
 import turip.favorite.domain.FavoriteContent;
 import turip.favorite.repository.FavoriteContentRepository;
-import turip.account.domain.Account;
 
 @Service
 @RequiredArgsConstructor
@@ -58,6 +58,10 @@ public class FavoriteContentService {
         boolean loadable = contentSlice.hasNext();
 
         return ContentsDetailWithLoadableResponse.of(contentsWithTripInfo, loadable);
+    }
+
+    public boolean existsByAccount(Account account) {
+        return favoriteContentRepository.existsByAccount(account);
     }
 
     @Transactional

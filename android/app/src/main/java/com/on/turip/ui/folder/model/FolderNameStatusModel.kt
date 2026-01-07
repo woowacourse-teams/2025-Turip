@@ -6,13 +6,14 @@ import com.on.turip.domain.folder.FolderNameStatus
 
 enum class FolderNameStatusModel(
     @StringRes val errorMessage: Int?,
+    val isConfirmEnabled: Boolean,
 ) {
-    OK(null),
-    EMPTY(null),
-    DUPLICATE_NAME(R.string.all_folder_name_error_duplicate),
-    DEFAULT_FOLDER_NAME(R.string.all_folder_name_error_default_folder),
-    MAX_LENGTH_FOLDER_NAME(R.string.all_folder_name_warning_max_length),
-    OUT_OF_BOUND_LENGTH(R.string.all_folder_name_error_out_of_bound),
+    OK(null, true),
+    EMPTY(null, false),
+    DUPLICATE_NAME(R.string.all_folder_name_error_duplicate, false),
+    DEFAULT_FOLDER_NAME(R.string.all_folder_name_error_default_folder, false),
+    MAX_LENGTH_FOLDER_NAME(R.string.all_folder_name_warning_max_length, true),
+    OUT_OF_BOUND_LENGTH(R.string.all_folder_name_error_out_of_bound, false),
     ;
 
     companion object {

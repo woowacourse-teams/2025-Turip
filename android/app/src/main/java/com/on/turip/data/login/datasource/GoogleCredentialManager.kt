@@ -8,9 +8,12 @@ import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetCredentialResponse
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
-import com.on.turip.data.common.TuripCustomResult
+import com.on.turip.core.result.ErrorType
+import com.on.turip.core.result.TuripResult
 import dagger.hilt.android.qualifiers.ActivityContext
+import java.io.IOException
 import javax.inject.Inject
+import kotlin.coroutines.cancellation.CancellationException
 
 class GoogleCredentialManager @Inject constructor(
     @ActivityContext private val context: Context,
@@ -18,16 +21,18 @@ class GoogleCredentialManager @Inject constructor(
 ) : CredentialProvider {
     private val credentialManager by lazy { CredentialManager.create(context) }
 
-    override suspend fun getIdToken(): TuripCustomResult<GoogleIdTokenCredential> =
-        runCatching {
-            credentialManager.getCredential(
-                request = getCredentialRequest,
-                context = context,
-            )
-        }.fold(
-            onSuccess = { result -> TuripCustomResult.success(handleSignIn(result)) },
-            onFailure = { error -> TuripCustomResult.NetworkError(error) },
-        )
+    override suspend fun getIdToken(): TuripResult<GoogleIdTokenCredential> =
+        try {
+            val googleIdTokenCredential =
+                credentialManager.getCredential(request = getCredentialRequest, context = context)
+            TuripResult.Success(handleSignIn(googleIdTokenCredential))
+        } catch (e: Throwable) {
+            if (e is CancellationException) throw e
+            when {
+                e is IOException -> TuripResult.Failure(ErrorType.Network, e)
+                else -> TuripResult.Failure(ErrorType.Unknown, e)
+            }
+        }
 
     private fun handleSignIn(result: GetCredentialResponse): GoogleIdTokenCredential {
         val credential: Credential = result.credential

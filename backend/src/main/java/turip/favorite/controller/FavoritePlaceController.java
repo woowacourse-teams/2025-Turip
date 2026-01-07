@@ -29,6 +29,7 @@ import turip.favorite.controller.dto.request.FavoritePlaceMultiFolderRequest;
 import turip.favorite.controller.dto.request.FavoritePlaceOrderRequest;
 import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlaceResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlacesWithPlaceDetailResponse;
+import turip.favorite.controller.dto.response.FavoritePlaceCountResponse;
 import turip.favorite.service.FavoritePlaceService;
 
 @RestController
@@ -410,8 +411,96 @@ public class FavoritePlaceController {
     )
     @ApiResponses(value = {
             @ApiResponse(
+                    responseCode = "200",
+                    description = "성공 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = FavoritePlaceCountResponse.class),
+                            examples = @ExampleObject(
+                                    name = "success",
+                                    summary = "장소 찜 폴더의 장소 찜 목록 조회 성공",
+                                    value = """
+                                            {
+                                               "count": 5
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "access token expired",
+                                            summary = "만료된 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_EXPIRED",
+                                                    	"message": "access token이 만료됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "invalid signature access token",
+                                            summary = "서명값이 올바르지 않은 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_SIGNATURE_INVALID",
+                                                    	"message": "access token이 위조됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "unauthorized",
+                                            summary = "알 수 없는 이유로 인증 실패",
+                                            value = """
+                                                    {
+                                                    	"tag": "UNAUTHORIZED",
+                                                    	"message": "토큰 기반 인증에 실패했습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            )
+    })
+    @GetMapping("/count")
+    public ResponseEntity<FavoritePlaceCountResponse> readCountByAccount(
+            @Parameter(hidden = true) @AuthAccount Account account) {
+        FavoritePlaceCountResponse response = favoritePlaceService.countByAccount(account);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "장소 찜 폴더 내의 장소 찜 정렬 순서 변경 api",
+            description = "장소 찜 폴더의 장소 찜들의 정렬 순서를 변경한다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
                     responseCode = "204",
                     description = "성공 예시"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "favorite_place_folder_mismatch",
+                                    summary = "장소 찜이 해당 폴더에 존재하지 않는 경우",
+                                    value = """
+                                            {
+                                                "tag": "FAVORITE_PLACE_FOLDER_MISMATCH",
+                                                "message": "장소 찜이 해당 폴더에 존재하지 않습니다."
+                                            }
+                                            """
+                            )
+                    )
             ),
             @ApiResponse(
                     responseCode = "401",
@@ -459,28 +548,17 @@ public class FavoritePlaceController {
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
-                            examples = {
-                                    @ExampleObject(
-                                            name = "not_folder_owner",
-                                            summary = "폴더 소유자가 아닌 경우",
-                                            value = """
-                                                    {
-                                                        "tag": "FORBIDDEN",
-                                                        "message": "접근 권한이 없습니다."
-                                                    }
-                                                    """
-                                    ),
-                                    @ExampleObject(
-                                            name = "favorite_place_not_belongs_to_folder",
-                                            summary = "다른 폴더의 favoritePlaceId가 포함된 경우",
-                                            value = """
-                                                    {
-                                                        "tag": "FORBIDDEN",
-                                                        "message": "접근 권한이 없습니다."
-                                                    }
-                                                    """
-                                    )
-                            }
+                            examples = @ExampleObject(
+                                    name = "not_folder_owner",
+                                    summary = "폴더 소유자가 아닌 경우",
+                                    value = """
+                                            {
+                                                "tag": "FORBIDDEN",
+                                                "message": "접근 권한이 없습니다."
+                                            }
+                                            """
+                            )
+
                     )
             ),
             @ApiResponse(

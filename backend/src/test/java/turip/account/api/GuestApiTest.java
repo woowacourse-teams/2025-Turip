@@ -1,6 +1,7 @@
 package turip.account.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.is;
 
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,6 +51,33 @@ class GuestApiTest {
         jdbcTemplate.update("ALTER TABLE creator ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE city ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE country ALTER COLUMN id RESTART WITH 1");
+    }
+
+    @Nested
+    @DisplayName("/guests/migration/availability GET 마이그레이션 가능 여부 조회 테스트")
+    class ReadMigrationAvailability {
+
+        @Test
+        @DisplayName("마이그레이션 가능 여부 조회 시 200 ok를 응답한다")
+        void readMigrationAvailability1() {
+            //given
+            jdbcTemplate.update("INSERT INTO account (id) VALUES (1)");
+            String deviceFid = "guest";
+            jdbcTemplate.update("INSERT INTO guest (id, account_id, device_fid) VALUES (1, 1, ?)", deviceFid);
+            jdbcTemplate.update(
+                    "INSERT INTO favorite_folder (id, account_id, name, is_default) VALUES (1, 1, '기본 폴더', true)");
+            jdbcTemplate.update(
+                    "INSERT INTO favorite_folder (id, account_id, name, is_default) VALUES (2, 1, '커스텀 폴더', false)");
+
+            // when & then
+            RestAssured
+                    .given().log().all()
+                    .header("device-fid", deviceFid)
+                    .when().get("/guests/migration/availability")
+                    .then().log().all()
+                    .statusCode(200)
+                    .body("availability", is(true));
+        }
     }
 
     @Nested

@@ -410,6 +410,35 @@ class FavoritePlaceApiTest {
                     .when().put("/favorites/places/{placeId}", 1L)
                     .then()
                     .statusCode(200);
+    @DisplayName("/favorites/places/count GET 계정의 장소 찜 개수 조회 테스트")
+    @Nested
+    class ReadCountByAccount {
+
+        @DisplayName("장소 찜 조회에 성공한 경우 200 OK를 응답한다.")
+        @Test
+        void readCountByAccount1() {
+            // given
+            jdbcTemplate.update("INSERT INTO account () VALUES ()");
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
+            jdbcTemplate.update(
+                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (1, '테스트 폴더', false)");
+            jdbcTemplate.update(
+                    "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('장소1','https://naver.me/place1', '장소1 주소', 37.1234, 127.1234)");
+            jdbcTemplate.update(
+                    "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('장소2','https://naver.me/place2', '장소2 주소', 37.5678, 127.5678)");
+            jdbcTemplate.update(
+                    "INSERT INTO favorite_place (favorite_folder_id, place_id, favorite_order) VALUES (1, 1, 1)");
+            jdbcTemplate.update(
+                    "INSERT INTO favorite_place (favorite_folder_id, place_id, favorite_order) VALUES (1, 2, 2)");
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .contentType(ContentType.JSON)
+                    .when().get("/favorites/places/count")
+                    .then()
+                    .statusCode(200)
+                    .body("count", is(2));
         }
     }
 
@@ -517,7 +546,7 @@ class FavoritePlaceApiTest {
                     .statusCode(404);
         }
 
-        @DisplayName("다른 폴더의 favoritePlaceId가 포함된 경우 403 FORBIDDEN을 응답한다")
+        @DisplayName("다른 폴더의 favoritePlaceId가 포함된 경우 400 Bad Request를 응답한다")
         @Test
         void updatePlaceOrder6() {
             // given
@@ -543,7 +572,7 @@ class FavoritePlaceApiTest {
                     .contentType(ContentType.JSON)
                     .when().patch("/favorites/places/favorite-order")
                     .then()
-                    .statusCode(403);
+                    .statusCode(400);
         }
     }
 

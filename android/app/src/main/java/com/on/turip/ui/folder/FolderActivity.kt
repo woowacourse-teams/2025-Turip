@@ -7,7 +7,9 @@ import android.view.View
 import androidx.activity.viewModels
 import com.on.turip.databinding.ActivityFolderBinding
 import com.on.turip.ui.common.base.BaseActivity
-import com.on.turip.ui.folder.model.FolderEditModel
+import com.on.turip.ui.common.collectOnStarted
+import com.on.turip.ui.common.error.ErrorUiState
+import com.on.turip.ui.folder.model.FolderUiState
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -61,16 +63,55 @@ class FolderActivity : BaseActivity<ActivityFolderBinding>() {
     }
 
     private fun setupObservers() {
-        viewModel.folders.observe(this) { folders: List<FolderEditModel> ->
-            if (folders.isEmpty()) {
-                binding.clFolderEmpty.visibility = View.VISIBLE
-                binding.rvFolder.visibility = View.GONE
-            } else {
-                binding.clFolderEmpty.visibility = View.GONE
-                binding.rvFolder.visibility = View.VISIBLE
+        collectOnStarted(viewModel.uiState) { uiState: FolderUiState ->
+            if (uiState.isLoading) showLoading()
+            when {
+                uiState.errorUiState != ErrorUiState.None -> showErrorView(uiState.errorUiState)
+                uiState.isEmpty -> showEmptyView()
+                else -> showContents(uiState)
             }
-            folderEditAdapter.submitList(folders)
         }
+    }
+
+    private fun showLoading() {
+        binding.pbFolderLoading.visibility = View.VISIBLE
+        binding.ivFolderFolderPlus.visibility = View.VISIBLE
+        binding.rvFolder.visibility = View.GONE
+        binding.customErrorView.visibility = View.GONE
+        binding.clFolderEmpty.visibility = View.GONE
+    }
+
+    private fun showErrorView(errorUiState: ErrorUiState) {
+        binding.pbFolderLoading.visibility = View.GONE
+        binding.ivFolderFolderPlus.visibility = View.GONE
+        binding.rvFolder.visibility = View.GONE
+        binding.clFolderEmpty.visibility = View.GONE
+
+        binding.customErrorView.apply {
+            visibility = View.VISIBLE
+            showErrorView(errorUiState)
+            setOnRetryClickListener { viewModel.loadFolders() }
+        }
+    }
+
+    private fun showEmptyView() {
+        binding.pbFolderLoading.visibility = View.GONE
+        binding.ivFolderFolderPlus.visibility = View.VISIBLE
+        binding.customErrorView.visibility = View.GONE
+
+        binding.rvFolder.visibility = View.GONE
+        binding.clFolderEmpty.visibility = View.VISIBLE
+    }
+
+    private fun showContents(uiState: FolderUiState) {
+        binding.pbFolderLoading.visibility = View.GONE
+        binding.ivFolderFolderPlus.visibility = View.VISIBLE
+        binding.customErrorView.visibility = View.GONE
+
+        folderEditAdapter.submitList(uiState.folders)
+
+        binding.rvFolder.visibility = View.VISIBLE
+        binding.clFolderEmpty.visibility = View.GONE
     }
 
     companion object {
