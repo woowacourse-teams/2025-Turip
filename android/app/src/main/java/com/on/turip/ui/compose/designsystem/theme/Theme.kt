@@ -1,4 +1,4 @@
-package com.on.turip.ui.compose.theme
+package com.on.turip.ui.compose.designsystem.theme
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.lightColorScheme

@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import com.on.turip.R
-import com.on.turip.ui.compose.theme.TuripTypography
+import com.on.turip.ui.compose.designsystem.theme.TuripTypography
 
 @Composable
 fun TuripSnackbar(

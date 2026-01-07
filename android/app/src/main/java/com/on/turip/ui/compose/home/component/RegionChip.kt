@@ -13,7 +13,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.on.turip.R
-import com.on.turip.ui.compose.theme.TuripTypography
+import com.on.turip.ui.compose.designsystem.theme.TuripTypography
 
 @Composable
 fun RegionChip(
@@ -27,11 +27,13 @@ fun RegionChip(
                 .background(
                     color = colorResource(R.color.turip_light_beige_FFF4B2),
                     shape = RoundedCornerShape(24.dp),
-                ).border(
+                )
+                .border(
                     width = 1.dp,
                     color = colorResource(R.color.turip_black_000000_06),
                     shape = RoundedCornerShape(24.dp),
-                ).padding(horizontal = 12.dp, vertical = 4.dp),
+                )
+                .padding(horizontal = 12.dp, vertical = 4.dp),
     ) {
         Text(
             text = regionName,

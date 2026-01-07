@@ -24,8 +24,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.on.turip.R
-import com.on.turip.ui.compose.theme.TuripTheme
-import com.on.turip.ui.compose.theme.TuripTypography
+import com.on.turip.ui.compose.designsystem.theme.TuripTheme
+import com.on.turip.ui.compose.designsystem.theme.TuripTypography
 
 @Composable
 fun TuripDialog(

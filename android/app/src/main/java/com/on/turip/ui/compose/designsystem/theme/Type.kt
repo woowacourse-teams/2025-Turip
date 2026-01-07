@@ -1,4 +1,4 @@
-package com.on.turip.ui.compose.theme
+package com.on.turip.ui.compose.designsystem.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

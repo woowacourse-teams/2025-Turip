@@ -38,13 +38,13 @@ import com.on.turip.data.login.datasource.GoogleCredentialManager
 import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.compose.designsystem.component.TuripDialog
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
+import com.on.turip.ui.compose.designsystem.theme.TuripTheme
+import com.on.turip.ui.compose.designsystem.theme.TuripTypography
 import com.on.turip.ui.compose.login.component.GoogleLoginButton
 import com.on.turip.ui.compose.login.component.HelpText
 import com.on.turip.ui.compose.login.model.LoginUiEffect
 import com.on.turip.ui.compose.login.model.LoginUiState
 import com.on.turip.ui.compose.login.util.noRippleClickable
-import com.on.turip.ui.compose.theme.TuripTheme
-import com.on.turip.ui.compose.theme.TuripTypography
 
 @Composable
 fun LoginScreen(

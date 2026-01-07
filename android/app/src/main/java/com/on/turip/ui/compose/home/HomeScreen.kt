@@ -36,12 +36,12 @@ import com.on.turip.R
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.compose.designsystem.component.ErrorScreen
 import com.on.turip.ui.compose.designsystem.component.TuripAppBar
+import com.on.turip.ui.compose.designsystem.theme.TuripTheme
+import com.on.turip.ui.compose.designsystem.theme.TuripTypography
 import com.on.turip.ui.compose.home.component.RegionList
 import com.on.turip.ui.compose.home.component.RegionTypeButtons
 import com.on.turip.ui.compose.home.component.SearchTextField
 import com.on.turip.ui.compose.home.component.UsersLikeList
-import com.on.turip.ui.compose.theme.TuripTheme
-import com.on.turip.ui.compose.theme.TuripTypography
 import com.on.turip.ui.main.home.model.UsersLikeContentModel
 import kotlinx.coroutines.flow.collectLatest
 

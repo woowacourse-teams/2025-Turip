@@ -18,7 +18,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.on.turip.R
-import com.on.turip.ui.compose.theme.TuripTypography
+import com.on.turip.ui.compose.designsystem.theme.TuripTypography
 
 @Composable
 fun UsersLikeItem(
