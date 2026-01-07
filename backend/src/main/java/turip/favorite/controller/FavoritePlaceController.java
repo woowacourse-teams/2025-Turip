@@ -380,12 +380,12 @@ public class FavoritePlaceController {
                                                     """
                                     ),
                                     @ExampleObject(
-                                            name = "favorite_place_not_found",
-                                            summary = "favoritePlaceId에 대한 찜한 장소를 찾을 수 없는 경우",
+                                            name = "place_not_found",
+                                            summary = "장소가 존재하지 않는 경우",
                                             value = """
                                                     {
-                                                        "tag": "FAVORITE_PLACE_NOT_FOUND",
-                                                        "message": "찜한 장소를 찾을 수 없습니다."
+                                                        "tag": "PLACE_NOT_FOUND",
+                                                        "message": "장소를 찾을 수 없습니다."
                                                     }
                                                     """
                                     )
