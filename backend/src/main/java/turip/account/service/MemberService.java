@@ -40,7 +40,7 @@ public class MemberService {
         }
 
         Account savedAccount = accountService.create();
-        Member member = new Member(savedAccount, email);
+        Member member = memberRepository.save(new Member(savedAccount, email));
         socialMemberService.create(member, provider, providerId);
         return member;
     }
