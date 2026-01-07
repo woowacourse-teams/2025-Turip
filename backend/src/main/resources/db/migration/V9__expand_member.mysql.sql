@@ -7,7 +7,7 @@ CREATE TABLE social_member (
     provider VARCHAR(255) NOT NULL,
     provider_id VARCHAR(255) NOT NULL,
     CONSTRAINT fk_social_member__member
-        FOREIGN KEY (member_id) REFERENCES member (id),
+        FOREIGN KEY (member_id) REFERENCES member (id) ON DELETE CASCADE,
     CONSTRAINT uq_social_member__provider_provider_id
         UNIQUE (provider, provider_id)
 );
@@ -19,7 +19,7 @@ CREATE TABLE turip_member (
     login_id VARCHAR(255) NOT NULL UNIQUE,
     login_password VARCHAR(255) NOT NULL,
     CONSTRAINT fk_turip_member__member
-       FOREIGN KEY (member_id) REFERENCES member (id)
+        FOREIGN KEY (member_id) REFERENCES member (id) ON DELETE CASCADE
 );
 
 -- expand) role 필드 추가
