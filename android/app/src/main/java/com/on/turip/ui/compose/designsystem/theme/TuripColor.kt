@@ -54,6 +54,7 @@ internal object TuripColor {
 @Immutable
 data class TuripColors(
     val primary: Color,
+    val primarySub: Color,
     val background: Color,
     val error: Color,
     val errorContainer: Color,
@@ -73,6 +74,7 @@ data class TuripColors(
 internal val LightColors =
     TuripColors(
         primary = TuripColor.Blue,
+        primarySub = TuripColor.LightBlue,
         background = TuripColor.White,
         error = TuripColor.Red,
         errorContainer = TuripColor.Red.copy(alpha = 0.12f),
@@ -93,6 +95,7 @@ val LocalColors =
     staticCompositionLocalOf {
         TuripColors(
             primary = TuripColor.Black,
+            primarySub = TuripColor.Black,
             background = TuripColor.Black,
             error = TuripColor.Black,
             errorContainer = TuripColor.Black,

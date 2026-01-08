@@ -10,7 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.on.turip.ui.compose.designsystem.theme.TuripColor
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 
 @Composable
@@ -21,7 +20,7 @@ fun RegionTypeButton(
     modifier: Modifier = Modifier,
 ) {
     val backgroundColor: Color =
-        if (isSelected) TuripTheme.colors.primary else TuripColor.LightBlue
+        if (isSelected) TuripTheme.colors.primary else TuripTheme.colors.primarySub
     val textColor: Color =
         if (isSelected) TuripTheme.colors.gray01 else TuripTheme.colors.gray02
     Button(
