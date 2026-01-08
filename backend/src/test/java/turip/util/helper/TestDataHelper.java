@@ -9,6 +9,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import turip.account.domain.Provider;
 import turip.account.domain.Role;
+import turip.account.domain.TuripMember;
 
 @Component
 public class TestDataHelper {
@@ -72,6 +73,9 @@ public class TestDataHelper {
     }
 
     public Long insertTuripMember(Long memberId, String loginId, String loginPassword) {
+        TuripMember turipMember = new TuripMember(null, loginId, loginPassword);
+        String encodedPassword = turipMember.getLoginPassword();
+
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
@@ -80,7 +84,7 @@ public class TestDataHelper {
                     Statement.RETURN_GENERATED_KEYS);
             ps.setLong(1, memberId);
             ps.setString(2, loginId);
-            ps.setString(3, loginPassword);
+            ps.setString(3, encodedPassword);
             return ps;
         }, keyHolder);
 

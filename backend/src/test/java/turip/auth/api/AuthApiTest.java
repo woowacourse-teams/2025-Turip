@@ -60,11 +60,91 @@ class AuthApiTest {
     }
 
     @Nested
-    @DisplayName("/login/google POST 구글 로그인 테스트")
-    class LoginTest {
+    @DisplayName("/login/turip POST 자체 로그인 테스트")
+    class LoginWithTuripTest {
 
         @Test
-        @DisplayName("신규 회원 로그인 성공 시 201 Created와 토큰을 응답한다")
+        @DisplayName("튜립 회원 로그인 성공 시 200 Ok와 토큰을 응답한다")
+        void loginWithTurip1() {
+            // given
+            String deviceFid = "device-123";
+            String email = "turip@gmail.com";
+            String loginId = "turip";
+            String loginPassword = "ValidPass1!";
+            boolean isFirstLogin = true;
+
+            testDataHelper.insertTuripMember(email, isFirstLogin, loginId, loginPassword);
+
+            Map<String, String> requestBody = new HashMap<>(Map.of("loginId", loginId, "loginPassword", loginPassword));
+
+            // when & then
+            RestAssured
+                    .given().log().all()
+                    .contentType(ContentType.JSON)
+                    .header("device-fid", deviceFid)
+                    .body(requestBody)
+                    .when().post("/login/turip")
+                    .then().log().all()
+                    .statusCode(200)
+                    .body("accessToken", notNullValue())
+                    .body("refreshToken", notNullValue())
+                    .body("isNewMember", is(isFirstLogin));
+        }
+
+        @Test
+        @DisplayName("loginId에 대한 회원이 존재하지 않는 경우 401 Unauthorized를 응답한다")
+        void loginWithTurip2() {
+            // given
+            String deviceFid = "device-123";
+            String loginId = "turip";
+            String loginPassword = "ValidPass1!";
+
+            Map<String, String> requestBody = new HashMap<>(Map.of("loginId", loginId, "loginPassword", loginPassword));
+
+            // when & then
+            RestAssured
+                    .given().log().all()
+                    .contentType(ContentType.JSON)
+                    .header("device-fid", deviceFid)
+                    .body(requestBody)
+                    .when().post("/login/turip")
+                    .then().log().all()
+                    .statusCode(401);
+        }
+
+        @Test
+        @DisplayName("비밀번호가 일치하지 않는 경우 401 Unauthorized를 응답한다")
+        void loginWithTurip3() {
+            // given
+            String deviceFid = "device-123";
+            String email = "turip@gmail.com";
+            String loginId = "turip";
+            String loginPassword = "InvalidPass1!";
+            String realPassword = "ValidPass1!";
+            boolean isFirstLogin = true;
+            
+            testDataHelper.insertTuripMember(email, isFirstLogin, loginId, realPassword);
+
+            Map<String, String> requestBody = new HashMap<>(Map.of("loginId", loginId, "loginPassword", loginPassword));
+
+            // when & then
+            RestAssured
+                    .given().log().all()
+                    .contentType(ContentType.JSON)
+                    .header("device-fid", deviceFid)
+                    .body(requestBody)
+                    .when().post("/login/turip")
+                    .then().log().all()
+                    .statusCode(401);
+        }
+    }
+
+    @Nested
+    @DisplayName("/login/google POST 구글 로그인 테스트")
+    class LoginWithGoogleTest {
+
+        @Test
+        @DisplayName("신규 소셜 회원 로그인 성공 시 200 Ok와 토큰을 응답한다")
         void loginNewMemberSuccess() {
             // given
             String idToken = "valid-google-id-token";
@@ -92,7 +172,7 @@ class AuthApiTest {
         }
 
         @Test
-        @DisplayName("기존 회원 로그인 성공 시 200 OK와 토큰을 응답한다")
+        @DisplayName("기존 소셜 회원 로그인 성공 시 200 OK와 토큰을 응답한다")
         void loginExistingMemberSuccess() {
             // given
             String email = "existing@gmail.com";

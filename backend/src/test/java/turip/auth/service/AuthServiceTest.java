@@ -29,10 +29,13 @@ import turip.account.domain.Account;
 import turip.account.domain.Member;
 import turip.account.domain.Provider;
 import turip.account.domain.SocialMember;
+import turip.account.domain.TuripMember;
 import turip.account.service.MemberService;
 import turip.account.service.SocialMemberService;
+import turip.account.service.TuripMemberService;
 import turip.auth.controller.dto.request.GoogleLoginRequest;
 import turip.auth.controller.dto.request.RefreshTokenRequest;
+import turip.auth.controller.dto.request.TuripLoginRequest;
 import turip.auth.controller.dto.response.LoginResponse;
 import turip.auth.controller.dto.response.RefreshTokenResponse;
 import turip.auth.domain.RefreshToken;
@@ -43,6 +46,7 @@ import turip.common.exception.custom.UnauthorizedException;
 import turip.util.fixture.AccountFixture;
 import turip.util.fixture.MemberFixture;
 import turip.util.fixture.SocialMemberFixture;
+import turip.util.fixture.TuripMemberFixture;
 
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
@@ -60,6 +64,9 @@ class AuthServiceTest {
     private SocialMemberService socialMemberService;
 
     @Mock
+    private TuripMemberService turipMemberService;
+
+    @Mock
     private RefreshTokenService refreshTokenService;
 
     @InjectMocks
@@ -73,9 +80,90 @@ class AuthServiceTest {
         signingKey = Keys.hmacShaKeyFor(testSecretKey.getBytes(StandardCharsets.UTF_8));
     }
 
+    @DisplayName("loginWithTurip 메서드 테스트")
     @Nested
-    @DisplayName("login 메서드 테스트")
-    class LoginTest {
+    class LoginWithTurip {
+
+        @DisplayName("자체 로그인 성공 시 access token과 refresh token을 반환한다")
+        @Test
+        void loginWithTurip1() {
+            // given
+            String deviceFid = "device-123";
+            String email = "test@gmail.com";
+            String loginId = "turip";
+            String loginPassword = "ValidPass1!";
+            Account account = AccountFixture.createUser();
+            Member member = MemberFixture.createCustomMember(account, email, false);
+            TuripMember turipMember = TuripMemberFixture.createCustomTuripMember(member, loginId, loginPassword);
+
+            TuripLoginRequest request = new TuripLoginRequest(loginId, loginPassword);
+
+            when(turipMemberService.login(request)).thenReturn(turipMember);
+            when(jwtProvider.generateAccessToken(1L)).thenReturn("access-token");
+            when(jwtProvider.generateRefreshToken(1L)).thenReturn("refresh-token");
+            when(jwtProvider.getIssuedAt(anyString())).thenReturn(LocalDateTime.now());
+            when(jwtProvider.getExpiration(anyString())).thenReturn(LocalDateTime.now().plusDays(7));
+            when(jwtProvider.hashToken(anyString())).thenReturn("hashed-token");
+
+            // when
+            LoginResponse response = authService.loginWithTurip(request, deviceFid);
+
+            // then
+            assertThat(response).isNotNull();
+            assertThat(response.accessToken()).isEqualTo("access-token");
+            assertThat(response.refreshToken()).isEqualTo("refresh-token");
+            assertThat(response.isNewMember()).isFalse();
+            verify(refreshTokenService).save(
+                    any(Member.class),
+                    anyString(),
+                    anyString(),
+                    any(LocalDateTime.class),
+                    any(LocalDateTime.class)
+            );
+        }
+
+        @DisplayName("신규 회원인 경우 isNewMember를 true로 반환한다")
+        @Test
+        void loginWithTurip2() {
+            // given
+            String deviceFid = "device-123";
+            String email = "test@gmail.com";
+            String loginId = "turip";
+            String loginPassword = "ValidPass1!";
+            Account account = AccountFixture.createUser();
+            Member member = MemberFixture.createCustomMember(account, email, true);
+            TuripMember turipMember = TuripMemberFixture.createCustomTuripMember(member, loginId, loginPassword);
+
+            TuripLoginRequest request = new TuripLoginRequest(loginId, loginPassword);
+
+            when(turipMemberService.login(request)).thenReturn(turipMember);
+            when(jwtProvider.generateAccessToken(1L)).thenReturn("access-token");
+            when(jwtProvider.generateRefreshToken(1L)).thenReturn("refresh-token");
+            when(jwtProvider.getIssuedAt(anyString())).thenReturn(LocalDateTime.now());
+            when(jwtProvider.getExpiration(anyString())).thenReturn(LocalDateTime.now().plusDays(7));
+            when(jwtProvider.hashToken(anyString())).thenReturn("hashed-token");
+
+            // when
+            LoginResponse response = authService.loginWithTurip(request, deviceFid);
+
+            // then
+            assertThat(response).isNotNull();
+            assertThat(response.accessToken()).isEqualTo("access-token");
+            assertThat(response.refreshToken()).isEqualTo("refresh-token");
+            assertThat(response.isNewMember()).isTrue();
+            verify(refreshTokenService).save(
+                    any(Member.class),
+                    anyString(),
+                    anyString(),
+                    any(LocalDateTime.class),
+                    any(LocalDateTime.class)
+            );
+        }
+    }
+
+    @Nested
+    @DisplayName("loginWithSocial 메서드 테스트")
+    class LoginWithSocialTest {
 
         @Test
         @DisplayName("구글 로그인 성공 시 access token과 refresh token을 반환한다")
