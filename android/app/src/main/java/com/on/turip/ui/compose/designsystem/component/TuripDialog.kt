@@ -11,7 +11,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -47,7 +46,6 @@ fun TuripDialog(
                     .padding(horizontal = 18.dp)
                     .wrapContentHeight(),
             shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = TuripTheme.colors.white),
         ) {
             Column(
                 modifier =
@@ -117,7 +115,6 @@ private fun DialogButtons(
             Text(
                 text = dismissText,
                 textAlign = TextAlign.Center,
-                color = TuripTheme.colors.white,
                 style = TuripTheme.typography.info1,
                 modifier = Modifier.padding(vertical = 8.dp),
             )
@@ -132,7 +129,6 @@ private fun DialogButtons(
             Text(
                 text = confirmText,
                 textAlign = TextAlign.Center,
-                color = TuripTheme.colors.white,
                 style = TuripTheme.typography.info1,
                 modifier = Modifier.padding(vertical = 8.dp),
             )
