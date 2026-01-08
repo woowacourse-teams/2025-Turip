@@ -51,7 +51,7 @@ public class Member {
     }
 
     public void completeFirstLogin() {
-        this.isFirstLogin = true;
+        this.isFirstLogin = false;
     }
 
     private void validateEmail(String email) {
