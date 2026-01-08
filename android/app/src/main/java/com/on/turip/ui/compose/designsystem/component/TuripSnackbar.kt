@@ -41,7 +41,6 @@ fun TuripSnackbar(
                 Text(
                     text = snackbarData.visuals.message,
                     style = TuripTheme.typography.info1,
-                    color = TuripTheme.colors.white,
                     maxLines = 1,
                 )
             }
