@@ -1,14 +1,18 @@
 package com.on.turip.ui.compose.designsystem.component
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarData
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 
@@ -45,4 +49,23 @@ fun TuripSnackbar(
             }
         },
     )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun TuripSnackbarPreview() {
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    TuripTheme {
+        LaunchedEffect(Unit) {
+            snackbarHostState.showSnackbar(
+                message = "미리보기 스낵바",
+            )
+        }
+
+        TuripSnackbar(
+            snackbarHostState = snackbarHostState,
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
 }
