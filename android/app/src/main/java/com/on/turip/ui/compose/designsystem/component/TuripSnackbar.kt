@@ -28,15 +28,13 @@ fun TuripSnackbar(
                 modifier = modifier.padding(16.dp),
                 action = {
                     snackbarData.visuals.actionLabel?.let { label ->
-                        Text(
-                            text = label,
-                            style = TuripTheme.typography.info2,
-                            color = TuripTheme.colors.gray02,
-                            modifier =
-                                Modifier
-                                    .clickable(onClick = snackbarData::performAction)
-                                    .padding(end = 10.dp),
-                        )
+                        TextButton(onClick = snackbarData::performAction) {
+                            Text(
+                                text = label,
+                                style = TuripTheme.typography.info2,
+                                color = TuripTheme.colors.gray02,
+                            )
+                        }
                     }
                 },
             ) {
