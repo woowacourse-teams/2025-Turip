@@ -27,7 +27,7 @@ public class MemberService {
     @Transactional
     public Member create(String email) {
         Account account = accountService.create();
-        return memberRepository.save(new Member(account, email));
+        return memberRepository.save(new Member(account, email, true));
     }
 
     public Member getByAccountId(Long accountId) {

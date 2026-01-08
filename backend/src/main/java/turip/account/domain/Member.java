@@ -34,8 +34,12 @@ public class Member {
     @Column(name = "email")
     private String email;
 
-    public Member(Account account, String email) {
+    @Column(name = "is_first_login")
+    private boolean isFirstLogin;
+
+    public Member(Account account, String email, boolean isFirstLogin) {
         this.account = account;
         this.email = email;
+        this.isFirstLogin = isFirstLogin;
     }
 }
