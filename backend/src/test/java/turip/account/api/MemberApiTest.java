@@ -88,7 +88,7 @@ class MemberApiTest {
                     guestAccountId,
                     guestDeviceFid
             );
-            Long memberId = testDataHelper.insertMember(memberAccountId, "migration@gmail.com");
+            Long memberId = testDataHelper.insertMember(memberAccountId, "migration@gmail.com", true);
             Provider provider = Provider.GOOGLE;
             String providerId = "google-user-migration";
             testDataHelper.insertSocialMember(memberId, provider, providerId);
@@ -203,7 +203,7 @@ class MemberApiTest {
             Provider provider = Provider.GOOGLE;
             String providerId = "google-user-no-device";
 
-            testDataHelper.insertSocialMember(email, provider, providerId);
+            testDataHelper.insertSocialMember(email, true, provider, providerId);
 
             String idToken = "valid-google-id-token";
 
@@ -247,7 +247,7 @@ class MemberApiTest {
             Provider provider = Provider.GOOGLE;
             String providerId = "google-user-delete";
 
-            testDataHelper.insertSocialMember(email, provider, providerId);
+            testDataHelper.insertSocialMember(email, true, provider, providerId);
 
             // 2. Member의 FavoriteFolder 생성
             jdbcTemplate.update(

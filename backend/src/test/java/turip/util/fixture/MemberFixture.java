@@ -10,7 +10,7 @@ public class MemberFixture {
         return new Member(account, "user@gmail.com", true);
     }
 
-    public static Member createCustomMember(Account account, String email) {
-        return new Member(account, email, true);
+    public static Member createCustomMember(Account account, String email, boolean isFirstLogin) {
+        return new Member(account, email, isFirstLogin);
     }
 }

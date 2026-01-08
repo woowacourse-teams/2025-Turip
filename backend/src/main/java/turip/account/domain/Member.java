@@ -42,4 +42,8 @@ public class Member {
         this.email = email;
         this.isFirstLogin = isFirstLogin;
     }
+
+    public void completeFirstLogin() {
+        this.isFirstLogin = true;
+    }
 }

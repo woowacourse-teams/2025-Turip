@@ -98,7 +98,7 @@ class AuthApiTest {
             String email = "existing@gmail.com";
             Provider provider = Provider.GOOGLE;
             String providerId = "google-user-existing";
-            testDataHelper.insertSocialMember(email, provider, providerId);
+            testDataHelper.insertSocialMember(email, false, provider, providerId);
 
             String idToken = "valid-google-id-token";
             String deviceFid = "device-456";
@@ -164,7 +164,7 @@ class AuthApiTest {
             String email = "refresh@gmail.com";
             Provider provider = Provider.GOOGLE;
             String providerId = "google-user-refresh";
-            testDataHelper.insertSocialMember(email, provider, providerId);
+            testDataHelper.insertSocialMember(email, true, provider, providerId);
 
             String idToken = "valid-google-id-token";
             String deviceFid = "device-refresh-123";
@@ -231,7 +231,7 @@ class AuthApiTest {
             String email = "mismatch@gmail.com";
             Provider provider = Provider.GOOGLE;
             String providerId = "google-user-mismatch";
-            testDataHelper.insertSocialMember(email, provider, providerId);
+            testDataHelper.insertSocialMember(email, true, provider, providerId);
 
             String idToken = "valid-google-id-token";
             String deviceFid = "device-mismatch-123";
@@ -256,7 +256,7 @@ class AuthApiTest {
             // 다른 사용자의 refresh token 사용 시도
             String email2 = "other@gmail.com";
             String providerId2 = "google-user-other";
-            testDataHelper.insertSocialMember(email2, provider, providerId2);
+            testDataHelper.insertSocialMember(email2, true, provider, providerId2);
 
             String otherIdToken = "other-valid-google-id-token";
             String otherDeviceFid = "device-other-123";
@@ -304,7 +304,7 @@ class AuthApiTest {
             String email = "logout@gmail.com";
             Provider provider = Provider.GOOGLE;
             String providerId = "google-user-logout";
-            testDataHelper.insertSocialMember(email, provider, providerId);
+            testDataHelper.insertSocialMember(email, true, provider, providerId);
 
             String idToken = "valid-google-id-token";
             String deviceFid = "device-logout-123";
@@ -345,7 +345,7 @@ class AuthApiTest {
             Provider provider = Provider.GOOGLE;
             String providerId = "google-user-logout-delete";
 
-            testDataHelper.insertSocialMember(email, provider, providerId);
+            testDataHelper.insertSocialMember(email, true, provider, providerId);
 
             String idToken = "valid-google-id-token";
             String deviceFid = "device-logout-delete-123";

@@ -84,9 +84,13 @@ public class AuthService {
         String providerId = googleTokenParser.getProviderId(idToken);
         String email = googleTokenParser.getEmail(idToken);
 
-        boolean isNewMember = socialMemberService.isFirstLogin(provider, providerId);
-
+        boolean isNewMember = false;
         Member member = findOrCreateSocialMember(provider, providerId, email);
+        if (member.isFirstLogin()) {
+            member.completeFirstLogin();
+            isNewMember = true;
+        }
+
         String accessToken = jwtProvider.generateAccessToken(member.getAccount().getId());
         String refreshToken = jwtProvider.generateRefreshToken(member.getAccount().getId());
 
