@@ -31,7 +31,7 @@ import turip.account.domain.Provider;
 import turip.account.domain.SocialMember;
 import turip.account.service.MemberService;
 import turip.account.service.SocialMemberService;
-import turip.auth.controller.dto.request.LoginRequest;
+import turip.auth.controller.dto.request.GoogleLoginRequest;
 import turip.auth.controller.dto.request.RefreshTokenRequest;
 import turip.auth.controller.dto.response.LoginResponse;
 import turip.auth.controller.dto.response.RefreshTokenResponse;
@@ -90,7 +90,7 @@ class AuthServiceTest {
             Member member = MemberFixture.createCustomMember(account, email, false);
             SocialMember socialMember = SocialMemberFixture.createCustomSocialMember(member, provider, providerId);
 
-            LoginRequest request = new LoginRequest(idToken);
+            GoogleLoginRequest request = new GoogleLoginRequest(idToken);
 
             when(googleTokenParser.getProvider()).thenReturn(provider);
             when(googleTokenParser.getProviderId(idToken)).thenReturn(providerId);
@@ -103,7 +103,7 @@ class AuthServiceTest {
             when(jwtProvider.hashToken(anyString())).thenReturn("hashed-token");
 
             // when
-            LoginResponse response = authService.login(request, provider, deviceFid);
+            LoginResponse response = authService.loginWithSocial(request, provider, deviceFid);
 
             // then
             assertThat(response).isNotNull();
@@ -132,7 +132,7 @@ class AuthServiceTest {
             Member member = MemberFixture.createCustomMember(account, email, true);
             SocialMember socialMember = SocialMemberFixture.createCustomSocialMember(member, provider, providerId);
 
-            LoginRequest request = new LoginRequest(idToken);
+            GoogleLoginRequest request = new GoogleLoginRequest(idToken);
 
             when(googleTokenParser.getProvider()).thenReturn(provider);
             when(googleTokenParser.getProviderId(idToken)).thenReturn(providerId);
@@ -145,7 +145,7 @@ class AuthServiceTest {
             when(jwtProvider.hashToken(anyString())).thenReturn("hashed-token");
 
             // when
-            LoginResponse response = authService.login(request, provider, deviceFid);
+            LoginResponse response = authService.loginWithSocial(request, provider, deviceFid);
 
             // then
             assertThat(response.isNewMember()).isTrue();
@@ -164,14 +164,14 @@ class AuthServiceTest {
             // given
             String invalidIdToken = "invalid-token";
             String deviceFid = "device-123";
-            LoginRequest request = new LoginRequest(invalidIdToken);
+            GoogleLoginRequest request = new GoogleLoginRequest(invalidIdToken);
 
             when(googleTokenParser.getProvider()).thenReturn(Provider.GOOGLE);
             when(googleTokenParser.getProviderId(invalidIdToken))
                     .thenThrow(new UnauthorizedException(ErrorTag.ID_TOKEN_NOT_VALID));
 
             // when & then
-            assertThatThrownBy(() -> authService.login(request, Provider.GOOGLE, deviceFid))
+            assertThatThrownBy(() -> authService.loginWithSocial(request, Provider.GOOGLE, deviceFid))
                     .isInstanceOf(UnauthorizedException.class)
                     .hasMessage(ErrorTag.ID_TOKEN_NOT_VALID.getMessage());
         }
