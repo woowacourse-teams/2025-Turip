@@ -106,6 +106,7 @@ class AuthServiceTest {
             LoginResponse response = authService.login(request, provider, deviceFid);
 
             // then
+            assertThat(member.isFirstLogin()).isFalse();
             assertThat(response).isNotNull();
             assertThat(response.accessToken()).isEqualTo("access-token");
             assertThat(response.refreshToken()).isEqualTo("refresh-token");
