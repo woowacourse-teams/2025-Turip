@@ -87,7 +87,7 @@ class AuthServiceTest {
             Provider provider = Provider.GOOGLE;
             String providerId = "google-user-123";
             Account account = AccountFixture.createUser();
-            Member member = MemberFixture.createCustomMember(account, email);
+            Member member = MemberFixture.createCustomMember(account, email, false);
             SocialMember socialMember = SocialMemberFixture.createCustomSocialMember(member, provider, providerId);
 
             LoginRequest request = new LoginRequest(idToken);
@@ -95,7 +95,6 @@ class AuthServiceTest {
             when(googleTokenParser.getProvider()).thenReturn(provider);
             when(googleTokenParser.getProviderId(idToken)).thenReturn(providerId);
             when(googleTokenParser.getEmail(idToken)).thenReturn(email);
-            when(socialMemberService.isFirstLogin(provider, providerId)).thenReturn(false);
             when(socialMemberService.findOrCreate(provider, providerId, email)).thenReturn(socialMember);
             when(jwtProvider.generateAccessToken(1L)).thenReturn("access-token");
             when(jwtProvider.generateRefreshToken(1L)).thenReturn("refresh-token");
@@ -130,7 +129,7 @@ class AuthServiceTest {
             String email = "newuser@gmail.com";
             Account account = AccountFixture.createUser();
             Provider provider = Provider.GOOGLE;
-            Member member = MemberFixture.createCustomMember(account, email);
+            Member member = MemberFixture.createCustomMember(account, email, true);
             SocialMember socialMember = SocialMemberFixture.createCustomSocialMember(member, provider, providerId);
 
             LoginRequest request = new LoginRequest(idToken);
@@ -138,7 +137,6 @@ class AuthServiceTest {
             when(googleTokenParser.getProvider()).thenReturn(provider);
             when(googleTokenParser.getProviderId(idToken)).thenReturn(providerId);
             when(googleTokenParser.getEmail(idToken)).thenReturn(email);
-            when(socialMemberService.isFirstLogin(provider, providerId)).thenReturn(true);
             when(socialMemberService.findOrCreate(provider, providerId, email)).thenReturn(socialMember);
             when(jwtProvider.generateAccessToken(1L)).thenReturn("access-token");
             when(jwtProvider.generateRefreshToken(1L)).thenReturn("refresh-token");
@@ -193,7 +191,7 @@ class AuthServiceTest {
             String hashedToken = "hashed-old-token";
 
             Account account = AccountFixture.createUser();
-            Member member = MemberFixture.createCustomMember(account, "test@gmail.com");
+            Member member = MemberFixture.createCustomMember(account, "test@gmail.com", true);
             RefreshToken storedRefreshToken = new RefreshToken(
                     member, deviceFid, hashedToken,
                     LocalDateTime.now(), LocalDateTime.now().plusDays(7)
@@ -238,7 +236,7 @@ class AuthServiceTest {
             String wrongHashedToken = "wrong-hashed-token";
 
             Account account = AccountFixture.createUser();
-            Member member = MemberFixture.createCustomMember(account, "test@gmail.com");
+            Member member = MemberFixture.createCustomMember(account, "test@gmail.com", true);
             RefreshToken storedRefreshToken = new RefreshToken(
                     member, deviceFid, "correct-hashed-token",
                     LocalDateTime.now(), LocalDateTime.now().plusDays(7)
@@ -267,7 +265,7 @@ class AuthServiceTest {
             String oldRefreshToken = generateValidRefreshToken(accountId);
 
             Account account = AccountFixture.createUser();
-            Member member = MemberFixture.createCustomMember(account, "test@gmail.com");
+            Member member = MemberFixture.createCustomMember(account, "test@gmail.com", true);
 
             RefreshTokenRequest request = new RefreshTokenRequest(oldRefreshToken);
 
@@ -343,7 +341,7 @@ class AuthServiceTest {
             // given
             String deviceFid = "device-123";
             Account account = AccountFixture.createUser();
-            Member member = MemberFixture.createCustomMember(account, "test@gmail.com");
+            Member member = MemberFixture.createCustomMember(account, "test@gmail.com", true);
 
             when(memberService.getByAccountId(account.getId())).thenReturn(member);
 

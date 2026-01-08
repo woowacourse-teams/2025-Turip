@@ -7,10 +7,10 @@ public class MemberFixture {
 
     public static Member createMember() {
         Account account = AccountFixture.createUser();
-        return new Member(account, "user@gmail.com");
+        return new Member(account, "user@gmail.com", true);
     }
 
-    public static Member createCustomMember(Account account, String email) {
-        return new Member(account, email);
+    public static Member createCustomMember(Account account, String email, boolean isFirstLogin) {
+        return new Member(account, email, isFirstLogin);
     }
 }

@@ -121,7 +121,7 @@ public class TuripMemberApiTest {
         void create3() {
             // given
             String loginId = "turip";
-            testDataHelper.insertTuripMember("turip1@gmail.com", loginId, "ValidPass1!");
+            testDataHelper.insertTuripMember("turip1@gmail.com", true, loginId, "ValidPass1!");
 
             Map<String, String> request = new HashMap<>(
                     Map.of("email", "turip2@gmail.com", "loginId", loginId, "loginPassword", "ValidPass2!"));

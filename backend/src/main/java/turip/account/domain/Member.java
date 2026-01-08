@@ -34,15 +34,24 @@ public class Member {
     @Column(name = "email")
     private String email;
 
-    public Member(Long id, Account account, String email) {
+    @Column(name = "is_first_login")
+    private boolean isFirstLogin;
+
+    public Member(Long id, Account account, String email, boolean isFirstLogin) {
         validateEmail(email);
+
         this.id = id;
         this.account = account;
         this.email = email;
+        this.isFirstLogin = isFirstLogin;
     }
 
-    public Member(Account account, String email) {
-        this(null, account, email);
+    public Member(Account account, String email, boolean isFirstLogin) {
+        this(null, account, email, isFirstLogin);
+    }
+
+    public void completeFirstLogin() {
+        this.isFirstLogin = true;
     }
 
     private void validateEmail(String email) {

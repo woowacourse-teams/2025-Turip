@@ -30,7 +30,7 @@ public class MemberService {
     public Member create(String email) {
         Account account = accountService.create();
         try {
-            Member member = new Member(account, email);
+            Member member = new Member(account, email, true);
             return memberRepository.save(member);
         } catch (IllegalArgumentException e) {
             throw new BadRequestException(e.getErrorTag());

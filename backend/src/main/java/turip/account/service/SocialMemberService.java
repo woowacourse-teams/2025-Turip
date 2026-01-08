@@ -23,8 +23,4 @@ public class SocialMemberService {
                     return socialMemberRepository.save(new SocialMember(member, provider, providerId));
                 });
     }
-
-    public boolean isFirstLogin(Provider provider, String providerId) {
-        return !socialMemberRepository.existsByProviderAndProviderId(provider, providerId);
-    }
 }

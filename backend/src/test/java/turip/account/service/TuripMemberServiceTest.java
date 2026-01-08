@@ -49,7 +49,7 @@ class TuripMemberServiceTest {
             TuripMemberRequest request = new TuripMemberRequest("valid_user-123", "ValidPass1!", "test@test.com");
 
             Member member = MemberFixture.createCustomMember(AccountFixture.createCustomAccount(1L, Role.USER),
-                    "test@test.com");
+                    "test@test.com", true);
             TuripMember turipMember = new TuripMember(member, request.loginId(), request.loginPassword());
 
             given(memberService.create(request.email())).willReturn(member);
@@ -70,7 +70,7 @@ class TuripMemberServiceTest {
             TuripMemberRequest request = new TuripMemberRequest(invalidLoginId, "ValidPass1!", "test@test.com");
 
             Member member = MemberFixture.createCustomMember(AccountFixture.createCustomAccount(1L, Role.USER),
-                    "test@test.com");
+                    "test@test.com", true);
             given(memberService.create(request.email())).willReturn(member);
 
             // when & then
@@ -89,7 +89,7 @@ class TuripMemberServiceTest {
             TuripMemberRequest request = new TuripMemberRequest("turip", invalidLoginPassword, "test@test.com");
 
             Member member = MemberFixture.createCustomMember(AccountFixture.createCustomAccount(1L, Role.USER),
-                    "test@test.com");
+                    "test@test.com", true);
             given(memberService.create(request.email())).willReturn(member);
 
             // when & then

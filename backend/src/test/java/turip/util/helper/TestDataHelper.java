@@ -33,14 +33,16 @@ public class TestDataHelper {
         return keyHolder.getKey().longValue();
     }
 
-    public Long insertMember(Long accountId, String email) {
+    public Long insertMember(Long accountId, String email, boolean isFirstLogin) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement("INSERT INTO member (account_id, email) VALUES (?, ?)",
+            PreparedStatement ps = connection.prepareStatement(
+                    "INSERT INTO member (account_id, email, is_first_login) VALUES (?, ?, ?)",
                     Statement.RETURN_GENERATED_KEYS);
             ps.setLong(1, accountId);
             ps.setString(2, email);
+            ps.setBoolean(3, isFirstLogin);
             return ps;
         }, keyHolder);
 
@@ -63,9 +65,9 @@ public class TestDataHelper {
         return keyHolder.getKey().longValue();
     }
 
-    public Long insertSocialMember(String email, Provider provider, String providerId) {
+    public Long insertSocialMember(String email, boolean isFirstLogin, Provider provider, String providerId) {
         Long accountId = insertAccount();
-        Long memberId = insertMember(accountId, email);
+        Long memberId = insertMember(accountId, email, isFirstLogin);
         return insertSocialMember(memberId, provider, providerId);
     }
 
@@ -85,9 +87,9 @@ public class TestDataHelper {
         return keyHolder.getKey().longValue();
     }
 
-    public Long insertTuripMember(String email, String loginId, String loginPassword) {
+    public Long insertTuripMember(String email, final boolean isFirstLogin, String loginId, String loginPassword) {
         Long accountId = insertAccount();
-        Long memberId = insertMember(accountId, email);
+        Long memberId = insertMember(accountId, email, isFirstLogin);
         return insertTuripMember(memberId, loginId, loginPassword);
     }
 }

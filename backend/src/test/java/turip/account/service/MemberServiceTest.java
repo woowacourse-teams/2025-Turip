@@ -85,7 +85,7 @@ class MemberServiceTest {
             // given
             Account memberAccount = AccountFixture.createCustomAccount(1L, Role.USER);
             Account guestAccount = AccountFixture.createCustomAccount(2L, Role.USER);
-            Member member = MemberFixture.createCustomMember(memberAccount, "email@test.com");
+            Member member = MemberFixture.createCustomMember(memberAccount, "email@test.com", true);
             Guest guest = GuestFixture.createCustomGuest(guestAccount, "device-fid-123");
 
             FavoriteContent guestFavoriteContent = new FavoriteContent(1L, LocalDate.now(), guestAccount, null);
@@ -109,7 +109,7 @@ class MemberServiceTest {
             // given
             Account memberAccount = AccountFixture.createCustomAccount(1L, Role.USER);
             Account guestAccount = AccountFixture.createCustomAccount(2L, Role.USER);
-            Member member = MemberFixture.createCustomMember(memberAccount, "email@test.com");
+            Member member = MemberFixture.createCustomMember(memberAccount, "email@test.com", true);
             Guest guest = GuestFixture.createCustomGuest(guestAccount, "device-fid-123");
 
             FavoriteFolder guestFolder1 = new FavoriteFolder(1L, guestAccount, "기본 폴더", true);
@@ -136,7 +136,7 @@ class MemberServiceTest {
             // given
             Account memberAccount = AccountFixture.createCustomAccount(1L, Role.USER);
             Account guestAccount = AccountFixture.createCustomAccount(2L, Role.USER);
-            Member member = MemberFixture.createCustomMember(memberAccount, "email@test.com");
+            Member member = MemberFixture.createCustomMember(memberAccount, "email@test.com", true);
             Guest guest = GuestFixture.createCustomGuest(guestAccount, "device-fid-123");
 
             given(favoriteContentRepository.findAllByAccount(any()))
@@ -161,7 +161,7 @@ class MemberServiceTest {
         void delete() {
             // given
             Account account = AccountFixture.createUser();
-            Member member = MemberFixture.createCustomMember(account, "email@test.com");
+            Member member = MemberFixture.createCustomMember(account, "email@test.com", true);
             // when
             memberService.delete(member);
 
