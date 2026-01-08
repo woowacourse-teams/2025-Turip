@@ -31,4 +31,12 @@ internal val Shape =
         wideButton = RoundedCornerShape(24.dp),
     )
 
-val LocalShape = staticCompositionLocalOf { Shape }
+val LocalShape =
+    staticCompositionLocalOf {
+        TuripShape(
+            container = RoundedCornerShape(0.dp),
+            chip = RoundedCornerShape(0.dp),
+            bottomSheetRounded = RoundedCornerShape(0.dp),
+            wideButton = RoundedCornerShape(0.dp),
+        )
+    }

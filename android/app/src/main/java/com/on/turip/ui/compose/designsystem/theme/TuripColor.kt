@@ -89,4 +89,23 @@ internal val LightColors =
         gray01 = TuripColor.Gray01,
     )
 
-val LocalColors = staticCompositionLocalOf { LightColors }
+val LocalColors =
+    staticCompositionLocalOf {
+        TuripColors(
+            primary = TuripColor.Black,
+            background = TuripColor.Black,
+            error = TuripColor.Black,
+            errorContainer = TuripColor.Black,
+            chipBackground = TuripColor.Black,
+            scrim = TuripColor.Black,
+            container = TuripColor.Black,
+            border = TuripColor.Black,
+            white = TuripColor.Black,
+            black = TuripColor.Black,
+            gray05 = TuripColor.Black,
+            gray04 = TuripColor.Black,
+            gray03 = TuripColor.Black,
+            gray02 = TuripColor.Black,
+            gray01 = TuripColor.Black,
+        )
+    }

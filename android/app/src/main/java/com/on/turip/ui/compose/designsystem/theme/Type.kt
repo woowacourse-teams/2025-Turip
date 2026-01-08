@@ -95,4 +95,16 @@ internal val Typography =
             ),
     )
 
-val LocalTypography = staticCompositionLocalOf { Typography }
+val LocalTypography =
+    staticCompositionLocalOf {
+        TuripTypography(
+            display = PretendardStyle,
+            title1 = PretendardStyle,
+            title2 = PretendardStyle,
+            title3 = PretendardStyle,
+            body1 = PretendardStyle,
+            body2 = PretendardStyle,
+            info1 = PretendardStyle,
+            info2 = PretendardStyle,
+        )
+    }
