@@ -99,8 +99,8 @@ class AuthServiceTest {
             TuripLoginRequest request = new TuripLoginRequest(loginId, loginPassword);
 
             when(turipMemberService.login(request)).thenReturn(turipMember);
-            when(jwtProvider.generateAccessToken(1L)).thenReturn("access-token");
-            when(jwtProvider.generateRefreshToken(1L)).thenReturn("refresh-token");
+            when(jwtProvider.generateAccessToken(1L, account.getRole())).thenReturn("access-token");
+            when(jwtProvider.generateRefreshToken(1L, account.getRole())).thenReturn("refresh-token");
             when(jwtProvider.getIssuedAt(anyString())).thenReturn(LocalDateTime.now());
             when(jwtProvider.getExpiration(anyString())).thenReturn(LocalDateTime.now().plusDays(7));
             when(jwtProvider.hashToken(anyString())).thenReturn("hashed-token");
@@ -137,8 +137,8 @@ class AuthServiceTest {
             TuripLoginRequest request = new TuripLoginRequest(loginId, loginPassword);
 
             when(turipMemberService.login(request)).thenReturn(turipMember);
-            when(jwtProvider.generateAccessToken(1L)).thenReturn("access-token");
-            when(jwtProvider.generateRefreshToken(1L)).thenReturn("refresh-token");
+            when(jwtProvider.generateAccessToken(1L, account.getRole())).thenReturn("access-token");
+            when(jwtProvider.generateRefreshToken(1L, account.getRole())).thenReturn("refresh-token");
             when(jwtProvider.getIssuedAt(anyString())).thenReturn(LocalDateTime.now());
             when(jwtProvider.getExpiration(anyString())).thenReturn(LocalDateTime.now().plusDays(7));
             when(jwtProvider.hashToken(anyString())).thenReturn("hashed-token");
@@ -184,8 +184,8 @@ class AuthServiceTest {
             when(googleTokenParser.getProviderId(idToken)).thenReturn(providerId);
             when(googleTokenParser.getEmail(idToken)).thenReturn(email);
             when(socialMemberService.findOrCreate(provider, providerId, email)).thenReturn(socialMember);
-            when(jwtProvider.generateAccessToken(1L)).thenReturn("access-token");
-            when(jwtProvider.generateRefreshToken(1L)).thenReturn("refresh-token");
+            when(jwtProvider.generateAccessToken(1L, account.getRole())).thenReturn("access-token");
+            when(jwtProvider.generateRefreshToken(1L, account.getRole())).thenReturn("refresh-token");
             when(jwtProvider.getIssuedAt(anyString())).thenReturn(LocalDateTime.now());
             when(jwtProvider.getExpiration(anyString())).thenReturn(LocalDateTime.now().plusDays(7));
             when(jwtProvider.hashToken(anyString())).thenReturn("hashed-token");
@@ -227,8 +227,8 @@ class AuthServiceTest {
             when(googleTokenParser.getProviderId(idToken)).thenReturn(providerId);
             when(googleTokenParser.getEmail(idToken)).thenReturn(email);
             when(socialMemberService.findOrCreate(provider, providerId, email)).thenReturn(socialMember);
-            when(jwtProvider.generateAccessToken(1L)).thenReturn("access-token");
-            when(jwtProvider.generateRefreshToken(1L)).thenReturn("refresh-token");
+            when(jwtProvider.generateAccessToken(1L, account.getRole())).thenReturn("access-token");
+            when(jwtProvider.generateRefreshToken(1L, account.getRole())).thenReturn("refresh-token");
             when(jwtProvider.getIssuedAt(anyString())).thenReturn(LocalDateTime.now());
             when(jwtProvider.getExpiration(anyString())).thenReturn(LocalDateTime.now().plusDays(7));
             when(jwtProvider.hashToken(anyString())).thenReturn("hashed-token");
@@ -293,8 +293,8 @@ class AuthServiceTest {
             when(memberService.getByAccountId(accountId)).thenReturn(member);
             when(refreshTokenService.getByMemberAndDeviceFid(member, deviceFid)).thenReturn(storedRefreshToken);
             when(jwtProvider.hashToken(oldRefreshToken)).thenReturn(hashedToken);
-            when(jwtProvider.generateAccessToken(accountId)).thenReturn("new-access-token");
-            when(jwtProvider.generateRefreshToken(accountId)).thenReturn("new-refresh-token");
+            when(jwtProvider.generateAccessToken(accountId, account.getRole())).thenReturn("new-access-token");
+            when(jwtProvider.generateRefreshToken(accountId, account.getRole())).thenReturn("new-refresh-token");
             when(jwtProvider.getIssuedAt(anyString())).thenReturn(LocalDateTime.now());
             when(jwtProvider.getExpiration(anyString())).thenReturn(LocalDateTime.now().plusDays(7));
             when(jwtProvider.hashToken("new-refresh-token")).thenReturn("new-hashed-token");
