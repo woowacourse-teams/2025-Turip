@@ -45,7 +45,7 @@ fun TuripDialog(
                     .fillMaxWidth()
                     .padding(horizontal = 18.dp)
                     .wrapContentHeight(),
-            shape = RoundedCornerShape(16.dp),
+            shape = TuripTheme.shape.largeContainer,
         ) {
             Column(
                 modifier =

@@ -48,9 +48,9 @@ fun SearchTextField(
                 .fillMaxWidth()
                 .background(
                     color = TuripTheme.colors.gray02,
-                    shape = RoundedCornerShape(16.dp),
+                    shape = TuripTheme.shape.largeContainer,
                 ),
-        shape = RoundedCornerShape(16.dp),
+        shape = TuripTheme.shape.largeContainer,
         colors =
             OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = TuripTheme.colors.gray02,
