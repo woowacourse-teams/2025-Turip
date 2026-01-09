@@ -177,7 +177,7 @@ class TuripMemberServiceTest {
                     "test@test.com", true);
             TuripMember turipMember = new TuripMember(member, loginId, realPassword);
 
-            given(turipMemberRepository.findByLoginId(loginId)).willReturn(Optional.empty());
+            given(turipMemberRepository.findByLoginId(loginId)).willReturn(Optional.of(turipMember));
 
             // when & then
             assertThatThrownBy(() -> turipMemberService.login(request))
