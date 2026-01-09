@@ -15,6 +15,7 @@
     <string name="all_folder_name_error_out_of_bound">폴더명은 1 ~ 20 글자 범위 입니다.</string>
     <string name="all_folder_name_warning_max_length">폴더명은 최대 20글자 입니다.(현재 20 글자)</string>
     <string name="all_turip_description">직진만 남은 여행</string>
+    <string name="all_back_description">뒤로 가기</string>
 
     <!-- 바텀 네비게이션 -->
     <string name="bottom_navigation_home">홈</string>

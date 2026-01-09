@@ -28,7 +28,6 @@ import com.on.turip.common.AuthState
 import com.on.turip.common.UserType
 import com.on.turip.domain.setting.InquiryMail
 import com.on.turip.ui.common.error.toUiModel
-import com.on.turip.ui.compose.designsystem.component.TuripAppBar
 import com.on.turip.ui.compose.designsystem.component.TuripDialog
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
@@ -104,12 +103,7 @@ fun SettingScreen(
                 .fillMaxSize()
                 .background(TuripTheme.colors.white)
                 .systemBarsPadding(),
-        topBar = {
-            TuripAppBar(
-                canBack = true,
-                onBackNavigate = navigateToBack,
-            )
-        },
+        topBar = { SettingAppBar(onBackClick = navigateToBack) },
         snackbarHost = { TuripSnackbar(snackbarHostState = snackbarHostState) },
     ) { innerPadding ->
         SettingScreenContent(
@@ -227,12 +221,22 @@ private fun SettingForMemberScreen(
 @Composable
 private fun GuestSettingScreenPreview() {
     TuripTheme {
-        SettingScreenContent(
-            onClickInquiry = {},
-            onClickPrivacyPolicy = {},
-            onClickLogin = {},
-            onClickLogout = {},
-            onClickWithdraw = {},
-        )
+        Scaffold(
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .background(TuripTheme.colors.white)
+                    .systemBarsPadding(),
+            topBar = { SettingAppBar(onBackClick = { }) },
+        ) { innerPadding ->
+            SettingScreenContent(
+                onClickInquiry = {},
+                onClickPrivacyPolicy = {},
+                onClickLogin = {},
+                onClickLogout = {},
+                onClickWithdraw = {},
+                modifier = Modifier.padding(innerPadding),
+            )
+        }
     }
 }
