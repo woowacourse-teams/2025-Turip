@@ -51,8 +51,8 @@ fun TuripDialog(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 20.dp),
-                verticalArrangement = Arrangement.spacedBy(30.dp),
+                        .padding(vertical = TuripTheme.spacing.extraLarge),
+                verticalArrangement = Arrangement.spacedBy(TuripTheme.spacing.huge),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 DialogTitleText(title = title)
@@ -76,7 +76,7 @@ private fun DialogTitleText(title: String) {
         text = title,
         textAlign = TextAlign.Center,
         style = TuripTheme.typography.title1,
-        modifier = Modifier.padding(top = 12.dp),
+        modifier = Modifier.padding(top = TuripTheme.spacing.medium),
     )
 }
 
@@ -86,7 +86,7 @@ private fun DialogMessageText(message: String) {
         text = message,
         textAlign = TextAlign.Center,
         style = TuripTheme.typography.body2,
-        modifier = Modifier.padding(horizontal = 24.dp),
+        modifier = Modifier.padding(horizontal = TuripTheme.spacing.extraExtraLarge),
     )
 }
 
@@ -103,8 +103,8 @@ private fun DialogButtons(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                .padding(horizontal = TuripTheme.spacing.extraLarge),
+        horizontalArrangement = Arrangement.spacedBy(TuripTheme.spacing.medium),
     ) {
         Button(
             onClick = onDismissRequest,
@@ -116,7 +116,7 @@ private fun DialogButtons(
                 text = dismissText,
                 textAlign = TextAlign.Center,
                 style = TuripTheme.typography.info1,
-                modifier = Modifier.padding(vertical = 8.dp),
+                modifier = Modifier.padding(vertical = TuripTheme.spacing.small),
             )
         }
 
@@ -130,7 +130,7 @@ private fun DialogButtons(
                 text = confirmText,
                 textAlign = TextAlign.Center,
                 style = TuripTheme.typography.info1,
-                modifier = Modifier.padding(vertical = 8.dp),
+                modifier = Modifier.padding(vertical = TuripTheme.spacing.small),
             )
         }
     }
