@@ -1,14 +1,14 @@
 package turip.auth.service;
 
-import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import turip.account.domain.Member;
 import turip.auth.domain.RefreshToken;
 import turip.auth.repository.RefreshTokenRepository;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.UnauthorizedException;
-import turip.account.domain.Member;
 
 @Service
 @RequiredArgsConstructor

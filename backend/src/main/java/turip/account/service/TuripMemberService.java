@@ -1,8 +1,8 @@
 package turip.account.service;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import turip.account.controller.dto.request.TuripMemberRequest;
 import turip.account.controller.dto.response.TuripMemberResponse;
 import turip.account.domain.Member;
