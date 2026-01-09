@@ -33,6 +33,10 @@ ALTER TABLE account ADD COLUMN role VARCHAR(255) NOT NULL DEFAULT 'USER';
 -- expand) is_first_login 필드 추가
 ALTER TABLE member ADD COLUMN is_first_login BOOLEAN NOT NULL DEFAULT true;
 
+-- modify) email 필드에 not null 속성 추가
+UPDATE member SET email = 'unknown' WHERE email IS NULL;
+ALTER TABLE member MODIFY COLUMN email VARCHAR(255) NOT NULL;
+
 -- backfill) 기존 데이터 복사 및 변경
 INSERT INTO social_member (member_id, provider, provider_id)
 SELECT id, provider, provider_id from member;
