@@ -31,23 +31,16 @@ public class JwtProvider {
     }
 
     public String generateAccessToken(Long accountId) {
-        Date now = new Date();
-        Date expiry = new Date(now.getTime() + accessTokenExpiredMs);
-
-        return Jwts.builder()
-                .header()
-                .type("JWT")
-                .and()
-                .issuedAt(now)
-                .expiration(expiry)
-                .claim("accountId", accountId)
-                .signWith(signingKey)
-                .compact();
+        return generateJwtToken(accountId, accessTokenExpiredMs);
     }
 
     public String generateRefreshToken(Long accountId) {
+        return generateJwtToken(accountId, refreshTokenExpireMs);
+    }
+
+    private String generateJwtToken(Long accountId, long expiredMs) {
         Date now = new Date();
-        Date expiry = new Date(now.getTime() + refreshTokenExpireMs);
+        Date expiry = new Date(now.getTime() + expiredMs);
 
         return Jwts.builder()
                 .header()
