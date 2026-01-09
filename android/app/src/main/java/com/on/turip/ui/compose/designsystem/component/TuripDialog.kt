@@ -109,7 +109,7 @@ private fun DialogButtons(
         Button(
             onClick = onDismissRequest,
             modifier = Modifier.weight(1f),
-            shape = RoundedCornerShape(8.dp),
+            shape = TuripTheme.shape.container,
             colors = ButtonDefaults.buttonColors(containerColor = dismissButtonColor),
         ) {
             Text(
@@ -123,7 +123,7 @@ private fun DialogButtons(
         Button(
             onClick = onConfirmation,
             modifier = Modifier.weight(1f),
-            shape = RoundedCornerShape(8.dp),
+            shape = TuripTheme.shape.container,
             colors = ButtonDefaults.buttonColors(containerColor = confirmButtonColor),
         ) {
             Text(
