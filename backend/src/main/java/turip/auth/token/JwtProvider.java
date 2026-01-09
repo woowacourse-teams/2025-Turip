@@ -9,9 +9,11 @@ import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.Map;
 import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import turip.account.domain.Role;
 
 @Component
 public class JwtProvider {
@@ -30,27 +32,12 @@ public class JwtProvider {
         this.refreshTokenExpireMs = refreshTokenExpireMs;
     }
 
-    public String generateAccessToken(Long accountId) {
-        return generateJwtToken(accountId, accessTokenExpiredMs);
+    public String generateAccessToken(Long accountId, Role role) {
+        return generateJwtToken(accountId, role, accessTokenExpiredMs);
     }
 
-    public String generateRefreshToken(Long accountId) {
-        return generateJwtToken(accountId, refreshTokenExpireMs);
-    }
-
-    private String generateJwtToken(Long accountId, long expiredMs) {
-        Date now = new Date();
-        Date expiry = new Date(now.getTime() + expiredMs);
-
-        return Jwts.builder()
-                .header()
-                .type("JWT")
-                .and()
-                .issuedAt(now)
-                .expiration(expiry)
-                .claim("accountId", accountId)
-                .signWith(signingKey)
-                .compact();
+    public String generateRefreshToken(Long accountId, Role role) {
+        return generateJwtToken(accountId, role, refreshTokenExpireMs);
     }
 
     public Claims parseToken(String token) {
@@ -92,5 +79,20 @@ public class JwtProvider {
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("SHA-256 algorithm not found", e);
         }
+    }
+
+    private String generateJwtToken(Long accountId, Role role, long expiredMs) {
+        Date now = new Date();
+        Date expiry = new Date(now.getTime() + expiredMs);
+
+        return Jwts.builder()
+                .header()
+                .type("JWT")
+                .and()
+                .issuedAt(now)
+                .expiration(expiry)
+                .claims(Map.of("accountId", accountId, "role", role.name()))
+                .signWith(signingKey)
+                .compact();
     }
 }

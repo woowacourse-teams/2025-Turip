@@ -13,6 +13,7 @@ import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.BadRequestException;
 import turip.common.exception.custom.ConflictException;
 import turip.common.exception.custom.IllegalArgumentException;
+import turip.common.exception.custom.NotFoundException;
 import turip.common.exception.custom.UnauthorizedException;
 
 @Service
@@ -46,6 +47,11 @@ public class TuripMemberService {
         }
 
         return turipMember;
+    }
+
+    public TuripMember getByAccountId(Long accountId) {
+        return turipMemberRepository.findByMemberAccountId(accountId)
+                .orElseThrow(() -> new NotFoundException(ErrorTag.MEMBER_NOT_FOUND));
     }
 
     private void validateDuplicatedLoginId(String loginId) {
