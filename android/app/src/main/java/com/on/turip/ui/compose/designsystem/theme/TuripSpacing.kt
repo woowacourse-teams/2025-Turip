@@ -42,9 +42,9 @@ internal val Spacing =
         small = 8.dp,
         medium = 12.dp,
         large = 16.dp,
-        extraLarge = 24.dp,
-        extraExtraLarge = 32.dp,
-        huge = 48.dp,
+        extraLarge = 20.dp,
+        extraExtraLarge = 24.dp,
+        huge = 32.dp,
     )
 
 internal val LocalSpacing =
