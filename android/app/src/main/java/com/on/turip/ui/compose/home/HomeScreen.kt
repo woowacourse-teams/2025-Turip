@@ -22,11 +22,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -36,12 +34,11 @@ import com.on.turip.R
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.compose.designsystem.component.ErrorScreen
 import com.on.turip.ui.compose.designsystem.component.TuripAppBar
+import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.home.component.RegionList
 import com.on.turip.ui.compose.home.component.RegionTypeButtons
 import com.on.turip.ui.compose.home.component.SearchTextField
 import com.on.turip.ui.compose.home.component.UsersLikeList
-import com.on.turip.ui.compose.theme.TuripTheme
-import com.on.turip.ui.compose.theme.TuripTypography
 import com.on.turip.ui.main.home.model.UsersLikeContentModel
 import kotlinx.coroutines.flow.collectLatest
 
@@ -101,7 +98,10 @@ private fun HomeScreenContent(
             modifier = modifier.fillMaxSize(),
             contentAlignment = Alignment.Center,
         ) {
-            CircularProgressIndicator(modifier = Modifier.size(60.dp), color = Color.Black)
+            CircularProgressIndicator(
+                modifier = Modifier.size(60.dp),
+                color = TuripTheme.colors.black,
+            )
         }
     }
     when {
@@ -129,8 +129,8 @@ private fun HomeScreenContent(
             ) {
                 Text(
                     text = stringResource(R.string.home_top_title),
-                    color = colorResource(R.color.gray_400_2b2b2b),
-                    style = TuripTypography.titleLarge,
+                    color = TuripTheme.colors.gray04,
+                    style = TuripTheme.typography.title1,
                 )
 
                 SearchTextField(
@@ -150,8 +150,8 @@ private fun HomeScreenContent(
                 Text(
                     text = stringResource(R.string.home_users_like_content_title),
                     modifier = Modifier.padding(top = 14.dp),
-                    color = colorResource(R.color.gray_400_2b2b2b),
-                    style = TuripTypography.titleLarge,
+                    color = TuripTheme.colors.gray04,
+                    style = TuripTheme.typography.title1,
                 )
 
                 UsersLikeList(
@@ -184,7 +184,7 @@ private fun HomeLoadingPreview() {
             },
         ) { innerPadding ->
             HomeScreenContent(
-                uiState = uiState.copy(isLoading = true, errorUiState = ErrorUiState.None),
+                uiState = uiState.copy(isLoading = true),
                 onSearchClick = {},
                 onRetryLoadContents = { },
                 onContentClick = { },

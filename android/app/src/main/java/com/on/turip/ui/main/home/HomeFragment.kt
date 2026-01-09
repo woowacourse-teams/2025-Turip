@@ -8,8 +8,8 @@ import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
+import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.home.HomeScreen
-import com.on.turip.ui.compose.theme.TuripTheme
 import com.on.turip.ui.login.LoginActivity
 import com.on.turip.ui.main.home.model.UsersLikeContentModel
 import com.on.turip.ui.search.keywordresult.SearchActivity

@@ -17,9 +17,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -33,10 +31,10 @@ import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.compose.designsystem.component.TuripAppBar
 import com.on.turip.ui.compose.designsystem.component.TuripDialog
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
+import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.setting.component.SettingItem
 import com.on.turip.ui.compose.setting.model.SettingUiEffect
 import com.on.turip.ui.compose.setting.model.SettingUiState
-import com.on.turip.ui.compose.theme.TuripTheme
 import timber.log.Timber
 
 @Composable
@@ -80,8 +78,8 @@ fun SettingScreen(
             message = stringResource(R.string.setting_logout_dialog_message),
             confirmText = stringResource(R.string.setting_logout_dialog_confirm),
             dismissText = stringResource(R.string.setting_logout_dialog_dismiss),
-            confirmButtonColor = colorResource(R.color.turip_blue_11aebf_70),
-            dismissButtonColor = colorResource(R.color.turip_gray_b4b4b4),
+            confirmButtonColor = TuripTheme.colors.primary,
+            dismissButtonColor = TuripTheme.colors.gray02,
             onConfirmation = viewModel::confirmLogout,
             onDismissRequest = { viewModel.onLogoutDialogVisibilityChange(visible = false) },
         )
@@ -93,8 +91,8 @@ fun SettingScreen(
             message = stringResource(R.string.setting_withdraw_dialog_message),
             confirmText = stringResource(R.string.setting_withdraw_dialog_confirm),
             dismissText = stringResource(R.string.setting_withdraw_dialog_dismiss),
-            confirmButtonColor = colorResource(R.color.turip_red_ff7474),
-            dismissButtonColor = colorResource(R.color.turip_gray_b4b4b4),
+            confirmButtonColor = TuripTheme.colors.error,
+            dismissButtonColor = TuripTheme.colors.gray02,
             onConfirmation = viewModel::confirmWithdraw,
             onDismissRequest = { viewModel.updateWithdrawDialogVisibility(visible = false) },
         )
@@ -104,7 +102,7 @@ fun SettingScreen(
         modifier =
             Modifier
                 .fillMaxSize()
-                .background(Color.White)
+                .background(TuripTheme.colors.white)
                 .systemBarsPadding(),
         topBar = {
             TuripAppBar(
@@ -179,7 +177,7 @@ private fun SettingCommonScreen(
 ) {
     HorizontalDivider(
         thickness = 8.dp,
-        color = colorResource(R.color.gray_100_f0f0ee),
+        color = TuripTheme.colors.gray01,
     )
 
     SettingItem(

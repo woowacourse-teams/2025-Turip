@@ -15,6 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import com.on.turip.domain.region.RegionCategory
+import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 
 private const val MAX_REGION_COUNT_IN_EACH_ROW = 4
 
@@ -49,19 +50,21 @@ fun RegionList(
 @Preview(showBackground = true)
 @Composable
 private fun RegionListPreview() {
-    RegionList(
-        regions =
-            listOf(
-                RegionCategory("서울", "", null),
-                RegionCategory("부산", "", null),
-                RegionCategory("대전", "", null),
-                RegionCategory("대구", "", null),
-                RegionCategory("울산", "", null),
-                RegionCategory("포항", "", null),
-                RegionCategory("강릉", "", null),
-                RegionCategory("여수", "", null),
-                RegionCategory("기타", "", null),
-            ),
-        onRegionClick = {},
-    )
+    TuripTheme {
+        RegionList(
+            regions =
+                listOf(
+                    RegionCategory("서울", "", null),
+                    RegionCategory("부산", "", null),
+                    RegionCategory("대전", "", null),
+                    RegionCategory("대구", "", null),
+                    RegionCategory("울산", "", null),
+                    RegionCategory("포항", "", null),
+                    RegionCategory("강릉", "", null),
+                    RegionCategory("여수", "", null),
+                    RegionCategory("기타", "", null),
+                ),
+            onRegionClick = {},
+        )
+    }
 }

@@ -57,7 +57,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/turip_blue_11aebf" />
+            app:tint="@color/turip_blue_5ac3d5" />
 
         <TextView
             android:id="@+id/tv_trip_place_time_line"

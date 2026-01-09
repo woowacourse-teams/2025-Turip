@@ -22,10 +22,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -38,13 +36,12 @@ import com.on.turip.data.login.datasource.GoogleCredentialManager
 import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.compose.designsystem.component.TuripDialog
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
+import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.login.component.GoogleLoginButton
 import com.on.turip.ui.compose.login.component.HelpText
 import com.on.turip.ui.compose.login.model.LoginUiEffect
 import com.on.turip.ui.compose.login.model.LoginUiState
 import com.on.turip.ui.compose.login.util.noRippleClickable
-import com.on.turip.ui.compose.theme.TuripTheme
-import com.on.turip.ui.compose.theme.TuripTypography
 
 @Composable
 fun LoginScreen(
@@ -80,8 +77,8 @@ fun LoginScreen(
             message = stringResource(R.string.login_dialog_migration_message),
             confirmText = stringResource(R.string.login_dialog_confirm_text),
             dismissText = stringResource(R.string.setting_logout_dialog_dismiss),
-            confirmButtonColor = colorResource(R.color.turip_blue_11aebf_70),
-            dismissButtonColor = colorResource(R.color.turip_gray_b4b4b4),
+            confirmButtonColor = TuripTheme.colors.primary,
+            dismissButtonColor = TuripTheme.colors.gray02,
             onConfirmation = viewmodel::migration,
             onDismissRequest = viewmodel::clearGuestData,
         )
@@ -137,7 +134,7 @@ private fun LoginScreenContent(
 
             Text(
                 text = stringResource(R.string.all_turip_description),
-                style = TuripTypography.titleSmall,
+                style = TuripTheme.typography.title3,
                 modifier = Modifier.padding(top = 5.dp),
             )
         }
@@ -153,19 +150,17 @@ private fun LoginScreenContent(
             if (isHelpTextVisible) {
                 Text(
                     text = stringResource(R.string.login_help_description),
-                    color = Color.White,
-                    style = TuripTypography.bodyLarge,
+                    color = TuripTheme.colors.white,
+                    style = TuripTheme.typography.body1,
                     modifier =
                         Modifier
                             .border(
-                                border = BorderStroke(1.dp, colorResource(R.color.gray_200_c1c1c1)),
+                                border = BorderStroke(1.dp, TuripTheme.colors.gray02),
                                 shape = RoundedCornerShape(10.dp),
-                            )
-                            .background(
-                                color = colorResource(R.color.gray_300_5b5b5b),
+                            ).background(
+                                color = TuripTheme.colors.gray03,
                                 shape = RoundedCornerShape(10.dp),
-                            )
-                            .fillMaxWidth()
+                            ).fillMaxWidth()
                             .padding(vertical = 20.dp),
                     textAlign = TextAlign.Center,
                 )
@@ -174,8 +169,8 @@ private fun LoginScreenContent(
             GoogleLoginButton(onClickLoginButton = onClickGoogleLogin)
             HelpText(
                 text = stringResource(R.string.login_start_to_guest),
-                style = TuripTypography.bodyLarge,
-                color = Color.White,
+                style = TuripTheme.typography.body1,
+                color = TuripTheme.colors.white,
                 onClickIcon = onClickHelpText,
                 onClickText = onClickGuestLogin,
             )
