@@ -38,7 +38,7 @@ fun SettingItem(
             contentDescription = null,
             modifier =
                 Modifier
-                    .padding(end = 14.dp)
+                    .padding(end = TuripTheme.spacing.large)
                     .size(24.dp),
         )
         Text(
