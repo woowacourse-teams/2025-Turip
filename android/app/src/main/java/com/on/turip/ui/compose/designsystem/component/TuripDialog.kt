@@ -42,7 +42,7 @@ fun TuripDialog(
             modifier =
                 modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 18.dp)
+                    .padding(horizontal = TuripTheme.spacing.extraLarge)
                     .wrapContentHeight(),
             shape = TuripTheme.shape.largeContainer,
         ) {
