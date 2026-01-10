@@ -21,15 +21,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 /**
- * @param container : 영상 상세 장소, 검색 결과 컨텐츠 등 감싸는 영역의 Round RoundedCornerShape(8.dp)
+ * @param container : 영상 상세 장소, 검색 결과 컨텐츠 등 감싸는 영역의 Round (8.dp)
  *
- * @param largeContainer : TuripDialog 카드나 검색창 등의 Round RoundedCornerShape(16.dp)
+ * @param largeContainer : TuripDialog 카드나 검색창 등의 Round (16.dp)
  *
- * @param chip : 장소, 날짜 등 Chip의 Round RoundedCornerShape(12.dp)
+ * @param chip : 장소, 날짜 등 Chip의 Round (12.dp)
  *
- * @param bottomSheetRounded : bottomSheet의 top Round RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
+ * @param bottomSheetRounded : bottomSheet의 top Round (topStart = 16.dp, topEnd = 16.dp)
  *
- * @param wideButton : 화면 가로 영역을 가득 채우는 버튼의 Round RoundedCornerShape(24.dp)
+ * @param wideButton : 화면 가로 영역을 가득 채우는 버튼의 Round (24.dp)
  */
 @Immutable
 data class TuripShape(
