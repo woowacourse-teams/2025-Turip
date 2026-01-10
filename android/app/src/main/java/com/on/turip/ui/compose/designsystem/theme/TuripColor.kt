@@ -1,9 +1,26 @@
 package com.on.turip.ui.compose.designsystem.theme
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 
 /**
  *  변수명 뒤에 숫자 2개인 경우 (높아질수록 짙은 색 / 단, 00인 경우 변수 색상과 완전 동일 색상)
@@ -112,3 +129,111 @@ val LocalColors =
             gray01 = TuripColor.Black,
         )
     }
+
+@Preview(name = "Turip Colors", heightDp = 1000)
+@Composable
+private fun ColorPalettePreview() {
+    TuripTheme {
+        Surface(modifier = Modifier.fillMaxSize()) {
+            ColorPaletteContent()
+        }
+    }
+}
+
+@Composable
+private fun ColorPaletteContent() {
+    val colors = LocalColors.current
+
+    Column(
+        modifier =
+            Modifier
+                .padding(TuripTheme.spacing.large),
+        verticalArrangement = Arrangement.spacedBy(TuripTheme.spacing.small),
+    ) {
+        Text(
+            text = "Turip Color Palette",
+            style = MaterialTheme.typography.headlineMedium,
+            modifier = Modifier.padding(bottom = TuripTheme.spacing.small),
+        )
+
+        ColorGroup(title = "Primary") {
+            ColorItem("primary", colors.primary)
+            ColorItem("primarySub", colors.primarySub)
+        }
+
+        ColorGroup(title = "Background / Container") {
+            ColorItem("background", colors.background)
+            ColorItem("container", colors.container)
+            ColorItem("chipBackground", colors.chipBackground)
+            ColorItem("border", colors.border)
+            ColorItem("scrim", colors.scrim)
+        }
+
+        ColorGroup(title = "Error") {
+            ColorItem("error", colors.error)
+            ColorItem("errorContainer", colors.errorContainer)
+        }
+
+        ColorGroup(title = "Base Colors") {
+            ColorItem("white", colors.white)
+            ColorItem("black", colors.black)
+        }
+
+        ColorGroup(title = "Gray Scale") {
+            ColorItem("gray05", colors.gray05)
+            ColorItem("gray04", colors.gray04)
+            ColorItem("gray03", colors.gray03)
+            ColorItem("gray02", colors.gray02)
+            ColorItem("gray01", colors.gray01)
+        }
+    }
+}
+
+@Composable
+private fun ColorGroup(
+    title: String,
+    content: @Composable () -> Unit,
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(TuripTheme.spacing.extraSmall),
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(vertical = TuripTheme.spacing.extraSmall),
+        )
+        content()
+    }
+}
+
+@Composable
+private fun ColorItem(
+    name: String,
+    color: Color,
+) {
+    Row(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .height(40.dp)
+                .background(MaterialTheme.colorScheme.surfaceVariant),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(
+            modifier =
+                Modifier
+                    .weight(0.3f)
+                    .height(48.dp)
+                    .background(color),
+        )
+        Text(
+            text = name,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier =
+                Modifier
+                    .weight(0.7f)
+                    .padding(horizontal = 12.dp),
+        )
+    }
+}
