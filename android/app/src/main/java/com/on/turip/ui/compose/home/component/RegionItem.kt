@@ -7,7 +7,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.on.turip.domain.region.Country
 import com.on.turip.domain.region.RegionCategory
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 
@@ -24,13 +26,28 @@ fun RegionItem(
             imageUrl = region.imageUrl,
             modifier =
                 Modifier
-                    .padding(6.dp)
+                    .padding(TuripTheme.spacing.small)
                     .size(84.dp),
         )
         Text(
             text = region.name,
             style = TuripTheme.typography.title3,
-            modifier = Modifier.padding(vertical = 4.dp),
+            modifier = Modifier.padding(vertical = TuripTheme.spacing.extraSmall),
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun RegionItemPreview() {
+    TuripTheme {
+        RegionItem(
+            region =
+                RegionCategory(
+                    name = "속초",
+                    imageUrl = "",
+                    country = Country(0, "", ""),
+                ),
         )
     }
 }
