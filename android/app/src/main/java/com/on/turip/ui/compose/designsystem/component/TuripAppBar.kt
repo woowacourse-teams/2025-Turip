@@ -56,7 +56,7 @@ fun TuripAppBar(
                 .fillMaxWidth()
                 .height(58.dp) // xml과 로고 맞추기 위한 dp값, 나중에 피그마 기준인 62로 수정 필요
                 .background(containerColor)
-                .padding(horizontal = 20.dp)
+                .padding(horizontal = TuripTheme.spacing.extraLarge)
                 .pointerInput(Unit) {}
                 .then(modifier),
     ) {
