@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 
@@ -25,9 +26,8 @@ fun UsersLikeItem(
     channelName: String,
     contentDescription: String,
     modifier: Modifier = Modifier,
+    width: Dp = 250.dp,
 ) {
-    val width = 250.dp
-
     Column(
         modifier =
             modifier
@@ -36,7 +36,7 @@ fun UsersLikeItem(
                     width = 1.dp,
                     color = TuripTheme.colors.gray02,
                     shape = TuripTheme.shape.chip,
-                ).padding(10.dp),
+                ).padding(TuripTheme.spacing.medium),
         verticalArrangement = Arrangement.spacedBy(TuripTheme.spacing.extraSmall),
     ) {
         Thumbnail(
