@@ -1,4 +1,4 @@
-package com.on.turip.ui.compose.setting
+package com.on.turip.ui.compose.setting.component
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.size

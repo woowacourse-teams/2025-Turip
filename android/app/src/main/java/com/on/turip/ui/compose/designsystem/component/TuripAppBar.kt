@@ -91,7 +91,7 @@ fun TuripAppBar(
     }
 }
 
-sealed class AppBarPreviewCase {
+private sealed class AppBarPreviewCase {
     data object BackOnly : AppBarPreviewCase()
 
     data object LogoOnly : AppBarPreviewCase()
@@ -113,7 +113,7 @@ private class AppBarPreviewProvider : PreviewParameterProvider<AppBarPreviewCase
 
 @Preview(showBackground = true)
 @Composable
-fun TuripAppBarPreview(
+private fun TuripAppBarPreview(
     @PreviewParameter(AppBarPreviewProvider::class)
     case: AppBarPreviewCase,
 ) {
