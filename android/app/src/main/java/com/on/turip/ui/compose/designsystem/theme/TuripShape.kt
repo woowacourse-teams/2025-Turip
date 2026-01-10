@@ -1,9 +1,23 @@
 package com.on.turip.ui.compose.designsystem.theme
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 /**
@@ -45,3 +59,66 @@ val LocalShape =
             wideButton = RoundedCornerShape(0.dp),
         )
     }
+
+@Preview(name = "Turip Shape", heightDp = 800)
+@Composable
+private fun ShapePreview() {
+    TuripTheme {
+        val shapes = LocalShape.current
+
+        Surface(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier =
+                    Modifier
+                        .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                Text(
+                    text = "Turip Shape Tokens",
+                    style = MaterialTheme.typography.headlineMedium,
+                    modifier = Modifier.padding(bottom = 8.dp),
+                )
+
+                ShapeItem("container (8.dp)", shapes.container)
+                ShapeItem("largeContainer (16.dp)", shapes.largeContainer)
+                ShapeItem("chip (12.dp)", shapes.chip)
+                ShapeItem("bottomSheetRounded (top 16.dp)", shapes.bottomSheetRounded)
+                ShapeItem("wideButton (24.dp)", shapes.wideButton)
+            }
+        }
+    }
+}
+
+@Composable
+private fun ShapeItem(
+    name: String,
+    shape: Shape,
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Text(
+            text = name,
+            style = MaterialTheme.typography.bodyMedium,
+        )
+        ShapePreviewBox(
+            shape = shape,
+            modifier = Modifier.size(100.dp, 60.dp),
+        )
+    }
+}
+
+@Composable
+fun ShapePreviewBox(
+    shape: Shape,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier =
+            modifier.background(
+                color = MaterialTheme.colorScheme.primaryContainer,
+                shape = shape,
+            ),
+    )
+}
