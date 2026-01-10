@@ -224,7 +224,7 @@ private fun ColorItem(
             modifier =
                 Modifier
                     .weight(0.3f)
-                    .height(48.dp)
+                    .height(40.dp)
                     .background(color),
         )
         Text(
