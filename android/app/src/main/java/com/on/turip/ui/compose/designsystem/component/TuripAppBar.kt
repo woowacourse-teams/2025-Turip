@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
@@ -55,6 +56,7 @@ fun TuripAppBar(
                 .fillMaxWidth()
                 .height(58.dp) // xml과 로고 맞추기 위한 dp값, 나중에 피그마 기준인 62로 수정 필요
                 .background(containerColor)
+                .padding(horizontal = 20.dp)
                 .pointerInput(Unit) {}
                 .then(modifier),
     ) {
@@ -63,10 +65,7 @@ fun TuripAppBar(
         ) {
             if (start != null) {
                 Row(
-                    modifier =
-                        Modifier
-                            .align(Alignment.CenterStart)
-                            .padding(start = 20.dp),
+                    modifier = Modifier.align(Alignment.CenterStart),
                     verticalAlignment = Alignment.CenterVertically,
                     content = start,
                 )
@@ -83,10 +82,7 @@ fun TuripAppBar(
 
             if (end != null) {
                 Row(
-                    modifier =
-                        Modifier
-                            .align(Alignment.CenterEnd)
-                            .padding(end = 20.dp),
+                    modifier = Modifier.align(Alignment.CenterEnd),
                     verticalAlignment = Alignment.CenterVertically,
                     content = end,
                 )
@@ -140,11 +136,19 @@ fun TuripAppBarPreview(
             }
 
             AppBarPreviewCase.BackAndTitle -> {
+                val startAreaSize = 30.dp
                 TuripAppBar(
                     start = {
                         Icon(Icons.AutoMirrored.Default.ArrowBack, null)
                     },
-                    center = { Text("서울") },
+                    center = {
+                        Text(
+                            text = "text lenght is very Loooooooooooooooooooooooooooong ",
+                            overflow = TextOverflow.Ellipsis,
+                            maxLines = 1,
+                            modifier = Modifier.padding(start = startAreaSize),
+                        )
+                    },
                 )
             }
 
