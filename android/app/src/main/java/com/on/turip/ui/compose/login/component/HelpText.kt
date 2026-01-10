@@ -42,7 +42,7 @@ fun HelpText(
                     onClickText()
                 },
         )
-        Spacer(modifier = Modifier.padding(4.dp))
+        Spacer(modifier = Modifier.padding(TuripTheme.spacing.extraSmall))
         Image(
             painter = painterResource(R.drawable.btn_help),
             contentDescription = null,

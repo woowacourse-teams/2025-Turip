@@ -30,7 +30,7 @@ fun SettingItem(
         modifier =
             modifier
                 .clickable(onClick = onClick)
-                .padding(horizontal = 20.dp, vertical = 14.dp),
+                .padding(horizontal = TuripTheme.spacing.extraLarge, vertical = TuripTheme.spacing.large),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Image(
