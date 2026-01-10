@@ -31,15 +31,15 @@ import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 
 /**
  *
- * containerColor : 앱 바 색상
+ * @param containerColor : 앱 바 색상
  *
- * contentColor : 앱 바 내부의 요소들 색상 (LocalContentColor는 Image에는 적용 안되므로 주의)
+ * @param contentColor : 앱 바 내부의 요소들 색상 (LocalContentColor는 Image에는 적용 안되므로 주의)
  *
- * start : 앱 바 기준 시작점에서부터 Row 정렬하기 위한 컴포넌트들
+ * @param start : 앱 바 기준 시작점에서부터 Row 정렬하기 위한 컴포넌트들
  *
- * center : 시작, 끝 지점에 아이콘이 있더라도 중앙 정렬하기 위한 컴포넌트
+ * @param center : 시작, 끝 지점에 아이콘이 있더라도 중앙 정렬하기 위한 컴포넌트
  *
- * end : 앱 바 기준 끝지점에 Row 정렬하기 위한 컴포넌트들
+ * @param end : 앱 바 기준 끝지점에 Row 정렬하기 위한 컴포넌트들
  */
 @Composable
 fun TuripAppBar(
