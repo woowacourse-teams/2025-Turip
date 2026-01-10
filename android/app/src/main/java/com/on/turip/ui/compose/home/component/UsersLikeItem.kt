@@ -36,23 +36,23 @@ fun UsersLikeItem(
                 .border(
                     width = 1.dp,
                     color = TuripTheme.colors.gray02,
-                    shape = RoundedCornerShape(12.dp),
+                    shape = TuripTheme.shape.chip,
                 ).padding(10.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
+        verticalArrangement = Arrangement.spacedBy(TuripTheme.spacing.extraSmall),
     ) {
         Thumbnail(
             imageUrl = thumbnailUrl,
             modifier = Modifier.size(width = width, height = 140.dp),
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(TuripTheme.spacing.medium))
 
         RegionChip(
             regionName = regionName,
             modifier = Modifier,
         )
 
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(TuripTheme.spacing.extraSmall))
 
         Text(
             text = title,
@@ -62,7 +62,7 @@ fun UsersLikeItem(
             modifier = Modifier.width(width),
         )
 
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(TuripTheme.spacing.extraSmall))
 
         Text(
             text = channelName,

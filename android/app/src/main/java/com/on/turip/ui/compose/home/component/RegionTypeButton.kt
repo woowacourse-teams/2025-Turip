@@ -26,8 +26,8 @@ fun RegionTypeButton(
     Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(containerColor = backgroundColor),
-        shape = RoundedCornerShape(24.dp),
-        contentPadding = PaddingValues(horizontal = 24.dp, vertical = 8.dp),
+        shape = TuripTheme.shape.wideButton,
+        contentPadding = PaddingValues(horizontal = TuripTheme.spacing.extraExtraLarge, vertical = TuripTheme.spacing.small),
         modifier = modifier,
     ) {
         Text(

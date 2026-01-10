@@ -29,7 +29,7 @@ fun RegionList(
     val height = rowCount.times(128.dp)
     LazyVerticalGrid(
         columns = GridCells.Fixed(count = MAX_REGION_COUNT_IN_EACH_ROW),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(TuripTheme.spacing.small),
         modifier =
             modifier
                 .height(height)
@@ -40,7 +40,7 @@ fun RegionList(
                 region = regionCategory,
                 modifier =
                     Modifier
-                        .clip(RoundedCornerShape(12.dp))
+                        .clip(TuripTheme.shape.chip)
                         .clickable { onRegionClick(regionCategory.name) },
             )
         }

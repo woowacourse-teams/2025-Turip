@@ -28,7 +28,7 @@ fun RegionChip(
                     width = 1.dp,
                     color = TuripTheme.colors.border,
                     shape = TuripTheme.shape.chip,
-                ).padding(horizontal = 12.dp, vertical = 4.dp),
+                ).padding(horizontal = TuripTheme.spacing.medium, vertical = TuripTheme.spacing.extraSmall),
     ) {
         Text(
             text = regionName,

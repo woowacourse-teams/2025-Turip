@@ -122,9 +122,9 @@ private fun HomeScreenContent(
                                 keyboardController?.hide()
                             })
                         }
-                        .padding(horizontal = 20.dp)
+                        .padding(horizontal = TuripTheme.spacing.extraLarge)
                         .verticalScroll(scrollState),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
+                verticalArrangement = Arrangement.spacedBy(TuripTheme.spacing.medium),
             ) {
                 Text(
                     text = stringResource(R.string.home_top_title),
@@ -143,12 +143,12 @@ private fun HomeScreenContent(
                     modifier =
                         Modifier
                             .wrapContentSize()
-                            .padding(top = 4.dp),
+                            .padding(top = TuripTheme.spacing.extraSmall),
                 )
 
                 Text(
                     text = stringResource(R.string.home_users_like_content_title),
-                    modifier = Modifier.padding(top = 14.dp),
+                    modifier = Modifier.padding(top = TuripTheme.spacing.medium),
                     color = TuripTheme.colors.gray04,
                     style = TuripTheme.typography.title1,
                 )

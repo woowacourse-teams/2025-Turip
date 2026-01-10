@@ -18,8 +18,8 @@ fun RegionTypeButtons(
     isSelectedDomestic: Boolean = true,
 ) {
     Row(
-        modifier = modifier.padding(top = 26.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = modifier.padding(top = TuripTheme.spacing.extraExtraLarge),
+        horizontalArrangement = Arrangement.spacedBy(TuripTheme.spacing.small),
     ) {
         RegionTypeButton(
             text = stringResource(R.string.region_type_buttons_domestic),
