@@ -23,6 +23,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
+/**
+ * @param none 0dp
+ * @param extraSmall 4dp
+ * @param small 8dp
+ * @param medium 12dp
+ * @param large 16dp
+ * @param extraLarge 20dp
+ * @param extraExtraLarge 24dp
+ * @param huge 32dp
+ */
+
 @Immutable
 data class TuripSpacing(
     val none: Dp,
