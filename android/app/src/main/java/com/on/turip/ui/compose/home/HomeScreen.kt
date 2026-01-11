@@ -121,8 +121,7 @@ private fun HomeScreenContent(
                                 focusManager.clearFocus()
                                 keyboardController?.hide()
                             })
-                        }
-                        .padding(horizontal = TuripTheme.spacing.extraLarge)
+                        }.padding(horizontal = TuripTheme.spacing.extraLarge)
                         .verticalScroll(scrollState),
                 verticalArrangement = Arrangement.spacedBy(TuripTheme.spacing.medium),
             ) {
