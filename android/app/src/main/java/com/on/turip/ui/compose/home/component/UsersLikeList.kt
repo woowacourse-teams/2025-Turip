@@ -3,6 +3,7 @@ package com.on.turip.ui.compose.home.component
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -12,6 +13,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.on.turip.R
 import com.on.turip.domain.content.Content
 import com.on.turip.domain.content.video.VideoData
@@ -51,6 +53,7 @@ fun UsersLikeList(
                     ),
                 modifier =
                     Modifier
+                        .width(280.dp)
                         .clip(TuripTheme.shape.chip)
                         .clickable { onContentClick(usersLikeContent) },
             )
