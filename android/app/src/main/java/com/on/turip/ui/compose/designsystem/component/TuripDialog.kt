@@ -50,7 +50,7 @@ fun TuripDialog(
                     Modifier
                         .fillMaxWidth()
                         .padding(vertical = TuripTheme.spacing.extraLarge),
-                verticalArrangement = Arrangement.spacedBy(TuripTheme.spacing.huge),
+                verticalArrangement = Arrangement.spacedBy(TuripTheme.spacing.extraHuge),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 DialogTitleText(title = title)
