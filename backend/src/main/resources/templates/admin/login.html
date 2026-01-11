@@ -47,15 +47,6 @@
             font-weight: 500;
         }
 
-        .password-wrapper {
-            position: relative;
-        }
-
-        .password-wrapper input[type="password"],
-        .password-wrapper input[type="text"] {
-            padding-right: 45px;
-        }
-
         input[type="text"],
         input[type="password"] {
             width: 100%;
@@ -70,36 +61,6 @@
         input[type="password"]:focus {
             outline: none;
             border-color: #667eea;
-        }
-
-        .password-toggle {
-            position: absolute;
-            right: 8px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 20px;
-            color: #999;
-            padding: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            user-select: none;
-        }
-
-        .password-toggle:hover {
-            color: #667eea;
-        }
-
-        .password-toggle.visible::after {
-            content: '';
-            position: absolute;
-            width: 24px;
-            height: 2px;
-            background: currentColor;
-            transform: rotate(-45deg);
         }
 
         .button-group {
@@ -147,12 +108,7 @@
             </div>
             <div class="form-group">
                 <label for="loginPassword">비밀번호</label>
-                <div class="password-wrapper">
-                    <input type="password" id="loginPassword" name="loginPassword" required>
-                    <button type="button" class="password-toggle" onclick="togglePassword('loginPassword', this)">
-                        👁
-                    </button>
-                </div>
+                <input type="password" id="loginPassword" name="loginPassword" required>
             </div>
             <div class="button-group">
                 <button type="submit" class="btn-login">로그인</button>
@@ -162,17 +118,6 @@
     </div>
 
     <script>
-        function togglePassword(inputId, button) {
-            const input = document.getElementById(inputId);
-            if (input.type === 'password') {
-                input.type = 'text';
-                button.classList.add('visible');
-            } else {
-                input.type = 'password';
-                button.classList.remove('visible');
-            }
-        }
-
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
