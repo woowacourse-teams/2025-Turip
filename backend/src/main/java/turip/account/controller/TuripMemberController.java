@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 import turip.account.controller.dto.request.TuripMemberRequest;
 import turip.account.controller.dto.response.TuripMemberResponse;
 import turip.account.service.TuripMemberService;
-import turip.auth.controller.dto.response.LoginResponse;
 import turip.common.exception.ErrorResponse;
 
 @RestController
@@ -38,7 +37,7 @@ public class TuripMemberController {
                     description = "성공 예시",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = LoginResponse.class),
+                            schema = @Schema(implementation = TuripMemberResponse.class),
                             examples = @ExampleObject(
                                     name = "success",
                                     summary = "로그인 성공",
