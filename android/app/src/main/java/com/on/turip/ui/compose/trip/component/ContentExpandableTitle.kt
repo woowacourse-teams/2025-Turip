@@ -1,0 +1,87 @@
+package com.on.turip.ui.compose.trip.component
+
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.on.turip.R
+import com.on.turip.ui.compose.designsystem.theme.TuripTheme
+
+@Composable
+fun ContentExpandableTitle(
+    title: String,
+    collapsedMaxLines: Int,
+    modifier: Modifier = Modifier,
+) {
+    var isOverFlow by remember { mutableStateOf(false) }
+    var expanded by rememberSaveable(title) { mutableStateOf(false) }
+
+    Column(modifier = modifier.animateContentSize()) {
+        Text(
+            text = title,
+            style = TuripTheme.typography.display,
+            maxLines = if (expanded) Int.MAX_VALUE else collapsedMaxLines,
+            overflow = TextOverflow.Ellipsis,
+            onTextLayout = { result ->
+                if (!expanded) isOverFlow = result.hasVisualOverflow
+            },
+        )
+
+        if (isOverFlow || expanded) {
+            Box(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .size(36.dp)
+                        .clickable { expanded = !expanded },
+                contentAlignment = Alignment.Center,
+            ) {
+                Image(
+                    painter =
+                        if (expanded) {
+                            painterResource(R.drawable.ic_up_arrow)
+                        } else {
+                            painterResource(R.drawable.ic_down_arrow)
+                        },
+                    contentDescription =
+                        if (expanded) {
+                            stringResource(R.string.all_text_collapse)
+                        } else {
+                            stringResource(R.string.all_text_expand)
+                        },
+                    modifier = Modifier.size(16.dp),
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ContentExpandableTitlePreview() {
+    TuripTheme {
+        ContentExpandableTitle(
+            title = "제목이 긴 컨텐츠의 경우 한 줄 이상 입력하면 확장 가능",
+            collapsedMaxLines = 1,
+            modifier = Modifier.height(120.dp),
+        )
+    }
+}
