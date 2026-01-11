@@ -16,6 +16,9 @@
     <string name="all_folder_name_warning_max_length">폴더명은 최대 20글자 입니다.(현재 20 글자)</string>
     <string name="all_turip_description">직진만 남은 여행</string>
     <string name="all_back_description">뒤로 가기</string>
+    <string name="all_text_expand">더보기</string>
+    <string name="all_text_collapse">접기</string>
+
 
     <!-- 바텀 네비게이션 -->
     <string name="bottom_navigation_home">홈</string>
@@ -74,6 +77,8 @@
     <string name="trip_place_map">지도</string>
     <string name="trip_place_favorite">장소찜</string>
     <string name="trip_place_time_line">%s~</string>
+    <string name="trip_detail_period">여행 기간</string>
+    <string name="trip_detail_visit_place">방문 장소</string>
 
     <!-- 폴더 페이지 -->
     <string name="folder_title">폴더 편집</string>
