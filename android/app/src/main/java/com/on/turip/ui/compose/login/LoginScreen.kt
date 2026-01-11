@@ -128,14 +128,16 @@ private fun LoginScreenContent(
                 contentDescription = null,
                 modifier =
                     Modifier
-                        .padding(top = 32.dp, start = 23.dp)
-                        .size(width = 160.dp, height = 61.dp),
+                        .padding(
+                            top = TuripTheme.spacing.extraHuge,
+                            start = TuripTheme.spacing.extraExtraLarge,
+                        ).size(width = 160.dp, height = 61.dp),
             )
 
             Text(
                 text = stringResource(R.string.all_turip_description),
                 style = TuripTheme.typography.title3,
-                modifier = Modifier.padding(top = 5.dp),
+                modifier = Modifier.padding(top = TuripTheme.spacing.extraSmall),
             )
         }
 
@@ -143,9 +145,13 @@ private fun LoginScreenContent(
             modifier =
                 Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(start = 20.dp, end = 20.dp, bottom = 44.dp),
+                    .padding(
+                        start = TuripTheme.spacing.extraLarge,
+                        end = TuripTheme.spacing.extraLarge,
+                        bottom = TuripTheme.spacing.extraExtraHuge,
+                    ),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(14.dp),
+            verticalArrangement = Arrangement.spacedBy(TuripTheme.spacing.large),
         ) {
             if (isHelpTextVisible) {
                 Text(
@@ -156,12 +162,12 @@ private fun LoginScreenContent(
                         Modifier
                             .border(
                                 border = BorderStroke(1.dp, TuripTheme.colors.gray02),
-                                shape = RoundedCornerShape(10.dp),
+                                shape = TuripTheme.shape.container,
                             ).background(
                                 color = TuripTheme.colors.gray03,
-                                shape = RoundedCornerShape(10.dp),
+                                shape = TuripTheme.shape.container,
                             ).fillMaxWidth()
-                            .padding(vertical = 20.dp),
+                            .padding(vertical = TuripTheme.spacing.extraLarge),
                     textAlign = TextAlign.Center,
                 )
             }
