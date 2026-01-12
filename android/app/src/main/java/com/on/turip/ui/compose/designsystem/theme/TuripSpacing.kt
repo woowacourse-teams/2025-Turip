@@ -33,7 +33,6 @@ import androidx.compose.ui.unit.dp
  * @param extraExtraLarge 24dp
  * @param huge 28dp
  * @param extraHuge 32dp
- * @param extraExtraHuge 44dp
  */
 
 @Immutable
@@ -47,7 +46,6 @@ data class TuripSpacing(
     val extraExtraLarge: Dp,
     val huge: Dp,
     val extraHuge: Dp,
-    val extraExtraHuge: Dp,
 )
 
 internal val Spacing =
@@ -61,7 +59,6 @@ internal val Spacing =
         extraExtraLarge = 24.dp,
         huge = 28.dp,
         extraHuge = 32.dp,
-        extraExtraHuge = 44.dp,
     )
 
 internal val LocalSpacing =
@@ -76,7 +73,6 @@ internal val LocalSpacing =
             extraExtraLarge = 0.dp,
             huge = 28.dp,
             extraHuge = 0.dp,
-            extraExtraHuge = 0.dp,
         )
     }
 
@@ -106,7 +102,6 @@ private fun SpacingPreview() {
                 SpacingItem("extraExtraLarge", TuripTheme.spacing.extraExtraLarge)
                 SpacingItem("huge", TuripTheme.spacing.huge)
                 SpacingItem("extraHuge", TuripTheme.spacing.extraHuge)
-                SpacingItem("extraExtraHuge", TuripTheme.spacing.extraExtraHuge)
             }
         }
     }
