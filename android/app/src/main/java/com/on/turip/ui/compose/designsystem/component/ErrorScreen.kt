@@ -34,7 +34,7 @@ fun ErrorScreen(
         modifier =
             modifier
                 .fillMaxSize()
-                .padding(16.dp),
+                .padding(TuripTheme.spacing.large),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -44,21 +44,21 @@ fun ErrorScreen(
             modifier = Modifier.size(120.dp),
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(TuripTheme.spacing.large))
 
         Text(
             text = stringResource(id = errorUiModel.titleRes),
             style = TuripTheme.typography.title1,
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(TuripTheme.spacing.small))
 
         Text(
             text = stringResource(id = errorUiModel.descriptionRes),
             style = TuripTheme.typography.body1,
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(TuripTheme.spacing.large))
 
         Button(onClick = onRetryClick) {
             Text(text = stringResource(id = errorUiModel.retryTextRes))

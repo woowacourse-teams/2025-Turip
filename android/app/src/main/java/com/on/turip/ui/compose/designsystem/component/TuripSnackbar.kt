@@ -13,7 +13,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 
 @Composable
@@ -25,7 +24,7 @@ fun TuripSnackbar(
         hostState = snackbarHostState,
         snackbar = { snackbarData: SnackbarData ->
             Snackbar(
-                modifier = modifier.padding(16.dp),
+                modifier = modifier.padding(TuripTheme.spacing.large),
                 action = {
                     snackbarData.visuals.actionLabel?.let { label ->
                         TextButton(onClick = snackbarData::performAction) {

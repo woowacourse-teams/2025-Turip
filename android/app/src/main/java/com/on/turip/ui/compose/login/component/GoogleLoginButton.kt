@@ -37,13 +37,13 @@ fun GoogleLoginButton(
                 ).background(color = TuripTheme.colors.white, shape = RoundedCornerShape(30.dp))
                 .clip(RoundedCornerShape(30.dp))
                 .clickable { onClickLoginButton() }
-                .padding(vertical = 16.dp, horizontal = 16.dp),
+                .padding(vertical = TuripTheme.spacing.large, horizontal = TuripTheme.spacing.large),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Image(
             painter = painterResource(R.drawable.ic_google),
             contentDescription = null,
-            modifier = Modifier.size(28.dp),
+            modifier = Modifier.size(TuripTheme.spacing.huge),
         )
         Text(
             text = stringResource(R.string.login_google_description),
@@ -51,7 +51,7 @@ fun GoogleLoginButton(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .padding(end = 28.dp),
+                    .padding(end = TuripTheme.spacing.huge),
             textAlign = TextAlign.Center,
         )
     }

@@ -2,7 +2,6 @@ package com.on.turip.ui.compose.home.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
@@ -20,7 +19,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.on.turip.R
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 
@@ -48,9 +46,9 @@ fun SearchTextField(
                 .fillMaxWidth()
                 .background(
                     color = TuripTheme.colors.gray02,
-                    shape = RoundedCornerShape(16.dp),
+                    shape = TuripTheme.shape.largeContainer,
                 ),
-        shape = RoundedCornerShape(16.dp),
+        shape = TuripTheme.shape.largeContainer,
         colors =
             OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = TuripTheme.colors.gray02,

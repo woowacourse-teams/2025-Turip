@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -18,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
@@ -43,16 +41,16 @@ fun TuripDialog(
             modifier =
                 modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 18.dp)
+                    .padding(horizontal = TuripTheme.spacing.extraLarge)
                     .wrapContentHeight(),
-            shape = RoundedCornerShape(16.dp),
+            shape = TuripTheme.shape.largeContainer,
         ) {
             Column(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 20.dp),
-                verticalArrangement = Arrangement.spacedBy(30.dp),
+                        .padding(vertical = TuripTheme.spacing.extraLarge),
+                verticalArrangement = Arrangement.spacedBy(TuripTheme.spacing.extraHuge),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 DialogTitleText(title = title)
@@ -76,7 +74,7 @@ private fun DialogTitleText(title: String) {
         text = title,
         textAlign = TextAlign.Center,
         style = TuripTheme.typography.title1,
-        modifier = Modifier.padding(top = 12.dp),
+        modifier = Modifier.padding(top = TuripTheme.spacing.medium),
     )
 }
 
@@ -86,7 +84,7 @@ private fun DialogMessageText(message: String) {
         text = message,
         textAlign = TextAlign.Center,
         style = TuripTheme.typography.body2,
-        modifier = Modifier.padding(horizontal = 24.dp),
+        modifier = Modifier.padding(horizontal = TuripTheme.spacing.extraExtraLarge),
     )
 }
 
@@ -103,34 +101,34 @@ private fun DialogButtons(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                .padding(horizontal = TuripTheme.spacing.extraLarge),
+        horizontalArrangement = Arrangement.spacedBy(TuripTheme.spacing.medium),
     ) {
         Button(
             onClick = onDismissRequest,
             modifier = Modifier.weight(1f),
-            shape = RoundedCornerShape(8.dp),
+            shape = TuripTheme.shape.container,
             colors = ButtonDefaults.buttonColors(containerColor = dismissButtonColor),
         ) {
             Text(
                 text = dismissText,
                 textAlign = TextAlign.Center,
                 style = TuripTheme.typography.info1,
-                modifier = Modifier.padding(vertical = 8.dp),
+                modifier = Modifier.padding(vertical = TuripTheme.spacing.small),
             )
         }
 
         Button(
             onClick = onConfirmation,
             modifier = Modifier.weight(1f),
-            shape = RoundedCornerShape(8.dp),
+            shape = TuripTheme.shape.container,
             colors = ButtonDefaults.buttonColors(containerColor = confirmButtonColor),
         ) {
             Text(
                 text = confirmText,
                 textAlign = TextAlign.Center,
                 style = TuripTheme.typography.info1,
-                modifier = Modifier.padding(vertical = 8.dp),
+                modifier = Modifier.padding(vertical = TuripTheme.spacing.small),
             )
         }
     }
