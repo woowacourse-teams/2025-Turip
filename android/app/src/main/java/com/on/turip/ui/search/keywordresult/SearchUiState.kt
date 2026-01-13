@@ -6,7 +6,9 @@ import com.on.turip.ui.search.model.VideoInformationModel
 sealed interface SearchUiState {
     data object Loading : SearchUiState
 
-    data object Empty : SearchUiState
+    data class Empty(
+        val keyword: String,
+    ) : SearchUiState
 
     data class Success(
         val videos: List<VideoInformationModel>,

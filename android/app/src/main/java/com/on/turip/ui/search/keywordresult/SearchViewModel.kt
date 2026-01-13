@@ -116,7 +116,7 @@ class SearchViewModel @Inject constructor(
                 }
 
             if (count == 0) {
-                _uiState.update { SearchUiState.Empty }
+                _uiState.update { SearchUiState.Empty(keyword = searchingKeyword) }
             } else {
                 _uiState.update {
                     SearchUiState.Success(
