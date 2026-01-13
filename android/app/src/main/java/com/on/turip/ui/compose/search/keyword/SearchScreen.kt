@@ -1,4 +1,4 @@
-package com.on.turip.ui.compose.search
+package com.on.turip.ui.compose.search.keyword
 
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
@@ -22,10 +22,10 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.on.turip.ui.compose.designsystem.component.ErrorScreen
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
-import com.on.turip.ui.compose.search.component.SearchAppBar
-import com.on.turip.ui.compose.search.component.SearchEmptyView
+import com.on.turip.ui.compose.search.keyword.component.SearchAppBar
+import com.on.turip.ui.compose.search.keyword.component.SearchEmptyView
 import com.on.turip.ui.compose.search.component.SearchHistoryList
-import com.on.turip.ui.compose.search.component.SearchResultList
+import com.on.turip.ui.compose.search.keyword.component.SearchResultList
 import com.on.turip.ui.search.keywordresult.SearchUiEffect
 import com.on.turip.ui.search.keywordresult.SearchUiState
 import com.on.turip.ui.search.keywordresult.SearchViewModel

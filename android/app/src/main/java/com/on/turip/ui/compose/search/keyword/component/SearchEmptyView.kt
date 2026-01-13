@@ -1,4 +1,4 @@
-package com.on.turip.ui.compose.search.component
+package com.on.turip.ui.compose.search.keyword.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
