@@ -19,6 +19,9 @@ fun TripDetailAppBar(
     onContentFavoriteClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val contentFavoriteIconRes =
+        if (isContentFavorite) R.drawable.btn_bookmark_selected else R.drawable.btn_bookmark_normal
+
     TuripAppBar(
         contentColor = TuripTheme.colors.white,
         containerColor = TuripTheme.colors.primary,
@@ -30,19 +33,11 @@ fun TripDetailAppBar(
             )
         },
         end = {
-            if (isContentFavorite) {
-                Icon(
-                    painter = painterResource(R.drawable.btn_bookmark_selected),
-                    contentDescription = null,
-                    modifier = Modifier.clickable(onClick = onContentFavoriteClick),
-                )
-            } else {
-                Icon(
-                    painter = painterResource(R.drawable.btn_bookmark_normal),
-                    contentDescription = null,
-                    modifier = Modifier.clickable(onClick = onContentFavoriteClick),
-                )
-            }
+            Icon(
+                painter = painterResource(contentFavoriteIconRes),
+                contentDescription = null,
+                modifier = Modifier.clickable(onClick = onContentFavoriteClick),
+            )
         },
         modifier = modifier,
     )
