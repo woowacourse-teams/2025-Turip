@@ -79,6 +79,8 @@
     <string name="trip_place_time_line">%s~</string>
     <string name="trip_detail_period">여행 기간</string>
     <string name="trip_detail_visit_place">방문 장소</string>
+    <string name="trip_detail_trip_favorite_normal">이 여행 저장하기 </string>
+    <string name="trip_detail_trip_favorite_select">저장된 여행이에요 </string>
 
     <!-- 폴더 페이지 -->
     <string name="folder_title">폴더 편집</string>
