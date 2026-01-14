@@ -16,6 +16,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
@@ -39,11 +40,15 @@ fun SearchAppBar(
     onFocusChanged: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val rememberedBackClick = remember(onBackClick) { onBackClick }
+    val rememberedClearClick = remember(onClearClick) { onClearClick }
+    val rememberedSearchAction = remember(onSearchAction) { onSearchAction }
+
     TuripAppBar(
         modifier = modifier,
         start = {
             IconButton(
-                onClick = onBackClick,
+                onClick = rememberedBackClick,
                 modifier = Modifier.size(36.dp),
             ) {
                 Icon(
@@ -53,7 +58,7 @@ fun SearchAppBar(
                 )
             }
 
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(TuripTheme.spacing.medium))
 
             Row(
                 modifier =
@@ -67,17 +72,20 @@ fun SearchAppBar(
                             width = 1.dp,
                             color = TuripTheme.colors.gray01,
                             shape = TuripTheme.shape.wideButton,
-                        ).padding(horizontal = 16.dp),
+                        ).padding(horizontal = TuripTheme.spacing.large),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 BasicTextField(
                     value = searchText,
                     onValueChange = onSearchTextChanged,
-                    modifier = Modifier.weight(1f).onFocusChanged { onFocusChanged(it.isFocused) },
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .onFocusChanged { onFocusChanged(it.isFocused) },
                     textStyle = TuripTheme.typography.title3.copy(color = TuripTheme.colors.black),
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                    keyboardActions = KeyboardActions(onSearch = { onSearchAction() }),
+                    keyboardActions = KeyboardActions(onSearch = { rememberedSearchAction() }),
                     decorationBox = { innerTextField ->
                         if (searchText.isEmpty()) {
                             Text(
@@ -92,8 +100,8 @@ fun SearchAppBar(
 
                 if (searchText.isNotEmpty()) {
                     IconButton(
-                        onClick = onClearClick,
-                        modifier = Modifier.size(20.dp),
+                        onClick = rememberedClearClick,
+                        modifier = Modifier.size(TuripTheme.spacing.extraLarge),
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_cancel),
