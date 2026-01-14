@@ -90,6 +90,8 @@ private fun SearchResultItem(
     onItemClick: () -> Unit,
 ) {
     val context = LocalContext.current
+    val itemShape = TuripTheme.shape.wideButton
+
     Column(
         modifier =
             Modifier
@@ -97,14 +99,18 @@ private fun SearchResultItem(
                 .padding(
                     horizontal = TuripTheme.spacing.extraLarge,
                     vertical = 6.dp,
-                ).background(
+                )
+                .background(
                     color = TuripColor.LightGray01,
-                    shape = TuripTheme.shape.wideButton,
-                ).border(
+                    shape = itemShape,
+                )
+                .border(
                     width = 1.dp,
                     color = TuripColor.Black06,
-                    shape = TuripTheme.shape.wideButton,
-                ).clickable { onItemClick() }
+                    shape = itemShape,
+                )
+                .clip(itemShape)
+                .clickable { onItemClick() }
                 .padding(14.dp),
     ) {
         Row(
