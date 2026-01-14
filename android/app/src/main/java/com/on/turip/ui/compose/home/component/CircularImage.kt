@@ -32,6 +32,7 @@ fun CircularImage(
             modifier
                 .aspectRatio(1f)
                 .clip(CircleShape),
+        placeholder = painterResource(R.drawable.bg_image_placeholder),
         error = painterResource(R.drawable.ic_sorry),
     )
 }

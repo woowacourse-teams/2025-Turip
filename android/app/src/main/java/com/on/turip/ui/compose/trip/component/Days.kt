@@ -1,6 +1,7 @@
 package com.on.turip.ui.compose.trip.component
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -22,7 +23,7 @@ fun Days(
 ) {
     LazyRow(
         state = state,
-        modifier = modifier,
+        modifier = modifier.padding(vertical = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         items(items = days, key = { it.day }) { dayModel: DayModel ->
