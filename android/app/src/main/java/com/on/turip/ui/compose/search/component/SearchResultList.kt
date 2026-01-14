@@ -17,11 +17,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -57,20 +57,27 @@ fun SearchResultList(
             text = stringResource(R.string.search_result_exist_result, totalCount),
             style = TuripTheme.typography.body2,
             color = TuripTheme.colors.gray03,
-            modifier = Modifier.padding(horizontal = 20.dp, vertical = 13.dp),
+            modifier =
+                Modifier.padding(
+                    horizontal = TuripTheme.spacing.extraLarge,
+                    vertical = 13.dp,
+                ),
         )
 
         LazyColumn(
-            contentPadding = PaddingValues(bottom = 16.dp),
+            contentPadding = PaddingValues(bottom = TuripTheme.spacing.large),
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
             items(
                 items = videos,
                 key = { it.content.id },
             ) { videoInfo ->
+                val videoId: Long = videoInfo.content.id
+                val onClick: () -> Unit = remember(videoId) { { onItemClick(videoId) } }
+
                 SearchResultItem(
                     videoInfo = videoInfo,
-                    onItemClick = onItemClick,
+                    onItemClick = onClick,
                 )
             }
         }
@@ -80,22 +87,24 @@ fun SearchResultList(
 @Composable
 private fun SearchResultItem(
     videoInfo: VideoInformationModel,
-    onItemClick: (Long) -> Unit,
+    onItemClick: () -> Unit,
 ) {
     val context = LocalContext.current
     Column(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 6.dp)
-                .background(
+                .padding(
+                    horizontal = TuripTheme.spacing.extraLarge,
+                    vertical = 6.dp,
+                ).background(
                     color = TuripColor.LightGray01,
-                    shape = RoundedCornerShape(24.dp),
+                    shape = TuripTheme.shape.wideButton,
                 ).border(
                     width = 1.dp,
                     color = TuripColor.Black06,
-                    shape = RoundedCornerShape(24.dp),
-                ).clickable { onItemClick(videoInfo.content.id) }
+                    shape = TuripTheme.shape.wideButton,
+                ).clickable { onItemClick() }
                 .padding(14.dp),
     ) {
         Row(
@@ -137,7 +146,7 @@ private fun SearchResultItem(
         Row(
             modifier =
                 Modifier
-                    .padding(top = 12.dp)
+                    .padding(top = TuripTheme.spacing.medium)
                     .fillMaxWidth()
                     .height(110.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -148,25 +157,32 @@ private fun SearchResultItem(
                 modifier =
                     Modifier
                         .size(width = 202.dp, height = 110.dp)
-                        .clip(RoundedCornerShape(8.dp)),
+                        .clip(TuripTheme.shape.container),
                 contentScale = ContentScale.Crop,
             )
 
-            Spacer(modifier = Modifier.width(20.dp))
+            Spacer(modifier = Modifier.width(TuripTheme.spacing.extraLarge))
 
             Column(
-                modifier = Modifier.fillMaxSize().padding(vertical = 10.dp),
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(vertical = 10.dp),
                 verticalArrangement = Arrangement.SpaceBetween,
             ) {
                 Surface(
                     color = TuripTheme.colors.chipBackground,
-                    shape = RoundedCornerShape(24.dp),
+                    shape = TuripTheme.shape.wideButton,
                 ) {
                     Text(
                         text = videoInfo.content.city.name,
                         style = TuripTheme.typography.info1,
                         color = TuripTheme.colors.gray05,
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                        modifier =
+                            Modifier.padding(
+                                horizontal = TuripTheme.spacing.medium,
+                                vertical = TuripTheme.spacing.extraSmall,
+                            ),
                     )
                 }
 
@@ -177,7 +193,11 @@ private fun SearchResultItem(
 
                 InfoIconText(
                     iconRes = R.drawable.ic_location,
-                    text = "${videoInfo.tripModel.tripPlaceCount}개 장소",
+                    text =
+                        stringResource(
+                            R.string.all_total_place_count,
+                            videoInfo.tripModel.tripPlaceCount,
+                        ),
                 )
             }
         }
@@ -195,7 +215,7 @@ private fun InfoIconText(
         Icon(
             painter = painterResource(id = iconRes),
             contentDescription = null,
-            modifier = Modifier.size(16.dp),
+            modifier = Modifier.size(TuripTheme.spacing.large),
             tint = TuripTheme.colors.gray02,
         )
         Text(
