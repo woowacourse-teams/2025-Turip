@@ -1,4 +1,4 @@
-package com.on.turip.ui.compose.search.keyword.component
+package com.on.turip.ui.compose.search.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,6 +17,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,16 +40,20 @@ fun SearchHistoryList(
             modifier
                 .fillMaxSize()
                 .background(TuripTheme.colors.white)
-                .padding(horizontal = 20.dp),
+                .padding(horizontal = TuripTheme.spacing.extraLarge),
     ) {
         items(
             items = histories,
             key = { it.keyword },
         ) { history ->
+            val currentKeyword = history.keyword
+            val onClick = remember(currentKeyword) { { onHistoryClick(currentKeyword) } }
+            val onDelete = remember(currentKeyword) { { onDeleteClick(currentKeyword) } }
+
             SearchHistoryItem(
-                keyword = history.keyword,
-                onItemClick = { onHistoryClick(history.keyword) },
-                onDeleteClick = { onDeleteClick(history.keyword) },
+                keyword = currentKeyword,
+                onItemClick = onClick,
+                onDeleteClick = onDelete,
             )
             HorizontalDivider(
                 color = TuripTheme.colors.gray01,
@@ -82,7 +87,7 @@ private fun SearchHistoryItem(
 
         IconButton(
             onClick = onDeleteClick,
-            modifier = Modifier.size(24.dp),
+            modifier = Modifier.size(TuripTheme.spacing.extraExtraLarge),
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_search_cancel),
