@@ -11,7 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.on.turip.ui.compose.designsystem.component.ErrorScreen
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
-import com.on.turip.ui.compose.search.keyword.component.SearchResultList
+import com.on.turip.ui.compose.search.component.SearchResultList
 import com.on.turip.ui.compose.search.regionresult.component.RegionResultAppBar
 import com.on.turip.ui.search.regionresult.RegionResultUiEffect
 import com.on.turip.ui.search.regionresult.RegionResultUiState

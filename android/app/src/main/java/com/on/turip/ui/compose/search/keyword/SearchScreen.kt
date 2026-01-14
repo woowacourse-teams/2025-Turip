@@ -24,8 +24,8 @@ import com.on.turip.ui.compose.designsystem.component.ErrorScreen
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.search.keyword.component.SearchAppBar
 import com.on.turip.ui.compose.search.keyword.component.SearchEmptyView
-import com.on.turip.ui.compose.search.component.SearchHistoryList
-import com.on.turip.ui.compose.search.keyword.component.SearchResultList
+import com.on.turip.ui.compose.search.keyword.component.SearchHistoryList
+import com.on.turip.ui.compose.search.component.SearchResultList
 import com.on.turip.ui.search.keywordresult.SearchUiEffect
 import com.on.turip.ui.search.keywordresult.SearchUiState
 import com.on.turip.ui.search.keywordresult.SearchViewModel
