@@ -18,7 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.on.turip.ui.compose.designsystem.component.ErrorScreen
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
@@ -43,8 +42,26 @@ fun SearchScreen(
     val searchHistory by viewModel.searchHistory.observeAsState(emptyList())
 
     val focusManager = LocalFocusManager.current
-    val keyboardController = LocalSoftwareKeyboardController.current
     var isHistoryVisible by remember { mutableStateOf(false) }
+
+    val onSearchTextChanged =
+        remember(viewModel) { { text: String -> viewModel.updateSearchingWord(text) } }
+    val onClearClick = remember(viewModel) { { viewModel.updateSearchingWord("") } }
+    val onRetryClick = remember(viewModel) { { viewModel.loadByKeyword() } }
+    val onDeleteHistoryClick =
+        remember(viewModel) { { keyword: String -> viewModel.deleteSearchHistory(keyword) } }
+
+    val onSearchAction =
+        remember(searchingWord, viewModel) {
+            {
+                if (searchingWord.isNotBlank()) {
+                    viewModel.loadByKeyword()
+                    viewModel.createSearchHistory()
+                    isHistoryVisible = false
+                    focusManager.clearFocus()
+                }
+            }
+        }
 
     LaunchedEffect(uiEffect) {
         when (uiEffect) {
@@ -57,16 +74,9 @@ fun SearchScreen(
         topBar = {
             SearchAppBar(
                 searchText = searchingWord,
-                onSearchTextChanged = { viewModel.updateSearchingWord(it) },
-                onSearchAction = {
-                    if (searchingWord.isNotBlank()) {
-                        viewModel.loadByKeyword()
-                        viewModel.createSearchHistory()
-                        isHistoryVisible = false
-                        focusManager.clearFocus()
-                    }
-                },
-                onClearClick = { viewModel.updateSearchingWord("") },
+                onSearchTextChanged = onSearchTextChanged,
+                onSearchAction = onSearchAction,
+                onClearClick = onClearClick,
                 onBackClick = onNavigateBack,
                 onFocusChanged = { hasFocus ->
                     if (hasFocus && uiState !is SearchUiState.Error) {
@@ -104,7 +114,7 @@ fun SearchScreen(
                 is SearchUiState.Error -> {
                     ErrorScreen(
                         errorUiState = state.errorUiState,
-                        onRetryClick = { viewModel.loadByKeyword() },
+                        onRetryClick = onRetryClick,
                     )
                 }
             }
@@ -119,7 +129,7 @@ fun SearchScreen(
                         isHistoryVisible = false
                         focusManager.clearFocus()
                     },
-                    onDeleteClick = { viewModel.deleteSearchHistory(it) },
+                    onDeleteClick = onDeleteHistoryClick,
                 )
             }
         }
