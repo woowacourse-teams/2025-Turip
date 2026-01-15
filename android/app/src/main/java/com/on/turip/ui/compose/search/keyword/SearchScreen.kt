@@ -21,13 +21,14 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.on.turip.ui.compose.designsystem.component.ErrorScreen
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
-import com.on.turip.ui.compose.search.component.SearchHistoryList
 import com.on.turip.ui.compose.search.component.SearchResultList
 import com.on.turip.ui.compose.search.keyword.component.SearchAppBar
 import com.on.turip.ui.compose.search.keyword.component.SearchEmptyView
+import com.on.turip.ui.compose.search.keyword.component.SearchHistoryList
 import com.on.turip.ui.search.keywordresult.SearchUiEffect
 import com.on.turip.ui.search.keywordresult.SearchUiState
 import com.on.turip.ui.search.keywordresult.SearchViewModel
+import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 fun SearchScreen(
@@ -106,7 +107,7 @@ fun SearchScreen(
                 is SearchUiState.Success -> {
                     SearchResultList(
                         totalCount = state.totalCount,
-                        videos = state.videos,
+                        videos = state.videos.toImmutableList(),
                         onItemClick = onNavigateToDetail,
                     )
                 }

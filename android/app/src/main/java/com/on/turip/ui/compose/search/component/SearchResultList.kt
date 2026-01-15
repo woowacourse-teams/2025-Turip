@@ -30,7 +30,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.on.turip.R
@@ -39,11 +38,12 @@ import com.on.turip.ui.common.model.trip.toDisplayText
 import com.on.turip.ui.compose.designsystem.theme.TuripColor
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.search.model.VideoInformationModel
+import kotlinx.collections.immutable.ImmutableList
 
 @Composable
 fun SearchResultList(
     totalCount: Int,
-    videos: List<VideoInformationModel>,
+    videos: ImmutableList<VideoInformationModel>,
     onItemClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -99,17 +99,14 @@ private fun SearchResultItem(
                 .padding(
                     horizontal = TuripTheme.spacing.extraLarge,
                     vertical = 6.dp,
-                )
-                .background(
+                ).background(
                     color = TuripColor.LightGray01,
                     shape = itemShape,
-                )
-                .border(
+                ).border(
                     width = 1.dp,
                     color = TuripColor.Black06,
                     shape = itemShape,
-                )
-                .clip(itemShape)
+                ).clip(itemShape)
                 .clickable { onItemClick() }
                 .padding(14.dp),
     ) {
@@ -230,19 +227,5 @@ private fun InfoIconText(
             color = TuripTheme.colors.black,
             modifier = Modifier.padding(start = 10.dp),
         )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun SearchResultListPreview() {
-    TuripTheme {
-        Surface {
-            SearchResultList(
-                totalCount = 0,
-                videos = emptyList(),
-                onItemClick = {},
-            )
-        }
     }
 }
