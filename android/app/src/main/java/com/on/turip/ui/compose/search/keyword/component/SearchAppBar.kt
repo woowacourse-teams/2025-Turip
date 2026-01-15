@@ -33,11 +33,11 @@ import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 @Composable
 fun SearchAppBar(
     searchText: String,
-    onSearchTextChanged: (String) -> Unit,
+    onSearchTextChanged: (text: String) -> Unit,
     onSearchAction: () -> Unit,
     onClearClick: () -> Unit,
     onBackClick: () -> Unit,
-    onFocusChanged: (Boolean) -> Unit,
+    onFocusChanged: (isFocusChanged: Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val rememberedBackClick = remember(onBackClick) { onBackClick }
@@ -68,11 +68,13 @@ fun SearchAppBar(
                         .background(
                             color = TuripTheme.colors.white,
                             shape = TuripTheme.shape.wideButton,
-                        ).border(
+                        )
+                        .border(
                             width = 1.dp,
                             color = TuripTheme.colors.gray01,
                             shape = TuripTheme.shape.wideButton,
-                        ).padding(horizontal = TuripTheme.spacing.large),
+                        )
+                        .padding(horizontal = TuripTheme.spacing.large),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 BasicTextField(

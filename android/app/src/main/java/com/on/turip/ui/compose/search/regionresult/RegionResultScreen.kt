@@ -24,7 +24,7 @@ fun RegionResultScreen(
     uiState: RegionResultUiState,
     uiEffect: RegionResultUiEffect?,
     onBackClick: () -> Unit,
-    onItemClick: (Long) -> Unit,
+    onItemClick: (id: Long) -> Unit,
     onNavigateToLogin: () -> Unit,
     onRetryClick: () -> Unit,
 ) {

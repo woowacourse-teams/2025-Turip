@@ -31,8 +31,8 @@ import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 @Composable
 fun SearchHistoryList(
     histories: List<SearchHistory>,
-    onHistoryClick: (String) -> Unit,
-    onDeleteClick: (String) -> Unit,
+    onHistoryClick: (keyword: String) -> Unit,
+    onDeleteClick: (keyword: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(

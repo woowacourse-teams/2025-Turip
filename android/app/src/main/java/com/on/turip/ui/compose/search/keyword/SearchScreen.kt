@@ -34,7 +34,7 @@ import kotlinx.collections.immutable.toImmutableList
 fun SearchScreen(
     viewModel: SearchViewModel,
     onNavigateBack: () -> Unit,
-    onNavigateToDetail: (Long) -> Unit,
+    onNavigateToDetail: (id: Long) -> Unit,
     onNavigateToLogin: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()

@@ -44,7 +44,7 @@ import kotlinx.collections.immutable.ImmutableList
 fun SearchResultList(
     totalCount: Int,
     videos: ImmutableList<VideoInformationModel>,
-    onItemClick: (Long) -> Unit,
+    onItemClick: (id: Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -99,14 +99,17 @@ private fun SearchResultItem(
                 .padding(
                     horizontal = TuripTheme.spacing.extraLarge,
                     vertical = 6.dp,
-                ).background(
+                )
+                .background(
                     color = TuripColor.LightGray01,
                     shape = itemShape,
-                ).border(
+                )
+                .border(
                     width = 1.dp,
                     color = TuripColor.Black06,
                     shape = itemShape,
-                ).clip(itemShape)
+                )
+                .clip(itemShape)
                 .clickable { onItemClick() }
                 .padding(14.dp),
     ) {
