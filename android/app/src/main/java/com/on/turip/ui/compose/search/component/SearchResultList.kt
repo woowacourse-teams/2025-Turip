@@ -59,13 +59,13 @@ fun SearchResultList(
             modifier =
                 Modifier.padding(
                     horizontal = TuripTheme.spacing.extraLarge,
-                    vertical = 13.dp,
+                    vertical = TuripTheme.spacing.medium,
                 ),
         )
 
         LazyColumn(
             contentPadding = PaddingValues(bottom = TuripTheme.spacing.large),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
+            verticalArrangement = Arrangement.spacedBy(TuripTheme.spacing.large),
         ) {
             items(
                 items = videos,
@@ -96,7 +96,7 @@ private fun SearchResultItem(
                 .fillMaxWidth()
                 .padding(
                     horizontal = TuripTheme.spacing.extraLarge,
-                    vertical = 6.dp,
+                    vertical = TuripTheme.spacing.small,
                 )
                 .background(
                     color = TuripColor.LightGray01,
@@ -109,7 +109,7 @@ private fun SearchResultItem(
                 )
                 .clip(itemShape)
                 .clickable { onItemClick() }
-                .padding(14.dp),
+                .padding(TuripTheme.spacing.medium),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -128,7 +128,7 @@ private fun SearchResultItem(
             Column(
                 modifier =
                     Modifier
-                        .padding(start = 6.dp)
+                        .padding(start = TuripTheme.spacing.extraSmall)
                         .weight(1f),
             ) {
                 Text(
@@ -147,7 +147,7 @@ private fun SearchResultItem(
                         ),
                     style = TuripTheme.typography.info2,
                     color = TuripTheme.colors.gray03,
-                    modifier = Modifier.padding(top = 6.dp),
+                    modifier = Modifier.padding(top = TuripTheme.spacing.extraSmall),
                 )
             }
         }
@@ -176,7 +176,7 @@ private fun SearchResultItem(
                 modifier =
                     Modifier
                         .fillMaxSize()
-                        .padding(vertical = 10.dp),
+                        .padding(vertical = TuripTheme.spacing.medium),
                 verticalArrangement = Arrangement.SpaceBetween,
             ) {
                 Surface(
