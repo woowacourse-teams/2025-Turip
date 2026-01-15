@@ -5,7 +5,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -19,13 +18,11 @@ internal fun RegionResultAppBar(
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val rememberedBackClick = remember(onBackClick) { onBackClick }
-
     TuripAppBar(
         modifier = modifier,
         start = {
             IconButton(
-                onClick = rememberedBackClick,
+                onClick = onBackClick,
                 modifier = Modifier.size(36.dp),
             ) {
                 Icon(

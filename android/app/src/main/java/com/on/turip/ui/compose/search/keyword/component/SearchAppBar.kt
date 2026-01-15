@@ -16,7 +16,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
@@ -40,15 +39,11 @@ fun SearchAppBar(
     onFocusChanged: (isFocusChanged: Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val rememberedBackClick = remember(onBackClick) { onBackClick }
-    val rememberedClearClick = remember(onClearClick) { onClearClick }
-    val rememberedSearchAction = remember(onSearchAction) { onSearchAction }
-
     TuripAppBar(
         modifier = modifier,
         start = {
             IconButton(
-                onClick = rememberedBackClick,
+                onClick = onBackClick,
                 modifier = Modifier.size(36.dp),
             ) {
                 Icon(
@@ -85,7 +80,7 @@ fun SearchAppBar(
                     textStyle = TuripTheme.typography.title3.copy(color = TuripTheme.colors.black),
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                    keyboardActions = KeyboardActions(onSearch = { rememberedSearchAction() }),
+                    keyboardActions = KeyboardActions(onSearch = { onSearchAction() }),
                     decorationBox = { innerTextField ->
                         if (searchText.isEmpty()) {
                             Text(
@@ -100,7 +95,7 @@ fun SearchAppBar(
 
                 if (searchText.isNotEmpty()) {
                     IconButton(
-                        onClick = rememberedClearClick,
+                        onClick = onClearClick,
                         modifier = Modifier.size(TuripTheme.spacing.extraLarge),
                     ) {
                         Icon(

@@ -21,7 +21,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -73,11 +72,10 @@ fun SearchResultList(
                 key = { it.content.id },
             ) { videoInfo ->
                 val videoId: Long = videoInfo.content.id
-                val onClick: () -> Unit = remember(videoId) { { onItemClick(videoId) } }
 
                 SearchResultItem(
                     videoInfo = videoInfo,
-                    onItemClick = onClick,
+                    onItemClick = { onItemClick(videoId) },
                 )
             }
         }
@@ -99,14 +97,17 @@ private fun SearchResultItem(
                 .padding(
                     horizontal = TuripTheme.spacing.extraLarge,
                     vertical = 6.dp,
-                ).background(
+                )
+                .background(
                     color = TuripColor.LightGray01,
                     shape = itemShape,
-                ).border(
+                )
+                .border(
                     width = 1.dp,
                     color = TuripColor.Black06,
                     shape = itemShape,
-                ).clip(itemShape)
+                )
+                .clip(itemShape)
                 .clickable { onItemClick() }
                 .padding(14.dp),
     ) {

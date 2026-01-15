@@ -47,24 +47,14 @@ fun SearchScreen(
     val focusManager = LocalFocusManager.current
     var isHistoryVisible by remember { mutableStateOf(false) }
 
-    val onSearchTextChanged =
-        remember(viewModel) { { text: String -> viewModel.updateSearchingWord(text) } }
-    val onClearClick = remember(viewModel) { { viewModel.updateSearchingWord("") } }
-    val onRetryClick = remember(viewModel) { { viewModel.loadByKeyword() } }
-    val onDeleteHistoryClick =
-        remember(viewModel) { { keyword: String -> viewModel.deleteSearchHistory(keyword) } }
-
-    val onSearchAction =
-        remember(searchingWord, viewModel) {
-            {
-                if (searchingWord.isNotBlank()) {
-                    viewModel.loadByKeyword()
-                    viewModel.createSearchHistory()
-                    isHistoryVisible = false
-                    focusManager.clearFocus()
-                }
-            }
+    val onSearchAction = {
+        if (searchingWord.isNotBlank()) {
+            viewModel.loadByKeyword()
+            viewModel.createSearchHistory()
+            isHistoryVisible = false
+            focusManager.clearFocus()
         }
+    }
 
     LaunchedEffect(uiEffect) {
         when (uiEffect) {
@@ -75,15 +65,15 @@ fun SearchScreen(
 
     Scaffold(
         topBar = {
-             Surface(
+            Surface(
                 color = TuripTheme.colors.white,
                 modifier = Modifier.statusBarsPadding(),
             ) {
                 SearchAppBar(
                     searchText = searchingWord,
-                    onSearchTextChanged = onSearchTextChanged,
+                    onSearchTextChanged = { viewModel.updateSearchingWord(it) },
                     onSearchAction = onSearchAction,
-                    onClearClick = onClearClick,
+                    onClearClick = { viewModel.updateSearchingWord("") },
                     onBackClick = onNavigateBack,
                     onFocusChanged = { hasFocus ->
                         if (hasFocus && uiState !is SearchUiState.Error) {
@@ -122,7 +112,7 @@ fun SearchScreen(
                 is SearchUiState.Error -> {
                     ErrorScreen(
                         errorUiState = state.errorUiState,
-                        onRetryClick = onRetryClick,
+                        onRetryClick = { viewModel.loadByKeyword() },
                     )
                 }
             }
@@ -137,7 +127,7 @@ fun SearchScreen(
                         isHistoryVisible = false
                         focusManager.clearFocus()
                     },
-                    onDeleteClick = onDeleteHistoryClick,
+                    onDeleteClick = { viewModel.deleteSearchHistory(it) },
                 )
             }
         }

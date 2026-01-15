@@ -17,7 +17,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -49,13 +48,11 @@ fun SearchHistoryList(
             key = { it.keyword },
         ) { history ->
             val currentKeyword = history.keyword
-            val onClick = remember(currentKeyword) { { onHistoryClick(currentKeyword) } }
-            val onDelete = remember(currentKeyword) { { onDeleteClick(currentKeyword) } }
 
             SearchHistoryItem(
                 keyword = currentKeyword,
-                onItemClick = onClick,
-                onDeleteClick = onDelete,
+                onItemClick = { onHistoryClick(currentKeyword) },
+                onDeleteClick = { onDeleteClick(currentKeyword) },
             )
             HorizontalDivider(
                 color = TuripTheme.colors.gray01,

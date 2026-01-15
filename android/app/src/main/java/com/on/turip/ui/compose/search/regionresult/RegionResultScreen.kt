@@ -9,7 +9,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.on.turip.ui.compose.designsystem.component.ErrorScreen
@@ -29,10 +28,6 @@ fun RegionResultScreen(
     onNavigateToLogin: () -> Unit,
     onRetryClick: () -> Unit,
 ) {
-    val rememberedBackClick = remember(onBackClick) { onBackClick }
-    val rememberedItemClick = remember(onItemClick) { onItemClick }
-    val rememberedRetryClick = remember(onRetryClick) { onRetryClick }
-
     LaunchedEffect(uiEffect) {
         when (uiEffect) {
             RegionResultUiEffect.NavigateToLogin -> onNavigateToLogin()
@@ -48,7 +43,7 @@ fun RegionResultScreen(
             ) {
                 RegionResultAppBar(
                     title = regionName,
-                    onBackClick = rememberedBackClick,
+                    onBackClick = onBackClick,
                 )
             }
         },
@@ -73,14 +68,14 @@ fun RegionResultScreen(
                     SearchResultList(
                         totalCount = uiState.totalCount,
                         videos = uiState.videos,
-                        onItemClick = rememberedItemClick,
+                        onItemClick = onItemClick,
                     )
                 }
 
                 is RegionResultUiState.Error -> {
                     ErrorScreen(
                         errorUiState = uiState.errorUiState,
-                        onRetryClick = rememberedRetryClick,
+                        onRetryClick = onRetryClick,
                     )
                 }
             }
