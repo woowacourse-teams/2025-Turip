@@ -1,6 +1,5 @@
 package com.on.turip.ui.compose.search.keyword
 
-import SearchUiState
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,10 +21,7 @@ import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.repeatOnLifecycle
 import com.on.turip.ui.compose.designsystem.component.ErrorScreen
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.search.component.SearchResultList
@@ -33,6 +29,7 @@ import com.on.turip.ui.compose.search.keyword.component.SearchAppBar
 import com.on.turip.ui.compose.search.keyword.component.SearchEmptyView
 import com.on.turip.ui.compose.search.keyword.component.SearchHistoryList
 import com.on.turip.ui.search.keywordresult.SearchUiEffect
+import com.on.turip.ui.search.keywordresult.SearchUiState
 import com.on.turip.ui.search.keywordresult.SearchViewModel
 import kotlinx.collections.immutable.persistentListOf
 
@@ -44,11 +41,9 @@ fun SearchScreen(
     viewModel: SearchViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val uiEffect by viewModel.uiEffect.collectAsStateWithLifecycle(initialValue = null)
     val searchingWord by viewModel.searchingWord.observeAsState("")
     val searchHistory by viewModel.searchHistory.observeAsState(persistentListOf())
 
-    val lifecycleOwner = LocalLifecycleOwner.current
     val focusManager = LocalFocusManager.current
     var isHistoryVisible by remember { mutableStateOf(false) }
 
@@ -62,19 +57,10 @@ fun SearchScreen(
     }
 
     LaunchedEffect(Unit) {
-        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            viewModel.uiEffect.collect { effect ->
-                when (effect) {
-                    SearchUiEffect.NavigateToLogin -> onNavigateToLogin()
-                }
+        viewModel.uiEffect.collect { effect ->
+            when (effect) {
+                SearchUiEffect.NavigateToLogin -> onNavigateToLogin()
             }
-        }
-    }
-
-    LaunchedEffect(uiEffect) {
-        when (uiEffect) {
-            SearchUiEffect.NavigateToLogin -> onNavigateToLogin()
-            else -> Unit
         }
     }
 
