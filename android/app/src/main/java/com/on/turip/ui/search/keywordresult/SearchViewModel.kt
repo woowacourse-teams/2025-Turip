@@ -1,5 +1,6 @@
 package com.on.turip.ui.search.keywordresult
 
+import SearchUiState
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
@@ -18,6 +19,9 @@ import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.search.keywordresult.SearchActivity.Companion.SEARCH_KEYWORD_KEY
 import com.on.turip.ui.search.model.VideoInformationModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
@@ -46,8 +50,11 @@ class SearchViewModel @Inject constructor(
     private val _searchingWord: MutableLiveData<String> = MutableLiveData()
     val searchingWord: LiveData<String> get() = _searchingWord
 
-    private val _searchHistory: MutableLiveData<List<SearchHistory>> = MutableLiveData(emptyList())
-    val searchHistory: LiveData<List<SearchHistory>> get() = _searchHistory
+    private val _searchHistory: MutableLiveData<ImmutableList<SearchHistory>> =
+        MutableLiveData(
+            persistentListOf(),
+        )
+    val searchHistory: LiveData<ImmutableList<SearchHistory>> get() = _searchHistory
 
     private val searchKeyword: String by lazy {
         checkNotNull(savedStateHandle[SEARCH_KEYWORD_KEY]) {
@@ -68,7 +75,7 @@ class SearchViewModel @Inject constructor(
                 .loadRecentSearches(MAX_SEARCH_HISTORY_COUNT)
                 .onSuccess { result: List<SearchHistory> ->
                     Timber.d("최근 검색 목록 받아옴 $result")
-                    _searchHistory.value = result
+                    _searchHistory.value = result.toImmutableList()
                 }
         }
     }
@@ -120,7 +127,7 @@ class SearchViewModel @Inject constructor(
             } else {
                 _uiState.update {
                     SearchUiState.Success(
-                        videos = videosInformation,
+                        videos = videosInformation.toImmutableList(),
                         totalCount = count,
                     )
                 }
@@ -156,7 +163,7 @@ class SearchViewModel @Inject constructor(
         val currentList = _searchHistory.value?.toMutableList()
         val updatedList = currentList?.filterNot { it.keyword == newItem.keyword }?.toMutableList()
         updatedList?.add(FIRST_INDEX, newItem)
-        _searchHistory.value = updatedList?.take(limit)
+        _searchHistory.value = updatedList?.take(limit)?.toImmutableList()
     }
 
     fun deleteSearchHistory(keyword: String) {
@@ -164,7 +171,8 @@ class SearchViewModel @Inject constructor(
             searchHistoryRepository
                 .deleteSearch(keyword)
                 .onSuccess {
-                    _searchHistory.value = searchHistory.value?.filterNot { it.keyword == keyword }
+                    _searchHistory.value =
+                        searchHistory.value?.filterNot { it.keyword == keyword }?.toImmutableList()
                     Timber.d("${keyword}가 최근 검색 목록에서 삭제")
                 }
         }

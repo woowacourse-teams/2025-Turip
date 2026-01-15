@@ -16,7 +16,6 @@ import com.on.turip.ui.compose.search.component.SearchResultList
 import com.on.turip.ui.compose.search.regionresult.component.RegionResultAppBar
 import com.on.turip.ui.search.regionresult.RegionResultUiEffect
 import com.on.turip.ui.search.regionresult.RegionResultUiState
-import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 fun RegionResultScreen(
@@ -66,7 +65,7 @@ fun RegionResultScreen(
                 is RegionResultUiState.Success -> {
                     SearchResultList(
                         totalCount = uiState.totalCount,
-                        videos = uiState.videos.toImmutableList(),
+                        videos = uiState.videos,
                         onItemClick = rememberedItemClick,
                     )
                 }

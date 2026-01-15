@@ -1,5 +1,6 @@
 package com.on.turip.ui.compose.search.keyword
 
+import SearchUiState
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,9 +27,8 @@ import com.on.turip.ui.compose.search.keyword.component.SearchAppBar
 import com.on.turip.ui.compose.search.keyword.component.SearchEmptyView
 import com.on.turip.ui.compose.search.keyword.component.SearchHistoryList
 import com.on.turip.ui.search.keywordresult.SearchUiEffect
-import com.on.turip.ui.search.keywordresult.SearchUiState
 import com.on.turip.ui.search.keywordresult.SearchViewModel
-import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun SearchScreen(
@@ -40,7 +40,7 @@ fun SearchScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val uiEffect by viewModel.uiEffect.collectAsStateWithLifecycle(initialValue = null)
     val searchingWord by viewModel.searchingWord.observeAsState("")
-    val searchHistory by viewModel.searchHistory.observeAsState(emptyList())
+    val searchHistory by viewModel.searchHistory.observeAsState(persistentListOf())
 
     val focusManager = LocalFocusManager.current
     var isHistoryVisible by remember { mutableStateOf(false) }
@@ -107,7 +107,7 @@ fun SearchScreen(
                 is SearchUiState.Success -> {
                     SearchResultList(
                         totalCount = state.totalCount,
-                        videos = state.videos.toImmutableList(),
+                        videos = state.videos,
                         onItemClick = onNavigateToDetail,
                     )
                 }

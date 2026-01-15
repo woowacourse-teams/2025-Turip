@@ -27,10 +27,12 @@ import androidx.compose.ui.unit.dp
 import com.on.turip.R
 import com.on.turip.domain.searchhistory.SearchHistory
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun SearchHistoryList(
-    histories: List<SearchHistory>,
+    histories: ImmutableList<SearchHistory>,
     onHistoryClick: (keyword: String) -> Unit,
     onDeleteClick: (keyword: String) -> Unit,
     modifier: Modifier = Modifier,
@@ -102,7 +104,7 @@ private fun SearchHistoryItem(
 @Composable
 private fun SearchHistoryListPreview() {
     val mockHistories =
-        listOf(
+        persistentListOf(
             SearchHistory("제주도 맛집", 0L),
             SearchHistory("서울 가볼만한 곳", 0L),
             SearchHistory("부산 여행 코스", 0L),

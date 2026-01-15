@@ -2,6 +2,7 @@ package com.on.turip.ui.search.regionresult
 
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.search.model.VideoInformationModel
+import kotlinx.collections.immutable.ImmutableList
 
 sealed interface RegionResultUiState {
     data object Loading : RegionResultUiState
@@ -9,7 +10,7 @@ sealed interface RegionResultUiState {
     data object Empty : RegionResultUiState
 
     data class Success(
-        val videos: List<VideoInformationModel>,
+        val videos: ImmutableList<VideoInformationModel>,
         val totalCount: Int,
         val region: String,
     ) : RegionResultUiState
