@@ -5,8 +5,10 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -73,18 +75,23 @@ fun SearchScreen(
 
     Scaffold(
         topBar = {
-            SearchAppBar(
-                searchText = searchingWord,
-                onSearchTextChanged = onSearchTextChanged,
-                onSearchAction = onSearchAction,
-                onClearClick = onClearClick,
-                onBackClick = onNavigateBack,
-                onFocusChanged = { hasFocus ->
-                    if (hasFocus && uiState !is SearchUiState.Error) {
-                        isHistoryVisible = true
-                    }
-                },
-            )
+             Surface(
+                color = TuripTheme.colors.white,
+                modifier = Modifier.statusBarsPadding(),
+            ) {
+                SearchAppBar(
+                    searchText = searchingWord,
+                    onSearchTextChanged = onSearchTextChanged,
+                    onSearchAction = onSearchAction,
+                    onClearClick = onClearClick,
+                    onBackClick = onNavigateBack,
+                    onFocusChanged = { hasFocus ->
+                        if (hasFocus && uiState !is SearchUiState.Error) {
+                            isHistoryVisible = true
+                        }
+                    },
+                )
+            }
         },
         containerColor = TuripTheme.colors.white,
     ) { paddingValues ->

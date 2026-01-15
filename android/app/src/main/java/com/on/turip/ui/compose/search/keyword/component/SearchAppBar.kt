@@ -61,6 +61,7 @@ fun SearchAppBar(
             Spacer(modifier = Modifier.width(TuripTheme.spacing.medium))
 
             Row(
+                verticalAlignment = Alignment.CenterVertically,
                 modifier =
                     Modifier
                         .weight(1f)
@@ -68,14 +69,11 @@ fun SearchAppBar(
                         .background(
                             color = TuripTheme.colors.white,
                             shape = TuripTheme.shape.wideButton,
-                        )
-                        .border(
+                        ).border(
                             width = 1.dp,
                             color = TuripTheme.colors.gray01,
                             shape = TuripTheme.shape.wideButton,
-                        )
-                        .padding(horizontal = TuripTheme.spacing.large),
-                verticalAlignment = Alignment.CenterVertically,
+                        ).padding(horizontal = TuripTheme.spacing.large),
             ) {
                 BasicTextField(
                     value = searchText,
