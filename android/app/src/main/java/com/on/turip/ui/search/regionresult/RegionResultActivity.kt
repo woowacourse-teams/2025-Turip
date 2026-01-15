@@ -7,8 +7,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.runtime.getValue
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.search.regionresult.RegionResultScreen
 import com.on.turip.ui.login.LoginActivity
@@ -23,14 +21,8 @@ class RegionResultActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-            val uiEffect by viewModel.uiEffect.collectAsStateWithLifecycle(initialValue = null)
-
             TuripTheme {
                 RegionResultScreen(
-                    regionName = viewModel.regionCategoryName,
-                    uiState = uiState,
-                    uiEffect = uiEffect,
                     onBackClick = { finish() },
                     onItemClick = { contentId ->
                         startActivity(
@@ -41,7 +33,7 @@ class RegionResultActivity : AppCompatActivity() {
                         )
                     },
                     onNavigateToLogin = { navigateToLoginScreen() },
-                    onRetryClick = { viewModel.loadContentsFromRegion() },
+                    viewModel = viewModel,
                 )
             }
         }
