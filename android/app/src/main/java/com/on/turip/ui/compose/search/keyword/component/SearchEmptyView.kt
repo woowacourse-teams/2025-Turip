@@ -18,6 +18,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.on.turip.R
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 
@@ -46,7 +47,7 @@ fun SearchEmptyView(
             Icon(
                 painter = painterResource(id = R.drawable.ic_star),
                 contentDescription = null,
-                modifier = Modifier.size(TuripTheme.spacing.extraExtraLarge),
+                modifier = Modifier.size(24.dp),
                 tint = TuripTheme.colors.primary,
             )
 
