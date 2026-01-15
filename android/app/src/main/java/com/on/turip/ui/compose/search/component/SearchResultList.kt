@@ -99,17 +99,14 @@ private fun SearchResultItem(
                 .padding(
                     horizontal = TuripTheme.spacing.extraLarge,
                     vertical = 6.dp,
-                )
-                .background(
+                ).background(
                     color = TuripColor.LightGray01,
                     shape = itemShape,
-                )
-                .border(
+                ).border(
                     width = 1.dp,
                     color = TuripColor.Black06,
                     shape = itemShape,
-                )
-                .clip(itemShape)
+                ).clip(itemShape)
                 .clickable { onItemClick() }
                 .padding(14.dp),
     ) {
@@ -141,7 +138,12 @@ private fun SearchResultItem(
                     overflow = TextOverflow.Ellipsis,
                 )
                 Text(
-                    text = "${videoInfo.content.creator.channelName} · ${videoInfo.content.videoData.uploadedDate}",
+                    text =
+                        stringResource(
+                            R.string.region_result_video_description,
+                            videoInfo.content.creator.channelName,
+                            videoInfo.content.videoData.uploadedDate,
+                        ),
                     style = TuripTheme.typography.info2,
                     color = TuripTheme.colors.gray03,
                     modifier = Modifier.padding(top = 6.dp),
