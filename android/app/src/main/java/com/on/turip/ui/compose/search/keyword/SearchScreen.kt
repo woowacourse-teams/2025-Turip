@@ -22,7 +22,10 @@ import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import com.on.turip.ui.compose.designsystem.component.ErrorScreen
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.search.component.SearchResultList
@@ -45,6 +48,7 @@ fun SearchScreen(
     val searchingWord by viewModel.searchingWord.observeAsState("")
     val searchHistory by viewModel.searchHistory.observeAsState(persistentListOf())
 
+    val lifecycleOwner = LocalLifecycleOwner.current
     val focusManager = LocalFocusManager.current
     var isHistoryVisible by remember { mutableStateOf(false) }
 
@@ -54,6 +58,16 @@ fun SearchScreen(
             viewModel.createSearchHistory()
             isHistoryVisible = false
             focusManager.clearFocus()
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.uiEffect.collect { effect ->
+                when (effect) {
+                    SearchUiEffect.NavigateToLogin -> onNavigateToLogin()
+                }
+            }
         }
     }
 
