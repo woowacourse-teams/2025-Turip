@@ -1,3 +1,5 @@
+package com.on.turip.ui.search.keywordresult
+
 import androidx.compose.runtime.Immutable
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.search.model.VideoInformationModel

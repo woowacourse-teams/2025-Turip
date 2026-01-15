@@ -1,6 +1,5 @@
 package com.on.turip.ui.search.keywordresult
 
-import SearchUiState
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
