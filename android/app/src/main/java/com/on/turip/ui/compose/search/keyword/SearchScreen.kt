@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.on.turip.ui.compose.designsystem.component.ErrorScreen
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
@@ -34,10 +35,10 @@ import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun SearchScreen(
-    viewModel: SearchViewModel,
     onNavigateBack: () -> Unit,
     onNavigateToDetail: (id: Long) -> Unit,
     onNavigateToLogin: () -> Unit,
+    viewModel: SearchViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val uiEffect by viewModel.uiEffect.collectAsStateWithLifecycle(initialValue = null)
