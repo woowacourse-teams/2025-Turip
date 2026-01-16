@@ -17,19 +17,22 @@ class VideoManager(
         webView.apply {
             if (!isInitialized) {
                 addJavascriptInterface(
-                    WebViewVideoBridge(
-                        TuripUrlConverter.extractVideoId(url),
-                    ) { onError() },
+                    WebViewVideoBridge(TuripUrlConverter.extractVideoId(url)) { onError() },
                     BRIDGE_NAME_IN_JS_FILE,
                 )
                 isInitialized = true
             }
 
             loadDataWithBaseURL(
+                // baseUrl =
                 BuildConfig.BASE_URL,
+                // data =
                 readLocalHtml(LOCAL_HTML_FILE_NAME),
+                // mimeType =
                 DEFAULT_MIME_TYPE,
+                // encoding =
                 DEFAULT_ENCODING,
+                // historyUrl =
                 null,
             )
         }

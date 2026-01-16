@@ -1,15 +1,14 @@
 package com.on.turip.ui.trip.detail.webview
 
-import android.content.Intent
 import android.graphics.Bitmap
-import android.view.View
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import androidx.core.net.toUri
 
 class TuripWebViewClient(
-    private val progressBar: View,
+    private val onLoadingStarted: () -> Unit,
+    private val onLoadingFinished: () -> Unit,
+    private val onNavigateExternalUrl: (String) -> Unit,
 ) : WebViewClient() {
     override fun shouldOverrideUrlLoading(
         view: WebView?,
@@ -21,11 +20,12 @@ class TuripWebViewClient(
                 false
             }
 
-            else -> {
-                if (!url.startsWith(SECURE_URL)) return true
+            !url.startsWith(SECURE_URL) -> {
+                true
+            }
 
-                val intent: Intent = Intent(Intent.ACTION_VIEW, url.toUri())
-                view?.context?.startActivity(intent)
+            else -> {
+                onNavigateExternalUrl(url)
                 true
             }
         }
@@ -37,7 +37,7 @@ class TuripWebViewClient(
         favicon: Bitmap?,
     ) {
         super.onPageStarted(view, url, favicon)
-        progressBar.visibility = View.VISIBLE
+        onLoadingStarted()
     }
 
     override fun onPageFinished(
@@ -45,7 +45,7 @@ class TuripWebViewClient(
         url: String?,
     ) {
         super.onPageFinished(view, url)
-        progressBar.visibility = View.GONE
+        onLoadingFinished()
     }
 
     companion object {

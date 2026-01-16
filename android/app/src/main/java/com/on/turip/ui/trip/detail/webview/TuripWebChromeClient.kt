@@ -2,12 +2,10 @@ package com.on.turip.ui.trip.detail.webview
 
 import android.view.View
 import android.webkit.WebChromeClient
-import android.widget.FrameLayout
 
 class TuripWebChromeClient(
-    private val fullScreenView: FrameLayout,
-    private val onEnterFullScreen: () -> Unit,
-    private val onExitFullScreen: () -> Unit,
+    private val onShowFullScreen: (video: View) -> Unit,
+    private val onHideFullScreen: () -> Unit,
 ) : WebChromeClient() {
     private var customView: View? = null
     private var customViewCallBack: CustomViewCallback? = null
@@ -24,30 +22,17 @@ class TuripWebChromeClient(
         customView = view
         customViewCallBack = callback
 
-        fullScreenView.apply {
-            visibility = View.VISIBLE
-            addView(
-                view,
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT,
-            )
-        }
-
-        onEnterFullScreen()
+        customView?.let { onShowFullScreen(it) }
     }
 
     override fun onHideCustomView() {
-        fullScreenView.apply {
-            removeAllViews()
-            visibility = View.GONE
-        }
+        if (customView == null) return
+
+        onHideFullScreen()
+
+        customViewCallBack?.onCustomViewHidden()
 
         customView = null
-        customViewCallBack?.onCustomViewHidden()
         customViewCallBack = null
-
-        onExitFullScreen()
     }
-
-    fun isFullScreen(): Boolean = customView != null
 }
