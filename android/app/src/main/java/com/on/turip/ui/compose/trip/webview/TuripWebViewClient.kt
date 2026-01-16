@@ -1,4 +1,4 @@
-package com.on.turip.ui.trip.detail.webview
+package com.on.turip.ui.compose.trip.webview
 
 import android.graphics.Bitmap
 import android.webkit.WebResourceRequest

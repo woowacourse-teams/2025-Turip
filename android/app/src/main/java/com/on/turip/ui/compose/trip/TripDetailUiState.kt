@@ -1,16 +1,22 @@
-package com.on.turip.ui.trip.detail
+package com.on.turip.ui.compose.trip
 
+import androidx.compose.runtime.Stable
 import com.on.turip.ui.common.error.ErrorUiState
+import com.on.turip.ui.compose.trip.model.DayModel
+import com.on.turip.ui.compose.trip.model.PlaceModel
+import com.on.turip.ui.trip.detail.TripDetailInfoModel
 
+@Stable
 data class TripDetailUiState(
     val isLoading: Boolean,
     val errorUiState: ErrorUiState,
     val days: List<DayModel>,
     val places: List<PlaceModel>,
-    val tripDetailInfo: TripDetailInfoModel?,
+    val tripDetailInfo: TripDetailInfoModel,
     val isFavorite: Boolean,
     val isExpandTextToggleVisible: Boolean?,
     val isExpandTextToggleSelected: Boolean,
+    val isVideoLoaded: Boolean,
 ) {
     val titleMaxLines: Int
         get() = if (isExpandTextToggleSelected) EXPAND_TEXT else DEFAULT_CONTENT_TITLE_MAX_LINES
@@ -30,10 +36,11 @@ data class TripDetailUiState(
                 errorUiState = ErrorUiState.None,
                 days = emptyList(),
                 places = emptyList(),
-                tripDetailInfo = null,
+                tripDetailInfo = TripDetailInfoModel.Idle,
                 isFavorite = false,
                 isExpandTextToggleVisible = null,
                 isExpandTextToggleSelected = false,
+                isVideoLoaded = false,
             )
     }
 }

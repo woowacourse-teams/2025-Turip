@@ -1,4 +1,4 @@
-package com.on.turip.ui.trip.detail
+package com.on.turip.ui.compose.trip
 
 import com.on.turip.ui.common.error.ErrorUiState
 
@@ -11,7 +11,7 @@ sealed interface TripDetailUiEffect {
 
     data class ShowError(
         val errorUiState: ErrorUiState,
-        val action: TripDetailRetryAction,
+        val retryAction: TripDetailRetryAction,
     ) : TripDetailUiEffect
 }
 

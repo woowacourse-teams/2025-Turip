@@ -1,9 +1,8 @@
-package com.on.turip.ui.trip.detail
+package com.on.turip.ui.compose.trip.webview
 
 import android.webkit.WebView
 import com.on.turip.BuildConfig
 import com.on.turip.ui.common.TuripUrlConverter
-import com.on.turip.ui.trip.detail.webview.WebViewVideoBridge
 
 class VideoManager(
     private val webView: WebView,
