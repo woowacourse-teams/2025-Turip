@@ -7,11 +7,11 @@ data class TripDurationModel(
     val nights: Int,
     val days: Int,
 ) {
-    fun isDayTrip(): Boolean = nights == 0 && days == 1
+    val isDayTrip: Boolean = nights == 0 && days == 1
 }
 
 fun TripDurationModel.toDisplayText(context: Context): String =
-    if (isDayTrip()) {
+    if (this.isDayTrip) {
         context.getString(R.string.all_trip_day_trip_duration)
     } else {
         context.getString(R.string.all_trip_duration, nights, days)

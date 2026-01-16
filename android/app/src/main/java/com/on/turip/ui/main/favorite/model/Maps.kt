@@ -1,9 +1,8 @@
-package com.on.turip.ui.trip.detail
+package com.on.turip.ui.main.favorite.model
 
 import android.net.Uri
 import androidx.annotation.DrawableRes
 import com.on.turip.R
-import com.on.turip.ui.trip.detail.Maps.entries
 
 private const val KAKAO_BASE_URL = "kakao.com"
 private const val GOOGLE_BASE_URL = "google.com"

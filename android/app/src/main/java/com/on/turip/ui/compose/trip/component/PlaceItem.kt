@@ -28,14 +28,15 @@ import androidx.compose.ui.unit.dp
 import com.on.turip.R
 import com.on.turip.domain.trip.MapType
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
+import com.on.turip.ui.compose.trip.model.MapModel
 import com.on.turip.ui.compose.trip.model.PlaceModel
 
 @Composable
 fun PlaceItem(
     placeModel: PlaceModel,
-    onTimeLineClick: () -> Unit,
-    onMapClick: () -> Unit,
-    onFavoriteClick: () -> Unit,
+    onTimeLineClick: (timeLine: Int) -> Unit,
+    onMapClick: (mapModel: MapModel) -> Unit,
+    onFavoriteClick: (id: Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -75,7 +76,7 @@ fun PlaceItem(
                 text = stringResource(R.string.trip_place_time_line, placeModel.timeLine),
                 drawableRes = R.drawable.ic_play_button,
                 useTint = true,
-                onClick = onTimeLineClick,
+                onClick = { onTimeLineClick(placeModel.seekTimeSeconds) },
             )
 
             VerticalDivider(modifier = Modifier.height(24.dp))
@@ -94,16 +95,17 @@ fun PlaceItem(
                         MapType.GOOGLE -> false
                         MapType.NONE -> true
                     },
-                onClick = onMapClick,
+                onClick = { onMapClick(placeModel.mapModel) },
             )
 
             VerticalDivider(modifier = Modifier.height(24.dp))
 
             PlaceActionItem(
                 text = stringResource(R.string.trip_place_favorite),
+                iconTint = if (placeModel.isFavorite) TuripTheme.colors.primary else TuripTheme.colors.gray04,
                 drawableRes = if (placeModel.isFavorite) R.drawable.btn_favorite_selected else R.drawable.btn_favorite_normal,
                 useTint = true,
-                onClick = onFavoriteClick,
+                onClick = { onFavoriteClick(placeModel.id) },
             )
         }
     }

@@ -17,8 +17,14 @@ import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.common.mapper.toUiModel
+import com.on.turip.ui.compose.trip.TripDetailRetryAction
+import com.on.turip.ui.compose.trip.TripDetailUiEffect
+import com.on.turip.ui.compose.trip.TripDetailUiState
+import com.on.turip.ui.compose.trip.model.DayModel
+import com.on.turip.ui.compose.trip.model.PlaceModel
 import com.on.turip.ui.trip.detail.TripDetailActivity.Companion.TRIP_DETAIL_CONTENT_KEY
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -29,7 +35,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @HiltViewModel
 class TripDetailViewModel @Inject constructor(
@@ -101,6 +106,7 @@ class TripDetailViewModel @Inject constructor(
                         TripDetailInfoModel(
                             creatorName = content.creator.channelName,
                             creatorThumbnail = content.creator.profileImage,
+                            city = content.city.name,
                             videoLink = content.videoData.url,
                             contentTitle = content.videoData.title,
                             uploadedDate = content.videoData.uploadedDate,
@@ -130,13 +136,13 @@ class TripDetailViewModel @Inject constructor(
         placeCacheByDay = placesByDay
     }
 
-    fun updateDay(updateDayModel: DayModel) {
+    fun updateDay(selectDay: Int) {
         _uiState.update { state: TripDetailUiState ->
             val updatedDays: List<DayModel> =
-                state.days.map { dayModel: DayModel -> dayModel.copy(isSelected = dayModel.day == updateDayModel.day) }
+                state.days.map { dayModel: DayModel -> dayModel.copy(isSelected = dayModel.day == selectDay) }
             state.copy(
                 days = updatedDays,
-                places = placeCacheByDay[updateDayModel.day].orEmpty(),
+                places = placeCacheByDay[selectDay].orEmpty(),
             )
         }
     }
