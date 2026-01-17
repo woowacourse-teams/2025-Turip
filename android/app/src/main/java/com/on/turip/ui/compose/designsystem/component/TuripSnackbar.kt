@@ -43,7 +43,7 @@ fun TuripSnackbar(
                     snackbarData.visuals as? TuripSnackbarVisuals ?: snackbarData.visuals
 
                 Snackbar(
-                    modifier = Modifier.padding(16.dp),
+                    modifier = Modifier.padding(TuripTheme.spacing.large),
                     action = {
                         visuals.actionLabel?.let { label ->
                             TextButton(onClick = snackbarData::performAction) {
@@ -58,7 +58,7 @@ fun TuripSnackbar(
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(TuripTheme.spacing.small),
                     ) {
                         if (visuals is TuripSnackbarVisuals && visuals.iconRes != null) {
                             Image(

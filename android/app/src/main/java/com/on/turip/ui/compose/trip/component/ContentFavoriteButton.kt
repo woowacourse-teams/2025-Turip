@@ -41,7 +41,7 @@ fun ContentFavoriteButton(
                 .clickable(onClick = onClick)
                 .background(color = TuripTheme.colors.primary, shape = TuripTheme.shape.wideButton)
                 .fillMaxWidth()
-                .padding(vertical = 12.dp),
+                .padding(vertical = TuripTheme.spacing.medium),
     ) {
         Icon(
             painter = painterResource(iconRes),
@@ -50,7 +50,7 @@ fun ContentFavoriteButton(
             modifier = Modifier.size(24.dp),
         )
 
-        Spacer(modifier = Modifier.width(4.dp))
+        Spacer(modifier = Modifier.width(TuripTheme.spacing.extraSmall))
 
         Text(
             text = stringResource(titleRes),

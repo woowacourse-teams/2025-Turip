@@ -50,7 +50,12 @@ fun PlaceItem(
                 ).background(
                     color = TuripTheme.colors.container,
                     shape = TuripTheme.shape.container,
-                ).padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 16.dp),
+                ).padding(
+                    start = TuripTheme.spacing.large,
+                    end = TuripTheme.spacing.large,
+                    top = TuripTheme.spacing.medium,
+                    bottom = TuripTheme.spacing.large,
+                ),
     ) {
         Text(
             text = placeModel.turipCategory,
@@ -58,7 +63,7 @@ fun PlaceItem(
             color = TuripTheme.colors.gray05,
         )
 
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(TuripTheme.spacing.extraSmall))
 
         Text(
             text = placeModel.name,
@@ -66,7 +71,7 @@ fun PlaceItem(
             color = TuripTheme.colors.gray04,
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(TuripTheme.spacing.medium))
 
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -79,7 +84,7 @@ fun PlaceItem(
                 onClick = { onTimeLineClick(placeModel.seekTimeSeconds) },
             )
 
-            VerticalDivider(modifier = Modifier.height(24.dp))
+            VerticalDivider(modifier = Modifier.height(TuripTheme.spacing.extraExtraLarge))
 
             PlaceActionItem(
                 text = stringResource(R.string.trip_place_map),
@@ -98,7 +103,7 @@ fun PlaceItem(
                 onClick = { onMapClick(placeModel.mapModel) },
             )
 
-            VerticalDivider(modifier = Modifier.height(24.dp))
+            VerticalDivider(modifier = Modifier.height(TuripTheme.spacing.extraExtraLarge))
 
             PlaceActionItem(
                 text = stringResource(R.string.trip_place_favorite),
@@ -126,9 +131,9 @@ private fun PlaceActionItem(
         modifier =
             modifier
                 .clickable(onClick = onClick)
-                .padding(horizontal = 12.dp),
+                .padding(horizontal = TuripTheme.spacing.medium),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalArrangement = Arrangement.spacedBy(TuripTheme.spacing.extraSmall),
     ) {
         if (useTint) {
             Icon(
@@ -170,7 +175,7 @@ private fun PlaceItemPreview() {
             onTimeLineClick = { },
             onMapClick = { },
             onFavoriteClick = { },
-            modifier = Modifier.padding(20.dp),
+            modifier = Modifier.padding(TuripTheme.spacing.extraLarge),
         )
     }
 }

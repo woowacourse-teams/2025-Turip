@@ -32,13 +32,13 @@ fun ContentInformation(
     information: TripDetailInfoModel,
     modifier: Modifier = Modifier,
 ) {
-    Column(modifier = modifier.padding(horizontal = 20.dp)) {
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    Column(modifier = modifier.padding(horizontal = TuripTheme.spacing.extraLarge)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(TuripTheme.spacing.small)) {
             ContentInfoChip(information.city)
             ContentInfoChip(information.uploadedDate)
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(TuripTheme.spacing.large))
 
         Column {
             ContentExpandableTitle(
@@ -46,7 +46,7 @@ fun ContentInformation(
                 collapsedMaxLines = 2,
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(TuripTheme.spacing.small))
 
             ContentInfoItem(
                 label = stringResource(R.string.trip_detail_period),
@@ -54,7 +54,7 @@ fun ContentInformation(
                 iconPainterRes = R.drawable.ic_calendar,
             )
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(TuripTheme.spacing.extraSmall))
 
             ContentInfoItem(
                 label = stringResource(R.string.trip_detail_visit_place),
@@ -81,8 +81,10 @@ private fun ContentInfoChip(
                     width = 1.dp,
                     color = TuripTheme.colors.gray02,
                     shape = TuripTheme.shape.chip,
-                )
-                .padding(horizontal = 8.dp, vertical = 4.dp),
+                ).padding(
+                    horizontal = TuripTheme.spacing.small,
+                    vertical = TuripTheme.spacing.extraSmall,
+                ),
     ) {
         Text(
             text = text,
@@ -102,7 +104,7 @@ private fun ContentInfoItem(
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalArrangement = Arrangement.spacedBy(TuripTheme.spacing.extraSmall),
         modifier = modifier,
     ) {
         Icon(
@@ -142,7 +144,7 @@ private fun ContentInformationPreview() {
                     placeTotalCount = 12,
                     duration = TripDurationModel(0, 1),
                 ),
-            modifier = Modifier.padding(vertical = 20.dp),
+            modifier = Modifier.padding(vertical = TuripTheme.spacing.extraLarge),
         )
     }
 }

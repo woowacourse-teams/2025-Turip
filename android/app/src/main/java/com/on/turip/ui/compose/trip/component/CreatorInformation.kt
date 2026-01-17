@@ -56,13 +56,13 @@ fun CreatorInformation(
                 name = name,
                 modifier =
                     Modifier.padding(
-                        start = 20.dp,
-                        end = 20.dp,
+                        start = TuripTheme.spacing.extraLarge,
+                        end = TuripTheme.spacing.extraLarge,
                         top = headerDiagonalHeight - thumbnailOverlap,
                     ),
             )
         }
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(TuripTheme.spacing.extraLarge))
     }
 }
 
@@ -124,21 +124,21 @@ private fun CreatorDetail(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(TuripTheme.spacing.small),
         modifier = modifier,
     ) {
         CreatorThumbnail(imageUrl = thumbnailUrl)
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            horizontalArrangement = Arrangement.spacedBy(TuripTheme.spacing.small),
         ) {
             Image(
                 painter = painterResource(R.drawable.ic_youtuber_badge),
                 contentDescription = null,
             )
             Text(
-                text = name, // TODO : uiState에서 가져오기
+                text = name,
                 style = TuripTheme.typography.title3,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,

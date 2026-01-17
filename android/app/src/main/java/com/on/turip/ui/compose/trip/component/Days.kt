@@ -33,7 +33,7 @@ fun Days(
 ) {
     LazyRow(
         modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalArrangement = Arrangement.spacedBy(TuripTheme.spacing.extraSmall),
     ) {
         items(items = days, key = { it.day }) { dayModel: DayModel ->
             DayItem(
@@ -67,7 +67,7 @@ private fun DayItem(
                 },
             style = TuripTheme.typography.title3,
             color = if (dayModel.isSelected) TuripTheme.colors.black else TuripTheme.colors.gray02,
-            modifier = Modifier.padding(4.dp),
+            modifier = Modifier.padding(TuripTheme.spacing.extraSmall),
         )
 
         Box(

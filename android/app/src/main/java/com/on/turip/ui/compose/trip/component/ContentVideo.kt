@@ -109,7 +109,7 @@ private fun VideoError(
         contentAlignment = Alignment.Center,
     ) {
         Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(TuripTheme.spacing.small),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(

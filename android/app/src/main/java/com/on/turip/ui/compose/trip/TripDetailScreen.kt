@@ -279,16 +279,16 @@ private fun TripDetailScreenContent(
         }
 
         item {
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(TuripTheme.spacing.extraLarge))
             ContentInformation(information = uiState.tripDetailInfo)
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(TuripTheme.spacing.large))
         }
 
         item {
             Days(
                 days = uiState.days,
                 onDayClick = { day -> onDayClick(day) },
-                modifier = Modifier.padding(horizontal = 20.dp),
+                modifier = Modifier.padding(horizontal = TuripTheme.spacing.extraLarge),
             )
         }
 
@@ -301,8 +301,11 @@ private fun TripDetailScreenContent(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 20.dp)
-                        .padding(top = 4.dp, bottom = 12.dp),
+                        .padding(horizontal = TuripTheme.spacing.extraLarge)
+                        .padding(
+                            top = TuripTheme.spacing.extraSmall,
+                            bottom = TuripTheme.spacing.medium,
+                        ),
             )
         }
 
@@ -314,7 +317,11 @@ private fun TripDetailScreenContent(
                 onFavoriteClick = { onFavoritePlaceClick(it) },
                 modifier =
                     Modifier
-                        .padding(start = 20.dp, end = 20.dp, bottom = 8.dp)
+                        .padding(
+                            start = TuripTheme.spacing.extraLarge,
+                            end = TuripTheme.spacing.extraLarge,
+                            bottom = TuripTheme.spacing.small,
+                        )
                         .fillMaxWidth(),
             )
         }
@@ -325,7 +332,10 @@ private fun TripDetailScreenContent(
                 onClick = onFavoriteContentClick,
                 modifier =
                     Modifier
-                        .padding(horizontal = 20.dp, vertical = 12.dp)
+                        .padding(
+                            horizontal = TuripTheme.spacing.extraLarge,
+                            vertical = TuripTheme.spacing.medium,
+                        )
                         .fillMaxWidth(),
             )
         }
