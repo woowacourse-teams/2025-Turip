@@ -125,15 +125,23 @@ fun TripDetailScreen(
 
     Scaffold(
         topBar = {
-            if (!webViewState.isFullScreen) {
-                TripDetailAppBar(
-                    isContentFavorite = uiState.isFavorite,
-                    onBackClick = navigateToBack,
-                    onContentFavoriteClick = viewModel::updateFavorite,
-                )
+            if (!webViewController.isFullScreen) {
+                Column {
+                    Spacer(
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .windowInsetsTopHeight(WindowInsets.systemBars)
+                                .background(TuripTheme.colors.primary),
+                    )
+                    TripDetailAppBar(
+                        isContentFavorite = uiState.isFavorite,
+                        onBackClick = navigateToBack,
+                        onContentFavoriteClick = viewModel::updateFavorite,
+                    )
+                }
             }
         },
-        contentWindowInsets = WindowInsets(),
         snackbarHost = {
             val bottomPadding by animateDpAsState(
                 targetValue = if (isAtBottom) 50.dp else 0.dp,
