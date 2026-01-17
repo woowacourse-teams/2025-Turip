@@ -281,7 +281,7 @@ private fun TripDetailScreenContent(
         item {
             Spacer(modifier = Modifier.height(20.dp))
             ContentInformation(information = uiState.tripDetailInfo)
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(16.dp))
         }
 
         item {
@@ -302,7 +302,7 @@ private fun TripDetailScreenContent(
                     Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 20.dp)
-                        .padding(top = 4.dp, bottom = 8.dp),
+                        .padding(top = 4.dp, bottom = 12.dp),
             )
         }
 

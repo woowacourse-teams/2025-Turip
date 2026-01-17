@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
@@ -115,27 +114,29 @@ private fun LoginScreenContent(
     )
 
     Box(
-        modifier = modifier.fillMaxSize(),
+        modifier =
+            modifier
+                .fillMaxSize()
+                .padding(
+                    vertical = TuripTheme.spacing.extraHuge,
+                    horizontal = TuripTheme.spacing.extraLarge,
+                ),
     ) {
         Column(
-            modifier =
-                Modifier
-                    .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Image(
                 painter = painterResource(R.drawable.ic_logo),
                 contentDescription = null,
-                modifier =
-                    Modifier
-                        .padding(top = 32.dp, start = 23.dp)
-                        .size(width = 160.dp, height = 61.dp),
+                modifier = Modifier.size(width = 160.dp, height = 60.dp),
             )
 
             Text(
                 text = stringResource(R.string.all_turip_description),
                 style = TuripTheme.typography.title3,
-                modifier = Modifier.padding(top = 5.dp),
+                modifier =
+                    Modifier.padding(top = TuripTheme.spacing.extraSmall),
             )
         }
 
@@ -143,9 +144,9 @@ private fun LoginScreenContent(
             modifier =
                 Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(start = 20.dp, end = 20.dp, bottom = 44.dp),
+                    .padding(bottom = TuripTheme.spacing.small),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(14.dp),
+            verticalArrangement = Arrangement.spacedBy(TuripTheme.spacing.large),
         ) {
             if (isHelpTextVisible) {
                 Text(
@@ -156,17 +157,18 @@ private fun LoginScreenContent(
                         Modifier
                             .border(
                                 border = BorderStroke(1.dp, TuripTheme.colors.gray02),
-                                shape = RoundedCornerShape(10.dp),
+                                shape = TuripTheme.shape.container,
                             ).background(
                                 color = TuripTheme.colors.gray03,
-                                shape = RoundedCornerShape(10.dp),
+                                shape = TuripTheme.shape.container,
                             ).fillMaxWidth()
-                            .padding(vertical = 20.dp),
+                            .padding(vertical = TuripTheme.spacing.extraLarge),
                     textAlign = TextAlign.Center,
                 )
             }
 
             GoogleLoginButton(onClickLoginButton = onClickGoogleLogin)
+
             HelpText(
                 text = stringResource(R.string.login_start_to_guest),
                 style = TuripTheme.typography.body1,

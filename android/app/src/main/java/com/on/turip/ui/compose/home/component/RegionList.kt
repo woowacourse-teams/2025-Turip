@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,7 +28,7 @@ fun RegionList(
     val height = rowCount.times(128.dp)
     LazyVerticalGrid(
         columns = GridCells.Fixed(count = MAX_REGION_COUNT_IN_EACH_ROW),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(TuripTheme.spacing.small),
         modifier =
             modifier
                 .height(height)
@@ -40,7 +39,7 @@ fun RegionList(
                 region = regionCategory,
                 modifier =
                     Modifier
-                        .clip(RoundedCornerShape(12.dp))
+                        .clip(TuripTheme.shape.chip)
                         .clickable { onRegionClick(regionCategory.name) },
             )
         }

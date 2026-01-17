@@ -40,6 +40,7 @@ fun TuripTheme(content: @Composable () -> Unit) {
         LocalColors provides LightColors,
         LocalTypography provides Typography,
         LocalShape provides Shape,
+        LocalSpacing provides Spacing,
     ) {
         MaterialTheme(
             colorScheme = LightColorScheme,
@@ -63,4 +64,9 @@ object TuripTheme {
         @Composable
         @ReadOnlyComposable
         get() = LocalShape.current
+
+    val spacing: TuripSpacing
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalSpacing.current
 }

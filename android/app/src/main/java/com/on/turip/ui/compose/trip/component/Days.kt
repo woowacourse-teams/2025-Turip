@@ -32,7 +32,7 @@ fun Days(
     modifier: Modifier = Modifier,
 ) {
     LazyRow(
-        modifier = modifier.padding(vertical = 8.dp),
+        modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         items(items = days, key = { it.day }) { dayModel: DayModel ->
