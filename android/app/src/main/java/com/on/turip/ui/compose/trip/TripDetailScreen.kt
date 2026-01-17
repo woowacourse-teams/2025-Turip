@@ -86,48 +86,18 @@ fun TripDetailScreen(
 
             lastVisibleItemIndex == totalItemsCount - 1
         }
-    val webViewClient =
-        remember {
-            TuripWebViewClient(
-                onLoadingStarted = webViewState::loadingStarted,
-                onLoadingFinished = {
-                    webViewState.loadingFinished()
-                    webViewState.updateWebViewError(false)
-                },
-                onNavigateExternalUrl = navigateToWebViewUrl,
-            )
-        }
-    val videoManager = remember { VideoManager(webView) }
-
-    val activity = context as? Activity
-    LaunchedEffect(webViewState.isFullScreen) {
-        val window = activity?.window ?: return@LaunchedEffect
-        val controller = WindowCompat.getInsetsController(window, window.decorView)
-
-        if (webViewState.isFullScreen) {
-            WindowCompat.setDecorFitsSystemWindows(window, false)
-            activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-            controller.hide(WindowInsetsCompat.Type.systemBars())
-            controller.systemBarsBehavior =
-                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-        } else {
-            WindowCompat.setDecorFitsSystemWindows(window, true)
-            activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-            controller.show(WindowInsetsCompat.Type.systemBars())
-
-//            controller.isAppearanceLightStatusBars = true
-//            controller.isAppearanceLightNavigationBars = true
-            controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_DEFAULT
-        }
     }
 
+    val webViewController =
+        rememberTripDetailWebViewController(
+            context = context,
+            navigateToWebViewUrl = navigateToWebViewUrl,
+        )
+
+    HandleFullScreenWindowLaunchedEffect(webViewController.isFullScreen)
+
     LaunchedEffect(uiState.tripDetailInfo.videoLink) {
-        val url = uiState.tripDetailInfo.videoLink
-        if (url.isNotEmpty() && url != webView.url) {
-            videoManager.loadVideo(uiState.tripDetailInfo.videoLink) {
-                webViewState.updateWebViewError(true)
-            }
-        }
+        webViewController.loadVideo(uiState.tripDetailInfo.videoLink)
     }
 
     LaunchedEffect(Unit) {
@@ -144,20 +114,13 @@ fun TripDetailScreen(
 
     BackHandler {
         when {
-            webViewState.isFullScreen -> webChromeClient.onHideCustomView()
-            webView.canGoBack() -> webView.goBack()
+            webViewController.canHandleBack() -> webViewController.handleBack()
             else -> navigateToBack()
         }
     }
 
     DisposableEffect(Unit) {
-        webView.webChromeClient = webChromeClient
-        webView.webViewClient = webViewClient
-
-        onDispose {
-            webView.destroy()
-            videoManager.clear()
-        }
+        onDispose { webViewController.clear() }
     }
 
     Scaffold(
