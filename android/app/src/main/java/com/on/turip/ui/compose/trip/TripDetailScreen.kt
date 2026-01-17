@@ -75,20 +75,16 @@ fun TripDetailScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
 
-    val webViewState = remember { TripDetailWebViewState() }
-    val webView =
-        remember {
-            WebView(context).apply {
-                applyVideoSettings()
-                setBackgroundColor(0)
-            }
-        }
-    val webChromeClient =
-        remember {
-            TuripWebChromeClient(
-                onShowFullScreen = webViewState::showFullScreen,
-                onHideFullScreen = webViewState::hideFullScreen,
-            )
+    val listState = rememberLazyListState()
+    val isAtBottom by remember {
+        derivedStateOf {
+            val lastVisibleItemIndex =
+                listState.layoutInfo.visibleItemsInfo
+                    .lastOrNull()
+                    ?.index
+            val totalItemsCount = listState.layoutInfo.totalItemsCount
+
+            lastVisibleItemIndex == totalItemsCount - 1
         }
     val webViewClient =
         remember {
@@ -176,9 +172,13 @@ fun TripDetailScreen(
         },
         contentWindowInsets = WindowInsets(),
         snackbarHost = {
+            val bottomPadding by animateDpAsState(
+                targetValue = if (isAtBottom) 50.dp else 0.dp,
+                label = "snackbarPadding",
+            )
             TuripSnackbar(
                 snackbarHostState = snackbarHostState,
-                modifier = Modifier.padding(bottom = 60.dp),
+                modifier = Modifier.padding(bottom = bottomPadding),
             )
         },
         modifier =
