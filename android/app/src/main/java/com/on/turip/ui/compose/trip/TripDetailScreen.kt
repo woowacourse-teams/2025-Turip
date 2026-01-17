@@ -1,26 +1,28 @@
 package com.on.turip.ui.compose.trip
 
-import android.app.Activity
 import android.content.Context
-import android.content.pm.ActivityInfo
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.WebView
+import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.widget.FrameLayout
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
@@ -30,45 +32,43 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.on.turip.R
 import com.on.turip.ui.common.error.ErrorUiModel
+import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.toUiModel
+import com.on.turip.ui.compose.designsystem.component.ErrorScreen
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbarVisuals
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.trip.component.ContentFavoriteButton
 import com.on.turip.ui.compose.trip.component.ContentInformation
+import com.on.turip.ui.compose.trip.component.ContentVideo
 import com.on.turip.ui.compose.trip.component.CreatorInformation
 import com.on.turip.ui.compose.trip.component.Days
 import com.on.turip.ui.compose.trip.component.PlaceItem
 import com.on.turip.ui.compose.trip.component.TripDetailAppBar
 import com.on.turip.ui.compose.trip.model.MapModel
-import com.on.turip.ui.compose.trip.webview.TuripWebChromeClient
-import com.on.turip.ui.compose.trip.webview.TuripWebViewClient
-import com.on.turip.ui.compose.trip.webview.VideoManager
-import com.on.turip.ui.compose.trip.webview.applyVideoSettings
-import com.on.turip.ui.compose.trip.webview.navigateToTimeLine
 import com.on.turip.ui.trip.detail.TripDetailViewModel
 
 @Composable
 fun TripDetailScreen(
-    navigateToBack: () -> Unit = {},
-    navigateToLogin: () -> Unit = {},
-    navigateToMap: (mapModel: MapModel) -> Unit = {},
-    navigateToWebViewUrl: (url: String) -> Unit = {},
-    onClickFavoritePlace: (id: Long) -> Unit = {},
+    navigateToBack: () -> Unit,
+    navigateToLogin: () -> Unit,
+    navigateToMap: (mapModel: MapModel) -> Unit,
+    navigateToWebViewUrl: (url: String) -> Unit,
+    onClickFavoritePlace: (id: Long) -> Unit,
     viewModel: TripDetailViewModel = hiltViewModel(),
 ) {
     val uiState: TripDetailUiState by viewModel.uiState.collectAsState()
@@ -93,6 +93,10 @@ fun TripDetailScreen(
             context = context,
             navigateToWebViewUrl = navigateToWebViewUrl,
         )
+
+    val isInitialLoading by remember {
+        derivedStateOf { uiState.isLoading || webViewController.isLoading }
+    }
 
     HandleFullScreenWindowLaunchedEffect(webViewController.isFullScreen)
 
@@ -153,53 +157,50 @@ fun TripDetailScreen(
                 modifier = Modifier.padding(bottom = bottomPadding),
             )
         },
-        modifier =
-            if (!webViewState.isFullScreen) {
+        modifier = Modifier.fillMaxSize(),
+    ) { innerPadding ->
+        Box(
+            modifier =
                 Modifier
                     .fillMaxSize()
-                    .systemBarsPadding()
-            } else {
-                Modifier
-            },
-    ) { innerPadding ->
-        Box(modifier = Modifier.padding(innerPadding)) {
-            TripDetailScreenContent(
-                uiState = uiState,
-                webView = webView,
-                webViewState = webViewState,
-                onDayClick = { viewModel.updateDay(it) },
-                onTimeLineClick = { webView.navigateToTimeLine(it) },
-                onMapClick = { navigateToMap(it) },
-                onFavoritePlaceClick = { onClickFavoritePlace(it) },
-                onFavoriteContentClick = viewModel::updateFavorite,
-            )
+                    .padding(innerPadding),
+        ) {
+            when {
+                uiState.errorUiState != ErrorUiState.None -> {
+                    ErrorScreen(
+                        errorUiState = uiState.errorUiState,
+                        onRetryClick = viewModel::loadTripDetails,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                }
 
-            if (webViewState.isFullScreen) {
-                AndroidView(
-                    factory = { context ->
-                        FrameLayout(context).apply {
-                            layoutParams =
-                                ViewGroup.LayoutParams(
-                                    ViewGroup.LayoutParams.MATCH_PARENT,
-                                    ViewGroup.LayoutParams.MATCH_PARENT,
-                                )
-                            addView(webViewState.fullScreenVideo)
-                        }
-                    },
-                    update = { view ->
-                        // 2. 비디오 뷰의 기존 부모가 있다면 안전하게 제거
-                        (view.parent as? ViewGroup)?.removeView(webViewState.fullScreenVideo)
+                isInitialLoading -> {
+                    CircularProgressIndicator(
+                        modifier =
+                            Modifier
+                                .size(60.dp)
+                                .align(Alignment.Center),
+                        color = TuripTheme.colors.primary,
+                    )
+                }
 
-                        // 3. 현재 레이아웃의 기존 자식들을 모두 비우고 새로 추가
-                        view.removeAllViews()
-                        view.addView(webViewState.fullScreenVideo)
-                    },
-                    modifier = Modifier.fillMaxSize(),
-                    onRelease = {
-                        val videoView = webViewState.fullScreenVideo
-                        (videoView?.parent as? ViewGroup)?.removeView(videoView)
-                    },
-                )
+                else -> {
+                    if (!webViewController.isFullScreen) {
+                        TripDetailScreenContent(
+                            uiState = uiState,
+                            listState = listState,
+                            webViewController = webViewController,
+                            onDayClick = { viewModel.updateDay(it) },
+                            onTimeLineClick = { webViewController.seekTo(it) },
+                            onMapClick = { navigateToMap(it) },
+                            onFavoritePlaceClick = { onClickFavoritePlace(it) },
+                            onFavoriteContentClick = viewModel::updateFavorite,
+                            onErrorVideoClick = { navigateToWebViewUrl(uiState.tripDetailInfo.videoLink) },
+                        )
+                    } else {
+                        FullScreenVideo(webViewController.fullScreenVideo)
+                    }
+                }
             }
         }
     }
@@ -250,16 +251,18 @@ private suspend fun handleUiEffect(
 @Composable
 private fun TripDetailScreenContent(
     uiState: TripDetailUiState,
-    webView: WebView,
-    webViewState: TripDetailWebViewState,
+    listState: LazyListState,
+    webViewController: TripDetailWebViewController,
     onDayClick: (day: Int) -> Unit,
     onTimeLineClick: (timeLine: Int) -> Unit,
     onMapClick: (mapModel: MapModel) -> Unit,
     onFavoritePlaceClick: (id: Long) -> Unit,
     onFavoriteContentClick: () -> Unit,
+    onErrorVideoClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
+        state = listState,
         modifier = modifier.fillMaxSize(),
     ) {
         item {
@@ -271,8 +274,8 @@ private fun TripDetailScreenContent(
 
         stickyHeader {
             ContentVideo(
-                webView = webView,
-                webViewState = webViewState,
+                onErrorClick = onErrorVideoClick,
+                webViewController = webViewController,
             )
         }
 
@@ -288,7 +291,20 @@ private fun TripDetailScreenContent(
                 onDayClick = { day -> onDayClick(day) },
                 modifier = Modifier.padding(horizontal = 20.dp),
             )
-            Spacer(modifier = Modifier.height(8.dp))
+        }
+
+        item {
+            Text(
+                text = stringResource(R.string.trip_detail_day_place_count, uiState.places.size),
+                style = TuripTheme.typography.info1,
+                color = TuripTheme.colors.gray05,
+                textAlign = TextAlign.End,
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp)
+                        .padding(top = 4.dp, bottom = 8.dp),
+            )
         }
 
         items(items = uiState.places, key = { it.id }) { place ->
@@ -318,61 +334,22 @@ private fun TripDetailScreenContent(
 }
 
 @Composable
-private fun ContentVideo(
-    webView: WebView,
-    webViewState: TripDetailWebViewState,
-) {
-    Box(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .aspectRatio(16 / 9f),
-    ) {
-        AndroidView(
-            factory = {
-                webView.apply {
-                    layoutParams =
-                        ViewGroup.LayoutParams(
-                            ViewGroup.LayoutParams.MATCH_PARENT,
-                            ViewGroup.LayoutParams.MATCH_PARENT,
-                        )
-                    setBackgroundColor(0x0000000)
-                }
-            },
-            update = { view ->
-                view.visibility = if (webViewState.isFullScreen) View.INVISIBLE else View.VISIBLE
-                if (!webViewState.isFullScreen) {
-                    view.post {
-                        view.requestLayout()
-                        view.invalidate()
-                    }
-                }
-            },
-            modifier = Modifier.fillMaxSize(),
-        )
-        if (webViewState.isLoading) {
-            CircularProgressIndicator(
-                modifier =
-                    Modifier
-                        .size(24.dp)
-                        .align(Alignment.Center),
-                color = TuripTheme.colors.primary,
-            )
-        }
-        if (webViewState.isError) {
-            Box(
-                modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .background(TuripTheme.colors.black),
-            ) {
-                Text(
-                    text = "에러",
-                    modifier = Modifier.align(Alignment.Center),
-                )
+private fun FullScreenVideo(fullScreenVideo: View?) {
+    if (fullScreenVideo == null) return
+    AndroidView(
+        factory = { context ->
+            FrameLayout(context).apply {
+                layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT)
             }
-        }
-    }
+        },
+        update = { view: FrameLayout ->
+            if (view.getChildAt(0) == fullScreenVideo) return@AndroidView
+            view.removeAllViews()
+            view.addView(fullScreenVideo)
+        },
+        modifier = Modifier.fillMaxSize(),
+        onRelease = { (fullScreenVideo.parent as? ViewGroup)?.removeView(fullScreenVideo) },
+    )
 }
 
 @Preview(showBackground = true)
@@ -382,6 +359,9 @@ private fun TripContentScreenPreview() {
         TripDetailScreen(
             navigateToBack = {},
             navigateToLogin = {},
+            navigateToMap = {},
+            navigateToWebViewUrl = {},
+            onClickFavoritePlace = {},
         )
     }
 }
