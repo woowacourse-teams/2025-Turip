@@ -14,22 +14,8 @@ data class TripDetailUiState(
     val places: List<PlaceModel>,
     val tripDetailInfo: TripDetailInfoModel,
     val isFavorite: Boolean,
-    val isExpandTextToggleVisible: Boolean?,
-    val isExpandTextToggleSelected: Boolean,
-    val isVideoLoaded: Boolean,
 ) {
-    val titleMaxLines: Int
-        get() = if (isExpandTextToggleSelected) EXPAND_TEXT else DEFAULT_CONTENT_TITLE_MAX_LINES
-
-    fun updateExpandTextToggleVisibility(
-        lineCount: Int,
-        ellipsisCount: Int,
-    ): TripDetailUiState = copy(isExpandTextToggleVisible = lineCount >= DEFAULT_CONTENT_TITLE_MAX_LINES && ellipsisCount > 0)
-
     companion object {
-        private const val DEFAULT_CONTENT_TITLE_MAX_LINES = 2
-        private const val EXPAND_TEXT = Int.MAX_VALUE
-
         val IDLE: TripDetailUiState =
             TripDetailUiState(
                 isLoading = false,
@@ -38,9 +24,6 @@ data class TripDetailUiState(
                 places = emptyList(),
                 tripDetailInfo = TripDetailInfoModel.Idle,
                 isFavorite = false,
-                isExpandTextToggleVisible = null,
-                isExpandTextToggleSelected = false,
-                isVideoLoaded = false,
             )
     }
 }

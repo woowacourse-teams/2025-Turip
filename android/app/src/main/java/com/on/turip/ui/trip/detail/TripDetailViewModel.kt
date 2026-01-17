@@ -24,6 +24,7 @@ import com.on.turip.ui.compose.trip.model.DayModel
 import com.on.turip.ui.compose.trip.model.PlaceModel
 import com.on.turip.ui.trip.detail.TripDetailActivity.Companion.TRIP_DETAIL_CONTENT_KEY
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -34,7 +35,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @HiltViewModel
 class TripDetailViewModel @Inject constructor(
@@ -44,10 +44,6 @@ class TripDetailViewModel @Inject constructor(
     private val updateFavoriteUseCase: UpdateFavoriteUseCase,
 ) : ViewModel() {
     private var placeCacheByDay: Map<Int, List<PlaceModel>> = emptyMap()
-
-    // video load 여러번 호출되는 것을 방지
-    var videoLoaded: Boolean = false
-        private set
 
     private val _uiState: MutableStateFlow<TripDetailUiState> =
         MutableStateFlow(TripDetailUiState.IDLE)
@@ -114,8 +110,6 @@ class TripDetailViewModel @Inject constructor(
                             duration = trip.tripDuration.toUiModel(),
                         ),
                     isFavorite = content.isFavorite,
-                    isExpandTextToggleVisible = null,
-                    isExpandTextToggleSelected = false,
                 )
             }
 
@@ -188,18 +182,6 @@ class TripDetailViewModel @Inject constructor(
         }
     }
 
-    fun updateExpandTextToggle() {
-        val updateExpandTextSelected: Boolean = !uiState.value.isExpandTextToggleSelected
-        _uiState.update { it.copy(isExpandTextToggleSelected = updateExpandTextSelected) }
-    }
-
-    fun updateExpandTextToggleVisibility(
-        lineCount: Int,
-        ellipsisCount: Int,
-    ) {
-        _uiState.update { it.updateExpandTextToggleVisibility(lineCount, ellipsisCount) }
-    }
-
     fun updateHasFavoriteFolderInPlace(
         hasFavoriteFolder: Boolean,
         placeId: Long,
@@ -227,10 +209,6 @@ class TripDetailViewModel @Inject constructor(
                     },
             )
         }
-    }
-
-    fun updateVideoLoadStatus(isLoaded: Boolean) {
-        videoLoaded = isLoaded
     }
 
     private suspend fun handleError(failure: TuripResult.Failure) {
