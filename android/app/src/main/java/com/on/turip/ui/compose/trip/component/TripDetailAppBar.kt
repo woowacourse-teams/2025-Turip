@@ -14,6 +14,7 @@ import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 
 @Composable
 fun TripDetailAppBar(
+    isError: Boolean,
     isContentFavorite: Boolean,
     onBackClick: () -> Unit,
     onContentFavoriteClick: () -> Unit,
@@ -33,11 +34,13 @@ fun TripDetailAppBar(
             )
         },
         end = {
-            Icon(
-                painter = painterResource(contentFavoriteIconRes),
-                contentDescription = null,
-                modifier = Modifier.clickable(onClick = onContentFavoriteClick),
-            )
+            if (!isError) {
+                Icon(
+                    painter = painterResource(contentFavoriteIconRes),
+                    contentDescription = null,
+                    modifier = Modifier.clickable(onClick = onContentFavoriteClick),
+                )
+            }
         },
         modifier = modifier,
     )
@@ -48,6 +51,7 @@ fun TripDetailAppBar(
 private fun IsFavoriteTripAppBarPreview() {
     TuripTheme {
         TripDetailAppBar(
+            isError = false,
             isContentFavorite = true,
             onBackClick = { },
             onContentFavoriteClick = { },
@@ -60,6 +64,20 @@ private fun IsFavoriteTripAppBarPreview() {
 private fun IsNotFavoriteTripAppBarPreview() {
     TuripTheme {
         TripDetailAppBar(
+            isError = false,
+            isContentFavorite = false,
+            onBackClick = { },
+            onContentFavoriteClick = { },
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "화면에 에러 발생")
+@Composable
+private fun ErrorFavoriteTripAppBarPreview() {
+    TuripTheme {
+        TripDetailAppBar(
+            isError = true,
             isContentFavorite = false,
             onBackClick = { },
             onContentFavoriteClick = { },

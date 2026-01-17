@@ -135,6 +135,7 @@ fun TripDetailScreen(
                                 .background(TuripTheme.colors.primary),
                     )
                     TripDetailAppBar(
+                        isError = uiState.errorUiState != ErrorUiState.None,
                         isContentFavorite = uiState.isFavorite,
                         onBackClick = navigateToBack,
                         onContentFavoriteClick = viewModel::updateFavorite,
