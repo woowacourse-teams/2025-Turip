@@ -33,7 +33,7 @@ class TripDetailWebViewController(
 ) {
     var isFullScreen by mutableStateOf(false)
         private set
-    var isLoading by mutableStateOf(false)
+    var isLoading by mutableStateOf(true)
         private set
     var isError by mutableStateOf(false)
         private set
@@ -51,6 +51,8 @@ class TripDetailWebViewController(
             onHideFullScreen = {
                 fullScreenVideo = null
                 isFullScreen = false
+
+                webView.resumeVideo()
             },
         )
 

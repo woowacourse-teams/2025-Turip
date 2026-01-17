@@ -1,4 +1,4 @@
-package com.on.turip.ui.trip.detail
+package com.on.turip.ui.compose.trip.model
 
 import androidx.compose.runtime.Stable
 import com.on.turip.ui.common.model.trip.TripDurationModel

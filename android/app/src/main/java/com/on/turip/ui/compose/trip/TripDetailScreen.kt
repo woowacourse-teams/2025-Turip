@@ -60,7 +60,6 @@ import com.on.turip.ui.compose.trip.component.Days
 import com.on.turip.ui.compose.trip.component.PlaceItem
 import com.on.turip.ui.compose.trip.component.TripDetailAppBar
 import com.on.turip.ui.compose.trip.model.MapModel
-import com.on.turip.ui.trip.detail.TripDetailViewModel
 
 @Composable
 fun TripDetailScreen(

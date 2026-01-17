@@ -4,7 +4,7 @@ import androidx.compose.runtime.Stable
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.compose.trip.model.DayModel
 import com.on.turip.ui.compose.trip.model.PlaceModel
-import com.on.turip.ui.trip.detail.TripDetailInfoModel
+import com.on.turip.ui.compose.trip.model.TripDetailInfoModel
 
 @Stable
 data class TripDetailUiState(

@@ -25,7 +25,7 @@ import com.on.turip.R
 import com.on.turip.ui.common.model.trip.TripDurationModel
 import com.on.turip.ui.common.model.trip.toDisplayText
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
-import com.on.turip.ui.trip.detail.TripDetailInfoModel
+import com.on.turip.ui.compose.trip.model.TripDetailInfoModel
 
 @Composable
 fun ContentInformation(
@@ -81,7 +81,8 @@ private fun ContentInfoChip(
                     width = 1.dp,
                     color = TuripTheme.colors.gray02,
                     shape = TuripTheme.shape.chip,
-                ).padding(horizontal = 8.dp, vertical = 4.dp),
+                )
+                .padding(horizontal = 8.dp, vertical = 4.dp),
     ) {
         Text(
             text = text,

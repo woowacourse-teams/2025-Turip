@@ -1,4 +1,4 @@
-package com.on.turip.ui.trip.detail
+package com.on.turip.ui.compose.trip
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -17,12 +17,10 @@ import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.common.mapper.toUiModel
-import com.on.turip.ui.compose.trip.TripDetailRetryAction
-import com.on.turip.ui.compose.trip.TripDetailUiEffect
-import com.on.turip.ui.compose.trip.TripDetailUiState
 import com.on.turip.ui.compose.trip.model.DayModel
 import com.on.turip.ui.compose.trip.model.PlaceModel
-import com.on.turip.ui.trip.detail.TripDetailActivity.Companion.TRIP_DETAIL_CONTENT_KEY
+import com.on.turip.ui.compose.trip.model.TripDetailInfoModel
+import com.on.turip.ui.trip.TripDetailActivity.Companion.TRIP_DETAIL_CONTENT_KEY
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.async
