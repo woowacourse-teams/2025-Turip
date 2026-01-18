@@ -22,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -49,6 +50,17 @@ fun TuripSnackbar(
                             TextButton(onClick = snackbarData::performAction) {
                                 Text(
                                     text = label,
+                                    style = TuripTheme.typography.info2,
+                                    color = TuripTheme.colors.gray02,
+                                )
+                            }
+                        }
+                    },
+                    dismissAction = {
+                        if (visuals.withDismissAction) {
+                            TextButton(onClick = snackbarData::dismiss) {
+                                Text(
+                                    text = stringResource(R.string.all_snackbar_close),
                                     style = TuripTheme.typography.info2,
                                     color = TuripTheme.colors.gray02,
                                 )
@@ -97,6 +109,7 @@ private class DefaultSnackbarPreviewModel(
 private class TuripVisualsSnackbarPreviewModel(
     val message: String,
     val actionLabel: String? = null,
+    val withDismissAction: Boolean = false,
     @DrawableRes val iconRes: Int? = null,
 )
 
@@ -130,6 +143,11 @@ private class TuripVisualsSnackbarPreviewProvider : PreviewParameterProvider<Tur
                 message = "네트워크 연결 실패",
                 iconRes = null,
                 actionLabel = "닫기",
+            ),
+            TuripVisualsSnackbarPreviewModel(
+                message = "연결 실패, withDismissAction = true",
+                iconRes = null,
+                withDismissAction = true,
             ),
         )
 }
@@ -173,6 +191,7 @@ private fun TuripVisualsSnackbarPreview(
                         message = preview.message,
                         actionLabel = preview.actionLabel,
                         duration = SnackbarDuration.Short,
+                        withDismissAction = preview.withDismissAction,
                         iconRes = preview.iconRes,
                     ),
             )
