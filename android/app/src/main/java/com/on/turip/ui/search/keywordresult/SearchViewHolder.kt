@@ -9,7 +9,6 @@ import com.on.turip.domain.content.Content
 import com.on.turip.ui.common.TuripUrlConverter
 import com.on.turip.ui.common.loadCircularImage
 import com.on.turip.ui.common.loadRoundedCornerImage
-import com.on.turip.ui.common.model.trip.toDisplayText
 import com.on.turip.ui.search.model.VideoInformationModel
 
 class SearchViewHolder(

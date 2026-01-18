@@ -23,7 +23,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.on.turip.R
 import com.on.turip.ui.common.model.trip.TripDurationModel
-import com.on.turip.ui.common.model.trip.toDisplayText
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.trip.model.TripDetailInfoModel
 
@@ -81,7 +80,8 @@ private fun ContentInfoChip(
                     width = 1.dp,
                     color = TuripTheme.colors.gray02,
                     shape = TuripTheme.shape.chip,
-                ).padding(
+                )
+                .padding(
                     horizontal = TuripTheme.spacing.small,
                     vertical = TuripTheme.spacing.extraSmall,
                 ),

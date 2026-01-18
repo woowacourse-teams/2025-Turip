@@ -12,7 +12,6 @@ import com.on.turip.domain.favorite.FavoriteContent
 import com.on.turip.ui.common.TuripUrlConverter
 import com.on.turip.ui.common.loadRoundedCornerImage
 import com.on.turip.ui.common.mapper.toUiModel
-import com.on.turip.ui.common.model.trip.toDisplayText
 
 class FavoriteContentViewHolder(
     private val binding: ItemFavoriteContentBinding,
