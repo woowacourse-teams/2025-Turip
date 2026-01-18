@@ -7,6 +7,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
+import com.on.turip.R
+import com.on.turip.ui.common.safeStartActivityWithToast
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.trip.TripDetailScreen
 import com.on.turip.ui.compose.trip.model.MapModel
@@ -35,11 +37,17 @@ class TripDetailActivity : AppCompatActivity() {
                     },
                     navigateToMap = { mapModel: MapModel ->
                         val intent = Intent(Intent.ACTION_VIEW, mapModel.uri)
-                        startActivity(intent)
+                        safeStartActivityWithToast(
+                            intent = intent,
+                            errorToastMessage = getString(R.string.all_snackbar_not_found_map_url),
+                        )
                     },
                     navigateToWebViewUrl = { url: String ->
                         val intent = Intent(Intent.ACTION_VIEW, url.toUri())
-                        startActivity(intent)
+                        safeStartActivityWithToast(
+                            intent = intent,
+                            errorToastMessage = getString(R.string.all_snackbar_not_found_video_url),
+                        )
                     },
                     onClickFavoritePlace = { id: Long ->
                         if (supportFragmentManager.findFragmentByTag("favorite_place_folder") == null) {

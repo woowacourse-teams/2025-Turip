@@ -8,7 +8,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
+import com.on.turip.R
 import com.on.turip.domain.setting.InquiryMail
+import com.on.turip.ui.common.safeStartActivityWithToast
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.setting.SettingScreen
 import com.on.turip.ui.login.LoginActivity
@@ -34,8 +36,11 @@ class SettingActivity : AppCompatActivity() {
                         startActivity(intent)
                     },
                     navigateToPrivacyPolicy = { privacyPolicyLink: String ->
-                        val intent: Intent = Intent(Intent.ACTION_VIEW, privacyPolicyLink.toUri())
-                        startActivity(intent)
+                        val intent = Intent(Intent.ACTION_VIEW, privacyPolicyLink.toUri())
+                        safeStartActivityWithToast(
+                            intent = intent,
+                            errorToastMessage = getString(R.string.all_snackbar_not_found_privacy_policy_url),
+                        )
                     },
                     navigateToLoginScreen = {
                         val intent: Intent =

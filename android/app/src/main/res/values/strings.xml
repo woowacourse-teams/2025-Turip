@@ -18,7 +18,9 @@
     <string name="all_back_description">뒤로 가기</string>
     <string name="all_text_expand">더보기</string>
     <string name="all_text_collapse">접기</string>
-
+    <string name="all_snackbar_not_found_map_url">지도 앱으로 이동에 문제가 발생 했어요</string>
+    <string name="all_snackbar_not_found_privacy_policy_url">개인 정보 처리 방침 이동에 문제가 발생 했어요</string>
+    <string name="all_snackbar_not_found_video_url">영상 앱으로 이동에 문제가 발생 했어요</string>
 
     <!-- 바텀 네비게이션 -->
     <string name="bottom_navigation_home">홈</string>
@@ -79,8 +81,9 @@
     <string name="trip_place_time_line">%s~</string>
     <string name="trip_detail_period">여행 기간</string>
     <string name="trip_detail_visit_place">방문 장소</string>
-    <string name="trip_detail_trip_favorite_normal">이 여행 저장하기 </string>
-    <string name="trip_detail_trip_favorite_select">저장된 여행이에요 </string>
+    <string name="trip_detail_trip_favorite_normal">이 여행 저장하기</string>
+    <string name="trip_detail_trip_favorite_select">저장된 여행이에요</string>
+    <string name="trip_detail_favorite_description">컨텐츠 좋아요</string>
 
     <!-- 폴더 페이지 -->
     <string name="folder_title">폴더 편집</string>
@@ -123,5 +126,6 @@
     <string name="turip_dialog_login_suggest_confirm">로그인</string>
     <string name="turip_dialog_login_suggest_dismiss">나중에</string>
 
+    <!--  -->
 
 </resources>
