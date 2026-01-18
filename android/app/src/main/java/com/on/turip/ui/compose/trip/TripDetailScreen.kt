@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
+import android.webkit.WebView
 import android.widget.FrameLayout
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.animateDpAsState
@@ -25,6 +26,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
@@ -48,6 +50,7 @@ import com.on.turip.R
 import com.on.turip.ui.common.error.ErrorUiModel
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.toUiModel
+import com.on.turip.ui.common.model.trip.TripDurationModel
 import com.on.turip.ui.compose.designsystem.component.ErrorScreen
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbarVisuals
@@ -59,7 +62,11 @@ import com.on.turip.ui.compose.trip.component.CreatorInformation
 import com.on.turip.ui.compose.trip.component.Days
 import com.on.turip.ui.compose.trip.component.PlaceItem
 import com.on.turip.ui.compose.trip.component.TripDetailAppBar
+import com.on.turip.ui.compose.trip.model.DayModel
 import com.on.turip.ui.compose.trip.model.MapModel
+import com.on.turip.ui.compose.trip.model.PlaceModel
+import com.on.turip.ui.compose.trip.model.TripDetailInfoModel
+import com.on.turip.ui.compose.trip.webview.VideoManager
 
 @Composable
 fun TripDetailScreen(
@@ -366,13 +373,62 @@ private fun FullScreenVideo(fullScreenVideo: View?) {
 @Preview(showBackground = true)
 @Composable
 private fun TripContentScreenPreview() {
-    TuripTheme {
-        TripDetailScreen(
-            navigateToBack = {},
-            navigateToLogin = {},
-            navigateToMap = {},
-            navigateToWebViewUrl = {},
-            onClickFavoritePlace = {},
+    val tripDetailInfo =
+        TripDetailInfoModel(
+            creatorName = "여행하는 튜립팀",
+            creatorThumbnail = "",
+            city = "서울",
+            videoLink = "",
+            contentTitle = "겨울엔 어떤 나라를 여행가면 좋을지 궁금하다 여행가고 싶다 여행 가고 싶 다",
+            uploadedDate = "2026-01-18",
+            placeTotalCount = 20,
+            duration = TripDurationModel(1, 2),
         )
+    val webView = WebView(LocalContext.current)
+    TuripTheme {
+        TuripTheme {
+            TripDetailScreenContent(
+                uiState =
+                    TripDetailUiState(
+                        isLoading = false,
+                        errorUiState = ErrorUiState.None,
+                        tripDetailInfo = tripDetailInfo,
+                        days = listOf(DayModel(1), DayModel(2)),
+                        places =
+                            listOf(
+                                PlaceModel(
+                                    id = 1L,
+                                    name = "우아한테크코스",
+                                    isFavorite = true,
+                                    category = "💻 코딩맛집",
+                                    mapLink = "kakao.com/123123",
+                                    timeLine = "01:03",
+                                ),
+                                PlaceModel(
+                                    id = 2L,
+                                    name = "우아한테크코스",
+                                    isFavorite = false,
+                                    category = "💻 코딩맛집",
+                                    mapLink = "google.com/123123",
+                                    timeLine = "03:03",
+                                ),
+                            ),
+                        isFavorite = true,
+                    ),
+                listState = rememberLazyListState(),
+                webViewController =
+                    TripDetailWebViewController(
+                        webView = webView,
+                        videoManager = VideoManager(webView),
+                        navigateToWebViewUrl = {},
+                    ),
+                onDayClick = {},
+                onTimeLineClick = {},
+                onMapClick = {},
+                onFavoritePlaceClick = {},
+                onFavoriteContentClick = {},
+                onErrorVideoClick = {},
+            )
+        }
     }
 }
