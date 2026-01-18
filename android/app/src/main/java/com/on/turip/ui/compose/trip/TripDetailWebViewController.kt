@@ -70,6 +70,7 @@ class TripDetailWebViewController(
 
     fun loadVideo(url: String) {
         if (url.isNotEmpty() && url != webView.url) {
+            if (isError) isError = false
             videoManager.loadVideo(url) { isError = true }
         }
     }

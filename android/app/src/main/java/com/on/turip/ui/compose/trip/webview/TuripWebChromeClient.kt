@@ -14,7 +14,7 @@ class TuripWebChromeClient(
         view: View?,
         callback: CustomViewCallback?,
     ) {
-        if (customView != null) {
+        if (view == null || customView != null) {
             callback?.onCustomViewHidden()
             return
         }

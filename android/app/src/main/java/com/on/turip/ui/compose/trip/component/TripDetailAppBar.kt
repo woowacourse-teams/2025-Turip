@@ -8,6 +8,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.on.turip.R
@@ -31,7 +32,7 @@ fun TripDetailAppBar(
         start = {
             Icon(
                 imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                contentDescription = null,
+                contentDescription = stringResource(R.string.all_back_description),
                 modifier = Modifier.clickable(onClick = onBackClick),
             )
         },
@@ -39,7 +40,7 @@ fun TripDetailAppBar(
             if (!isError) {
                 Icon(
                     painter = painterResource(contentFavoriteIconRes),
-                    contentDescription = null,
+                    contentDescription = stringResource(R.string.trip_detail_favorite_description),
                     modifier =
                         Modifier
                             .clickable(onClick = onContentFavoriteClick)

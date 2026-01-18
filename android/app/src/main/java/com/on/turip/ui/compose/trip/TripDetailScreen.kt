@@ -248,6 +248,7 @@ private suspend fun handleUiEffect(
                 snackbarHostState.showSnackbar(
                     message = context.getString(uiModel.titleRes),
                     actionLabel = context.getString(uiModel.retryTextRes),
+                    duration = SnackbarDuration.Indefinite,
                 )
             if (result == SnackbarResult.ActionPerformed) {
                 handleErrorRetryRequest(uiEffect.retryAction)
@@ -362,6 +363,7 @@ private fun FullScreenVideo(fullScreenVideo: View?) {
         },
         update = { view: FrameLayout ->
             if (view.getChildAt(0) == fullScreenVideo) return@AndroidView
+            (fullScreenVideo.parent as? ViewGroup)?.removeView(fullScreenVideo)
             view.removeAllViews()
             view.addView(fullScreenVideo)
         },

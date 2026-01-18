@@ -19,7 +19,7 @@ fun WebView.applyVideoSettings() {
 
 fun WebView.navigateToTimeLine(seconds: Int) {
     evaluateJavascript(
-        "seekToSecond($seconds);",
+        "seekToSecond(${seconds.coerceAtLeast(0)});",
         null,
     )
 }
