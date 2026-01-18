@@ -214,6 +214,8 @@ private suspend fun handleUiEffect(
 ) {
     when (uiEffect) {
         is TripDetailUiEffect.ShowFavoriteStatus -> {
+            snackbarHostState.currentSnackbarData?.dismiss()
+
             val messageResource: Int =
                 if (uiEffect.isFavorite) R.string.trip_detail_snackbar_favorite_save else R.string.trip_detail_snackbar_favorite_remove
             val iconResource: Int =
