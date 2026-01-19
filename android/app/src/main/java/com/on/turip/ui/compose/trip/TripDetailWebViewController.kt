@@ -1,10 +1,10 @@
 package com.on.turip.ui.compose.trip
 
-import android.app.Activity
 import android.content.Context
 import android.content.pm.ActivityInfo
 import android.view.View
 import android.webkit.WebView
+import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
@@ -12,12 +12,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalContext
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.trip.webview.TuripWebChromeClient
 import com.on.turip.ui.compose.trip.webview.TuripWebViewClient
 import com.on.turip.ui.compose.trip.webview.VideoManager
@@ -112,9 +109,7 @@ fun rememberTripDetailWebViewController(
 
 @Composable
 fun HandleFullScreenWindowLaunchedEffect(isFullScreen: Boolean) {
-    val context = LocalContext.current
-    val activity = context as? Activity ?: return
-    val statusBarColor = TuripTheme.colors.primary.toArgb()
+    val activity = LocalActivity.current ?: return
 
     LaunchedEffect(isFullScreen) {
         val window = activity.window
