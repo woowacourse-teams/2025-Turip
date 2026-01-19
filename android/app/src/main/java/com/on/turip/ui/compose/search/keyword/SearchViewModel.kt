@@ -1,4 +1,4 @@
-package com.on.turip.ui.search.keywordresult
+package com.on.turip.ui.compose.search.keyword
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -15,8 +15,8 @@ import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.common.mapper.toUiModel
+import com.on.turip.ui.compose.search.model.VideoInformationModel
 import com.on.turip.ui.search.keywordresult.SearchActivity.Companion.SEARCH_KEYWORD_KEY
-import com.on.turip.ui.search.model.VideoInformationModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf

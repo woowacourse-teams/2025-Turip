@@ -1,4 +1,4 @@
-package com.on.turip.ui.compose.setting.model
+package com.on.turip.ui.compose.setting
 
 import com.on.turip.ui.common.error.ErrorUiState
 

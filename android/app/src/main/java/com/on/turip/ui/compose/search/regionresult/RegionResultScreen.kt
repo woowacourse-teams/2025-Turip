@@ -18,9 +18,6 @@ import com.on.turip.ui.compose.designsystem.component.ErrorScreen
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.search.component.SearchResultList
 import com.on.turip.ui.compose.search.regionresult.component.RegionResultAppBar
-import com.on.turip.ui.search.regionresult.RegionResultUiEffect
-import com.on.turip.ui.search.regionresult.RegionResultUiState
-import com.on.turip.ui.search.regionresult.RegionResultViewModel
 
 @Composable
 fun RegionResultScreen(

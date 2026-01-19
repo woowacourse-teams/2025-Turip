@@ -1,4 +1,4 @@
-package com.on.turip.ui.search.model
+package com.on.turip.ui.compose.search.model
 
 import com.on.turip.domain.content.Content
 import com.on.turip.ui.common.model.trip.TripModel

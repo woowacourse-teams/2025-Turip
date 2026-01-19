@@ -1,8 +1,8 @@
-package com.on.turip.ui.search.keywordresult
+package com.on.turip.ui.compose.search.keyword
 
 import androidx.compose.runtime.Immutable
 import com.on.turip.ui.common.error.ErrorUiState
-import com.on.turip.ui.search.model.VideoInformationModel
+import com.on.turip.ui.compose.search.model.VideoInformationModel
 import kotlinx.collections.immutable.ImmutableList
 
 @Immutable

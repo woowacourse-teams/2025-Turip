@@ -1,4 +1,4 @@
-package com.on.turip.ui.compose.setting.model
+package com.on.turip.ui.compose.setting
 
 import androidx.compose.runtime.Immutable
 import com.on.turip.domain.userstorage.TuripDeviceIdentifier

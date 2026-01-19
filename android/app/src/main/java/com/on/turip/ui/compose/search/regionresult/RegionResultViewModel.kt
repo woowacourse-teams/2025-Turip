@@ -1,4 +1,4 @@
-package com.on.turip.ui.search.regionresult
+package com.on.turip.ui.compose.search.regionresult
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -11,7 +11,7 @@ import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.common.mapper.toUiModel
-import com.on.turip.ui.search.model.VideoInformationModel
+import com.on.turip.ui.compose.search.model.VideoInformationModel
 import com.on.turip.ui.search.regionresult.RegionResultActivity.Companion.REGION_RESULT_REGION_CATEGORY_NAME_KEY
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList

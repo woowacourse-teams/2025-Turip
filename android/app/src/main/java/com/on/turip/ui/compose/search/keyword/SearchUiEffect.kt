@@ -1,4 +1,4 @@
-package com.on.turip.ui.search.keywordresult
+package com.on.turip.ui.compose.search.keyword
 
 sealed interface SearchUiEffect {
     data object NavigateToLogin : SearchUiEffect

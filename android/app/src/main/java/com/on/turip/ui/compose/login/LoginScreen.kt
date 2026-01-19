@@ -38,8 +38,6 @@ import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.login.component.GoogleLoginButton
 import com.on.turip.ui.compose.login.component.HelpText
-import com.on.turip.ui.compose.login.model.LoginUiEffect
-import com.on.turip.ui.compose.login.model.LoginUiState
 import com.on.turip.ui.compose.login.util.noRippleClickable
 
 @Composable
@@ -158,10 +156,12 @@ private fun LoginScreenContent(
                             .border(
                                 border = BorderStroke(1.dp, TuripTheme.colors.gray02),
                                 shape = TuripTheme.shape.container,
-                            ).background(
+                            )
+                            .background(
                                 color = TuripTheme.colors.gray03,
                                 shape = TuripTheme.shape.container,
-                            ).fillMaxWidth()
+                            )
+                            .fillMaxWidth()
                             .padding(vertical = TuripTheme.spacing.extraLarge),
                     textAlign = TextAlign.Center,
                 )

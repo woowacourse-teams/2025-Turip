@@ -1,4 +1,4 @@
-package com.on.turip.ui.compose.login.model
+package com.on.turip.ui.compose.login
 
 import com.on.turip.ui.common.error.ErrorUiState
 
