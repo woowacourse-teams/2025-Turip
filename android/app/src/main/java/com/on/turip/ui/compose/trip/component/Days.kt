@@ -19,15 +19,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.google.common.collect.ImmutableList
 import com.on.turip.R
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.trip.model.DayModel
 import com.on.turip.ui.compose.trip.model.DayModel.Companion.ALL_PLACE
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun Days(
-    days: List<DayModel>,
+    days: ImmutableList<DayModel>,
     onDayClick: (day: Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -85,7 +86,7 @@ private fun DayItem(
 @Preview(showBackground = true)
 @Composable
 private fun DaysPreview() {
-    val days = ImmutableList.of(DayModel(1, false), DayModel(2, true), DayModel(3, false))
+    val days = persistentListOf(DayModel(1, false), DayModel(2, true), DayModel(3, false))
     TuripTheme {
         Days(
             days = days,

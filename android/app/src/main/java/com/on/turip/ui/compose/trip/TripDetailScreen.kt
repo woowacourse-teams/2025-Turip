@@ -67,6 +67,7 @@ import com.on.turip.ui.compose.trip.model.MapModel
 import com.on.turip.ui.compose.trip.model.PlaceModel
 import com.on.turip.ui.compose.trip.model.TripDetailInfoModel
 import com.on.turip.ui.compose.trip.webview.VideoManager
+import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun TripDetailScreen(
@@ -335,8 +336,7 @@ private fun TripDetailScreenContent(
                             start = TuripTheme.spacing.extraLarge,
                             end = TuripTheme.spacing.extraLarge,
                             bottom = TuripTheme.spacing.small,
-                        )
-                        .fillMaxWidth(),
+                        ).fillMaxWidth(),
             )
         }
 
@@ -349,8 +349,7 @@ private fun TripDetailScreenContent(
                         .padding(
                             horizontal = TuripTheme.spacing.extraLarge,
                             vertical = TuripTheme.spacing.medium,
-                        )
-                        .fillMaxWidth(),
+                        ).fillMaxWidth(),
             )
         }
     }
@@ -399,9 +398,9 @@ private fun TripContentScreenPreview() {
                         isLoading = false,
                         errorUiState = ErrorUiState.None,
                         tripDetailInfo = tripDetailInfo,
-                        days = listOf(DayModel(1), DayModel(2)),
+                        days = persistentListOf(DayModel(1), DayModel(2)),
                         places =
-                            listOf(
+                            persistentListOf(
                                 PlaceModel(
                                     id = 1L,
                                     name = "우아한테크코스",

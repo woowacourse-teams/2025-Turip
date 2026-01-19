@@ -22,6 +22,10 @@ import com.on.turip.ui.compose.trip.model.PlaceModel
 import com.on.turip.ui.compose.trip.model.TripDetailInfoModel
 import com.on.turip.ui.trip.TripDetailActivity.Companion.TRIP_DETAIL_CONTENT_KEY
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -32,7 +36,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @HiltViewModel
 class TripDetailViewModel @Inject constructor(
@@ -41,7 +44,7 @@ class TripDetailViewModel @Inject constructor(
     private val contentPlaceRepository: ContentPlaceRepository,
     private val updateFavoriteUseCase: UpdateFavoriteUseCase,
 ) : ViewModel() {
-    private var placeCacheByDay: Map<Int, List<PlaceModel>> = emptyMap()
+    private var placeCacheByDay: Map<Int, ImmutableList<PlaceModel>> = emptyMap()
 
     private val _uiState: MutableStateFlow<TripDetailUiState> =
         MutableStateFlow(TripDetailUiState.IDLE)
@@ -92,10 +95,12 @@ class TripDetailViewModel @Inject constructor(
                     isLoading = false,
                     errorUiState = ErrorUiState.None,
                     days =
-                        placeCacheByDay.keys.sorted().mapIndexed { index, day ->
-                            DayModel(day = day, isSelected = index == DayModel.ALL_PLACE)
-                        },
-                    places = placeCacheByDay[DayModel.ALL_PLACE] ?: emptyList(),
+                        placeCacheByDay.keys
+                            .sorted()
+                            .mapIndexed { index, day ->
+                                DayModel(day = day, isSelected = index == DayModel.ALL_PLACE)
+                            }.toImmutableList(),
+                    places = placeCacheByDay[DayModel.ALL_PLACE] ?: persistentListOf(),
                     tripDetailInfo =
                         TripDetailInfoModel(
                             creatorName = content.creator.channelName,
@@ -116,25 +121,33 @@ class TripDetailViewModel @Inject constructor(
     }
 
     private fun setupCached(trip: Trip) {
-        val placesByDay: MutableMap<Int, List<PlaceModel>> =
+        val placesByDay: MutableMap<Int, ImmutableList<PlaceModel>> =
             trip.contentPlaces
                 .sortedBy { it.visitDay }
                 .groupBy(
                     keySelector = { contentPlace: ContentPlace -> contentPlace.visitDay },
                     valueTransform = { contentPlace: ContentPlace -> contentPlace.toUiModel() },
-                ).toMutableMap()
-        placesByDay[DayModel.ALL_PLACE] = placesByDay.toSortedMap().flatMap { it.value }
+                ).mapValues { it.value.toImmutableList() }
+                .toMutableMap()
 
+        placesByDay[DayModel.ALL_PLACE] =
+            placesByDay
+                .toSortedMap()
+                .values
+                .flatten()
+                .toImmutableList()
         placeCacheByDay = placesByDay
     }
 
     fun updateDay(selectDay: Int) {
         _uiState.update { state: TripDetailUiState ->
-            val updatedDays: List<DayModel> =
-                state.days.map { dayModel: DayModel -> dayModel.copy(isSelected = dayModel.day == selectDay) }
+            val updatedDays: ImmutableList<DayModel> =
+                state.days
+                    .map { dayModel: DayModel -> dayModel.copy(isSelected = dayModel.day == selectDay) }
+                    .toImmutableList()
             state.copy(
                 days = updatedDays,
-                places = placeCacheByDay[selectDay].orEmpty(),
+                places = placeCacheByDay[selectDay] ?: persistentListOf(),
             )
         }
     }
@@ -184,28 +197,20 @@ class TripDetailViewModel @Inject constructor(
         hasFavoriteFolder: Boolean,
         placeId: Long,
     ) {
-        val updatedCachePlaces =
+        placeCacheByDay =
             placeCacheByDay.mapValues { (_, places: List<PlaceModel>) ->
                 if (places.any { it.id == placeId }) {
-                    places.map { place: PlaceModel -> if (place.id == placeId) place.copy(isFavorite = hasFavoriteFolder) else place }
+                    places
+                        .map { place: PlaceModel -> if (place.id == placeId) place.copy(isFavorite = hasFavoriteFolder) else place }
+                        .toImmutableList()
                 } else {
                     places
                 }
             }
 
-        placeCacheByDay = updatedCachePlaces
-
         _uiState.update { state: TripDetailUiState ->
-            state.copy(
-                places =
-                    state.places.map { place: PlaceModel ->
-                        if (place.id == placeId) {
-                            place.copy(isFavorite = hasFavoriteFolder)
-                        } else {
-                            place
-                        }
-                    },
-            )
+            val currentSelectedDay = state.days.find { it.isSelected }?.day ?: DayModel.ALL_PLACE
+            state.copy(places = placeCacheByDay[currentSelectedDay] ?: persistentListOf())
         }
     }
 

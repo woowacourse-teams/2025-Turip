@@ -5,13 +5,15 @@ import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.compose.trip.model.DayModel
 import com.on.turip.ui.compose.trip.model.PlaceModel
 import com.on.turip.ui.compose.trip.model.TripDetailInfoModel
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 
 @Stable
 data class TripDetailUiState(
     val isLoading: Boolean,
     val errorUiState: ErrorUiState,
-    val days: List<DayModel>,
-    val places: List<PlaceModel>,
+    val days: ImmutableList<DayModel>,
+    val places: ImmutableList<PlaceModel>,
     val tripDetailInfo: TripDetailInfoModel,
     val isFavorite: Boolean,
 ) {
@@ -20,8 +22,8 @@ data class TripDetailUiState(
             TripDetailUiState(
                 isLoading = false,
                 errorUiState = ErrorUiState.None,
-                days = emptyList(),
-                places = emptyList(),
+                days = persistentListOf(),
+                places = persistentListOf(),
                 tripDetailInfo = TripDetailInfoModel.Idle,
                 isFavorite = false,
             )
