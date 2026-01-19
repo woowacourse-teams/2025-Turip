@@ -33,7 +33,6 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.on.turip.R
 import com.on.turip.ui.common.TuripUrlConverter.convertVideoThumbnailUrl
-import com.on.turip.ui.common.model.trip.toDisplayText
 import com.on.turip.ui.compose.designsystem.theme.TuripColor
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.search.model.VideoInformationModel
@@ -97,17 +96,14 @@ private fun SearchResultItem(
                 .padding(
                     horizontal = TuripTheme.spacing.extraLarge,
                     vertical = TuripTheme.spacing.small,
-                )
-                .background(
+                ).background(
                     color = TuripColor.LightGray01,
                     shape = itemShape,
-                )
-                .border(
+                ).border(
                     width = 1.dp,
                     color = TuripColor.Black06,
                     shape = itemShape,
-                )
-                .clip(itemShape)
+                ).clip(itemShape)
                 .clickable { onItemClick() }
                 .padding(TuripTheme.spacing.medium),
     ) {
