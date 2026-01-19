@@ -24,6 +24,7 @@ dependencies {
     implementation 'org.flywaydb:flyway-mysql'
     implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
     implementation 'com.google.api-client:google-api-client:2.2.0'
+    implementation 'org.mindrot:jbcrypt:0.4'
 
     compileOnly 'org.projectlombok:lombok:1.18.38'
     annotationProcessor 'org.projectlombok:lombok:1.18.38'

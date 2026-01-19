@@ -70,4 +70,26 @@ public class TestDataHelper {
         Long memberId = insertMember(accountId, email, isFirstLogin);
         return insertSocialMember(memberId, provider, providerId);
     }
+
+    public Long insertTuripMember(Long memberId, String loginId, String loginPassword) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(
+                    "INSERT INTO turip_member (member_id, login_id, login_password) VALUES (?, ?, ?)",
+                    Statement.RETURN_GENERATED_KEYS);
+            ps.setLong(1, memberId);
+            ps.setString(2, loginId);
+            ps.setString(3, loginPassword);
+            return ps;
+        }, keyHolder);
+
+        return keyHolder.getKey().longValue();
+    }
+
+    public Long insertTuripMember(String email, final boolean isFirstLogin, String loginId, String loginPassword) {
+        Long accountId = insertAccount();
+        Long memberId = insertMember(accountId, email, isFirstLogin);
+        return insertTuripMember(memberId, loginId, loginPassword);
+    }
 }

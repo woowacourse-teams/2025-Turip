@@ -9,6 +9,8 @@ import turip.account.domain.Member;
 import turip.account.repository.MemberRepository;
 import turip.auth.service.RefreshTokenService;
 import turip.common.exception.ErrorTag;
+import turip.common.exception.custom.BadRequestException;
+import turip.common.exception.custom.IllegalArgumentException;
 import turip.common.exception.custom.NotFoundException;
 import turip.favorite.repository.FavoriteContentRepository;
 import turip.favorite.repository.FavoriteFolderRepository;
@@ -27,7 +29,12 @@ public class MemberService {
     @Transactional
     public Member create(String email) {
         Account account = accountService.create();
-        return memberRepository.save(new Member(account, email, true));
+        try {
+            Member member = new Member(account, email, true);
+            return memberRepository.save(member);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(e.getErrorTag());
+        }
     }
 
     public Member getByAccountId(Long accountId) {
