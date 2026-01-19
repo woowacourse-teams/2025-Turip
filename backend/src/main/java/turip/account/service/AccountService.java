@@ -3,12 +3,12 @@ package turip.account.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import turip.account.domain.Account;
+import turip.account.repository.AccountRepository;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.NotFoundException;
 import turip.favorite.repository.FavoriteContentRepository;
 import turip.favorite.service.FavoriteFolderService;
-import turip.account.domain.Account;
-import turip.account.repository.AccountRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -20,7 +20,7 @@ public class AccountService {
 
     @Transactional
     public Account create() {
-        Account savedAccount = accountRepository.save(new Account());
+        Account savedAccount = accountRepository.save(Account.createUserAccount());
         favoriteFolderService.createDefaultFavoriteFolder(savedAccount);
         return savedAccount;
     }

@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
+import turip.util.helper.TestDataHelper;
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -23,6 +24,9 @@ class GuestApiTest {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+    
+    @Autowired
+    private TestDataHelper testDataHelper;
 
     @BeforeEach
     void setUp() {
@@ -61,7 +65,7 @@ class GuestApiTest {
         @DisplayName("마이그레이션 가능 여부 조회 시 200 ok를 응답한다")
         void readMigrationAvailability1() {
             //given
-            jdbcTemplate.update("INSERT INTO account (id) VALUES (1)");
+            testDataHelper.insertAccount();
             String deviceFid = "guest";
             jdbcTemplate.update("INSERT INTO guest (id, account_id, device_fid) VALUES (1, 1, ?)", deviceFid);
             jdbcTemplate.update(
@@ -88,7 +92,7 @@ class GuestApiTest {
         @DisplayName("게스트 탈퇴 시 Guest와 연관된 찜 데이터를 모두 삭제하고 204 No Content를 응답한다")
         void deleteGuestSuccess() {
             // given
-            jdbcTemplate.update("INSERT INTO account (id) VALUES (1)");
+            testDataHelper.insertAccount();
             String deviceFid = "guest";
             jdbcTemplate.update("INSERT INTO guest (id, account_id, device_fid) VALUES (1, 1, ?)", deviceFid);
 

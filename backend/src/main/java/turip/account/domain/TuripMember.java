@@ -14,13 +14,15 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Getter
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Member {
+public class TuripMember {
 
     @Id
     @EqualsAndHashCode.Include
@@ -28,22 +30,13 @@ public class Member {
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "account_id", nullable = false, unique = true, foreignKey = @ForeignKey(name = "fk_member__account"))
-    private Account account;
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "member_id", nullable = false, foreignKey = @ForeignKey(name = "fk_turip_member__member"))
+    private Member member;
 
-    @Column(name = "email")
-    private String email;
+    @Column(name = "login_id", nullable = false, unique = true)
+    private String loginId;
 
-    @Column(name = "is_first_login")
-    private boolean isFirstLogin;
-
-    public Member(Account account, String email, boolean isFirstLogin) {
-        this.account = account;
-        this.email = email;
-        this.isFirstLogin = isFirstLogin;
-    }
-
-    public void completeFirstLogin() {
-        this.isFirstLogin = true;
-    }
+    @Column(name = "login_password", nullable = false)
+    private String loginPassword;
 }

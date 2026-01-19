@@ -16,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
+import turip.util.helper.TestDataHelper;
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -23,8 +24,12 @@ class FavoriteContentApiTest {
 
     @LocalServerPort
     private int port;
+
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private TestDataHelper testDataHelper;
 
     @BeforeEach
     void setUp() {
@@ -36,6 +41,7 @@ class FavoriteContentApiTest {
         jdbcTemplate.update("DELETE FROM favorite_content");
         jdbcTemplate.update("DELETE FROM guest");
         jdbcTemplate.update("DELETE FROM refresh_token");
+        jdbcTemplate.update("DELETE FROM social_member");
         jdbcTemplate.update("DELETE FROM member");
         jdbcTemplate.update("DELETE FROM account");
         jdbcTemplate.update("DELETE FROM content");
@@ -55,6 +61,7 @@ class FavoriteContentApiTest {
         jdbcTemplate.update("ALTER TABLE favorite_content ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE content ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE guest ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE social_member ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE member ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE refresh_token ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE account ALTER COLUMN id RESTART WITH 1");
@@ -128,10 +135,12 @@ class FavoriteContentApiTest {
                     "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 1, 'https://youtube.com/watch?v=test123', '서울 여행', '2025-06-01')");
             jdbcTemplate.update(
                     "INSERT INTO content_place (content_id, place_id, visit_day, visit_order, time_line) VALUES (1, 1, 1, 1, '00:10:00')");
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
+
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
             jdbcTemplate.update(
-                    "INSERT INTO favorite_content (account_id, content_id, created_at) VALUES (1, 1, CURRENT_TIMESTAMP)");
+                    "INSERT INTO favorite_content (account_id, content_id, created_at) VALUES (?, 1, CURRENT_TIMESTAMP)",
+                    accountId);
 
             // when & then
             Map<String, String> request = new HashMap<>(Map.of("contentId", "2"));
@@ -162,10 +171,11 @@ class FavoriteContentApiTest {
                     "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 1, 'https://youtube.com/watch?v=test123', '서울 여행', '2025-06-01')");
             jdbcTemplate.update(
                     "INSERT INTO content_place (content_id, place_id, visit_day, visit_order, time_line) VALUES (1, 1, 1, 1, '00:10:00')");
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
             jdbcTemplate.update(
-                    "INSERT INTO favorite_content (created_at, account_id, content_id) VALUES ('2024-05-05', 1, 1)");
+                    "INSERT INTO favorite_content (account_id, content_id, created_at) VALUES (?, 1, '2024-05-05')",
+                    accountId);
 
             // when & then
             Map<String, String> request = new HashMap<>(Map.of("contentId", "1"));
@@ -195,10 +205,11 @@ class FavoriteContentApiTest {
                     "INSERT INTO city (name, country_id, province_id, image_url) VALUES ('서울', 1, null, 'https://image.example.com/seoul.jpg')");
             jdbcTemplate.update(
                     "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 1, 'https://youtube.com/watch?v=deleteTest', '삭제 테스트 영상', '2025-06-01')");
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
             jdbcTemplate.update(
-                    "INSERT INTO favorite_content (account_id, content_id, created_at) VALUES (1, 1, CURRENT_TIMESTAMP)");
+                    "INSERT INTO favorite_content (account_id, content_id, created_at) VALUES (?, 1, CURRENT_TIMESTAMP)",
+                    accountId);
 
             // when & then
             RestAssured.given().port(port)
@@ -221,10 +232,11 @@ class FavoriteContentApiTest {
                     "INSERT INTO city (name, country_id, province_id, image_url) VALUES ('서울', 1, null, 'https://image.example.com/seoul.jpg')");
             jdbcTemplate.update(
                     "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 1, 'https://youtube.com/watch?v=deleteTest', '삭제 테스트 영상', '2025-06-01')");
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
             jdbcTemplate.update(
-                    "INSERT INTO favorite_content (account_id, content_id, created_at) VALUES (1, 1, CURRENT_TIMESTAMP)");
+                    "INSERT INTO favorite_content (account_id, content_id, created_at) VALUES (?, 1, CURRENT_TIMESTAMP)",
+                    accountId);
 
             // when & then
             RestAssured.given().port(port)
@@ -247,10 +259,11 @@ class FavoriteContentApiTest {
                     "INSERT INTO city (name, country_id, province_id, image_url) VALUES ('서울', 1, null, 'https://image.example.com/seoul.jpg')");
             jdbcTemplate.update(
                     "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 1, 'https://youtube.com/watch?v=deleteTest', '삭제 테스트 영상', '2025-06-01')");
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
             jdbcTemplate.update(
-                    "INSERT INTO favorite_content (account_id, content_id, created_at) VALUES (1, 1, CURRENT_TIMESTAMP)");
+                    "INSERT INTO favorite_content (account_id, content_id, created_at) VALUES (?, 1, CURRENT_TIMESTAMP)",
+                    accountId);
 
             // when & then
             RestAssured.given().port(port)
@@ -273,10 +286,11 @@ class FavoriteContentApiTest {
                     "INSERT INTO city (name, country_id, province_id, image_url) VALUES ('서울', 1, null, 'https://image.example.com/seoul.jpg')");
             jdbcTemplate.update(
                     "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 1, 'https://youtube.com/watch?v=deleteTest', '삭제 테스트 영상', '2025-06-01')");
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
             jdbcTemplate.update(
-                    "INSERT INTO favorite_content (account_id, content_id, created_at) VALUES (1, 1, CURRENT_TIMESTAMP)");
+                    "INSERT INTO favorite_content (account_id, content_id, created_at) VALUES (?, 1, CURRENT_TIMESTAMP)",
+                    accountId);
 
             // when & then
             RestAssured.given().port(port)
@@ -302,12 +316,13 @@ class FavoriteContentApiTest {
                     "INSERT INTO country (name, image_url) VALUES ('대한민국', 'https://image.example.com/korea.jpg')");
             jdbcTemplate.update(
                     "INSERT INTO city (name, country_id, province_id, image_url) VALUES ('서울', 1, null,'https://image.example.com/seoul.jpg')");
-            jdbcTemplate.update("INSERT INTO account () VALUES ()");
-            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (1, 'testDeviceFid')");
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
             jdbcTemplate.update(
                     "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 1, 'https://youtube.com/watch?v=test', '테스트 영상', '2025-08-01')");
             jdbcTemplate.update(
-                    "INSERT INTO favorite_content (account_id, content_id, created_at) VALUES (1, 1, CURRENT_TIMESTAMP)");
+                    "INSERT INTO favorite_content (account_id, content_id, created_at) VALUES (?, 1, CURRENT_TIMESTAMP)",
+                    accountId);
             jdbcTemplate.update(
                     "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('장소1','https://naver.me/place1','주소1',37.5,127.0)");
             jdbcTemplate.update(

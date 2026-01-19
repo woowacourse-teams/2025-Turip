@@ -11,17 +11,18 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.test.context.ActiveProfiles;
+import turip.account.domain.Account;
+import turip.account.repository.AccountRepository;
 import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
 import turip.creator.domain.Creator;
 import turip.creator.repository.CreatorRepository;
 import turip.favorite.domain.FavoriteContent;
-import turip.account.domain.Account;
-import turip.account.repository.AccountRepository;
 import turip.region.domain.City;
 import turip.region.domain.Country;
 import turip.region.repository.CityRepository;
 import turip.region.repository.CountryRepository;
+import turip.util.fixture.AccountFixture;
 
 @DataJpaTest
 @ActiveProfiles("test")
@@ -62,7 +63,7 @@ class FavoriteContentRepositoryTest {
         Content content2 = contentRepository.save(
                 new Content(creator, city, "테스트 컨텐츠 2", "https://example.com/content2", LocalDate.now()));
 
-        Account account = accountRepository.save(new Account());
+        Account account = accountRepository.save(AccountFixture.createEntity());
 
         FavoriteContent favoriteContent1 = new FavoriteContent(LocalDate.now().minusDays(2), account, content1);
         FavoriteContent favoriteContent2 = new FavoriteContent(LocalDate.now().minusDays(1), account,

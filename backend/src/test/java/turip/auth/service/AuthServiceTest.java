@@ -25,6 +25,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import turip.account.domain.Account;
+import turip.account.domain.Member;
+import turip.account.domain.Provider;
+import turip.account.domain.SocialMember;
+import turip.account.service.MemberService;
+import turip.account.service.SocialMemberService;
 import turip.auth.controller.dto.request.LoginRequest;
 import turip.auth.controller.dto.request.RefreshTokenRequest;
 import turip.auth.controller.dto.response.LoginResponse;
@@ -34,10 +40,9 @@ import turip.auth.token.GoogleTokenParser;
 import turip.auth.token.JwtProvider;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.UnauthorizedException;
-import turip.account.domain.Account;
-import turip.account.domain.Member;
-import turip.account.domain.Provider;
-import turip.account.service.MemberService;
+import turip.util.fixture.AccountFixture;
+import turip.util.fixture.MemberFixture;
+import turip.util.fixture.SocialMemberFixture;
 
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
@@ -50,6 +55,9 @@ class AuthServiceTest {
 
     @Mock
     private MemberService memberService;
+
+    @Mock
+    private SocialMemberService socialMemberService;
 
     @Mock
     private RefreshTokenService refreshTokenService;
@@ -75,18 +83,19 @@ class AuthServiceTest {
             // given
             String idToken = "valid-google-id-token";
             String deviceFid = "device-123";
-            String providerId = "google-user-123";
             String email = "test@gmail.com";
-            Account account = new Account(1L);
-            Member member = new Member(account, Provider.GOOGLE, providerId, email);
+            Provider provider = Provider.GOOGLE;
+            String providerId = "google-user-123";
+            Account account = AccountFixture.createUser();
+            Member member = MemberFixture.createCustomMember(account, email, false);
+            SocialMember socialMember = SocialMemberFixture.createCustomSocialMember(member, provider, providerId);
 
             LoginRequest request = new LoginRequest(idToken);
 
-            when(googleTokenParser.getProvider()).thenReturn(Provider.GOOGLE);
+            when(googleTokenParser.getProvider()).thenReturn(provider);
             when(googleTokenParser.getProviderId(idToken)).thenReturn(providerId);
             when(googleTokenParser.getEmail(idToken)).thenReturn(email);
-            when(memberService.isFirstLogin(Provider.GOOGLE, providerId)).thenReturn(false);
-            when(memberService.findOrCreate(Provider.GOOGLE, providerId, email)).thenReturn(member);
+            when(socialMemberService.findOrCreate(provider, providerId, email)).thenReturn(socialMember);
             when(jwtProvider.generateAccessToken(1L)).thenReturn("access-token");
             when(jwtProvider.generateRefreshToken(1L)).thenReturn("refresh-token");
             when(jwtProvider.getIssuedAt(anyString())).thenReturn(LocalDateTime.now());
@@ -94,7 +103,7 @@ class AuthServiceTest {
             when(jwtProvider.hashToken(anyString())).thenReturn("hashed-token");
 
             // when
-            LoginResponse response = authService.login(request, Provider.GOOGLE, deviceFid);
+            LoginResponse response = authService.login(request, provider, deviceFid);
 
             // then
             assertThat(response).isNotNull();
@@ -118,16 +127,17 @@ class AuthServiceTest {
             String deviceFid = "device-123";
             String providerId = "google-user-new";
             String email = "newuser@gmail.com";
-            Account account = new Account(1L);
-            Member member = new Member(account, Provider.GOOGLE, providerId, email);
+            Account account = AccountFixture.createUser();
+            Provider provider = Provider.GOOGLE;
+            Member member = MemberFixture.createCustomMember(account, email, true);
+            SocialMember socialMember = SocialMemberFixture.createCustomSocialMember(member, provider, providerId);
 
             LoginRequest request = new LoginRequest(idToken);
 
-            when(googleTokenParser.getProvider()).thenReturn(Provider.GOOGLE);
+            when(googleTokenParser.getProvider()).thenReturn(provider);
             when(googleTokenParser.getProviderId(idToken)).thenReturn(providerId);
             when(googleTokenParser.getEmail(idToken)).thenReturn(email);
-            when(memberService.isFirstLogin(Provider.GOOGLE, providerId)).thenReturn(true);
-            when(memberService.findOrCreate(Provider.GOOGLE, providerId, email)).thenReturn(member);
+            when(socialMemberService.findOrCreate(provider, providerId, email)).thenReturn(socialMember);
             when(jwtProvider.generateAccessToken(1L)).thenReturn("access-token");
             when(jwtProvider.generateRefreshToken(1L)).thenReturn("refresh-token");
             when(jwtProvider.getIssuedAt(anyString())).thenReturn(LocalDateTime.now());
@@ -135,7 +145,7 @@ class AuthServiceTest {
             when(jwtProvider.hashToken(anyString())).thenReturn("hashed-token");
 
             // when
-            LoginResponse response = authService.login(request, Provider.GOOGLE, deviceFid);
+            LoginResponse response = authService.login(request, provider, deviceFid);
 
             // then
             assertThat(response.isNewMember()).isTrue();
@@ -180,8 +190,8 @@ class AuthServiceTest {
             String oldRefreshToken = generateValidRefreshToken(accountId);
             String hashedToken = "hashed-old-token";
 
-            Account account = new Account(accountId);
-            Member member = new Member(account, Provider.GOOGLE, "provider-id", "test@gmail.com");
+            Account account = AccountFixture.createUser();
+            Member member = MemberFixture.createCustomMember(account, "test@gmail.com", true);
             RefreshToken storedRefreshToken = new RefreshToken(
                     member, deviceFid, hashedToken,
                     LocalDateTime.now(), LocalDateTime.now().plusDays(7)
@@ -225,8 +235,8 @@ class AuthServiceTest {
             String oldRefreshToken = generateValidRefreshToken(accountId);
             String wrongHashedToken = "wrong-hashed-token";
 
-            Account account = new Account(accountId);
-            Member member = new Member(account, Provider.GOOGLE, "provider-id", "test@gmail.com");
+            Account account = AccountFixture.createUser();
+            Member member = MemberFixture.createCustomMember(account, "test@gmail.com", true);
             RefreshToken storedRefreshToken = new RefreshToken(
                     member, deviceFid, "correct-hashed-token",
                     LocalDateTime.now(), LocalDateTime.now().plusDays(7)
@@ -254,8 +264,8 @@ class AuthServiceTest {
             String deviceFid = "device-123";
             String oldRefreshToken = generateValidRefreshToken(accountId);
 
-            Account account = new Account(accountId);
-            Member member = new Member(account, Provider.GOOGLE, "provider-id", "test@gmail.com");
+            Account account = AccountFixture.createUser();
+            Member member = MemberFixture.createCustomMember(account, "test@gmail.com", true);
 
             RefreshTokenRequest request = new RefreshTokenRequest(oldRefreshToken);
 
@@ -329,15 +339,14 @@ class AuthServiceTest {
         @DisplayName("정상적으로 로그아웃이 성공한다")
         void logoutSuccess() {
             // given
-            Long accountId = 1L;
             String deviceFid = "device-123";
-            Account account = new Account(accountId);
-            Member member = new Member(account, Provider.GOOGLE, "provider-id", "test@gmail.com");
+            Account account = AccountFixture.createUser();
+            Member member = MemberFixture.createCustomMember(account, "test@gmail.com", true);
 
-            when(memberService.getByAccountId(accountId)).thenReturn(member);
+            when(memberService.getByAccountId(account.getId())).thenReturn(member);
 
             // when
-            authService.logout(account, deviceFid);
+            authService.logout(member.getAccount(), deviceFid);
 
             // then
             verify(refreshTokenService).deleteByMemberAndDeviceFid(member, deviceFid);
@@ -349,7 +358,7 @@ class AuthServiceTest {
             // given
             Long accountId = 999L;
             String deviceFid = "device-123";
-            Account account = new Account(accountId);
+            Account account = AccountFixture.createUser();
 
             when(memberService.getByAccountId(accountId))
                     .thenThrow(new UnauthorizedException(ErrorTag.UNAUTHORIZED));

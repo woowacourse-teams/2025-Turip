@@ -3,16 +3,15 @@ package turip.account.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import turip.account.domain.Account;
+import turip.account.domain.Guest;
+import turip.account.domain.Member;
+import turip.account.repository.MemberRepository;
 import turip.auth.service.RefreshTokenService;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.NotFoundException;
 import turip.favorite.repository.FavoriteContentRepository;
 import turip.favorite.repository.FavoriteFolderRepository;
-import turip.account.domain.Account;
-import turip.account.domain.Guest;
-import turip.account.domain.Member;
-import turip.account.domain.Provider;
-import turip.account.repository.MemberRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -25,18 +24,10 @@ public class MemberService {
     private final AccountService accountService;
     private final RefreshTokenService refreshTokenService;
 
-    public boolean isFirstLogin(Provider provider, String providerId) {
-        return !memberRepository.existsByProviderAndProviderId(provider, providerId);
-    }
-
     @Transactional
-    public Member findOrCreate(Provider provider, String providerId, String email) {
-        return memberRepository.findByProviderAndProviderId(provider, providerId)
-                .orElseGet(() -> {
-                    Account savedAccount = accountService.create();
-                    Member member = new Member(savedAccount, provider, providerId, email);
-                    return memberRepository.save(member);
-                });
+    public Member create(String email) {
+        Account account = accountService.create();
+        return memberRepository.save(new Member(account, email, true));
     }
 
     public Member getByAccountId(Long accountId) {

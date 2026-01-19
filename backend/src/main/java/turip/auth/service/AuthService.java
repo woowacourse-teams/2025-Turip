@@ -6,6 +6,11 @@ import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import turip.account.domain.Account;
+import turip.account.domain.Member;
+import turip.account.domain.Provider;
+import turip.account.service.MemberService;
+import turip.account.service.SocialMemberService;
 import turip.auth.controller.dto.request.LoginRequest;
 import turip.auth.controller.dto.request.RefreshTokenRequest;
 import turip.auth.controller.dto.response.LoginResponse;
@@ -16,10 +21,6 @@ import turip.auth.token.JwtProvider;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.BadRequestException;
 import turip.common.exception.custom.UnauthorizedException;
-import turip.account.domain.Account;
-import turip.account.domain.Member;
-import turip.account.domain.Provider;
-import turip.account.service.MemberService;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +30,7 @@ public class AuthService {
     private final GoogleTokenParser googleTokenParser;
     private final RefreshTokenService refreshTokenService;
     private final MemberService memberService;
+    private final SocialMemberService socialMemberService;
 
     @Transactional
     public LoginResponse login(LoginRequest request, Provider provider, String deviceFid) {
@@ -82,9 +84,13 @@ public class AuthService {
         String providerId = googleTokenParser.getProviderId(idToken);
         String email = googleTokenParser.getEmail(idToken);
 
-        boolean isNewMember = memberService.isFirstLogin(provider, providerId);
+        boolean isNewMember = false;
+        Member member = findOrCreateSocialMember(provider, providerId, email);
+        if (member.isFirstLogin()) {
+            member.completeFirstLogin();
+            isNewMember = true;
+        }
 
-        Member member = findOrCreateMember(provider, providerId, email);
         String accessToken = jwtProvider.generateAccessToken(member.getAccount().getId());
         String refreshToken = jwtProvider.generateRefreshToken(member.getAccount().getId());
 
@@ -93,8 +99,8 @@ public class AuthService {
         return LoginResponse.of(accessToken, refreshToken, isNewMember);
     }
 
-    private Member findOrCreateMember(Provider provider, String providerId, String email) {
-        return memberService.findOrCreate(provider, providerId, email);
+    private Member findOrCreateSocialMember(Provider provider, String providerId, String email) {
+        return socialMemberService.findOrCreate(provider, providerId, email).getMember();
     }
 
     private Member getMemberByAccountId(Long accountId) {

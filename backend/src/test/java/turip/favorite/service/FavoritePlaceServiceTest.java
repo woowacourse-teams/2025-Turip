@@ -16,6 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import turip.account.domain.Account;
+import turip.account.domain.Role;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.BadRequestException;
 import turip.common.exception.custom.ConflictException;
@@ -31,6 +32,7 @@ import turip.favorite.repository.FavoriteFolderRepository;
 import turip.favorite.repository.FavoritePlaceRepository;
 import turip.place.domain.Place;
 import turip.place.repository.PlaceRepository;
+import turip.util.fixture.AccountFixture;
 
 @ExtendWith(MockitoExtension.class)
 class FavoritePlaceServiceTest {
@@ -58,7 +60,7 @@ class FavoritePlaceServiceTest {
             Long favoriteFolderId = 1L;
             Long placeId = 1L;
 
-            Account account = new Account(1L);
+            Account account = AccountFixture.createUser();
             FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, account, "폴더 이름 1", true);
             Place place = new Place(placeId, "장소 이름", "장소 url", "주소", 1, 1);
             FavoritePlace favoritePlace = new FavoritePlace(favoriteFolder, place, 1);
@@ -90,8 +92,8 @@ class FavoritePlaceServiceTest {
             Long favoriteFolderId = 1L;
             Long placeId = 1L;
 
-            Account owner = new Account(1L);
-            Account requestAccount = new Account(2L);
+            Account owner = AccountFixture.createCustomAccount(1L, Role.USER);
+            Account requestAccount = AccountFixture.createCustomAccount(2L, Role.USER);
             FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, owner, "폴더 이름 1", true);
             Place place = new Place(placeId, "장소 이름", "장소 url", "주소", 1, 1);
 
@@ -111,7 +113,7 @@ class FavoritePlaceServiceTest {
             // given
             Long favoriteFolderId = 1L;
             Long placeId = 1L;
-            Account account = new Account(1L);
+            Account account = AccountFixture.createUser();
 
             given(favoriteFolderRepository.findById(favoriteFolderId))
                     .willReturn(Optional.empty());
@@ -128,7 +130,7 @@ class FavoritePlaceServiceTest {
             // given
             Long favoriteFolderId = 1L;
             Long placeId = 1L;
-            Account account = new Account(1L);
+            Account account = AccountFixture.createUser();
             FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, account, "폴더 이름 1", true);
 
             given(favoriteFolderRepository.findById(favoriteFolderId))
@@ -148,7 +150,7 @@ class FavoritePlaceServiceTest {
             // given
             Long favoriteFolderId = 1L;
             Long placeId = 1L;
-            Account account = new Account(1L);
+            Account account = AccountFixture.createUser();
             FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, account, "폴더 이름 1", true);
             Place place = new Place(placeId, "장소 이름", "장소 url", "주소", 1, 1);
 
@@ -174,7 +176,7 @@ class FavoritePlaceServiceTest {
         void findAllByFolder1() {
             // given
             Long favoriteFolderId = 1L;
-            Account account = new Account(1L);
+            Account account = AccountFixture.createUser();
             FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, account, "테스트 폴더", false);
             Place place1 = new Place(1L, "장소1", "url1", "주소1", 1, 1);
             Place place2 = new Place(2L, "장소2", "url2", "주소2", 2, 2);
@@ -221,7 +223,7 @@ class FavoritePlaceServiceTest {
         @Test
         void countByAccount1() {
             // given
-            Account account = new Account(1L);
+            Account account = AccountFixture.createUser();
             int favoritePlaceCount = 3;
             given(favoritePlaceRepository.countByFavoriteFolderAccount(account))
                     .willReturn(favoritePlaceCount);
@@ -243,7 +245,7 @@ class FavoritePlaceServiceTest {
         @Test
         void updatePlaceOrder1() {
             // given
-            Account account = new Account(1L);
+            Account account = AccountFixture.createUser();
             FavoriteFolder favoriteFolder = new FavoriteFolder(1L, account, "폴더1", false);
             FavoritePlace firstFavoritePlace = new FavoritePlace(1L, favoriteFolder, null, 1);
             FavoritePlace secondFavoritePlace = new FavoritePlace(2L, favoriteFolder, null, 2);
@@ -269,8 +271,8 @@ class FavoritePlaceServiceTest {
         @Test
         void updatePlaceOrder2() {
             // given
-            Account owner = new Account(1L);
-            Account requestAccount = new Account(2L);
+            Account owner = AccountFixture.createCustomAccount(1L, Role.USER);
+            Account requestAccount = AccountFixture.createCustomAccount(2L, Role.USER);
             FavoriteFolder favoriteFolder = new FavoriteFolder(1L, owner, "폴더1", false);
             given(favoriteFolderRepository.findById(favoriteFolder.getId()))
                     .willReturn(Optional.of(favoriteFolder));
@@ -288,7 +290,7 @@ class FavoritePlaceServiceTest {
         @Test
         void updatePlaceOrder3() {
             // given
-            Account account = new Account(1L);
+            Account account = AccountFixture.createUser();
             FavoriteFolder favoriteFolder = new FavoriteFolder(1L, account, "폴더1", false);
             FavoriteFolder otherFavoriteFolder = new FavoriteFolder(2L, account, "다른 폴더", false);
             FavoritePlace firstFavoritePlace = new FavoritePlace(1L, favoriteFolder, null, 1);
@@ -321,7 +323,7 @@ class FavoritePlaceServiceTest {
             Long favoriteFolderId = 1L;
             Long placeId = 1L;
 
-            Account account = new Account(1L);
+            Account account = AccountFixture.createUser();
             FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, account, "폴더 이름 1", true);
             Place place = new Place(placeId, "장소 이름", "장소 url", "주소", 1, 1);
             FavoritePlace favoritePlace = new FavoritePlace(favoriteFolder, place, 1);
@@ -344,8 +346,8 @@ class FavoritePlaceServiceTest {
             Long favoriteFolderId = 1L;
             Long placeId = 1L;
 
-            Account owner = new Account(1L);
-            Account requestAccount = new Account(2L);
+            Account owner = AccountFixture.createCustomAccount(1L, Role.USER);
+            Account requestAccount = AccountFixture.createCustomAccount(2L, Role.USER);
             FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, owner, "폴더 이름 1", true);
             Place place = new Place(placeId, "장소 이름", "장소 url", "주소", 1, 1);
 
@@ -365,7 +367,7 @@ class FavoritePlaceServiceTest {
             // given
             Long favoriteFolderId = 1L;
             Long placeId = 1L;
-            Account account = new Account(1L);
+            Account account = AccountFixture.createUser();
 
             given(favoriteFolderRepository.findById(favoriteFolderId))
                     .willReturn(Optional.empty());
@@ -382,7 +384,7 @@ class FavoritePlaceServiceTest {
             // given
             Long favoriteFolderId = 1L;
             Long placeId = 1L;
-            Account account = new Account(1L);
+            Account account = AccountFixture.createUser();
             FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, account, "폴더 이름 1", true);
 
             given(favoriteFolderRepository.findById(favoriteFolderId))
@@ -402,7 +404,7 @@ class FavoritePlaceServiceTest {
             // given
             Long favoriteFolderId = 1L;
             Long placeId = 1L;
-            Account account = new Account(1L);
+            Account account = AccountFixture.createUser();
             FavoriteFolder favoriteFolder = new FavoriteFolder(favoriteFolderId, account, "폴더 이름 1", true);
             Place place = new Place(placeId, "장소 이름", "장소 url", "주소", 1, 1);
 
