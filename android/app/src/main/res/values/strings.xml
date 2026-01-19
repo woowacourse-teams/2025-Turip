@@ -27,13 +27,15 @@
     <string name="bottom_navigation_my_page">마이페이지</string>
 
     <!-- 검색 결과 페이지 -->
-    <string name="search_result_no_result">검색 결과가 없습니다.</string>
+    <string name="search_result_no_result">\'%s\'의\n검색 결과가 없어요...</string>
     <string name="search_result_video_description">%1$s · %2$s</string>
     <string name="search_result_exist_result">검색결과 %d개</string>
     <string name="search_result_hint_text">예시 검색: 1박 2일, 감성, 도쿄, 해수욕장</string>
+    <string name="search_result_tip">TIP</string>
+    <string name="search_result_tip_region">지역명으로 검색해보세요.</string>
 
     <!-- 지역 결과 페이지 -->
-    <string name="region_result_no_result">검색 결과가 없습니다.</string>
+    <string name="region_result_no_result">검색 결과가 없어요...</string>
     <string name="region_result_video_description">%1$s · %2$s</string>
     <string name="region_result_exist_result">검색결과 %d개</string>
 

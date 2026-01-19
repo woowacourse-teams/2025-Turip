@@ -14,6 +14,7 @@ import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.search.model.VideoInformationModel
 import com.on.turip.ui.search.regionresult.RegionResultActivity.Companion.REGION_RESULT_REGION_CATEGORY_NAME_KEY
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
@@ -89,7 +90,7 @@ class RegionResultViewModel @Inject constructor(
             } else {
                 _uiState.update {
                     RegionResultUiState.Success(
-                        videos = videosInformation,
+                        videos = videosInformation.toImmutableList(),
                         totalCount = count,
                         region = regionCategoryName,
                     )
