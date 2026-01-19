@@ -97,8 +97,8 @@ class TripDetailViewModel @Inject constructor(
                     days =
                         placeCacheByDay.keys
                             .sorted()
-                            .mapIndexed { index, day ->
-                                DayModel(day = day, isSelected = index == DayModel.ALL_PLACE)
+                            .map { day: Int ->
+                                DayModel(day = day, isSelected = day == DayModel.ALL_PLACE)
                             }.toImmutableList(),
                     places = placeCacheByDay[DayModel.ALL_PLACE] ?: persistentListOf(),
                     tripDetailInfo =
