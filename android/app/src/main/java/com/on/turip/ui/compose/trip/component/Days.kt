@@ -2,6 +2,7 @@ package com.on.turip.ui.compose.trip.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,9 +13,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -51,25 +56,36 @@ private fun DayItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
+
     Column(
-        modifier =
-            modifier
-                .clickable(onClick = onClick)
-                .width(48.dp),
+        modifier = modifier.width(48.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        Text(
-            text =
-                if (dayModel.day == ALL_PLACE) {
-                    stringResource(R.string.trip_detail_trip_all_place)
-                } else {
-                    stringResource(R.string.trip_detail_trip_day, dayModel.day)
-                },
-            style = TuripTheme.typography.title3,
-            color = if (dayModel.isSelected) TuripTheme.colors.black else TuripTheme.colors.gray02,
-            modifier = Modifier.padding(TuripTheme.spacing.extraSmall),
-        )
+        Box(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .clip(TuripTheme.shape.container)
+                    .clickable(
+                        interactionSource = interactionSource,
+                        indication = ripple(color = TuripTheme.colors.gray03),
+                        onClick = onClick,
+                    ).padding(TuripTheme.spacing.small),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text =
+                    if (dayModel.day == ALL_PLACE) {
+                        stringResource(R.string.trip_detail_trip_all_place)
+                    } else {
+                        stringResource(R.string.trip_detail_trip_day, dayModel.day)
+                    },
+                style = TuripTheme.typography.title3,
+                color = if (dayModel.isSelected) TuripTheme.colors.black else TuripTheme.colors.gray02,
+            )
+        }
 
         Box(
             modifier =

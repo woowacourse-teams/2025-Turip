@@ -1,10 +1,15 @@
 package com.on.turip.ui.compose.trip.component
 
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,10 +21,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -54,7 +64,7 @@ fun PlaceItem(
                     start = TuripTheme.spacing.large,
                     end = TuripTheme.spacing.large,
                     top = TuripTheme.spacing.medium,
-                    bottom = TuripTheme.spacing.large,
+                    bottom = TuripTheme.spacing.medium,
                 ),
     ) {
         Text(
@@ -71,10 +81,11 @@ fun PlaceItem(
             color = TuripTheme.colors.gray04,
         )
 
-        Spacer(modifier = Modifier.height(TuripTheme.spacing.medium))
+        Spacer(modifier = Modifier.height(TuripTheme.spacing.small))
 
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth(),
         ) {
             PlaceActionItem(
@@ -127,11 +138,28 @@ private fun PlaceActionItem(
     iconTint: Color = TuripTheme.colors.gray04,
     iconSize: Dp = 24.dp,
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.95f else 1f,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+        label = "scaleAnimation",
+    )
+
     Row(
         modifier =
             modifier
-                .clickable(onClick = onClick)
-                .padding(horizontal = TuripTheme.spacing.medium),
+                .graphicsLayer(scaleX = scale, scaleY = scale)
+                .clip(TuripTheme.shape.container)
+                .clickable(
+                    onClick = onClick,
+                    interactionSource = interactionSource,
+                    indication = ripple(color = TuripTheme.colors.gray03),
+                ).padding(
+                    horizontal = TuripTheme.spacing.medium,
+                    vertical = TuripTheme.spacing.extraSmall,
+                ),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(TuripTheme.spacing.extraSmall),
     ) {
