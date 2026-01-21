@@ -38,7 +38,9 @@ VS Code
 .vscode/
 
 Logging
-/logs
+logs/
+*.log
+*.gz
 
 .env
 /mysql-data
