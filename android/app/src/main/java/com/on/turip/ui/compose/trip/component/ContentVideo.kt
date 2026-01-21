@@ -88,6 +88,7 @@ private fun Video(webViewController: TripDetailWebViewController) {
     AndroidView(
         factory = {
             webViewController.webView.apply {
+                (parent as? ViewGroup)?.removeView(this)
                 layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT)
             }
         },

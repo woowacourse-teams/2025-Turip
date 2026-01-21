@@ -54,7 +54,7 @@ fun ContentExpandableTitle(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .size(36.dp)
+                        .height(36.dp)
                         .clip(TuripTheme.shape.container)
                         .clickable(
                             onClick = { expanded = !expanded },
