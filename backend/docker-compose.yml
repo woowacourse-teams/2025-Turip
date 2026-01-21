@@ -5,6 +5,7 @@ services:
     restart: always
     ports:
       - "${NGINX_PORT:-80}:80"
+      - "8081:8081"
     volumes:
       - /home/ubuntu/actions-runner/_work/2025-Turip/2025-Turip/backend/nginx/conf.d:/etc/nginx/conf.d
     networks:
@@ -67,6 +68,36 @@ services:
       - turip-network
     volumes:
       - /home/ubuntu/logs:/logs
+
+  admin:
+    image: ${ADMIN_IMAGE_NAME:-teamturip/turip-admin:latest}
+    container_name: turip-admin
+    restart: always
+    expose:
+      - "8081"
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
+      SERVER_PORT: 8081
+      OTEL_SERVICE_NAME: turip-admin
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT}
+      OTEL_RESOURCE_ATTRIBUTES: env=dev
+      OTEL_INSTRUMENTATION_LOGBACK_APPENDER_EXPERIMENTAL_LOG_ATTRIBUTES: "true"
+      CSV_LINKS_COLLECTION_URL: ${CSV_LINKS_COLLECTION_URL}
+      DOMESTIC_ETC_IMAGE_URL: ${DOMESTIC_ETC_IMAGE_URL}
+      OVERSEAS_ETC_IMAGE_URL: ${OVERSEAS_ETC_IMAGE_URL}
+      MYSQL_URL: ${MYSQL_URL}
+      MYSQL_USERNAME: ${MYSQL_USERNAME}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      FLYWAY_USERNAME: ${FLYWAY_USERNAME}
+      FLYWAY_PASSWORD: ${FLYWAY_PASSWORD}
+      CSV_IMPORT_PASSWORD: ${CSV_IMPORT_PASSWORD}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+    networks:
+      - turip-network
+    volumes:
+      - /home/ubuntu/logs/admin:/logs
+
 
 networks:
   turip-network:
