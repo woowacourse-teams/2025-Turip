@@ -12,12 +12,16 @@ import com.on.turip.domain.folder.repository.FolderRepository
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
-import com.on.turip.ui.main.favorite.FavoritePlaceFolderFragment.Companion.FAVORITE_PLACE_FOLDER_ARGUMENTS_PLACE_ID
+import com.on.turip.ui.main.favorite.FavoritePlaceFolderBottomSheetFragment.Companion.FAVORITE_PLACE_FOLDER_ARGUMENTS_PLACE_ID
+import com.on.turip.ui.main.favorite.FavoritePlaceFolderBottomSheetFragment.Companion.FAVORITE_PLACE_FOLDER_ARGUMENTS_PLACE_NAME
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderRetryAction
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderUiEffect
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,7 +31,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @HiltViewModel
 class FavoritePlaceFolderViewModel @Inject constructor(
@@ -38,6 +41,12 @@ class FavoritePlaceFolderViewModel @Inject constructor(
     private val placeId: Long by lazy {
         checkNotNull(savedStateHandle[FAVORITE_PLACE_FOLDER_ARGUMENTS_PLACE_ID]) {
             Timber.e("폴더 목록 화면 place ID 값이 존재하지 않습니다.")
+        }
+    }
+
+    private val placeName: String by lazy {
+        checkNotNull(savedStateHandle[FAVORITE_PLACE_FOLDER_ARGUMENTS_PLACE_NAME]) {
+            Timber.e("폴더 목록 화면, 장소명이 존재하지 않습니다.")
         }
     }
 
@@ -53,10 +62,13 @@ class FavoritePlaceFolderViewModel @Inject constructor(
             folderRepository
                 .loadFavoriteFoldersStatusByPlaceId(placeId)
                 .onSuccess { favoriteFolders: List<FavoriteFolder> ->
+                    val folders = favoriteFolders.map { it.toUiModel() }.toImmutableList()
+
                     _uiState.update { state: FavoritePlaceFolderUiState ->
                         state.copy(
                             placeId = placeId,
-                            favoritePlaceFolders = favoriteFolders.map { it.toUiModel() },
+                            placeName = placeName,
+                            favoritePlaceFolders = folders,
                         )
                     }
                     Timber.d("상세 페이지에서 장소에 대한 찜 폴더 현황 데이터 불러오기 성공 ")

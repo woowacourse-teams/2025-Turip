@@ -46,7 +46,7 @@ fun PlaceItem(
     placeModel: PlaceModel,
     onTimeLineClick: (timeLine: Int) -> Unit,
     onMapClick: (mapModel: MapModel) -> Unit,
-    onFavoriteClick: (id: Long) -> Unit,
+    onFavoriteClick: (id: Long, placeName: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -121,7 +121,7 @@ fun PlaceItem(
                 iconTint = if (placeModel.isFavorite) TuripTheme.colors.primary else TuripTheme.colors.gray04,
                 drawableRes = if (placeModel.isFavorite) R.drawable.btn_favorite_selected else R.drawable.btn_favorite_normal,
                 useTint = true,
-                onClick = { onFavoriteClick(placeModel.id) },
+                onClick = { onFavoriteClick(placeModel.id, placeModel.name) },
             )
         }
     }
@@ -202,7 +202,7 @@ private fun PlaceItemPreview() {
             placeModel = model,
             onTimeLineClick = { },
             onMapClick = { },
-            onFavoriteClick = { },
+            onFavoriteClick = { _, _ -> },
             modifier = Modifier.padding(TuripTheme.spacing.extraLarge),
         )
     }

@@ -75,7 +75,7 @@ fun TripDetailScreen(
     navigateToLogin: () -> Unit,
     navigateToMap: (mapModel: MapModel) -> Unit,
     navigateToWebViewUrl: (url: String) -> Unit,
-    onClickFavoritePlace: (id: Long) -> Unit,
+    onClickFavoritePlace: (id: Long, placeName: String) -> Unit,
     viewModel: TripDetailViewModel = hiltViewModel(),
 ) {
     val uiState: TripDetailUiState by viewModel.uiState.collectAsState()
@@ -270,7 +270,7 @@ private fun TripDetailScreenContent(
     onDayClick: (day: Int) -> Unit,
     onTimeLineClick: (timeLine: Int) -> Unit,
     onMapClick: (mapModel: MapModel) -> Unit,
-    onFavoritePlaceClick: (id: Long) -> Unit,
+    onFavoritePlaceClick: (id: Long, placeName: String) -> Unit,
     onFavoriteContentClick: () -> Unit,
     onErrorVideoClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -336,7 +336,8 @@ private fun TripDetailScreenContent(
                             start = TuripTheme.spacing.extraLarge,
                             end = TuripTheme.spacing.extraLarge,
                             bottom = TuripTheme.spacing.small,
-                        ).fillMaxWidth(),
+                        )
+                        .fillMaxWidth(),
             )
         }
 
@@ -349,7 +350,8 @@ private fun TripDetailScreenContent(
                         .padding(
                             horizontal = TuripTheme.spacing.extraLarge,
                             vertical = TuripTheme.spacing.medium,
-                        ).fillMaxWidth(),
+                        )
+                        .fillMaxWidth(),
             )
         }
     }
@@ -430,7 +432,7 @@ private fun TripContentScreenPreview() {
                 onDayClick = {},
                 onTimeLineClick = {},
                 onMapClick = {},
-                onFavoritePlaceClick = {},
+                onFavoritePlaceClick = { _, _ -> },
                 onFavoriteContentClick = {},
                 onErrorVideoClick = {},
             )

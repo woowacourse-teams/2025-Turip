@@ -1,8 +1,12 @@
 package com.on.turip.ui.main.favorite.model
 
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+
 data class FavoritePlaceFolderUiState(
     val placeId: Long,
-    val favoritePlaceFolders: List<FavoritePlaceFolderModel>,
+    val placeName: String,
+    val favoritePlaceFolders: ImmutableList<FavoritePlaceFolderModel>,
 ) {
     val hasFavoriteFolder: Boolean
         get() = favoritePlaceFolders.any { it.isSelected }
@@ -11,7 +15,8 @@ data class FavoritePlaceFolderUiState(
         val Idle: FavoritePlaceFolderUiState =
             FavoritePlaceFolderUiState(
                 placeId = 0L,
-                favoritePlaceFolders = emptyList(),
+                placeName = "",
+                favoritePlaceFolders = persistentListOf(),
             )
     }
 }

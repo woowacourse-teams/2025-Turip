@@ -13,7 +13,7 @@ import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.trip.TripDetailScreen
 import com.on.turip.ui.compose.trip.model.MapModel
 import com.on.turip.ui.login.LoginActivity
-import com.on.turip.ui.main.favorite.FavoriteBottomSheetContainerFragment
+import com.on.turip.ui.main.favorite.FavoritePlaceFolderBottomSheetFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -49,11 +49,11 @@ class TripDetailActivity : AppCompatActivity() {
                             errorToastMessage = getString(R.string.all_snackbar_not_found_video_url),
                         )
                     },
-                    onClickFavoritePlace = { id: Long ->
+                    onClickFavoritePlace = { id: Long, placeName: String ->
                         if (supportFragmentManager.findFragmentByTag("favorite_place_folder") == null) {
-                            val bottomSheet: FavoriteBottomSheetContainerFragment =
-                                FavoriteBottomSheetContainerFragment.instance(id)
-                            bottomSheet.show(supportFragmentManager, "favorite_place_folder")
+                            FavoritePlaceFolderBottomSheetFragment
+                                .newInstance(id, placeName)
+                                .show(supportFragmentManager, "favorite_place_folder")
                         }
                     },
                 )
