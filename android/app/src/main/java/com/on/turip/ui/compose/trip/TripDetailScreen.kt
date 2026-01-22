@@ -118,7 +118,7 @@ fun TripDetailScreen(
                 snackbarHostState = snackbarHostState,
                 context = context,
                 navigateToLogin = navigateToLogin,
-                handleErrorRetryRequest = { viewModel.handleErrorRetryRequest(it) },
+                handleErrorRetryRequest = viewModel::handleErrorRetryRequest,
             )
         }
     }
@@ -200,10 +200,10 @@ fun TripDetailScreen(
                             uiState = uiState,
                             listState = listState,
                             webViewController = webViewController,
-                            onDayClick = { viewModel.updateDay(it) },
-                            onTimeLineClick = { webViewController.seekTo(it) },
-                            onMapClick = { navigateToMap(it) },
-                            onFavoritePlaceClick = { onClickFavoritePlace(it) },
+                            onDayClick = viewModel::updateDay,
+                            onTimeLineClick = webViewController::seekTo,
+                            onMapClick = navigateToMap,
+                            onFavoritePlaceClick = onClickFavoritePlace,
                             onFavoriteContentClick = {
                                 snackbarHostState.currentSnackbarData?.dismiss()
                                 viewModel.updateFavorite()
@@ -302,7 +302,7 @@ private fun TripDetailScreenContent(
         item {
             Days(
                 days = uiState.days,
-                onDayClick = { day -> onDayClick(day) },
+                onDayClick = onDayClick,
                 modifier = Modifier.padding(horizontal = TuripTheme.spacing.extraLarge),
             )
         }
@@ -327,9 +327,9 @@ private fun TripDetailScreenContent(
         items(items = uiState.places, key = { it.id }) { place ->
             PlaceItem(
                 placeModel = place,
-                onTimeLineClick = { onTimeLineClick(it) },
-                onMapClick = { onMapClick(it) },
-                onFavoriteClick = { onFavoritePlaceClick(it) },
+                onTimeLineClick = onTimeLineClick,
+                onMapClick = onMapClick,
+                onFavoriteClick = onFavoritePlaceClick,
                 modifier =
                     Modifier
                         .padding(
