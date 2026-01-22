@@ -40,7 +40,9 @@
     <string name="region_result_exist_result">검색결과 %d개</string>
 
     <!-- 컨텐츠 상세 페이지 -->
-    <string name="bottom_sheet_favorite_place_folder_title">폴더 목록</string>
+    <string name="bottom_sheet_favorite_place_folder_title">내 장소</string>
+    <string name="bottom_sheet_favorite_place_folder_add_folder_description">폴더 추가</string>
+    <string name="bottom_sheet_favorite_place_folder_confirm">완료</string>
 
     <!-- 홈 페이지 -->
     <string name="home_top_title">😊 오늘의 기분은, 여행하기 딱 좋아요!</string>
@@ -98,7 +100,6 @@
     <string name="bottom_sheet_folder_remove_remove">삭제</string>
     <string name="folder_empty_suggest_title">나만의 폴더를 만들어보세요!</string>
     <string name="folder_empty_suggest_description">폴더를 만들면 다양한 장소들을\n내 마음대로 나누어 보관할 수 있어요.</string>
-
     <string name="main_double_back_pressed_to_exit">한 번 더 누르면 종료됩니다.</string>
 
     <!-- 네트워크 오류 -->
@@ -127,7 +128,4 @@
     <string name="turip_dialog_login_suggest_description">로그인하고 나만의 여행 정보를\n 공유해보세요!</string>
     <string name="turip_dialog_login_suggest_confirm">로그인</string>
     <string name="turip_dialog_login_suggest_dismiss">나중에</string>
-
-    <!--  -->
-
 </resources>
