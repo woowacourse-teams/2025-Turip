@@ -21,7 +21,6 @@ import com.on.turip.domain.creator.Creator
 import com.on.turip.domain.region.City
 import com.on.turip.ui.common.TuripUrlConverter
 import com.on.turip.ui.common.model.trip.TripDurationModel
-import com.on.turip.ui.common.model.trip.toDisplayText
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.main.home.model.UsersLikeContentModel
 

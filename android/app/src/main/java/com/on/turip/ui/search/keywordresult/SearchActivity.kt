@@ -9,8 +9,9 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.search.keyword.SearchScreen
+import com.on.turip.ui.compose.search.keyword.SearchViewModel
 import com.on.turip.ui.login.LoginActivity
-import com.on.turip.ui.trip.detail.TripDetailActivity
+import com.on.turip.ui.trip.TripDetailActivity
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

@@ -33,8 +33,6 @@ import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.setting.component.SettingAppBar
 import com.on.turip.ui.compose.setting.component.SettingItem
-import com.on.turip.ui.compose.setting.model.SettingUiEffect
-import com.on.turip.ui.compose.setting.model.SettingUiState
 import timber.log.Timber
 
 @Composable
