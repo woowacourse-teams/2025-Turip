@@ -1,0 +1,113 @@
+name: Dev App CI/CD
+
+on:
+  push:
+    branches: [ develop ]
+    paths:
+      - 'backend/app/**'
+      - 'backend/build.gradle'
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: 'Deploy app image tag (YYYYMMDD-HHMM-SHA)'
+        required: true
+
+jobs:
+  build_and_test:
+    if: github.event_name != 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.vars.outputs.image_tag }}
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set image tag
+        id: vars
+        run: |
+          echo "image_tag=$(TZ=Asia/Seoul date +%Y%m%d-%H%M)-${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Build App Jar
+        run: |
+          chmod +x gradlew
+          ./gradlew :app:bootJar -x test
+
+      - name: Run Unit Tests (App)
+        run: ./gradlew :app:test
+
+      - name: Prepare OpenTelemetry agent
+        run: |
+          mkdir -p otel
+          curl -L -o otel/opentelemetry-javaagent.jar \
+          https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v2.10.0/opentelemetry-javaagent.jar
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: network=host
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push App image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          file: ./backend/app.Dockerfile
+          platforms: linux/arm64
+          push: true
+          tags: teamturip/turip-backend:dev-app-${{ steps.vars.outputs.image_tag }}
+
+  deploy:
+    needs: build_and_test
+    runs-on: [ self-hosted, turip-server-dev ]
+    environment: development
+    if: github.event_name == 'workflow_dispatch' || needs.build_and_test.result == 'success'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Grant execute permission for deploy script
+        run: chmod +x /home/ubuntu/deploy/deploy.sh
+
+      - name: Deploy to EC2
+        working-directory: /home/ubuntu/deploy
+        env:
+          CSV_LINKS_COLLECTION_URL: ${{ secrets.CSV_LINKS_COLLECTION_URL }}
+          OVERSEAS_ETC_IMAGE_URL: ${{ secrets.OVERSEAS_ETC_IMAGE_URL }}
+          DOMESTIC_ETC_IMAGE_URL: ${{ secrets.DOMESTIC_ETC_IMAGE_URL }}
+          OTEL_EXPORTER_OTLP_ENDPOINT: ${{ secrets.OTEL_EXPORTER_OTLP_ENDPOINT }}
+          MYSQL_URL: ${{ secrets.MYSQL_URL }}
+          MYSQL_USERNAME: ${{ secrets.MYSQL_USERNAME }}
+          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+          FLYWAY_USERNAME: ${{ secrets.FLYWAY_USERNAME }}
+          FLYWAY_PASSWORD: ${{ secrets.FLYWAY_PASSWORD }}
+          CSV_IMPORT_PASSWORD: ${{ secrets.CSV_IMPORT_PASSWORD }}
+          JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+        run: |
+          IMAGE_TAG="${{ inputs.image_tag || needs.build_and_test.outputs.image_tag }}"
+          echo "🚀 배포 이미지 태그: ${IMAGE_TAG}"
+          ./deploy.sh ${IMAGE_TAG}
