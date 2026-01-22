@@ -7,6 +7,7 @@ data class FavoritePlaceFolderUiState(
     val placeId: Long,
     val placeName: String,
     val favoritePlaceFolders: ImmutableList<FavoritePlaceFolderModel>,
+    val isChanged: Boolean,
 ) {
     val hasFavoriteFolder: Boolean
         get() = favoritePlaceFolders.any { it.isSelected }
@@ -17,6 +18,7 @@ data class FavoritePlaceFolderUiState(
                 placeId = 0L,
                 placeName = "",
                 favoritePlaceFolders = persistentListOf(),
+                isChanged = false,
             )
     }
 }

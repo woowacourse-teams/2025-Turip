@@ -50,6 +50,8 @@ class FavoritePlaceFolderViewModel @Inject constructor(
         }
     }
 
+    private var originFavoriteFolderIds: Set<Long> = setOf()
+
     private val _uiState: MutableStateFlow<FavoritePlaceFolderUiState> =
         MutableStateFlow(FavoritePlaceFolderUiState.Idle)
     val uiState: StateFlow<FavoritePlaceFolderUiState> = _uiState.asStateFlow()
@@ -57,7 +59,11 @@ class FavoritePlaceFolderViewModel @Inject constructor(
     private val _uiEffect: Channel<FavoritePlaceFolderUiEffect> = Channel(Channel.BUFFERED)
     val uiEffect: Flow<FavoritePlaceFolderUiEffect> = _uiEffect.receiveAsFlow()
 
-    fun loadFavoriteFoldersForPlace() {
+    init {
+        loadFavoriteFoldersForPlace()
+    }
+
+    private fun loadFavoriteFoldersForPlace() {
         viewModelScope.launch {
             folderRepository
                 .loadFavoriteFoldersStatusByPlaceId(placeId)
@@ -69,8 +75,11 @@ class FavoritePlaceFolderViewModel @Inject constructor(
                             placeId = placeId,
                             placeName = placeName,
                             favoritePlaceFolders = folders,
+                            isChanged = false,
                         )
                     }
+
+                    originFavoriteFolderIds = folders.filter { it.isSelected }.map { it.id }.toSet()
                     Timber.d("상세 페이지에서 장소에 대한 찜 폴더 현황 데이터 불러오기 성공 ")
                 }.onFailure { errorType: ErrorType ->
                     sendErrorEffect(
@@ -82,35 +91,20 @@ class FavoritePlaceFolderViewModel @Inject constructor(
         }
     }
 
-    fun updateFolder(favoritePlaceFolderModel: FavoritePlaceFolderModel) {
-        viewModelScope.launch {
-            val updateFavoritesStatus: Boolean = !favoritePlaceFolderModel.isSelected
-            updateFavoritePlaceUseCase(favoritePlaceFolderModel.id, placeId, updateFavoritesStatus)
-                .onSuccess {
-                    Timber.d("장소에 대한 찜 폴더들 현황에서 장소 찜 업데이트")
-                    _uiState.update { state: FavoritePlaceFolderUiState ->
-                        state.copy(
-                            favoritePlaceFolders =
-                                state.favoritePlaceFolders.map { folder ->
-                                    if (folder.id == favoritePlaceFolderModel.id) {
-                                        folder.copy(isSelected = !folder.isSelected)
-                                    } else {
-                                        folder
-                                    }
-                                },
-                        )
-                    }
-                    _uiEffect.send(
-                        FavoritePlaceFolderUiEffect.ShowUpdateFavoriteState(favoritePlaceFolderModel),
-                    )
-                }.onFailure { errorType: ErrorType ->
-                    sendErrorEffect(
-                        errorType = errorType,
-                        retryAction =
-                            FavoritePlaceFolderRetryAction.UpdateFolder(favoritePlaceFolderModel),
-                    )
-                    Timber.e("장소에 대한 찜 폴더들 현황에서 장소 찜 실패")
-                }
+    // TODO : UI만 반영하도록 수정, 다음 PR에서 완료 버튼 누르면 전체 변경 내역 반영 API 연동
+    fun updateFolder(updateFolder: FavoritePlaceFolderModel) {
+        val updatedFavorite: Boolean = !updateFolder.isSelected
+        _uiState.update { state ->
+            val updateFavoriteFolders =
+                state.favoritePlaceFolders
+                    .map { folder ->
+                        if (folder.id == updateFolder.id) folder.copy(isSelected = updatedFavorite) else folder
+                    }.toImmutableList()
+
+            state.copy(
+                favoritePlaceFolders = updateFavoriteFolders,
+                isChanged = isFavoriteFolderChanged(updateFavoriteFolders),
+            )
         }
     }
 
@@ -145,5 +139,10 @@ class FavoritePlaceFolderViewModel @Inject constructor(
             FavoritePlaceFolderRetryAction.LoadFavoriteFolders -> loadFavoriteFoldersForPlace()
             is FavoritePlaceFolderRetryAction.UpdateFolder -> updateFolder(action.favoritePlaceFolderModel)
         }
+    }
+
+    private fun isFavoriteFolderChanged(folders: ImmutableList<FavoritePlaceFolderModel>): Boolean {
+        val currentFavoriteFolderIds = folders.filter { it.isSelected }.map { it.id }.toSet()
+        return originFavoriteFolderIds != currentFavoriteFolderIds
     }
 }
