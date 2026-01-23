@@ -15,7 +15,6 @@ dependencies {
     implementation 'org.flywaydb:flyway-mysql'
     implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
     implementation 'com.google.api-client:google-api-client:2.2.0'
-    implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
     runtimeOnly 'com.h2database:h2'
     runtimeOnly 'com.mysql:mysql-connector-j'

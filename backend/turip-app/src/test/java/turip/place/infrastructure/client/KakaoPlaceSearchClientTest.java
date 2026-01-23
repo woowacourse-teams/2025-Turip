@@ -2,49 +2,40 @@ package turip.place.infrastructure.client;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
-import java.io.IOException;
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
-import okhttp3.mockwebserver.RecordedRequest;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.client.MockRestServiceServer;
 import turip.place.controller.dto.response.PlaceSearchResponse;
 import turip.place.domain.PlaceSearchProvider;
 
+@ActiveProfiles("test")
 @RestClientTest(KakaoPlaceSearchClient.class)
 class KakaoPlaceSearchClientTest {
 
-    private static MockWebServer mockWebServer;
+    @Autowired
+    private MockRestServiceServer mockRestServiceServer;
+
     @Autowired
     private KakaoPlaceSearchClient kakaoPlaceSearchClient;
 
-    @BeforeAll
-    static void beforeAll() throws IOException {
-        mockWebServer = new MockWebServer();
-        mockWebServer.start();
-    }
+    @Value("${kakao.api.url}")
+    private String kakaoApiUrl;
 
-    @AfterAll
-    static void afterAll() throws IOException {
-        mockWebServer.shutdown();
-    }
-
-    @DynamicPropertySource
-    static void dynamicPropertySource(DynamicPropertyRegistry registry) {
-        registry.add("kakao.api.url", () -> mockWebServer.url("/").toString());
-        registry.add("kakao.api.key", () -> "test-api-key");
-    }
+    @Value("${kakao.api.key}")
+    private String kakaoApiKey;
 
     @Test
     @DisplayName("카카오 장소 검색 API를 호출하고 응답을 올바르게 파싱한다.")
-    void search() throws InterruptedException {
+    void search() {
         // given
         String mockResponse = """
                 {
@@ -62,11 +53,11 @@ class KakaoPlaceSearchClientTest {
                   ]
                 }
                 """;
-        mockWebServer.enqueue(new MockResponse()
-                .setBody(mockResponse)
-                .addHeader("Content-Type", "application/json"));
-
         String query = "testquery";
+
+        mockRestServiceServer.expect(requestTo(kakaoApiUrl + "?query=" + query))
+                .andExpect(header("Authorization", "KakaoAK " + kakaoApiKey))
+                .andRespond(withSuccess(mockResponse, MediaType.APPLICATION_JSON));
 
         // when
         PlaceSearchResponse response = kakaoPlaceSearchClient.search(query);
@@ -78,7 +69,7 @@ class KakaoPlaceSearchClientTest {
                 () -> assertThat(response.items()).hasSize(1)
         );
 
-        PlaceSearchResponse.PlaceSearchItem item = response.items().get(0);
+        PlaceSearchResponse.PlaceSearchItem item = response.items().getFirst();
         assertAll(
                 () -> assertThat(item.externalId()).isEqualTo("12345"),
                 () -> assertThat(item.name()).isEqualTo("Test Place"),
@@ -86,12 +77,6 @@ class KakaoPlaceSearchClientTest {
                 () -> assertThat(item.latitude()).isEqualTo(37.54321),
                 () -> assertThat(item.longitude()).isEqualTo(127.12345)
         );
-
-        RecordedRequest recordedRequest = mockWebServer.takeRequest();
-        assertAll(
-                () -> assertThat(recordedRequest.getMethod()).isEqualTo("GET"),
-                () -> assertThat(recordedRequest.getPath()).isEqualTo("/?query=" + query),
-                () -> assertThat(recordedRequest.getHeader("Authorization")).isEqualTo("KakaoAK test-api-key")
-        );
+        mockRestServiceServer.verify();
     }
 }

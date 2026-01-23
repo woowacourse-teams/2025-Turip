@@ -1,38 +1,35 @@
 package turip.place.infrastructure.client;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.client.RestClient;
 import turip.place.controller.dto.response.PlaceSearchResponse;
 import turip.place.domain.PlaceSearchClient;
 import turip.place.domain.PlaceSearchType;
 import turip.place.infrastructure.client.dto.GooglePlaceSearchResponse;
 
-@Slf4j
 @Component
 public class GooglePlaceSearchClient implements PlaceSearchClient {
 
-    private final WebClient webClient;
+    private final RestClient restClient;
     private final String googleApiKey;
 
-    public GooglePlaceSearchClient(WebClient.Builder webClientBuilder,
+    public GooglePlaceSearchClient(RestClient.Builder restClientBuilder,
                                    @Value("${google.api.key}") String googleApiKey,
                                    @Value("${google.api.url}") String googleApiUrl) {
-        this.webClient = webClientBuilder.baseUrl(googleApiUrl).build();
+        this.restClient = restClientBuilder.baseUrl(googleApiUrl).build();
         this.googleApiKey = googleApiKey;
     }
 
     @Override
     public PlaceSearchResponse search(String query) {
-        GooglePlaceSearchResponse response = webClient.get()
+        GooglePlaceSearchResponse response = restClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .queryParam("query", query)
                         .queryParam("key", googleApiKey)
                         .build())
                 .retrieve()
-                .bodyToMono(GooglePlaceSearchResponse.class)
-                .block();
+                .body(GooglePlaceSearchResponse.class);
 
         if (response == null) {
             return new PlaceSearchResponse(null, null);

@@ -2,52 +2,40 @@ package turip.place.infrastructure.client;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
-import java.io.IOException;
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
-import okhttp3.mockwebserver.RecordedRequest;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.client.MockRestServiceServer;
 import turip.place.controller.dto.response.PlaceSearchResponse;
 import turip.place.domain.PlaceSearchProvider;
 
+@ActiveProfiles("test")
 @RestClientTest(GooglePlaceSearchClient.class)
 class GooglePlaceSearchClientTest {
 
-    private static MockWebServer mockWebServer;
     @Autowired
     private GooglePlaceSearchClient googlePlaceSearchClient;
 
-    @BeforeAll
-    static void beforeAll() throws IOException {
-        mockWebServer = new MockWebServer();
-        mockWebServer.start();
-    }
+    @Autowired
+    private MockRestServiceServer mockRestServiceServer;
 
-    @AfterAll
-    static void afterAll() throws IOException {
-        mockWebServer.shutdown();
-    }
+    @Value("${google.api.url}")
+    private String googleApiUrl;
 
-    @DynamicPropertySource
-    static void dynamicPropertySource(DynamicPropertyRegistry registry) {
-        registry.add("google.api.url", () -> mockWebServer.url("/").toString());
-        registry.add("google.api.key", () -> "test-google-api-key");
-    }
+    @Value("${google.api.key}")
+    private String googleApiKey;
 
     @Test
     @DisplayName("구글 장소 검색 API를 호출하고 응답을 올바르게 파싱한다.")
-    void search() throws InterruptedException {
+    void search() {
         // given
-        String query = "testquery";
         String mockResponse = """
                 {
                   "results": [
@@ -67,22 +55,23 @@ class GooglePlaceSearchClientTest {
                   ]
                 }
                 """;
-        mockWebServer.enqueue(new MockResponse()
-                .setBody(mockResponse)
-                .addHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE));
+        String query = "testquery";
+
+        this.mockRestServiceServer.expect(requestTo(googleApiUrl + "?query=" + query + "&key=" + googleApiKey))
+                .andRespond(withSuccess(mockResponse, MediaType.APPLICATION_JSON));
 
         // when
         PlaceSearchResponse response = googlePlaceSearchClient.search(query);
 
         // then
-        assertAll("Response DTO validation",
+        assertAll(
                 () -> assertThat(response).isNotNull(),
                 () -> assertThat(response.provider()).isEqualTo(PlaceSearchProvider.GOOGLE),
                 () -> assertThat(response.items()).hasSize(1)
         );
 
-        PlaceSearchResponse.PlaceSearchItem item = response.items().get(0);
-        assertAll("PlaceSearchItem validation",
+        PlaceSearchResponse.PlaceSearchItem item = response.items().getFirst();
+        assertAll(
                 () -> assertThat(item.externalId()).isEqualTo("google123"),
                 () -> assertThat(item.name()).isEqualTo("Google Test Place"),
                 () -> assertThat(item.address()).isEqualTo("123, Google Test Street"),
@@ -90,14 +79,6 @@ class GooglePlaceSearchClientTest {
                 () -> assertThat(item.longitude()).isEqualTo(-118.2437),
                 () -> assertThat(item.categoryName()).isEqualTo("tourist_attraction")
         );
-
-        RecordedRequest recordedRequest = mockWebServer.takeRequest();
-        assertAll("HTTP Request validation",
-                () -> assertThat(recordedRequest.getMethod()).isEqualTo("GET"),
-                () -> {
-                    String expectedPath = "/?query=" + query + "&key=test-google-api-key";
-                    assertThat(recordedRequest.getPath()).isEqualTo(expectedPath);
-                }
-        );
+        this.mockRestServiceServer.verify();
     }
 }
