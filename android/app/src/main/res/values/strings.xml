@@ -21,6 +21,8 @@
     <string name="all_snackbar_not_found_map_url">지도 앱으로 이동에 문제가 발생 했어요</string>
     <string name="all_snackbar_not_found_privacy_policy_url">개인 정보 처리 방침 이동에 문제가 발생 했어요</string>
     <string name="all_snackbar_not_found_video_url">영상 앱으로 이동에 문제가 발생 했어요</string>
+    <string name="all_share_description">공유 하기</string>
+    <string name="all_mascot_description">마스코트</string>
 
     <!-- 바텀 네비게이션 -->
     <string name="bottom_navigation_home">홈</string>
@@ -66,8 +68,8 @@
     <string name="favorite_content_empty_suggest_description">원하는 동선이 담긴\n여행 일정을 저장해 보세요.</string>
 
     <!-- 찜 장소 목록 페이지 -->
-    <string name="favorite_place_empty_suggest_title">장소를 찜 해보세요!</string>
-    <string name="favorite_place_empty_suggest_description">장소에 하트를 눌러\n마음에 드는 장소 목록을 만들어 보세요.</string>
+    <string name="favorite_place_empty_suggest_title">장소를 저장 해보세요!</string>
+    <string name="favorite_place_empty_suggest_description">장소를 저장해서\n마음에 드는 장소 목록을 만들어 보세요.</string>
     <string name="favorite_place_suggest_login_for_share">로그인 후 이용 가능합니다.</string>
 
     <!-- 여행 상세 페이지 -->
