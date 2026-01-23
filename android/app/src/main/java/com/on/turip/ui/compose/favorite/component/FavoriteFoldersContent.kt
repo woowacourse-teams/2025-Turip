@@ -10,7 +10,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
@@ -33,6 +35,7 @@ import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun FavoriteFoldersContent(
+    listState: LazyListState,
     placeName: String,
     enableConfirm: Boolean,
     folders: ImmutableList<FavoritePlaceFolderModel>,
@@ -46,6 +49,7 @@ fun FavoriteFoldersContent(
         Header(placeName, onAddFolderClick)
 
         FavoriteFolders(
+            listState = listState,
             folders = folders,
             onNavigateToFolder = onNavigateToFolder,
             onFavoriteClick = onFavoriteClick,
@@ -110,12 +114,14 @@ private fun Header(
 
 @Composable
 private fun FavoriteFolders(
+    listState: LazyListState,
     folders: ImmutableList<FavoritePlaceFolderModel>,
     onNavigateToFolder: (folder: FavoritePlaceFolderModel) -> Unit,
     onFavoriteClick: (folder: FavoritePlaceFolderModel) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
+        state = listState,
         modifier = modifier,
         contentPadding = PaddingValues(bottom = TuripTheme.spacing.small),
     ) {
@@ -159,9 +165,11 @@ private fun ConfirmButton(
 @Preview(showBackground = true)
 @Composable
 private fun FavoriteFoldersContentPreview() {
+    val listState = rememberLazyListState()
     TuripTheme {
         Surface {
             FavoriteFoldersContent(
+                listState = listState,
                 placeName = "부산 경포대 해수욕장 해수욕장 해수욕장 해수욕장",
                 enableConfirm = false,
                 folders =
