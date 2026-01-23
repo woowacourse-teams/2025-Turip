@@ -85,7 +85,7 @@ class AuthServiceTest {
     @Nested
     class LoginWithTurip {
 
-        @DisplayName("자체 로그인 성공 시 access token과 refresh token을 반환한다")
+        @DisplayName("자체 로그인 성공 시 헤더에 access token, refresh token, role을 반환한다.")
         @Test
         void loginWithTurip1() {
             // given
@@ -109,53 +109,13 @@ class AuthServiceTest {
             when(jwtProvider.hashToken(anyString())).thenReturn("hashed-token");
 
             // when
-            TuripLoginResult reslt = authService.loginWithTurip(request, deviceFid);
+            TuripLoginResult result = authService.loginWithTurip(request, deviceFid);
 
             // then
-            assertThat(reslt).isNotNull();
-            assertThat(reslt.accessToken()).isEqualTo(accessToken);
-            assertThat(reslt.refreshToken()).isEqualTo(refreshToken);
-            assertThat(reslt.role()).isEqualTo(account.getRole());
-            verify(refreshTokenService).save(
-                    any(Member.class),
-                    anyString(),
-                    anyString(),
-                    any(LocalDateTime.class),
-                    any(LocalDateTime.class)
-            );
-        }
-
-        @DisplayName("신규 회원인 경우 isNewMember를 true로 반환한다")
-        @Test
-        void loginWithTurip2() {
-            // given
-            String deviceFid = "device-123";
-            String email = "test@gmail.com";
-            String loginId = "turip";
-            String loginPassword = "ValidPass1!";
-            Account account = AccountFixture.createUser();
-            Member member = MemberFixture.createCustomMember(account, email, true);
-            TuripMember turipMember = TuripMemberFixture.createCustomTuripMember(member, loginId, loginPassword);
-            String accessToken = "access-token";
-            String refreshToken = "refresh-token";
-
-            TuripLoginRequest request = new TuripLoginRequest(loginId, loginPassword);
-
-            when(turipMemberService.login(request)).thenReturn(turipMember);
-            when(jwtProvider.generateAccessToken(1L, account.getRole())).thenReturn(accessToken);
-            when(jwtProvider.generateRefreshToken(1L, account.getRole())).thenReturn(refreshToken);
-            when(jwtProvider.getIssuedAt(anyString())).thenReturn(LocalDateTime.now());
-            when(jwtProvider.getExpiration(anyString())).thenReturn(LocalDateTime.now().plusDays(7));
-            when(jwtProvider.hashToken(anyString())).thenReturn("hashed-token");
-
-            // when
-            TuripLoginResult reslt = authService.loginWithTurip(request, deviceFid);
-
-            // then
-            assertThat(reslt).isNotNull();
-            assertThat(reslt.accessToken()).isEqualTo(accessToken);
-            assertThat(reslt.refreshToken()).isEqualTo(refreshToken);
-            assertThat(reslt.role()).isEqualTo(account.getRole());
+            assertThat(result).isNotNull();
+            assertThat(result.accessToken()).isEqualTo(accessToken);
+            assertThat(result.refreshToken()).isEqualTo(refreshToken);
+            assertThat(result.role()).isEqualTo(account.getRole());
             verify(refreshTokenService).save(
                     any(Member.class),
                     anyString(),
