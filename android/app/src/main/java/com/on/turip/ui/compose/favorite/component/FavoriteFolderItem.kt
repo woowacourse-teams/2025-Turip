@@ -26,7 +26,7 @@ import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
 
 @Composable
-fun FolderItem(
+fun FavoriteFolderItem(
     folder: FavoritePlaceFolderModel,
     onItemClick: (folder: FavoritePlaceFolderModel) -> Unit,
     onFavoriteClick: (folder: FavoritePlaceFolderModel) -> Unit,
@@ -91,7 +91,7 @@ fun FolderItem(
     }
 }
 
-private class FolderItemPreviewParameterProvider : PreviewParameterProvider<FavoritePlaceFolderModel> {
+private class FavoriteFolderItemPreviewParameterProvider : PreviewParameterProvider<FavoritePlaceFolderModel> {
     override val values =
         sequenceOf(
             FavoritePlaceFolderModel(
@@ -117,11 +117,11 @@ private class FolderItemPreviewParameterProvider : PreviewParameterProvider<Favo
 
 @Preview(showBackground = true)
 @Composable
-private fun FolderItemPreview(
-    @PreviewParameter(FolderItemPreviewParameterProvider::class) folder: FavoritePlaceFolderModel,
+private fun FavoriteFolderItemPreview(
+    @PreviewParameter(FavoriteFolderItemPreviewParameterProvider::class) folder: FavoritePlaceFolderModel,
 ) {
     TuripTheme {
-        FolderItem(
+        FavoriteFolderItem(
             folder = folder,
             onItemClick = { },
             onFavoriteClick = { },

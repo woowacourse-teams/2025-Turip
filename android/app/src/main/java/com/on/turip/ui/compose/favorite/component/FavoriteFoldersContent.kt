@@ -1,6 +1,5 @@
 package com.on.turip.ui.compose.favorite.component
 
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -33,7 +32,7 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
 @Composable
-fun FoldersContent(
+fun FavoriteFoldersContent(
     placeName: String,
     enableConfirm: Boolean,
     folders: ImmutableList<FavoritePlaceFolderModel>,
@@ -43,15 +42,10 @@ fun FoldersContent(
     onConfirmClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .animateContentSize(),
-    ) {
+    Column(modifier = modifier.fillMaxWidth()) {
         Header(placeName, onAddFolderClick)
 
-        Folders(
+        FavoriteFolders(
             folders = folders,
             onNavigateToFolder = onNavigateToFolder,
             onFavoriteClick = onFavoriteClick,
@@ -115,7 +109,7 @@ private fun Header(
 }
 
 @Composable
-private fun Folders(
+private fun FavoriteFolders(
     folders: ImmutableList<FavoritePlaceFolderModel>,
     onNavigateToFolder: (folder: FavoritePlaceFolderModel) -> Unit,
     onFavoriteClick: (folder: FavoritePlaceFolderModel) -> Unit,
@@ -126,7 +120,7 @@ private fun Folders(
         contentPadding = PaddingValues(bottom = TuripTheme.spacing.small),
     ) {
         items(items = folders, key = { it.id }) { folder ->
-            FolderItem(
+            FavoriteFolderItem(
                 folder = folder,
                 onItemClick = onNavigateToFolder,
                 onFavoriteClick = onFavoriteClick,
@@ -164,10 +158,10 @@ private fun ConfirmButton(
 
 @Preview(showBackground = true)
 @Composable
-private fun FoldersContentPreview() {
+private fun FavoriteFoldersContentPreview() {
     TuripTheme {
         Surface {
-            FoldersContent(
+            FavoriteFoldersContent(
                 placeName = "부산 경포대 해수욕장 해수욕장 해수욕장 해수욕장",
                 enableConfirm = false,
                 folders =
