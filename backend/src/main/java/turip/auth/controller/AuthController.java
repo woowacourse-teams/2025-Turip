@@ -9,6 +9,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,11 +23,14 @@ import turip.account.domain.Provider;
 import turip.auth.controller.dto.request.GoogleLoginRequest;
 import turip.auth.controller.dto.request.RefreshTokenRequest;
 import turip.auth.controller.dto.request.TuripLoginRequest;
-import turip.auth.controller.dto.response.LoginResponse;
 import turip.auth.controller.dto.response.RefreshTokenResponse;
+import turip.auth.controller.dto.response.SocialLoginResponse;
+import turip.auth.controller.dto.response.TuripLoginResponse;
 import turip.auth.resolver.AuthAccount;
 import turip.auth.resolver.AuthMember;
 import turip.auth.service.AuthService;
+import turip.auth.service.dto.TuripLoginResult;
+import turip.auth.util.TokenCookieUtil;
 import turip.common.exception.ErrorResponse;
 
 @Controller
@@ -34,6 +39,7 @@ import turip.common.exception.ErrorResponse;
 public class AuthController {
 
     private final AuthService authService;
+    private final TokenCookieUtil tokenCookieUtil;
 
     @Operation(
             summary = "자체 로그인 api",
@@ -45,15 +51,13 @@ public class AuthController {
                     description = "성공 예시",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = LoginResponse.class),
+                            schema = @Schema(implementation = TuripLoginResponse.class),
                             examples = @ExampleObject(
                                     name = "success",
                                     summary = "로그인 성공",
                                     value = """
                                             {
-                                              "accessToken": "jwt-access",
-                                              "refreshToken": "jwt-refresh",
-                                              "isNewMember": false
+                                              "role": "ADMIN"
                                             }
                                             """
                             )
@@ -79,11 +83,19 @@ public class AuthController {
             )
     })
     @PostMapping("/login/turip")
-    public ResponseEntity<LoginResponse> loginWithTurip(
+    public ResponseEntity<TuripLoginResponse> loginWithTurip(
             @Parameter(hidden = true) @RequestHeader("device-fid") String deviceFid,
             @RequestBody TuripLoginRequest request) {
-        LoginResponse response = authService.loginWithTurip(request, deviceFid);
-        return ResponseEntity.ok(response);
+        TuripLoginResult result = authService.loginWithTurip(request, deviceFid);
+
+        ResponseCookie accessTokenCookie = tokenCookieUtil.createAccessTokenCookie(result.accessToken());
+        ResponseCookie refreshTokenCookie = tokenCookieUtil.createRefreshTokenCookie(result.refreshToken());
+        TuripLoginResponse response = TuripLoginResponse.from(result);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
+                .body(response);
     }
 
     @Operation(
@@ -96,7 +108,7 @@ public class AuthController {
                     description = "성공 예시",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = LoginResponse.class),
+                            schema = @Schema(implementation = SocialLoginResponse.class),
                             examples = @ExampleObject(
                                     name = "success",
                                     summary = "로그인 성공",
@@ -132,10 +144,10 @@ public class AuthController {
             )
     })
     @PostMapping("/login/google")
-    public ResponseEntity<LoginResponse> loginWithGoogle(
+    public ResponseEntity<SocialLoginResponse> loginWithGoogle(
             @Parameter(hidden = true) @RequestHeader("device-fid") String deviceFid,
             @RequestBody GoogleLoginRequest request) {
-        LoginResponse response = authService.loginWithSocial(request, Provider.GOOGLE, deviceFid);
+        SocialLoginResponse response = authService.loginWithSocial(request, Provider.GOOGLE, deviceFid);
         return ResponseEntity.ok(response);
     }
 
@@ -294,7 +306,15 @@ public class AuthController {
     public ResponseEntity<Void> logout(@Parameter(hidden = true) @RequestHeader("device-fid") String deviceFid,
                                        @Parameter(hidden = true) @AuthAccount Account account) {
         authService.logout(account, deviceFid);
-        return ResponseEntity.noContent().build();
+
+        // 쿠키 무효화
+        ResponseCookie accessTokenCookie = tokenCookieUtil.createExpiredAccessTokenCookie();
+        ResponseCookie refreshTokenCookie = tokenCookieUtil.createExpiredRefreshTokenCookie();
+
+        return ResponseEntity.noContent()
+                .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
+                .build();
     }
 
     @Operation(

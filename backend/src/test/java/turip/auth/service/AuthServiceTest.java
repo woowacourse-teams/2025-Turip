@@ -36,9 +36,10 @@ import turip.account.service.TuripMemberService;
 import turip.auth.controller.dto.request.GoogleLoginRequest;
 import turip.auth.controller.dto.request.RefreshTokenRequest;
 import turip.auth.controller.dto.request.TuripLoginRequest;
-import turip.auth.controller.dto.response.LoginResponse;
 import turip.auth.controller.dto.response.RefreshTokenResponse;
+import turip.auth.controller.dto.response.SocialLoginResponse;
 import turip.auth.domain.RefreshToken;
+import turip.auth.service.dto.TuripLoginResult;
 import turip.auth.token.GoogleTokenParser;
 import turip.auth.token.JwtProvider;
 import turip.common.exception.ErrorTag;
@@ -95,24 +96,26 @@ class AuthServiceTest {
             Account account = AccountFixture.createUser();
             Member member = MemberFixture.createCustomMember(account, email, false);
             TuripMember turipMember = TuripMemberFixture.createCustomTuripMember(member, loginId, loginPassword);
+            String accessToken = "access-token";
+            String refreshToken = "refresh-token";
 
             TuripLoginRequest request = new TuripLoginRequest(loginId, loginPassword);
 
             when(turipMemberService.login(request)).thenReturn(turipMember);
-            when(jwtProvider.generateAccessToken(1L, account.getRole())).thenReturn("access-token");
-            when(jwtProvider.generateRefreshToken(1L, account.getRole())).thenReturn("refresh-token");
+            when(jwtProvider.generateAccessToken(1L, account.getRole())).thenReturn(accessToken);
+            when(jwtProvider.generateRefreshToken(1L, account.getRole())).thenReturn(refreshToken);
             when(jwtProvider.getIssuedAt(anyString())).thenReturn(LocalDateTime.now());
             when(jwtProvider.getExpiration(anyString())).thenReturn(LocalDateTime.now().plusDays(7));
             when(jwtProvider.hashToken(anyString())).thenReturn("hashed-token");
 
             // when
-            LoginResponse response = authService.loginWithTurip(request, deviceFid);
+            TuripLoginResult reslt = authService.loginWithTurip(request, deviceFid);
 
             // then
-            assertThat(response).isNotNull();
-            assertThat(response.accessToken()).isEqualTo("access-token");
-            assertThat(response.refreshToken()).isEqualTo("refresh-token");
-            assertThat(response.isNewMember()).isFalse();
+            assertThat(reslt).isNotNull();
+            assertThat(reslt.accessToken()).isEqualTo(accessToken);
+            assertThat(reslt.refreshToken()).isEqualTo(refreshToken);
+            assertThat(reslt.role()).isEqualTo(account.getRole());
             verify(refreshTokenService).save(
                     any(Member.class),
                     anyString(),
@@ -133,24 +136,26 @@ class AuthServiceTest {
             Account account = AccountFixture.createUser();
             Member member = MemberFixture.createCustomMember(account, email, true);
             TuripMember turipMember = TuripMemberFixture.createCustomTuripMember(member, loginId, loginPassword);
+            String accessToken = "access-token";
+            String refreshToken = "refresh-token";
 
             TuripLoginRequest request = new TuripLoginRequest(loginId, loginPassword);
 
             when(turipMemberService.login(request)).thenReturn(turipMember);
-            when(jwtProvider.generateAccessToken(1L, account.getRole())).thenReturn("access-token");
-            when(jwtProvider.generateRefreshToken(1L, account.getRole())).thenReturn("refresh-token");
+            when(jwtProvider.generateAccessToken(1L, account.getRole())).thenReturn(accessToken);
+            when(jwtProvider.generateRefreshToken(1L, account.getRole())).thenReturn(refreshToken);
             when(jwtProvider.getIssuedAt(anyString())).thenReturn(LocalDateTime.now());
             when(jwtProvider.getExpiration(anyString())).thenReturn(LocalDateTime.now().plusDays(7));
             when(jwtProvider.hashToken(anyString())).thenReturn("hashed-token");
 
             // when
-            LoginResponse response = authService.loginWithTurip(request, deviceFid);
+            TuripLoginResult reslt = authService.loginWithTurip(request, deviceFid);
 
             // then
-            assertThat(response).isNotNull();
-            assertThat(response.accessToken()).isEqualTo("access-token");
-            assertThat(response.refreshToken()).isEqualTo("refresh-token");
-            assertThat(response.isNewMember()).isTrue();
+            assertThat(reslt).isNotNull();
+            assertThat(reslt.accessToken()).isEqualTo(accessToken);
+            assertThat(reslt.refreshToken()).isEqualTo(refreshToken);
+            assertThat(reslt.role()).isEqualTo(account.getRole());
             verify(refreshTokenService).save(
                     any(Member.class),
                     anyString(),
@@ -177,6 +182,8 @@ class AuthServiceTest {
             Account account = AccountFixture.createUser();
             Member member = MemberFixture.createCustomMember(account, email, false);
             SocialMember socialMember = SocialMemberFixture.createCustomSocialMember(member, provider, providerId);
+            String accessToken = "access-token";
+            String refreshToken = "refresh-token";
 
             GoogleLoginRequest request = new GoogleLoginRequest(idToken);
 
@@ -184,14 +191,14 @@ class AuthServiceTest {
             when(googleTokenParser.getProviderId(idToken)).thenReturn(providerId);
             when(googleTokenParser.getEmail(idToken)).thenReturn(email);
             when(socialMemberService.findOrCreate(provider, providerId, email)).thenReturn(socialMember);
-            when(jwtProvider.generateAccessToken(1L, account.getRole())).thenReturn("access-token");
-            when(jwtProvider.generateRefreshToken(1L, account.getRole())).thenReturn("refresh-token");
+            when(jwtProvider.generateAccessToken(1L, account.getRole())).thenReturn(accessToken);
+            when(jwtProvider.generateRefreshToken(1L, account.getRole())).thenReturn(refreshToken);
             when(jwtProvider.getIssuedAt(anyString())).thenReturn(LocalDateTime.now());
             when(jwtProvider.getExpiration(anyString())).thenReturn(LocalDateTime.now().plusDays(7));
             when(jwtProvider.hashToken(anyString())).thenReturn("hashed-token");
 
             // when
-            LoginResponse response = authService.loginWithSocial(request, provider, deviceFid);
+            SocialLoginResponse response = authService.loginWithSocial(request, provider, deviceFid);
 
             // then
             assertThat(member.isFirstLogin()).isFalse();
@@ -234,7 +241,7 @@ class AuthServiceTest {
             when(jwtProvider.hashToken(anyString())).thenReturn("hashed-token");
 
             // when
-            LoginResponse response = authService.loginWithSocial(request, provider, deviceFid);
+            SocialLoginResponse response = authService.loginWithSocial(request, provider, deviceFid);
 
             // then
             assertThat(response.isNewMember()).isTrue();

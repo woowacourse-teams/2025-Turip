@@ -96,4 +96,9 @@ public class TestDataHelper {
         Long memberId = insertMember(accountId, email, isFirstLogin);
         return insertTuripMember(memberId, loginId, loginPassword);
     }
+
+    public Long insertTuripMember(Long accountId, String email, String loginId, String loginPassword) {
+        Long memberId = insertMember(accountId, email, false);
+        return insertTuripMember(memberId, loginId, loginPassword);
+    }
 }
