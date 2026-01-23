@@ -41,6 +41,9 @@ public class AuthService {
     @Transactional
     public TuripLoginResult loginWithTurip(TuripLoginRequest request, String deviceFid) {
         Member member = turipMemberService.login(request).getMember();
+        if (member.isFirstLogin()) {
+            member.completeFirstLogin();
+        }
         TokenResult tokenResult = issueToken(deviceFid, member);
         return TuripLoginResult.of(tokenResult, member.getAccount().getRole());
     }
