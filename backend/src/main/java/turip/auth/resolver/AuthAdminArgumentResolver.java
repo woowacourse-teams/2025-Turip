@@ -52,6 +52,10 @@ public class AuthAdminArgumentResolver implements HandlerMethodArgumentResolver 
             Long accountId = claims.get("accountId", Long.class);
             String roleName = claims.get("role", String.class);
 
+            if (accountId == null || roleName == null) {
+                throw new UnauthorizedException(ErrorTag.UNAUTHORIZED);
+            }
+
             if (Role.valueOf(roleName) != Role.ADMIN) {
                 throw new ForbiddenException(ErrorTag.FORBIDDEN);
             }
