@@ -99,72 +99,70 @@
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <h1>관리자 로그인</h1>
-        <form id="loginForm">
-            <div class="form-group">
-                <label for="loginId">아이디</label>
-                <input type="text" id="loginId" name="loginId" required>
-            </div>
-            <div class="form-group">
-                <label for="loginPassword">비밀번호</label>
-                <input type="password" id="loginPassword" name="loginPassword" required>
-            </div>
-            <div class="button-group">
-                <button type="submit" class="btn-login">로그인</button>
-                <button type="button" class="btn-signup" onclick="location.href='/admin/signup'">회원가입</button>
-            </div>
-        </form>
-    </div>
+<div class="login-container">
+    <h1>관리자 로그인</h1>
+    <form id="loginForm">
+        <div class="form-group">
+            <label for="loginId">아이디</label>
+            <input type="text" id="loginId" name="loginId" required>
+        </div>
+        <div class="form-group">
+            <label for="loginPassword">비밀번호</label>
+            <input type="password" id="loginPassword" name="loginPassword" required>
+        </div>
+        <div class="button-group">
+            <button type="submit" class="btn-login">로그인</button>
+            <button type="button" class="btn-signup" onclick="location.href='/admin/signup'">회원가입</button>
+        </div>
+    </form>
+</div>
 
-    <script>
-        document.getElementById('loginForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
+<script>
+    document.getElementById('loginForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
 
-            const loginId = document.getElementById('loginId').value;
-            const loginPassword = document.getElementById('loginPassword').value;
+        const loginId = document.getElementById('loginId').value;
+        const loginPassword = document.getElementById('loginPassword').value;
 
-            try {
-                const response = await fetch('/login/turip', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'device-fid': 'admin-web'
-                    },
-                    body: JSON.stringify({
-                        loginId: loginId,
-                        loginPassword: loginPassword
-                    })
-                });
+        try {
+            const response = await fetch('/login/turip', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'device-fid': 'admin-web'
+                },
+                credentials: 'include',  // 쿠키 자동 처리
+                body: JSON.stringify({
+                    loginId: loginId,
+                    loginPassword: loginPassword
+                })
+            });
 
-                if (response.ok) {
-                    const data = await response.json();
+            if (response.ok) {
+                const data = await response.json();
 
-                    // accessToken을 쿠키에 저장
-                    document.cookie = `accessToken=${data.accessToken}; path=/; max-age=86400; SameSite=Strict`;
-
-                    // 메인 페이지로 리다이렉트 시도 (권한 확인)
-                    const homeResponse = await fetch('/admin/home', {
-                        headers: {
-                            'Authorization': 'Bearer ' + data.accessToken
-                        }
+                // role 체크 (서버에서 Set-Cookie로 쿠키는 이미 설정됨)
+                if (data.role !== 'ADMIN') {
+                    alert('관리자 권한이 없습니다.');
+                    // 로그아웃 요청으로 쿠키 무효화
+                    await fetch('/logout', {
+                        method: 'POST',
+                        headers: {'device-fid': 'admin-web'},
+                        credentials: 'include'
                     });
-
-                    if (homeResponse.status === 403) {
-                        // 쿠키 삭제
-                        document.cookie = 'accessToken=; path=/; max-age=0';
-                        alert('관리자 권한이 없습니다.');
-                    } else {
-                        window.location.href = '/admin/home';
-                    }
-                } else {
-                    const errorData = await response.json();
-                    alert(errorData.message || '로그인에 실패했습니다. 아이디 또는 비밀번호를 확인해주세요.');
+                    return;
                 }
-            } catch (error) {
-                alert('로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
+
+                // 관리자 권한 확인 후 메인 페이지로 이동
+                window.location.href = '/admin/home';
+            } else {
+                const errorData = await response.json();
+                alert(errorData.message || '로그인에 실패했습니다. 아이디 또는 비밀번호를 확인해주세요.');
             }
-        });
-    </script>
+        } catch (error) {
+            alert('로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
+        }
+    });
+</script>
 </body>
 </html>
