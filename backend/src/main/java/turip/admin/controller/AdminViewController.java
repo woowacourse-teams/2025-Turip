@@ -10,7 +10,7 @@ import turip.auth.resolver.AuthAdmin;
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/admin")
-public class AdminController {
+public class AdminViewController {
 
     @GetMapping("/login")
     public String loginPage() {
