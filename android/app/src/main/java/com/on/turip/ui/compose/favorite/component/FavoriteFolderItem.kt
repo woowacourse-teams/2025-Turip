@@ -28,8 +28,8 @@ import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
 @Composable
 fun FavoriteFolderItem(
     folder: FavoritePlaceFolderModel,
-    onItemClick: (folder: FavoritePlaceFolderModel) -> Unit,
-    onFavoriteClick: (folder: FavoritePlaceFolderModel) -> Unit,
+    onItemClick: () -> Unit,
+    onFavoriteClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -44,7 +44,7 @@ fun FavoriteFolderItem(
                     .padding(start = TuripTheme.spacing.large)
                     .padding(vertical = TuripTheme.spacing.extraSmall)
                     .clip(TuripTheme.shape.container)
-                    .clickable { onItemClick(folder) },
+                    .clickable(onClick = onItemClick),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(TuripTheme.spacing.small),
         ) {
@@ -74,7 +74,7 @@ fun FavoriteFolderItem(
         }
 
         IconButton(
-            onClick = { onFavoriteClick(folder) },
+            onClick = onFavoriteClick,
         ) {
             Icon(
                 painter =

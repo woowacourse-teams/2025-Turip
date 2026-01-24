@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
@@ -23,7 +22,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.on.turip.R
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
@@ -37,8 +35,8 @@ fun FavoriteFoldersContent(
     enableConfirm: Boolean,
     folders: ImmutableList<FavoritePlaceFolderModel>,
     onAddFolderClick: () -> Unit,
+    onNavigateToFolder: (folderId: Long, folderName: String) -> Unit,
     onFavoriteClick: (folder: FavoritePlaceFolderModel) -> Unit,
-    onNavigateToFolder: (folder: FavoritePlaceFolderModel) -> Unit,
     onConfirmClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -87,7 +85,6 @@ private fun Header(
                 Icon(
                     painter = painterResource(R.drawable.ic_folder_plus),
                     contentDescription = stringResource(R.string.bottom_sheet_favorite_place_folder_add_folder_description),
-                    modifier = Modifier.size(24.dp),
                 )
             }
         },
@@ -98,7 +95,7 @@ private fun Header(
 private fun FavoriteFolders(
     listState: LazyListState,
     folders: ImmutableList<FavoritePlaceFolderModel>,
-    onNavigateToFolder: (folder: FavoritePlaceFolderModel) -> Unit,
+    onNavigateToFolder: (folderId: Long, folderName: String) -> Unit,
     onFavoriteClick: (folder: FavoritePlaceFolderModel) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -110,8 +107,8 @@ private fun FavoriteFolders(
         items(items = folders, key = { it.id }) { folder ->
             FavoriteFolderItem(
                 folder = folder,
-                onItemClick = onNavigateToFolder,
-                onFavoriteClick = onFavoriteClick,
+                onItemClick = { onNavigateToFolder(folder.id, folder.name) },
+                onFavoriteClick = { onFavoriteClick(folder) },
             )
         }
     }
@@ -162,7 +159,7 @@ private fun FavoriteFoldersContentPreview() {
                     ),
                 onAddFolderClick = { },
                 onFavoriteClick = { },
-                onNavigateToFolder = {},
+                onNavigateToFolder = { _, _ -> },
                 onConfirmClick = {},
             )
         }

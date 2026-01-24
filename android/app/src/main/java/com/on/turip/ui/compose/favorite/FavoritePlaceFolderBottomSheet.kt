@@ -1,9 +1,22 @@
 package com.on.turip.ui.compose.favorite
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
@@ -12,19 +25,27 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.on.turip.R
 import com.on.turip.ui.common.error.ErrorUiModel
 import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
-import com.on.turip.ui.compose.favorite.component.FoldersContent
+import com.on.turip.ui.compose.favorite.component.FavoriteFolderDetail
+import com.on.turip.ui.compose.favorite.component.FavoriteFoldersContent
+import com.on.turip.ui.compose.trip.model.MapModel
 import com.on.turip.ui.main.favorite.FavoritePlaceFolderViewModel
+import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
+import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderScreenMode
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderUiEffect
 import kotlinx.collections.immutable.persistentListOf
 
@@ -32,6 +53,8 @@ import kotlinx.collections.immutable.persistentListOf
 fun FavoritePlaceFolderBottomSheet(
     onNavigateToLogin: () -> Unit,
     onNavigateToAddFolder: () -> Unit,
+    onNavigateToMap: (mapModel: MapModel) -> Unit,
+    onShareFolder: (shareModel: FavoriteFolderShareModel) -> Unit,
     onDismiss: () -> Unit,
     viewModel: FavoritePlaceFolderViewModel = hiltViewModel(),
 ) {
@@ -42,13 +65,47 @@ fun FavoritePlaceFolderBottomSheet(
 
     val windowInfo = LocalWindowInfo.current
     val density = LocalDensity.current
-    val maxHeightDp = with(density) { windowInfo.containerSize.height.toDp() * 0.8f }
+    val bottomSheetHeight = with(density) { windowInfo.containerSize.height.toDp() * 0.8f }
+
+    val foldersListState = rememberLazyListState()
 
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { uiEffect ->
             when (uiEffect) {
                 FavoritePlaceFolderUiEffect.NavigateToLogin -> {
                     onNavigateToLogin()
+                }
+
+                FavoritePlaceFolderUiEffect.DeletePlaceFailed -> {
+                    snackbarHostState.showSnackbar(
+                        message = context.getString(R.string.bottom_sheet_favorite_place_folder_snackbar_place_remove_failed),
+                        duration = SnackbarDuration.Short,
+                    )
+                }
+
+                FavoritePlaceFolderUiEffect.FolderShareNotAllowed -> {
+                    // TODO : 다이얼로그로 로그인 할 것을 권유
+                }
+
+                is FavoritePlaceFolderUiEffect.ShareFolder -> {
+                    onShareFolder(uiEffect.favoriteFolderShareModel)
+                }
+
+                is FavoritePlaceFolderUiEffect.ShowRemovedFavoritePlace -> {
+                    val messageResource: Int =
+                        R.string.bottom_sheet_favorite_place_folder_snackbar_place_removed
+                    val actionLabelResource: Int =
+                        R.string.bottom_sheet_favorite_place_folder_snackbar_place_remove_undo
+                    val result =
+                        snackbarHostState.showSnackbar(
+                            message = context.getString(messageResource, uiEffect.placeName),
+                            actionLabel = context.getString(actionLabelResource),
+                            duration = SnackbarDuration.Short,
+                        )
+                    when (result) {
+                        SnackbarResult.ActionPerformed -> viewModel.rollbackFavoritePlaceDelete()
+                        SnackbarResult.Dismissed -> viewModel.commitFavoritePlaceDelete()
+                    }
                 }
 
                 is FavoritePlaceFolderUiEffect.ShowError -> {
@@ -72,24 +129,78 @@ fun FavoritePlaceFolderBottomSheet(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .heightIn(max = maxHeightDp),
+                .height(bottomSheetHeight),
         shape = TuripTheme.shape.bottomSheetRounded,
     ) {
-        Column(modifier = Modifier.padding(top = TuripTheme.spacing.medium)) {
-            FoldersContent(
-                placeName = uiState.placeName,
-                enableConfirm = uiState.isChanged,
-                folders = uiState.favoritePlaceFolders,
-                onAddFolderClick = onNavigateToAddFolder,
-                onFavoriteClick = viewModel::updateFolder,
-                onNavigateToFolder = {}, // TODO : uistate 전환 필요
-                onConfirmClick = {
-                    // TODO : 폴더 전반에 대한 찜 업데이트 API 연동 예정
-                    // TODO : API 성공 -> 스낵바 + dismiss, 실패 -> 스낵바로 안내
-                },
-            )
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(modifier = Modifier.padding(top = TuripTheme.spacing.medium)) {
+                AnimatedVisibility(
+                    visible = uiState.screenMode is FavoritePlaceFolderScreenMode.Folders,
+                    enter = expandVertically() + fadeIn(),
+                    exit = shrinkVertically() + fadeOut(),
+                ) {
+                    CloseButton(onCloseClick = onDismiss, modifier = Modifier.fillMaxWidth())
+                }
 
-            TuripSnackbar(snackbarHostState = snackbarHostState)
+                when (val mode = uiState.screenMode) {
+                    FavoritePlaceFolderScreenMode.Folders -> {
+                        FavoriteFoldersContent(
+                            listState = foldersListState,
+                            placeName = uiState.placeName,
+                            enableConfirm = uiState.isChanged,
+                            folders = uiState.favoritePlaceFolders,
+                            onAddFolderClick = onNavigateToAddFolder,
+                            onFavoriteClick = viewModel::updateFolder,
+                            onNavigateToFolder = viewModel::loadPlacesInSelectFolder,
+                            onConfirmClick = {
+                                // TODO : 폴더 전반에 대한 찜 업데이트 API 연동 예정
+                                // TODO : API 성공 -> 스낵바 + dismiss, 실패 -> 스낵바로 안내
+                            },
+                        )
+                    }
+
+                    is FavoritePlaceFolderScreenMode.FolderDetail -> {
+                        FavoriteFolderDetail(
+                            folderName = mode.folderName,
+                            places = uiState.selectedFolderPlaces,
+                            onMapClick = onNavigateToMap,
+                            onFavoriteClick = viewModel::applyFavoritePlaceDelete,
+                            onBackClick = viewModel::onFavoriteDetailBack, // TODO: Backhandler로 처리 ?
+                            onShareClick = viewModel::shareFolder,
+                        )
+                    }
+                }
+            }
+            TuripSnackbar(
+                snackbarHostState = snackbarHostState,
+                modifier =
+                    Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = TuripTheme.spacing.medium),
+            )
+        }
+    }
+}
+
+@Composable
+private fun CloseButton(
+    onCloseClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Box(modifier = modifier.padding(end = TuripTheme.spacing.medium)) {
+        IconButton(
+            onClick = onCloseClick,
+            modifier =
+                Modifier
+                    .align(Alignment.CenterEnd)
+                    .size(40.dp),
+        ) {
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = stringResource(R.string.all_close_description),
+                modifier = Modifier.size(16.dp),
+                tint = TuripTheme.colors.gray04,
+            )
         }
     }
 }
@@ -97,18 +208,20 @@ fun FavoritePlaceFolderBottomSheet(
 @Preview(showBackground = true)
 @Composable
 private fun FavoritePlaceFolderBottomSheetPreview() {
+    val listState = rememberLazyListState()
     TuripTheme {
         Surface(
             color = TuripTheme.colors.primarySub,
             shape = TuripTheme.shape.bottomSheetRounded,
         ) {
-            FoldersContent(
+            FavoriteFoldersContent(
+                listState = listState,
                 placeName = "장소명",
                 enableConfirm = false,
                 folders = persistentListOf(),
                 onAddFolderClick = { },
                 onFavoriteClick = { },
-                onNavigateToFolder = { },
+                onNavigateToFolder = { _, _ -> },
                 onConfirmClick = { },
             )
         }

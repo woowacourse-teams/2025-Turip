@@ -5,8 +5,16 @@ import com.on.turip.ui.common.error.ErrorUiState
 sealed interface FavoritePlaceFolderUiEffect {
     data object NavigateToLogin : FavoritePlaceFolderUiEffect
 
-    data class ShowUpdateFavoriteState(
-        val folder: FavoritePlaceFolderModel,
+    data object FolderShareNotAllowed : FavoritePlaceFolderUiEffect
+
+    data object DeletePlaceFailed : FavoritePlaceFolderUiEffect
+
+    data class ShareFolder(
+        val favoriteFolderShareModel: FavoriteFolderShareModel,
+    ) : FavoritePlaceFolderUiEffect
+
+    data class ShowRemovedFavoritePlace(
+        val placeName: String,
     ) : FavoritePlaceFolderUiEffect
 
     data class ShowError(
@@ -20,5 +28,10 @@ sealed interface FavoritePlaceFolderRetryAction {
 
     data class UpdateFolder(
         val favoritePlaceFolderModel: FavoritePlaceFolderModel,
+    ) : FavoritePlaceFolderRetryAction
+
+    data class LoadFavoritePlacesInFolder(
+        val folderId: Long,
+        val folderName: String,
     ) : FavoritePlaceFolderRetryAction
 }
