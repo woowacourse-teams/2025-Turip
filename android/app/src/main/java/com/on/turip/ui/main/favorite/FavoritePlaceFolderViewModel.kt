@@ -130,6 +130,8 @@ class FavoritePlaceFolderViewModel @Inject constructor(
     }
 
     fun onFavoriteDetailBack() {
+        if (deletePlaceSnapshot.hasSnapshot()) commitFavoritePlaceDelete()
+
         _uiState.update {
             it.copy(
                 screenMode = FavoritePlaceFolderScreenMode.Folders,

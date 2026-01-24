@@ -1,5 +1,6 @@
 package com.on.turip.ui.compose.favorite
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -125,6 +126,19 @@ fun FavoritePlaceFolderBottomSheet(
         }
     }
 
+    BackHandler {
+        when (uiState.screenMode) {
+            is FavoritePlaceFolderScreenMode.FolderDetail -> {
+                snackbarHostState.currentSnackbarData?.dismiss()
+                viewModel.onFavoriteDetailBack()
+            }
+
+            is FavoritePlaceFolderScreenMode.Folders -> {
+                onDismiss()
+            }
+        }
+    }
+
     Surface(
         modifier =
             Modifier
@@ -165,7 +179,10 @@ fun FavoritePlaceFolderBottomSheet(
                             places = uiState.selectedFolderPlaces,
                             onMapClick = onNavigateToMap,
                             onFavoriteClick = viewModel::applyFavoritePlaceDelete,
-                            onBackClick = viewModel::onFavoriteDetailBack, // TODO: Backhandler로 처리 ?
+                            onBackClick = {
+                                snackbarHostState.currentSnackbarData?.dismiss()
+                                viewModel.onFavoriteDetailBack()
+                            },
                             onShareClick = viewModel::shareFolder,
                         )
                     }
