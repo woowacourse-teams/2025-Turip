@@ -7,7 +7,7 @@
     <string name="all_trip_day_trip_duration">당일치기</string>
     <string name="all_loading">로딩 중…</string>
     <string name="all_video_description">%s · %s</string>
-    <string name="all_snackbar_close">닫기</string>
+    <string name="all_close_description">닫기</string>
     <string name="all_snackbar_redirect_login">로그인 하기</string>
     <string name="all_confirm">확인</string>
     <string name="all_folder_name_error_duplicate">중복된 폴더명이 존재합니다.</string>

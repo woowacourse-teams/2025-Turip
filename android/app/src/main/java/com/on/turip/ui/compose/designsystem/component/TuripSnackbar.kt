@@ -60,7 +60,7 @@ fun TuripSnackbar(
                         if (visuals.withDismissAction) {
                             TextButton(onClick = snackbarData::dismiss) {
                                 Text(
-                                    text = stringResource(R.string.all_snackbar_close),
+                                    text = stringResource(R.string.all_close_description),
                                     style = TuripTheme.typography.info2,
                                     color = TuripTheme.colors.gray02,
                                 )
