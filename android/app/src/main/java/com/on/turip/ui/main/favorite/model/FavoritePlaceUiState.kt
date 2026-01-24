@@ -5,7 +5,7 @@ import com.on.turip.ui.common.error.ErrorUiState
 data class FavoritePlaceUiState(
     val isLoading: Boolean,
     val errorUiState: ErrorUiState,
-    val places: List<FavoritePlaceModel>,
+    val places: List<FavoritePlaceUiModel>,
     val folders: List<FavoritePlaceFolderModel>,
     val placesLatLng: List<FavoritePlaceLatLngUiModel>,
 ) {

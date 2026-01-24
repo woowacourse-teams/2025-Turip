@@ -4,11 +4,15 @@ import androidx.compose.runtime.Stable
 import com.google.android.gms.maps.model.LatLng
 import com.on.turip.ui.compose.trip.model.MapModel
 
+/**
+ * @param favoritePlaceId : 폴더 내에서 장소에 대한 id
+ * @param placeId : 장소에 대한 고유 id
+ */
 @Stable
 data class FavoritePlaceModel(
     val favoritePlaceId: Long,
-    val order: Long,
     val placeId: Long,
+    val order: Long,
     val name: String,
     val isFavorite: Boolean,
     val latLng: LatLng,

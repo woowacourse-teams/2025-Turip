@@ -33,8 +33,8 @@ import com.on.turip.ui.login.LoginActivity
 import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceLatLngUiModel
-import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceUiEffect
+import com.on.turip.ui.main.favorite.model.FavoritePlaceUiModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceUiState
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -66,15 +66,15 @@ class FavoritePlaceFragment :
                     )
                 }
 
-                override fun onItemClick(favoritePlaceModel: FavoritePlaceModel) {
+                override fun onItemClick(favoritePlaceUiModel: FavoritePlaceUiModel) {
                     map.animateCamera(
                         CameraUpdateFactory.newCameraPosition(
-                            CameraPosition(favoritePlaceModel.latLng, 15f, 0f, 0f),
+                            CameraPosition(favoritePlaceUiModel.latLng, 15f, 0f, 0f),
                         ),
                         1000,
                         null,
                     )
-                    markerMap[favoritePlaceModel.placeId]?.showInfoWindow()
+                    markerMap[favoritePlaceUiModel.placeId]?.showInfoWindow()
                 }
             },
             onCommit = { viewModel.updateFavoritePlacesOrder(it) },

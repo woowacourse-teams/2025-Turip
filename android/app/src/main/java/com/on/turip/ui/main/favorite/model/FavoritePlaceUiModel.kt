@@ -3,7 +3,7 @@ package com.on.turip.ui.main.favorite.model
 import android.net.Uri
 import com.google.android.gms.maps.model.LatLng
 
-data class FavoritePlaceModel(
+data class FavoritePlaceUiModel(
     val favoritePlaceId: Long,
     val order: Long,
     val placeId: Long,

@@ -19,11 +19,12 @@ import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
-import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceRetryAction
 import com.on.turip.ui.main.favorite.model.FavoritePlaceUiEffect
+import com.on.turip.ui.main.favorite.model.FavoritePlaceUiModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,7 +34,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @HiltViewModel
 class FavoritePlaceViewModel @Inject constructor(
@@ -71,7 +71,7 @@ class FavoritePlaceViewModel @Inject constructor(
                                 it.copy(
                                     isLoading = false,
                                     errorUiState = ErrorUiState.None,
-                                    places = result.value.map { favoritePlace: FavoritePlace -> favoritePlace.toUiModel() },
+                                    places = result.value.map { favoritePlace: FavoritePlace -> favoritePlace.toModel() },
                                     folders = loadFolders,
                                     placesLatLng = result.value.map { it.toLatLng() },
                                 )
@@ -175,7 +175,7 @@ class FavoritePlaceViewModel @Inject constructor(
                         originUiState.copy(
                             isLoading = false,
                             errorUiState = ErrorUiState.None,
-                            places = favoritePlaces.map { it.toUiModel() },
+                            places = favoritePlaces.map { it.toModel() },
                             folders =
                                 originUiState.folders.map { folder: FavoritePlaceFolderModel ->
                                     folder.copy(isSelected = folder.id == folderId)
@@ -193,7 +193,7 @@ class FavoritePlaceViewModel @Inject constructor(
         }
     }
 
-    fun updateFavoritePlacesOrder(newFavoritePlaces: List<FavoritePlaceModel>) {
+    fun updateFavoritePlacesOrder(newFavoritePlaces: List<FavoritePlaceUiModel>) {
         viewModelScope.launch {
             favoritePlaceRepository
                 .updateFavoritePlacesOrder(
