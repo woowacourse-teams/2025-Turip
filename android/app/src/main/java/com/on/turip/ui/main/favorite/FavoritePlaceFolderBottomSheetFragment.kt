@@ -82,6 +82,7 @@ class FavoritePlaceFolderBottomSheetFragment : BottomSheetDialogFragment() {
 
                 val behavior = BottomSheetBehavior.from(it)
                 behavior.isFitToContents = true
+                behavior.isDraggable = false
                 behavior.state = BottomSheetBehavior.STATE_EXPANDED
             }
         }
