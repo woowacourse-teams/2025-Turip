@@ -48,7 +48,7 @@ fun FavoriteFoldersContent(
             folders = folders,
             onNavigateToFolder = onNavigateToFolder,
             onFavoriteClick = onFavoriteClick,
-            modifier = Modifier.weight(1f, fill = false),
+            modifier = Modifier.weight(1f),
         )
 
         ConfirmButton(
@@ -57,7 +57,7 @@ fun FavoriteFoldersContent(
             modifier =
                 Modifier.padding(
                     horizontal = TuripTheme.spacing.extraLarge,
-                    vertical = TuripTheme.spacing.medium,
+                    vertical = TuripTheme.spacing.small,
                 ),
         )
     }

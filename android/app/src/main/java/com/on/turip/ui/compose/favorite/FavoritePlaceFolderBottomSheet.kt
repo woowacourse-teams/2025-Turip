@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -147,7 +148,12 @@ fun FavoritePlaceFolderBottomSheet(
         shape = TuripTheme.shape.bottomSheetRounded,
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
-            Column(modifier = Modifier.padding(top = TuripTheme.spacing.medium)) {
+            Column(
+                modifier =
+                    Modifier
+                        .padding(top = TuripTheme.spacing.medium)
+                        .navigationBarsPadding(),
+            ) {
                 AnimatedVisibility(
                     visible = uiState.screenMode is FavoritePlaceFolderScreenMode.Folders,
                     enter = expandVertically() + fadeIn(),
