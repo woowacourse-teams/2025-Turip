@@ -208,6 +208,18 @@ private data class FavoriteFolderDetailPreviewState(
     val places: ImmutableList<FavoritePlaceModel>,
 )
 
+private val baseFavoritePlaceModel =
+    FavoritePlaceModel(
+        0L,
+        0L,
+        0L,
+        "",
+        false,
+        LatLng(0.0, 0.0),
+        "",
+        "",
+    )
+
 private class FavoriteFolderDetailPreviewProvider : PreviewParameterProvider<FavoriteFolderDetailPreviewState> {
     override val values: Sequence<FavoriteFolderDetailPreviewState> =
         sequenceOf(
@@ -221,25 +233,15 @@ private class FavoriteFolderDetailPreviewProvider : PreviewParameterProvider<Fav
                 folderName = "서울 여행",
                 places =
                     persistentListOf(
-                        FavoritePlaceModel(
-                            1L,
-                            1L,
-                            1L,
-                            "장소명1",
-                            true,
-                            LatLng(0.0, 0.0),
-                            "카테고리1",
-                            "url",
+                        baseFavoritePlaceModel.copy(
+                            favoritePlaceId = 1L,
+                            name = "장소명1",
+                            category = "카테고리1",
                         ),
-                        FavoritePlaceModel(
-                            2L,
-                            2L,
-                            2L,
-                            "장소명2",
-                            true,
-                            LatLng(0.0, 0.0),
-                            "카테고리2",
-                            "url",
+                        baseFavoritePlaceModel.copy(
+                            favoritePlaceId = 2L,
+                            name = "장소명2",
+                            category = "카테고리2",
                         ),
                     ),
             ),
@@ -248,15 +250,10 @@ private class FavoriteFolderDetailPreviewProvider : PreviewParameterProvider<Fav
                 folderName = "폴더 이름이 정말 말도 안 되게 길어질 경우 UI가 어떻게 보일까요?",
                 places =
                     persistentListOf(
-                        FavoritePlaceModel(
-                            1L,
-                            1L,
-                            1L,
-                            "아주아주아주아주아주매우매우매우매우 긴 장소 이름",
-                            true,
-                            LatLng(0.0, 0.0),
-                            "카테고리",
-                            "url",
+                        baseFavoritePlaceModel.copy(
+                            favoritePlaceId = 1L,
+                            name = "아주아주아주아주아주매우매우매우매우 긴 장소 이름",
+                            category = "카테고리",
                         ),
                     ),
             ),
@@ -266,15 +263,10 @@ private class FavoriteFolderDetailPreviewProvider : PreviewParameterProvider<Fav
                 places =
                     (1..20)
                         .map {
-                            FavoritePlaceModel(
+                            baseFavoritePlaceModel.copy(
                                 favoritePlaceId = it.toLong(),
-                                order = it.toLong(),
-                                placeId = it.toLong(),
                                 name = "장소명 $it",
-                                isFavorite = true,
-                                latLng = LatLng(0.0, 0.0),
-                                category = "카테고리",
-                                mapLink = "url",
+                                category = "카테고리 $it",
                             )
                         }.toPersistentList(),
             ),

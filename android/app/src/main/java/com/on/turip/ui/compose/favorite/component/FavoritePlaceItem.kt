@@ -130,47 +130,38 @@ private data class FavoritePlaceItemPreviewState(
     val place: FavoritePlaceModel,
 )
 
+private val baseFavoritePlaceModel =
+    FavoritePlaceModel(
+        0L,
+        0L,
+        0L,
+        "",
+        false,
+        LatLng(0.0, 0.0),
+        "",
+        "",
+    )
+
 private class FavoritePlaceItemPreviewProvider : PreviewParameterProvider<FavoritePlaceItemPreviewState> {
     override val values: Sequence<FavoritePlaceItemPreviewState> =
         sequenceOf(
             FavoritePlaceItemPreviewState(
                 name = "Normal",
-                place =
-                    FavoritePlaceModel(
-                        favoritePlaceId = 1L,
-                        order = 1L,
-                        placeId = 1L,
-                        name = "장소명",
-                        isFavorite = true,
-                        latLng = LatLng(0.0, 0.0),
-                        category = "카테고리",
-                        mapLink = "url",
-                    ),
+                place = baseFavoritePlaceModel.copy(name = "장소명", category = "카테고리"),
             ),
             FavoritePlaceItemPreviewState(
                 name = "Long Place Name",
                 place =
-                    FavoritePlaceModel(
-                        favoritePlaceId = 2L,
-                        order = 2L,
-                        placeId = 2L,
+                    baseFavoritePlaceModel.copy(
                         name = "이름이 아주아주 길어서 말줄임이 제대로 되는지 확인하기 위한 장소명",
-                        isFavorite = true,
-                        latLng = LatLng(0.0, 0.0),
                         category = "카테고리",
-                        mapLink = "url",
                     ),
             ),
             FavoritePlaceItemPreviewState(
                 name = "Long Category",
                 place =
-                    FavoritePlaceModel(
-                        favoritePlaceId = 3L,
-                        order = 3L,
-                        placeId = 3L,
-                        name = "장소명",
-                        isFavorite = true,
-                        latLng = LatLng(0.0, 0.0),
+                    baseFavoritePlaceModel.copy(
+                        name = "이름이 아주아주 길어서 말줄임이 제대로 되는지 확인하기 위한 장소명",
                         category = "아주아주아주아주아주아주아주아주아주 긴 카테고리 이름",
                         mapLink = "google.com",
                     ),
@@ -178,13 +169,9 @@ private class FavoritePlaceItemPreviewProvider : PreviewParameterProvider<Favori
             FavoritePlaceItemPreviewState(
                 name = "Not Favorite (Edge)",
                 place =
-                    FavoritePlaceModel(
-                        favoritePlaceId = 4L,
-                        order = 4L,
-                        placeId = 4L,
+                    baseFavoritePlaceModel.copy(
                         name = "즐겨찾기 해제 상태",
                         isFavorite = false,
-                        latLng = LatLng(0.0, 0.0),
                         category = "카테고리",
                         mapLink = "kakao.com",
                     ),
