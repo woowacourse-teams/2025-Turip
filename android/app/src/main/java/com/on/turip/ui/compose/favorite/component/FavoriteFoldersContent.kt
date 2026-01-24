@@ -5,7 +5,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -23,8 +22,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.on.turip.R
@@ -72,44 +69,29 @@ fun FavoriteFoldersContent(
 private fun Header(
     placeName: String,
     onAddFolderClick: () -> Unit,
-    modifier: Modifier = Modifier,
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .padding(start = TuripTheme.spacing.large, end = TuripTheme.spacing.extraSmall),
-    ) {
-        Text(
-            text = stringResource(R.string.bottom_sheet_favorite_place_folder_title),
-            style = TuripTheme.typography.body2,
-            color = TuripTheme.colors.gray03,
-        )
-
-        Text(
-            text = placeName,
-            style = TuripTheme.typography.title2,
-            color = TuripTheme.colors.gray04,
-            textAlign = TextAlign.Center,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier =
-                Modifier
-                    .weight(1f)
-                    .padding(horizontal = TuripTheme.spacing.large),
-        )
-
-        IconButton(
-            onClick = onAddFolderClick,
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_folder_plus),
-                contentDescription = stringResource(R.string.bottom_sheet_favorite_place_folder_add_folder_description),
-                modifier = Modifier.size(24.dp),
+    FavoritePlaceFolderBottomSheetHeader(
+        title = placeName,
+        navigation = {
+            Text(
+                text = stringResource(R.string.bottom_sheet_favorite_place_folder_title),
+                style = TuripTheme.typography.body2,
+                color = TuripTheme.colors.gray03,
+                modifier = Modifier.padding(start = TuripTheme.spacing.small),
             )
-        }
-    }
+        },
+        actions = {
+            IconButton(
+                onClick = onAddFolderClick,
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_folder_plus),
+                    contentDescription = stringResource(R.string.bottom_sheet_favorite_place_folder_add_folder_description),
+                    modifier = Modifier.size(24.dp),
+                )
+            }
+        },
+    )
 }
 
 @Composable

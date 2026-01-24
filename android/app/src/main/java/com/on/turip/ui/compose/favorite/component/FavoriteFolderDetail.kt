@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -24,7 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
@@ -58,7 +56,7 @@ fun FavoriteFolderDetail(
     ) {
         Header(
             folderName = folderName,
-            enableShare = hasPlaces,
+            isVisibleShare = hasPlaces,
             onBackClick = onBackClick,
             onShareClick = onShareClick,
         )
@@ -84,55 +82,41 @@ fun FavoriteFolderDetail(
 @Composable
 private fun Header(
     folderName: String,
-    enableShare: Boolean,
+    isVisibleShare: Boolean,
     onBackClick: () -> Unit,
     onShareClick: () -> Unit,
-    modifier: Modifier = Modifier,
 ) {
-    Row(
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .height(40.dp)
-                .padding(horizontal = TuripTheme.spacing.small),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        IconButton(
-            onClick = onBackClick,
-            modifier = Modifier.size(40.dp),
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.btn_chevron_left),
-                contentDescription = stringResource(R.string.all_back_description),
-                tint = TuripTheme.colors.gray03,
-            )
-        }
-
-        Text(
-            text = folderName,
-            style = TuripTheme.typography.title2,
-            color = TuripTheme.colors.gray04,
-            textAlign = TextAlign.Center,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.weight(1f),
-        )
-
-        if (enableShare) {
+    FavoritePlaceFolderBottomSheetHeader(
+        title = folderName,
+        navigation = {
             IconButton(
-                onClick = onShareClick,
+                onClick = onBackClick,
                 modifier = Modifier.size(40.dp),
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.ic_share),
-                    contentDescription = stringResource(R.string.all_share_description),
+                    painter = painterResource(R.drawable.btn_chevron_left),
+                    contentDescription = stringResource(R.string.all_back_description),
                     tint = TuripTheme.colors.gray03,
                 )
             }
-        } else {
-            Spacer(modifier = Modifier.width(40.dp))
-        }
-    }
+        },
+        actions = {
+            if (isVisibleShare) {
+                IconButton(
+                    onClick = onShareClick,
+                    modifier = Modifier.size(40.dp),
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_share),
+                        contentDescription = stringResource(R.string.all_share_description),
+                        tint = TuripTheme.colors.gray03,
+                    )
+                }
+            } else {
+                Spacer(modifier = Modifier.width(40.dp))
+            }
+        },
+    )
 }
 
 @Composable
