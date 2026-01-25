@@ -97,7 +97,7 @@ jobs:
     if: |
       needs.build_and_test.result == 'success' && 
       (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
-    runs-on: [ self-hosted, "${{ env.RUNNER_NAME }}" ]
+    runs-on: [ self-hosted, "turip-server-dev" ]
 
     steps:
       - name: Login to Docker Hub (for Pull)
