@@ -7,7 +7,7 @@ on:
       - 'backend/app/**'
       - 'backend/build.gradle'
   pull_request:
-    branches: [ 'develop' ]   
+    branches: [ develop ]
     paths:
       - 'backend/app/**'
       - 'backend/build.gradle'
@@ -19,12 +19,15 @@ on:
 
 env:
   DOCKER_IMAGE_REPO: teamturip/turip-backend
-  PROFILE: dev
   SERVICE_NAME: dev-app
+  APP_MODULE_NAME: app
   ADMIN_SERVICE_NAME: dev-admin
   WORKING_DIR: backend
   DOCKERFILE_PATH: backend/app.Dockerfile
   JAVA_VERSION: '21'
+  SPRING_PROFILES_ACTIVE: dev
+  NGINX_PORT: 8080
+  RUNNER_NAME: turip-server-dev
 
 jobs:
   build_and_test:
@@ -42,7 +45,8 @@ jobs:
       - name: Set image tag
         id: vars
         run: |
-          echo "image_tag=$(TZ=Asia/Seoul date +%Y%m%d-%H%M)-${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+          TAG_VALUE="${{ env.SERVICE_NAME }}-$(TZ=Asia/Seoul date +%Y%m%d-%H%M)-${GITHUB_SHA::7}"
+          echo "image_tag=$TAG_VALUE" >> $GITHUB_OUTPUT
 
       - name: Set up JDK ${{ env.JAVA_VERSION }}
         uses: actions/setup-java@v4
@@ -51,13 +55,13 @@ jobs:
           distribution: 'temurin'
           cache: 'gradle'
 
-      - name: Build App Jar
+      - name: Build Module Jar
         run: |
           chmod +x gradlew
-          ./gradlew :app:bootJar -x test
+          ./gradlew :${{ env.APP_MODULE_NAME }}:bootJar -x test
 
-      - name: Run Unit Tests (App)
-        run: ./gradlew :app:test
+      - name: Run Unit Tests
+        run: ./gradlew :${{ env.APP_MODULE_NAME }}:test
 
       - name: Prepare OpenTelemetry agent
         run: |
@@ -65,7 +69,6 @@ jobs:
           curl -L -o otel/opentelemetry-javaagent.jar \
           https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v2.10.0/opentelemetry-javaagent.jar
 
-      # 이미지 푸시는 Push(머지) 또는 수동 실행일 때만 진행
       - name: Login to Docker Hub
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         uses: docker/login-action@v3
@@ -79,7 +82,7 @@ jobs:
         with:
           driver-opts: network=host
 
-      - name: Build and push App image
+      - name: Build and push image
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         uses: docker/build-push-action@v6
         with:
@@ -87,14 +90,14 @@ jobs:
           file: ./${{ env.DOCKERFILE_PATH }}
           platforms: linux/arm64
           push: true
-          tags: ${{ env.DOCKER_IMAGE_REPO }}:${{ env.SERVICE_NAME }}-${{ steps.vars.outputs.image_tag }}
+          tags: ${{ env.DOCKER_IMAGE_REPO }}:${{ steps.vars.outputs.image_tag }}
 
   deploy:
     needs: build_and_test
     if: |
       needs.build_and_test.result == 'success' && 
       (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
-    runs-on: [ self-hosted, turip-server-dev ]
+    runs-on: [ self-hosted, "${{ env.RUNNER_NAME }}" ]
 
     steps:
       - name: Login to Docker Hub (for Pull)
@@ -103,7 +106,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Deploy App
+      - name: Deploy
         env:
           CSV_LINKS_COLLECTION_URL: ${{ secrets.CSV_LINKS_COLLECTION_URL }}
           DOMESTIC_ETC_IMAGE_URL: ${{ secrets.DOMESTIC_ETC_IMAGE_URL }}
@@ -126,8 +129,8 @@ jobs:
           cat <<EOF > .env.tmp
           IMAGE_NAME_PREFIX=${{ env.SERVICE_NAME }}
           IMAGE_NAME_ADMIN_PREFIX=${{ env.ADMIN_SERVICE_NAME }}
-          SPRING_PROFILES_ACTIVE=dev
-          NGINX_PORT=8080
+          SPRING_PROFILES_ACTIVE=${{ env.SPRING_PROFILES_ACTIVE }}
+          NGINX_PORT=${{ env.NGINX_PORT }}
           CSV_LINKS_COLLECTION_URL=${CSV_LINKS_COLLECTION_URL}
           DOMESTIC_ETC_IMAGE_URL=${DOMESTIC_ETC_IMAGE_URL}
           OVERSEAS_ETC_IMAGE_URL=${OVERSEAS_ETC_IMAGE_URL}
