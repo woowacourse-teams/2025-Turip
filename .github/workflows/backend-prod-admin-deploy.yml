@@ -15,7 +15,7 @@ on:
 env:
   DOCKER_IMAGE_REPO: teamturip/turip-backend
   SERVICE_NAME: prod-admin
-  APP_MODULE_NAME: admin
+  APP_MODULE_NAME: turip-admin
   ADMIN_SERVICE_NAME: prod-admin
   WORKING_DIR: backend
   DOCKERFILE_PATH: backend/admin.Dockerfile

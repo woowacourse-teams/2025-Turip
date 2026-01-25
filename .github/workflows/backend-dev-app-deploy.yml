@@ -20,7 +20,7 @@ on:
 env:
   DOCKER_IMAGE_REPO: teamturip/turip-backend
   SERVICE_NAME: dev-app
-  APP_MODULE_NAME: app
+  APP_MODULE_NAME: turip-app
   ADMIN_SERVICE_NAME: dev-admin
   WORKING_DIR: backend
   DOCKERFILE_PATH: backend/app.Dockerfile
