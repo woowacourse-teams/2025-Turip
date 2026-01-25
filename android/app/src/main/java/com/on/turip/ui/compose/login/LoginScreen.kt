@@ -74,8 +74,6 @@ fun LoginScreen(
             message = stringResource(R.string.login_dialog_migration_message),
             confirmText = stringResource(R.string.login_dialog_confirm_text),
             dismissText = stringResource(R.string.setting_logout_dialog_dismiss),
-            confirmButtonColor = TuripTheme.colors.primary,
-            dismissButtonColor = TuripTheme.colors.gray02,
             onConfirmation = viewmodel::migration,
             onDismissRequest = viewmodel::clearGuestData,
         )
@@ -156,12 +154,10 @@ private fun LoginScreenContent(
                             .border(
                                 border = BorderStroke(1.dp, TuripTheme.colors.gray02),
                                 shape = TuripTheme.shape.container,
-                            )
-                            .background(
+                            ).background(
                                 color = TuripTheme.colors.gray03,
                                 shape = TuripTheme.shape.container,
-                            )
-                            .fillMaxWidth()
+                            ).fillMaxWidth()
                             .padding(vertical = TuripTheme.spacing.extraLarge),
                     textAlign = TextAlign.Center,
                 )

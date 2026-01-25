@@ -26,7 +26,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -40,6 +42,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.on.turip.R
 import com.on.turip.ui.common.error.ErrorUiModel
 import com.on.turip.ui.common.error.toUiModel
+import com.on.turip.ui.compose.designsystem.component.TuripDialog
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.favorite.component.FavoriteFolderDetail
@@ -71,6 +74,8 @@ fun FavoritePlaceFolderBottomSheet(
 
     val foldersListState = rememberLazyListState()
 
+    var showLoginSuggestDialog by remember { mutableStateOf(false) }
+
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { uiEffect ->
             when (uiEffect) {
@@ -86,7 +91,7 @@ fun FavoritePlaceFolderBottomSheet(
                 }
 
                 FavoritePlaceFolderUiEffect.FolderShareNotAllowed -> {
-                    // TODO : 다이얼로그로 로그인 할 것을 권유
+                    showLoginSuggestDialog = true
                 }
 
                 is FavoritePlaceFolderUiEffect.ShareFolder -> {
@@ -138,6 +143,20 @@ fun FavoritePlaceFolderBottomSheet(
                 onDismiss()
             }
         }
+    }
+
+    if (showLoginSuggestDialog) {
+        TuripDialog(
+            title = stringResource(R.string.turip_dialog_login_suggest_title),
+            message = stringResource(R.string.turip_dialog_login_suggest_description),
+            confirmText = stringResource(R.string.turip_dialog_login_suggest_confirm),
+            dismissText = stringResource(R.string.turip_dialog_login_suggest_dismiss),
+            onConfirmation = {
+                onNavigateToLogin()
+                showLoginSuggestDialog = false
+            },
+            onDismissRequest = { showLoginSuggestDialog = false },
+        )
     }
 
     Surface(
