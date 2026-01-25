@@ -7,7 +7,7 @@ on:
       - 'backend/app/**'
       - 'backend/build.gradle'
   pull_request:
-    branches: [ 'release-be/**' ]
+    branches: [ 'develop' ]   
     paths:
       - 'backend/app/**'
       - 'backend/build.gradle'
@@ -17,15 +17,23 @@ on:
         description: 'Deploy app image tag (YYYYMMDD-HHMM-SHA)'
         required: true
 
+env:
+  DOCKER_IMAGE_REPO: teamturip/turip-backend
+  PROFILE: dev
+  SERVICE_NAME: dev-app
+  ADMIN_SERVICE_NAME: dev-admin
+  WORKING_DIR: backend
+  DOCKERFILE_PATH: backend/app.Dockerfile
+  JAVA_VERSION: '21'
+
 jobs:
   build_and_test:
-    if: github.event_name != 'workflow_dispatch'
     runs-on: ubuntu-latest
     outputs:
       image_tag: ${{ steps.vars.outputs.image_tag }}
     defaults:
       run:
-        working-directory: backend
+        working-directory: ${{ env.WORKING_DIR }}
 
     steps:
       - name: Checkout repository
@@ -36,10 +44,10 @@ jobs:
         run: |
           echo "image_tag=$(TZ=Asia/Seoul date +%Y%m%d-%H%M)-${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
 
-      - name: Set up JDK 21
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
+          java-version: ${{ env.JAVA_VERSION }}
           distribution: 'temurin'
           cache: 'gradle'
 
@@ -57,32 +65,44 @@ jobs:
           curl -L -o otel/opentelemetry-javaagent.jar \
           https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v2.10.0/opentelemetry-javaagent.jar
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-        with:
-          driver-opts: network=host
-
+      # 이미지 푸시는 Push(머지) 또는 수동 실행일 때만 진행
       - name: Login to Docker Hub
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Set up Docker Buildx
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: network=host
+
       - name: Build and push App image
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         uses: docker/build-push-action@v6
         with:
-          context: ./backend
-          file: ./backend/app.Dockerfile
+          context: ./${{ env.WORKING_DIR }}
+          file: ./${{ env.DOCKERFILE_PATH }}
           platforms: linux/arm64
           push: true
-          tags: teamturip/turip-backend:dev-app-${{ steps.vars.outputs.image_tag }}
+          tags: ${{ env.DOCKER_IMAGE_REPO }}:${{ env.SERVICE_NAME }}-${{ steps.vars.outputs.image_tag }}
 
   deploy:
     needs: build_and_test
+    if: |
+      needs.build_and_test.result == 'success' && 
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     runs-on: [ self-hosted, turip-server-dev ]
-    if: github.event_name == 'workflow_dispatch' || needs.build_and_test.result == 'success'
 
     steps:
+      - name: Login to Docker Hub (for Pull)
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: Deploy App
         env:
           CSV_LINKS_COLLECTION_URL: ${{ secrets.CSV_LINKS_COLLECTION_URL }}
@@ -101,11 +121,11 @@ jobs:
           cd /home/ubuntu/deploy
           IMAGE_TAG="${{ github.event.inputs.image_tag || needs.build_and_test.outputs.image_tag }}"
           
-          echo "🚀 App 배포 시작 (Tag: ${IMAGE_TAG})"
+          echo "🚀 ${{ env.SERVICE_NAME }} 배포 시작 (Tag: ${IMAGE_TAG})"
           
           cat <<EOF > .env.tmp
-          IMAGE_NAME_PREFIX=dev-app
-          IMAGE_NAME_ADMIN_PREFIX=dev-admin
+          IMAGE_NAME_PREFIX=${{ env.SERVICE_NAME }}
+          IMAGE_NAME_ADMIN_PREFIX=${{ env.ADMIN_SERVICE_NAME }}
           SPRING_PROFILES_ACTIVE=dev
           NGINX_PORT=8080
           CSV_LINKS_COLLECTION_URL=${CSV_LINKS_COLLECTION_URL}
