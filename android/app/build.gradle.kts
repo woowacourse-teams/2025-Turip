@@ -166,4 +166,7 @@ dependencies {
 
     // leak
     debugImplementation(libs.leakcanary.android)
+
+    // immutable collection
+    implementation(libs.kotlinx.collections.immutable)
 }
