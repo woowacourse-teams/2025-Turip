@@ -47,7 +47,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="27dp"
-        android:background="@drawable/bg_turip_blue_70_radius_40dp"
+        android:background="@drawable/bg_turip_blue_radius_40dp"
         android:clickable="true"
         android:focusable="true"
         android:paddingHorizontal="16dp"

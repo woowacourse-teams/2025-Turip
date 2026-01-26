@@ -31,7 +31,7 @@ public class TestDataHelper {
             return ps;
         }, keyHolder);
 
-        return keyHolder.getKey().longValue();
+        return extractGeneratedKey(keyHolder);
     }
 
     public Long insertMember(Long accountId, String email, boolean isFirstLogin) {
@@ -47,7 +47,7 @@ public class TestDataHelper {
             return ps;
         }, keyHolder);
 
-        return keyHolder.getKey().longValue();
+        return extractGeneratedKey(keyHolder);
     }
 
     public Long insertSocialMember(Long memberId, Provider provider, String providerId) {
@@ -63,7 +63,7 @@ public class TestDataHelper {
             return ps;
         }, keyHolder);
 
-        return keyHolder.getKey().longValue();
+        return extractGeneratedKey(keyHolder);
     }
 
     public Long insertSocialMember(String email, boolean isFirstLogin, Provider provider, String providerId) {
@@ -88,12 +88,20 @@ public class TestDataHelper {
             return ps;
         }, keyHolder);
 
-        return keyHolder.getKey().longValue();
+        return extractGeneratedKey(keyHolder);
     }
 
     public Long insertTuripMember(String email, final boolean isFirstLogin, String loginId, String loginPassword) {
         Long accountId = insertAccount();
         Long memberId = insertMember(accountId, email, isFirstLogin);
         return insertTuripMember(memberId, loginId, loginPassword);
+    }
+
+    private Long extractGeneratedKey(KeyHolder keyHolder) {
+        Number key = keyHolder.getKey();
+        if (key == null) {
+            throw new IllegalArgumentException("insert 후 반환된 key값이 null 입니다.");
+        }
+        return key.longValue();
     }
 }

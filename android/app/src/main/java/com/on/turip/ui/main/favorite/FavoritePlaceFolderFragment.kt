@@ -15,13 +15,13 @@ import com.on.turip.ui.common.base.BaseFragment
 import com.on.turip.ui.common.collectOnStarted
 import com.on.turip.ui.common.error.ErrorUiModel
 import com.on.turip.ui.common.error.toUiModel
+import com.on.turip.ui.compose.trip.TripDetailViewModel
 import com.on.turip.ui.folder.FolderActivity
 import com.on.turip.ui.login.LoginActivity
 import com.on.turip.ui.main.favorite.FavoritePlaceFolderViewHolder.FavoritePlaceFolderListener
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderUiEffect
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderUiState
-import com.on.turip.ui.trip.detail.TripDetailViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

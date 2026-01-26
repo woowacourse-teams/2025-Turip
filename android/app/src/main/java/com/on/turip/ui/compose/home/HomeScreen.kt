@@ -22,11 +22,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -35,13 +33,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.on.turip.R
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.compose.designsystem.component.ErrorScreen
-import com.on.turip.ui.compose.designsystem.component.TuripAppBar
+import com.on.turip.ui.compose.designsystem.theme.TuripTheme
+import com.on.turip.ui.compose.home.component.HomeAppBar
 import com.on.turip.ui.compose.home.component.RegionList
 import com.on.turip.ui.compose.home.component.RegionTypeButtons
 import com.on.turip.ui.compose.home.component.SearchTextField
 import com.on.turip.ui.compose.home.component.UsersLikeList
-import com.on.turip.ui.compose.theme.TuripTheme
-import com.on.turip.ui.compose.theme.TuripTypography
 import com.on.turip.ui.main.home.model.UsersLikeContentModel
 import kotlinx.coroutines.flow.collectLatest
 
@@ -65,9 +62,7 @@ fun HomeScreen(
 
     Scaffold(
         contentWindowInsets = WindowInsets(),
-        topBar = {
-            TuripAppBar(canBack = false)
-        },
+        topBar = { HomeAppBar() },
     ) { innerPadding ->
         HomeScreenContent(
             uiState = uiState,
@@ -101,7 +96,10 @@ private fun HomeScreenContent(
             modifier = modifier.fillMaxSize(),
             contentAlignment = Alignment.Center,
         ) {
-            CircularProgressIndicator(modifier = Modifier.size(60.dp), color = Color.Black)
+            CircularProgressIndicator(
+                modifier = Modifier.size(60.dp),
+                color = TuripTheme.colors.black,
+            )
         }
     }
     when {
@@ -123,14 +121,14 @@ private fun HomeScreenContent(
                                 focusManager.clearFocus()
                                 keyboardController?.hide()
                             })
-                        }.padding(horizontal = 20.dp)
+                        }.padding(horizontal = TuripTheme.spacing.extraLarge)
                         .verticalScroll(scrollState),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
+                verticalArrangement = Arrangement.spacedBy(TuripTheme.spacing.medium),
             ) {
                 Text(
                     text = stringResource(R.string.home_top_title),
-                    color = colorResource(R.color.gray_400_2b2b2b),
-                    style = TuripTypography.titleLarge,
+                    color = TuripTheme.colors.gray04,
+                    style = TuripTheme.typography.title1,
                 )
 
                 SearchTextField(
@@ -144,14 +142,14 @@ private fun HomeScreenContent(
                     modifier =
                         Modifier
                             .wrapContentSize()
-                            .padding(top = 4.dp),
+                            .padding(top = TuripTheme.spacing.extraSmall),
                 )
 
                 Text(
                     text = stringResource(R.string.home_users_like_content_title),
-                    modifier = Modifier.padding(top = 14.dp),
-                    color = colorResource(R.color.gray_400_2b2b2b),
-                    style = TuripTypography.titleLarge,
+                    modifier = Modifier.padding(top = TuripTheme.spacing.medium),
+                    color = TuripTheme.colors.gray04,
+                    style = TuripTheme.typography.title1,
                 )
 
                 UsersLikeList(
@@ -178,13 +176,9 @@ private fun HomeScreenContent(
 private fun HomeLoadingPreview() {
     val uiState = HomeUiState.Idle
     TuripTheme {
-        Scaffold(
-            topBar = {
-                TuripAppBar(canBack = false)
-            },
-        ) { innerPadding ->
+        Scaffold(topBar = { HomeAppBar() }) { innerPadding ->
             HomeScreenContent(
-                uiState = uiState.copy(isLoading = true, errorUiState = ErrorUiState.None),
+                uiState = uiState.copy(isLoading = true),
                 onSearchClick = {},
                 onRetryLoadContents = { },
                 onContentClick = { },
@@ -208,11 +202,7 @@ private fun HomeSuccessPreview() {
             errorUiState = ErrorUiState.None,
         )
     TuripTheme {
-        Scaffold(
-            topBar = {
-                TuripAppBar(canBack = false)
-            },
-        ) { innerPadding ->
+        Scaffold(topBar = { HomeAppBar() }) { innerPadding ->
             HomeScreenContent(
                 uiState = uiState,
                 onSearchClick = {},
@@ -231,11 +221,7 @@ private fun HomeSuccessPreview() {
 private fun HomeServerErrorPreview() {
     val uiState = HomeUiState.Idle
     TuripTheme {
-        Scaffold(
-            topBar = {
-                TuripAppBar(canBack = false)
-            },
-        ) { innerPadding ->
+        Scaffold(topBar = { HomeAppBar() }) { innerPadding ->
             HomeScreenContent(
                 uiState = uiState.copy(isLoading = false, errorUiState = ErrorUiState.Server),
                 onSearchClick = {},
@@ -254,11 +240,7 @@ private fun HomeServerErrorPreview() {
 private fun HomeNetworkErrorPreview() {
     val uiState = HomeUiState.Idle
     TuripTheme {
-        Scaffold(
-            topBar = {
-                TuripAppBar(canBack = false)
-            },
-        ) { innerPadding ->
+        Scaffold(topBar = { HomeAppBar() }) { innerPadding ->
             HomeScreenContent(
                 uiState = uiState.copy(isLoading = false, errorUiState = ErrorUiState.Network),
                 onSearchClick = {},

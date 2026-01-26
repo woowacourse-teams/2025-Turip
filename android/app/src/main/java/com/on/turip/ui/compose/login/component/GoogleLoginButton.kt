@@ -15,16 +15,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.on.turip.R
-import com.on.turip.ui.compose.theme.TuripTheme
-import com.on.turip.ui.compose.theme.TuripTypography
+import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 
 @Composable
 fun GoogleLoginButton(
@@ -35,26 +32,26 @@ fun GoogleLoginButton(
         modifier =
             modifier
                 .border(
-                    border = BorderStroke(1.dp, colorResource(R.color.turip_gray_b4b4b4)),
+                    border = BorderStroke(1.dp, TuripTheme.colors.gray02),
                     shape = RoundedCornerShape(30.dp),
-                ).background(color = Color.White, shape = RoundedCornerShape(30.dp))
+                ).background(color = TuripTheme.colors.white, shape = RoundedCornerShape(30.dp))
                 .clip(RoundedCornerShape(30.dp))
                 .clickable { onClickLoginButton() }
-                .padding(vertical = 16.dp, horizontal = 16.dp),
+                .padding(vertical = TuripTheme.spacing.large, horizontal = TuripTheme.spacing.large),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Image(
             painter = painterResource(R.drawable.ic_google),
             contentDescription = null,
-            modifier = Modifier.size(28.dp),
+            modifier = Modifier.size(TuripTheme.spacing.huge),
         )
         Text(
             text = stringResource(R.string.login_google_description),
-            style = TuripTypography.titleMedium,
+            style = TuripTheme.typography.title2,
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .padding(end = 28.dp),
+                    .padding(end = TuripTheme.spacing.huge),
             textAlign = TextAlign.Center,
         )
     }
