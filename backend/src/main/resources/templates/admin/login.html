@@ -139,21 +139,6 @@
             });
 
             if (response.ok) {
-                const data = await response.json();
-
-                // role 체크 (서버에서 Set-Cookie로 쿠키는 이미 설정됨)
-                if (data.role !== 'ADMIN') {
-                    alert('관리자 권한이 없습니다.');
-                    // 로그아웃 요청으로 쿠키 무효화
-                    await fetch('/logout', {
-                        method: 'POST',
-                        headers: {'device-fid': 'admin-web'},
-                        credentials: 'include'
-                    });
-                    return;
-                }
-
-                // 관리자 권한 확인 후 메인 페이지로 이동
                 window.location.href = '/admin/home';
             } else {
                 const errorData = await response.json();
