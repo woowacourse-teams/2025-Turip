@@ -40,7 +40,17 @@ public class AuthService {
 
     @Transactional
     public TuripLoginResult loginWithTurip(TuripLoginRequest request, String deviceFid) {
-        Member member = turipMemberService.login(request).getMember();
+        Member member = loginAndGetMember(request);
+        return processTuripLogin(deviceFid, member);
+    }
+
+    @Transactional
+    public Member loginAndGetMember(TuripLoginRequest request) {
+        return turipMemberService.login(request).getMember();
+    }
+
+    @Transactional
+    public TuripLoginResult processTuripLogin(final String deviceFid, final Member member) {
         if (member.isFirstLogin()) {
             member.completeFirstLogin();
         }

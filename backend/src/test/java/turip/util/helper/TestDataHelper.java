@@ -91,7 +91,13 @@ public class TestDataHelper {
         return extractGeneratedKey(keyHolder);
     }
 
-    public Long insertTuripMember(String email, final boolean isFirstLogin, String loginId, String loginPassword) {
+    public Long insertTuripMember(Long accountId, String email, boolean isFirstLogin, String loginId,
+                                  String loginPassword) {
+        Long memberId = insertMember(accountId, email, isFirstLogin);
+        return insertTuripMember(memberId, loginId, loginPassword);
+    }
+
+    public Long insertTuripMember(String email, boolean isFirstLogin, String loginId, String loginPassword) {
         Long accountId = insertAccount();
         Long memberId = insertMember(accountId, email, isFirstLogin);
         return insertTuripMember(memberId, loginId, loginPassword);

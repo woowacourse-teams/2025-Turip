@@ -75,7 +75,7 @@ class AuthApiTest {
             Role role = Role.USER;
 
             Long accountId = testDataHelper.insertAccount(role);
-            testDataHelper.insertTuripMember(accountId, email, loginId, loginPassword);
+            testDataHelper.insertTuripMember(accountId, email, true, loginId, loginPassword);
 
             Map<String, String> requestBody = new HashMap<>(Map.of("loginId", loginId, "loginPassword", loginPassword));
 
