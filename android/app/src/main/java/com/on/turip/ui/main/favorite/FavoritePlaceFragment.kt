@@ -27,6 +27,7 @@ import com.on.turip.ui.common.collectOnStarted
 import com.on.turip.ui.common.error.ErrorUiModel
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.toUiModel
+import com.on.turip.ui.common.safeStartActivityWithToast
 import com.on.turip.ui.folder.FolderActivity
 import com.on.turip.ui.login.LoginActivity
 import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
@@ -58,8 +59,11 @@ class FavoritePlaceFragment :
                 }
 
                 override fun onMapClick(uri: Uri) {
-                    val intent: Intent = Intent(Intent.ACTION_VIEW, uri)
-                    startActivity(intent)
+                    val intent = Intent(Intent.ACTION_VIEW, uri)
+                    requireContext().safeStartActivityWithToast(
+                        intent = intent,
+                        errorToastMessage = getString(R.string.all_snackbar_not_found_map_url),
+                    )
                 }
 
                 override fun onItemClick(favoritePlaceModel: FavoritePlaceModel) {
