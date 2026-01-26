@@ -18,8 +18,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import turip.account.domain.Account;
 import turip.account.domain.Member;
 import turip.account.domain.Provider;
-import turip.auth.controller.dto.request.LoginRequest;
+import turip.auth.controller.dto.request.GoogleLoginRequest;
 import turip.auth.controller.dto.request.RefreshTokenRequest;
+import turip.auth.controller.dto.request.TuripLoginRequest;
 import turip.auth.controller.dto.response.LoginResponse;
 import turip.auth.controller.dto.response.RefreshTokenResponse;
 import turip.auth.resolver.AuthAccount;
@@ -33,6 +34,57 @@ import turip.common.exception.ErrorResponse;
 public class AuthController {
 
     private final AuthService authService;
+
+    @Operation(
+            summary = "자체 로그인 api",
+            description = "튜립 자체 로그인을 진행한다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "성공 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = LoginResponse.class),
+                            examples = @ExampleObject(
+                                    name = "success",
+                                    summary = "로그인 성공",
+                                    value = """
+                                            {
+                                              "accessToken": "jwt-access",
+                                              "refreshToken": "jwt-refresh",
+                                              "isNewMember": false
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "invalid credential",
+                                    summary = "올바르지 않은 자격 증명",
+                                    value = """
+                                            {
+                                            	"tag": "CREDENTIALS_INVALID",
+                                            	"message": "아이디 또는 비밀번호가 올바르지 않습니다."
+                                            }
+                                            """
+                            )
+                    )
+            )
+    })
+    @PostMapping("/login/turip")
+    public ResponseEntity<LoginResponse> loginWithTurip(
+            @Parameter(hidden = true) @RequestHeader("device-fid") String deviceFid,
+            @RequestBody TuripLoginRequest request) {
+        LoginResponse response = authService.loginWithTurip(request, deviceFid);
+        return ResponseEntity.ok(response);
+    }
 
     @Operation(
             summary = "구글 로그인 api",
@@ -80,9 +132,10 @@ public class AuthController {
             )
     })
     @PostMapping("/login/google")
-    public ResponseEntity<LoginResponse> login(@Parameter(hidden = true) @RequestHeader("device-fid") String deviceFid,
-                                               @RequestBody LoginRequest request) {
-        LoginResponse response = authService.login(request, Provider.GOOGLE, deviceFid);
+    public ResponseEntity<LoginResponse> loginWithGoogle(
+            @Parameter(hidden = true) @RequestHeader("device-fid") String deviceFid,
+            @RequestBody GoogleLoginRequest request) {
+        LoginResponse response = authService.loginWithSocial(request, Provider.GOOGLE, deviceFid);
         return ResponseEntity.ok(response);
     }
 

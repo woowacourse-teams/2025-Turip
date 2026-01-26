@@ -94,4 +94,8 @@ public class TuripMember {
             throw new IllegalArgumentException(ErrorTag.LOGIN_PASSWORD_INVALID);
         }
     }
+
+    public boolean isPasswordMatch(String password) {
+        return BCrypt.checkpw(password, loginPassword);
+    }
 }

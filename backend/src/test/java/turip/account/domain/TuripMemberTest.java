@@ -1,13 +1,16 @@
 package turip.account.domain;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.IllegalArgumentException;
 import turip.util.fixture.MemberFixture;
+import turip.util.fixture.TuripMemberFixture;
 
 public class TuripMemberTest {
 
@@ -37,5 +40,21 @@ public class TuripMemberTest {
         assertThatThrownBy(() -> new TuripMember(member, "turip", invalidLoginPassword))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage(ErrorTag.LOGIN_PASSWORD_INVALID.getMessage());
+    }
+
+    @DisplayName("비밀번호가 매치하는지 확인할 수 있다")
+    @ParameterizedTest
+    @CsvSource({
+            "validPass1!, validPass1!, true",
+            "invalidPass1!, validPass1!, false"
+    })
+    void isPasswordMatch(String inputPassword, String realPassword, boolean expected) {
+        // given
+        Member member = MemberFixture.createMember();
+        TuripMember turipMember = TuripMemberFixture.createCustomTuripMember(member, "turip", realPassword);
+
+        // when & then
+        assertThat(turipMember.isPasswordMatch(inputPassword))
+                .isEqualTo(expected);
     }
 }

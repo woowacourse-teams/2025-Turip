@@ -2,17 +2,20 @@ package turip.auth.service;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.SignatureException;
-import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import turip.account.domain.Account;
 import turip.account.domain.Member;
 import turip.account.domain.Provider;
+import turip.account.domain.Role;
 import turip.account.service.MemberService;
 import turip.account.service.SocialMemberService;
-import turip.auth.controller.dto.request.LoginRequest;
+import turip.account.service.TuripMemberService;
+import turip.auth.controller.dto.request.GoogleLoginRequest;
 import turip.auth.controller.dto.request.RefreshTokenRequest;
+import turip.auth.controller.dto.request.TuripLoginRequest;
 import turip.auth.controller.dto.response.LoginResponse;
 import turip.auth.controller.dto.response.RefreshTokenResponse;
 import turip.auth.domain.RefreshToken;
@@ -31,9 +34,16 @@ public class AuthService {
     private final RefreshTokenService refreshTokenService;
     private final MemberService memberService;
     private final SocialMemberService socialMemberService;
+    private final TuripMemberService turipMemberService;
 
     @Transactional
-    public LoginResponse login(LoginRequest request, Provider provider, String deviceFid) {
+    public LoginResponse loginWithTurip(TuripLoginRequest request, String deviceFid) {
+        Member member = turipMemberService.login(request).getMember();
+        return issueTokenAndCreateResponse(deviceFid, member);
+    }
+
+    @Transactional
+    public LoginResponse loginWithSocial(GoogleLoginRequest request, Provider provider, String deviceFid) {
         if (provider == Provider.GOOGLE) {
             return loginWithGoogle(request, deviceFid);
         }
@@ -52,8 +62,8 @@ public class AuthService {
             verifyRefreshTokenMatch(refreshToken, storedRefreshToken);
             validateRefreshTokenExpiration(storedRefreshToken);
 
-            String newAccessToken = jwtProvider.generateAccessToken(accountId);
-            String newRefreshToken = jwtProvider.generateRefreshToken(accountId);
+            String newAccessToken = jwtProvider.generateAccessToken(accountId, member.getAccount().getRole());
+            String newRefreshToken = jwtProvider.generateRefreshToken(accountId, member.getAccount().getRole());
 
             saveRefreshToken(member, newRefreshToken, deviceFid);
 
@@ -76,7 +86,25 @@ public class AuthService {
         refreshTokenService.deleteByMemberAndDeviceFid(member, deviceFid);
     }
 
-    private LoginResponse loginWithGoogle(LoginRequest request, String deviceFid) {
+    private LoginResponse issueTokenAndCreateResponse(String deviceFid, Member member) {
+        boolean isNewMember = false;
+        if (member.isFirstLogin()) {
+            member.completeFirstLogin();
+            isNewMember = true;
+        }
+
+        Long accountId = member.getAccount().getId();
+        Role role = member.getAccount().getRole();
+
+        String accessToken = jwtProvider.generateAccessToken(accountId, role);
+        String refreshToken = jwtProvider.generateRefreshToken(accountId, role);
+
+        saveRefreshToken(member, refreshToken, deviceFid);
+
+        return LoginResponse.of(accessToken, refreshToken, isNewMember);
+    }
+
+    private LoginResponse loginWithGoogle(GoogleLoginRequest request, String deviceFid) {
         String idToken = request.idToken();
         validateIdToken(idToken);
 
@@ -84,19 +112,8 @@ public class AuthService {
         String providerId = googleTokenParser.getProviderId(idToken);
         String email = googleTokenParser.getEmail(idToken);
 
-        boolean isNewMember = false;
         Member member = findOrCreateSocialMember(provider, providerId, email);
-        if (member.isFirstLogin()) {
-            member.completeFirstLogin();
-            isNewMember = true;
-        }
-
-        String accessToken = jwtProvider.generateAccessToken(member.getAccount().getId());
-        String refreshToken = jwtProvider.generateRefreshToken(member.getAccount().getId());
-
-        saveRefreshToken(member, refreshToken, deviceFid);
-
-        return LoginResponse.of(accessToken, refreshToken, isNewMember);
+        return issueTokenAndCreateResponse(deviceFid, member);
     }
 
     private Member findOrCreateSocialMember(Provider provider, String providerId, String email) {
