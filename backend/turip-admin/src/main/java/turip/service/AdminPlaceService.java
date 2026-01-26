@@ -5,8 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.BadRequestException;
+import turip.infrastructure.client.PlaceSearchClient;
 import turip.place.controller.dto.response.PlaceSearchResponse;
-import turip.place.domain.PlaceSearchClient;
 import turip.place.domain.PlaceSearchType;
 
 @Service

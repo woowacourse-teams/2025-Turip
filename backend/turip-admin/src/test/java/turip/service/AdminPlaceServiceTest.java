@@ -15,8 +15,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import turip.common.exception.custom.BadRequestException;
+import turip.infrastructure.client.PlaceSearchClient;
 import turip.place.controller.dto.response.PlaceSearchResponse;
-import turip.place.domain.PlaceSearchClient;
 import turip.place.domain.PlaceSearchProvider;
 import turip.place.domain.PlaceSearchType;
 

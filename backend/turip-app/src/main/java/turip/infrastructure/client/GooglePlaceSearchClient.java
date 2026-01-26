@@ -1,12 +1,11 @@
-package turip.place.infrastructure.client;
+package turip.infrastructure.client;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import turip.infrastructure.client.dto.GooglePlaceSearchResponse;
 import turip.place.controller.dto.response.PlaceSearchResponse;
-import turip.place.domain.PlaceSearchClient;
 import turip.place.domain.PlaceSearchType;
-import turip.place.infrastructure.client.dto.GooglePlaceSearchResponse;
 
 @Component
 public class GooglePlaceSearchClient implements PlaceSearchClient {
