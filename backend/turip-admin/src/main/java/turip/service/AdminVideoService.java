@@ -2,75 +2,35 @@ package turip.service;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatusCode;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClient;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.BadRequestException;
-import turip.common.exception.custom.NotFoundException;
 import turip.controller.dto.response.AdminVideoResponse;
+import turip.infrastructure.client.YoutubeVideoSearchClient;
+import turip.infrastructure.client.dto.YoutubeVideoSearchResponse;
 
 @Service
+@RequiredArgsConstructor
 public class AdminVideoService {
 
-    public static final String YOUTUBE_ITEMS_KEY = "items";
-    public static final String YOUTUBE_SNIPPET_KEY = "snippet";
-    private final RestClient restClient;
-    private final String youtubeApiKey;
-
-    public AdminVideoService(RestClient baseRestClient,
-                             @Value("${youtube.api.key}") String youtubeApiKey,
-                             @Value("${youtube.api.url}") String youtubeApiUrl) {
-        this.restClient = baseRestClient.mutate()
-                .baseUrl(youtubeApiUrl)
-                .build();
-        this.youtubeApiKey = youtubeApiKey;
-    }
+    private final YoutubeVideoSearchClient youtubeVideoSearchClient;
 
     public AdminVideoResponse getVideoData(String videoUrl) {
         String videoId = extractVideoId(videoUrl);
         if (videoId == null) {
             throw new BadRequestException(ErrorTag.INVALID_YOUTUBE_URL);
         }
-        return fetchFromYoutubeApi(videoId);
-    }
 
-    private AdminVideoResponse fetchFromYoutubeApi(String videoId) {
-        String response = restClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .queryParam("part", YOUTUBE_SNIPPET_KEY)
-                        .queryParam("id", videoId)
-                        .queryParam("key", youtubeApiKey)
-                        .build())
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, (request, res) -> {
-                    throw new BadRequestException(ErrorTag.YOUTUBE_API_REQUEST_FAILED);
-                })
-                .body(String.class);
-
-        return parseJsonResponse(response, videoId);
-    }
-
-    private AdminVideoResponse parseJsonResponse(String response, String videoId) {
-        JSONObject json = new JSONObject(response);
-
-        if (!json.has(YOUTUBE_ITEMS_KEY) || json.getJSONArray(YOUTUBE_ITEMS_KEY).isEmpty()) {
-            throw new NotFoundException(ErrorTag.YOUTUBE_VIDEO_NOT_FOUND);
-        }
-
-        JSONObject snippet = json.getJSONArray(YOUTUBE_ITEMS_KEY).getJSONObject(0).getJSONObject(YOUTUBE_SNIPPET_KEY);
+        YoutubeVideoSearchResponse searchResponse = youtubeVideoSearchClient.searchByVideoId(videoId);
 
         return AdminVideoResponse.of(
-                videoId,
-                snippet.getString("title"),
-                snippet.getString("channelTitle"),
-                convertToLocalDate(snippet.getString("publishedAt"))
+                searchResponse.videoId(),
+                searchResponse.title(),
+                searchResponse.channelName(),
+                searchResponse.uploadedDate()
         );
     }
 
@@ -101,9 +61,5 @@ public class AdminVideoService {
             return null;
         }
         return null;
-    }
-
-    private LocalDate convertToLocalDate(String publishedAt) {
-        return ZonedDateTime.parse(publishedAt).toLocalDate();
     }
 }
