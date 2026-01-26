@@ -9,4 +9,6 @@ public interface TuripMemberRepository extends JpaRepository<TuripMember, Long> 
     boolean existsByLoginId(String loginId);
 
     Optional<TuripMember> findByLoginId(String loginId);
+
+    Optional<TuripMember> findByMemberAccountId(Long accountId);
 }

@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import turip.account.domain.Account;
 import turip.account.domain.Member;
 import turip.account.domain.Provider;
+import turip.account.domain.Role;
 import turip.account.service.MemberService;
 import turip.account.service.SocialMemberService;
 import turip.account.service.TuripMemberService;
@@ -61,8 +62,8 @@ public class AuthService {
             verifyRefreshTokenMatch(refreshToken, storedRefreshToken);
             validateRefreshTokenExpiration(storedRefreshToken);
 
-            String newAccessToken = jwtProvider.generateAccessToken(accountId);
-            String newRefreshToken = jwtProvider.generateRefreshToken(accountId);
+            String newAccessToken = jwtProvider.generateAccessToken(accountId, member.getAccount().getRole());
+            String newRefreshToken = jwtProvider.generateRefreshToken(accountId, member.getAccount().getRole());
 
             saveRefreshToken(member, newRefreshToken, deviceFid);
 
@@ -92,8 +93,11 @@ public class AuthService {
             isNewMember = true;
         }
 
-        String accessToken = jwtProvider.generateAccessToken(member.getAccount().getId());
-        String refreshToken = jwtProvider.generateRefreshToken(member.getAccount().getId());
+        Long accountId = member.getAccount().getId();
+        Role role = member.getAccount().getRole();
+
+        String accessToken = jwtProvider.generateAccessToken(accountId, role);
+        String refreshToken = jwtProvider.generateRefreshToken(accountId, role);
 
         saveRefreshToken(member, refreshToken, deviceFid);
 
