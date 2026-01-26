@@ -2,17 +2,19 @@ package turip.auth.service;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.SignatureException;
-import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import turip.account.domain.Account;
 import turip.account.domain.Member;
 import turip.account.domain.Provider;
 import turip.account.service.MemberService;
 import turip.account.service.SocialMemberService;
-import turip.auth.controller.dto.request.LoginRequest;
+import turip.account.service.TuripMemberService;
+import turip.auth.controller.dto.request.GoogleLoginRequest;
 import turip.auth.controller.dto.request.RefreshTokenRequest;
+import turip.auth.controller.dto.request.TuripLoginRequest;
 import turip.auth.controller.dto.response.LoginResponse;
 import turip.auth.controller.dto.response.RefreshTokenResponse;
 import turip.auth.domain.RefreshToken;
@@ -31,9 +33,16 @@ public class AuthService {
     private final RefreshTokenService refreshTokenService;
     private final MemberService memberService;
     private final SocialMemberService socialMemberService;
+    private final TuripMemberService turipMemberService;
 
     @Transactional
-    public LoginResponse login(LoginRequest request, Provider provider, String deviceFid) {
+    public LoginResponse loginWithTurip(TuripLoginRequest request, String deviceFid) {
+        Member member = turipMemberService.login(request).getMember();
+        return issueTokenAndCreateResponse(deviceFid, member);
+    }
+
+    @Transactional
+    public LoginResponse loginWithSocial(GoogleLoginRequest request, Provider provider, String deviceFid) {
         if (provider == Provider.GOOGLE) {
             return loginWithGoogle(request, deviceFid);
         }
@@ -76,16 +85,8 @@ public class AuthService {
         refreshTokenService.deleteByMemberAndDeviceFid(member, deviceFid);
     }
 
-    private LoginResponse loginWithGoogle(LoginRequest request, String deviceFid) {
-        String idToken = request.idToken();
-        validateIdToken(idToken);
-
-        Provider provider = googleTokenParser.getProvider();
-        String providerId = googleTokenParser.getProviderId(idToken);
-        String email = googleTokenParser.getEmail(idToken);
-
+    private LoginResponse issueTokenAndCreateResponse(String deviceFid, Member member) {
         boolean isNewMember = false;
-        Member member = findOrCreateSocialMember(provider, providerId, email);
         if (member.isFirstLogin()) {
             member.completeFirstLogin();
             isNewMember = true;
@@ -97,6 +98,18 @@ public class AuthService {
         saveRefreshToken(member, refreshToken, deviceFid);
 
         return LoginResponse.of(accessToken, refreshToken, isNewMember);
+    }
+
+    private LoginResponse loginWithGoogle(GoogleLoginRequest request, String deviceFid) {
+        String idToken = request.idToken();
+        validateIdToken(idToken);
+
+        Provider provider = googleTokenParser.getProvider();
+        String providerId = googleTokenParser.getProviderId(idToken);
+        String email = googleTokenParser.getEmail(idToken);
+
+        Member member = findOrCreateSocialMember(provider, providerId, email);
+        return issueTokenAndCreateResponse(deviceFid, member);
     }
 
     private Member findOrCreateSocialMember(Provider provider, String providerId, String email) {

@@ -9,6 +9,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import turip.account.domain.Provider;
 import turip.account.domain.Role;
+import turip.account.domain.TuripMember;
 
 @Component
 public class TestDataHelper {
@@ -30,7 +31,7 @@ public class TestDataHelper {
             return ps;
         }, keyHolder);
 
-        return keyHolder.getKey().longValue();
+        return extractGeneratedKey(keyHolder);
     }
 
     public Long insertMember(Long accountId, String email, boolean isFirstLogin) {
@@ -46,7 +47,7 @@ public class TestDataHelper {
             return ps;
         }, keyHolder);
 
-        return keyHolder.getKey().longValue();
+        return extractGeneratedKey(keyHolder);
     }
 
     public Long insertSocialMember(Long memberId, Provider provider, String providerId) {
@@ -62,7 +63,7 @@ public class TestDataHelper {
             return ps;
         }, keyHolder);
 
-        return keyHolder.getKey().longValue();
+        return extractGeneratedKey(keyHolder);
     }
 
     public Long insertSocialMember(String email, boolean isFirstLogin, Provider provider, String providerId) {
@@ -72,6 +73,9 @@ public class TestDataHelper {
     }
 
     public Long insertTuripMember(Long memberId, String loginId, String loginPassword) {
+        TuripMember turipMember = new TuripMember(null, loginId, loginPassword);
+        String encodedPassword = turipMember.getLoginPassword();
+
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
@@ -80,16 +84,24 @@ public class TestDataHelper {
                     Statement.RETURN_GENERATED_KEYS);
             ps.setLong(1, memberId);
             ps.setString(2, loginId);
-            ps.setString(3, loginPassword);
+            ps.setString(3, encodedPassword);
             return ps;
         }, keyHolder);
 
-        return keyHolder.getKey().longValue();
+        return extractGeneratedKey(keyHolder);
     }
 
     public Long insertTuripMember(String email, final boolean isFirstLogin, String loginId, String loginPassword) {
         Long accountId = insertAccount();
         Long memberId = insertMember(accountId, email, isFirstLogin);
         return insertTuripMember(memberId, loginId, loginPassword);
+    }
+
+    private Long extractGeneratedKey(KeyHolder keyHolder) {
+        Number key = keyHolder.getKey();
+        if (key == null) {
+            throw new IllegalArgumentException("insert 후 반환된 key값이 null 입니다.");
+        }
+        return key.longValue();
     }
 }
