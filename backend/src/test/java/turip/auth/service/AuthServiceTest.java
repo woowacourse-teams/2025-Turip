@@ -39,7 +39,7 @@ import turip.auth.controller.dto.request.TuripLoginRequest;
 import turip.auth.controller.dto.response.RefreshTokenResponse;
 import turip.auth.controller.dto.response.SocialLoginResponse;
 import turip.auth.domain.RefreshToken;
-import turip.auth.service.dto.TuripLoginResult;
+import turip.auth.service.dto.TokenResult;
 import turip.auth.token.GoogleTokenParser;
 import turip.auth.token.JwtProvider;
 import turip.common.exception.ErrorTag;
@@ -109,13 +109,12 @@ class AuthServiceTest {
             when(jwtProvider.hashToken(anyString())).thenReturn("hashed-token");
 
             // when
-            TuripLoginResult result = authService.loginWithTurip(request, deviceFid);
+            TokenResult result = authService.loginWithTurip(request, deviceFid);
 
             // then
             assertThat(result).isNotNull();
             assertThat(result.accessToken()).isEqualTo(accessToken);
             assertThat(result.refreshToken()).isEqualTo(refreshToken);
-            assertThat(result.role()).isEqualTo(account.getRole());
             verify(refreshTokenService).save(
                     any(Member.class),
                     anyString(),

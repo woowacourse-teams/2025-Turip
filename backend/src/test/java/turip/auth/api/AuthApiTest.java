@@ -89,8 +89,7 @@ class AuthApiTest {
                     .then().log().all()
                     .statusCode(200)
                     .cookie("accessToken")
-                    .cookie("refreshToken")
-                    .body("role", is(role.name()));
+                    .cookie("refreshToken");
         }
 
         @Test

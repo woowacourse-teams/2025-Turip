@@ -19,8 +19,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import turip.admin.service.AdminService;
 import turip.auth.controller.dto.request.TuripLoginRequest;
-import turip.auth.controller.dto.response.TuripLoginResponse;
-import turip.auth.service.dto.TuripLoginResult;
+import turip.auth.service.dto.TokenResult;
 import turip.auth.util.TokenCookieUtil;
 import turip.common.exception.ErrorResponse;
 
@@ -98,19 +97,18 @@ public class AdminController {
             )
     })
     @PostMapping("/login/admin")
-    public ResponseEntity<TuripLoginResponse> login(
+    public ResponseEntity<Void> login(
             @Parameter(hidden = true) @RequestHeader("device-fid") String deviceFid,
             @RequestBody TuripLoginRequest request) {
-        TuripLoginResult result = adminService.login(request, deviceFid);
+        TokenResult result = adminService.login(request, deviceFid);
 
         ResponseCookie accessTokenCookie = tokenCookieUtil.createAccessTokenCookie(result.accessToken());
         ResponseCookie refreshTokenCookie = tokenCookieUtil.createRefreshTokenCookie(result.refreshToken());
-        TuripLoginResponse response = TuripLoginResponse.from(result);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString())
                 .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
-                .body(response);
+                .build();
     }
 
 }

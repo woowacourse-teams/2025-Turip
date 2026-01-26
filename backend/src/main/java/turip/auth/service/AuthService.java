@@ -20,7 +20,6 @@ import turip.auth.controller.dto.response.RefreshTokenResponse;
 import turip.auth.controller.dto.response.SocialLoginResponse;
 import turip.auth.domain.RefreshToken;
 import turip.auth.service.dto.TokenResult;
-import turip.auth.service.dto.TuripLoginResult;
 import turip.auth.token.GoogleTokenParser;
 import turip.auth.token.JwtProvider;
 import turip.common.exception.ErrorTag;
@@ -39,7 +38,7 @@ public class AuthService {
     private final TuripMemberService turipMemberService;
 
     @Transactional
-    public TuripLoginResult loginWithTurip(TuripLoginRequest request, String deviceFid) {
+    public TokenResult loginWithTurip(TuripLoginRequest request, String deviceFid) {
         Member member = loginAndGetMember(request);
         return processTuripLogin(deviceFid, member);
     }
@@ -50,12 +49,11 @@ public class AuthService {
     }
 
     @Transactional
-    public TuripLoginResult processTuripLogin(final String deviceFid, final Member member) {
+    public TokenResult processTuripLogin(final String deviceFid, final Member member) {
         if (member.isFirstLogin()) {
             member.completeFirstLogin();
         }
-        TokenResult tokenResult = issueToken(deviceFid, member);
-        return TuripLoginResult.of(tokenResult, member.getAccount().getRole());
+        return issueToken(deviceFid, member);
     }
 
     @Transactional
