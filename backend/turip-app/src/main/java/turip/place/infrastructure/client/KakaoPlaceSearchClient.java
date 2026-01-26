@@ -14,10 +14,12 @@ public class KakaoPlaceSearchClient implements PlaceSearchClient {
     private final RestClient restClient;
     private final String kakaoApiKey;
 
-    public KakaoPlaceSearchClient(RestClient.Builder restClientBuilder,
+    public KakaoPlaceSearchClient(RestClient baseRestClient,
                                   @Value("${kakao.api.key}") String kakaoApiKey,
                                   @Value("${kakao.api.url}") String kakaoApiUrl) {
-        this.restClient = restClientBuilder.baseUrl(kakaoApiUrl).build();
+        this.restClient = baseRestClient.mutate()
+                .baseUrl(kakaoApiUrl)
+                .build();
         this.kakaoApiKey = kakaoApiKey;
     }
 
