@@ -125,7 +125,7 @@
         const loginPassword = document.getElementById('loginPassword').value;
 
         try {
-            const response = await fetch('/api/v1/login/admin', {
+            const response = await fetch('/api/v1/auth/login/admin', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

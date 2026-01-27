@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
 import turip.account.domain.Account;
 import turip.account.domain.Member;
 import turip.account.domain.Provider;
@@ -35,6 +36,7 @@ import turip.common.exception.ErrorResponse;
 
 @Controller
 @RequiredArgsConstructor
+@RequestMapping("/api/v1/auth")
 @Tag(name = "Auth", description = "인증 API")
 public class AuthController {
 
@@ -88,7 +90,7 @@ public class AuthController {
                     )
             )
     })
-    @PostMapping("/api/v1/login/turip")
+    @PostMapping("/login/turip")
     public ResponseEntity<Void> loginWithTurip(
             @Parameter(hidden = true) @RequestHeader("device-fid") String deviceFid,
             @RequestBody TuripLoginRequest request) {
@@ -148,7 +150,7 @@ public class AuthController {
                     )
             )
     })
-    @PostMapping("/api/v1/login/google")
+    @PostMapping("/login/google")
     public ResponseEntity<SocialLoginResponse> loginWithGoogle(
             @Parameter(hidden = true) @RequestHeader("device-fid") String deviceFid,
             @RequestBody GoogleLoginRequest request) {
@@ -230,7 +232,7 @@ public class AuthController {
                     )
             )
     })
-    @PostMapping("/api/v1/token")
+    @PostMapping("/tokens")
     public ResponseEntity<RefreshTokenResponse> refresh(
             @Parameter(hidden = true) @RequestHeader("device-fid") String deviceFid,
             @RequestBody RefreshTokenRequest request) {
@@ -307,7 +309,7 @@ public class AuthController {
                     )
             )
     })
-    @PostMapping("/api/v1/logout")
+    @PostMapping("/logout")
     public ResponseEntity<Void> logout(@Parameter(hidden = true) @RequestHeader("device-fid") String deviceFid,
                                        @Parameter(hidden = true) @AuthAccount Account account) {
         authService.logout(account, deviceFid);
@@ -372,7 +374,7 @@ public class AuthController {
                     )
             )
     })
-    @GetMapping("/api/v1/token/verification")
+    @GetMapping("/tokens/verification")
     public ResponseEntity<Void> verify(@Parameter(hidden = true) @AuthMember Member member) {
         return ResponseEntity.noContent().build();
     }

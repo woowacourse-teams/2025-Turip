@@ -61,7 +61,7 @@ class AuthApiTest {
     }
 
     @Nested
-    @DisplayName("/api/v1/login/turip POST 자체 로그인 테스트")
+    @DisplayName("/api/v1/auth/login/turip POST 자체 로그인 테스트")
     class LoginWithTuripTest {
 
         @Test
@@ -85,7 +85,7 @@ class AuthApiTest {
                     .contentType(ContentType.JSON)
                     .header("device-fid", deviceFid)
                     .body(requestBody)
-                    .when().post("/api/v1/login/turip")
+                    .when().post("/api/v1/auth/login/turip")
                     .then().log().all()
                     .statusCode(200)
                     .cookie("accessToken")
@@ -108,7 +108,7 @@ class AuthApiTest {
                     .contentType(ContentType.JSON)
                     .header("device-fid", deviceFid)
                     .body(requestBody)
-                    .when().post("/api/v1/login/turip")
+                    .when().post("/api/v1/auth/login/turip")
                     .then().log().all()
                     .statusCode(401);
         }
@@ -134,14 +134,14 @@ class AuthApiTest {
                     .contentType(ContentType.JSON)
                     .header("device-fid", deviceFid)
                     .body(requestBody)
-                    .when().post("/api/v1/login/turip")
+                    .when().post("/api/v1/auth/login/turip")
                     .then().log().all()
                     .statusCode(401);
         }
     }
 
     @Nested
-    @DisplayName("/api/v1/login/google POST 구글 로그인 테스트")
+    @DisplayName("/api/v1/auth/login/google POST 구글 로그인 테스트")
     class LoginWithGoogleTest {
 
         @Test
@@ -164,7 +164,7 @@ class AuthApiTest {
                     .contentType(ContentType.JSON)
                     .header("device-fid", deviceFid)
                     .body(requestBody)
-                    .when().post("/api/v1/login/google")
+                    .when().post("/api/v1/auth/login/google")
                     .then().log().all()
                     .statusCode(200)
                     .body("accessToken", notNullValue())
@@ -197,7 +197,7 @@ class AuthApiTest {
                     .contentType(ContentType.JSON)
                     .header("device-fid", deviceFid)
                     .body(requestBody)
-                    .when().post("/api/v1/login/google")
+                    .when().post("/api/v1/auth/login/google")
                     .then().log().all()
                     .statusCode(200)
                     .body("accessToken", notNullValue())
@@ -226,7 +226,7 @@ class AuthApiTest {
                     .contentType(ContentType.JSON)
                     .header("device-fid", deviceFid)
                     .body(requestBody)
-                    .when().post("/api/v1/login/google")
+                    .when().post("/api/v1/auth/login/google")
                     .then().log().all()
                     .statusCode(401)
                     .body("tag", is("ID_TOKEN_NOT_VALID"));
@@ -234,7 +234,7 @@ class AuthApiTest {
     }
 
     @Nested
-    @DisplayName("/api/v1/token POST 토큰 갱신 테스트")
+    @DisplayName("/api/v1/auth/tokens POST 토큰 갱신 테스트")
     class RefreshTest {
 
         @Test
@@ -262,7 +262,7 @@ class AuthApiTest {
                     .contentType(ContentType.JSON)
                     .header("device-fid", deviceFid)
                     .body(loginRequest)
-                    .when().post("/api/v1/login/google")
+                    .when().post("/api/v1/auth/login/google")
                     .then().log().all()
                     .statusCode(200)
                     .extract().path("refreshToken");
@@ -277,7 +277,7 @@ class AuthApiTest {
                     .contentType(ContentType.JSON)
                     .header("device-fid", deviceFid)
                     .body(refreshRequest)
-                    .when().post("/api/v1/token")
+                    .when().post("/api/v1/auth/tokens")
                     .then().log().all()
                     .statusCode(200)
                     .body("accessToken", notNullValue())
@@ -300,7 +300,7 @@ class AuthApiTest {
                     .contentType(ContentType.JSON)
                     .header("device-fid", deviceFid)
                     .body(refreshRequest)
-                    .when().post("/api/v1/token")
+                    .when().post("/api/v1/auth/tokens")
                     .then().log().all()
                     .statusCode(401);
         }
@@ -330,7 +330,7 @@ class AuthApiTest {
                     .contentType(ContentType.JSON)
                     .header("device-fid", deviceFid)
                     .body(loginRequest)
-                    .when().post("/api/v1/login/google")
+                    .when().post("/api/v1/auth/login/google")
                     .then().log().all()
                     .statusCode(200);
 
@@ -353,7 +353,7 @@ class AuthApiTest {
                     .contentType(ContentType.JSON)
                     .header("device-fid", otherDeviceFid)
                     .body(otherLoginRequest)
-                    .when().post("/api/v1/login/google")
+                    .when().post("/api/v1/auth/login/google")
                     .then().log().all()
                     .statusCode(200)
                     .extract().path("refreshToken");
@@ -368,14 +368,14 @@ class AuthApiTest {
                     .contentType(ContentType.JSON)
                     .header("device-fid", deviceFid)
                     .body(refreshRequest)
-                    .when().post("/api/v1/token")
+                    .when().post("/api/v1/auth/tokens")
                     .then().log().all()
                     .statusCode(401);
         }
     }
 
     @Nested
-    @DisplayName("/api/v1/logout POST 로그아웃 테스트")
+    @DisplayName("/api/v1/auth/logout POST 로그아웃 테스트")
     class LogoutTest {
 
         @Test
@@ -403,7 +403,7 @@ class AuthApiTest {
                     .contentType(ContentType.JSON)
                     .header("device-fid", deviceFid)
                     .body(loginRequest)
-                    .when().post("/api/v1/login/google")
+                    .when().post("/api/v1/auth/login/google")
                     .then().log().all()
                     .statusCode(200)
                     .extract().path("accessToken");
@@ -413,7 +413,7 @@ class AuthApiTest {
                     .given().log().all()
                     .header("device-fid", deviceFid)
                     .header("Authorization", "Bearer " + accessToken)
-                    .when().post("/api/v1/logout")
+                    .when().post("/api/v1/auth/logout")
                     .then().log().all()
                     .statusCode(204);
         }
@@ -444,7 +444,7 @@ class AuthApiTest {
                     .contentType(ContentType.JSON)
                     .header("device-fid", deviceFid)
                     .body(loginRequest)
-                    .when().post("/api/v1/login/google")
+                    .when().post("/api/v1/auth/login/google")
                     .then().log().all()
                     .statusCode(200)
                     .extract().path("accessToken");
@@ -462,7 +462,7 @@ class AuthApiTest {
                     .given().log().all()
                     .header("device-fid", deviceFid)
                     .header("Authorization", "Bearer " + accessToken)
-                    .when().post("/api/v1/logout")
+                    .when().post("/api/v1/auth/logout")
                     .then().log().all()
                     .statusCode(204);
 
@@ -485,7 +485,7 @@ class AuthApiTest {
             RestAssured
                     .given().log().all()
                     .header("device-fid", deviceFid)
-                    .when().post("/api/v1/logout")
+                    .when().post("/api/v1/auth/logout")
                     .then().log().all()
                     .statusCode(401);
         }
@@ -502,7 +502,7 @@ class AuthApiTest {
                     .given().log().all()
                     .header("device-fid", deviceFid)
                     .header("Authorization", "Bearer " + invalidAccessToken)
-                    .when().post("/api/v1/logout")
+                    .when().post("/api/v1/auth/logout")
                     .then().log().all()
                     .statusCode(401);
         }

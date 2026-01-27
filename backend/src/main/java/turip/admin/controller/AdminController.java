@@ -96,7 +96,7 @@ public class AdminController {
                     )
             )
     })
-    @PostMapping("/api/v1/login/admin")
+    @PostMapping("/api/v1/auth/login/admin")
     public ResponseEntity<Void> login(
             @Parameter(hidden = true) @RequestHeader("device-fid") String deviceFid,
             @RequestBody TuripLoginRequest request) {
