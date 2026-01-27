@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import turip.admin.service.AdminService;
 import turip.auth.controller.dto.request.TuripLoginRequest;
-import turip.auth.service.dto.TokenResult;
+import turip.auth.controller.dto.response.TokenResult;
 import turip.auth.util.TokenCookieUtil;
 import turip.common.exception.ErrorResponse;
 

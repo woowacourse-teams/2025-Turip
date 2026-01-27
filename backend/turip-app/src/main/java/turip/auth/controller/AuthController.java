@@ -26,10 +26,10 @@ import turip.auth.controller.dto.request.RefreshTokenRequest;
 import turip.auth.controller.dto.request.TuripLoginRequest;
 import turip.auth.controller.dto.response.RefreshTokenResponse;
 import turip.auth.controller.dto.response.SocialLoginResponse;
+import turip.auth.controller.dto.response.TokenResult;
 import turip.auth.resolver.AuthAccount;
 import turip.auth.resolver.AuthMember;
 import turip.auth.service.AuthService;
-import turip.auth.service.dto.TokenResult;
 import turip.auth.util.TokenCookieUtil;
 import turip.common.exception.ErrorResponse;
 

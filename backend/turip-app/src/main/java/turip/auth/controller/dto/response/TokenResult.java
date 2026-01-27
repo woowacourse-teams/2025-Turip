@@ -1,4 +1,4 @@
-package turip.auth.service.dto;
+package turip.auth.controller.dto.response;
 
 public record TokenResult(String accessToken, String refreshToken) {
 

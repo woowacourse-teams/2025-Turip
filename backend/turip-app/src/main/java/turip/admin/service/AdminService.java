@@ -5,8 +5,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import turip.account.domain.Member;
 import turip.auth.controller.dto.request.TuripLoginRequest;
+import turip.auth.controller.dto.response.TokenResult;
 import turip.auth.service.AuthService;
-import turip.auth.service.dto.TokenResult;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.ForbiddenException;
 

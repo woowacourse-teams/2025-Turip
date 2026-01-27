@@ -1,6 +1,5 @@
 package turip.auth.controller.dto.response;
 
-import turip.auth.service.dto.TokenResult;
 
 public record SocialLoginResponse(
         String accessToken,
