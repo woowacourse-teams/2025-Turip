@@ -42,6 +42,11 @@ kakao:
     key: test-kakao-api-key
     url: https://test.kakao.com
 
+youtube:
+  api:
+    key: test-youtube-api-key
+    url: https://test.youtube.com
+
 # CSV Import 설정
 csv:
   import:

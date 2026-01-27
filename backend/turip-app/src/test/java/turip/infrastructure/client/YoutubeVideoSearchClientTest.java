@@ -20,11 +20,12 @@ import turip.common.configuration.RestClientConfiguration;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.BadRequestException;
 import turip.common.exception.custom.NotFoundException;
+import turip.common.log.ExternalApiLoggingInterceptor;
 import turip.infrastructure.client.dto.YoutubeVideoSearchResponse;
 
 @ActiveProfiles("test")
-@Import(RestClientConfiguration.class)
 @RestClientTest(YoutubeVideoSearchClient.class)
+@Import({RestClientConfiguration.class, ExternalApiLoggingInterceptor.class})
 class YoutubeVideoSearchClientTest {
 
     @Autowired

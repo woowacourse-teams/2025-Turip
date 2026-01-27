@@ -10,7 +10,6 @@ public enum ErrorTag {
     REGION_CATEGORY_INVALID("잘못된 지역 카테고리입니다."),
     DEVICE_FID_REQUIRED("요청 헤더에 device_fid가 존재하지 않습니다."),
     FAVORITE_PLACE_FOLDER_MISMATCH("장소 찜이 해당 폴더에 존재하지 않습니다."),
-    UNSUPPORTED_SEARCH_TYPE("지원하지 않는 검색 타입입니다."),
 
     // 401 Unauthorized
     UNAUTHORIZED("토큰 기반 인증에 실패했습니다."),
@@ -48,6 +47,7 @@ public enum ErrorTag {
     // ==== Admin ====
 
     // 400 Bad Request
+    UNSUPPORTED_SEARCH_TYPE("지원하지 않는 검색 타입입니다."),
     YOUTUBE_API_REQUEST_FAILED("유튜브 API 요청에 실패했습니다."),
     INVALID_YOUTUBE_URL("유효하지 않은 유튜브 URL입니다."),
 
