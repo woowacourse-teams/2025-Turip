@@ -159,7 +159,7 @@ class ContentApiTest {
         }
     }
 
-    @DisplayName("/api/v1/contents/popular/favorites GET 주간 인기 컨텐츠 조회 테스트")
+    @DisplayName("/api/v1/contents/popular GET 주간 인기 컨텐츠 조회 테스트")
     @Nested
     class ReadWeeklyPopularFavoriteContentContents {
 
@@ -185,7 +185,7 @@ class ContentApiTest {
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
                     .queryParam("size", 5)
-                    .when().get("/api/v1/contents/popular/favorites")
+                    .when().get("/api/v1/contents/popular")
                     .then()
                     .statusCode(200);
         }

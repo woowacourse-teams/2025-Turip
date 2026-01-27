@@ -474,8 +474,8 @@ public class ContentController {
     }
 
     @Operation(
-            summary = "주간 인기 찜 컨텐츠 조회 api",
-            description = "지난 주 찜 수가 많은 컨텐츠 조회"
+            summary = "주간 인기 북마크 컨텐츠 조회 api",
+            description = "지난 주 북마크 수가 많은 컨텐츠 조회"
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -581,7 +581,7 @@ public class ContentController {
                     )
             )
     })
-    @GetMapping("/popular/favorites")
+    @GetMapping("/popular")
     public ResponseEntity<WeeklyPopularFavoriteContentsResponse> readWeeklyPopularFavoriteContents(
             @Parameter(hidden = true) @AuthAccount Account account,
             @RequestParam("size") int topContentSize) {
