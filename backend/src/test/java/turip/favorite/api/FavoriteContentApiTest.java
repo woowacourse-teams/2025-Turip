@@ -67,7 +67,7 @@ class FavoriteContentApiTest {
         jdbcTemplate.update("ALTER TABLE account ALTER COLUMN id RESTART WITH 1");
     }
 
-    @DisplayName("/api/v1/favorites/contents POST 찜 생성 테스트")
+    @DisplayName("/api/v1/bookmarks POST 찜 생성 테스트")
     @Nested
     class createFavoriteContent {
 
@@ -106,10 +106,10 @@ class FavoriteContentApiTest {
                     .header("device-fid", "testDeviceFid")
                     .contentType(ContentType.JSON)
                     .body(request)
-                    .when().post("/api/v1/favorites/contents")
+                    .when().post("/api/v1/bookmarks")
                     .then()
                     .statusCode(201)
-                    .header("Location", org.hamcrest.Matchers.containsString("/favorites/contents/"))
+                    .header("Location", org.hamcrest.Matchers.containsString("/bookmarks/"))
                     .body("id", Matchers.notNullValue())
                     .body("createdAt", Matchers.notNullValue())
                     .body("accountId", Matchers.notNullValue())
@@ -148,7 +148,7 @@ class FavoriteContentApiTest {
                     .header("device-fid", "testDeviceFid")
                     .contentType(ContentType.JSON)
                     .body(request)
-                    .when().post("/api/v1/favorites/contents")
+                    .when().post("/api/v1/bookmarks")
                     .then()
                     .statusCode(404);
         }
@@ -183,13 +183,13 @@ class FavoriteContentApiTest {
                     .header("device-fid", "testDeviceFid")
                     .contentType(ContentType.JSON)
                     .body(request)
-                    .when().post("/api/v1/favorites/contents")
+                    .when().post("/api/v1/bookmarks")
                     .then()
                     .statusCode(409);
         }
     }
 
-    @DisplayName("/api/v1/favorites/contents DELETE 찜 삭제 테스트")
+    @DisplayName("/api/v1/bookmarks DELETE 찜 삭제 테스트")
     @Nested
     class deleteFavoriteContent {
 
@@ -215,7 +215,7 @@ class FavoriteContentApiTest {
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
                     .queryParam("contentId", 1)
-                    .when().delete("/api/v1/favorites/contents")
+                    .when().delete("/api/v1/bookmarks")
                     .then()
                     .statusCode(204);
         }
@@ -242,7 +242,7 @@ class FavoriteContentApiTest {
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
                     .queryParam("contentId", 2)
-                    .when().delete("/api/v1/favorites/contents")
+                    .when().delete("/api/v1/bookmarks")
                     .then()
                     .statusCode(404);
         }
@@ -269,7 +269,7 @@ class FavoriteContentApiTest {
             RestAssured.given().port(port)
                     .header("device-fid", "haruharu")
                     .queryParam("contentId", 1)
-                    .when().delete("/api/v1/favorites/contents")
+                    .when().delete("/api/v1/bookmarks")
                     .then()
                     .statusCode(404);
         }
@@ -296,13 +296,13 @@ class FavoriteContentApiTest {
             RestAssured.given().port(port)
                     .header("device-fid", "haruharu")
                     .queryParam("contentId", 2)
-                    .when().delete("/api/v1/favorites/contents")
+                    .when().delete("/api/v1/bookmarks")
                     .then()
                     .statusCode(404);
         }
     }
 
-    @DisplayName("/api/v1/favorites/contents GET 찜 조회 테스트")
+    @DisplayName("/api/v1/bookmarks GET 찜 조회 테스트")
     @Nested
     class ReadFavoriteContent {
 
@@ -333,7 +333,7 @@ class FavoriteContentApiTest {
                     .header("device-fid", "testDeviceFid")
                     .queryParam("size", 5)
                     .queryParam("lastId", 0)
-                    .when().get("/api/v1/favorites/contents")
+                    .when().get("/api/v1/bookmarks")
                     .then()
                     .statusCode(200)
                     .body("contents.size()", is(1))

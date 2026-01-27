@@ -28,15 +28,15 @@ import turip.favorite.service.FavoriteContentService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/favorites/contents")
-@Tag(name = "FavoriteContent", description = "컨텐츠 찜 API")
+@RequestMapping("/api/v1/bookmarks")
+@Tag(name = "Bookmark", description = "북마크 API")
 public class FavoriteContentController {
 
     private final FavoriteContentService favoriteContentService;
 
     @Operation(
-            summary = "컨텐츠 찜 생성 api",
-            description = "컨텐츠를 찜한다."
+            summary = "북마크 생성 api",
+            description = "컨텐츠를 북마크한다."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -47,7 +47,7 @@ public class FavoriteContentController {
                             schema = @Schema(implementation = FavoriteContentResponse.class),
                             examples = @ExampleObject(
                                     name = "success",
-                                    summary = "컨텐츠 찜 생성 성공",
+                                    summary = "북마크 생성 성공",
                                     value = """
                                             {
                                                 "id": 1,
@@ -159,13 +159,13 @@ public class FavoriteContentController {
             @Parameter(hidden = true) @AuthAccount Account account,
             @RequestBody FavoriteContentRequest request) {
         FavoriteContentResponse response = favoriteContentService.create(request, account);
-        return ResponseEntity.created(URI.create("/favorites/contents/" + response.id()))
+        return ResponseEntity.created(URI.create("/bookmarks/" + response.id()))
                 .body(response);
     }
 
     @Operation(
-            summary = "내 컨텐츠 찜 목록 조회 api",
-            description = "내가 찜한 컨텐츠 목록을 조회한다."
+            summary = "내 북마크 목록 조회 api",
+            description = "내가 북마크한 콘텐츠 목록을 조회한다."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -262,8 +262,8 @@ public class FavoriteContentController {
     }
 
     @Operation(
-            summary = "컨텐츠 찜 삭제 api",
-            description = "컨텐츠 찜을 취소한다."
+            summary = "북마크 삭제 api",
+            description = "컨텐츠 북마크를 취소한다."
     )
     @ApiResponses(value = {
             @ApiResponse(
