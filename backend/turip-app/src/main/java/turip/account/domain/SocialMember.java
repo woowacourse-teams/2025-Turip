@@ -38,7 +38,7 @@ public class SocialMember {
 
     @OneToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "member_id", nullable = false, foreignKey = @ForeignKey(name = "fk_social_member__member"))
+    @JoinColumn(name = "member_id", nullable = false, unique = true, foreignKey = @ForeignKey(name = "fk_social_member__member"))
     private Member member;
 
     @Enumerated(EnumType.STRING)

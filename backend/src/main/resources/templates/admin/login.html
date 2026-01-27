@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관리자 로그인 - Turip</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 28px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .button-group {
+            margin-top: 30px;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-login {
+            background: #667eea;
+            color: white;
+            margin-bottom: 12px;
+        }
+
+        .btn-login:hover {
+            background: #5568d3;
+        }
+
+        .btn-signup {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .btn-signup:hover {
+            background: #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+<div class="login-container">
+    <h1>관리자 로그인</h1>
+    <form id="loginForm">
+        <div class="form-group">
+            <label for="loginId">아이디</label>
+            <input type="text" id="loginId" name="loginId" required>
+        </div>
+        <div class="form-group">
+            <label for="loginPassword">비밀번호</label>
+            <input type="password" id="loginPassword" name="loginPassword" required>
+        </div>
+        <div class="button-group">
+            <button type="submit" class="btn-login">로그인</button>
+            <button type="button" class="btn-signup" onclick="location.href='/admin/signup'">회원가입</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.getElementById('loginForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const loginId = document.getElementById('loginId').value;
+        const loginPassword = document.getElementById('loginPassword').value;
+
+        try {
+            const response = await fetch('/login/admin', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'device-fid': 'admin-web'
+                },
+                credentials: 'include',  // 쿠키 자동 처리
+                body: JSON.stringify({
+                    loginId: loginId,
+                    loginPassword: loginPassword
+                })
+            });
+
+            if (response.ok) {
+                window.location.href = '/admin/home';
+            } else {
+                const errorData = await response.json();
+                alert(errorData.message || '로그인에 실패했습니다. 아이디 또는 비밀번호를 확인해주세요.');
+            }
+        } catch (error) {
+            alert('로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
+        }
+    });
+</script>
+</body>
+</html>

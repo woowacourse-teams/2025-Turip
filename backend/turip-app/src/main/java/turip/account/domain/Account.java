@@ -38,4 +38,8 @@ public class Account {
     public static Account createUserAccount() {
         return new Account(Role.USER);
     }
+
+    public boolean isAdmin() {
+        return this.role == Role.ADMIN;
+    }
 }
