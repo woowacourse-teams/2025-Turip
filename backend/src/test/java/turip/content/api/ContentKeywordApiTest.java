@@ -62,7 +62,7 @@ public class ContentKeywordApiTest {
     }
 
 
-    @DisplayName("/contents/keyword/count GET 키워드로 검색된 컨텐츠 수 조회 테스트")
+    @DisplayName("/api/v1/contents/keyword/count GET 키워드로 검색된 컨텐츠 수 조회 테스트")
     @Nested
     class ReadCountByKeyword {
 
@@ -84,14 +84,14 @@ public class ContentKeywordApiTest {
             // when & then
             RestAssured.given().port(port)
                     .queryParam("keyword", "메이")
-                    .when().get("/contents/keyword/count")
+                    .when().get("/api/v1/contents/keyword/count")
                     .then()
                     .statusCode(200)
                     .body("count", is(1));
         }
     }
 
-    @DisplayName("/contents/keyword GET 키워드 기반 컨텐츠 검색 테스트")
+    @DisplayName("/api/v1/contents/keyword GET 키워드 기반 컨텐츠 검색 테스트")
     @Nested
     class ReadByKeyword {
 
@@ -116,7 +116,7 @@ public class ContentKeywordApiTest {
                     .queryParam("keyword", "메이")
                     .queryParam("size", 2)
                     .queryParam("lastId", 0)
-                    .when().get("/contents/keyword")
+                    .when().get("/api/v1/contents/keyword")
                     .then()
                     .statusCode(200)
                     .body("contents.size()", is(2))
@@ -144,7 +144,7 @@ public class ContentKeywordApiTest {
                     .queryParam("keyword", "메이")
                     .queryParam("size", 1)
                     .queryParam("lastId", 0)
-                    .when().get("/contents/keyword")
+                    .when().get("/api/v1/contents/keyword")
                     .then()
                     .statusCode(200)
                     .body("contents.size()", is(1))
@@ -179,7 +179,7 @@ public class ContentKeywordApiTest {
                     .queryParam("keyword", "명동교자")
                     .queryParam("size", 2)
                     .queryParam("lastId", 0)
-                    .when().get("/contents/keyword")
+                    .when().get("/api/v1/contents/keyword")
                     .then()
                     .statusCode(200)
                     .body("contents.size()", is(1));
@@ -190,7 +190,7 @@ public class ContentKeywordApiTest {
                     .queryParam("keyword", "서울")
                     .queryParam("size", 2)
                     .queryParam("lastId", 0)
-                    .when().get("/contents/keyword")
+                    .when().get("/api/v1/contents/keyword")
                     .then()
                     .statusCode(200)
                     .body("contents.size()", is(2));
@@ -201,7 +201,7 @@ public class ContentKeywordApiTest {
                     .queryParam("keyword", "여행블로거")
                     .queryParam("size", 2)
                     .queryParam("lastId", 0)
-                    .when().get("/contents/keyword")
+                    .when().get("/api/v1/contents/keyword")
                     .then()
                     .statusCode(200)
                     .body("contents.size()", is(2));
@@ -224,7 +224,7 @@ public class ContentKeywordApiTest {
                     .queryParam("keyword", "해운대해수욕장")
                     .queryParam("size", 2)
                     .queryParam("lastId", 0)
-                    .when().get("/contents/keyword")
+                    .when().get("/api/v1/contents/keyword")
                     .then()
                     .statusCode(200)
                     .body("contents.size()", is(0))
@@ -235,7 +235,7 @@ public class ContentKeywordApiTest {
                     .queryParam("keyword", "부산")
                     .queryParam("size", 2)
                     .queryParam("lastId", 0)
-                    .when().get("/contents/keyword")
+                    .when().get("/api/v1/contents/keyword")
                     .then()
                     .statusCode(200)
                     .body("contents.size()", is(1));

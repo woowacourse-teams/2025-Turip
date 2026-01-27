@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import turip.account.domain.Account;
 import turip.auth.resolver.AuthAccount;
 import turip.common.exception.ErrorResponse;
 import turip.content.controller.dto.response.content.ContentCountResponse;
@@ -22,11 +23,10 @@ import turip.content.controller.dto.response.content.ContentResponse;
 import turip.content.controller.dto.response.content.ContentsDetailWithLoadableResponse;
 import turip.content.controller.dto.response.favorite.WeeklyPopularFavoriteContentsResponse;
 import turip.content.service.ContentService;
-import turip.account.domain.Account;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/contents")
+@RequestMapping("/api/v1/contents")
 @Tag(name = "Content", description = "컨텐츠 API")
 public class ContentController {
 

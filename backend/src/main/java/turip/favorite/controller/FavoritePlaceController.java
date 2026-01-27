@@ -34,7 +34,7 @@ import turip.favorite.service.FavoritePlaceService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/favorites/places")
+@RequestMapping("/api/v1/favorites/places")
 @Tag(name = "FavoritePlace", description = "장소 찜 API")
 public class FavoritePlaceController {
 

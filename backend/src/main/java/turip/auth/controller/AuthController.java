@@ -88,7 +88,7 @@ public class AuthController {
                     )
             )
     })
-    @PostMapping("/login/turip")
+    @PostMapping("/api/v1/login/turip")
     public ResponseEntity<Void> loginWithTurip(
             @Parameter(hidden = true) @RequestHeader("device-fid") String deviceFid,
             @RequestBody TuripLoginRequest request) {
@@ -148,7 +148,7 @@ public class AuthController {
                     )
             )
     })
-    @PostMapping("/login/google")
+    @PostMapping("/api/v1/login/google")
     public ResponseEntity<SocialLoginResponse> loginWithGoogle(
             @Parameter(hidden = true) @RequestHeader("device-fid") String deviceFid,
             @RequestBody GoogleLoginRequest request) {
@@ -230,7 +230,7 @@ public class AuthController {
                     )
             )
     })
-    @PostMapping("/token")
+    @PostMapping("/api/v1/token")
     public ResponseEntity<RefreshTokenResponse> refresh(
             @Parameter(hidden = true) @RequestHeader("device-fid") String deviceFid,
             @RequestBody RefreshTokenRequest request) {
@@ -307,7 +307,7 @@ public class AuthController {
                     )
             )
     })
-    @PostMapping("/logout")
+    @PostMapping("/api/v1/logout")
     public ResponseEntity<Void> logout(@Parameter(hidden = true) @RequestHeader("device-fid") String deviceFid,
                                        @Parameter(hidden = true) @AuthAccount Account account) {
         authService.logout(account, deviceFid);
@@ -372,7 +372,7 @@ public class AuthController {
                     )
             )
     })
-    @GetMapping("/token/verification")
+    @GetMapping("/api/v1/token/verification")
     public ResponseEntity<Void> verify(@Parameter(hidden = true) @AuthMember Member member) {
         return ResponseEntity.noContent().build();
     }

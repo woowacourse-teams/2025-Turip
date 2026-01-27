@@ -71,7 +71,7 @@ class FavoritePlaceApiTest {
         jdbcTemplate.update("ALTER TABLE account ALTER COLUMN id RESTART WITH 1");
     }
 
-    @DisplayName("/favorites/places POST 장소 찜 생성 테스트")
+    @DisplayName("/api/v1/favorites/places POST 장소 찜 생성 테스트")
     @Nested
     class Create {
 
@@ -92,7 +92,7 @@ class FavoritePlaceApiTest {
                     .queryParam("favoriteFolderId", 1L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
-                    .when().post("/favorites/places")
+                    .when().post("/api/v1/favorites/places")
                     .then()
                     .statusCode(201);
         }
@@ -115,7 +115,7 @@ class FavoritePlaceApiTest {
                     .queryParam("favoriteFolderId", 1L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
-                    .when().post("/favorites/places")
+                    .when().post("/api/v1/favorites/places")
                     .then()
                     .statusCode(201);
 
@@ -148,7 +148,7 @@ class FavoritePlaceApiTest {
                     .queryParam("favoriteFolderId", 1L)
                     .queryParam("placeId", 2L)
                     .contentType(ContentType.JSON)
-                    .when().post("/favorites/places")
+                    .when().post("/api/v1/favorites/places")
                     .then()
                     .statusCode(201);
 
@@ -181,7 +181,7 @@ class FavoritePlaceApiTest {
                     .queryParam("favoriteFolderId", 1L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
-                    .when().post("/favorites/places")
+                    .when().post("/api/v1/favorites/places")
                     .then()
                     .statusCode(201);
 
@@ -190,7 +190,7 @@ class FavoritePlaceApiTest {
                     .queryParam("favoriteFolderId", 1L)
                     .queryParam("placeId", 2L)
                     .contentType(ContentType.JSON)
-                    .when().post("/favorites/places")
+                    .when().post("/api/v1/favorites/places")
                     .then()
                     .statusCode(201);
 
@@ -199,7 +199,7 @@ class FavoritePlaceApiTest {
                     .queryParam("favoriteFolderId", 1L)
                     .queryParam("placeId", 3L)
                     .contentType(ContentType.JSON)
-                    .when().post("/favorites/places")
+                    .when().post("/api/v1/favorites/places")
                     .then()
                     .statusCode(201);
 
@@ -236,7 +236,7 @@ class FavoritePlaceApiTest {
                     .queryParam("favoriteFolderId", 1L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
-                    .when().post("/favorites/places")
+                    .when().post("/api/v1/favorites/places")
                     .then()
                     .statusCode(403);
         }
@@ -255,7 +255,7 @@ class FavoritePlaceApiTest {
                     .queryParam("favoriteFolderId", 1L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
-                    .when().post("/favorites/places")
+                    .when().post("/api/v1/favorites/places")
                     .then()
                     .statusCode(404);
         }
@@ -275,7 +275,7 @@ class FavoritePlaceApiTest {
                     .queryParam("favoriteFolderId", 1L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
-                    .when().post("/favorites/places")
+                    .when().post("/api/v1/favorites/places")
                     .then()
                     .statusCode(404);
         }
@@ -298,13 +298,13 @@ class FavoritePlaceApiTest {
                     .queryParam("favoriteFolderId", 1L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
-                    .when().post("/favorites/places")
+                    .when().post("/api/v1/favorites/places")
                     .then()
                     .statusCode(409);
         }
     }
 
-    @DisplayName("/favorites/places GET 장소 찜 폴더의 장소 찜 목록 조회 테스트")
+    @DisplayName("/api/v1/favorites/places GET 장소 찜 폴더의 장소 찜 목록 조회 테스트")
     @Nested
     class ReadAllByFolder {
 
@@ -330,7 +330,7 @@ class FavoritePlaceApiTest {
             RestAssured.given().port(port)
                     .queryParam("favoriteFolderId", 1L)
                     .contentType(ContentType.JSON)
-                    .when().get("/favorites/places")
+                    .when().get("/api/v1/favorites/places")
                     .then()
                     .statusCode(200)
                     .body("favoritePlaceCount", is(2))
@@ -370,7 +370,7 @@ class FavoritePlaceApiTest {
             RestAssured.given().port(port)
                     .queryParam("favoriteFolderId", 1L)
                     .contentType(ContentType.JSON)
-                    .when().get("/favorites/places")
+                    .when().get("/api/v1/favorites/places")
                     .then()
                     .statusCode(200)
                     .body("favoritePlaceCount", is(5))
@@ -388,13 +388,13 @@ class FavoritePlaceApiTest {
             RestAssured.given().port(port)
                     .queryParam("favoriteFolderId", 1L)
                     .contentType(ContentType.JSON)
-                    .when().get("/favorites/places")
+                    .when().get("/api/v1/favorites/places")
                     .then()
                     .statusCode(404);
         }
     }
 
-    @DisplayName("/favorites/places PUT 여러 폴더에 장소 찜 테스트")
+    @DisplayName("/api/v1/favorites/places PUT 여러 폴더에 장소 찜 테스트")
     @Nested
     class UpdateFavoriteFolders {
 
@@ -425,13 +425,13 @@ class FavoritePlaceApiTest {
                     .header("device-fid", "testDeviceFid")
                     .body(request)
                     .contentType(ContentType.JSON)
-                    .when().put("/favorites/places/{placeId}", 1L)
+                    .when().put("/api/v1/favorites/places/{placeId}", 1L)
                     .then()
                     .statusCode(200);
         }
     }
 
-    @DisplayName("/favorites/places/count GET 계정의 장소 찜 개수 조회 테스트")
+    @DisplayName("/api/v1/favorites/places/count GET 계정의 장소 찜 개수 조회 테스트")
     @Nested
     class ReadCountByAccount {
 
@@ -457,14 +457,14 @@ class FavoritePlaceApiTest {
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
                     .contentType(ContentType.JSON)
-                    .when().get("/favorites/places/count")
+                    .when().get("/api/v1/favorites/places/count")
                     .then()
                     .statusCode(200)
                     .body("count", is(2));
         }
     }
 
-    @DisplayName("/favorites/places/favorite-order PATCH 장소 찜 폴더 정렬 순서 변경 테스트")
+    @DisplayName("/api/v1/favorites/places/favorite-order PATCH 장소 찜 폴더 정렬 순서 변경 테스트")
     @Nested
     class UpdatePlaceOrder {
 
@@ -495,7 +495,7 @@ class FavoritePlaceApiTest {
                     .queryParam("favoriteFolderId", 1L)
                     .body(request)
                     .contentType(ContentType.JSON)
-                    .when().patch("/favorites/places/favorite-order")
+                    .when().patch("/api/v1/favorites/places/favorite-order")
                     .then()
                     .statusCode(204);
         }
@@ -516,7 +516,7 @@ class FavoritePlaceApiTest {
                     .queryParam("favoriteFolderId", 999L)
                     .body(request)
                     .contentType(ContentType.JSON)
-                    .when().patch("/favorites/places/favorite-order")
+                    .when().patch("/api/v1/favorites/places/favorite-order")
                     .then()
                     .statusCode(404);
         }
@@ -544,7 +544,7 @@ class FavoritePlaceApiTest {
                     .queryParam("favoriteFolderId", 1L)
                     .body(request)
                     .contentType(ContentType.JSON)
-                    .when().patch("/favorites/places/favorite-order")
+                    .when().patch("/api/v1/favorites/places/favorite-order")
                     .then()
                     .statusCode(403);
         }
@@ -568,7 +568,7 @@ class FavoritePlaceApiTest {
                     .queryParam("favoriteFolderId", 1L)
                     .body(request)
                     .contentType(ContentType.JSON)
-                    .when().patch("/favorites/places/favorite-order")
+                    .when().patch("/api/v1/favorites/places/favorite-order")
                     .then()
                     .statusCode(404);
         }
@@ -597,13 +597,13 @@ class FavoritePlaceApiTest {
                     .queryParam("favoriteFolderId", 1L)
                     .body(request)
                     .contentType(ContentType.JSON)
-                    .when().patch("/favorites/places/favorite-order")
+                    .when().patch("/api/v1/favorites/places/favorite-order")
                     .then()
                     .statusCode(400);
         }
     }
 
-    @DisplayName("/favorites/places DELETE 장소 찜 삭제 테스트")
+    @DisplayName("/api/v1/favorites/places DELETE 장소 찜 삭제 테스트")
     @Nested
     class Delete {
 
@@ -625,7 +625,7 @@ class FavoritePlaceApiTest {
                     .queryParam("favoriteFolderId", 1L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
-                    .when().delete("/favorites/places")
+                    .when().delete("/api/v1/favorites/places")
                     .then()
                     .statusCode(204);
         }
@@ -652,7 +652,7 @@ class FavoritePlaceApiTest {
                     .queryParam("favoriteFolderId", 1L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
-                    .when().delete("/favorites/places")
+                    .when().delete("/api/v1/favorites/places")
                     .then()
                     .statusCode(403);
         }
@@ -666,7 +666,7 @@ class FavoritePlaceApiTest {
                     .queryParam("favoriteFolderId", 1L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
-                    .when().delete("/favorites/places")
+                    .when().delete("/api/v1/favorites/places")
                     .then()
                     .statusCode(404);
         }
@@ -685,7 +685,7 @@ class FavoritePlaceApiTest {
                     .queryParam("favoriteFolderId", 999L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
-                    .when().delete("/favorites/places")
+                    .when().delete("/api/v1/favorites/places")
                     .then()
                     .statusCode(404);
         }
@@ -705,7 +705,7 @@ class FavoritePlaceApiTest {
                     .queryParam("favoriteFolderId", 1L)
                     .queryParam("placeId", 999L)
                     .contentType(ContentType.JSON)
-                    .when().delete("/favorites/places")
+                    .when().delete("/api/v1/favorites/places")
                     .then()
                     .statusCode(404);
         }
@@ -727,7 +727,7 @@ class FavoritePlaceApiTest {
                     .queryParam("favoriteFolderId", 1L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
-                    .when().delete("/favorites/places")
+                    .when().delete("/api/v1/favorites/places")
                     .then()
                     .statusCode(404);
         }

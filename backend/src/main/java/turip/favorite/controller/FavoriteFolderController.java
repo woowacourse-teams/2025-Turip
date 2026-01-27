@@ -32,7 +32,7 @@ import turip.favorite.service.FavoriteFolderService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/favorites/folders")
+@RequestMapping("/api/v1/favorites/folders")
 @Tag(name = "FavoriteFolder", description = "장소 찜 폴더 API")
 public class FavoriteFolderController {
 

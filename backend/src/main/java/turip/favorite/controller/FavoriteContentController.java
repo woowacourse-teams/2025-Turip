@@ -28,7 +28,7 @@ import turip.favorite.service.FavoriteContentService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/favorites/contents")
+@RequestMapping("/api/v1/favorites/contents")
 @Tag(name = "FavoriteContent", description = "컨텐츠 찜 API")
 public class FavoriteContentController {
 

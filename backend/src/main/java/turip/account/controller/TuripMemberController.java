@@ -21,7 +21,7 @@ import turip.common.exception.ErrorResponse;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/turip-members")
+@RequestMapping("/api/v1/turip-members")
 @Tag(name = "TuripMember", description = "튜립 자체 회원 API")
 public class TuripMemberController {
 

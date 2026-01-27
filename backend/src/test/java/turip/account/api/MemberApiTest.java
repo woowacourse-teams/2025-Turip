@@ -70,7 +70,7 @@ class MemberApiTest {
     }
 
     @Nested
-    @DisplayName("/members/migration POST 마이그레이션 테스트")
+    @DisplayName("/api/v1/members/migration POST 마이그레이션 테스트")
     class MigrationTest {
 
         @Test
@@ -144,7 +144,7 @@ class MemberApiTest {
                     .contentType(ContentType.JSON)
                     .header("device-fid", guestDeviceFid)
                     .body(loginRequest)
-                    .when().post("/login/google")
+                    .when().post("/api/v1/login/google")
                     .then().log().all()
                     .statusCode(200)
                     .body("accessToken", notNullValue())
@@ -155,7 +155,7 @@ class MemberApiTest {
                     .given().log().all()
                     .header("device-fid", guestDeviceFid)
                     .header("Authorization", "Bearer " + accessToken)
-                    .when().post("/members/migration")
+                    .when().post("/api/v1/members/migration")
                     .then().log().all()
                     .statusCode(204);
 
@@ -190,7 +190,7 @@ class MemberApiTest {
             RestAssured
                     .given().log().all()
                     .header("device-fid", deviceFid)
-                    .when().post("/members/migration")
+                    .when().post("/api/v1/members/migration")
                     .then().log().all()
                     .statusCode(401);
         }
@@ -220,7 +220,7 @@ class MemberApiTest {
                     .contentType(ContentType.JSON)
                     .header("device-fid", "temp-device")
                     .body(loginRequest)
-                    .when().post("/login/google")
+                    .when().post("/api/v1/login/google")
                     .then().log().all()
                     .statusCode(200)
                     .extract().path("accessToken");
@@ -229,14 +229,14 @@ class MemberApiTest {
             RestAssured
                     .given().log().all()
                     .header("Authorization", "Bearer " + accessToken)
-                    .when().post("/members/migration")
+                    .when().post("/api/v1/members/migration")
                     .then().log().all()
                     .statusCode(400);
         }
     }
 
     @Nested
-    @DisplayName("/members/me DELETE 회원 탈퇴 테스트")
+    @DisplayName("/api/v1/members/me DELETE 회원 탈퇴 테스트")
     class DeleteMemberTest {
 
         @Test
@@ -292,7 +292,7 @@ class MemberApiTest {
                     .contentType(ContentType.JSON)
                     .header("device-fid", "device-123")
                     .body(loginRequest)
-                    .when().post("/login/google")
+                    .when().post("/api/v1/login/google")
                     .then().log().all()
                     .statusCode(200)
                     .body("accessToken", notNullValue())
@@ -302,7 +302,7 @@ class MemberApiTest {
             RestAssured
                     .given().log().all()
                     .header("Authorization", "Bearer " + accessToken)
-                    .when().delete("/members/me")
+                    .when().delete("/api/v1/members/me")
                     .then().log().all()
                     .statusCode(204);
 
@@ -333,7 +333,7 @@ class MemberApiTest {
             // when & then
             RestAssured
                     .given().log().all()
-                    .when().delete("/members/me")
+                    .when().delete("/api/v1/members/me")
                     .then().log().all()
                     .statusCode(401);
         }

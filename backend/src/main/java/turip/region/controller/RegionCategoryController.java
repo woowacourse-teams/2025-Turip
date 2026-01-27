@@ -18,7 +18,7 @@ import turip.region.service.RegionCategoryService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/region-categories")
+@RequestMapping("/api/v1/region-categories")
 @Tag(name = "RegionCategory", description = "지역 카테고리 API")
 public class RegionCategoryController {
 

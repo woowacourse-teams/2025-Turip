@@ -22,7 +22,7 @@ import turip.content.service.ContentPlaceService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/contents")
+@RequestMapping("/api/v1/contents")
 @Tag(name = "ContentPlace", description = "컨텐츠 장소 API")
 public class ContentPlaceController {
 

@@ -69,7 +69,7 @@ class FavoriteFolderApiTest {
         jdbcTemplate.update("ALTER TABLE account ALTER COLUMN id RESTART WITH 1");
     }
 
-    @DisplayName("/favorites/folders POST 장소 찜 폴더 생성 테스트")
+    @DisplayName("/api/v1/favorites/folders POST 장소 찜 폴더 생성 테스트")
     @Nested
     class Create {
 
@@ -82,7 +82,7 @@ class FavoriteFolderApiTest {
                     .header("device-fid", "testDeviceFid")
                     .body(request)
                     .contentType(ContentType.JSON)
-                    .when().post("/favorites/folders")
+                    .when().post("/api/v1/favorites/folders")
                     .then()
                     .statusCode(201);
         }
@@ -103,7 +103,7 @@ class FavoriteFolderApiTest {
                     .header("device-fid", "testDeviceFid")
                     .body(request)
                     .contentType(ContentType.JSON)
-                    .when().post("/favorites/folders")
+                    .when().post("/api/v1/favorites/folders")
                     .then()
                     .statusCode(409);
         }
@@ -117,13 +117,13 @@ class FavoriteFolderApiTest {
                     .header("device-fid", "testDeviceFid")
                     .body(request)
                     .contentType(ContentType.JSON)
-                    .when().post("/favorites/folders")
+                    .when().post("/api/v1/favorites/folders")
                     .then()
                     .statusCode(400);
         }
     }
 
-    @DisplayName("/favorites/folders GET 특정 회원의 장소 찜 폴더 조회 테스트")
+    @DisplayName("/api/v1/favorites/folders GET 특정 회원의 장소 찜 폴더 조회 테스트")
     @Nested
     class ReadAllByMember {
 
@@ -142,7 +142,7 @@ class FavoriteFolderApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .when().get("/favorites/folders")
+                    .when().get("/api/v1/favorites/folders")
                     .then()
                     .statusCode(200)
                     .body("favoriteFolders.size()", is(2))
@@ -162,7 +162,7 @@ class FavoriteFolderApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "newDeviceFid")
-                    .when().get("/favorites/folders")
+                    .when().get("/api/v1/favorites/folders")
                     .then()
                     .statusCode(200)
                     .body("favoriteFolders.size()", is(1))
@@ -172,7 +172,7 @@ class FavoriteFolderApiTest {
         }
     }
 
-    @DisplayName("/favorites/folders/favorite-status GET 특정 회원의 장소 찜 폴더와 찜 여부 조회 테스트")
+    @DisplayName("/api/v1/favorites/folders/favorite-status GET 특정 회원의 장소 찜 폴더와 찜 여부 조회 테스트")
     @Nested
     class ReadAllWithFavoriteStatusByDeviceId {
 
@@ -194,7 +194,7 @@ class FavoriteFolderApiTest {
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
                     .queryParam("placeId", 1L)
-                    .when().get("/favorites/folders/favorite-status")
+                    .when().get("/api/v1/favorites/folders/favorite-status")
                     .then()
                     .statusCode(200)
                     .body("favoriteFolders.size()", is(2))
@@ -213,7 +213,7 @@ class FavoriteFolderApiTest {
             RestAssured.given().port(port)
                     .header("device-fid", "newDeviceFid")
                     .queryParam("placeId", 1L)
-                    .when().get("/favorites/folders/favorite-status")
+                    .when().get("/api/v1/favorites/folders/favorite-status")
                     .then()
                     .statusCode(200)
                     .body("favoriteFolders[0].name", is("기본 폴더"))
@@ -234,13 +234,13 @@ class FavoriteFolderApiTest {
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
                     .queryParam("placeId", 1L)
-                    .when().get("/favorites/folders/favorite-status")
+                    .when().get("/api/v1/favorites/folders/favorite-status")
                     .then()
                     .statusCode(404);
         }
     }
 
-    @DisplayName("/favorites/folders PATCH 폴더 이름 수정 테스트")
+    @DisplayName("/api/v1/favorites/folders PATCH 폴더 이름 수정 테스트")
     @Nested
     class UpdateName {
 
@@ -260,7 +260,7 @@ class FavoriteFolderApiTest {
                     .header("device-fid", "testDeviceFid")
                     .body(request)
                     .contentType(ContentType.JSON)
-                    .when().patch("/favorites/folders/1")
+                    .when().patch("/api/v1/favorites/folders/1")
                     .then()
                     .statusCode(200)
                     .body("id", is(1))
@@ -285,7 +285,7 @@ class FavoriteFolderApiTest {
                     .header("device-fid", "testDeviceFid")
                     .body(request)
                     .contentType(ContentType.JSON)
-                    .when().patch("/favorites/folders/999")
+                    .when().patch("/api/v1/favorites/folders/999")
                     .then()
                     .statusCode(404);
         }
@@ -310,7 +310,7 @@ class FavoriteFolderApiTest {
                     .header("device-fid", "requestDeviceFid")
                     .body(request)
                     .contentType(ContentType.JSON)
-                    .when().patch("/favorites/folders/1")
+                    .when().patch("/api/v1/favorites/folders/1")
                     .then()
                     .statusCode(403);
         }
@@ -333,7 +333,7 @@ class FavoriteFolderApiTest {
                     .header("device-fid", "testDeviceFid")
                     .body(request)
                     .contentType(ContentType.JSON)
-                    .when().patch("/favorites/folders/1")
+                    .when().patch("/api/v1/favorites/folders/1")
                     .then()
                     .statusCode(409);
         }
@@ -354,7 +354,7 @@ class FavoriteFolderApiTest {
                     .header("device-fid", "testDeviceFid")
                     .body(request)
                     .contentType(ContentType.JSON)
-                    .when().patch("/favorites/folders/1")
+                    .when().patch("/api/v1/favorites/folders/1")
                     .then()
                     .statusCode(400);
         }
@@ -374,13 +374,13 @@ class FavoriteFolderApiTest {
                     .header("device-fid", "testDeviceFid")
                     .body(request)
                     .contentType(ContentType.JSON)
-                    .when().patch("/favorites/folders/1")
+                    .when().patch("/api/v1/favorites/folders/1")
                     .then()
                     .statusCode(400);
         }
     }
 
-    @DisplayName("/favorites/folders DELETE 장소 찜 폴더 삭제 테스트")
+    @DisplayName("/api/v1/favorites/folders DELETE 장소 찜 폴더 삭제 테스트")
     @Nested
     class Delete {
 
@@ -397,7 +397,7 @@ class FavoriteFolderApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .when().delete("/favorites/folders/1")
+                    .when().delete("/api/v1/favorites/folders/1")
                     .then()
                     .statusCode(204);
         }
@@ -415,7 +415,7 @@ class FavoriteFolderApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .when().delete("/favorites/folders/999")
+                    .when().delete("/api/v1/favorites/folders/999")
                     .then()
                     .statusCode(404);
         }
@@ -437,7 +437,7 @@ class FavoriteFolderApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "requestDeviceFid")
-                    .when().delete("/favorites/folders/1")
+                    .when().delete("/api/v1/favorites/folders/1")
                     .then()
                     .statusCode(403);
         }
@@ -454,7 +454,7 @@ class FavoriteFolderApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .when().delete("/favorites/folders/1")
+                    .when().delete("/api/v1/favorites/folders/1")
                     .then()
                     .statusCode(400);
         }

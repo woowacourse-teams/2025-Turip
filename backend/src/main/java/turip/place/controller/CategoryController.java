@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/categories")
+@RequestMapping("/api/v1/categories")
 public class CategoryController {
 
 }

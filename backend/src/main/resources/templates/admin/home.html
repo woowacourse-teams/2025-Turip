@@ -74,38 +74,38 @@
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>Turip 관리자</h1>
-        <button class="logout-btn" onclick="logout()">로그아웃</button>
+<div class="header">
+    <h1>Turip 관리자</h1>
+    <button class="logout-btn" onclick="logout()">로그아웃</button>
+</div>
+
+<div class="main-content">
+    <div class="welcome-card">
+        <h2>환영합니다!</h2>
+        <p>Turip 관리자 페이지입니다.</p>
     </div>
+</div>
 
-    <div class="main-content">
-        <div class="welcome-card">
-            <h2>환영합니다!</h2>
-            <p>Turip 관리자 페이지입니다.</p>
-        </div>
-    </div>
+<script>
+    async function logout() {
+        try {
+            // 서버에 로그아웃 요청 (RefreshToken 삭제 + 쿠키 무효화)
+            const response = await fetch('/api/v1/logout', {
+                method: 'POST',
+                headers: {
+                    'device-fid': 'admin-web'
+                },
+                credentials: 'include'  // 쿠키 자동 전송
+            });
 
-    <script>
-        async function logout() {
-            try {
-                // 서버에 로그아웃 요청 (RefreshToken 삭제 + 쿠키 무효화)
-                const response = await fetch('/logout', {
-                    method: 'POST',
-                    headers: {
-                        'device-fid': 'admin-web'
-                    },
-                    credentials: 'include'  // 쿠키 자동 전송
-                });
-
-                // 성공 여부와 관계없이 로그인 페이지로 리다이렉트
-                window.location.href = '/admin/login';
-            } catch (error) {
-                console.error('로그아웃 중 오류:', error);
-                // 오류가 발생해도 로그인 페이지로 이동
-                window.location.href = '/admin/login';
-            }
+            // 성공 여부와 관계없이 로그인 페이지로 리다이렉트
+            window.location.href = '/admin/login';
+        } catch (error) {
+            console.error('로그아웃 중 오류:', error);
+            // 오류가 발생해도 로그인 페이지로 이동
+            window.location.href = '/admin/login';
         }
-    </script>
+    }
+</script>
 </body>
 </html>
