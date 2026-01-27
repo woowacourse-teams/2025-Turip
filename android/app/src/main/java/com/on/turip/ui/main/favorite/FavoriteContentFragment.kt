@@ -19,7 +19,7 @@ import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.login.LoginActivity
 import com.on.turip.ui.main.favorite.model.FavoriteContentUiEffect
 import com.on.turip.ui.main.favorite.model.FavoriteContentUiState
-import com.on.turip.ui.trip.detail.TripDetailActivity
+import com.on.turip.ui.trip.TripDetailActivity
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 

@@ -12,6 +12,9 @@ public enum ErrorTag {
     FAVORITE_PLACE_FOLDER_MISMATCH("장소 찜이 해당 폴더에 존재하지 않습니다."),
     UNSUPPORTED_SEARCH_TYPE("지원하지 않는 검색 타입입니다."),
 
+    EMAIL_INVALID("이메일 형식이 올바르지 않습니다."),
+    LOGIN_ID_INVALID("아이디 형식이 올바르지 않습니다."),
+    LOGIN_PASSWORD_INVALID("비밀번호 형식이 올바르지 않습니다."),
 
     // 401 Unauthorized
     UNAUTHORIZED("토큰 기반 인증에 실패했습니다."),
@@ -22,6 +25,7 @@ public enum ErrorTag {
     REFRESH_TOKEN_NOT_FOUND("refresh token을 찾을 수 없습니다."),
     REFRESH_TOKEN_INVALID("유효하지 않은 refresh token입니다."),
     REFRESH_TOKEN_SIGNATURE_INVALID("refresh token이 위조됐습니다."),
+    CREDENTIALS_INVALID("아이디 또는 비밀번호가 올바르지 않습니다."),
 
     // 403 Forbidden
     FORBIDDEN("접근 권한이 없습니다."),
@@ -42,6 +46,7 @@ public enum ErrorTag {
     FAVORITE_FOLDER_NAME_CONFLICT("이미 존재하는 찜폴더 이름입니다."),
     FAVORITE_CONTENT_CONFLICT("이미 찜한 컨텐츠입니다."),
     FAVORITE_PLACE_IN_FOLDER_CONFLICT("해당 폴더에 이미 찜한 장소입니다."),
+    LOGIN_ID_CONFLICT("중복 아이디가 존재합니다."),
 
     // 500 Internal Server Error
     INTERNAL_SERVER_ERROR("서버에서 예기치 못한 에러가 발생했습니다.");

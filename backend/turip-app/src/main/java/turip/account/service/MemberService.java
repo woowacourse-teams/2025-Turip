@@ -1,15 +1,16 @@
 package turip.account.service;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import turip.account.domain.Account;
 import turip.account.domain.Guest;
 import turip.account.domain.Member;
-import turip.account.domain.Provider;
 import turip.account.repository.MemberRepository;
 import turip.auth.service.RefreshTokenService;
 import turip.common.exception.ErrorTag;
+import turip.common.exception.custom.BadRequestException;
+import turip.common.exception.custom.IllegalArgumentException;
 import turip.common.exception.custom.NotFoundException;
 import turip.favorite.repository.FavoriteContentRepository;
 import turip.favorite.repository.FavoriteFolderRepository;
@@ -25,18 +26,15 @@ public class MemberService {
     private final AccountService accountService;
     private final RefreshTokenService refreshTokenService;
 
-    public boolean isFirstLogin(Provider provider, String providerId) {
-        return !memberRepository.existsByProviderAndProviderId(provider, providerId);
-    }
-
     @Transactional
-    public Member findOrCreate(Provider provider, String providerId, String email) {
-        return memberRepository.findByProviderAndProviderId(provider, providerId)
-                .orElseGet(() -> {
-                    Account savedAccount = accountService.create();
-                    Member member = new Member(savedAccount, provider, providerId, email);
-                    return memberRepository.save(member);
-                });
+    public Member create(String email) {
+        Account account = accountService.create();
+        try {
+            Member member = new Member(account, email, true);
+            return memberRepository.save(member);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(e.getErrorTag());
+        }
     }
 
     public Member getByAccountId(Long accountId) {

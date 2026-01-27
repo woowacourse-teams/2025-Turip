@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.on.turip.databinding.ItemFavoritePlaceBinding
 import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
-import com.on.turip.ui.trip.detail.Maps
+import com.on.turip.ui.main.favorite.model.Maps
 
 class FavoritePlaceViewHolder(
     private val binding: ItemFavoritePlaceBinding,

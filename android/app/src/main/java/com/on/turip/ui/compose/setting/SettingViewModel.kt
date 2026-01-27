@@ -13,9 +13,6 @@ import com.on.turip.platform.device.AppEnvironmentInfoProvider
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
-import com.on.turip.ui.compose.setting.model.SettingRetryAction
-import com.on.turip.ui.compose.setting.model.SettingUiEffect
-import com.on.turip.ui.compose.setting.model.SettingUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
