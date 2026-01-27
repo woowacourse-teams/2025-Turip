@@ -6,8 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
-import com.on.turip.domain.favorite.usecase.UpdateFavoritePlaceUseCase
-import com.on.turip.domain.folder.FavoriteFolder
+import com.on.turip.domain.favorite.usecase.UpdateTuripPlaceUseCase
+import com.on.turip.domain.folder.Turip
 import com.on.turip.domain.folder.repository.FolderRepository
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
@@ -18,6 +18,7 @@ import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderRetryAction
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderUiEffect
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,13 +28,12 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @HiltViewModel
 class FavoritePlaceFolderViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val folderRepository: FolderRepository,
-    private val updateFavoritePlaceUseCase: UpdateFavoritePlaceUseCase,
+    private val updateTuripPlaceUseCase: UpdateTuripPlaceUseCase,
 ) : ViewModel() {
     private val placeId: Long by lazy {
         checkNotNull(savedStateHandle[FAVORITE_PLACE_FOLDER_ARGUMENTS_PLACE_ID]) {
@@ -52,11 +52,11 @@ class FavoritePlaceFolderViewModel @Inject constructor(
         viewModelScope.launch {
             folderRepository
                 .loadFavoriteFoldersStatusByPlaceId(placeId)
-                .onSuccess { favoriteFolders: List<FavoriteFolder> ->
+                .onSuccess { turips: List<Turip> ->
                     _uiState.update { state: FavoritePlaceFolderUiState ->
                         state.copy(
                             placeId = placeId,
-                            favoritePlaceFolders = favoriteFolders.map { it.toUiModel() },
+                            favoritePlaceFolders = turips.map { it.toUiModel() },
                         )
                     }
                     Timber.d("상세 페이지에서 장소에 대한 찜 폴더 현황 데이터 불러오기 성공 ")
@@ -73,7 +73,7 @@ class FavoritePlaceFolderViewModel @Inject constructor(
     fun updateFolder(favoritePlaceFolderModel: FavoritePlaceFolderModel) {
         viewModelScope.launch {
             val updateFavoritesStatus: Boolean = !favoritePlaceFolderModel.isSelected
-            updateFavoritePlaceUseCase(favoritePlaceFolderModel.id, placeId, updateFavoritesStatus)
+            updateTuripPlaceUseCase(favoritePlaceFolderModel.id, placeId, updateFavoritesStatus)
                 .onSuccess {
                     Timber.d("장소에 대한 찜 폴더들 현황에서 장소 찜 업데이트")
                     _uiState.update { state: FavoritePlaceFolderUiState ->

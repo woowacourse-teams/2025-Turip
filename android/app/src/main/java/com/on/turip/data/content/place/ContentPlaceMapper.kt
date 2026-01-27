@@ -30,7 +30,7 @@ fun ContentPlaceResponse.toDomain(): ContentPlace =
         visitOrder = visitOrder,
         place = place.toDomain(),
         timeLine = timeLine,
-        isFavoritePlace = isFavoritePlace,
+        isTuripPlace = isTuripPlace,
     )
 
 fun PlaceResponse.toDomain(): Place =

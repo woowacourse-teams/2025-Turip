@@ -4,11 +4,11 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class FavoritePlaceResponse(
+data class TuripPlaceResponse(
     @SerialName("id")
     val id: Long,
     @SerialName("place")
     val placeResponse: PlaceResponse,
-    @SerialName("favoriteOrder")
+    @SerialName("turipPlaceOrder")
     val order: Long,
 )

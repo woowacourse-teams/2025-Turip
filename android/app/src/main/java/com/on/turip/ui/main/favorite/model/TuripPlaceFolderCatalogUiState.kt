@@ -1,12 +1,12 @@
 package com.on.turip.ui.main.favorite.model
 
-data class FavoritePlaceFolderCatalogUiState(
-    val places: List<FavoritePlaceModel>,
+data class TuripPlaceFolderCatalogUiState(
+    val places: List<TuripPlaceModel>,
     val folderName: String,
 ) {
     companion object {
-        val Idle: FavoritePlaceFolderCatalogUiState =
-            FavoritePlaceFolderCatalogUiState(
+        val Idle: TuripPlaceFolderCatalogUiState =
+            TuripPlaceFolderCatalogUiState(
                 places = emptyList(),
                 folderName = "",
             )

@@ -20,15 +20,15 @@ import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.common.safeStartActivityWithToast
 import com.on.turip.ui.login.LoginActivity
 import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
-import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderCatalogUiEffect
-import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderCatalogUiState
-import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
+import com.on.turip.ui.main.favorite.model.TuripPlaceFolderCatalogUiEffect
+import com.on.turip.ui.main.favorite.model.TuripPlaceFolderCatalogUiState
+import com.on.turip.ui.main.favorite.model.TuripPlaceModel
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 
 @AndroidEntryPoint
 class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavoritePlaceFolderCatalogBinding>() {
-    private val viewModel: FavoritePlaceFolderCatalogViewModel by viewModels()
+    private val viewModel: TuripPlaceFolderCatalogViewModel by viewModels()
 
     private val placeAdapter: FavoritePlaceAdapter by lazy {
         FavoritePlaceAdapter(
@@ -37,7 +37,7 @@ class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavor
                     placeId: Long,
                     isFavorite: Boolean,
                 ) {
-                    viewModel.updateFavoritePlace(placeId, isFavorite)
+                    viewModel.updateTuripPlace(placeId, isFavorite)
                 }
 
                 override fun onMapClick(uri: Uri) {
@@ -48,11 +48,11 @@ class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavor
                     )
                 }
 
-                override fun onItemClick(favoritePlaceModel: FavoritePlaceModel) {
-                    Timber.d("아이템 클릭: $favoritePlaceModel")
+                override fun onItemClick(turipPlaceModel: TuripPlaceModel) {
+                    Timber.d("아이템 클릭: $turipPlaceModel")
                 }
             },
-            onCommit = { viewModel.updateFavoritePlacesOrder(it) },
+            onCommit = { viewModel.updateTuripPlacesOrder(it) },
         )
     }
 
@@ -117,35 +117,35 @@ class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavor
     }
 
     private fun setupObservers() {
-        collectOnStarted(viewModel.uiState) { uiState: FavoritePlaceFolderCatalogUiState ->
+        collectOnStarted(viewModel.uiState) { uiState: TuripPlaceFolderCatalogUiState ->
             placeAdapter.submitList(uiState.places)
             binding.tvBottomSheetFolderFavoritePlaceFolderCatalogTitle.text = uiState.folderName
 
             binding.tvBottomSheetFavoritePlaceFolderCount.text =
                 getString(R.string.all_total_place_count, uiState.places.size)
 
-            if (uiState.places == emptyList<FavoritePlaceModel>()) {
+            if (uiState.places == emptyList<TuripPlaceModel>()) {
                 binding.ivBottomSheetFavoritePlaceFolderShare.visibility = View.GONE
             } else {
                 binding.ivBottomSheetFavoritePlaceFolderShare.visibility = View.VISIBLE
             }
         }
 
-        collectOnStarted(viewModel.uiEffect) { uiEffect: FavoritePlaceFolderCatalogUiEffect ->
+        collectOnStarted(viewModel.uiEffect) { uiEffect: TuripPlaceFolderCatalogUiEffect ->
             when (uiEffect) {
-                FavoritePlaceFolderCatalogUiEffect.NavigateToLogin -> {
+                TuripPlaceFolderCatalogUiEffect.NavigateToLogin -> {
                     navigateToLoginScreen()
                 }
 
-                FavoritePlaceFolderCatalogUiEffect.ShowFolderShareNotAllowed -> {
+                TuripPlaceFolderCatalogUiEffect.ShowFolderShareNotAllowed -> {
                     showSuggestLoginMessage()
                 }
 
-                is FavoritePlaceFolderCatalogUiEffect.ShareFolder -> {
+                is TuripPlaceFolderCatalogUiEffect.ShareFolder -> {
                     shareFolder(uiEffect.favoriteFolderShareModel)
                 }
 
-                is FavoritePlaceFolderCatalogUiEffect.ShowError -> {
+                is TuripPlaceFolderCatalogUiEffect.ShowError -> {
                     val uiModel: ErrorUiModel =
                         uiEffect.errorUiState.toUiModel() ?: return@collectOnStarted
                     view?.let { view: View ->

@@ -1,8 +1,8 @@
 package com.on.turip.domain.folder.repository
 
 import com.on.turip.core.result.TuripResult
-import com.on.turip.domain.folder.FavoriteFolder
 import com.on.turip.domain.folder.Folder
+import com.on.turip.domain.folder.Turip
 
 interface FolderRepository {
     suspend fun loadFavoriteFolders(): TuripResult<List<Folder>>
@@ -16,5 +16,5 @@ interface FolderRepository {
 
     suspend fun deleteFavoriteFolder(folderId: Long): TuripResult<Unit>
 
-    suspend fun loadFavoriteFoldersStatusByPlaceId(placeId: Long): TuripResult<List<FavoriteFolder>>
+    suspend fun loadFavoriteFoldersStatusByPlaceId(placeId: Long): TuripResult<List<Turip>>
 }

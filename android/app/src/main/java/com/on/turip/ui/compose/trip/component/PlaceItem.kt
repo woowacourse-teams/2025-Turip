@@ -46,7 +46,7 @@ fun PlaceItem(
     placeModel: PlaceModel,
     onTimeLineClick: (timeLine: Int) -> Unit,
     onMapClick: (mapModel: MapModel) -> Unit,
-    onFavoriteClick: (id: Long) -> Unit,
+    onTuripPlaceClick: (id: Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -118,10 +118,10 @@ fun PlaceItem(
 
             PlaceActionItem(
                 text = stringResource(R.string.trip_place_favorite),
-                iconTint = if (placeModel.isFavorite) TuripTheme.colors.primary else TuripTheme.colors.gray04,
-                drawableRes = if (placeModel.isFavorite) R.drawable.btn_favorite_selected else R.drawable.btn_favorite_normal,
+                iconTint = if (placeModel.isTuripPlace) TuripTheme.colors.primary else TuripTheme.colors.gray04,
+                drawableRes = if (placeModel.isTuripPlace) R.drawable.btn_turip_place_selected else R.drawable.btn_turip_place_normal,
                 useTint = true,
-                onClick = { onFavoriteClick(placeModel.id) },
+                onClick = { onTuripPlaceClick(placeModel.id) },
             )
         }
     }
@@ -192,7 +192,7 @@ private fun PlaceItemPreview() {
         PlaceModel(
             id = 1L,
             name = "우아한테크코스",
-            isFavorite = true,
+            isTuripPlace = true,
             category = "💻 코딩맛집",
             mapLink = "kakao.com/123123",
             timeLine = "01:03",
@@ -202,7 +202,7 @@ private fun PlaceItemPreview() {
             placeModel = model,
             onTimeLineClick = { },
             onMapClick = { },
-            onFavoriteClick = { },
+            onTuripPlaceClick = { },
             modifier = Modifier.padding(TuripTheme.spacing.extraLarge),
         )
     }

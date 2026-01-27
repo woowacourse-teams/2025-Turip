@@ -49,7 +49,7 @@ class TripDetailActivity : AppCompatActivity() {
                             errorToastMessage = getString(R.string.all_snackbar_not_found_video_url),
                         )
                     },
-                    onClickFavoritePlace = { id: Long ->
+                    onTuripPlaceClick = { id: Long ->
                         if (supportFragmentManager.findFragmentByTag("favorite_place_folder") == null) {
                             val bottomSheet: FavoriteBottomSheetContainerFragment =
                                 FavoriteBottomSheetContainerFragment.instance(id)

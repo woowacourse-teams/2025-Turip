@@ -2,7 +2,7 @@ package com.on.turip.ui.main.favorite.model
 
 import android.net.Uri
 
-data class FavoritePlaceShareModel(
+data class TuripPlaceShareModel(
     val name: String,
     val uri: Uri,
 ) {

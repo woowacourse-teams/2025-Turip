@@ -6,8 +6,8 @@ import com.on.turip.data.folder.datasource.FolderRemoteDataSource
 import com.on.turip.data.folder.toDomain
 import com.on.turip.data.folder.toPatchRequestDto
 import com.on.turip.data.folder.toPostRequestDto
-import com.on.turip.domain.folder.FavoriteFolder
 import com.on.turip.domain.folder.Folder
+import com.on.turip.domain.folder.Turip
 import com.on.turip.domain.folder.repository.FolderRepository
 import javax.inject.Inject
 
@@ -29,7 +29,7 @@ class DefaultFolderRepository @Inject constructor(
 
     override suspend fun deleteFavoriteFolder(folderId: Long): TuripResult<Unit> = folderRemoteDataSource.deleteFavoriteFolder(folderId)
 
-    override suspend fun loadFavoriteFoldersStatusByPlaceId(placeId: Long): TuripResult<List<FavoriteFolder>> =
+    override suspend fun loadFavoriteFoldersStatusByPlaceId(placeId: Long): TuripResult<List<Turip>> =
         folderRemoteDataSource
             .getFavoriteFoldersStatusByPlaceId(placeId)
             .mapCatching { it.toDomain() }

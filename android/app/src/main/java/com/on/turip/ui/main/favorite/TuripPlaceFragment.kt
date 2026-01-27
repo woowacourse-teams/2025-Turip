@@ -32,17 +32,17 @@ import com.on.turip.ui.folder.FolderActivity
 import com.on.turip.ui.login.LoginActivity
 import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
-import com.on.turip.ui.main.favorite.model.FavoritePlaceLatLngUiModel
-import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
-import com.on.turip.ui.main.favorite.model.FavoritePlaceUiEffect
-import com.on.turip.ui.main.favorite.model.FavoritePlaceUiState
+import com.on.turip.ui.main.favorite.model.TuripPlaceLatLngUiModel
+import com.on.turip.ui.main.favorite.model.TuripPlaceModel
+import com.on.turip.ui.main.favorite.model.TuripPlaceUiEffect
+import com.on.turip.ui.main.favorite.model.TuripPlaceUiState
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class FavoritePlaceFragment :
+class TuripPlaceFragment :
     BaseFragment<FragmentFavoritePlaceBinding>(),
     OnMapReadyCallback {
-    private val viewModel: FavoritePlaceViewModel by viewModels()
+    private val viewModel: TuripPlaceViewModel by viewModels()
     private val folderNameAdapter: FavoritePlaceFolderNameAdapter by lazy {
         FavoritePlaceFolderNameAdapter { folderId: Long ->
             viewModel.updateFolderWithPlaces(folderId)
@@ -55,7 +55,7 @@ class FavoritePlaceFragment :
                     placeId: Long,
                     isFavorite: Boolean,
                 ) {
-                    viewModel.updateFavoritePlace(placeId, isFavorite)
+                    viewModel.updateTuripPlace(placeId, isFavorite)
                 }
 
                 override fun onMapClick(uri: Uri) {
@@ -66,18 +66,18 @@ class FavoritePlaceFragment :
                     )
                 }
 
-                override fun onItemClick(favoritePlaceModel: FavoritePlaceModel) {
+                override fun onItemClick(turipPlaceModel: TuripPlaceModel) {
                     map.animateCamera(
                         CameraUpdateFactory.newCameraPosition(
-                            CameraPosition(favoritePlaceModel.latLng, 15f, 0f, 0f),
+                            CameraPosition(turipPlaceModel.latLng, 15f, 0f, 0f),
                         ),
                         1000,
                         null,
                     )
-                    markerMap[favoritePlaceModel.placeId]?.showInfoWindow()
+                    markerMap[turipPlaceModel.placeId]?.showInfoWindow()
                 }
             },
-            onCommit = { viewModel.updateFavoritePlacesOrder(it) },
+            onCommit = { viewModel.updateTuripPlacesOrder(it) },
         )
     }
 
@@ -173,7 +173,7 @@ class FavoritePlaceFragment :
     }
 
     private fun setupObservers() {
-        collectOnStarted(viewModel.uiState) { uiState: FavoritePlaceUiState ->
+        collectOnStarted(viewModel.uiState) { uiState: TuripPlaceUiState ->
             if (uiState.isLoading) showLoading()
             when {
                 uiState.errorUiState != ErrorUiState.None -> showErrorView(uiState.errorUiState)
@@ -182,21 +182,21 @@ class FavoritePlaceFragment :
             }
         }
 
-        collectOnStarted(viewModel.uiEffect) { uiEffect: FavoritePlaceUiEffect ->
+        collectOnStarted(viewModel.uiEffect) { uiEffect: TuripPlaceUiEffect ->
             when (uiEffect) {
-                FavoritePlaceUiEffect.ShowFolderShareNotAllowed -> {
+                TuripPlaceUiEffect.ShowFolderShareNotAllowed -> {
                     showSuggestLoginMessage()
                 }
 
-                is FavoritePlaceUiEffect.ShareFolder -> {
+                is TuripPlaceUiEffect.ShareFolder -> {
                     shareFolder(uiEffect.favoriteFolderShareModel)
                 }
 
-                FavoritePlaceUiEffect.NavigateToLogin -> {
+                TuripPlaceUiEffect.NavigateToLogin -> {
                     navigateToLoginScreen()
                 }
 
-                is FavoritePlaceUiEffect.ShowError -> {
+                is TuripPlaceUiEffect.ShowError -> {
                     val uiModel: ErrorUiModel =
                         uiEffect.errorUiState.toUiModel() ?: return@collectOnStarted
                     view?.let { view: View ->
@@ -286,7 +286,7 @@ class FavoritePlaceFragment :
         binding.mvFavoritePlace.visibility = View.GONE
     }
 
-    private fun showContents(uiState: FavoritePlaceUiState) {
+    private fun showContents(uiState: TuripPlaceUiState) {
         folderNameAdapter.submitList(uiState.folders)
         placeAdapter.submitList(uiState.places)
 
@@ -390,7 +390,7 @@ class FavoritePlaceFragment :
         markerMap.clear()
     }
 
-    private fun handleSingleFavorite(favoriteLatLng: FavoritePlaceLatLngUiModel) {
+    private fun handleSingleFavorite(favoriteLatLng: TuripPlaceLatLngUiModel) {
         showMap()
         clearMapMarkers()
 
@@ -402,7 +402,7 @@ class FavoritePlaceFragment :
         }
     }
 
-    private fun handleMultipleFavorites(favoriteLatLngList: List<FavoritePlaceLatLngUiModel>) {
+    private fun handleMultipleFavorites(favoriteLatLngList: List<TuripPlaceLatLngUiModel>) {
         showMap()
         clearMapMarkers()
 
@@ -431,7 +431,7 @@ class FavoritePlaceFragment :
         markerMap.clear()
     }
 
-    private fun addMarkerToMap(favoriteLatLng: FavoritePlaceLatLngUiModel) {
+    private fun addMarkerToMap(favoriteLatLng: TuripPlaceLatLngUiModel) {
         val marker =
             map.addMarker(
                 MarkerOptions()
@@ -460,7 +460,7 @@ class FavoritePlaceFragment :
         private const val KAKAO_PACKAGE = "com.kakao.talk"
         private const val INSTAGRAM_PACKAGE = "com.instagram.android"
 
-        fun instance(): FavoritePlaceFragment = FavoritePlaceFragment()
+        fun instance(): TuripPlaceFragment = TuripPlaceFragment()
     }
 }
 

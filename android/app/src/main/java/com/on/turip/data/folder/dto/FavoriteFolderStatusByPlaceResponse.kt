@@ -9,8 +9,8 @@ data class FavoriteFolderStatusByPlaceResponse(
     val id: Long,
     @SerialName("isDefault")
     val isDefault: Boolean,
-    @SerialName("isFavoritePlace")
-    val isFavoritePlace: Boolean,
+    @SerialName("isTuripPlace")
+    val isTuripPlace: Boolean,
     @SerialName("memberId")
     val memberId: Long,
     @SerialName("name")

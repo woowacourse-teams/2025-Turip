@@ -2,13 +2,13 @@ package com.on.turip.ui.main.favorite.model
 
 data class FavoriteFolderShareModel(
     val name: String,
-    val places: List<FavoritePlaceShareModel>,
+    val places: List<TuripPlaceShareModel>,
 ) {
     fun toShareFormat(): String =
         buildString {
             appendLine("$FOLDER_NAME_EMOJI_UNICODE 폴더명 : $name")
             appendLine()
-            places.forEach { placeShareModel: FavoritePlaceShareModel -> appendLine(placeShareModel.toShareFormat()) }
+            places.forEach { placeShareModel: TuripPlaceShareModel -> appendLine(placeShareModel.toShareFormat()) }
             appendLine("$DOWNLOAD_EMOJI_UNICODE 튜립 플레이스토어 다운로드 링크 : $TURIP_PLAY_STORE_DOWNLOAD_LINK")
         }
 

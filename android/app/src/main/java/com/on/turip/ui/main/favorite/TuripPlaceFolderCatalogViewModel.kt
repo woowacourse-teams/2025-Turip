@@ -8,20 +8,21 @@ import com.on.turip.common.UserType
 import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
-import com.on.turip.domain.favorite.FavoritePlace
-import com.on.turip.domain.favorite.repository.FavoritePlaceRepository
-import com.on.turip.domain.favorite.usecase.UpdateFavoritePlaceUseCase
+import com.on.turip.domain.favorite.TuripPlace
+import com.on.turip.domain.favorite.repository.TuripPlaceRepository
+import com.on.turip.domain.favorite.usecase.UpdateTuripPlaceUseCase
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.main.favorite.FavoritePlaceFolderCatalogFragment.Companion.FAVORITE_PLACE_FOLDER_CATALOG_ARGUMENTS_FOLDER_ID
 import com.on.turip.ui.main.favorite.FavoritePlaceFolderCatalogFragment.Companion.FAVORITE_PLACE_FOLDER_CATALOG_ARGUMENTS_FOLDER_NAME
 import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
-import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderCatalogRetryAction
-import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderCatalogUiEffect
-import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderCatalogUiState
-import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
+import com.on.turip.ui.main.favorite.model.TuripPlaceFolderCatalogRetryAction
+import com.on.turip.ui.main.favorite.model.TuripPlaceFolderCatalogUiEffect
+import com.on.turip.ui.main.favorite.model.TuripPlaceFolderCatalogUiState
+import com.on.turip.ui.main.favorite.model.TuripPlaceModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,13 +32,12 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @HiltViewModel
-class FavoritePlaceFolderCatalogViewModel @Inject constructor(
+class TuripPlaceFolderCatalogViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val favoritePlaceRepository: FavoritePlaceRepository,
-    private val updateFavoritePlaceUseCase: UpdateFavoritePlaceUseCase,
+    private val turipPlaceRepository: TuripPlaceRepository,
+    private val updateTuripPlaceUseCase: UpdateTuripPlaceUseCase,
 ) : ViewModel() {
     private val folderId: Long by lazy {
         checkNotNull(savedStateHandle[FAVORITE_PLACE_FOLDER_CATALOG_ARGUMENTS_FOLDER_ID]) {
@@ -50,12 +50,12 @@ class FavoritePlaceFolderCatalogViewModel @Inject constructor(
         }
     }
 
-    private val _uiState: MutableStateFlow<FavoritePlaceFolderCatalogUiState> =
-        MutableStateFlow(FavoritePlaceFolderCatalogUiState.Idle)
-    val uiState: StateFlow<FavoritePlaceFolderCatalogUiState> = _uiState.asStateFlow()
+    private val _uiState: MutableStateFlow<TuripPlaceFolderCatalogUiState> =
+        MutableStateFlow(TuripPlaceFolderCatalogUiState.Idle)
+    val uiState: StateFlow<TuripPlaceFolderCatalogUiState> = _uiState.asStateFlow()
 
-    private val _uiEffect: Channel<FavoritePlaceFolderCatalogUiEffect> = Channel(Channel.BUFFERED)
-    val uiEffect: Flow<FavoritePlaceFolderCatalogUiEffect> = _uiEffect.receiveAsFlow()
+    private val _uiEffect: Channel<TuripPlaceFolderCatalogUiEffect> = Channel(Channel.BUFFERED)
+    val uiEffect: Flow<TuripPlaceFolderCatalogUiEffect> = _uiEffect.receiveAsFlow()
 
     init {
         loadPlacesInSelectFolder()
@@ -63,12 +63,12 @@ class FavoritePlaceFolderCatalogViewModel @Inject constructor(
 
     private fun loadPlacesInSelectFolder() {
         viewModelScope.launch {
-            favoritePlaceRepository
-                .loadFavoritePlaces(folderId)
-                .onSuccess { favoritePlaces: List<FavoritePlace> ->
-                    _uiState.update { originUiState: FavoritePlaceFolderCatalogUiState ->
-                        originUiState.copy(
-                            places = favoritePlaces.map { it.toUiModel() },
+            turipPlaceRepository
+                .loadTuripPlaces(folderId)
+                .onSuccess { turipPlaces: List<TuripPlace> ->
+                    _uiState.update { state: TuripPlaceFolderCatalogUiState ->
+                        state.copy(
+                            places = turipPlaces.map { it.toUiModel() },
                             folderName = folderName,
                         )
                     }
@@ -77,7 +77,7 @@ class FavoritePlaceFolderCatalogViewModel @Inject constructor(
                         is UiError.Global -> {
                             handleGlobalError(
                                 uiError = uiError,
-                                retryAction = FavoritePlaceFolderCatalogRetryAction.LoadPlacesInFolder,
+                                retryAction = TuripPlaceFolderCatalogRetryAction.LoadPlacesInFolder,
                             )
                         }
 
@@ -90,26 +90,24 @@ class FavoritePlaceFolderCatalogViewModel @Inject constructor(
         }
     }
 
-    fun updateFavoritePlace(
+    fun updateTuripPlace(
         placeId: Long,
-        isFavorite: Boolean,
+        isTuripPlace: Boolean,
     ) {
-        val updatedFavorite: Boolean = !isFavorite
+        val updatedIsTuripPlace: Boolean = !isTuripPlace
         viewModelScope.launch {
-            updateFavoritePlaceUseCase(folderId, placeId, updatedFavorite)
+            updateTuripPlaceUseCase(folderId, placeId, updatedIsTuripPlace)
                 .onSuccess {
-                    _uiState.update { originUiState: FavoritePlaceFolderCatalogUiState ->
-                        originUiState.copy(
-                            places = originUiState.places.filter { it.placeId != placeId },
-                        )
+                    _uiState.update { state: TuripPlaceFolderCatalogUiState ->
+                        state.copy(places = state.places.filter { it.placeId != placeId })
                     }
-                    Timber.d("찜 목록 화면 폴더명에 해당하는 찜 장소들 업데이트 성공")
+                    Timber.d("튜립 장소 목록 바텀 시트, 튜립 장소 상태 업데이트 성공")
                 }.onFailure { errorType: ErrorType ->
                     when (val uiError: UiError = errorType.toUiError()) {
                         is UiError.Global -> {
                             handleGlobalError(
                                 uiError = uiError,
-                                retryAction = FavoritePlaceFolderCatalogRetryAction.LoadPlacesInFolder,
+                                retryAction = TuripPlaceFolderCatalogRetryAction.LoadPlacesInFolder,
                             )
                         }
 
@@ -117,26 +115,26 @@ class FavoritePlaceFolderCatalogViewModel @Inject constructor(
                             Unit
                         }
                     }
-                    Timber.e("찜 목록 화면 폴더명에 해당하는 찜 장소들 업데이트 실패 (placeId = $placeId)")
+                    Timber.e("튜립 장소 목록 바텀 시트, 튜립 장소 상태 업데이트 실패 (placeId = $placeId")
                 }
         }
     }
 
-    fun updateFavoritePlacesOrder(newFavoritePlaces: List<FavoritePlaceModel>) {
+    fun updateTuripPlacesOrder(updateTuripPlaces: List<TuripPlaceModel>) {
         viewModelScope.launch {
-            favoritePlaceRepository
-                .updateFavoritePlacesOrder(
-                    favoriteFolderId = folderId,
-                    updatedOrder = newFavoritePlaces.map { it.favoritePlaceId },
+            turipPlaceRepository
+                .updateTuripPlacesOrder(
+                    turipId = folderId,
+                    updatedOrder = updateTuripPlaces.map { it.turipPlaceId },
                 ).onSuccess {
-                    _uiState.update { it.copy(places = newFavoritePlaces) }
-                    Timber.d("순서 변경 완료: $newFavoritePlaces")
+                    _uiState.update { it.copy(places = updateTuripPlaces) }
+                    Timber.d("튜립 장소 목록 바텀 시트, 튜립 장소 순서 변경 완료")
                 }.onFailure { errorType: ErrorType ->
                     when (val uiError: UiError = errorType.toUiError()) {
                         is UiError.Global -> {
                             handleGlobalError(
                                 uiError = uiError,
-                                retryAction = FavoritePlaceFolderCatalogRetryAction.LoadPlacesInFolder,
+                                retryAction = TuripPlaceFolderCatalogRetryAction.LoadPlacesInFolder,
                             )
                         }
 
@@ -144,7 +142,7 @@ class FavoritePlaceFolderCatalogViewModel @Inject constructor(
                             Unit
                         }
                     }
-                    Timber.e("장소 순서 변경 API 호출 실패 ")
+                    Timber.e("튜립 장소 목록 바텀 시트, 튜립 장소 순서 변경 실패 ")
                 }
         }
     }
@@ -159,14 +157,14 @@ class FavoritePlaceFolderCatalogViewModel @Inject constructor(
                     )
                 viewModelScope.launch {
                     _uiEffect.send(
-                        FavoritePlaceFolderCatalogUiEffect.ShareFolder(favoriteFolderShareModel),
+                        TuripPlaceFolderCatalogUiEffect.ShareFolder(favoriteFolderShareModel),
                     )
                 }
             }
 
             UserType.GUEST, UserType.NONE -> {
                 viewModelScope.launch {
-                    _uiEffect.send(FavoritePlaceFolderCatalogUiEffect.ShowFolderShareNotAllowed)
+                    _uiEffect.send(TuripPlaceFolderCatalogUiEffect.ShowFolderShareNotAllowed)
                 }
             }
         }
@@ -174,30 +172,30 @@ class FavoritePlaceFolderCatalogViewModel @Inject constructor(
 
     private suspend fun handleGlobalError(
         uiError: UiError.Global,
-        retryAction: FavoritePlaceFolderCatalogRetryAction,
+        retryAction: TuripPlaceFolderCatalogRetryAction,
     ) {
         when (uiError) {
             UiError.Global.Network -> {
                 _uiEffect.send(
-                    FavoritePlaceFolderCatalogUiEffect.ShowError(ErrorUiState.Network, retryAction),
+                    TuripPlaceFolderCatalogUiEffect.ShowError(ErrorUiState.Network, retryAction),
                 )
             }
 
             UiError.Global.Server -> {
                 _uiEffect.send(
-                    FavoritePlaceFolderCatalogUiEffect.ShowError(ErrorUiState.Server, retryAction),
+                    TuripPlaceFolderCatalogUiEffect.ShowError(ErrorUiState.Server, retryAction),
                 )
             }
 
             UiError.Global.TokenExpired -> {
-                _uiEffect.send(FavoritePlaceFolderCatalogUiEffect.NavigateToLogin)
+                _uiEffect.send(TuripPlaceFolderCatalogUiEffect.NavigateToLogin)
             }
         }
     }
 
-    fun handleErrorRetryRequest(action: FavoritePlaceFolderCatalogRetryAction) {
+    fun handleErrorRetryRequest(action: TuripPlaceFolderCatalogRetryAction) {
         when (action) {
-            FavoritePlaceFolderCatalogRetryAction.LoadPlacesInFolder -> loadPlacesInSelectFolder()
+            TuripPlaceFolderCatalogRetryAction.LoadPlacesInFolder -> loadPlacesInSelectFolder()
         }
     }
 }

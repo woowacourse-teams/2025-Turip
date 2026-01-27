@@ -5,40 +5,40 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.on.turip.databinding.ItemFavoritePlaceBinding
-import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
 import com.on.turip.ui.main.favorite.model.Maps
+import com.on.turip.ui.main.favorite.model.TuripPlaceModel
 
 class FavoritePlaceViewHolder(
     private val binding: ItemFavoritePlaceBinding,
     favoritePlaceListener: FavoritePlaceListener,
 ) : RecyclerView.ViewHolder(binding.root) {
-    private var favoritePlaceModel: FavoritePlaceModel? = null
+    private var turipPlaceModel: TuripPlaceModel? = null
 
     init {
         binding.ivFavoritePlaceMapLink.setOnClickListener {
-            favoritePlaceModel?.let {
+            turipPlaceModel?.let {
                 favoritePlaceListener.onMapClick(it.uri)
             }
         }
         binding.ivFavoritePlaceFavorite.setOnClickListener {
-            favoritePlaceModel?.let {
-                favoritePlaceListener.onFavoriteClick(it.placeId, it.isFavorite)
+            turipPlaceModel?.let {
+                favoritePlaceListener.onFavoriteClick(it.placeId, it.isTuripPlace)
             }
         }
         binding.root.setOnClickListener {
-            favoritePlaceModel?.let {
+            turipPlaceModel?.let {
                 favoritePlaceListener.onItemClick(it)
             }
         }
     }
 
-    fun bind(favoritePlaceModel: FavoritePlaceModel) {
-        this.favoritePlaceModel = favoritePlaceModel
+    fun bind(turipPlaceModel: TuripPlaceModel) {
+        this.turipPlaceModel = turipPlaceModel
 
-        binding.tvFavoritePlaceCategory.text = favoritePlaceModel.turipCategory
-        binding.tvFavoritePlaceName.text = favoritePlaceModel.name
-        binding.ivFavoritePlaceFavorite.isSelected = favoritePlaceModel.isFavorite
-        binding.ivFavoritePlaceMapLink.setImageResource(Maps.from(favoritePlaceModel.uri).iconRes)
+        binding.tvFavoritePlaceCategory.text = turipPlaceModel.turipCategory
+        binding.tvFavoritePlaceName.text = turipPlaceModel.name
+        binding.ivFavoritePlaceFavorite.isSelected = turipPlaceModel.isTuripPlace
+        binding.ivFavoritePlaceMapLink.setImageResource(Maps.from(turipPlaceModel.uri).iconRes)
     }
 
     companion object {
@@ -61,6 +61,6 @@ class FavoritePlaceViewHolder(
 
         fun onMapClick(uri: Uri)
 
-        fun onItemClick(favoritePlaceModel: FavoritePlaceModel)
+        fun onItemClick(turipPlaceModel: TuripPlaceModel)
     }
 }

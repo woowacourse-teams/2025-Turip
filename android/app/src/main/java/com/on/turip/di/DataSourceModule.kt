@@ -12,8 +12,8 @@ import com.on.turip.data.login.datasource.AuthDataSource
 import com.on.turip.data.login.datasource.AuthRemoteDataSource
 import com.on.turip.data.login.datasource.MemberDataSource
 import com.on.turip.data.login.datasource.MemberRemoteDataSource
-import com.on.turip.data.place.datasource.DefaultFavoritePlaceRemoteDataSource
-import com.on.turip.data.place.datasource.FavoritePlaceRemoteDataSource
+import com.on.turip.data.place.datasource.DefaultTuripPlaceRemoteDataSource
+import com.on.turip.data.place.datasource.TuripPlaceRemoteDataSource
 import com.on.turip.data.region.datasource.DefaultRegionRemoteDataSource
 import com.on.turip.data.region.datasource.RegionRemoteDataSource
 import com.on.turip.data.searchhistory.datasource.DefaultSearchHistoryDataSource
@@ -63,9 +63,9 @@ abstract class DataSourceModule {
 
     @Binds
     @Singleton
-    abstract fun bindFavoritePlaceRemoteDataSource(
-        defaultFavoritePlaceRemoteDataSource: DefaultFavoritePlaceRemoteDataSource,
-    ): FavoritePlaceRemoteDataSource
+    abstract fun bindTuripPlaceRemoteDataSource(
+        defaultTuripPlaceRemoteDataSource: DefaultTuripPlaceRemoteDataSource,
+    ): TuripPlaceRemoteDataSource
 
     @Binds
     @Singleton

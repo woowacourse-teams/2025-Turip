@@ -19,7 +19,7 @@ class MyPageFragment : BaseFragment<FragmentMyPageBinding>() {
         MyPageStateAdapter(
             this,
             listOf(
-                FavoritePlaceFragment.instance(),
+                TuripPlaceFragment.instance(),
                 BookmarkContentFragment.instance(),
             ),
         )

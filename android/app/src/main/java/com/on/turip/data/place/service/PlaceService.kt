@@ -1,7 +1,7 @@
 package com.on.turip.data.place.service
 
-import com.on.turip.data.place.dto.FavoritePlaceOrderRequest
-import com.on.turip.data.place.dto.FavoritePlacesResponse
+import com.on.turip.data.place.dto.TuripPlaceOrderRequest
+import com.on.turip.data.place.dto.TuripPlacesResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -11,26 +11,26 @@ import retrofit2.http.POST
 import retrofit2.http.Query
 
 interface PlaceService {
-    @GET("favorites/places")
-    suspend fun getFavoritePlaces(
-        @Query("favoriteFolderId") favoriteFolderId: Long,
-    ): Response<FavoritePlacesResponse>
+    @GET("turips/places")
+    suspend fun getTuripPlaces(
+        @Query("turipId") turipId: Long,
+    ): Response<TuripPlacesResponse>
 
-    @POST("favorites/places")
-    suspend fun postFavoritePlace(
-        @Query("favoriteFolderId") favoriteFolderId: Long,
+    @POST("turips/places")
+    suspend fun postTuripPlace(
+        @Query("turipId") turipId: Long,
         @Query("placeId") placeId: Long,
     ): Response<Unit>
 
-    @DELETE("favorites/places")
-    suspend fun deleteFavoritePlace(
-        @Query("favoriteFolderId") favoriteFolderId: Long,
+    @DELETE("turips/places")
+    suspend fun deleteTuripPlace(
+        @Query("turipId") turipId: Long,
         @Query("placeId") placeId: Long,
     ): Response<Unit>
 
-    @PATCH("favorites/places/favorite-order")
-    suspend fun patchFavoritePlaceOrder(
-        @Query("favoriteFolderId") favoriteFolderId: Long,
-        @Body favoritePlaceOrderRequest: FavoritePlaceOrderRequest,
+    @PATCH("turips/places/turip-place-order")
+    suspend fun patchTuripPlaceOrder(
+        @Query("turipId") turipId: Long,
+        @Body turipPlaceOrderRequest: TuripPlaceOrderRequest,
     ): Response<Unit>
 }

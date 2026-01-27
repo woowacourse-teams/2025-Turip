@@ -75,7 +75,7 @@ fun TripDetailScreen(
     navigateToLogin: () -> Unit,
     navigateToMap: (mapModel: MapModel) -> Unit,
     navigateToWebViewUrl: (url: String) -> Unit,
-    onClickFavoritePlace: (id: Long) -> Unit,
+    onTuripPlaceClick: (id: Long) -> Unit,
     viewModel: TripDetailViewModel = hiltViewModel(),
 ) {
     val uiState: TripDetailUiState by viewModel.uiState.collectAsState()
@@ -203,7 +203,7 @@ fun TripDetailScreen(
                             onDayClick = viewModel::updateDay,
                             onTimeLineClick = webViewController::seekTo,
                             onMapClick = navigateToMap,
-                            onFavoritePlaceClick = onClickFavoritePlace,
+                            onTuripPlaceClick = onTuripPlaceClick,
                             onBookmarkClick = {
                                 snackbarHostState.currentSnackbarData?.dismiss()
                                 viewModel.updateBookmark()
@@ -270,7 +270,7 @@ private fun TripDetailScreenContent(
     onDayClick: (day: Int) -> Unit,
     onTimeLineClick: (timeLine: Int) -> Unit,
     onMapClick: (mapModel: MapModel) -> Unit,
-    onFavoritePlaceClick: (id: Long) -> Unit,
+    onTuripPlaceClick: (id: Long) -> Unit,
     onBookmarkClick: () -> Unit,
     onErrorVideoClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -329,14 +329,15 @@ private fun TripDetailScreenContent(
                 placeModel = place,
                 onTimeLineClick = onTimeLineClick,
                 onMapClick = onMapClick,
-                onFavoriteClick = onFavoritePlaceClick,
+                onTuripPlaceClick = onTuripPlaceClick,
                 modifier =
                     Modifier
                         .padding(
                             start = TuripTheme.spacing.extraLarge,
                             end = TuripTheme.spacing.extraLarge,
                             bottom = TuripTheme.spacing.small,
-                        ).fillMaxWidth(),
+                        )
+                        .fillMaxWidth(),
             )
         }
 
@@ -349,7 +350,8 @@ private fun TripDetailScreenContent(
                         .padding(
                             horizontal = TuripTheme.spacing.extraLarge,
                             vertical = TuripTheme.spacing.medium,
-                        ).fillMaxWidth(),
+                        )
+                        .fillMaxWidth(),
             )
         }
     }
@@ -404,7 +406,7 @@ private fun TripContentScreenPreview() {
                                 PlaceModel(
                                     id = 1L,
                                     name = "우아한테크코스",
-                                    isFavorite = true,
+                                    isTuripPlace = true,
                                     category = "💻 코딩맛집",
                                     mapLink = "kakao.com/123123",
                                     timeLine = "01:03",
@@ -412,7 +414,7 @@ private fun TripContentScreenPreview() {
                                 PlaceModel(
                                     id = 2L,
                                     name = "우아한테크코스",
-                                    isFavorite = false,
+                                    isTuripPlace = false,
                                     category = "💻 코딩맛집",
                                     mapLink = "google.com/123123",
                                     timeLine = "03:03",
@@ -430,7 +432,7 @@ private fun TripContentScreenPreview() {
                 onDayClick = {},
                 onTimeLineClick = {},
                 onMapClick = {},
-                onFavoritePlaceClick = {},
+                onTuripPlaceClick = {},
                 onBookmarkClick = {},
                 onErrorVideoClick = {},
             )

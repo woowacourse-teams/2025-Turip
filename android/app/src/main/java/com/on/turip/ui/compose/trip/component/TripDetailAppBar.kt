@@ -54,7 +54,7 @@ fun TripDetailAppBar(
 
 @Preview(showBackground = true, name = "컨텐츠 북마크 선택 상태")
 @Composable
-private fun IsFavoriteTripAppBarPreview() {
+private fun IsBookmarkedTripDetailAppBarPreview() {
     TuripTheme {
         TripDetailAppBar(
             isError = false,
@@ -67,7 +67,7 @@ private fun IsFavoriteTripAppBarPreview() {
 
 @Preview(showBackground = true, name = "컨텐츠 북마크 해제 상태")
 @Composable
-private fun IsNotFavoriteTripAppBarPreview() {
+private fun IsNotBookmarkedTripDetailAppBarPreview() {
     TuripTheme {
         TripDetailAppBar(
             isError = false,
@@ -80,7 +80,7 @@ private fun IsNotFavoriteTripAppBarPreview() {
 
 @Preview(showBackground = true, name = "화면에 에러 발생")
 @Composable
-private fun ErrorFavoriteTripAppBarPreview() {
+private fun ErrorTripDetailAppBarPreview() {
     TuripTheme {
         TripDetailAppBar(
             isError = true,

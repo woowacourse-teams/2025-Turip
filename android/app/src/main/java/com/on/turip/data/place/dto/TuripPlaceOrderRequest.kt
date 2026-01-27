@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class FavoritePlaceOrderRequest(
-    @SerialName("favoritePlaceIdsOrder")
-    val favoritePlaceIdsOrder: List<Long>,
+data class TuripPlaceOrderRequest(
+    @SerialName("turipPlaceIdsOrder")
+    val turipPlaceIdsOrder: List<Long>,
 )
