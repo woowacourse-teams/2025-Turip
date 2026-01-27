@@ -16,12 +16,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.client.MockRestServiceServer;
 import turip.common.configuration.RestClientConfiguration;
+import turip.common.log.ExternalApiLoggingInterceptor;
 import turip.place.controller.dto.response.PlaceSearchResponse;
 import turip.place.domain.PlaceSearchProvider;
 
 @ActiveProfiles("test")
-@Import(RestClientConfiguration.class)
 @RestClientTest(KakaoPlaceSearchClient.class)
+@Import({RestClientConfiguration.class, ExternalApiLoggingInterceptor.class})
 class KakaoPlaceSearchClientTest {
 
     @Autowired
