@@ -16,9 +16,10 @@ import turip.account.service.TuripMemberService;
 import turip.auth.controller.dto.request.GoogleLoginRequest;
 import turip.auth.controller.dto.request.RefreshTokenRequest;
 import turip.auth.controller.dto.request.TuripLoginRequest;
-import turip.auth.controller.dto.response.LoginResponse;
 import turip.auth.controller.dto.response.RefreshTokenResponse;
+import turip.auth.controller.dto.response.SocialLoginResponse;
 import turip.auth.domain.RefreshToken;
+import turip.auth.service.dto.TokenResult;
 import turip.auth.token.GoogleTokenParser;
 import turip.auth.token.JwtProvider;
 import turip.common.exception.ErrorTag;
@@ -37,13 +38,26 @@ public class AuthService {
     private final TuripMemberService turipMemberService;
 
     @Transactional
-    public LoginResponse loginWithTurip(TuripLoginRequest request, String deviceFid) {
-        Member member = turipMemberService.login(request).getMember();
-        return issueTokenAndCreateResponse(deviceFid, member);
+    public TokenResult loginWithTurip(TuripLoginRequest request, String deviceFid) {
+        Member member = loginAndGetMember(request);
+        return processTuripLogin(deviceFid, member);
     }
 
     @Transactional
-    public LoginResponse loginWithSocial(GoogleLoginRequest request, Provider provider, String deviceFid) {
+    public Member loginAndGetMember(TuripLoginRequest request) {
+        return turipMemberService.login(request).getMember();
+    }
+
+    @Transactional
+    public TokenResult processTuripLogin(final String deviceFid, final Member member) {
+        if (member.isFirstLogin()) {
+            member.completeFirstLogin();
+        }
+        return issueToken(deviceFid, member);
+    }
+
+    @Transactional
+    public SocialLoginResponse loginWithSocial(GoogleLoginRequest request, Provider provider, String deviceFid) {
         if (provider == Provider.GOOGLE) {
             return loginWithGoogle(request, deviceFid);
         }
@@ -86,13 +100,7 @@ public class AuthService {
         refreshTokenService.deleteByMemberAndDeviceFid(member, deviceFid);
     }
 
-    private LoginResponse issueTokenAndCreateResponse(String deviceFid, Member member) {
-        boolean isNewMember = false;
-        if (member.isFirstLogin()) {
-            member.completeFirstLogin();
-            isNewMember = true;
-        }
-
+    private TokenResult issueToken(String deviceFid, Member member) {
         Long accountId = member.getAccount().getId();
         Role role = member.getAccount().getRole();
 
@@ -100,11 +108,10 @@ public class AuthService {
         String refreshToken = jwtProvider.generateRefreshToken(accountId, role);
 
         saveRefreshToken(member, refreshToken, deviceFid);
-
-        return LoginResponse.of(accessToken, refreshToken, isNewMember);
+        return TokenResult.of(accessToken, refreshToken);
     }
 
-    private LoginResponse loginWithGoogle(GoogleLoginRequest request, String deviceFid) {
+    private SocialLoginResponse loginWithGoogle(GoogleLoginRequest request, String deviceFid) {
         String idToken = request.idToken();
         validateIdToken(idToken);
 
@@ -113,7 +120,15 @@ public class AuthService {
         String email = googleTokenParser.getEmail(idToken);
 
         Member member = findOrCreateSocialMember(provider, providerId, email);
-        return issueTokenAndCreateResponse(deviceFid, member);
+
+        boolean isNewMember = false;
+        if (member.isFirstLogin()) {
+            member.completeFirstLogin();
+            isNewMember = true;
+        }
+        TokenResult tokenResult = issueToken(deviceFid, member);
+
+        return SocialLoginResponse.of(tokenResult, isNewMember);
     }
 
     private Member findOrCreateSocialMember(Provider provider, String providerId, String email) {

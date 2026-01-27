@@ -21,6 +21,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import turip.account.domain.Provider;
+import turip.account.domain.Role;
 import turip.auth.token.GoogleTokenParser;
 import turip.util.helper.TestDataHelper;
 
@@ -71,9 +72,10 @@ class AuthApiTest {
             String email = "turip@gmail.com";
             String loginId = "turip";
             String loginPassword = "ValidPass1!";
-            boolean isFirstLogin = true;
+            Role role = Role.USER;
 
-            testDataHelper.insertTuripMember(email, isFirstLogin, loginId, loginPassword);
+            Long accountId = testDataHelper.insertAccount(role);
+            testDataHelper.insertTuripMember(accountId, email, true, loginId, loginPassword);
 
             Map<String, String> requestBody = new HashMap<>(Map.of("loginId", loginId, "loginPassword", loginPassword));
 
@@ -86,9 +88,8 @@ class AuthApiTest {
                     .when().post("/login/turip")
                     .then().log().all()
                     .statusCode(200)
-                    .body("accessToken", notNullValue())
-                    .body("refreshToken", notNullValue())
-                    .body("isNewMember", is(isFirstLogin));
+                    .cookie("accessToken")
+                    .cookie("refreshToken");
         }
 
         @Test
@@ -122,7 +123,7 @@ class AuthApiTest {
             String loginPassword = "InvalidPass1!";
             String realPassword = "ValidPass1!";
             boolean isFirstLogin = true;
-            
+
             testDataHelper.insertTuripMember(email, isFirstLogin, loginId, realPassword);
 
             Map<String, String> requestBody = new HashMap<>(Map.of("loginId", loginId, "loginPassword", loginPassword));

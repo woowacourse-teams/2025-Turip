@@ -9,11 +9,11 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
+import turip.account.domain.Member;
+import turip.account.service.MemberService;
 import turip.auth.token.JwtProvider;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.UnauthorizedException;
-import turip.account.domain.Member;
-import turip.account.service.MemberService;
 
 @Component
 @RequiredArgsConstructor
@@ -46,6 +46,9 @@ public class AuthMemberArgumentResolver implements HandlerMethodArgumentResolver
     private Member getMember(String accessToken) {
         try {
             Long accountId = jwtProvider.parseToken(accessToken).get("accountId", Long.class);
+            if (accountId == null) {
+                throw new UnauthorizedException(ErrorTag.UNAUTHORIZED);
+            }
             return memberService.getByAccountId(accountId);
 
         } catch (ExpiredJwtException e) {
