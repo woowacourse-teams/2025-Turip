@@ -1,4 +1,4 @@
-package com.on.turip.ui.main.favorite
+package com.on.turip.ui.main.bookmarks
 
 import android.content.Intent
 import android.os.Bundle
@@ -9,7 +9,7 @@ import androidx.fragment.app.viewModels
 import com.google.android.material.snackbar.Snackbar
 import com.on.turip.R
 import com.on.turip.databinding.FragmentFavoriteContentBinding
-import com.on.turip.domain.favorite.FavoriteContent
+import com.on.turip.domain.favorite.BookmarkContent
 import com.on.turip.ui.common.ItemDividerDecoration
 import com.on.turip.ui.common.base.BaseFragment
 import com.on.turip.ui.common.collectOnStarted
@@ -17,15 +17,13 @@ import com.on.turip.ui.common.error.ErrorUiModel
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.login.LoginActivity
-import com.on.turip.ui.main.favorite.model.FavoriteContentUiEffect
-import com.on.turip.ui.main.favorite.model.FavoriteContentUiState
 import com.on.turip.ui.trip.TripDetailActivity
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 
 @AndroidEntryPoint
-class FavoriteContentFragment : BaseFragment<FragmentFavoriteContentBinding>() {
-    private val viewModel: FavoriteContentViewModel by viewModels()
+class BookmarkContentFragment : BaseFragment<FragmentFavoriteContentBinding>() {
+    private val viewModel: BookmarkContentViewModel by viewModels()
 
     private val favoriteContentAdapter: FavoriteContentAdapter by lazy {
         FavoriteContentAdapter(
@@ -34,12 +32,12 @@ class FavoriteContentFragment : BaseFragment<FragmentFavoriteContentBinding>() {
                     contentId: Long,
                     isFavorite: Boolean,
                 ) {
-                    Timber.d("찜 목록의 찜 버튼을 클릭(contentId=$contentId)\n업데이트 된 찜 상태 =${!isFavorite}")
-                    viewModel.updateFavorite(contentId, isFavorite)
+                    Timber.d("컨텐츠 목록의 북마크 버튼을 클릭(contentId=$contentId)\n업데이트 된 북마크 상태 =${!isFavorite}")
+                    viewModel.updateBookmark(contentId, isFavorite)
                 }
 
                 override fun onFavoriteItemClick(contentId: Long) {
-                    Timber.d("찜 목록의 아이템 클릭(contentId=$contentId)")
+                    Timber.d("컨텐츠 목록의 아이템 클릭(contentId=$contentId)")
                     val intent: Intent =
                         TripDetailActivity.newIntent(
                             context = requireContext(),
@@ -78,22 +76,22 @@ class FavoriteContentFragment : BaseFragment<FragmentFavoriteContentBinding>() {
     }
 
     private fun setupObservers() {
-        collectOnStarted(viewModel.uiState) { uiState: FavoriteContentUiState ->
+        collectOnStarted(viewModel.uiState) { uiState: BookmarkContentUiState ->
             if (uiState.isLoading) showLoading()
             when {
                 uiState.errorUiState != ErrorUiState.None -> showErrorView(uiState.errorUiState)
                 uiState.isEmpty -> showEmptyView()
-                else -> showContents(uiState.favoriteContents)
+                else -> showContents(uiState.bookmarkContents)
             }
         }
 
-        collectOnStarted(viewModel.uiEffect) { uiEffect: FavoriteContentUiEffect ->
+        collectOnStarted(viewModel.uiEffect) { uiEffect: BookmarkContentUiEffect ->
             when (uiEffect) {
-                FavoriteContentUiEffect.NavigateToLogin -> {
+                BookmarkContentUiEffect.NavigateToLogin -> {
                     navigateToLoginScreen()
                 }
 
-                is FavoriteContentUiEffect.ShowError -> {
+                is BookmarkContentUiEffect.ShowError -> {
                     val uiModel: ErrorUiModel =
                         uiEffect.errorUiState.toUiModel() ?: return@collectOnStarted
                     view?.let { view: View ->
@@ -126,7 +124,7 @@ class FavoriteContentFragment : BaseFragment<FragmentFavoriteContentBinding>() {
         binding.customErrorView.apply {
             visibility = View.VISIBLE
             showErrorView(errorUiState)
-            setOnRetryClickListener { viewModel.loadFavoriteContents() }
+            setOnRetryClickListener { viewModel.loadBookmarkContents() }
         }
     }
 
@@ -137,13 +135,13 @@ class FavoriteContentFragment : BaseFragment<FragmentFavoriteContentBinding>() {
         binding.clFavoriteContentNotEmpty.visibility = View.GONE
     }
 
-    private fun showContents(favoriteContents: List<FavoriteContent>) {
+    private fun showContents(bookmarkContents: List<BookmarkContent>) {
         binding.customErrorView.visibility = View.GONE
         binding.pbFavoriteContentLoading.visibility = View.GONE
 
         binding.clFavoriteContentNotEmpty.visibility = View.VISIBLE
         binding.clFavoriteContentEmpty.visibility = View.GONE
-        favoriteContentAdapter.submitList(favoriteContents)
+        favoriteContentAdapter.submitList(bookmarkContents)
     }
 
     private fun navigateToLoginScreen() {
@@ -157,17 +155,17 @@ class FavoriteContentFragment : BaseFragment<FragmentFavoriteContentBinding>() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.loadFavoriteContents()
+        viewModel.loadBookmarkContents()
     }
 
     override fun onHiddenChanged(hidden: Boolean) {
         super.onHiddenChanged(hidden)
         if (!hidden) {
-            viewModel.loadFavoriteContents()
+            viewModel.loadBookmarkContents()
         }
     }
 
     companion object {
-        fun instance(): FavoriteContentFragment = FavoriteContentFragment()
+        fun instance(): BookmarkContentFragment = BookmarkContentFragment()
     }
 }

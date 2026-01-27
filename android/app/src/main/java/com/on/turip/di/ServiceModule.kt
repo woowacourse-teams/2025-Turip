@@ -1,8 +1,8 @@
 package com.on.turip.di
 
+import com.on.turip.data.bookmarks.service.BookmarkService
 import com.on.turip.data.content.place.service.ContentPlaceService
 import com.on.turip.data.content.service.ContentService
-import com.on.turip.data.favorite.service.FavoriteService
 import com.on.turip.data.folder.service.FolderService
 import com.on.turip.data.login.service.AuthService
 import com.on.turip.data.login.service.MemberService
@@ -26,7 +26,7 @@ object ServiceModule {
 
     @Provides
     @Singleton
-    fun provideFavoriteService(retrofit: Retrofit): FavoriteService = retrofit.create<FavoriteService>()
+    fun provideBookmarkService(retrofit: Retrofit): BookmarkService = retrofit.create<BookmarkService>()
 
     @Provides
     @Singleton

@@ -1,8 +1,8 @@
 package com.on.turip.di
 
+import com.on.turip.data.bookmarks.repository.DefaultBookmarkRepository
 import com.on.turip.data.content.place.repository.DefaultContentPlaceRepository
 import com.on.turip.data.content.repository.DefaultContentRepository
-import com.on.turip.data.favorite.repository.DefaultFavoriteRepository
 import com.on.turip.data.folder.repository.DefaultFolderRepository
 import com.on.turip.data.login.repository.DefaultAuthRepository
 import com.on.turip.data.login.repository.DefaultMemberRepository
@@ -11,8 +11,8 @@ import com.on.turip.data.region.repository.DefaultRegionRepository
 import com.on.turip.data.searchhistory.repository.DefaultSearchHistoryRepository
 import com.on.turip.data.userstorage.repository.DefaultUserStorageRepository
 import com.on.turip.domain.content.repository.ContentRepository
+import com.on.turip.domain.favorite.repository.BookmarkRepository
 import com.on.turip.domain.favorite.repository.FavoritePlaceRepository
-import com.on.turip.domain.favorite.repository.FavoriteRepository
 import com.on.turip.domain.folder.repository.FolderRepository
 import com.on.turip.domain.login.AuthRepository
 import com.on.turip.domain.login.MemberRepository
@@ -47,7 +47,7 @@ abstract class RepositoryModule {
 
     @Binds
     @Singleton
-    abstract fun bindFavoriteRepository(defaultFavoriteRepository: DefaultFavoriteRepository): FavoriteRepository
+    abstract fun bindBookmarkRepository(defaultBookmarkRepository: DefaultBookmarkRepository): BookmarkRepository
 
     @Binds
     @Singleton

@@ -47,7 +47,7 @@ fun ContentResponse.toDomain(): Content =
                 uploadedDate = uploadedDate,
             ),
         city = city.toDomain(),
-        isFavorite = isFavorite,
+        isBookmarked = isBookmarked,
     )
 
 fun CityResponse.toDomain(): City =
@@ -79,7 +79,7 @@ fun ContentDetailResponse.toDomain(): Content =
                 uploadedDate = uploadedDate,
             ),
         city = city.toDomain(),
-        isFavorite = isFavorite,
+        isBookmarked = isBookmarked,
     )
 
 fun UsersLikeContentsResponse.toDomain(): List<UsersLikeContent> = contents.map { it.toDomain() }

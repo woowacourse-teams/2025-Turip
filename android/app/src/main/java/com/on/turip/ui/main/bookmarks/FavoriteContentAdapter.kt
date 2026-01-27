@@ -1,13 +1,13 @@
-package com.on.turip.ui.main.favorite
+package com.on.turip.ui.main.bookmarks
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import com.on.turip.domain.favorite.FavoriteContent
+import com.on.turip.domain.favorite.BookmarkContent
 
 class FavoriteContentAdapter(
     private val onFavoriteContentListener: FavoriteContentViewHolder.FavoriteContentListener,
-) : ListAdapter<FavoriteContent, FavoriteContentViewHolder>(FavoriteContentDiffUtil) {
+) : ListAdapter<BookmarkContent, FavoriteContentViewHolder>(FavoriteContentDiffUtil) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -20,15 +20,15 @@ class FavoriteContentAdapter(
         holder.bind(getItem(position))
     }
 
-    private object FavoriteContentDiffUtil : DiffUtil.ItemCallback<FavoriteContent>() {
+    private object FavoriteContentDiffUtil : DiffUtil.ItemCallback<BookmarkContent>() {
         override fun areItemsTheSame(
-            oldItem: FavoriteContent,
-            newItem: FavoriteContent,
+            oldItem: BookmarkContent,
+            newItem: BookmarkContent,
         ): Boolean = oldItem.content.id == newItem.content.id
 
         override fun areContentsTheSame(
-            oldItem: FavoriteContent,
-            newItem: FavoriteContent,
+            oldItem: BookmarkContent,
+            newItem: BookmarkContent,
         ): Boolean = oldItem == newItem
     }
 }

@@ -115,7 +115,7 @@ private fun previewUsersLikeContent(
                     City(
                         name = city,
                     ),
-                isFavorite = true,
+                isBookmarked = true,
             ),
         tripDuration =
             TripDurationModel(

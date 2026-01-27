@@ -3,7 +3,7 @@ package com.on.turip.domain.favorite
 import com.on.turip.domain.content.Content
 import com.on.turip.domain.trip.TripDuration
 
-data class FavoriteContent(
+data class BookmarkContent(
     val content: Content,
     val tripDuration: TripDuration,
     val tripPlaceCount: Int,

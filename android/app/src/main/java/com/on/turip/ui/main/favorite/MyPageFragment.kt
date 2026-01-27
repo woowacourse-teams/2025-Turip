@@ -9,6 +9,7 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.on.turip.databinding.FragmentMyPageBinding
 import com.on.turip.ui.common.base.BaseFragment
+import com.on.turip.ui.main.bookmarks.BookmarkContentFragment
 import com.on.turip.ui.setting.SettingActivity
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -19,7 +20,7 @@ class MyPageFragment : BaseFragment<FragmentMyPageBinding>() {
             this,
             listOf(
                 FavoritePlaceFragment.instance(),
-                FavoriteContentFragment.instance(),
+                BookmarkContentFragment.instance(),
             ),
         )
     }

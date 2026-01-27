@@ -1,10 +1,10 @@
-package com.on.turip.data.favorite.dto
+package com.on.turip.data.bookmarks.dto
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class FavoriteAddRequest(
+data class BookmarkAddRequest(
     @SerialName("contentId")
     val contentId: Long,
 )

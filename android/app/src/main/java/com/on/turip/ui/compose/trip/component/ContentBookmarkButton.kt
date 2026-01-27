@@ -23,16 +23,16 @@ import com.on.turip.R
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 
 @Composable
-fun ContentFavoriteButton(
-    isContentFavorite: Boolean,
+fun ContentBookmarkButton(
+    isBookmarked: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val iconRes =
-        if (isContentFavorite) R.drawable.btn_bookmark_selected else R.drawable.btn_bookmark_normal
+        if (isBookmarked) R.drawable.btn_bookmark_selected else R.drawable.btn_bookmark_normal
 
     val titleRes =
-        if (isContentFavorite) R.string.trip_detail_trip_favorite_select else R.string.trip_detail_trip_favorite_normal
+        if (isBookmarked) R.string.trip_detail_trip_bookmark_select else R.string.trip_detail_trip_bookmark_normal
 
     Row(
         horizontalArrangement = Arrangement.Center,
@@ -62,23 +62,23 @@ fun ContentFavoriteButton(
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, name = "북마크 선택 상태")
 @Composable
-private fun FavoriteContentFavoriteButtonPreview() {
+private fun ContentBookmarkButtonIsBookmarkedPreview() {
     TuripTheme {
-        ContentFavoriteButton(
-            isContentFavorite = true,
+        ContentBookmarkButton(
+            isBookmarked = true,
             onClick = {},
         )
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, name = "북마크 해제 상태")
 @Composable
-private fun DefaultContentFavoriteButtonPreview() {
+private fun ContentBookmarkButtonIsNotBookmarkedPreview() {
     TuripTheme {
-        ContentFavoriteButton(
-            isContentFavorite = false,
+        ContentBookmarkButton(
+            isBookmarked = false,
             onClick = {},
         )
     }

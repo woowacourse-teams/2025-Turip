@@ -1,11 +1,11 @@
 package com.on.turip.di
 
+import com.on.turip.data.bookmarks.datasource.BookmarkRemoteDataSource
+import com.on.turip.data.bookmarks.datasource.DefaultBookmarkRemoteDataSource
 import com.on.turip.data.content.datasource.ContentRemoteDataSource
 import com.on.turip.data.content.datasource.DefaultContentRemoteDataSource
 import com.on.turip.data.content.place.datasource.ContentPlaceRemoteDataSource
 import com.on.turip.data.content.place.datasource.DefaultContentPlaceRemoteDataSource
-import com.on.turip.data.favorite.datasource.DefaultFavoriteRemoteDataSource
-import com.on.turip.data.favorite.datasource.FavoriteRemoteDataSource
 import com.on.turip.data.folder.datasource.DefaultFolderRemoteDataSource
 import com.on.turip.data.folder.datasource.FolderRemoteDataSource
 import com.on.turip.data.login.datasource.AuthDataSource
@@ -47,7 +47,7 @@ abstract class DataSourceModule {
 
     @Binds
     @Singleton
-    abstract fun bindFavoriteRemoteDataSource(defaultFavoriteRemoteDataSource: DefaultFavoriteRemoteDataSource): FavoriteRemoteDataSource
+    abstract fun bindBookmarkRemoteDataSource(defaultBookmarkRemoteDataSource: DefaultBookmarkRemoteDataSource): BookmarkRemoteDataSource
 
     @Binds
     @Singleton

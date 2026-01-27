@@ -39,9 +39,6 @@
     <string name="region_result_video_description">%1$s · %2$s</string>
     <string name="region_result_exist_result">검색결과 %d개</string>
 
-    <!-- 컨텐츠 상세 페이지 -->
-    <string name="bottom_sheet_favorite_place_folder_title">폴더 목록</string>
-
     <!-- 홈 페이지 -->
     <string name="home_top_title">😊 오늘의 기분은, 여행하기 딱 좋아요!</string>
     <string name="home_users_like_content_title">❤️ 한 주간 가장 많이 찜 된 콘텐츠</string>
@@ -59,9 +56,9 @@
     <string name="setting_withdraw_dialog_confirm">회원탈퇴</string>
     <string name="setting_withdraw_dialog_dismiss">취소</string>
 
-    <!-- 찜 컨텐츠 목록 페이지 -->
-    <string name="favorite_content_empty_suggest_title">컨텐츠를 찜 해보세요!</string>
-    <string name="favorite_content_empty_suggest_description">원하는 동선이 담긴\n여행 일정을 저장해 보세요.</string>
+    <!-- 북마크 컨텐츠 목록 페이지 -->
+    <string name="bookmark_content_empty_suggest_title">컨텐츠를 저장 해보세요!</string>
+    <string name="bookmark_content_empty_suggest_description">원하는 동선이 담긴\n여행 일정을 저장해 보세요.</string>
 
     <!-- 찜 장소 목록 페이지 -->
     <string name="favorite_place_empty_suggest_title">장소를 찜 해보세요!</string>
@@ -73,9 +70,10 @@
     <string name="trip_detail_day_place_count">일정 %d개</string>
     <string name="trip_detail_trip_day">%d일차</string>
     <string name="trip_detail_trip_all_place">전체</string>
-    <string name="trip_detail_snackbar_favorite_save">컨텐츠 찜 목록에 저장했어요</string>
-    <string name="trip_detail_snackbar_favorite_remove">컨텐츠 찜 목록에서 삭제했어요</string>
+    <string name="trip_detail_snackbar_bookmark_save">북마크에 저장했어요</string>
+    <string name="trip_detail_snackbar_bookmark_remove">북마크를 해제했어요</string>
     <string name="trip_detail_info">%s • %d개 장소 • %s</string>
+    <string name="bottom_sheet_favorite_place_folder_title">폴더 목록</string>
     <string name="bottom_sheet_favorite_place_folder_save_with_folder_name">%s에 저장했어요</string>
     <string name="bottom_sheet_favorite_place_folder_remove_with_folder_name">%s에서 삭제했어요</string>
     <string name="trip_place_map">지도 보기</string>
@@ -83,9 +81,9 @@
     <string name="trip_place_time_line">%s~</string>
     <string name="trip_detail_period">여행 기간</string>
     <string name="trip_detail_visit_place">방문 장소</string>
-    <string name="trip_detail_trip_favorite_normal">이 여행 저장하기</string>
-    <string name="trip_detail_trip_favorite_select">저장된 여행이에요</string>
-    <string name="trip_detail_favorite_description">컨텐츠 좋아요</string>
+    <string name="trip_detail_trip_bookmark_normal">이 여행 저장하기</string>
+    <string name="trip_detail_trip_bookmark_select">저장된 여행이에요</string>
+    <string name="trip_detail_bookmark_description">컨텐츠 북마크</string>
 
     <!-- 폴더 페이지 -->
     <string name="folder_title">폴더 편집</string>
@@ -127,7 +125,5 @@
     <string name="turip_dialog_login_suggest_description">로그인하고 나만의 여행 정보를\n 공유해보세요!</string>
     <string name="turip_dialog_login_suggest_confirm">로그인</string>
     <string name="turip_dialog_login_suggest_dismiss">나중에</string>
-
-    <!--  -->
 
 </resources>

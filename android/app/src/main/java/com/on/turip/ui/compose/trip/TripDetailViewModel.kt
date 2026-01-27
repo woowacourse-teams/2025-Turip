@@ -9,7 +9,7 @@ import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
 import com.on.turip.domain.content.Content
 import com.on.turip.domain.content.repository.ContentRepository
-import com.on.turip.domain.favorite.usecase.UpdateFavoriteUseCase
+import com.on.turip.domain.favorite.usecase.UpdateBookmarkUseCase
 import com.on.turip.domain.trip.ContentPlace
 import com.on.turip.domain.trip.Trip
 import com.on.turip.domain.trip.repository.ContentPlaceRepository
@@ -42,7 +42,7 @@ class TripDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val contentRepository: ContentRepository,
     private val contentPlaceRepository: ContentPlaceRepository,
-    private val updateFavoriteUseCase: UpdateFavoriteUseCase,
+    private val updateBookmarkUseCase: UpdateBookmarkUseCase,
 ) : ViewModel() {
     private var placeCacheByDay: Map<Int, ImmutableList<PlaceModel>> = emptyMap()
 
@@ -112,7 +112,7 @@ class TripDetailViewModel @Inject constructor(
                             placeTotalCount = trip.tripPlaceCount,
                             duration = trip.tripDuration.toUiModel(),
                         ),
-                    isFavorite = content.isFavorite,
+                    isBookmarked = content.isBookmarked,
                 )
             }
 
@@ -152,14 +152,14 @@ class TripDetailViewModel @Inject constructor(
         }
     }
 
-    fun updateFavorite() {
-        val updatedIsFavorite = !uiState.value.isFavorite
+    fun updateBookmark() {
+        val updateBookmark = !uiState.value.isBookmarked
         viewModelScope.launch {
-            updateFavoriteUseCase(updatedIsFavorite, contentId)
+            updateBookmarkUseCase(updateBookmark, contentId)
                 .onSuccess {
-                    Timber.d("컨텐츠 찜 API 통신 성공")
-                    _uiState.update { it.copy(isFavorite = updatedIsFavorite) }
-                    _uiEffect.send(TripDetailUiEffect.ShowFavoriteStatus(updatedIsFavorite))
+                    Timber.d("북마크 업데이트 API 성공")
+                    _uiState.update { it.copy(isBookmarked = updateBookmark) }
+                    _uiEffect.send(TripDetailUiEffect.ShowBookmarkStatus(updateBookmark))
                 }.onFailure { errorType: ErrorType ->
                     _uiState.update { it.copy(isLoading = false) }
                     val uiError: UiError = errorType.toUiError()
@@ -169,7 +169,7 @@ class TripDetailViewModel @Inject constructor(
                                 _uiEffect.send(
                                     TripDetailUiEffect.ShowError(
                                         ErrorUiState.Network,
-                                        TripDetailRetryAction.UpdateFavorite,
+                                        TripDetailRetryAction.UpdateBookmark,
                                     ),
                                 )
                             }
@@ -178,7 +178,7 @@ class TripDetailViewModel @Inject constructor(
                                 _uiEffect.send(
                                     TripDetailUiEffect.ShowError(
                                         ErrorUiState.Server,
-                                        TripDetailRetryAction.UpdateFavorite,
+                                        TripDetailRetryAction.UpdateBookmark,
                                     ),
                                 )
                             }
@@ -188,7 +188,7 @@ class TripDetailViewModel @Inject constructor(
                             }
                         }
                     }
-                    Timber.d("컨텐츠 찜 API 통신 실패")
+                    Timber.d("북마크 업데이트 API 실패")
                 }
         }
     }
@@ -240,7 +240,7 @@ class TripDetailViewModel @Inject constructor(
 
     fun handleErrorRetryRequest(action: TripDetailRetryAction) {
         when (action) {
-            TripDetailRetryAction.UpdateFavorite -> updateFavorite()
+            TripDetailRetryAction.UpdateBookmark -> updateBookmark()
         }
     }
 }

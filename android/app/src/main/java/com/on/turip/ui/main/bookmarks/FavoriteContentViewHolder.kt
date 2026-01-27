@@ -1,4 +1,4 @@
-package com.on.turip.ui.main.favorite
+package com.on.turip.ui.main.bookmarks
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -8,7 +8,7 @@ import com.on.turip.databinding.ItemFavoriteContentBinding
 import com.on.turip.domain.content.Content
 import com.on.turip.domain.content.video.VideoData
 import com.on.turip.domain.creator.Creator
-import com.on.turip.domain.favorite.FavoriteContent
+import com.on.turip.domain.favorite.BookmarkContent
 import com.on.turip.ui.common.TuripUrlConverter
 import com.on.turip.ui.common.loadRoundedCornerImage
 import com.on.turip.ui.common.mapper.toUiModel
@@ -17,29 +17,29 @@ class FavoriteContentViewHolder(
     private val binding: ItemFavoriteContentBinding,
     private val onFavoriteContentListener: FavoriteContentListener,
 ) : RecyclerView.ViewHolder(binding.root) {
-    private var favoriteContent: FavoriteContent? = null
+    private var bookmarkContent: BookmarkContent? = null
 
     init {
         itemView.setOnClickListener {
-            favoriteContent?.content?.let { content: Content ->
+            bookmarkContent?.content?.let { content: Content ->
                 onFavoriteContentListener.onFavoriteItemClick(
                     content.id,
                 )
             }
         }
         binding.ivFavoriteContentFavorite.setOnClickListener {
-            favoriteContent?.let {
+            bookmarkContent?.let {
                 onFavoriteContentListener.onFavoriteClick(
                     it.content.id,
-                    it.content.isFavorite,
+                    it.content.isBookmarked,
                 )
             }
         }
     }
 
-    fun bind(favoriteContent: FavoriteContent) {
-        this.favoriteContent = favoriteContent
-        val content: Content = favoriteContent.content
+    fun bind(bookmarkContent: BookmarkContent) {
+        this.bookmarkContent = bookmarkContent
+        val content: Content = bookmarkContent.content
         val videoData: VideoData = content.videoData
         val creator: Creator = content.creator
 
@@ -58,18 +58,18 @@ class FavoriteContentViewHolder(
             tvFavoriteContentTotalPlaceCount.text =
                 itemView.context.getString(
                     R.string.all_total_place_count,
-                    favoriteContent.tripPlaceCount,
+                    bookmarkContent.tripPlaceCount,
                 )
 
             tvFavoriteContentTripDuration.text =
-                favoriteContent.tripDuration.toUiModel().toDisplayText(itemView.context)
+                bookmarkContent.tripDuration.toUiModel().toDisplayText(itemView.context)
 
             ivFavoriteContentVideoThumbnail.loadRoundedCornerImage(
                 imageUrl = TuripUrlConverter.convertVideoThumbnailUrl(videoData.url),
                 radius = 10,
             )
 
-            ivFavoriteContentFavorite.isSelected = content.isFavorite
+            ivFavoriteContentFavorite.isSelected = content.isBookmarked
         }
     }
 
