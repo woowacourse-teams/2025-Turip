@@ -52,7 +52,7 @@ public class FavoriteContentController {
                                             {
                                                 "id": 1,
                                                 "createdAt": "2025-08-06",
-                                                "memberId": 1,
+                                                "accountId": 1,
                                                 "content": {
                                                     "id": 1,
                                                     "title": "나혼자 기차 타고 부산 여행 vlog 🌊 | 당일치기 쌉가능한 여행코스 💌 , 200% 만족한 광안리 숙소 🏠, 부산 토박이의 단골집 추천까지,,💛 | 3박4일 부산 브이로그",

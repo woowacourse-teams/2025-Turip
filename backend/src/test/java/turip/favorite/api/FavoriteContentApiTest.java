@@ -112,7 +112,7 @@ class FavoriteContentApiTest {
                     .header("Location", org.hamcrest.Matchers.containsString("/favorites/contents/"))
                     .body("id", Matchers.notNullValue())
                     .body("createdAt", Matchers.notNullValue())
-                    .body("memberId", Matchers.notNullValue())
+                    .body("accountId", Matchers.notNullValue())
                     .body("content.id", is(1))
                     .body("content.title", is("서울 데이트 코스 추천"));
         }

@@ -7,7 +7,7 @@ import turip.place.controller.dto.response.PlaceResponse;
 
 public record FavoriteFolderWithFavoriteStatusResponse(
         Long id,
-        Long memberId,
+        Long accountId,
         String name,
         boolean isDefault,
         boolean isFavoritePlace

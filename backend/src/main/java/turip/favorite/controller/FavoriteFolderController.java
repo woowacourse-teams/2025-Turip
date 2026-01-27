@@ -55,7 +55,7 @@ public class FavoriteFolderController {
                                     value = """
                                             {
                                                 "id": 1,
-                                                "memberId": 1,
+                                                "accountId": 1,
                                                 "name": "뭉치가 가고싶은 맛집들",
                                                 "isDefault": false
                                             }
@@ -182,14 +182,14 @@ public class FavoriteFolderController {
                                                 "favoriteFolders": [
                                                     {
                                                         "id": 5,
-                                                        "memberId": 8,
+                                                        "accountId": 8,
                                                         "name": "기본 폴더",
                                                         "isDefault": true,
                                                         "placeCount": 0
                                                     },
                                                     {
                                                         "id": 6,
-                                                        "memberId": 8,
+                                                        "accountId": 8,
                                                         "name": "뭉치가 가고싶은 맛집들",
                                                         "isDefault": false,
                                                         "placeCount": 0
@@ -267,14 +267,14 @@ public class FavoriteFolderController {
                                                 "favoriteFolders": [
                                                     {
                                                         "id": 5,
-                                                        "memberId": 1,
+                                                        "accountId": 1,
                                                         "name": "기본 폴더",
                                                         "isDefault": true,
                                                         "isFavoritePlace": true
                                                     },
                                                     {
                                                         "id": 6,
-                                                        "memberId": 1,
+                                                        "accountId": 1,
                                                         "name": "잠실 맛집들",
                                                         "isDefault": false,
                                                         "isFavoritePlace": false
@@ -370,7 +370,7 @@ public class FavoriteFolderController {
                                     value = """
                                             {
                                                 "id": 1,
-                                                "memberId": 1,
+                                                "accountId": 1,
                                                 "name": "수정된 폴더명",
                                                 "isDefault": false
                                             }

@@ -147,11 +147,11 @@ class FavoriteFolderApiTest {
                     .statusCode(200)
                     .body("favoriteFolders.size()", is(2))
                     .body("favoriteFolders[0].id", is(1))
-                    .body("favoriteFolders[0].memberId", is(accountId.intValue()))
+                    .body("favoriteFolders[0].accountId", is(accountId.intValue()))
                     .body("favoriteFolders[0].name", is("기본 폴더"))
                     .body("favoriteFolders[0].isDefault", is(true))
                     .body("favoriteFolders[1].id", is(2))
-                    .body("favoriteFolders[1].memberId", is(accountId.intValue()))
+                    .body("favoriteFolders[1].accountId", is(accountId.intValue()))
                     .body("favoriteFolders[1].name", is("대구 맛집 모음"))
                     .body("favoriteFolders[1].isDefault", is(false));
         }
@@ -166,7 +166,7 @@ class FavoriteFolderApiTest {
                     .then()
                     .statusCode(200)
                     .body("favoriteFolders.size()", is(1))
-                    .body("favoriteFolders[0].memberId", is(1))
+                    .body("favoriteFolders[0].accountId", is(1))
                     .body("favoriteFolders[0].name", is("기본 폴더"))
                     .body("favoriteFolders[0].isDefault", is(true));
         }
@@ -264,7 +264,7 @@ class FavoriteFolderApiTest {
                     .then()
                     .statusCode(200)
                     .body("id", is(1))
-                    .body("memberId", is(accountId.intValue()))
+                    .body("accountId", is(accountId.intValue()))
                     .body("name", is("변경된 폴더"))
                     .body("isDefault", is(false));
         }
