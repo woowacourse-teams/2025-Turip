@@ -140,7 +140,7 @@ public class ContentController {
                                                                 "channelName": "하찬투어 hachantour",
                                                                 "profileImage": "https://yt3.googleusercontent.com/xMc7FcCl689p_ymaijuY5WOwX9DeHaZ_WTnRHb8UajggQotOO8Bxd0P7cqsYYfubotgjlh4Qfw=s160-c-k-c0x00ffffff-no-rj"
                                                             },
-                                                            "isFavorite": false
+                                                            "isBookmarked": false
                                                         },
                                                         "tripDuration": {
                                                             "nights": 3,
@@ -162,7 +162,7 @@ public class ContentController {
                                                                 "channelName": "연수연",
                                                                 "profileImage": "https://yt3.googleusercontent.com/EMvavcwV96_NkCYm4V8TZIrsytHaiS2AaxS_goqR57WP7kn36qQY92Ujex8JUbBWGQ7P5VY0DA=s160-c-k-c0x00ffffff-no-rj"
                                                             },
-                                                            "isFavorite": true
+                                                            "isBookmarked": true
                                                         },
                                                         "tripDuration": {
                                                             "nights": 2,
@@ -280,7 +280,7 @@ public class ContentController {
                                                                 "channelName": "하찬투어 hachantour",
                                                                 "profileImage": "https://yt3.googleusercontent.com/xMc7FcCl689p_ymaijuY5WOwX9DeHaZ_WTnRHb8UajggQotOO8Bxd0P7cqsYYfubotgjlh4Qfw=s160-c-k-c0x00ffffff-no-rj"
                                                             },
-                                                            "isFavorite": false
+                                                            "isBookmarked": false
                                                         },
                                                         "tripDuration": {
                                                             "nights": 3,
@@ -302,7 +302,7 @@ public class ContentController {
                                                                 "channelName": "연수연",
                                                                 "profileImage": "https://yt3.googleusercontent.com/EMvavcwV96_NkCYm4V8TZIrsytHaiS2AaxS_goqR57WP7kn36qQY92Ujex8JUbBWGQ7P5VY0DA=s160-c-k-c0x00ffffff-no-rj"
                                                             },
-                                                            "isFavorite": true
+                                                            "isBookmarked": true
                                                         },
                                                         "tripDuration": {
                                                             "nights": 2,
@@ -398,7 +398,7 @@ public class ContentController {
                                                     "channelName": "연수연",
                                                     "profileImage": "https://yt3.googleusercontent.com/EMvavcwV96_NkCYm4V8TZIrsytHaiS2AaxS_goqR57WP7kn36qQY92Ujex8JUbBWGQ7P5VY0DA=s160-c-k-c0x00ffffff-no-rj"
                                                 },
-                                                "isFavorite": false
+                                                "isBookmarked": false
                                             }
                                             """
                             )
@@ -504,7 +504,7 @@ public class ContentController {
                                                       "channelName": "여행하는 뭉치",
                                                       "profileImage": "http://turip.com/static/youtuber1"
                                                     },
-                                                    "isFavorite": false
+                                                    "isBookmarked": false
                                                   },
                                                   "tripDuration": {
                                                     "nights": 2,
@@ -525,7 +525,7 @@ public class ContentController {
                                                       "channelName": "여행하는 하루",
                                                       "profileImage": "http://turip.com/static/youtuber2"
                                                     },
-                                                    "isFavorite": true
+                                                    "isBookmarked": true
                                                   },
                                                   "tripDuration": {
                                                     "nights": 1,

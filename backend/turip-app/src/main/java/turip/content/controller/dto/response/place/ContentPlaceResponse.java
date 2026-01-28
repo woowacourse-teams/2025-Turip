@@ -2,6 +2,7 @@ package turip.content.controller.dto.response.place;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalTime;
 import turip.content.domain.ContentPlace;
 import turip.place.controller.dto.response.PlaceResponse;
@@ -13,6 +14,7 @@ public record ContentPlaceResponse(
         PlaceResponse place,
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "mm:ss")
         LocalTime timeLine,
+        @JsonProperty("isTuripPlace")
         boolean isFavoritePlace
 ) {
 

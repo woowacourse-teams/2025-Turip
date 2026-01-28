@@ -179,7 +179,7 @@ public class FavoriteFolderController {
                                     summary = "튜립 조회 성공",
                                     value = """
                                             {
-                                                "favoriteFolders": [
+                                                "turips": [
                                                     {
                                                         "id": 5,
                                                         "accountId": 8,
@@ -264,20 +264,20 @@ public class FavoriteFolderController {
                                     summary = "튜립 조회 성공",
                                     value = """
                                             {
-                                                "favoriteFolders": [
+                                                "turips": [
                                                     {
                                                         "id": 5,
                                                         "accountId": 1,
                                                         "name": "기본 폴더",
                                                         "isDefault": true,
-                                                        "isFavoritePlace": true
+                                                        "isTuripPlace": true
                                                     },
                                                     {
                                                         "id": 6,
                                                         "accountId": 1,
                                                         "name": "잠실 맛집들",
                                                         "isDefault": false,
-                                                        "isFavoritePlace": false
+                                                        "isTuripPlace": false
                                                     }
                                                 ]
                                             }

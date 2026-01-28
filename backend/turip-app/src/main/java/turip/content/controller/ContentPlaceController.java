@@ -63,7 +63,7 @@ public class ContentPlaceController {
                                                     ]
                                                   },
                                                   "timeLine": "01:22",
-                                                  "isFavoritePlace": false
+                                                  "isTuripPlace": false
                                                 },
                                                 {
                                                   "id": 2,
@@ -83,7 +83,7 @@ public class ContentPlaceController {
                                                     ]
                                                   },
                                                   "timeLine": "02:00",
-                                                  "isFavoritePlace": false
+                                                  "isTuripPlace": false
                                                 },
                                                 {
                                                   "id": 3,
@@ -103,7 +103,7 @@ public class ContentPlaceController {
                                                     ]
                                                   },
                                                   "timeLine": "02:20",
-                                                  "isFavoritePlace": false
+                                                  "isTuripPlace": false
                                                 }
                                               ],
                                               "contentPlaceCount": 3,

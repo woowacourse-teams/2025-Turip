@@ -96,10 +96,10 @@ class ContentApiTest {
                     .body("title", is("서울 데이트 코스 추천"))
                     .body("url", is("https://youtube.com/watch?v=abcd1"))
                     .body("uploadedDate", is("2024-07-01"))
-                    .body("isFavorite", is(false));
+                    .body("isBookmarked", is(false));
         }
 
-        @DisplayName("해당 계정에 찜이 되어 있는 경우 isFavorite이 true로 응답된다")
+        @DisplayName("해당 계정에 찜이 되어 있는 경우 isBookmarked가 true로 응답된다")
         @Test
         void readContentById_withDeviceFidHeader() {
             // given
@@ -130,7 +130,7 @@ class ContentApiTest {
                     .body("title", is("서울 데이트 코스 추천"))
                     .body("url", is("https://youtube.com/watch?v=abcd1"))
                     .body("uploadedDate", is("2024-07-01"))
-                    .body("isFavorite", is(true));
+                    .body("isBookmarked", is(true));
         }
 
         @DisplayName("id에 해당하는 컨텐츠가 없는 경우 404 NOT FOUND 코드를 응답한다")

@@ -145,15 +145,15 @@ class FavoriteFolderApiTest {
                     .when().get("/api/v1/turips")
                     .then()
                     .statusCode(200)
-                    .body("favoriteFolders.size()", is(2))
-                    .body("favoriteFolders[0].id", is(1))
-                    .body("favoriteFolders[0].accountId", is(accountId.intValue()))
-                    .body("favoriteFolders[0].name", is("기본 폴더"))
-                    .body("favoriteFolders[0].isDefault", is(true))
-                    .body("favoriteFolders[1].id", is(2))
-                    .body("favoriteFolders[1].accountId", is(accountId.intValue()))
-                    .body("favoriteFolders[1].name", is("대구 맛집 모음"))
-                    .body("favoriteFolders[1].isDefault", is(false));
+                    .body("turips.size()", is(2))
+                    .body("turips[0].id", is(1))
+                    .body("turips[0].accountId", is(accountId.intValue()))
+                    .body("turips[0].name", is("기본 폴더"))
+                    .body("turips[0].isDefault", is(true))
+                    .body("turips[1].id", is(2))
+                    .body("turips[1].accountId", is(accountId.intValue()))
+                    .body("turips[1].name", is("대구 맛집 모음"))
+                    .body("turips[1].isDefault", is(false));
         }
 
         @DisplayName("저장되지 않은 회원이 조회를 시도하는 경우 200 OK 코드와 기본 폴더 정보를 응답한다")
@@ -165,10 +165,10 @@ class FavoriteFolderApiTest {
                     .when().get("/api/v1/turips")
                     .then()
                     .statusCode(200)
-                    .body("favoriteFolders.size()", is(1))
-                    .body("favoriteFolders[0].accountId", is(1))
-                    .body("favoriteFolders[0].name", is("기본 폴더"))
-                    .body("favoriteFolders[0].isDefault", is(true));
+                    .body("turips.size()", is(1))
+                    .body("turips[0].accountId", is(1))
+                    .body("turips[0].name", is("기본 폴더"))
+                    .body("turips[0].isDefault", is(true));
         }
     }
 
@@ -197,9 +197,9 @@ class FavoriteFolderApiTest {
                     .when().get("/api/v1/turips/turip-status")
                     .then()
                     .statusCode(200)
-                    .body("favoriteFolders.size()", is(2))
-                    .body("favoriteFolders[0].isFavoritePlace", is(false))
-                    .body("favoriteFolders[1].isFavoritePlace", is(true));
+                    .body("turips.size()", is(2))
+                    .body("turips[0].isTuripPlace", is(false))
+                    .body("turips[1].isTuripPlace", is(true));
         }
 
         @DisplayName("저장되지 않은 회원이 조회를 시도하는 경우 200 OK 코드와 기본 폴더 정보를 응답한다")
@@ -216,9 +216,9 @@ class FavoriteFolderApiTest {
                     .when().get("/api/v1/turips/turip-status")
                     .then()
                     .statusCode(200)
-                    .body("favoriteFolders[0].name", is("기본 폴더"))
-                    .body("favoriteFolders[0].isDefault", is(true))
-                    .body("favoriteFolders[0].isFavoritePlace", is(false));
+                    .body("turips[0].name", is("기본 폴더"))
+                    .body("turips[0].isDefault", is(true))
+                    .body("turips[0].isTuripPlace", is(false));
         }
 
         @DisplayName("placeId에 대한 장소를 찾을 수 없는 경우 404 NOT FOUND를 응답한다")

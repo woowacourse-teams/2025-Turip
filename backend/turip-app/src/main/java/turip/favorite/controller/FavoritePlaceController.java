@@ -201,7 +201,7 @@ public class FavoritePlaceController {
                                     summary = "튜립 내 장소 목록 조회 성공",
                                     value = """
                                             {
-                                                "favoritePlaces": [
+                                                "turipPlaces": [
                                                     {
                                                         "id": 1,
                                                         "place": {
@@ -217,7 +217,7 @@ public class FavoritePlaceController {
                                                                 }
                                                             ]
                                                         },
-                                                        "favoriteOrder": 1
+                                                        "turipPlaceOrder": 1
                                                     },
                                                     {
                                                         "id": 2,
@@ -234,10 +234,10 @@ public class FavoritePlaceController {
                                                                 }
                                                             ]
                                                         },
-                                                        "favoriteOrder": 2
+                                                        "turipPlaceOrder": 2
                                                     }
                                                 ],
-                                                "favoritePlaceCount": 2
+                                                "turipPlaceCount": 2
                                             }
                                             """
                             )

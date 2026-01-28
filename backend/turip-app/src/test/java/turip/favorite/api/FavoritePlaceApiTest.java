@@ -333,9 +333,9 @@ class FavoritePlaceApiTest {
                     .when().get("/api/v1/turips/places")
                     .then()
                     .statusCode(200)
-                    .body("favoritePlaceCount", is(2))
-                    .body("favoritePlaces[0].place.name", is("루터회관"))
-                    .body("favoritePlaces[1].place.name", is("스타벅스"));
+                    .body("turipPlaceCount", is(2))
+                    .body("turipPlaces[0].place.name", is("루터회관"))
+                    .body("turipPlaces[1].place.name", is("스타벅스"));
         }
 
         @DisplayName("장소가 favoriteOrder 오름차순으로 정렬되어 반환된다")
@@ -373,12 +373,12 @@ class FavoritePlaceApiTest {
                     .when().get("/api/v1/turips/places")
                     .then()
                     .statusCode(200)
-                    .body("favoritePlaceCount", is(5))
-                    .body("favoritePlaces[0].place.name", is("장소2"))  // favoriteOrder 1
-                    .body("favoritePlaces[1].place.name", is("장소4"))  // favoriteOrder 2
-                    .body("favoritePlaces[2].place.name", is("장소3"))  // favoriteOrder 3
-                    .body("favoritePlaces[3].place.name", is("장소5"))  // favoriteOrder 4
-                    .body("favoritePlaces[4].place.name", is("장소1")); // favoriteOrder 5
+                    .body("turipPlaceCount", is(5))
+                    .body("turipPlaces[0].place.name", is("장소2"))  // favoriteOrder 1
+                    .body("turipPlaces[1].place.name", is("장소4"))  // favoriteOrder 2
+                    .body("turipPlaces[2].place.name", is("장소3"))  // favoriteOrder 3
+                    .body("turipPlaces[3].place.name", is("장소5"))  // favoriteOrder 4
+                    .body("turipPlaces[4].place.name", is("장소1")); // favoriteOrder 5
         }
 
         @DisplayName("favoriteFolderId에 대한 폴더가 존재하지 않는 경우 404 NOT FOUND를 응답한다")
@@ -488,7 +488,7 @@ class FavoritePlaceApiTest {
 
             // when & then
             Map<String, Object> request = new HashMap<>();
-            request.put("favoritePlaceIdsOrder", List.of(2L, 1L)); // 순서 바꾸기
+            request.put("turipPlaceIdsOrder", List.of(2L, 1L)); // 순서 바꾸기
 
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
@@ -509,7 +509,7 @@ class FavoritePlaceApiTest {
 
             // when & then
             Map<String, Object> request = new HashMap<>();
-            request.put("favoritePlaceIdsOrder", List.of(1L));
+            request.put("turipPlaceIdsOrder", List.of(1L));
 
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
@@ -537,7 +537,7 @@ class FavoritePlaceApiTest {
 
             // when & then
             Map<String, Object> request = new HashMap<>();
-            request.put("favoritePlaceIdsOrder", List.of(1L));
+            request.put("turipPlaceIdsOrder", List.of(1L));
 
             RestAssured.given().port(port)
                     .header("device-fid", "requestDeviceFid")
@@ -561,7 +561,7 @@ class FavoritePlaceApiTest {
 
             // when & then
             Map<String, Object> request = new HashMap<>();
-            request.put("favoritePlaceIdsOrder", List.of(999L)); // 존재하지 않는 favoritePlaceId
+            request.put("turipPlaceIdsOrder", List.of(999L)); // 존재하지 않는 favoritePlaceId
 
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
@@ -590,7 +590,7 @@ class FavoritePlaceApiTest {
 
             // when & then
             Map<String, Object> request = new HashMap<>();
-            request.put("favoritePlaceIdsOrder", List.of(1L)); // 폴더2의 favoritePlaceId를 폴더1에서 사용
+            request.put("turipPlaceIdsOrder", List.of(1L)); // 폴더2의 favoritePlaceId를 폴더1에서 사용
 
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")

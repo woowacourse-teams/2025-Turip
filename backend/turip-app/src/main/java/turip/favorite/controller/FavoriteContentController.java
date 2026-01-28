@@ -66,7 +66,7 @@ public class FavoriteContentController {
                                                         "channelName": "연수연",
                                                         "profileImage": "https://yt3.googleusercontent.com/EMvavcwV96_NkCYm4V8TZIrsytHaiS2AaxS_goqR57WP7kn36qQY92Ujex8JUbBWGQ7P5VY0DA=s160-c-k-c0x00ffffff-no-rj"
                                                     },
-                                                    "isFavorite": true
+                                                    "isBookmarked": true
                                                 }
                                             }
                                             """
@@ -194,7 +194,7 @@ public class FavoriteContentController {
                                                                 "channelName": "연수연",
                                                                 "profileImage": "https://yt3.googleusercontent.com/EMvavcwV96_NkCYm4V8TZIrsytHaiS2AaxS_goqR57WP7kn36qQY92Ujex8JUbBWGQ7P5VY0DA=s160-c-k-c0x00ffffff-no-rj"
                                                             },
-                                                            "isFavorite": true
+                                                            "isBookmarked": true
                                                         },
                                                         "tripDuration": {
                                                             "nights": 2,
