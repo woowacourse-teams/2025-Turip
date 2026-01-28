@@ -1,0 +1,178 @@
+package turip.auth.service;
+
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.security.SignatureException;
+import java.time.LocalDateTime;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import turip.account.domain.Account;
+import turip.account.domain.Member;
+import turip.account.domain.Provider;
+import turip.account.domain.Role;
+import turip.account.service.MemberService;
+import turip.account.service.SocialMemberService;
+import turip.account.service.TuripMemberService;
+import turip.auth.controller.dto.request.GoogleLoginRequest;
+import turip.auth.controller.dto.request.RefreshTokenRequest;
+import turip.auth.controller.dto.request.TuripLoginRequest;
+import turip.auth.controller.dto.response.RefreshTokenResponse;
+import turip.auth.controller.dto.response.SocialLoginResponse;
+import turip.auth.controller.dto.response.TokenResult;
+import turip.auth.domain.RefreshToken;
+import turip.auth.token.GoogleTokenParser;
+import turip.auth.token.JwtProvider;
+import turip.common.exception.ErrorTag;
+import turip.common.exception.custom.BadRequestException;
+import turip.common.exception.custom.UnauthorizedException;
+
+@Service
+@RequiredArgsConstructor
+public class AuthService {
+
+    private final JwtProvider jwtProvider;
+    private final GoogleTokenParser googleTokenParser;
+    private final RefreshTokenService refreshTokenService;
+    private final MemberService memberService;
+    private final SocialMemberService socialMemberService;
+    private final TuripMemberService turipMemberService;
+
+    @Transactional
+    public TokenResult loginWithTurip(TuripLoginRequest request, String deviceFid) {
+        Member member = loginAndGetMember(request);
+        return processTuripLogin(deviceFid, member);
+    }
+
+    @Transactional
+    public Member loginAndGetMember(TuripLoginRequest request) {
+        return turipMemberService.login(request).getMember();
+    }
+
+    @Transactional
+    public TokenResult processTuripLogin(final String deviceFid, final Member member) {
+        if (member.isFirstLogin()) {
+            member.completeFirstLogin();
+        }
+        return issueToken(deviceFid, member);
+    }
+
+    @Transactional
+    public SocialLoginResponse loginWithSocial(GoogleLoginRequest request, Provider provider, String deviceFid) {
+        if (provider == Provider.GOOGLE) {
+            return loginWithGoogle(request, deviceFid);
+        }
+        throw new UnauthorizedException(ErrorTag.UNAUTHORIZED);
+    }
+
+    @Transactional
+    public RefreshTokenResponse refresh(RefreshTokenRequest request, String deviceFid) {
+        String refreshToken = request.refreshToken();
+
+        try {
+            Long accountId = jwtProvider.parseToken(refreshToken).get("accountId", Long.class);
+            Member member = getMemberByAccountId(accountId);
+            RefreshToken storedRefreshToken = refreshTokenService.getByMemberAndDeviceFid(member, deviceFid);
+
+            verifyRefreshTokenMatch(refreshToken, storedRefreshToken);
+            validateRefreshTokenExpiration(storedRefreshToken);
+
+            String newAccessToken = jwtProvider.generateAccessToken(accountId, member.getAccount().getRole());
+            String newRefreshToken = jwtProvider.generateRefreshToken(accountId, member.getAccount().getRole());
+
+            saveRefreshToken(member, newRefreshToken, deviceFid);
+
+            return new RefreshTokenResponse(newAccessToken, newRefreshToken);
+
+        } catch (ExpiredJwtException e) {
+            throw new UnauthorizedException(ErrorTag.REFRESH_TOKEN_EXPIRED);
+        } catch (SignatureException e) {
+            throw new UnauthorizedException(ErrorTag.REFRESH_TOKEN_SIGNATURE_INVALID);
+        } catch (UnauthorizedException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new UnauthorizedException(ErrorTag.UNAUTHORIZED);
+        }
+    }
+
+    @Transactional
+    public void logout(Account account, String deviceFid) {
+        Member member = getMemberByAccountId(account.getId());
+        refreshTokenService.deleteByMemberAndDeviceFid(member, deviceFid);
+    }
+
+    private TokenResult issueToken(String deviceFid, Member member) {
+        Long accountId = member.getAccount().getId();
+        Role role = member.getAccount().getRole();
+
+        String accessToken = jwtProvider.generateAccessToken(accountId, role);
+        String refreshToken = jwtProvider.generateRefreshToken(accountId, role);
+
+        saveRefreshToken(member, refreshToken, deviceFid);
+        return TokenResult.of(accessToken, refreshToken);
+    }
+
+    private SocialLoginResponse loginWithGoogle(GoogleLoginRequest request, String deviceFid) {
+        String idToken = request.idToken();
+        validateIdToken(idToken);
+
+        Provider provider = googleTokenParser.getProvider();
+        String providerId = googleTokenParser.getProviderId(idToken);
+        String email = googleTokenParser.getEmail(idToken);
+
+        Member member = findOrCreateSocialMember(provider, providerId, email);
+
+        boolean isNewMember = false;
+        if (member.isFirstLogin()) {
+            member.completeFirstLogin();
+            isNewMember = true;
+        }
+        TokenResult tokenResult = issueToken(deviceFid, member);
+
+        return SocialLoginResponse.of(tokenResult, isNewMember);
+    }
+
+    private Member findOrCreateSocialMember(Provider provider, String providerId, String email) {
+        return socialMemberService.findOrCreate(provider, providerId, email).getMember();
+    }
+
+    private Member getMemberByAccountId(Long accountId) {
+        try {
+            return memberService.getByAccountId(accountId);
+        } catch (Exception e) {
+            throw new UnauthorizedException(ErrorTag.UNAUTHORIZED);
+        }
+    }
+
+    private void saveRefreshToken(Member member, String refreshToken, String deviceFid) {
+        try {
+            LocalDateTime issuedAt = jwtProvider.getIssuedAt(refreshToken);
+            LocalDateTime expiration = jwtProvider.getExpiration(refreshToken);
+            refreshTokenService.save(member, deviceFid, jwtProvider.hashToken(refreshToken), issuedAt, expiration);
+        } catch (ExpiredJwtException e) {
+            throw new UnauthorizedException(ErrorTag.REFRESH_TOKEN_EXPIRED);
+        } catch (SignatureException e) {
+            throw new UnauthorizedException(ErrorTag.REFRESH_TOKEN_SIGNATURE_INVALID);
+        } catch (Exception e) {
+            throw new UnauthorizedException(ErrorTag.UNAUTHORIZED);
+        }
+    }
+
+    private void verifyRefreshTokenMatch(String oldRefreshToken, RefreshToken storedRefreshToken) {
+        String oldTokenHash = jwtProvider.hashToken(oldRefreshToken);
+        if (!storedRefreshToken.getTokenHash().equals(oldTokenHash)) {
+            throw new UnauthorizedException(ErrorTag.REFRESH_TOKEN_INVALID);
+        }
+    }
+
+    private void validateRefreshTokenExpiration(RefreshToken storedRefreshToken) {
+        if (storedRefreshToken.isExpired()) {
+            throw new UnauthorizedException(ErrorTag.REFRESH_TOKEN_EXPIRED);
+        }
+    }
+
+    private void validateIdToken(String idToken) {
+        if (idToken == null || idToken.isBlank()) {
+            throw new BadRequestException(ErrorTag.ID_TOKEN_NOT_VALID);
+        }
+    }
+}
