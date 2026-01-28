@@ -181,7 +181,7 @@ public class FavoritePlaceController {
             @RequestParam("placeId") Long placeId
     ) {
         FavoritePlaceResponse response = favoritePlaceService.create(account, favoriteFolderId, placeId);
-        return ResponseEntity.created(URI.create("/turips/places/" + response.id()))
+        return ResponseEntity.created(URI.create("/api/v1/turips/places/" + response.id()))
                 .body(response);
     }
 

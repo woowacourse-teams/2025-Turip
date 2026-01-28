@@ -159,7 +159,7 @@ public class FavoriteFolderController {
             @Parameter(hidden = true) @AuthAccount Account account,
             @RequestBody FavoriteFolderRequest request) {
         FavoriteFolderResponse response = favoriteFolderService.createCustomFavoriteFolder(request, account);
-        return ResponseEntity.created(URI.create("/turips/" + response.id()))
+        return ResponseEntity.created(URI.create("/api/v1/turips/" + response.id()))
                 .body(response);
     }
 

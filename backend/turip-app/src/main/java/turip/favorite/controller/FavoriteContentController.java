@@ -159,7 +159,7 @@ public class FavoriteContentController {
             @Parameter(hidden = true) @AuthAccount Account account,
             @RequestBody FavoriteContentRequest request) {
         FavoriteContentResponse response = favoriteContentService.create(request, account);
-        return ResponseEntity.created(URI.create("/bookmarks/" + response.id()))
+        return ResponseEntity.created(URI.create("/api/v1/bookmarks/" + response.id()))
                 .body(response);
     }
 
