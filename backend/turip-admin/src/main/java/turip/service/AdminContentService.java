@@ -2,10 +2,12 @@ package turip.service;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import turip.common.exception.ErrorTag;
+import turip.common.exception.custom.BadRequestException;
 import turip.common.exception.custom.NotFoundException;
 import turip.content.domain.Content;
 import turip.content.domain.ContentPlace;
@@ -16,7 +18,11 @@ import turip.controller.dto.request.AdminContentSaveRequest.ContentPlaceRequest;
 import turip.controller.dto.request.AdminContentSaveRequest.PlaceRequest;
 import turip.creator.domain.Creator;
 import turip.creator.repository.CreatorRepository;
+import turip.place.domain.Category;
 import turip.place.domain.Place;
+import turip.place.domain.PlaceCategory;
+import turip.place.repository.CategoryRepository;
+import turip.place.repository.PlaceCategoryRepository;
 import turip.place.repository.PlaceRepository;
 import turip.region.domain.City;
 import turip.region.repository.CityRepository;
@@ -30,22 +36,31 @@ public class AdminContentService {
     private final ContentPlaceRepository contentPlaceRepository;
     private final CreatorRepository creatorRepository;
     private final CityRepository cityRepository;
+    private final CategoryRepository categoryRepository;
+    private final PlaceCategoryRepository placeCategoryRepository;
 
     @Transactional
     public Long save(AdminContentSaveRequest request) {
+        // TODO: request.tripDuration()은 현재 사용되지 않습니다. Content 엔티티에 nights, days 필드 추가를 고려해야 합니다.
         Creator creator = findOrCreateCreator(request);
         City city = findCity(request);
         Content content = createContent(request, creator, city);
-        Content savedContent = contentRepository.save(content);
+        contentRepository.save(content);
 
         request.contentPlaces().forEach(contentPlaceRequest -> {
             AdminContentSaveRequest.PlaceRequest placeRequest = contentPlaceRequest.place();
             Place place = findOrCreatePlace(placeRequest);
+
+            if (placeRequest.categoryName() != null && !placeRequest.categoryName().isBlank()) {
+                Category category = findOrCreateCategory(placeRequest.categoryName());
+                findOrCreatePlaceCategory(place, category);
+            }
+
             ContentPlace newContentPlace = createContentPlace(contentPlaceRequest, place, content);
             contentPlaceRepository.save(newContentPlace);
         });
 
-        return savedContent.getId();
+        return content.getId();
     }
 
     private City findCity(AdminContentSaveRequest request) {
@@ -92,11 +107,34 @@ public class AdminContentService {
                             request.video().channelName(),
                             request.video().channelImage()
                     );
+
                     return creatorRepository.save(creator);
                 });
     }
 
     private LocalTime parseTimeLine(String timeLine) {
-        return LocalTime.parse("00:" + timeLine, DateTimeFormatter.ofPattern("HH:mm:ss"));
+        if (timeLine == null) {
+            throw new BadRequestException(ErrorTag.INVALID_TIMELINE_FORMAT);
+        }
+        try {
+            return LocalTime.parse("00:" + timeLine, DateTimeFormatter.ofPattern("HH:mm:ss"));
+        } catch (DateTimeParseException e) {
+            throw new BadRequestException(ErrorTag.INVALID_TIMELINE_FORMAT);
+        }
+    }
+
+    private Category findOrCreateCategory(String categoryName) {
+        return categoryRepository.findByName(categoryName)
+                .orElseGet(() -> categoryRepository.save(new Category(categoryName)));
+    }
+
+    private void findOrCreatePlaceCategory(Place place, Category category) {
+        placeCategoryRepository.findByPlaceAndCategory(place, category)
+                .ifPresentOrElse(
+                        placeCategory -> {
+                        },
+                        () -> placeCategoryRepository.save(new PlaceCategory(place, category))
+                );
     }
 }
+
