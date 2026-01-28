@@ -58,7 +58,10 @@ public enum ErrorTag {
     INVALID_YOUTUBE_URL("유효하지 않은 유튜브 URL입니다."),
 
     // 404 Not Found
-    YOUTUBE_VIDEO_NOT_FOUND("유튜브 영상을 찾을 수 없습니다.");
+    YOUTUBE_VIDEO_NOT_FOUND("유튜브 영상을 찾을 수 없습니다."),
+
+    // 500 Internal Server Error
+    YOUTUBE_API_SERVER_ERROR("유튜브 API 서버에 에러가 발생했습니다.");
 
     private final String message;
 

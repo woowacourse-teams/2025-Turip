@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.BadRequestException;
+import turip.common.exception.custom.InternalServerException;
 import turip.infrastructure.client.dto.YoutubeVideoApiResponse;
 import turip.infrastructure.client.dto.YoutubeVideoSearchResponse;
 
@@ -35,7 +36,14 @@ public class YoutubeVideoSearchClient {
                 .onStatus(HttpStatusCode::is4xxClientError, (request, res) -> {
                     throw new BadRequestException(ErrorTag.YOUTUBE_API_REQUEST_FAILED);
                 })
+                .onStatus(HttpStatusCode::is5xxServerError, (request, res) -> {
+                    throw new InternalServerException(ErrorTag.YOUTUBE_API_SERVER_ERROR);
+                })
                 .body(YoutubeVideoApiResponse.class);
+
+        if (response == null) {
+            throw new InternalServerException(ErrorTag.YOUTUBE_API_REQUEST_FAILED);
+        }
 
         return response.toVideoSearchResponse(videoId);
     }
