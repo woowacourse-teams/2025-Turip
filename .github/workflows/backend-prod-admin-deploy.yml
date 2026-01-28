@@ -103,12 +103,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Copy docker-compose.yml to deploy directory
-        run: |
-          mkdir -p /home/ubuntu/deploy
-          cp backend/docker-compose.yml /home/ubuntu/deploy/
-          echo "✅ docker-compose.yml copied to /home/ubuntu/deploy"
-
       - name: Deploy
         env:
           CSV_LINKS_COLLECTION_URL: ${{ secrets.CSV_LINKS_COLLECTION_URL }}
@@ -124,7 +118,7 @@ jobs:
           JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
         run: |
-          cd /home/ubuntu/deploy
+          cd backend
           IMAGE_TAG="${{ needs.build_and_test.outputs.image_tag }}"
           
           echo "🚀 ${{ env.SERVICE_NAME }} 배포 시작 (Tag: ${IMAGE_TAG})"
