@@ -1,4 +1,4 @@
-package turip.admin.controller;
+package turip.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;

@@ -1,4 +1,4 @@
-package turip.admin.service;
+package turip.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,7 +12,7 @@ import turip.common.exception.custom.ForbiddenException;
 
 @Service
 @RequiredArgsConstructor
-public class AdminService {
+public class AdminAuthService {
 
     private final AuthService authService;
 
