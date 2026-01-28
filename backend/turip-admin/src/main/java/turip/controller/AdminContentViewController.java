@@ -13,9 +13,13 @@ public class AdminContentViewController {
     @Value("${google.api.key}")
     private String googleApiKey;
 
+    @Value("${youtube.api.key}")
+    private String youtubeApiKey;
+
     @GetMapping("/contents")
     public String createContentPage(Model model) {
         model.addAttribute("googleApiKey", googleApiKey);
+        model.addAttribute("youtubeApiKey", youtubeApiKey);
         return "admin-content";
     }
 }
