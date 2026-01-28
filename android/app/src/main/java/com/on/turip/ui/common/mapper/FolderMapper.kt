@@ -1,19 +1,19 @@
 package com.on.turip.ui.common.mapper
 
-import com.on.turip.domain.folder.Folder
-import com.on.turip.ui.folder.model.FolderEditModel
-import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
+import com.on.turip.domain.folder.Turip
+import com.on.turip.ui.folder.model.TuripEditModel
+import com.on.turip.ui.main.favorite.model.TuripModel
 
-fun Folder.toUiModel(selectFolderId: Long): FavoritePlaceFolderModel =
-    FavoritePlaceFolderModel(
+fun Turip.toUiModel(selectTuripId: Long): TuripModel =
+    TuripModel(
         id = id,
         name = name,
         placeCount = placeCount,
-        isSelected = id == selectFolderId,
+        isSelected = id == selectTuripId,
     )
 
-fun Folder.toEditUiModel(): FolderEditModel =
-    FolderEditModel(
+fun Turip.toEditUiModel(): TuripEditModel =
+    TuripEditModel(
         id = id,
         name = name,
         count = placeCount,

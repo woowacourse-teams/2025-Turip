@@ -26,13 +26,13 @@ private fun String.toErrorType(): ErrorType =
         "CONTENT_NOT_FOUND" -> ErrorType.Content.NotFound
         "PLACE_NOT_FOUND" -> ErrorType.Place.NotFound
         "REGION_CATEGORY_INVALID" -> ErrorType.Region.InvalidCategory
-        "FAVORITE_FOLDER_NOT_FOUND" -> ErrorType.FavoriteFolder.NotFound
-        "FAVORITE_FOLDER_NAME_CONFLICT" -> ErrorType.FavoriteFolder.DuplicatedName
-        "FAVORITE_FOLDER_NAME_BLANK" -> ErrorType.FavoriteFolder.BlankName
-        "FAVORITE_FOLDER_NAME_TOO_LONG" -> ErrorType.FavoriteFolder.ExceededName
-        "DEFAULT_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED" -> ErrorType.FavoriteFolder.DefaultFolderRenameNotAllowed
-        "FAVORITE_PLACE_NOT_FOUND" -> ErrorType.FavoritePlace.NotFound
-        "FAVORITE_PLACE_IN_FOLDER_CONFLICT" -> ErrorType.FavoritePlace.DuplicatePlaceInFolder
-        "FAVORITE_CONTENT_CONFLICT" -> ErrorType.FavoriteContent.DuplicateContent
+        "FAVORITE_FOLDER_NOT_FOUND" -> ErrorType.Turip.NotFound
+        "FAVORITE_FOLDER_NAME_CONFLICT" -> ErrorType.Turip.DuplicatedName
+        "FAVORITE_FOLDER_NAME_BLANK" -> ErrorType.Turip.BlankName
+        "FAVORITE_FOLDER_NAME_TOO_LONG" -> ErrorType.Turip.ExceededName
+        "DEFAULT_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED" -> ErrorType.Turip.DefaultTuripRenameNotAllowed
+        "FAVORITE_PLACE_NOT_FOUND" -> ErrorType.TuripPlace.NotFound
+        "FAVORITE_PLACE_IN_FOLDER_CONFLICT" -> ErrorType.TuripPlace.DuplicatePlaceInTurip
+        "FAVORITE_CONTENT_CONFLICT" -> ErrorType.Bookmark.DuplicateBookmarked
         else -> ErrorType.Unknown
     }

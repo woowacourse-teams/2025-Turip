@@ -11,18 +11,18 @@ import com.on.turip.core.result.onSuccess
 import com.on.turip.domain.favorite.TuripPlace
 import com.on.turip.domain.favorite.repository.TuripPlaceRepository
 import com.on.turip.domain.favorite.usecase.UpdateTuripPlaceUseCase
-import com.on.turip.domain.folder.Folder
-import com.on.turip.domain.folder.repository.FolderRepository
+import com.on.turip.domain.folder.Turip
+import com.on.turip.domain.folder.repository.TuripRepository
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.common.mapper.toUiModel
-import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
-import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
+import com.on.turip.ui.main.favorite.model.TuripModel
 import com.on.turip.ui.main.favorite.model.TuripPlaceModel
 import com.on.turip.ui.main.favorite.model.TuripPlaceRetryAction
 import com.on.turip.ui.main.favorite.model.TuripPlaceUiEffect
 import com.on.turip.ui.main.favorite.model.TuripPlaceUiState
+import com.on.turip.ui.main.favorite.model.TuripShareModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.channels.Channel
@@ -37,7 +37,7 @@ import timber.log.Timber
 
 @HiltViewModel
 class TuripPlaceViewModel @Inject constructor(
-    private val folderRepository: FolderRepository,
+    private val turipRepository: TuripRepository,
     private val turipPlaceRepository: TuripPlaceRepository,
     private val updateTuripPlaceUseCase: UpdateTuripPlaceUseCase,
 ) : ViewModel() {
@@ -48,23 +48,23 @@ class TuripPlaceViewModel @Inject constructor(
     private val _uiEffect: Channel<TuripPlaceUiEffect> = Channel(Channel.BUFFERED)
     val uiEffect: Flow<TuripPlaceUiEffect> = _uiEffect.receiveAsFlow()
 
-    private var selectedFolderId: Long = NOT_INITIALIZED
+    private var selectedTuripId: Long = NOT_INITIALIZED
 
-    fun loadFoldersAndPlaces() {
+    fun loadTuripsAndPlaces() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            folderRepository
-                .loadFavoriteFolders()
-                .onSuccess { folders: List<Folder> ->
+            turipRepository
+                .loadTurips()
+                .onSuccess { turips: List<Turip> ->
                     Timber.d("튜립 불러오기 성공")
-                    ensureValidSelectedFolderId(folders)
+                    ensureValidSelectedTuripId(turips)
 
-                    val loadFolders =
-                        folders.map { folder: Folder -> folder.toUiModel(selectFolderId = selectedFolderId) }
+                    val loadTurips =
+                        turips.map { turip: Turip -> turip.toUiModel(selectTuripId = selectedTuripId) }
 
                     when (
                         val result: TuripResult<List<TuripPlace>> =
-                            turipPlaceRepository.loadTuripPlaces(selectedFolderId)
+                            turipPlaceRepository.loadTuripPlaces(selectedTuripId)
                     ) {
                         is TuripResult.Success -> {
                             _uiState.update { state: TuripPlaceUiState ->
@@ -72,7 +72,7 @@ class TuripPlaceViewModel @Inject constructor(
                                     isLoading = false,
                                     errorUiState = ErrorUiState.None,
                                     places = result.value.map { turipPlace: TuripPlace -> turipPlace.toUiModel() },
-                                    folders = loadFolders,
+                                    turips = loadTurips,
                                     placesLatLng = result.value.map { it.toLatLng() },
                                 )
                             }
@@ -96,10 +96,10 @@ class TuripPlaceViewModel @Inject constructor(
         }
     }
 
-    private fun ensureValidSelectedFolderId(folders: List<Folder>) {
-        if (selectedFolderId == NOT_INITIALIZED || folders.all { it.id != selectedFolderId }) {
-            selectedFolderId = folders.firstOrNull { it.name == DEFAULT_FOLDER_NAME }?.id
-                ?: folders.firstOrNull()?.id ?: NOT_INITIALIZED
+    private fun ensureValidSelectedTuripId(turips: List<Turip>) {
+        if (selectedTuripId == NOT_INITIALIZED || turips.all { it.id != selectedTuripId }) {
+            selectedTuripId = turips.firstOrNull { it.name == DEFAULT_TURIP_NAME }?.id
+                ?: turips.firstOrNull()?.id ?: NOT_INITIALIZED
         }
     }
 
@@ -109,7 +109,7 @@ class TuripPlaceViewModel @Inject constructor(
     ) {
         val updatedIsTuripPlace: Boolean = !isTuripPlace
         viewModelScope.launch {
-            updateTuripPlaceUseCase(selectedFolderId, placeId, updatedIsTuripPlace)
+            updateTuripPlaceUseCase(selectedTuripId, placeId, updatedIsTuripPlace)
                 .onSuccess {
                     _uiState.update { state: TuripPlaceUiState ->
                         state.copy(
@@ -119,7 +119,7 @@ class TuripPlaceViewModel @Inject constructor(
                             placesLatLng = state.placesLatLng.filter { it.placeId != placeId },
                         )
                     }
-                    Timber.d("튜립 내 튜립 장소 상태 업데이트 성공, turipId = $selectedFolderId placeId = $placeId")
+                    Timber.d("튜립 내 튜립 장소 상태 업데이트 성공, turipId = $selectedTuripId placeId = $placeId")
                 }.onFailure { errorType: ErrorType ->
                     _uiState.update { it.copy(isLoading = false) }
                     val uiError: UiError = errorType.toUiError()
@@ -152,29 +152,29 @@ class TuripPlaceViewModel @Inject constructor(
                             }
                         }
                     }
-                    Timber.d("튜립 내 튜립 장소 상태 업데이트 실패, turipId = $selectedFolderId placeId = $placeId originIsTuripPlace =$isTuripPlace")
+                    Timber.d("튜립 내 튜립 장소 상태 업데이트 실패, turipId = $selectedTuripId placeId = $placeId originIsTuripPlace =$isTuripPlace")
                 }
         }
     }
 
-    fun updateFolderWithPlaces(folderId: Long) {
-        if (folderId == selectedFolderId) return
+    fun updateTuripWithPlaces(turipId: Long) {
+        if (turipId == selectedTuripId) return
 
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
             turipPlaceRepository
-                .loadTuripPlaces(folderId)
+                .loadTuripPlaces(turipId)
                 .onSuccess { turipPlaces: List<TuripPlace> ->
-                    selectedFolderId = folderId
+                    selectedTuripId = turipId
                     _uiState.update { state: TuripPlaceUiState ->
                         state.copy(
                             isLoading = false,
                             errorUiState = ErrorUiState.None,
                             places = turipPlaces.map { it.toUiModel() },
-                            folders =
-                                state.folders.map { folder: FavoritePlaceFolderModel ->
-                                    folder.copy(isSelected = folder.id == folderId)
+                            turips =
+                                state.turips.map { turip: TuripModel ->
+                                    turip.copy(isSelected = turip.id == turipId)
                                 },
                             placesLatLng = turipPlaces.map { it.toLatLng() },
                         )
@@ -184,7 +184,7 @@ class TuripPlaceViewModel @Inject constructor(
                         is UiError.Global -> handleGlobalError(uiError)
                         is UiError.Feature -> Unit
                     }
-                    Timber.e("튜립에 포함된 장소 불러오는 API 호출 실패 turipId =$folderId")
+                    Timber.e("튜립에 포함된 장소 불러오는 API 호출 실패 turipId =$turipId")
                 }
         }
     }
@@ -193,7 +193,7 @@ class TuripPlaceViewModel @Inject constructor(
         viewModelScope.launch {
             turipPlaceRepository
                 .updateTuripPlacesOrder(
-                    turipId = selectedFolderId,
+                    turipId = selectedTuripId,
                     updatedOrder = updateTuripPlaces.map { it.turipPlaceId },
                 ).onSuccess {
                     _uiState.update {
@@ -213,25 +213,25 @@ class TuripPlaceViewModel @Inject constructor(
         }
     }
 
-    fun shareFolder() {
+    fun shareTurip() {
         when (AuthState.type) {
             UserType.MEMBER -> {
-                val favoriteFolderShareModel =
-                    FavoriteFolderShareModel(
+                val turipShareModel =
+                    TuripShareModel(
                         name =
-                            uiState.value.folders
+                            uiState.value.turips
                                 .first { it.isSelected }
                                 .name,
                         places = uiState.value.places.map { it.toUiModel() },
                     )
                 viewModelScope.launch {
-                    _uiEffect.send(TuripPlaceUiEffect.ShareFolder(favoriteFolderShareModel))
+                    _uiEffect.send(TuripPlaceUiEffect.ShareTurip(turipShareModel))
                 }
             }
 
             UserType.GUEST, UserType.NONE -> {
                 viewModelScope.launch {
-                    _uiEffect.send(TuripPlaceUiEffect.ShowFolderShareNotAllowed)
+                    _uiEffect.send(TuripPlaceUiEffect.ShowTuripShareNotAllowed)
                 }
             }
         }
@@ -268,6 +268,6 @@ class TuripPlaceViewModel @Inject constructor(
 
     companion object {
         private const val NOT_INITIALIZED: Long = 0L
-        private const val DEFAULT_FOLDER_NAME = "기본 폴더"
+        private const val DEFAULT_TURIP_NAME = "기본 튜립"
     }
 }

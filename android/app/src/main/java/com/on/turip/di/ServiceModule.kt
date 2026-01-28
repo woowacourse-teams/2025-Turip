@@ -3,19 +3,19 @@ package com.on.turip.di
 import com.on.turip.data.bookmarks.service.BookmarkService
 import com.on.turip.data.content.place.service.ContentPlaceService
 import com.on.turip.data.content.service.ContentService
-import com.on.turip.data.folder.service.FolderService
 import com.on.turip.data.login.service.AuthService
 import com.on.turip.data.login.service.MemberService
 import com.on.turip.data.place.service.PlaceService
 import com.on.turip.data.region.service.RegionService
+import com.on.turip.data.turip.service.TuripService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import retrofit2.Retrofit
-import retrofit2.create
 import javax.inject.Named
 import javax.inject.Singleton
+import retrofit2.Retrofit
+import retrofit2.create
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -30,7 +30,7 @@ object ServiceModule {
 
     @Provides
     @Singleton
-    fun provideFolderService(retrofit: Retrofit): FolderService = retrofit.create<FolderService>()
+    fun provideTuripService(retrofit: Retrofit): TuripService = retrofit.create<TuripService>()
 
     @Provides
     @Singleton

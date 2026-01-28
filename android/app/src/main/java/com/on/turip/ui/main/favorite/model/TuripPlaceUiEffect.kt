@@ -5,10 +5,10 @@ import com.on.turip.ui.common.error.ErrorUiState
 sealed interface TuripPlaceUiEffect {
     data object NavigateToLogin : TuripPlaceUiEffect
 
-    data object ShowFolderShareNotAllowed : TuripPlaceUiEffect
+    data object ShowTuripShareNotAllowed : TuripPlaceUiEffect
 
-    data class ShareFolder(
-        val favoriteFolderShareModel: FavoriteFolderShareModel,
+    data class ShareTurip(
+        val turipShareModel: TuripShareModel,
     ) : TuripPlaceUiEffect
 
     data class ShowError(

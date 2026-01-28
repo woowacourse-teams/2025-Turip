@@ -4,24 +4,24 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.on.turip.databinding.ItemPlaceFolderNameBinding
-import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
+import com.on.turip.ui.main.favorite.model.TuripModel
 
 class FavoritePlaceFolderNameViewHolder(
     private val binding: ItemPlaceFolderNameBinding,
     onPlaceFolderListener: OnPlaceFolderNameListener,
 ) : RecyclerView.ViewHolder(binding.root) {
-    private var favoritePlaceFolderModel: FavoritePlaceFolderModel? = null
+    private var turipModel: TuripModel? = null
 
     init {
         itemView.setOnClickListener {
-            favoritePlaceFolderModel?.let { onPlaceFolderListener.onPlaceFolderNameClick(it.id) }
+            turipModel?.let { onPlaceFolderListener.onPlaceFolderNameClick(it.id) }
         }
     }
 
-    fun bind(favoritePlaceFolderModel: FavoritePlaceFolderModel) {
-        this.favoritePlaceFolderModel = favoritePlaceFolderModel
-        binding.tvPlaceFolderName.text = favoritePlaceFolderModel.name
-        itemView.isSelected = favoritePlaceFolderModel.isSelected
+    fun bind(turipModel: TuripModel) {
+        this.turipModel = turipModel
+        binding.tvPlaceFolderName.text = turipModel.name
+        itemView.isSelected = turipModel.isSelected
     }
 
     companion object {

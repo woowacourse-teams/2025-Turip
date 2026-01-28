@@ -1,9 +1,9 @@
 package com.on.turip.domain.folder
 
-class Turip(
+data class Turip(
     val id: Long,
     val name: String,
     val isDefault: Boolean,
-    val isTuripPlace: Boolean,
-    val placeCount: Int = 0,
+    val placeCount: Int,
+    val hasIncludePlace: Boolean = false,
 )

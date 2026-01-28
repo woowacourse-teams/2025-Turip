@@ -6,8 +6,8 @@ data class TuripPlaceUiState(
     val isLoading: Boolean,
     val errorUiState: ErrorUiState,
     val places: List<TuripPlaceModel>,
-    val folders: List<FavoritePlaceFolderModel>,
-    val placesLatLng: List<TuripPlaceLatLngUiModel>,
+    val turips: List<TuripModel>,
+    val placesLatLng: List<PlaceLatLngUiModel>,
 ) {
     val isEmpty: Boolean
         get() = places.isEmpty() && this != Idle
@@ -18,7 +18,7 @@ data class TuripPlaceUiState(
                 isLoading = true,
                 errorUiState = ErrorUiState.None,
                 places = emptyList(),
-                folders = emptyList(),
+                turips = emptyList(),
                 placesLatLng = emptyList(),
             )
     }

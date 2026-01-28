@@ -6,8 +6,6 @@ import com.on.turip.data.content.datasource.ContentRemoteDataSource
 import com.on.turip.data.content.datasource.DefaultContentRemoteDataSource
 import com.on.turip.data.content.place.datasource.ContentPlaceRemoteDataSource
 import com.on.turip.data.content.place.datasource.DefaultContentPlaceRemoteDataSource
-import com.on.turip.data.folder.datasource.DefaultFolderRemoteDataSource
-import com.on.turip.data.folder.datasource.FolderRemoteDataSource
 import com.on.turip.data.login.datasource.AuthDataSource
 import com.on.turip.data.login.datasource.AuthRemoteDataSource
 import com.on.turip.data.login.datasource.MemberDataSource
@@ -18,6 +16,8 @@ import com.on.turip.data.region.datasource.DefaultRegionRemoteDataSource
 import com.on.turip.data.region.datasource.RegionRemoteDataSource
 import com.on.turip.data.searchhistory.datasource.DefaultSearchHistoryDataSource
 import com.on.turip.data.searchhistory.datasource.SearchHistoryDataSource
+import com.on.turip.data.turip.datasource.DefaultTuripRemoteDataSource
+import com.on.turip.data.turip.datasource.TuripRemoteDataSource
 import com.on.turip.data.userstorage.datasource.DefaultUserStorageLocalDataSource
 import com.on.turip.data.userstorage.datasource.UserStorageLocalDataSource
 import dagger.Binds
@@ -59,7 +59,7 @@ abstract class DataSourceModule {
 
     @Binds
     @Singleton
-    abstract fun bindFolderRemoteDataSource(defaultFolderRemoteDataSource: DefaultFolderRemoteDataSource): FolderRemoteDataSource
+    abstract fun bindTuripRemoteDataSource(defaultTuripRemoteDataSource: DefaultTuripRemoteDataSource): TuripRemoteDataSource
 
     @Binds
     @Singleton

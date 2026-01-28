@@ -57,10 +57,12 @@ fun PlaceItem(
                     width = 1.dp,
                     color = TuripTheme.colors.border,
                     shape = TuripTheme.shape.container,
-                ).background(
+                )
+                .background(
                     color = TuripTheme.colors.container,
                     shape = TuripTheme.shape.container,
-                ).padding(
+                )
+                .padding(
                     start = TuripTheme.spacing.large,
                     end = TuripTheme.spacing.large,
                     top = TuripTheme.spacing.medium,
@@ -117,7 +119,7 @@ fun PlaceItem(
             VerticalDivider(modifier = Modifier.height(TuripTheme.spacing.extraExtraLarge))
 
             PlaceActionItem(
-                text = stringResource(R.string.trip_place_favorite),
+                text = stringResource(R.string.trip_turip_place),
                 iconTint = if (placeModel.isTuripPlace) TuripTheme.colors.primary else TuripTheme.colors.gray04,
                 drawableRes = if (placeModel.isTuripPlace) R.drawable.btn_turip_place_selected else R.drawable.btn_turip_place_normal,
                 useTint = true,
@@ -156,7 +158,8 @@ private fun PlaceActionItem(
                     onClick = onClick,
                     interactionSource = interactionSource,
                     indication = ripple(color = TuripTheme.colors.gray03),
-                ).padding(
+                )
+                .padding(
                     horizontal = TuripTheme.spacing.medium,
                     vertical = TuripTheme.spacing.extraSmall,
                 ),

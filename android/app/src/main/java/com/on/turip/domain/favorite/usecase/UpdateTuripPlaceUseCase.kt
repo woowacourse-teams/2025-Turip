@@ -11,13 +11,13 @@ class UpdateTuripPlaceUseCase @Inject constructor(
     private val turipPlaceRepository: TuripPlaceRepository,
 ) {
     suspend operator fun invoke(
-        favoriteFolderId: Long,
+        turipId: Long,
         placeId: Long,
         isTuripPlace: Boolean,
     ): TuripResult<Unit> =
         if (isTuripPlace) {
             turipPlaceRepository
-                .createTuripPlace(favoriteFolderId, placeId)
+                .createTuripPlace(turipId, placeId)
                 .onSuccess {
                     Timber.d("튜립에 장소 추가 성공")
                 }.onFailure {
@@ -25,7 +25,7 @@ class UpdateTuripPlaceUseCase @Inject constructor(
                 }
         } else {
             turipPlaceRepository
-                .deleteTuripPlace(favoriteFolderId, placeId)
+                .deleteTuripPlace(turipId, placeId)
                 .onSuccess {
                     Timber.d("튜립에서 장소 제거 성공")
                 }.onFailure {
