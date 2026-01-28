@@ -44,7 +44,7 @@ class RegionCategoryApiTest {
         jdbcTemplate.update("ALTER TABLE country ALTER COLUMN id RESTART WITH 1");
     }
 
-    @DisplayName("/api/v1/regionCategories GET 지역 카테고리 조회 테스트")
+    @DisplayName("/api/v1/region-categories GET 지역 카테고리 조회 테스트")
     @Nested
     class getRegionCategories {
 
