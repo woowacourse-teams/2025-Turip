@@ -108,8 +108,12 @@ jobs:
 
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          path: /home/ubuntu/deploy
+
+      - name: Copy docker-compose.yml to deploy directory
+        run: |
+          mkdir -p /home/ubuntu/deploy
+          cp docker-compose.yml /home/ubuntu/deploy/
+          echo "✅ docker-compose.yml copied to /home/ubuntu/deploy"
 
       - name: Deploy
         env:
