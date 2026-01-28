@@ -11,8 +11,8 @@ data class TuripByPlaceResponse(
     val isDefault: Boolean,
     @SerialName("isTuripPlace")
     val isTuripPlace: Boolean,
-    @SerialName("memberId")
-    val memberId: Long,
+    @SerialName("accountId")
+    val accountId: Long,
     @SerialName("name")
     val name: String,
 )

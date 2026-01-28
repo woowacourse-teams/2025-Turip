@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class TuripsResponse(
     @SerialName("turips")
-    val turipsResponse: List<TuripPostResponse>,
+    val turipsResponse: List<TuripResponse>,
 )

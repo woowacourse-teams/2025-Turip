@@ -7,8 +7,8 @@ import kotlinx.serialization.Serializable
 data class TuripCreationResponse(
     @SerialName("id")
     val id: Long,
-    @SerialName("memberId")
-    val memberId: Long,
+    @SerialName("accountId")
+    val accountId: Long,
     @SerialName("name")
     val name: String,
     @SerialName("isDefault")

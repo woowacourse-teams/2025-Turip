@@ -4,14 +4,14 @@ import com.on.turip.data.turip.dto.TuripByPlaceResponse
 import com.on.turip.data.turip.dto.TuripCreationResponse
 import com.on.turip.data.turip.dto.TuripPatchRequest
 import com.on.turip.data.turip.dto.TuripPostRequest
-import com.on.turip.data.turip.dto.TuripPostResponse
+import com.on.turip.data.turip.dto.TuripResponse
 import com.on.turip.data.turip.dto.TuripsByPlaceResponse
 import com.on.turip.data.turip.dto.TuripsResponse
 import com.on.turip.domain.folder.Turip
 
 fun TuripsResponse.toDomain(): List<Turip> = turipsResponse.map { it.toDomain() }
 
-fun TuripPostResponse.toDomain(): Turip =
+fun TuripResponse.toDomain(): Turip =
     Turip(
         id = id,
         name = name,

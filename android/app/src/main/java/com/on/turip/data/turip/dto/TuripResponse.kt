@@ -4,11 +4,11 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class TuripPostResponse(
+data class TuripResponse(
     @SerialName("id")
     val id: Long,
-    @SerialName("memberId")
-    val memberId: Long,
+    @SerialName("accountId")
+    val accountId: Long,
     @SerialName("name")
     val name: String,
     @SerialName("isDefault")
