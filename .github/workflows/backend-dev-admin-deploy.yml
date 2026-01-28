@@ -123,6 +123,9 @@ jobs:
           CSV_IMPORT_PASSWORD: ${{ secrets.CSV_IMPORT_PASSWORD }}
           JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          KAKAO_API_KEY: ${{ secrets.KAKAO_API_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
         run: |
           cd backend
           IMAGE_TAG="${{ github.event.inputs.image_tag || needs.build_and_test.outputs.image_tag }}"
@@ -146,6 +149,9 @@ jobs:
           CSV_IMPORT_PASSWORD=${CSV_IMPORT_PASSWORD}
           JWT_SECRET_KEY=${JWT_SECRET_KEY}
           GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+          KAKAO_API_KEY=${KAKAO_API_KEY}
+          GOOGLE_API_KEY=${GOOGLE_API_KEY}
+          YOUTUBE_API_KEY=${YOUTUBE_API_KEY}
           EOF
           
           if [ -f .env ]; then
