@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
@@ -75,13 +74,9 @@ class AuthAdminArgumentResolverTest {
             Member member = MemberFixture.createCustomMember(account, "admin@test.com", false);
             TuripMember turipMember = TuripMemberFixture.createCustomTuripMember(member, "admin", "AdminPass1!");
 
-            Claims claims = Jwts.claims()
-                    .add("accountId", accountId)
-                    .add("role", Role.ADMIN.name())
-                    .build();
-
             when(nativeWebRequest.getHeader("Authorization")).thenReturn(bearerToken);
-            when(jwtProvider.parseToken(accessToken)).thenReturn(claims);
+            when(jwtProvider.getClaimOfName(accessToken, "accountId", Long.class)).thenReturn(accountId);
+            when(jwtProvider.getClaimOfName(accessToken, "role", String.class)).thenReturn(Role.ADMIN.name());
             when(turipMemberService.getByAccountId(accountId)).thenReturn(turipMember);
 
             // when
@@ -99,13 +94,9 @@ class AuthAdminArgumentResolverTest {
             String accessToken = generateValidAccessToken(accountId, Role.USER);
             String bearerToken = "Bearer " + accessToken;
 
-            Claims claims = Jwts.claims()
-                    .add("accountId", accountId)
-                    .add("role", Role.USER.name())
-                    .build();
-
             when(nativeWebRequest.getHeader("Authorization")).thenReturn(bearerToken);
-            when(jwtProvider.parseToken(accessToken)).thenReturn(claims);
+            when(jwtProvider.getClaimOfName(accessToken, "accountId", Long.class)).thenReturn(accountId);
+            when(jwtProvider.getClaimOfName(accessToken, "role", String.class)).thenReturn(Role.USER.name());
 
             // when & then
             assertThatThrownBy(
