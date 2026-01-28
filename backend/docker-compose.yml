@@ -53,7 +53,7 @@ services:
       - /home/ubuntu/logs/app:/logs
 
   admin:
-    image: teamturip/turip-backend:${IMAGE_NAME_ADMIN_PREFIX:-dev-admin}-${ADMIN_IMAGE_TAG:-latest}
+    image: teamturip/turip-backend:${ADMIN_IMAGE_TAG:-latest}
     container_name: turip-admin
     restart: always
     expose:
