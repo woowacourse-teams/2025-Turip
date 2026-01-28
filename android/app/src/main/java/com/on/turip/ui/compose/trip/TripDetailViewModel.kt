@@ -22,7 +22,6 @@ import com.on.turip.ui.compose.trip.model.PlaceModel
 import com.on.turip.ui.compose.trip.model.TripDetailInfoModel
 import com.on.turip.ui.trip.TripDetailActivity.Companion.TRIP_DETAIL_CONTENT_KEY
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -36,6 +35,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 @HiltViewModel
 class TripDetailViewModel @Inject constructor(

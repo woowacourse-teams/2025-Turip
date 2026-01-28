@@ -8,10 +8,10 @@ import com.on.turip.data.turip.dto.TuripPostRequest
 import com.on.turip.data.turip.dto.TuripsByPlaceResponse
 import com.on.turip.data.turip.dto.TuripsResponse
 import com.on.turip.data.turip.service.TuripService
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 
 class DefaultTuripRemoteDataSource @Inject constructor(
     private val turipService: TuripService,

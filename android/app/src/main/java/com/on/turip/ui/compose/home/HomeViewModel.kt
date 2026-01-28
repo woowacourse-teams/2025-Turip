@@ -15,7 +15,6 @@ import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.common.mapper.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -26,6 +25,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
