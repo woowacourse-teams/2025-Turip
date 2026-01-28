@@ -35,6 +35,9 @@ services:
       CSV_IMPORT_PASSWORD: ${CSV_IMPORT_PASSWORD}
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY}
+      KAKAO_API_KEY: ${KAKAO_API_KEY}
+      YOUTUBE_API_KEY: ${YOUTUBE_API_KEY}
     networks:
       - turip-network
     volumes:
