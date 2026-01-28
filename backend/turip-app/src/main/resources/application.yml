@@ -23,9 +23,6 @@ jwt:
   secret-key: ${JWT_SECRET_KEY}
   refresh-token-expiration-ms: 2592000000  # 30일
 
-google:
-  client-id: ${GOOGLE_CLIENT_ID}
-
 management:
   endpoints:
     web:
@@ -39,3 +36,14 @@ server:
   tomcat:
     mbeanregistry:
       enabled: true
+
+kakao:
+  api:
+    key: ${KAKAO_API_KEY}
+    url: https://dapi.kakao.com/v2/local/search/keyword.json
+
+google:
+  client-id: ${GOOGLE_CLIENT_ID}
+  api:
+    key: ${GOOGLE_API_KEY}
+    url: https://maps.googleapis.com/maps/api/place/textsearch/json
