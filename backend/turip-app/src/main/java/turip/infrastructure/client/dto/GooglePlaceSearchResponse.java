@@ -1,4 +1,4 @@
-package turip.place.infrastructure.client.dto;
+package turip.infrastructure.client.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Collections;
