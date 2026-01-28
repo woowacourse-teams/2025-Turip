@@ -1,12 +1,11 @@
-package turip.place.infrastructure.client;
+package turip.infrastructure.client;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import turip.infrastructure.client.dto.KakaoPlaceSearchResponse;
 import turip.place.controller.dto.response.PlaceSearchResponse;
-import turip.place.domain.PlaceSearchClient;
 import turip.place.domain.PlaceSearchType;
-import turip.place.infrastructure.client.dto.KakaoPlaceSearchResponse;
 
 @Component
 public class KakaoPlaceSearchClient implements PlaceSearchClient {
@@ -14,10 +13,12 @@ public class KakaoPlaceSearchClient implements PlaceSearchClient {
     private final RestClient restClient;
     private final String kakaoApiKey;
 
-    public KakaoPlaceSearchClient(RestClient.Builder restClientBuilder,
+    public KakaoPlaceSearchClient(RestClient baseRestClient,
                                   @Value("${kakao.api.key}") String kakaoApiKey,
                                   @Value("${kakao.api.url}") String kakaoApiUrl) {
-        this.restClient = restClientBuilder.baseUrl(kakaoApiUrl).build();
+        this.restClient = baseRestClient.mutate()
+                .baseUrl(kakaoApiUrl)
+                .build();
         this.kakaoApiKey = kakaoApiKey;
     }
 
