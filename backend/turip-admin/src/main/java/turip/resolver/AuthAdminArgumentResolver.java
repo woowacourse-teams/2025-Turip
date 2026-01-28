@@ -1,4 +1,4 @@
-package turip.auth.resolver;
+package turip.resolver;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;

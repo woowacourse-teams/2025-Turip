@@ -5,7 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import turip.account.domain.TuripMember;
-import turip.auth.resolver.AuthAdmin;
+import turip.resolver.AuthAdmin;
 
 @Controller
 @RequiredArgsConstructor
