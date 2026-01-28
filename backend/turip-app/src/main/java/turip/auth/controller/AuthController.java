@@ -2,6 +2,7 @@ package turip.auth.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -9,6 +10,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,13 +21,16 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import turip.account.domain.Account;
 import turip.account.domain.Member;
 import turip.account.domain.Provider;
-import turip.auth.controller.dto.request.LoginRequest;
+import turip.auth.controller.dto.request.GoogleLoginRequest;
 import turip.auth.controller.dto.request.RefreshTokenRequest;
-import turip.auth.controller.dto.response.LoginResponse;
+import turip.auth.controller.dto.request.TuripLoginRequest;
 import turip.auth.controller.dto.response.RefreshTokenResponse;
+import turip.auth.controller.dto.response.SocialLoginResponse;
+import turip.auth.controller.dto.response.TokenResult;
 import turip.auth.resolver.AuthAccount;
 import turip.auth.resolver.AuthMember;
 import turip.auth.service.AuthService;
+import turip.auth.util.TokenCookieUtil;
 import turip.common.exception.ErrorResponse;
 
 @Controller
@@ -33,6 +39,69 @@ import turip.common.exception.ErrorResponse;
 public class AuthController {
 
     private final AuthService authService;
+    private final TokenCookieUtil tokenCookieUtil;
+
+    @Operation(
+            summary = "자체 로그인 api",
+            description = "튜립 자체 로그인을 진행한다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = """
+                            로그인 성공
+                            
+                            응답 헤더에 두 개의 Set-Cookie가 포함됩니다:
+                            - accessToken: 인증 토큰 (30분)
+                            - refreshToken: 갱신 토큰 (7일)
+                            
+                            모든 쿠키는 HttpOnly, Secure, SameSite=Strict 속성을 가집니다.
+                            """,
+                    headers = @Header(
+                            name = "Set-Cookie",
+                            description = "인증 쿠키",
+                            schema = @Schema(
+                                    type = "string",
+                                    example = """
+                                            accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...; Path=/; Max-Age=1800; HttpOnly; Secure; SameSite=Strict
+                                            refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...; Path=/; Max-Age=604800; HttpOnly; Secure; SameSite=Strict
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "invalid credential",
+                                    summary = "올바르지 않은 자격 증명",
+                                    value = """
+                                            {
+                                            	"tag": "CREDENTIALS_INVALID",
+                                            	"message": "아이디 또는 비밀번호가 올바르지 않습니다."
+                                            }
+                                            """
+                            )
+                    )
+            )
+    })
+    @PostMapping("/login/turip")
+    public ResponseEntity<Void> loginWithTurip(
+            @Parameter(hidden = true) @RequestHeader("device-fid") String deviceFid,
+            @RequestBody TuripLoginRequest request) {
+        TokenResult result = authService.loginWithTurip(request, deviceFid);
+
+        ResponseCookie accessTokenCookie = tokenCookieUtil.createAccessTokenCookie(result.accessToken());
+        ResponseCookie refreshTokenCookie = tokenCookieUtil.createRefreshTokenCookie(result.refreshToken());
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
+                .build();
+    }
 
     @Operation(
             summary = "구글 로그인 api",
@@ -44,7 +113,7 @@ public class AuthController {
                     description = "성공 예시",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = LoginResponse.class),
+                            schema = @Schema(implementation = SocialLoginResponse.class),
                             examples = @ExampleObject(
                                     name = "success",
                                     summary = "로그인 성공",
@@ -80,9 +149,10 @@ public class AuthController {
             )
     })
     @PostMapping("/login/google")
-    public ResponseEntity<LoginResponse> login(@Parameter(hidden = true) @RequestHeader("device-fid") String deviceFid,
-                                               @RequestBody LoginRequest request) {
-        LoginResponse response = authService.login(request, Provider.GOOGLE, deviceFid);
+    public ResponseEntity<SocialLoginResponse> loginWithGoogle(
+            @Parameter(hidden = true) @RequestHeader("device-fid") String deviceFid,
+            @RequestBody GoogleLoginRequest request) {
+        SocialLoginResponse response = authService.loginWithSocial(request, Provider.GOOGLE, deviceFid);
         return ResponseEntity.ok(response);
     }
 
@@ -241,7 +311,15 @@ public class AuthController {
     public ResponseEntity<Void> logout(@Parameter(hidden = true) @RequestHeader("device-fid") String deviceFid,
                                        @Parameter(hidden = true) @AuthAccount Account account) {
         authService.logout(account, deviceFid);
-        return ResponseEntity.noContent().build();
+
+        // 쿠키 무효화
+        ResponseCookie accessTokenCookie = tokenCookieUtil.createExpiredAccessTokenCookie();
+        ResponseCookie refreshTokenCookie = tokenCookieUtil.createExpiredRefreshTokenCookie();
+
+        return ResponseEntity.noContent()
+                .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
+                .build();
     }
 
     @Operation(

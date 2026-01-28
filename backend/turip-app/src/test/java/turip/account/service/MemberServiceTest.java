@@ -1,6 +1,7 @@
 package turip.account.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -15,16 +16,21 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import turip.account.domain.Account;
+import turip.account.domain.Guest;
+import turip.account.domain.Member;
+import turip.account.domain.Role;
+import turip.account.repository.MemberRepository;
+import turip.auth.service.RefreshTokenService;
+import turip.common.exception.ErrorTag;
+import turip.common.exception.custom.BadRequestException;
 import turip.favorite.domain.FavoriteContent;
 import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.repository.FavoriteContentRepository;
 import turip.favorite.repository.FavoriteFolderRepository;
-import turip.auth.service.RefreshTokenService;
-import turip.account.domain.Account;
-import turip.account.domain.Guest;
-import turip.account.domain.Member;
-import turip.account.domain.Provider;
-import turip.account.repository.MemberRepository;
+import turip.util.fixture.AccountFixture;
+import turip.util.fixture.GuestFixture;
+import turip.util.fixture.MemberFixture;
 
 @ExtendWith(MockitoExtension.class)
 class MemberServiceTest {
@@ -50,6 +56,25 @@ class MemberServiceTest {
     @Mock
     private RefreshTokenService refreshTokenService;
 
+    @DisplayName("Member 생성 테스트")
+    @Nested
+    class CreateTest {
+
+        @DisplayName("이메일 형식이 올바르지 않은 경우 예외를 발생시킨다.")
+        @Test
+        void create1() {
+            // given
+            String invalidEmail = "invalid-email";
+            given(accountService.create()).willReturn(AccountFixture.createUser());
+
+            // when & then
+            assertThatThrownBy(() -> memberService.create(invalidEmail))
+                    .isInstanceOf(BadRequestException.class)
+                    .hasMessage(ErrorTag.EMAIL_INVALID.getMessage());
+
+        }
+    }
+
     @DisplayName("Guest에서 Member로 데이터 마이그레이션 테스트")
     @Nested
     class MigrateTest {
@@ -58,10 +83,10 @@ class MemberServiceTest {
         @Test
         void migrateFavoriteContents() {
             // given
-            Account memberAccount = new Account(1L);
-            Account guestAccount = new Account(2L);
-            Member member = new Member(1L, memberAccount, Provider.GOOGLE, "providerId", "email@test.com");
-            Guest guest = new Guest(1L, guestAccount, "device-fid-123");
+            Account memberAccount = AccountFixture.createCustomAccount(1L, Role.USER);
+            Account guestAccount = AccountFixture.createCustomAccount(2L, Role.USER);
+            Member member = MemberFixture.createCustomMember(memberAccount, "email@test.com", true);
+            Guest guest = GuestFixture.createCustomGuest(guestAccount, "device-fid-123");
 
             FavoriteContent guestFavoriteContent = new FavoriteContent(1L, LocalDate.now(), guestAccount, null);
 
@@ -82,10 +107,10 @@ class MemberServiceTest {
         @Test
         void migrateFavoriteFolders() {
             // given
-            Account memberAccount = new Account(1L);
-            Account guestAccount = new Account(2L);
-            Member member = new Member(1L, memberAccount, Provider.GOOGLE, "providerId", "email@test.com");
-            Guest guest = new Guest(1L, guestAccount, "device-fid-123");
+            Account memberAccount = AccountFixture.createCustomAccount(1L, Role.USER);
+            Account guestAccount = AccountFixture.createCustomAccount(2L, Role.USER);
+            Member member = MemberFixture.createCustomMember(memberAccount, "email@test.com", true);
+            Guest guest = GuestFixture.createCustomGuest(guestAccount, "device-fid-123");
 
             FavoriteFolder guestFolder1 = new FavoriteFolder(1L, guestAccount, "기본 폴더", true);
             FavoriteFolder guestFolder2 = new FavoriteFolder(2L, guestAccount, "게스트 커스텀 폴더였던 것", false);
@@ -109,10 +134,10 @@ class MemberServiceTest {
         @Test
         void deleteGuest() {
             // given
-            Account memberAccount = new Account(1L);
-            Account guestAccount = new Account(2L);
-            Member member = new Member(1L, memberAccount, Provider.GOOGLE, "providerId", "email@test.com");
-            Guest guest = new Guest(1L, guestAccount, "device-fid-123");
+            Account memberAccount = AccountFixture.createCustomAccount(1L, Role.USER);
+            Account guestAccount = AccountFixture.createCustomAccount(2L, Role.USER);
+            Member member = MemberFixture.createCustomMember(memberAccount, "email@test.com", true);
+            Guest guest = GuestFixture.createCustomGuest(guestAccount, "device-fid-123");
 
             given(favoriteContentRepository.findAllByAccount(any()))
                     .willReturn(List.of());
@@ -135,9 +160,8 @@ class MemberServiceTest {
         @Test
         void delete() {
             // given
-            Account account = new Account(1L);
-            Member member = new Member(1L, account, Provider.GOOGLE, "providerId", "email@test.com");
-
+            Account account = AccountFixture.createUser();
+            Member member = MemberFixture.createCustomMember(account, "email@test.com", true);
             // when
             memberService.delete(member);
 

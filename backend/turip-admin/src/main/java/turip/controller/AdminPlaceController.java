@@ -11,8 +11,8 @@ import turip.place.domain.PlaceSearchType;
 import turip.service.AdminPlaceService;
 
 @RestController
-@RequestMapping("/api/v1/admin/places")
 @RequiredArgsConstructor
+@RequestMapping("/api/v1/admin/places")
 public class AdminPlaceController {
 
     private final AdminPlaceService adminPlaceService;

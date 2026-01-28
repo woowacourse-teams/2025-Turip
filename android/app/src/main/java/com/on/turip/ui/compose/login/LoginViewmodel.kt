@@ -14,8 +14,6 @@ import com.on.turip.domain.login.usecase.LoginUserUseCase
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
-import com.on.turip.ui.compose.login.model.LoginUiEffect
-import com.on.turip.ui.compose.login.model.LoginUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow

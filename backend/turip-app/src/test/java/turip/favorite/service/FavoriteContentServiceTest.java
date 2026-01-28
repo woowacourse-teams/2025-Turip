@@ -18,6 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.SliceImpl;
+import turip.account.domain.Account;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.ConflictException;
 import turip.common.exception.custom.NotFoundException;
@@ -30,10 +31,10 @@ import turip.favorite.controller.dto.request.FavoriteContentRequest;
 import turip.favorite.controller.dto.response.FavoriteContentResponse;
 import turip.favorite.domain.FavoriteContent;
 import turip.favorite.repository.FavoriteContentRepository;
-import turip.account.domain.Account;
 import turip.region.domain.City;
 import turip.region.domain.Country;
 import turip.region.domain.Province;
+import turip.util.fixture.AccountFixture;
 
 @ExtendWith(MockitoExtension.class)
 class FavoriteContentServiceTest {
@@ -62,7 +63,7 @@ class FavoriteContentServiceTest {
         Province province = new Province(1L, "강원도");
         City city = new City(1L, country, province, "속초", "시 이미지 경로");
         Content content = new Content(contentId, creator, city, "뭉치의 속초 브이로그", "속초 브이로그 Url", LocalDate.of(2025, 7, 8));
-        Account account = new Account(1L);
+        Account account = AccountFixture.createUser();
         FavoriteContent favoriteContent = new FavoriteContent(LocalDate.now(), account, content);
 
         given(contentRepository.findById(contentId))
@@ -107,7 +108,7 @@ class FavoriteContentServiceTest {
         Province province = new Province(1L, "강원도");
         City city = new City(1L, country, province, "속초", "시 이미지 경로");
         Content content = new Content(contentId, creator, city, "뭉치의 속초 브이로그", "속초 브이로그 Url", LocalDate.of(2025, 7, 8));
-        Account account = new Account(1L);
+        Account account = AccountFixture.createUser();
 
         given(contentRepository.findById(contentId))
                 .willReturn(Optional.of(content));
@@ -133,7 +134,7 @@ class FavoriteContentServiceTest {
         Content content1 = new Content(1L, creator, city, "뭉치의 속초 브이로그 1편", "속초 브이로그 Url 1", LocalDate.of(2025, 7, 8));
         Content content2 = new Content(2L, creator, city, "뭉치의 속초 브이로그 2편", "속초 브이로그 Url 2", LocalDate.of(2025, 7, 8));
         List<Content> contents = List.of(content1, content2);
-        Account account = new Account(1L);
+        Account account = AccountFixture.createUser();
 
         given(favoriteContentRepository.findMyFavoriteContentsByAccountId(eq(account.getId()), eq(Long.MAX_VALUE),
                 any()))
@@ -173,7 +174,7 @@ class FavoriteContentServiceTest {
         Content content1 = new Content(1L, creator, city, "뭉치의 속초 브이로그 1편", "속초 브이로그 Url 1", LocalDate.of(2025, 7, 8));
         Content content2 = new Content(2L, creator, city, "뭉치의 속초 브이로그 2편", "속초 브이로그 Url 2", LocalDate.of(2025, 7, 8));
         List<Content> contents = List.of(content1, content2);
-        Account account = new Account(1L);
+        Account account = AccountFixture.createUser();
 
         given(favoriteContentRepository.findMyFavoriteContentsByAccountId(eq(account.getId()), eq(Long.MAX_VALUE),
                 any()))
@@ -207,7 +208,7 @@ class FavoriteContentServiceTest {
             City city = new City(1L, country, province, "속초", "시 이미지 경로");
             Content content = new Content(contentId, creator, city, "뭉치의 속초 브이로그", "속초 브이로그 Url",
                     LocalDate.of(2025, 7, 8));
-            Account account = new Account(1L);
+            Account account = AccountFixture.createUser();
             FavoriteContent favoriteContent = new FavoriteContent(LocalDate.now(), account, content);
 
             given(contentRepository.findById(contentId))
@@ -249,7 +250,7 @@ class FavoriteContentServiceTest {
             City city = new City(1L, country, province, "속초", "시 이미지 경로");
             Content content = new Content(contentId, creator, city, "뭉치의 속초 브이로그", "속초 브이로그 Url",
                     LocalDate.of(2025, 7, 8));
-            Account account = new Account(1L);
+            Account account = AccountFixture.createUser();
 
             given(contentRepository.findById(contentId))
                     .willReturn(Optional.of(content));

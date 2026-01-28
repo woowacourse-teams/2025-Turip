@@ -38,6 +38,9 @@ internal object TuripColor {
     val Black0050 = Color(0x80000000)
 
     @Stable
+    val Black06 = Color(0x0F000000)
+
+    @Stable
     val Red = Color(0xFFFF7474)
 
     @Stable
@@ -63,6 +66,9 @@ internal object TuripColor {
 
     @Stable
     val LightGray = Color(0xFFF9F9F9)
+
+    @Stable
+    val LightGray01 = Color(0x80F2F2F2)
 
     @Stable
     val LightBeige = Color(0xFFFFF4B2)

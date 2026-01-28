@@ -42,7 +42,7 @@
             android:name=".ui.search.regionresult.RegionResultActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.trip.detail.TripDetailActivity"
+            android:name=".ui.trip.TripDetailActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="false" />
         <activity

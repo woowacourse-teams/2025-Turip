@@ -14,12 +14,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import turip.account.domain.Account;
+import turip.account.domain.Role;
+import turip.account.repository.AccountRepository;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.NotFoundException;
 import turip.favorite.repository.FavoriteContentRepository;
 import turip.favorite.service.FavoriteFolderService;
-import turip.account.domain.Account;
-import turip.account.repository.AccountRepository;
+import turip.util.fixture.AccountFixture;
 
 @ExtendWith(MockitoExtension.class)
 class AccountServiceTest {
@@ -44,7 +46,7 @@ class AccountServiceTest {
         @Test
         void create() {
             // given
-            Account savedAccount = new Account(1L);
+            Account savedAccount = AccountFixture.createUser();
             given(accountRepository.save(any(Account.class)))
                     .willReturn(savedAccount);
 
@@ -66,7 +68,7 @@ class AccountServiceTest {
         void getById1() {
             // given
             Long accountId = 1L;
-            Account account = new Account(accountId);
+            Account account = AccountFixture.createCustomAccount(1L, Role.USER);
             given(accountRepository.findById(accountId))
                     .willReturn(Optional.of(account));
 
@@ -100,8 +102,7 @@ class AccountServiceTest {
         @Test
         void deleteAccountAndFavorites() {
             // given
-            Long accountId = 1L;
-            Account account = new Account(accountId);
+            Account account = AccountFixture.createUser();
 
             // when
             accountService.deleteAccountAndFavorites(account);

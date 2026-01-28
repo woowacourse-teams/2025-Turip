@@ -27,6 +27,9 @@ spring:
 jwt:
   access-token-expiration-ms: 10800000  # 3시간
 
+cookie:
+  secure: false  # HTTP 환경에서 쿠키 전송 허용
+
 management:
   endpoint:
     health:

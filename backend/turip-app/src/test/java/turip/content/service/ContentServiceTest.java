@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.SliceImpl;
+import turip.account.domain.Account;
 import turip.common.exception.custom.BadRequestException;
 import turip.content.controller.dto.response.content.ContentCountResponse;
 import turip.content.controller.dto.response.content.ContentsDetailWithLoadableResponse;
@@ -28,12 +29,12 @@ import turip.content.repository.ContentRepository;
 import turip.creator.domain.Creator;
 import turip.favorite.domain.FavoriteContent;
 import turip.favorite.repository.FavoriteContentRepository;
-import turip.account.domain.Account;
 import turip.region.domain.City;
 import turip.region.domain.Country;
 import turip.region.domain.DomesticRegionCategory;
 import turip.region.domain.OverseasRegionCategory;
 import turip.region.domain.Province;
+import turip.util.fixture.AccountFixture;
 
 @ExtendWith(MockitoExtension.class)
 class ContentServiceTest {
@@ -122,7 +123,7 @@ class ContentServiceTest {
             Content content2 = new Content(2L, creator, city, "뭉치의 속초 브이로그 2편", "속초 브이로그 Url 2",
                     LocalDate.of(2025, 7, 8));
 
-            Account account = new Account(1L);
+            Account account = AccountFixture.createUser();
 
             List<Content> popularContents = List.of(content1, content2);
 

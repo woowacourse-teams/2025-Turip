@@ -1,0 +1,151 @@
+name: prod App CI/CD
+
+on:
+  push:
+    branches: [ 'release-be/**' ]
+    paths:
+      - 'backend/app/**'
+      - 'backend/build.gradle'
+  pull_request:
+    branches: [ 'release-be/**' ]
+    paths:
+      - 'backend/app/**'
+      - 'backend/build.gradle'
+
+env:
+  DOCKER_IMAGE_REPO: teamturip/turip-backend
+  SERVICE_NAME: prod-app
+  APP_MODULE_NAME: turip-app
+  ADMIN_SERVICE_NAME: prod-admin
+  WORKING_DIR: backend
+  DOCKERFILE_PATH: backend/app.Dockerfile
+  JAVA_VERSION: '21'
+  SPRING_PROFILES_ACTIVE: prod
+  NGINX_PORT: 80
+  RUNNER_NAME: turip-server-prod
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.vars.outputs.image_tag }}
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIR }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set image tag
+        id: vars
+        run: |
+          TAG_VALUE="${{ env.SERVICE_NAME }}-$(TZ=Asia/Seoul date +%Y%m%d-%H%M)-${GITHUB_SHA::7}"
+          echo "image_tag=$TAG_VALUE" >> $GITHUB_OUTPUT
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Build Module Jar
+        run: |
+          chmod +x gradlew
+          ./gradlew :${{ env.APP_MODULE_NAME }}:bootJar -x test
+
+      - name: Run Unit Tests
+        run: ./gradlew :${{ env.APP_MODULE_NAME }}:test
+
+      - name: Prepare OpenTelemetry agent
+        run: |
+          mkdir -p otel
+          curl -L -o otel/opentelemetry-javaagent.jar \
+          https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v2.10.0/opentelemetry-javaagent.jar
+
+      - name: Login to Docker Hub
+        if: github.event_name == 'push'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        if: github.event_name == 'push'
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: network=host
+
+      - name: Build and push image
+        if: github.event_name == 'push'
+        uses: docker/build-push-action@v6
+        with:
+          context: ./${{ env.WORKING_DIR }}
+          file: ./${{ env.DOCKERFILE_PATH }}
+          platforms: linux/arm64
+          push: true
+          tags: ${{ env.DOCKER_IMAGE_REPO }}:${{ steps.vars.outputs.image_tag }}
+
+  deploy:
+    needs: build_and_test
+    if: |
+      needs.build_and_test.result == 'success' && (github.event_name == 'push')
+    runs-on: [ self-hosted, "turip-server-prod" ]
+
+    steps:
+      - name: Login to Docker Hub (for Pull)
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Deploy
+        env:
+          CSV_LINKS_COLLECTION_URL: ${{ secrets.CSV_LINKS_COLLECTION_URL }}
+          DOMESTIC_ETC_IMAGE_URL: ${{ secrets.DOMESTIC_ETC_IMAGE_URL }}
+          OVERSEAS_ETC_IMAGE_URL: ${{ secrets.OVERSEAS_ETC_IMAGE_URL }}
+          OTEL_EXPORTER_OTLP_ENDPOINT: ${{ secrets.OTEL_EXPORTER_OTLP_ENDPOINT }}
+          MYSQL_URL: ${{ secrets.MYSQL_URL }}
+          MYSQL_USERNAME: ${{ secrets.MYSQL_USERNAME }}
+          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+          FLYWAY_USERNAME: ${{ secrets.FLYWAY_USERNAME }}
+          FLYWAY_PASSWORD: ${{ secrets.FLYWAY_PASSWORD }}
+          CSV_IMPORT_PASSWORD: ${{ secrets.CSV_IMPORT_PASSWORD }}
+          JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+        run: |
+          cd /home/ubuntu/deploy
+          IMAGE_TAG="${{ needs.build_and_test.outputs.image_tag }}"
+          
+          echo "🚀 ${{ env.SERVICE_NAME }} 배포 시작 (Tag: ${IMAGE_TAG})"
+          
+          cat <<EOF > .env.tmp
+          IMAGE_NAME_PREFIX=${{ env.SERVICE_NAME }}
+          IMAGE_NAME_ADMIN_PREFIX=${{ env.ADMIN_SERVICE_NAME }}
+          SPRING_PROFILES_ACTIVE=${{ env.SPRING_PROFILES_ACTIVE }}
+          NGINX_PORT=${{ env.NGINX_PORT }}
+          CSV_LINKS_COLLECTION_URL=${CSV_LINKS_COLLECTION_URL}
+          DOMESTIC_ETC_IMAGE_URL=${DOMESTIC_ETC_IMAGE_URL}
+          OVERSEAS_ETC_IMAGE_URL=${OVERSEAS_ETC_IMAGE_URL}
+          OTEL_EXPORTER_OTLP_ENDPOINT=${OTEL_EXPORTER_OTLP_ENDPOINT}
+          MYSQL_URL=${MYSQL_URL}
+          MYSQL_USERNAME=${MYSQL_USERNAME}
+          MYSQL_PASSWORD=${MYSQL_PASSWORD}
+          FLYWAY_USERNAME=${FLYWAY_USERNAME}
+          FLYWAY_PASSWORD=${FLYWAY_PASSWORD}
+          CSV_IMPORT_PASSWORD=${CSV_IMPORT_PASSWORD}
+          JWT_SECRET_KEY=${JWT_SECRET_KEY}
+          GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+          EOF
+          
+          if [ -f .env ]; then
+            grep "^ADMIN_IMAGE_TAG=" .env >> .env.tmp || true
+          fi
+          
+          echo "APP_IMAGE_TAG=${IMAGE_TAG}" >> .env.tmp
+          
+          mv .env.tmp .env
+          
+          chmod +x ./deploy.sh
+          ./deploy.sh ${IMAGE_TAG}

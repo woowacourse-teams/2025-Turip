@@ -12,6 +12,8 @@ import turip.place.domain.PlaceSearchProvider;
 @NoArgsConstructor
 public class GooglePlaceSearchResponse {
 
+    public static final String MAP_URL_PREFIX = "https://www.google.com/maps/search/?api=1&query=Google&query_place_id=";
+
     @JsonProperty("results")
     private List<Result> results;
 
@@ -23,11 +25,11 @@ public class GooglePlaceSearchResponse {
                 .map(result -> new PlaceSearchResponse.PlaceSearchItem(
                         result.placeId,
                         result.name,
-                        result.website,
+                        MAP_URL_PREFIX + result.placeId,
                         result.formattedAddress,
                         result.geometry.location.lat,
                         result.geometry.location.lng,
-                        result.types != null && !result.types.isEmpty() ? result.types.get(0) : null))
+                        result.types != null && !result.types.isEmpty() ? result.types.getFirst() : null))
                 .toList();
         return new PlaceSearchResponse(PlaceSearchProvider.GOOGLE, items);
     }
