@@ -10,6 +10,8 @@ public enum ErrorTag {
     REGION_CATEGORY_INVALID("잘못된 지역 카테고리입니다."),
     DEVICE_FID_REQUIRED("요청 헤더에 device_fid가 존재하지 않습니다."),
     FAVORITE_PLACE_FOLDER_MISMATCH("장소 찜이 해당 폴더에 존재하지 않습니다."),
+    UNSUPPORTED_SEARCH_TYPE("지원하지 않는 검색 타입입니다."),
+
     EMAIL_INVALID("이메일 형식이 올바르지 않습니다."),
     LOGIN_ID_INVALID("아이디 형식이 올바르지 않습니다."),
     LOGIN_PASSWORD_INVALID("비밀번호 형식이 올바르지 않습니다."),

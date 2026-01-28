@@ -33,6 +33,14 @@ jwt:
 # Google OAuth 설정 (테스트용)
 google:
   client-id: test-google-client-id.apps.googleusercontent.com
+  api:
+    key: test-google-api-key
+    url: https://test.google.com
+
+kakao:
+  api:
+    key: test-kakao-api-key
+    url: https://test.kakao.com
 
 # CSV Import 설정
 csv:
@@ -48,3 +56,4 @@ region:
     overseas:
       etc:
         image-url: https://test.example.com/overseas-etc.jpg
+
