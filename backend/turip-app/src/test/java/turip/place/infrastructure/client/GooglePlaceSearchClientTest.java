@@ -43,7 +43,6 @@ class GooglePlaceSearchClientTest {
                       "place_id": "google123",
                       "name": "Google Test Place",
                       "formatted_address": "123, Google Test Street",
-                      "website": "https://google.example.com",
                       "types": ["tourist_attraction"],
                       "geometry": {
                         "location": {
