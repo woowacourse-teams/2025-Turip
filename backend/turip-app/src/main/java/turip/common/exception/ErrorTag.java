@@ -59,6 +59,7 @@ public enum ErrorTag {
 
     // 404 Not Found
     YOUTUBE_VIDEO_NOT_FOUND("유튜브 영상을 찾을 수 없습니다."),
+    CITY_NOT_FOUND("도시를 찾을 수 없습니다."),
 
     // 500 Internal Server Error
     YOUTUBE_API_SERVER_ERROR("유튜브 API 서버에 에러가 발생했습니다.");
