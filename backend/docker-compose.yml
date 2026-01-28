@@ -12,7 +12,7 @@ services:
       - turip-network
 
   blue:
-    image: teamturip/turip-backend:${IMAGE_NAME_PREFIX:-dev-app}-${APP_IMAGE_TAG:-latest}
+    image: teamturip/turip-backend:${APP_IMAGE_TAG:-latest}
     container_name: blue
     restart: always
     expose:
@@ -41,7 +41,7 @@ services:
       - /home/ubuntu/logs/app:/logs
 
   green:
-    image: teamturip/turip-backend:${IMAGE_NAME_PREFIX:-dev-app}-${APP_IMAGE_TAG:-latest}
+    image: teamturip/turip-backend:${APP_IMAGE_TAG:-latest}
     container_name: green
     restart: always
     expose:
