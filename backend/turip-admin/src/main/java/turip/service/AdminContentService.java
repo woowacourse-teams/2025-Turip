@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.BadRequestException;
+import turip.common.exception.custom.ConflictException;
 import turip.common.exception.custom.NotFoundException;
 import turip.content.domain.Content;
 import turip.content.domain.ContentPlace;
@@ -41,10 +42,9 @@ public class AdminContentService {
 
     @Transactional
     public Long save(AdminContentSaveRequest request) {
-        // TODO: request.tripDuration()은 현재 사용되지 않습니다. Content 엔티티에 nights, days 필드 추가를 고려해야 합니다.
         Creator creator = findOrCreateCreator(request);
         City city = findCity(request);
-        Content content = createContent(request, creator, city);
+        Content content = findOrCreateContent(request, creator, city);
         contentRepository.save(content);
 
         request.contentPlaces().forEach(contentPlaceRequest -> {
@@ -79,7 +79,12 @@ public class AdminContentService {
         );
     }
 
-    private Content createContent(AdminContentSaveRequest request, Creator creator, City city) {
+    private Content findOrCreateContent(AdminContentSaveRequest request, Creator creator, City city) {
+        contentRepository.findByCreatorAndTitle(creator, request.video().title())
+                .ifPresent(content -> {
+                    throw new ConflictException(ErrorTag.CONTENT_SAVE_CONFLICT);
+                });
+
         return new Content(
                 creator,
                 city,

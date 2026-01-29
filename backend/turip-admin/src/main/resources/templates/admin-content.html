@@ -214,7 +214,7 @@
                         <input id="tripNights" type="hidden" value="0"><input id="tripDays" type="hidden" value="1">
                     </div>
                 </div>
-                <button class="btn btn-primary btn-lg w-50 shadow" onclick="saveAllData()">💾 서버에 콘텐츠 저장</button>
+                <button class="btn btn-primary btn-lg w-50 shadow" id="saveContentBtn" onclick="saveAllData()">💾 서버에 콘텐츠 저장</button>
             </div>
         </div>
     </div>
@@ -260,7 +260,6 @@
         player = new YT.Player('player', {height: '100%', width: '100%', videoId: videoId});
     }
 
-    // 장소 리스트를 지도 마커에 동기화
     function updateMapMarkers() {
         markers.forEach(m => m.setMap(null));
         markers = [];
@@ -402,8 +401,31 @@
             grouped[day].forEach(item => {
                 listDiv.insertAdjacentHTML('beforeend', `<div class="place-item" data-id="${item.id}"><div><b>${item.place.name}</b> <small>🕒 ${item.timeLine}</small></div><button class="btn btn-sm text-danger" onclick="removePlace(${item.id})">✕</button></div>`);
             });
-            Sortable.create(listDiv, {group: 'places', animation: 150});
+            Sortable.create(listDiv, {
+                group: 'places', animation: 150,
+                onEnd: function (evt) {
+                    rebuildCollectedPlacesArray();
+                    calculateDuration();
+                    updateMapMarkers();
+                }
+            });
         });
+    }
+
+    function rebuildCollectedPlacesArray() {
+        let newCollectedPlaces = [];
+        document.querySelectorAll('[id^="day-list-"]').forEach(dayListDiv => {
+            const day = parseInt(dayListDiv.id.replace('day-list-', ''));
+            Array.from(dayListDiv.children).forEach(placeItemDiv => {
+                const placeId = parseInt(placeItemDiv.dataset.id);
+                const originalPlace = collectedPlaces.find(p => p.id === placeId);
+                if (originalPlace) {
+                    originalPlace.visitDay = day;
+                    newCollectedPlaces.push(originalPlace);
+                }
+            });
+        });
+        collectedPlaces = newCollectedPlaces;
     }
 
     function removePlace(id) {
@@ -414,6 +436,9 @@
     }
 
     async function saveAllData() {
+        const saveButton = document.getElementById('saveContentBtn');
+        if (saveButton.disabled) return;
+
         const vId = document.getElementById('v_id').value;
         const cityName = document.getElementById('cityName').value;
         if (!vId || !cityName) return alert("필수 정보를 모두 입력하세요.");
@@ -438,12 +463,17 @@
                 place: p.place
             }))
         };
+
         try {
+            saveButton.disabled = true;
+            saveButton.innerHTML = '💾 저장 중...';
             await authFetch('/api/v1/admin/contents', {method: 'POST', body: JSON.stringify(payload)});
             alert("🎉 콘텐츠 저장 완료!");
             location.reload();
         } catch (e) {
             alert("⚠️ 저장 실패\n" + e.message);
+            saveButton.disabled = false;
+            saveButton.innerHTML = '💾 서버에 콘텐츠 저장';
         }
     }
 
