@@ -155,6 +155,7 @@
                     <input id="v_date_val" type="hidden">
                 </div>
                 <div id="player"></div>
+                <div class="alert alert-warning d-none mt-3" id="existingContentWarning"></div>
             </div>
 
             <div class="row">
@@ -301,6 +302,9 @@
 
     async function fetchVideoInfo() {
         const videoUrl = document.getElementById('videoUrlInput').value;
+        const warningDiv = document.getElementById('existingContentWarning');
+        warningDiv.classList.add('d-none'); // Reset warning
+
         if (!videoUrl) return alert("URL을 입력하세요.");
         try {
             const res = await authFetch(`/api/v1/admin/video?url=${encodeURIComponent(videoUrl)}`);
@@ -315,6 +319,11 @@
             document.getElementById('v_video_title').innerText = data.videoTitle;
             document.getElementById('v_channel_img').src = channelProfileImg;
             document.getElementById('v_date_val').value = data.uploadDate;
+
+            if (data.isExisting) {
+                warningDiv.innerText = "⚠️ 이미 등록된 콘텐츠입니다. 저장 시 기존 내용에 덮어쓰기 됩니다.";
+                warningDiv.classList.remove('d-none');
+            }
 
             createPlayer(data.videoId);
         } catch (e) {
