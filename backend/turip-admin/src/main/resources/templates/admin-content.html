@@ -120,6 +120,15 @@
             margin-top: 20px;
         }
 
+        .search-result-item {
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+            padding: 10px;
+        }
+
+        .search-result-item:hover {
+            background-color: #f1f4ff;
+        }
     </style>
 </head>
 <body>
@@ -232,6 +241,16 @@
         }
     }
 
+    function initMap() {
+        map = new google.maps.Map(document.getElementById("map"), {center: {lat: 37.5665, lng: 126.9780}, zoom: 12});
+        infoWindow = new google.maps.InfoWindow();
+    }
+
+    function onYouTubeIframeAPIReady() {
+        isYouTubeApiReady = true;
+        if (videoIdToLoad) createPlayer(videoIdToLoad);
+    }
+
     function createPlayer(videoId) {
         if (!isYouTubeApiReady) {
             videoIdToLoad = videoId;
@@ -241,6 +260,7 @@
         player = new YT.Player('player', {height: '100%', width: '100%', videoId: videoId});
     }
 
+    // 장소 리스트를 지도 마커에 동기화
     function updateMapMarkers() {
         markers.forEach(m => m.setMap(null));
         markers = [];
