@@ -215,7 +215,9 @@
                         <input id="tripNights" type="hidden" value="0"><input id="tripDays" type="hidden" value="1">
                     </div>
                 </div>
-                <button class="btn btn-primary btn-lg w-50 shadow" id="saveContentBtn" onclick="saveAllData()">💾 서버에 콘텐츠 저장</button>
+                <button class="btn btn-primary btn-lg w-50 shadow" id="saveContentBtn" onclick="saveAllData()">💾 서버에 콘텐츠
+                    저장
+                </button>
             </div>
         </div>
     </div>
@@ -235,7 +237,20 @@
         const mergedOptions = {...options, headers: {...defaultOptions.headers, ...options.headers}};
         try {
             const response = await fetch(url, mergedOptions);
-            if (!response.ok) throw new Error(`[에러 ${response.status}] 서버 응답 실패`);
+            if (!response.ok) {
+                let errorMessage = `[에러 ${response.status}] 서버 응답 실패`;
+                try {
+                    const errorBody = await response.json();
+                    if (errorBody && errorBody.message) {
+                        errorMessage = errorBody.message;
+                    } else if (errorBody) {
+                        errorMessage = JSON.stringify(errorBody);
+                    }
+                } catch (jsonError) {
+                    // response body was not JSON, use default message
+                }
+                throw new Error(errorMessage);
+            }
             return response;
         } catch (e) {
             throw new Error(e.message);
@@ -310,6 +325,10 @@
             const res = await authFetch(`/api/v1/admin/video?url=${encodeURIComponent(videoUrl)}`);
             const data = await res.json();
 
+            if (data && data.isExisting) {
+                alert("⚠️ 이미 등록된 콘텐츠입니다.");
+            }
+
             const channelProfileImg = await fetchChannelImage(data.channelId);
 
             document.getElementById('videoInfoArea').classList.remove('d-none');
@@ -319,11 +338,6 @@
             document.getElementById('v_video_title').innerText = data.videoTitle;
             document.getElementById('v_channel_img').src = channelProfileImg;
             document.getElementById('v_date_val').value = data.uploadDate;
-
-            if (data.isExisting) {
-                warningDiv.innerText = "⚠️ 이미 등록된 콘텐츠입니다. 저장 시 기존 내용에 덮어쓰기 됩니다.";
-                warningDiv.classList.remove('d-none');
-            }
 
             createPlayer(data.videoId);
         } catch (e) {
