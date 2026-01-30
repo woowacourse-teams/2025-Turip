@@ -90,6 +90,7 @@ fun LazyItemScope.ReorderableItem(
     state: ReorderableLazyColumnState,
     key: Long,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     animateItemModifier: Modifier = Modifier.animateItem(),
     content: @Composable ReorderableLazyColumnItemScope.(isDragging: Boolean) -> Unit,
 ) {
@@ -126,6 +127,7 @@ fun LazyItemScope.ReorderableItem(
                     reorderableLazyColumnState = state,
                     key = key,
                     itemPositionYProvider = { itemPosition },
+                    enabled = enabled,
                 )
             }
 

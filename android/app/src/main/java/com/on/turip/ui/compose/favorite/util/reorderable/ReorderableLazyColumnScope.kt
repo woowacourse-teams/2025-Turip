@@ -35,6 +35,7 @@ class ReorderableLazyColumnItemScope(
     private val reorderableLazyColumnState: ReorderableLazyColumnState,
     private val key: Long,
     private val itemPositionYProvider: () -> Float,
+    private val enabled: Boolean = true,
 ) {
     fun Modifier.draggableAfterLongPress(
         interactionSource: MutableInteractionSource?,
@@ -53,7 +54,7 @@ class ReorderableLazyColumnItemScope(
                 dragAreaHeight = it.size.height
             }.detectDragGesturesAfterLongPress(
                 key = reorderableLazyColumnState,
-                enabled = reorderableLazyColumnState.isDragging(key).value || !reorderableLazyColumnState.isAnyItemDragging,
+                enabled = enabled && (reorderableLazyColumnState.isDragging(key).value || !reorderableLazyColumnState.isAnyItemDragging),
                 interactionSource = interactionSource,
                 onDragStart = {
                     coroutineScope.launch {
