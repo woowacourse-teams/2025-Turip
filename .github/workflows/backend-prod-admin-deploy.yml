@@ -155,7 +155,7 @@ jobs:
           echo "ADMIN_IMAGE_TAG=${IMAGE_TAG}" >> .env.tmp
           
           mv .env.tmp .env
-          docker-compose pull admin
-          docker-compose up -d admin
+          docker compose pull admin
+          docker compose up -d admin
           
           echo "✅ Admin 배포 완료"
