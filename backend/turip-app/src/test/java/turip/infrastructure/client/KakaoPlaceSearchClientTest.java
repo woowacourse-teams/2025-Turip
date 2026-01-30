@@ -75,7 +75,6 @@ class KakaoPlaceSearchClientTest {
 
         PlaceSearchResponse.PlaceSearchItem item = response.items().getFirst();
         assertAll(
-                () -> assertThat(item.externalId()).isEqualTo("12345"),
                 () -> assertThat(item.name()).isEqualTo("Test Place"),
                 () -> assertThat(item.address()).isEqualTo("123, Test Street"),
                 () -> assertThat(item.latitude()).isEqualTo(37.54321),

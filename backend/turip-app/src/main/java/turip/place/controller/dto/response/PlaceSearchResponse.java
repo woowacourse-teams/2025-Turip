@@ -8,7 +8,6 @@ public record PlaceSearchResponse(
         List<PlaceSearchItem> items
 ) {
     public record PlaceSearchItem(
-            String externalId,
             String name,
             String url,
             String address,

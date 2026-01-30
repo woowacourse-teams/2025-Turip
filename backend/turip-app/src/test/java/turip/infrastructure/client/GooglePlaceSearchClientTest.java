@@ -75,7 +75,6 @@ class GooglePlaceSearchClientTest {
 
         PlaceSearchResponse.PlaceSearchItem item = response.items().getFirst();
         assertAll(
-                () -> assertThat(item.externalId()).isEqualTo("google123"),
                 () -> assertThat(item.name()).isEqualTo("Google Test Place"),
                 () -> assertThat(item.address()).isEqualTo("123, Google Test Street"),
                 () -> assertThat(item.latitude()).isEqualTo(34.0522),

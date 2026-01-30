@@ -5,16 +5,20 @@ import java.time.LocalDate;
 public record AdminVideoResponse(
         String videoId,
         String videoTitle,
+        String channelId,
         String channelName,
-        LocalDate uploadDate
+        LocalDate uploadDate,
+        boolean isExisting
 ) {
 
     public static AdminVideoResponse of(
             String videoId,
             String videoTitle,
+            String channelId,
             String channelName,
-            LocalDate uploadDate
+            LocalDate uploadDate,
+            boolean isExisting
     ) {
-        return new AdminVideoResponse(videoId, videoTitle, channelName, uploadDate);
+        return new AdminVideoResponse(videoId, videoTitle, channelId, channelName, uploadDate, isExisting);
     }
 }

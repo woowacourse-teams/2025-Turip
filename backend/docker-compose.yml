@@ -12,7 +12,7 @@ services:
       - turip-network
 
   blue:
-    image: teamturip/turip-backend:${IMAGE_NAME_PREFIX:-dev-app}-${APP_IMAGE_TAG:-latest}
+    image: teamturip/turip-backend:${APP_IMAGE_TAG:-latest}
     container_name: blue
     restart: always
     expose:
@@ -35,13 +35,16 @@ services:
       CSV_IMPORT_PASSWORD: ${CSV_IMPORT_PASSWORD}
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY}
+      KAKAO_API_KEY: ${KAKAO_API_KEY}
+      YOUTUBE_API_KEY: ${YOUTUBE_API_KEY}
     networks:
       - turip-network
     volumes:
       - /home/ubuntu/logs/app:/logs
 
   green:
-    image: teamturip/turip-backend:${IMAGE_NAME_PREFIX:-dev-app}-${APP_IMAGE_TAG:-latest}
+    image: teamturip/turip-backend:${APP_IMAGE_TAG:-latest}
     container_name: green
     restart: always
     expose:
@@ -53,7 +56,7 @@ services:
       - /home/ubuntu/logs/app:/logs
 
   admin:
-    image: teamturip/turip-backend:${IMAGE_NAME_ADMIN_PREFIX:-dev-admin}-${ADMIN_IMAGE_TAG:-latest}
+    image: teamturip/turip-backend:${ADMIN_IMAGE_TAG:-latest}
     container_name: turip-admin
     restart: always
     expose:

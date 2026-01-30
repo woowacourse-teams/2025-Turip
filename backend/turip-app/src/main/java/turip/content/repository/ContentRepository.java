@@ -11,7 +11,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import turip.content.domain.Content;
 
+
+import turip.creator.domain.Creator;
+
 public interface ContentRepository extends JpaRepository<Content, Long> {
+
+    Optional<Content> findByCreatorAndTitle(Creator creator, String title);
 
     Optional<Content> findByTitleAndUrl(String title, String url);
 

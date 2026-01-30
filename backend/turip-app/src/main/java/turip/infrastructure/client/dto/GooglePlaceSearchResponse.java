@@ -23,7 +23,6 @@ public class GooglePlaceSearchResponse {
         }
         List<PlaceSearchResponse.PlaceSearchItem> items = results.stream()
                 .map(result -> new PlaceSearchResponse.PlaceSearchItem(
-                        result.placeId,
                         result.name,
                         MAP_URL_PREFIX + result.placeId,
                         result.formattedAddress,
