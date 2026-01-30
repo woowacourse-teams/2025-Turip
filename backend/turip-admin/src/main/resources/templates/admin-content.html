@@ -312,7 +312,7 @@
                 return data.items[0].snippet.thumbnails.medium.url;
             }
         } catch (e) {
-            console.error("채널 이미지 로드 실패:", e);
+            console.error("⚠️ 채널 이미지 로드 실패:", e);
         }
         return 'https://via.placeholder.com/90?text=No+Image';
     }
