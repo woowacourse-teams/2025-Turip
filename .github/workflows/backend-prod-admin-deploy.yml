@@ -21,7 +21,7 @@ env:
   DOCKERFILE_PATH: backend/admin.Dockerfile
   JAVA_VERSION: '21'
   SPRING_PROFILES_ACTIVE: prod
-  NGINX_PORT: 8080
+  NGINX_PORT: 80
   RUNNER_NAME: turip-server-prod
 
 jobs:
