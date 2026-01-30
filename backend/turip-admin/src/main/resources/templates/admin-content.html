@@ -437,25 +437,25 @@
 
     function rebuildCollectedPlacesArray() {
         let newCollectedPlaces = [];
+
         document.querySelectorAll('[id^="day-list-"]').forEach(dayListDiv => {
             const day = parseInt(dayListDiv.id.replace('day-list-', ''));
+
+            let orderInDay = 1;
+
             Array.from(dayListDiv.children).forEach(placeItemDiv => {
                 const placeId = parseInt(placeItemDiv.dataset.id);
                 const originalPlace = collectedPlaces.find(p => p.id === placeId);
+
                 if (originalPlace) {
                     originalPlace.visitDay = day;
+                    originalPlace.visitOrder = orderInDay++;
                     newCollectedPlaces.push(originalPlace);
                 }
             });
         });
-        collectedPlaces = newCollectedPlaces;
-    }
 
-    function removePlace(id) {
-        collectedPlaces = collectedPlaces.filter(p => p.id !== id);
-        renderPlaceList();
-        calculateDuration();
-        updateMapMarkers();
+        collectedPlaces = newCollectedPlaces;
     }
 
     async function saveAllData() {
@@ -469,7 +469,8 @@
         const payload = {
             cityName: cityName,
             video: {
-                videoId: vId, url: document.getElementById('v_url').value,
+                videoId: vId,
+                url: document.getElementById('v_url').value,
                 title: document.getElementById('v_video_title').innerText,
                 channelName: document.getElementById('v_channel_name').innerText,
                 channelImage: document.getElementById('v_channel_img').src,
@@ -479,9 +480,9 @@
                 nights: parseInt(document.getElementById('tripNights').value),
                 days: parseInt(document.getElementById('tripDays').value)
             },
-            contentPlaces: collectedPlaces.map((p, idx) => ({
+            contentPlaces: collectedPlaces.map(p => ({
                 visitDay: p.visitDay,
-                visitOrder: idx + 1,
+                visitOrder: p.visitOrder, // 1일차 1, 2... 2일차 1, 2...
                 timeLine: p.timeLine,
                 place: p.place
             }))
@@ -498,6 +499,13 @@
             saveButton.disabled = false;
             saveButton.innerHTML = '💾 서버에 콘텐츠 저장';
         }
+    }
+
+    function removePlace(id) {
+        collectedPlaces = collectedPlaces.filter(p => p.id !== id);
+        renderPlaceList();
+        calculateDuration();
+        updateMapMarkers();
     }
 
     /*]]>*/
