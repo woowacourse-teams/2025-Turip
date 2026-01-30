@@ -277,6 +277,8 @@
     }
 
     function updateMapMarkers() {
+        if (!map || !infoWindow) return;
+
         markers.forEach(m => m.setMap(null));
         markers = [];
         if (collectedPlaces.length === 0) return;
@@ -368,7 +370,7 @@
                     }
                     container.style.display = 'none';
                     document.getElementById('btnAddPlace').disabled = false;
-                    map.setCenter({lat: item.latitude, lng: item.longitude});
+                    if (map) map.setCenter({lat: item.latitude, lng: item.longitude});
                 };
                 container.appendChild(div);
             });
@@ -461,6 +463,8 @@
     async function saveAllData() {
         const saveButton = document.getElementById('saveContentBtn');
         if (saveButton.disabled) return;
+
+        rebuildCollectedPlacesArray();
 
         const vId = document.getElementById('v_id').value;
         const cityName = document.getElementById('cityName').value;
