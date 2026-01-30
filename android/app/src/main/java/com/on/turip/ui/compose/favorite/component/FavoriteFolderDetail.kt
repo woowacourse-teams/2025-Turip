@@ -1,7 +1,9 @@
 package com.on.turip.ui.compose.favorite.component
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,13 +16,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -32,6 +39,8 @@ import com.google.android.gms.maps.model.LatLng
 import com.on.turip.R
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.favorite.model.FavoritePlaceModel
+import com.on.turip.ui.compose.favorite.util.reorderable.ReorderableItem
+import com.on.turip.ui.compose.favorite.util.reorderable.rememberReorderableLazyColumnState
 import com.on.turip.ui.compose.trip.model.MapModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -45,9 +54,13 @@ fun FavoriteFolderDetail(
     onFavoriteClick: (place: FavoritePlaceModel) -> Unit,
     onBackClick: () -> Unit,
     onShareClick: () -> Unit,
+    onDragStart: () -> Unit,
+    onDragPlace: (from: Int, to: Int) -> Unit,
+    onDragEnd: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val hasPlaces = places.isNotEmpty()
+    val listState = rememberLazyListState()
 
     Column(
         modifier =
@@ -64,9 +77,13 @@ fun FavoriteFolderDetail(
 
         if (hasPlaces) {
             FavoritePlacesContent(
+                listState = listState,
                 places = places,
                 onMapClick = onMapClick,
                 onFavoriteClick = onFavoriteClick,
+                onDragStart = onDragStart,
+                onDragPlace = onDragPlace,
+                onDragEnd = onDragEnd,
                 modifier = Modifier.padding(horizontal = TuripTheme.spacing.large),
             )
         } else {
@@ -121,9 +138,13 @@ private fun Header(
 
 @Composable
 private fun FavoritePlacesContent(
+    listState: LazyListState,
     places: ImmutableList<FavoritePlaceModel>,
     onMapClick: (map: MapModel) -> Unit,
     onFavoriteClick: (place: FavoritePlaceModel) -> Unit,
+    onDragStart: () -> Unit,
+    onDragPlace: (from: Int, to: Int) -> Unit,
+    onDragEnd: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
@@ -135,32 +156,67 @@ private fun FavoritePlacesContent(
         )
 
         FavoritePlaces(
+            listState = listState,
             places = places,
             onMapClick = onMapClick,
             onFavoriteClick = onFavoriteClick,
+            onDragStart = onDragStart,
+            onDragPlace = onDragPlace,
+            onDragEnd = onDragEnd,
         )
     }
 }
 
 @Composable
 private fun FavoritePlaces(
+    listState: LazyListState,
     places: ImmutableList<FavoritePlaceModel>,
     onMapClick: (map: MapModel) -> Unit,
     onFavoriteClick: (place: FavoritePlaceModel) -> Unit,
+    onDragStart: () -> Unit,
+    onDragPlace: (from: Int, to: Int) -> Unit,
+    onDragEnd: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val reorderableItemShape = TuripTheme.shape.container
+    val reorderableLazyColumnState =
+        rememberReorderableLazyColumnState(
+            lazyListState = listState,
+            onDragStart = onDragStart,
+            onDragEnd = onDragEnd,
+            onMove = { from, to ->
+                onDragPlace(from.index, to.index)
+            },
+        )
+
     LazyColumn(
+        state = listState,
         verticalArrangement = Arrangement.spacedBy(TuripTheme.spacing.small),
-        contentPadding = PaddingValues(bottom = TuripTheme.spacing.medium),
+        contentPadding = PaddingValues(vertical = TuripTheme.spacing.medium),
         modifier = modifier,
     ) {
         items(items = places, key = { it.favoritePlaceId }) { place ->
-            FavoritePlaceItem(
-                place = place,
-                onMapClick = { onMapClick(place.mapModel) },
-                onFavoriteClick = { onFavoriteClick(place) },
-                modifier = Modifier.animateItem(),
-            )
+            ReorderableItem(
+                state = reorderableLazyColumnState,
+                key = place.favoritePlaceId,
+            ) { isDragging: Boolean ->
+                val interactionSource = remember { MutableInteractionSource() }
+                val elevation by animateFloatAsState(if (isDragging) 8.0f else 0.0f)
+                FavoritePlaceItem(
+                    place = place,
+                    onMapClick = { onMapClick(place.mapModel) },
+                    onFavoriteClick = { onFavoriteClick(place) },
+                    modifier =
+                        Modifier
+                            .graphicsLayer {
+                                shadowElevation = elevation
+                                shape = reorderableItemShape
+                                clip = true
+                            }.draggableAfterLongPress(
+                                interactionSource = interactionSource,
+                            ),
+                )
+            }
         }
     }
 }
@@ -285,6 +341,9 @@ private fun FavoriteFolderDetail_Preview(
             onFavoriteClick = {},
             onBackClick = {},
             onShareClick = {},
+            onDragStart = {},
+            onDragPlace = { _, _ -> },
+            onDragEnd = { },
         )
     }
 }

@@ -209,6 +209,9 @@ fun FavoritePlaceFolderBottomSheet(
                                 viewModel.onFavoriteDetailBack()
                             },
                             onShareClick = viewModel::shareFolder,
+                            onDragStart = viewModel::onDragStart,
+                            onDragPlace = viewModel::onDragMove,
+                            onDragEnd = viewModel::onDragEnd,
                         )
                     }
                 }
