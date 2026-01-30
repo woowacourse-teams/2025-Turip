@@ -17,6 +17,7 @@ public record YoutubeVideoApiResponse(List<Item> items) {
         return YoutubeVideoSearchResponse.of(
                 videoId,
                 snippet.title(),
+                snippet.channelId(),
                 snippet.channelTitle(),
                 snippet.publishedAt().toLocalDate()
         );
@@ -27,6 +28,7 @@ public record YoutubeVideoApiResponse(List<Item> items) {
 
     private record Snippet(
             String title,
+            @JsonProperty("channelId") String channelId,
             @JsonProperty("channelTitle") String channelTitle,
             @JsonProperty("publishedAt") ZonedDateTime publishedAt
     ) {
