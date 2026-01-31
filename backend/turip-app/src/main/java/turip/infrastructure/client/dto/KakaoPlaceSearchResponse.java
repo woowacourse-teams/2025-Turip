@@ -1,4 +1,4 @@
-package turip.place.infrastructure.client.dto;
+package turip.infrastructure.client.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Collections;
@@ -21,7 +21,6 @@ public class KakaoPlaceSearchResponse {
         }
         List<PlaceSearchResponse.PlaceSearchItem> items = documents.stream()
                 .map(doc -> new PlaceSearchResponse.PlaceSearchItem(
-                        doc.id,
                         doc.placeName,
                         doc.placeUrl,
                         doc.addressName,

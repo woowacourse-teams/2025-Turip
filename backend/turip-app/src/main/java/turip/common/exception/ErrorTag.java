@@ -10,7 +10,6 @@ public enum ErrorTag {
     REGION_CATEGORY_INVALID("잘못된 지역 카테고리입니다."),
     DEVICE_FID_REQUIRED("요청 헤더에 device_fid가 존재하지 않습니다."),
     FAVORITE_PLACE_FOLDER_MISMATCH("장소 찜이 해당 폴더에 존재하지 않습니다."),
-    UNSUPPORTED_SEARCH_TYPE("지원하지 않는 검색 타입입니다."),
 
     EMAIL_INVALID("이메일 형식이 올바르지 않습니다."),
     LOGIN_ID_INVALID("아이디 형식이 올바르지 않습니다."),
@@ -47,9 +46,25 @@ public enum ErrorTag {
     FAVORITE_CONTENT_CONFLICT("이미 찜한 컨텐츠입니다."),
     FAVORITE_PLACE_IN_FOLDER_CONFLICT("해당 폴더에 이미 찜한 장소입니다."),
     LOGIN_ID_CONFLICT("중복 아이디가 존재합니다."),
+    CONTENT_SAVE_CONFLICT("이미 등록된 컨텐츠입니다."),
 
     // 500 Internal Server Error
-    INTERNAL_SERVER_ERROR("서버에서 예기치 못한 에러가 발생했습니다.");
+    INTERNAL_SERVER_ERROR("서버에서 예기치 못한 에러가 발생했습니다."),
+
+    // ==== Admin ====
+
+    // 400 Bad Request
+    UNSUPPORTED_SEARCH_TYPE("지원하지 않는 검색 타입입니다."),
+    YOUTUBE_API_REQUEST_FAILED("유튜브 API 요청에 실패했습니다."),
+    INVALID_YOUTUBE_URL("유효하지 않은 유튜브 URL입니다."),
+    INVALID_TIMELINE_FORMAT("타임라인 형식이 올바르지 않습니다."),
+
+    // 404 Not Found
+    YOUTUBE_VIDEO_NOT_FOUND("유튜브 영상을 찾을 수 없습니다."),
+    CITY_NOT_FOUND("도시를 찾을 수 없습니다."),
+
+    // 500 Internal Server Error
+    YOUTUBE_API_SERVER_ERROR("유튜브 API 서버에 에러가 발생했습니다.");
 
     private final String message;
 

@@ -1,4 +1,4 @@
-package turip.place.infrastructure.client.dto;
+package turip.infrastructure.client.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Collections;
@@ -23,7 +23,6 @@ public class GooglePlaceSearchResponse {
         }
         List<PlaceSearchResponse.PlaceSearchItem> items = results.stream()
                 .map(result -> new PlaceSearchResponse.PlaceSearchItem(
-                        result.placeId,
                         result.name,
                         MAP_URL_PREFIX + result.placeId,
                         result.formattedAddress,

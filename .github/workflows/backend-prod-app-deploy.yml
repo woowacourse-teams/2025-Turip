@@ -4,12 +4,12 @@ on:
   push:
     branches: [ 'release-be/**' ]
     paths:
-      - 'backend/app/**'
+      - 'backend/turip-app/**'
       - 'backend/build.gradle'
   pull_request:
     branches: [ 'release-be/**' ]
     paths:
-      - 'backend/app/**'
+      - 'backend/turip-app/**'
       - 'backend/build.gradle'
 
 env:
@@ -100,6 +100,9 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Deploy
         env:
           CSV_LINKS_COLLECTION_URL: ${{ secrets.CSV_LINKS_COLLECTION_URL }}
@@ -114,8 +117,11 @@ jobs:
           CSV_IMPORT_PASSWORD: ${{ secrets.CSV_IMPORT_PASSWORD }}
           JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          KAKAO_API_KEY: ${{ secrets.KAKAO_API_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
         run: |
-          cd /home/ubuntu/deploy
+          cd backend
           IMAGE_TAG="${{ needs.build_and_test.outputs.image_tag }}"
           
           echo "🚀 ${{ env.SERVICE_NAME }} 배포 시작 (Tag: ${IMAGE_TAG})"
@@ -137,6 +143,9 @@ jobs:
           CSV_IMPORT_PASSWORD=${CSV_IMPORT_PASSWORD}
           JWT_SECRET_KEY=${JWT_SECRET_KEY}
           GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+          KAKAO_API_KEY=${KAKAO_API_KEY}
+          GOOGLE_API_KEY=${GOOGLE_API_KEY}
+          YOUTUBE_API_KEY=${YOUTUBE_API_KEY}
           EOF
           
           if [ -f .env ]; then
@@ -146,6 +155,6 @@ jobs:
           echo "APP_IMAGE_TAG=${IMAGE_TAG}" >> .env.tmp
           
           mv .env.tmp .env
-          
-          chmod +x ./deploy.sh
-          ./deploy.sh ${IMAGE_TAG}
+
+          chmod +x /home/ubuntu/deploy/deploy.sh
+          /home/ubuntu/deploy/deploy.sh ${IMAGE_TAG}

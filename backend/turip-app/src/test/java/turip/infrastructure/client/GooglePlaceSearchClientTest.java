@@ -1,4 +1,4 @@
-package turip.place.infrastructure.client;
+package turip.infrastructure.client;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -10,14 +10,18 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.client.MockRestServiceServer;
+import turip.common.configuration.RestClientConfiguration;
+import turip.common.log.ExternalApiLoggingInterceptor;
 import turip.place.controller.dto.response.PlaceSearchResponse;
 import turip.place.domain.PlaceSearchProvider;
 
 @ActiveProfiles("test")
 @RestClientTest(GooglePlaceSearchClient.class)
+@Import({RestClientConfiguration.class, ExternalApiLoggingInterceptor.class})
 class GooglePlaceSearchClientTest {
 
     @Autowired
@@ -71,7 +75,6 @@ class GooglePlaceSearchClientTest {
 
         PlaceSearchResponse.PlaceSearchItem item = response.items().getFirst();
         assertAll(
-                () -> assertThat(item.externalId()).isEqualTo("google123"),
                 () -> assertThat(item.name()).isEqualTo("Google Test Place"),
                 () -> assertThat(item.address()).isEqualTo("123, Google Test Street"),
                 () -> assertThat(item.latitude()).isEqualTo(34.0522),
