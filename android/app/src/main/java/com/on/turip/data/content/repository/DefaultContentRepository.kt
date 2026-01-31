@@ -3,7 +3,6 @@ package com.on.turip.data.content.repository
 import com.on.turip.core.result.TuripResult
 import com.on.turip.core.result.mapCatching
 import com.on.turip.data.content.datasource.ContentRemoteDataSource
-import com.on.turip.data.content.place.toDomain
 import com.on.turip.data.content.toDomain
 import com.on.turip.domain.content.Content
 import com.on.turip.domain.content.PagedContentsResult
