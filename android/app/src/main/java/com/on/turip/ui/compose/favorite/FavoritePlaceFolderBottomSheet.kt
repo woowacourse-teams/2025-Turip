@@ -83,9 +83,13 @@ fun FavoritePlaceFolderBottomSheet(
                     onNavigateToLogin()
                 }
 
-                FavoritePlaceFolderUiEffect.DeletePlaceFailed -> {
+                is FavoritePlaceFolderUiEffect.ShowFavoritePlaceRemoveFailed -> {
                     snackbarHostState.showSnackbar(
-                        message = context.getString(R.string.bottom_sheet_favorite_place_folder_snackbar_place_remove_failed),
+                        message =
+                            context.getString(
+                                R.string.bottom_sheet_favorite_place_folder_snackbar_place_remove_failed,
+                                uiEffect.placeName,
+                            ),
                         duration = SnackbarDuration.Short,
                     )
                 }

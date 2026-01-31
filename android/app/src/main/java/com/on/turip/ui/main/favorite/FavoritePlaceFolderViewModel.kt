@@ -211,7 +211,11 @@ class FavoritePlaceFolderViewModel @Inject constructor(
                         syncFolderForSelectedPlace(deletePlace, screenMode)
                         Timber.d("찜 목록 화면 폴더명에 해당하는 찜 장소들 업데이트 성공")
                     }.onFailure {
-                        _uiEffect.send(FavoritePlaceFolderUiEffect.DeletePlaceFailed)
+                        _uiEffect.send(
+                            FavoritePlaceFolderUiEffect.ShowFavoritePlaceRemoveFailed(
+                                deletePlace.name,
+                            ),
+                        )
                         _uiState.update { it.copy(selectedFolderPlaces = deletePlaceSnapshot.originPlaces) }
                         Timber.e("찜 목록 화면 폴더명에 해당하는 찜 장소들 업데이트 실패 (placeId = $placeId)")
                     }
