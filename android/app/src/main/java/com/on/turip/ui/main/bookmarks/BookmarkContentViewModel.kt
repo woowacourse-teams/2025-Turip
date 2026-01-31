@@ -5,9 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
-import com.on.turip.domain.favorite.PagedBookmarkContents
-import com.on.turip.domain.favorite.repository.BookmarkRepository
-import com.on.turip.domain.favorite.usecase.UpdateBookmarkUseCase
+import com.on.turip.domain.bookmark.PagedBookmarkContents
+import com.on.turip.domain.bookmark.repository.BookmarkRepository
+import com.on.turip.domain.bookmark.usecase.UpdateBookmarkUseCase
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError

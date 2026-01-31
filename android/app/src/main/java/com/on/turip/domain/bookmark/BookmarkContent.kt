@@ -1,4 +1,4 @@
-package com.on.turip.domain.favorite
+package com.on.turip.domain.bookmark
 
 import com.on.turip.domain.content.Content
 import com.on.turip.domain.trip.TripDuration

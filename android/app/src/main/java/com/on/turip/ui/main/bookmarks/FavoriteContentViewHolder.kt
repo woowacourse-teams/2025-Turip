@@ -5,10 +5,10 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.on.turip.R
 import com.on.turip.databinding.ItemFavoriteContentBinding
+import com.on.turip.domain.bookmark.BookmarkContent
 import com.on.turip.domain.content.Content
 import com.on.turip.domain.content.video.VideoData
 import com.on.turip.domain.creator.Creator
-import com.on.turip.domain.favorite.BookmarkContent
 import com.on.turip.ui.common.TuripUrlConverter
 import com.on.turip.ui.common.loadRoundedCornerImage
 import com.on.turip.ui.common.mapper.toUiModel

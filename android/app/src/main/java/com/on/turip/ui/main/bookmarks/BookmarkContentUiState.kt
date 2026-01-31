@@ -1,6 +1,6 @@
 package com.on.turip.ui.main.bookmarks
 
-import com.on.turip.domain.favorite.BookmarkContent
+import com.on.turip.domain.bookmark.BookmarkContent
 import com.on.turip.ui.common.error.ErrorUiState
 
 data class BookmarkContentUiState(

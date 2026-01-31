@@ -1,7 +1,7 @@
 package com.on.turip.domain.folder.repository
 
 import com.on.turip.core.result.TuripResult
-import com.on.turip.domain.favorite.TuripPlace
+import com.on.turip.domain.bookmark.TuripPlace
 import com.on.turip.domain.folder.Turip
 
 interface TuripRepository {

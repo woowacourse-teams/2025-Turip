@@ -5,8 +5,8 @@ import com.on.turip.core.result.mapCatching
 import com.on.turip.data.bookmarks.datasource.BookmarkRemoteDataSource
 import com.on.turip.data.bookmarks.toDomain
 import com.on.turip.data.bookmarks.toRequestDto
-import com.on.turip.domain.favorite.PagedBookmarkContents
-import com.on.turip.domain.favorite.repository.BookmarkRepository
+import com.on.turip.domain.bookmark.PagedBookmarkContents
+import com.on.turip.domain.bookmark.repository.BookmarkRepository
 import javax.inject.Inject
 
 class DefaultBookmarkRepository @Inject constructor(

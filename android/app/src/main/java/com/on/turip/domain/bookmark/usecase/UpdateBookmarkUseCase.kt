@@ -1,7 +1,7 @@
-package com.on.turip.domain.favorite.usecase
+package com.on.turip.domain.bookmark.usecase
 
 import com.on.turip.core.result.TuripResult
-import com.on.turip.domain.favorite.repository.BookmarkRepository
+import com.on.turip.domain.bookmark.repository.BookmarkRepository
 import javax.inject.Inject
 
 class UpdateBookmarkUseCase @Inject constructor(

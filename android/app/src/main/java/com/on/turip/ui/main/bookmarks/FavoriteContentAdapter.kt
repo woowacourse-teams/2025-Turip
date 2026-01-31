@@ -3,7 +3,7 @@ package com.on.turip.ui.main.bookmarks
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import com.on.turip.domain.favorite.BookmarkContent
+import com.on.turip.domain.bookmark.BookmarkContent
 
 class FavoriteContentAdapter(
     private val onFavoriteContentListener: FavoriteContentViewHolder.FavoriteContentListener,

@@ -8,7 +8,7 @@ import com.on.turip.data.turip.dto.TuripPostRequest
 import com.on.turip.data.turip.dto.TuripResponse
 import com.on.turip.data.turip.dto.TuripsByPlaceResponse
 import com.on.turip.data.turip.dto.TuripsResponse
-import com.on.turip.domain.favorite.TuripPlace
+import com.on.turip.domain.bookmark.TuripPlace
 import com.on.turip.domain.folder.Turip
 import com.on.turip.domain.trip.Place
 

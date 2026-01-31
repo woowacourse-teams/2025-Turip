@@ -1,4 +1,4 @@
-package com.on.turip.domain.favorite
+package com.on.turip.domain.bookmark
 
 data class PagedBookmarkContents(
     val bookmarkContents: List<BookmarkContent>,

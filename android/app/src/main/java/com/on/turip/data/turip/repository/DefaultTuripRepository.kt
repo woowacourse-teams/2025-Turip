@@ -7,7 +7,7 @@ import com.on.turip.data.turip.dto.TuripPlaceOrderRequest
 import com.on.turip.data.turip.toDomain
 import com.on.turip.data.turip.toPatchRequestDto
 import com.on.turip.data.turip.toPostRequestDto
-import com.on.turip.domain.favorite.TuripPlace
+import com.on.turip.domain.bookmark.TuripPlace
 import com.on.turip.domain.folder.Turip
 import com.on.turip.domain.folder.repository.TuripRepository
 import javax.inject.Inject

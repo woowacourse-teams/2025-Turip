@@ -1,4 +1,4 @@
-package com.on.turip.domain.favorite.usecase
+package com.on.turip.domain.bookmark.usecase
 
 import com.on.turip.core.result.TuripResult
 import com.on.turip.core.result.onFailure

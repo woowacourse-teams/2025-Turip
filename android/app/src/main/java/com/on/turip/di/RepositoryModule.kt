@@ -9,8 +9,8 @@ import com.on.turip.data.region.repository.DefaultRegionRepository
 import com.on.turip.data.searchhistory.repository.DefaultSearchHistoryRepository
 import com.on.turip.data.turip.repository.DefaultTuripRepository
 import com.on.turip.data.userstorage.repository.DefaultUserStorageRepository
+import com.on.turip.domain.bookmark.repository.BookmarkRepository
 import com.on.turip.domain.content.repository.ContentRepository
-import com.on.turip.domain.favorite.repository.BookmarkRepository
 import com.on.turip.domain.folder.repository.TuripRepository
 import com.on.turip.domain.login.AuthRepository
 import com.on.turip.domain.login.GuestRepository

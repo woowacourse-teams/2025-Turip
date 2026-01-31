@@ -4,8 +4,8 @@ import com.on.turip.data.bookmarks.dto.BookmarkAddRequest
 import com.on.turip.data.bookmarks.dto.BookmarkContentResponse
 import com.on.turip.data.bookmarks.dto.BookmarkContentsResponse
 import com.on.turip.data.content.toDomain
-import com.on.turip.domain.favorite.BookmarkContent
-import com.on.turip.domain.favorite.PagedBookmarkContents
+import com.on.turip.domain.bookmark.BookmarkContent
+import com.on.turip.domain.bookmark.PagedBookmarkContents
 
 fun Long.toRequestDto(): BookmarkAddRequest = BookmarkAddRequest(contentId = this)
 
