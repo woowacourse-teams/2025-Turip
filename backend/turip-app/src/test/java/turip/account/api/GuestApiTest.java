@@ -24,7 +24,7 @@ class GuestApiTest {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
-    
+
     @Autowired
     private TestDataHelper testDataHelper;
 
@@ -58,7 +58,7 @@ class GuestApiTest {
     }
 
     @Nested
-    @DisplayName("/guests/migration/availability GET 마이그레이션 가능 여부 조회 테스트")
+    @DisplayName("/api/v1/guests/migration/availability GET 마이그레이션 가능 여부 조회 테스트")
     class ReadMigrationAvailability {
 
         @Test
@@ -77,7 +77,7 @@ class GuestApiTest {
             RestAssured
                     .given().log().all()
                     .header("device-fid", deviceFid)
-                    .when().get("/guests/migration/availability")
+                    .when().get("/api/v1/guests/migration/availability")
                     .then().log().all()
                     .statusCode(200)
                     .body("availability", is(true));
@@ -85,7 +85,7 @@ class GuestApiTest {
     }
 
     @Nested
-    @DisplayName("/guests/me DELETE 게스트 탈퇴 테스트")
+    @DisplayName("/api/v1/guests/me DELETE 게스트 탈퇴 테스트")
     class DeleteGuestTest {
 
         @Test
@@ -117,7 +117,7 @@ class GuestApiTest {
             RestAssured
                     .given().log().all()
                     .header("device-fid", deviceFid)
-                    .when().delete("/guests/me")
+                    .when().delete("/api/v1/guests/me")
                     .then().log().all()
                     .statusCode(204);
 
@@ -147,7 +147,7 @@ class GuestApiTest {
             // when & then
             RestAssured
                     .given().log().all()
-                    .when().delete("/guests/me")
+                    .when().delete("/api/v1/guests/me")
                     .then().log().all()
                     .statusCode(400);
         }

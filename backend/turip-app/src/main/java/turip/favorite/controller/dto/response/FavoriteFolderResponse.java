@@ -4,7 +4,7 @@ import turip.favorite.domain.FavoriteFolder;
 
 public record FavoriteFolderResponse(
         Long id,
-        Long memberId,
+        Long accountId,
         String name,
         boolean isDefault
 ) {

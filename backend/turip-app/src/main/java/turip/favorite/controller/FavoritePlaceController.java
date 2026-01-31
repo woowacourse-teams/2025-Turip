@@ -34,15 +34,15 @@ import turip.favorite.service.FavoritePlaceService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/favorites/places")
-@Tag(name = "FavoritePlace", description = "장소 찜 API")
+@RequestMapping("/api/v1/turips/places")
+@Tag(name = "TuripPlace", description = "튜립 장소 API")
 public class FavoritePlaceController {
 
     private final FavoritePlaceService favoritePlaceService;
 
     @Operation(
-            summary = "장소 찜 생성 api",
-            description = "장소를 찜한다."
+            summary = "튜립 장소 추가 api",
+            description = "내 튜립에 장소를 추가한다."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -53,7 +53,7 @@ public class FavoritePlaceController {
                             schema = @Schema(implementation = FavoritePlaceResponse.class),
                             examples = @ExampleObject(
                                     name = "success",
-                                    summary = "장소 찜 생성 성공",
+                                    summary = "튜립 장소 추가 성공",
                                     value = """
                                             {
                                                 "id": 1,
@@ -111,8 +111,8 @@ public class FavoritePlaceController {
                             mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(
-                                    name = "not_folder_owner",
-                                    summary = "폴더 소유자의 기기id와 요청자의 기기id가 같지 않은 경우",
+                                    name = "not_turip_owner",
+                                    summary = "튜립 소유자가 아닌 사용자가 요청한 경우",
                                     value = """
                                             {
                                                 "tag": "FORBIDDEN",
@@ -131,8 +131,8 @@ public class FavoritePlaceController {
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = {
                                     @ExampleObject(
-                                            name = "folder_not_found",
-                                            summary = "favoriteFolderId에 대한 폴더를 찾을 수 없는 경우",
+                                            name = "turip_not_found",
+                                            summary = "turipId에 대한 폴더(튜립)를 찾을 수 없는 경우",
                                             value = """
                                                     {
                                                         "tag": "FAVORITE_FOLDER_NOT_FOUND",
@@ -161,8 +161,8 @@ public class FavoritePlaceController {
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = {
                                     @ExampleObject(
-                                            name = "already_favorite",
-                                            summary = "이미 해당 폴더에 찜한 상태인 경우",
+                                            name = "already_turip_place",
+                                            summary = "이미 해당 튜립에 추가된 장소인 경우",
                                             value = """
                                                     {
                                                         "tag": "FAVORITE_PLACE_IN_FOLDER_CONFLICT",
@@ -177,17 +177,17 @@ public class FavoritePlaceController {
     @PostMapping
     public ResponseEntity<FavoritePlaceResponse> create(
             @Parameter(hidden = true) @AuthAccount Account account,
-            @RequestParam("favoriteFolderId") Long favoriteFolderId,
+            @RequestParam("turipId") Long favoriteFolderId,
             @RequestParam("placeId") Long placeId
     ) {
         FavoritePlaceResponse response = favoritePlaceService.create(account, favoriteFolderId, placeId);
-        return ResponseEntity.created(URI.create("/favorites/places/" + response.id()))
+        return ResponseEntity.created(URI.create("/api/v1/turips/places/" + response.id()))
                 .body(response);
     }
 
     @Operation(
-            summary = "장소 찜 폴더의 장소 찜 조회 api",
-            description = "장소 찜 폴더의 장소 찜 목록을 조회한다."
+            summary = "튜립 내 장소 조회 api",
+            description = "튜립에 추가한 장소들을 조회한다."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -198,10 +198,10 @@ public class FavoritePlaceController {
                             schema = @Schema(implementation = FavoritePlacesWithPlaceDetailResponse.class),
                             examples = @ExampleObject(
                                     name = "success",
-                                    summary = "장소 찜 폴더의 장소 찜 목록 조회 성공",
+                                    summary = "튜립 내 장소 목록 조회 성공",
                                     value = """
                                             {
-                                                "favoritePlaces": [
+                                                "turipPlaces": [
                                                     {
                                                         "id": 1,
                                                         "place": {
@@ -217,7 +217,7 @@ public class FavoritePlaceController {
                                                                 }
                                                             ]
                                                         },
-                                                        "favoriteOrder": 1
+                                                        "turipPlaceOrder": 1
                                                     },
                                                     {
                                                         "id": 2,
@@ -234,10 +234,10 @@ public class FavoritePlaceController {
                                                                 }
                                                             ]
                                                         },
-                                                        "favoriteOrder": 2
+                                                        "turipPlaceOrder": 2
                                                     }
                                                 ],
-                                                "favoritePlaceCount": 2
+                                                "turipPlaceCount": 2
                                             }
                                             """
                             )
@@ -251,8 +251,8 @@ public class FavoritePlaceController {
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = {
                                     @ExampleObject(
-                                            name = "folder_not_found",
-                                            summary = "favoriteFolderId에 대한 폴더가 존재하지 않는 경우",
+                                            name = "turip_not_found",
+                                            summary = "turipId에 대한 튜립이 존재하지 않는 경우",
                                             value = """
                                                     {
                                                         "tag": "FAVORITE_FOLDER_NOT_FOUND",
@@ -266,15 +266,15 @@ public class FavoritePlaceController {
     })
     @GetMapping
     public ResponseEntity<FavoritePlacesWithPlaceDetailResponse> readAllByFolder(
-            @RequestParam("favoriteFolderId") Long favoriteFolderId) {
+            @RequestParam("turipId") Long favoriteFolderId) {
         FavoritePlacesWithPlaceDetailResponse response = favoritePlaceService.findAllByFolder(
                 favoriteFolderId);
         return ResponseEntity.ok(response);
     }
 
     @Operation(
-            summary = "장소 찜 폴더 다중 업데이트 api",
-            description = "특정 장소에 대해 선택된 찜 폴더 목록을 일괄 업데이트한다."
+            summary = "튜립 다중 업데이트 api",
+            description = "특정 장소에 대해 선택된 튜립 목록을 일괄 업데이트한다."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -285,7 +285,7 @@ public class FavoritePlaceController {
                             schema = @Schema(type = "array", implementation = FavoritePlaceResponse.class),
                             examples = @ExampleObject(
                                     name = "success",
-                                    summary = "장소 찜 폴더 업데이트 성공",
+                                    summary = "튜립 업데이트 성공",
                                     value = """
                                             [
                                                 {
@@ -351,8 +351,8 @@ public class FavoritePlaceController {
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = {
                                     @ExampleObject(
-                                            name = "not_folder_owner",
-                                            summary = "폴더 소유자가 아닌 경우",
+                                            name = "not_turip_owner",
+                                            summary = "튜립 소유자가 아닌 경우",
                                             value = """
                                                     {
                                                         "tag": "FORBIDDEN",
@@ -371,8 +371,8 @@ public class FavoritePlaceController {
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = {
                                     @ExampleObject(
-                                            name = "folder_not_found",
-                                            summary = "id에 대한 폴더를 찾을 수 없는 경우",
+                                            name = "turip_not_found",
+                                            summary = "turipId에 대한 튜립을 찾을 수 없는 경우",
                                             value = """
                                                     {
                                                         "tag": "FAVORITE_FOLDER_NOT_FOUND",
@@ -406,8 +406,8 @@ public class FavoritePlaceController {
     }
 
     @Operation(
-            summary = "장소 찜 폴더 내의 장소 찜 정렬 순서 변경 api",
-            description = "장소 찜 폴더의 장소 찜들의 정렬 순서를 변경한다."
+            summary = "튜립의 장소 수 조회 api",
+            description = "튜립의 장소 수를 조회한다."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -418,7 +418,7 @@ public class FavoritePlaceController {
                             schema = @Schema(implementation = FavoritePlaceCountResponse.class),
                             examples = @ExampleObject(
                                     name = "success",
-                                    summary = "장소 찜 폴더의 장소 찜 목록 조회 성공",
+                                    summary = "튜립의 장소 수 조회 성공",
                                     value = """
                                             {
                                                "count": 5
@@ -476,8 +476,8 @@ public class FavoritePlaceController {
     }
 
     @Operation(
-            summary = "장소 찜 폴더 내의 장소 찜 정렬 순서 변경 api",
-            description = "장소 찜 폴더의 장소 찜들의 정렬 순서를 변경한다."
+            summary = "튜립 내의 장소 정렬 순서 변경 api",
+            description = "튜립 장소들의 정렬 순서를 변경한다."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -491,8 +491,8 @@ public class FavoritePlaceController {
                             mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(
-                                    name = "favorite_place_folder_mismatch",
-                                    summary = "장소 찜이 해당 폴더에 존재하지 않는 경우",
+                                    name = "turip_place_turip_mismatch",
+                                    summary = "장소가 해당 튜립에 존재하지 않는 경우",
                                     value = """
                                             {
                                                 "tag": "FAVORITE_PLACE_FOLDER_MISMATCH",
@@ -549,8 +549,8 @@ public class FavoritePlaceController {
                             mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(
-                                    name = "not_folder_owner",
-                                    summary = "폴더 소유자가 아닌 경우",
+                                    name = "not_turip_owner",
+                                    summary = "튜립 소유자가 아닌 경우",
                                     value = """
                                             {
                                                 "tag": "FORBIDDEN",
@@ -569,8 +569,8 @@ public class FavoritePlaceController {
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = {
                                     @ExampleObject(
-                                            name = "folder_not_found",
-                                            summary = "id에 대한 폴더를 찾을 수 없는 경우",
+                                            name = "turip_not_found",
+                                            summary = "id에 대한 튜립을 찾을 수 없는 경우",
                                             value = """
                                                     {
                                                         "tag": "FAVORITE_FOLDER_NOT_FOUND",
@@ -579,8 +579,8 @@ public class FavoritePlaceController {
                                                     """
                                     ),
                                     @ExampleObject(
-                                            name = "favorite_place_not_found",
-                                            summary = "favoritePlaceId에 대한 찜한 장소를 찾을 수 없는 경우",
+                                            name = "turip_place_not_found",
+                                            summary = "favoritePlaceId에 대한 튜립 장소를 찾을 수 없는 경우",
                                             value = """
                                                     {
                                                         "tag": "FAVORITE_PLACE_NOT_FOUND",
@@ -592,10 +592,10 @@ public class FavoritePlaceController {
                     )
             )
     })
-    @PatchMapping("/favorite-order")
+    @PatchMapping("/turip-order")
     public ResponseEntity<Void> updatePlaceOrder(
             @Parameter(hidden = true) @AuthAccount Account account,
-            @RequestParam("favoriteFolderId") Long favoriteFolderId,
+            @RequestParam("turipId") Long favoriteFolderId,
             @RequestBody FavoritePlaceOrderRequest request
     ) {
         favoritePlaceService.updatePlaceOrder(account, favoriteFolderId, request);
@@ -603,8 +603,8 @@ public class FavoritePlaceController {
     }
 
     @Operation(
-            summary = "장소 찜 삭제 api",
-            description = "장소 찜을 취소한다."
+            summary = "튜립의 장소 삭제 api",
+            description = "튜립에서 장소를 제거한다."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -659,8 +659,8 @@ public class FavoritePlaceController {
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = {
                                     @ExampleObject(
-                                            name = "not_folder_owner",
-                                            summary = "폴더 소유자가 아닌 경우",
+                                            name = "not_turip_owner",
+                                            summary = "튜립 소유자가 아닌 경우",
                                             value = """
                                                     {
                                                         "tag": "FORBIDDEN",
@@ -679,8 +679,8 @@ public class FavoritePlaceController {
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = {
                                     @ExampleObject(
-                                            name = "folder_not_found",
-                                            summary = "favoriteFolderId에 대한 폴더를 찾을 수 없는 경우",
+                                            name = "turip_not_found",
+                                            summary = "turipId에 대한 튜립을 찾을 수 없는 경우",
                                             value = """
                                                     {
                                                         "tag": "FAVORITE_FOLDER_NOT_FOUND",
@@ -699,8 +699,8 @@ public class FavoritePlaceController {
                                                     """
                                     ),
                                     @ExampleObject(
-                                            name = "favorite_place_not_found",
-                                            summary = "해당 폴더에 장소 찜이 되어있지 않은 경우",
+                                            name = "turip_place_not_found",
+                                            summary = "해당 튜립에 장소가 추가되어있지 않은 경우",
                                             value = """
                                                     {
                                                         "tag": "FAVORITE_PLACE_NOT_FOUND",
@@ -715,7 +715,7 @@ public class FavoritePlaceController {
     @DeleteMapping
     public ResponseEntity<Void> delete(
             @Parameter(hidden = true) @AuthAccount Account account,
-            @RequestParam("favoriteFolderId") Long favoriteFolderId,
+            @RequestParam("turipId") Long favoriteFolderId,
             @RequestParam("placeId") Long placeId
     ) {
         favoritePlaceService.remove(account, favoriteFolderId, placeId);

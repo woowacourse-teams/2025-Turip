@@ -44,7 +44,7 @@ class RegionCategoryApiTest {
         jdbcTemplate.update("ALTER TABLE country ALTER COLUMN id RESTART WITH 1");
     }
 
-    @DisplayName("/regionCategories GET 지역 카테고리 조회 테스트")
+    @DisplayName("/api/v1/region-categories GET 지역 카테고리 조회 테스트")
     @Nested
     class getRegionCategories {
 
@@ -76,7 +76,7 @@ class RegionCategoryApiTest {
             // when & then
             RestAssured.given().port(port)
                     .queryParam("isKorea", true)
-                    .when().get("/region-categories")
+                    .when().get("/api/v1/region-categories")
                     .then()
                     .statusCode(200)
                     .body("regionCategories.size()", is(2)) // 서울, 부산만 (국내 기타는 컨텐츠가 0개라서 제외)
@@ -112,7 +112,7 @@ class RegionCategoryApiTest {
             // when & then
             RestAssured.given().port(port)
                     .queryParam("isKorea", false)
-                    .when().get("/region-categories")
+                    .when().get("/api/v1/region-categories")
                     .then()
                     .statusCode(200)
                     .body("regionCategories.size()", is(2)) // 일본, 중국만 (해외 기타는 컨텐츠가 0개라서 제외)
@@ -144,7 +144,7 @@ class RegionCategoryApiTest {
             // when & then
             RestAssured.given().port(port)
                     .queryParam("isKorea", true)
-                    .when().get("/region-categories")
+                    .when().get("/api/v1/region-categories")
                     .then()
                     .statusCode(200)
                     .body("regionCategories.size()", is(1)) // 서울만 (부산, 대구, 국내 기타는 컨텐츠가 없어서 제외)
@@ -183,7 +183,7 @@ class RegionCategoryApiTest {
             // when & then
             RestAssured.given().port(port)
                     .queryParam("isKorea", true)
-                    .when().get("/region-categories")
+                    .when().get("/api/v1/region-categories")
                     .then()
                     .statusCode(200)
                     .body("regionCategories.size()", is(3)) // 서울, 부산, 국내 기타 (대구는 국내 기타에 포함)

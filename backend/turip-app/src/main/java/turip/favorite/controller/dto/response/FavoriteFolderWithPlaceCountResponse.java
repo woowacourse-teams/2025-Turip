@@ -4,7 +4,7 @@ import turip.favorite.domain.FavoriteFolder;
 
 public record FavoriteFolderWithPlaceCountResponse(
         Long id,
-        Long memberId,
+        Long accountId,
         String name,
         boolean isDefault,
         int placeCount

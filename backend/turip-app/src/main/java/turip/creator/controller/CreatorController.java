@@ -19,7 +19,7 @@ import turip.creator.service.CreatorService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/creators")
+@RequestMapping("/api/v1/creators")
 @Tag(name = "Creator", description = "크리에이터 API")
 public class CreatorController {
 

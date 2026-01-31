@@ -71,7 +71,7 @@ class FavoritePlaceApiTest {
         jdbcTemplate.update("ALTER TABLE account ALTER COLUMN id RESTART WITH 1");
     }
 
-    @DisplayName("/favorites/places POST 장소 찜 생성 테스트")
+    @DisplayName("/api/v1/turips/places POST 장소 찜 생성 테스트")
     @Nested
     class Create {
 
@@ -89,10 +89,10 @@ class FavoritePlaceApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("turipId",1L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
-                    .when().post("/favorites/places")
+                    .when().post("/api/v1/turips/places")
                     .then()
                     .statusCode(201);
         }
@@ -112,10 +112,10 @@ class FavoritePlaceApiTest {
             // when
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("turipId",1L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
-                    .when().post("/favorites/places")
+                    .when().post("/api/v1/turips/places")
                     .then()
                     .statusCode(201);
 
@@ -145,10 +145,10 @@ class FavoritePlaceApiTest {
             // when
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("turipId",1L)
                     .queryParam("placeId", 2L)
                     .contentType(ContentType.JSON)
-                    .when().post("/favorites/places")
+                    .when().post("/api/v1/turips/places")
                     .then()
                     .statusCode(201);
 
@@ -178,28 +178,28 @@ class FavoritePlaceApiTest {
             // when - 3개의 장소를 순차적으로 찜
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("turipId",1L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
-                    .when().post("/favorites/places")
+                    .when().post("/api/v1/turips/places")
                     .then()
                     .statusCode(201);
 
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("turipId",1L)
                     .queryParam("placeId", 2L)
                     .contentType(ContentType.JSON)
-                    .when().post("/favorites/places")
+                    .when().post("/api/v1/turips/places")
                     .then()
                     .statusCode(201);
 
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("turipId",1L)
                     .queryParam("placeId", 3L)
                     .contentType(ContentType.JSON)
-                    .when().post("/favorites/places")
+                    .when().post("/api/v1/turips/places")
                     .then()
                     .statusCode(201);
 
@@ -233,10 +233,10 @@ class FavoritePlaceApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "cool")
-                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("turipId",1L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
-                    .when().post("/favorites/places")
+                    .when().post("/api/v1/turips/places")
                     .then()
                     .statusCode(403);
         }
@@ -252,10 +252,10 @@ class FavoritePlaceApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("turipId",1L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
-                    .when().post("/favorites/places")
+                    .when().post("/api/v1/turips/places")
                     .then()
                     .statusCode(404);
         }
@@ -272,10 +272,10 @@ class FavoritePlaceApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("turipId",1L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
-                    .when().post("/favorites/places")
+                    .when().post("/api/v1/turips/places")
                     .then()
                     .statusCode(404);
         }
@@ -295,16 +295,16 @@ class FavoritePlaceApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("turipId",1L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
-                    .when().post("/favorites/places")
+                    .when().post("/api/v1/turips/places")
                     .then()
                     .statusCode(409);
         }
     }
 
-    @DisplayName("/favorites/places GET 장소 찜 폴더의 장소 찜 목록 조회 테스트")
+    @DisplayName("/api/v1/turips/places GET 장소 찜 폴더의 장소 찜 목록 조회 테스트")
     @Nested
     class ReadAllByFolder {
 
@@ -328,14 +328,14 @@ class FavoritePlaceApiTest {
 
             // when & then
             RestAssured.given().port(port)
-                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("turipId",1L)
                     .contentType(ContentType.JSON)
-                    .when().get("/favorites/places")
+                    .when().get("/api/v1/turips/places")
                     .then()
                     .statusCode(200)
-                    .body("favoritePlaceCount", is(2))
-                    .body("favoritePlaces[0].place.name", is("루터회관"))
-                    .body("favoritePlaces[1].place.name", is("스타벅스"));
+                    .body("turipPlaceCount", is(2))
+                    .body("turipPlaces[0].place.name", is("루터회관"))
+                    .body("turipPlaces[1].place.name", is("스타벅스"));
         }
 
         @DisplayName("장소가 favoriteOrder 오름차순으로 정렬되어 반환된다")
@@ -368,17 +368,17 @@ class FavoritePlaceApiTest {
 
             // when & then - favoriteOrder 오름차순으로 정렬되어 반환되는지 확인
             RestAssured.given().port(port)
-                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("turipId",1L)
                     .contentType(ContentType.JSON)
-                    .when().get("/favorites/places")
+                    .when().get("/api/v1/turips/places")
                     .then()
                     .statusCode(200)
-                    .body("favoritePlaceCount", is(5))
-                    .body("favoritePlaces[0].place.name", is("장소2"))  // favoriteOrder 1
-                    .body("favoritePlaces[1].place.name", is("장소4"))  // favoriteOrder 2
-                    .body("favoritePlaces[2].place.name", is("장소3"))  // favoriteOrder 3
-                    .body("favoritePlaces[3].place.name", is("장소5"))  // favoriteOrder 4
-                    .body("favoritePlaces[4].place.name", is("장소1")); // favoriteOrder 5
+                    .body("turipPlaceCount", is(5))
+                    .body("turipPlaces[0].place.name", is("장소2"))  // favoriteOrder 1
+                    .body("turipPlaces[1].place.name", is("장소4"))  // favoriteOrder 2
+                    .body("turipPlaces[2].place.name", is("장소3"))  // favoriteOrder 3
+                    .body("turipPlaces[3].place.name", is("장소5"))  // favoriteOrder 4
+                    .body("turipPlaces[4].place.name", is("장소1")); // favoriteOrder 5
         }
 
         @DisplayName("favoriteFolderId에 대한 폴더가 존재하지 않는 경우 404 NOT FOUND를 응답한다")
@@ -386,15 +386,15 @@ class FavoritePlaceApiTest {
         void readAllByFolder3() {
             // when & then
             RestAssured.given().port(port)
-                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("turipId",1L)
                     .contentType(ContentType.JSON)
-                    .when().get("/favorites/places")
+                    .when().get("/api/v1/turips/places")
                     .then()
                     .statusCode(404);
         }
     }
 
-    @DisplayName("/favorites/places PUT 여러 폴더에 장소 찜 테스트")
+    @DisplayName("/api/v1/turips/places PUT 여러 폴더에 장소 찜 테스트")
     @Nested
     class UpdateFavoriteFolders {
 
@@ -425,13 +425,13 @@ class FavoritePlaceApiTest {
                     .header("device-fid", "testDeviceFid")
                     .body(request)
                     .contentType(ContentType.JSON)
-                    .when().put("/favorites/places/{placeId}", 1L)
+                    .when().put("/api/v1/turips/places/{placeId}", 1L)
                     .then()
                     .statusCode(200);
         }
     }
 
-    @DisplayName("/favorites/places/count GET 계정의 장소 찜 개수 조회 테스트")
+    @DisplayName("/api/v1/turips/places/count GET 계정의 장소 찜 개수 조회 테스트")
     @Nested
     class ReadCountByAccount {
 
@@ -457,14 +457,14 @@ class FavoritePlaceApiTest {
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
                     .contentType(ContentType.JSON)
-                    .when().get("/favorites/places/count")
+                    .when().get("/api/v1/turips/places/count")
                     .then()
                     .statusCode(200)
                     .body("count", is(2));
         }
     }
 
-    @DisplayName("/favorites/places/favorite-order PATCH 장소 찜 폴더 정렬 순서 변경 테스트")
+    @DisplayName("/api/v1/turips/places/turip-order PATCH 장소 찜 폴더 정렬 순서 변경 테스트")
     @Nested
     class UpdatePlaceOrder {
 
@@ -488,14 +488,14 @@ class FavoritePlaceApiTest {
 
             // when & then
             Map<String, Object> request = new HashMap<>();
-            request.put("favoritePlaceIdsOrder", List.of(2L, 1L)); // 순서 바꾸기
+            request.put("turipPlaceIdsOrder", List.of(2L, 1L)); // 순서 바꾸기
 
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("turipId",1L)
                     .body(request)
                     .contentType(ContentType.JSON)
-                    .when().patch("/favorites/places/favorite-order")
+                    .when().patch("/api/v1/turips/places/turip-order")
                     .then()
                     .statusCode(204);
         }
@@ -509,14 +509,14 @@ class FavoritePlaceApiTest {
 
             // when & then
             Map<String, Object> request = new HashMap<>();
-            request.put("favoritePlaceIdsOrder", List.of(1L));
+            request.put("turipPlaceIdsOrder", List.of(1L));
 
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("favoriteFolderId", 999L)
+                    .queryParam("turipId",999L)
                     .body(request)
                     .contentType(ContentType.JSON)
-                    .when().patch("/favorites/places/favorite-order")
+                    .when().patch("/api/v1/turips/places/turip-order")
                     .then()
                     .statusCode(404);
         }
@@ -537,14 +537,14 @@ class FavoritePlaceApiTest {
 
             // when & then
             Map<String, Object> request = new HashMap<>();
-            request.put("favoritePlaceIdsOrder", List.of(1L));
+            request.put("turipPlaceIdsOrder", List.of(1L));
 
             RestAssured.given().port(port)
                     .header("device-fid", "requestDeviceFid")
-                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("turipId",1L)
                     .body(request)
                     .contentType(ContentType.JSON)
-                    .when().patch("/favorites/places/favorite-order")
+                    .when().patch("/api/v1/turips/places/turip-order")
                     .then()
                     .statusCode(403);
         }
@@ -561,14 +561,14 @@ class FavoritePlaceApiTest {
 
             // when & then
             Map<String, Object> request = new HashMap<>();
-            request.put("favoritePlaceIdsOrder", List.of(999L)); // 존재하지 않는 favoritePlaceId
+            request.put("turipPlaceIdsOrder", List.of(999L)); // 존재하지 않는 favoritePlaceId
 
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("turipId",1L)
                     .body(request)
                     .contentType(ContentType.JSON)
-                    .when().patch("/favorites/places/favorite-order")
+                    .when().patch("/api/v1/turips/places/turip-order")
                     .then()
                     .statusCode(404);
         }
@@ -590,20 +590,20 @@ class FavoritePlaceApiTest {
 
             // when & then
             Map<String, Object> request = new HashMap<>();
-            request.put("favoritePlaceIdsOrder", List.of(1L)); // 폴더2의 favoritePlaceId를 폴더1에서 사용
+            request.put("turipPlaceIdsOrder", List.of(1L)); // 폴더2의 favoritePlaceId를 폴더1에서 사용
 
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("turipId",1L)
                     .body(request)
                     .contentType(ContentType.JSON)
-                    .when().patch("/favorites/places/favorite-order")
+                    .when().patch("/api/v1/turips/places/turip-order")
                     .then()
                     .statusCode(400);
         }
     }
 
-    @DisplayName("/favorites/places DELETE 장소 찜 삭제 테스트")
+    @DisplayName("/api/v1/turips/places DELETE 장소 찜 삭제 테스트")
     @Nested
     class Delete {
 
@@ -622,10 +622,10 @@ class FavoritePlaceApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("turipId",1L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
-                    .when().delete("/favorites/places")
+                    .when().delete("/api/v1/turips/places")
                     .then()
                     .statusCode(204);
         }
@@ -649,10 +649,10 @@ class FavoritePlaceApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "cool")
-                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("turipId",1L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
-                    .when().delete("/favorites/places")
+                    .when().delete("/api/v1/turips/places")
                     .then()
                     .statusCode(403);
         }
@@ -663,10 +663,10 @@ class FavoritePlaceApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "nonExistentDeviceFid")
-                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("turipId",1L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
-                    .when().delete("/favorites/places")
+                    .when().delete("/api/v1/turips/places")
                     .then()
                     .statusCode(404);
         }
@@ -682,10 +682,10 @@ class FavoritePlaceApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("favoriteFolderId", 999L)
+                    .queryParam("turipId",999L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
-                    .when().delete("/favorites/places")
+                    .when().delete("/api/v1/turips/places")
                     .then()
                     .statusCode(404);
         }
@@ -702,10 +702,10 @@ class FavoritePlaceApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("turipId",1L)
                     .queryParam("placeId", 999L)
                     .contentType(ContentType.JSON)
-                    .when().delete("/favorites/places")
+                    .when().delete("/api/v1/turips/places")
                     .then()
                     .statusCode(404);
         }
@@ -724,10 +724,10 @@ class FavoritePlaceApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("turipId",1L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
-                    .when().delete("/favorites/places")
+                    .when().delete("/api/v1/turips/places")
                     .then()
                     .statusCode(404);
         }

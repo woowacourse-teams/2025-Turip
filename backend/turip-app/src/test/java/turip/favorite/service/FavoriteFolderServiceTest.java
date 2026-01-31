@@ -99,7 +99,7 @@ class FavoriteFolderServiceTest {
             assertAll(
                     () -> assertThat(response.id()).isEqualTo(folderId),
                     () -> assertThat(response.name()).isEqualTo(folderName),
-                    () -> assertThat(response.memberId()).isEqualTo(accountId),
+                    () -> assertThat(response.accountId()).isEqualTo(accountId),
                     () -> assertThat(response.isDefault()).isFalse()
             );
         }
@@ -250,7 +250,7 @@ class FavoriteFolderServiceTest {
             assertAll(
                     () -> assertThat(response.id()).isEqualTo(folderId),
                     () -> assertThat(response.name()).isEqualTo(newName),
-                    () -> assertThat(response.memberId()).isEqualTo(accountId),
+                    () -> assertThat(response.accountId()).isEqualTo(accountId),
                     () -> assertThat(response.isDefault()).isFalse()
             );
         }
