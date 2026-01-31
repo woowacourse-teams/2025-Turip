@@ -4,7 +4,6 @@ import com.on.turip.data.bookmarks.service.BookmarkService
 import com.on.turip.data.content.service.ContentService
 import com.on.turip.data.login.service.AuthService
 import com.on.turip.data.login.service.MemberService
-import com.on.turip.data.place.service.PlaceService
 import com.on.turip.data.region.service.RegionService
 import com.on.turip.data.turip.service.TuripService
 import dagger.Module
@@ -30,10 +29,6 @@ object ServiceModule {
     @Provides
     @Singleton
     fun provideTuripService(retrofit: Retrofit): TuripService = retrofit.create<TuripService>()
-
-    @Provides
-    @Singleton
-    fun providePlaceService(retrofit: Retrofit): PlaceService = retrofit.create<PlaceService>()
 
     @Provides
     @Singleton

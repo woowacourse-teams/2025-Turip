@@ -1,5 +1,7 @@
 package com.on.turip.data.turip.service
 
+import com.on.turip.data.place.dto.TuripPlaceOrderRequest
+import com.on.turip.data.place.dto.TuripPlacesResponse
 import com.on.turip.data.turip.dto.TuripCreationResponse
 import com.on.turip.data.turip.dto.TuripPatchRequest
 import com.on.turip.data.turip.dto.TuripPostRequest
@@ -38,4 +40,27 @@ interface TuripService {
     suspend fun getTuripsByPlaceId(
         @Query("placeId") placeId: Long,
     ): Response<TuripsByPlaceResponse>
+
+    @GET("turips/places")
+    suspend fun getTuripPlaces(
+        @Query("turipId") turipId: Long,
+    ): Response<TuripPlacesResponse>
+
+    @POST("turips/places")
+    suspend fun postTuripPlace(
+        @Query("turipId") turipId: Long,
+        @Query("placeId") placeId: Long,
+    ): Response<Unit>
+
+    @DELETE("turips/places")
+    suspend fun deleteTuripPlace(
+        @Query("turipId") turipId: Long,
+        @Query("placeId") placeId: Long,
+    ): Response<Unit>
+
+    @PATCH("turips/places/turip-place-order")
+    suspend fun patchTuripPlaceOrder(
+        @Query("turipId") turipId: Long,
+        @Body turipPlaceOrderRequest: TuripPlaceOrderRequest,
+    ): Response<Unit>
 }

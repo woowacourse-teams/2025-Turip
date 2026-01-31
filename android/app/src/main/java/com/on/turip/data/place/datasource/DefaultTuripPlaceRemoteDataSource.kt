@@ -3,32 +3,32 @@ package com.on.turip.data.place.datasource
 import com.on.turip.core.result.TuripResult
 import com.on.turip.data.place.dto.TuripPlaceOrderRequest
 import com.on.turip.data.place.dto.TuripPlacesResponse
-import com.on.turip.data.place.service.PlaceService
 import com.on.turip.data.result.safeApiCall
+import com.on.turip.data.turip.service.TuripService
 import javax.inject.Inject
 
 class DefaultTuripPlaceRemoteDataSource @Inject constructor(
-    private val placeService: PlaceService,
+    private val turipService: TuripService,
 ) : TuripPlaceRemoteDataSource {
     override suspend fun getTuripPlaces(turipId: Long): TuripResult<TuripPlacesResponse> =
-        safeApiCall { placeService.getTuripPlaces(turipId) }
+        safeApiCall { turipService.getTuripPlaces(turipId) }
 
     override suspend fun createTuripPlace(
         turipId: Long,
         placeId: Long,
-    ): TuripResult<Unit> = safeApiCall { placeService.postTuripPlace(turipId, placeId) }
+    ): TuripResult<Unit> = safeApiCall { turipService.postTuripPlace(turipId, placeId) }
 
     override suspend fun deleteTuripPlace(
         turipId: Long,
         placeId: Long,
-    ): TuripResult<Unit> = safeApiCall { placeService.deleteTuripPlace(turipId, placeId) }
+    ): TuripResult<Unit> = safeApiCall { turipService.deleteTuripPlace(turipId, placeId) }
 
     override suspend fun patchTuripPlacesOrder(
         turipId: Long,
         turipPlaceOrderRequest: TuripPlaceOrderRequest,
     ): TuripResult<Unit> =
         safeApiCall {
-            placeService.patchTuripPlaceOrder(
+            turipService.patchTuripPlaceOrder(
                 turipId,
                 turipPlaceOrderRequest,
             )
