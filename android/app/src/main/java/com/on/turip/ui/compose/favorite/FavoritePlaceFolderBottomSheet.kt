@@ -102,7 +102,7 @@ fun FavoritePlaceFolderBottomSheet(
                     onShareFolder(uiEffect.favoriteFolderShareModel)
                 }
 
-                is FavoritePlaceFolderUiEffect.ShowRemovedFavoritePlace -> {
+                is FavoritePlaceFolderUiEffect.ShowFavoritePlaceRemoved -> {
                     val messageResource: Int =
                         R.string.bottom_sheet_favorite_place_folder_snackbar_place_removed
                     val actionLabelResource: Int =
@@ -267,7 +267,7 @@ private fun CloseButton(
             modifier =
                 Modifier
                     .align(Alignment.CenterEnd)
-                    .size(40.dp),
+                    .size(32.dp),
         ) {
             Icon(
                 imageVector = Icons.Default.Close,
