@@ -172,6 +172,8 @@ class FavoritePlaceFolderViewModel @Inject constructor(
 
     // 낙관적 UI / UI 반영만
     fun applyFavoritePlaceDelete(place: FavoritePlaceModel) {
+        if (deletePlaceSnapshot.hasSnapshot()) return // 필요 없지만 혹시 모를 raceCondition 방지
+
         _uiState.update { state: FavoritePlaceFolderUiState ->
             deletePlaceSnapshot = DeletePlaceSnapshot(place, state.selectedFolderPlaces)
             val updatePlaces =
@@ -182,7 +184,7 @@ class FavoritePlaceFolderViewModel @Inject constructor(
         }
         viewModelScope.launch {
             _uiEffect.send(
-                FavoritePlaceFolderUiEffect.ShowRemovedFavoritePlace(placeName = place.name),
+                FavoritePlaceFolderUiEffect.ShowFavoritePlaceRemoved(placeName = place.name),
             )
         }
     }
@@ -209,23 +211,22 @@ class FavoritePlaceFolderViewModel @Inject constructor(
                 updateFavoritePlaceUseCase(screenMode.folderId, deletePlace.placeId, false)
                     .onSuccess {
                         syncFolderForSelectedPlace(deletePlace, screenMode)
-                        Timber.d("찜 목록 화면 폴더명에 해당하는 찜 장소들 업데이트 성공")
+                        Timber.d("찜 장소 목록 바텀시트, 장소 업데이트 성공")
                     }.onFailure {
                         _uiEffect.send(
-                            FavoritePlaceFolderUiEffect.ShowFavoritePlaceRemoveFailed(
-                                deletePlace.name,
-                            ),
+                            FavoritePlaceFolderUiEffect.ShowFavoritePlaceRemoveFailed(deletePlace.name),
                         )
                         _uiState.update { it.copy(selectedFolderPlaces = deletePlaceSnapshot.originPlaces) }
-                        Timber.e("찜 목록 화면 폴더명에 해당하는 찜 장소들 업데이트 실패 (placeId = $placeId)")
+                        Timber.e("찜 장소 목록 바텀시트, 장소 업데이트 실패 place = ${deletePlace.name}")
                     }
 
+                // 장소 제거 스낵바에선 다시 시도 기능 제공 안하고 있어 성공 실패 여부와 없이 초기화
                 deletePlaceSnapshot = DeletePlaceSnapshot.EMPTY
             }
         }
     }
 
-    // 바텀 시트 진입할 때 선택한 장소와 폴더의 장소가 동일한 경우 데이터 동기화
+    // '바텀 시트 진입할 때 선택한 장소' 와 폴더의 장소가 동일한 경우 데이터 동기화
     private fun syncFolderForSelectedPlace(
         deletePlace: FavoritePlaceModel,
         screenMode: FavoritePlaceFolderScreenMode.FolderDetail,

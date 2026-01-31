@@ -7,13 +7,15 @@ sealed interface FavoritePlaceFolderUiEffect {
 
     data object FolderShareNotAllowed : FavoritePlaceFolderUiEffect
 
-    data object DeletePlaceFailed : FavoritePlaceFolderUiEffect
+    data class ShowFavoritePlaceRemoveFailed(
+        val placeName: String,
+    ) : FavoritePlaceFolderUiEffect
 
     data class ShareFolder(
         val favoriteFolderShareModel: FavoriteFolderShareModel,
     ) : FavoritePlaceFolderUiEffect
 
-    data class ShowRemovedFavoritePlace(
+    data class ShowFavoritePlaceRemoved(
         val placeName: String,
     ) : FavoritePlaceFolderUiEffect
 
