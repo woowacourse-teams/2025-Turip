@@ -9,8 +9,8 @@ import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
 import com.on.turip.domain.favorite.TuripPlace
-import com.on.turip.domain.favorite.repository.TuripPlaceRepository
 import com.on.turip.domain.favorite.usecase.UpdateTuripPlaceUseCase
+import com.on.turip.domain.folder.repository.TuripRepository
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
@@ -36,7 +36,7 @@ import javax.inject.Inject
 @HiltViewModel
 class TuripCatalogViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val turipPlaceRepository: TuripPlaceRepository,
+    private val turipRepository: TuripRepository,
     private val updateTuripPlaceUseCase: UpdateTuripPlaceUseCase,
 ) : ViewModel() {
     private val turipId: Long by lazy {
@@ -63,7 +63,7 @@ class TuripCatalogViewModel @Inject constructor(
 
     private fun loadPlacesInSelectTurip() {
         viewModelScope.launch {
-            turipPlaceRepository
+            turipRepository
                 .loadTuripPlaces(turipId)
                 .onSuccess { turipPlaces: List<TuripPlace> ->
                     _uiState.update { state: TuripCatalogUiState ->
@@ -113,7 +113,7 @@ class TuripCatalogViewModel @Inject constructor(
 
     fun updateTuripPlacesOrder(updateTuripPlaces: List<TuripPlaceModel>) {
         viewModelScope.launch {
-            turipPlaceRepository
+            turipRepository
                 .updateTuripPlacesOrder(
                     turipId = turipId,
                     updatedOrder = updateTuripPlaces.map { it.turipPlaceId },

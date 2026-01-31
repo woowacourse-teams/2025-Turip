@@ -9,7 +9,6 @@ import com.on.turip.core.result.TuripResult
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
 import com.on.turip.domain.favorite.TuripPlace
-import com.on.turip.domain.favorite.repository.TuripPlaceRepository
 import com.on.turip.domain.favorite.usecase.UpdateTuripPlaceUseCase
 import com.on.turip.domain.folder.Turip
 import com.on.turip.domain.folder.repository.TuripRepository
@@ -38,7 +37,6 @@ import javax.inject.Inject
 @HiltViewModel
 class TuripPlaceViewModel @Inject constructor(
     private val turipRepository: TuripRepository,
-    private val turipPlaceRepository: TuripPlaceRepository,
     private val updateTuripPlaceUseCase: UpdateTuripPlaceUseCase,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<TuripPlaceUiState> =
@@ -64,7 +62,7 @@ class TuripPlaceViewModel @Inject constructor(
 
                     when (
                         val result: TuripResult<List<TuripPlace>> =
-                            turipPlaceRepository.loadTuripPlaces(selectedTuripId)
+                            turipRepository.loadTuripPlaces(selectedTuripId)
                     ) {
                         is TuripResult.Success -> {
                             _uiState.update { state: TuripPlaceUiState ->
@@ -163,7 +161,7 @@ class TuripPlaceViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
-            turipPlaceRepository
+            turipRepository
                 .loadTuripPlaces(turipId)
                 .onSuccess { turipPlaces: List<TuripPlace> ->
                     selectedTuripId = turipId
@@ -191,7 +189,7 @@ class TuripPlaceViewModel @Inject constructor(
 
     fun updateTuripPlacesOrder(updateTuripPlaces: List<TuripPlaceModel>) {
         viewModelScope.launch {
-            turipPlaceRepository
+            turipRepository
                 .updateTuripPlacesOrder(
                     turipId = selectedTuripId,
                     updatedOrder = updateTuripPlaces.map { it.turipPlaceId },

@@ -1,6 +1,8 @@
 package com.on.turip.data.turip.datasource
 
 import com.on.turip.core.result.TuripResult
+import com.on.turip.data.place.dto.TuripPlaceOrderRequest
+import com.on.turip.data.place.dto.TuripPlacesResponse
 import com.on.turip.data.turip.dto.TuripCreationResponse
 import com.on.turip.data.turip.dto.TuripPatchRequest
 import com.on.turip.data.turip.dto.TuripPostRequest
@@ -20,4 +22,21 @@ interface TuripRemoteDataSource {
     suspend fun deleteTurip(turipId: Long): TuripResult<Unit>
 
     suspend fun getTuripsByPlaceId(placeId: Long): TuripResult<TuripsByPlaceResponse>
+
+    suspend fun getTuripPlaces(turipId: Long): TuripResult<TuripPlacesResponse>
+
+    suspend fun createTuripPlace(
+        turipId: Long,
+        placeId: Long,
+    ): TuripResult<Unit>
+
+    suspend fun deleteTuripPlace(
+        turipId: Long,
+        placeId: Long,
+    ): TuripResult<Unit>
+
+    suspend fun patchTuripPlacesOrder(
+        turipId: Long,
+        turipPlaceOrderRequest: TuripPlaceOrderRequest,
+    ): TuripResult<Unit>
 }

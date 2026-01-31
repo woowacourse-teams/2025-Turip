@@ -3,12 +3,12 @@ package com.on.turip.domain.favorite.usecase
 import com.on.turip.core.result.TuripResult
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
-import com.on.turip.domain.favorite.repository.TuripPlaceRepository
+import com.on.turip.domain.folder.repository.TuripRepository
 import timber.log.Timber
 import javax.inject.Inject
 
 class UpdateTuripPlaceUseCase @Inject constructor(
-    private val turipPlaceRepository: TuripPlaceRepository,
+    private val turipRepository: TuripRepository,
 ) {
     suspend operator fun invoke(
         turipId: Long,
@@ -16,7 +16,7 @@ class UpdateTuripPlaceUseCase @Inject constructor(
         isTuripPlace: Boolean,
     ): TuripResult<Unit> =
         if (isTuripPlace) {
-            turipPlaceRepository
+            turipRepository
                 .createTuripPlace(turipId, placeId)
                 .onSuccess {
                     Timber.d("튜립에 장소 추가 성공")
@@ -24,7 +24,7 @@ class UpdateTuripPlaceUseCase @Inject constructor(
                     Timber.e("튜립에 장소 추가 실패")
                 }
         } else {
-            turipPlaceRepository
+            turipRepository
                 .deleteTuripPlace(turipId, placeId)
                 .onSuccess {
                     Timber.d("튜립에서 장소 제거 성공")

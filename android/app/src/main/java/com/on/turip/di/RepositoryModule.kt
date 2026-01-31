@@ -4,14 +4,12 @@ import com.on.turip.data.bookmarks.repository.DefaultBookmarkRepository
 import com.on.turip.data.content.repository.DefaultContentRepository
 import com.on.turip.data.login.repository.DefaultAuthRepository
 import com.on.turip.data.login.repository.DefaultMemberRepository
-import com.on.turip.data.place.repository.DefaultTuripPlaceRepository
 import com.on.turip.data.region.repository.DefaultRegionRepository
 import com.on.turip.data.searchhistory.repository.DefaultSearchHistoryRepository
 import com.on.turip.data.turip.repository.DefaultTuripRepository
 import com.on.turip.data.userstorage.repository.DefaultUserStorageRepository
 import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.favorite.repository.BookmarkRepository
-import com.on.turip.domain.favorite.repository.TuripPlaceRepository
 import com.on.turip.domain.folder.repository.TuripRepository
 import com.on.turip.domain.login.AuthRepository
 import com.on.turip.domain.login.MemberRepository
@@ -50,10 +48,6 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindTuripRepository(defaultTuripRepository: DefaultTuripRepository): TuripRepository
-
-    @Binds
-    @Singleton
-    abstract fun bindTuripPlaceRepository(defaultTuripPlaceRepository: DefaultTuripPlaceRepository): TuripPlaceRepository
 
     @Binds
     @Singleton
