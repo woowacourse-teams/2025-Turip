@@ -1,7 +1,9 @@
 package turip.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import turip.account.domain.TuripMember;
@@ -11,6 +13,12 @@ import turip.resolver.AuthAdmin;
 @RequiredArgsConstructor
 @RequestMapping("/admin")
 public class AdminViewController {
+
+    @Value("${google.api.key}")
+    private String googleApiKey;
+
+    @Value("${youtube.api.key}")
+    private String youtubeApiKey;
 
     @GetMapping("/login")
     public String loginPage() {
@@ -25,5 +33,12 @@ public class AdminViewController {
     @GetMapping("/home")
     public String homePage(@AuthAdmin TuripMember admin) {
         return "admin/home";
+    }
+
+    @GetMapping("/contents")
+    public String createContentPage(Model model) {
+        model.addAttribute("googleApiKey", googleApiKey);
+        model.addAttribute("youtubeApiKey", youtubeApiKey);
+        return "admin/content";
     }
 }
