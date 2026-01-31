@@ -40,7 +40,7 @@ interface ContentService {
         @Path("contentId") contentId: Long,
     ): Response<ContentDetailResponse>
 
-    @GET("/contents/popular")
+    @GET("contents/popular")
     suspend fun getUsersLikeContents(
         @Query("size") size: Int,
     ): Response<UsersLikeContentsResponse>
