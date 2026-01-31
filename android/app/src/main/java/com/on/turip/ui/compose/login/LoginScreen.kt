@@ -156,12 +156,10 @@ private fun LoginScreenContent(
                             .border(
                                 border = BorderStroke(1.dp, TuripTheme.colors.gray02),
                                 shape = TuripTheme.shape.container,
-                            )
-                            .background(
+                            ).background(
                                 color = TuripTheme.colors.gray03,
                                 shape = TuripTheme.shape.container,
-                            )
-                            .fillMaxWidth()
+                            ).fillMaxWidth()
                             .padding(vertical = TuripTheme.spacing.extraLarge),
                     textAlign = TextAlign.Center,
                 )
