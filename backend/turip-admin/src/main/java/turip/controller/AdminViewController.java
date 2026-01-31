@@ -36,7 +36,7 @@ public class AdminViewController {
     }
 
     @GetMapping("/contents")
-    public String createContentPage(Model model) {
+    public String createContentPage(@AuthAdmin TuripMember admin, Model model) {
         model.addAttribute("googleApiKey", googleApiKey);
         model.addAttribute("youtubeApiKey", youtubeApiKey);
         return "admin/content";
