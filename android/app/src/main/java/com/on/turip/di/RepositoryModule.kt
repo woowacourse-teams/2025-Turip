@@ -1,7 +1,6 @@
 package com.on.turip.di
 
 import com.on.turip.data.bookmarks.repository.DefaultBookmarkRepository
-import com.on.turip.data.content.place.repository.DefaultContentPlaceRepository
 import com.on.turip.data.content.repository.DefaultContentRepository
 import com.on.turip.data.login.repository.DefaultAuthRepository
 import com.on.turip.data.login.repository.DefaultMemberRepository
@@ -18,7 +17,6 @@ import com.on.turip.domain.login.AuthRepository
 import com.on.turip.domain.login.MemberRepository
 import com.on.turip.domain.region.repository.RegionRepository
 import com.on.turip.domain.searchhistory.SearchHistoryRepository
-import com.on.turip.domain.trip.repository.ContentPlaceRepository
 import com.on.turip.domain.userstorage.repository.UserStorageRepository
 import dagger.Binds
 import dagger.Module
@@ -32,10 +30,6 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindContentRepository(defaultContentRepository: DefaultContentRepository): ContentRepository
-
-    @Binds
-    @Singleton
-    abstract fun bindContentPlaceRepository(defaultContentPlaceRepository: DefaultContentPlaceRepository): ContentPlaceRepository
 
     @Binds
     @Singleton

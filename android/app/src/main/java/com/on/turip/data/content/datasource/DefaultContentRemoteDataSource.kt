@@ -5,6 +5,7 @@ import com.on.turip.data.content.dto.ContentDetailResponse
 import com.on.turip.data.content.dto.ContentInformationCountResponse
 import com.on.turip.data.content.dto.ContentsInformationResponse
 import com.on.turip.data.content.dto.UsersLikeContentsResponse
+import com.on.turip.data.content.place.dto.ContentPlacesResponse
 import com.on.turip.data.content.service.ContentService
 import com.on.turip.data.result.safeApiCall
 import kotlinx.coroutines.Dispatchers
@@ -64,5 +65,10 @@ class DefaultContentRemoteDataSource @Inject constructor(
     override suspend fun getUsersLikeContents(size: Int): TuripResult<UsersLikeContentsResponse> =
         withContext(coroutineContext) {
             safeApiCall { contentService.getUsersLikeContents(size) }
+        }
+
+    override suspend fun getTrip(contentId: Long): TuripResult<ContentPlacesResponse> =
+        withContext(coroutineContext) {
+            safeApiCall { contentService.getTrip(contentId) }
         }
 }

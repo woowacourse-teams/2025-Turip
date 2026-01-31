@@ -4,8 +4,6 @@ import com.on.turip.data.bookmarks.datasource.BookmarkRemoteDataSource
 import com.on.turip.data.bookmarks.datasource.DefaultBookmarkRemoteDataSource
 import com.on.turip.data.content.datasource.ContentRemoteDataSource
 import com.on.turip.data.content.datasource.DefaultContentRemoteDataSource
-import com.on.turip.data.content.place.datasource.ContentPlaceRemoteDataSource
-import com.on.turip.data.content.place.datasource.DefaultContentPlaceRemoteDataSource
 import com.on.turip.data.login.datasource.AuthDataSource
 import com.on.turip.data.login.datasource.AuthRemoteDataSource
 import com.on.turip.data.login.datasource.MemberDataSource
@@ -32,12 +30,6 @@ abstract class DataSourceModule {
     @Binds
     @Singleton
     abstract fun bindContentRemoteDataSource(defaultContentRemoteDataSource: DefaultContentRemoteDataSource): ContentRemoteDataSource
-
-    @Binds
-    @Singleton
-    abstract fun bindContentPlaceRemoteDataSource(
-        defaultContentPlaceRemoteDataSource: DefaultContentPlaceRemoteDataSource,
-    ): ContentPlaceRemoteDataSource
 
     @Binds
     @Singleton

@@ -12,7 +12,6 @@ import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.favorite.usecase.UpdateBookmarkUseCase
 import com.on.turip.domain.trip.ContentPlace
 import com.on.turip.domain.trip.Trip
-import com.on.turip.domain.trip.repository.ContentPlaceRepository
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
@@ -41,7 +40,6 @@ import javax.inject.Inject
 class TripDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val contentRepository: ContentRepository,
-    private val contentPlaceRepository: ContentPlaceRepository,
     private val updateBookmarkUseCase: UpdateBookmarkUseCase,
 ) : ViewModel() {
     private var placeCacheByDay: Map<Int, ImmutableList<PlaceModel>> = emptyMap()
@@ -70,7 +68,7 @@ class TripDetailViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true) }
 
             val contentDeferred = async { contentRepository.loadContent(contentId) }
-            val tripInfoDeferred = async { contentPlaceRepository.loadTripInfo(contentId) }
+            val tripInfoDeferred = async { contentRepository.loadTripInfo(contentId) }
 
             val contentResult: TuripResult<Content> = contentDeferred.await()
             val tripInfoResult: TuripResult<Trip> = tripInfoDeferred.await()
