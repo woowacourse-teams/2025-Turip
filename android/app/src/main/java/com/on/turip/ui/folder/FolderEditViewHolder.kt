@@ -5,30 +5,30 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.on.turip.R
 import com.on.turip.databinding.ItemFolderEditBinding
-import com.on.turip.ui.folder.model.FolderEditModel
+import com.on.turip.ui.folder.model.TuripEditModel
 
 class FolderEditViewHolder(
     private val binding: ItemFolderEditBinding,
     folderEditListener: FolderEditListener,
 ) : RecyclerView.ViewHolder(binding.root) {
-    private var folderEditModel: FolderEditModel? = null
+    private var turipEditModel: TuripEditModel? = null
 
     init {
         binding.ivFolderEditRemove.setOnClickListener {
-            folderEditModel?.let { folderEditListener.onRemoveClick(it.id) }
+            turipEditModel?.let { folderEditListener.onRemoveClick(it.id) }
         }
 
         binding.clFolderEditItem.setOnClickListener {
-            folderEditModel?.let { folderEditListener.onItemClick(it.id) }
+            turipEditModel?.let { folderEditListener.onItemClick(it.id) }
         }
     }
 
-    fun bind(folderEditModel: FolderEditModel) {
-        this.folderEditModel = folderEditModel
+    fun bind(turipEditModel: TuripEditModel) {
+        this.turipEditModel = turipEditModel
 
-        binding.tvFolderEditName.text = folderEditModel.name
+        binding.tvFolderEditName.text = turipEditModel.name
         binding.tvFolderPlaceCount.text =
-            itemView.context.getString(R.string.all_total_place_count, folderEditModel.count)
+            itemView.context.getString(R.string.all_total_place_count, turipEditModel.count)
     }
 
     companion object {

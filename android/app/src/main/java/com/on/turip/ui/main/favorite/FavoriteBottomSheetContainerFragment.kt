@@ -53,7 +53,7 @@ class FavoriteBottomSheetContainerFragment : BaseBottomSheetFragment<BottomSheet
                 .beginTransaction()
                 .replace(
                     R.id.fcv_bottom_sheet_folder_favorite_place_folder_catalog,
-                    FavoritePlaceFolderFragment.newInstance(placeId),
+                    PlaceTuripSelectionFragment.newInstance(placeId),
                 ).commit()
         }
     }

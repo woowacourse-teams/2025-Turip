@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
-        android:text="@string/bottom_sheet_favorite_place_folder_title"
+        android:text="@string/bottom_sheet_turip_title"
         android:textAppearance="@style/title3"
         android:textColor="@color/pure_black_151515"
         app:layout_constraintStart_toStartOf="parent"

@@ -1,13 +1,12 @@
 package com.on.turip.di
 
-import com.on.turip.data.content.place.service.ContentPlaceService
+import com.on.turip.data.bookmarks.service.BookmarkService
 import com.on.turip.data.content.service.ContentService
-import com.on.turip.data.favorite.service.FavoriteService
-import com.on.turip.data.folder.service.FolderService
 import com.on.turip.data.login.service.AuthService
+import com.on.turip.data.login.service.GuestService
 import com.on.turip.data.login.service.MemberService
-import com.on.turip.data.place.service.PlaceService
 import com.on.turip.data.region.service.RegionService
+import com.on.turip.data.turip.service.TuripService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -26,23 +25,15 @@ object ServiceModule {
 
     @Provides
     @Singleton
-    fun provideFavoriteService(retrofit: Retrofit): FavoriteService = retrofit.create<FavoriteService>()
+    fun provideBookmarkService(retrofit: Retrofit): BookmarkService = retrofit.create<BookmarkService>()
 
     @Provides
     @Singleton
-    fun provideFolderService(retrofit: Retrofit): FolderService = retrofit.create<FolderService>()
-
-    @Provides
-    @Singleton
-    fun providePlaceService(retrofit: Retrofit): PlaceService = retrofit.create<PlaceService>()
+    fun provideTuripService(retrofit: Retrofit): TuripService = retrofit.create<TuripService>()
 
     @Provides
     @Singleton
     fun provideRegionService(retrofit: Retrofit): RegionService = retrofit.create<RegionService>()
-
-    @Provides
-    @Singleton
-    fun provideContentPlaceService(retrofit: Retrofit): ContentPlaceService = retrofit.create<ContentPlaceService>()
 
     @Provides
     @Singleton
@@ -53,4 +44,8 @@ object ServiceModule {
     @Provides
     @Singleton
     fun provideMemberService(retrofit: Retrofit): MemberService = retrofit.create<MemberService>()
+
+    @Provides
+    @Singleton
+    fun provideGuestService(retrofit: Retrofit): GuestService = retrofit.create<GuestService>()
 }

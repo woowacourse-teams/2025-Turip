@@ -8,6 +8,7 @@ import com.on.turip.domain.content.Content
 import com.on.turip.domain.content.PagedContentsResult
 import com.on.turip.domain.content.UsersLikeContent
 import com.on.turip.domain.content.repository.ContentRepository
+import com.on.turip.domain.trip.Trip
 import javax.inject.Inject
 
 class DefaultContentRepository @Inject constructor(
@@ -49,5 +50,10 @@ class DefaultContentRepository @Inject constructor(
     override suspend fun loadPopularFavoriteContents(size: Int): TuripResult<List<UsersLikeContent>> =
         contentRemoteDataSource
             .getUsersLikeContents(size)
+            .mapCatching { it.toDomain() }
+
+    override suspend fun loadTripInfo(contentId: Long): TuripResult<Trip> =
+        contentRemoteDataSource
+            .getTrip(contentId)
             .mapCatching { it.toDomain() }
 }

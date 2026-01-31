@@ -4,6 +4,7 @@ import com.on.turip.core.result.TuripResult
 import com.on.turip.domain.content.Content
 import com.on.turip.domain.content.PagedContentsResult
 import com.on.turip.domain.content.UsersLikeContent
+import com.on.turip.domain.trip.Trip
 
 interface ContentRepository {
     suspend fun loadContentsSizeByRegion(regionCategoryName: String): TuripResult<Int>
@@ -25,4 +26,6 @@ interface ContentRepository {
     suspend fun loadContent(contentId: Long): TuripResult<Content>
 
     suspend fun loadPopularFavoriteContents(size: Int = 5): TuripResult<List<UsersLikeContent>>
+
+    suspend fun loadTripInfo(contentId: Long): TuripResult<Trip>
 }

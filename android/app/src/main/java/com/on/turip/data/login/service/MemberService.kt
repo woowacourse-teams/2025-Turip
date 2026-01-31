@@ -8,12 +8,9 @@ interface MemberService {
     @POST("members/migration")
     suspend fun postMigration(): Response<Unit>
 
-    @POST("logout")
+    @POST("auth/logout")
     suspend fun postLogout(): Response<Unit>
 
     @DELETE("members/me")
     suspend fun deleteMember(): Response<Unit>
-
-    @DELETE("guests/me")
-    suspend fun deleteGuest(): Response<Unit>
 }

@@ -12,8 +12,8 @@ data class ContentDetailResponse(
     val creator: CreatorResponse,
     @SerialName("id")
     val id: Long,
-    @SerialName("isFavorite")
-    val isFavorite: Boolean,
+    @SerialName("isBookmarked")
+    val isBookmarked: Boolean,
     @SerialName("title")
     val title: String,
     @SerialName("uploadedDate")
