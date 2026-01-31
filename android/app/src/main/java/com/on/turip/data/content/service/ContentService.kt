@@ -4,6 +4,7 @@ import com.on.turip.data.content.dto.ContentDetailResponse
 import com.on.turip.data.content.dto.ContentInformationCountResponse
 import com.on.turip.data.content.dto.ContentsInformationResponse
 import com.on.turip.data.content.dto.UsersLikeContentsResponse
+import com.on.turip.data.content.place.dto.ContentPlacesResponse
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -43,4 +44,9 @@ interface ContentService {
     suspend fun getUsersLikeContents(
         @Query("size") size: Int,
     ): Response<UsersLikeContentsResponse>
+
+    @GET("contents/{contentId}/places")
+    suspend fun getTrip(
+        @Path("contentId") contentId: Long,
+    ): Response<ContentPlacesResponse>
 }
