@@ -8,6 +8,4 @@ interface MemberRepository {
     suspend fun logout(): TuripResult<Unit>
 
     suspend fun deleteMember(): TuripResult<Unit>
-
-    suspend fun deleteGuest(): TuripResult<Unit>
 }

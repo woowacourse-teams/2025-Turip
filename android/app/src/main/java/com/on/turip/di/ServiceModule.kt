@@ -3,6 +3,7 @@ package com.on.turip.di
 import com.on.turip.data.bookmarks.service.BookmarkService
 import com.on.turip.data.content.service.ContentService
 import com.on.turip.data.login.service.AuthService
+import com.on.turip.data.login.service.GuestService
 import com.on.turip.data.login.service.MemberService
 import com.on.turip.data.region.service.RegionService
 import com.on.turip.data.turip.service.TuripService
@@ -43,4 +44,8 @@ object ServiceModule {
     @Provides
     @Singleton
     fun provideMemberService(retrofit: Retrofit): MemberService = retrofit.create<MemberService>()
+
+    @Provides
+    @Singleton
+    fun provideGuestService(retrofit: Retrofit): GuestService = retrofit.create<GuestService>()
 }

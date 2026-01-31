@@ -6,6 +6,8 @@ import com.on.turip.data.content.datasource.ContentRemoteDataSource
 import com.on.turip.data.content.datasource.DefaultContentRemoteDataSource
 import com.on.turip.data.login.datasource.AuthDataSource
 import com.on.turip.data.login.datasource.AuthRemoteDataSource
+import com.on.turip.data.login.datasource.GuestDataSource
+import com.on.turip.data.login.datasource.GuestRemoteDataSource
 import com.on.turip.data.login.datasource.MemberDataSource
 import com.on.turip.data.login.datasource.MemberRemoteDataSource
 import com.on.turip.data.region.datasource.DefaultRegionRemoteDataSource
@@ -58,4 +60,8 @@ abstract class DataSourceModule {
     @Binds
     @Singleton
     abstract fun bindMemberRemoteDataSource(memberRemoteDataSource: MemberRemoteDataSource): MemberDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindGuestRemoteDataSource(guestRemoteDataSource: GuestRemoteDataSource): GuestDataSource
 }

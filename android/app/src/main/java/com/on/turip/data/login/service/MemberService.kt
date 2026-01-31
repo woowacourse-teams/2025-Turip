@@ -13,7 +13,4 @@ interface MemberService {
 
     @DELETE("members/me")
     suspend fun deleteMember(): Response<Unit>
-
-    @DELETE("guests/me")
-    suspend fun deleteGuest(): Response<Unit>
 }
