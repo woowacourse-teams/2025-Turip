@@ -126,7 +126,7 @@ fun FavoritePlaceFolderBottomSheet(
                         snackbarHostState.showSnackbar(
                             message = context.getString(uiModel.titleRes),
                             actionLabel = context.getString(uiModel.retryTextRes),
-                            duration = SnackbarDuration.Indefinite,
+                            duration = SnackbarDuration.Long,
                         )
                     if (result == SnackbarResult.ActionPerformed) {
                         viewModel.handleErrorRetryRequest(uiEffect.retryAction)

@@ -61,7 +61,7 @@ fun LoginScreen(
                     val errorUiModel = effect.errorUiState.toUiModel() ?: return@collect
                     snackbarHostState.showSnackbar(
                         message = context.getString(errorUiModel.titleRes),
-                        duration = SnackbarDuration.Short,
+                        duration = SnackbarDuration.Long,
                     )
                 }
             }

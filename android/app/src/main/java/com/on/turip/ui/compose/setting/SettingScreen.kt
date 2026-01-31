@@ -60,7 +60,7 @@ fun SettingScreen(
                         snackbarHostState.showSnackbar(
                             message = context.getString(errorUiModel.titleRes),
                             actionLabel = context.getString(errorUiModel.retryTextRes),
-                            duration = SnackbarDuration.Indefinite,
+                            duration = SnackbarDuration.Long,
                         )
                     if (result == SnackbarResult.ActionPerformed) {
                         viewModel.handleErrorRetryRequest(uiEffect.retryAction)

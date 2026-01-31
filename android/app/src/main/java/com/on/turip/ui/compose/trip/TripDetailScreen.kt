@@ -253,7 +253,7 @@ private suspend fun handleUiEffect(
                 snackbarHostState.showSnackbar(
                     message = context.getString(uiModel.titleRes),
                     actionLabel = context.getString(uiModel.retryTextRes),
-                    duration = SnackbarDuration.Indefinite,
+                    duration = SnackbarDuration.Long,
                 )
             if (result == SnackbarResult.ActionPerformed) {
                 handleErrorRetryRequest(uiEffect.retryAction)
