@@ -2,9 +2,8 @@ package com.on.turip.data.turip.repository
 
 import com.on.turip.core.result.TuripResult
 import com.on.turip.core.result.mapCatching
-import com.on.turip.data.place.dto.TuripPlaceOrderRequest
-import com.on.turip.data.place.toDomain
 import com.on.turip.data.turip.datasource.TuripRemoteDataSource
+import com.on.turip.data.turip.dto.TuripPlaceOrderRequest
 import com.on.turip.data.turip.toDomain
 import com.on.turip.data.turip.toPatchRequestDto
 import com.on.turip.data.turip.toPostRequestDto

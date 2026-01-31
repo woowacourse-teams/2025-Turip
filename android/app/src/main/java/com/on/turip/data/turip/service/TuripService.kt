@@ -1,9 +1,9 @@
 package com.on.turip.data.turip.service
 
-import com.on.turip.data.place.dto.TuripPlaceOrderRequest
-import com.on.turip.data.place.dto.TuripPlacesResponse
 import com.on.turip.data.turip.dto.TuripCreationResponse
 import com.on.turip.data.turip.dto.TuripPatchRequest
+import com.on.turip.data.turip.dto.TuripPlaceOrderRequest
+import com.on.turip.data.turip.dto.TuripPlacesResponse
 import com.on.turip.data.turip.dto.TuripPostRequest
 import com.on.turip.data.turip.dto.TuripsByPlaceResponse
 import com.on.turip.data.turip.dto.TuripsResponse
