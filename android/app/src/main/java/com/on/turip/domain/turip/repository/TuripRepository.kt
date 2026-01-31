@@ -1,8 +1,8 @@
-package com.on.turip.domain.folder.repository
+package com.on.turip.domain.turip.repository
 
 import com.on.turip.core.result.TuripResult
 import com.on.turip.domain.bookmark.TuripPlace
-import com.on.turip.domain.folder.Turip
+import com.on.turip.domain.turip.Turip
 
 interface TuripRepository {
     suspend fun loadTurips(): TuripResult<List<Turip>>

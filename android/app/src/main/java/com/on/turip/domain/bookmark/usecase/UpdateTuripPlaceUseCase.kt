@@ -3,7 +3,7 @@ package com.on.turip.domain.bookmark.usecase
 import com.on.turip.core.result.TuripResult
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
-import com.on.turip.domain.folder.repository.TuripRepository
+import com.on.turip.domain.turip.repository.TuripRepository
 import timber.log.Timber
 import javax.inject.Inject
 

@@ -11,12 +11,12 @@ import com.on.turip.data.turip.repository.DefaultTuripRepository
 import com.on.turip.data.userstorage.repository.DefaultUserStorageRepository
 import com.on.turip.domain.bookmark.repository.BookmarkRepository
 import com.on.turip.domain.content.repository.ContentRepository
-import com.on.turip.domain.folder.repository.TuripRepository
 import com.on.turip.domain.login.AuthRepository
 import com.on.turip.domain.login.GuestRepository
 import com.on.turip.domain.login.MemberRepository
 import com.on.turip.domain.region.repository.RegionRepository
 import com.on.turip.domain.searchhistory.SearchHistoryRepository
+import com.on.turip.domain.turip.repository.TuripRepository
 import com.on.turip.domain.userstorage.repository.UserStorageRepository
 import dagger.Binds
 import dagger.Module

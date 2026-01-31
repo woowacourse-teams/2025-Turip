@@ -10,8 +10,8 @@ import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
 import com.on.turip.domain.bookmark.TuripPlace
 import com.on.turip.domain.bookmark.usecase.UpdateTuripPlaceUseCase
-import com.on.turip.domain.folder.Turip
-import com.on.turip.domain.folder.repository.TuripRepository
+import com.on.turip.domain.turip.Turip
+import com.on.turip.domain.turip.repository.TuripRepository
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError

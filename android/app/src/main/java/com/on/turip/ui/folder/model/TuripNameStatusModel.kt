@@ -2,7 +2,7 @@ package com.on.turip.ui.folder.model
 
 import androidx.annotation.StringRes
 import com.on.turip.R
-import com.on.turip.domain.folder.TuripNameStatus
+import com.on.turip.domain.turip.TuripNameStatus
 
 enum class TuripNameStatusModel(
     @StringRes val errorMessage: Int?,

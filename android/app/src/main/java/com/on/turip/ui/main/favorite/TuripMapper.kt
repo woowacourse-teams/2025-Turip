@@ -3,7 +3,7 @@ package com.on.turip.ui.main.favorite
 import androidx.core.net.toUri
 import com.google.android.gms.maps.model.LatLng
 import com.on.turip.domain.bookmark.TuripPlace
-import com.on.turip.domain.folder.Turip
+import com.on.turip.domain.turip.Turip
 import com.on.turip.ui.main.favorite.model.PlaceLatLngUiModel
 import com.on.turip.ui.main.favorite.model.TuripModel
 import com.on.turip.ui.main.favorite.model.TuripPlaceModel

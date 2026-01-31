@@ -1,4 +1,4 @@
-package com.on.turip.domain.folder
+package com.on.turip.domain.turip
 
 data class Turip(
     val id: Long,

@@ -1,4 +1,4 @@
-package com.on.turip.domain.folder
+package com.on.turip.domain.turip
 
 enum class TuripNameStatus {
     OK,

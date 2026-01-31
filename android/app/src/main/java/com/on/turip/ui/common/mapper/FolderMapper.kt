@@ -1,6 +1,6 @@
 package com.on.turip.ui.common.mapper
 
-import com.on.turip.domain.folder.Turip
+import com.on.turip.domain.turip.Turip
 import com.on.turip.ui.folder.model.TuripEditModel
 import com.on.turip.ui.main.favorite.model.TuripModel
 
