@@ -1,6 +1,8 @@
 package com.on.turip.ui.main.favorite.model
 
 import com.on.turip.ui.common.error.ErrorUiState
+import com.on.turip.ui.compose.favorite.model.FavoritePlaceModel
+import kotlinx.collections.immutable.ImmutableList
 
 sealed interface FavoritePlaceFolderUiEffect {
     data object NavigateToLogin : FavoritePlaceFolderUiEffect
@@ -19,6 +21,10 @@ sealed interface FavoritePlaceFolderUiEffect {
         val placeName: String,
     ) : FavoritePlaceFolderUiEffect
 
+    data class ShowReorderPlaceFailed(
+        val retryAction: FavoritePlaceFolderRetryAction,
+    ) : FavoritePlaceFolderUiEffect
+
     data class ShowError(
         val errorUiState: ErrorUiState,
         val retryAction: FavoritePlaceFolderRetryAction,
@@ -35,5 +41,9 @@ sealed interface FavoritePlaceFolderRetryAction {
     data class LoadFavoritePlacesInFolder(
         val folderId: Long,
         val folderName: String,
+    ) : FavoritePlaceFolderRetryAction
+
+    data class UpdateReorderedPlaces(
+        val reorderedPlaces: ImmutableList<FavoritePlaceModel>,
     ) : FavoritePlaceFolderRetryAction
 }

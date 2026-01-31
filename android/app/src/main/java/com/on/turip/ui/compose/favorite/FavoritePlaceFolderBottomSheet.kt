@@ -132,6 +132,22 @@ fun FavoritePlaceFolderBottomSheet(
                         viewModel.handleErrorRetryRequest(uiEffect.retryAction)
                     }
                 }
+
+                is FavoritePlaceFolderUiEffect.ShowReorderPlaceFailed -> {
+                    val messageResource: Int =
+                        R.string.bottom_sheet_favorite_place_folder_snackbar_place_reorder_failed
+                    val actionLabelResource: Int =
+                        R.string.bottom_sheet_favorite_place_folder_snackbar_place_reorder_retry
+                    val result =
+                        snackbarHostState.showSnackbar(
+                            message = context.getString(messageResource),
+                            actionLabel = context.getString(actionLabelResource),
+                            duration = SnackbarDuration.Short,
+                        )
+                    if (result == SnackbarResult.ActionPerformed) {
+                        viewModel.handleErrorRetryRequest(uiEffect.retryAction)
+                    }
+                }
             }
         }
     }
@@ -139,7 +155,6 @@ fun FavoritePlaceFolderBottomSheet(
     BackHandler {
         when (uiState.screenMode) {
             is FavoritePlaceFolderScreenMode.FolderDetail -> {
-                snackbarHostState.currentSnackbarData?.dismiss()
                 viewModel.onFavoriteDetailBack()
             }
 
@@ -207,13 +222,23 @@ fun FavoritePlaceFolderBottomSheet(
                             folderName = mode.folderName,
                             places = uiState.selectedFolderPlaces,
                             onMapClick = onNavigateToMap,
-                            onFavoriteClick = viewModel::applyFavoritePlaceDelete,
+                            onFavoriteClick = {
+                                snackbarHostState.currentSnackbarData?.dismiss()
+                                viewModel.applyFavoritePlaceDelete(it)
+                            },
                             onBackClick = {
                                 snackbarHostState.currentSnackbarData?.dismiss()
                                 viewModel.onFavoriteDetailBack()
                             },
-                            onShareClick = viewModel::shareFolder,
-                            onDragStart = viewModel::onDragStart,
+                            onShareClick = {
+                                snackbarHostState.currentSnackbarData?.dismiss()
+                                viewModel.shareFolder()
+                            },
+                            onDragStart = {
+                                // 필요시, 장소 해제(낙관적 UI) API 호출 : 트리거 snackbar dismiss 시점
+                                snackbarHostState.currentSnackbarData?.dismiss()
+                                viewModel.onDragStart()
+                            },
                             onDragPlace = viewModel::onDragMove,
                             onDragEnd = viewModel::onDragEnd,
                         )

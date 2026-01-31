@@ -48,6 +48,8 @@
     <string name="bottom_sheet_favorite_place_folder_snackbar_place_removed">%s을(를) 폴더에서 제거했어요</string>
     <string name="bottom_sheet_favorite_place_folder_snackbar_place_remove_undo">되돌리기</string>
     <string name="bottom_sheet_favorite_place_folder_snackbar_place_remove_failed"> 일시적인 오류로 [%s]을(를) 제거하지 못했어요</string>
+    <string name="bottom_sheet_favorite_place_folder_snackbar_place_reorder_retry">다시 시도</string>
+    <string name="bottom_sheet_favorite_place_folder_snackbar_place_reorder_failed"> 일시적인 오류로 장소 순서를 변경하지 못했어요</string>
 
     <!-- 홈 페이지 -->
     <string name="home_top_title">😊 오늘의 기분은, 여행하기 딱 좋아요!</string>

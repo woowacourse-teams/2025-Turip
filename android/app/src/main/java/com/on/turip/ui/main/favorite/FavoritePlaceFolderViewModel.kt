@@ -31,12 +31,16 @@ import javax.inject.Inject
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -66,6 +70,9 @@ class FavoritePlaceFolderViewModel @Inject constructor(
 
     // 폴더 내 장소들 낙관적 UI를 위한 캐싱
     private var deletePlaceSnapshot: DeletePlaceSnapshot = DeletePlaceSnapshot.EMPTY
+    private var reorderPlacesSnapshot: ImmutableList<FavoritePlaceModel>? = null
+
+    private val dragEndEvents = MutableSharedFlow<Unit>(replay = 0, extraBufferCapacity = 1)
 
     private val _uiState: MutableStateFlow<FavoritePlaceFolderUiState> =
         MutableStateFlow(FavoritePlaceFolderUiState.Idle)
@@ -76,6 +83,7 @@ class FavoritePlaceFolderViewModel @Inject constructor(
 
     init {
         loadFavoriteFoldersForPlace()
+        registerDragEndEvents()
     }
 
     private fun loadFavoriteFoldersForPlace() {
@@ -105,6 +113,14 @@ class FavoritePlaceFolderViewModel @Inject constructor(
                     Timber.e("상세 페이지에서 장소에 대한 찜 폴더 현황 데이터 불러오기 실패")
                 }
         }
+    }
+
+    @OptIn(FlowPreview::class)
+    private fun registerDragEndEvents() {
+        dragEndEvents
+            .debounce(500L)
+            .onEach { updateFavoritePlacesOrder(uiState.value.selectedFolderPlaces) }
+            .launchIn(viewModelScope)
     }
 
     // TODO : UI만 반영하도록 수정, 다음 PR에서 완료 버튼 누르면 전체 변경 내역 반영 API 연동
@@ -279,6 +295,65 @@ class FavoritePlaceFolderViewModel @Inject constructor(
         }
     }
 
+    // API 호출 실패 시 롤백을 위해 원본 상태 기록
+    // 장소 제거 API가 반영되지 않은 상태라면 제거 전 원본 상태를 기록
+    fun onDragStart() {
+        reorderPlacesSnapshot =
+            if (deletePlaceSnapshot.hasSnapshot()) deletePlaceSnapshot.originPlaces else uiState.value.selectedFolderPlaces
+    }
+
+    // 드래그 시 아이템 위치 변경
+    fun onDragMove(
+        from: Int,
+        to: Int,
+    ) {
+        if (from == to) return
+        _uiState.update { state ->
+            val reOrderedPlaces =
+                state.selectedFolderPlaces
+                    .toMutableList()
+                    .apply { add(to, removeAt(from)) }
+                    .toImmutableList()
+            state.copy(selectedFolderPlaces = reOrderedPlaces)
+        }
+    }
+
+    fun onDragEnd() {
+        val current = uiState.value.selectedFolderPlaces
+        if (reorderPlacesSnapshot == current) return
+
+        dragEndEvents.tryEmit(Unit)
+    }
+
+    private fun updateFavoritePlacesOrder(reorderedFavoritePlaces: ImmutableList<FavoritePlaceModel>) {
+        if (uiState.value.screenMode is FavoritePlaceFolderScreenMode.FolderDetail) {
+            val screenMode = uiState.value.screenMode as FavoritePlaceFolderScreenMode.FolderDetail
+            viewModelScope.launch {
+                favoritePlaceRepository
+                    .updateFavoritePlacesOrder(
+                        favoriteFolderId = screenMode.folderId,
+                        updatedOrder = reorderedFavoritePlaces.map { it.favoritePlaceId },
+                    ).onSuccess {
+                        _uiState.update { it.copy(selectedFolderPlaces = reorderedFavoritePlaces) }
+                        Timber.d("장소 순서 변경 API 성공")
+                    }.onFailure {
+                        if (reorderPlacesSnapshot != null) {
+                            _uiState.update { it.copy(selectedFolderPlaces = reorderPlacesSnapshot!!) }
+                        }
+                        _uiEffect.send(
+                            FavoritePlaceFolderUiEffect.ShowReorderPlaceFailed(
+                                retryAction =
+                                    FavoritePlaceFolderRetryAction
+                                        .UpdateReorderedPlaces(reorderedFavoritePlaces),
+                            ),
+                        )
+                        Timber.e("장소 순서 변경 API 실패")
+                    }
+                reorderPlacesSnapshot = null
+            }
+        }
+    }
+
     private suspend fun sendErrorEffect(
         errorType: ErrorType,
         retryAction: FavoritePlaceFolderRetryAction,
@@ -320,6 +395,10 @@ class FavoritePlaceFolderViewModel @Inject constructor(
                     folderId = action.folderId,
                     folderName = action.folderName,
                 )
+            }
+
+            is FavoritePlaceFolderRetryAction.UpdateReorderedPlaces -> {
+                updateFavoritePlacesOrder(action.reorderedPlaces)
             }
         }
     }
