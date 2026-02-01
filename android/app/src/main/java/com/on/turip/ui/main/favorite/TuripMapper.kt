@@ -7,7 +7,6 @@ import com.on.turip.domain.turip.Turip
 import com.on.turip.ui.compose.turip.selection.model.TuripPlaceModel
 import com.on.turip.ui.main.favorite.model.PlaceLatLngUiModel
 import com.on.turip.ui.main.favorite.model.TuripModel
-import com.on.turip.ui.main.favorite.model.TuripPlaceModel
 import com.on.turip.ui.main.favorite.model.TuripPlaceShareModel
 import com.on.turip.ui.main.favorite.model.TuripPlaceUiModel
 

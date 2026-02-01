@@ -48,9 +48,6 @@ import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.trip.model.MapModel
 import com.on.turip.ui.compose.turip.selection.component.TuripDetail
 import com.on.turip.ui.compose.turip.selection.component.TuripsContent
-import com.on.turip.ui.main.favorite.PlaceTuripSelectionViewModel
-import com.on.turip.ui.main.favorite.model.PlaceTuripSelectionScreenMode
-import com.on.turip.ui.main.favorite.model.PlaceTuripSelectionUiEffect
 import com.on.turip.ui.main.favorite.model.TuripShareModel
 import kotlinx.collections.immutable.persistentListOf
 

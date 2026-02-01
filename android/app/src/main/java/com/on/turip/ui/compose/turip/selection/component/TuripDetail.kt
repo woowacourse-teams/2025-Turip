@@ -239,7 +239,7 @@ fun EmptyTuripPlaces(modifier: Modifier = Modifier) {
             Spacer(modifier = Modifier.height(TuripTheme.spacing.extraLarge))
 
             Text(
-                text = stringResource(R.string.favorite_place_empty_suggest_title),
+                text = stringResource(R.string.turip_place_empty_suggest_title),
                 style = TuripTheme.typography.title1,
                 textAlign = TextAlign.Center,
             )
@@ -247,7 +247,7 @@ fun EmptyTuripPlaces(modifier: Modifier = Modifier) {
             Spacer(modifier = Modifier.height(TuripTheme.spacing.small))
 
             Text(
-                text = stringResource(R.string.favorite_place_empty_suggest_description),
+                text = stringResource(R.string.turip_place_empty_suggest_description),
                 style = TuripTheme.typography.title2,
                 color = TuripTheme.colors.gray03,
                 textAlign = TextAlign.Center,

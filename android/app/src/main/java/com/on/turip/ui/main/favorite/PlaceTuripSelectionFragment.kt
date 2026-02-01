@@ -20,6 +20,7 @@ import com.on.turip.R
 import com.on.turip.ui.common.safeStartActivityWithToast
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.turip.selection.PlaceTuripSelectionBottomSheet
+import com.on.turip.ui.compose.turip.selection.PlaceTuripSelectionViewModel
 import com.on.turip.ui.folder.TuripActivity
 import com.on.turip.ui.login.LoginActivity
 import com.on.turip.ui.main.favorite.model.TuripShareModel

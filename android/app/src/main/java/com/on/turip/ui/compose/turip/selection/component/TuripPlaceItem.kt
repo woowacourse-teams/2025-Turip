@@ -68,7 +68,7 @@ fun TuripPlaceItem(
             )
 
             TuripPlaceButton(
-                drawableRes = R.drawable.btn_favorite_selected,
+                drawableRes = R.drawable.btn_turip_place_selected,
                 useTint = true,
                 onClick = onTuripPlaceClick,
                 iconTint = TuripTheme.colors.primary,

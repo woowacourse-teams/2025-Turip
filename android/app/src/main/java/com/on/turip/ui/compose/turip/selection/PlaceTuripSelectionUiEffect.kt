@@ -1,7 +1,9 @@
-package com.on.turip.ui.main.favorite.model
+package com.on.turip.ui.compose.turip.selection
 
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.compose.turip.selection.model.TuripPlaceModel
+import com.on.turip.ui.main.favorite.model.TuripModel
+import com.on.turip.ui.main.favorite.model.TuripShareModel
 import kotlinx.collections.immutable.ImmutableList
 
 sealed interface PlaceTuripSelectionUiEffect {

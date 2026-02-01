@@ -1,4 +1,4 @@
-package com.on.turip.ui.main.favorite
+package com.on.turip.ui.compose.turip.selection
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -8,10 +8,8 @@ import com.on.turip.common.UserType
 import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
+import com.on.turip.domain.bookmark.TuripPlace
 import com.on.turip.domain.bookmark.usecase.UpdateTuripPlaceUseCase
-import com.on.turip.domain.favorite.TuripPlace
-import com.on.turip.domain.favorite.repository.FavoritePlaceRepository
-import com.on.turip.domain.favorite.usecase.UpdateTuripPlaceUseCase
 import com.on.turip.domain.turip.repository.TuripRepository
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
@@ -20,12 +18,9 @@ import com.on.turip.ui.compose.turip.selection.model.DeletePlaceSnapshot
 import com.on.turip.ui.compose.turip.selection.model.TuripPlaceModel
 import com.on.turip.ui.main.favorite.PlaceTuripSelectionFragment.Companion.PLACE_TURIP_SELECTION_ARGUMENTS_PLACE_ID
 import com.on.turip.ui.main.favorite.PlaceTuripSelectionFragment.Companion.PLACE_TURIP_SELECTION_ARGUMENTS_PLACE_NAME
-import com.on.turip.ui.main.favorite.model.PlaceTuripSelectionRetryAction
-import com.on.turip.ui.main.favorite.model.PlaceTuripSelectionScreenMode
-import com.on.turip.ui.main.favorite.model.PlaceTuripSelectionUiEffect
-import com.on.turip.ui.main.favorite.model.PlaceTuripSelectionUiState
 import com.on.turip.ui.main.favorite.model.TuripModel
 import com.on.turip.ui.main.favorite.model.TuripShareModel
+import com.on.turip.ui.main.favorite.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.collections.immutable.ImmutableList
@@ -50,7 +45,6 @@ import timber.log.Timber
 class PlaceTuripSelectionViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val turipRepository: TuripRepository,
-    private val favoritePlaceRepository: FavoritePlaceRepository,
     private val updateTuripPlaceUseCase: UpdateTuripPlaceUseCase,
 ) : ViewModel() {
     private val placeId: Long by lazy {
@@ -161,7 +155,7 @@ class PlaceTuripSelectionViewModel @Inject constructor(
         turipName: String,
     ) {
         viewModelScope.launch {
-            favoritePlaceRepository
+            turipRepository
                 .loadTuripPlaces(turipId)
                 .onSuccess { turipPlaces: List<TuripPlace> ->
                     _uiState.update { state: PlaceTuripSelectionUiState ->
@@ -336,7 +330,7 @@ class PlaceTuripSelectionViewModel @Inject constructor(
             val screenMode =
                 uiState.value.screenMode as PlaceTuripSelectionScreenMode.TuripDetail
             viewModelScope.launch {
-                favoritePlaceRepository
+                turipRepository
                     .updateTuripPlacesOrder(
                         turipId = screenMode.turipId,
                         updatedOrder = reorderedTuripPlaces.map { it.turipPlaceId },
