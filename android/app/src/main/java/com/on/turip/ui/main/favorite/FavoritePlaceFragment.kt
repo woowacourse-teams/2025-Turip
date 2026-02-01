@@ -28,14 +28,14 @@ import com.on.turip.ui.common.error.ErrorUiModel
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.common.safeStartActivityWithToast
-import com.on.turip.ui.folder.FolderActivity
+import com.on.turip.ui.folder.TuripActivity
 import com.on.turip.ui.login.LoginActivity
-import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
-import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
-import com.on.turip.ui.main.favorite.model.FavoritePlaceLatLngUiModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceUiEffect
-import com.on.turip.ui.main.favorite.model.FavoritePlaceUiModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceUiState
+import com.on.turip.ui.main.favorite.model.PlaceLatLngUiModel
+import com.on.turip.ui.main.favorite.model.TuripModel
+import com.on.turip.ui.main.favorite.model.TuripPlaceUiModel
+import com.on.turip.ui.main.favorite.model.TuripShareModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -66,15 +66,15 @@ class FavoritePlaceFragment :
                     )
                 }
 
-                override fun onItemClick(favoritePlaceUiModel: FavoritePlaceUiModel) {
+                override fun onItemClick(turipPlaceUiModel: TuripPlaceUiModel) {
                     map.animateCamera(
                         CameraUpdateFactory.newCameraPosition(
-                            CameraPosition(favoritePlaceUiModel.latLng, 15f, 0f, 0f),
+                            CameraPosition(turipPlaceUiModel.latLng, 15f, 0f, 0f),
                         ),
                         1000,
                         null,
                     )
-                    markerMap[favoritePlaceUiModel.placeId]?.showInfoWindow()
+                    markerMap[turipPlaceUiModel.placeId]?.showInfoWindow()
                 }
             },
             onCommit = { viewModel.updateFavoritePlacesOrder(it) },
@@ -158,7 +158,7 @@ class FavoritePlaceFragment :
 
     private fun setupListeners() {
         binding.ivFavoritePlaceFolder.setOnClickListener {
-            val intent: Intent = FolderActivity.newIntent(requireContext())
+            val intent: Intent = TuripActivity.newIntent(requireContext())
             startActivity(intent)
         }
         binding.ivFavoritePlaceShare.setOnClickListener {
@@ -189,7 +189,7 @@ class FavoritePlaceFragment :
                 }
 
                 is FavoritePlaceUiEffect.ShareFolder -> {
-                    shareFolder(uiEffect.favoriteFolderShareModel)
+                    shareFolder(uiEffect.turipShareModel)
                 }
 
                 FavoritePlaceUiEffect.NavigateToLogin -> {
@@ -232,7 +232,7 @@ class FavoritePlaceFragment :
         requireActivity().finish()
     }
 
-    private fun shareFolder(folderShareModel: FavoriteFolderShareModel) {
+    private fun shareFolder(folderShareModel: TuripShareModel) {
         val sharedContents: String = folderShareModel.toShareFormat()
 
         val intent =
@@ -272,7 +272,7 @@ class FavoritePlaceFragment :
         binding.customErrorView.visibility = View.GONE
     }
 
-    private fun showEmptyView(folders: List<FavoritePlaceFolderModel>) {
+    private fun showEmptyView(folders: List<TuripModel>) {
         folderNameAdapter.submitList(folders)
 
         binding.pbFavoritePlaceLoading.visibility = View.GONE
@@ -390,19 +390,19 @@ class FavoritePlaceFragment :
         markerMap.clear()
     }
 
-    private fun handleSingleFavorite(favoriteLatLng: FavoritePlaceLatLngUiModel) {
+    private fun handleSingleFavorite(favoriteLatLng: PlaceLatLngUiModel) {
         showMap()
         clearMapMarkers()
 
         addMarkerToMap(favoriteLatLng)
         map.setOnMapLoadedCallback {
             map.moveCamera(
-                CameraUpdateFactory.newLatLngZoom(favoriteLatLng.favoriteLatLng, 15f),
+                CameraUpdateFactory.newLatLngZoom(favoriteLatLng.latLng, 15f),
             )
         }
     }
 
-    private fun handleMultipleFavorites(favoriteLatLngList: List<FavoritePlaceLatLngUiModel>) {
+    private fun handleMultipleFavorites(favoriteLatLngList: List<PlaceLatLngUiModel>) {
         showMap()
         clearMapMarkers()
 
@@ -410,7 +410,7 @@ class FavoritePlaceFragment :
 
         favoriteLatLngList.forEach { favoriteLatLng ->
             addMarkerToMap(favoriteLatLng)
-            boundsBuilder.include(favoriteLatLng.favoriteLatLng)
+            boundsBuilder.include(favoriteLatLng.latLng)
         }
 
         val bounds = boundsBuilder.build()
@@ -431,11 +431,11 @@ class FavoritePlaceFragment :
         markerMap.clear()
     }
 
-    private fun addMarkerToMap(favoriteLatLng: FavoritePlaceLatLngUiModel) {
+    private fun addMarkerToMap(favoriteLatLng: PlaceLatLngUiModel) {
         val marker =
             map.addMarker(
                 MarkerOptions()
-                    .position(favoriteLatLng.favoriteLatLng)
+                    .position(favoriteLatLng.latLng)
                     .title(favoriteLatLng.name),
             )
         marker?.let {

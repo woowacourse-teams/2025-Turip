@@ -6,7 +6,7 @@ import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
 import com.on.turip.domain.folder.Folder
-import com.on.turip.domain.folder.repository.FolderRepository
+import com.on.turip.domain.folder.repository.turipRepository
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
@@ -17,6 +17,7 @@ import com.on.turip.ui.folder.model.FolderRetryAction
 import com.on.turip.ui.folder.model.FolderUiEffect
 import com.on.turip.ui.folder.model.FolderUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,11 +30,10 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @HiltViewModel
 class FolderViewModel @Inject constructor(
-    private val folderRepository: FolderRepository,
+    private val turipRepository: turipRepository,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<FolderUiState> = MutableStateFlow(FolderUiState.Idle)
     val uiState: StateFlow<FolderUiState> = _uiState.asStateFlow()
@@ -61,7 +61,7 @@ class FolderViewModel @Inject constructor(
     fun loadFolders() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            folderRepository
+            turipRepository
                 .loadFavoriteFolders()
                 .onSuccess { folders: List<Folder> ->
                     Timber.d("찜 폴더 목록 설정 화면 폴더 불러오기 성공")
@@ -108,7 +108,7 @@ class FolderViewModel @Inject constructor(
 
     fun addFolder() {
         viewModelScope.launch {
-            folderRepository
+            turipRepository
                 .createFavoriteFolder(inputFolderName.value)
                 .onSuccess {
                     Timber.d("폴더 생성 완료(폴더명 = ${inputFolderName.value})")
@@ -137,7 +137,7 @@ class FolderViewModel @Inject constructor(
     fun updateFolderName() {
         val selectFolder: FolderEditModel = getSelectedFolderOrNull() ?: return
         viewModelScope.launch {
-            folderRepository
+            turipRepository
                 .updateFavoriteFolder(selectFolder.id, inputFolderName.value)
                 .onSuccess {
                     Timber.d("폴더 수정 완료(폴더명 = ${selectFolder.name} -> ${inputFolderName.value})")
@@ -167,7 +167,7 @@ class FolderViewModel @Inject constructor(
     fun deleteFolder() {
         val selectFolder: FolderEditModel = getSelectedFolderOrNull() ?: return
         viewModelScope.launch {
-            folderRepository
+            turipRepository
                 .deleteFavoriteFolder(selectFolder.id)
                 .onSuccess {
                     _uiState.update { originUiState: FolderUiState ->

@@ -8,7 +8,7 @@ sealed interface FavoritePlaceUiEffect {
     data object ShowFolderShareNotAllowed : FavoritePlaceUiEffect
 
     data class ShareFolder(
-        val favoriteFolderShareModel: FavoriteFolderShareModel,
+        val turipShareModel: TuripShareModel,
     ) : FavoritePlaceUiEffect
 
     data class ShowError(

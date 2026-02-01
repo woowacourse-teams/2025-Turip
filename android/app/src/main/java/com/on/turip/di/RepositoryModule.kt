@@ -3,7 +3,7 @@ package com.on.turip.di
 import com.on.turip.data.content.place.repository.DefaultContentPlaceRepository
 import com.on.turip.data.content.repository.DefaultContentRepository
 import com.on.turip.data.favorite.repository.DefaultFavoriteRepository
-import com.on.turip.data.folder.repository.DefaultFolderRepository
+import com.on.turip.data.folder.repository.DefaultTuripRepository
 import com.on.turip.data.login.repository.DefaultAuthRepository
 import com.on.turip.data.login.repository.DefaultMemberRepository
 import com.on.turip.data.place.repository.DefaultFavoritePlaceRepository
@@ -13,7 +13,7 @@ import com.on.turip.data.userstorage.repository.DefaultUserStorageRepository
 import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.favorite.repository.FavoritePlaceRepository
 import com.on.turip.domain.favorite.repository.FavoriteRepository
-import com.on.turip.domain.folder.repository.FolderRepository
+import com.on.turip.domain.folder.repository.turipRepository
 import com.on.turip.domain.login.AuthRepository
 import com.on.turip.domain.login.MemberRepository
 import com.on.turip.domain.region.repository.RegionRepository
@@ -55,7 +55,7 @@ abstract class RepositoryModule {
 
     @Binds
     @Singleton
-    abstract fun bindFolderRepository(defaultFolderRepository: DefaultFolderRepository): FolderRepository
+    abstract fun bindFolderRepository(defaultFolderRepository: DefaultTuripRepository): turipRepository
 
     @Binds
     @Singleton

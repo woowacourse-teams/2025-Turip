@@ -13,7 +13,7 @@ import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.trip.TripDetailScreen
 import com.on.turip.ui.compose.trip.model.MapModel
 import com.on.turip.ui.login.LoginActivity
-import com.on.turip.ui.main.favorite.FavoritePlaceFolderBottomSheetFragment
+import com.on.turip.ui.main.favorite.PlaceTuripSelectionFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -50,10 +50,10 @@ class TripDetailActivity : AppCompatActivity() {
                         )
                     },
                     onClickFavoritePlace = { id: Long, placeName: String ->
-                        if (supportFragmentManager.findFragmentByTag("favorite_place_folder") == null) {
-                            FavoritePlaceFolderBottomSheetFragment
+                        if (supportFragmentManager.findFragmentByTag("place_turip_selection") == null) {
+                            PlaceTuripSelectionFragment
                                 .newInstance(id, placeName)
-                                .show(supportFragmentManager, "favorite_place_folder")
+                                .show(supportFragmentManager, "place_turip_selection")
                         }
                     },
                 )

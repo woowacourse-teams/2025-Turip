@@ -5,14 +5,14 @@ import com.on.turip.core.result.mapCatching
 import com.on.turip.data.place.datasource.FavoritePlaceRemoteDataSource
 import com.on.turip.data.place.dto.FavoritePlaceOrderRequest
 import com.on.turip.data.place.toDomain
-import com.on.turip.domain.favorite.FavoritePlace
+import com.on.turip.domain.favorite.TuripPlace
 import com.on.turip.domain.favorite.repository.FavoritePlaceRepository
 import javax.inject.Inject
 
 class DefaultFavoritePlaceRepository @Inject constructor(
     private val favoritePlaceRemoteDataSource: FavoritePlaceRemoteDataSource,
 ) : FavoritePlaceRepository {
-    override suspend fun loadFavoritePlaces(favoriteFolderId: Long): TuripResult<List<FavoritePlace>> =
+    override suspend fun loadTuripPlaces(favoriteFolderId: Long): TuripResult<List<TuripPlace>> =
         favoritePlaceRemoteDataSource.getFavoritePlaces(favoriteFolderId).mapCatching {
             it.toDomain()
         }
@@ -35,12 +35,12 @@ class DefaultFavoritePlaceRepository @Inject constructor(
             placeId = placeId,
         )
 
-    override suspend fun updateFavoritePlacesOrder(
-        favoriteFolderId: Long,
+    override suspend fun updateTuripPlacesOrder(
+        turipId: Long,
         updatedOrder: List<Long>,
     ): TuripResult<Unit> =
         favoritePlaceRemoteDataSource.patchFavoritePlacesOrder(
-            favoriteFolderId = favoriteFolderId,
+            favoriteFolderId = turipId,
             favoritePlaceOrderRequest =
                 FavoritePlaceOrderRequest(
                     favoritePlaceIdsOrder = updatedOrder,

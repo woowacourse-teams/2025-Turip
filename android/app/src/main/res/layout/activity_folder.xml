@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/pure_white_ffffff"
-    tools:context=".ui.folder.FolderActivity">
+    tools:context=".ui.folder.TuripActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/cl_folder_toolbar"

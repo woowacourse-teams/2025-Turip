@@ -8,22 +8,23 @@ import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.TuripResult
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
-import com.on.turip.domain.favorite.FavoritePlace
+import com.on.turip.domain.favorite.TuripPlace
 import com.on.turip.domain.favorite.repository.FavoritePlaceRepository
-import com.on.turip.domain.favorite.usecase.UpdateFavoritePlaceUseCase
+import com.on.turip.domain.favorite.usecase.UpdateTuripPlaceUseCase
 import com.on.turip.domain.folder.Folder
-import com.on.turip.domain.folder.repository.FolderRepository
+import com.on.turip.domain.folder.repository.turipRepository
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.common.mapper.toUiModel
-import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
-import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceRetryAction
 import com.on.turip.ui.main.favorite.model.FavoritePlaceUiEffect
-import com.on.turip.ui.main.favorite.model.FavoritePlaceUiModel
 import com.on.turip.ui.main.favorite.model.FavoritePlaceUiState
+import com.on.turip.ui.main.favorite.model.TuripModel
+import com.on.turip.ui.main.favorite.model.TuripPlaceUiModel
+import com.on.turip.ui.main.favorite.model.TuripShareModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,13 +34,12 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @HiltViewModel
 class FavoritePlaceViewModel @Inject constructor(
-    private val folderRepository: FolderRepository,
+    private val turipRepository: turipRepository,
     private val favoritePlaceRepository: FavoritePlaceRepository,
-    private val updateFavoritePlaceUseCase: UpdateFavoritePlaceUseCase,
+    private val updateTuripPlaceUseCase: UpdateTuripPlaceUseCase,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<FavoritePlaceUiState> =
         MutableStateFlow(FavoritePlaceUiState.Idle)
@@ -53,7 +53,7 @@ class FavoritePlaceViewModel @Inject constructor(
     fun loadFoldersAndPlaces() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            folderRepository
+            turipRepository
                 .loadFavoriteFolders()
                 .onSuccess { folders: List<Folder> ->
                     Timber.d("장소 찜 목록 화면 폴더 불러오기 성공")
@@ -63,15 +63,15 @@ class FavoritePlaceViewModel @Inject constructor(
                         folders.map { folder: Folder -> folder.toUiModel(selectFolderId = selectedFolderId) }
 
                     when (
-                        val result: TuripResult<List<FavoritePlace>> =
-                            favoritePlaceRepository.loadFavoritePlaces(selectedFolderId)
+                        val result: TuripResult<List<TuripPlace>> =
+                            favoritePlaceRepository.loadTuripPlaces(selectedFolderId)
                     ) {
                         is TuripResult.Success -> {
                             _uiState.update {
                                 it.copy(
                                     isLoading = false,
                                     errorUiState = ErrorUiState.None,
-                                    places = result.value.map { favoritePlace: FavoritePlace -> favoritePlace.toModel() },
+                                    places = result.value.map { turipPlace: TuripPlace -> turipPlace.toModel() },
                                     folders = loadFolders,
                                     placesLatLng = result.value.map { it.toLatLng() },
                                 )
@@ -109,7 +109,7 @@ class FavoritePlaceViewModel @Inject constructor(
     ) {
         val updatedFavorite: Boolean = !isFavorite
         viewModelScope.launch {
-            updateFavoritePlaceUseCase(selectedFolderId, placeId, updatedFavorite)
+            updateTuripPlaceUseCase(selectedFolderId, placeId, updatedFavorite)
                 .onSuccess {
                     _uiState.update { originUiState: FavoritePlaceUiState ->
                         originUiState.copy(
@@ -168,19 +168,19 @@ class FavoritePlaceViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true) }
 
             favoritePlaceRepository
-                .loadFavoritePlaces(folderId)
-                .onSuccess { favoritePlaces: List<FavoritePlace> ->
+                .loadTuripPlaces(folderId)
+                .onSuccess { turipPlaces: List<TuripPlace> ->
                     selectedFolderId = folderId
                     _uiState.update { originUiState: FavoritePlaceUiState ->
                         originUiState.copy(
                             isLoading = false,
                             errorUiState = ErrorUiState.None,
-                            places = favoritePlaces.map { it.toModel() },
+                            places = turipPlaces.map { it.toModel() },
                             folders =
-                                originUiState.folders.map { folder: FavoritePlaceFolderModel ->
+                                originUiState.folders.map { folder: TuripModel ->
                                     folder.copy(isSelected = folder.id == folderId)
                                 },
-                            placesLatLng = favoritePlaces.map { it.toLatLng() },
+                            placesLatLng = turipPlaces.map { it.toLatLng() },
                         )
                     }
                 }.onFailure { errorType: ErrorType ->
@@ -193,12 +193,12 @@ class FavoritePlaceViewModel @Inject constructor(
         }
     }
 
-    fun updateFavoritePlacesOrder(newFavoritePlaces: List<FavoritePlaceUiModel>) {
+    fun updateFavoritePlacesOrder(newFavoritePlaces: List<TuripPlaceUiModel>) {
         viewModelScope.launch {
             favoritePlaceRepository
-                .updateFavoritePlacesOrder(
-                    favoriteFolderId = selectedFolderId,
-                    updatedOrder = newFavoritePlaces.map { it.favoritePlaceId },
+                .updateTuripPlacesOrder(
+                    turipId = selectedFolderId,
+                    updatedOrder = newFavoritePlaces.map { it.turipPlaceId },
                 ).onSuccess {
                     _uiState.update {
                         it.copy(
@@ -220,8 +220,8 @@ class FavoritePlaceViewModel @Inject constructor(
     fun shareFolder() {
         when (AuthState.type) {
             UserType.MEMBER -> {
-                val favoriteFolderShareModel =
-                    FavoriteFolderShareModel(
+                val turipShareModel =
+                    TuripShareModel(
                         name =
                             uiState.value.folders
                                 .first { it.isSelected }
@@ -229,7 +229,7 @@ class FavoritePlaceViewModel @Inject constructor(
                         places = uiState.value.places.map { it.toUiModel() },
                     )
                 viewModelScope.launch {
-                    _uiEffect.send(FavoritePlaceUiEffect.ShareFolder(favoriteFolderShareModel))
+                    _uiEffect.send(FavoritePlaceUiEffect.ShareFolder(turipShareModel))
                 }
             }
 
