@@ -49,7 +49,7 @@ class TripDetailActivity : AppCompatActivity() {
                             errorToastMessage = getString(R.string.all_snackbar_not_found_video_url),
                         )
                     },
-                    onClickFavoritePlace = { id: Long, placeName: String ->
+                    onTuripPlaceClick = { id: Long, placeName: String ->
                         if (supportFragmentManager.findFragmentByTag("place_turip_selection") == null) {
                             PlaceTuripSelectionFragment
                                 .newInstance(id, placeName)

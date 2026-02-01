@@ -117,7 +117,7 @@ private class DefaultSnackbarPreviewProvider : PreviewParameterProvider<DefaultS
     override val values: Sequence<DefaultSnackbarPreviewModel> =
         sequenceOf(
             DefaultSnackbarPreviewModel(message = "저장되었습니다"),
-            DefaultSnackbarPreviewModel(message = "찜 목록에 추가되었습니다", actionLabel = "닫기"),
+            DefaultSnackbarPreviewModel(message = "북마크에 추가되었습니다", actionLabel = "닫기"),
             DefaultSnackbarPreviewModel(message = "네트워크 연결 실패", actionLabel = "재시도"),
         )
 }
@@ -130,13 +130,13 @@ private class TuripVisualsSnackbarPreviewProvider : PreviewParameterProvider<Tur
                 iconRes = null,
             ),
             TuripVisualsSnackbarPreviewModel(
-                message = "찜 목록에 추가되었습니다",
-                iconRes = R.drawable.ic_heart_pressed,
+                message = "북마크 목록에 추가되었습니다",
+                iconRes = R.drawable.btn_bookmark_selected,
                 actionLabel = "닫기",
             ),
             TuripVisualsSnackbarPreviewModel(
-                message = "찜 목록에서 해제되었습니다",
-                iconRes = R.drawable.ic_heart_empty,
+                message = "북마크 목록에서 해제되었습니다",
+                iconRes = R.drawable.btn_bookmark_normal,
                 actionLabel = "재시도",
             ),
             TuripVisualsSnackbarPreviewModel(

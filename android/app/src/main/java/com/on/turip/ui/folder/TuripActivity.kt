@@ -9,12 +9,12 @@ import com.on.turip.databinding.ActivityFolderBinding
 import com.on.turip.ui.common.base.BaseActivity
 import com.on.turip.ui.common.collectOnStarted
 import com.on.turip.ui.common.error.ErrorUiState
-import com.on.turip.ui.folder.model.FolderUiState
+import com.on.turip.ui.folder.model.TuripUiState
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class TuripActivity : BaseActivity<ActivityFolderBinding>() {
-    private val viewModel: FolderViewModel by viewModels()
+    private val viewModel: TuripViewModel by viewModels()
 
     override val binding: ActivityFolderBinding by lazy {
         ActivityFolderBinding.inflate(layoutInflater)
@@ -24,14 +24,14 @@ class TuripActivity : BaseActivity<ActivityFolderBinding>() {
         FolderEditAdapter(
             object : FolderEditViewHolder.FolderEditListener {
                 override fun onRemoveClick(folderId: Long) {
-                    viewModel.selectFolder(folderId)
+                    viewModel.selectTurip(folderId)
                     val bottomSheet: FolderRemoveBottomSheetFragment =
                         FolderRemoveBottomSheetFragment.instance()
                     bottomSheet.show(supportFragmentManager, "folder_remove")
                 }
 
                 override fun onItemClick(folderId: Long) {
-                    viewModel.selectFolder(folderId)
+                    viewModel.selectTurip(folderId)
                     val bottomSheet: FolderModifyBottomSheetFragment =
                         FolderModifyBottomSheetFragment.instance()
                     bottomSheet.show(supportFragmentManager, "folder_modify")
@@ -63,7 +63,7 @@ class TuripActivity : BaseActivity<ActivityFolderBinding>() {
     }
 
     private fun setupObservers() {
-        collectOnStarted(viewModel.uiState) { uiState: FolderUiState ->
+        collectOnStarted(viewModel.uiState) { uiState: TuripUiState ->
             if (uiState.isLoading) showLoading()
             when {
                 uiState.errorUiState != ErrorUiState.None -> showErrorView(uiState.errorUiState)
@@ -90,7 +90,7 @@ class TuripActivity : BaseActivity<ActivityFolderBinding>() {
         binding.customErrorView.apply {
             visibility = View.VISIBLE
             showErrorView(errorUiState)
-            setOnRetryClickListener { viewModel.loadFolders() }
+            setOnRetryClickListener { viewModel.loadTurips() }
         }
     }
 
@@ -103,12 +103,12 @@ class TuripActivity : BaseActivity<ActivityFolderBinding>() {
         binding.clFolderEmpty.visibility = View.VISIBLE
     }
 
-    private fun showContents(uiState: FolderUiState) {
+    private fun showContents(uiState: TuripUiState) {
         binding.pbFolderLoading.visibility = View.GONE
         binding.ivFolderFolderPlus.visibility = View.VISIBLE
         binding.customErrorView.visibility = View.GONE
 
-        folderEditAdapter.submitList(uiState.folders)
+        folderEditAdapter.submitList(uiState.turips)
 
         binding.rvFolder.visibility = View.VISIBLE
         binding.clFolderEmpty.visibility = View.GONE

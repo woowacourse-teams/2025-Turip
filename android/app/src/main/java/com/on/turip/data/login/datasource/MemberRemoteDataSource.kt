@@ -22,9 +22,4 @@ class MemberRemoteDataSource @Inject constructor(
         safeApiCall {
             memberService.deleteMember()
         }
-
-    override suspend fun deleteGuest(): TuripResult<Unit> =
-        safeApiCall {
-            memberService.deleteGuest()
-        }
 }

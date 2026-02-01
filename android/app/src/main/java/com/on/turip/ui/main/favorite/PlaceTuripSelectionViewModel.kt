@@ -8,10 +8,11 @@ import com.on.turip.common.UserType
 import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
+import com.on.turip.domain.bookmark.usecase.UpdateTuripPlaceUseCase
 import com.on.turip.domain.favorite.TuripPlace
 import com.on.turip.domain.favorite.repository.FavoritePlaceRepository
 import com.on.turip.domain.favorite.usecase.UpdateTuripPlaceUseCase
-import com.on.turip.domain.folder.repository.turipRepository
+import com.on.turip.domain.turip.repository.TuripRepository
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
@@ -48,19 +49,19 @@ import timber.log.Timber
 @HiltViewModel
 class PlaceTuripSelectionViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val turipRepository: turipRepository,
+    private val turipRepository: TuripRepository,
     private val favoritePlaceRepository: FavoritePlaceRepository,
     private val updateTuripPlaceUseCase: UpdateTuripPlaceUseCase,
 ) : ViewModel() {
     private val placeId: Long by lazy {
         checkNotNull(savedStateHandle[PLACE_TURIP_SELECTION_ARGUMENTS_PLACE_ID]) {
-            Timber.e("폴더 목록 화면 place ID 값이 존재하지 않습니다.")
+            Timber.e("장소에 대한 튜립 목록 바텀시트, place ID 값이 존재하지 않습니다.")
         }
     }
 
     private val placeName: String by lazy {
         checkNotNull(savedStateHandle[PLACE_TURIP_SELECTION_ARGUMENTS_PLACE_NAME]) {
-            Timber.e("폴더 목록 화면, 장소명이 존재하지 않습니다.")
+            Timber.e("장소에 대한 튜립 목록 바텀시트, 장소명이 존재하지 않습니다.")
         }
     }
 
@@ -103,13 +104,13 @@ class PlaceTuripSelectionViewModel @Inject constructor(
                     }
 
                     originTuripIds = turips.filter { it.isSelected }.map { it.id }.toSet()
-                    Timber.d("상세 페이지에서 장소에 대한 찜 폴더 현황 데이터 불러오기 성공 ")
+                    Timber.d("장소에 대한 튜립 목록 바텀시트, 튜립 목록 불러오기 성공")
                 }.onFailure { errorType: ErrorType ->
                     sendErrorEffect(
                         errorType = errorType,
                         retryAction = PlaceTuripSelectionRetryAction.LoadTurips,
                     )
-                    Timber.e("상세 페이지에서 장소에 대한 찜 폴더 현황 데이터 불러오기 실패")
+                    Timber.e("장소에 대한 튜립 목록 바텀시트, 튜립 목록 불러오기 실패")
                 }
         }
     }

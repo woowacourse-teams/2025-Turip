@@ -9,5 +9,5 @@ data class Content(
     val creator: Creator,
     val videoData: VideoData,
     val city: City,
-    val isFavorite: Boolean,
+    val isBookmarked: Boolean,
 )

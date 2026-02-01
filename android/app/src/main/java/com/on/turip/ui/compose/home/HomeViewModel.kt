@@ -77,7 +77,7 @@ class HomeViewModel @Inject constructor(
                 )
             }
 
-            Timber.d("인기 찜 목록: $usersLikeContents")
+            Timber.d("인기 북마크 목록: $usersLikeContents")
             Timber.d("지역 카테고리 조회: $regionCategories")
         }
     }

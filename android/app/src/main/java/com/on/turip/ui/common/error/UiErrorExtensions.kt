@@ -4,9 +4,9 @@ import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.ErrorType.Auth
 import com.on.turip.core.result.ErrorType.Content
 import com.on.turip.core.result.ErrorType.Creator
-import com.on.turip.core.result.ErrorType.FavoriteFolder
-import com.on.turip.core.result.ErrorType.FavoritePlace
 import com.on.turip.core.result.ErrorType.Place
+import com.on.turip.core.result.ErrorType.Turip
+import com.on.turip.core.result.ErrorType.TuripPlace
 
 fun ErrorType.toUiError(): UiError =
     when (this) {
@@ -17,18 +17,18 @@ fun ErrorType.toUiError(): UiError =
         Creator.NotFound,
         Content.NotFound,
         Place.NotFound,
-        FavoritePlace.NotFound,
-        FavoriteFolder.NotFound,
+        TuripPlace.NotFound,
+        Turip.NotFound,
         -> UiError.Feature.NotFound
 
-        FavoriteFolder.DuplicatedName,
-        FavoritePlace.DuplicatePlaceInFolder,
-        ErrorType.FavoriteContent.DuplicateContent,
+        Turip.DuplicatedName,
+        TuripPlace.DuplicatePlaceInTurip,
+        ErrorType.Bookmark.DuplicateBookmarked,
         -> UiError.Feature.Duplicated
 
-        FavoriteFolder.BlankName,
-        FavoriteFolder.ExceededName,
-        FavoriteFolder.DefaultFolderRenameNotAllowed,
+        Turip.BlankName,
+        Turip.ExceededName,
+        Turip.DefaultTuripRenameNotAllowed,
         -> UiError.Feature.InValid
 
         ErrorType.Network -> UiError.Global.Network

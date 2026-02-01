@@ -23,7 +23,7 @@ fun ContentPlace.toUiModel(): PlaceModel =
         category = place.category.joinToString(),
         mapLink = place.url,
         timeLine = timeLine,
-        isFavorite = isFavoritePlace,
+        isTuripPlace = isTuripPlace,
     )
 
 fun TripDuration.toUiModel(): TripDurationModel =

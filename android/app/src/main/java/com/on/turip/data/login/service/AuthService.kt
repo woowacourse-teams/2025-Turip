@@ -11,17 +11,17 @@ import retrofit2.http.Header
 import retrofit2.http.POST
 
 interface AuthService {
-    @POST("login/google")
+    @POST("auth/login/google")
     suspend fun postIdToken(
         @Body loginIdTokenPostRequest: LoginIdTokenPostRequest,
     ): Response<LoginJwtTokenResponse>
 
-    @POST("token")
+    @POST("auth/tokens")
     suspend fun postReissueToken(
         @Body reissueTokenRequest: ReissueTokenRequest,
     ): Response<ReissueTokenResponse>
 
-    @GET("token/verification")
+    @GET("auth/tokens/verification")
     suspend fun getTokenVerification(
         @Header("Authorization") token: String,
     ): Response<Unit>

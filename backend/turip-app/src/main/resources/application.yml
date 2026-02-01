@@ -1,0 +1,54 @@
+spring:
+  profiles:
+    active: local
+
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        default_batch_fetch_size: 100
+    defer-datasource-initialization: false
+
+region:
+  category:
+    domestic:
+      etc:
+        image-url: ${DOMESTIC_ETC_IMAGE_URL}
+    overseas:
+      etc:
+        image-url: ${OVERSEAS_ETC_IMAGE_URL}
+
+jwt:
+  secret-key: ${JWT_SECRET_KEY}
+  refresh-token-expiration-ms: 2592000000  # 30일
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus,health,info
+  endpoint:
+    health:
+      show-details: never
+
+server:
+  tomcat:
+    mbeanregistry:
+      enabled: true
+
+kakao:
+  api:
+    key: ${KAKAO_API_KEY}
+    url: https://dapi.kakao.com/v2/local/search/keyword.json
+
+google:
+  client-id: ${GOOGLE_CLIENT_ID}
+  api:
+    key: ${GOOGLE_API_KEY}
+    url: https://maps.googleapis.com/maps/api/place/textsearch/json
+
+youtube:
+  api:
+    key: ${YOUTUBE_API_KEY}
+    url: https://www.googleapis.com/youtube/v3/videos

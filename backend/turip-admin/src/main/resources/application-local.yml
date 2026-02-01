@@ -1,0 +1,17 @@
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    url: jdbc:mysql://localhost:3306/turip_dev
+    username: turip
+    password: turip_pw
+  jpa:
+    properties:
+      hibernate:
+        # 개발 환경에서는 스키마 검증을 완화
+        validator:
+          apply_to_ddl: false
+
+jwt:
+  access-token-expiration-ms: 10800000  # 3시간
