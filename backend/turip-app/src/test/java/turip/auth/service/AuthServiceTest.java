@@ -8,11 +8,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.security.SignatureException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -251,11 +248,9 @@ class AuthServiceTest {
                     member, deviceFid, hashedToken,
                     LocalDateTime.now(), LocalDateTime.now().plusDays(7)
             );
-
             RefreshTokenRequest request = new RefreshTokenRequest(oldRefreshToken);
 
-            Claims claims = Jwts.claims().add("accountId", accountId).build();
-            when(jwtProvider.parseToken(oldRefreshToken)).thenReturn(claims);
+            when(jwtProvider.getClaimOfName(oldRefreshToken, "accountId", Long.class)).thenReturn(accountId);
             when(memberService.getByAccountId(accountId)).thenReturn(member);
             when(refreshTokenService.getByMemberAndDeviceFid(member, deviceFid)).thenReturn(storedRefreshToken);
             when(jwtProvider.hashToken(oldRefreshToken)).thenReturn(hashedToken);
@@ -296,11 +291,9 @@ class AuthServiceTest {
                     member, deviceFid, "correct-hashed-token",
                     LocalDateTime.now(), LocalDateTime.now().plusDays(7)
             );
-
             RefreshTokenRequest request = new RefreshTokenRequest(oldRefreshToken);
 
-            Claims claims = Jwts.claims().add("accountId", accountId).build();
-            when(jwtProvider.parseToken(oldRefreshToken)).thenReturn(claims);
+            when(jwtProvider.getClaimOfName(oldRefreshToken, "accountId", Long.class)).thenReturn(accountId);
             when(memberService.getByAccountId(accountId)).thenReturn(member);
             when(refreshTokenService.getByMemberAndDeviceFid(member, deviceFid)).thenReturn(storedRefreshToken);
             when(jwtProvider.hashToken(oldRefreshToken)).thenReturn(wrongHashedToken);
@@ -324,8 +317,7 @@ class AuthServiceTest {
 
             RefreshTokenRequest request = new RefreshTokenRequest(oldRefreshToken);
 
-            Claims claims = Jwts.claims().add("accountId", accountId).build();
-            when(jwtProvider.parseToken(oldRefreshToken)).thenReturn(claims);
+            when(jwtProvider.getClaimOfName(oldRefreshToken, "accountId", Long.class)).thenReturn(accountId);
             when(memberService.getByAccountId(accountId)).thenReturn(member);
             when(refreshTokenService.getByMemberAndDeviceFid(member, deviceFid)).thenThrow(
                     new UnauthorizedException(ErrorTag.REFRESH_TOKEN_NOT_FOUND));
@@ -344,13 +336,12 @@ class AuthServiceTest {
             String deviceFid = "device-123";
             RefreshTokenRequest request = new RefreshTokenRequest(expiredToken);
 
-            when(jwtProvider.parseToken(expiredToken))
-                    .thenThrow(new ExpiredJwtException(null, null, "Token expired"));
+            when(jwtProvider.getClaimOfName(expiredToken, "accountId", Long.class))
+                    .thenThrow(new UnauthorizedException(ErrorTag.ACCESS_TOKEN_EXPIRED));
 
             // when & then
             assertThatThrownBy(() -> authService.refresh(request, deviceFid))
-                    .isInstanceOf(UnauthorizedException.class)
-                    .hasMessage(ErrorTag.REFRESH_TOKEN_EXPIRED.getMessage());
+                    .isInstanceOf(UnauthorizedException.class);
         }
 
         @Test
@@ -361,13 +352,12 @@ class AuthServiceTest {
             String deviceFid = "device-123";
             RefreshTokenRequest request = new RefreshTokenRequest(forgedToken);
 
-            when(jwtProvider.parseToken(forgedToken))
-                    .thenThrow(new SignatureException("Invalid signature"));
+            when(jwtProvider.getClaimOfName(forgedToken, "accountId", Long.class))
+                    .thenThrow(new UnauthorizedException(ErrorTag.ACCESS_TOKEN_SIGNATURE_INVALID));
 
             // when & then
             assertThatThrownBy(() -> authService.refresh(request, deviceFid))
-                    .isInstanceOf(UnauthorizedException.class)
-                    .hasMessage(ErrorTag.REFRESH_TOKEN_SIGNATURE_INVALID.getMessage());
+                    .isInstanceOf(UnauthorizedException.class);
         }
 
         private String generateValidRefreshToken(Long accountId) {

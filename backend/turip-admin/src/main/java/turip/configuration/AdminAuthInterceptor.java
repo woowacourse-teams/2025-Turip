@@ -1,7 +1,5 @@
-package turip.admin.configuration;
+package turip.configuration;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -10,6 +8,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import turip.account.domain.Role;
 import turip.auth.token.JwtProvider;
+import turip.common.exception.custom.IllegalArgumentException;
+import turip.common.exception.custom.UnauthorizedException;
 
 @Component
 @RequiredArgsConstructor
@@ -32,8 +32,7 @@ public class AdminAuthInterceptor implements HandlerInterceptor {
         String accessToken = bearer.substring(7);
 
         try {
-            Claims claims = jwtProvider.parseToken(accessToken);
-            String roleName = claims.get("role", String.class);
+            String roleName = jwtProvider.getClaimOfName(accessToken, "role", String.class);
 
             if (!Role.ADMIN.name().equals(roleName)) {
                 sendError(response, HttpServletResponse.SC_FORBIDDEN, "관리자 권한이 필요합니다");
@@ -42,9 +41,8 @@ public class AdminAuthInterceptor implements HandlerInterceptor {
 
             return true;
 
-        } catch (ExpiredJwtException e) {
-            sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "토큰이 만료되었습니다");
-            return false;
+        } catch (IllegalArgumentException e) {
+            throw new UnauthorizedException(e.getErrorTag());
         } catch (Exception e) {
             sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "유효하지 않은 토큰입니다");
             return false;

@@ -1,8 +1,10 @@
 package turip.auth.token;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -14,6 +16,8 @@ import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import turip.account.domain.Role;
+import turip.common.exception.ErrorTag;
+import turip.common.exception.custom.IllegalArgumentException;
 
 @Component
 public class JwtProvider {
@@ -40,12 +44,9 @@ public class JwtProvider {
         return generateJwtToken(accountId, role, refreshTokenExpireMs);
     }
 
-    public Claims parseToken(String token) {
-        return Jwts.parser()
-                .verifyWith(signingKey)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+    public <T> T getClaimOfName(String token, String claim, Class<T> requiredType) {
+        Claims claims = parseToken(token);
+        return claims.get(claim, requiredType);
     }
 
     public LocalDateTime getIssuedAt(String token) {
@@ -94,5 +95,19 @@ public class JwtProvider {
                 .claims(Map.of("accountId", accountId, "role", role.name()))
                 .signWith(signingKey)
                 .compact();
+    }
+
+    private Claims parseToken(String token) {
+        try {
+            return Jwts.parser()
+                    .verifyWith(signingKey)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+        } catch (ExpiredJwtException e) {
+            throw new IllegalArgumentException(ErrorTag.ACCESS_TOKEN_EXPIRED);
+        } catch (SignatureException e) {
+            throw new IllegalArgumentException(ErrorTag.ACCESS_TOKEN_SIGNATURE_INVALID);
+        }
     }
 }

@@ -1,4 +1,4 @@
-package turip.admin.configuration;
+package turip.configuration;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
