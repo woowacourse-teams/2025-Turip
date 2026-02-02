@@ -20,7 +20,7 @@ public class AdminAuthController {
     private final AdminAuthService adminAuthService;
     private final TokenCookieUtil tokenCookieUtil;
 
-    @PostMapping("/login/admin")
+    @PostMapping("/api/v1/auth/login/admin")
     public ResponseEntity<Void> login(
             @RequestHeader("device-fid") String deviceFid,
             @RequestBody TuripLoginRequest request) {
