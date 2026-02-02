@@ -1,6 +1,6 @@
-package com.on.turip.domain.common
+package com.on.turip.ui.compose.setting.model
 
-data class AppEnvironmentInfo(
+data class AppEnvironmentInfoModel(
     val appVersionName: String,
     val appVersionCode: Int,
     val deviceReleaseVersion: String,
