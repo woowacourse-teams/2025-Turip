@@ -119,7 +119,7 @@ fun LazyItemScope.ReorderableItem(
             .graphicsLayer {
                 scaleX = scale
                 scaleY = scale
-            }.onGloballyPositioned { itemPosition = it.positionInRoot().y }, // 아이템의 실제 화면상 Y 위치 측정
+            }.onGloballyPositioned { itemPosition = it.positionInRoot().y },
     ) {
         val itemScope: ReorderableLazyColumnItemScope =
             remember(state, key) {

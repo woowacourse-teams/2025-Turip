@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -27,9 +28,9 @@ import com.on.turip.ui.main.favorite.model.TuripModel
 
 @Composable
 fun TuripItem(
-    folder: TuripModel,
+    turip: TuripModel,
     onItemClick: () -> Unit,
-    onFavoriteClick: () -> Unit,
+    onTuripPlaceClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -59,14 +60,14 @@ fun TuripItem(
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.ic_folder),
+                    painter = painterResource(R.drawable.ic_turip),
                     contentDescription = null,
                     tint = TuripTheme.colors.white,
                     modifier = Modifier.size(24.dp),
                 )
             }
             Text(
-                text = folder.name,
+                text = turip.name,
                 style = TuripTheme.typography.title2,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -74,16 +75,21 @@ fun TuripItem(
         }
 
         IconButton(
-            onClick = onFavoriteClick,
+            onClick = onTuripPlaceClick,
         ) {
             Icon(
                 painter =
-                    if (folder.isSelected) {
-                        painterResource(R.drawable.btn_favorite_folder_selected)
+                    if (turip.isSelected) {
+                        painterResource(R.drawable.btn_turip_selected)
                     } else {
-                        painterResource(R.drawable.btn_favorite_folder_normal)
+                        painterResource(R.drawable.btn_turip_normal)
                     },
-                contentDescription = null,
+                contentDescription =
+                    if (turip.isSelected) {
+                        stringResource(R.string.trip_detail_bottom_sheet_turip_place_select_description)
+                    } else {
+                        stringResource(R.string.trip_detail_bottom_sheet_turip_place_unselect_description)
+                    },
                 tint = Color.Unspecified,
                 modifier =
                     Modifier
@@ -94,18 +100,18 @@ fun TuripItem(
     }
 }
 
-private class FavoriteFolderItemPreviewParameterProvider : PreviewParameterProvider<TuripModel> {
+private class TuripItemPreviewParameterProvider : PreviewParameterProvider<TuripModel> {
     override val values =
         sequenceOf(
             TuripModel(
                 id = 1L,
-                name = "찜 상태인 폴더",
+                name = "튜립에 포함된 상태",
                 placeCount = 5,
                 isSelected = true,
             ),
             TuripModel(
                 id = 2L,
-                name = "찜 하지 않은 상태인 폴더",
+                name = "튜립에 포함되지 않은 상태",
                 placeCount = 0,
                 isSelected = false,
             ),
@@ -120,14 +126,14 @@ private class FavoriteFolderItemPreviewParameterProvider : PreviewParameterProvi
 
 @Preview(showBackground = true)
 @Composable
-private fun FavoriteFolderItemPreview(
-    @PreviewParameter(FavoriteFolderItemPreviewParameterProvider::class) folder: TuripModel,
+private fun TuripItemPreview(
+    @PreviewParameter(TuripItemPreviewParameterProvider::class) turip: TuripModel,
 ) {
     TuripTheme {
         TuripItem(
-            folder = folder,
+            turip = turip,
             onItemClick = { },
-            onFavoriteClick = { },
+            onTuripPlaceClick = { },
         )
     }
 }

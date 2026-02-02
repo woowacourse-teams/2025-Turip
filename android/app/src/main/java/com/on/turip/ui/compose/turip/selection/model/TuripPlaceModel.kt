@@ -5,7 +5,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.on.turip.ui.compose.trip.model.MapModel
 
 /**
- * @param turipPlaceId : 폴더 내에서 장소에 대한 id
+ * @param turipPlaceId : 튜립 내에서 장소에 대한 id
  * @param placeId : 장소에 대한 고유 id
  */
 @Stable

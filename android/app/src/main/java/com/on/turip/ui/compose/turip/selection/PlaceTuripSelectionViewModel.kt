@@ -97,7 +97,11 @@ class PlaceTuripSelectionViewModel @Inject constructor(
                         )
                     }
 
-                    originTuripIds = turips.filter { it.isSelected }.map { it.id }.toSet()
+                    originTuripIds =
+                        turips
+                            .filter { turip -> turip.isSelected }
+                            .map { turip -> turip.id }
+                            .toSet()
                     Timber.d("장소에 대한 튜립 목록 바텀시트, 튜립 목록 불러오기 성공")
                 }.onFailure { errorType: ErrorType ->
                     sendErrorEffect(
@@ -174,11 +178,11 @@ class PlaceTuripSelectionViewModel @Inject constructor(
                         errorType = errorType,
                         retryAction =
                             PlaceTuripSelectionRetryAction.LoadPlacesInTurip(
-                                folderId = turipId,
-                                folderName = turipName,
+                                turipId = turipId,
+                                turipName = turipName,
                             ),
                     )
-                    Timber.e("폴더에 담긴 장소들을 불러오는 API 호출 실패")
+                    Timber.e("튜립에 담긴 장소들을 불러오는 API 호출 실패 turipName = $turipName")
                 }
         }
     }
@@ -225,13 +229,13 @@ class PlaceTuripSelectionViewModel @Inject constructor(
                 updateTuripPlaceUseCase(screenMode.turipId, deletePlace.placeId, false)
                     .onSuccess {
                         syncTuripForSelectedPlace(deletePlace, screenMode)
-                        Timber.d("찜 장소 목록 바텀시트, 장소 업데이트 성공")
+                        Timber.d("튜립 상세 바텀시트, 장소 업데이트 성공")
                     }.onFailure {
                         _uiEffect.send(
                             PlaceTuripSelectionUiEffect.ShowTuripPlaceRemoveFailed(deletePlace.name),
                         )
                         _uiState.update { it.copy(selectedTuripPlaces = deletePlaceSnapshot.originPlaces) }
-                        Timber.e("찜 장소 목록 바텀시트, 장소 업데이트 실패 place = ${deletePlace.name}")
+                        Timber.e("튜립 상세 바텀시트, 장소 업데이트 실패 place = ${deletePlace.name}")
                     }
 
                 // 장소 제거 스낵바에선 다시 시도 기능 제공 안하고 있어 성공 실패 여부와 없이 초기화
@@ -247,12 +251,12 @@ class PlaceTuripSelectionViewModel @Inject constructor(
     ) {
         if (placeId == deletePlace.placeId) {
             _uiState.update { state ->
-                val syncFolderStatus =
+                val syncTuripStatus =
                     state.turips
                         .map { if (it.id == screenMode.turipId) it.copy(isSelected = false) else it }
                         .toImmutableList()
 
-                state.copy(turips = syncFolderStatus)
+                state.copy(turips = syncTuripStatus)
             }
             val updateCache =
                 originTuripIds
@@ -393,8 +397,8 @@ class PlaceTuripSelectionViewModel @Inject constructor(
 
             is PlaceTuripSelectionRetryAction.LoadPlacesInTurip -> {
                 loadPlacesInSelectTurip(
-                    turipId = action.folderId,
-                    turipName = action.folderName,
+                    turipId = action.turipId,
+                    turipName = action.turipName,
                 )
             }
 

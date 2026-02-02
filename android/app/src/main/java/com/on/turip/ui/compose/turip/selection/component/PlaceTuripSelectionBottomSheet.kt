@@ -1,4 +1,4 @@
-package com.on.turip.ui.compose.turip.selection
+package com.on.turip.ui.compose.turip.selection.component
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -46,8 +46,9 @@ import com.on.turip.ui.compose.designsystem.component.TuripDialog
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.trip.model.MapModel
-import com.on.turip.ui.compose.turip.selection.component.TuripDetail
-import com.on.turip.ui.compose.turip.selection.component.TuripsContent
+import com.on.turip.ui.compose.turip.selection.PlaceTuripSelectionScreenMode
+import com.on.turip.ui.compose.turip.selection.PlaceTuripSelectionUiEffect
+import com.on.turip.ui.compose.turip.selection.PlaceTuripSelectionViewModel
 import com.on.turip.ui.main.favorite.model.TuripShareModel
 import kotlinx.collections.immutable.persistentListOf
 
@@ -84,7 +85,7 @@ fun PlaceTuripSelectionBottomSheet(
                     snackbarHostState.showSnackbar(
                         message =
                             context.getString(
-                                R.string.bottom_sheet_favorite_place_folder_snackbar_place_remove_failed,
+                                R.string.trip_detail_bottom_sheet_snackbar_place_remove_failed,
                                 uiEffect.placeName,
                             ),
                         duration = SnackbarDuration.Short,
@@ -101,9 +102,9 @@ fun PlaceTuripSelectionBottomSheet(
 
                 is PlaceTuripSelectionUiEffect.ShowTuripPlaceRemoved -> {
                     val messageResource: Int =
-                        R.string.bottom_sheet_favorite_place_folder_snackbar_place_removed
+                        R.string.trip_detail_bottom_sheet_snackbar_place_removed
                     val actionLabelResource: Int =
-                        R.string.bottom_sheet_favorite_place_folder_snackbar_place_remove_undo
+                        R.string.trip_detail_bottom_sheet_snackbar_place_remove_undo
                     val result =
                         snackbarHostState.showSnackbar(
                             message = context.getString(messageResource, uiEffect.placeName),
@@ -132,9 +133,9 @@ fun PlaceTuripSelectionBottomSheet(
 
                 is PlaceTuripSelectionUiEffect.ShowReorderPlaceFailed -> {
                     val messageResource: Int =
-                        R.string.bottom_sheet_favorite_place_folder_snackbar_place_reorder_failed
+                        R.string.trip_detail_bottom_sheet_snackbar_place_reorder_failed
                     val actionLabelResource: Int =
-                        R.string.bottom_sheet_favorite_place_folder_snackbar_place_reorder_retry
+                        R.string.trip_detail_bottom_sheet_snackbar_place_reorder_retry
                     val result =
                         snackbarHostState.showSnackbar(
                             message = context.getString(messageResource),

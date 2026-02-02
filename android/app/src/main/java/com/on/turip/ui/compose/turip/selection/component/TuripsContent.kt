@@ -36,7 +36,7 @@ fun TuripsContent(
     turips: ImmutableList<TuripModel>,
     onAddTuripClick: () -> Unit,
     onNavigateToTurip: (turipId: Long, turipName: String) -> Unit,
-    onTuripPlaceClick: (folder: TuripModel) -> Unit,
+    onTuripPlaceClick: (turip: TuripModel) -> Unit,
     onConfirmClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -72,7 +72,7 @@ private fun Header(
         title = placeName,
         navigation = {
             Text(
-                text = stringResource(R.string.bottom_sheet_favorite_place_folder_title),
+                text = stringResource(R.string.trip_detail_bottom_sheet_turip_title),
                 style = TuripTheme.typography.body2,
                 color = TuripTheme.colors.gray03,
                 modifier = Modifier.padding(start = TuripTheme.spacing.small),
@@ -83,8 +83,8 @@ private fun Header(
                 onClick = onAddTuripClick,
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.ic_folder_plus),
-                    contentDescription = stringResource(R.string.bottom_sheet_favorite_place_folder_add_folder_description),
+                    painter = painterResource(R.drawable.ic_turip_plus),
+                    contentDescription = stringResource(R.string.trip_detail_bottom_sheet_add_turip_description),
                 )
             }
         },
@@ -106,9 +106,9 @@ private fun Turips(
     ) {
         items(items = turips, key = { it.id }) { turip ->
             TuripItem(
-                folder = turip,
+                turip = turip,
                 onItemClick = { onNavigateToTurip(turip.id, turip.name) },
-                onFavoriteClick = { onTuripPlaceClick(turip) },
+                onTuripPlaceClick = { onTuripPlaceClick(turip) },
             )
         }
     }
@@ -134,7 +134,7 @@ private fun ConfirmButton(
         contentAlignment = Alignment.Center,
     ) {
         Text(
-            text = stringResource(R.string.bottom_sheet_favorite_place_folder_confirm),
+            text = stringResource(R.string.trip_detail_bottom_sheet_turip_selection_confirm),
             style = TuripTheme.typography.title2,
             color = contentColor,
         )
