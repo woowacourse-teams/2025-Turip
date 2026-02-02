@@ -106,17 +106,17 @@
         </div>
     </div>
 
-    <script>
-        async function logout() {
-            try {
-                // 서버에 로그아웃 요청 (RefreshToken 삭제 + 쿠키 무효화)
-                const response = await fetch('/logout', {
-                    method: 'POST',
-                    headers: {
-                        'device-fid': 'admin-web'
-                    },
-                    credentials: 'include'  // 쿠키 자동 전송
-                });
+<script>
+    async function logout() {
+        try {
+            // 서버에 로그아웃 요청 (RefreshToken 삭제 + 쿠키 무효화)
+            const response = await fetch('/api/v1/auth/logout', {
+                method: 'POST',
+                headers: {
+                    'device-fid': 'admin-web'
+                },
+                credentials: 'include'  // 쿠키 자동 전송
+            });
 
                 // 성공 여부와 관계없이 로그인 페이지로 리다이렉트
                 window.location.href = '/admin/login';

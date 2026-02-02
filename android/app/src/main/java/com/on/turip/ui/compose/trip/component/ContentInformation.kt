@@ -80,8 +80,7 @@ private fun ContentInfoChip(
                     width = 1.dp,
                     color = TuripTheme.colors.gray02,
                     shape = TuripTheme.shape.chip,
-                )
-                .padding(
+                ).padding(
                     horizontal = TuripTheme.spacing.small,
                     vertical = TuripTheme.spacing.extraSmall,
                 ),

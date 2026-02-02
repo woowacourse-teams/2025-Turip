@@ -67,7 +67,7 @@ public class TuripMemberApiTest {
     }
 
     @Nested
-    @DisplayName("/turip-members POST 자체 회원가입 테스트")
+    @DisplayName("/api/v1/turip-members POST 자체 회원가입 테스트")
     class create {
 
         @DisplayName("자체 회원가입 할 수 있다")
@@ -86,7 +86,7 @@ public class TuripMemberApiTest {
                     .header("device-fid", "testDeviceFid")
                     .body(request)
                     .contentType(ContentType.JSON)
-                    .when().post("/turip-members")
+                    .when().post("/api/v1/turip-members")
                     .then()
                     .statusCode(201)
                     .body("id", is(1))
@@ -111,7 +111,7 @@ public class TuripMemberApiTest {
                     .header("device-fid", "testDeviceFid")
                     .body(request)
                     .contentType(ContentType.JSON)
-                    .when().post("/turip-members")
+                    .when().post("/api/v1/turip-members")
                     .then()
                     .statusCode(400);
         }
@@ -131,7 +131,7 @@ public class TuripMemberApiTest {
                     .header("device-fid", "testDeviceFid")
                     .body(request)
                     .contentType(ContentType.JSON)
-                    .when().post("/turip-members")
+                    .when().post("/api/v1/turip-members")
                     .then()
                     .statusCode(409)
                     .body("tag", is(ErrorTag.LOGIN_ID_CONFLICT.name()))

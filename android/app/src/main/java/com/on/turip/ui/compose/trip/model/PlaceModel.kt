@@ -6,7 +6,7 @@ import androidx.compose.runtime.Stable
 data class PlaceModel(
     val id: Long,
     val name: String,
-    val isFavorite: Boolean,
+    val isTuripPlace: Boolean,
     val timeLine: String,
     private val category: String,
     private val mapLink: String,

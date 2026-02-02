@@ -14,16 +14,16 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import turip.auth.resolver.AuthGuest;
-import turip.auth.resolver.AuthMember;
-import turip.common.exception.ErrorResponse;
 import turip.account.domain.Guest;
 import turip.account.domain.Member;
 import turip.account.service.MemberService;
+import turip.auth.resolver.AuthGuest;
+import turip.auth.resolver.AuthMember;
+import turip.common.exception.ErrorResponse;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/members")
+@RequestMapping("/api/v1/members")
 @Tag(name = "Member", description = "회원 API")
 public class MemberController {
 

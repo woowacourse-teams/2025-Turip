@@ -9,6 +9,7 @@ import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
 import com.on.turip.data.login.datasource.GoogleCredentialManager
+import com.on.turip.domain.login.GuestRepository
 import com.on.turip.domain.login.MemberRepository
 import com.on.turip.domain.login.usecase.LoginUserUseCase
 import com.on.turip.ui.common.error.ErrorUiState
@@ -29,6 +30,7 @@ import javax.inject.Inject
 class LoginViewmodel @Inject constructor(
     private val loginUserUseCase: LoginUserUseCase,
     private val memberRepository: MemberRepository,
+    private val guestRepository: GuestRepository,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<LoginUiState> = MutableStateFlow(LoginUiState.IDLE)
     val uiState: StateFlow<LoginUiState> = _uiState
@@ -97,7 +99,7 @@ class LoginViewmodel @Inject constructor(
 
     fun clearGuestData() {
         viewModelScope.launch {
-            memberRepository
+            guestRepository
                 .deleteGuest()
                 .onSuccess {
                     _uiEffect.send(LoginUiEffect.NavigateToMain)

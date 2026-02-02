@@ -44,7 +44,7 @@ class ContentCountApiTest {
         jdbcTemplate.update("ALTER TABLE country ALTER COLUMN id RESTART WITH 1");
     }
 
-    @DisplayName("/contents/count GET 지역 카테고리별 컨텐츠 수 조회 테스트")
+    @DisplayName("/api/v1/contents/count GET 지역 카테고리별 컨텐츠 수 조회 테스트")
     @Nested
     class getCountByRegionCategory {
 
@@ -67,7 +67,7 @@ class ContentCountApiTest {
             // when & then
             RestAssured.given().port(port)
                     .queryParam("regionCategory", "서울")
-                    .when().get("/contents/count")
+                    .when().get("/api/v1/contents/count")
                     .then()
                     .statusCode(200)
                     .body("count", is(2));
@@ -94,7 +94,7 @@ class ContentCountApiTest {
             // when & then
             RestAssured.given().port(port)
                     .queryParam("regionCategory", "일본")
-                    .when().get("/contents/count")
+                    .when().get("/api/v1/contents/count")
                     .then()
                     .statusCode(200)
                     .body("count", is(2));
@@ -120,7 +120,7 @@ class ContentCountApiTest {
             // when & then
             RestAssured.given().port(port)
                     .queryParam("regionCategory", "국내 기타")
-                    .when().get("/contents/count")
+                    .when().get("/api/v1/contents/count")
                     .then()
                     .statusCode(200)
                     .body("count", is(2)); // 대구, 울산
@@ -148,7 +148,7 @@ class ContentCountApiTest {
             // when & then
             RestAssured.given().port(port)
                     .queryParam("regionCategory", "해외 기타")
-                    .when().get("/contents/count")
+                    .when().get("/api/v1/contents/count")
                     .then()
                     .statusCode(200)
                     .body("count", is(2)); // 태국, 싱가포르
@@ -170,7 +170,7 @@ class ContentCountApiTest {
             // when & then
             RestAssured.given().port(port)
                     .queryParam("regionCategory", "아라키스")
-                    .when().get("/contents/count")
+                    .when().get("/api/v1/contents/count")
                     .then()
                     .statusCode(400);
         }

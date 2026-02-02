@@ -55,7 +55,7 @@ import com.on.turip.ui.compose.designsystem.component.ErrorScreen
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbarVisuals
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
-import com.on.turip.ui.compose.trip.component.ContentFavoriteButton
+import com.on.turip.ui.compose.trip.component.ContentBookmarkButton
 import com.on.turip.ui.compose.trip.component.ContentInformation
 import com.on.turip.ui.compose.trip.component.ContentVideo
 import com.on.turip.ui.compose.trip.component.CreatorInformation
@@ -75,7 +75,7 @@ fun TripDetailScreen(
     navigateToLogin: () -> Unit,
     navigateToMap: (mapModel: MapModel) -> Unit,
     navigateToWebViewUrl: (url: String) -> Unit,
-    onClickFavoritePlace: (id: Long) -> Unit,
+    onTuripPlaceClick: (id: Long) -> Unit,
     viewModel: TripDetailViewModel = hiltViewModel(),
 ) {
     val uiState: TripDetailUiState by viewModel.uiState.collectAsState()
@@ -147,11 +147,11 @@ fun TripDetailScreen(
                     )
                     TripDetailAppBar(
                         isError = uiState.errorUiState != ErrorUiState.None,
-                        isContentFavorite = uiState.isFavorite,
+                        isBookmarked = uiState.isBookmarked,
                         onBackClick = navigateToBack,
-                        onContentFavoriteClick = {
+                        onBookmarkClick = {
                             snackbarHostState.currentSnackbarData?.dismiss()
-                            viewModel.updateFavorite()
+                            viewModel.updateBookmark()
                         },
                     )
                 }
@@ -203,10 +203,10 @@ fun TripDetailScreen(
                             onDayClick = viewModel::updateDay,
                             onTimeLineClick = webViewController::seekTo,
                             onMapClick = navigateToMap,
-                            onFavoritePlaceClick = onClickFavoritePlace,
-                            onFavoriteContentClick = {
+                            onTuripPlaceClick = onTuripPlaceClick,
+                            onBookmarkClick = {
                                 snackbarHostState.currentSnackbarData?.dismiss()
-                                viewModel.updateFavorite()
+                                viewModel.updateBookmark()
                             },
                             onErrorVideoClick = { navigateToWebViewUrl(uiState.tripDetailInfo.videoLink) },
                         )
@@ -227,11 +227,11 @@ private suspend fun handleUiEffect(
     handleErrorRetryRequest: (action: TripDetailRetryAction) -> Unit,
 ) {
     when (uiEffect) {
-        is TripDetailUiEffect.ShowFavoriteStatus -> {
+        is TripDetailUiEffect.ShowBookmarkStatus -> {
             val messageResource: Int =
-                if (uiEffect.isFavorite) R.string.trip_detail_snackbar_favorite_save else R.string.trip_detail_snackbar_favorite_remove
+                if (uiEffect.isBookmarked) R.string.trip_detail_snackbar_bookmark_save else R.string.trip_detail_snackbar_bookmark_remove
             val iconResource: Int =
-                if (uiEffect.isFavorite) R.drawable.ic_heart_pressed else R.drawable.ic_heart_empty
+                if (uiEffect.isBookmarked) R.drawable.btn_bookmark_selected else R.drawable.btn_bookmark_normal
             snackbarHostState.showSnackbar(
                 visuals =
                     TuripSnackbarVisuals(
@@ -270,8 +270,8 @@ private fun TripDetailScreenContent(
     onDayClick: (day: Int) -> Unit,
     onTimeLineClick: (timeLine: Int) -> Unit,
     onMapClick: (mapModel: MapModel) -> Unit,
-    onFavoritePlaceClick: (id: Long) -> Unit,
-    onFavoriteContentClick: () -> Unit,
+    onTuripPlaceClick: (id: Long) -> Unit,
+    onBookmarkClick: () -> Unit,
     onErrorVideoClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -329,7 +329,7 @@ private fun TripDetailScreenContent(
                 placeModel = place,
                 onTimeLineClick = onTimeLineClick,
                 onMapClick = onMapClick,
-                onFavoriteClick = onFavoritePlaceClick,
+                onTuripPlaceClick = onTuripPlaceClick,
                 modifier =
                     Modifier
                         .padding(
@@ -341,9 +341,9 @@ private fun TripDetailScreenContent(
         }
 
         item {
-            ContentFavoriteButton(
-                isContentFavorite = uiState.isFavorite,
-                onClick = onFavoriteContentClick,
+            ContentBookmarkButton(
+                isBookmarked = uiState.isBookmarked,
+                onClick = onBookmarkClick,
                 modifier =
                     Modifier
                         .padding(
@@ -404,7 +404,7 @@ private fun TripContentScreenPreview() {
                                 PlaceModel(
                                     id = 1L,
                                     name = "우아한테크코스",
-                                    isFavorite = true,
+                                    isTuripPlace = true,
                                     category = "💻 코딩맛집",
                                     mapLink = "kakao.com/123123",
                                     timeLine = "01:03",
@@ -412,13 +412,13 @@ private fun TripContentScreenPreview() {
                                 PlaceModel(
                                     id = 2L,
                                     name = "우아한테크코스",
-                                    isFavorite = false,
+                                    isTuripPlace = false,
                                     category = "💻 코딩맛집",
                                     mapLink = "google.com/123123",
                                     timeLine = "03:03",
                                 ),
                             ),
-                        isFavorite = true,
+                        isBookmarked = true,
                     ),
                 listState = rememberLazyListState(),
                 webViewController =
@@ -430,8 +430,8 @@ private fun TripContentScreenPreview() {
                 onDayClick = {},
                 onTimeLineClick = {},
                 onMapClick = {},
-                onFavoritePlaceClick = {},
-                onFavoriteContentClick = {},
+                onTuripPlaceClick = {},
+                onBookmarkClick = {},
                 onErrorVideoClick = {},
             )
         }

@@ -4,22 +4,22 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.on.turip.databinding.ItemFavoritePlaceFolderBinding
-import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
+import com.on.turip.ui.main.favorite.model.TuripModel
 
 class FavoritePlaceFolderViewHolder(
     private val binding: ItemFavoritePlaceFolderBinding,
     favoritePlaceFolderListener: FavoritePlaceFolderListener,
 ) : RecyclerView.ViewHolder(binding.root) {
-    private var favoritePlaceFolderModel: FavoritePlaceFolderModel? = null
+    private var turipModel: TuripModel? = null
 
     init {
         binding.ivFavoritePlaceFolderFavorite.setOnClickListener {
-            favoritePlaceFolderModel?.let { placeFolder: FavoritePlaceFolderModel ->
+            turipModel?.let { placeFolder: TuripModel ->
                 favoritePlaceFolderListener.onFavoriteFolderFavoriteClick(placeFolder)
             }
         }
         binding.ivFavoritePlaceFolderIcon.setOnClickListener {
-            favoritePlaceFolderModel?.let {
+            turipModel?.let {
                 favoritePlaceFolderListener.onFavoriteFolderClick(
                     favoriteFolderId = it.id,
                     favoriteFolderName = it.name,
@@ -27,7 +27,7 @@ class FavoritePlaceFolderViewHolder(
             }
         }
         binding.tvFavoritePlaceFolderName.setOnClickListener {
-            favoritePlaceFolderModel?.let {
+            turipModel?.let {
                 favoritePlaceFolderListener.onFavoriteFolderClick(
                     favoriteFolderId = it.id,
                     favoriteFolderName = it.name,
@@ -36,10 +36,10 @@ class FavoritePlaceFolderViewHolder(
         }
     }
 
-    fun bind(favoritePlaceFolderModel: FavoritePlaceFolderModel) {
-        this.favoritePlaceFolderModel = favoritePlaceFolderModel
-        binding.tvFavoritePlaceFolderName.text = favoritePlaceFolderModel.name
-        binding.ivFavoritePlaceFolderFavorite.isSelected = favoritePlaceFolderModel.isSelected
+    fun bind(turipModel: TuripModel) {
+        this.turipModel = turipModel
+        binding.tvFavoritePlaceFolderName.text = turipModel.name
+        binding.ivFavoritePlaceFolderFavorite.isSelected = turipModel.isSelected
     }
 
     companion object {
@@ -55,7 +55,7 @@ class FavoritePlaceFolderViewHolder(
     }
 
     interface FavoritePlaceFolderListener {
-        fun onFavoriteFolderFavoriteClick(favoritePlaceFolderModel: FavoritePlaceFolderModel)
+        fun onFavoriteFolderFavoriteClick(turipModel: TuripModel)
 
         fun onFavoriteFolderClick(
             favoriteFolderId: Long,

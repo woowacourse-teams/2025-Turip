@@ -17,12 +17,12 @@ import com.on.turip.ui.common.base.BaseBottomSheetFragment
 import com.on.turip.ui.common.collectOnStarted
 import com.on.turip.ui.common.error.ErrorUiModel
 import com.on.turip.ui.common.error.toUiModel
-import com.on.turip.ui.folder.model.FolderNameStatusModel
-import com.on.turip.ui.folder.model.FolderUiEffect
+import com.on.turip.ui.folder.model.TuripNameStatusModel
+import com.on.turip.ui.folder.model.TuripUiEffect
 import com.on.turip.ui.login.LoginActivity
 
 class FolderModifyBottomSheetFragment : BaseBottomSheetFragment<BottomSheetFragmentFolderModifyBinding>() {
-    private val sharedViewModel: FolderViewModel by activityViewModels()
+    private val sharedViewModel: TuripViewModel by activityViewModels()
 
     override fun inflateBinding(
         inflater: LayoutInflater,
@@ -53,7 +53,7 @@ class FolderModifyBottomSheetFragment : BaseBottomSheetFragment<BottomSheetFragm
     }
 
     private fun setupObservers() {
-        collectOnStarted(sharedViewModel.folderNameStatus) { folderNameStatus: FolderNameStatusModel ->
+        collectOnStarted(sharedViewModel.turipNameStatus) { folderNameStatus: TuripNameStatusModel ->
             binding.tvBottomSheetFolderModifyConfirm.isEnabled = folderNameStatus.isConfirmEnabled
 
             if (folderNameStatus.errorMessage != null) {
@@ -66,17 +66,17 @@ class FolderModifyBottomSheetFragment : BaseBottomSheetFragment<BottomSheetFragm
             }
         }
 
-        collectOnStarted(sharedViewModel.uiEffect) { uiEffect: FolderUiEffect ->
+        collectOnStarted(sharedViewModel.uiEffect) { uiEffect: TuripUiEffect ->
             when (uiEffect) {
-                FolderUiEffect.NavigateToLogin -> {
+                TuripUiEffect.NavigateToLogin -> {
                     navigateToLoginScreen()
                 }
 
-                FolderUiEffect.FolderUpdated -> {
+                TuripUiEffect.TuripUpdated -> {
                     dismiss()
                 }
 
-                is FolderUiEffect.ShowError -> {
+                is TuripUiEffect.ShowError -> {
                     val uiModel: ErrorUiModel =
                         uiEffect.errorUiState.toUiModel() ?: return@collectOnStarted
                     view?.let { view: View ->
@@ -99,10 +99,10 @@ class FolderModifyBottomSheetFragment : BaseBottomSheetFragment<BottomSheetFragm
 
     private fun setupListeners() {
         binding.tvBottomSheetFolderModifyConfirm.setOnClickListener {
-            sharedViewModel.updateFolderName()
+            sharedViewModel.updateTuripName()
         }
         binding.etBottomSheetFolderModifyFolderName.addTextChangedListener { text: Editable? ->
-            sharedViewModel.updateInputFolderName(text.toString())
+            sharedViewModel.updateTuripName(text.toString())
         }
     }
 

@@ -83,7 +83,7 @@ class OverseasRegionCategoryPagingApiTest {
         }
     }
 
-    @DisplayName("/contents GET 일본(해외 카테고리 나라) 지역별 컨텐츠 목록 페이징 테스트")
+    @DisplayName("/api/v1/contents GET 일본(해외 카테고리 나라) 지역별 컨텐츠 목록 페이징 테스트")
     @Test
     void readContentsBySeoulRegionCategory() {
         // when: 첫 번째 페이지 (lastId=0, size=5)
@@ -92,7 +92,7 @@ class OverseasRegionCategoryPagingApiTest {
                 .queryParam("regionCategory", "일본")
                 .queryParam("size", 5)
                 .queryParam("lastId", 0)
-                .when().get("/contents");
+                .when().get("/api/v1/contents");
 
         // then: 첫 번째 페이지
         firstPageResponse.then()
@@ -109,7 +109,7 @@ class OverseasRegionCategoryPagingApiTest {
                 .queryParam("regionCategory", "일본")
                 .queryParam("size", 5)
                 .queryParam("lastId", lastContentId)
-                .when().get("/contents");
+                .when().get("/api/v1/contents");
 
         // then: 두 번째 페이지
         secondPageResponse.then()
@@ -118,7 +118,7 @@ class OverseasRegionCategoryPagingApiTest {
                 .body("loadable", is(false));
     }
 
-    @DisplayName("/contents GET 해외 기타 지역별 컨텐츠 목록 페이징 테스트")
+    @DisplayName("/api/v1/contents GET 해외 기타 지역별 컨텐츠 목록 페이징 테스트")
     @Test
     void readContentsByDomesticOtherRegionCategory() {
         // when: 첫 번째 페이지 (lastId=0, size=5)
@@ -127,7 +127,7 @@ class OverseasRegionCategoryPagingApiTest {
                 .queryParam("regionCategory", "해외 기타")
                 .queryParam("size", 5)
                 .queryParam("lastId", 0)
-                .when().get("/contents");
+                .when().get("/api/v1/contents");
 
         // then: 첫 번째 페이지
         firstPageResponse.then()
@@ -144,7 +144,7 @@ class OverseasRegionCategoryPagingApiTest {
                 .queryParam("regionCategory", "해외 기타")
                 .queryParam("size", 5)
                 .queryParam("lastId", lastContentId)
-                .when().get("/contents");
+                .when().get("/api/v1/contents");
 
         // then: 두 번째 페이지
         secondPageResponse.then()

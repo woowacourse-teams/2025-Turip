@@ -19,16 +19,16 @@ import com.on.turip.ui.common.error.ErrorUiModel
 import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.common.safeStartActivityWithToast
 import com.on.turip.ui.login.LoginActivity
-import com.on.turip.ui.main.favorite.model.FavoriteFolderShareModel
-import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderCatalogUiEffect
-import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderCatalogUiState
-import com.on.turip.ui.main.favorite.model.FavoritePlaceModel
+import com.on.turip.ui.main.favorite.model.TuripCatalogUiEffect
+import com.on.turip.ui.main.favorite.model.TuripCatalogUiState
+import com.on.turip.ui.main.favorite.model.TuripPlaceModel
+import com.on.turip.ui.main.favorite.model.TuripShareModel
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 
 @AndroidEntryPoint
 class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavoritePlaceFolderCatalogBinding>() {
-    private val viewModel: FavoritePlaceFolderCatalogViewModel by viewModels()
+    private val viewModel: TuripCatalogViewModel by viewModels()
 
     private val placeAdapter: FavoritePlaceAdapter by lazy {
         FavoritePlaceAdapter(
@@ -37,7 +37,7 @@ class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavor
                     placeId: Long,
                     isFavorite: Boolean,
                 ) {
-                    viewModel.updateFavoritePlace(placeId, isFavorite)
+                    viewModel.updateTuripPlace(placeId, isFavorite)
                 }
 
                 override fun onMapClick(uri: Uri) {
@@ -48,11 +48,11 @@ class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavor
                     )
                 }
 
-                override fun onItemClick(favoritePlaceModel: FavoritePlaceModel) {
-                    Timber.d("아이템 클릭: $favoritePlaceModel")
+                override fun onItemClick(turipPlaceModel: TuripPlaceModel) {
+                    Timber.d("아이템 클릭: $turipPlaceModel")
                 }
             },
-            onCommit = { viewModel.updateFavoritePlacesOrder(it) },
+            onCommit = { viewModel.updateTuripPlacesOrder(it) },
         )
     }
 
@@ -117,35 +117,35 @@ class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavor
     }
 
     private fun setupObservers() {
-        collectOnStarted(viewModel.uiState) { uiState: FavoritePlaceFolderCatalogUiState ->
+        collectOnStarted(viewModel.uiState) { uiState: TuripCatalogUiState ->
             placeAdapter.submitList(uiState.places)
-            binding.tvBottomSheetFolderFavoritePlaceFolderCatalogTitle.text = uiState.folderName
+            binding.tvBottomSheetFolderFavoritePlaceFolderCatalogTitle.text = uiState.turipName
 
             binding.tvBottomSheetFavoritePlaceFolderCount.text =
                 getString(R.string.all_total_place_count, uiState.places.size)
 
-            if (uiState.places == emptyList<FavoritePlaceModel>()) {
+            if (uiState.places == emptyList<TuripPlaceModel>()) {
                 binding.ivBottomSheetFavoritePlaceFolderShare.visibility = View.GONE
             } else {
                 binding.ivBottomSheetFavoritePlaceFolderShare.visibility = View.VISIBLE
             }
         }
 
-        collectOnStarted(viewModel.uiEffect) { uiEffect: FavoritePlaceFolderCatalogUiEffect ->
+        collectOnStarted(viewModel.uiEffect) { uiEffect: TuripCatalogUiEffect ->
             when (uiEffect) {
-                FavoritePlaceFolderCatalogUiEffect.NavigateToLogin -> {
+                TuripCatalogUiEffect.NavigateToLogin -> {
                     navigateToLoginScreen()
                 }
 
-                FavoritePlaceFolderCatalogUiEffect.ShowFolderShareNotAllowed -> {
+                TuripCatalogUiEffect.ShowTuripShareNotAllowed -> {
                     showSuggestLoginMessage()
                 }
 
-                is FavoritePlaceFolderCatalogUiEffect.ShareFolder -> {
-                    shareFolder(uiEffect.favoriteFolderShareModel)
+                is TuripCatalogUiEffect.ShareTurip -> {
+                    shareFolder(uiEffect.turipShareModel)
                 }
 
-                is FavoritePlaceFolderCatalogUiEffect.ShowError -> {
+                is TuripCatalogUiEffect.ShowError -> {
                     val uiModel: ErrorUiModel =
                         uiEffect.errorUiState.toUiModel() ?: return@collectOnStarted
                     view?.let { view: View ->
@@ -193,7 +193,7 @@ class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavor
         }
     }
 
-    private fun shareFolder(folderShareModel: FavoriteFolderShareModel) {
+    private fun shareFolder(folderShareModel: TuripShareModel) {
         val sharedContents: String = folderShareModel.toShareFormat()
 
         val intent =
@@ -246,22 +246,21 @@ class FavoritePlaceFolderCatalogFragment : BaseFragment<BottomSheetFragmentFavor
     }
 
     companion object {
-        const val FAVORITE_PLACE_FOLDER_CATALOG_ARGUMENTS_FOLDER_ID =
-            "com.on.turip.FAVORITE_PLACE_FOLDER_CATALOG_ARGUMENTS_FOLDER_ID"
-        const val FAVORITE_PLACE_FOLDER_CATALOG_ARGUMENTS_FOLDER_NAME =
-            "com.on.turip.FAVORITE_PLACE_FOLDER_CATALOG_ARGUMENTS_FOLDER_NAME"
+        const val TURIP_CATALOG_ARGUMENTS_TURIP_ID = "com.on.turip.TURIP_CATALOG_ARGUMENTS_TURIP_ID"
+        const val TURIP_CATALOG_ARGUMENTS_TURIP_NAME =
+            "com.on.turip.TURIP_CATALOG_ARGUMENTS_TURIP_NAME"
         private const val KAKAO_PACKAGE = "com.kakao.talk"
         private const val INSTAGRAM_PACKAGE = "com.instagram.android"
 
         fun newInstance(
-            folderId: Long,
-            folderName: String,
+            turipId: Long,
+            turipName: String,
         ): FavoritePlaceFolderCatalogFragment =
             FavoritePlaceFolderCatalogFragment().apply {
                 arguments =
                     Bundle().apply {
-                        putLong(FAVORITE_PLACE_FOLDER_CATALOG_ARGUMENTS_FOLDER_ID, folderId)
-                        putString(FAVORITE_PLACE_FOLDER_CATALOG_ARGUMENTS_FOLDER_NAME, folderName)
+                        putLong(TURIP_CATALOG_ARGUMENTS_TURIP_ID, turipId)
+                        putString(TURIP_CATALOG_ARGUMENTS_TURIP_NAME, turipName)
                     }
             }
     }
