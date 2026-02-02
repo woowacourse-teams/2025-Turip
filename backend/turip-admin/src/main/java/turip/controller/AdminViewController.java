@@ -20,6 +20,11 @@ public class AdminViewController {
     @Value("${youtube.api.key}")
     private String youtubeApiKey;
 
+    @GetMapping
+    public String indexPage() {
+        return "admin/index";
+    }
+
     @GetMapping("/login")
     public String loginPage() {
         return "admin/login";
