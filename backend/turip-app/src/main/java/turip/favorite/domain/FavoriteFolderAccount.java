@@ -55,4 +55,8 @@ public class FavoriteFolderAccount {
     public static FavoriteFolderAccount of(FavoriteFolder favoriteFolder, Account account, AccountRole accountRole) {
         return new FavoriteFolderAccount(favoriteFolder, account, accountRole);
     }
+
+    public void updateAccount(Account account) {
+        this.account = account;
+    }
 }

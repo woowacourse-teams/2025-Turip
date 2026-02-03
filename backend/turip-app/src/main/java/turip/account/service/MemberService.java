@@ -13,6 +13,7 @@ import turip.common.exception.custom.BadRequestException;
 import turip.common.exception.custom.IllegalArgumentException;
 import turip.common.exception.custom.NotFoundException;
 import turip.favorite.repository.FavoriteContentRepository;
+import turip.favorite.repository.FavoriteFolderAccountRepository;
 import turip.favorite.repository.FavoriteFolderRepository;
 
 @Service
@@ -22,6 +23,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final FavoriteContentRepository favoriteContentRepository;
     private final FavoriteFolderRepository favoriteFolderRepository;
+    private final FavoriteFolderAccountRepository favoriteFolderAccountRepository;
     private final GuestService guestService;
     private final AccountService accountService;
     private final RefreshTokenService refreshTokenService;
@@ -62,9 +64,14 @@ public class MemberService {
     }
 
     private void migrateFavoriteFolders(Member member, Guest guest) {
-        favoriteFolderRepository.deleteByAccountAndIsDefault(member.getAccount(), true);
-
-        favoriteFolderRepository.findAllByAccount(guest.getAccount())
-                .forEach(favoriteFolder -> favoriteFolder.updateAccount(member.getAccount()));
+        // guest account에 대한 FavoriteFolderAccount의 account를 member로 바꿔주기(default 폴더는 지우기)
+        favoriteFolderAccountRepository.findAllByAccount(guest.getAccount())
+                .forEach(favoriteFolderAccount -> {
+                    if (favoriteFolderAccount.getFavoriteFolder().isDefault()) {
+                        favoriteFolderRepository.delete(favoriteFolderAccount.getFavoriteFolder());
+                        favoriteFolderAccountRepository.delete(favoriteFolderAccount);
+                    }
+                    favoriteFolderAccount.updateAccount(member.getAccount());
+                });
     }
 }
