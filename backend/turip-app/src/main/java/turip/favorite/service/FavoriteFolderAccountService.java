@@ -37,8 +37,12 @@ public class FavoriteFolderAccountService {
     @Transactional
     public void removeByAccount(Account account) {
         favoriteFolderAccountRepository.findAllByAccount(account).
-                forEach(favoriteFolderAccount -> favoriteFolderRepository.delete(
-                        favoriteFolderAccount.getFavoriteFolder()));
+                forEach(favoriteFolderAccount -> {
+                    FavoriteFolder favoriteFolder = favoriteFolderAccount.getFavoriteFolder();
+                    if (!favoriteFolder.isShared()) {
+                        favoriteFolderRepository.delete(favoriteFolder);
+                    }
+                });
     }
 
     public void validateOwnership(Account account, FavoriteFolder favoriteFolder) {

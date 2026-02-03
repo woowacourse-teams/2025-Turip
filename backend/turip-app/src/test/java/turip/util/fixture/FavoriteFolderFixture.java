@@ -24,4 +24,16 @@ public class FavoriteFolderFixture {
         ReflectionTestUtils.setField(folder, "id", id);
         return folder;
     }
+
+    public static FavoriteFolder createSharedFolder(String name) {
+        FavoriteFolder customFolder = createCustomFolder(name);
+        customFolder.shareFolder();
+        return customFolder;
+    }
+
+    public static FavoriteFolder createSharedFolderWithId(Long id, String name) {
+        FavoriteFolder folder = createSharedFolder(name);
+        ReflectionTestUtils.setField(folder, "id", id);
+        return folder;
+    }
 }
