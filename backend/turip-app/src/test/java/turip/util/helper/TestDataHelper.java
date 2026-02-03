@@ -2,6 +2,7 @@ package turip.util.helper;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -40,11 +41,12 @@ public class TestDataHelper {
 
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(
-                    "INSERT INTO member (account_id, email, is_first_login) VALUES (?, ?, ?)",
+                    "INSERT INTO member (account_id, email, is_first_login, nickname) VALUES (?, ?, ?, ?)",
                     Statement.RETURN_GENERATED_KEYS);
             ps.setLong(1, accountId);
             ps.setString(2, email);
             ps.setBoolean(3, isFirstLogin);
+            ps.setString(4, UUID.randomUUID().toString().substring(0, 8));
             return ps;
         }, keyHolder);
 

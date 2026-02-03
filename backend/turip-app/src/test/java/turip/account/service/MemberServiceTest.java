@@ -16,6 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DuplicateKeyException;
 import turip.account.domain.Account;
 import turip.account.domain.Guest;
 import turip.account.domain.Member;
@@ -24,6 +25,8 @@ import turip.account.repository.MemberRepository;
 import turip.auth.service.RefreshTokenService;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.BadRequestException;
+import turip.common.exception.custom.IllegalArgumentException;
+import turip.common.exception.custom.InternalServerException;
 import turip.favorite.domain.AccountRole;
 import turip.favorite.domain.FavoriteContent;
 import turip.favorite.domain.FavoriteFolder;
@@ -59,6 +62,9 @@ class MemberServiceTest {
     @Mock
     private RefreshTokenService refreshTokenService;
 
+    @Mock
+    private MemberCreateService memberCreateService;
+
     @DisplayName("Member 생성 테스트")
     @Nested
     class CreateTest {
@@ -68,13 +74,33 @@ class MemberServiceTest {
         void create1() {
             // given
             String invalidEmail = "invalid-email";
-            given(accountService.create()).willReturn(AccountFixture.createUser());
+            Account account = AccountFixture.createUser();
+            given(accountService.create())
+                    .willReturn(account);
+            given(memberCreateService.save(account, invalidEmail))
+                    .willThrow(new IllegalArgumentException(ErrorTag.EMAIL_INVALID));
 
             // when & then
             assertThatThrownBy(() -> memberService.create(invalidEmail))
                     .isInstanceOf(BadRequestException.class)
                     .hasMessage(ErrorTag.EMAIL_INVALID.getMessage());
+        }
 
+        @DisplayName("닉네임이 5번 연속 중복으로 나온 경우 InternalServerError를 발생시킨다.")
+        @Test
+        void create2() {
+            // given
+            String invalidEmail = "invalid-email";
+            Account account = AccountFixture.createUser();
+            given(accountService.create())
+                    .willReturn(account);
+            given(memberCreateService.save(account, invalidEmail))
+                    .willThrow(new DuplicateKeyException(""));
+
+            // when & then
+            assertThatThrownBy(() -> memberService.create(invalidEmail))
+                    .isInstanceOf(InternalServerException.class)
+                    .hasMessage(ErrorTag.NICKNAME_CREATION_ERROR.getMessage());
         }
     }
 
