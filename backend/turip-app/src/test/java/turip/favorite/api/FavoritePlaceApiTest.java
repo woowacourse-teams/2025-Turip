@@ -47,6 +47,7 @@ class FavoritePlaceApiTest {
         jdbcTemplate.update("DELETE FROM social_member");
         jdbcTemplate.update("DELETE FROM member");
         jdbcTemplate.update("DELETE FROM account");
+        jdbcTemplate.update("DELETE FROM favorite_folder_account");
         jdbcTemplate.update("DELETE FROM content");
         jdbcTemplate.update("DELETE FROM creator");
         jdbcTemplate.update("DELETE FROM city");
@@ -70,6 +71,7 @@ class FavoritePlaceApiTest {
         jdbcTemplate.update("ALTER TABLE member ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE refresh_token ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE account ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE favorite_folder_account ALTER COLUMN id RESTART WITH 1");
     }
 
     @DisplayName("/api/v1/turips/places POST 장소 찜 생성 테스트")
