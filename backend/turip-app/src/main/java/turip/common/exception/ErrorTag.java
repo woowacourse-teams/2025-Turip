@@ -50,6 +50,7 @@ public enum ErrorTag {
 
     // 500 Internal Server Error
     INTERNAL_SERVER_ERROR("서버에서 예기치 못한 에러가 발생했습니다."),
+    NICKNAME_CREATION_ERROR("닉네임 생성에 실패했습니다."),
 
     // ==== Admin ====
 

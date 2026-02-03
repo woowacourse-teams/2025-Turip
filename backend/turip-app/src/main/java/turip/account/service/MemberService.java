@@ -1,6 +1,7 @@
 package turip.account.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import turip.account.domain.Account;
@@ -11,6 +12,7 @@ import turip.auth.service.RefreshTokenService;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.BadRequestException;
 import turip.common.exception.custom.IllegalArgumentException;
+import turip.common.exception.custom.InternalServerException;
 import turip.common.exception.custom.NotFoundException;
 import turip.favorite.repository.FavoriteContentRepository;
 import turip.favorite.service.FavoriteFolderAccountService;
@@ -25,13 +27,15 @@ public class MemberService {
     private final AccountService accountService;
     private final RefreshTokenService refreshTokenService;
     private final FavoriteFolderAccountService favoriteFolderAccountService;
+    private final MemberCreateService memberCreateService;
 
     @Transactional
     public Member create(String email) {
         Account account = accountService.create();
         try {
-            Member member = new Member(account, email, true);
-            return memberRepository.save(member);
+            return memberCreateService.save(account, email);
+        } catch (DuplicateKeyException e) {
+            throw new InternalServerException(ErrorTag.NICKNAME_CREATION_ERROR);
         } catch (IllegalArgumentException e) {
             throw new BadRequestException(e.getErrorTag());
         }
