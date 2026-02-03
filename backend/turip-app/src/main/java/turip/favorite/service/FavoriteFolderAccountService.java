@@ -15,7 +15,6 @@ import turip.favorite.repository.FavoriteFolderRepository;
 
 @Service
 @RequiredArgsConstructor
-// 폴더-사용자 관계 관리
 public class FavoriteFolderAccountService {
 
     private final FavoriteFolderAccountRepository favoriteFolderAccountRepository;
@@ -38,7 +37,8 @@ public class FavoriteFolderAccountService {
     @Transactional
     public void removeByAccount(Account account) {
         favoriteFolderAccountRepository.findAllByAccount(account).
-                forEach(this::removeWithFavoriteFolder);
+                forEach(favoriteFolderAccount -> favoriteFolderRepository.delete(
+                        favoriteFolderAccount.getFavoriteFolder()));
     }
 
     public void validateOwnership(Account account, FavoriteFolder favoriteFolder) {
@@ -49,9 +49,5 @@ public class FavoriteFolderAccountService {
         if (!favoriteFolderAccount.isRoleOf(AccountRole.OWNER)) {
             throw new ForbiddenException(ErrorTag.FORBIDDEN);
         }
-    }
-
-    private void removeWithFavoriteFolder(FavoriteFolderAccount favoriteFolderAccount) {
-        favoriteFolderRepository.delete(favoriteFolderAccount.getFavoriteFolder());
     }
 }

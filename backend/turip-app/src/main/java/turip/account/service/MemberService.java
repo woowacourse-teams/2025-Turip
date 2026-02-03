@@ -13,8 +13,7 @@ import turip.common.exception.custom.BadRequestException;
 import turip.common.exception.custom.IllegalArgumentException;
 import turip.common.exception.custom.NotFoundException;
 import turip.favorite.repository.FavoriteContentRepository;
-import turip.favorite.repository.FavoriteFolderAccountRepository;
-import turip.favorite.repository.FavoriteFolderRepository;
+import turip.favorite.service.FavoriteFolderAccountService;
 
 @Service
 @RequiredArgsConstructor
@@ -22,11 +21,10 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final FavoriteContentRepository favoriteContentRepository;
-    private final FavoriteFolderRepository favoriteFolderRepository;
-    private final FavoriteFolderAccountRepository favoriteFolderAccountRepository;
     private final GuestService guestService;
     private final AccountService accountService;
     private final RefreshTokenService refreshTokenService;
+    private final FavoriteFolderAccountService favoriteFolderAccountService;
 
     @Transactional
     public Member create(String email) {
@@ -64,14 +62,8 @@ public class MemberService {
     }
 
     private void migrateFavoriteFolders(Member member, Guest guest) {
-        // guest account에 대한 FavoriteFolderAccount의 account를 member로 바꿔주기(default 폴더는 지우기)
-        favoriteFolderAccountRepository.findAllByAccount(guest.getAccount())
-                .forEach(favoriteFolderAccount -> {
-                    if (favoriteFolderAccount.getFavoriteFolder().isDefault()) {
-                        favoriteFolderRepository.delete(favoriteFolderAccount.getFavoriteFolder());
-                        favoriteFolderAccountRepository.delete(favoriteFolderAccount);
-                    }
-                    favoriteFolderAccount.updateAccount(member.getAccount());
-                });
+        favoriteFolderAccountService.removeByAccount(member.getAccount());
+        favoriteFolderAccountService.findAllByAccount(guest.getAccount())
+                .forEach(favoriteFolderAccount -> favoriteFolderAccount.updateAccount(member.getAccount()));
     }
 }
