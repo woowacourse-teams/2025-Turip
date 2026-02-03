@@ -321,7 +321,7 @@ class FavoriteFolderServiceTest {
             // given
             Long accountId = 1L;
             Long oldFolderId = 1L;
-            Long newFolderId = 1L;
+            Long newFolderId = 2L;
             String newName = "중복된 폴더 이름";
 
             Account account = AccountFixture.createCustomAccount(accountId, Role.USER);
