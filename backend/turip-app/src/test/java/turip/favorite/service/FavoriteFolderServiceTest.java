@@ -32,15 +32,12 @@ import turip.favorite.controller.dto.request.FavoriteFolderRequest;
 import turip.favorite.controller.dto.response.FavoriteFolderResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithFavoriteStatusResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithPlaceCountResponse;
-import turip.favorite.domain.AccountRole;
 import turip.favorite.domain.FavoriteFolder;
-import turip.favorite.domain.FavoriteFolderAccount;
 import turip.favorite.repository.FavoriteFolderRepository;
 import turip.favorite.repository.FavoritePlaceRepository;
 import turip.place.domain.Place;
 import turip.place.repository.PlaceRepository;
 import turip.util.fixture.AccountFixture;
-import turip.util.fixture.FavoriteFolderAccountFixture;
 import turip.util.fixture.FavoriteFolderFixture;
 
 @ExtendWith(MockitoExtension.class)
@@ -95,7 +92,7 @@ class FavoriteFolderServiceTest {
             Account account = AccountFixture.createUser();
             FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(folderId, folderName);
 
-            given(favoriteFolderAccountService.findAllByAccount(account))
+            given(favoriteFolderRepository.findAllByAccount(account))
                     .willReturn(List.of());
             given(favoriteFolderRepository.save(FavoriteFolderFixture.createCustomFolder(folderName)))
                     .willReturn(favoriteFolder);
@@ -122,9 +119,8 @@ class FavoriteFolderServiceTest {
             Account account = AccountFixture.createUser();
             FavoriteFolder customFolder = FavoriteFolderFixture.createCustomFolderWithId(1L, folderName);
 
-            given(favoriteFolderAccountService.findAllByAccount(account))
-                    .willReturn(List.of(FavoriteFolderAccountFixture.createFavoriteFolderAccount(customFolder, account,
-                            AccountRole.OWNER)));
+            given(favoriteFolderRepository.findAllByAccount(account))
+                    .willReturn(List.of(customFolder));
 
             // when & then
             assertThatThrownBy(() -> favoriteFolderService.createCustomFavoriteFolder(request, account))
@@ -157,12 +153,8 @@ class FavoriteFolderServiceTest {
 
             FavoriteFolder defaultFolder = FavoriteFolderFixture.createDefaultFolderWithId(1L);
             FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(2L, "커스텀 폴더 1");
-            FavoriteFolderAccount defaultFolderAccount = FavoriteFolderAccountFixture.createFavoriteFolderAccount(
-                    defaultFolder, savedAccount, AccountRole.OWNER);
-            FavoriteFolderAccount favoriteFolderAccount = FavoriteFolderAccountFixture.createFavoriteFolderAccount(
-                    favoriteFolder, savedAccount, AccountRole.OWNER);
-            given(favoriteFolderAccountService.findAllByAccountOrderByIdAsc(savedAccount))
-                    .willReturn(List.of(defaultFolderAccount, favoriteFolderAccount));
+            given(favoriteFolderRepository.findAllByAccountOrderByFavoriteFolderAccountIdAsc(savedAccount))
+                    .willReturn(List.of(defaultFolder, favoriteFolder));
 
             int defaultFolderPlaceCount = 3;
             int favoriteFolderPlaceCount = 4;
@@ -197,12 +189,8 @@ class FavoriteFolderServiceTest {
 
             FavoriteFolder defaultFolder = FavoriteFolderFixture.createDefaultFolderWithId(1L);
             FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(2L, "커스텀 폴더 1");
-            FavoriteFolderAccount defaultFolderAccount = FavoriteFolderAccountFixture.createFavoriteFolderAccount(
-                    defaultFolder, savedAccount, AccountRole.OWNER);
-            FavoriteFolderAccount favoriteFolderAccount = FavoriteFolderAccountFixture.createFavoriteFolderAccount(
-                    favoriteFolder, savedAccount, AccountRole.OWNER);
-            given(favoriteFolderAccountService.findAllByAccountOrderByIdAsc(savedAccount))
-                    .willReturn(List.of(defaultFolderAccount, favoriteFolderAccount));
+            given(favoriteFolderRepository.findAllByAccountOrderByFavoriteFolderAccountIdAsc(savedAccount))
+                    .willReturn(List.of(defaultFolder, favoriteFolder));
 
             Long placeId = 1L;
             Place place = new Place(placeId, "장소", "url", "주소", 1, 1);
@@ -331,10 +319,8 @@ class FavoriteFolderServiceTest {
 
             given(favoriteFolderRepository.findById(newFolderId))
                     .willReturn(Optional.of(newFavoriteFolder));
-            given(favoriteFolderAccountService.findAllByAccount(account))
-                    .willReturn(
-                            List.of(FavoriteFolderAccountFixture.createFavoriteFolderAccount(oldFavoriteFolder, account,
-                                    AccountRole.OWNER)));
+            given(favoriteFolderRepository.findAllByAccount(account))
+                    .willReturn(List.of(oldFavoriteFolder));
 
             // when & then
             assertThatThrownBy(() -> favoriteFolderService.updateName(account, newFolderId, request))

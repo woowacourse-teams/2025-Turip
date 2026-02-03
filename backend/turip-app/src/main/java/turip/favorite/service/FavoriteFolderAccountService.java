@@ -30,10 +30,6 @@ public class FavoriteFolderAccountService {
         return favoriteFolderAccountRepository.findAllByAccount(account);
     }
 
-    public List<FavoriteFolderAccount> findAllByAccountOrderByIdAsc(Account account) {
-        return favoriteFolderAccountRepository.findAllByAccountOrderByIdAsc(account);
-    }
-
     @Transactional
     public void removeByAccount(Account account) {
         favoriteFolderAccountRepository.findAllByAccount(account).
