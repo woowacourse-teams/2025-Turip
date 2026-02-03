@@ -24,11 +24,14 @@ import turip.account.repository.MemberRepository;
 import turip.auth.service.RefreshTokenService;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.BadRequestException;
+import turip.favorite.domain.AccountRole;
 import turip.favorite.domain.FavoriteContent;
 import turip.favorite.domain.FavoriteFolder;
+import turip.favorite.domain.FavoriteFolderAccount;
 import turip.favorite.repository.FavoriteContentRepository;
-import turip.favorite.repository.FavoriteFolderRepository;
+import turip.favorite.service.FavoriteFolderAccountService;
 import turip.util.fixture.AccountFixture;
+import turip.util.fixture.FavoriteFolderFixture;
 import turip.util.fixture.GuestFixture;
 import turip.util.fixture.MemberFixture;
 
@@ -45,7 +48,7 @@ class MemberServiceTest {
     private FavoriteContentRepository favoriteContentRepository;
 
     @Mock
-    private FavoriteFolderRepository favoriteFolderRepository;
+    private FavoriteFolderAccountService favoriteFolderAccountService;
 
     @Mock
     private GuestService guestService;
@@ -92,7 +95,7 @@ class MemberServiceTest {
 
             given(favoriteContentRepository.findAllByAccount(guestAccount))
                     .willReturn(List.of(guestFavoriteContent));
-            given(favoriteFolderRepository.findAllByAccount(guestAccount))
+            given(favoriteFolderAccountService.findAllByAccount(guestAccount))
                     .willReturn(List.of());
 
             // when
@@ -112,21 +115,26 @@ class MemberServiceTest {
             Member member = MemberFixture.createCustomMember(memberAccount, "email@test.com", true);
             Guest guest = GuestFixture.createCustomGuest(guestAccount, "device-fid-123");
 
-            FavoriteFolder guestFolder1 = new FavoriteFolder(1L, guestAccount, "기본 폴더", true);
-            FavoriteFolder guestFolder2 = new FavoriteFolder(2L, guestAccount, "게스트 커스텀 폴더였던 것", false);
+            FavoriteFolder guestFolder1 = FavoriteFolderFixture.createDefaultFolderWithId(1L);
+            FavoriteFolder guestFolder2 = FavoriteFolderFixture.createCustomFolderWithId(2L, "게스트 커스텀 폴더였던 것");
+
+            FavoriteFolderAccount folderAccount1 = new FavoriteFolderAccount(guestFolder1, guestAccount,
+                    AccountRole.OWNER);
+            FavoriteFolderAccount folderAccount2 = new FavoriteFolderAccount(guestFolder2, guestAccount,
+                    AccountRole.OWNER);
 
             given(favoriteContentRepository.findAllByAccount(any()))
                     .willReturn(List.of());
-            given(favoriteFolderRepository.findAllByAccount(guestAccount))
-                    .willReturn(List.of(guestFolder1, guestFolder2));
+            given(favoriteFolderAccountService.findAllByAccount(guestAccount))
+                    .willReturn(List.of(folderAccount1, folderAccount2));
 
             // when
             memberService.migrate(member, guest);
 
             // then
             assertAll(
-                    () -> assertThat(guestFolder1.getAccount()).isEqualTo(memberAccount),
-                    () -> assertThat(guestFolder2.getAccount()).isEqualTo(memberAccount)
+                    () -> assertThat(folderAccount1.getAccount()).isEqualTo(memberAccount),
+                    () -> assertThat(folderAccount2.getAccount()).isEqualTo(memberAccount)
             );
         }
 
@@ -141,7 +149,7 @@ class MemberServiceTest {
 
             given(favoriteContentRepository.findAllByAccount(any()))
                     .willReturn(List.of());
-            given(favoriteFolderRepository.findAllByAccount(any()))
+            given(favoriteFolderAccountService.findAllByAccount(any()))
                     .willReturn(List.of());
 
             // when

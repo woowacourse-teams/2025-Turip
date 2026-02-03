@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Mockito.verify;
 
 import java.util.List;
@@ -31,12 +32,16 @@ import turip.favorite.controller.dto.request.FavoriteFolderRequest;
 import turip.favorite.controller.dto.response.FavoriteFolderResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithFavoriteStatusResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithPlaceCountResponse;
+import turip.favorite.domain.AccountRole;
 import turip.favorite.domain.FavoriteFolder;
+import turip.favorite.domain.FavoriteFolderAccount;
 import turip.favorite.repository.FavoriteFolderRepository;
 import turip.favorite.repository.FavoritePlaceRepository;
 import turip.place.domain.Place;
 import turip.place.repository.PlaceRepository;
 import turip.util.fixture.AccountFixture;
+import turip.util.fixture.FavoriteFolderAccountFixture;
+import turip.util.fixture.FavoriteFolderFixture;
 
 @ExtendWith(MockitoExtension.class)
 class FavoriteFolderServiceTest {
@@ -46,6 +51,9 @@ class FavoriteFolderServiceTest {
 
     @Mock
     private FavoriteFolderRepository favoriteFolderRepository;
+
+    @Mock
+    private FavoriteFolderAccountService favoriteFolderAccountService;
 
     @Mock
     private FavoritePlaceRepository favoritePlaceRepository;
@@ -67,7 +75,7 @@ class FavoriteFolderServiceTest {
             favoriteFolderService.createDefaultFavoriteFolder(account);
 
             // then
-            verify(favoriteFolderRepository).save(FavoriteFolder.defaultFolderOf(account));
+            verify(favoriteFolderRepository).save(FavoriteFolder.defaultFolderOf());
         }
     }
 
@@ -81,16 +89,16 @@ class FavoriteFolderServiceTest {
             // given
             String folderName = "괜찮은 소품샵 모음";
             Long accountId = 1L;
-            boolean isDefault = false;
             Long folderId = 1L;
 
             FavoriteFolderRequest request = new FavoriteFolderRequest(folderName);
             Account account = AccountFixture.createUser();
+            FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(folderId, folderName);
 
-            given(favoriteFolderRepository.existsByNameAndAccount(folderName, account))
-                    .willReturn(false);
-            given(favoriteFolderRepository.save(FavoriteFolder.customFolderOf(account, folderName)))
-                    .willReturn(new FavoriteFolder(folderId, account, folderName, isDefault));
+            given(favoriteFolderAccountService.findAllByAccount(account))
+                    .willReturn(List.of());
+            given(favoriteFolderRepository.save(FavoriteFolderFixture.createCustomFolder(folderName)))
+                    .willReturn(favoriteFolder);
 
             // when
             FavoriteFolderResponse response = favoriteFolderService.createCustomFavoriteFolder(request, account);
@@ -112,9 +120,11 @@ class FavoriteFolderServiceTest {
 
             FavoriteFolderRequest request = new FavoriteFolderRequest(folderName);
             Account account = AccountFixture.createUser();
+            FavoriteFolder customFolder = FavoriteFolderFixture.createCustomFolderWithId(1L, folderName);
 
-            given(favoriteFolderRepository.existsByNameAndAccount(folderName, account))
-                    .willReturn(true);
+            given(favoriteFolderAccountService.findAllByAccount(account))
+                    .willReturn(List.of(FavoriteFolderAccountFixture.createFavoriteFolderAccount(customFolder, account,
+                            AccountRole.OWNER)));
 
             // when & then
             assertThatThrownBy(() -> favoriteFolderService.createCustomFavoriteFolder(request, account))
@@ -145,10 +155,14 @@ class FavoriteFolderServiceTest {
             // given
             Account savedAccount = AccountFixture.createUser();
 
-            FavoriteFolder defaultFolder = new FavoriteFolder(1L, savedAccount, "기본 폴더", true);
-            FavoriteFolder favoriteFolder = new FavoriteFolder(2L, savedAccount, "커스텀 폴더 1", true);
-            given(favoriteFolderRepository.findAllByAccountOrderByIdAsc(savedAccount))
-                    .willReturn(List.of(defaultFolder, favoriteFolder));
+            FavoriteFolder defaultFolder = FavoriteFolderFixture.createDefaultFolderWithId(1L);
+            FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(2L, "커스텀 폴더 1");
+            FavoriteFolderAccount defaultFolderAccount = FavoriteFolderAccountFixture.createFavoriteFolderAccount(
+                    defaultFolder, savedAccount, AccountRole.OWNER);
+            FavoriteFolderAccount favoriteFolderAccount = FavoriteFolderAccountFixture.createFavoriteFolderAccount(
+                    favoriteFolder, savedAccount, AccountRole.OWNER);
+            given(favoriteFolderAccountService.findAllByAccountOrderByIdAsc(savedAccount))
+                    .willReturn(List.of(defaultFolderAccount, favoriteFolderAccount));
 
             int defaultFolderPlaceCount = 3;
             int favoriteFolderPlaceCount = 4;
@@ -181,10 +195,14 @@ class FavoriteFolderServiceTest {
             // given
             Account savedAccount = AccountFixture.createUser();
 
-            FavoriteFolder defaultFolder = new FavoriteFolder(1L, savedAccount, "기본 폴더", true);
-            FavoriteFolder favoriteFolder = new FavoriteFolder(2L, savedAccount, "커스텀 폴더 1", false);
-            given(favoriteFolderRepository.findAllByAccountOrderByIdAsc(savedAccount))
-                    .willReturn(List.of(defaultFolder, favoriteFolder));
+            FavoriteFolder defaultFolder = FavoriteFolderFixture.createDefaultFolderWithId(1L);
+            FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(2L, "커스텀 폴더 1");
+            FavoriteFolderAccount defaultFolderAccount = FavoriteFolderAccountFixture.createFavoriteFolderAccount(
+                    defaultFolder, savedAccount, AccountRole.OWNER);
+            FavoriteFolderAccount favoriteFolderAccount = FavoriteFolderAccountFixture.createFavoriteFolderAccount(
+                    favoriteFolder, savedAccount, AccountRole.OWNER);
+            given(favoriteFolderAccountService.findAllByAccountOrderByIdAsc(savedAccount))
+                    .willReturn(List.of(defaultFolderAccount, favoriteFolderAccount));
 
             Long placeId = 1L;
             Place place = new Place(placeId, "장소", "url", "주소", 1, 1);
@@ -234,10 +252,9 @@ class FavoriteFolderServiceTest {
             Long folderId = 1L;
             String oldName = "기존 폴더 이름";
             String newName = "변경된 폴더 이름";
-            boolean isDefault = false;
 
             Account account = AccountFixture.createCustomAccount(accountId, Role.USER);
-            FavoriteFolder favoriteFolder = new FavoriteFolder(folderId, account, oldName, isDefault);
+            FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(folderId, oldName);
             FavoriteFolderNameRequest request = new FavoriteFolderNameRequest(newName);
 
             given(favoriteFolderRepository.findById(folderId))
@@ -280,19 +297,18 @@ class FavoriteFolderServiceTest {
         void updateName4() {
             // given
             Long requestMemberId = 1L;
-            Long ownerMemberId = 2L;
             Long folderId = 1L;
             String oldName = "기존 폴더 이름";
             String newName = "변경된 폴더 이름";
-            boolean isDefault = false;
 
             Account requestAccount = AccountFixture.createCustomAccount(requestMemberId, Role.USER);
-            Account ownerAccount = AccountFixture.createCustomAccount(ownerMemberId, Role.USER);
-            FavoriteFolder favoriteFolder = new FavoriteFolder(folderId, ownerAccount, oldName, isDefault);
+            FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(folderId, oldName);
             FavoriteFolderNameRequest request = new FavoriteFolderNameRequest(newName);
 
             given(favoriteFolderRepository.findById(folderId))
                     .willReturn(Optional.of(favoriteFolder));
+            willThrow(new ForbiddenException(ErrorTag.FORBIDDEN))
+                    .given(favoriteFolderAccountService).validateOwnership(requestAccount, favoriteFolder);
 
             // when & then
             assertThatThrownBy(() -> favoriteFolderService.updateName(requestAccount, folderId, request))
@@ -304,22 +320,24 @@ class FavoriteFolderServiceTest {
         void updateName5() {
             // given
             Long accountId = 1L;
-            Long folderId = 1L;
-            String oldName = "기존 폴더 이름";
+            Long oldFolderId = 1L;
+            Long newFolderId = 1L;
             String newName = "중복된 폴더 이름";
-            boolean isDefault = false;
 
             Account account = AccountFixture.createCustomAccount(accountId, Role.USER);
-            FavoriteFolder favoriteFolder = new FavoriteFolder(folderId, account, oldName, isDefault);
+            FavoriteFolder oldFavoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(oldFolderId, newName);
+            FavoriteFolder newFavoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(newFolderId, newName);
             FavoriteFolderNameRequest request = new FavoriteFolderNameRequest(newName);
 
-            given(favoriteFolderRepository.findById(folderId))
-                    .willReturn(Optional.of(favoriteFolder));
-            given(favoriteFolderRepository.existsByNameAndAccount(newName, account))
-                    .willReturn(true);
+            given(favoriteFolderRepository.findById(newFolderId))
+                    .willReturn(Optional.of(newFavoriteFolder));
+            given(favoriteFolderAccountService.findAllByAccount(account))
+                    .willReturn(
+                            List.of(FavoriteFolderAccountFixture.createFavoriteFolderAccount(oldFavoriteFolder, account,
+                                    AccountRole.OWNER)));
 
             // when & then
-            assertThatThrownBy(() -> favoriteFolderService.updateName(account, folderId, request))
+            assertThatThrownBy(() -> favoriteFolderService.updateName(account, newFolderId, request))
                     .isInstanceOf(ConflictException.class);
         }
 
@@ -331,10 +349,9 @@ class FavoriteFolderServiceTest {
             Long accountId = 1L;
             Long folderId = 1L;
             String oldName = "기존 폴더 이름";
-            boolean isDefault = false;
 
             Account member = AccountFixture.createCustomAccount(accountId, Role.USER);
-            FavoriteFolder favoriteFolder = new FavoriteFolder(folderId, member, oldName, isDefault);
+            FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(folderId, oldName);
             FavoriteFolderNameRequest request = new FavoriteFolderNameRequest(newName);
 
             given(favoriteFolderRepository.findById(folderId))
@@ -351,12 +368,10 @@ class FavoriteFolderServiceTest {
             // given
             Long accountId = 1L;
             Long folderId = 1L;
-            String oldName = "기본 폴더";
             String newName = "새로운 폴더 이름";
-            boolean isDefault = true;
 
             Account member = AccountFixture.createCustomAccount(accountId, Role.USER);
-            FavoriteFolder favoriteFolder = new FavoriteFolder(folderId, member, oldName, isDefault);
+            FavoriteFolder favoriteFolder = FavoriteFolderFixture.createDefaultFolderWithId(folderId);
             FavoriteFolderNameRequest request = new FavoriteFolderNameRequest(newName);
 
             given(favoriteFolderRepository.findById(folderId))
@@ -380,10 +395,9 @@ class FavoriteFolderServiceTest {
             Long accountId = 1L;
             Long folderId = 1L;
             String folderName = "삭제할 폴더";
-            boolean isDefault = false;
 
             Account member = AccountFixture.createCustomAccount(accountId, Role.USER);
-            FavoriteFolder favoriteFolder = new FavoriteFolder(folderId, member, folderName, isDefault);
+            FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(folderId, folderName);
 
             given(favoriteFolderRepository.findById(folderId))
                     .willReturn(Optional.of(favoriteFolder));
@@ -419,17 +433,16 @@ class FavoriteFolderServiceTest {
         void remove4() {
             // given
             Long requestAccountId = 1L;
-            Long ownerMemberId = 2L;
             Long folderId = 1L;
             String folderName = "다른 사람의 폴더";
-            boolean isDefault = false;
 
             Account requestAccount = AccountFixture.createCustomAccount(requestAccountId, Role.USER);
-            Account ownerAccount = AccountFixture.createCustomAccount(ownerMemberId, Role.USER);
-            FavoriteFolder favoriteFolder = new FavoriteFolder(folderId, ownerAccount, folderName, isDefault);
+            FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(folderId, folderName);
 
             given(favoriteFolderRepository.findById(folderId))
                     .willReturn(Optional.of(favoriteFolder));
+            willThrow(new ForbiddenException(ErrorTag.FORBIDDEN))
+                    .given(favoriteFolderAccountService).validateOwnership(requestAccount, favoriteFolder);
 
             // when & then
             assertThatThrownBy(() -> favoriteFolderService.remove(requestAccount, folderId))
@@ -442,11 +455,9 @@ class FavoriteFolderServiceTest {
             // given
             Long accountId = 1L;
             Long folderId = 1L;
-            String folderName = "기본 폴더";
-            boolean isDefault = true;
 
             Account member = AccountFixture.createCustomAccount(accountId, Role.USER);
-            FavoriteFolder favoriteFolder = new FavoriteFolder(folderId, member, folderName, isDefault);
+            FavoriteFolder favoriteFolder = FavoriteFolderFixture.createDefaultFolderWithId(folderId);
 
             given(favoriteFolderRepository.findById(folderId))
                     .willReturn(Optional.of(favoriteFolder));
@@ -455,51 +466,6 @@ class FavoriteFolderServiceTest {
             assertThatThrownBy(() -> favoriteFolderService.remove(member, folderId))
                     .isInstanceOf(BadRequestException.class)
                     .hasMessage(ErrorTag.DEFAULT_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED.getMessage());
-        }
-    }
-
-    @DisplayName("Account 기준 장소 찜 폴더 일괄 삭제 테스트")
-    @Nested
-    class RemoveByAccount {
-
-        @DisplayName("Account의 모든 장소 찜 폴더와 폴더 내 장소 찜들을 삭제할 수 있다")
-        @Test
-        void removeByAccount1() {
-            // given
-            Long accountId = 1L;
-            Account account = AccountFixture.createCustomAccount(accountId, Role.USER);
-
-            FavoriteFolder defaultFolder = new FavoriteFolder(1L, account, "기본 폴더", true);
-            FavoriteFolder customFolder = new FavoriteFolder(2L, account, "커스텀 폴더", false);
-
-            given(favoriteFolderRepository.findAllByAccount(account))
-                    .willReturn(List.of(defaultFolder, customFolder));
-
-            // when
-            favoriteFolderService.removeByAccount(account);
-
-            // then
-            verify(favoritePlaceRepository).deleteAllByFavoriteFolder(defaultFolder);
-            verify(favoritePlaceRepository).deleteAllByFavoriteFolder(customFolder);
-            verify(favoriteFolderRepository).delete(defaultFolder);
-            verify(favoriteFolderRepository).delete(customFolder);
-        }
-
-        @DisplayName("Account에 폴더가 없는 경우에도 정상적으로 처리된다")
-        @Test
-        void removeByAccount2() {
-            // given
-            Long accountId = 1L;
-            Account account = AccountFixture.createCustomAccount(accountId, Role.USER);
-
-            given(favoriteFolderRepository.findAllByAccount(account))
-                    .willReturn(List.of());
-
-            // when
-            favoriteFolderService.removeByAccount(account);
-
-            // then
-            verify(favoriteFolderRepository).findAllByAccount(account);
         }
     }
 }

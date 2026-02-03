@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import turip.account.domain.Provider;
 import turip.account.domain.Role;
 import turip.account.domain.TuripMember;
+import turip.favorite.domain.AccountRole;
 
 @Component
 public class TestDataHelper {
@@ -101,6 +102,43 @@ public class TestDataHelper {
         Long accountId = insertAccount();
         Long memberId = insertMember(accountId, email, isFirstLogin);
         return insertTuripMember(memberId, loginId, loginPassword);
+    }
+
+    public Long insertFavoriteFolder(String name, boolean isDefault, int memberCount, boolean isShared) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(
+                    "INSERT INTO favorite_folder (name, is_default, member_count, is_shared) VALUES (?, ?, ?, ?)",
+                    Statement.RETURN_GENERATED_KEYS);
+            ps.setString(1, name);
+            ps.setBoolean(2, isDefault);
+            ps.setInt(3, memberCount);
+            ps.setBoolean(4, isShared);
+            return ps;
+        }, keyHolder);
+
+        return extractGeneratedKey(keyHolder);
+    }
+
+    public Long insertFavoriteFolder(String name) {
+        return insertFavoriteFolder(name, false, 1, false);
+    }
+
+    public Long insertFavoriteFolderAccount(Long accountId, Long favoriteFolderId, AccountRole accountRole) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(
+                    "INSERT INTO favorite_folder_account (account_id, favorite_folder_id, account_role) VALUES (?, ?, ?)",
+                    Statement.RETURN_GENERATED_KEYS);
+            ps.setLong(1, accountId);
+            ps.setLong(2, favoriteFolderId);
+            ps.setString(3, accountRole.name());
+            return ps;
+        }, keyHolder);
+
+        return extractGeneratedKey(keyHolder);
     }
 
     private Long extractGeneratedKey(KeyHolder keyHolder) {

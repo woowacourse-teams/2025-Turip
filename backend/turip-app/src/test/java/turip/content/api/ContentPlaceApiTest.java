@@ -12,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
+import turip.favorite.domain.AccountRole;
 import turip.util.helper.TestDataHelper;
 
 @ActiveProfiles("test")
@@ -100,8 +101,8 @@ class ContentPlaceApiTest {
 
             Long accountId = testDataHelper.insertAccount();
             jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
-            jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '기본 폴더', true)", accountId);
+            Long folderId = testDataHelper.insertFavoriteFolder("기본 폴더", true, 1, false);
+            testDataHelper.insertFavoriteFolderAccount(accountId, folderId, AccountRole.OWNER);
             jdbcTemplate.update(
                     "INSERT INTO favorite_place (favorite_folder_id, place_id) VALUES (1, 1)");
 
