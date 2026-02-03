@@ -23,4 +23,15 @@ public class FavoriteFolderAccountService {
         FavoriteFolderAccount favoriteFolderAccount = new FavoriteFolderAccount(favoriteFolder, account, accountRole);
         favoriteFolderAccountRepository.save(favoriteFolderAccount);
     }
+
+    @Transactional
+    public void removeByAccount(Account account) {
+        favoriteFolderAccountRepository.findAllByAccount(account).
+                forEach(this::removeWithFavoriteFolder);
+    }
+
+    private void removeWithFavoriteFolder(FavoriteFolderAccount favoriteFolderAccount) {
+        favoriteFolderRepository.delete(favoriteFolderAccount.getFavoriteFolder());
+        favoriteFolderAccountRepository.delete(favoriteFolderAccount);
+    }
 }

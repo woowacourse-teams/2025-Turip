@@ -113,16 +113,6 @@ public class FavoriteFolderService {
         favoriteFolderRepository.deleteById(favoriteFolderId);
     }
 
-    @Transactional
-    public void removeByAccount(Account account) {
-        favoriteFolderRepository.findAllByAccount(account)
-                .forEach(favoriteFolder -> {
-                    validateOwnership(account, favoriteFolder);
-                    favoritePlaceRepository.deleteAllByFavoriteFolder(favoriteFolder);
-                    favoriteFolderRepository.delete(favoriteFolder);
-                });
-    }
-
     private void validateDuplicatedName(String folderName, Account account) {
         if (favoriteFolderRepository.existsByNameAndAccount(folderName, account)) {
             throw new ConflictException(ErrorTag.FAVORITE_FOLDER_NAME_CONFLICT);

@@ -8,6 +8,7 @@ import turip.account.repository.AccountRepository;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.NotFoundException;
 import turip.favorite.repository.FavoriteContentRepository;
+import turip.favorite.service.FavoriteFolderAccountService;
 import turip.favorite.service.FavoriteFolderService;
 
 @Service
@@ -17,6 +18,7 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final FavoriteContentRepository favoriteContentRepository;
     private final FavoriteFolderService favoriteFolderService;
+    private final FavoriteFolderAccountService favoriteFolderAccountService;
 
     @Transactional
     public Account create() {
@@ -33,7 +35,7 @@ public class AccountService {
     @Transactional
     public void deleteAccountAndFavorites(Account account) {
         favoriteContentRepository.deleteByAccount(account);
-        favoriteFolderService.removeByAccount(account);
+        favoriteFolderAccountService.removeByAccount(account);
         accountRepository.delete(account);
     }
 }
