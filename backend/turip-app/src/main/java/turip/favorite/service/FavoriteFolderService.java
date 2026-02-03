@@ -85,7 +85,8 @@ public class FavoriteFolderService {
     }
 
     public boolean isCustomFolderExists(Account account) {
-        return favoriteFolderRepository.existsByAccountAndIsDefault(account, false);
+        return favoriteFolderAccountService.findAllByAccount(account).stream()
+                .anyMatch(favoriteFolderAccount -> !favoriteFolderAccount.getFavoriteFolder().isDefault());
     }
 
     @Transactional
