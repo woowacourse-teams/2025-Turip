@@ -1,9 +1,9 @@
 package turip.favorite.repository;
 
 import java.util.List;
-import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import turip.account.domain.Account;
+import turip.favorite.domain.AccountRole;
 import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.domain.FavoriteFolderAccount;
 
@@ -13,5 +13,6 @@ public interface FavoriteFolderAccountRepository extends JpaRepository<FavoriteF
 
     List<FavoriteFolderAccount> findAllByAccountOrderByIdAsc(Account account);
 
-    Optional<FavoriteFolderAccount> findByAccountAndFavoriteFolder(Account account, FavoriteFolder favoriteFolder);
+    boolean existsByFavoriteFolderAndAccountAndAccountRole(FavoriteFolder favoriteFolder, Account account,
+                                                           AccountRole accountRole);
 }

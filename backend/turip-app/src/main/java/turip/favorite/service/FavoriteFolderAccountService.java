@@ -42,11 +42,11 @@ public class FavoriteFolderAccountService {
     }
 
     public void validateOwnership(Account account, FavoriteFolder favoriteFolder) {
-        FavoriteFolderAccount favoriteFolderAccount = favoriteFolderAccountRepository.findByAccountAndFavoriteFolder(
-                        account, favoriteFolder)
-                .orElseThrow(() -> new ForbiddenException(ErrorTag.FORBIDDEN));
+        boolean isOwner = favoriteFolderAccountRepository.existsByFavoriteFolderAndAccountAndAccountRole(
+                favoriteFolder, account, AccountRole.OWNER
+        );
 
-        if (!favoriteFolderAccount.isRoleOf(AccountRole.OWNER)) {
+        if (!isOwner) {
             throw new ForbiddenException(ErrorTag.FORBIDDEN);
         }
     }
