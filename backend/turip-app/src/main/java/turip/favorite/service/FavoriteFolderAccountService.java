@@ -1,5 +1,6 @@
 package turip.favorite.service;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +26,10 @@ public class FavoriteFolderAccountService {
     public void save(FavoriteFolder favoriteFolder, Account account, AccountRole accountRole) {
         FavoriteFolderAccount favoriteFolderAccount = new FavoriteFolderAccount(favoriteFolder, account, accountRole);
         favoriteFolderAccountRepository.save(favoriteFolderAccount);
+    }
+
+    public List<FavoriteFolderAccount> findAllByAccount(Account account) {
+        return favoriteFolderAccountRepository.findAllByAccount(account);
     }
 
     @Transactional

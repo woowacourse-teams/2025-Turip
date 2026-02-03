@@ -19,6 +19,7 @@ import turip.favorite.controller.dto.response.FavoriteFoldersWithFavoriteStatusR
 import turip.favorite.controller.dto.response.FavoriteFoldersWithPlaceCountResponse;
 import turip.favorite.domain.AccountRole;
 import turip.favorite.domain.FavoriteFolder;
+import turip.favorite.domain.FavoriteFolderAccount;
 import turip.favorite.repository.FavoriteFolderRepository;
 import turip.favorite.repository.FavoritePlaceRepository;
 import turip.place.domain.Place;
@@ -113,9 +114,13 @@ public class FavoriteFolderService {
     }
 
     private void validateDuplicatedName(String folderName, Account account) {
-        if (favoriteFolderRepository.existsByNameAndAccount(folderName, account)) {
-            throw new ConflictException(ErrorTag.FAVORITE_FOLDER_NAME_CONFLICT);
-        }
+        favoriteFolderAccountService.findAllByAccount(account)
+                .forEach(favoriteFolderAccount -> {
+                    FavoriteFolder favoriteFolder = favoriteFolderAccount.getFavoriteFolder();
+                    if (!favoriteFolder.isShared() && favoriteFolder.isFolderName(folderName)) {
+                        throw new ConflictException(ErrorTag.FAVORITE_FOLDER_NAME_CONFLICT);
+                    }
+                });
     }
 
     private Place getPlaceById(Long id) {

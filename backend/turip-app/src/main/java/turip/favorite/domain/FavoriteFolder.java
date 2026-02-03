@@ -75,4 +75,8 @@ public class FavoriteFolder {
             throw new IllegalArgumentException(ErrorTag.FAVORITE_FOLDER_NAME_TOO_LONG);
         }
     }
+
+    public boolean isFolderName(String folderName) {
+        return this.name.equals(folderName);
+    }
 }
