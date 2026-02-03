@@ -47,12 +47,12 @@ class MemberApiTest {
         jdbcTemplate.update("DELETE FROM refresh_token");
         jdbcTemplate.update("DELETE FROM favorite_content");
         jdbcTemplate.update("DELETE FROM favorite_place");
+        jdbcTemplate.update("DELETE FROM favorite_folder_account");
         jdbcTemplate.update("DELETE FROM favorite_folder");
         jdbcTemplate.update("DELETE FROM social_member");
         jdbcTemplate.update("DELETE FROM member");
         jdbcTemplate.update("DELETE FROM guest");
         jdbcTemplate.update("DELETE FROM account");
-        jdbcTemplate.update("DELETE FROM favorite_folder_account");
         jdbcTemplate.update("DELETE FROM content");
         jdbcTemplate.update("DELETE FROM creator");
         jdbcTemplate.update("DELETE FROM city");
