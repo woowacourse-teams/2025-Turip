@@ -53,9 +53,10 @@ public class FavoriteFolderService {
     }
 
     public FavoriteFoldersWithPlaceCountResponse findAllByMember(Account account) {
-        List<FavoriteFolderWithPlaceCountResponse> favoriteFoldersWithPlaceCount = favoriteFolderRepository.findAllByAccountOrderByIdAsc(
+        List<FavoriteFolderWithPlaceCountResponse> favoriteFoldersWithPlaceCount = favoriteFolderAccountService.findAllByAccountOrderByIdAsc(
                         account).stream()
-                .map(favoriteFolder -> {
+                .map(favoriteFolderAccount -> {
+                    FavoriteFolder favoriteFolder = favoriteFolderAccount.getFavoriteFolder();
                     int placeCount = favoritePlaceRepository.countByFavoriteFolder(favoriteFolder);
                     return FavoriteFolderWithPlaceCountResponse.of(favoriteFolder, placeCount);
                 })
@@ -67,7 +68,10 @@ public class FavoriteFolderService {
     public FavoriteFoldersWithFavoriteStatusResponse findAllWithFavoriteStatusByAccountId(Account account,
                                                                                           Long placeId) {
         Place place = getPlaceById(placeId);
-        List<FavoriteFolder> favoriteFolders = favoriteFolderRepository.findAllByAccountOrderByIdAsc(account);
+        List<FavoriteFolder> favoriteFolders = favoriteFolderAccountService.findAllByAccountOrderByIdAsc(account)
+                .stream()
+                .map(FavoriteFolderAccount::getFavoriteFolder)
+                .toList();
         Set<Long> favoritedFolderIds = favoritePlaceRepository.findFavoriteFolderIdsByPlaceAndFavoriteFolderIn(
                 place, favoriteFolders);
 
