@@ -9,7 +9,6 @@ import turip.account.domain.Account;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.BadRequestException;
 import turip.common.exception.custom.ConflictException;
-import turip.common.exception.custom.ForbiddenException;
 import turip.common.exception.custom.NotFoundException;
 import turip.favorite.controller.dto.request.FavoriteFolderNameRequest;
 import turip.favorite.controller.dto.request.FavoriteFolderRequest;
@@ -93,7 +92,7 @@ public class FavoriteFolderService {
         }
 
         String newName = FavoriteFolder.formatName(request.name());
-        validateOwnership(account, favoriteFolder);
+        favoriteFolderAccountService.validateOwnership(account, favoriteFolder);
         validateDuplicatedName(newName, account);
         favoriteFolder.rename(newName);
 
@@ -107,7 +106,7 @@ public class FavoriteFolderService {
         if (favoriteFolder.isDefault()) {
             throw new BadRequestException(ErrorTag.DEFAULT_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED);
         }
-        validateOwnership(account, favoriteFolder);
+        favoriteFolderAccountService.validateOwnership(account, favoriteFolder);
 
         favoritePlaceRepository.deleteAllByFavoriteFolder(favoriteFolder);
         favoriteFolderRepository.deleteById(favoriteFolderId);
@@ -127,11 +126,5 @@ public class FavoriteFolderService {
     private FavoriteFolder getById(Long favoriteFolderId) {
         return favoriteFolderRepository.findById(favoriteFolderId)
                 .orElseThrow(() -> new NotFoundException(ErrorTag.FAVORITE_FOLDER_NOT_FOUND));
-    }
-
-    private void validateOwnership(Account requestAccount, FavoriteFolder favoriteFolder) {
-        if (!favoriteFolder.isOwner(requestAccount)) {
-            throw new ForbiddenException(ErrorTag.FORBIDDEN);
-        }
     }
 }

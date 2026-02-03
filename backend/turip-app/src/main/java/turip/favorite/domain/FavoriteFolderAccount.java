@@ -63,4 +63,8 @@ public class FavoriteFolderAccount {
     public void updateAccount(Account account) {
         this.account = account;
     }
+
+    public boolean isRoleOf(AccountRole accountRole) {
+        return this.accountRole == accountRole;
+    }
 }
