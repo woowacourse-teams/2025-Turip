@@ -49,7 +49,7 @@ public class FavoriteFolderService {
         FavoriteFolder savedFavoriteFolder = favoriteFolderRepository.save(favoriteFolder);
         favoriteFolderAccountService.save(savedFavoriteFolder, account, AccountRole.OWNER);
 
-        return FavoriteFolderResponse.from(savedFavoriteFolder);
+        return FavoriteFolderResponse.of(savedFavoriteFolder, account);
     }
 
     public FavoriteFoldersWithPlaceCountResponse findAllByMember(Account account) {
@@ -58,7 +58,7 @@ public class FavoriteFolderService {
                 .map(favoriteFolderAccount -> {
                     FavoriteFolder favoriteFolder = favoriteFolderAccount.getFavoriteFolder();
                     int placeCount = favoritePlaceRepository.countByFavoriteFolder(favoriteFolder);
-                    return FavoriteFolderWithPlaceCountResponse.of(favoriteFolder, placeCount);
+                    return FavoriteFolderWithPlaceCountResponse.of(favoriteFolder, account, placeCount);
                 })
                 .toList();
 
@@ -78,7 +78,7 @@ public class FavoriteFolderService {
         List<FavoriteFolderWithFavoriteStatusResponse> favoriteFoldersWithFavoriteStatus = favoriteFolders.stream()
                 .map(favoriteFolder -> {
                     boolean isFavoritePlace = favoritedFolderIds.contains(favoriteFolder.getId());
-                    return FavoriteFolderWithFavoriteStatusResponse.of(favoriteFolder, isFavoritePlace);
+                    return FavoriteFolderWithFavoriteStatusResponse.of(favoriteFolder, account, isFavoritePlace);
                 })
                 .toList();
         return FavoriteFoldersWithFavoriteStatusResponse.from(favoriteFoldersWithFavoriteStatus);
@@ -102,7 +102,7 @@ public class FavoriteFolderService {
         validateDuplicatedName(newName, account);
         favoriteFolder.rename(newName);
 
-        return FavoriteFolderResponse.from(favoriteFolder);
+        return FavoriteFolderResponse.of(favoriteFolder, account);
     }
 
     @Transactional
