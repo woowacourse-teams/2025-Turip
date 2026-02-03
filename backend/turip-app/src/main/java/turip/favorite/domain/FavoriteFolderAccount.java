@@ -18,6 +18,8 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import turip.account.domain.Account;
 
 @Getter
@@ -35,10 +37,12 @@ public class FavoriteFolderAccount {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "favorite_folder_id", nullable = false, foreignKey = @ForeignKey(name = "fk_favorite_folder_account__favorite_folder"))
     private FavoriteFolder favoriteFolder;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "account_id", nullable = false, foreignKey = @ForeignKey(name = "fk_favorite_folder_account__account"))
     private Account account;
 
