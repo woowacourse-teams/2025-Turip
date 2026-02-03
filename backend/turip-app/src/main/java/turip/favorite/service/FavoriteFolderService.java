@@ -18,6 +18,7 @@ import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusRe
 import turip.favorite.controller.dto.response.FavoriteFolderWithPlaceCountResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithFavoriteStatusResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithPlaceCountResponse;
+import turip.favorite.domain.AccountRole;
 import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.repository.FavoriteFolderRepository;
 import turip.favorite.repository.FavoritePlaceRepository;
@@ -31,19 +32,22 @@ public class FavoriteFolderService {
     private final FavoriteFolderRepository favoriteFolderRepository;
     private final FavoritePlaceRepository favoritePlaceRepository;
     private final PlaceRepository placeRepository;
+    private final FavoriteFolderAccountService favoriteFolderAccountService;
 
     @Transactional
     public void createDefaultFavoriteFolder(Account account) {
-        FavoriteFolder defaultFolder = FavoriteFolder.defaultFolderOf(account);
-        favoriteFolderRepository.save(defaultFolder);
+        FavoriteFolder defaultFolder = FavoriteFolder.defaultFolderOf();
+        FavoriteFolder savedFavoriteFolder = favoriteFolderRepository.save(defaultFolder);
+        favoriteFolderAccountService.save(savedFavoriteFolder, account, AccountRole.OWNER);
     }
 
     @Transactional
     public FavoriteFolderResponse createCustomFavoriteFolder(FavoriteFolderRequest request, Account account) {
-        FavoriteFolder favoriteFolder = FavoriteFolder.customFolderOf(account, request.name());
+        FavoriteFolder favoriteFolder = FavoriteFolder.customFolderOf(request.name());
 
         validateDuplicatedName(favoriteFolder.getName(), account);
         FavoriteFolder savedFavoriteFolder = favoriteFolderRepository.save(favoriteFolder);
+        favoriteFolderAccountService.save(savedFavoriteFolder, account, AccountRole.OWNER);
 
         return FavoriteFolderResponse.from(savedFavoriteFolder);
     }

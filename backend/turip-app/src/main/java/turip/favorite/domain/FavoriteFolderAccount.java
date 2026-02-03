@@ -50,7 +50,7 @@ public class FavoriteFolderAccount {
     @Column(name = "account_role", nullable = false)
     private AccountRole accountRole;
 
-    private FavoriteFolderAccount(FavoriteFolder favoriteFolder, Account account, AccountRole accountRole) {
+    public FavoriteFolderAccount(FavoriteFolder favoriteFolder, Account account, AccountRole accountRole) {
         this.favoriteFolder = favoriteFolder;
         this.account = account;
         this.accountRole = accountRole;
