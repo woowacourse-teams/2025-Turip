@@ -53,6 +53,5 @@ public class FavoriteFolderAccountService {
 
     private void removeWithFavoriteFolder(FavoriteFolderAccount favoriteFolderAccount) {
         favoriteFolderRepository.delete(favoriteFolderAccount.getFavoriteFolder());
-        favoriteFolderAccountRepository.delete(favoriteFolderAccount);
     }
 }
