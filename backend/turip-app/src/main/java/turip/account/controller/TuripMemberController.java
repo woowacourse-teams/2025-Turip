@@ -45,7 +45,8 @@ public class TuripMemberController {
                                             {
                                                 "id": 1,
                                                 "memberId": 15,
-                                                "loginId": "turip"
+                                                "loginId": "turip",
+                                                "nickname": "여행하는 튜립"
                                             }
                                             """
                             )
