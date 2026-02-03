@@ -125,7 +125,7 @@ public class AuthService {
         }
         TokenResult tokenResult = issueToken(deviceFid, member);
 
-        return SocialLoginResponse.of(tokenResult, isNewMember);
+        return SocialLoginResponse.of(tokenResult, isNewMember, member.getNickname());
     }
 
     private Member findOrCreateSocialMember(Provider provider, String providerId, String email) {

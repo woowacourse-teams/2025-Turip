@@ -123,7 +123,8 @@ public class AuthController {
                                             {
                                               "accessToken": "jwt-access",
                                               "refreshToken": "jwt-refresh",
-                                              "isNewMember": false
+                                              "isNewMember": false,
+                                              "nickname": "여행하는 튜립"
                                             }
                                             """
                             )
