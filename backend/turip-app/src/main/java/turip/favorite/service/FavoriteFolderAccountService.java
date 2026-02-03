@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 import turip.account.domain.Account;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.ForbiddenException;
-import turip.common.exception.custom.NotFoundException;
 import turip.favorite.domain.AccountRole;
 import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.domain.FavoriteFolderAccount;
@@ -45,7 +44,7 @@ public class FavoriteFolderAccountService {
     public void validateOwnership(Account account, FavoriteFolder favoriteFolder) {
         FavoriteFolderAccount favoriteFolderAccount = favoriteFolderAccountRepository.findByAccountAndFavoriteFolder(
                         account, favoriteFolder)
-                .orElseThrow(() -> new NotFoundException(ErrorTag.FAVORITE_FOLDER_NOT_FOUND));
+                .orElseThrow(() -> new ForbiddenException(ErrorTag.FORBIDDEN));
 
         if (!favoriteFolderAccount.isRoleOf(AccountRole.OWNER)) {
             throw new ForbiddenException(ErrorTag.FORBIDDEN);
