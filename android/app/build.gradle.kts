@@ -7,10 +7,10 @@ plugins {
     kotlin("plugin.serialization") version "2.1.0"
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
-    id("kotlin-kapt")
     alias(libs.plugins.compose.compiler)
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
     id("com.google.dagger.hilt.android")
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -128,7 +128,6 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     // Room
     implementation(libs.androidx.room.runtime)
-    kapt(libs.androidx.room.compiler)
     // viewpager2
     implementation(libs.androidx.viewpager2)
     // livedata
@@ -156,7 +155,7 @@ dependencies {
 
     // hilt
     implementation(libs.hilt.android)
-    kapt(libs.hilt.android.compiler)
+    ksp(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
     // credential
