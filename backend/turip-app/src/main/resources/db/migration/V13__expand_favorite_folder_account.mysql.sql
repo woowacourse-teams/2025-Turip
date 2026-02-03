@@ -54,12 +54,12 @@ INSERT INTO favorite_folder_account (favorite_folder_id, account_id, account_rol
 SELECT id, account_id, 'OWNER'
 FROM favorite_folder;
 
--- 7. favorite_folder의 (account_id, name) unique 제약조건 제거
-ALTER TABLE favorite_folder
-    DROP INDEX uq_favorite_folder__account_id_name;
-
--- 8. favorite_folder의 account_id FK 제약조건 제거
+-- 7. favorite_folder의 account_id FK 제약조건 제거
 ALTER TABLE favorite_folder
     DROP FOREIGN KEY fk_favorite_folder__account;
+
+-- 8. favorite_folder의 (account_id, name) unique 제약조건 제거
+ALTER TABLE favorite_folder
+DROP INDEX uq_favorite_folder__account_id_name;
 
 -- favorite_folder의 account_id 컬럼은 안정적인 배포 후 contract 과정에서 제거 예정
