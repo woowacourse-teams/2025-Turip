@@ -122,7 +122,7 @@ fun LazyItemScope.ReorderableItem(
             }.onGloballyPositioned { itemPosition = it.positionInRoot().y },
     ) {
         val itemScope: ReorderableLazyColumnItemScope =
-            remember(state, key) {
+            remember(state, key, enabled) {
                 ReorderableLazyColumnItemScope(
                     reorderableLazyColumnState = state,
                     key = key,
