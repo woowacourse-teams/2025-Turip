@@ -1,11 +1,11 @@
 -- 공유찜폴더 기능 추가에 따른 설계 변경
 
--- 1. member 테이블에 nickname 필드 추가
-ALTER TABLE member
+-- 1. account 테이블에 nickname 필드 추가
+ALTER TABLE account
     ADD COLUMN nickname VARCHAR(255) UNIQUE;
 
--- 2. 기존 member의 nickname 업데이트 (랜덤 닉네임 생성)
-UPDATE member
+-- 2. 기존 account의 nickname 업데이트 (랜덤 닉네임 생성)
+UPDATE account
 SET nickname = CONCAT(
     -- FIRST 카테고리 (동작)
     ELT(FLOOR(1 + RAND() * 10),
@@ -24,7 +24,7 @@ SET nickname = CONCAT(
         '고릴라', '원숭이', '고양이', '강아지', '여우',
         '곰', '토끼', '사자', '호랑이', '늑대'
     ),
-    id -- member의 id로 중복 완전 방지
+    id -- account의 id로 중복 완전 방지
 )
 WHERE nickname IS NULL;
 
