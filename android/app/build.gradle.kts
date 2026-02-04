@@ -11,7 +11,7 @@ plugins {
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
     id("com.google.dagger.hilt.android")
     alias(libs.plugins.ksp)
-    alias(libs.plugins.ktrofit) apply false
+    alias(libs.plugins.ktrofit)
 }
 
 android {
@@ -106,14 +106,16 @@ dependencies {
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.savedstate)
-    // retrofit2
-    implementation(libs.retrofit)
-    implementation(libs.retrofit2.kotlinx.serialization.converter)
     // kotlinx.serialization
     implementation(libs.kotlinx.serialization.json)
-    // okhttp
-    implementation(libs.okhttp)
-    implementation(libs.logging.interceptor)
+    // ktorfit
+    implementation(libs.ktorfit)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.serialization.kotlinx.json)
+    implementation(libs.ktor.client.okhttp)
+    implementation(libs.ktor.client.logging)
+    implementation(libs.ktor.client.auth)
+    // ksp
     // coil
     implementation(libs.coil)
     // WebView
