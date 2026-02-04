@@ -1,19 +1,24 @@
 package com.on.turip.di
 
 import com.on.turip.data.bookmarks.service.BookmarkService
+import com.on.turip.data.bookmarks.service.createBookmarkService
 import com.on.turip.data.content.service.ContentService
+import com.on.turip.data.content.service.createContentService
 import com.on.turip.data.login.service.AuthService
 import com.on.turip.data.login.service.GuestService
 import com.on.turip.data.login.service.MemberService
+import com.on.turip.data.login.service.createAuthService
+import com.on.turip.data.login.service.createGuestService
+import com.on.turip.data.login.service.createMemberService
 import com.on.turip.data.region.service.RegionService
+import com.on.turip.data.region.service.createRegionService
 import com.on.turip.data.turip.service.TuripService
+import com.on.turip.data.turip.service.createTuripService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import retrofit2.Retrofit
-import retrofit2.create
-import javax.inject.Named
+import de.jensklingenberg.ktorfit.Ktorfit
 import javax.inject.Singleton
 
 @Module
@@ -21,31 +26,29 @@ import javax.inject.Singleton
 object ServiceModule {
     @Provides
     @Singleton
-    fun provideContentService(retrofit: Retrofit): ContentService = retrofit.create<ContentService>()
+    fun provideContentService(ktorfit: Ktorfit): ContentService = ktorfit.createContentService()
 
     @Provides
     @Singleton
-    fun provideBookmarkService(retrofit: Retrofit): BookmarkService = retrofit.create<BookmarkService>()
+    fun provideBookmarkService(ktorfit: Ktorfit): BookmarkService = ktorfit.createBookmarkService()
 
     @Provides
     @Singleton
-    fun provideTuripService(retrofit: Retrofit): TuripService = retrofit.create<TuripService>()
+    fun provideTuripService(ktorfit: Ktorfit): TuripService = ktorfit.createTuripService()
 
     @Provides
     @Singleton
-    fun provideRegionService(retrofit: Retrofit): RegionService = retrofit.create<RegionService>()
+    fun provideRegionService(ktorfit: Ktorfit): RegionService = ktorfit.createRegionService()
 
     @Provides
     @Singleton
-    fun provideAuthService(
-        @Named("refreshRetrofit") retrofit: Retrofit,
-    ): AuthService = retrofit.create<AuthService>()
+    fun provideAuthService(ktorfit: Ktorfit): AuthService = ktorfit.createAuthService()
 
     @Provides
     @Singleton
-    fun provideMemberService(retrofit: Retrofit): MemberService = retrofit.create<MemberService>()
+    fun provideMemberService(ktorfit: Ktorfit): MemberService = ktorfit.createMemberService()
 
     @Provides
     @Singleton
-    fun provideGuestService(retrofit: Retrofit): GuestService = retrofit.create<GuestService>()
+    fun provideGuestService(ktorfit: Ktorfit): GuestService = ktorfit.createGuestService()
 }
