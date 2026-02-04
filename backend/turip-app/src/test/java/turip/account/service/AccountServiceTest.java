@@ -2,7 +2,6 @@ package turip.account.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
@@ -14,10 +13,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DuplicateKeyException;
 import turip.account.domain.Account;
 import turip.account.domain.Role;
 import turip.account.repository.AccountRepository;
 import turip.common.exception.ErrorTag;
+import turip.common.exception.custom.InternalServerException;
 import turip.common.exception.custom.NotFoundException;
 import turip.favorite.repository.FavoriteContentRepository;
 import turip.favorite.service.FavoriteFolderAccountService;
@@ -42,16 +43,19 @@ class AccountServiceTest {
     @Mock
     private FavoriteFolderAccountService favoriteFolderAccountService;
 
+    @Mock
+    private AccountCreateService accountCreateService;
+
     @DisplayName("Account 생성 테스트")
     @Nested
     class Create {
 
         @DisplayName("Account를 생성하고 기본 찜 폴더를 생성한다")
         @Test
-        void create() {
+        void create1() {
             // given
             Account savedAccount = AccountFixture.createUser();
-            given(accountRepository.save(any(Account.class)))
+            given(accountCreateService.createUserAccount())
                     .willReturn(savedAccount);
 
             // when
@@ -60,6 +64,21 @@ class AccountServiceTest {
             // then
             assertThat(result).isEqualTo(savedAccount);
             verify(favoriteFolderService).createDefaultFavoriteFolder(savedAccount);
+        }
+
+
+        @DisplayName("닉네임이 5번 연속 중복으로 나온 경우 InternalServerError를 발생시킨다.")
+        @Test
+        void create2() {
+            // given
+            String invalidEmail = "invalid-email";
+            given(accountCreateService.createUserAccount())
+                    .willThrow(new DuplicateKeyException(""));
+
+            // when & then
+            assertThatThrownBy(() -> accountService.create())
+                    .isInstanceOf(InternalServerException.class)
+                    .hasMessage(ErrorTag.NICKNAME_CREATION_ERROR.getMessage());
         }
     }
 

@@ -21,82 +21,62 @@ import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import turip.account.domain.Account;
-import turip.account.domain.Member;
-import turip.account.repository.MemberRepository;
-import turip.common.exception.ErrorTag;
-import turip.common.exception.custom.IllegalArgumentException;
-import turip.util.fixture.AccountFixture;
+import turip.account.domain.Role;
+import turip.account.repository.AccountRepository;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = MemberCreateServiceTest.RetryTestConfig.class)
-public class MemberCreateServiceTest {
+@ContextConfiguration(classes = AccountCreateServiceTest.RetryTestConfig.class)
+public class AccountCreateServiceTest {
 
     @Autowired
-    private MemberCreateService memberCreateService;
+    private AccountCreateService accountCreateService;
 
     @Autowired
-    private MemberRepository memberRepository;
+    private AccountRepository accountRepository;
 
     @Configuration
     @EnableRetry
     static class RetryTestConfig {
 
         @Bean
-        MemberRepository memberRepository() {
-            return mock(MemberRepository.class);
+        AccountRepository accountRepository() {
+            return mock(AccountRepository.class);
         }
 
         @Bean
-        MemberCreateService memberCreateService(MemberRepository memberRepository) {
-            return new MemberCreateService(memberRepository);
+        AccountCreateService accountCreateService(AccountRepository accountRepository) {
+            return new AccountCreateService(accountRepository);
         }
     }
 
     @BeforeEach
     void setUp() {
-        reset(memberRepository);
-    }
-
-    @DisplayName("이메일 형식이 올바르지 않은 경우 예외를 발생시킨다.")
-    @Test
-    void save1() {
-        // given
-        String invalidEmail = "invalid-email";
-        Account account = AccountFixture.createUser();
-
-        // when & then
-        assertThatThrownBy(() -> memberCreateService.save(account, invalidEmail))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage(ErrorTag.EMAIL_INVALID.getMessage());
+        reset(accountRepository);
     }
 
     @DisplayName("랜덤 닉네임이 중복되는 경우 4번까지 재시도하고 5번째 성공 시 저장된다.")
     @Test
-    void save2() {
+    void createUserAccount1() {
         // given
-        Account account = AccountFixture.createUser();
-        String email = "test@example.com";
-        Member savedMember = new Member(account, email, "테스트 닉네임", true);
-        when(memberRepository.save(any(Member.class)))
+        Account savedAccount = new Account(1L, Role.USER, "테스트 닉네임");
+        when(accountRepository.save(any(Account.class)))
                 .thenThrow(new DuplicateKeyException("dup1"))
                 .thenThrow(new DuplicateKeyException("dup2"))
                 .thenThrow(new DuplicateKeyException("dup3"))
                 .thenThrow(new DuplicateKeyException("dup4"))
-                .thenReturn(savedMember);
+                .thenReturn(savedAccount);
 
         // when & then
-        assertThatCode(() -> memberCreateService.save(account, email))
+        assertThatCode(() -> accountCreateService.createUserAccount())
                 .doesNotThrowAnyException();
-        verify(memberRepository, times(5)).save(any(Member.class));
+        verify(accountRepository, times(5)).save(any(Account.class));
     }
 
     @DisplayName("중복 예외가 5번 연속 발생하면 예외를 던진다.")
     @Test
-    void save3() {
+    void createUserAccount2() {
         // given
-        Account account = AccountFixture.createUser();
-        String email = "test@example.com";
-        when(memberRepository.save(any(Member.class)))
+        when(accountRepository.save(any(Account.class)))
                 .thenThrow(new DuplicateKeyException("dup1"))
                 .thenThrow(new DuplicateKeyException("dup2"))
                 .thenThrow(new DuplicateKeyException("dup3"))
@@ -104,8 +84,8 @@ public class MemberCreateServiceTest {
                 .thenThrow(new DuplicateKeyException("dup5"));
 
         // when & then
-        assertThatThrownBy(() -> memberCreateService.save(account, email))
+        assertThatThrownBy(() -> accountCreateService.createUserAccount())
                 .isInstanceOf(DuplicateKeyException.class);
-        verify(memberRepository, times(5)).save(any(Member.class));
+        verify(accountRepository, times(5)).save(any(Account.class));
     }
 }

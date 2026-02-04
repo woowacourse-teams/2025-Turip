@@ -18,7 +18,7 @@ public class MemberTest {
         String invalidEmail = "invalid-email";
 
         // when & then
-        assertThatThrownBy(() -> new Member(account, invalidEmail, "nickname", true))
+        assertThatThrownBy(() -> new Member(account, invalidEmail, true))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage(ErrorTag.EMAIL_INVALID.getMessage());
     }

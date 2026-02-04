@@ -24,12 +24,14 @@ public class TestDataHelper {
     }
 
     public Long insertAccount(Role role) {
+        String nickname = UUID.randomUUID().toString().substring(0, 8);
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement("INSERT INTO account (role) VALUES (?)",
+            PreparedStatement ps = connection.prepareStatement("INSERT INTO account (role, nickname) VALUES (?, ?)",
                     Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, role.name());
+            ps.setString(2, nickname);
             return ps;
         }, keyHolder);
 
@@ -41,12 +43,11 @@ public class TestDataHelper {
 
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(
-                    "INSERT INTO member (account_id, email, is_first_login, nickname) VALUES (?, ?, ?, ?)",
+                    "INSERT INTO member (account_id, email, is_first_login) VALUES (?, ?, ?)",
                     Statement.RETURN_GENERATED_KEYS);
             ps.setLong(1, accountId);
             ps.setString(2, email);
             ps.setBoolean(3, isFirstLogin);
-            ps.setString(4, UUID.randomUUID().toString().substring(0, 8));
             return ps;
         }, keyHolder);
 
