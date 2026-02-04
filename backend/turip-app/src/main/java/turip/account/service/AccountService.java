@@ -1,12 +1,13 @@
 package turip.account.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import turip.account.domain.Account;
+import turip.account.domain.Role;
 import turip.account.repository.AccountRepository;
 import turip.common.exception.ErrorTag;
+import turip.common.exception.custom.IllegalArgumentException;
 import turip.common.exception.custom.InternalServerException;
 import turip.common.exception.custom.NotFoundException;
 import turip.favorite.repository.FavoriteContentRepository;
@@ -18,7 +19,7 @@ import turip.favorite.service.FavoriteFolderService;
 public class AccountService {
 
     private final AccountRepository accountRepository;
-    private final AccountCreateService accountCreateService;
+    private final NicknameCreateService nicknameCreateService;
     private final FavoriteContentRepository favoriteContentRepository;
     private final FavoriteFolderService favoriteFolderService;
     private final FavoriteFolderAccountService favoriteFolderAccountService;
@@ -26,10 +27,12 @@ public class AccountService {
     @Transactional
     public Account create() {
         try {
-            Account savedAccount = accountCreateService.createUserAccount();
+            String nickname = nicknameCreateService.generateUniqueNickname();
+            Account account = new Account(Role.USER, nickname);
+            Account savedAccount = accountRepository.save(account);
             favoriteFolderService.createDefaultFavoriteFolder(savedAccount);
             return savedAccount;
-        } catch (DuplicateKeyException e) {
+        } catch (IllegalArgumentException e) {
             throw new InternalServerException(ErrorTag.NICKNAME_CREATION_ERROR);
         }
     }

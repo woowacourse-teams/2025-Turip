@@ -2,6 +2,7 @@ package turip.account.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
@@ -13,11 +14,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.dao.DuplicateKeyException;
 import turip.account.domain.Account;
 import turip.account.domain.Role;
 import turip.account.repository.AccountRepository;
 import turip.common.exception.ErrorTag;
+import turip.common.exception.custom.IllegalArgumentException;
 import turip.common.exception.custom.InternalServerException;
 import turip.common.exception.custom.NotFoundException;
 import turip.favorite.repository.FavoriteContentRepository;
@@ -44,7 +45,7 @@ class AccountServiceTest {
     private FavoriteFolderAccountService favoriteFolderAccountService;
 
     @Mock
-    private AccountCreateService accountCreateService;
+    private NicknameCreateService nicknameCreateService;
 
     @DisplayName("Account 생성 테스트")
     @Nested
@@ -55,7 +56,9 @@ class AccountServiceTest {
         void create1() {
             // given
             Account savedAccount = AccountFixture.createUser();
-            given(accountCreateService.createUserAccount())
+            given(nicknameCreateService.generateUniqueNickname())
+                    .willReturn(savedAccount.getNickname());
+            given(accountRepository.save(any(Account.class)))
                     .willReturn(savedAccount);
 
             // when
@@ -72,8 +75,8 @@ class AccountServiceTest {
         void create2() {
             // given
             String invalidEmail = "invalid-email";
-            given(accountCreateService.createUserAccount())
-                    .willThrow(new DuplicateKeyException(""));
+            given(nicknameCreateService.generateUniqueNickname())
+                    .willThrow(new IllegalArgumentException(ErrorTag.NICKNAME_CREATION_ERROR));
 
             // when & then
             assertThatThrownBy(() -> accountService.create())
