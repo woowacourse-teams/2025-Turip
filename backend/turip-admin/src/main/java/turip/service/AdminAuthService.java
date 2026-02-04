@@ -23,7 +23,7 @@ public class AdminAuthService {
             throw new ForbiddenException(ErrorTag.FORBIDDEN);
         }
 
-        return new TuripLoginResult(authService.processTuripLogin(deviceFid, member), member.getNickname());
+        return new TuripLoginResult(authService.processTuripLogin(deviceFid, member), member.getAccount().getNickname());
     }
 
 }

@@ -41,7 +41,7 @@ public class AuthService {
     public TuripLoginResult loginWithTurip(TuripLoginRequest request, String deviceFid) {
         Member member = loginAndGetMember(request);
         TokenResult tokenResult = processTuripLogin(deviceFid, member);
-        return new TuripLoginResult(tokenResult, member.getNickname());
+        return new TuripLoginResult(tokenResult, member.getAccount().getNickname());
     }
 
     @Transactional
@@ -127,7 +127,7 @@ public class AuthService {
         }
         TokenResult tokenResult = issueToken(deviceFid, member);
 
-        return SocialLoginResponse.of(tokenResult, isNewMember, member.getNickname());
+        return SocialLoginResponse.of(tokenResult, isNewMember, member.getAccount().getNickname());
     }
 
     private Member findOrCreateSocialMember(Provider provider, String providerId, String email) {

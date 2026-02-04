@@ -37,32 +37,24 @@ public class Member {
     @Column(name = "email")
     private String email;
 
-    @Column(name = "nickname", unique = true, nullable = false)
-    private String nickname;
-
     @Column(name = "is_first_login")
     private boolean isFirstLogin;
 
-    public Member(Long id, Account account, String email, String nickname, boolean isFirstLogin) {
+    public Member(Long id, Account account, String email, boolean isFirstLogin) {
         validateEmail(email);
 
         this.id = id;
         this.account = account;
         this.email = email;
-        this.nickname = nickname;
         this.isFirstLogin = isFirstLogin;
     }
 
-    public Member(Account account, String email, String nickname, boolean isFirstLogin) {
-        this(null, account, email, nickname, isFirstLogin);
+    public Member(Account account, String email, boolean isFirstLogin) {
+        this(null, account, email, isFirstLogin);
     }
 
     public void completeFirstLogin() {
         this.isFirstLogin = false;
-    }
-
-    public void updateNickname(String nickname) {
-        this.nickname = nickname;
     }
 
     private void validateEmail(String email) {

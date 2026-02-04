@@ -7,22 +7,22 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import turip.account.domain.Account;
-import turip.account.domain.Member;
 import turip.account.domain.NicknameWord;
-import turip.account.repository.MemberRepository;
+import turip.account.domain.Role;
+import turip.account.repository.AccountRepository;
 
 @Service
 @RequiredArgsConstructor
-public class MemberCreateService {
+public class AccountCreateService {
 
     private static final Random RANDOM = new SecureRandom();
 
-    private final MemberRepository memberRepository;
+    private final AccountRepository accountRepository;
 
     @Retryable(retryFor = DuplicateKeyException.class, maxAttempts = 5)
-    public Member save(Account account, String email) {
+    public Account createUserAccount() {
         String nickname = NicknameWord.createRandomNickname(RANDOM);
-        Member member = new Member(account, email, nickname, true);
-        return memberRepository.save(member);
+        Account account = new Account(Role.USER, nickname);
+        return accountRepository.save(account);
     }
 }

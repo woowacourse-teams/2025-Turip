@@ -6,6 +6,6 @@ public record TuripMemberResponse(Long id, Long memberId, String loginId, String
 
     public static TuripMemberResponse from(TuripMember turipMember) {
         return new TuripMemberResponse(turipMember.getId(), turipMember.getMember().getId(), turipMember.getLoginId(),
-                turipMember.getMember().getNickname());
+                turipMember.getMember().getAccount().getNickname());
     }
 }
