@@ -22,6 +22,7 @@ import com.on.turip.ui.main.favorite.model.TuripModel
 import com.on.turip.ui.main.favorite.model.TuripShareModel
 import com.on.turip.ui.main.favorite.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -39,7 +40,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @HiltViewModel
 class PlaceTuripSelectionViewModel @Inject constructor(
@@ -80,7 +80,7 @@ class PlaceTuripSelectionViewModel @Inject constructor(
         registerDragEndEvents()
     }
 
-    private fun loadTuripsByPlace() {
+    fun loadTuripsByPlace() {
         viewModelScope.launch {
             turipRepository
                 .loadTuripsByPlaceId(placeId)
