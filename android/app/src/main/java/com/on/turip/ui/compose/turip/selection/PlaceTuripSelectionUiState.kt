@@ -12,9 +12,6 @@ data class PlaceTuripSelectionUiState(
     val selectedTuripPlaces: ImmutableList<TuripPlaceModel>,
     val isChanged: Boolean,
 ) {
-    val hasTuripForPlace: Boolean
-        get() = turips.any { it.isSelected }
-
     companion object {
         val Idle: PlaceTuripSelectionUiState =
             PlaceTuripSelectionUiState(

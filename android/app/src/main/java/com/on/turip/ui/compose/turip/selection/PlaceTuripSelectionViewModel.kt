@@ -22,6 +22,7 @@ import com.on.turip.ui.main.favorite.model.TuripModel
 import com.on.turip.ui.main.favorite.model.TuripShareModel
 import com.on.turip.ui.main.favorite.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -39,7 +40,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @HiltViewModel
 class PlaceTuripSelectionViewModel @Inject constructor(
@@ -121,7 +121,6 @@ class PlaceTuripSelectionViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
-    // TODO : UI만 반영하도록 수정, 다음 PR에서 완료 버튼 누르면 전체 변경 내역 반영 API 연동
     fun updateTurip(turipModel: TuripModel) {
         val updateHasTuripPlace: Boolean = !turipModel.isSelected
         _uiState.update { state ->
@@ -135,6 +134,33 @@ class PlaceTuripSelectionViewModel @Inject constructor(
                 turips = updateTurips,
                 isChanged = isTuripChanged(updateTurips),
             )
+        }
+    }
+
+    fun updateTuripsByPlace() {
+        viewModelScope.launch {
+            val selectedTuripIds: List<Long> =
+                uiState.value.turips
+                    .filter { it.isSelected }
+                    .map { it.id }
+
+            turipRepository
+                .updatePlaceTurips(placeId, selectedTuripIds)
+                .onSuccess {
+                    _uiEffect.send(
+                        PlaceTuripSelectionUiEffect.UpdateTuripsByPlace(
+                            placeId = placeId,
+                            hasTurip = selectedTuripIds.isNotEmpty(),
+                        ),
+                    )
+                    Timber.d("바텀시트, 선택한 장소에 대한 튜립들 현황 업데이트 성공")
+                }.onFailure { errorType: ErrorType ->
+                    sendErrorEffect(
+                        errorType = errorType,
+                        retryAction = PlaceTuripSelectionRetryAction.UpdateTuripsByPlace,
+                    )
+                    Timber.e("바텀시트, 선택한 장소에 대한 튜립들 현황 업데이트 실패")
+                }
         }
     }
 
@@ -400,6 +426,10 @@ class PlaceTuripSelectionViewModel @Inject constructor(
 
             is PlaceTuripSelectionRetryAction.UpdateReorderedPlaces -> {
                 updateTuripPlacesOrder(action.reorderedPlaces)
+            }
+
+            is PlaceTuripSelectionRetryAction.UpdateTuripsByPlace -> {
+                updateTuripsByPlace()
             }
         }
     }
