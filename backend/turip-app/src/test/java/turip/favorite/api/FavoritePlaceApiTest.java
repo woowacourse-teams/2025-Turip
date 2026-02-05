@@ -89,7 +89,7 @@ class FavoritePlaceApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("turipId",1L)
+                    .queryParam("turipId", 1L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
                     .when().post("/api/v1/turips/places")
@@ -112,7 +112,7 @@ class FavoritePlaceApiTest {
             // when
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("turipId",1L)
+                    .queryParam("turipId", 1L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
                     .when().post("/api/v1/turips/places")
@@ -145,7 +145,7 @@ class FavoritePlaceApiTest {
             // when
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("turipId",1L)
+                    .queryParam("turipId", 1L)
                     .queryParam("placeId", 2L)
                     .contentType(ContentType.JSON)
                     .when().post("/api/v1/turips/places")
@@ -178,7 +178,7 @@ class FavoritePlaceApiTest {
             // when - 3개의 장소를 순차적으로 찜
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("turipId",1L)
+                    .queryParam("turipId", 1L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
                     .when().post("/api/v1/turips/places")
@@ -187,7 +187,7 @@ class FavoritePlaceApiTest {
 
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("turipId",1L)
+                    .queryParam("turipId", 1L)
                     .queryParam("placeId", 2L)
                     .contentType(ContentType.JSON)
                     .when().post("/api/v1/turips/places")
@@ -196,7 +196,7 @@ class FavoritePlaceApiTest {
 
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("turipId",1L)
+                    .queryParam("turipId", 1L)
                     .queryParam("placeId", 3L)
                     .contentType(ContentType.JSON)
                     .when().post("/api/v1/turips/places")
@@ -233,7 +233,7 @@ class FavoritePlaceApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "cool")
-                    .queryParam("turipId",1L)
+                    .queryParam("turipId", 1L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
                     .when().post("/api/v1/turips/places")
@@ -252,7 +252,7 @@ class FavoritePlaceApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("turipId",1L)
+                    .queryParam("turipId", 1L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
                     .when().post("/api/v1/turips/places")
@@ -272,7 +272,7 @@ class FavoritePlaceApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("turipId",1L)
+                    .queryParam("turipId", 1L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
                     .when().post("/api/v1/turips/places")
@@ -295,7 +295,7 @@ class FavoritePlaceApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("turipId",1L)
+                    .queryParam("turipId", 1L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
                     .when().post("/api/v1/turips/places")
@@ -328,7 +328,7 @@ class FavoritePlaceApiTest {
 
             // when & then
             RestAssured.given().port(port)
-                    .queryParam("turipId",1L)
+                    .queryParam("turipId", 1L)
                     .contentType(ContentType.JSON)
                     .when().get("/api/v1/turips/places")
                     .then()
@@ -368,7 +368,7 @@ class FavoritePlaceApiTest {
 
             // when & then - favoriteOrder 오름차순으로 정렬되어 반환되는지 확인
             RestAssured.given().port(port)
-                    .queryParam("turipId",1L)
+                    .queryParam("turipId", 1L)
                     .contentType(ContentType.JSON)
                     .when().get("/api/v1/turips/places")
                     .then()
@@ -386,7 +386,7 @@ class FavoritePlaceApiTest {
         void readAllByFolder3() {
             // when & then
             RestAssured.given().port(port)
-                    .queryParam("turipId",1L)
+                    .queryParam("turipId", 1L)
                     .contentType(ContentType.JSON)
                     .when().get("/api/v1/turips/places")
                     .then()
@@ -419,7 +419,7 @@ class FavoritePlaceApiTest {
 
             // when & then
             Map<String, Object> request = new HashMap<>();
-            request.put("favoriteFolderIds", List.of(1L, 2L, 3L));
+            request.put("turipIds", List.of(1L, 2L, 3L));
 
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
@@ -492,7 +492,7 @@ class FavoritePlaceApiTest {
 
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("turipId",1L)
+                    .queryParam("turipId", 1L)
                     .body(request)
                     .contentType(ContentType.JSON)
                     .when().patch("/api/v1/turips/places/turip-order")
@@ -513,7 +513,7 @@ class FavoritePlaceApiTest {
 
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("turipId",999L)
+                    .queryParam("turipId", 999L)
                     .body(request)
                     .contentType(ContentType.JSON)
                     .when().patch("/api/v1/turips/places/turip-order")
@@ -541,7 +541,7 @@ class FavoritePlaceApiTest {
 
             RestAssured.given().port(port)
                     .header("device-fid", "requestDeviceFid")
-                    .queryParam("turipId",1L)
+                    .queryParam("turipId", 1L)
                     .body(request)
                     .contentType(ContentType.JSON)
                     .when().patch("/api/v1/turips/places/turip-order")
@@ -565,7 +565,7 @@ class FavoritePlaceApiTest {
 
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("turipId",1L)
+                    .queryParam("turipId", 1L)
                     .body(request)
                     .contentType(ContentType.JSON)
                     .when().patch("/api/v1/turips/places/turip-order")
@@ -594,7 +594,7 @@ class FavoritePlaceApiTest {
 
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("turipId",1L)
+                    .queryParam("turipId", 1L)
                     .body(request)
                     .contentType(ContentType.JSON)
                     .when().patch("/api/v1/turips/places/turip-order")
@@ -622,7 +622,7 @@ class FavoritePlaceApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("turipId",1L)
+                    .queryParam("turipId", 1L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
                     .when().delete("/api/v1/turips/places")
@@ -649,7 +649,7 @@ class FavoritePlaceApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "cool")
-                    .queryParam("turipId",1L)
+                    .queryParam("turipId", 1L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
                     .when().delete("/api/v1/turips/places")
@@ -663,7 +663,7 @@ class FavoritePlaceApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "nonExistentDeviceFid")
-                    .queryParam("turipId",1L)
+                    .queryParam("turipId", 1L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
                     .when().delete("/api/v1/turips/places")
@@ -682,7 +682,7 @@ class FavoritePlaceApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("turipId",999L)
+                    .queryParam("turipId", 999L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
                     .when().delete("/api/v1/turips/places")
@@ -702,7 +702,7 @@ class FavoritePlaceApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("turipId",1L)
+                    .queryParam("turipId", 1L)
                     .queryParam("placeId", 999L)
                     .contentType(ContentType.JSON)
                     .when().delete("/api/v1/turips/places")
@@ -724,7 +724,7 @@ class FavoritePlaceApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("turipId",1L)
+                    .queryParam("turipId", 1L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
                     .when().delete("/api/v1/turips/places")
