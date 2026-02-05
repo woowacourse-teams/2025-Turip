@@ -83,6 +83,7 @@
     <string name="trip_place_time_line">%s~</string>
     <string name="trip_detail_period">여행 기간</string>
     <string name="trip_detail_visit_place">방문 장소</string>
+    <string name="trip_detail_turip_selection_updated">%s에 대한 변경 사항이 반영됐어요</string>
     <!-- 여행 상세 페이지 바텀시트 -->
     <string name="trip_detail_trip_bookmark_normal">이 여행 저장하기</string>
     <string name="trip_detail_trip_bookmark_select">저장된 여행이에요</string>

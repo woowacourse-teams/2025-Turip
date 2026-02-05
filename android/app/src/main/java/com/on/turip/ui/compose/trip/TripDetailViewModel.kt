@@ -21,6 +21,7 @@ import com.on.turip.ui.compose.trip.model.PlaceModel
 import com.on.turip.ui.compose.trip.model.TripDetailInfoModel
 import com.on.turip.ui.trip.TripDetailActivity.Companion.TRIP_DETAIL_CONTENT_KEY
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -34,7 +35,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @HiltViewModel
 class TripDetailViewModel @Inject constructor(
@@ -191,26 +191,38 @@ class TripDetailViewModel @Inject constructor(
         }
     }
 
-    fun updateHasFavoriteFolderInPlace(
-        hasFavoriteFolder: Boolean,
+    fun updatePlaceTuripSelection(
+        hasTurip: Boolean,
         placeId: Long,
     ) {
         placeCacheByDay =
             placeCacheByDay.mapValues { (_, places: ImmutableList<PlaceModel>) ->
                 if (places.any { it.id == placeId }) {
                     places
-                        .map { place: PlaceModel -> if (place.id == placeId) place.copy(isTuripPlace = hasFavoriteFolder) else place }
+                        .map { place: PlaceModel -> if (place.id == placeId) place.copy(isTuripPlace = hasTurip) else place }
                         .toImmutableList()
                 } else {
                     places
                 }
             }
 
+        viewModelScope.launch {
+            val placeName: String = getPlaceName(placeId)
+            _uiEffect.send(TripDetailUiEffect.ShowUpdatedTuripSelectionByPlace(placeName))
+        }
+
         _uiState.update { state: TripDetailUiState ->
             val currentSelectedDay = state.days.find { it.isSelected }?.day ?: DayModel.ALL_PLACE
             state.copy(places = placeCacheByDay[currentSelectedDay] ?: persistentListOf())
         }
     }
+
+    private fun getPlaceName(placeId: Long): String =
+        placeCacheByDay[DayModel.ALL_PLACE]?.firstOrNull { place -> place.id == placeId }?.name
+            ?: run {
+                Timber.e("캐싱데이터에서 placeId를 찾을 수 없습니다. placeID = $placeId")
+                ""
+            }
 
     private suspend fun handleError(failure: TuripResult.Failure) {
         val uiError: UiError = failure.errorType.toUiError()

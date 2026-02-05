@@ -5,12 +5,14 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import com.on.turip.R
 import com.on.turip.ui.common.safeStartActivityWithToast
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.trip.TripDetailScreen
+import com.on.turip.ui.compose.trip.TripDetailViewModel
 import com.on.turip.ui.compose.trip.model.MapModel
 import com.on.turip.ui.login.LoginActivity
 import com.on.turip.ui.main.favorite.PlaceTuripSelectionFragment
@@ -18,9 +20,13 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class TripDetailActivity : AppCompatActivity() {
+    private val viewModel: TripDetailViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        syncTuripSelectionResult()
 
         setContent {
             TuripTheme {
@@ -56,8 +62,21 @@ class TripDetailActivity : AppCompatActivity() {
                                 .show(supportFragmentManager, "place_turip_selection")
                         }
                     },
+                    viewModel = viewModel,
                 )
             }
+        }
+    }
+
+    private fun syncTuripSelectionResult() {
+        supportFragmentManager.setFragmentResultListener(
+            "TURIP_SELECTION_RESULT",
+            this,
+        ) { _, bundle ->
+            viewModel.updatePlaceTuripSelection(
+                placeId = bundle.getLong("TURIP_SELECTION_PLACE_ID"),
+                hasTurip = bundle.getBoolean("TURIP_SELECTION_HAS_TURIP"),
+            )
         }
     }
 

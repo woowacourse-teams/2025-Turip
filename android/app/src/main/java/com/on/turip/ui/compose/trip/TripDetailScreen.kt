@@ -246,6 +246,19 @@ private suspend fun handleUiEffect(
             navigateToLogin()
         }
 
+        is TripDetailUiEffect.ShowUpdatedTuripSelectionByPlace -> {
+            val messageResource: Int = R.string.trip_detail_turip_selection_updated
+            val iconResource: Int = R.drawable.btn_turip_selected
+            snackbarHostState.showSnackbar(
+                visuals =
+                    TuripSnackbarVisuals(
+                        message = context.getString(messageResource, uiEffect.placeName),
+                        actionLabel = context.getString(R.string.all_close_description),
+                        iconRes = iconResource,
+                    ),
+            )
+        }
+
         is TripDetailUiEffect.ShowError -> {
             val uiModel: ErrorUiModel =
                 uiEffect.errorUiState.toUiModel() ?: return
@@ -336,8 +349,7 @@ private fun TripDetailScreenContent(
                             start = TuripTheme.spacing.extraLarge,
                             end = TuripTheme.spacing.extraLarge,
                             bottom = TuripTheme.spacing.small,
-                        )
-                        .fillMaxWidth(),
+                        ).fillMaxWidth(),
             )
         }
 
@@ -350,8 +362,7 @@ private fun TripDetailScreenContent(
                         .padding(
                             horizontal = TuripTheme.spacing.extraLarge,
                             vertical = TuripTheme.spacing.medium,
-                        )
-                        .fillMaxWidth(),
+                        ).fillMaxWidth(),
             )
         }
     }
