@@ -70,21 +70,41 @@
         .welcome-card p {
             color: #666;
             font-size: 16px;
+            margin-bottom: 30px;
+        }
+
+        .action-btn {
+            padding: 14px 30px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .action-btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
         }
     </style>
 </head>
 <body>
-<div class="header">
-    <h1>Turip 관리자</h1>
-    <button class="logout-btn" onclick="logout()">로그아웃</button>
-</div>
-
-<div class="main-content">
-    <div class="welcome-card">
-        <h2>환영합니다!</h2>
-        <p>Turip 관리자 페이지입니다.</p>
+    <div class="header">
+        <h1>Turip 관리자</h1>
+        <button class="logout-btn" onclick="logout()">로그아웃</button>
     </div>
-</div>
+
+    <div class="main-content">
+        <div class="welcome-card">
+            <h2>환영합니다!</h2>
+            <p>Turip 관리자 페이지입니다.</p>
+            <button class="action-btn" onclick="location.href='/admin/contents'">콘텐츠 수집</button>
+        </div>
+    </div>
 
 <script>
     async function logout() {
@@ -98,14 +118,14 @@
                 credentials: 'include'  // 쿠키 자동 전송
             });
 
-            // 성공 여부와 관계없이 로그인 페이지로 리다이렉트
-            window.location.href = '/admin/login';
-        } catch (error) {
-            console.error('로그아웃 중 오류:', error);
-            // 오류가 발생해도 로그인 페이지로 이동
-            window.location.href = '/admin/login';
+                // 성공 여부와 관계없이 로그인 페이지로 리다이렉트
+                window.location.href = '/admin/login';
+            } catch (error) {
+                console.error('로그아웃 중 오류:', error);
+                // 오류가 발생해도 로그인 페이지로 이동
+                window.location.href = '/admin/login';
+            }
         }
-    }
-</script>
+    </script>
 </body>
 </html>

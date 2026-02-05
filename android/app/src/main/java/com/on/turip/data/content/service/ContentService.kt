@@ -5,48 +5,47 @@ import com.on.turip.data.content.dto.ContentInformationCountResponse
 import com.on.turip.data.content.dto.ContentPlacesResponse
 import com.on.turip.data.content.dto.ContentsInformationResponse
 import com.on.turip.data.content.dto.UsersLikeContentsResponse
-import retrofit2.Response
-import retrofit2.http.GET
-import retrofit2.http.Path
-import retrofit2.http.Query
+import de.jensklingenberg.ktorfit.http.GET
+import de.jensklingenberg.ktorfit.http.Path
+import de.jensklingenberg.ktorfit.http.Query
 
 interface ContentService {
     @GET("contents/count")
     suspend fun getContentsCountByRegion(
         @Query("regionCategory") regionCategoryName: String,
-    ): Response<ContentInformationCountResponse>
+    ): ContentInformationCountResponse
 
     @GET("contents/keyword/count")
     suspend fun getContentsCountByKeyword(
         @Query("keyword") keyword: String,
-    ): Response<ContentInformationCountResponse>
+    ): ContentInformationCountResponse
 
     @GET("contents")
     suspend fun getContentsByRegion(
         @Query("regionCategory") regionCategoryName: String,
         @Query("size") size: Int,
         @Query("lastId") lastId: Long,
-    ): Response<ContentsInformationResponse>
+    ): ContentsInformationResponse
 
     @GET("contents/keyword")
     suspend fun getContentsByKeyword(
         @Query("keyword") keyword: String,
         @Query("size") size: Int,
         @Query("lastId") lastId: Long,
-    ): Response<ContentsInformationResponse>
+    ): ContentsInformationResponse
 
     @GET("contents/{contentId}")
     suspend fun getContentDetail(
         @Path("contentId") contentId: Long,
-    ): Response<ContentDetailResponse>
+    ): ContentDetailResponse
 
     @GET("contents/popular")
     suspend fun getUsersLikeContents(
         @Query("size") size: Int,
-    ): Response<UsersLikeContentsResponse>
+    ): UsersLikeContentsResponse
 
     @GET("contents/{contentId}/places")
     suspend fun getTrip(
         @Path("contentId") contentId: Long,
-    ): Response<ContentPlacesResponse>
+    ): ContentPlacesResponse
 }

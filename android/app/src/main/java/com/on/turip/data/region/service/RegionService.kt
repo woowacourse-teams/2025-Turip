@@ -1,13 +1,12 @@
 package com.on.turip.data.region.service
 
 import com.on.turip.data.region.dto.RegionCategoriesResponse
-import retrofit2.Response
-import retrofit2.http.GET
-import retrofit2.http.Query
+import de.jensklingenberg.ktorfit.http.GET
+import de.jensklingenberg.ktorfit.http.Query
 
 interface RegionService {
     @GET("region-categories")
     suspend fun getRegionCategories(
         @Query("isKorea") isDomestic: Boolean,
-    ): Response<RegionCategoriesResponse>
+    ): RegionCategoriesResponse
 }

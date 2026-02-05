@@ -1,16 +1,15 @@
 package com.on.turip.data.login.service
 
-import retrofit2.Response
-import retrofit2.http.DELETE
-import retrofit2.http.POST
+import de.jensklingenberg.ktorfit.http.DELETE
+import de.jensklingenberg.ktorfit.http.POST
 
 interface MemberService {
     @POST("members/migration")
-    suspend fun postMigration(): Response<Unit>
+    suspend fun postMigration()
 
     @POST("auth/logout")
-    suspend fun postLogout(): Response<Unit>
+    suspend fun postLogout()
 
     @DELETE("members/me")
-    suspend fun deleteMember(): Response<Unit>
+    suspend fun deleteMember()
 }
