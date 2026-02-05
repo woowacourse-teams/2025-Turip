@@ -2,6 +2,7 @@ package com.on.turip.data.turip.datasource
 
 import com.on.turip.core.result.TuripResult
 import com.on.turip.data.result.safeApiCall
+import com.on.turip.data.turip.dto.PlaceTuripsRequest
 import com.on.turip.data.turip.dto.TuripCreationResponse
 import com.on.turip.data.turip.dto.TuripPatchRequest
 import com.on.turip.data.turip.dto.TuripPlaceOrderRequest
@@ -10,10 +11,10 @@ import com.on.turip.data.turip.dto.TuripPostRequest
 import com.on.turip.data.turip.dto.TuripsByPlaceResponse
 import com.on.turip.data.turip.dto.TuripsResponse
 import com.on.turip.data.turip.service.TuripService
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class DefaultTuripRemoteDataSource @Inject constructor(
     private val turipService: TuripService,
@@ -70,4 +71,9 @@ class DefaultTuripRemoteDataSource @Inject constructor(
                 turipPlaceOrderRequest,
             )
         }
+
+    override suspend fun putPlaceTurips(
+        placeId: Long,
+        placeTuripsRequest: PlaceTuripsRequest,
+    ): TuripResult<Unit> = safeApiCall { turipService.putPlaceTurips(placeId, placeTuripsRequest) }
 }

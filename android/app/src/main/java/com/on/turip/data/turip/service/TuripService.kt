@@ -1,5 +1,6 @@
 package com.on.turip.data.turip.service
 
+import com.on.turip.data.turip.dto.PlaceTuripsRequest
 import com.on.turip.data.turip.dto.TuripCreationResponse
 import com.on.turip.data.turip.dto.TuripPatchRequest
 import com.on.turip.data.turip.dto.TuripPlaceOrderRequest
@@ -12,6 +13,7 @@ import de.jensklingenberg.ktorfit.http.DELETE
 import de.jensklingenberg.ktorfit.http.GET
 import de.jensklingenberg.ktorfit.http.PATCH
 import de.jensklingenberg.ktorfit.http.POST
+import de.jensklingenberg.ktorfit.http.PUT
 import de.jensklingenberg.ktorfit.http.Path
 import de.jensklingenberg.ktorfit.http.Query
 
@@ -61,5 +63,11 @@ interface TuripService {
     suspend fun patchTuripPlaceOrder(
         @Query("turipId") turipId: Long,
         @Body turipPlaceOrderRequest: TuripPlaceOrderRequest,
+    )
+
+    @PUT("turips/places/{placeId}")
+    suspend fun putPlaceTurips(
+        @Path("placeId") placeId: Long,
+        @Body placeTuripsRequest: PlaceTuripsRequest,
     )
 }
