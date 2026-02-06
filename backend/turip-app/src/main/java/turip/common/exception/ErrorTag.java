@@ -52,6 +52,7 @@ public enum ErrorTag {
     // 500 Internal Server Error
     INTERNAL_SERVER_ERROR("서버에서 예기치 못한 에러가 발생했습니다."),
     ACCOUNT_CREATION_ERROR("계정 생성에 실패했습니다."),
+    SSE_CONNECTION_ERROR("SSE 연결에 실패했습니다."),
 
     // ==== Admin ====
 

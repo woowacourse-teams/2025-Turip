@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,8 +21,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import turip.account.domain.Account;
+import turip.account.domain.Member;
 import turip.auth.resolver.AuthAccount;
+import turip.auth.resolver.AuthMember;
 import turip.common.exception.ErrorResponse;
 import turip.favorite.controller.dto.request.FavoriteFolderNameRequest;
 import turip.favorite.controller.dto.request.FavoriteFolderRequest;
@@ -29,6 +33,7 @@ import turip.favorite.controller.dto.response.FavoriteFolderResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithFavoriteStatusResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithPlaceCountResponse;
 import turip.favorite.service.FavoriteFolderService;
+import turip.favorite.service.FavoriteFolderStreamService;
 
 @RestController
 @RequiredArgsConstructor
@@ -37,6 +42,12 @@ import turip.favorite.service.FavoriteFolderService;
 public class FavoriteFolderController {
 
     private final FavoriteFolderService favoriteFolderService;
+    private final FavoriteFolderStreamService favoriteFolderStreamService;
+
+    @GetMapping(value = "/{turipId}/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter stream(@PathVariable("turipId") Long favoriteFolderId, @AuthMember Member member) {
+        return favoriteFolderStreamService.createEmitter(favoriteFolderId, member);
+    }
 
     @Operation(
             summary = "튜립 생성 api",
