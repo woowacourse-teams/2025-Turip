@@ -62,4 +62,7 @@ ALTER TABLE favorite_folder
 ALTER TABLE favorite_folder
 DROP INDEX uq_favorite_folder__account_id_name;
 
+-- 9. favorite_folder의 account_id 이 nullable하도록 수정
+ALTER TABLE favorite_folder MODIFY COLUMN account_id BIGINT NULL;
+
 -- favorite_folder의 account_id 컬럼은 안정적인 배포 후 contract 과정에서 제거 예정
