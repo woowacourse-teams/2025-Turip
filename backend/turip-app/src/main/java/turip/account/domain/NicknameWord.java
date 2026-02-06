@@ -335,11 +335,6 @@ public enum NicknameWord {
         return category;
     }
 
-    public static NicknameWord random(Category category, Random random) {
-        List<NicknameWord> words = BY_CATEGORY.get(category);
-        return words.get(random.nextInt(words.size()));
-    }
-
     public static String createRandomNickname(Random random) {
         NicknameWord first = random(Category.FIRST, random);
         NicknameWord second = random(Category.SECOND, random);
@@ -356,5 +351,10 @@ public enum NicknameWord {
             );
         }
         return Map.copyOf(map);
+    }
+
+    private static NicknameWord random(Category category, Random random) {
+        List<NicknameWord> words = BY_CATEGORY.get(category);
+        return words.get(random.nextInt(words.size()));
     }
 }
