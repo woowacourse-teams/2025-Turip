@@ -11,8 +11,6 @@ public interface FavoriteFolderAccountRepository extends JpaRepository<FavoriteF
 
     List<FavoriteFolderAccount> findAllByAccount(Account account);
 
-    List<FavoriteFolderAccount> findAllByAccountOrderByIdAsc(Account account);
-
     boolean existsByFavoriteFolderAndAccountAndAccountRole(FavoriteFolder favoriteFolder, Account account,
                                                            AccountRole accountRole);
 }
