@@ -28,6 +28,7 @@ public enum ErrorTag {
 
     // 403 Forbidden
     FORBIDDEN("접근 권한이 없습니다."),
+    FOLDER_STREAM_FORBIDDEN("해당 폴더에 대한 스트리밍 권한이 없습니다."),
 
     // 404 Not Found
     NOT_FOUND("요청 정보를 찾을 수 없습니다."),
@@ -51,6 +52,7 @@ public enum ErrorTag {
     // 500 Internal Server Error
     INTERNAL_SERVER_ERROR("서버에서 예기치 못한 에러가 발생했습니다."),
     NICKNAME_CREATION_ERROR("닉네임 생성에 실패했습니다."),
+    SSE_CONNECTION_ERROR("SSE 연결에 실패했습니다."),
 
     // ==== Admin ====
 
