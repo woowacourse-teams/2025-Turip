@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
+import turip.favorite.domain.AccountRole;
 import turip.util.helper.TestDataHelper;
 
 @ActiveProfiles("test")
@@ -65,13 +66,15 @@ class GuestApiTest {
         @DisplayName("마이그레이션 가능 여부 조회 시 200 ok를 응답한다")
         void readMigrationAvailability1() {
             //given
-            testDataHelper.insertAccount();
+            Long accountId = testDataHelper.insertAccount();
             String deviceFid = "guest";
-            jdbcTemplate.update("INSERT INTO guest (id, account_id, device_fid) VALUES (1, 1, ?)", deviceFid);
-            jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (id, account_id, name, is_default) VALUES (1, 1, '기본 폴더', true)");
-            jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (id, account_id, name, is_default) VALUES (2, 1, '커스텀 폴더', false)");
+            jdbcTemplate.update("INSERT INTO guest (id, account_id, device_fid) VALUES (1, ?, ?)", accountId,
+                    deviceFid);
+
+            Long folderId1 = testDataHelper.insertFavoriteFolder("기본 폴더", true, 1, false);
+            Long folderId2 = testDataHelper.insertFavoriteFolder("커스텀 폴더");
+            testDataHelper.insertFavoriteFolderAccount(accountId, folderId1, AccountRole.OWNER);
+            testDataHelper.insertFavoriteFolderAccount(accountId, folderId2, AccountRole.OWNER);
 
             // when & then
             RestAssured
@@ -92,14 +95,15 @@ class GuestApiTest {
         @DisplayName("게스트 탈퇴 시 Guest와 연관된 찜 데이터를 모두 삭제하고 204 No Content를 응답한다")
         void deleteGuestSuccess() {
             // given
-            testDataHelper.insertAccount();
+            Long accountId = testDataHelper.insertAccount();
             String deviceFid = "guest";
-            jdbcTemplate.update("INSERT INTO guest (id, account_id, device_fid) VALUES (1, 1, ?)", deviceFid);
+            jdbcTemplate.update("INSERT INTO guest (id, account_id, device_fid) VALUES (1, ?, ?)", accountId,
+                    deviceFid);
 
-            jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (id, account_id, name, is_default) VALUES (1, 1, '기본 폴더', true)");
-            jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (id, account_id, name, is_default) VALUES (2, 1, '커스텀 폴더', false)");
+            Long folderId1 = testDataHelper.insertFavoriteFolder("기본 폴더", true, 1, false);
+            Long folderId2 = testDataHelper.insertFavoriteFolder("커스텀 폴더");
+            testDataHelper.insertFavoriteFolderAccount(accountId, folderId1, AccountRole.OWNER);
+            testDataHelper.insertFavoriteFolderAccount(accountId, folderId2, AccountRole.OWNER);
 
             jdbcTemplate.update(
                     "INSERT INTO creator (id, profile_image, channel_name) VALUES (1, 'https://image.example.com/creator1.jpg', 'TravelMate')");
@@ -135,10 +139,10 @@ class GuestApiTest {
                     "SELECT COUNT(*) FROM favorite_content WHERE account_id = 1", Integer.class);
             assertThat(favoriteContentCount).isEqualTo(0);
 
-            // 검증: FavoriteFolder가 삭제되었는지 확인
-            Integer favoriteFolderCount = jdbcTemplate.queryForObject(
-                    "SELECT COUNT(*) FROM favorite_folder WHERE account_id = 1", Integer.class);
-            assertThat(favoriteFolderCount).isEqualTo(0);
+            // 검증: FavoriteFolderAccount가 삭제되었는지 확인
+            Integer favoriteFolderAccountCount = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM favorite_folder_account WHERE account_id = 1", Integer.class);
+            assertThat(favoriteFolderAccountCount).isEqualTo(0);
         }
 
         @Test

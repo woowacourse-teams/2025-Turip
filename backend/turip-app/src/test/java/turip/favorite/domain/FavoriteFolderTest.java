@@ -10,28 +10,10 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import turip.account.domain.Account;
-import turip.account.domain.Role;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.IllegalArgumentException;
-import turip.util.fixture.AccountFixture;
 
 class FavoriteFolderTest {
-
-    @DisplayName("폴더의 소유자인지 확인할 수 있다")
-    @Test
-    void isOwner1() {
-        // given
-        Account owner = AccountFixture.createCustomAccount(1L, Role.USER);
-        Account nonOwner = AccountFixture.createCustomAccount(2L, Role.USER);
-        FavoriteFolder favoriteFolder = new FavoriteFolder(1L, owner, "폴더", false);
-
-        // when & then
-        assertAll(
-                () -> assertThat(favoriteFolder.isOwner(owner)).isTrue(),
-                () -> assertThat(favoriteFolder.isOwner(nonOwner)).isFalse()
-        );
-    }
 
     @DisplayName("폴더 이름 앞, 뒤의 공백을 제거할 수 있다")
     @Test
@@ -54,7 +36,7 @@ class FavoriteFolderTest {
         @ValueSource(strings = {"", " ", "    "})
         void validateName1(String name) {
             // when & then
-            assertThatThrownBy(() -> FavoriteFolder.customFolderOf(null, name))
+            assertThatThrownBy(() -> FavoriteFolder.customFolderOf(name))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage(ErrorTag.FAVORITE_FOLDER_NAME_BLANK.getMessage());
         }
@@ -68,8 +50,8 @@ class FavoriteFolderTest {
 
             // when & then
             assertAll(
-                    () -> assertDoesNotThrow(() -> FavoriteFolder.customFolderOf(null, nameOfLength20)),
-                    () -> assertThatThrownBy(() -> FavoriteFolder.customFolderOf(null, nameOfLength21))
+                    () -> assertDoesNotThrow(() -> FavoriteFolder.customFolderOf(nameOfLength20)),
+                    () -> assertThatThrownBy(() -> FavoriteFolder.customFolderOf(nameOfLength21))
                             .isInstanceOf(IllegalArgumentException.class)
                             .hasMessage(ErrorTag.FAVORITE_FOLDER_NAME_TOO_LONG.getMessage())
             );

@@ -48,6 +48,7 @@ public class ContentKeywordApiTest {
         jdbcTemplate.execute("TRUNCATE TABLE content_place");
         jdbcTemplate.execute("TRUNCATE TABLE place");
         jdbcTemplate.execute("TRUNCATE TABLE category");
+        jdbcTemplate.execute("TRUNCATE TABLE favorite_folder_account");
         jdbcTemplate.execute("TRUNCATE TABLE favorite_folder");
         jdbcTemplate.execute("TRUNCATE TABLE favorite_content");
         jdbcTemplate.execute("TRUNCATE TABLE guest");
