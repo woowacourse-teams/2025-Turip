@@ -76,7 +76,7 @@ public class FavoriteFolder {
         }
     }
 
-    public boolean isFolderName(String folderName) {
+    public boolean isSameFolderName(String folderName) {
         return this.name.equals(folderName);
     }
 }

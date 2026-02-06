@@ -116,7 +116,7 @@ public class FavoriteFolderService {
     private void validateDuplicatedName(String folderName, Account account) {
         favoriteFolderRepository.findAllByAccount(account)
                 .forEach(favoriteFolder -> {
-                    if (!favoriteFolder.isShared() && favoriteFolder.isFolderName(folderName)) {
+                    if (!favoriteFolder.isShared() && favoriteFolder.isSameFolderName(folderName)) {
                         throw new ConflictException(ErrorTag.FAVORITE_FOLDER_NAME_CONFLICT);
                     }
                 });
