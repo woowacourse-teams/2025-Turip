@@ -164,7 +164,7 @@ class FavoriteFolderServiceTest {
                     .willReturn(favoriteFolderPlaceCount);
 
             // when
-            FavoriteFoldersWithPlaceCountResponse response = favoriteFolderService.findAllByMember(savedAccount);
+            FavoriteFoldersWithPlaceCountResponse response = favoriteFolderService.findAllByAccount(savedAccount);
 
             // then
             assertAll(

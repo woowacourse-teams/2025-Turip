@@ -51,7 +51,7 @@ public class FavoriteFolderService {
         return FavoriteFolderResponse.of(savedFavoriteFolder, account);
     }
 
-    public FavoriteFoldersWithPlaceCountResponse findAllByMember(Account account) {
+    public FavoriteFoldersWithPlaceCountResponse findAllByAccount(Account account) {
         List<FavoriteFolderWithPlaceCountResponse> favoriteFoldersWithPlaceCount = favoriteFolderRepository.findAllByAccountOrderByFavoriteFolderAccountIdAsc(
                         account).stream()
                 .map(favoriteFolder -> {

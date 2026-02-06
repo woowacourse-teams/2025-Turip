@@ -244,7 +244,7 @@ public class FavoriteFolderController {
     @GetMapping
     public ResponseEntity<FavoriteFoldersWithPlaceCountResponse> readAllByMember(
             @Parameter(hidden = true) @AuthAccount Account account) {
-        FavoriteFoldersWithPlaceCountResponse response = favoriteFolderService.findAllByMember(account);
+        FavoriteFoldersWithPlaceCountResponse response = favoriteFolderService.findAllByAccount(account);
         return ResponseEntity.ok(response);
     }
 
