@@ -413,7 +413,7 @@ class FavoritePlaceApiTest {
 
             // when & then
             Map<String, Object> request = new HashMap<>();
-            request.put("favoriteFolderIds", List.of(1L, 2L, 3L));
+            request.put("turipIds", List.of(1L, 2L, 3L));
 
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")

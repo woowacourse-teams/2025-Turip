@@ -57,7 +57,7 @@ public class FavoritePlaceController {
                                     value = """
                                             {
                                                 "id": 1,
-                                                "favoriteFolderId": 3,
+                                                "turipId": 3,
                                                 "placeId": 5
                                             }
                                             """
@@ -290,12 +290,12 @@ public class FavoritePlaceController {
                                             [
                                                 {
                                                     "id": 10,
-                                                    "favoriteFolderId": 1,
+                                                    "turipId": 1,
                                                     "placeId": 123
                                                 },
                                                 {
                                                     "id": 11,
-                                                    "favoriteFolderId": 2,
+                                                    "turipId": 2,
                                                     "placeId": 123
                                                 }
                                             ]
