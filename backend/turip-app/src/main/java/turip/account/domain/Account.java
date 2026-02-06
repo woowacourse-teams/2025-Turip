@@ -43,14 +43,6 @@ public class Account {
         this.role = role;
     }
 
-    public static Account createUserAccount() {
-        return new Account(Role.USER);
-    }
-
-    public void updateNickname(String nickname) {
-        this.nickname = nickname;
-    }
-
     public boolean isAdmin() {
         return this.role == Role.ADMIN;
     }
