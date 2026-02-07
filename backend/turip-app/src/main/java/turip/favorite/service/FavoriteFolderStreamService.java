@@ -16,9 +16,9 @@ import turip.account.domain.Member;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.ForbiddenException;
 import turip.common.exception.custom.InternalServerException;
-import turip.favorite.controller.dto.response.sse.ConnectStreamResponse;
-import turip.favorite.controller.dto.response.sse.FolderUpdateStreamResponse;
-import turip.favorite.controller.dto.response.sse.HeartbeatResponse;
+import turip.favorite.controller.dto.response.ConnectStreamResponse;
+import turip.favorite.controller.dto.response.FolderUpdateStreamResponse;
+import turip.favorite.controller.dto.response.HeartbeatResponse;
 import turip.favorite.repository.FavoriteFolderRepository;
 
 @Slf4j
@@ -31,7 +31,7 @@ public class FavoriteFolderStreamService {
     private static final String SSE_LOG_PREFIX = "[SSE] ";
     private final Map<Long, Map<Long, SseEmitter>> emitters = new ConcurrentHashMap<>();
     private final Map<Long, ScheduledFuture<?>> heartbeatSchedules = new ConcurrentHashMap<>();
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1); // TODO: 스레드풀 수 정하기
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     private final FavoriteFolderRepository favoriteFolderRepository;
 
