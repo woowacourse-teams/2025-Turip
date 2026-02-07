@@ -1,7 +1,7 @@
 package turip.favorite.service;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +13,8 @@ import turip.account.domain.Member;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.ForbiddenException;
 import turip.common.exception.custom.InternalServerException;
-import turip.favorite.controller.dto.response.sse.SseConnectResponse;
+import turip.favorite.controller.dto.response.sse.ConnectStreamResponse;
+import turip.favorite.controller.dto.response.sse.FolderUpdateStreamResponse;
 import turip.favorite.repository.FavoriteFolderRepository;
 
 @Slf4j
@@ -39,7 +40,7 @@ public class FavoriteFolderStreamService {
 
         emitter.onTimeout(() -> {
             removeEmitter(favoriteFolderId, member.getId());
-            log.warn(SSE_LOG_PREFIX + "연결 타임아웃, folderId: {}, memberId: {}",
+            log.info(SSE_LOG_PREFIX + "연결 타임아웃, folderId: {}, memberId: {}",
                     favoriteFolderId, member.getId());
         });
 
@@ -56,6 +57,34 @@ public class FavoriteFolderStreamService {
 
         sendConnectEvent(favoriteFolderId, emitter);
         return emitter;
+    }
+
+    public void sendFolderUpdateEvents(Long favoriteFolderId, ActionType actionType) {
+        Map<Long, SseEmitter> folderEmitters = emitters.get(favoriteFolderId);
+        if (folderEmitters == null || folderEmitters.isEmpty()) {
+            log.info(SSE_LOG_PREFIX + "폴더에 연결된 사용자 없음, folderId: {}", favoriteFolderId);
+            return;
+        }
+        log.info(SSE_LOG_PREFIX + "폴더 업데이트 이벤트 전송 시작, folderId: {}, 연결된 사용자 수: {}", favoriteFolderId,
+                folderEmitters.size());
+        folderEmitters.values()
+                .forEach(emitter -> sendFolderUpdateEvent(favoriteFolderId, actionType, emitter));
+    }
+
+    private void sendFolderUpdateEvent(Long favoriteFolderId, ActionType actionType, SseEmitter emitter) {
+        try {
+            FolderUpdateStreamResponse response = FolderUpdateStreamResponse.of(favoriteFolderId, actionType);
+
+            SseEventBuilder event = SseEmitter.event()
+                    .id(String.valueOf(System.currentTimeMillis()))
+                    .name(SseEventType.FOLDER_UPDATE.getName())
+                    .data(response);
+
+            emitter.send(event);
+        } catch (IOException e) {
+            log.error(SSE_LOG_PREFIX + "폴더 업데이트 이벤트 전송 실패, folderId: {}", favoriteFolderId, e);
+            emitter.completeWithError(e);
+        }
     }
 
     private void removeEmitter(Long favoriteFolderId, Long memberId) {
@@ -91,5 +120,9 @@ public class FavoriteFolderStreamService {
             log.error(SSE_LOG_PREFIX + "SSE 연결 실패, folderId: {}", favoriteFolderId, e);
             throw new InternalServerException(ErrorTag.SSE_CONNECTION_ERROR);
         }
+    }
+
+    private void sendMemberUpdateEvent() {
+        // TODO: 구현 필요
     }
 }
