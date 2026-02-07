@@ -11,7 +11,7 @@ import turip.favorite.domain.FavoriteFolderAccount;
 
 public interface FavoriteFolderAccountRepository extends JpaRepository<FavoriteFolderAccount, Long> {
 
-    boolean countByFavoriteFolder(FavoriteFolder favoriteFolder);
+    int countByFavoriteFolder(FavoriteFolder favoriteFolder);
 
     boolean existsByFavoriteFolderAndAccountAndAccountRole(FavoriteFolder favoriteFolder, Account account,
                                                            AccountRole accountRole);
