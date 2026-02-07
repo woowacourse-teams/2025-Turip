@@ -18,7 +18,7 @@ import turip.common.exception.custom.ForbiddenException;
 import turip.common.exception.custom.InternalServerException;
 import turip.favorite.controller.dto.response.ConnectStreamResponse;
 import turip.favorite.controller.dto.response.FolderUpdateStreamResponse;
-import turip.favorite.controller.dto.response.HeartbeatResponse;
+import turip.favorite.controller.dto.response.HeartbeatStreamResponse;
 import turip.favorite.repository.FavoriteFolderRepository;
 
 @Slf4j
@@ -157,7 +157,7 @@ public class FavoriteFolderStreamService {
             SseEventBuilder event = SseEmitter.event()
                     .id(String.valueOf(System.currentTimeMillis()))
                     .name(SseEventType.HEARTBEAT.getName())
-                    .data(HeartbeatResponse.create());
+                    .data(HeartbeatStreamResponse.create());
             emitter.send(event);
         } catch (IOException e) {
             log.warn(SSE_LOG_PREFIX + "하트비트 전송 실패", e);
