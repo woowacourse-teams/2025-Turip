@@ -29,6 +29,7 @@ public class FavoriteFolderStreamService {
     private final FavoriteFolderRepository favoriteFolderRepository;
 
     public SseEmitter createEmitter(Long favoriteFolderId, Member member) {
+        validateIfMemberJoiningFavoriteFolder(favoriteFolderId, member);
         SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
 
         // emitter 제거 콜백 메서드 등록
