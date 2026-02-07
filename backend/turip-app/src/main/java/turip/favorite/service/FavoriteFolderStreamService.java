@@ -39,7 +39,7 @@ public class FavoriteFolderStreamService {
         });
 
         emitter.onTimeout(() -> {
-            removeEmitter(favoriteFolderId, member.getId());
+            emitter.complete();
             log.info(SSE_LOG_PREFIX + "연결 타임아웃, folderId: {}, memberId: {}",
                     favoriteFolderId, member.getId());
         });
