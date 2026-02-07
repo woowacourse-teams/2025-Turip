@@ -13,7 +13,8 @@ import turip.common.exception.custom.BadRequestException;
 import turip.common.exception.custom.IllegalArgumentException;
 import turip.common.exception.custom.NotFoundException;
 import turip.favorite.repository.FavoriteContentRepository;
-import turip.favorite.service.FavoriteFolderAccountService;
+import turip.favorite.repository.FavoriteFolderAccountRepository;
+import turip.favorite.repository.FavoriteFolderRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +25,8 @@ public class MemberService {
     private final GuestService guestService;
     private final AccountService accountService;
     private final RefreshTokenService refreshTokenService;
-    private final FavoriteFolderAccountService favoriteFolderAccountService;
+    private final FavoriteFolderAccountRepository favoriteFolderAccountRepository;
+    private final FavoriteFolderRepository favoriteFolderRepository;
 
     @Transactional
     public Member create(String email) {
@@ -62,8 +64,7 @@ public class MemberService {
     }
 
     private void migrateFavoriteFolders(Member member, Guest guest) {
-        favoriteFolderAccountService.removeByAccount(member.getAccount());
-        favoriteFolderAccountService.findAllByAccount(guest.getAccount())
-                .forEach(favoriteFolderAccount -> favoriteFolderAccount.updateAccount(member.getAccount()));
+        favoriteFolderRepository.deletePersonalFoldersByAccount(guest.getAccount());
+        favoriteFolderAccountRepository.updateAccount(guest.getAccount(), member.getAccount());
     }
 }

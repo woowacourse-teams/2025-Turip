@@ -29,7 +29,8 @@ import turip.favorite.domain.FavoriteContent;
 import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.domain.FavoriteFolderAccount;
 import turip.favorite.repository.FavoriteContentRepository;
-import turip.favorite.service.FavoriteFolderAccountService;
+import turip.favorite.repository.FavoriteFolderAccountRepository;
+import turip.favorite.repository.FavoriteFolderRepository;
 import turip.util.fixture.AccountFixture;
 import turip.util.fixture.FavoriteFolderFixture;
 import turip.util.fixture.GuestFixture;
@@ -48,7 +49,10 @@ class MemberServiceTest {
     private FavoriteContentRepository favoriteContentRepository;
 
     @Mock
-    private FavoriteFolderAccountService favoriteFolderAccountService;
+    private FavoriteFolderAccountRepository favoriteFolderAccountRepository;
+
+    @Mock
+    private FavoriteFolderRepository favoriteFolderRepository;
 
     @Mock
     private GuestService guestService;
@@ -96,8 +100,6 @@ class MemberServiceTest {
 
             given(favoriteContentRepository.findAllByAccount(guestAccount))
                     .willReturn(List.of(guestFavoriteContent));
-            given(favoriteFolderAccountService.findAllByAccount(guestAccount))
-                    .willReturn(List.of());
 
             // when
             memberService.migrate(member, guest);
@@ -116,27 +118,15 @@ class MemberServiceTest {
             Member member = MemberFixture.createCustomMember(memberAccount, "email@test.com", true);
             Guest guest = GuestFixture.createCustomGuest(guestAccount, "device-fid-123");
 
-            FavoriteFolder guestFolder1 = FavoriteFolderFixture.createDefaultFolderWithId(1L);
-            FavoriteFolder guestFolder2 = FavoriteFolderFixture.createCustomFolderWithId(2L, "게스트 커스텀 폴더였던 것");
-
-            FavoriteFolderAccount folderAccount1 = new FavoriteFolderAccount(guestFolder1, guestAccount,
-                    AccountRole.OWNER);
-            FavoriteFolderAccount folderAccount2 = new FavoriteFolderAccount(guestFolder2, guestAccount,
-                    AccountRole.OWNER);
-
             given(favoriteContentRepository.findAllByAccount(any()))
                     .willReturn(List.of());
-            given(favoriteFolderAccountService.findAllByAccount(guestAccount))
-                    .willReturn(List.of(folderAccount1, folderAccount2));
 
             // when
             memberService.migrate(member, guest);
 
             // then
-            assertAll(
-                    () -> assertThat(folderAccount1.getAccount()).isEqualTo(memberAccount),
-                    () -> assertThat(folderAccount2.getAccount()).isEqualTo(memberAccount)
-            );
+            verify(favoriteFolderRepository).deletePersonalFoldersByAccount(guestAccount);
+            verify(favoriteFolderAccountRepository).updateAccount(guestAccount, memberAccount);
         }
 
         @DisplayName("마이그레이션이 완료되면 Guest를 삭제한다")
@@ -149,8 +139,6 @@ class MemberServiceTest {
             Guest guest = GuestFixture.createCustomGuest(guestAccount, "device-fid-123");
 
             given(favoriteContentRepository.findAllByAccount(any()))
-                    .willReturn(List.of());
-            given(favoriteFolderAccountService.findAllByAccount(any()))
                     .willReturn(List.of());
 
             // when

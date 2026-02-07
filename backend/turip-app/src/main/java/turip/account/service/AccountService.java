@@ -11,7 +11,7 @@ import turip.common.exception.custom.IllegalArgumentException;
 import turip.common.exception.custom.InternalServerException;
 import turip.common.exception.custom.NotFoundException;
 import turip.favorite.repository.FavoriteContentRepository;
-import turip.favorite.service.FavoriteFolderAccountService;
+import turip.favorite.repository.FavoriteFolderRepository;
 import turip.favorite.service.FavoriteFolderService;
 
 @Service
@@ -22,7 +22,7 @@ public class AccountService {
     private final NicknameCreateService nicknameCreateService;
     private final FavoriteContentRepository favoriteContentRepository;
     private final FavoriteFolderService favoriteFolderService;
-    private final FavoriteFolderAccountService favoriteFolderAccountService;
+    private final FavoriteFolderRepository favoriteFolderRepository;
 
     @Transactional
     public Account create() {
@@ -45,7 +45,7 @@ public class AccountService {
     @Transactional
     public void deleteAccountAndFavorites(Account account) {
         favoriteContentRepository.deleteByAccount(account);
-        favoriteFolderAccountService.removeByAccount(account);
+        favoriteFolderRepository.deletePersonalFoldersByAccount(account);
         accountRepository.delete(account);
     }
 }

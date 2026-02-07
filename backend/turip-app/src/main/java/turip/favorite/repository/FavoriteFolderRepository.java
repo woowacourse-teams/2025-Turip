@@ -2,6 +2,7 @@ package turip.favorite.repository;
 
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import turip.account.domain.Account;
@@ -24,4 +25,14 @@ public interface FavoriteFolderRepository extends JpaRepository<FavoriteFolder, 
             "JOIN FavoriteFolderAccount ffa ON ffa.favoriteFolder = ff " +
             "WHERE ffa.account = :account AND ff.isDefault = false")
     boolean existsCustomFolderByAccount(@Param("account") Account account);
+
+    @Modifying
+    @Query("DELETE FROM FavoriteFolder ff " +
+            "WHERE ff.id IN (" +
+            "   SELECT ffa.favoriteFolder.id " +
+            "   FROM FavoriteFolderAccount ffa " +
+            "   WHERE ffa.account = :account " +
+            ") " +
+            "AND ff.isShared = false")
+    void deletePersonalFoldersByAccount(@Param("account") Account account);
 }

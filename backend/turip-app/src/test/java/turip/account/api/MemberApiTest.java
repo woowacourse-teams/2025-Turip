@@ -163,7 +163,7 @@ class MemberApiTest {
                     "SELECT COUNT(*) FROM favorite_folder_account WHERE account_id = 2",
                     Integer.class
             );
-            assertThat(favoriteFolderAccountCount).isEqualTo(2); // Guest의 2개 폴더
+            assertThat(favoriteFolderAccountCount).isEqualTo(0); // Guest의 개인 폴더는 모두 삭제됨
 
             // 검증: Guest가 삭제되었는지 확인
             Integer guestCount = jdbcTemplate.queryForObject(
