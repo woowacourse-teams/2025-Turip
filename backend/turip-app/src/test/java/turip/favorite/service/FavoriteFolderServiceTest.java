@@ -453,5 +453,24 @@ class FavoriteFolderServiceTest {
                     .isInstanceOf(BadRequestException.class)
                     .hasMessage(ErrorTag.DEFAULT_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED.getMessage());
         }
+
+        @DisplayName("공유 찜 폴더를 삭제하려는 경우 BadRequestException을 발생시킨다")
+        @Test
+        void remove6() {
+            // given
+            Long accountId = 1L;
+            Long folderId = 1L;
+
+            Account member = AccountFixture.createCustomAccount(accountId, Role.USER);
+            FavoriteFolder favoriteFolder = FavoriteFolderFixture.createSharedFolder("공유 폴더");
+
+            given(favoriteFolderRepository.findById(folderId))
+                    .willReturn(Optional.of(favoriteFolder));
+
+            // when & then
+            assertThatThrownBy(() -> favoriteFolderService.remove(member, folderId))
+                    .isInstanceOf(BadRequestException.class)
+                    .hasMessage(ErrorTag.SHARED_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED.getMessage());
+        }
     }
 }

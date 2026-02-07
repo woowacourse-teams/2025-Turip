@@ -540,16 +540,28 @@ public class FavoriteFolderController {
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
-                            examples = @ExampleObject(
-                                    name = "is_default_turip",
-                                    summary = "삭제하려는 튜립이 기본 튜립인 경우",
-                                    value = """
-                                            {
-                                                "tag": "DEFAULT_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED",
-                                                "message": "기본 찜폴더에는 이 작업을 수행할 수 없습니다."
-                                            }
-                                            """
-                            )
+                            examples = {
+                                    @ExampleObject(
+                                            name = "is_default_turip",
+                                            summary = "삭제하려는 튜립이 기본 튜립인 경우",
+                                            value = """
+                                                    {
+                                                        "tag": "DEFAULT_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED",
+                                                        "message": "기본 찜폴더에는 이 작업을 수행할 수 없습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "is_shared_turip",
+                                            summary = "삭제하려는 튜립이 함께 튜립인 경우",
+                                            value = """
+                                                    {
+                                                        "tag": "SHARED_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED",
+                                                        "message": "공유 찜폴더에는 이 작업을 수행할 수 없습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
                     )
             ),
             @ApiResponse(

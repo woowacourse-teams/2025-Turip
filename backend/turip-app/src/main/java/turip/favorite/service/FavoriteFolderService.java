@@ -103,9 +103,17 @@ public class FavoriteFolderService {
     @Transactional
     public void remove(Account account, Long favoriteFolderId) {
         FavoriteFolder favoriteFolder = getById(favoriteFolderId);
+        validateRemovableFolder(account, favoriteFolder);
+        favoritePlaceRepository.deleteAllByFavoriteFolder(favoriteFolder);
+        favoriteFolderRepository.deleteById(favoriteFolderId);
+    }
 
+    private void validateRemovableFolder(Account account, FavoriteFolder favoriteFolder) {
         if (favoriteFolder.isDefault()) {
             throw new BadRequestException(ErrorTag.DEFAULT_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED);
+        }
+        if (favoriteFolder.isShared()) {
+            throw new BadRequestException(ErrorTag.SHARED_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED);
         }
         favoriteFolderAccountService.validateOwnership(account, favoriteFolder);
 

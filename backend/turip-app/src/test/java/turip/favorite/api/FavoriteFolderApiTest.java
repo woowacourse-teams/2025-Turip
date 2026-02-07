@@ -452,5 +452,22 @@ class FavoriteFolderApiTest {
                     .then()
                     .statusCode(400);
         }
+
+        @DisplayName("삭제하려는 폴더가 공유 폴더인 경우 400 BAD REQUEST를 응답한다")
+        @Test
+        void delete6() {
+            // given
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
+            Long favoriteFolderId = testDataHelper.insertFavoriteFolder("공유 폴더", false, 1, true);
+            testDataHelper.insertFavoriteFolderAccount(accountId, favoriteFolderId, AccountRole.OWNER);
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .when().delete("/api/v1/turips/1")
+                    .then()
+                    .statusCode(400);
+        }
     }
 }
