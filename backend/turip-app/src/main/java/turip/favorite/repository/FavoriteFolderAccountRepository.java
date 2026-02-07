@@ -14,6 +14,8 @@ public interface FavoriteFolderAccountRepository extends JpaRepository<FavoriteF
     boolean existsByFavoriteFolderAndAccountAndAccountRole(FavoriteFolder favoriteFolder, Account account,
                                                            AccountRole accountRole);
 
+    boolean existsByFavoriteFolderAndAccount(FavoriteFolder favoriteFolder, Account account);
+
     @Modifying
     @Query("UPDATE FavoriteFolderAccount ffa " +
             "SET ffa.account = :newAccount " +

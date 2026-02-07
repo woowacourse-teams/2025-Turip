@@ -93,7 +93,7 @@ public class FavoriteFolderService {
         }
 
         String newName = FavoriteFolder.formatName(request.name());
-        favoriteFolderAccountService.validateOwnership(account, favoriteFolder);
+        favoriteFolderAccountService.validateMembership(account, favoriteFolder);
         validateDuplicatedName(newName, account);
         favoriteFolder.rename(newName);
 
@@ -116,9 +116,6 @@ public class FavoriteFolderService {
             throw new BadRequestException(ErrorTag.SHARED_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED);
         }
         favoriteFolderAccountService.validateOwnership(account, favoriteFolder);
-
-        favoritePlaceRepository.deleteAllByFavoriteFolder(favoriteFolder);
-        favoriteFolderRepository.deleteById(favoriteFolderId);
     }
 
     private void validateDuplicatedName(String folderName, Account account) {

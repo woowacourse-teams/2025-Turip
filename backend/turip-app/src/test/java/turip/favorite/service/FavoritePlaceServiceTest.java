@@ -107,7 +107,7 @@ class FavoritePlaceServiceTest {
                     .willReturn(Optional.of(place));
             doThrow(new ForbiddenException(ErrorTag.FORBIDDEN))
                     .when(favoriteFolderAccountService)
-                    .validateOwnership(requestAccount, favoriteFolder);
+                    .validateMembership(requestAccount, favoriteFolder);
 
             // when & then
             assertThatThrownBy(() -> favoritePlaceService.create(requestAccount, favoriteFolderId, placeId))
@@ -284,7 +284,7 @@ class FavoritePlaceServiceTest {
                     .willReturn(Optional.of(favoriteFolder));
             doThrow(new ForbiddenException(ErrorTag.FORBIDDEN))
                     .when(favoriteFolderAccountService)
-                    .validateOwnership(requestAccount, favoriteFolder);
+                    .validateMembership(requestAccount, favoriteFolder);
 
             // when
             FavoritePlaceOrderRequest request = new FavoritePlaceOrderRequest(List.of(2L, 1L));
@@ -365,7 +365,7 @@ class FavoritePlaceServiceTest {
                     .willReturn(Optional.of(place));
             doThrow(new ForbiddenException(ErrorTag.FORBIDDEN))
                     .when(favoriteFolderAccountService)
-                    .validateOwnership(requestAccount, favoriteFolder);
+                    .validateMembership(requestAccount, favoriteFolder);
 
             // when & then
             assertThatThrownBy(() -> favoritePlaceService.remove(requestAccount, favoriteFolderId, placeId))

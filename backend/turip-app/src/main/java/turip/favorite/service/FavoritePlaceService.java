@@ -37,7 +37,7 @@ public class FavoritePlaceService {
         FavoriteFolder favoriteFolder = getFavoriteFolderById(favoriteFolderId);
         Place place = getPlaceById(placeId);
 
-        favoriteFolderAccountService.validateOwnership(account, favoriteFolder);
+        favoriteFolderAccountService.validateMembership(account, favoriteFolder);
         validateDuplicated(favoriteFolder, place);
 
         Integer maxOrder = favoritePlaceRepository.findMaxFavoriteOrderByFavoriteFolder(favoriteFolder)
@@ -92,7 +92,7 @@ public class FavoritePlaceService {
     public void updatePlaceOrder(Account account, Long favoriteFolderId,
                                  FavoritePlaceOrderRequest request) {
         FavoriteFolder favoriteFolder = getFavoriteFolderById(favoriteFolderId);
-        favoriteFolderAccountService.validateOwnership(account, favoriteFolder);
+        favoriteFolderAccountService.validateMembership(account, favoriteFolder);
 
         List<Long> favoritePlaceIdsOrder = request.favoritePlaceIdsOrder();
 
@@ -109,7 +109,7 @@ public class FavoritePlaceService {
         FavoriteFolder favoriteFolder = getFavoriteFolderById(favoriteFolderId);
         Place place = getPlaceById(placeId);
 
-        favoriteFolderAccountService.validateOwnership(account, favoriteFolder);
+        favoriteFolderAccountService.validateMembership(account, favoriteFolder);
         FavoritePlace favoritePlace = getByFavoriteFolderAndPlace(favoriteFolder, place);
 
         favoritePlaceRepository.delete(favoritePlace);

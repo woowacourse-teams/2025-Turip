@@ -296,7 +296,7 @@ class FavoriteFolderServiceTest {
             given(favoriteFolderRepository.findById(folderId))
                     .willReturn(Optional.of(favoriteFolder));
             willThrow(new ForbiddenException(ErrorTag.FORBIDDEN))
-                    .given(favoriteFolderAccountService).validateOwnership(requestAccount, favoriteFolder);
+                    .given(favoriteFolderAccountService).validateMembership(requestAccount, favoriteFolder);
 
             // when & then
             assertThatThrownBy(() -> favoriteFolderService.updateName(requestAccount, folderId, request))
