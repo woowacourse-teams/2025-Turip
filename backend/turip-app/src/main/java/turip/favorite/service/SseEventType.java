@@ -10,6 +10,7 @@ public enum SseEventType {
     CONNECT("connect"),
     FOLDER_UPDATE("folder-update"),
     MEMBER_UPDATE("member-update"),
+    HEARTBEAT("heartbeat"),
     ;
 
     private final String name;
