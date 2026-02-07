@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum SseEventType {
+public enum StreamEventType {
 
     CONNECT("connect"),
     FOLDER_UPDATE("folder-update"),

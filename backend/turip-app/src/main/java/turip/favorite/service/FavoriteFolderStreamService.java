@@ -85,7 +85,7 @@ public class FavoriteFolderStreamService {
 
             SseEventBuilder event = SseEmitter.event()
                     .id(String.valueOf(System.currentTimeMillis()))
-                    .name(SseEventType.FOLDER_UPDATE.getName())
+                    .name(StreamEventType.FOLDER_UPDATE.getName())
                     .data(response);
 
             emitter.send(event);
@@ -119,7 +119,7 @@ public class FavoriteFolderStreamService {
 
             SseEventBuilder event = SseEmitter.event()
                     .id(String.valueOf(System.currentTimeMillis()))
-                    .name(SseEventType.CONNECT.getName())
+                    .name(StreamEventType.CONNECT.getName())
                     .data(response);
 
             emitter.send(event);
@@ -156,7 +156,7 @@ public class FavoriteFolderStreamService {
         try {
             SseEventBuilder event = SseEmitter.event()
                     .id(String.valueOf(System.currentTimeMillis()))
-                    .name(SseEventType.HEARTBEAT.getName())
+                    .name(StreamEventType.HEARTBEAT.getName())
                     .data(HeartbeatStreamResponse.create());
             emitter.send(event);
         } catch (IOException e) {
