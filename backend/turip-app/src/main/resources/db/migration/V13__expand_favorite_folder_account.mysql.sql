@@ -40,29 +40,25 @@ CREATE TABLE favorite_folder_account
     CONSTRAINT uk_favorite_folder_account UNIQUE (favorite_folder_id, account_id)
 );
 
--- 4. favorite_folder에 member_count 컬럼 추가
-ALTER TABLE favorite_folder
-    ADD COLUMN member_count INT NOT NULL DEFAULT 1;
-
--- 5. favorite_folder에 is_shared 컬럼 추가
+-- 4. favorite_folder에 is_shared 컬럼 추가
 ALTER TABLE favorite_folder
     ADD COLUMN is_shared BOOLEAN NOT NULL DEFAULT FALSE;
 
--- 6. 기존 favorite_folder의 정보를 기반으로 favorite_folder_account 정보 채우기
+-- 5. 기존 favorite_folder의 정보를 기반으로 favorite_folder_account 정보 채우기
 -- 각 favorite_folder의 소유자를 OWNER 역할로 추가
 INSERT INTO favorite_folder_account (favorite_folder_id, account_id, account_role)
 SELECT id, account_id, 'OWNER'
 FROM favorite_folder;
 
--- 7. favorite_folder의 account_id FK 제약조건 제거
+-- 6. favorite_folder의 account_id FK 제약조건 제거
 ALTER TABLE favorite_folder
     DROP FOREIGN KEY fk_favorite_folder__account;
 
--- 8. favorite_folder의 (account_id, name) unique 제약조건 제거
+-- 7. favorite_folder의 (account_id, name) unique 제약조건 제거
 ALTER TABLE favorite_folder
 DROP INDEX uq_favorite_folder__account_id_name;
 
--- 9. favorite_folder의 account_id 이 nullable하도록 수정
+-- 8. favorite_folder의 account_id 이 nullable하도록 수정
 ALTER TABLE favorite_folder MODIFY COLUMN account_id BIGINT NULL;
 
 -- favorite_folder의 account_id 컬럼은 안정적인 배포 후 contract 과정에서 제거 예정

@@ -71,7 +71,7 @@ class GuestApiTest {
             jdbcTemplate.update("INSERT INTO guest (id, account_id, device_fid) VALUES (1, ?, ?)", accountId,
                     deviceFid);
 
-            Long folderId1 = testDataHelper.insertFavoriteFolder("기본 폴더", true, 1, false);
+            Long folderId1 = testDataHelper.insertFavoriteFolder("기본 폴더", true, false);
             Long folderId2 = testDataHelper.insertFavoriteFolder("커스텀 폴더");
             testDataHelper.insertFavoriteFolderAccount(accountId, folderId1, AccountRole.OWNER);
             testDataHelper.insertFavoriteFolderAccount(accountId, folderId2, AccountRole.OWNER);
@@ -100,7 +100,7 @@ class GuestApiTest {
             jdbcTemplate.update("INSERT INTO guest (id, account_id, device_fid) VALUES (1, ?, ?)", accountId,
                     deviceFid);
 
-            Long folderId1 = testDataHelper.insertFavoriteFolder("기본 폴더", true, 1, false);
+            Long folderId1 = testDataHelper.insertFavoriteFolder("기본 폴더", true, false);
             Long folderId2 = testDataHelper.insertFavoriteFolder("커스텀 폴더");
             testDataHelper.insertFavoriteFolderAccount(accountId, folderId1, AccountRole.OWNER);
             testDataHelper.insertFavoriteFolderAccount(accountId, folderId2, AccountRole.OWNER);

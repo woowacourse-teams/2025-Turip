@@ -107,17 +107,16 @@ public class TestDataHelper {
         return insertTuripMember(memberId, loginId, loginPassword);
     }
 
-    public Long insertFavoriteFolder(String name, boolean isDefault, int memberCount, boolean isShared) {
+    public Long insertFavoriteFolder(String name, boolean isDefault, boolean isShared) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(
-                    "INSERT INTO favorite_folder (name, is_default, member_count, is_shared) VALUES (?, ?, ?, ?)",
+                    "INSERT INTO favorite_folder (name, is_default, is_shared) VALUES (?, ?, ?)",
                     Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, name);
             ps.setBoolean(2, isDefault);
-            ps.setInt(3, memberCount);
-            ps.setBoolean(4, isShared);
+            ps.setBoolean(3, isShared);
             return ps;
         }, keyHolder);
 
@@ -125,7 +124,7 @@ public class TestDataHelper {
     }
 
     public Long insertFavoriteFolder(String name) {
-        return insertFavoriteFolder(name, false, 1, false);
+        return insertFavoriteFolder(name, false, false);
     }
 
     public Long insertFavoriteFolderAccount(Long accountId, Long favoriteFolderId, AccountRole accountRole) {

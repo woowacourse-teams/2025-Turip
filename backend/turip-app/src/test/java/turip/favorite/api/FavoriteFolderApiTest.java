@@ -136,8 +136,8 @@ class FavoriteFolderApiTest {
             // given
             Long accountId = testDataHelper.insertAccount();
             jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
-            Long favoriteFolder1 = testDataHelper.insertFavoriteFolder("기본 폴더", true, 1, false);
-            Long favoriteFolder2 = testDataHelper.insertFavoriteFolder("대구 맛집 모음", false, 1, false);
+            Long favoriteFolder1 = testDataHelper.insertFavoriteFolder("기본 폴더", true, false);
+            Long favoriteFolder2 = testDataHelper.insertFavoriteFolder("대구 맛집 모음", false, false);
             testDataHelper.insertFavoriteFolderAccount(accountId, favoriteFolder1, AccountRole.OWNER);
             testDataHelper.insertFavoriteFolderAccount(accountId, favoriteFolder2, AccountRole.OWNER);
 
@@ -184,8 +184,8 @@ class FavoriteFolderApiTest {
             // given
             Long accountId = testDataHelper.insertAccount();
             jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
-            Long favoriteFolder1 = testDataHelper.insertFavoriteFolder("기본 폴더", true, 1, false);
-            Long favoriteFolder2 = testDataHelper.insertFavoriteFolder("대구 맛집 모음", false, 1, false);
+            Long favoriteFolder1 = testDataHelper.insertFavoriteFolder("기본 폴더", true, false);
+            Long favoriteFolder2 = testDataHelper.insertFavoriteFolder("대구 맛집 모음", false, false);
             testDataHelper.insertFavoriteFolderAccount(accountId, favoriteFolder1, AccountRole.OWNER);
             testDataHelper.insertFavoriteFolderAccount(accountId, favoriteFolder2, AccountRole.OWNER);
             jdbcTemplate.update(
@@ -229,7 +229,7 @@ class FavoriteFolderApiTest {
             // given
             Long accountId = testDataHelper.insertAccount();
             jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
-            Long favoriteFolder = testDataHelper.insertFavoriteFolder("기본 폴더", true, 1, false);
+            Long favoriteFolder = testDataHelper.insertFavoriteFolder("기본 폴더", true, false);
             testDataHelper.insertFavoriteFolderAccount(accountId, favoriteFolder, AccountRole.OWNER);
 
             // when & then
@@ -252,7 +252,7 @@ class FavoriteFolderApiTest {
             // given
             Long accountId = testDataHelper.insertAccount();
             jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
-            Long favoriteFolder = testDataHelper.insertFavoriteFolder("변경전 폴더", false, 1, false);
+            Long favoriteFolder = testDataHelper.insertFavoriteFolder("변경전 폴더", false, false);
             testDataHelper.insertFavoriteFolderAccount(accountId, favoriteFolder, AccountRole.OWNER);
 
             // when & then
@@ -276,7 +276,7 @@ class FavoriteFolderApiTest {
             // given
             Long accountId = testDataHelper.insertAccount();
             jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
-            Long favoriteFolder = testDataHelper.insertFavoriteFolder("변경전 폴더", false, 1, false);
+            Long favoriteFolder = testDataHelper.insertFavoriteFolder("변경전 폴더", false, false);
             testDataHelper.insertFavoriteFolderAccount(accountId, favoriteFolder, AccountRole.OWNER);
 
             // when & then
@@ -300,7 +300,7 @@ class FavoriteFolderApiTest {
             Long requestAccountId = testDataHelper.insertAccount();
             jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'requestDeviceFid')",
                     requestAccountId);
-            Long favoriteFolder = testDataHelper.insertFavoriteFolder("변경전 폴더", false, 1, false);
+            Long favoriteFolder = testDataHelper.insertFavoriteFolder("변경전 폴더", false, false);
             testDataHelper.insertFavoriteFolderAccount(ownerAccountId, favoriteFolder, AccountRole.OWNER);
 
             // when & then
@@ -320,9 +320,9 @@ class FavoriteFolderApiTest {
             // given
             Long accountId = testDataHelper.insertAccount();
             jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
-            Long favoriteFolder = testDataHelper.insertFavoriteFolder("변경전 폴더", false, 1, false);
+            Long favoriteFolder = testDataHelper.insertFavoriteFolder("변경전 폴더", false, false);
             testDataHelper.insertFavoriteFolderAccount(accountId, favoriteFolder, AccountRole.OWNER);
-            Long favoriteFolder2 = testDataHelper.insertFavoriteFolder("다른 폴더", false, 1, false);
+            Long favoriteFolder2 = testDataHelper.insertFavoriteFolder("다른 폴더", false, false);
             testDataHelper.insertFavoriteFolderAccount(accountId, favoriteFolder2, AccountRole.OWNER);
 
             // when & then
@@ -342,7 +342,7 @@ class FavoriteFolderApiTest {
             // given
             Long accountId = testDataHelper.insertAccount();
             jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
-            Long favoriteFolder = testDataHelper.insertFavoriteFolder("변경전 폴더", false, 1, false);
+            Long favoriteFolder = testDataHelper.insertFavoriteFolder("변경전 폴더", false, false);
             testDataHelper.insertFavoriteFolderAccount(accountId, favoriteFolder, AccountRole.OWNER);
 
             // when & then
@@ -362,7 +362,7 @@ class FavoriteFolderApiTest {
             // given
             Long accountId = testDataHelper.insertAccount();
             jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
-            Long favoriteFolder = testDataHelper.insertFavoriteFolder("기본 폴더", true, 1, false);
+            Long favoriteFolder = testDataHelper.insertFavoriteFolder("기본 폴더", true, false);
             testDataHelper.insertFavoriteFolderAccount(accountId, favoriteFolder, AccountRole.OWNER);
 
             // when & then
@@ -387,7 +387,7 @@ class FavoriteFolderApiTest {
             // given
             Long accountId = testDataHelper.insertAccount();
             jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
-            Long favoriteFolderId = testDataHelper.insertFavoriteFolder("삭제할 폴더", false, 1, false);
+            Long favoriteFolderId = testDataHelper.insertFavoriteFolder("삭제할 폴더", false, false);
             testDataHelper.insertFavoriteFolderAccount(accountId, favoriteFolderId, AccountRole.OWNER);
 
             // when & then
@@ -404,7 +404,7 @@ class FavoriteFolderApiTest {
             // given
             Long accountId = testDataHelper.insertAccount();
             jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
-            Long favoriteFolderId = testDataHelper.insertFavoriteFolder("삭제할 폴더", false, 1, false);
+            Long favoriteFolderId = testDataHelper.insertFavoriteFolder("삭제할 폴더", false, false);
             testDataHelper.insertFavoriteFolderAccount(accountId, favoriteFolderId, AccountRole.OWNER);
 
             // when & then
@@ -425,7 +425,7 @@ class FavoriteFolderApiTest {
             Long requestAccountId = testDataHelper.insertAccount();
             jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'requestDeviceFid')",
                     requestAccountId);
-            Long favoriteFolderId = testDataHelper.insertFavoriteFolder("삭제할 폴더", false, 1, false);
+            Long favoriteFolderId = testDataHelper.insertFavoriteFolder("삭제할 폴더", false, false);
             testDataHelper.insertFavoriteFolderAccount(ownerAccountId, favoriteFolderId, AccountRole.OWNER);
 
             // when & then
@@ -442,7 +442,7 @@ class FavoriteFolderApiTest {
             // given
             Long accountId = testDataHelper.insertAccount();
             jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
-            Long favoriteFolderId = testDataHelper.insertFavoriteFolder("기본 폴더", true, 1, false);
+            Long favoriteFolderId = testDataHelper.insertFavoriteFolder("기본 폴더", true, false);
             testDataHelper.insertFavoriteFolderAccount(accountId, favoriteFolderId, AccountRole.OWNER);
 
             // when & then
@@ -459,7 +459,7 @@ class FavoriteFolderApiTest {
             // given
             Long accountId = testDataHelper.insertAccount();
             jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
-            Long favoriteFolderId = testDataHelper.insertFavoriteFolder("공유 폴더", false, 1, true);
+            Long favoriteFolderId = testDataHelper.insertFavoriteFolder("공유 폴더", false, true);
             testDataHelper.insertFavoriteFolderAccount(accountId, favoriteFolderId, AccountRole.OWNER);
 
             // when & then

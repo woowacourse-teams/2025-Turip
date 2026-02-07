@@ -98,7 +98,7 @@ class MemberApiTest {
             testDataHelper.insertSocialMember(memberId, provider, providerId);
 
             // 3. Guest의 FavoriteFolder와 FavoriteContent 생성
-            Long folderId1 = testDataHelper.insertFavoriteFolder("기본 폴더", true, 1, false);
+            Long folderId1 = testDataHelper.insertFavoriteFolder("기본 폴더", true, false);
             Long folderId2 = testDataHelper.insertFavoriteFolder("커스텀 폴더");
             testDataHelper.insertFavoriteFolderAccount(guestAccountId, folderId1, AccountRole.OWNER);
             testDataHelper.insertFavoriteFolderAccount(guestAccountId, folderId2, AccountRole.OWNER);
@@ -247,7 +247,7 @@ class MemberApiTest {
             testDataHelper.insertSocialMember(memberId, provider, providerId);
 
             // 2. Member의 FavoriteFolder 생성
-            Long folderId1 = testDataHelper.insertFavoriteFolder("기본 폴더", true, 1, false);
+            Long folderId1 = testDataHelper.insertFavoriteFolder("기본 폴더", true, false);
             Long folderId2 = testDataHelper.insertFavoriteFolder("커스텀 폴더");
             testDataHelper.insertFavoriteFolderAccount(accountId, folderId1, AccountRole.OWNER);
             testDataHelper.insertFavoriteFolderAccount(accountId, folderId2, AccountRole.OWNER);

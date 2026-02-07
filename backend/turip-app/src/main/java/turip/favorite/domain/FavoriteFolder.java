@@ -31,27 +31,23 @@ public class FavoriteFolder {
     @Column(name = "is_default", nullable = false)
     private boolean isDefault;
 
-    @Column(name = "member_count", nullable = false)
-    private int memberCount;
-
     @Column(name = "is_shared", nullable = false)
     private boolean isShared;
 
-    private FavoriteFolder(String name, boolean isDefault, int memberCount) {
+    private FavoriteFolder(String name, boolean isDefault) {
         this.name = name;
         this.isDefault = isDefault;
-        this.memberCount = memberCount;
         this.isShared = false;
     }
 
     public static FavoriteFolder defaultFolderOf() {
-        return new FavoriteFolder("기본 폴더", true, 1);
+        return new FavoriteFolder("기본 폴더", true);
     }
 
     public static FavoriteFolder customFolderOf(String name) {
         String formattedName = formatName(name);
         validateName(formattedName);
-        return new FavoriteFolder(formattedName, false, 1);
+        return new FavoriteFolder(formattedName, false);
     }
 
     public static String formatName(String unformattedName) {

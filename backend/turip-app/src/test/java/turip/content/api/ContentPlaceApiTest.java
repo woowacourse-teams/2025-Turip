@@ -101,7 +101,7 @@ class ContentPlaceApiTest {
 
             Long accountId = testDataHelper.insertAccount();
             jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
-            Long folderId = testDataHelper.insertFavoriteFolder("기본 폴더", true, 1, false);
+            Long folderId = testDataHelper.insertFavoriteFolder("기본 폴더", true, false);
             testDataHelper.insertFavoriteFolderAccount(accountId, folderId, AccountRole.OWNER);
             jdbcTemplate.update(
                     "INSERT INTO favorite_place (favorite_folder_id, place_id) VALUES (1, 1)");
