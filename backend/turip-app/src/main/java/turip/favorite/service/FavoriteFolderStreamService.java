@@ -61,7 +61,10 @@ public class FavoriteFolderStreamService {
         });
 
         emitters.computeIfAbsent(favoriteFolderId, key -> new ConcurrentHashMap<>())
-                .put(emitterKey, emitter);
+                .merge(emitterKey, emitter, (oldEmitter, newEmitter) -> {
+                    oldEmitter.complete();
+                    return newEmitter;
+                });
 
         sendConnectEvent(favoriteFolderId, emitter, emitterKey);
         return emitter;
