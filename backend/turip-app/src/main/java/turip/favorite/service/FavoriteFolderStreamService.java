@@ -100,15 +100,15 @@ public class FavoriteFolderStreamService {
 
     private void removeEmitter(Long favoriteFolderId, Long memberId) {
         String emitterKey = getEmitterKey(favoriteFolderId, memberId);
-        Map<String, SseEmitter> turipEmitters = emitters.get(favoriteFolderId);
-        if (turipEmitters != null) {
+        emitters.computeIfPresent(favoriteFolderId, (key, turipEmitters) -> {
             turipEmitters.remove(emitterKey);
             log.info(SSE_LOG_PREFIX + "SSE 연결 해제, favoriteFolderId: {}, memberId: {}", favoriteFolderId, memberId);
-
             if (turipEmitters.isEmpty()) {
                 emitters.remove(favoriteFolderId);
+                return null;
             }
-        }
+            return turipEmitters;
+        });
     }
 
     private void validateIfMemberJoiningFavoriteFolder(Long favoriteFolderId, Member member) {
