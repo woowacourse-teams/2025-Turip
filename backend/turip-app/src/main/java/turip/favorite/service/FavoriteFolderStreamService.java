@@ -29,8 +29,8 @@ public class FavoriteFolderStreamService {
     private static final Long DEFAULT_TIMEOUT = 3 * 60 * 1000L; // 3분
     private static final Long HEARTBEAT_INTERVAL = 30L; // 30초
     private static final String SSE_LOG_PREFIX = "[SSE] ";
-    private final Map<Long, Map<Long, SseEmitter>> emitters = new ConcurrentHashMap<>();
-    private final Map<Long, ScheduledFuture<?>> heartbeatSchedules = new ConcurrentHashMap<>();
+    private final Map<Long, Map<String, SseEmitter>> emitters = new ConcurrentHashMap<>();
+    private final Map<String, ScheduledFuture<?>> heartbeatSchedules = new ConcurrentHashMap<>();
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     private final FavoriteFolderRepository favoriteFolderRepository;
@@ -38,11 +38,11 @@ public class FavoriteFolderStreamService {
     public SseEmitter createEmitter(Long favoriteFolderId, Member member) {
         validateIfMemberJoiningFavoriteFolder(favoriteFolderId, member);
         SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
-        Long emitterKey = member.getId();
+        String emitterKey = getEmitterKey(favoriteFolderId, member.getId());
 
         emitter.onCompletion(() -> {
             cancelHeartbeat(emitterKey);
-            removeEmitter(favoriteFolderId, emitterKey);
+            removeEmitter(favoriteFolderId, member.getId());
             log.info(SSE_LOG_PREFIX + "클라이언트 연결 해제, folderId: {}, memberId: {}",
                     favoriteFolderId, emitterKey);
         });
@@ -55,7 +55,7 @@ public class FavoriteFolderStreamService {
 
         emitter.onError(e -> {
             cancelHeartbeat(emitterKey);
-            removeEmitter(favoriteFolderId, emitterKey);
+            removeEmitter(favoriteFolderId, member.getId());
             log.error(SSE_LOG_PREFIX + "연결 에러, folderId: {}, memberId: {}",
                     favoriteFolderId, emitterKey, e);
         });
@@ -68,7 +68,7 @@ public class FavoriteFolderStreamService {
     }
 
     public void sendFolderUpdateEvents(Long favoriteFolderId, ActionType actionType) {
-        Map<Long, SseEmitter> folderEmitters = emitters.get(favoriteFolderId);
+        Map<String, SseEmitter> folderEmitters = emitters.get(favoriteFolderId);
         if (folderEmitters == null || folderEmitters.isEmpty()) {
             log.info(SSE_LOG_PREFIX + "폴더에 연결된 사용자 없음, folderId: {}", favoriteFolderId);
             return;
@@ -96,9 +96,10 @@ public class FavoriteFolderStreamService {
     }
 
     private void removeEmitter(Long favoriteFolderId, Long memberId) {
-        Map<Long, SseEmitter> turipEmitters = emitters.get(favoriteFolderId);
+        String emitterKey = getEmitterKey(favoriteFolderId, memberId);
+        Map<String, SseEmitter> turipEmitters = emitters.get(favoriteFolderId);
         if (turipEmitters != null) {
-            turipEmitters.remove(memberId);
+            turipEmitters.remove(emitterKey);
             log.info(SSE_LOG_PREFIX + "SSE 연결 해제, favoriteFolderId: {}, memberId: {}", favoriteFolderId, memberId);
 
             if (turipEmitters.isEmpty()) {
@@ -113,7 +114,7 @@ public class FavoriteFolderStreamService {
         }
     }
 
-    private void sendConnectEvent(Long favoriteFolderId, SseEmitter emitter, Long emitterKey) {
+    private void sendConnectEvent(Long favoriteFolderId, SseEmitter emitter, String emitterKey) {
         try {
             ConnectStreamResponse response = ConnectStreamResponse.from(favoriteFolderId);
 
@@ -135,7 +136,11 @@ public class FavoriteFolderStreamService {
         // TODO: 구현 필요
     }
 
-    private void startHeartbeat(Long emitterKey, SseEmitter emitter) {
+    private String getEmitterKey(Long favoriteFolderId, Long memberId) {
+        return favoriteFolderId + ":" + memberId;
+    }
+
+    private void startHeartbeat(String emitterKey, SseEmitter emitter) {
         ScheduledFuture<?> scheduledFuture = scheduler.scheduleAtFixedRate(
                 () -> sendHeartbeat(emitter),
                 HEARTBEAT_INTERVAL,
@@ -145,7 +150,7 @@ public class FavoriteFolderStreamService {
         heartbeatSchedules.put(emitterKey, scheduledFuture);
     }
 
-    private void cancelHeartbeat(Long emitterKey) {
+    private void cancelHeartbeat(String emitterKey) {
         ScheduledFuture<?> scheduledFuture = heartbeatSchedules.remove(emitterKey);
         if (scheduledFuture != null) {
             scheduledFuture.cancel(false);
