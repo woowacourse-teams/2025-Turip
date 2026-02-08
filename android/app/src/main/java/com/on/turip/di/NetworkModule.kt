@@ -39,7 +39,6 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-@OptIn(ExperimentalSerializationApi::class)
 object NetworkModule {
     const val LOG_PREFIX = "moongjenut"
 
