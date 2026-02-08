@@ -2,6 +2,7 @@ package com.on.turip
 
 import android.app.Application
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.on.turip.common.FidProvider
 import com.on.turip.common.TuripDebugTree
 import com.on.turip.common.TuripReleaseTree
 import com.on.turip.data.initializer.FirebaseInstallationsInitializer
@@ -18,8 +19,12 @@ class TuripApplication : Application() {
     @Inject
     lateinit var userStorageRepository: UserStorageRepository
 
+    @Inject
+    lateinit var fidProvider: FidProvider
+
     override fun onCreate() {
         super.onCreate()
+        fidProvider.init()
 
         FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(!BuildConfig.DEBUG)
 
@@ -27,14 +32,7 @@ class TuripApplication : Application() {
             FirebaseInstallationsInitializer(userStorageRepository)
                 .setupFirebaseInstallationId()
 
-            val fid: String =
-                userStorageRepository
-                    .loadId()
-                    .getOrNull()
-                    ?.fid
-                    ?: "unknown"
-
-            FirebaseCrashlytics.getInstance().setUserId(fid)
+            FirebaseCrashlytics.getInstance().setUserId(fidProvider.cachedFid)
         }
 
         if (BuildConfig.DEBUG) {
