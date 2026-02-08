@@ -190,7 +190,8 @@ class FavoriteFolderApiTest {
             testDataHelper.insertFavoriteFolderAccount(accountId, favoriteFolder2, AccountRole.OWNER);
             jdbcTemplate.update(
                     "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('루터회관','https://naver.me/5UrZAIeY', '루터회관의 도로명 주소', 38.1234, 127.23123)");
-            jdbcTemplate.update("INSERT INTO favorite_place (favorite_folder_id, place_id) VALUES (2, 1)");
+            jdbcTemplate.update("INSERT INTO favorite_place (favorite_folder_id, place_id) VALUES (?, 1)",
+                    favoriteFolder2);
 
             // when & then
             RestAssured.given().port(port)
