@@ -74,7 +74,6 @@ class AccountServiceTest {
         @Test
         void create2() {
             // given
-            String invalidEmail = "invalid-email";
             given(nicknameCreateService.generateUniqueNickname())
                     .willThrow(new IllegalArgumentException(ErrorTag.NICKNAME_CREATION_ERROR));
 
