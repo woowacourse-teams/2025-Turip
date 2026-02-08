@@ -66,7 +66,7 @@ public class FavoriteFolderStreamService {
                     return newEmitter;
                 });
 
-        sendConnectEvent(favoriteFolderId, emitter, emitterKey);
+        sendConnectEvent(favoriteFolderId, member.getId(), emitter);
         return emitter;
     }
 
@@ -117,8 +117,9 @@ public class FavoriteFolderStreamService {
         }
     }
 
-    private void sendConnectEvent(Long favoriteFolderId, SseEmitter emitter, String emitterKey) {
+    private void sendConnectEvent(Long favoriteFolderId, Long memberId, SseEmitter emitter) {
         try {
+            String emitterKey = getEmitterKey(favoriteFolderId, memberId);
             ConnectStreamResponse response = ConnectStreamResponse.from(favoriteFolderId);
 
             SseEventBuilder event = SseEmitter.event()
@@ -131,6 +132,7 @@ public class FavoriteFolderStreamService {
             log.info(SSE_LOG_PREFIX + "SSE 연결 성공, folderId: {}", favoriteFolderId);
         } catch (IOException e) {
             log.error(SSE_LOG_PREFIX + "SSE 연결 실패, folderId: {}", favoriteFolderId, e);
+            removeEmitter(favoriteFolderId, memberId);
             throw new InternalServerException(ErrorTag.SSE_CONNECTION_ERROR);
         }
     }
