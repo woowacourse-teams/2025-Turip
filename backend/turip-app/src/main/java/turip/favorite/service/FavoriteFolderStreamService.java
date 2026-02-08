@@ -44,20 +44,20 @@ public class FavoriteFolderStreamService {
             cancelHeartbeat(emitterKey);
             removeEmitter(favoriteFolderId, member.getId());
             log.info(SSE_LOG_PREFIX + "클라이언트 연결 해제, folderId: {}, memberId: {}",
-                    favoriteFolderId, emitterKey);
+                    favoriteFolderId, member.getId());
         });
 
         emitter.onTimeout(() -> {
             emitter.complete();
             log.info(SSE_LOG_PREFIX + "연결 타임아웃, folderId: {}, memberId: {}",
-                    favoriteFolderId, emitterKey);
+                    favoriteFolderId, member.getId());
         });
 
         emitter.onError(e -> {
             cancelHeartbeat(emitterKey);
             removeEmitter(favoriteFolderId, member.getId());
             log.error(SSE_LOG_PREFIX + "연결 에러, folderId: {}, memberId: {}",
-                    favoriteFolderId, emitterKey, e);
+                    favoriteFolderId, member.getId(), e);
         });
 
         emitters.computeIfAbsent(favoriteFolderId, key -> new ConcurrentHashMap<>())
