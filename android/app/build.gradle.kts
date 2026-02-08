@@ -116,6 +116,7 @@ dependencies {
     implementation(libs.ktor.client.logging)
     implementation(libs.ktor.client.auth)
     // ksp
+    ksp(libs.androidx.room.compiler)
     // coil
     implementation(libs.coil)
     // WebView
