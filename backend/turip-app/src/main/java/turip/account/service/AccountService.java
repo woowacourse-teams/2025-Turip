@@ -26,15 +26,17 @@ public class AccountService {
 
     @Transactional
     public Account create() {
+        String nickname;
         try {
-            String nickname = nicknameCreateService.generateUniqueNickname();
-            Account account = new Account(Role.USER, nickname);
-            Account savedAccount = accountRepository.save(account);
-            favoriteFolderService.createDefaultFavoriteFolder(savedAccount);
-            return savedAccount;
+            nickname = nicknameCreateService.generateUniqueNickname();
         } catch (IllegalArgumentException e) {
             throw new InternalServerException(ErrorTag.NICKNAME_CREATION_ERROR);
         }
+
+        Account account = new Account(Role.USER, nickname);
+        Account savedAccount = accountRepository.save(account);
+        favoriteFolderService.createDefaultFavoriteFolder(savedAccount);
+        return savedAccount;
     }
 
     public Account getById(Long accountId) {
