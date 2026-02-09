@@ -3,8 +3,10 @@ package turip.account.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -18,7 +20,6 @@ import turip.account.domain.Account;
 import turip.account.domain.Role;
 import turip.account.repository.AccountRepository;
 import turip.common.exception.ErrorTag;
-import turip.common.exception.custom.IllegalArgumentException;
 import turip.common.exception.custom.InternalServerException;
 import turip.common.exception.custom.NotFoundException;
 import turip.favorite.repository.FavoriteContentRepository;
@@ -44,9 +45,6 @@ class AccountServiceTest {
     @Mock
     private FavoriteFolderRepository favoriteFolderRepository;
 
-    @Mock
-    private NicknameCreateService nicknameCreateService;
-
     @DisplayName("Account 생성 테스트")
     @Nested
     class Create {
@@ -56,8 +54,8 @@ class AccountServiceTest {
         void create1() {
             // given
             Account savedAccount = AccountFixture.createUser();
-            given(nicknameCreateService.generateUniqueNickname())
-                    .willReturn(savedAccount.getNickname());
+            given(accountRepository.existsByNickname(any()))
+                    .willReturn(false);
             given(accountRepository.save(any(Account.class)))
                     .willReturn(savedAccount);
 
@@ -74,9 +72,12 @@ class AccountServiceTest {
         @Test
         void create2() {
             // given
-            String invalidEmail = "invalid-email";
-            given(nicknameCreateService.generateUniqueNickname())
-                    .willThrow(new IllegalArgumentException(ErrorTag.NICKNAME_CREATION_ERROR));
+            when(accountRepository.existsByNickname(anyString()))
+                    .thenReturn(true)
+                    .thenReturn(true)
+                    .thenReturn(true)
+                    .thenReturn(true)
+                    .thenReturn(true);
 
             // when & then
             assertThatThrownBy(() -> accountService.create())
