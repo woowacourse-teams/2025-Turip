@@ -41,7 +41,7 @@ public class AuthService {
     public TuripLoginResult loginWithTurip(TuripLoginRequest request, String deviceFid) {
         Member member = loginAndGetMember(request);
         TokenResult tokenResult = processTuripLogin(deviceFid, member);
-        return new TuripLoginResult(tokenResult, member.getAccount().getNickname());
+        return TuripLoginResult.of(tokenResult, member.getAccount().getNickname());
     }
 
     @Transactional
@@ -82,7 +82,7 @@ public class AuthService {
 
             saveRefreshToken(member, newRefreshToken, deviceFid);
 
-            return new RefreshTokenResponse(newAccessToken, newRefreshToken);
+            return RefreshTokenResponse.of(newAccessToken, newRefreshToken);
 
         } catch (UnauthorizedException e) {
             throw e;

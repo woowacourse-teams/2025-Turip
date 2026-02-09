@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import turip.account.domain.Member;
 import turip.auth.controller.dto.request.TuripLoginRequest;
 import turip.auth.service.AuthService;
+import turip.auth.service.dto.TokenResult;
 import turip.auth.service.dto.TuripLoginResult;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.ForbiddenException;
@@ -23,7 +24,8 @@ public class AdminAuthService {
             throw new ForbiddenException(ErrorTag.FORBIDDEN);
         }
 
-        return new TuripLoginResult(authService.processTuripLogin(deviceFid, member), member.getAccount().getNickname());
+        TokenResult tokenResult = authService.processTuripLogin(deviceFid, member);
+        return TuripLoginResult.of(tokenResult, member.getAccount().getNickname());
     }
 
 }

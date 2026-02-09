@@ -117,7 +117,7 @@ public class AuthController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString())
                 .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
-                .body(new TuripLoginResponse(result.nickname()));
+                .body(TuripLoginResponse.from(result.nickname()));
     }
 
     @Operation(
