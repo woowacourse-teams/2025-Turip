@@ -1,6 +1,7 @@
 package turip.auth.controller.dto.response;
 
 
+import turip.account.domain.Member;
 import turip.auth.service.dto.TokenResult;
 
 public record SocialLoginResponse(
@@ -10,7 +11,8 @@ public record SocialLoginResponse(
         String nickname
 ) {
 
-    public static SocialLoginResponse of(TokenResult tokenResult, boolean isNewMember, String nickname) {
-        return new SocialLoginResponse(tokenResult.accessToken(), tokenResult.refreshToken(), isNewMember, nickname);
+    public static SocialLoginResponse of(TokenResult tokenResult, boolean isNewMember, Member member) {
+        return new SocialLoginResponse(tokenResult.accessToken(), tokenResult.refreshToken(), isNewMember,
+                member.getAccount().getNickname());
     }
 }

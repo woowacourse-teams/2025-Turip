@@ -25,7 +25,7 @@ public class AdminAuthService {
         }
 
         TokenResult tokenResult = authService.processTuripLogin(deviceFid, member);
-        return TuripLoginResult.of(tokenResult, member.getAccount().getNickname());
+        return TuripLoginResult.of(tokenResult, member);
     }
 
 }
