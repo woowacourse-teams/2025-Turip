@@ -17,11 +17,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import turip.account.domain.Provider;
 import turip.account.domain.Role;
+import turip.account.service.AccountCreateService;
 import turip.auth.token.GoogleTokenParser;
 import turip.util.helper.TestDataHelper;
 
@@ -40,6 +43,9 @@ class AuthApiTest {
 
     @MockitoBean
     private GoogleTokenParser googleTokenParser;
+
+    @MockitoSpyBean
+    private AccountCreateService accountCreateService;
 
     @BeforeEach
     void setUp() {
@@ -230,6 +236,37 @@ class AuthApiTest {
                     .then().log().all()
                     .statusCode(401)
                     .body("tag", is("ID_TOKEN_NOT_VALID"));
+        }
+
+        @Test
+        @DisplayName("계정 생성에 실패한 경우 500 Internal Server Error를 응답한다")
+        void accountCreationFailed() {
+            // given
+            String email = "newuser@gmail.com";
+            Provider provider = Provider.GOOGLE;
+            String providerId = "google-user-new";
+
+            String idToken = "valid-google-id-token";
+            String deviceFid = "device-456";
+
+            when(googleTokenParser.getProvider()).thenReturn(provider);
+            when(googleTokenParser.getProviderId(idToken)).thenReturn(providerId);
+            when(googleTokenParser.getEmail(idToken)).thenReturn(email);
+            when(accountCreateService.save()).thenThrow(new DataIntegrityViolationException("nickname constraint"));
+
+            Map<String, String> requestBody = new HashMap<>();
+            requestBody.put("idToken", idToken);
+
+            // when & then
+            RestAssured
+                    .given().log().all()
+                    .contentType(ContentType.JSON)
+                    .header("device-fid", deviceFid)
+                    .body(requestBody)
+                    .when().post("/api/v1/auth/login/google")
+                    .then().log().all()
+                    .statusCode(500)
+                    .body("tag", is("ACCOUNT_CREATION_ERROR"));
         }
     }
 

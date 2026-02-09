@@ -109,6 +109,26 @@ public class TuripMemberController {
                                             """
                             )
                     )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "account creation error",
+                                            summary = "계정 생성 실패(재시도 5번에 모두 실패)",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCOUNT_CREATION_ERROR",
+                                                    	"message": "계정 생성에 실패했습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
             )
     })
     @PostMapping
