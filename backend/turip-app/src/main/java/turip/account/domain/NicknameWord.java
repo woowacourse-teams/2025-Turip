@@ -317,7 +317,7 @@ public enum NicknameWord {
         THIRD
     }
 
-    private static final Map<Category, List<NicknameWord>> BY_CATEGORY = buildByCategory();
+    private static final Map<Category, List<NicknameWord>> WORDS_BY_CATEGORY = buildByCategory();
 
     private final String text;
     private final Category category;
@@ -354,7 +354,7 @@ public enum NicknameWord {
     }
 
     private static NicknameWord random(Category category, Random random) {
-        List<NicknameWord> words = BY_CATEGORY.get(category);
+        List<NicknameWord> words = WORDS_BY_CATEGORY.get(category);
         return words.get(random.nextInt(words.size()));
     }
 }
