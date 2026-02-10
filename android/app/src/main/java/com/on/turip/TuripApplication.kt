@@ -10,6 +10,7 @@ import com.on.turip.domain.userstorage.repository.UserStorageRepository
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -21,14 +22,14 @@ class TuripApplication : Application() {
 
     @Inject
     lateinit var fidProvider: FidProvider
+    private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override fun onCreate() {
         super.onCreate()
-        fidProvider.init()
 
         FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(!BuildConfig.DEBUG)
 
-        CoroutineScope(Dispatchers.IO).launch {
+        applicationScope.launch {
             FirebaseInstallationsInitializer(userStorageRepository)
                 .setupFirebaseInstallationId()
 

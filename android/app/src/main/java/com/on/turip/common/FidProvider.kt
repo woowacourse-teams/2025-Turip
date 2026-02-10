@@ -3,7 +3,8 @@ package com.on.turip.common
 import com.on.turip.domain.userstorage.repository.UserStorageRepository
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 @Singleton
 class FidProvider @Inject constructor(
@@ -11,17 +12,19 @@ class FidProvider @Inject constructor(
 ) {
     @Volatile
     private var _cachedFid: String? = null
+    private val mutex = Mutex()
 
-    fun init() {
+    suspend fun init() {
         if (_cachedFid != null) return
 
-        _cachedFid =
-            runBlocking {
+        mutex.withLock {
+            if (_cachedFid != null) return
+            _cachedFid =
                 userStorageRepository
                     .loadId()
                     .getOrNull()
-                    ?.fid
-            } ?: "unknown"
+                    ?.fid ?: "unknown"
+        }
     }
 
     val cachedFid: String get() = _cachedFid ?: "unknown"
