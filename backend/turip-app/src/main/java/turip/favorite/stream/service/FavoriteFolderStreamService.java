@@ -104,7 +104,6 @@ public class FavoriteFolderStreamService {
             turipEmitters.remove(emitterKey);
             log.info(SSE_LOG_PREFIX + "SSE 연결 해제, favoriteFolderId: {}, memberId: {}", favoriteFolderId, memberId);
             if (turipEmitters.isEmpty()) {
-                emitters.remove(favoriteFolderId);
                 return null;
             }
             return turipEmitters;
