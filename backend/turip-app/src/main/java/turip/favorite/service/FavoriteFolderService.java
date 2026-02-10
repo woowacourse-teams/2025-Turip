@@ -100,8 +100,17 @@ public class FavoriteFolderService {
         return favoriteFolderRepository.existsCustomFolderByAccount(account);
     }
 
-    public FavoriteFolderMembersResponse findMembersById(Long turipId, Account account) {
-        FavoriteFolder favoriteFolder = getById(turipId);
+    public FavoriteFolderDetailResponse findById(Long favoriteFolderId, Account account) {
+        FavoriteFolder favoriteFolder = getById(favoriteFolderId);
+        favoriteFolderAccountService.validateMembership(account, favoriteFolder);
+
+        int placeCount = favoritePlaceRepository.countByFavoriteFolder(favoriteFolder);
+        int memberCount = favoriteFolderAccountService.countByFavoriteFolder(favoriteFolder);
+        return FavoriteFolderDetailResponse.of(favoriteFolder, account, placeCount, memberCount);
+    }
+
+    public FavoriteFolderMembersResponse findMembersById(Long favoriteFolderId, Account account) {
+        FavoriteFolder favoriteFolder = getById(favoriteFolderId);
         favoriteFolderAccountService.validateMembership(account, favoriteFolder);
 
         List<Member> members = favoriteFolderAccountService.findMembersByFavoriteFolder(favoriteFolder);

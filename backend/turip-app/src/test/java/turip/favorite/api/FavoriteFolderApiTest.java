@@ -880,6 +880,62 @@ class FavoriteFolderApiTest {
                     .then()
                     .statusCode(400);
         }
+    }
 
+    @DisplayName("GET /api/v1/turips/{turipId} 튜립 상세 조회 테스트")
+    @Nested
+    class ReadById {
+
+        @DisplayName("튜립 멤버가 상세 조회에 성공한 경우 200 OK와 튜립 상세 정보를 응답한다")
+        @Test
+        void readById1() {
+            // given
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
+            Long favoriteFolderId = testDataHelper.insertFavoriteFolder("튜립 부산", false, true);
+            testDataHelper.insertFavoriteFolderAccount(accountId, favoriteFolderId, AccountRole.OWNER);
+
+            // 다른 멤버 추가
+            Long accountId2 = testDataHelper.insertAccount();
+            testDataHelper.insertFavoriteFolderAccount(accountId2, favoriteFolderId, AccountRole.MEMBER);
+
+            Long accountId3 = testDataHelper.insertAccount();
+            testDataHelper.insertFavoriteFolderAccount(accountId3, favoriteFolderId, AccountRole.MEMBER);
+
+            Long accountId4 = testDataHelper.insertAccount();
+            testDataHelper.insertFavoriteFolderAccount(accountId4, favoriteFolderId, AccountRole.MEMBER);
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .when().get("/api/v1/turips/" + favoriteFolderId)
+                    .then()
+                    .statusCode(200)
+                    .body("id", is(favoriteFolderId.intValue()))
+                    .body("name", is("튜립 부산"))
+                    .body("isDefault", is(false))
+                    .body("isShared", is(true))
+                    .body("memberCount", is(4));
+        }
+
+        @DisplayName("해당 폴더에 참여한 멤버가 아닌 경우 403 FORBIDDEN을 응답한다")
+        @Test
+        void readById3() {
+            // given
+            Long ownerAccountId = testDataHelper.insertAccount();
+            Long nonMemberAccountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'nonMemberDeviceFid')",
+                    nonMemberAccountId);
+
+            Long favoriteFolderId = testDataHelper.insertFavoriteFolder("비공개 튜립", false, false);
+            testDataHelper.insertFavoriteFolderAccount(ownerAccountId, favoriteFolderId, AccountRole.OWNER);
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("device-fid", "nonMemberDeviceFid")
+                    .when().get("/api/v1/turips/" + favoriteFolderId)
+                    .then()
+                    .statusCode(403);
+        }
     }
 }
