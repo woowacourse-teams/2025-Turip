@@ -265,7 +265,7 @@ private fun CloseButton(
 
 @Preview(showBackground = true)
 @Composable
-private fun FavoritePlaceFolderBottomSheetPreview() {
+private fun PlaceTuripSelectionBottomSheetPreview() {
     val listState = rememberLazyListState()
     TuripTheme {
         Surface(
