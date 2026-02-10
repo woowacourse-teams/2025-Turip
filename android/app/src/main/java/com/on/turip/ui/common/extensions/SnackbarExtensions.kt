@@ -1,4 +1,4 @@
-package com.on.turip.ui.common
+package com.on.turip.ui.common.extensions
 
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState

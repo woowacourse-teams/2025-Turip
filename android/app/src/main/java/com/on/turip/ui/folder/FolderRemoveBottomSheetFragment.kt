@@ -10,9 +10,9 @@ import com.google.android.material.snackbar.Snackbar
 import com.on.turip.R
 import com.on.turip.databinding.BottomSheetFragmentFolderRemoveBinding
 import com.on.turip.ui.common.base.BaseBottomSheetFragment
-import com.on.turip.ui.common.collectOnStarted
 import com.on.turip.ui.common.error.ErrorUiModel
 import com.on.turip.ui.common.error.toUiModel
+import com.on.turip.ui.common.extensions.collectOnStarted
 import com.on.turip.ui.folder.model.TuripUiEffect
 import com.on.turip.ui.login.LoginActivity
 
