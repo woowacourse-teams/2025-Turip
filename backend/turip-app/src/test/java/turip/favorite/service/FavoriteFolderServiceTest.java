@@ -30,16 +30,20 @@ import turip.common.exception.custom.IllegalArgumentException;
 import turip.common.exception.custom.NotFoundException;
 import turip.favorite.controller.dto.request.FavoriteFolderNameRequest;
 import turip.favorite.controller.dto.request.FavoriteFolderRequest;
+import turip.favorite.controller.dto.response.FavoriteFolderJoinResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithFavoriteStatusResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithPlaceCountResponse;
+import turip.favorite.domain.AccountRole;
 import turip.favorite.domain.FavoriteFolder;
+import turip.favorite.domain.FavoriteFolderAccount;
 import turip.favorite.repository.FavoriteFolderRepository;
 import turip.favorite.repository.FavoritePlaceRepository;
 import turip.place.domain.Place;
 import turip.place.repository.PlaceRepository;
 import turip.util.fixture.AccountFixture;
 import turip.util.fixture.FavoriteFolderFixture;
+import turip.util.fixture.MemberFixture;
 
 @ExtendWith(MockitoExtension.class)
 class FavoriteFolderServiceTest {
@@ -437,6 +441,94 @@ class FavoriteFolderServiceTest {
             assertThatThrownBy(() -> favoriteFolderService.findMembersById(turipId, nonMemberAccount))
                     .isInstanceOf(ForbiddenException.class)
                     .hasMessage(ErrorTag.FORBIDDEN.getMessage());
+        }
+    }
+
+    @DisplayName("공유 찜폴더 참여 테스트")
+    @Nested
+    class JoinFavoriteFolder {
+
+        @DisplayName("공유 찜폴더에 참여할 수 있다")
+        @Test
+        void joinFavoriteFolder1() {
+            // given
+            Long turipId = 1L;
+            Long accountId = 1L;
+            Long favoriteFolderAccountId = 1L;
+            Member member = MemberFixture.createMember();
+            Account account = member.getAccount();
+            FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(turipId, "함께 튜립");
+            favoriteFolder.shareFolder();
+            FavoriteFolderAccount favoriteFolderAccount = new FavoriteFolderAccount(
+                    favoriteFolderAccountId, favoriteFolder, account, AccountRole.MEMBER
+            );
+
+            given(favoriteFolderRepository.findById(turipId))
+                    .willReturn(Optional.of(favoriteFolder));
+            given(favoriteFolderAccountService.findOrCreate(favoriteFolder, account))
+                    .willReturn(favoriteFolderAccount);
+
+            // when
+            FavoriteFolderJoinResponse response = favoriteFolderService.joinMember(turipId, member);
+
+            // then
+            assertAll(
+                    () -> assertThat(response.id()).isEqualTo(favoriteFolderAccountId),
+                    () -> assertThat(response.favoriteFolderId()).isEqualTo(turipId),
+                    () -> assertThat(response.isShared()).isTrue(),
+                    () -> assertThat(response.accountId()).isEqualTo(accountId)
+            );
+        }
+
+        @DisplayName("찜폴더가 존재하지 않는 경우 NotFoundException을 발생시킨다")
+        @Test
+        void joinFavoriteFolder2() {
+            // given
+            Long nonExistentTuripId = 999L;
+            Member member = MemberFixture.createMember();
+
+            given(favoriteFolderRepository.findById(nonExistentTuripId))
+                    .willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> favoriteFolderService.joinMember(nonExistentTuripId, member))
+                    .isInstanceOf(NotFoundException.class)
+                    .hasMessage(ErrorTag.FAVORITE_FOLDER_NOT_FOUND.getMessage());
+        }
+
+        @DisplayName("개인 찜폴더에 참여하려는 경우 BadRequestException을 발생시킨다")
+        @Test
+        void joinFavoriteFolder3() {
+            // given
+            Long turipId = 1L;
+            Member member = MemberFixture.createMember();
+            FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(turipId, "함께 튜립");
+
+            given(favoriteFolderRepository.findById(turipId))
+                    .willReturn(Optional.of(favoriteFolder));
+
+            // when & then
+            assertThatThrownBy(() -> favoriteFolderService.joinMember(turipId, member))
+                    .isInstanceOf(BadRequestException.class)
+                    .hasMessage(ErrorTag.PERSONAL_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED.getMessage());
+        }
+
+        @DisplayName("기본 찜폴더에 참여하려는 경우 BadRequestException을 발생시킨다")
+        @Test
+        void joinFavoriteFolder4() {
+            // given
+            Long turipId = 1L;
+            Member member = MemberFixture.createMember();
+            FavoriteFolder favoriteFolder = FavoriteFolderFixture.createDefaultFolderWithId(turipId);
+            favoriteFolder.shareFolder();
+
+            given(favoriteFolderRepository.findById(turipId))
+                    .willReturn(Optional.of(favoriteFolder));
+
+            // when & then
+            assertThatThrownBy(() -> favoriteFolderService.joinMember(turipId, member))
+                    .isInstanceOf(BadRequestException.class)
+                    .hasMessage(ErrorTag.DEFAULT_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED.getMessage());
         }
     }
 

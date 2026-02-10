@@ -13,6 +13,7 @@ import turip.common.exception.custom.ConflictException;
 import turip.common.exception.custom.NotFoundException;
 import turip.favorite.controller.dto.request.FavoriteFolderNameRequest;
 import turip.favorite.controller.dto.request.FavoriteFolderRequest;
+import turip.favorite.controller.dto.response.FavoriteFolderJoinResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderMembersResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse;
@@ -21,6 +22,7 @@ import turip.favorite.controller.dto.response.FavoriteFoldersWithFavoriteStatusR
 import turip.favorite.controller.dto.response.FavoriteFoldersWithPlaceCountResponse;
 import turip.favorite.domain.AccountRole;
 import turip.favorite.domain.FavoriteFolder;
+import turip.favorite.domain.FavoriteFolderAccount;
 import turip.favorite.repository.FavoriteFolderRepository;
 import turip.favorite.repository.FavoritePlaceRepository;
 import turip.place.domain.Place;
@@ -51,6 +53,16 @@ public class FavoriteFolderService {
         favoriteFolderAccountService.save(savedFavoriteFolder, account, AccountRole.OWNER);
 
         return FavoriteFolderResponse.of(savedFavoriteFolder, account);
+    }
+
+    @Transactional
+    public FavoriteFolderJoinResponse joinMember(Long favoriteFolderId, Member member) {
+        FavoriteFolder favoriteFolder = getById(favoriteFolderId);
+        validateSharable(favoriteFolder);
+
+        FavoriteFolderAccount favoriteFolderAccount = favoriteFolderAccountService.findOrCreate(favoriteFolder,
+                member.getAccount());
+        return FavoriteFolderJoinResponse.from(favoriteFolderAccount);
     }
 
     public FavoriteFoldersWithPlaceCountResponse findAllByAccount(Account account) {
@@ -135,6 +147,15 @@ public class FavoriteFolderService {
                         throw new ConflictException(ErrorTag.FAVORITE_FOLDER_NAME_CONFLICT);
                     }
                 });
+    }
+
+    private void validateSharable(FavoriteFolder favoriteFolder) {
+        if (!favoriteFolder.isShared()) {
+            throw new BadRequestException(ErrorTag.PERSONAL_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED);
+        }
+        if (favoriteFolder.isDefault()) {
+            throw new BadRequestException(ErrorTag.DEFAULT_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED);
+        }
     }
 
     private Place getPlaceById(Long id) {

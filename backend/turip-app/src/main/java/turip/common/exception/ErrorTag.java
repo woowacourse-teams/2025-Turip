@@ -11,6 +11,7 @@ public enum ErrorTag {
     DEVICE_FID_REQUIRED("요청 헤더에 device_fid가 존재하지 않습니다."),
     FAVORITE_PLACE_FOLDER_MISMATCH("장소 찜이 해당 폴더에 존재하지 않습니다."),
     SHARED_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED("공유 찜폴더에는 이 작업을 수행할 수 없습니다."),
+    PERSONAL_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED("개인 찜폴더에는 이 작업을 수행할 수 없습니다."),
 
     EMAIL_INVALID("이메일 형식이 올바르지 않습니다."),
     LOGIN_ID_INVALID("아이디 형식이 올바르지 않습니다."),
@@ -29,6 +30,7 @@ public enum ErrorTag {
 
     // 403 Forbidden
     FORBIDDEN("접근 권한이 없습니다."),
+    GUEST_FORBIDDEN("게스트 계정이 접근할 수 없는 기능입니다."),
 
     // 404 Not Found
     NOT_FOUND("요청 정보를 찾을 수 없습니다."),

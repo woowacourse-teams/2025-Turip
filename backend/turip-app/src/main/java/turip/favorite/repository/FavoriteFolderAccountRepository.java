@@ -1,6 +1,7 @@
 package turip.favorite.repository;
 
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -19,6 +20,8 @@ public interface FavoriteFolderAccountRepository extends JpaRepository<FavoriteF
                                                            AccountRole accountRole);
 
     boolean existsByFavoriteFolderAndAccount(FavoriteFolder favoriteFolder, Account account);
+
+    Optional<FavoriteFolderAccount> findByFavoriteFolderAndAccount(FavoriteFolder favoriteFolder, Account account);
 
     @Query("SELECT m FROM FavoriteFolderAccount ffa " +
             "JOIN ffa.account a " +

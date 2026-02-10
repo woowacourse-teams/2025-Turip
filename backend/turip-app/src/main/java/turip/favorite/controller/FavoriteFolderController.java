@@ -21,10 +21,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import turip.account.domain.Account;
+import turip.account.domain.Member;
 import turip.auth.resolver.AuthAccount;
+import turip.auth.resolver.AuthMember;
 import turip.common.exception.ErrorResponse;
 import turip.favorite.controller.dto.request.FavoriteFolderNameRequest;
 import turip.favorite.controller.dto.request.FavoriteFolderRequest;
+import turip.favorite.controller.dto.response.FavoriteFolderJoinResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderMembersResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithFavoriteStatusResponse;
@@ -162,6 +165,146 @@ public class FavoriteFolderController {
         FavoriteFolderResponse response = favoriteFolderService.createCustomFavoriteFolder(request, account);
         return ResponseEntity.created(URI.create("/api/v1/turips/" + response.id()))
                 .body(response);
+    }
+
+    @Operation(
+            summary = "튜립 참여 api",
+            description = "회원을 공유 폴더에 참여시킨다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "성공 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = FavoriteFolderJoinResponse.class),
+                            examples = @ExampleObject(
+                                    name = "success",
+                                    summary = "튜립 참여 성공",
+                                    value = """
+                                            {
+                                                "id": 1,
+                                                "turipId": 1,
+                                                "isShared": true,
+                                                "accountId": 1
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "personal folder not valid",
+                                            summary = "개인 찜폴더인 경우",
+                                            value = """
+                                                    {
+                                                    	"tag": "PERSONAL_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED",
+                                                    	"message": "개인 찜폴더에는 이 작업을 수행할 수 없습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "default folder not valid",
+                                            summary = "기본 찜폴더인 경우",
+                                            value = """
+                                                    {
+                                                    	"tag": "DEFAULT_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED",
+                                                    	"message": "기본 찜폴더에는 이 작업을 수행할 수 없습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "access token expired",
+                                            summary = "만료된 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_EXPIRED",
+                                                    	"message": "access token이 만료됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "invalid signature access token",
+                                            summary = "서명값이 올바르지 않은 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_SIGNATURE_INVALID",
+                                                    	"message": "access token이 위조됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "unauthorized",
+                                            summary = "알 수 없는 이유로 인증 실패",
+                                            value = """
+                                                    {
+                                                    	"tag": "UNAUTHORIZED",
+                                                    	"message": "토큰 기반 인증에 실패했습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "guest_forbidden",
+                                    summary = "게스트가 해당 기능에 접근하려는 경우",
+                                    value = """
+                                            {
+                                                "tag": "GUEST_FORBIDDEN",
+                                                "message": "게스트 계정이 접근할 수 없는 기능입니다."
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "turip_not_found",
+                                    summary = "turipId에 대한 튜립을 찾을 수 없는 경우",
+                                    value = """
+                                            {
+                                                "tag": "FAVORITE_FOLDER_NOT_FOUND",
+                                                "message": "찜폴더를 찾을 수 없습니다."
+                                            }
+                                            """
+                            )
+                    )
+            )
+    })
+    @PostMapping("/{turipId}/join")
+    public ResponseEntity<FavoriteFolderJoinResponse> join(
+            @Parameter(hidden = true) @AuthMember Member member,
+            @PathVariable("turipId") Long favoriteFolderId) {
+        FavoriteFolderJoinResponse response = favoriteFolderService.joinMember(favoriteFolderId, member);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(

@@ -20,9 +20,15 @@ public class FavoriteFolderAccountService {
     private final FavoriteFolderAccountRepository favoriteFolderAccountRepository;
 
     @Transactional
-    public void save(FavoriteFolder favoriteFolder, Account account, AccountRole accountRole) {
+    public FavoriteFolderAccount save(FavoriteFolder favoriteFolder, Account account, AccountRole accountRole) {
         FavoriteFolderAccount favoriteFolderAccount = new FavoriteFolderAccount(favoriteFolder, account, accountRole);
-        favoriteFolderAccountRepository.save(favoriteFolderAccount);
+        return favoriteFolderAccountRepository.save(favoriteFolderAccount);
+    }
+
+    @Transactional
+    public FavoriteFolderAccount findOrCreate(FavoriteFolder favoriteFolder, Account account) {
+        return favoriteFolderAccountRepository.findByFavoriteFolderAndAccount(favoriteFolder, account)
+                .orElseGet(() -> save(favoriteFolder, account, AccountRole.MEMBER));
     }
 
     public void validateOwnership(Account account, FavoriteFolder favoriteFolder) {
