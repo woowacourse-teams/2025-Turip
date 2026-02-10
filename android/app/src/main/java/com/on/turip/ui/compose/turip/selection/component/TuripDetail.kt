@@ -35,7 +35,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
-import com.google.android.gms.maps.model.LatLng
 import com.on.turip.R
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.trip.model.MapModel
@@ -262,18 +261,6 @@ private data class TuripDetailPreviewState(
     val places: ImmutableList<TuripPlaceModel>,
 )
 
-private val baseTuripPlaceModel =
-    TuripPlaceModel(
-        0L,
-        0L,
-        0L,
-        "",
-        false,
-        LatLng(0.0, 0.0),
-        "",
-        "",
-    )
-
 private class TuripDetailPreviewProvider : PreviewParameterProvider<TuripDetailPreviewState> {
     override val values: Sequence<TuripDetailPreviewState> =
         sequenceOf(
@@ -287,12 +274,12 @@ private class TuripDetailPreviewProvider : PreviewParameterProvider<TuripDetailP
                 turipName = "서울 여행",
                 places =
                     persistentListOf(
-                        baseTuripPlaceModel.copy(
+                        TuripPlaceModel.Idle.copy(
                             turipPlaceId = 1L,
                             name = "장소명1",
                             category = "카테고리1",
                         ),
-                        baseTuripPlaceModel.copy(
+                        TuripPlaceModel.Idle.copy(
                             turipPlaceId = 2L,
                             name = "장소명2",
                             category = "카테고리2",
@@ -304,7 +291,7 @@ private class TuripDetailPreviewProvider : PreviewParameterProvider<TuripDetailP
                 turipName = "폴더 이름이 정말 말도 안 되게 길어질 경우 UI가 어떻게 보일까요?",
                 places =
                     persistentListOf(
-                        baseTuripPlaceModel.copy(
+                        TuripPlaceModel.Idle.copy(
                             turipPlaceId = 1L,
                             name = "아주아주아주아주아주매우매우매우매우 긴 장소 이름",
                             category = "카테고리",
@@ -317,7 +304,7 @@ private class TuripDetailPreviewProvider : PreviewParameterProvider<TuripDetailP
                 places =
                     (1..20)
                         .map {
-                            baseTuripPlaceModel.copy(
+                            TuripPlaceModel.Idle.copy(
                                 turipPlaceId = it.toLong(),
                                 name = "장소명 $it",
                                 category = "카테고리 $it",
