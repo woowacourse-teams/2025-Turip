@@ -1,6 +1,8 @@
 package turip.favorite.api;
 
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -15,6 +17,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import turip.account.domain.Member;
+import turip.auth.resolver.AuthMemberArgumentResolver;
 import turip.favorite.domain.AccountRole;
 import turip.util.helper.TestDataHelper;
 
@@ -30,6 +35,9 @@ class FavoriteFolderApiTest {
 
     @Autowired
     private TestDataHelper testDataHelper;
+
+    @MockitoBean
+    private AuthMemberArgumentResolver authMemberArgumentResolver;
 
     @BeforeEach
     void setUp() {
@@ -468,6 +476,84 @@ class FavoriteFolderApiTest {
                     .when().delete("/api/v1/turips/1")
                     .then()
                     .statusCode(400);
+        }
+    }
+
+    @DisplayName("GET /api/v1/turips/{turipId}/members 공유 찜폴더 참여자 목록 조회 테스트")
+    @Nested
+    class ReadMembersById {
+
+        @DisplayName("공유 찜폴더 참여자 목록 조회에 성공한 경우 200 OK 코드와 참여자 정보를 응답한다")
+        @Test
+        void readMembersById1() {
+            // given
+            Long accountId1 = testDataHelper.insertAccount();
+            Long accountId2 = testDataHelper.insertAccount();
+
+            Long memberId1 = testDataHelper.insertMember(accountId1, "test1@example.com", false);
+            Long memberId2 = testDataHelper.insertMember(accountId2, "test2@example.com", false);
+
+            testDataHelper.insertTuripMember(memberId1, "member1", "TestPass1!");
+            testDataHelper.insertTuripMember(memberId2, "member2", "TestPass1!");
+
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId1);
+
+            Long favoriteFolderId = testDataHelper.insertFavoriteFolder("함께 튜립", false, false);
+            testDataHelper.insertFavoriteFolderAccount(accountId1, favoriteFolderId, AccountRole.OWNER);
+            testDataHelper.insertFavoriteFolderAccount(accountId2, favoriteFolderId, AccountRole.MEMBER);
+
+            when(authMemberArgumentResolver.resolveArgument(any(), any(), any(), any()))
+                    .thenReturn(new Member(memberId1, null, "turip@example.com", false));
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .when().get("/api/v1/turips/" + favoriteFolderId + "/members")
+                    .then()
+                    .statusCode(200)
+                    .body("members.size()", is(2))
+                    .body("members[0].email", is("test1@example.com"))
+                    .body("members[1].email", is("test2@example.com"));
+        }
+
+        @DisplayName("공유 찜폴더가 존재하지 않는 경우 404 NOT FOUND를 응답한다")
+        @Test
+        void readMembersById2() {
+            // given
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .when().get("/api/v1/turips/999/members")
+                    .then()
+                    .statusCode(404);
+        }
+
+        @DisplayName("요청한 account가 찜폴더 참여자가 아닌 경우 403 FORBIDDEN을 응답한다")
+        @Test
+        void readMembersById3() {
+            // given
+            Long ownerAccountId = testDataHelper.insertAccount();
+            Long nonOwnerAccountId = testDataHelper.insertAccount();
+            Long ownerMemberId = testDataHelper.insertMember(ownerAccountId, "owner@example.com", false);
+            Long nonOwnerMemberId = testDataHelper.insertMember(nonOwnerAccountId, "nonowner@example.com", false);
+            testDataHelper.insertTuripMember(ownerMemberId, "owner", "OwnerPass1!");
+            testDataHelper.insertTuripMember(nonOwnerMemberId, "nonowner", "NonOwnerPass1!");
+
+            Long favoriteFolderId = testDataHelper.insertFavoriteFolder("비공개 튜립", false, false);
+            testDataHelper.insertFavoriteFolderAccount(ownerAccountId, favoriteFolderId, AccountRole.OWNER);
+
+            when(authMemberArgumentResolver.resolveArgument(any(), any(), any(), any()))
+                    .thenReturn(new Member(nonOwnerMemberId, null, "nonowner@example.com", false));
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("device-fid", "nonMemberDeviceFid")
+                    .when().get("/api/v1/turips/" + favoriteFolderId + "/members")
+                    .then()
+                    .statusCode(403);
         }
     }
 }

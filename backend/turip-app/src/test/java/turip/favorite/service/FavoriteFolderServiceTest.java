@@ -20,6 +20,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import turip.account.domain.Account;
+import turip.account.domain.Member;
 import turip.account.domain.Role;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.BadRequestException;
@@ -367,6 +368,75 @@ class FavoriteFolderServiceTest {
             assertThatThrownBy(() -> favoriteFolderService.updateName(member, folderId, request))
                     .isInstanceOf(BadRequestException.class)
                     .hasMessage(ErrorTag.DEFAULT_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED.getMessage());
+        }
+    }
+
+    @DisplayName("공유 찜폴더 참여자 목록 조회 테스트")
+    @Nested
+    class FindMembersById {
+
+        @DisplayName("공유 찜폴더 참여자 목록을 조회할 수 있다")
+        @Test
+        void findMembersById1() {
+            // given
+            Long turipId = 1L;
+            Account account = AccountFixture.createUser();
+            FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(turipId, "함께 튜립");
+
+            Account memberAccount1 = new Account(2L, Role.USER, "계정1");
+            Account memberAccount2 = new Account(3L, Role.USER, "계정2");
+            Member member1 = new Member(1L, memberAccount1, "test1@example.com", false);
+            Member member2 = new Member(2L, memberAccount2, "test2@example.com", false);
+
+            given(favoriteFolderRepository.findById(turipId))
+                    .willReturn(Optional.of(favoriteFolder));
+            given(favoriteFolderAccountService.findMembersByFavoriteFolder(favoriteFolder))
+                    .willReturn(List.of(member1, member2));
+
+            // when
+            var response = favoriteFolderService.findMembersById(turipId, account);
+
+            // then
+            assertThat(response.members()).hasSize(2);
+            assertThat(response.members().get(0).email()).isEqualTo("test1@example.com");
+            assertThat(response.members().get(0).nickname()).isEqualTo("계정1");
+            assertThat(response.members().get(1).email()).isEqualTo("test2@example.com");
+            assertThat(response.members().get(1).nickname()).isEqualTo("계정2");
+        }
+
+        @DisplayName("찜폴더가 존재하지 않는 경우 NotFoundException을 발생시킨다")
+        @Test
+        void findMembersById2() {
+            // given
+            Long nonExistentTuripId = 999L;
+            Account account = AccountFixture.createUser();
+
+            given(favoriteFolderRepository.findById(nonExistentTuripId))
+                    .willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> favoriteFolderService.findMembersById(nonExistentTuripId, account))
+                    .isInstanceOf(NotFoundException.class)
+                    .hasMessage(ErrorTag.FAVORITE_FOLDER_NOT_FOUND.getMessage());
+        }
+
+        @DisplayName("요청한 account가 공유 찜폴더 참여 account가 아닌 경우 ForbiddenException을 발생시킨다")
+        @Test
+        void findMembersById3() {
+            // given
+            Long turipId = 1L;
+            Account nonMemberAccount = AccountFixture.createUser();
+            FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(turipId, "비공개 튜립");
+
+            given(favoriteFolderRepository.findById(turipId))
+                    .willReturn(Optional.of(favoriteFolder));
+            willThrow(new ForbiddenException(ErrorTag.FORBIDDEN))
+                    .given(favoriteFolderAccountService).validateMembership(nonMemberAccount, favoriteFolder);
+
+            // when & then
+            assertThatThrownBy(() -> favoriteFolderService.findMembersById(turipId, nonMemberAccount))
+                    .isInstanceOf(ForbiddenException.class)
+                    .hasMessage(ErrorTag.FORBIDDEN.getMessage());
         }
     }
 
