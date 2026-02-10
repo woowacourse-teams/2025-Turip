@@ -1,10 +1,12 @@
 package com.on.turip.ui.compose.turip.selection
 
+import androidx.compose.runtime.Immutable
 import com.on.turip.ui.compose.turip.selection.model.TuripPlaceModel
 import com.on.turip.ui.main.favorite.model.TuripModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
+@Immutable
 data class PlaceTuripSelectionUiState(
     val screenMode: PlaceTuripSelectionScreenMode,
     val placeName: String,
@@ -27,6 +29,7 @@ data class PlaceTuripSelectionUiState(
     }
 }
 
+@Immutable
 sealed interface PlaceTuripSelectionScreenMode {
     data object Turips : PlaceTuripSelectionScreenMode
 
