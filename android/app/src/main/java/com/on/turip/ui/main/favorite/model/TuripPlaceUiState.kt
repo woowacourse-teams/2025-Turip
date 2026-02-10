@@ -5,7 +5,7 @@ import com.on.turip.ui.common.error.ErrorUiState
 data class TuripPlaceUiState(
     val isLoading: Boolean,
     val errorUiState: ErrorUiState,
-    val places: List<TuripPlaceModel>,
+    val places: List<TuripPlaceUiModel>,
     val turips: List<TuripModel>,
     val placesLatLng: List<PlaceLatLngUiModel>,
 ) {

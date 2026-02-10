@@ -28,7 +28,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -50,6 +49,8 @@ import com.on.turip.R
 import com.on.turip.ui.common.error.ErrorUiModel
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.toUiModel
+import com.on.turip.ui.common.extensions.dismissAndExecute
+import com.on.turip.ui.common.extensions.showSnackbarWithAction
 import com.on.turip.ui.common.model.trip.TripDurationModel
 import com.on.turip.ui.compose.designsystem.component.ErrorScreen
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
@@ -75,7 +76,7 @@ fun TripDetailScreen(
     navigateToLogin: () -> Unit,
     navigateToMap: (mapModel: MapModel) -> Unit,
     navigateToWebViewUrl: (url: String) -> Unit,
-    onTuripPlaceClick: (id: Long) -> Unit,
+    onTuripPlaceClick: (id: Long, placeName: String) -> Unit,
     viewModel: TripDetailViewModel = hiltViewModel(),
 ) {
     val uiState: TripDetailUiState by viewModel.uiState.collectAsState()
@@ -150,8 +151,7 @@ fun TripDetailScreen(
                         isBookmarked = uiState.isBookmarked,
                         onBackClick = navigateToBack,
                         onBookmarkClick = {
-                            snackbarHostState.currentSnackbarData?.dismiss()
-                            viewModel.updateBookmark()
+                            snackbarHostState.dismissAndExecute { viewModel.updateBookmark() }
                         },
                     )
                 }
@@ -205,8 +205,7 @@ fun TripDetailScreen(
                             onMapClick = navigateToMap,
                             onTuripPlaceClick = onTuripPlaceClick,
                             onBookmarkClick = {
-                                snackbarHostState.currentSnackbarData?.dismiss()
-                                viewModel.updateBookmark()
+                                snackbarHostState.dismissAndExecute { viewModel.updateBookmark() }
                             },
                             onErrorVideoClick = { navigateToWebViewUrl(uiState.tripDetailInfo.videoLink) },
                         )
@@ -236,7 +235,7 @@ private suspend fun handleUiEffect(
                 visuals =
                     TuripSnackbarVisuals(
                         message = context.getString(messageResource),
-                        actionLabel = context.getString(R.string.all_snackbar_close),
+                        actionLabel = context.getString(R.string.all_close_description),
                         iconRes = iconResource,
                     ),
             )
@@ -249,15 +248,12 @@ private suspend fun handleUiEffect(
         is TripDetailUiEffect.ShowError -> {
             val uiModel: ErrorUiModel =
                 uiEffect.errorUiState.toUiModel() ?: return
-            val result =
-                snackbarHostState.showSnackbar(
-                    message = context.getString(uiModel.titleRes),
-                    actionLabel = context.getString(uiModel.retryTextRes),
-                    duration = SnackbarDuration.Indefinite,
-                )
-            if (result == SnackbarResult.ActionPerformed) {
-                handleErrorRetryRequest(uiEffect.retryAction)
-            }
+            snackbarHostState.showSnackbarWithAction(
+                message = context.getString(uiModel.titleRes),
+                actionLabel = context.getString(uiModel.retryTextRes),
+                duration = SnackbarDuration.Long,
+                onAction = { handleErrorRetryRequest(uiEffect.retryAction) },
+            )
         }
     }
 }
@@ -270,7 +266,7 @@ private fun TripDetailScreenContent(
     onDayClick: (day: Int) -> Unit,
     onTimeLineClick: (timeLine: Int) -> Unit,
     onMapClick: (mapModel: MapModel) -> Unit,
-    onTuripPlaceClick: (id: Long) -> Unit,
+    onTuripPlaceClick: (id: Long, placeName: String) -> Unit,
     onBookmarkClick: () -> Unit,
     onErrorVideoClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -430,7 +426,7 @@ private fun TripContentScreenPreview() {
                 onDayClick = {},
                 onTimeLineClick = {},
                 onMapClick = {},
-                onTuripPlaceClick = {},
+                onTuripPlaceClick = { _, _ -> },
                 onBookmarkClick = {},
                 onErrorVideoClick = {},
             )

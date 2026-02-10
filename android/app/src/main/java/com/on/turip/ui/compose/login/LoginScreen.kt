@@ -61,7 +61,7 @@ fun LoginScreen(
                     val errorUiModel = effect.errorUiState.toUiModel() ?: return@collect
                     snackbarHostState.showSnackbar(
                         message = context.getString(errorUiModel.titleRes),
-                        duration = SnackbarDuration.Short,
+                        duration = SnackbarDuration.Long,
                     )
                 }
             }
@@ -74,8 +74,6 @@ fun LoginScreen(
             message = stringResource(R.string.login_dialog_migration_message),
             confirmText = stringResource(R.string.login_dialog_confirm_text),
             dismissText = stringResource(R.string.setting_logout_dialog_dismiss),
-            confirmButtonColor = TuripTheme.colors.primary,
-            dismissButtonColor = TuripTheme.colors.gray02,
             onConfirmation = viewmodel::migration,
             onDismissRequest = viewmodel::clearGuestData,
         )

@@ -27,11 +27,11 @@ fun TuripDialog(
     message: String,
     confirmText: String,
     dismissText: String,
-    confirmButtonColor: Color,
-    dismissButtonColor: Color,
     onConfirmation: () -> Unit,
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
+    confirmButtonColor: Color = TuripTheme.colors.primary,
+    dismissButtonColor: Color = TuripTheme.colors.gray02,
 ) {
     Dialog(
         onDismissRequest = onDismissRequest,

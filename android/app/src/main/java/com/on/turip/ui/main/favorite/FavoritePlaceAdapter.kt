@@ -2,13 +2,13 @@ package com.on.turip.ui.main.favorite
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.on.turip.ui.main.favorite.model.TuripPlaceModel
+import com.on.turip.ui.main.favorite.model.TuripPlaceUiModel
 
 class FavoritePlaceAdapter(
     private val favoritePlaceListener: FavoritePlaceViewHolder.FavoritePlaceListener,
-    private val onCommit: (List<TuripPlaceModel>) -> Unit,
+    private val onCommit: (List<TuripPlaceUiModel>) -> Unit,
 ) : RecyclerView.Adapter<FavoritePlaceViewHolder>() {
-    private val items = mutableListOf<TuripPlaceModel>()
+    private val items = mutableListOf<TuripPlaceUiModel>()
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -24,7 +24,7 @@ class FavoritePlaceAdapter(
 
     override fun getItemCount(): Int = items.size
 
-    fun submitList(newItems: List<TuripPlaceModel>) {
+    fun submitList(newItems: List<TuripPlaceUiModel>) {
         items.clear()
         items.addAll(newItems)
         notifyDataSetChanged()

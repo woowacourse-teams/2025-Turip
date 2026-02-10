@@ -6,13 +6,13 @@ import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
 import com.on.turip.domain.login.MemberRepository
-import com.on.turip.domain.setting.InquiryMail
 import com.on.turip.domain.setting.PrivacyPolicy
 import com.on.turip.domain.userstorage.repository.UserStorageRepository
-import com.on.turip.platform.device.AppEnvironmentInfoProvider
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
+import com.on.turip.ui.compose.setting.model.InquiryMail
+import com.on.turip.ui.compose.setting.util.AppEnvironmentInfoProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -28,7 +28,6 @@ import javax.inject.Inject
 class SettingViewModel @Inject constructor(
     private val userStorageRepository: UserStorageRepository,
     private val memberRepository: MemberRepository,
-    private val appEnvironmentInfoProvider: AppEnvironmentInfoProvider,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<SettingUiState> = MutableStateFlow(SettingUiState.EMPTY)
     val uiState: StateFlow<SettingUiState> = _uiState
@@ -54,7 +53,7 @@ class SettingViewModel @Inject constructor(
 
     fun loadInquiryMail(): InquiryMail =
         InquiryMail(
-            appEnvironmentInfo = appEnvironmentInfoProvider.getAppEnvironmentInfo(),
+            appEnvironmentInfo = AppEnvironmentInfoProvider.getAppEnvironmentInfo(),
             fid = uiState.value.deviceIdentifier.fid,
         )
 

@@ -17,9 +17,9 @@ import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.main.favorite.model.TuripModel
-import com.on.turip.ui.main.favorite.model.TuripPlaceModel
 import com.on.turip.ui.main.favorite.model.TuripPlaceRetryAction
 import com.on.turip.ui.main.favorite.model.TuripPlaceUiEffect
+import com.on.turip.ui.main.favorite.model.TuripPlaceUiModel
 import com.on.turip.ui.main.favorite.model.TuripPlaceUiState
 import com.on.turip.ui.main.favorite.model.TuripShareModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -69,7 +69,7 @@ class TuripPlaceViewModel @Inject constructor(
                                 state.copy(
                                     isLoading = false,
                                     errorUiState = ErrorUiState.None,
-                                    places = result.value.map { turipPlace: TuripPlace -> turipPlace.toUiModel() },
+                                    places = result.value.map { turipPlace: TuripPlace -> turipPlace.toModel() },
                                     turips = loadTurips,
                                     placesLatLng = result.value.map { it.toLatLng() },
                                 )
@@ -169,7 +169,7 @@ class TuripPlaceViewModel @Inject constructor(
                         state.copy(
                             isLoading = false,
                             errorUiState = ErrorUiState.None,
-                            places = turipPlaces.map { it.toUiModel() },
+                            places = turipPlaces.map { it.toModel() },
                             turips =
                                 state.turips.map { turip: TuripModel ->
                                     turip.copy(isSelected = turip.id == turipId)
@@ -187,7 +187,7 @@ class TuripPlaceViewModel @Inject constructor(
         }
     }
 
-    fun updateTuripPlacesOrder(updateTuripPlaces: List<TuripPlaceModel>) {
+    fun updateTuripPlacesOrder(updateTuripPlaces: List<TuripPlaceUiModel>) {
         viewModelScope.launch {
             turipRepository
                 .updateTuripPlacesOrder(

@@ -1,13 +1,12 @@
-package com.on.turip.platform.device
+package com.on.turip.ui.compose.setting.util
 
 import android.os.Build
 import com.on.turip.BuildConfig
-import com.on.turip.domain.common.AppEnvironmentInfo
-import javax.inject.Inject
+import com.on.turip.ui.compose.setting.model.AppEnvironmentInfoModel
 
-class AndroidAppEnvironmentInfoProvider @Inject constructor() : AppEnvironmentInfoProvider {
-    override fun getAppEnvironmentInfo(): AppEnvironmentInfo =
-        AppEnvironmentInfo(
+object AppEnvironmentInfoProvider {
+    fun getAppEnvironmentInfo(): AppEnvironmentInfoModel =
+        AppEnvironmentInfoModel(
             appVersionName = BuildConfig.VERSION_NAME,
             appVersionCode = BuildConfig.VERSION_CODE,
             deviceReleaseVersion = Build.VERSION.RELEASE,

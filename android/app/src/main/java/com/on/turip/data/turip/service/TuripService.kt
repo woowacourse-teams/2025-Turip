@@ -57,7 +57,7 @@ interface TuripService {
         @Query("placeId") placeId: Long,
     )
 
-    @PATCH("turips/places/turip-place-order")
+    @PATCH("turips/places/turip-order")
     suspend fun patchTuripPlaceOrder(
         @Query("turipId") turipId: Long,
         @Body turipPlaceOrderRequest: TuripPlaceOrderRequest,
