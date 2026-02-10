@@ -1,9 +1,7 @@
-package com.on.turip.domain.setting
-
-import com.on.turip.domain.common.AppEnvironmentInfo
+package com.on.turip.ui.compose.setting.model
 
 data class InquiryMail(
-    val appEnvironmentInfo: AppEnvironmentInfo,
+    val appEnvironmentInfo: AppEnvironmentInfoModel,
     val fid: String,
 ) {
     val content: String
