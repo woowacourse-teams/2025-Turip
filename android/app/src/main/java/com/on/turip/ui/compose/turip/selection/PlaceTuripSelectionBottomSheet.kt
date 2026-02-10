@@ -142,7 +142,7 @@ fun PlaceTuripSelectionBottomSheet(
     BackHandler {
         when (uiState.screenMode) {
             is PlaceTuripSelectionScreenMode.TuripDetail -> {
-                viewModel.onTuripDetailBack()
+                snackbarHostState.dismissAndExecute { viewModel.onTuripDetailBack() }
             }
 
             is PlaceTuripSelectionScreenMode.Turips -> {

@@ -144,8 +144,6 @@ class PlaceTuripSelectionViewModel @Inject constructor(
     }
 
     fun onTuripDetailBack() {
-        if (deletePlaceSnapshot.hasSnapshot()) commitTuripPlaceDelete()
-
         _uiState.update {
             it.copy(
                 screenMode = PlaceTuripSelectionScreenMode.Turips,
