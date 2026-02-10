@@ -1,8 +1,8 @@
-package turip.favorite.controller.dto.response;
+package turip.favorite.stream.controller.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDateTime;
-import turip.favorite.service.ActionType;
+import turip.favorite.stream.service.ActionType;
 
 public record FolderUpdateStreamResponse(
         @JsonProperty("folderId") Long favoriteFolderId,

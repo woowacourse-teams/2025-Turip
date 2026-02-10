@@ -1,4 +1,4 @@
-package turip.favorite.controller.dto.response;
+package turip.favorite.stream.controller.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDateTime;

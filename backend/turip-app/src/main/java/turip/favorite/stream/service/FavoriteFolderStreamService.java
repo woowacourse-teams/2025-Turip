@@ -1,4 +1,4 @@
-package turip.favorite.service;
+package turip.favorite.stream.service;
 
 import java.io.IOException;
 import java.util.Map;
@@ -16,10 +16,10 @@ import turip.account.domain.Member;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.ForbiddenException;
 import turip.common.exception.custom.InternalServerException;
-import turip.favorite.controller.dto.response.ConnectStreamResponse;
-import turip.favorite.controller.dto.response.FolderUpdateStreamResponse;
-import turip.favorite.controller.dto.response.HeartbeatStreamResponse;
 import turip.favorite.repository.FavoriteFolderRepository;
+import turip.favorite.stream.controller.dto.response.ConnectStreamResponse;
+import turip.favorite.stream.controller.dto.response.FolderUpdateStreamResponse;
+import turip.favorite.stream.controller.dto.response.HeartbeatStreamResponse;
 
 @Slf4j
 @Service

@@ -1,4 +1,4 @@
-package turip.favorite.service;
+package turip.favorite.stream.service;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

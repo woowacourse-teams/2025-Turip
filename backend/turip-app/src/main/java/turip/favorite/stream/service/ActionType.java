@@ -1,4 +1,4 @@
-package turip.favorite.service;
+package turip.favorite.stream.service;
 
 public enum ActionType {
     // FavoritePlace 관련

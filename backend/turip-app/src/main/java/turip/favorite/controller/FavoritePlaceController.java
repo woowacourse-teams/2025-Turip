@@ -30,9 +30,9 @@ import turip.favorite.controller.dto.request.FavoritePlaceOrderRequest;
 import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlaceResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlacesWithPlaceDetailResponse;
 import turip.favorite.controller.dto.response.FavoritePlaceCountResponse;
-import turip.favorite.service.ActionType;
-import turip.favorite.service.FavoriteFolderStreamService;
 import turip.favorite.service.FavoritePlaceService;
+import turip.favorite.stream.service.ActionType;
+import turip.favorite.stream.service.FavoriteFolderStreamService;
 
 @RestController
 @RequiredArgsConstructor
