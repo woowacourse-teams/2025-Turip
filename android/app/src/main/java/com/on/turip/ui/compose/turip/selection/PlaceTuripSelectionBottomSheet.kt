@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.on.turip.R
+import com.on.turip.ui.common.dismissAndExecute
 import com.on.turip.ui.common.error.ErrorUiModel
 import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.common.showSnackbarWithAction
@@ -209,21 +210,18 @@ fun PlaceTuripSelectionBottomSheet(
                             places = uiState.selectedTuripPlaces,
                             onMapClick = onNavigateToMap,
                             onTuripPlaceClick = {
-                                snackbarHostState.currentSnackbarData?.dismiss()
-                                viewModel.applyTuripPlaceDelete(it)
+                                snackbarHostState.dismissAndExecute {
+                                    viewModel.applyTuripPlaceDelete(it)
+                                }
                             },
                             onBackClick = {
-                                snackbarHostState.currentSnackbarData?.dismiss()
-                                viewModel.onTuripDetailBack()
+                                snackbarHostState.dismissAndExecute { viewModel.onTuripDetailBack() }
                             },
                             onShareClick = {
-                                snackbarHostState.currentSnackbarData?.dismiss()
-                                viewModel.shareTurip()
+                                snackbarHostState.dismissAndExecute { viewModel.shareTurip() }
                             },
                             onDragStart = {
-                                // 필요시, 장소 해제(낙관적 UI) API 호출 : 트리거 snackbar dismiss 시점
-                                snackbarHostState.currentSnackbarData?.dismiss()
-                                viewModel.onDragStart()
+                                snackbarHostState.dismissAndExecute { viewModel.onDragStart() }
                             },
                             onDragPlace = viewModel::onDragMove,
                             onDragEnd = viewModel::onDragEnd,

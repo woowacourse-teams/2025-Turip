@@ -22,3 +22,8 @@ suspend fun SnackbarHostState.showSnackbarWithAction(
         SnackbarResult.Dismissed -> onDismiss?.invoke()
     }
 }
+
+inline fun SnackbarHostState.dismissAndExecute(crossinline action: () -> Unit) {
+    if (currentSnackbarData != null) currentSnackbarData?.dismiss()
+    action()
+}
