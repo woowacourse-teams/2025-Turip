@@ -129,9 +129,49 @@
         .search-result-item:hover {
             background-color: #f1f4ff;
         }
+
+        .header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 24px;
+            margin: 0;
+        }
+
+        .home-btn {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .home-btn:hover {
+            background: #5568d3;
+            color: white;
+        }
     </style>
 </head>
 <body>
+
+<div class="header">
+    <h1>Turip 관리자 - 콘텐츠 수집</h1>
+    <a href="/admin/home" class="home-btn">홈으로 돌아가기</a>
+</div>
 
 <div class="container">
     <div class="row justify-content-center">

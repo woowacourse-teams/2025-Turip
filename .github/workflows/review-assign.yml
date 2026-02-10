@@ -17,9 +17,9 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const androidReviewers = ['m6z1', 'yrsel', 'jerry8282'];
+            const androidReviewers = ['yrsel', 'jerry8282'];
             const backendReviewers = ['seaniiio', 'eunseongu'];
-            const allReviewers = ['m6z1', 'yrsel', 'jerry8282', 'seaniiio', 'eunseongu'];
+            const allReviewers = ['yrsel', 'jerry8282', 'seaniiio', 'eunseongu'];
 
             const changedFiles = await github.paginate(
               github.rest.pulls.listFiles, {

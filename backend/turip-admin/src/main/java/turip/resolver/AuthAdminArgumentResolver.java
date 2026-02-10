@@ -1,8 +1,5 @@
-package turip.auth.resolver;
+package turip.resolver;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
@@ -16,6 +13,7 @@ import turip.account.service.TuripMemberService;
 import turip.auth.token.JwtProvider;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.ForbiddenException;
+import turip.common.exception.custom.IllegalArgumentException;
 import turip.common.exception.custom.UnauthorizedException;
 
 @Component
@@ -48,11 +46,10 @@ public class AuthAdminArgumentResolver implements HandlerMethodArgumentResolver 
 
     private TuripMember getAdmin(String accessToken) {
         try {
-            Claims claims = jwtProvider.parseToken(accessToken);
-            Long accountId = claims.get("accountId", Long.class);
-            String roleName = claims.get("role", String.class);
+            Long accountId = jwtProvider.getClaimOfName(accessToken, "accountId", Long.class);
+            String roleName = jwtProvider.getClaimOfName(accessToken, "role", String.class);
 
-            if (accountId == null || roleName == null) {
+            if (roleName == null) {
                 throw new UnauthorizedException(ErrorTag.UNAUTHORIZED);
             }
 
@@ -61,12 +58,10 @@ public class AuthAdminArgumentResolver implements HandlerMethodArgumentResolver 
             }
 
             return turipMemberService.getByAccountId(accountId);
+        } catch (IllegalArgumentException e) {
+            throw new UnauthorizedException(e.getErrorTag());
         } catch (ForbiddenException e) {
             throw e;
-        } catch (ExpiredJwtException e) {
-            throw new UnauthorizedException(ErrorTag.ACCESS_TOKEN_EXPIRED);
-        } catch (SignatureException e) {
-            throw new UnauthorizedException(ErrorTag.ACCESS_TOKEN_SIGNATURE_INVALID);
         } catch (Exception e) {
             throw new UnauthorizedException(ErrorTag.UNAUTHORIZED);
         }

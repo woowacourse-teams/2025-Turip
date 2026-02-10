@@ -1,7 +1,5 @@
 package turip.auth.resolver;
 
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
@@ -14,6 +12,7 @@ import turip.account.service.AccountService;
 import turip.account.service.GuestService;
 import turip.auth.token.JwtProvider;
 import turip.common.exception.ErrorTag;
+import turip.common.exception.custom.IllegalArgumentException;
 import turip.common.exception.custom.UnauthorizedException;
 
 @Component
@@ -48,16 +47,10 @@ public class AuthAccountArgumentResolver implements HandlerMethodArgumentResolve
 
     private Account getMemberAccount(String accessToken) {
         try {
-            Long accountId = jwtProvider.parseToken(accessToken).get("accountId", Long.class);
-            if (accountId == null) {
-                throw new UnauthorizedException(ErrorTag.UNAUTHORIZED);
-            }
+            Long accountId = jwtProvider.getClaimOfName(accessToken, "accountId", Long.class);
             return accountService.getById(accountId);
-
-        } catch (ExpiredJwtException e) {
-            throw new UnauthorizedException(ErrorTag.ACCESS_TOKEN_EXPIRED);
-        } catch (SignatureException e) {
-            throw new UnauthorizedException(ErrorTag.ACCESS_TOKEN_SIGNATURE_INVALID);
+        } catch (IllegalArgumentException e) {
+            throw new UnauthorizedException(e.getErrorTag());
         } catch (Exception e) {
             throw new UnauthorizedException(ErrorTag.UNAUTHORIZED);
         }
