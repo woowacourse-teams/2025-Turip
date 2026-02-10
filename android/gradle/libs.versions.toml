@@ -9,8 +9,7 @@ secretsGradlePlugin = "2.0.1"
 ktlint = "12.1.0"
 
 # Kotlin
-kotlin = "2.2.0"
-jetbrainsKotlinJvm = "2.1.0"
+kotlin = "2.2.21"
 kotlinxCollectionsImmutable = "0.3.8"
 
 # AndroidX Core
@@ -23,9 +22,7 @@ webkit = "1.14.0"
 viewpager2 = "1.1.0"
 
 # Lifecycle
-lifecycleCompose = "2.9.4"
-lifecycleViewmodelKtx = "2.9.1"
-lifecycleLivedataKtx = "2.9.2"
+lifecycle = "2.10.0"
 
 # Compose
 composeBom = "2025.08.00"
@@ -33,8 +30,8 @@ activityCompose = "1.10.1"
 material = "1.12.0"
 
 # Coroutines & Serialization
-kotlinxCoroutinesCore = "1.9.0"
-kotlinxSerialization = "1.9.0"
+kotlinxCoroutinesCore = "1.10.2"
+kotlinxSerialization = "1.10.0"
 
 # Network
 ktor = "3.3.3"
@@ -90,10 +87,10 @@ androidx-credentials-play-services-auth = { module = "androidx.credentials:crede
 secrets-gradle-plugin = { module = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin", version.ref = "secretsGradlePlugin" }
 
 # Lifecycle
-androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
-androidx-lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycleLivedataKtx" }
-androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleCompose" }
-androidx-lifecycle-viewmodel-savedstate = { module = "androidx.lifecycle:lifecycle-viewmodel-savedstate", version.ref = "lifecycleViewmodelKtx" }
+androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
+androidx-lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycle" }
+androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
+androidx-lifecycle-viewmodel-savedstate = { module = "androidx.lifecycle:lifecycle-viewmodel-savedstate", version.ref = "lifecycle" }
 
 # Compose
 compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
@@ -175,3 +172,6 @@ ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 
 # Network
 ktrofit = { id = "de.jensklingenberg.ktorfit", version.ref = "ktorfit" }
+
+# serialization
+serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
