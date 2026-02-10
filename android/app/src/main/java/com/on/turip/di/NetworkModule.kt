@@ -133,10 +133,6 @@ object NetworkModule {
             }
         }
 
-        /**
-         * 기본 요청 설정 Retrofit의 헤더 인터셉터의 역할
-         * defaultRequest는 suspend로 구현이 되어 있지 않아 여전히 runBlocking사용
-         */
         defaultRequest {
             header("device-fid", fidProvider.cachedFid)
             contentType(type = ContentType.Application.Json)
