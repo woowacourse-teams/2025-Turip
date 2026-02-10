@@ -33,8 +33,8 @@ import turip.favorite.controller.dto.request.FavoriteFolderRequest;
 import turip.favorite.controller.dto.response.FavoriteFolderExitResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderJoinResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderResponse;
+import turip.favorite.controller.dto.response.FavoriteFoldersDetailResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithFavoriteStatusResponse;
-import turip.favorite.controller.dto.response.FavoriteFoldersWithPlaceCountResponse;
 import turip.favorite.domain.AccountRole;
 import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.domain.FavoriteFolderAccount;
@@ -171,7 +171,7 @@ class FavoriteFolderServiceTest {
                     .willReturn(favoriteFolderPlaceCount);
 
             // when
-            FavoriteFoldersWithPlaceCountResponse response = favoriteFolderService.findAllByAccount(savedAccount);
+            FavoriteFoldersDetailResponse response = favoriteFolderService.findAllByAccount(savedAccount);
 
             // then
             assertAll(

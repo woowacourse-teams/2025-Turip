@@ -13,14 +13,14 @@ import turip.common.exception.custom.ConflictException;
 import turip.common.exception.custom.NotFoundException;
 import turip.favorite.controller.dto.request.FavoriteFolderNameRequest;
 import turip.favorite.controller.dto.request.FavoriteFolderRequest;
+import turip.favorite.controller.dto.response.FavoriteFolderDetailResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderExitResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderJoinResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderMembersResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse;
-import turip.favorite.controller.dto.response.FavoriteFolderWithPlaceCountResponse;
+import turip.favorite.controller.dto.response.FavoriteFoldersDetailResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithFavoriteStatusResponse;
-import turip.favorite.controller.dto.response.FavoriteFoldersWithPlaceCountResponse;
 import turip.favorite.domain.AccountRole;
 import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.domain.FavoriteFolderAccount;
@@ -66,16 +66,17 @@ public class FavoriteFolderService {
         return FavoriteFolderJoinResponse.from(favoriteFolderAccount);
     }
 
-    public FavoriteFoldersWithPlaceCountResponse findAllByAccount(Account account) {
-        List<FavoriteFolderWithPlaceCountResponse> favoriteFoldersWithPlaceCount = favoriteFolderRepository.findAllByAccountOrderByFavoriteFolderAccountIdAsc(
+    public FavoriteFoldersDetailResponse findAllByAccount(Account account) {
+        List<FavoriteFolderDetailResponse> favoriteFoldersWithPlaceCount = favoriteFolderRepository.findAllByAccountOrderByFavoriteFolderAccountIdAsc(
                         account).stream()
                 .map(favoriteFolder -> {
                     int placeCount = favoritePlaceRepository.countByFavoriteFolder(favoriteFolder);
-                    return FavoriteFolderWithPlaceCountResponse.of(favoriteFolder, account, placeCount);
+                    int memberCount = favoriteFolderAccountService.countByFavoriteFolder(favoriteFolder);
+                    return FavoriteFolderDetailResponse.of(favoriteFolder, account, placeCount, memberCount);
                 })
                 .toList();
 
-        return FavoriteFoldersWithPlaceCountResponse.from(favoriteFoldersWithPlaceCount);
+        return FavoriteFoldersDetailResponse.from(favoriteFoldersWithPlaceCount);
     }
 
     public FavoriteFoldersWithFavoriteStatusResponse findAllWithFavoriteStatusByAccountId(Account account,

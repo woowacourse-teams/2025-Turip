@@ -31,8 +31,8 @@ import turip.favorite.controller.dto.response.FavoriteFolderExitResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderJoinResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderMembersResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderResponse;
+import turip.favorite.controller.dto.response.FavoriteFoldersDetailResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithFavoriteStatusResponse;
-import turip.favorite.controller.dto.response.FavoriteFoldersWithPlaceCountResponse;
 import turip.favorite.service.FavoriteFolderService;
 
 @RestController
@@ -318,7 +318,7 @@ public class FavoriteFolderController {
                     description = "성공 예시",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = FavoriteFoldersWithPlaceCountResponse.class),
+                            schema = @Schema(implementation = FavoriteFoldersDetailResponse.class),
                             examples = @ExampleObject(
                                     name = "success",
                                     summary = "튜립 조회 성공",
@@ -330,14 +330,18 @@ public class FavoriteFolderController {
                                                         "accountId": 8,
                                                         "name": "기본 폴더",
                                                         "isDefault": true,
-                                                        "placeCount": 0
+                                                        "placeCount": 0,
+                                                        "memberCount": 1,
+                                                        "isShared": false
                                                     },
                                                     {
                                                         "id": 6,
                                                         "accountId": 8,
                                                         "name": "뭉치가 가고싶은 맛집들",
                                                         "isDefault": false,
-                                                        "placeCount": 0
+                                                        "placeCount": 0,
+                                                        "memberCount": 5,
+                                                        "isShared": true
                                                     }
                                                 ]
                                             }
@@ -387,9 +391,9 @@ public class FavoriteFolderController {
             )
     })
     @GetMapping
-    public ResponseEntity<FavoriteFoldersWithPlaceCountResponse> readAllByMember(
+    public ResponseEntity<FavoriteFoldersDetailResponse> readAllByMember(
             @Parameter(hidden = true) @AuthAccount Account account) {
-        FavoriteFoldersWithPlaceCountResponse response = favoriteFolderService.findAllByAccount(account);
+        FavoriteFoldersDetailResponse response = favoriteFolderService.findAllByAccount(account);
         return ResponseEntity.ok(response);
     }
 
