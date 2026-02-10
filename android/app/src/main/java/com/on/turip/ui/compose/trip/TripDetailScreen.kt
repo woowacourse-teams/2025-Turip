@@ -28,7 +28,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -51,6 +50,7 @@ import com.on.turip.ui.common.error.ErrorUiModel
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.common.model.trip.TripDurationModel
+import com.on.turip.ui.common.showSnackbarWithAction
 import com.on.turip.ui.compose.designsystem.component.ErrorScreen
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbarVisuals
@@ -249,15 +249,12 @@ private suspend fun handleUiEffect(
         is TripDetailUiEffect.ShowError -> {
             val uiModel: ErrorUiModel =
                 uiEffect.errorUiState.toUiModel() ?: return
-            val result =
-                snackbarHostState.showSnackbar(
-                    message = context.getString(uiModel.titleRes),
-                    actionLabel = context.getString(uiModel.retryTextRes),
-                    duration = SnackbarDuration.Long,
-                )
-            if (result == SnackbarResult.ActionPerformed) {
-                handleErrorRetryRequest(uiEffect.retryAction)
-            }
+            snackbarHostState.showSnackbarWithAction(
+                message = context.getString(uiModel.titleRes),
+                actionLabel = context.getString(uiModel.retryTextRes),
+                duration = SnackbarDuration.Long,
+                onAction = { handleErrorRetryRequest(uiEffect.retryAction) },
+            )
         }
     }
 }

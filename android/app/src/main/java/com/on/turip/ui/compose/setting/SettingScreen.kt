@@ -11,7 +11,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -28,6 +27,7 @@ import com.on.turip.common.AuthState
 import com.on.turip.common.UserType
 import com.on.turip.domain.setting.InquiryMail
 import com.on.turip.ui.common.error.toUiModel
+import com.on.turip.ui.common.showSnackbarWithAction
 import com.on.turip.ui.compose.designsystem.component.TuripDialog
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
@@ -56,15 +56,12 @@ fun SettingScreen(
 
                 is SettingUiEffect.ShowError -> {
                     val errorUiModel = uiEffect.errorUiState.toUiModel() ?: return@collect
-                    val result: SnackbarResult =
-                        snackbarHostState.showSnackbar(
-                            message = context.getString(errorUiModel.titleRes),
-                            actionLabel = context.getString(errorUiModel.retryTextRes),
-                            duration = SnackbarDuration.Long,
-                        )
-                    if (result == SnackbarResult.ActionPerformed) {
-                        viewModel.handleErrorRetryRequest(uiEffect.retryAction)
-                    }
+                    snackbarHostState.showSnackbarWithAction(
+                        message = context.getString(errorUiModel.titleRes),
+                        actionLabel = context.getString(errorUiModel.retryTextRes),
+                        duration = SnackbarDuration.Long,
+                        onAction = { viewModel.handleErrorRetryRequest(uiEffect.retryAction) },
+                    )
                 }
             }
         }
