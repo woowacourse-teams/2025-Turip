@@ -7,8 +7,8 @@ import android.view.View
 import androidx.activity.viewModels
 import com.on.turip.databinding.ActivityFolderBinding
 import com.on.turip.ui.common.base.BaseActivity
-import com.on.turip.ui.common.collectOnStarted
 import com.on.turip.ui.common.error.ErrorUiState
+import com.on.turip.ui.common.extensions.collectOnStarted
 import com.on.turip.ui.folder.model.TuripUiState
 import dagger.hilt.android.AndroidEntryPoint
 

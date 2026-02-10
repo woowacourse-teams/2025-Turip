@@ -8,12 +8,12 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import com.on.turip.R
-import com.on.turip.ui.common.safeStartActivityWithToast
+import com.on.turip.ui.common.extensions.safeStartActivityWithToast
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.trip.TripDetailScreen
 import com.on.turip.ui.compose.trip.model.MapModel
 import com.on.turip.ui.login.LoginActivity
-import com.on.turip.ui.main.favorite.FavoriteBottomSheetContainerFragment
+import com.on.turip.ui.main.favorite.PlaceTuripSelectionFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -49,11 +49,11 @@ class TripDetailActivity : AppCompatActivity() {
                             errorToastMessage = getString(R.string.all_snackbar_not_found_video_url),
                         )
                     },
-                    onTuripPlaceClick = { id: Long ->
-                        if (supportFragmentManager.findFragmentByTag("favorite_place_folder") == null) {
-                            val bottomSheet: FavoriteBottomSheetContainerFragment =
-                                FavoriteBottomSheetContainerFragment.instance(id)
-                            bottomSheet.show(supportFragmentManager, "favorite_place_folder")
+                    onTuripPlaceClick = { id: Long, placeName: String ->
+                        if (supportFragmentManager.findFragmentByTag("place_turip_selection") == null) {
+                            PlaceTuripSelectionFragment
+                                .newInstance(id, placeName)
+                                .show(supportFragmentManager, "place_turip_selection")
                         }
                     },
                 )

@@ -7,7 +7,7 @@
     <string name="all_trip_day_trip_duration">당일치기</string>
     <string name="all_loading">로딩 중…</string>
     <string name="all_video_description">%s · %s</string>
-    <string name="all_snackbar_close">닫기</string>
+    <string name="all_close_description">닫기</string>
     <string name="all_snackbar_redirect_login">로그인 하기</string>
     <string name="all_confirm">확인</string>
     <string name="all_turip_name_error_duplicate">중복된 튜립명이 존재합니다.</string>
@@ -21,6 +21,8 @@
     <string name="all_snackbar_not_found_map_url">지도 앱으로 이동에 문제가 발생 했어요</string>
     <string name="all_snackbar_not_found_privacy_policy_url">개인 정보 처리 방침 이동에 문제가 발생 했어요</string>
     <string name="all_snackbar_not_found_video_url">영상 앱으로 이동에 문제가 발생 했어요</string>
+    <string name="all_share_description">공유 하기</string>
+    <string name="all_mascot_description">마스코트</string>
 
     <!-- 바텀 네비게이션 -->
     <string name="bottom_navigation_home">홈</string>
@@ -81,9 +83,20 @@
     <string name="trip_place_time_line">%s~</string>
     <string name="trip_detail_period">여행 기간</string>
     <string name="trip_detail_visit_place">방문 장소</string>
+    <!-- 여행 상세 페이지 바텀시트 -->
     <string name="trip_detail_trip_bookmark_normal">이 여행 저장하기</string>
     <string name="trip_detail_trip_bookmark_select">저장된 여행이에요</string>
     <string name="trip_detail_bookmark_description">컨텐츠 북마크</string>
+    <string name="trip_detail_bottom_sheet_turip_title">내 장소</string>
+    <string name="trip_detail_bottom_sheet_add_turip_description">튜립 추가</string>
+    <string name="trip_detail_bottom_sheet_turip_selection_confirm">완료</string>
+    <string name="trip_detail_bottom_sheet_snackbar_place_removed">%s을(를) 튜립에서 제거했어요</string>
+    <string name="trip_detail_bottom_sheet_snackbar_place_remove_undo">취소</string>
+    <string name="trip_detail_bottom_sheet_snackbar_place_remove_failed">일시적인 오류로 [%s]을(를) 제거하지 못했어요</string>
+    <string name="trip_detail_bottom_sheet_snackbar_place_reorder_retry">다시 시도</string>
+    <string name="trip_detail_bottom_sheet_snackbar_place_reorder_failed">일시적인 오류로 장소 순서를 변경하지 못했어요</string>
+    <string name="trip_detail_bottom_sheet_turip_place_select_description">튜립에 저장</string>
+    <string name="trip_detail_bottom_sheet_turip_place_unselect_description">튜립에서 저장 해제</string>
 
     <!-- 튜립 페이지 -->
     <string name="turip_title">튜립 편집</string>
@@ -96,7 +109,6 @@
     <string name="bottom_sheet_turip_remove_approve">삭제</string>
     <string name="turip_empty_suggest_title">나만의 튜립을 만들어보세요!</string>
     <string name="turip_empty_suggest_description">튜립을 만들면 다양한 장소들을\n내 마음대로 나누어 보관할 수 있어요.</string>
-
     <string name="main_double_back_pressed_to_exit">한 번 더 누르면 종료됩니다.</string>
 
     <!-- 네트워크 오류 -->

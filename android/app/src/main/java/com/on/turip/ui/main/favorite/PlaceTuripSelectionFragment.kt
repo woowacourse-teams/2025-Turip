@@ -1,156 +1,134 @@
 package com.on.turip.ui.main.favorite
 
+import android.app.Dialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.activityViewModels
+import android.widget.FrameLayout
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.viewModels
-import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.on.turip.R
-import com.on.turip.databinding.BottomSheetFragmentFavoritePlaceFolderBinding
-import com.on.turip.ui.common.TuripSnackbar
-import com.on.turip.ui.common.base.BaseFragment
-import com.on.turip.ui.common.collectOnStarted
-import com.on.turip.ui.common.error.ErrorUiModel
-import com.on.turip.ui.common.error.toUiModel
-import com.on.turip.ui.compose.trip.TripDetailViewModel
+import com.on.turip.ui.common.extensions.safeStartActivityWithToast
+import com.on.turip.ui.compose.designsystem.theme.TuripTheme
+import com.on.turip.ui.compose.turip.selection.PlaceTuripSelectionBottomSheet
+import com.on.turip.ui.compose.turip.selection.PlaceTuripSelectionViewModel
 import com.on.turip.ui.folder.TuripActivity
 import com.on.turip.ui.login.LoginActivity
-import com.on.turip.ui.main.favorite.FavoritePlaceFolderViewHolder.FavoritePlaceFolderListener
-import com.on.turip.ui.main.favorite.model.PlaceTuripSelectionUiEffect
-import com.on.turip.ui.main.favorite.model.PlaceTuripSelectionUiState
-import com.on.turip.ui.main.favorite.model.TuripModel
+import com.on.turip.ui.main.favorite.model.TuripShareModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class PlaceTuripSelectionFragment : BaseFragment<BottomSheetFragmentFavoritePlaceFolderBinding>() {
+class PlaceTuripSelectionFragment : BottomSheetDialogFragment() {
     private val viewModel: PlaceTuripSelectionViewModel by viewModels()
-    private val sharedViewModel: TripDetailViewModel by activityViewModels()
 
-    private val favoritePlaceFolderAdapter: FavoritePlaceFolderAdapter by lazy {
-        FavoritePlaceFolderAdapter(
-            object : FavoritePlaceFolderListener {
-                override fun onFavoriteFolderFavoriteClick(turipModel: TuripModel) {
-                    viewModel.updateTurip(turipModel)
-                }
-
-                override fun onFavoriteFolderClick(
-                    favoriteFolderId: Long,
-                    favoriteFolderName: String,
-                ) {
-                    parentFragmentManager
-                        .beginTransaction()
-                        .replace(
-                            R.id.fcv_bottom_sheet_folder_favorite_place_folder_catalog,
-                            FavoritePlaceFolderCatalogFragment.newInstance(
-                                favoriteFolderId,
-                                favoriteFolderName,
-                            ),
-                        ).addToBackStack(null)
-                        .commit()
-                }
-            },
-        )
-    }
-
-    override fun inflateBinding(
+    override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-    ): BottomSheetFragmentFavoritePlaceFolderBinding = BottomSheetFragmentFavoritePlaceFolderBinding.inflate(inflater, container, false)
-
-    override fun onViewCreated(
-        view: View,
         savedInstanceState: Bundle?,
-    ) {
-        super.onViewCreated(view, savedInstanceState)
-        setupAdapters()
-        setupListeners()
-        setupObservers()
-    }
-
-    private fun setupAdapters() {
-        binding.rvBottomSheetFavoritePlaceFolderFolder.adapter = favoritePlaceFolderAdapter
-    }
-
-    private fun setupListeners() {
-        binding.ivBottomSheetFolderFavoritePlaceAddFolder.setOnClickListener {
-            val intent: Intent = TuripActivity.newIntent(requireContext())
-            startActivity(intent)
-        }
-    }
-
-    private fun setupObservers() {
-        collectOnStarted(viewModel.uiState) { uiState: PlaceTuripSelectionUiState ->
-            favoritePlaceFolderAdapter.submitList(uiState.turips)
-            sharedViewModel.updateHasFavoriteFolderInPlace(
-                hasFavoriteFolder = uiState.isIncludedInAnyTurip,
-                placeId = uiState.placeId,
-            )
-        }
-
-        collectOnStarted(viewModel.uiEffect) { uiEffect: PlaceTuripSelectionUiEffect ->
-            when (uiEffect) {
-                is PlaceTuripSelectionUiEffect.ShowUpdateTurip -> {
-                    showFavoriteStatus(uiEffect.turip)
-                }
-
-                PlaceTuripSelectionUiEffect.NavigateToLogin -> {
-                    navigateToLoginScreen()
-                }
-
-                is PlaceTuripSelectionUiEffect.ShowError -> {
-                    val uiModel: ErrorUiModel =
-                        uiEffect.errorUiState.toUiModel() ?: return@collectOnStarted
-                    view?.let { view: View ->
-                        Snackbar
-                            .make(view, uiModel.titleRes, Snackbar.LENGTH_INDEFINITE)
-                            .apply {
-                                setAction(uiModel.retryTextRes) {
-                                    viewModel.handleErrorRetryRequest(
-                                        uiEffect.retryAction,
-                                    )
+    ): View =
+        ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                TuripTheme {
+                    PlaceTuripSelectionBottomSheet(
+                        onNavigateToLogin = {
+                            val intent: Intent =
+                                LoginActivity.newIntent(requireActivity()).apply {
+                                    flags =
+                                        Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                                 }
-                            }.show()
-                    }
+                            startActivity(intent)
+                            requireActivity().finish()
+                        },
+                        onNavigateToAddTurip = {
+                            val intent: Intent = TuripActivity.newIntent(requireContext())
+                            startActivity(intent)
+                        },
+                        onNavigateToMap = { map ->
+                            val intent = Intent(Intent.ACTION_VIEW, map.uri)
+                            requireContext().safeStartActivityWithToast(
+                                intent = intent,
+                                errorToastMessage = getString(R.string.all_snackbar_not_found_map_url),
+                            )
+                        },
+                        onShareTurip = { model: TuripShareModel ->
+                            navigateToShareTurip(model)
+                        },
+                        onDismiss = { dismiss() },
+                        viewModel = viewModel,
+                    )
                 }
             }
         }
-    }
 
-    private fun showFavoriteStatus(turipModel: TuripModel) {
-        val updatedFavorites = !turipModel.isSelected
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val dialog: Dialog = super.onCreateDialog(savedInstanceState)
+        dialog.setOnShowListener { dialogInterface: DialogInterface ->
+            val bottomSheetDialog = dialogInterface as BottomSheetDialog
+            val bottomSheet =
+                bottomSheetDialog.findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)
 
-        val messageResource =
-            if (updatedFavorites) {
-                R.string.bottom_sheet_turip_place_save_in_turip
-            } else {
-                R.string.bottom_sheet_turip_place_remove_in_turip
+            bottomSheet?.let {
+                it.setBackgroundColor(Color.White.toArgb())
+                it.setBackgroundResource(R.drawable.bg_pure_white_top_radius_20dp)
+
+                val behavior = BottomSheetBehavior.from(it)
+                behavior.isFitToContents = true
+                behavior.isDraggable = false
+                behavior.state = BottomSheetBehavior.STATE_EXPANDED
             }
-        val message = getString(messageResource, turipModel.name)
-        val iconResource =
-            if (updatedFavorites) R.drawable.ic_heart_pressed else R.drawable.ic_heart_empty
-
-        TuripSnackbar
-            .make(
-                rootView = binding.root,
-                message = message,
-                duration = Snackbar.LENGTH_LONG,
-                layoutInflater = layoutInflater,
-            ).icon(iconResource)
-            .action(R.string.all_snackbar_close)
-            .show()
+        }
+        return dialog
     }
 
-    private fun navigateToLoginScreen() {
-        val intent: Intent =
-            LoginActivity
-                .newIntent(requireActivity())
-                .apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK }
-        startActivity(intent)
-        requireActivity().finish()
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        viewModel.commitTuripPlaceDelete()
     }
+
+    private fun navigateToShareTurip(folderShareModel: TuripShareModel) {
+        val sharedContents: String = folderShareModel.toShareFormat()
+
+        val intent =
+            createShareIntent(text = sharedContents).apply {
+                putExtra(Intent.EXTRA_TITLE, folderShareModel.name)
+            }
+
+        val initialIntents =
+            arrayOf(
+                createShareIntent(text = sharedContents, packageName = KAKAO_PACKAGE),
+                createShareIntent(text = sharedContents, packageName = INSTAGRAM_PACKAGE),
+            )
+
+        val chooserIntent =
+            Intent
+                .createChooser(intent, folderShareModel.name)
+                .apply { putExtra(Intent.EXTRA_INITIAL_INTENTS, initialIntents) }
+
+        startActivity(chooserIntent)
+    }
+
+    private fun createShareIntent(
+        text: String,
+        packageName: String? = null,
+    ): Intent =
+        Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, text)
+
+            packageName?.let {
+                `package` = it
+            }
+        }
 
     override fun onResume() {
         super.onResume()
@@ -158,14 +136,23 @@ class PlaceTuripSelectionFragment : BaseFragment<BottomSheetFragmentFavoritePlac
     }
 
     companion object {
-        const val FAVORITE_PLACE_FOLDER_ARGUMENTS_PLACE_ID =
-            "com.on.turip.FAVORITE_PLACE_FOLDER_ARGUMENTS_PLACE_ID"
+        const val PLACE_TURIP_SELECTION_ARGUMENTS_PLACE_ID =
+            "com.on.turip.PLACE_TURIP_SELECTION_ARGUMENTS_PLACE_ID"
+        const val PLACE_TURIP_SELECTION_ARGUMENTS_PLACE_NAME =
+            "com.on.turip.PLACE_TURIP_SELECTION_ARGUMENTS_PLACE_NAME"
 
-        fun newInstance(placeId: Long): PlaceTuripSelectionFragment =
+        private const val KAKAO_PACKAGE = "com.kakao.talk"
+        private const val INSTAGRAM_PACKAGE = "com.instagram.android"
+
+        fun newInstance(
+            placeId: Long,
+            placeName: String,
+        ): PlaceTuripSelectionFragment =
             PlaceTuripSelectionFragment().apply {
                 arguments =
                     Bundle().apply {
-                        putLong(FAVORITE_PLACE_FOLDER_ARGUMENTS_PLACE_ID, placeId)
+                        putLong(PLACE_TURIP_SELECTION_ARGUMENTS_PLACE_ID, placeId)
+                        putString(PLACE_TURIP_SELECTION_ARGUMENTS_PLACE_NAME, placeName)
                     }
             }
     }

@@ -23,17 +23,17 @@ import com.on.turip.R
 import com.on.turip.databinding.FragmentFavoritePlaceBinding
 import com.on.turip.ui.common.TuripDialogFragment
 import com.on.turip.ui.common.base.BaseFragment
-import com.on.turip.ui.common.collectOnStarted
 import com.on.turip.ui.common.error.ErrorUiModel
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.toUiModel
-import com.on.turip.ui.common.safeStartActivityWithToast
+import com.on.turip.ui.common.extensions.collectOnStarted
+import com.on.turip.ui.common.extensions.safeStartActivityWithToast
 import com.on.turip.ui.folder.TuripActivity
 import com.on.turip.ui.login.LoginActivity
 import com.on.turip.ui.main.favorite.model.PlaceLatLngUiModel
 import com.on.turip.ui.main.favorite.model.TuripModel
-import com.on.turip.ui.main.favorite.model.TuripPlaceModel
 import com.on.turip.ui.main.favorite.model.TuripPlaceUiEffect
+import com.on.turip.ui.main.favorite.model.TuripPlaceUiModel
 import com.on.turip.ui.main.favorite.model.TuripPlaceUiState
 import com.on.turip.ui.main.favorite.model.TuripShareModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -66,15 +66,15 @@ class TuripPlaceFragment :
                     )
                 }
 
-                override fun onItemClick(turipPlaceModel: TuripPlaceModel) {
+                override fun onItemClick(turipPlaceUiModel: TuripPlaceUiModel) {
                     map.animateCamera(
                         CameraUpdateFactory.newCameraPosition(
-                            CameraPosition(turipPlaceModel.latLng, 15f, 0f, 0f),
+                            CameraPosition(turipPlaceUiModel.latLng, 15f, 0f, 0f),
                         ),
                         1000,
                         null,
                     )
-                    markerMap[turipPlaceModel.placeId]?.showInfoWindow()
+                    markerMap[turipPlaceUiModel.placeId]?.showInfoWindow()
                 }
             },
             onCommit = { viewModel.updateTuripPlacesOrder(it) },

@@ -12,10 +12,10 @@ import com.on.turip.databinding.FragmentFavoriteContentBinding
 import com.on.turip.domain.bookmark.BookmarkContent
 import com.on.turip.ui.common.ItemDividerDecoration
 import com.on.turip.ui.common.base.BaseFragment
-import com.on.turip.ui.common.collectOnStarted
 import com.on.turip.ui.common.error.ErrorUiModel
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.toUiModel
+import com.on.turip.ui.common.extensions.collectOnStarted
 import com.on.turip.ui.login.LoginActivity
 import com.on.turip.ui.trip.TripDetailActivity
 import dagger.hilt.android.AndroidEntryPoint
