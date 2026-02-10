@@ -9,6 +9,10 @@ sealed interface TripDetailUiEffect {
         val isBookmarked: Boolean,
     ) : TripDetailUiEffect
 
+    data class ShowUpdatedTuripSelectionByPlace(
+        val placeName: String,
+    ) : TripDetailUiEffect
+
     data class ShowError(
         val errorUiState: ErrorUiState,
         val retryAction: TripDetailRetryAction,

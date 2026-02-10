@@ -34,4 +34,9 @@ interface TuripRepository {
         turipId: Long,
         updatedOrder: List<Long>,
     ): TuripResult<Unit>
+
+    suspend fun updatePlaceTurips(
+        placeId: Long,
+        turipIds: List<Long>,
+    ): TuripResult<Unit>
 }

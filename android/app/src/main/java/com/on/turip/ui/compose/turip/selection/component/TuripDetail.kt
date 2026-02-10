@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -192,7 +193,7 @@ private fun TuripPlaces(
         state = listState,
         verticalArrangement = Arrangement.spacedBy(TuripTheme.spacing.small),
         contentPadding = PaddingValues(vertical = TuripTheme.spacing.medium),
-        modifier = modifier,
+        modifier = modifier.fillMaxHeight(),
     ) {
         items(items = places, key = { it.turipPlaceId }) { place ->
             ReorderableItem(
@@ -211,7 +212,8 @@ private fun TuripPlaces(
                                 shadowElevation = elevation
                                 shape = reorderableItemShape
                                 clip = true
-                            }.draggableAfterLongPress(
+                            }
+                            .draggableAfterLongPress(
                                 interactionSource = interactionSource,
                             ),
                 )

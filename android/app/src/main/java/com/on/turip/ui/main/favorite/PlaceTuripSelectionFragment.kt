@@ -12,6 +12,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.core.os.bundleOf
+import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -62,6 +64,17 @@ class PlaceTuripSelectionFragment : BottomSheetDialogFragment() {
                         },
                         onShareTurip = { model: TuripShareModel ->
                             navigateToShareTurip(model)
+                        },
+                        onTuripSelectionConfirm = { placeId, hasTurip ->
+                            setFragmentResult(
+                                "TURIP_SELECTION_RESULT",
+                                bundleOf(
+                                    "TURIP_SELECTION_PLACE_ID" to placeId,
+                                    "TURIP_SELECTION_HAS_TURIP" to hasTurip,
+                                ),
+                            )
+
+                            dismiss()
                         },
                         onDismiss = { dismiss() },
                         viewModel = viewModel,

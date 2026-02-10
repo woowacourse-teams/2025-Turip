@@ -3,6 +3,7 @@ package com.on.turip.data.turip.repository
 import com.on.turip.core.result.TuripResult
 import com.on.turip.core.result.mapCatching
 import com.on.turip.data.turip.datasource.TuripRemoteDataSource
+import com.on.turip.data.turip.dto.PlaceTuripsRequest
 import com.on.turip.data.turip.dto.TuripPlaceOrderRequest
 import com.on.turip.data.turip.toDomain
 import com.on.turip.data.turip.toPatchRequestDto
@@ -56,4 +57,13 @@ class DefaultTuripRepository @Inject constructor(
                 turipId = turipId,
                 turipPlaceOrderRequest = TuripPlaceOrderRequest(turipPlaceIdsOrder = updatedOrder),
             )
+
+    override suspend fun updatePlaceTurips(
+        placeId: Long,
+        turipIds: List<Long>,
+    ): TuripResult<Unit> =
+        turipRemoteDataSource.putPlaceTurips(
+            placeId = placeId,
+            placeTuripsRequest = PlaceTuripsRequest(turipIds),
+        )
 }

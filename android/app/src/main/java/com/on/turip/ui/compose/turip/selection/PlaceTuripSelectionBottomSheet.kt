@@ -58,6 +58,7 @@ fun PlaceTuripSelectionBottomSheet(
     onNavigateToAddTurip: () -> Unit,
     onNavigateToMap: (mapModel: MapModel) -> Unit,
     onShareTurip: (shareModel: TuripShareModel) -> Unit,
+    onTuripSelectionConfirm: (placeId: Long, hasTurip: Boolean) -> Unit,
     onDismiss: () -> Unit,
     viewModel: PlaceTuripSelectionViewModel = hiltViewModel(),
 ) {
@@ -135,6 +136,10 @@ fun PlaceTuripSelectionBottomSheet(
                         onAction = { viewModel.handleErrorRetryRequest(uiEffect.retryAction) },
                     )
                 }
+
+                is PlaceTuripSelectionUiEffect.UpdateTuripsByPlace -> {
+                    onTuripSelectionConfirm(uiEffect.placeId, uiEffect.hasTurip)
+                }
             }
         }
     }
@@ -197,10 +202,7 @@ fun PlaceTuripSelectionBottomSheet(
                             onAddTuripClick = onNavigateToAddTurip,
                             onTuripPlaceClick = viewModel::updateTurip,
                             onNavigateToTurip = viewModel::loadPlacesInSelectTurip,
-                            onConfirmClick = {
-                                // TODO : 폴더 전반에 대한 찜 업데이트 API 연동 예정
-                                // TODO : API 성공 -> 스낵바 + dismiss, 실패 -> 스낵바로 안내
-                            },
+                            onConfirmClick = viewModel::updateTuripsByPlace,
                         )
                     }
 
