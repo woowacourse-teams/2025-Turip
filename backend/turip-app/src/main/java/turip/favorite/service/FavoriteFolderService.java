@@ -6,12 +6,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import turip.account.domain.Account;
+import turip.account.domain.Member;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.BadRequestException;
 import turip.common.exception.custom.ConflictException;
 import turip.common.exception.custom.NotFoundException;
 import turip.favorite.controller.dto.request.FavoriteFolderNameRequest;
 import turip.favorite.controller.dto.request.FavoriteFolderRequest;
+import turip.favorite.controller.dto.response.FavoriteFolderMembersResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderWithPlaceCountResponse;
@@ -82,6 +84,14 @@ public class FavoriteFolderService {
 
     public boolean isCustomFolderExists(Account account) {
         return favoriteFolderRepository.existsCustomFolderByAccount(account);
+    }
+
+    public FavoriteFolderMembersResponse findMembersById(Long turipId, Account account) {
+        FavoriteFolder favoriteFolder = getById(turipId);
+        favoriteFolderAccountService.validateMembership(account, favoriteFolder);
+
+        List<Member> members = favoriteFolderAccountService.findMembersByFavoriteFolder(favoriteFolder);
+        return FavoriteFolderMembersResponse.of(members);
     }
 
     @Transactional

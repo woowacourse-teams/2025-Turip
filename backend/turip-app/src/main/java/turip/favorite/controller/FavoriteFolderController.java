@@ -25,6 +25,7 @@ import turip.auth.resolver.AuthAccount;
 import turip.common.exception.ErrorResponse;
 import turip.favorite.controller.dto.request.FavoriteFolderNameRequest;
 import turip.favorite.controller.dto.request.FavoriteFolderRequest;
+import turip.favorite.controller.dto.response.FavoriteFolderMembersResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithFavoriteStatusResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithPlaceCountResponse;
@@ -350,6 +351,121 @@ public class FavoriteFolderController {
             @RequestParam("placeId") Long placeId) {
         FavoriteFoldersWithFavoriteStatusResponse response = favoriteFolderService.findAllWithFavoriteStatusByAccountId(
                 account, placeId);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "튜립 참여자 목록 조회 api",
+            description = "함께 튜립의 참여들의 정보를 조회한다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "성공 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = FavoriteFoldersWithFavoriteStatusResponse.class),
+                            examples = @ExampleObject(
+                                    name = "success",
+                                    summary = "튜립 참여자 목록 조회 성공",
+                                    value = """
+                                            {
+                                                "members" : [
+                                                    {
+                                                        "email" : "team.turip@gmail.com",
+                                                        "nickname" : "하루"
+                                                    },
+                                                    {
+                                                        "email" : "t.turip@gmail.com",
+                                                        "nickname" : "메이"
+                                                    }
+                                                ]
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "access token expired",
+                                            summary = "만료된 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_EXPIRED",
+                                                    	"message": "access token이 만료됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "invalid signature access token",
+                                            summary = "서명값이 올바르지 않은 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_SIGNATURE_INVALID",
+                                                    	"message": "access token이 위조됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "unauthorized",
+                                            summary = "알 수 없는 이유로 인증 실패",
+                                            value = """
+                                                    {
+                                                    	"tag": "UNAUTHORIZED",
+                                                    	"message": "토큰 기반 인증에 실패했습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "forbidden",
+                                    summary = "요청한 account가 해당 튜립에 참여중이지 않은 경우",
+                                    value = """
+                                            {
+                                                "tag": "FORBIDDEN",
+                                                "message": "접근 권한이 없습니다."
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "turip_not_found",
+                                    summary = "id에 대한 튜립을 찾을 수 없는 경우",
+                                    value = """
+                                            {
+                                                "tag": "FAVORITE_FOLDER_NOT_FOUND",
+                                                "message": "찜폴더를 찾을 수 없습니다."
+                                            }
+                                            """
+                            )
+                    )
+            ),
+    })
+    @GetMapping("/{turipId}/members")
+    public ResponseEntity<FavoriteFolderMembersResponse> readMembersById(
+            @Parameter(hidden = true) @AuthAccount Account account, @PathVariable("turipId") Long favoriteFolderId) {
+        FavoriteFolderMembersResponse response = favoriteFolderService.findMembersById(favoriteFolderId, account);
         return ResponseEntity.ok(response);
     }
 

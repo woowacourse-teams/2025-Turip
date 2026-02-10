@@ -1,9 +1,11 @@
 package turip.favorite.service;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import turip.account.domain.Account;
+import turip.account.domain.Member;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.ForbiddenException;
 import turip.favorite.domain.AccountRole;
@@ -39,5 +41,9 @@ public class FavoriteFolderAccountService {
         if (!isMember) {
             throw new ForbiddenException(ErrorTag.FORBIDDEN);
         }
+    }
+
+    public List<Member> findMembersByFavoriteFolder(FavoriteFolder favoriteFolder) {
+        return favoriteFolderAccountRepository.findMembersByFavoriteFolder(favoriteFolder);
     }
 }
