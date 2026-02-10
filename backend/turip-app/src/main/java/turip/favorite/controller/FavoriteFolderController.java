@@ -632,11 +632,9 @@ public class FavoriteFolderController {
                                             {
                                                 "members" : [
                                                     {
-                                                        "email" : "team.turip@gmail.com",
                                                         "nickname" : "하루"
                                                     },
                                                     {
-                                                        "email" : "t.turip@gmail.com",
                                                         "nickname" : "메이"
                                                     }
                                                 ]

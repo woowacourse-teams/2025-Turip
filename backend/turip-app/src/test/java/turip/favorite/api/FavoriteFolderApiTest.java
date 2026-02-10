@@ -503,8 +503,8 @@ class FavoriteFolderApiTest {
                     .then()
                     .statusCode(200)
                     .body("members.size()", is(2))
-                    .body("members[0].email", is("test1@example.com"))
-                    .body("members[1].email", is("test2@example.com"));
+                    .body("members[0].nickname", notNullValue())
+                    .body("members[1].nickname", notNullValue());
         }
 
         @DisplayName("공유 찜폴더가 존재하지 않는 경우 404 NOT FOUND를 응답한다")

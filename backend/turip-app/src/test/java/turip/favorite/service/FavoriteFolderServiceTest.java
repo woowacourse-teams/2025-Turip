@@ -404,9 +404,7 @@ class FavoriteFolderServiceTest {
 
             // then
             assertThat(response.members()).hasSize(2);
-            assertThat(response.members().get(0).email()).isEqualTo("test1@example.com");
             assertThat(response.members().get(0).nickname()).isEqualTo("계정1");
-            assertThat(response.members().get(1).email()).isEqualTo("test2@example.com");
             assertThat(response.members().get(1).nickname()).isEqualTo("계정2");
         }
 
