@@ -624,7 +624,7 @@ public class FavoriteFolderController {
                     description = "성공 예시",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = FavoriteFoldersWithFavoriteStatusResponse.class),
+                            schema = @Schema(implementation = FavoriteFolderMembersResponse.class),
                             examples = @ExampleObject(
                                     name = "success",
                                     summary = "튜립 참여자 목록 조회 성공",
@@ -1042,7 +1042,7 @@ public class FavoriteFolderController {
                                     value = """
                                             {
                                                 "id": 1,
-                                                "favoriteFolderId": 1,
+                                                "turipId": 1,
                                                 "isDeleted": true
                                             }
                                             """
