@@ -17,15 +17,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import turip.account.domain.Provider;
 import turip.account.domain.Role;
-import turip.account.service.AccountCreateService;
+import turip.account.service.AccountService;
 import turip.auth.token.GoogleTokenParser;
+import turip.common.exception.ErrorTag;
+import turip.common.exception.custom.InternalServerException;
 import turip.util.helper.TestDataHelper;
 
 @ActiveProfiles("test")
@@ -45,7 +46,7 @@ class AuthApiTest {
     private GoogleTokenParser googleTokenParser;
 
     @MockitoSpyBean
-    private AccountCreateService accountCreateService;
+    private AccountService accountService;
 
     @BeforeEach
     void setUp() {
@@ -252,7 +253,7 @@ class AuthApiTest {
             when(googleTokenParser.getProvider()).thenReturn(provider);
             when(googleTokenParser.getProviderId(idToken)).thenReturn(providerId);
             when(googleTokenParser.getEmail(idToken)).thenReturn(email);
-            when(accountCreateService.save()).thenThrow(new DataIntegrityViolationException("nickname constraint"));
+            when(accountService.create()).thenThrow(new InternalServerException(ErrorTag.ACCOUNT_CREATION_ERROR));
 
             Map<String, String> requestBody = new HashMap<>();
             requestBody.put("idToken", idToken);
