@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ktlint)
-    kotlin("plugin.serialization") version "2.1.0"
+    alias(libs.plugins.serialization)
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
     alias(libs.plugins.compose.compiler)
@@ -116,6 +116,7 @@ dependencies {
     implementation(libs.ktor.client.logging)
     implementation(libs.ktor.client.auth)
     // ksp
+    ksp(libs.androidx.room.compiler)
     // coil
     implementation(libs.coil)
     // WebView

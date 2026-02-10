@@ -2,6 +2,7 @@ package com.on.turip.di
 
 import com.on.turip.BuildConfig
 import com.on.turip.common.AuthState
+import com.on.turip.common.FidProvider
 import com.on.turip.common.UserType
 import com.on.turip.core.result.fold
 import com.on.turip.di.NetworkModule.LOG_PREFIX
@@ -30,7 +31,6 @@ import io.ktor.client.request.header
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
@@ -39,7 +39,6 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-@OptIn(ExperimentalSerializationApi::class)
 object NetworkModule {
     const val LOG_PREFIX = "moongjenut"
 
@@ -48,6 +47,7 @@ object NetworkModule {
     fun provideHttpClient(
         userStorageRepository: UserStorageRepository,
         authRepository: Lazy<AuthRepository>,
+        fidProvider: FidProvider,
     ): HttpClient =
         HttpClient(OkHttp) {
             /**
@@ -76,12 +76,13 @@ object NetworkModule {
                 )
             }
 
-            headerInterceptor(userStorageRepository, authRepository)
+            headerInterceptor(userStorageRepository, authRepository, fidProvider)
         }
 
     private fun HttpClientConfig<OkHttpConfig>.headerInterceptor(
         userStorageRepository: UserStorageRepository,
         authRepository: Lazy<AuthRepository>,
+        fidProvider: FidProvider,
     ) {
         install(plugin = Auth) {
             bearer {
@@ -132,16 +133,8 @@ object NetworkModule {
             }
         }
 
-        /**
-         * 기본 요청 설정 Retrofit의 헤더 인터셉터의 역할
-         * defaultRequest는 suspend로 구현이 되어 있지 않아 여전히 runBlocking사용
-         */
         defaultRequest {
-            val fid: String =
-                runBlocking {
-                    userStorageRepository.loadId().getOrNull()?.fid ?: ""
-                }
-            header("device-fid", fid)
+            header("device-fid", fidProvider.cachedFid)
             contentType(type = ContentType.Application.Json)
         }
     }
