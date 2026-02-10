@@ -10,7 +10,7 @@ import com.on.turip.domain.content.Content
 import com.on.turip.domain.content.video.VideoData
 import com.on.turip.domain.creator.Creator
 import com.on.turip.ui.common.TuripUrlConverter
-import com.on.turip.ui.common.loadRoundedCornerImage
+import com.on.turip.ui.common.extensions.loadRoundedCornerImage
 import com.on.turip.ui.common.mapper.toUiModel
 
 class FavoriteContentViewHolder(

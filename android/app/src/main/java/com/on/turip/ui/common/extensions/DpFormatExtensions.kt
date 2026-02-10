@@ -1,4 +1,4 @@
-package com.on.turip.ui.common
+package com.on.turip.ui.common.extensions
 
 import android.content.res.Resources
 

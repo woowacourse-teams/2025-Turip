@@ -76,6 +76,7 @@ fun TuripItem(
 
         IconButton(
             onClick = onTuripPlaceClick,
+            modifier = Modifier.padding(end = TuripTheme.spacing.small),
         ) {
             Icon(
                 painter =
@@ -86,15 +87,12 @@ fun TuripItem(
                     },
                 contentDescription =
                     if (turip.isSelected) {
-                        stringResource(R.string.trip_detail_bottom_sheet_turip_place_select_description)
-                    } else {
                         stringResource(R.string.trip_detail_bottom_sheet_turip_place_unselect_description)
+                    } else {
+                        stringResource(R.string.trip_detail_bottom_sheet_turip_place_select_description)
                     },
                 tint = Color.Unspecified,
-                modifier =
-                    Modifier
-                        .padding(end = TuripTheme.spacing.small)
-                        .size(24.dp),
+                modifier = Modifier.size(24.dp),
             )
         }
     }

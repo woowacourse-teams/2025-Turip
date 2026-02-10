@@ -27,4 +27,18 @@ data class TuripPlaceModel(
             if (findIndex == -1) return category
             return category.substring(findIndex + 1).trim()
         }
+
+    companion object {
+        val Idle: TuripPlaceModel =
+            TuripPlaceModel(
+                turipPlaceId = 0L,
+                placeId = 0L,
+                order = 0L,
+                name = "",
+                isTuripPlace = false,
+                latLng = LatLng(0.0, 0.0),
+                category = "",
+                mapLink = "",
+            )
+    }
 }

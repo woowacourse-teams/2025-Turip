@@ -9,7 +9,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import com.on.turip.R
-import com.on.turip.ui.common.safeStartActivityWithToast
+import com.on.turip.ui.common.extensions.safeStartActivityWithToast
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.setting.SettingScreen
 import com.on.turip.ui.compose.setting.model.InquiryMail

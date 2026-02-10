@@ -19,7 +19,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.on.turip.R
-import com.on.turip.ui.common.safeStartActivityWithToast
+import com.on.turip.ui.common.extensions.safeStartActivityWithToast
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.turip.selection.PlaceTuripSelectionBottomSheet
 import com.on.turip.ui.compose.turip.selection.PlaceTuripSelectionViewModel
