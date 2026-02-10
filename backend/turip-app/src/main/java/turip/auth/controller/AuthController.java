@@ -27,10 +27,11 @@ import turip.auth.controller.dto.request.RefreshTokenRequest;
 import turip.auth.controller.dto.request.TuripLoginRequest;
 import turip.auth.controller.dto.response.RefreshTokenResponse;
 import turip.auth.controller.dto.response.SocialLoginResponse;
-import turip.auth.controller.dto.response.TokenResult;
+import turip.auth.controller.dto.response.TuripLoginResponse;
 import turip.auth.resolver.AuthAccount;
 import turip.auth.resolver.AuthMember;
 import turip.auth.service.AuthService;
+import turip.auth.service.dto.TuripLoginResult;
 import turip.auth.util.TokenCookieUtil;
 import turip.common.exception.ErrorResponse;
 
@@ -59,6 +60,19 @@ public class AuthController {
                             
                             모든 쿠키는 HttpOnly, Secure, SameSite=Strict 속성을 가집니다.
                             """,
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = TuripLoginResponse.class),
+                            examples = @ExampleObject(
+                                    name = "success",
+                                    summary = "로그인 성공",
+                                    value = """
+                                            {
+                                              "nickname": "여행하는 귀여운 고양이"
+                                            }
+                                            """
+                            )
+                    ),
                     headers = @Header(
                             name = "Set-Cookie",
                             description = "인증 쿠키",
@@ -91,18 +105,19 @@ public class AuthController {
             )
     })
     @PostMapping("/login/turip")
-    public ResponseEntity<Void> loginWithTurip(
+    public ResponseEntity<TuripLoginResponse> loginWithTurip(
             @Parameter(hidden = true) @RequestHeader("device-fid") String deviceFid,
             @RequestBody TuripLoginRequest request) {
-        TokenResult result = authService.loginWithTurip(request, deviceFid);
+        TuripLoginResult result = authService.loginWithTurip(request, deviceFid);
 
-        ResponseCookie accessTokenCookie = tokenCookieUtil.createAccessTokenCookie(result.accessToken());
-        ResponseCookie refreshTokenCookie = tokenCookieUtil.createRefreshTokenCookie(result.refreshToken());
+        ResponseCookie accessTokenCookie = tokenCookieUtil.createAccessTokenCookie(result.tokenResult().accessToken());
+        ResponseCookie refreshTokenCookie = tokenCookieUtil.createRefreshTokenCookie(
+                result.tokenResult().refreshToken());
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString())
                 .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
-                .build();
+                .body(TuripLoginResponse.from(result));
     }
 
     @Operation(
@@ -123,7 +138,8 @@ public class AuthController {
                                             {
                                               "accessToken": "jwt-access",
                                               "refreshToken": "jwt-refresh",
-                                              "isNewMember": false
+                                              "isNewMember": false,
+                                              "nickname": "여행하는 튜립"
                                             }
                                             """
                             )
@@ -143,6 +159,26 @@ public class AuthController {
                                                     {
                                                     	"tag": "ID_TOKEN_NOT_VALID",
                                                     	"message": "유효하지 않은 id token입니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "account creation error",
+                                            summary = "계정 생성 실패(재시도 5번에 모두 실패)",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCOUNT_CREATION_ERROR",
+                                                    	"message": "계정 생성에 실패했습니다."
                                                     }
                                                     """
                                     )

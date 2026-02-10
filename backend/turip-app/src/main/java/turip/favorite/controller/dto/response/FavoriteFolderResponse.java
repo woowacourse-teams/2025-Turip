@@ -1,5 +1,6 @@
 package turip.favorite.controller.dto.response;
 
+import turip.account.domain.Account;
 import turip.favorite.domain.FavoriteFolder;
 
 public record FavoriteFolderResponse(
@@ -9,8 +10,8 @@ public record FavoriteFolderResponse(
         boolean isDefault
 ) {
 
-    public static FavoriteFolderResponse from(FavoriteFolder favoriteFolder) {
-        return new FavoriteFolderResponse(favoriteFolder.getId(), favoriteFolder.getAccount().getId(),
+    public static FavoriteFolderResponse of(FavoriteFolder favoriteFolder, Account account) {
+        return new FavoriteFolderResponse(favoriteFolder.getId(), account.getId(),
                 favoriteFolder.getName(), favoriteFolder.isDefault()
         );
     }

@@ -5,5 +5,5 @@ import turip.account.domain.Account;
 
 public interface AccountRepository extends JpaRepository<Account, Long> {
 
-
+    boolean existsByNickname(String nickname);
 }

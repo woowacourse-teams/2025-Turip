@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import turip.account.domain.Account;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.NotFoundException;
 import turip.content.controller.dto.response.content.TripDurationResponse;
@@ -16,7 +17,6 @@ import turip.content.domain.ContentPlace;
 import turip.content.repository.ContentPlaceRepository;
 import turip.content.repository.ContentRepository;
 import turip.favorite.repository.FavoritePlaceRepository;
-import turip.account.domain.Account;
 import turip.place.domain.Place;
 
 @Service
@@ -101,7 +101,7 @@ public class ContentPlaceService {
                 .map(ContentPlace::getPlace)
                 .distinct()
                 .toList();
-        Set<Long> favoritedPlaceIds = favoritePlaceRepository.findFavoritedPlaceIdsByFavoriteFolderAccountAndPlaceIn(
+        Set<Long> favoritedPlaceIds = favoritePlaceRepository.findFavoritedPlaceIdsByAccountAndPlaceIn(
                 account, places);
         return contentPlaces.stream()
                 .map(contentPlace -> {

@@ -31,12 +31,16 @@ public class Account {
     @Column(name = "role", nullable = false)
     private Role role;
 
-    public Account(Role role) {
+    @Column(name = "nickname", unique = true, nullable = false)
+    private String nickname;
+
+    public Account(Role role, String nickname) {
         this.role = role;
+        this.nickname = nickname;
     }
 
-    public static Account createUserAccount() {
-        return new Account(Role.USER);
+    public Account(Role role) {
+        this.role = role;
     }
 
     public boolean isAdmin() {

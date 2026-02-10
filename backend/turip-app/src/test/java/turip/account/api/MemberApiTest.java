@@ -19,7 +19,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import turip.account.domain.Provider;
+import turip.account.domain.Role;
 import turip.auth.token.GoogleTokenParser;
+import turip.favorite.domain.AccountRole;
 import turip.util.helper.TestDataHelper;
 
 @ActiveProfiles("test")
@@ -45,6 +47,7 @@ class MemberApiTest {
         jdbcTemplate.update("DELETE FROM refresh_token");
         jdbcTemplate.update("DELETE FROM favorite_content");
         jdbcTemplate.update("DELETE FROM favorite_place");
+        jdbcTemplate.update("DELETE FROM favorite_folder_account");
         jdbcTemplate.update("DELETE FROM favorite_folder");
         jdbcTemplate.update("DELETE FROM social_member");
         jdbcTemplate.update("DELETE FROM member");
@@ -63,6 +66,7 @@ class MemberApiTest {
         jdbcTemplate.update("ALTER TABLE member ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE guest ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE account ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE favorite_folder_account ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE content ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE creator ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE city ALTER COLUMN id RESTART WITH 1");
@@ -78,8 +82,7 @@ class MemberApiTest {
         void migrationSuccess() {
             // given
             // 1. Guest account와 Member account 생성
-            Long guestAccountId =
-                    testDataHelper.insertAccount();// Guest account
+            Long guestAccountId = testDataHelper.insertAccount();// Guest account
             Long memberAccountId = testDataHelper.insertAccount(); // Member account
 
             // 2. Guest와 Member 생성
@@ -95,20 +98,10 @@ class MemberApiTest {
             testDataHelper.insertSocialMember(memberId, provider, providerId);
 
             // 3. Guest의 FavoriteFolder와 FavoriteContent 생성
-            jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (id, account_id, name, is_default) VALUES (1, ?, '기본 폴더', true)",
-                    guestAccountId
-            );
-            jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (id, account_id, name, is_default) VALUES (2, ?, '커스텀 폴더', false)",
-                    guestAccountId
-            );
-
-            // Member의 기본 폴더 생성 (마이그레이션 시 삭제될 폴더)
-            jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (id, account_id, name, is_default) VALUES (3, ?, '기본 폴더', true)",
-                    memberAccountId
-            );
+            Long folderId1 = testDataHelper.insertFavoriteFolder("기본 폴더", true, false);
+            Long folderId2 = testDataHelper.insertFavoriteFolder("커스텀 폴더");
+            testDataHelper.insertFavoriteFolderAccount(guestAccountId, folderId1, AccountRole.OWNER);
+            testDataHelper.insertFavoriteFolderAccount(guestAccountId, folderId2, AccountRole.OWNER);
 
             // FavoriteContent를 위한 Content 생성
             jdbcTemplate.update(
@@ -166,11 +159,11 @@ class MemberApiTest {
             );
             assertThat(favoriteContentCount).isEqualTo(1);
 
-            Integer favoriteFolderCount = jdbcTemplate.queryForObject(
-                    "SELECT COUNT(*) FROM favorite_folder WHERE account_id = 2",
+            Integer favoriteFolderAccountCount = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM favorite_folder_account WHERE account_id = 2",
                     Integer.class
             );
-            assertThat(favoriteFolderCount).isEqualTo(2); // Guest의 2개 폴더
+            assertThat(favoriteFolderAccountCount).isEqualTo(0); // Guest의 개인 폴더는 모두 삭제됨
 
             // 검증: Guest가 삭제되었는지 확인
             Integer guestCount = jdbcTemplate.queryForObject(
@@ -244,19 +237,20 @@ class MemberApiTest {
         void deleteMemberSuccess() {
             // given
             // 1. Account와 Member 생성
+            Long accountId = testDataHelper.insertAccount(Role.USER);
+
             String email = "delete@gmail.com";
             Provider provider = Provider.GOOGLE;
             String providerId = "google-user-delete";
 
-            testDataHelper.insertSocialMember(email, true, provider, providerId);
+            Long memberId = testDataHelper.insertMember(accountId, email, true);
+            testDataHelper.insertSocialMember(memberId, provider, providerId);
 
             // 2. Member의 FavoriteFolder 생성
-            jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (id, account_id, name, is_default) VALUES (1, 1, '기본 폴더', true)"
-            );
-            jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (id, account_id, name, is_default) VALUES (2, 1, '커스텀 폴더', false)"
-            );
+            Long folderId1 = testDataHelper.insertFavoriteFolder("기본 폴더", true, false);
+            Long folderId2 = testDataHelper.insertFavoriteFolder("커스텀 폴더");
+            testDataHelper.insertFavoriteFolderAccount(accountId, folderId1, AccountRole.OWNER);
+            testDataHelper.insertFavoriteFolderAccount(accountId, folderId2, AccountRole.OWNER);
 
             // 3. FavoriteContent를 위한 Content 생성
             jdbcTemplate.update(
@@ -321,10 +315,10 @@ class MemberApiTest {
                     "SELECT COUNT(*) FROM favorite_content WHERE account_id = 1", Integer.class);
             assertThat(favoriteContentCount).isEqualTo(0);
 
-            // 검증: FavoriteFolder가 삭제되었는지 확인
-            Integer favoriteFolderCount = jdbcTemplate.queryForObject(
-                    "SELECT COUNT(*) FROM favorite_folder WHERE account_id = 1", Integer.class);
-            assertThat(favoriteFolderCount).isEqualTo(0);
+            // 검증: FavoriteFolderAccount가 삭제되었는지 확인
+            Integer favoriteFolderAccountCount = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM favorite_folder_account WHERE account_id = 1", Integer.class);
+            assertThat(favoriteFolderAccountCount).isEqualTo(0);
         }
 
         @Test

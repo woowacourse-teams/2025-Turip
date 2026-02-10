@@ -93,7 +93,7 @@ class ContentPlaceServiceTest {
                 .willReturn(true);
         given(contentPlaceRepository.findAllByContentId(contentId))
                 .willReturn(List.of(firstContentPlace, secondContentPlace));
-        given(favoritePlaceRepository.findFavoritedPlaceIdsByFavoriteFolderAccountAndPlaceIn(account,
+        given(favoritePlaceRepository.findFavoritedPlaceIdsByAccountAndPlaceIn(account,
                 List.of(place1, place2)))
                 .willReturn(Set.of());
         ContentPlaceDetailResponse response = contentPlaceService.findContentPlaceDetails(account, contentId);
@@ -149,7 +149,7 @@ class ContentPlaceServiceTest {
                 .willReturn(true);
         given(contentPlaceRepository.findAllByContentId(contentId))
                 .willReturn(List.of(firstContentPlace, secondContentPlace));
-        given(favoritePlaceRepository.findFavoritedPlaceIdsByFavoriteFolderAccountAndPlaceIn(account,
+        given(favoritePlaceRepository.findFavoritedPlaceIdsByAccountAndPlaceIn(account,
                 List.of(place1, place2)))
                 .willReturn(Set.of());
         ContentPlaceDetailResponse response = contentPlaceService.findContentPlaceDetails(account, contentId);
