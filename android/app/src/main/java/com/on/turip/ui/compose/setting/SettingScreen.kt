@@ -26,13 +26,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.on.turip.R
 import com.on.turip.common.AuthState
 import com.on.turip.common.UserType
-import com.on.turip.domain.setting.InquiryMail
 import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.compose.designsystem.component.TuripDialog
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.setting.component.SettingAppBar
 import com.on.turip.ui.compose.setting.component.SettingItem
+import com.on.turip.ui.compose.setting.model.InquiryMail
 import timber.log.Timber
 
 @Composable
