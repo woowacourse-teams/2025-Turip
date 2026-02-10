@@ -29,6 +29,7 @@ public enum ErrorTag {
 
     // 403 Forbidden
     FORBIDDEN("접근 권한이 없습니다."),
+    FOLDER_STREAM_FORBIDDEN("해당 폴더에 대한 스트리밍 권한이 없습니다."),
 
     // 404 Not Found
     NOT_FOUND("요청 정보를 찾을 수 없습니다."),
