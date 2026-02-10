@@ -52,4 +52,21 @@ public class FavoriteFolderAccountService {
     public List<Member> findMembersByFavoriteFolder(FavoriteFolder favoriteFolder) {
         return favoriteFolderAccountRepository.findMembersByFavoriteFolder(favoriteFolder);
     }
+
+    public FavoriteFolderAccount getByFavoriteFolderAndAccount(FavoriteFolder favoriteFolder, Account account) {
+        return favoriteFolderAccountRepository.findByFavoriteFolderAndAccount(favoriteFolder, account)
+                .orElseThrow(() -> new ForbiddenException(ErrorTag.FORBIDDEN));
+    }
+
+    @Transactional
+    public void deleteByFavoriteFolderAndAccount(FavoriteFolder favoriteFolder, Account account) {
+        FavoriteFolderAccount favoriteFolderAccount = favoriteFolderAccountRepository.findByFavoriteFolderAndAccount(
+                        favoriteFolder, account)
+                .orElseThrow(() -> new ForbiddenException(ErrorTag.FORBIDDEN));
+        favoriteFolderAccountRepository.delete(favoriteFolderAccount);
+    }
+
+    public int countByFavoriteFolder(FavoriteFolder favoriteFolder) {
+        return favoriteFolderAccountRepository.countByFavoriteFolder(favoriteFolder);
+    }
 }

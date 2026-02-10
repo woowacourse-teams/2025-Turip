@@ -13,6 +13,7 @@ import turip.common.exception.custom.ConflictException;
 import turip.common.exception.custom.NotFoundException;
 import turip.favorite.controller.dto.request.FavoriteFolderNameRequest;
 import turip.favorite.controller.dto.request.FavoriteFolderRequest;
+import turip.favorite.controller.dto.response.FavoriteFolderExitResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderJoinResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderMembersResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderResponse;
@@ -58,7 +59,7 @@ public class FavoriteFolderService {
     @Transactional
     public FavoriteFolderJoinResponse joinMember(Long favoriteFolderId, Member member) {
         FavoriteFolder favoriteFolder = getById(favoriteFolderId);
-        validateSharable(favoriteFolder);
+        validateShareAndCustomFolder(favoriteFolder);
 
         FavoriteFolderAccount favoriteFolderAccount = favoriteFolderAccountService.findOrCreate(favoriteFolder,
                 member.getAccount());
@@ -126,8 +127,27 @@ public class FavoriteFolderService {
     public void remove(Account account, Long favoriteFolderId) {
         FavoriteFolder favoriteFolder = getById(favoriteFolderId);
         validateRemovableFolder(account, favoriteFolder);
-        favoritePlaceRepository.deleteAllByFavoriteFolder(favoriteFolder);
-        favoriteFolderRepository.deleteById(favoriteFolderId);
+        removeFavoriteFolderWithFavoritePlaces(favoriteFolderId, favoriteFolder);
+    }
+
+    @Transactional
+    public FavoriteFolderExitResponse exitFolder(Account account, Long favoriteFolderId) {
+        FavoriteFolder favoriteFolder = getById(favoriteFolderId);
+        validateShareAndCustomFolder(favoriteFolder);
+
+        FavoriteFolderAccount favoriteFolderAccount = favoriteFolderAccountService.getByFavoriteFolderAndAccount(
+                favoriteFolder, account);
+        Long favoriteFolderAccountId = favoriteFolderAccount.getId();
+        favoriteFolderAccountService.deleteByFavoriteFolderAndAccount(favoriteFolder, account);
+
+        boolean isDeleted = false;
+        int remainingMemberCount = favoriteFolderAccountService.countByFavoriteFolder(favoriteFolder);
+        if (remainingMemberCount == 0) {
+            removeFavoriteFolderWithFavoritePlaces(favoriteFolderId, favoriteFolder);
+            isDeleted = true;
+        }
+
+        return FavoriteFolderExitResponse.of(favoriteFolderAccountId, favoriteFolderId, isDeleted);
     }
 
     private void validateRemovableFolder(Account account, FavoriteFolder favoriteFolder) {
@@ -149,7 +169,7 @@ public class FavoriteFolderService {
                 });
     }
 
-    private void validateSharable(FavoriteFolder favoriteFolder) {
+    private void validateShareAndCustomFolder(FavoriteFolder favoriteFolder) {
         if (!favoriteFolder.isShared()) {
             throw new BadRequestException(ErrorTag.PERSONAL_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED);
         }
@@ -166,5 +186,10 @@ public class FavoriteFolderService {
     private FavoriteFolder getById(Long favoriteFolderId) {
         return favoriteFolderRepository.findById(favoriteFolderId)
                 .orElseThrow(() -> new NotFoundException(ErrorTag.FAVORITE_FOLDER_NOT_FOUND));
+    }
+
+    private void removeFavoriteFolderWithFavoritePlaces(Long favoriteFolderId, FavoriteFolder favoriteFolder) {
+        favoritePlaceRepository.deleteAllByFavoriteFolder(favoriteFolder);
+        favoriteFolderRepository.deleteById(favoriteFolderId);
     }
 }
