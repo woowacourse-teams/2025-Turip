@@ -1,6 +1,5 @@
 package turip.favorite.stream.service;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
@@ -92,7 +91,7 @@ public class FavoriteFolderStreamService {
                     .data(response);
 
             emitter.send(event);
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error(SSE_LOG_PREFIX + "폴더 업데이트 이벤트 전송 실패, folderId: {}", favoriteFolderId, e);
             emitter.completeWithError(e);
         }
@@ -129,7 +128,7 @@ public class FavoriteFolderStreamService {
             emitter.send(event);
             startHeartbeat(emitterKey, emitter);
             log.info(SSE_LOG_PREFIX + "SSE 연결 성공, folderId: {}", favoriteFolderId);
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error(SSE_LOG_PREFIX + "SSE 연결 실패, folderId: {}", favoriteFolderId, e);
             removeEmitter(favoriteFolderId, memberId);
             throw new InternalServerException(ErrorTag.SSE_CONNECTION_ERROR);
@@ -168,7 +167,7 @@ public class FavoriteFolderStreamService {
                     .name(StreamEventType.HEARTBEAT.getName())
                     .data(HeartbeatStreamResponse.create());
             emitter.send(event);
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.warn(SSE_LOG_PREFIX + "하트비트 전송 실패", e);
             emitter.completeWithError(e);
         }
