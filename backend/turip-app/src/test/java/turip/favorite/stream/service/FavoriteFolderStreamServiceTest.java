@@ -163,38 +163,6 @@ class FavoriteFolderStreamServiceTest {
             assertThat(heartbeatSchedules).containsKey(emitterKey);
         }
 
-        @DisplayName("emitterKey에 대한 기존 하트비트 스케줄이 있으면 취소하고 새로 등록한다")
-        @Test
-        void startHeartbeat_cancelExisting() {
-            // given
-            String emitterKey = "1:1";
-            SseEmitter emitter = mock(SseEmitter.class);
-            @SuppressWarnings("unchecked")
-            ScheduledFuture<Object> oldScheduledFuture = (ScheduledFuture<Object>) mock(ScheduledFuture.class);
-            @SuppressWarnings("unchecked")
-            ScheduledFuture<Object> newScheduledFuture = (ScheduledFuture<Object>) mock(ScheduledFuture.class);
-            Long heartbeatInterval = 30L;
-
-            Map<String, ScheduledFuture<?>> heartbeatSchedules = new ConcurrentHashMap<>();
-            heartbeatSchedules.put(emitterKey, oldScheduledFuture);
-            ReflectionTestUtils.setField(favoriteFolderStreamService, "heartbeatSchedules", heartbeatSchedules);
-            ReflectionTestUtils.setField(favoriteFolderStreamService, "heartbeatInterval", heartbeatInterval);
-
-            given(scheduler.scheduleAtFixedRate(
-                    any(Runnable.class),
-                    anyLong(),
-                    anyLong(),
-                    any(TimeUnit.class)
-            )).willReturn((ScheduledFuture) newScheduledFuture);
-
-            // when
-            ReflectionTestUtils.invokeMethod(favoriteFolderStreamService, "startHeartbeat", emitterKey, emitter);
-
-            // then
-            verify(oldScheduledFuture, times(1)).cancel(false);
-            assertThat((Object) heartbeatSchedules.get(emitterKey)).isEqualTo(newScheduledFuture);
-        }
-
         @DisplayName("하트비트 스케줄을 취소할 수 있다")
         @Test
         void cancelHeartbeat() {

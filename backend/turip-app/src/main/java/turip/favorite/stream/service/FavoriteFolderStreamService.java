@@ -50,10 +50,10 @@ public class FavoriteFolderStreamService {
         SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
         String emitterKey = getEmitterKey(favoriteFolderId, member.getId());
 
-        registerEmitterCallbacks(favoriteFolderId, member, emitter, emitterKey);
-        replaceExistingEmitter(favoriteFolderId, emitterKey, emitter);
+        registerEmitterCallbacks(favoriteFolderId, emitter, emitterKey);
+        addEmitter(favoriteFolderId, emitterKey, emitter);
 
-        sendConnectEvent(favoriteFolderId, member.getId(), emitter);
+        sendConnectEvent(favoriteFolderId, emitter, emitterKey);
         return emitter;
     }
 
@@ -75,47 +75,40 @@ public class FavoriteFolderStreamService {
     }
 
     private String getEmitterKey(Long favoriteFolderId, Long memberId) {
-        return favoriteFolderId + ":" + memberId;
+        return favoriteFolderId + ":" + memberId + ":" + System.currentTimeMillis();
     }
 
-    private void registerEmitterCallbacks(Long favoriteFolderId, Member member, SseEmitter emitter, String emitterKey) {
+    private void registerEmitterCallbacks(Long favoriteFolderId, SseEmitter emitter, String emitterKey) {
         emitter.onCompletion(() -> {
             cancelHeartbeat(emitterKey);
-            removeEmitter(favoriteFolderId, member.getId());
-            log.info(SSE_LOG_PREFIX + "클라이언트 연결 해제, folderId: {}, memberId: {}",
-                    favoriteFolderId, member.getId());
+            removeEmitter(favoriteFolderId, emitterKey);
+            log.info(SSE_LOG_PREFIX + "클라이언트 연결 해제, emitterKey: {}", emitterKey);
         });
 
         emitter.onTimeout(() -> {
             emitter.complete();
-            log.info(SSE_LOG_PREFIX + "연결 타임아웃, folderId: {}, memberId: {}",
-                    favoriteFolderId, member.getId());
+            log.info(SSE_LOG_PREFIX + "연결 타임아웃, emitterKey: {}", emitterKey);
         });
 
         emitter.onError(e -> {
             cancelHeartbeat(emitterKey);
-            removeEmitter(favoriteFolderId, member.getId());
-            log.error(SSE_LOG_PREFIX + "연결 에러, folderId: {}, memberId: {}",
-                    favoriteFolderId, member.getId(), e);
+            removeEmitter(favoriteFolderId, emitterKey);
+            log.error(SSE_LOG_PREFIX + "연결 에러, emitterKey: {}", emitterKey, e);
         });
     }
 
-    private void replaceExistingEmitter(Long favoriteFolderId, String emitterKey, SseEmitter emitter) {
+    private void addEmitter(Long favoriteFolderId, String emitterKey, SseEmitter emitter) {
         emitters.compute(favoriteFolderId, (key, folderEmitters) -> {
             if (folderEmitters == null) {
                 folderEmitters = new ConcurrentHashMap<>();
             }
-            SseEmitter oldEmitter = folderEmitters.put(emitterKey, emitter);
-            if (oldEmitter != null) {
-                oldEmitter.complete();
-            }
+            folderEmitters.put(emitterKey, emitter);
             return folderEmitters;
         });
     }
 
-    private void sendConnectEvent(Long favoriteFolderId, Long memberId, SseEmitter emitter) {
+    private void sendConnectEvent(Long favoriteFolderId, SseEmitter emitter, String emitterKey) {
         try {
-            String emitterKey = getEmitterKey(favoriteFolderId, memberId);
             ConnectStreamResponse response = ConnectStreamResponse.from(favoriteFolderId);
 
             SseEventBuilder event = SseEmitter.event()
@@ -125,11 +118,11 @@ public class FavoriteFolderStreamService {
 
             emitter.send(event);
             startHeartbeat(emitterKey, emitter);
-            log.info(SSE_LOG_PREFIX + "SSE 연결 성공, folderId: {}", favoriteFolderId);
+            log.info(SSE_LOG_PREFIX + "SSE 연결 성공, emitterKey: {}", emitterKey);
         } catch (Exception e) {
-            log.error(SSE_LOG_PREFIX + "SSE 연결 실패, folderId: {}", favoriteFolderId, e);
+            log.error(SSE_LOG_PREFIX + "SSE 연결 실패, emitterKey: {}", emitterKey, e);
             emitter.completeWithError(e);
-            removeEmitter(favoriteFolderId, memberId);
+            removeEmitter(favoriteFolderId, emitterKey);
             throw new InternalServerException(ErrorTag.SSE_CONNECTION_ERROR);
         }
     }
@@ -150,15 +143,14 @@ public class FavoriteFolderStreamService {
         }
     }
 
-    private void removeEmitter(Long favoriteFolderId, Long memberId) {
-        String emitterKey = getEmitterKey(favoriteFolderId, memberId);
-        emitters.computeIfPresent(favoriteFolderId, (key, turipEmitters) -> {
-            turipEmitters.remove(emitterKey);
-            log.info(SSE_LOG_PREFIX + "SSE 연결 해제, favoriteFolderId: {}, memberId: {}", favoriteFolderId, memberId);
-            if (turipEmitters.isEmpty()) {
+    private void removeEmitter(Long favoriteFolderId, String emitterKey) {
+        emitters.computeIfPresent(favoriteFolderId, (key, folderEmitters) -> {
+            folderEmitters.remove(emitterKey);
+            log.info(SSE_LOG_PREFIX + "SSE 연결 해제, emitterKey: {}", emitterKey);
+            if (folderEmitters.isEmpty()) {
                 return null;
             }
-            return turipEmitters;
+            return folderEmitters;
         });
     }
 
@@ -167,7 +159,6 @@ public class FavoriteFolderStreamService {
     }
 
     private void startHeartbeat(String emitterKey, SseEmitter emitter) {
-        cancelHeartbeat(emitterKey);
         ScheduledFuture<?> scheduledFuture = scheduler.scheduleAtFixedRate(
                 () -> sendHeartbeatEvent(emitter),
                 heartbeatInterval,
