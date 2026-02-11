@@ -62,3 +62,9 @@ region:
       etc:
         image-url: https://test.example.com/overseas-etc.jpg
 
+invitation:
+  base-url: https://invite.turip.kro.kr/
+  jwt:
+    secret-key: turip-test-invitation-jwt-secret-key-for-testing-purposes
+    token-expiration: 1h
+

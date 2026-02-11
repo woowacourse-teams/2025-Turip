@@ -32,9 +32,11 @@ import turip.favorite.controller.dto.request.FavoriteFolderRequest;
 import turip.favorite.controller.dto.response.FavoriteFolderResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithFavoriteStatusResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithPlaceCountResponse;
+import turip.favorite.controller.dto.response.FolderInvitationCodeResponse;
 import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.repository.FavoriteFolderRepository;
 import turip.favorite.repository.FavoritePlaceRepository;
+import turip.favorite.token.InvitationTokenProvider;
 import turip.place.domain.Place;
 import turip.place.repository.PlaceRepository;
 import turip.util.fixture.AccountFixture;
@@ -57,6 +59,9 @@ class FavoriteFolderServiceTest {
 
     @Mock
     private PlaceRepository placeRepository;
+
+    @Mock
+    private InvitationTokenProvider invitationTokenProvider;
 
     @DisplayName("기본 장소 찜 폴더 생성 테스트")
     @Nested
@@ -471,6 +476,73 @@ class FavoriteFolderServiceTest {
             assertThatThrownBy(() -> favoriteFolderService.remove(member, folderId))
                     .isInstanceOf(BadRequestException.class)
                     .hasMessage(ErrorTag.SHARED_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED.getMessage());
+        }
+    }
+
+    @DisplayName("공유 폴더 초대 코드 생성 테스트")
+    @Nested
+    class CreateInvitationCode {
+
+        @DisplayName("초대 코드를 생성할 수 있다")
+        @Test
+        void createInvitationCode() {
+            // given
+            Long accountId = 1L;
+            Long folderId = 1L;
+            Account account = AccountFixture.createCustomAccount(accountId, Role.USER);
+            FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(folderId, "폴더");
+
+            given(favoriteFolderRepository.findById(folderId))
+                    .willReturn(Optional.of(favoriteFolder));
+            given(invitationTokenProvider.generateToken(account.getId(), folderId))
+                    .willReturn("test_token");
+
+            // when
+            FolderInvitationCodeResponse actual = favoriteFolderService.createInvitationCode(account, folderId);
+
+            // then
+            assertThat(actual.invitationCode()).isEqualTo("test_token");
+        }
+
+        @DisplayName("초대 코드 최초 생성 시 공유 폴더로 변경된다")
+        @Test
+        void createInvitationCode_convertsToShared() {
+            // given
+            Long accountId = 1L;
+            Long folderId = 1L;
+            Account account = AccountFixture.createCustomAccount(accountId, Role.USER);
+            FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(folderId, "폴더");
+            boolean before = favoriteFolder.isShared();
+
+            given(favoriteFolderRepository.findById(folderId))
+                    .willReturn(Optional.of(favoriteFolder));
+
+            // when
+            favoriteFolderService.createInvitationCode(account, folderId);
+            boolean after = favoriteFolder.isShared();
+
+            // then
+            assertThat(before).isFalse();
+            assertThat(after).isTrue();
+        }
+
+        @Test
+        @DisplayName("공유 폴더에 참여하지 않은 멤버가 초대 코드 생성 시 예외가 발생한다")
+        void createInvitationCode_Forbidden() {
+            // given
+            Long accountId = 1L;
+            Long folderId = 1L;
+            Account account = AccountFixture.createCustomAccount(accountId, Role.USER);
+            FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(folderId, "폴더");
+
+            given(favoriteFolderRepository.findById(folderId))
+                    .willReturn(Optional.of(favoriteFolder));
+            willThrow(new ForbiddenException(ErrorTag.FORBIDDEN))
+                    .given(favoriteFolderAccountService).validateMembership(account, favoriteFolder);
+
+            // when & then
+            assertThatThrownBy(() -> favoriteFolderService.createInvitationCode(account, folderId))
+                    .isInstanceOf(ForbiddenException.class);
         }
     }
 }
