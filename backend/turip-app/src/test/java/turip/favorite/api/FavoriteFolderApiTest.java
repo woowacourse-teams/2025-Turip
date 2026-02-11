@@ -736,8 +736,6 @@ class FavoriteFolderApiTest {
                     .when().delete("/api/v1/turips/" + favoriteFolderId + "/exit")
                     .then()
                     .statusCode(200)
-                    .body("id", notNullValue())
-                    .body("turipId", is(favoriteFolderId.intValue()))
                     .body("isDeleted", is(false));
         }
 
@@ -774,8 +772,6 @@ class FavoriteFolderApiTest {
                     .when().delete("/api/v1/turips/" + favoriteFolderId + "/exit")
                     .then()
                     .statusCode(200)
-                    .body("id", notNullValue())
-                    .body("turipId", is(favoriteFolderId.intValue()))
                     .body("isDeleted", is(true));
         }
 

@@ -1041,8 +1041,6 @@ public class FavoriteFolderController {
                                     summary = "튜립 나가기 성공",
                                     value = """
                                             {
-                                                "id": 1,
-                                                "turipId": 1,
                                                 "isDeleted": true
                                             }
                                             """

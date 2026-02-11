@@ -144,10 +144,7 @@ public class FavoriteFolderService {
     public FavoriteFolderExitResponse exitFolder(Account account, Long favoriteFolderId) {
         FavoriteFolder favoriteFolder = getByIdWithLock(favoriteFolderId);
         validateShareAndCustomFolder(favoriteFolder);
-
-        FavoriteFolderAccount favoriteFolderAccount = favoriteFolderAccountService.getByFavoriteFolderAndAccount(
-                favoriteFolder, account);
-        Long favoriteFolderAccountId = favoriteFolderAccount.getId();
+        favoriteFolderAccountService.validateMembership(account, favoriteFolder);
         favoriteFolderAccountService.deleteByFavoriteFolderAndAccount(favoriteFolder, account);
 
         boolean isDeleted = false;
@@ -157,7 +154,7 @@ public class FavoriteFolderService {
             isDeleted = true;
         }
 
-        return FavoriteFolderExitResponse.of(favoriteFolderAccountId, favoriteFolderId, isDeleted);
+        return FavoriteFolderExitResponse.of(isDeleted);
     }
 
     private void validateRemovableFolder(Account account, FavoriteFolder favoriteFolder) {

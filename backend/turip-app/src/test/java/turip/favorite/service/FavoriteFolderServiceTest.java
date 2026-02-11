@@ -43,7 +43,6 @@ import turip.favorite.repository.FavoritePlaceRepository;
 import turip.place.domain.Place;
 import turip.place.repository.PlaceRepository;
 import turip.util.fixture.AccountFixture;
-import turip.util.fixture.FavoriteFolderAccountFixture;
 import turip.util.fixture.FavoriteFolderFixture;
 import turip.util.fixture.MemberFixture;
 
@@ -646,17 +645,12 @@ class FavoriteFolderServiceTest {
             // given
             Long accountId = 1L;
             Long folderId = 1L;
-            Long favoriteFolderAccountId = 1L;
 
             Account account = AccountFixture.createCustomAccount(accountId, Role.USER);
             FavoriteFolder favoriteFolder = FavoriteFolderFixture.createSharedFolderWithId(folderId, "공유 폴더");
-            FavoriteFolderAccount favoriteFolderAccount = FavoriteFolderAccountFixture.createFavoriteFolderAccountWithId(
-                    favoriteFolderAccountId, favoriteFolder, account, AccountRole.MEMBER);
 
             given(favoriteFolderRepository.findByIdWithLock(folderId))
                     .willReturn(Optional.of(favoriteFolder));
-            given(favoriteFolderAccountService.getByFavoriteFolderAndAccount(favoriteFolder, account))
-                    .willReturn(favoriteFolderAccount);
             given(favoriteFolderAccountService.countByFavoriteFolder(favoriteFolder))
                     .willReturn(2);
 
@@ -664,11 +658,7 @@ class FavoriteFolderServiceTest {
             FavoriteFolderExitResponse response = favoriteFolderService.exitFolder(account, folderId);
 
             // then
-            assertAll(
-                    () -> assertThat(response.id()).isEqualTo(favoriteFolderAccountId),
-                    () -> assertThat(response.favoriteFolderId()).isEqualTo(folderId),
-                    () -> assertThat(response.isDeleted()).isFalse()
-            );
+            assertThat(response.isDeleted()).isFalse();
             verify(favoriteFolderAccountService).deleteByFavoriteFolderAndAccount(favoriteFolder, account);
         }
 
@@ -678,17 +668,12 @@ class FavoriteFolderServiceTest {
             // given
             Long accountId = 1L;
             Long folderId = 1L;
-            Long favoriteFolderAccountId = 1L;
 
             Account account = AccountFixture.createCustomAccount(accountId, Role.USER);
             FavoriteFolder favoriteFolder = FavoriteFolderFixture.createSharedFolderWithId(folderId, "공유 폴더");
-            FavoriteFolderAccount favoriteFolderAccount = FavoriteFolderAccountFixture.createFavoriteFolderAccountWithId(
-                    favoriteFolderAccountId, favoriteFolder, account, AccountRole.MEMBER);
 
             given(favoriteFolderRepository.findByIdWithLock(folderId))
                     .willReturn(Optional.of(favoriteFolder));
-            given(favoriteFolderAccountService.getByFavoriteFolderAndAccount(favoriteFolder, account))
-                    .willReturn(favoriteFolderAccount);
             given(favoriteFolderAccountService.countByFavoriteFolder(favoriteFolder))
                     .willReturn(0);
 
@@ -696,11 +681,7 @@ class FavoriteFolderServiceTest {
             FavoriteFolderExitResponse response = favoriteFolderService.exitFolder(account, folderId);
 
             // then
-            assertAll(
-                    () -> assertThat(response.id()).isEqualTo(favoriteFolderAccountId),
-                    () -> assertThat(response.favoriteFolderId()).isEqualTo(folderId),
-                    () -> assertThat(response.isDeleted()).isTrue()
-            );
+            assertThat(response.isDeleted()).isTrue();
             verify(favoriteFolderAccountService).deleteByFavoriteFolderAndAccount(favoriteFolder, account);
             verify(favoritePlaceRepository).deleteAllByFavoriteFolder(favoriteFolder);
             verify(favoriteFolderRepository).deleteById(folderId);
@@ -777,7 +758,7 @@ class FavoriteFolderServiceTest {
                     .willReturn(Optional.of(favoriteFolder));
             willThrow(new ForbiddenException(ErrorTag.FORBIDDEN))
                     .given(favoriteFolderAccountService)
-                    .getByFavoriteFolderAndAccount(favoriteFolder, nonMemberAccount);
+                    .validateMembership(nonMemberAccount, favoriteFolder);
 
             // when & then
             assertThatThrownBy(() -> favoriteFolderService.exitFolder(nonMemberAccount, folderId))
