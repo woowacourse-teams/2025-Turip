@@ -520,8 +520,10 @@ public class FavoriteFolderController {
                                     value = """
                                             {
                                                 "id": 1,
+                                                "accountId": 1
                                                 "name": "튜립 부산",
                                                 "isDefault": false,
+                                                "placeCount": 2,
                                                 "isShared": true,
                                                 "memberCount": 4
                                             }
