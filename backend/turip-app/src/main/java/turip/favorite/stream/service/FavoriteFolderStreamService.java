@@ -9,6 +9,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.SseEventBuilder;
@@ -28,11 +29,12 @@ import turip.favorite.stream.controller.dto.response.HeartbeatStreamResponse;
 public class FavoriteFolderStreamService {
 
     private static final Long DEFAULT_TIMEOUT = 3 * 60 * 1000L; // 3분
-    private static final Long HEARTBEAT_INTERVAL = 30L; // 30초
     private static final String SSE_LOG_PREFIX = "[SSE] ";
     private final Map<Long, Map<String, SseEmitter>> emitters = new ConcurrentHashMap<>();
     private final Map<String, ScheduledFuture<?>> heartbeatSchedules = new ConcurrentHashMap<>();
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    @Value("${sse.heartbeat.interval:30}")
+    private Long heartbeatInterval;
 
     private final FavoriteFolderService favoriteFolderService;
     private final FavoriteFolderAccountService favoriteFolderAccountService;
@@ -162,8 +164,8 @@ public class FavoriteFolderStreamService {
         cancelHeartbeat(emitterKey);
         ScheduledFuture<?> scheduledFuture = scheduler.scheduleAtFixedRate(
                 () -> sendHeartbeatEvent(emitter),
-                HEARTBEAT_INTERVAL,
-                HEARTBEAT_INTERVAL,
+                heartbeatInterval,
+                heartbeatInterval,
                 TimeUnit.SECONDS
         );
         heartbeatSchedules.put(emitterKey, scheduledFuture);
