@@ -39,7 +39,7 @@ public class FavoriteFolderStreamService {
         SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
         String emitterKey = getEmitterKey(favoriteFolderId, member.getId());
 
-        emitter.onCompletion(() -> {
+        emitter.onCompletion(() -> { // emitter.complete() 호출되면 이거 실행할거야.
             cancelHeartbeat(emitterKey);
             removeEmitter(favoriteFolderId, member.getId());
             log.info(SSE_LOG_PREFIX + "클라이언트 연결 해제, folderId: {}, memberId: {}",
@@ -144,6 +144,7 @@ public class FavoriteFolderStreamService {
     }
 
     private void startHeartbeat(String emitterKey, SseEmitter emitter) {
+        cancelHeartbeat(emitterKey);
         ScheduledFuture<?> scheduledFuture = scheduler.scheduleAtFixedRate(
                 () -> sendHeartbeat(emitter),
                 HEARTBEAT_INTERVAL,
