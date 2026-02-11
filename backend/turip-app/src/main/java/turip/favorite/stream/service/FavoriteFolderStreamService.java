@@ -130,6 +130,7 @@ public class FavoriteFolderStreamService {
             log.info(SSE_LOG_PREFIX + "SSE 연결 성공, folderId: {}", favoriteFolderId);
         } catch (Exception e) {
             log.error(SSE_LOG_PREFIX + "SSE 연결 실패, folderId: {}", favoriteFolderId, e);
+            emitter.completeWithError(e);
             removeEmitter(favoriteFolderId, memberId);
             throw new InternalServerException(ErrorTag.SSE_CONNECTION_ERROR);
         }
