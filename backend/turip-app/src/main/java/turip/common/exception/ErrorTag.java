@@ -11,10 +11,11 @@ public enum ErrorTag {
     DEVICE_FID_REQUIRED("요청 헤더에 device_fid가 존재하지 않습니다."),
     FAVORITE_PLACE_FOLDER_MISMATCH("장소 찜이 해당 폴더에 존재하지 않습니다."),
     SHARED_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED("공유 찜폴더에는 이 작업을 수행할 수 없습니다."),
-
     EMAIL_INVALID("이메일 형식이 올바르지 않습니다."),
     LOGIN_ID_INVALID("아이디 형식이 올바르지 않습니다."),
     LOGIN_PASSWORD_INVALID("비밀번호 형식이 올바르지 않습니다."),
+    INVITATION_TOKEN_EXPIRED("초대 토큰이 만료됐습니다."),
+    INVALID_INVITATION_TOKEN("유효하지 않은 초대 토큰입니다."),
 
     // 401 Unauthorized
     UNAUTHORIZED("토큰 기반 인증에 실패했습니다."),

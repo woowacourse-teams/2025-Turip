@@ -29,6 +29,7 @@ import turip.favorite.controller.dto.response.FavoriteFolderResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithFavoriteStatusResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithPlaceCountResponse;
 import turip.favorite.controller.dto.response.FolderInvitationCodeResponse;
+import turip.favorite.controller.dto.response.FolderInvitationDetailResponse;
 import turip.favorite.service.FavoriteFolderService;
 
 @RestController
@@ -165,8 +166,8 @@ public class FavoriteFolderController {
     }
 
     @Operation(
-            summary = "튜립 초대코드 생성 api",
-            description = "튜립을 공유하기 위한 초대코드를 생성한다."
+            summary = "튜립 초대 토큰 생성 api",
+            description = "튜립을 공유하기 위한 초대 토큰를 생성한다."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -177,7 +178,7 @@ public class FavoriteFolderController {
                             schema = @Schema(implementation = FolderInvitationCodeResponse.class),
                             examples = @ExampleObject(
                                     name = "success",
-                                    summary = "초대코드 생성 성공",
+                                    summary = "초대 토큰 생성 성공",
                                     value = """
                                             {
                                                 "invitationCode": "aZbC1dasda13"
@@ -270,6 +271,100 @@ public class FavoriteFolderController {
             @PathVariable("turipId") Long favoriteFolderId,
             @Parameter(hidden = true) @AuthAccount Account account) {
         FolderInvitationCodeResponse response = favoriteFolderService.createInvitationCode(account, favoriteFolderId);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "튜립 초대 토큰 검증 api",
+            description = "튜립 초대 토큰를 검증한다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "성공 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = FolderInvitationDetailResponse.class),
+                            examples = @ExampleObject(
+                                    name = "success",
+                                    summary = "초대 토큰 검증 성공",
+                                    value = """
+                                            {
+                                                "turipId": 1,
+                                                "turipName": "내 튜립",
+                                                "isMember": true
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "invalid_invitation_token",
+                                            summary = "유효하지 않은 초대 토큰",
+                                            value = """
+                                                    {
+                                                        "tag": "INVALID_INVITATION_TOKEN",
+                                                        "message": "유효하지 않은 초대 토큰입니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "access token expired",
+                                            summary = "만료된 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_EXPIRED",
+                                                    	"message": "access token이 만료됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "invalid signature access token",
+                                            summary = "서명값이 올바르지 않은 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_SIGNATURE_INVALID",
+                                                    	"message": "access token이 위조됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "unauthorized",
+                                            summary = "알 수 없는 이유로 인증 실패",
+                                            value = """
+                                                    {
+                                                    	"tag": "UNAUTHORIZED",
+                                                    	"message": "토큰 기반 인증에 실패했습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            )
+    })
+    @GetMapping("/invitation-tokens")
+    public ResponseEntity<FolderInvitationDetailResponse> verifyInvitation(
+            @RequestParam("token") String token,
+            @Parameter(hidden = true) @AuthAccount Account account
+    ) {
+        FolderInvitationDetailResponse response = favoriteFolderService.getInvitationDetails(token);
         return ResponseEntity.ok(response);
     }
 

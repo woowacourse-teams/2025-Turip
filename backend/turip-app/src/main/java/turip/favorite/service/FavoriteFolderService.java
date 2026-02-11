@@ -18,6 +18,7 @@ import turip.favorite.controller.dto.response.FavoriteFolderWithPlaceCountRespon
 import turip.favorite.controller.dto.response.FavoriteFoldersWithFavoriteStatusResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithPlaceCountResponse;
 import turip.favorite.controller.dto.response.FolderInvitationCodeResponse;
+import turip.favorite.controller.dto.response.FolderInvitationDetailResponse;
 import turip.favorite.domain.AccountRole;
 import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.repository.FavoriteFolderRepository;
@@ -68,6 +69,17 @@ public class FavoriteFolderService {
         String invitationCode = invitationTokenProvider.generateToken(account.getId(), favoriteFolderId);
 
         return FolderInvitationCodeResponse.from(invitationCode);
+    }
+
+    public FolderInvitationDetailResponse getInvitationDetails(String token) {
+        Long favoriteFolderId = invitationTokenProvider.getClaimOfName(token, "fid", Long.class);
+
+        boolean exists = favoriteFolderRepository.existsById(favoriteFolderId);
+        if (!exists) {
+            throw new NotFoundException(ErrorTag.FAVORITE_FOLDER_NOT_FOUND);
+        }
+
+        return FolderInvitationDetailResponse.from(favoriteFolderId);
     }
 
     public FavoriteFoldersWithPlaceCountResponse findAllByAccount(Account account) {
