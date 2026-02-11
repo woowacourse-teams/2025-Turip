@@ -1,5 +1,6 @@
 package turip.favorite.stream.service;
 
+import jakarta.annotation.PreDestroy;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
@@ -172,6 +173,19 @@ public class FavoriteFolderStreamService {
         } catch (Exception e) {
             log.warn(SSE_LOG_PREFIX + "하트비트 전송 실패", e);
             emitter.completeWithError(e);
+        }
+    }
+
+    @PreDestroy
+    public void destroy() {
+        scheduler.shutdown();
+        try {
+            if (!scheduler.awaitTermination(45, TimeUnit.SECONDS)) {
+                scheduler.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            scheduler.shutdownNow();
+            Thread.currentThread().interrupt();
         }
     }
 }
