@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import turip.favorite.stream.service.ActionType;
 
 public record FolderUpdateStreamResponse(
-        @JsonProperty("folderId") Long favoriteFolderId,
+        @JsonProperty("turipId") Long favoriteFolderId,
         @JsonProperty("action") ActionType actionType,
         LocalDateTime timestamp
 ) {
