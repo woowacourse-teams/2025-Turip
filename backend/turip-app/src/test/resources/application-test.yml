@@ -62,3 +62,7 @@ region:
       etc:
         image-url: https://test.example.com/overseas-etc.jpg
 
+# SSE 설정 (테스트용 - 빠른 하트비트)
+sse:
+  heartbeat:
+    interval: 2  # 2초
