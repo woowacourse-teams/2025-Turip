@@ -40,7 +40,7 @@ public class FavoriteFolderStreamService {
         SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
         String emitterKey = getEmitterKey(favoriteFolderId, member.getId());
 
-        emitter.onCompletion(() -> { // emitter.complete() 호출되면 이거 실행할거야.
+        emitter.onCompletion(() -> {
             cancelHeartbeat(emitterKey);
             removeEmitter(favoriteFolderId, member.getId());
             log.info(SSE_LOG_PREFIX + "클라이언트 연결 해제, folderId: {}, memberId: {}",
@@ -60,11 +60,16 @@ public class FavoriteFolderStreamService {
                     favoriteFolderId, member.getId(), e);
         });
 
-        emitters.computeIfAbsent(favoriteFolderId, key -> new ConcurrentHashMap<>())
-                .merge(emitterKey, emitter, (oldEmitter, newEmitter) -> {
-                    oldEmitter.complete();
-                    return newEmitter;
-                });
+        emitters.compute(favoriteFolderId, (key, folderEmitters) -> {
+            if (folderEmitters == null) {
+                folderEmitters = new ConcurrentHashMap<>();
+            }
+            SseEmitter oldEmitter = folderEmitters.put(emitterKey, emitter);
+            if (oldEmitter != null) {
+                oldEmitter.complete();
+            }
+            return folderEmitters;
+        });
 
         sendConnectEvent(favoriteFolderId, member.getId(), emitter);
         return emitter;
