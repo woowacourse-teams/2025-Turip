@@ -61,6 +61,15 @@ public class FavoriteFolderStreamService {
                 .forEach(emitter -> sendFolderUpdateEvent(favoriteFolderId, actionType, emitter));
     }
 
+    private void validateIfMemberJoiningFavoriteFolder(Long favoriteFolderId, Member member) {
+        FavoriteFolder favoriteFolder = favoriteFolderService.getById(favoriteFolderId);
+        favoriteFolderAccountService.validateMembership(member.getAccount(), favoriteFolder);
+    }
+
+    private String getEmitterKey(Long favoriteFolderId, Long memberId) {
+        return favoriteFolderId + ":" + memberId;
+    }
+
     private void registerEmitterCallbacks(Long favoriteFolderId, Member member, SseEmitter emitter, String emitterKey) {
         emitter.onCompletion(() -> {
             cancelHeartbeat(emitterKey);
@@ -96,6 +105,27 @@ public class FavoriteFolderStreamService {
         });
     }
 
+    private void sendConnectEvent(Long favoriteFolderId, Long memberId, SseEmitter emitter) {
+        try {
+            String emitterKey = getEmitterKey(favoriteFolderId, memberId);
+            ConnectStreamResponse response = ConnectStreamResponse.from(favoriteFolderId);
+
+            SseEventBuilder event = SseEmitter.event()
+                    .id(String.valueOf(System.currentTimeMillis()))
+                    .name(StreamEventType.CONNECT.getName())
+                    .data(response);
+
+            emitter.send(event);
+            startHeartbeat(emitterKey, emitter);
+            log.info(SSE_LOG_PREFIX + "SSE 연결 성공, folderId: {}", favoriteFolderId);
+        } catch (Exception e) {
+            log.error(SSE_LOG_PREFIX + "SSE 연결 실패, folderId: {}", favoriteFolderId, e);
+            emitter.completeWithError(e);
+            removeEmitter(favoriteFolderId, memberId);
+            throw new InternalServerException(ErrorTag.SSE_CONNECTION_ERROR);
+        }
+    }
+
     private void sendFolderUpdateEvent(Long favoriteFolderId, ActionType actionType, SseEmitter emitter) {
         try {
             FolderUpdateStreamResponse response = FolderUpdateStreamResponse.of(favoriteFolderId, actionType);
@@ -124,38 +154,8 @@ public class FavoriteFolderStreamService {
         });
     }
 
-    private void validateIfMemberJoiningFavoriteFolder(Long favoriteFolderId, Member member) {
-        FavoriteFolder favoriteFolder = favoriteFolderService.getById(favoriteFolderId);
-        favoriteFolderAccountService.validateMembership(member.getAccount(), favoriteFolder);
-    }
-
-    private void sendConnectEvent(Long favoriteFolderId, Long memberId, SseEmitter emitter) {
-        try {
-            String emitterKey = getEmitterKey(favoriteFolderId, memberId);
-            ConnectStreamResponse response = ConnectStreamResponse.from(favoriteFolderId);
-
-            SseEventBuilder event = SseEmitter.event()
-                    .id(String.valueOf(System.currentTimeMillis()))
-                    .name(StreamEventType.CONNECT.getName())
-                    .data(response);
-
-            emitter.send(event);
-            startHeartbeat(emitterKey, emitter);
-            log.info(SSE_LOG_PREFIX + "SSE 연결 성공, folderId: {}", favoriteFolderId);
-        } catch (Exception e) {
-            log.error(SSE_LOG_PREFIX + "SSE 연결 실패, folderId: {}", favoriteFolderId, e);
-            emitter.completeWithError(e);
-            removeEmitter(favoriteFolderId, memberId);
-            throw new InternalServerException(ErrorTag.SSE_CONNECTION_ERROR);
-        }
-    }
-
     private void sendMemberUpdateEvent() {
         // TODO: 구현 필요
-    }
-
-    private String getEmitterKey(Long favoriteFolderId, Long memberId) {
-        return favoriteFolderId + ":" + memberId;
     }
 
     private void startHeartbeat(String emitterKey, SseEmitter emitter) {
