@@ -271,12 +271,12 @@ public class FavoriteFolderController {
                             mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(
-                                    name = "guest_forbidden",
+                                    name = "forbidden",
                                     summary = "게스트가 해당 기능에 접근하려는 경우",
                                     value = """
                                             {
-                                                "tag": "GUEST_FORBIDDEN",
-                                                "message": "게스트 계정이 접근할 수 없는 기능입니다."
+                                                "tag": "FORBIDDEN",
+                                                "message": "접근 권한이 없습니다."
                                             }
                                             """
                             )
@@ -1124,12 +1124,12 @@ public class FavoriteFolderController {
                             mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(
-                                    name = "guest_forbidden",
+                                    name = "forbidden",
                                     summary = "게스트가 해당 기능에 접근하려는 경우",
                                     value = """
                                             {
-                                                "tag": "GUEST_FORBIDDEN",
-                                                "message": "게스트 계정이 접근할 수 없는 기능입니다."
+                                                "tag": "FORBIDDEN",
+                                                "message": "접근 권한이 없습니다."
                                             }
                                             """
                             )

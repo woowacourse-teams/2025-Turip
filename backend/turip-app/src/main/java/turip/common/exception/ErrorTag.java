@@ -30,7 +30,6 @@ public enum ErrorTag {
 
     // 403 Forbidden
     FORBIDDEN("접근 권한이 없습니다."),
-    GUEST_FORBIDDEN("게스트 계정이 접근할 수 없는 기능입니다."),
 
     // 404 Not Found
     NOT_FOUND("요청 정보를 찾을 수 없습니다."),
