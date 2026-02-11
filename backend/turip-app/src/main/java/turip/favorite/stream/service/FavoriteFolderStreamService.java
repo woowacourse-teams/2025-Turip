@@ -161,7 +161,7 @@ public class FavoriteFolderStreamService {
     private void startHeartbeat(String emitterKey, SseEmitter emitter) {
         cancelHeartbeat(emitterKey);
         ScheduledFuture<?> scheduledFuture = scheduler.scheduleAtFixedRate(
-                () -> sendHeartbeat(emitter),
+                () -> sendHeartbeatEvent(emitter),
                 HEARTBEAT_INTERVAL,
                 HEARTBEAT_INTERVAL,
                 TimeUnit.SECONDS
@@ -176,7 +176,7 @@ public class FavoriteFolderStreamService {
         }
     }
 
-    private void sendHeartbeat(SseEmitter emitter) {
+    private void sendHeartbeatEvent(SseEmitter emitter) {
         try {
             SseEventBuilder event = SseEmitter.event()
                     .id(String.valueOf(System.currentTimeMillis()))
