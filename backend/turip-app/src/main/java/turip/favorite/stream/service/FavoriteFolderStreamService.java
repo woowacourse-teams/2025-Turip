@@ -42,6 +42,26 @@ public class FavoriteFolderStreamService {
         SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
         String emitterKey = getEmitterKey(favoriteFolderId, member.getId());
 
+        registerEmitterCallbacks(favoriteFolderId, member, emitter, emitterKey);
+        replaceExistingEmitter(favoriteFolderId, emitterKey, emitter);
+
+        sendConnectEvent(favoriteFolderId, member.getId(), emitter);
+        return emitter;
+    }
+
+    public void sendFolderUpdateEvents(Long favoriteFolderId, ActionType actionType) {
+        Map<String, SseEmitter> folderEmitters = emitters.get(favoriteFolderId);
+        if (folderEmitters == null || folderEmitters.isEmpty()) {
+            log.info(SSE_LOG_PREFIX + "폴더에 연결된 사용자 없음, folderId: {}", favoriteFolderId);
+            return;
+        }
+        log.info(SSE_LOG_PREFIX + "폴더 업데이트 이벤트 전송 시작, folderId: {}, 연결된 사용자 수: {}", favoriteFolderId,
+                folderEmitters.size());
+        folderEmitters.values()
+                .forEach(emitter -> sendFolderUpdateEvent(favoriteFolderId, actionType, emitter));
+    }
+
+    private void registerEmitterCallbacks(Long favoriteFolderId, Member member, SseEmitter emitter, String emitterKey) {
         emitter.onCompletion(() -> {
             cancelHeartbeat(emitterKey);
             removeEmitter(favoriteFolderId, member.getId());
@@ -61,7 +81,9 @@ public class FavoriteFolderStreamService {
             log.error(SSE_LOG_PREFIX + "연결 에러, folderId: {}, memberId: {}",
                     favoriteFolderId, member.getId(), e);
         });
+    }
 
+    private void replaceExistingEmitter(Long favoriteFolderId, String emitterKey, SseEmitter emitter) {
         emitters.compute(favoriteFolderId, (key, folderEmitters) -> {
             if (folderEmitters == null) {
                 folderEmitters = new ConcurrentHashMap<>();
@@ -72,21 +94,6 @@ public class FavoriteFolderStreamService {
             }
             return folderEmitters;
         });
-
-        sendConnectEvent(favoriteFolderId, member.getId(), emitter);
-        return emitter;
-    }
-
-    public void sendFolderUpdateEvents(Long favoriteFolderId, ActionType actionType) {
-        Map<String, SseEmitter> folderEmitters = emitters.get(favoriteFolderId);
-        if (folderEmitters == null || folderEmitters.isEmpty()) {
-            log.info(SSE_LOG_PREFIX + "폴더에 연결된 사용자 없음, folderId: {}", favoriteFolderId);
-            return;
-        }
-        log.info(SSE_LOG_PREFIX + "폴더 업데이트 이벤트 전송 시작, folderId: {}, 연결된 사용자 수: {}", favoriteFolderId,
-                folderEmitters.size());
-        folderEmitters.values()
-                .forEach(emitter -> sendFolderUpdateEvent(favoriteFolderId, actionType, emitter));
     }
 
     private void sendFolderUpdateEvent(Long favoriteFolderId, ActionType actionType, SseEmitter emitter) {
