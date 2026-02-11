@@ -17,10 +17,12 @@ import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusRe
 import turip.favorite.controller.dto.response.FavoriteFolderWithPlaceCountResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithFavoriteStatusResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithPlaceCountResponse;
+import turip.favorite.controller.dto.response.FolderInvitationCodeResponse;
 import turip.favorite.domain.AccountRole;
 import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.repository.FavoriteFolderRepository;
 import turip.favorite.repository.FavoritePlaceRepository;
+import turip.favorite.token.InvitationTokenProvider;
 import turip.place.domain.Place;
 import turip.place.repository.PlaceRepository;
 
@@ -32,6 +34,7 @@ public class FavoriteFolderService {
     private final FavoritePlaceRepository favoritePlaceRepository;
     private final PlaceRepository placeRepository;
     private final FavoriteFolderAccountService favoriteFolderAccountService;
+    private final InvitationTokenProvider invitationTokenProvider;
 
     @Transactional
     public void createDefaultFavoriteFolder(Account account) {
@@ -49,6 +52,22 @@ public class FavoriteFolderService {
         favoriteFolderAccountService.save(savedFavoriteFolder, account, AccountRole.OWNER);
 
         return FavoriteFolderResponse.of(savedFavoriteFolder, account);
+    }
+
+    @Transactional
+    public FolderInvitationCodeResponse createInvitationCode(Account account, Long favoriteFolderId) {
+        FavoriteFolder favoriteFolder = favoriteFolderRepository.findById(favoriteFolderId)
+                .orElseThrow(() -> new NotFoundException(ErrorTag.FAVORITE_FOLDER_NOT_FOUND));
+
+        favoriteFolderAccountService.validateMembership(account, favoriteFolder);
+
+        if (!favoriteFolder.isShared()) {
+            favoriteFolder.convertToSharedFolder();
+        }
+
+        String invitationCode = invitationTokenProvider.generateToken(account.getId(), favoriteFolderId);
+
+        return FolderInvitationCodeResponse.from(invitationCode);
     }
 
     public FavoriteFoldersWithPlaceCountResponse findAllByAccount(Account account) {

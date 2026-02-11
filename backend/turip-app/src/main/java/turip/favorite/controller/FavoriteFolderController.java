@@ -28,6 +28,7 @@ import turip.favorite.controller.dto.request.FavoriteFolderRequest;
 import turip.favorite.controller.dto.response.FavoriteFolderResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithFavoriteStatusResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithPlaceCountResponse;
+import turip.favorite.controller.dto.response.FolderInvitationCodeResponse;
 import turip.favorite.service.FavoriteFolderService;
 
 @RestController
@@ -161,6 +162,115 @@ public class FavoriteFolderController {
         FavoriteFolderResponse response = favoriteFolderService.createCustomFavoriteFolder(request, account);
         return ResponseEntity.created(URI.create("/api/v1/turips/" + response.id()))
                 .body(response);
+    }
+
+    @Operation(
+            summary = "튜립 초대코드 생성 api",
+            description = "튜립을 공유하기 위한 초대코드를 생성한다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "성공 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = FolderInvitationCodeResponse.class),
+                            examples = @ExampleObject(
+                                    name = "success",
+                                    summary = "초대코드 생성 성공",
+                                    value = """
+                                            {
+                                                "invitationCode": "aZbC1dasda13"
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "access token expired",
+                                            summary = "만료된 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_EXPIRED",
+                                                    	"message": "access token이 만료됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "invalid signature access token",
+                                            summary = "서명값이 올바르지 않은 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_SIGNATURE_INVALID",
+                                                    	"message": "access token이 위조됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "unauthorized",
+                                            summary = "알 수 없는 이유로 인증 실패",
+                                            value = """
+                                                    {
+                                                    	"tag": "UNAUTHORIZED",
+                                                    	"message": "토큰 기반 인증에 실패했습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "not_turip_member",
+                                            summary = "튜립(폴더) 멤버가 아닌 경우",
+                                            value = """
+                                                    {
+                                                        "tag": "FORBIDDEN",
+                                                        "message": "접근 권한이 없습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "turip_not_found",
+                                    summary = "id에 대한 튜립을 찾을 수 없는 경우",
+                                    value = """
+                                            {
+                                                "tag": "FAVORITE_FOLDER_NOT_FOUND",
+                                                "message": "찜폴더를 찾을 수 없습니다."
+                                            }
+                                            """
+                            )
+                    )
+            )
+    })
+    @PostMapping("/{turipId}/invitation-codes")
+    public ResponseEntity<FolderInvitationCodeResponse> createInvitationCode(
+            @PathVariable("turipId") Long favoriteFolderId,
+            @Parameter(hidden = true) @AuthAccount Account account) {
+        FolderInvitationCodeResponse response = favoriteFolderService.createInvitationCode(account, favoriteFolderId);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(
