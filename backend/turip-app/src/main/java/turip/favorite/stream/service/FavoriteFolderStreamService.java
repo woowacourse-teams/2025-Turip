@@ -1,13 +1,10 @@
 package turip.favorite.stream.service;
 
-import jakarta.annotation.PreDestroy;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -25,19 +22,28 @@ import turip.favorite.stream.controller.dto.response.HeartbeatStreamResponse;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class FavoriteFolderStreamService {
 
     private static final Long DEFAULT_TIMEOUT = 3 * 60 * 1000L; // 3분
     private static final String SSE_LOG_PREFIX = "[SSE] ";
     private final Map<Long, Map<String, SseEmitter>> emitters = new ConcurrentHashMap<>();
     private final Map<String, ScheduledFuture<?>> heartbeatSchedules = new ConcurrentHashMap<>();
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    private final ScheduledExecutorService scheduler;
     @Value("${sse.heartbeat.interval:30}")
     private Long heartbeatInterval;
 
     private final FavoriteFolderService favoriteFolderService;
     private final FavoriteFolderAccountService favoriteFolderAccountService;
+
+    public FavoriteFolderStreamService(
+            FavoriteFolderService favoriteFolderService,
+            FavoriteFolderAccountService favoriteFolderAccountService,
+            ScheduledExecutorService scheduler
+    ) {
+        this.favoriteFolderService = favoriteFolderService;
+        this.favoriteFolderAccountService = favoriteFolderAccountService;
+        this.scheduler = scheduler;
+    }
 
     public SseEmitter createEmitter(Long favoriteFolderId, Member member) {
         validateIfMemberJoiningFavoriteFolder(favoriteFolderId, member);
@@ -188,19 +194,6 @@ public class FavoriteFolderStreamService {
         } catch (Exception e) {
             log.warn(SSE_LOG_PREFIX + "하트비트 전송 실패", e);
             emitter.completeWithError(e);
-        }
-    }
-
-    @PreDestroy
-    public void destroy() {
-        scheduler.shutdown();
-        try {
-            if (!scheduler.awaitTermination(45, TimeUnit.SECONDS)) {
-                scheduler.shutdownNow();
-            }
-        } catch (InterruptedException e) {
-            scheduler.shutdownNow();
-            Thread.currentThread().interrupt();
         }
     }
 }
