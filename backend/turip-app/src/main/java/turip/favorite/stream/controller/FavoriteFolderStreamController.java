@@ -48,7 +48,7 @@ public class FavoriteFolderStreamController {
                                             value = """
                                                     event: connect
                                                     id: 1738987654321
-                                                    data: {"folderId":1,"timestamp":"2025-02-08T12:00:00"}
+                                                    data: {"turipId":1,"timestamp":"2025-02-08T12:00:00"}
                                                     
                                                     """
                                     ),
@@ -58,7 +58,7 @@ public class FavoriteFolderStreamController {
                                             value = """
                                                     event: folder-update
                                                     id: 1738987654322
-                                                    data: {"folderId":1,"action":"PLACE_ADDED","timestamp":"2025-02-08T12:01:00"}
+                                                    data: {"turipId":1,"action":"PLACE_ADDED","timestamp":"2025-02-08T12:01:00"}
                                                     
                                                     """
                                     ),
@@ -128,6 +128,24 @@ public class FavoriteFolderStreamController {
                                             {
                                                 "tag": "FORBIDDEN",
                                                 "message": "접근 권한이 없습니다."
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "turip_not_found",
+                                    summary = "해당 튜립이 존재하지 않는 경우",
+                                    value = """
+                                            {
+                                                "tag": "FAVORITE_FOLDER_NOT_FOUND",
+                                                "message": "찜폴더를 찾을 수 없습니다."
                                             }
                                             """
                             )
