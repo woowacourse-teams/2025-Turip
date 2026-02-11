@@ -53,11 +53,6 @@ public class FavoriteFolderAccountService {
         return favoriteFolderAccountRepository.findMembersByFavoriteFolder(favoriteFolder);
     }
 
-    public FavoriteFolderAccount getByFavoriteFolderAndAccount(FavoriteFolder favoriteFolder, Account account) {
-        return favoriteFolderAccountRepository.findByFavoriteFolderAndAccount(favoriteFolder, account)
-                .orElseThrow(() -> new ForbiddenException(ErrorTag.FORBIDDEN));
-    }
-
     @Transactional
     public void deleteByFavoriteFolderAndAccount(FavoriteFolder favoriteFolder, Account account) {
         FavoriteFolderAccount favoriteFolderAccount = favoriteFolderAccountRepository.findByFavoriteFolderAndAccount(
