@@ -126,8 +126,8 @@ public class FavoriteFolderStreamController {
                                     summary = "해당 튜립에 접근 권한이 없는 경우",
                                     value = """
                                             {
-                                                "tag": "FOLDER_STREAM_FORBIDDEN",
-                                                "message": "폴더 스트림에 접근할 권한이 없습니다."
+                                                "tag": "FORBIDDEN",
+                                                "message": "접근 권한이 없습니다."
                                             }
                                             """
                             )

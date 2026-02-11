@@ -26,11 +26,6 @@ public interface FavoriteFolderRepository extends JpaRepository<FavoriteFolder, 
             "WHERE ffa.account = :account AND ff.isDefault = false")
     boolean existsCustomFolderByAccount(@Param("account") Account account);
 
-    @Query("SELECT CASE WHEN COUNT(ff) > 0 THEN true ELSE false END FROM FavoriteFolder ff " +
-            "JOIN FavoriteFolderAccount ffa ON ffa.favoriteFolder = ff " +
-            "WHERE ff.id = :id AND ffa.account = :account")
-    boolean existsByIdAndAccount(@Param("id") Long id, @Param("account") Account account);
-
     @Modifying
     @Query("DELETE FROM FavoriteFolder ff " +
             "WHERE ff.id IN (" +

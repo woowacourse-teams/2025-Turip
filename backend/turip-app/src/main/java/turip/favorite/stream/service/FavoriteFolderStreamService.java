@@ -14,9 +14,10 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.SseEventBuilder;
 import turip.account.domain.Member;
 import turip.common.exception.ErrorTag;
-import turip.common.exception.custom.ForbiddenException;
 import turip.common.exception.custom.InternalServerException;
-import turip.favorite.repository.FavoriteFolderRepository;
+import turip.favorite.domain.FavoriteFolder;
+import turip.favorite.service.FavoriteFolderAccountService;
+import turip.favorite.service.FavoriteFolderService;
 import turip.favorite.stream.controller.dto.response.ConnectStreamResponse;
 import turip.favorite.stream.controller.dto.response.FolderUpdateStreamResponse;
 import turip.favorite.stream.controller.dto.response.HeartbeatStreamResponse;
@@ -33,7 +34,8 @@ public class FavoriteFolderStreamService {
     private final Map<String, ScheduledFuture<?>> heartbeatSchedules = new ConcurrentHashMap<>();
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
-    private final FavoriteFolderRepository favoriteFolderRepository;
+    private final FavoriteFolderService favoriteFolderService;
+    private final FavoriteFolderAccountService favoriteFolderAccountService;
 
     public SseEmitter createEmitter(Long favoriteFolderId, Member member) {
         validateIfMemberJoiningFavoriteFolder(favoriteFolderId, member);
@@ -116,9 +118,8 @@ public class FavoriteFolderStreamService {
     }
 
     private void validateIfMemberJoiningFavoriteFolder(Long favoriteFolderId, Member member) {
-        if (!favoriteFolderRepository.existsByIdAndAccount(favoriteFolderId, member.getAccount())) {
-            throw new ForbiddenException(ErrorTag.FOLDER_STREAM_FORBIDDEN);
-        }
+        FavoriteFolder favoriteFolder = favoriteFolderService.getById(favoriteFolderId);
+        favoriteFolderAccountService.validateMembership(member.getAccount(), favoriteFolder);
     }
 
     private void sendConnectEvent(Long favoriteFolderId, Long memberId, SseEmitter emitter) {

@@ -51,6 +51,11 @@ public class FavoriteFolderService {
         return FavoriteFolderResponse.of(savedFavoriteFolder, account);
     }
 
+    public FavoriteFolder getById(Long favoriteFolderId) {
+        return favoriteFolderRepository.findById(favoriteFolderId)
+                .orElseThrow(() -> new NotFoundException(ErrorTag.FAVORITE_FOLDER_NOT_FOUND));
+    }
+
     public FavoriteFoldersWithPlaceCountResponse findAllByAccount(Account account) {
         List<FavoriteFolderWithPlaceCountResponse> favoriteFoldersWithPlaceCount = favoriteFolderRepository.findAllByAccountOrderByFavoriteFolderAccountIdAsc(
                         account).stream()
@@ -130,10 +135,5 @@ public class FavoriteFolderService {
     private Place getPlaceById(Long id) {
         return placeRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(ErrorTag.PLACE_NOT_FOUND));
-    }
-
-    private FavoriteFolder getById(Long favoriteFolderId) {
-        return favoriteFolderRepository.findById(favoriteFolderId)
-                .orElseThrow(() -> new NotFoundException(ErrorTag.FAVORITE_FOLDER_NOT_FOUND));
     }
 }
