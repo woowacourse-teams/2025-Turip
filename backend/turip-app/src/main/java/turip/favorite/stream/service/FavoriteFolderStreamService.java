@@ -138,8 +138,12 @@ public class FavoriteFolderStreamService {
 
             emitter.send(event);
         } catch (Exception e) {
-            log.error(SSE_LOG_PREFIX + "폴더 업데이트 이벤트 전송 실패, folderId: {}", favoriteFolderId, e);
-            emitter.completeWithError(e);
+            try {
+                log.error(SSE_LOG_PREFIX + "폴더 업데이트 이벤트 전송 실패, folderId: {}", favoriteFolderId, e);
+                emitter.completeWithError(e);
+            } catch (Exception completeException) {
+                log.error(SSE_LOG_PREFIX + "completeWithError 실패, folderId: {}", favoriteFolderId, completeException);
+            }
         }
     }
 
