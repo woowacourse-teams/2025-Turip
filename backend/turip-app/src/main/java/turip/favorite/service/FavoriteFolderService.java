@@ -142,7 +142,7 @@ public class FavoriteFolderService {
 
     @Transactional
     public FavoriteFolderExitResponse exitFolder(Account account, Long favoriteFolderId) {
-        FavoriteFolder favoriteFolder = getById(favoriteFolderId);
+        FavoriteFolder favoriteFolder = getByIdWithLock(favoriteFolderId);
         validateShareAndCustomFolder(favoriteFolder);
 
         FavoriteFolderAccount favoriteFolderAccount = favoriteFolderAccountService.getByFavoriteFolderAndAccount(
@@ -195,6 +195,11 @@ public class FavoriteFolderService {
 
     private FavoriteFolder getById(Long favoriteFolderId) {
         return favoriteFolderRepository.findById(favoriteFolderId)
+                .orElseThrow(() -> new NotFoundException(ErrorTag.FAVORITE_FOLDER_NOT_FOUND));
+    }
+
+    private FavoriteFolder getByIdWithLock(Long favoriteFolderId) {
+        return favoriteFolderRepository.findByIdWithLock(favoriteFolderId)
                 .orElseThrow(() -> new NotFoundException(ErrorTag.FAVORITE_FOLDER_NOT_FOUND));
     }
 
