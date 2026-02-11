@@ -479,11 +479,11 @@ class FavoriteFolderServiceTest {
         }
     }
 
-    @DisplayName("공유 폴더 초대 코드 생성 테스트")
+    @DisplayName("공유 폴더 초대 토큰 생성 테스트")
     @Nested
     class CreateInvitationCode {
 
-        @DisplayName("초대 코드를 생성할 수 있다")
+        @DisplayName("초대 토큰를 생성할 수 있다")
         @Test
         void createInvitationCode() {
             // given
@@ -504,7 +504,7 @@ class FavoriteFolderServiceTest {
             assertThat(actual.invitationCode()).isEqualTo("test_token");
         }
 
-        @DisplayName("초대 코드 최초 생성 시 공유 폴더로 변경된다")
+        @DisplayName("초대 토큰 최초 생성 시 공유 폴더로 변경된다")
         @Test
         void createInvitationCode_convertsToShared() {
             // given
@@ -527,7 +527,7 @@ class FavoriteFolderServiceTest {
         }
 
         @Test
-        @DisplayName("공유 폴더에 참여하지 않은 멤버가 초대 코드 생성 시 예외가 발생한다")
+        @DisplayName("공유 폴더에 참여하지 않은 멤버가 초대 토큰 생성 시 예외가 발생한다")
         void createInvitationCode_Forbidden() {
             // given
             Long accountId = 1L;
@@ -542,7 +542,81 @@ class FavoriteFolderServiceTest {
 
             // when & then
             assertThatThrownBy(() -> favoriteFolderService.createInvitationCode(account, folderId))
-                    .isInstanceOf(ForbiddenException.class);
+                    .isInstanceOf(ForbiddenException.class)
+                    .hasMessage(ErrorTag.FORBIDDEN.getMessage());
+
+        }
+    }
+
+    @DisplayName("공유 폴더 초대 토큰 검증 테스트")
+    @Nested
+    class VerifyInvitation {
+
+        @DisplayName("유효한 토큰을 검증하고 폴더 id를 응답한다")
+        @Test
+        void verifyInvitation_success() {
+            // given
+            String token = "valid_token";
+            Long folderId = 1L;
+
+            given(invitationTokenProvider.getClaimOfName(token, "fid", Long.class))
+                    .willReturn(folderId);
+            given(favoriteFolderRepository.existsById(folderId))
+                    .willReturn(true);
+
+            // when
+            var response = favoriteFolderService.getInvitationDetails(token);
+
+            // then
+            assertThat(response.turipId()).isEqualTo(folderId);
+        }
+
+        @DisplayName("토큰에 해당하는 폴더가 존재하지 않으면 NotFoundException을 발생시킨다")
+        @Test
+        void verifyInvitation_folderNotFound() {
+            // given
+            String token = "valid_token";
+            Long folderId = 1L;
+
+            given(invitationTokenProvider.getClaimOfName(token, "fid", Long.class))
+                    .willReturn(folderId);
+            given(favoriteFolderRepository.existsById(folderId))
+                    .willReturn(false);
+
+            // when & then
+            assertThatThrownBy(() -> favoriteFolderService.getInvitationDetails(token))
+                    .isInstanceOf(NotFoundException.class)
+                    .hasMessage(ErrorTag.FAVORITE_FOLDER_NOT_FOUND.getMessage());
+        }
+
+        @DisplayName("토큰이 만료되었으면 BadRequestException을 발생시킨다")
+        @Test
+        void verifyInvitation_expiredToken() {
+            // given
+            String token = "expired_token";
+
+            given(invitationTokenProvider.getClaimOfName(token, "fid", Long.class))
+                    .willThrow(new BadRequestException(ErrorTag.INVITATION_TOKEN_EXPIRED));
+
+            // when & then
+            assertThatThrownBy(() -> favoriteFolderService.getInvitationDetails(token))
+                    .isInstanceOf(BadRequestException.class)
+                    .hasMessage(ErrorTag.INVITATION_TOKEN_EXPIRED.getMessage());
+        }
+
+        @DisplayName("토큰이 유효하지 않으면 BadRequestException을 발생시킨다")
+        @Test
+        void verifyInvitation_invalidToken() {
+            // given
+            String token = "invalid_token";
+
+            given(invitationTokenProvider.getClaimOfName(token, "fid", Long.class))
+                    .willThrow(new BadRequestException(ErrorTag.INVALID_INVITATION_TOKEN));
+
+            // when & then
+            assertThatThrownBy(() -> favoriteFolderService.getInvitationDetails(token))
+                    .isInstanceOf(BadRequestException.class)
+                    .hasMessage(ErrorTag.INVALID_INVITATION_TOKEN.getMessage());
         }
     }
 }
