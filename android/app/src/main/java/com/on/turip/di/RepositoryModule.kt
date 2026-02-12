@@ -1,24 +1,22 @@
 package com.on.turip.di
 
-import com.on.turip.data.content.place.repository.DefaultContentPlaceRepository
+import com.on.turip.data.bookmarks.repository.DefaultBookmarkRepository
 import com.on.turip.data.content.repository.DefaultContentRepository
-import com.on.turip.data.favorite.repository.DefaultFavoriteRepository
-import com.on.turip.data.folder.repository.DefaultFolderRepository
 import com.on.turip.data.login.repository.DefaultAuthRepository
+import com.on.turip.data.login.repository.DefaultGuestRepository
 import com.on.turip.data.login.repository.DefaultMemberRepository
-import com.on.turip.data.place.repository.DefaultFavoritePlaceRepository
 import com.on.turip.data.region.repository.DefaultRegionRepository
 import com.on.turip.data.searchhistory.repository.DefaultSearchHistoryRepository
+import com.on.turip.data.turip.repository.DefaultTuripRepository
 import com.on.turip.data.userstorage.repository.DefaultUserStorageRepository
+import com.on.turip.domain.bookmark.repository.BookmarkRepository
 import com.on.turip.domain.content.repository.ContentRepository
-import com.on.turip.domain.favorite.repository.FavoritePlaceRepository
-import com.on.turip.domain.favorite.repository.FavoriteRepository
-import com.on.turip.domain.folder.repository.FolderRepository
 import com.on.turip.domain.login.AuthRepository
+import com.on.turip.domain.login.GuestRepository
 import com.on.turip.domain.login.MemberRepository
 import com.on.turip.domain.region.repository.RegionRepository
 import com.on.turip.domain.searchhistory.SearchHistoryRepository
-import com.on.turip.domain.trip.repository.ContentPlaceRepository
+import com.on.turip.domain.turip.repository.TuripRepository
 import com.on.turip.domain.userstorage.repository.UserStorageRepository
 import dagger.Binds
 import dagger.Module
@@ -35,10 +33,6 @@ abstract class RepositoryModule {
 
     @Binds
     @Singleton
-    abstract fun bindContentPlaceRepository(defaultContentPlaceRepository: DefaultContentPlaceRepository): ContentPlaceRepository
-
-    @Binds
-    @Singleton
     abstract fun bindRegionRepository(defaultRegionRepository: DefaultRegionRepository): RegionRepository
 
     @Binds
@@ -47,7 +41,7 @@ abstract class RepositoryModule {
 
     @Binds
     @Singleton
-    abstract fun bindFavoriteRepository(defaultFavoriteRepository: DefaultFavoriteRepository): FavoriteRepository
+    abstract fun bindBookmarkRepository(defaultBookmarkRepository: DefaultBookmarkRepository): BookmarkRepository
 
     @Binds
     @Singleton
@@ -55,11 +49,7 @@ abstract class RepositoryModule {
 
     @Binds
     @Singleton
-    abstract fun bindFolderRepository(defaultFolderRepository: DefaultFolderRepository): FolderRepository
-
-    @Binds
-    @Singleton
-    abstract fun bindFavoritePlaceRepository(defaultFavoritePlaceRepository: DefaultFavoritePlaceRepository): FavoritePlaceRepository
+    abstract fun bindTuripRepository(defaultTuripRepository: DefaultTuripRepository): TuripRepository
 
     @Binds
     @Singleton
@@ -68,4 +58,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindMemberRepository(defaultMemberRepository: DefaultMemberRepository): MemberRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindGuestRepository(defaultGuestRepository: DefaultGuestRepository): GuestRepository
 }

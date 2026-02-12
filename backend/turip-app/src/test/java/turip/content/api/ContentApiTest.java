@@ -64,7 +64,7 @@ class ContentApiTest {
         jdbcTemplate.update("ALTER TABLE account ALTER COLUMN id RESTART WITH 1");
     }
 
-    @DisplayName("/contents/{contentId} GET 컨텐츠 단건 조회 테스트")
+    @DisplayName("/api/v1/contents/{contentId} GET 컨텐츠 단건 조회 테스트")
     @Nested
     class ReadContentById {
         @DisplayName("contentId로 컨텐츠 단건 조회 성공 시 200 OK 코드와 컨텐츠 정보를 응답한다")
@@ -87,7 +87,7 @@ class ContentApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .when().get("/contents/{id}", 1)
+                    .when().get("/api/v1/contents/{id}", 1)
                     .then()
                     .statusCode(200)
                     .body("id", is(1))
@@ -96,10 +96,10 @@ class ContentApiTest {
                     .body("title", is("서울 데이트 코스 추천"))
                     .body("url", is("https://youtube.com/watch?v=abcd1"))
                     .body("uploadedDate", is("2024-07-01"))
-                    .body("isFavorite", is(false));
+                    .body("isBookmarked", is(false));
         }
 
-        @DisplayName("해당 계정에 찜이 되어 있는 경우 isFavorite이 true로 응답된다")
+        @DisplayName("해당 계정에 찜이 되어 있는 경우 isBookmarked가 true로 응답된다")
         @Test
         void readContentById_withDeviceFidHeader() {
             // given
@@ -121,7 +121,7 @@ class ContentApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .when().get("/contents/{id}", 1)
+                    .when().get("/api/v1/contents/{id}", 1)
                     .then()
                     .statusCode(200)
                     .body("id", is(1))
@@ -130,7 +130,7 @@ class ContentApiTest {
                     .body("title", is("서울 데이트 코스 추천"))
                     .body("url", is("https://youtube.com/watch?v=abcd1"))
                     .body("uploadedDate", is("2024-07-01"))
-                    .body("isFavorite", is(true));
+                    .body("isBookmarked", is(true));
         }
 
         @DisplayName("id에 해당하는 컨텐츠가 없는 경우 404 NOT FOUND 코드를 응답한다")
@@ -153,13 +153,13 @@ class ContentApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .when().get("/contents/{id}", 20)
+                    .when().get("/api/v1/contents/{id}", 20)
                     .then()
                     .statusCode(404);
         }
     }
 
-    @DisplayName("/contents/popular/favorites GET 주간 인기 컨텐츠 조회 테스트")
+    @DisplayName("/api/v1/contents/popular GET 주간 인기 컨텐츠 조회 테스트")
     @Nested
     class ReadWeeklyPopularFavoriteContentContents {
 
@@ -185,7 +185,7 @@ class ContentApiTest {
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
                     .queryParam("size", 5)
-                    .when().get("/contents/popular/favorites")
+                    .when().get("/api/v1/contents/popular")
                     .then()
                     .statusCode(200);
         }

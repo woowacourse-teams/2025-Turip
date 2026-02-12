@@ -1,22 +1,26 @@
 package turip.favorite.controller.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
+import turip.account.domain.Account;
 import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.domain.FavoritePlace;
 import turip.place.controller.dto.response.PlaceResponse;
 
 public record FavoriteFolderWithFavoriteStatusResponse(
         Long id,
-        Long memberId,
+        Long accountId,
         String name,
         boolean isDefault,
+        @JsonProperty("isTuripPlace")
         boolean isFavoritePlace
 ) {
 
-    public static FavoriteFolderWithFavoriteStatusResponse of(FavoriteFolder favoriteFolder, boolean isFavoritePlace) {
+    public static FavoriteFolderWithFavoriteStatusResponse of(FavoriteFolder favoriteFolder, Account account,
+                                                              boolean isFavoritePlace) {
         return new FavoriteFolderWithFavoriteStatusResponse(
                 favoriteFolder.getId(),
-                favoriteFolder.getAccount().getId(),
+                account.getId(),
                 favoriteFolder.getName(),
                 favoriteFolder.isDefault(),
                 isFavoritePlace
@@ -25,6 +29,7 @@ public record FavoriteFolderWithFavoriteStatusResponse(
 
     public record FavoritePlaceResponse(
             Long id,
+            @JsonProperty("turipId")
             Long favoriteFolderId,
             Long placeId
     ) {
@@ -39,7 +44,10 @@ public record FavoriteFolderWithFavoriteStatusResponse(
     }
 
     public record FavoritePlacesWithPlaceDetailResponse(
-            List<FavoritePlaceWithPlaceDetailResponse> favoritePlaces, Integer favoritePlaceCount) {
+            @JsonProperty("turipPlaces")
+            List<FavoritePlaceWithPlaceDetailResponse> favoritePlaces,
+            @JsonProperty("turipPlaceCount")
+            Integer favoritePlaceCount) {
 
         public static FavoritePlacesWithPlaceDetailResponse from(
                 List<FavoritePlaceWithPlaceDetailResponse> favoritePlaces) {
@@ -50,6 +58,7 @@ public record FavoriteFolderWithFavoriteStatusResponse(
     public record FavoritePlaceWithPlaceDetailResponse(
             Long id,
             PlaceResponse place,
+            @JsonProperty("turipPlaceOrder")
             Integer favoriteOrder
     ) {
 

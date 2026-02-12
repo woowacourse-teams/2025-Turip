@@ -8,6 +8,4 @@ interface MemberDataSource {
     suspend fun postLogout(): TuripResult<Unit>
 
     suspend fun deleteMember(): TuripResult<Unit>
-
-    suspend fun deleteGuest(): TuripResult<Unit>
 }

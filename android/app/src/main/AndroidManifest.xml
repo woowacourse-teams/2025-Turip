@@ -24,7 +24,7 @@
             android:name=".ui.login.LoginActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.folder.FolderActivity"
+            android:name=".ui.folder.TuripActivity"
             android:exported="false" />
         <activity
             android:name=".ui.search.keywordresult.SearchActivity"

@@ -22,7 +22,7 @@ import turip.common.exception.ErrorResponse;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/guests")
+@RequestMapping("/api/v1/guests")
 @Tag(name = "Guest", description = "게스트 API")
 public class GuestController {
 

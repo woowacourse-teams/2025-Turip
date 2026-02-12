@@ -5,8 +5,12 @@ import com.on.turip.ui.common.error.ErrorUiState
 sealed interface TripDetailUiEffect {
     data object NavigateToLogin : TripDetailUiEffect
 
-    data class ShowFavoriteStatus(
-        val isFavorite: Boolean,
+    data class ShowBookmarkStatus(
+        val isBookmarked: Boolean,
+    ) : TripDetailUiEffect
+
+    data class ShowUpdatedTuripSelectionByPlace(
+        val placeName: String,
     ) : TripDetailUiEffect
 
     data class ShowError(
@@ -16,5 +20,5 @@ sealed interface TripDetailUiEffect {
 }
 
 sealed interface TripDetailRetryAction {
-    data object UpdateFavorite : TripDetailRetryAction
+    data object UpdateBookmark : TripDetailRetryAction
 }

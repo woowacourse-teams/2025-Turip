@@ -18,13 +18,13 @@ import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 @Composable
 fun TripDetailAppBar(
     isError: Boolean,
-    isContentFavorite: Boolean,
+    isBookmarked: Boolean,
     onBackClick: () -> Unit,
-    onContentFavoriteClick: () -> Unit,
+    onBookmarkClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val contentFavoriteIconRes =
-        if (isContentFavorite) R.drawable.btn_bookmark_selected else R.drawable.btn_bookmark_normal
+    val bookmarkIconRes =
+        if (isBookmarked) R.drawable.btn_bookmark_selected else R.drawable.btn_bookmark_normal
 
     TuripAppBar(
         contentColor = TuripTheme.colors.white,
@@ -39,11 +39,11 @@ fun TripDetailAppBar(
         end = {
             if (!isError) {
                 Icon(
-                    painter = painterResource(contentFavoriteIconRes),
-                    contentDescription = stringResource(R.string.trip_detail_favorite_description),
+                    painter = painterResource(bookmarkIconRes),
+                    contentDescription = stringResource(R.string.trip_detail_bookmark_description),
                     modifier =
                         Modifier
-                            .clickable(onClick = onContentFavoriteClick)
+                            .clickable(onClick = onBookmarkClick)
                             .size(20.dp),
                 )
             }
@@ -52,41 +52,41 @@ fun TripDetailAppBar(
     )
 }
 
-@Preview(showBackground = true, name = "컨텐츠 찜한 상태")
+@Preview(showBackground = true, name = "컨텐츠 북마크 선택 상태")
 @Composable
-private fun IsFavoriteTripAppBarPreview() {
+private fun IsBookmarkedTripDetailAppBarPreview() {
     TuripTheme {
         TripDetailAppBar(
             isError = false,
-            isContentFavorite = true,
+            isBookmarked = true,
             onBackClick = { },
-            onContentFavoriteClick = { },
+            onBookmarkClick = { },
         )
     }
 }
 
-@Preview(showBackground = true, name = "컨텐츠 찜하지 않은 상태")
+@Preview(showBackground = true, name = "컨텐츠 북마크 해제 상태")
 @Composable
-private fun IsNotFavoriteTripAppBarPreview() {
+private fun IsNotBookmarkedTripDetailAppBarPreview() {
     TuripTheme {
         TripDetailAppBar(
             isError = false,
-            isContentFavorite = false,
+            isBookmarked = false,
             onBackClick = { },
-            onContentFavoriteClick = { },
+            onBookmarkClick = { },
         )
     }
 }
 
 @Preview(showBackground = true, name = "화면에 에러 발생")
 @Composable
-private fun ErrorFavoriteTripAppBarPreview() {
+private fun ErrorTripDetailAppBarPreview() {
     TuripTheme {
         TripDetailAppBar(
             isError = true,
-            isContentFavorite = false,
+            isBookmarked = false,
             onBackClick = { },
-            onContentFavoriteClick = { },
+            onBookmarkClick = { },
         )
     }
 }

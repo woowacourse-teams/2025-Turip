@@ -17,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
+import turip.favorite.domain.AccountRole;
 import turip.util.helper.TestDataHelper;
 
 @ActiveProfiles("test")
@@ -40,6 +41,7 @@ class FavoritePlaceApiTest {
         jdbcTemplate.update("DELETE FROM place");
         jdbcTemplate.update("DELETE FROM category");
         jdbcTemplate.update("DELETE FROM favorite_content");
+        jdbcTemplate.update("DELETE FROM favorite_folder_account");
         jdbcTemplate.update("DELETE FROM favorite_folder");
         jdbcTemplate.update("DELETE FROM guest");
         jdbcTemplate.update("DELETE FROM refresh_token");
@@ -69,9 +71,10 @@ class FavoritePlaceApiTest {
         jdbcTemplate.update("ALTER TABLE member ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE refresh_token ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE account ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE favorite_folder_account ALTER COLUMN id RESTART WITH 1");
     }
 
-    @DisplayName("/favorites/places POST 장소 찜 생성 테스트")
+    @DisplayName("/api/v1/turips/places POST 장소 찜 생성 테스트")
     @Nested
     class Create {
 
@@ -80,19 +83,18 @@ class FavoritePlaceApiTest {
         void create1() {
             Long accountId = testDataHelper.insertAccount();
             jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
-            jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '잠실캠 맛집 모음', false)",
-                    accountId);
+            Long folderId = testDataHelper.insertFavoriteFolder("테스트 폴더");
+            testDataHelper.insertFavoriteFolderAccount(accountId, folderId, AccountRole.OWNER);
             jdbcTemplate.update(
                     "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('루터회관','https://naver.me/5UrZAIeY', '루터회관의 도로명 주소', 38.1234, 127.23123)");
 
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("turipId", 1L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
-                    .when().post("/favorites/places")
+                    .when().post("/api/v1/turips/places")
                     .then()
                     .statusCode(201);
         }
@@ -103,19 +105,18 @@ class FavoritePlaceApiTest {
             // given
             Long accountId = testDataHelper.insertAccount();
             jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
-            jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '테스트 폴더', false)",
-                    accountId);
+            Long folderId = testDataHelper.insertFavoriteFolder("테스트 폴더");
+            testDataHelper.insertFavoriteFolderAccount(accountId, folderId, AccountRole.OWNER);
             jdbcTemplate.update(
                     "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('첫 번째 장소','https://naver.me/place1', '첫 번째 장소 주소', 37.1234, 127.1234)");
 
             // when
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("turipId", 1L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
-                    .when().post("/favorites/places")
+                    .when().post("/api/v1/turips/places")
                     .then()
                     .statusCode(201);
 
@@ -132,9 +133,8 @@ class FavoritePlaceApiTest {
             // given
             Long accountId = testDataHelper.insertAccount();
             jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
-            jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '테스트 폴더', false)",
-                    accountId);
+            Long folderId = testDataHelper.insertFavoriteFolder("테스트 폴더");
+            testDataHelper.insertFavoriteFolderAccount(accountId, folderId, AccountRole.OWNER);
             jdbcTemplate.update(
                     "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('첫 번째 장소','https://naver.me/place1', '첫 번째 장소 주소', 37.1234, 127.1234)");
             jdbcTemplate.update(
@@ -145,10 +145,10 @@ class FavoritePlaceApiTest {
             // when
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("turipId", 1L)
                     .queryParam("placeId", 2L)
                     .contentType(ContentType.JSON)
-                    .when().post("/favorites/places")
+                    .when().post("/api/v1/turips/places")
                     .then()
                     .statusCode(201);
 
@@ -165,9 +165,8 @@ class FavoritePlaceApiTest {
             // given
             Long accountId = testDataHelper.insertAccount();
             jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
-            jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '테스트 폴더', false)",
-                    accountId);
+            Long folderId = testDataHelper.insertFavoriteFolder("테스트 폴더");
+            testDataHelper.insertFavoriteFolderAccount(accountId, folderId, AccountRole.OWNER);
             jdbcTemplate.update(
                     "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('장소1','https://naver.me/place1', '장소1 주소', 37.1234, 127.1234)");
             jdbcTemplate.update(
@@ -178,28 +177,28 @@ class FavoritePlaceApiTest {
             // when - 3개의 장소를 순차적으로 찜
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("turipId", 1L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
-                    .when().post("/favorites/places")
+                    .when().post("/api/v1/turips/places")
                     .then()
                     .statusCode(201);
 
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("turipId", 1L)
                     .queryParam("placeId", 2L)
                     .contentType(ContentType.JSON)
-                    .when().post("/favorites/places")
+                    .when().post("/api/v1/turips/places")
                     .then()
                     .statusCode(201);
 
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("turipId", 1L)
                     .queryParam("placeId", 3L)
                     .contentType(ContentType.JSON)
-                    .when().post("/favorites/places")
+                    .when().post("/api/v1/turips/places")
                     .then()
                     .statusCode(201);
 
@@ -224,19 +223,18 @@ class FavoritePlaceApiTest {
         void create5() {
             Long accountId = testDataHelper.insertAccount();
             jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'may')", accountId);
-            jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '잠실캠 맛집 모음', false)",
-                    accountId);
+            Long folderId = testDataHelper.insertFavoriteFolder("테스트 폴더");
+            testDataHelper.insertFavoriteFolderAccount(accountId, folderId, AccountRole.OWNER);
             jdbcTemplate.update(
                     "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('루터회관','https://naver.me/5UrZAIeY', '루터회관의 도로명 주소', 38.1234, 127.23123)");
 
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "cool")
-                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("turipId", 1L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
-                    .when().post("/favorites/places")
+                    .when().post("/api/v1/turips/places")
                     .then()
                     .statusCode(403);
         }
@@ -252,10 +250,10 @@ class FavoritePlaceApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("turipId", 1L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
-                    .when().post("/favorites/places")
+                    .when().post("/api/v1/turips/places")
                     .then()
                     .statusCode(404);
         }
@@ -265,17 +263,16 @@ class FavoritePlaceApiTest {
         void create7() {
             Long accountId = testDataHelper.insertAccount();
             jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
-            jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '잠실캠 맛집 모음', false)",
-                    accountId);
+            Long folderId = testDataHelper.insertFavoriteFolder("테스트 폴더");
+            testDataHelper.insertFavoriteFolderAccount(accountId, folderId, AccountRole.OWNER);
 
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("turipId", 1L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
-                    .when().post("/favorites/places")
+                    .when().post("/api/v1/turips/places")
                     .then()
                     .statusCode(404);
         }
@@ -285,9 +282,8 @@ class FavoritePlaceApiTest {
         void create8() {
             Long accountId = testDataHelper.insertAccount();
             jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
-            jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '잠실캠 맛집 모음', false)",
-                    accountId);
+            Long folderId = testDataHelper.insertFavoriteFolder("테스트 폴더");
+            testDataHelper.insertFavoriteFolderAccount(accountId, folderId, AccountRole.OWNER);
             jdbcTemplate.update(
                     "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('루터회관','https://naver.me/5UrZAIeY', '루터회관의 도로명 주소', 38.1234, 127.23123)");
             jdbcTemplate.update("INSERT INTO favorite_place (favorite_folder_id, place_id) VALUES (1, 1)");
@@ -295,16 +291,16 @@ class FavoritePlaceApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("turipId", 1L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
-                    .when().post("/favorites/places")
+                    .when().post("/api/v1/turips/places")
                     .then()
                     .statusCode(409);
         }
     }
 
-    @DisplayName("/favorites/places GET 장소 찜 폴더의 장소 찜 목록 조회 테스트")
+    @DisplayName("/api/v1/turips/places GET 장소 찜 폴더의 장소 찜 목록 조회 테스트")
     @Nested
     class ReadAllByFolder {
 
@@ -314,9 +310,8 @@ class FavoritePlaceApiTest {
             // given
             Long accountId = testDataHelper.insertAccount();
             jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
-            jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '잠실캠 맛집 모음', false)",
-                    accountId);
+            Long folderId = testDataHelper.insertFavoriteFolder("테스트 폴더");
+            testDataHelper.insertFavoriteFolderAccount(accountId, folderId, AccountRole.OWNER);
             jdbcTemplate.update(
                     "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('루터회관','https://naver.me/5UrZAIeY', '루터회관의 도로명 주소', 38.1234, 127.23123)");
             jdbcTemplate.update(
@@ -328,14 +323,14 @@ class FavoritePlaceApiTest {
 
             // when & then
             RestAssured.given().port(port)
-                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("turipId", 1L)
                     .contentType(ContentType.JSON)
-                    .when().get("/favorites/places")
+                    .when().get("/api/v1/turips/places")
                     .then()
                     .statusCode(200)
-                    .body("favoritePlaceCount", is(2))
-                    .body("favoritePlaces[0].place.name", is("루터회관"))
-                    .body("favoritePlaces[1].place.name", is("스타벅스"));
+                    .body("turipPlaceCount", is(2))
+                    .body("turipPlaces[0].place.name", is("루터회관"))
+                    .body("turipPlaces[1].place.name", is("스타벅스"));
         }
 
         @DisplayName("장소가 favoriteOrder 오름차순으로 정렬되어 반환된다")
@@ -344,9 +339,8 @@ class FavoritePlaceApiTest {
             // given
             Long accountId = testDataHelper.insertAccount();
             jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
-            jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '테스트 폴더', false)",
-                    accountId);
+            Long folderId = testDataHelper.insertFavoriteFolder("테스트 폴더");
+            testDataHelper.insertFavoriteFolderAccount(accountId, folderId, AccountRole.OWNER);
 
             for (int i = 1; i <= 5; i++) {
                 jdbcTemplate.update(
@@ -368,17 +362,17 @@ class FavoritePlaceApiTest {
 
             // when & then - favoriteOrder 오름차순으로 정렬되어 반환되는지 확인
             RestAssured.given().port(port)
-                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("turipId", 1L)
                     .contentType(ContentType.JSON)
-                    .when().get("/favorites/places")
+                    .when().get("/api/v1/turips/places")
                     .then()
                     .statusCode(200)
-                    .body("favoritePlaceCount", is(5))
-                    .body("favoritePlaces[0].place.name", is("장소2"))  // favoriteOrder 1
-                    .body("favoritePlaces[1].place.name", is("장소4"))  // favoriteOrder 2
-                    .body("favoritePlaces[2].place.name", is("장소3"))  // favoriteOrder 3
-                    .body("favoritePlaces[3].place.name", is("장소5"))  // favoriteOrder 4
-                    .body("favoritePlaces[4].place.name", is("장소1")); // favoriteOrder 5
+                    .body("turipPlaceCount", is(5))
+                    .body("turipPlaces[0].place.name", is("장소2"))  // favoriteOrder 1
+                    .body("turipPlaces[1].place.name", is("장소4"))  // favoriteOrder 2
+                    .body("turipPlaces[2].place.name", is("장소3"))  // favoriteOrder 3
+                    .body("turipPlaces[3].place.name", is("장소5"))  // favoriteOrder 4
+                    .body("turipPlaces[4].place.name", is("장소1")); // favoriteOrder 5
         }
 
         @DisplayName("favoriteFolderId에 대한 폴더가 존재하지 않는 경우 404 NOT FOUND를 응답한다")
@@ -386,15 +380,15 @@ class FavoritePlaceApiTest {
         void readAllByFolder3() {
             // when & then
             RestAssured.given().port(port)
-                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("turipId", 1L)
                     .contentType(ContentType.JSON)
-                    .when().get("/favorites/places")
+                    .when().get("/api/v1/turips/places")
                     .then()
                     .statusCode(404);
         }
     }
 
-    @DisplayName("/favorites/places PUT 여러 폴더에 장소 찜 테스트")
+    @DisplayName("/api/v1/turips/places PUT 여러 폴더에 장소 찜 테스트")
     @Nested
     class UpdateFavoriteFolders {
 
@@ -404,12 +398,12 @@ class FavoritePlaceApiTest {
             // given
             Long accountId = testDataHelper.insertAccount();
             jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
-            jdbcTemplate.update("INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '폴더1', false)",
-                    accountId);
-            jdbcTemplate.update("INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '폴더2', false)",
-                    accountId);
-            jdbcTemplate.update("INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '폴더3', false)",
-                    accountId);
+            Long folderId1 = testDataHelper.insertFavoriteFolder("폴더 1");
+            Long folderId2 = testDataHelper.insertFavoriteFolder("폴더 2");
+            Long folderId3 = testDataHelper.insertFavoriteFolder("폴더 3");
+            testDataHelper.insertFavoriteFolderAccount(accountId, folderId1, AccountRole.OWNER);
+            testDataHelper.insertFavoriteFolderAccount(accountId, folderId2, AccountRole.OWNER);
+            testDataHelper.insertFavoriteFolderAccount(accountId, folderId3, AccountRole.OWNER);
             jdbcTemplate.update(
                     "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('장소1','https://naver.me/place1', '주소', 37.1234, 127.1234)");
 
@@ -419,19 +413,19 @@ class FavoritePlaceApiTest {
 
             // when & then
             Map<String, Object> request = new HashMap<>();
-            request.put("favoriteFolderIds", List.of(1L, 2L, 3L));
+            request.put("turipIds", List.of(1L, 2L, 3L));
 
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
                     .body(request)
                     .contentType(ContentType.JSON)
-                    .when().put("/favorites/places/{placeId}", 1L)
+                    .when().put("/api/v1/turips/places/{placeId}", 1L)
                     .then()
                     .statusCode(200);
         }
     }
 
-    @DisplayName("/favorites/places/count GET 계정의 장소 찜 개수 조회 테스트")
+    @DisplayName("/api/v1/turips/places/count GET 계정의 장소 찜 개수 조회 테스트")
     @Nested
     class ReadCountByAccount {
 
@@ -441,9 +435,8 @@ class FavoritePlaceApiTest {
             // given
             Long accountId = testDataHelper.insertAccount();
             jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
-            jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '테스트 폴더', false)",
-                    accountId);
+            Long folderId = testDataHelper.insertFavoriteFolder("테스트 폴더");
+            testDataHelper.insertFavoriteFolderAccount(accountId, folderId, AccountRole.OWNER);
             jdbcTemplate.update(
                     "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('장소1','https://naver.me/place1', '장소1 주소', 37.1234, 127.1234)");
             jdbcTemplate.update(
@@ -457,14 +450,14 @@ class FavoritePlaceApiTest {
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
                     .contentType(ContentType.JSON)
-                    .when().get("/favorites/places/count")
+                    .when().get("/api/v1/turips/places/count")
                     .then()
                     .statusCode(200)
                     .body("count", is(2));
         }
     }
 
-    @DisplayName("/favorites/places/favorite-order PATCH 장소 찜 폴더 정렬 순서 변경 테스트")
+    @DisplayName("/api/v1/turips/places/turip-order PATCH 장소 찜 폴더 정렬 순서 변경 테스트")
     @Nested
     class UpdatePlaceOrder {
 
@@ -474,9 +467,8 @@ class FavoritePlaceApiTest {
             // given
             Long accountId = testDataHelper.insertAccount();
             jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
-            jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '테스트 폴더', false)",
-                    accountId);
+            Long folderId = testDataHelper.insertFavoriteFolder("테스트 폴더");
+            testDataHelper.insertFavoriteFolderAccount(accountId, folderId, AccountRole.OWNER);
             jdbcTemplate.update(
                     "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('장소1','https://naver.me/place1', '장소1 주소', 37.1234, 127.1234)");
             jdbcTemplate.update(
@@ -488,14 +480,14 @@ class FavoritePlaceApiTest {
 
             // when & then
             Map<String, Object> request = new HashMap<>();
-            request.put("favoritePlaceIdsOrder", List.of(2L, 1L)); // 순서 바꾸기
+            request.put("turipPlaceIdsOrder", List.of(2L, 1L)); // 순서 바꾸기
 
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("turipId", 1L)
                     .body(request)
                     .contentType(ContentType.JSON)
-                    .when().patch("/favorites/places/favorite-order")
+                    .when().patch("/api/v1/turips/places/turip-order")
                     .then()
                     .statusCode(204);
         }
@@ -509,14 +501,14 @@ class FavoritePlaceApiTest {
 
             // when & then
             Map<String, Object> request = new HashMap<>();
-            request.put("favoritePlaceIdsOrder", List.of(1L));
+            request.put("turipPlaceIdsOrder", List.of(1L));
 
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("favoriteFolderId", 999L)
+                    .queryParam("turipId", 999L)
                     .body(request)
                     .contentType(ContentType.JSON)
-                    .when().patch("/favorites/places/favorite-order")
+                    .when().patch("/api/v1/turips/places/turip-order")
                     .then()
                     .statusCode(404);
         }
@@ -531,20 +523,19 @@ class FavoritePlaceApiTest {
             Long requestAccountId = testDataHelper.insertAccount();
             jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'requestDeviceFid')",
                     requestAccountId);
-            jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '다른 사람의 폴더', false)",
-                    ownerAccountId);
+            Long folderId = testDataHelper.insertFavoriteFolder("테스트 폴더");
+            testDataHelper.insertFavoriteFolderAccount(ownerAccountId, folderId, AccountRole.OWNER);
 
             // when & then
             Map<String, Object> request = new HashMap<>();
-            request.put("favoritePlaceIdsOrder", List.of(1L));
+            request.put("turipPlaceIdsOrder", List.of(1L));
 
             RestAssured.given().port(port)
                     .header("device-fid", "requestDeviceFid")
-                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("turipId", 1L)
                     .body(request)
                     .contentType(ContentType.JSON)
-                    .when().patch("/favorites/places/favorite-order")
+                    .when().patch("/api/v1/turips/places/turip-order")
                     .then()
                     .statusCode(403);
         }
@@ -555,20 +546,19 @@ class FavoritePlaceApiTest {
             // given
             Long accountId = testDataHelper.insertAccount();
             jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
-            jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '테스트 폴더', false)",
-                    accountId);
+            Long folderId = testDataHelper.insertFavoriteFolder("테스트 폴더");
+            testDataHelper.insertFavoriteFolderAccount(accountId, folderId, AccountRole.OWNER);
 
             // when & then
             Map<String, Object> request = new HashMap<>();
-            request.put("favoritePlaceIdsOrder", List.of(999L)); // 존재하지 않는 favoritePlaceId
+            request.put("turipPlaceIdsOrder", List.of(999L)); // 존재하지 않는 favoritePlaceId
 
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("turipId", 1L)
                     .body(request)
                     .contentType(ContentType.JSON)
-                    .when().patch("/favorites/places/favorite-order")
+                    .when().patch("/api/v1/turips/places/turip-order")
                     .then()
                     .statusCode(404);
         }
@@ -579,10 +569,10 @@ class FavoritePlaceApiTest {
             // given
             Long accountId = testDataHelper.insertAccount();
             jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
-            jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '폴더1', false)", accountId);
-            jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '폴더2', false)", accountId);
+            Long folderId1 = testDataHelper.insertFavoriteFolder("폴더1");
+            Long folderId2 = testDataHelper.insertFavoriteFolder("폴더2");
+            testDataHelper.insertFavoriteFolderAccount(accountId, folderId1, AccountRole.OWNER);
+            testDataHelper.insertFavoriteFolderAccount(accountId, folderId2, AccountRole.OWNER);
             jdbcTemplate.update(
                     "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('장소1','https://naver.me/place1', '장소1 주소', 37.1234, 127.1234)");
             jdbcTemplate.update(
@@ -590,20 +580,20 @@ class FavoritePlaceApiTest {
 
             // when & then
             Map<String, Object> request = new HashMap<>();
-            request.put("favoritePlaceIdsOrder", List.of(1L)); // 폴더2의 favoritePlaceId를 폴더1에서 사용
+            request.put("turipPlaceIdsOrder", List.of(1L)); // 폴더2의 favoritePlaceId를 폴더1에서 사용
 
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("turipId", 1L)
                     .body(request)
                     .contentType(ContentType.JSON)
-                    .when().patch("/favorites/places/favorite-order")
+                    .when().patch("/api/v1/turips/places/turip-order")
                     .then()
                     .statusCode(400);
         }
     }
 
-    @DisplayName("/favorites/places DELETE 장소 찜 삭제 테스트")
+    @DisplayName("/api/v1/turips/places DELETE 장소 찜 삭제 테스트")
     @Nested
     class Delete {
 
@@ -612,9 +602,8 @@ class FavoritePlaceApiTest {
         void delete1() {
             Long accountId = testDataHelper.insertAccount();
             jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
-            jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '잠실캠 맛집 모음', false)",
-                    accountId);
+            Long folderId = testDataHelper.insertFavoriteFolder("테스트 폴더");
+            testDataHelper.insertFavoriteFolderAccount(accountId, folderId, AccountRole.OWNER);
             jdbcTemplate.update(
                     "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('루터회관','https://naver.me/5UrZAIeY', '루터회관의 도로명 주소', 38.1234, 127.23123)");
             jdbcTemplate.update("INSERT INTO favorite_place (favorite_folder_id, place_id) VALUES (1, 1)");
@@ -622,10 +611,10 @@ class FavoritePlaceApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("turipId", 1L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
-                    .when().delete("/favorites/places")
+                    .when().delete("/api/v1/turips/places")
                     .then()
                     .statusCode(204);
         }
@@ -639,9 +628,8 @@ class FavoritePlaceApiTest {
             // given
             Long accountId2 = testDataHelper.insertAccount();
             jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'cool')", accountId2);
-            jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '잠실캠 맛집 모음', false)",
-                    accountId1);
+            Long folderId = testDataHelper.insertFavoriteFolder("테스트 폴더");
+            testDataHelper.insertFavoriteFolderAccount(accountId1, folderId, AccountRole.OWNER);
             jdbcTemplate.update(
                     "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('루터회관','https://naver.me/5UrZAIeY', '루터회관의 도로명 주소', 38.1234, 127.23123)");
             jdbcTemplate.update("INSERT INTO favorite_place (favorite_folder_id, place_id) VALUES (1, 1)");
@@ -649,10 +637,10 @@ class FavoritePlaceApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "cool")
-                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("turipId", 1L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
-                    .when().delete("/favorites/places")
+                    .when().delete("/api/v1/turips/places")
                     .then()
                     .statusCode(403);
         }
@@ -663,10 +651,10 @@ class FavoritePlaceApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "nonExistentDeviceFid")
-                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("turipId", 1L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
-                    .when().delete("/favorites/places")
+                    .when().delete("/api/v1/turips/places")
                     .then()
                     .statusCode(404);
         }
@@ -682,10 +670,10 @@ class FavoritePlaceApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("favoriteFolderId", 999L)
+                    .queryParam("turipId", 999L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
-                    .when().delete("/favorites/places")
+                    .when().delete("/api/v1/turips/places")
                     .then()
                     .statusCode(404);
         }
@@ -695,17 +683,16 @@ class FavoritePlaceApiTest {
         void delete5() {
             Long accountId = testDataHelper.insertAccount();
             jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
-            jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '잠실캠 맛집 모음', false)",
-                    accountId);
+            Long folderId = testDataHelper.insertFavoriteFolder("테스트 폴더");
+            testDataHelper.insertFavoriteFolderAccount(accountId, folderId, AccountRole.OWNER);
 
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("turipId", 1L)
                     .queryParam("placeId", 999L)
                     .contentType(ContentType.JSON)
-                    .when().delete("/favorites/places")
+                    .when().delete("/api/v1/turips/places")
                     .then()
                     .statusCode(404);
         }
@@ -715,19 +702,18 @@ class FavoritePlaceApiTest {
         void delete6() {
             Long accountId = testDataHelper.insertAccount();
             jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
-            jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '잠실캠 맛집 모음', false)",
-                    accountId);
+            Long folderId = testDataHelper.insertFavoriteFolder("테스트 폴더");
+            testDataHelper.insertFavoriteFolderAccount(accountId, folderId, AccountRole.OWNER);
             jdbcTemplate.update(
                     "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('루터회관','https://naver.me/5UrZAIeY', '루터회관의 도로명 주소', 38.1234, 127.23123)");
 
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .queryParam("favoriteFolderId", 1L)
+                    .queryParam("turipId", 1L)
                     .queryParam("placeId", 1L)
                     .contentType(ContentType.JSON)
-                    .when().delete("/favorites/places")
+                    .when().delete("/api/v1/turips/places")
                     .then()
                     .statusCode(404);
         }

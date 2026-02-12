@@ -24,11 +24,15 @@ import turip.account.repository.MemberRepository;
 import turip.auth.service.RefreshTokenService;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.BadRequestException;
+import turip.favorite.domain.AccountRole;
 import turip.favorite.domain.FavoriteContent;
 import turip.favorite.domain.FavoriteFolder;
+import turip.favorite.domain.FavoriteFolderAccount;
 import turip.favorite.repository.FavoriteContentRepository;
+import turip.favorite.repository.FavoriteFolderAccountRepository;
 import turip.favorite.repository.FavoriteFolderRepository;
 import turip.util.fixture.AccountFixture;
+import turip.util.fixture.FavoriteFolderFixture;
 import turip.util.fixture.GuestFixture;
 import turip.util.fixture.MemberFixture;
 
@@ -43,6 +47,9 @@ class MemberServiceTest {
 
     @Mock
     private FavoriteContentRepository favoriteContentRepository;
+
+    @Mock
+    private FavoriteFolderAccountRepository favoriteFolderAccountRepository;
 
     @Mock
     private FavoriteFolderRepository favoriteFolderRepository;
@@ -65,13 +72,14 @@ class MemberServiceTest {
         void create1() {
             // given
             String invalidEmail = "invalid-email";
-            given(accountService.create()).willReturn(AccountFixture.createUser());
+            Account account = AccountFixture.createUser();
+            given(accountService.create())
+                    .willReturn(account);
 
             // when & then
             assertThatThrownBy(() -> memberService.create(invalidEmail))
                     .isInstanceOf(BadRequestException.class)
                     .hasMessage(ErrorTag.EMAIL_INVALID.getMessage());
-
         }
     }
 
@@ -92,8 +100,6 @@ class MemberServiceTest {
 
             given(favoriteContentRepository.findAllByAccount(guestAccount))
                     .willReturn(List.of(guestFavoriteContent));
-            given(favoriteFolderRepository.findAllByAccount(guestAccount))
-                    .willReturn(List.of());
 
             // when
             memberService.migrate(member, guest);
@@ -112,22 +118,15 @@ class MemberServiceTest {
             Member member = MemberFixture.createCustomMember(memberAccount, "email@test.com", true);
             Guest guest = GuestFixture.createCustomGuest(guestAccount, "device-fid-123");
 
-            FavoriteFolder guestFolder1 = new FavoriteFolder(1L, guestAccount, "기본 폴더", true);
-            FavoriteFolder guestFolder2 = new FavoriteFolder(2L, guestAccount, "게스트 커스텀 폴더였던 것", false);
-
             given(favoriteContentRepository.findAllByAccount(any()))
                     .willReturn(List.of());
-            given(favoriteFolderRepository.findAllByAccount(guestAccount))
-                    .willReturn(List.of(guestFolder1, guestFolder2));
 
             // when
             memberService.migrate(member, guest);
 
             // then
-            assertAll(
-                    () -> assertThat(guestFolder1.getAccount()).isEqualTo(memberAccount),
-                    () -> assertThat(guestFolder2.getAccount()).isEqualTo(memberAccount)
-            );
+            verify(favoriteFolderRepository).deletePersonalFoldersByAccount(guestAccount);
+            verify(favoriteFolderAccountRepository).updateAccount(guestAccount, memberAccount);
         }
 
         @DisplayName("마이그레이션이 완료되면 Guest를 삭제한다")
@@ -140,8 +139,6 @@ class MemberServiceTest {
             Guest guest = GuestFixture.createCustomGuest(guestAccount, "device-fid-123");
 
             given(favoriteContentRepository.findAllByAccount(any()))
-                    .willReturn(List.of());
-            given(favoriteFolderRepository.findAllByAccount(any()))
                     .willReturn(List.of());
 
             // when

@@ -15,7 +15,7 @@ data class TripDetailUiState(
     val days: ImmutableList<DayModel>,
     val places: ImmutableList<PlaceModel>,
     val tripDetailInfo: TripDetailInfoModel,
-    val isFavorite: Boolean,
+    val isBookmarked: Boolean,
 ) {
     companion object {
         val IDLE: TripDetailUiState =
@@ -25,7 +25,7 @@ data class TripDetailUiState(
                 days = persistentListOf(),
                 places = persistentListOf(),
                 tripDetailInfo = TripDetailInfoModel.Idle,
-                isFavorite = false,
+                isBookmarked = false,
             )
     }
 }

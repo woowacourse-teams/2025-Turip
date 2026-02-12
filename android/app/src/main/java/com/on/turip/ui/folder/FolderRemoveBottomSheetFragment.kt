@@ -10,14 +10,14 @@ import com.google.android.material.snackbar.Snackbar
 import com.on.turip.R
 import com.on.turip.databinding.BottomSheetFragmentFolderRemoveBinding
 import com.on.turip.ui.common.base.BaseBottomSheetFragment
-import com.on.turip.ui.common.collectOnStarted
 import com.on.turip.ui.common.error.ErrorUiModel
 import com.on.turip.ui.common.error.toUiModel
-import com.on.turip.ui.folder.model.FolderUiEffect
+import com.on.turip.ui.common.extensions.collectOnStarted
+import com.on.turip.ui.folder.model.TuripUiEffect
 import com.on.turip.ui.login.LoginActivity
 
 class FolderRemoveBottomSheetFragment : BaseBottomSheetFragment<BottomSheetFragmentFolderRemoveBinding>() {
-    private val sharedViewModel: FolderViewModel by activityViewModels()
+    private val sharedViewModel: TuripViewModel by activityViewModels()
 
     override fun inflateBinding(
         inflater: LayoutInflater,
@@ -36,7 +36,7 @@ class FolderRemoveBottomSheetFragment : BaseBottomSheetFragment<BottomSheetFragm
 
     private fun setupListeners() {
         binding.tvBottomSheetFolderRemoveRemove.setOnClickListener {
-            sharedViewModel.deleteFolder()
+            sharedViewModel.deleteTurip()
         }
         binding.tvBottomSheetFolderRemoveCancel.setOnClickListener {
             dismiss()
@@ -44,24 +44,24 @@ class FolderRemoveBottomSheetFragment : BaseBottomSheetFragment<BottomSheetFragm
     }
 
     private fun setupObservers() {
-        sharedViewModel.getSelectedFolderOrNull()?.let { selectFolder ->
+        sharedViewModel.getSelectedTuripOrNull()?.let { selectFolder ->
             binding.tvBottomSheetFolderRemoveTitle.text =
-                getString(R.string.bottom_sheet_folder_remove_title, selectFolder.name)
+                getString(R.string.bottom_sheet_turip_remove_title, selectFolder.name)
             binding.tvBottomSheetFolderRemovePlaceCount.text =
                 getString(R.string.all_total_place_count, selectFolder.count)
         }
 
-        collectOnStarted(sharedViewModel.uiEffect) { uiEffect: FolderUiEffect ->
+        collectOnStarted(sharedViewModel.uiEffect) { uiEffect: TuripUiEffect ->
             when (uiEffect) {
-                FolderUiEffect.NavigateToLogin -> {
+                TuripUiEffect.NavigateToLogin -> {
                     navigateToLoginScreen()
                 }
 
-                FolderUiEffect.FolderDeleted -> {
+                TuripUiEffect.TuripDeleted -> {
                     dismiss()
                 }
 
-                is FolderUiEffect.ShowError -> {
+                is TuripUiEffect.ShowError -> {
                     val uiModel: ErrorUiModel =
                         uiEffect.errorUiState.toUiModel() ?: return@collectOnStarted
                     view?.let { view: View ->

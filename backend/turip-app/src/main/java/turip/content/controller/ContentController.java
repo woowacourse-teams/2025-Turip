@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import turip.account.domain.Account;
 import turip.auth.resolver.AuthAccount;
 import turip.common.exception.ErrorResponse;
 import turip.content.controller.dto.response.content.ContentCountResponse;
@@ -22,11 +23,10 @@ import turip.content.controller.dto.response.content.ContentResponse;
 import turip.content.controller.dto.response.content.ContentsDetailWithLoadableResponse;
 import turip.content.controller.dto.response.favorite.WeeklyPopularFavoriteContentsResponse;
 import turip.content.service.ContentService;
-import turip.account.domain.Account;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/contents")
+@RequestMapping("/api/v1/contents")
 @Tag(name = "Content", description = "컨텐츠 API")
 public class ContentController {
 
@@ -140,7 +140,7 @@ public class ContentController {
                                                                 "channelName": "하찬투어 hachantour",
                                                                 "profileImage": "https://yt3.googleusercontent.com/xMc7FcCl689p_ymaijuY5WOwX9DeHaZ_WTnRHb8UajggQotOO8Bxd0P7cqsYYfubotgjlh4Qfw=s160-c-k-c0x00ffffff-no-rj"
                                                             },
-                                                            "isFavorite": false
+                                                            "isBookmarked": false
                                                         },
                                                         "tripDuration": {
                                                             "nights": 3,
@@ -162,7 +162,7 @@ public class ContentController {
                                                                 "channelName": "연수연",
                                                                 "profileImage": "https://yt3.googleusercontent.com/EMvavcwV96_NkCYm4V8TZIrsytHaiS2AaxS_goqR57WP7kn36qQY92Ujex8JUbBWGQ7P5VY0DA=s160-c-k-c0x00ffffff-no-rj"
                                                             },
-                                                            "isFavorite": true
+                                                            "isBookmarked": true
                                                         },
                                                         "tripDuration": {
                                                             "nights": 2,
@@ -280,7 +280,7 @@ public class ContentController {
                                                                 "channelName": "하찬투어 hachantour",
                                                                 "profileImage": "https://yt3.googleusercontent.com/xMc7FcCl689p_ymaijuY5WOwX9DeHaZ_WTnRHb8UajggQotOO8Bxd0P7cqsYYfubotgjlh4Qfw=s160-c-k-c0x00ffffff-no-rj"
                                                             },
-                                                            "isFavorite": false
+                                                            "isBookmarked": false
                                                         },
                                                         "tripDuration": {
                                                             "nights": 3,
@@ -302,7 +302,7 @@ public class ContentController {
                                                                 "channelName": "연수연",
                                                                 "profileImage": "https://yt3.googleusercontent.com/EMvavcwV96_NkCYm4V8TZIrsytHaiS2AaxS_goqR57WP7kn36qQY92Ujex8JUbBWGQ7P5VY0DA=s160-c-k-c0x00ffffff-no-rj"
                                                             },
-                                                            "isFavorite": true
+                                                            "isBookmarked": true
                                                         },
                                                         "tripDuration": {
                                                             "nights": 2,
@@ -398,7 +398,7 @@ public class ContentController {
                                                     "channelName": "연수연",
                                                     "profileImage": "https://yt3.googleusercontent.com/EMvavcwV96_NkCYm4V8TZIrsytHaiS2AaxS_goqR57WP7kn36qQY92Ujex8JUbBWGQ7P5VY0DA=s160-c-k-c0x00ffffff-no-rj"
                                                 },
-                                                "isFavorite": false
+                                                "isBookmarked": false
                                             }
                                             """
                             )
@@ -474,8 +474,8 @@ public class ContentController {
     }
 
     @Operation(
-            summary = "주간 인기 찜 컨텐츠 조회 api",
-            description = "지난 주 찜 수가 많은 컨텐츠 조회"
+            summary = "주간 인기 북마크 컨텐츠 조회 api",
+            description = "지난 주 북마크 수가 많은 컨텐츠 조회"
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -504,7 +504,7 @@ public class ContentController {
                                                       "channelName": "여행하는 뭉치",
                                                       "profileImage": "http://turip.com/static/youtuber1"
                                                     },
-                                                    "isFavorite": false
+                                                    "isBookmarked": false
                                                   },
                                                   "tripDuration": {
                                                     "nights": 2,
@@ -525,7 +525,7 @@ public class ContentController {
                                                       "channelName": "여행하는 하루",
                                                       "profileImage": "http://turip.com/static/youtuber2"
                                                     },
-                                                    "isFavorite": true
+                                                    "isBookmarked": true
                                                   },
                                                   "tripDuration": {
                                                     "nights": 1,
@@ -581,7 +581,7 @@ public class ContentController {
                     )
             )
     })
-    @GetMapping("/popular/favorites")
+    @GetMapping("/popular")
     public ResponseEntity<WeeklyPopularFavoriteContentsResponse> readWeeklyPopularFavoriteContents(
             @Parameter(hidden = true) @AuthAccount Account account,
             @RequestParam("size") int topContentSize) {

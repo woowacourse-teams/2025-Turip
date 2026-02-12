@@ -7,7 +7,7 @@ import turip.favorite.domain.FavoriteContent;
 public record FavoriteContentResponse(
         Long id,
         LocalDate createdAt,
-        Long memberId,
+        Long accountId,
         ContentResponse content
 ) {
 

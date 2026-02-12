@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -16,10 +17,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import turip.account.domain.Account;
 import turip.account.domain.Role;
+import turip.account.repository.AccountInsertRepository;
 import turip.account.repository.AccountRepository;
 import turip.common.exception.ErrorTag;
+import turip.common.exception.custom.InternalServerException;
 import turip.common.exception.custom.NotFoundException;
 import turip.favorite.repository.FavoriteContentRepository;
+import turip.favorite.repository.FavoriteFolderRepository;
 import turip.favorite.service.FavoriteFolderService;
 import turip.util.fixture.AccountFixture;
 
@@ -36,19 +40,25 @@ class AccountServiceTest {
     private FavoriteContentRepository favoriteContentRepository;
 
     @Mock
+    private AccountInsertRepository accountInsertRepository;
+
+    @Mock
+    private FavoriteFolderRepository favoriteFolderRepository;
+
+    @Mock
     private FavoriteFolderService favoriteFolderService;
 
     @DisplayName("Account 생성 테스트")
     @Nested
     class Create {
 
-        @DisplayName("Account를 생성하고 기본 찜 폴더를 생성한다")
+        @DisplayName("Account를 생성한다.")
         @Test
-        void create() {
+        void create1() {
             // given
             Account savedAccount = AccountFixture.createUser();
-            given(accountRepository.save(any(Account.class)))
-                    .willReturn(savedAccount);
+            given(accountInsertRepository.trySave(any()))
+                    .willReturn(Optional.of(savedAccount));
 
             // when
             Account result = accountService.create();
@@ -56,6 +66,24 @@ class AccountServiceTest {
             // then
             assertThat(result).isEqualTo(savedAccount);
             verify(favoriteFolderService).createDefaultFavoriteFolder(savedAccount);
+
+        }
+
+        @DisplayName("닉네임이 5번 연속 중복으로 나온 경우 InternalServerError를 발생시킨다.")
+        @Test
+        void create2() {
+            // given
+            when(accountInsertRepository.trySave(any()))
+                    .thenReturn(Optional.empty())
+                    .thenReturn(Optional.empty())
+                    .thenReturn(Optional.empty())
+                    .thenReturn(Optional.empty())
+                    .thenReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> accountService.create())
+                    .isInstanceOf(InternalServerException.class)
+                    .hasMessage(ErrorTag.ACCOUNT_CREATION_ERROR.getMessage());
         }
     }
 
@@ -109,7 +137,7 @@ class AccountServiceTest {
 
             // then
             verify(favoriteContentRepository).deleteByAccount(account);
-            verify(favoriteFolderService).removeByAccount(account);
+            verify(favoriteFolderRepository).deletePersonalFoldersByAccount(account);
             verify(accountRepository).delete(account);
         }
     }

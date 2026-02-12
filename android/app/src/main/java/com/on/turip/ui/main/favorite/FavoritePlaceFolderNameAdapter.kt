@@ -3,11 +3,11 @@ package com.on.turip.ui.main.favorite
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import com.on.turip.ui.main.favorite.model.FavoritePlaceFolderModel
+import com.on.turip.ui.main.favorite.model.TuripModel
 
 class FavoritePlaceFolderNameAdapter(
     private val onPlaceFolderNameListener: FavoritePlaceFolderNameViewHolder.OnPlaceFolderNameListener,
-) : ListAdapter<FavoritePlaceFolderModel, FavoritePlaceFolderNameViewHolder>(
+) : ListAdapter<TuripModel, FavoritePlaceFolderNameViewHolder>(
         FavoritePlaceFolderDiffUtil,
     ) {
     override fun onCreateViewHolder(
@@ -22,15 +22,15 @@ class FavoritePlaceFolderNameAdapter(
         holder.bind(getItem(position))
     }
 
-    private object FavoritePlaceFolderDiffUtil : DiffUtil.ItemCallback<FavoritePlaceFolderModel>() {
+    private object FavoritePlaceFolderDiffUtil : DiffUtil.ItemCallback<TuripModel>() {
         override fun areItemsTheSame(
-            oldItem: FavoritePlaceFolderModel,
-            newItem: FavoritePlaceFolderModel,
+            oldItem: TuripModel,
+            newItem: TuripModel,
         ): Boolean = oldItem.name == newItem.name
 
         override fun areContentsTheSame(
-            oldItem: FavoritePlaceFolderModel,
-            newItem: FavoritePlaceFolderModel,
+            oldItem: TuripModel,
+            newItem: TuripModel,
         ): Boolean = oldItem == newItem
     }
 }

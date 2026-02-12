@@ -57,34 +57,34 @@ sealed interface ErrorType {
     }
 
     /**
-     * 찜 폴더에 대한 에러 타입
+     * 튜립에 대한 에러 타입
      */
-    sealed interface FavoriteFolder : ErrorType {
-        data object NotFound : FavoriteFolder
+    sealed interface Turip : ErrorType {
+        data object NotFound : Turip
 
-        data object DuplicatedName : FavoriteFolder
+        data object DuplicatedName : Turip
 
-        data object BlankName : FavoriteFolder
+        data object BlankName : Turip
 
-        data object ExceededName : FavoriteFolder
+        data object ExceededName : Turip
 
-        data object DefaultFolderRenameNotAllowed : FavoriteFolder
+        data object DefaultTuripRenameNotAllowed : Turip
     }
 
     /**
-     * 찜 장소에 대한 에러 타입
+     * 튜립된 장소에 대한 에러 타입
      */
-    sealed interface FavoritePlace : ErrorType {
-        data object NotFound : FavoritePlace
+    sealed interface TuripPlace : ErrorType {
+        data object NotFound : TuripPlace
 
-        data object DuplicatePlaceInFolder : FavoritePlace
+        data object DuplicatePlaceInTurip : TuripPlace
     }
 
     /**
-     * 찜 컨텐츠에 대한 에러 타입
+     * 북마크에 대한 에러 타입
      */
-    sealed interface FavoriteContent : ErrorType {
-        data object DuplicateContent : FavoriteContent
+    sealed interface Bookmark : ErrorType {
+        data object DuplicateBookmarked : Bookmark
     }
 
     /**

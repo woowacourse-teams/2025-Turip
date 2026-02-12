@@ -4,7 +4,6 @@ import androidx.annotation.DrawableRes
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -36,7 +35,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.on.turip.R
-import com.on.turip.domain.trip.MapType
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.trip.model.MapModel
 import com.on.turip.ui.compose.trip.model.PlaceModel
@@ -46,7 +44,7 @@ fun PlaceItem(
     placeModel: PlaceModel,
     onTimeLineClick: (timeLine: Int) -> Unit,
     onMapClick: (mapModel: MapModel) -> Unit,
-    onFavoriteClick: (id: Long) -> Unit,
+    onTuripPlaceClick: (id: Long, placeName: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -57,10 +55,12 @@ fun PlaceItem(
                     width = 1.dp,
                     color = TuripTheme.colors.border,
                     shape = TuripTheme.shape.container,
-                ).background(
+                )
+                .background(
                     color = TuripTheme.colors.container,
                     shape = TuripTheme.shape.container,
-                ).padding(
+                )
+                .padding(
                     start = TuripTheme.spacing.large,
                     end = TuripTheme.spacing.large,
                     top = TuripTheme.spacing.medium,
@@ -99,29 +99,19 @@ fun PlaceItem(
 
             PlaceActionItem(
                 text = stringResource(R.string.trip_place_map),
-                drawableRes =
-                    when (placeModel.mapModel.type) {
-                        MapType.KAKAO -> R.drawable.btn_kakao_map_basic
-                        MapType.GOOGLE -> R.drawable.btn_google_map_basic
-                        MapType.NONE -> R.drawable.btn_map_link
-                    },
-                useTint =
-                    when (placeModel.mapModel.type) {
-                        MapType.KAKAO -> false
-                        MapType.GOOGLE -> false
-                        MapType.NONE -> true
-                    },
+                drawableRes = placeModel.mapModel.drawableRes,
+                useTint = placeModel.mapModel.enableTint,
                 onClick = { onMapClick(placeModel.mapModel) },
             )
 
             VerticalDivider(modifier = Modifier.height(TuripTheme.spacing.extraExtraLarge))
 
             PlaceActionItem(
-                text = stringResource(R.string.trip_place_favorite),
-                iconTint = if (placeModel.isFavorite) TuripTheme.colors.primary else TuripTheme.colors.gray04,
-                drawableRes = if (placeModel.isFavorite) R.drawable.btn_favorite_selected else R.drawable.btn_favorite_normal,
+                text = stringResource(R.string.trip_turip_place),
+                iconTint = if (placeModel.isTuripPlace) TuripTheme.colors.primary else TuripTheme.colors.gray04,
+                drawableRes = if (placeModel.isTuripPlace) R.drawable.btn_turip_place_selected else R.drawable.btn_turip_place_normal,
                 useTint = true,
-                onClick = { onFavoriteClick(placeModel.id) },
+                onClick = { onTuripPlaceClick(placeModel.id, placeModel.name) },
             )
         }
     }
@@ -156,27 +146,20 @@ private fun PlaceActionItem(
                     onClick = onClick,
                     interactionSource = interactionSource,
                     indication = ripple(color = TuripTheme.colors.gray03),
-                ).padding(
+                )
+                .padding(
                     horizontal = TuripTheme.spacing.medium,
                     vertical = TuripTheme.spacing.extraSmall,
                 ),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(TuripTheme.spacing.extraSmall),
     ) {
-        if (useTint) {
-            Icon(
-                painter = painterResource(drawableRes),
-                contentDescription = null,
-                tint = iconTint,
-                modifier = Modifier.size(iconSize),
-            )
-        } else {
-            Image(
-                painter = painterResource(drawableRes),
-                contentDescription = null,
-                modifier = Modifier.size(iconSize),
-            )
-        }
+        Icon(
+            painter = painterResource(drawableRes),
+            contentDescription = null,
+            tint = if (useTint) iconTint else Color.Unspecified,
+            modifier = Modifier.size(iconSize),
+        )
         Text(
             text = text,
             style = TuripTheme.typography.info1,
@@ -192,7 +175,7 @@ private fun PlaceItemPreview() {
         PlaceModel(
             id = 1L,
             name = "우아한테크코스",
-            isFavorite = true,
+            isTuripPlace = true,
             category = "💻 코딩맛집",
             mapLink = "kakao.com/123123",
             timeLine = "01:03",
@@ -202,7 +185,7 @@ private fun PlaceItemPreview() {
             placeModel = model,
             onTimeLineClick = { },
             onMapClick = { },
-            onFavoriteClick = { },
+            onTuripPlaceClick = { _, _ -> },
             modifier = Modifier.padding(TuripTheme.spacing.extraLarge),
         )
     }

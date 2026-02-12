@@ -55,7 +55,7 @@ public class DevDataInitializer implements CommandLineRunner {
 
         try {
             log.info("CSV 파일 링크 모음집 다운로드 시작: {}", csvLinksCollectionUrl);
-
+    
             // CSV 파일 링크 모음집 다운로드
             Path tempFile = csvFileService.downloadCsvFromUrl(csvLinksCollectionUrl);
 

@@ -7,12 +7,11 @@ import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.TuripResult
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
+import com.on.turip.domain.bookmark.usecase.UpdateBookmarkUseCase
 import com.on.turip.domain.content.Content
 import com.on.turip.domain.content.repository.ContentRepository
-import com.on.turip.domain.favorite.usecase.UpdateFavoriteUseCase
 import com.on.turip.domain.trip.ContentPlace
 import com.on.turip.domain.trip.Trip
-import com.on.turip.domain.trip.repository.ContentPlaceRepository
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
@@ -41,8 +40,7 @@ import javax.inject.Inject
 class TripDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val contentRepository: ContentRepository,
-    private val contentPlaceRepository: ContentPlaceRepository,
-    private val updateFavoriteUseCase: UpdateFavoriteUseCase,
+    private val updateBookmarkUseCase: UpdateBookmarkUseCase,
 ) : ViewModel() {
     private var placeCacheByDay: Map<Int, ImmutableList<PlaceModel>> = emptyMap()
 
@@ -70,7 +68,7 @@ class TripDetailViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true) }
 
             val contentDeferred = async { contentRepository.loadContent(contentId) }
-            val tripInfoDeferred = async { contentPlaceRepository.loadTripInfo(contentId) }
+            val tripInfoDeferred = async { contentRepository.loadTripInfo(contentId) }
 
             val contentResult: TuripResult<Content> = contentDeferred.await()
             val tripInfoResult: TuripResult<Trip> = tripInfoDeferred.await()
@@ -112,7 +110,7 @@ class TripDetailViewModel @Inject constructor(
                             placeTotalCount = trip.tripPlaceCount,
                             duration = trip.tripDuration.toUiModel(),
                         ),
-                    isFavorite = content.isFavorite,
+                    isBookmarked = content.isBookmarked,
                 )
             }
 
@@ -152,14 +150,14 @@ class TripDetailViewModel @Inject constructor(
         }
     }
 
-    fun updateFavorite() {
-        val updatedIsFavorite = !uiState.value.isFavorite
+    fun updateBookmark() {
+        val updateBookmark = !uiState.value.isBookmarked
         viewModelScope.launch {
-            updateFavoriteUseCase(updatedIsFavorite, contentId)
+            updateBookmarkUseCase(updateBookmark, contentId)
                 .onSuccess {
-                    Timber.d("컨텐츠 찜 API 통신 성공")
-                    _uiState.update { it.copy(isFavorite = updatedIsFavorite) }
-                    _uiEffect.send(TripDetailUiEffect.ShowFavoriteStatus(updatedIsFavorite))
+                    Timber.d("북마크 업데이트 API 성공")
+                    _uiState.update { it.copy(isBookmarked = updateBookmark) }
+                    _uiEffect.send(TripDetailUiEffect.ShowBookmarkStatus(updateBookmark))
                 }.onFailure { errorType: ErrorType ->
                     _uiState.update { it.copy(isLoading = false) }
                     val uiError: UiError = errorType.toUiError()
@@ -169,7 +167,7 @@ class TripDetailViewModel @Inject constructor(
                                 _uiEffect.send(
                                     TripDetailUiEffect.ShowError(
                                         ErrorUiState.Network,
-                                        TripDetailRetryAction.UpdateFavorite,
+                                        TripDetailRetryAction.UpdateBookmark,
                                     ),
                                 )
                             }
@@ -178,7 +176,7 @@ class TripDetailViewModel @Inject constructor(
                                 _uiEffect.send(
                                     TripDetailUiEffect.ShowError(
                                         ErrorUiState.Server,
-                                        TripDetailRetryAction.UpdateFavorite,
+                                        TripDetailRetryAction.UpdateBookmark,
                                     ),
                                 )
                             }
@@ -188,31 +186,43 @@ class TripDetailViewModel @Inject constructor(
                             }
                         }
                     }
-                    Timber.d("컨텐츠 찜 API 통신 실패")
+                    Timber.d("북마크 업데이트 API 실패")
                 }
         }
     }
 
-    fun updateHasFavoriteFolderInPlace(
-        hasFavoriteFolder: Boolean,
+    fun updatePlaceTuripSelection(
+        hasTurip: Boolean,
         placeId: Long,
     ) {
         placeCacheByDay =
             placeCacheByDay.mapValues { (_, places: ImmutableList<PlaceModel>) ->
                 if (places.any { it.id == placeId }) {
                     places
-                        .map { place: PlaceModel -> if (place.id == placeId) place.copy(isFavorite = hasFavoriteFolder) else place }
+                        .map { place: PlaceModel -> if (place.id == placeId) place.copy(isTuripPlace = hasTurip) else place }
                         .toImmutableList()
                 } else {
                     places
                 }
             }
 
+        viewModelScope.launch {
+            val placeName: String = getPlaceName(placeId)
+            _uiEffect.send(TripDetailUiEffect.ShowUpdatedTuripSelectionByPlace(placeName))
+        }
+
         _uiState.update { state: TripDetailUiState ->
             val currentSelectedDay = state.days.find { it.isSelected }?.day ?: DayModel.ALL_PLACE
             state.copy(places = placeCacheByDay[currentSelectedDay] ?: persistentListOf())
         }
     }
+
+    private fun getPlaceName(placeId: Long): String =
+        placeCacheByDay[DayModel.ALL_PLACE]?.firstOrNull { place -> place.id == placeId }?.name
+            ?: run {
+                Timber.e("캐싱데이터에서 placeId를 찾을 수 없습니다. placeID = $placeId")
+                ""
+            }
 
     private suspend fun handleError(failure: TuripResult.Failure) {
         val uiError: UiError = failure.errorType.toUiError()
@@ -240,7 +250,7 @@ class TripDetailViewModel @Inject constructor(
 
     fun handleErrorRetryRequest(action: TripDetailRetryAction) {
         when (action) {
-            TripDetailRetryAction.UpdateFavorite -> updateFavorite()
+            TripDetailRetryAction.UpdateBookmark -> updateBookmark()
         }
     }
 }

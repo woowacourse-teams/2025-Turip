@@ -2,6 +2,7 @@ package turip.util.helper;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Component;
 import turip.account.domain.Provider;
 import turip.account.domain.Role;
 import turip.account.domain.TuripMember;
+import turip.favorite.domain.AccountRole;
 
 @Component
 public class TestDataHelper {
@@ -22,12 +24,14 @@ public class TestDataHelper {
     }
 
     public Long insertAccount(Role role) {
+        String nickname = UUID.randomUUID().toString().substring(0, 8);
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement("INSERT INTO account (role) VALUES (?)",
+            PreparedStatement ps = connection.prepareStatement("INSERT INTO account (role, nickname) VALUES (?, ?)",
                     Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, role.name());
+            ps.setString(2, nickname);
             return ps;
         }, keyHolder);
 
@@ -101,6 +105,42 @@ public class TestDataHelper {
         Long accountId = insertAccount();
         Long memberId = insertMember(accountId, email, isFirstLogin);
         return insertTuripMember(memberId, loginId, loginPassword);
+    }
+
+    public Long insertFavoriteFolder(String name, boolean isDefault, boolean isShared) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(
+                    "INSERT INTO favorite_folder (name, is_default, is_shared) VALUES (?, ?, ?)",
+                    Statement.RETURN_GENERATED_KEYS);
+            ps.setString(1, name);
+            ps.setBoolean(2, isDefault);
+            ps.setBoolean(3, isShared);
+            return ps;
+        }, keyHolder);
+
+        return extractGeneratedKey(keyHolder);
+    }
+
+    public Long insertFavoriteFolder(String name) {
+        return insertFavoriteFolder(name, false, false);
+    }
+
+    public Long insertFavoriteFolderAccount(Long accountId, Long favoriteFolderId, AccountRole accountRole) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(
+                    "INSERT INTO favorite_folder_account (account_id, favorite_folder_id, account_role) VALUES (?, ?, ?)",
+                    Statement.RETURN_GENERATED_KEYS);
+            ps.setLong(1, accountId);
+            ps.setLong(2, favoriteFolderId);
+            ps.setString(3, accountRole.name());
+            return ps;
+        }, keyHolder);
+
+        return extractGeneratedKey(keyHolder);
     }
 
     private Long extractGeneratedKey(KeyHolder keyHolder) {

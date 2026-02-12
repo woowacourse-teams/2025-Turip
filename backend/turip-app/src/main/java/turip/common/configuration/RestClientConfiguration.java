@@ -12,7 +12,7 @@ public class RestClientConfiguration {
 
     private final ExternalApiLoggingInterceptor loggingInterceptor;
 
-    // TODO: 타임아웃 설정하기
+    // TODO: api 타임아웃 설정하기
     @Bean
     public RestClient baseRestClient(RestClient.Builder builder) {
         return builder

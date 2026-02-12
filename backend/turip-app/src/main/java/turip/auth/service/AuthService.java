@@ -1,7 +1,5 @@
 package turip.auth.service;
 
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.security.SignatureException;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,12 +16,14 @@ import turip.auth.controller.dto.request.RefreshTokenRequest;
 import turip.auth.controller.dto.request.TuripLoginRequest;
 import turip.auth.controller.dto.response.RefreshTokenResponse;
 import turip.auth.controller.dto.response.SocialLoginResponse;
-import turip.auth.controller.dto.response.TokenResult;
 import turip.auth.domain.RefreshToken;
+import turip.auth.service.dto.TokenResult;
+import turip.auth.service.dto.TuripLoginResult;
 import turip.auth.token.GoogleTokenParser;
 import turip.auth.token.JwtProvider;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.BadRequestException;
+import turip.common.exception.custom.IllegalArgumentException;
 import turip.common.exception.custom.UnauthorizedException;
 
 @Service
@@ -38,9 +38,10 @@ public class AuthService {
     private final TuripMemberService turipMemberService;
 
     @Transactional
-    public TokenResult loginWithTurip(TuripLoginRequest request, String deviceFid) {
+    public TuripLoginResult loginWithTurip(TuripLoginRequest request, String deviceFid) {
         Member member = loginAndGetMember(request);
-        return processTuripLogin(deviceFid, member);
+        TokenResult tokenResult = processTuripLogin(deviceFid, member);
+        return TuripLoginResult.of(tokenResult, member);
     }
 
     @Transactional
@@ -69,7 +70,7 @@ public class AuthService {
         String refreshToken = request.refreshToken();
 
         try {
-            Long accountId = jwtProvider.parseToken(refreshToken).get("accountId", Long.class);
+            Long accountId = jwtProvider.getClaimOfName(refreshToken, "accountId", Long.class);
             Member member = getMemberByAccountId(accountId);
             RefreshToken storedRefreshToken = refreshTokenService.getByMemberAndDeviceFid(member, deviceFid);
 
@@ -81,14 +82,12 @@ public class AuthService {
 
             saveRefreshToken(member, newRefreshToken, deviceFid);
 
-            return new RefreshTokenResponse(newAccessToken, newRefreshToken);
+            return RefreshTokenResponse.of(newAccessToken, newRefreshToken);
 
-        } catch (ExpiredJwtException e) {
-            throw new UnauthorizedException(ErrorTag.REFRESH_TOKEN_EXPIRED);
-        } catch (SignatureException e) {
-            throw new UnauthorizedException(ErrorTag.REFRESH_TOKEN_SIGNATURE_INVALID);
         } catch (UnauthorizedException e) {
             throw e;
+        } catch (IllegalArgumentException e) {
+            throw new UnauthorizedException(e.getErrorTag());
         } catch (Exception e) {
             throw new UnauthorizedException(ErrorTag.UNAUTHORIZED);
         }
@@ -128,7 +127,7 @@ public class AuthService {
         }
         TokenResult tokenResult = issueToken(deviceFid, member);
 
-        return SocialLoginResponse.of(tokenResult, isNewMember);
+        return SocialLoginResponse.of(tokenResult, isNewMember, member);
     }
 
     private Member findOrCreateSocialMember(Provider provider, String providerId, String email) {
@@ -148,10 +147,8 @@ public class AuthService {
             LocalDateTime issuedAt = jwtProvider.getIssuedAt(refreshToken);
             LocalDateTime expiration = jwtProvider.getExpiration(refreshToken);
             refreshTokenService.save(member, deviceFid, jwtProvider.hashToken(refreshToken), issuedAt, expiration);
-        } catch (ExpiredJwtException e) {
-            throw new UnauthorizedException(ErrorTag.REFRESH_TOKEN_EXPIRED);
-        } catch (SignatureException e) {
-            throw new UnauthorizedException(ErrorTag.REFRESH_TOKEN_SIGNATURE_INVALID);
+        } catch (IllegalArgumentException e) {
+            throw new UnauthorizedException(e.getErrorTag());
         } catch (Exception e) {
             throw new UnauthorizedException(ErrorTag.UNAUTHORIZED);
         }

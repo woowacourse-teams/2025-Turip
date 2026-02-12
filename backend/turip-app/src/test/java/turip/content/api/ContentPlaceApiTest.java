@@ -12,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
+import turip.favorite.domain.AccountRole;
 import turip.util.helper.TestDataHelper;
 
 @ActiveProfiles("test")
@@ -65,7 +66,7 @@ class ContentPlaceApiTest {
         jdbcTemplate.update("ALTER TABLE place_category ALTER COLUMN id RESTART WITH 1");
     }
 
-    @DisplayName("/contents GET 여행 상세 조회 테스트")
+    @DisplayName("/api/v1/contents GET 여행 상세 조회 테스트")
     @Nested
     class ReadContentPlace {
 
@@ -100,20 +101,20 @@ class ContentPlaceApiTest {
 
             Long accountId = testDataHelper.insertAccount();
             jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
-            jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (account_id, name, is_default) VALUES (?, '기본 폴더', true)", accountId);
+            Long folderId = testDataHelper.insertFavoriteFolder("기본 폴더", true, false);
+            testDataHelper.insertFavoriteFolderAccount(accountId, folderId, AccountRole.OWNER);
             jdbcTemplate.update(
                     "INSERT INTO favorite_place (favorite_folder_id, place_id) VALUES (1, 1)");
 
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .when().get("/contents/1/places")
+                    .when().get("/api/v1/contents/1/places")
                     .then()
                     .statusCode(200)
                     .body("contentPlaceCount", is(2))
-                    .body("contentPlaces[0].isFavoritePlace", is(true))
-                    .body("contentPlaces[1].isFavoritePlace", is(false))
+                    .body("contentPlaces[0].isTuripPlace", is(true))
+                    .body("contentPlaces[1].isTuripPlace", is(false))
                     .body("contentPlaces[0].timeLine", is("11:00"))
                     .body("contentPlaces[1].timeLine", is("12:00"))
                     .body("contentPlaces[0].visitDay", is(1))
@@ -130,7 +131,7 @@ class ContentPlaceApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
-                    .when().get("/contents/1/places")
+                    .when().get("/api/v1/contents/1/places")
                     .then()
                     .statusCode(404);
         }
