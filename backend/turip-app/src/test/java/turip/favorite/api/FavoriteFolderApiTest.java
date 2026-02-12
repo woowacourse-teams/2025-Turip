@@ -494,7 +494,8 @@ class FavoriteFolderApiTest {
                     .when().get("/api/v1/turips/invitation-tokens")
                     .then()
                     .statusCode(200)
-                    .body("turipId", is(folderId.intValue()));
+                    .body("turipId", is(folderId.intValue()))
+                    .body("alreadyJoined", is(true));
         }
 
         @DisplayName("유효하지 않은 초대 토큰를 검증하고 400 BAD REQUEST를 응답한다")

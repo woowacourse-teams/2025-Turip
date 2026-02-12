@@ -565,12 +565,17 @@ class FavoriteFolderServiceTest {
                     .willReturn(folderId);
             given(favoriteFolderRepository.findById(folderId))
                     .willReturn(Optional.of(favoriteFolder));
+            given(favoriteFolderAccountService.isFolderMember(user, favoriteFolder))
+                    .willReturn(true);
 
             // when
             var response = favoriteFolderService.getInvitationDetails(token, user);
 
             // then
-            assertThat(response.turipId()).isEqualTo(folderId);
+            assertAll(
+                    () -> assertThat(response.turipId()).isEqualTo(folderId),
+                    () -> assertThat(response.alreadyJoined()).isTrue()
+            );
         }
 
         @DisplayName("토큰에 해당하는 폴더가 존재하지 않으면 NotFoundException을 발생시킨다")
