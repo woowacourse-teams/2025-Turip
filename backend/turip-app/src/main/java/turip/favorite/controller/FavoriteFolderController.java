@@ -290,7 +290,8 @@ public class FavoriteFolderController {
                                     summary = "초대 토큰 검증 성공",
                                     value = """
                                             {
-                                                "turipId": 1
+                                                "turipId": 1,
+                                                "alreadyJoined": false
                                             }
                                             """
                             )
@@ -362,7 +363,7 @@ public class FavoriteFolderController {
             @RequestParam("token") String token,
             @Parameter(hidden = true) @AuthAccount Account account
     ) {
-        FolderInvitationDetailResponse response = favoriteFolderService.getInvitationDetails(token);
+        FolderInvitationDetailResponse response = favoriteFolderService.getInvitationDetails(token, account);
         return ResponseEntity.ok(response);
     }
 

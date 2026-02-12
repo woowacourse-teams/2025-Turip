@@ -71,15 +71,15 @@ public class FavoriteFolderService {
         return FolderInvitationTokenResponse.from(invitationToken);
     }
 
-    public FolderInvitationDetailResponse getInvitationDetails(String token) {
+    public FolderInvitationDetailResponse getInvitationDetails(String token, Account account) {
         Long favoriteFolderId = invitationTokenProvider.getClaimOfName(token, "fid", Long.class);
 
-        boolean exists = favoriteFolderRepository.existsById(favoriteFolderId);
-        if (!exists) {
-            throw new NotFoundException(ErrorTag.FAVORITE_FOLDER_NOT_FOUND);
-        }
+        FavoriteFolder favoriteFolder = favoriteFolderRepository.findById(favoriteFolderId)
+                .orElseThrow(() -> new NotFoundException(ErrorTag.FAVORITE_FOLDER_NOT_FOUND));
 
-        return FolderInvitationDetailResponse.from(favoriteFolderId);
+        boolean alreadyJoined = favoriteFolderAccountService.isFolderMember(account, favoriteFolder);
+
+        return FolderInvitationDetailResponse.from(favoriteFolderId, alreadyJoined);
     }
 
     public FavoriteFoldersWithPlaceCountResponse findAllByAccount(Account account) {
