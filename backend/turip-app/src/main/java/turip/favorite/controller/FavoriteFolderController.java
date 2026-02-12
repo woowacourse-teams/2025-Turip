@@ -290,9 +290,7 @@ public class FavoriteFolderController {
                                     summary = "초대 토큰 검증 성공",
                                     value = """
                                             {
-                                                "turipId": 1,
-                                                "turipName": "내 튜립",
-                                                "isMember": true
+                                                "turipId": 1
                                             }
                                             """
                             )
