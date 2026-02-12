@@ -3,6 +3,7 @@ package turip.favorite.token;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import java.nio.charset.StandardCharsets;
@@ -57,7 +58,7 @@ public class InvitationTokenProvider {
                     .getPayload();
         } catch (ExpiredJwtException e) {
             throw new BadRequestException(ErrorTag.INVITATION_TOKEN_EXPIRED);
-        } catch (Exception e) {
+        } catch (SignatureException | MalformedJwtException | IllegalArgumentException e) {
             throw new BadRequestException(ErrorTag.INVALID_INVITATION_TOKEN);
         }
     }

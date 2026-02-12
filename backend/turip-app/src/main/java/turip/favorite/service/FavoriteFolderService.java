@@ -17,8 +17,8 @@ import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusRe
 import turip.favorite.controller.dto.response.FavoriteFolderWithPlaceCountResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithFavoriteStatusResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithPlaceCountResponse;
-import turip.favorite.controller.dto.response.FolderInvitationCodeResponse;
 import turip.favorite.controller.dto.response.FolderInvitationDetailResponse;
+import turip.favorite.controller.dto.response.FolderInvitationTokenResponse;
 import turip.favorite.domain.AccountRole;
 import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.repository.FavoriteFolderRepository;
@@ -56,7 +56,7 @@ public class FavoriteFolderService {
     }
 
     @Transactional
-    public FolderInvitationCodeResponse createInvitationCode(Account account, Long favoriteFolderId) {
+    public FolderInvitationTokenResponse createInvitationToken(Account account, Long favoriteFolderId) {
         FavoriteFolder favoriteFolder = favoriteFolderRepository.findById(favoriteFolderId)
                 .orElseThrow(() -> new NotFoundException(ErrorTag.FAVORITE_FOLDER_NOT_FOUND));
 
@@ -66,9 +66,9 @@ public class FavoriteFolderService {
             favoriteFolder.convertToSharedFolder();
         }
 
-        String invitationCode = invitationTokenProvider.generateToken(account.getId(), favoriteFolderId);
+        String invitationToken = invitationTokenProvider.generateToken(account.getId(), favoriteFolderId);
 
-        return FolderInvitationCodeResponse.from(invitationCode);
+        return FolderInvitationTokenResponse.from(invitationToken);
     }
 
     public FolderInvitationDetailResponse getInvitationDetails(String token) {

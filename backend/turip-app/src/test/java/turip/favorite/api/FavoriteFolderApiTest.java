@@ -475,7 +475,7 @@ class FavoriteFolderApiTest {
     @Nested
     class VerifyInvitation {
 
-        @DisplayName("유효한 초대 토큰를 검증하고 200 OK와 튜립 정보를 응답한다")
+        @DisplayName("유효한 초대 토큰을 검증하고 200 OK와 튜립 정보를 응답한다")
         @Test
         void verifyInvitation1() {
             // given

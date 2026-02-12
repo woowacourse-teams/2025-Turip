@@ -28,8 +28,8 @@ import turip.favorite.controller.dto.request.FavoriteFolderRequest;
 import turip.favorite.controller.dto.response.FavoriteFolderResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithFavoriteStatusResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithPlaceCountResponse;
-import turip.favorite.controller.dto.response.FolderInvitationCodeResponse;
 import turip.favorite.controller.dto.response.FolderInvitationDetailResponse;
+import turip.favorite.controller.dto.response.FolderInvitationTokenResponse;
 import turip.favorite.service.FavoriteFolderService;
 
 @RestController
@@ -167,7 +167,7 @@ public class FavoriteFolderController {
 
     @Operation(
             summary = "튜립 초대 토큰 생성 api",
-            description = "튜립을 공유하기 위한 초대 토큰를 생성한다."
+            description = "튜립을 공유하기 위한 초대 토큰을 생성한다."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -175,7 +175,7 @@ public class FavoriteFolderController {
                     description = "성공 예시",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = FolderInvitationCodeResponse.class),
+                            schema = @Schema(implementation = FolderInvitationTokenResponse.class),
                             examples = @ExampleObject(
                                     name = "success",
                                     summary = "초대 토큰 생성 성공",
@@ -266,17 +266,17 @@ public class FavoriteFolderController {
                     )
             )
     })
-    @PostMapping("/{turipId}/invitation-codes")
-    public ResponseEntity<FolderInvitationCodeResponse> createInvitationCode(
+    @PostMapping("/{turipId}/invitation-tokens")
+    public ResponseEntity<FolderInvitationTokenResponse> createInvitationToken(
             @PathVariable("turipId") Long favoriteFolderId,
             @Parameter(hidden = true) @AuthAccount Account account) {
-        FolderInvitationCodeResponse response = favoriteFolderService.createInvitationCode(account, favoriteFolderId);
+        FolderInvitationTokenResponse response = favoriteFolderService.createInvitationToken(account, favoriteFolderId);
         return ResponseEntity.ok(response);
     }
 
     @Operation(
             summary = "튜립 초대 토큰 검증 api",
-            description = "튜립 초대 토큰를 검증한다."
+            description = "튜립 초대 토큰을 검증한다."
     )
     @ApiResponses(value = {
             @ApiResponse(

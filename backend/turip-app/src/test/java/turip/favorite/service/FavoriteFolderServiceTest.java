@@ -32,7 +32,7 @@ import turip.favorite.controller.dto.request.FavoriteFolderRequest;
 import turip.favorite.controller.dto.response.FavoriteFolderResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithFavoriteStatusResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithPlaceCountResponse;
-import turip.favorite.controller.dto.response.FolderInvitationCodeResponse;
+import turip.favorite.controller.dto.response.FolderInvitationTokenResponse;
 import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.repository.FavoriteFolderRepository;
 import turip.favorite.repository.FavoritePlaceRepository;
@@ -498,7 +498,7 @@ class FavoriteFolderServiceTest {
                     .willReturn("test_token");
 
             // when
-            FolderInvitationCodeResponse actual = favoriteFolderService.createInvitationCode(account, folderId);
+            FolderInvitationTokenResponse actual = favoriteFolderService.createInvitationToken(account, folderId);
 
             // then
             assertThat(actual.invitationCode()).isEqualTo("test_token");
@@ -518,7 +518,7 @@ class FavoriteFolderServiceTest {
                     .willReturn(Optional.of(favoriteFolder));
 
             // when
-            favoriteFolderService.createInvitationCode(account, folderId);
+            favoriteFolderService.createInvitationToken(account, folderId);
             boolean after = favoriteFolder.isShared();
 
             // then
@@ -541,7 +541,7 @@ class FavoriteFolderServiceTest {
                     .given(favoriteFolderAccountService).validateMembership(account, favoriteFolder);
 
             // when & then
-            assertThatThrownBy(() -> favoriteFolderService.createInvitationCode(account, folderId))
+            assertThatThrownBy(() -> favoriteFolderService.createInvitationToken(account, folderId))
                     .isInstanceOf(ForbiddenException.class)
                     .hasMessage(ErrorTag.FORBIDDEN.getMessage());
 
