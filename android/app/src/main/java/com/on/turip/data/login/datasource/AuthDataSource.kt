@@ -1,13 +1,13 @@
 package com.on.turip.data.login.datasource
 
-import com.on.turip.data.common.TuripCustomResult
+import com.on.turip.core.result.TuripResult
 import com.on.turip.data.login.dto.LoginJwtTokenResponse
 import com.on.turip.data.login.dto.ReissueTokenResponse
 
 interface AuthDataSource {
-    suspend fun postIdToken(idToken: String): TuripCustomResult<LoginJwtTokenResponse>
+    suspend fun postIdToken(idToken: String): TuripResult<LoginJwtTokenResponse>
 
-    suspend fun postReissueToken(refreshToken: String): TuripCustomResult<ReissueTokenResponse>
+    suspend fun postReissueToken(refreshToken: String): TuripResult<ReissueTokenResponse>
 
-    suspend fun getTokenVerification(accessToken: String): TuripCustomResult<Unit>
+    suspend fun getTokenVerification(accessToken: String): TuripResult<Unit>
 }

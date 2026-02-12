@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Turip Admin - Content Builder</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script async defer
+            th:src="@{'https://maps.googleapis.com/maps/api/js?key=' + ${googleApiKey} + '&callback=initMap'}"></script>
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #becdfd, #ffffff);
+            min-height: 100vh;
+            padding: 40px 0;
+            font-family: 'Pretendard', sans-serif;
+        }
+
+        .admin-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 20px;
+            border-left: 5px solid #6e8efb;
+            padding-left: 15px;
+        }
+
+        .video-info-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            align-items: stretch;
+        }
+
+        .channel-box {
+            flex: 0 0 160px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            padding: 20px;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(5px);
+        }
+
+        .title-box {
+            flex: 1;
+            border: 1px solid rgba(110, 142, 251, 0.3);
+            padding: 20px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            font-weight: 600;
+            background: white;
+            color: #444;
+            line-height: 1.5;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .channel-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #f8f9fa;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border: 2px solid white;
+        }
+
+        .channel-name {
+            font-size: 0.95rem;
+            color: #6e8efb;
+            font-weight: 700;
+        }
+
+
+        .day-title {
+            font-weight: 600;
+            color: #6e8efb;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .place-item {
+            background: white;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #map {
+            width: 100%;
+            height: 500px;
+            border-radius: 15px;
+            background: #eee;
+        }
+
+        #player {
+            width: 100%;
+            aspect-ratio: 21/9;
+            border-radius: 15px;
+            background: #000;
+            margin-top: 20px;
+        }
+
+        .search-result-item {
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+            padding: 10px;
+        }
+
+        .search-result-item:hover {
+            background-color: #f1f4ff;
+        }
+
+        .header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 24px;
+            margin: 0;
+        }
+
+        .home-btn {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .home-btn:hover {
+            background: #5568d3;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Turip 관리자 - 콘텐츠 수집</h1>
+    <a href="/admin/home" class="home-btn">홈으로 돌아가기</a>
+</div>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-12">
+            <div class="admin-card">
+                <h3 class="section-title">1. 영상 정보 수집</h3>
+                <div class="input-group mb-4">
+                    <input class="form-control" id="videoUrlInput" placeholder="YouTube URL을 입력하세요" type="text">
+                    <button class="btn btn-primary px-4" onclick="fetchVideoInfo()">영상 불러오기</button>
+                </div>
+
+                <div class="video-info-container d-none" id="videoInfoArea">
+                    <div class="channel-box">
+                        <img alt="Profile" class="channel-img" id="v_channel_img" src="">
+                        <div class="channel-name" id="v_channel_name">채널명</div>
+                    </div>
+                    <div class="title-box" id="v_video_title">영상제목</div>
+
+                    <input id="v_id" type="hidden">
+                    <input id="v_url" type="hidden">
+                    <input id="v_date_val" type="hidden">
+                </div>
+                <div id="player"></div>
+                <div class="alert alert-warning d-none mt-3" id="existingContentWarning"></div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="admin-card">
+                        <h3 class="section-title">2. 경로 확인 (지도)</h3>
+                        <div id="map"></div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="admin-card">
+                        <h3 class="section-title">3. 장소 추가</h3>
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-3">
+                                <select class="form-select" id="searchType">
+                                    <option value="DOMESTIC">국내</option>
+                                    <option value="OVERSEAS">해외</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6"><input class="form-control" id="placeQuery"
+                                                         onkeypress="if(event.keyCode==13) searchPlaces()"
+                                                         placeholder="장소명 입력" type="text"></div>
+                            <div class="col-md-3">
+                                <button class="btn btn-dark w-100" onclick="searchPlaces()">검색</button>
+                            </div>
+                        </div>
+                        <div class="border rounded mb-3" id="searchResults"
+                             style="max-height: 200px; overflow-y: auto; display: none; background: white;"></div>
+                        <div class="row g-2">
+                            <div class="col-md-3"><label class="small text-muted">일차</label><input class="form-control"
+                                                                                                   id="visitDay" min="1"
+                                                                                                   type="number"
+                                                                                                   value="1"></div>
+                            <div class="col-md-4"><label class="small text-muted">타임라인</label><input
+                                    class="form-control" id="timeLine" placeholder="00:00" type="text"></div>
+                            <div class="col-md-5 d-flex align-items-end">
+                                <button class="btn btn-outline-primary w-100" disabled id="btnAddPlace"
+                                        onclick="addPlaceToList()">장소 추가
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="admin-card">
+                        <h3 class="section-title">4. 장소 관리</h3>
+                        <div id="dayGroupsContainer"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-card text-center">
+                <h3 class="section-title text-start">5. 최종 콘텐츠 저장</h3>
+                <div class="row mb-3 justify-content-center align-items-center">
+                    <div class="col-md-3"><label class="small text-muted">도시 이름</label><input
+                            class="form-control text-center" id="cityName" placeholder="예: 서울" type="text"></div>
+                    <div class="col-md-3"><label class="small text-muted">여행 기간</label><h4 class="fw-bold text-primary"
+                                                                                           id="durationText">0박 1일</h4>
+                        <input id="tripNights" type="hidden" value="0"><input id="tripDays" type="hidden" value="1">
+                    </div>
+                </div>
+                <button class="btn btn-primary btn-lg w-50 shadow" id="saveContentBtn" onclick="saveAllData()">💾 서버에 콘텐츠
+                    저장
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const YOUTUBE_API_KEY = /*[[${youtubeApiKey}]]*/ '';
+    let player, map, markers = [], infoWindow;
+    let selectedPlaceData = null;
+    let collectedPlaces = [];
+    let isYouTubeApiReady = false;
+    let videoIdToLoad = null;
+
+    async function authFetch(url, options = {}) {
+        const defaultOptions = {headers: {'Content-Type': 'application/json'}};
+        const mergedOptions = {...options, headers: {...defaultOptions.headers, ...options.headers}};
+        try {
+            const response = await fetch(url, mergedOptions);
+            if (!response.ok) {
+                let errorMessage = `[에러 ${response.status}] 서버 응답 실패`;
+                try {
+                    const errorBody = await response.json();
+                    if (errorBody && errorBody.message) {
+                        errorMessage = errorBody.message;
+                    } else if (errorBody) {
+                        errorMessage = JSON.stringify(errorBody);
+                    }
+                } catch (jsonError) {
+                    // response body was not JSON, use default message
+                }
+                throw new Error(errorMessage);
+            }
+            return response;
+        } catch (e) {
+            throw new Error(e.message);
+        }
+    }
+
+    function initMap() {
+        map = new google.maps.Map(document.getElementById("map"), {center: {lat: 37.5665, lng: 126.9780}, zoom: 12});
+        infoWindow = new google.maps.InfoWindow();
+    }
+
+    function onYouTubeIframeAPIReady() {
+        isYouTubeApiReady = true;
+        if (videoIdToLoad) createPlayer(videoIdToLoad);
+    }
+
+    function createPlayer(videoId) {
+        if (!isYouTubeApiReady) {
+            videoIdToLoad = videoId;
+            return;
+        }
+        if (player && typeof player.destroy === 'function') player.destroy();
+        player = new YT.Player('player', {height: '100%', width: '100%', videoId: videoId});
+    }
+
+    function updateMapMarkers() {
+        if (!map || !infoWindow) return;
+
+        markers.forEach(m => m.setMap(null));
+        markers = [];
+        if (collectedPlaces.length === 0) return;
+
+        const bounds = new google.maps.LatLngBounds();
+        collectedPlaces.forEach((p, idx) => {
+            const pos = {lat: p.place.latitude, lng: p.place.longitude};
+            const marker = new google.maps.Marker({
+                position: pos, map: map,
+                label: {text: String(idx + 1), color: "white", fontWeight: "bold"},
+                title: p.place.name
+            });
+            marker.addListener("click", () => {
+                infoWindow.setContent(`<div><strong>${p.visitDay}일차: ${p.place.name}</strong><br>🕒 ${p.timeLine}</div>`);
+                infoWindow.open(map, marker);
+            });
+            markers.push(marker);
+            bounds.extend(pos);
+        });
+        if (collectedPlaces.length > 1) map.fitBounds(bounds);
+        else if (collectedPlaces.length === 1) map.setCenter(markers[0].getPosition());
+    }
+
+    async function fetchChannelImage(channelId) {
+        try {
+            const url = `https://www.googleapis.com/youtube/v3/channels?part=snippet&id=${channelId}&key=${YOUTUBE_API_KEY}`;
+            const res = await fetch(url);
+            const data = await res.json();
+
+            if (data.items && data.items.length > 0) {
+                return data.items[0].snippet.thumbnails.medium.url;
+            }
+        } catch (e) {
+            console.error("⚠️ 채널 이미지 로드 실패:", e);
+        }
+        return 'https://via.placeholder.com/90?text=No+Image';
+    }
+
+    async function fetchVideoInfo() {
+        const videoUrl = document.getElementById('videoUrlInput').value;
+        const warningDiv = document.getElementById('existingContentWarning');
+        warningDiv.classList.add('d-none'); // Reset warning
+
+        if (!videoUrl) return alert("URL을 입력하세요.");
+        try {
+            const res = await authFetch(`/api/v1/admin/video?url=${encodeURIComponent(videoUrl)}`);
+            const data = await res.json();
+
+            if (data && data.isExisting) {
+                alert("⚠️ 이미 등록된 콘텐츠입니다.");
+            }
+
+            const channelProfileImg = await fetchChannelImage(data.channelId);
+
+            document.getElementById('videoInfoArea').classList.remove('d-none');
+            document.getElementById('v_id').value = data.videoId;
+            document.getElementById('v_url').value = videoUrl;
+            document.getElementById('v_channel_name').innerText = data.channelName;
+            document.getElementById('v_video_title').innerText = data.videoTitle;
+            document.getElementById('v_channel_img').src = channelProfileImg;
+            document.getElementById('v_date_val').value = data.uploadDate;
+
+            createPlayer(data.videoId);
+        } catch (e) {
+            alert("⚠️ 영상 정보를 불러올 수 없습니다.\n" + e.message);
+        }
+    }
+
+    async function searchPlaces() {
+        const query = document.getElementById('placeQuery').value;
+        const type = document.getElementById('searchType').value;
+        const container = document.getElementById('searchResults');
+        if (!query) return alert("검색어를 입력하세요.");
+        try {
+            const res = await authFetch(`/api/v1/admin/places/search?query=${encodeURIComponent(query)}&type=${type}`);
+            const data = await res.json();
+            container.innerHTML = '';
+            container.style.display = 'block';
+            data.items.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'search-result-item';
+                div.innerHTML = `<strong>${item.name}</strong><br><small>${item.address}</small>`;
+                div.onclick = () => {
+                    selectedPlaceData = item;
+                    document.getElementById('placeQuery').value = item.name;
+                    if (player && player.getCurrentTime) {
+                        const sec = Math.floor(player.getCurrentTime());
+                        document.getElementById('timeLine').value = `${String(Math.floor(sec / 60)).padStart(2, '0')}:${String(sec % 60).padStart(2, '0')}`;
+                    }
+                    container.style.display = 'none';
+                    document.getElementById('btnAddPlace').disabled = false;
+                    if (map) map.setCenter({lat: item.latitude, lng: item.longitude});
+                };
+                container.appendChild(div);
+            });
+        } catch (e) {
+            alert(e.message);
+        }
+    }
+
+    function calculateDuration() {
+        if (collectedPlaces.length === 0) {
+            document.getElementById('durationText').innerText = "0박 1일";
+            document.getElementById('tripNights').value = 0;
+            document.getElementById('tripDays').value = 1;
+            return;
+        }
+        const maxDay = Math.max(...collectedPlaces.map(p => p.visitDay));
+        document.getElementById('durationText').innerText = `${maxDay - 1}박 ${maxDay}일`;
+        document.getElementById('tripNights').value = maxDay - 1;
+        document.getElementById('tripDays').value = maxDay;
+    }
+
+    function addPlaceToList() {
+        if (!selectedPlaceData) return;
+        const day = parseInt(document.getElementById('visitDay').value);
+        collectedPlaces.push({
+            id: Date.now(),
+            visitDay: day,
+            timeLine: document.getElementById('timeLine').value || "00:00",
+            place: {...selectedPlaceData}
+        });
+        renderPlaceList();
+        calculateDuration();
+        updateMapMarkers();
+        selectedPlaceData = null;
+        document.getElementById('placeQuery').value = '';
+        document.getElementById('btnAddPlace').disabled = true;
+    }
+
+    function renderPlaceList() {
+        const container = document.getElementById('dayGroupsContainer');
+        container.innerHTML = '';
+        const grouped = collectedPlaces.reduce((acc, p) => {
+            if (!acc[p.visitDay]) acc[p.visitDay] = [];
+            acc[p.visitDay].push(p);
+            return acc;
+        }, {});
+        Object.keys(grouped).sort((a, b) => a - b).forEach(day => {
+            const dayBox = document.createElement('div');
+            dayBox.className = 'day-group';
+            dayBox.innerHTML = `<span class="day-title">${day}일차</span><div id="day-list-${day}"></div>`;
+            container.appendChild(dayBox);
+            const listDiv = document.getElementById(`day-list-${day}`);
+            grouped[day].forEach(item => {
+                listDiv.insertAdjacentHTML('beforeend', `<div class="place-item" data-id="${item.id}"><div><b>${item.place.name}</b> <small>🕒 ${item.timeLine}</small></div><button class="btn btn-sm text-danger" onclick="removePlace(${item.id})">✕</button></div>`);
+            });
+            Sortable.create(listDiv, {
+                group: 'places', animation: 150,
+                onEnd: function (evt) {
+                    rebuildCollectedPlacesArray();
+                    calculateDuration();
+                    updateMapMarkers();
+                }
+            });
+        });
+    }
+
+    function rebuildCollectedPlacesArray() {
+        let newCollectedPlaces = [];
+
+        document.querySelectorAll('[id^="day-list-"]').forEach(dayListDiv => {
+            const day = parseInt(dayListDiv.id.replace('day-list-', ''));
+
+            let orderInDay = 1;
+
+            Array.from(dayListDiv.children).forEach(placeItemDiv => {
+                const placeId = parseInt(placeItemDiv.dataset.id);
+                const originalPlace = collectedPlaces.find(p => p.id === placeId);
+
+                if (originalPlace) {
+                    originalPlace.visitDay = day;
+                    originalPlace.visitOrder = orderInDay++;
+                    newCollectedPlaces.push(originalPlace);
+                }
+            });
+        });
+
+        collectedPlaces = newCollectedPlaces;
+    }
+
+    async function saveAllData() {
+        const saveButton = document.getElementById('saveContentBtn');
+        if (saveButton.disabled) return;
+
+        rebuildCollectedPlacesArray();
+
+        const vId = document.getElementById('v_id').value;
+        const cityName = document.getElementById('cityName').value;
+        if (!vId || !cityName) return alert("필수 정보를 모두 입력하세요.");
+
+        const payload = {
+            cityName: cityName,
+            video: {
+                videoId: vId,
+                url: document.getElementById('v_url').value,
+                title: document.getElementById('v_video_title').innerText,
+                channelName: document.getElementById('v_channel_name').innerText,
+                channelImage: document.getElementById('v_channel_img').src,
+                uploadedDate: document.getElementById('v_date_val').value
+            },
+            tripDuration: {
+                nights: parseInt(document.getElementById('tripNights').value),
+                days: parseInt(document.getElementById('tripDays').value)
+            },
+            contentPlaces: collectedPlaces.map(p => ({
+                visitDay: p.visitDay,
+                visitOrder: p.visitOrder,
+                timeLine: p.timeLine,
+                place: p.place
+            }))
+        };
+
+        try {
+            saveButton.disabled = true;
+            saveButton.innerHTML = '💾 저장 중...';
+            await authFetch('/api/v1/admin/contents', {method: 'POST', body: JSON.stringify(payload)});
+            alert("🎉 콘텐츠 저장 완료!");
+            location.reload();
+        } catch (e) {
+            alert("⚠️ 저장 실패\n" + e.message);
+            saveButton.disabled = false;
+            saveButton.innerHTML = '💾 서버에 콘텐츠 저장';
+        }
+    }
+
+    function removePlace(id) {
+        collectedPlaces = collectedPlaces.filter(p => p.id !== id);
+        renderPlaceList();
+        calculateDuration();
+        updateMapMarkers();
+    }
+
+    /*]]>*/
+</script>
+</body>
+</html>

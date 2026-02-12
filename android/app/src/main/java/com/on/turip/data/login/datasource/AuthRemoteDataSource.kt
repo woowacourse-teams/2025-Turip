@@ -1,12 +1,12 @@
 package com.on.turip.data.login.datasource
 
-import com.on.turip.data.common.TuripCustomResult
-import com.on.turip.data.common.safeApiCall
+import com.on.turip.core.result.TuripResult
 import com.on.turip.data.login.dto.LoginIdTokenPostRequest
 import com.on.turip.data.login.dto.LoginJwtTokenResponse
 import com.on.turip.data.login.dto.ReissueTokenRequest
 import com.on.turip.data.login.dto.ReissueTokenResponse
 import com.on.turip.data.login.service.AuthService
+import com.on.turip.data.result.safeApiCall
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -16,21 +16,21 @@ class AuthRemoteDataSource @Inject constructor(
     private val authService: AuthService,
     private val coroutineContext: CoroutineContext = Dispatchers.IO,
 ) : AuthDataSource {
-    override suspend fun postIdToken(idToken: String): TuripCustomResult<LoginJwtTokenResponse> =
+    override suspend fun postIdToken(idToken: String): TuripResult<LoginJwtTokenResponse> =
         withContext(coroutineContext) {
             safeApiCall {
                 authService.postIdToken(LoginIdTokenPostRequest(idToken))
             }
         }
 
-    override suspend fun postReissueToken(refreshToken: String): TuripCustomResult<ReissueTokenResponse> =
+    override suspend fun postReissueToken(refreshToken: String): TuripResult<ReissueTokenResponse> =
         withContext(coroutineContext) {
             safeApiCall {
                 authService.postReissueToken(ReissueTokenRequest(refreshToken))
             }
         }
 
-    override suspend fun getTokenVerification(accessToken: String): TuripCustomResult<Unit> =
+    override suspend fun getTokenVerification(accessToken: String): TuripResult<Unit> =
         withContext(coroutineContext) {
             safeApiCall {
                 authService.getTokenVerification(AUTHORIZATION_PREFIX + accessToken)

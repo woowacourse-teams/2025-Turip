@@ -1,17 +1,23 @@
 package com.on.turip.ui.folder
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import com.google.android.material.snackbar.Snackbar
 import com.on.turip.R
 import com.on.turip.databinding.BottomSheetFragmentFolderRemoveBinding
 import com.on.turip.ui.common.base.BaseBottomSheetFragment
-import com.on.turip.ui.folder.model.FolderEditModel
+import com.on.turip.ui.common.error.ErrorUiModel
+import com.on.turip.ui.common.error.toUiModel
+import com.on.turip.ui.common.extensions.collectOnStarted
+import com.on.turip.ui.folder.model.TuripUiEffect
+import com.on.turip.ui.login.LoginActivity
 
 class FolderRemoveBottomSheetFragment : BaseBottomSheetFragment<BottomSheetFragmentFolderRemoveBinding>() {
-    private val sharedViewModel: FolderViewModel by activityViewModels()
+    private val sharedViewModel: TuripViewModel by activityViewModels()
 
     override fun inflateBinding(
         inflater: LayoutInflater,
@@ -30,8 +36,7 @@ class FolderRemoveBottomSheetFragment : BaseBottomSheetFragment<BottomSheetFragm
 
     private fun setupListeners() {
         binding.tvBottomSheetFolderRemoveRemove.setOnClickListener {
-            sharedViewModel.deleteFolder()
-            dismiss()
+            sharedViewModel.deleteTurip()
         }
         binding.tvBottomSheetFolderRemoveCancel.setOnClickListener {
             dismiss()
@@ -39,12 +44,51 @@ class FolderRemoveBottomSheetFragment : BaseBottomSheetFragment<BottomSheetFragm
     }
 
     private fun setupObservers() {
-        sharedViewModel.selectedFolder.observe(viewLifecycleOwner) { selectedFolder: FolderEditModel ->
+        sharedViewModel.getSelectedTuripOrNull()?.let { selectFolder ->
             binding.tvBottomSheetFolderRemoveTitle.text =
-                getString(R.string.bottom_sheet_folder_remove_title, selectedFolder.name)
+                getString(R.string.bottom_sheet_turip_remove_title, selectFolder.name)
             binding.tvBottomSheetFolderRemovePlaceCount.text =
-                getString(R.string.all_total_place_count, selectedFolder.count)
+                getString(R.string.all_total_place_count, selectFolder.count)
         }
+
+        collectOnStarted(sharedViewModel.uiEffect) { uiEffect: TuripUiEffect ->
+            when (uiEffect) {
+                TuripUiEffect.NavigateToLogin -> {
+                    navigateToLoginScreen()
+                }
+
+                TuripUiEffect.TuripDeleted -> {
+                    dismiss()
+                }
+
+                is TuripUiEffect.ShowError -> {
+                    val uiModel: ErrorUiModel =
+                        uiEffect.errorUiState.toUiModel() ?: return@collectOnStarted
+                    view?.let { view: View ->
+                        Snackbar
+                            .make(view, uiModel.titleRes, Snackbar.LENGTH_INDEFINITE)
+                            .apply {
+                                setAction(uiModel.retryTextRes) {
+                                    sharedViewModel.handleErrorRetryRequest(uiEffect.action)
+                                }
+                            }.show()
+                    }
+                }
+
+                else -> {
+                    Unit
+                }
+            }
+        }
+    }
+
+    private fun navigateToLoginScreen() {
+        val intent: Intent =
+            LoginActivity
+                .newIntent(requireActivity())
+                .apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK }
+        startActivity(intent)
+        requireActivity().finish()
     }
 
     companion object {

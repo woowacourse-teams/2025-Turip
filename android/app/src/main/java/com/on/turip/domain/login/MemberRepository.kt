@@ -1,13 +1,11 @@
 package com.on.turip.domain.login
 
-import com.on.turip.data.common.TuripCustomResult
+import com.on.turip.core.result.TuripResult
 
 interface MemberRepository {
-    suspend fun updateMigration(): TuripCustomResult<Unit>
+    suspend fun updateMigration(): TuripResult<Unit>
 
-    suspend fun logout(): TuripCustomResult<Unit>
+    suspend fun logout(): TuripResult<Unit>
 
-    suspend fun deleteMember(): TuripCustomResult<Unit>
-
-    suspend fun deleteGuest(): TuripCustomResult<Unit>
+    suspend fun deleteMember(): TuripResult<Unit>
 }

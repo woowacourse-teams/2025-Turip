@@ -35,15 +35,9 @@
     @androidx.room.* <methods>;
 }
 
-# Retrofit
--keep class retrofit2.** { *; }
--keepclasseswithmembers class * {
-    @retrofit2.http.* <methods>;
-}
--dontwarn javax.annotation.**
-
-# OkHttp
--dontwarn okhttp3.**
+# ktorfit
+-keep class de.jensklingenberg.ktorfit.** { *; }
+-keepclassmembers class de.jensklingenberg.ktorfit.** { *; }
 
 # kotlinx.serialization
 -keep class kotlinx.serialization.** { *; }
@@ -65,11 +59,11 @@
 -dontwarn com.google.firebase.**
 
 # WebView JavaScript Interface
--keepclassmembers class com.on.turip.ui.trip.detail.webview.WebViewVideoBridge {
+-keepclassmembers class com.on.turip.ui.compose.trip.webview.WebViewVideoBridge {
     @android.webkit.JavascriptInterface <methods>;
 }
 
--keep class com.on.turip.ui.trip.detail.webview.WebViewVideoBridge {
+-keep class com.on.turip.ui.compose.trip.webview.WebViewVideoBridge {
     public *;
 }
 

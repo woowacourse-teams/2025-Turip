@@ -39,6 +39,9 @@ VS Code
 
 Logging
 /logs
+/turip-app/logs
+*.log
+*.gz
 
 .env
 /mysql-data

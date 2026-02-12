@@ -5,11 +5,16 @@ import androidx.lifecycle.viewModelScope
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.on.turip.common.AuthState
 import com.on.turip.common.UserType
-import com.on.turip.data.common.onFailure
-import com.on.turip.data.common.onSuccess
+import com.on.turip.core.result.ErrorType
+import com.on.turip.core.result.onFailure
+import com.on.turip.core.result.onSuccess
 import com.on.turip.data.login.datasource.GoogleCredentialManager
+import com.on.turip.domain.login.GuestRepository
 import com.on.turip.domain.login.MemberRepository
 import com.on.turip.domain.login.usecase.LoginUserUseCase
+import com.on.turip.ui.common.error.ErrorUiState
+import com.on.turip.ui.common.error.UiError
+import com.on.turip.ui.common.error.toUiError
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -25,12 +30,13 @@ import javax.inject.Inject
 class LoginViewmodel @Inject constructor(
     private val loginUserUseCase: LoginUserUseCase,
     private val memberRepository: MemberRepository,
+    private val guestRepository: GuestRepository,
 ) : ViewModel() {
-    private val _uiState: MutableStateFlow<LoginUiState> = MutableStateFlow(LoginUiState.EMPTY)
+    private val _uiState: MutableStateFlow<LoginUiState> = MutableStateFlow(LoginUiState.IDLE)
     val uiState: StateFlow<LoginUiState> = _uiState
 
-    private val _uiEvent: Channel<LoginUiEvent> = Channel(Channel.BUFFERED)
-    val uiEvent: Flow<LoginUiEvent> = _uiEvent.receiveAsFlow()
+    private val _uiEffect: Channel<LoginUiEffect> = Channel(Channel.BUFFERED)
+    val uiEffect: Flow<LoginUiEffect> = _uiEffect.receiveAsFlow()
 
     fun updateHelpTextVisible(show: Boolean) {
         _uiState.update { it.copy(showHelpText = show) }
@@ -47,12 +53,29 @@ class LoginViewmodel @Inject constructor(
                             if (isNewMember) {
                                 showMigrationDialog(true)
                             } else {
-                                _uiEvent.send(LoginUiEvent.NavigateToMain)
+                                _uiEffect.send(LoginUiEffect.NavigateToMain)
                             }
                         }.onFailure {
                             Timber.e("Token 저장 실패")
+                            _uiEffect.send(LoginUiEffect.ShowError(ErrorUiState.Server))
                         }
-                }.onFailure {
+                }.onFailure { errorType: ErrorType ->
+                    val uiError: UiError = errorType.toUiError()
+                    if (uiError is UiError.Global) {
+                        when (uiError) {
+                            UiError.Global.Network -> {
+                                _uiEffect.send(LoginUiEffect.ShowError(ErrorUiState.Network))
+                            }
+
+                            UiError.Global.Server -> {
+                                _uiEffect.send(LoginUiEffect.ShowError(ErrorUiState.Server))
+                            }
+
+                            UiError.Global.TokenExpired -> {
+                                Unit
+                            }
+                        }
+                    }
                     Timber.e("IdToken불러오기 실패")
                 }
         }
@@ -67,7 +90,7 @@ class LoginViewmodel @Inject constructor(
             memberRepository
                 .updateMigration()
                 .onSuccess {
-                    _uiEvent.send(LoginUiEvent.NavigateToMain)
+                    _uiEffect.send(LoginUiEffect.NavigateToMain)
                 }.onFailure {
                     Timber.e("마이그레이션 실패")
                 }
@@ -76,10 +99,10 @@ class LoginViewmodel @Inject constructor(
 
     fun clearGuestData() {
         viewModelScope.launch {
-            memberRepository
+            guestRepository
                 .deleteGuest()
                 .onSuccess {
-                    _uiEvent.send(LoginUiEvent.NavigateToMain)
+                    _uiEffect.send(LoginUiEffect.NavigateToMain)
                 }.onFailure {
                     Timber.e("게스트 데이터 삭제 실패")
                 }
@@ -89,7 +112,7 @@ class LoginViewmodel @Inject constructor(
     fun onGuestLogin() {
         viewModelScope.launch {
             AuthState.change(UserType.GUEST)
-            _uiEvent.send(LoginUiEvent.NavigateToMain)
+            _uiEffect.send(LoginUiEffect.NavigateToMain)
         }
     }
 }

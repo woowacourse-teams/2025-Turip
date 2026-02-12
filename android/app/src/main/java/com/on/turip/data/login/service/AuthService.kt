@@ -4,25 +4,24 @@ import com.on.turip.data.login.dto.LoginIdTokenPostRequest
 import com.on.turip.data.login.dto.LoginJwtTokenResponse
 import com.on.turip.data.login.dto.ReissueTokenRequest
 import com.on.turip.data.login.dto.ReissueTokenResponse
-import retrofit2.Response
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.Header
-import retrofit2.http.POST
+import de.jensklingenberg.ktorfit.http.Body
+import de.jensklingenberg.ktorfit.http.GET
+import de.jensklingenberg.ktorfit.http.Header
+import de.jensklingenberg.ktorfit.http.POST
 
 interface AuthService {
-    @POST("login/google")
+    @POST("auth/login/google")
     suspend fun postIdToken(
         @Body loginIdTokenPostRequest: LoginIdTokenPostRequest,
-    ): Response<LoginJwtTokenResponse>
+    ): LoginJwtTokenResponse
 
-    @POST("token")
+    @POST("auth/tokens")
     suspend fun postReissueToken(
         @Body reissueTokenRequest: ReissueTokenRequest,
-    ): Response<ReissueTokenResponse>
+    ): ReissueTokenResponse
 
-    @GET("token/verification")
+    @GET("auth/tokens/verification")
     suspend fun getTokenVerification(
         @Header("Authorization") token: String,
-    ): Response<Unit>
+    )
 }

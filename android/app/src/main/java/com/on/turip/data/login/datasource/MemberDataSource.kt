@@ -1,13 +1,11 @@
 package com.on.turip.data.login.datasource
 
-import com.on.turip.data.common.TuripCustomResult
+import com.on.turip.core.result.TuripResult
 
 interface MemberDataSource {
-    suspend fun postMigration(): TuripCustomResult<Unit>
+    suspend fun postMigration(): TuripResult<Unit>
 
-    suspend fun postLogout(): TuripCustomResult<Unit>
+    suspend fun postLogout(): TuripResult<Unit>
 
-    suspend fun deleteMember(): TuripCustomResult<Unit>
-
-    suspend fun deleteGuest(): TuripCustomResult<Unit>
+    suspend fun deleteMember(): TuripResult<Unit>
 }

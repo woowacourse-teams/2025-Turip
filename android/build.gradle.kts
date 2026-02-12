@@ -7,6 +7,8 @@ plugins {
     id("com.google.firebase.crashlytics") version "3.0.5" apply false
     alias(libs.plugins.compose.compiler) apply false
     alias(libs.plugins.dagger.hilt) apply false
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.ktrofit) apply false
 }
 buildscript {
     dependencies {

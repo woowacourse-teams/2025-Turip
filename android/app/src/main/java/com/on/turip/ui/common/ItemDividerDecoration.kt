@@ -4,6 +4,7 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
+import com.on.turip.ui.common.extensions.dpToPxFloat
 
 class ItemDividerDecoration(
     private val height: Int,

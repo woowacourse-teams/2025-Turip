@@ -9,6 +9,7 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.on.turip.databinding.FragmentMyPageBinding
 import com.on.turip.ui.common.base.BaseFragment
+import com.on.turip.ui.main.bookmarks.BookmarkContentFragment
 import com.on.turip.ui.setting.SettingActivity
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -18,8 +19,8 @@ class MyPageFragment : BaseFragment<FragmentMyPageBinding>() {
         MyPageStateAdapter(
             this,
             listOf(
-                FavoritePlaceFragment.instance(),
-                FavoriteContentFragment.instance(),
+                TuripPlaceFragment.instance(),
+                BookmarkContentFragment.instance(),
             ),
         )
     }
@@ -51,8 +52,8 @@ class MyPageFragment : BaseFragment<FragmentMyPageBinding>() {
         ) { tab: TabLayout.Tab, position: Int ->
             tab.text =
                 when (position) {
-                    0 -> FAVORITE_PLACE_TAB_NAME
-                    else -> FAVORITE_CONTENT_TAB_NAME
+                    0 -> TURIP_TAB_NAME
+                    else -> BOOKMARK_TAB_NAME
                 }
         }.attach()
     }
@@ -64,7 +65,7 @@ class MyPageFragment : BaseFragment<FragmentMyPageBinding>() {
     }
 
     companion object {
-        private const val FAVORITE_CONTENT_TAB_NAME: String = "컨텐츠 찜"
-        private const val FAVORITE_PLACE_TAB_NAME: String = "장소 찜"
+        private const val BOOKMARK_TAB_NAME: String = "북마크"
+        private const val TURIP_TAB_NAME: String = "튜립"
     }
 }

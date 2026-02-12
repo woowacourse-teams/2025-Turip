@@ -1,0 +1,22 @@
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: jdbc:mysql://mysql:3306/turip_dev
+    username: turip
+    password: turip_pw
+  jpa:
+    properties:
+      hibernate:
+        validator:
+          apply_to_ddl: false
+  management:
+    endpoint:
+      health:
+        show-details: always
+jwt:
+  access-token-expiration-ms: 10800000  # 3시간
+
+cookie:
+  secure: false  # HTTP 환경에서 쿠키 전송 허용
