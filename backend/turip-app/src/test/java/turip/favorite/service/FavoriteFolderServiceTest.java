@@ -558,14 +558,16 @@ class FavoriteFolderServiceTest {
             // given
             String token = "valid_token";
             Long folderId = 1L;
+            FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(folderId, "폴더");
+            Account user = AccountFixture.createUser();
 
             given(invitationTokenProvider.getClaimOfName(token, "fid", Long.class))
                     .willReturn(folderId);
-            given(favoriteFolderRepository.existsById(folderId))
-                    .willReturn(true);
+            given(favoriteFolderRepository.findById(folderId))
+                    .willReturn(Optional.of(favoriteFolder));
 
             // when
-            var response = favoriteFolderService.getInvitationDetails(token);
+            var response = favoriteFolderService.getInvitationDetails(token, user);
 
             // then
             assertThat(response.turipId()).isEqualTo(folderId);
@@ -577,14 +579,15 @@ class FavoriteFolderServiceTest {
             // given
             String token = "valid_token";
             Long folderId = 1L;
+            Account user = AccountFixture.createUser();
 
             given(invitationTokenProvider.getClaimOfName(token, "fid", Long.class))
                     .willReturn(folderId);
-            given(favoriteFolderRepository.existsById(folderId))
-                    .willReturn(false);
+            given(favoriteFolderRepository.findById(folderId))
+                    .willReturn(Optional.empty());
 
             // when & then
-            assertThatThrownBy(() -> favoriteFolderService.getInvitationDetails(token))
+            assertThatThrownBy(() -> favoriteFolderService.getInvitationDetails(token, user))
                     .isInstanceOf(NotFoundException.class)
                     .hasMessage(ErrorTag.FAVORITE_FOLDER_NOT_FOUND.getMessage());
         }
@@ -594,12 +597,13 @@ class FavoriteFolderServiceTest {
         void verifyInvitation_expiredToken() {
             // given
             String token = "expired_token";
+            Account user = AccountFixture.createUser();
 
             given(invitationTokenProvider.getClaimOfName(token, "fid", Long.class))
                     .willThrow(new BadRequestException(ErrorTag.INVITATION_TOKEN_EXPIRED));
 
             // when & then
-            assertThatThrownBy(() -> favoriteFolderService.getInvitationDetails(token))
+            assertThatThrownBy(() -> favoriteFolderService.getInvitationDetails(token, user))
                     .isInstanceOf(BadRequestException.class)
                     .hasMessage(ErrorTag.INVITATION_TOKEN_EXPIRED.getMessage());
         }
@@ -609,12 +613,13 @@ class FavoriteFolderServiceTest {
         void verifyInvitation_invalidToken() {
             // given
             String token = "invalid_token";
+            Account user = AccountFixture.createUser();
 
             given(invitationTokenProvider.getClaimOfName(token, "fid", Long.class))
                     .willThrow(new BadRequestException(ErrorTag.INVALID_INVITATION_TOKEN));
 
             // when & then
-            assertThatThrownBy(() -> favoriteFolderService.getInvitationDetails(token))
+            assertThatThrownBy(() -> favoriteFolderService.getInvitationDetails(token, user))
                     .isInstanceOf(BadRequestException.class)
                     .hasMessage(ErrorTag.INVALID_INVITATION_TOKEN.getMessage());
         }
