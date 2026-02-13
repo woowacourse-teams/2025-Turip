@@ -98,9 +98,10 @@ class FavoriteFolderStreamApiTest {
             URL url = new URI("http://localhost:" + port + "/api/v1/turips/" + folderId + "/stream").toURL();
 
             // when
-            BufferedReader reader = connectStreamingAndGetInputBuffer(url, accessToken);
-            List<String> events = readUntilEvent(reader, "connect");
-            reader.close();
+            List<String> events;
+            try (BufferedReader reader = connectStreamingAndGetInputBuffer(url, accessToken);) {
+                events = readUntilEvent(reader, "connect");
+            }
 
             // then
             assertThat(events).anyMatch(event -> event.contains("connect"));
@@ -121,9 +122,10 @@ class FavoriteFolderStreamApiTest {
             URL url = new URI("http://localhost:" + port + "/api/v1/turips/" + folderId + "/stream").toURL();
 
             // when
-            BufferedReader reader = connectStreamingAndGetInputBuffer(url, accessToken);
-            List<String> events = readUntilEvent(reader, "heartbeat");
-            reader.close();
+            List<String> events;
+            try (BufferedReader reader = connectStreamingAndGetInputBuffer(url, accessToken);) {
+                events = readUntilEvent(reader, "heartbeat");
+            }
 
             // then
             assertThat(events).anyMatch(event -> event.contains("heartbeat"));
