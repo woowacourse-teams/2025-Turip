@@ -1,4 +1,4 @@
-package com.on.turip.ui.compose.turip.selection.util.reorderable
+package com.on.turip.ui.compose.trip.bottomsheet.util.reorderable
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Box
@@ -119,7 +119,8 @@ fun LazyItemScope.ReorderableItem(
             .graphicsLayer {
                 scaleX = scale
                 scaleY = scale
-            }.onGloballyPositioned { itemPosition = it.positionInRoot().y },
+            }
+            .onGloballyPositioned { itemPosition = it.positionInRoot().y },
     ) {
         val itemScope: ReorderableLazyColumnItemScope =
             remember(state, key, enabled) {

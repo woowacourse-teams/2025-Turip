@@ -1,4 +1,4 @@
-package com.on.turip.ui.compose.turip.selection
+package com.on.turip.ui.compose.trip.bottomsheet
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -14,14 +14,15 @@ import com.on.turip.domain.turip.repository.TuripRepository
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
-import com.on.turip.ui.compose.turip.selection.model.DeletePlaceSnapshot
-import com.on.turip.ui.compose.turip.selection.model.TuripPlaceModel
+import com.on.turip.ui.compose.trip.bottomsheet.model.DeletePlaceSnapshot
+import com.on.turip.ui.compose.trip.bottomsheet.model.TuripPlaceModel
 import com.on.turip.ui.main.favorite.PlaceTuripSelectionFragment.Companion.PLACE_TURIP_SELECTION_ARGUMENTS_PLACE_ID
 import com.on.turip.ui.main.favorite.PlaceTuripSelectionFragment.Companion.PLACE_TURIP_SELECTION_ARGUMENTS_PLACE_NAME
 import com.on.turip.ui.main.favorite.model.TuripModel
 import com.on.turip.ui.main.favorite.model.TuripShareModel
 import com.on.turip.ui.main.favorite.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -39,7 +40,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @HiltViewModel
 class PlaceTuripSelectionViewModel @Inject constructor(
@@ -368,8 +368,9 @@ class PlaceTuripSelectionViewModel @Inject constructor(
                         _uiEffect.send(
                             PlaceTuripSelectionUiEffect.ShowReorderPlaceFailed(
                                 retryAction =
-                                    PlaceTuripSelectionRetryAction
-                                        .UpdateReorderedPlaces(reorderedTuripPlaces),
+                                    PlaceTuripSelectionRetryAction.UpdateReorderedPlaces(
+                                        reorderedTuripPlaces,
+                                    ),
                             ),
                         )
                         Timber.e("장소 순서 변경 API 실패")

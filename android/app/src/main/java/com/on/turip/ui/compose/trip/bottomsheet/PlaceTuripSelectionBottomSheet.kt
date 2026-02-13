@@ -1,4 +1,4 @@
-package com.on.turip.ui.compose.turip.selection
+package com.on.turip.ui.compose.trip.bottomsheet
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -46,9 +46,9 @@ import com.on.turip.ui.common.extensions.showSnackbarWithAction
 import com.on.turip.ui.compose.designsystem.component.TuripDialog
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
+import com.on.turip.ui.compose.trip.bottomsheet.component.TuripDetail
+import com.on.turip.ui.compose.trip.bottomsheet.component.TuripsContent
 import com.on.turip.ui.compose.trip.model.MapModel
-import com.on.turip.ui.compose.turip.selection.component.TuripDetail
-import com.on.turip.ui.compose.turip.selection.component.TuripsContent
 import com.on.turip.ui.main.favorite.model.TuripShareModel
 import kotlinx.collections.immutable.persistentListOf
 

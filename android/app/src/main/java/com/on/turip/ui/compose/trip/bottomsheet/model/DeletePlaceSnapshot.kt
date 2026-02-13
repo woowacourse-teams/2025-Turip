@@ -1,4 +1,4 @@
-package com.on.turip.ui.compose.turip.selection.model
+package com.on.turip.ui.compose.trip.bottomsheet.model
 
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.collections.immutable.ImmutableList
