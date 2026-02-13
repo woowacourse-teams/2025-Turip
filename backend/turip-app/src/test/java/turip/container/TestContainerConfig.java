@@ -8,12 +8,21 @@ import org.testcontainers.containers.MySQLContainer;
 @TestConfiguration
 public class TestContainerConfig {
 
+    private static final MySQLContainer<?> MYSQL_CONTAINER;
+
+    static {
+        MYSQL_CONTAINER = new MySQLContainer<>("mysql:8.0.42")
+                .withUsername("root")
+                .withPassword("rootpwd")
+                .withDatabaseName("test_db")
+                .withReuse(true);  // 재사용으로 속도 향상
+
+        MYSQL_CONTAINER.start();
+    }
+
     @Bean
     @ServiceConnection
     public MySQLContainer<?> mySQLContainer() {
-        return new MySQLContainer<>("mysql:8.0.42")
-                .withUsername("root")
-                .withPassword("rootpwd")
-                .withDatabaseName("test_db");
+        return MYSQL_CONTAINER;
     }
 }
