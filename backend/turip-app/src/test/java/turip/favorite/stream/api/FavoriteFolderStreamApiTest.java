@@ -91,7 +91,7 @@ class FavoriteFolderStreamApiTest {
             Long memberId = testDataHelper.insertMember(accountId, "test@example.com", false);
             testDataHelper.insertTuripMember(memberId, "turip", "TestPass1!");
             Long folderId = testDataHelper.insertFavoriteFolder("테스트 폴더");
-            testDataHelper.insertFavoriteFolderAccount(folderId, accountId, AccountRole.OWNER);
+            testDataHelper.insertFavoriteFolderAccount(accountId, folderId, AccountRole.OWNER);
 
             String accessToken = loginAndGetAccessToken("turip", "TestPass1!");
             URL url = new URL("http://localhost:" + port + "/api/v1/turips/" + folderId + "/stream");
@@ -114,7 +114,7 @@ class FavoriteFolderStreamApiTest {
             Long memberId = testDataHelper.insertMember(accountId, "test@example.com", false);
             testDataHelper.insertTuripMember(memberId, "turip", "TestPass1!");
             Long folderId = testDataHelper.insertFavoriteFolder("테스트 폴더");
-            testDataHelper.insertFavoriteFolderAccount(folderId, accountId, AccountRole.OWNER);
+            testDataHelper.insertFavoriteFolderAccount(accountId, folderId, AccountRole.OWNER);
 
             String accessToken = loginAndGetAccessToken("turip", "TestPass1!");
             URL url = new URL("http://localhost:" + port + "/api/v1/turips/" + folderId + "/stream");
@@ -136,7 +136,7 @@ class FavoriteFolderStreamApiTest {
             Long ownerMemberId = testDataHelper.insertMember(ownerAccountId, "test@example.com", false);
             testDataHelper.insertTuripMember(ownerMemberId, "owner", "TestPass1!");
             Long folderId = testDataHelper.insertFavoriteFolder("테스트 폴더");
-            testDataHelper.insertFavoriteFolderAccount(folderId, ownerAccountId, AccountRole.OWNER);
+            testDataHelper.insertFavoriteFolderAccount(ownerAccountId, folderId, AccountRole.OWNER);
 
             Long notOwnerAccountId = testDataHelper.insertAccount();
             Long notOwnerMemberId = testDataHelper.insertMember(notOwnerAccountId, "test2@example.com", false);
