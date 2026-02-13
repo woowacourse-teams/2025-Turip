@@ -21,7 +21,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import turip.account.domain.Account;
+import turip.account.domain.Member;
 import turip.auth.resolver.AuthAccount;
+import turip.auth.resolver.AuthMember;
 import turip.common.exception.ErrorResponse;
 import turip.favorite.controller.dto.request.FavoriteFolderNameRequest;
 import turip.favorite.controller.dto.request.FavoriteFolderRequest;
@@ -269,8 +271,8 @@ public class FavoriteFolderController {
     @PostMapping("/{turipId}/invitation-tokens")
     public ResponseEntity<FolderInvitationTokenResponse> createInvitationToken(
             @PathVariable("turipId") Long favoriteFolderId,
-            @Parameter(hidden = true) @AuthAccount Account account) {
-        FolderInvitationTokenResponse response = favoriteFolderService.createInvitationToken(account, favoriteFolderId);
+            @Parameter(hidden = true) @AuthMember Member member) {
+        FolderInvitationTokenResponse response = favoriteFolderService.createInvitationToken(member, favoriteFolderId);
         return ResponseEntity.ok(response);
     }
 

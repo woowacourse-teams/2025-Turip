@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import turip.account.domain.Account;
+import turip.account.domain.Member;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.BadRequestException;
 import turip.common.exception.custom.ConflictException;
@@ -56,17 +57,17 @@ public class FavoriteFolderService {
     }
 
     @Transactional
-    public FolderInvitationTokenResponse createInvitationToken(Account account, Long favoriteFolderId) {
+    public FolderInvitationTokenResponse createInvitationToken(Member member, Long favoriteFolderId) {
         FavoriteFolder favoriteFolder = favoriteFolderRepository.findById(favoriteFolderId)
                 .orElseThrow(() -> new NotFoundException(ErrorTag.FAVORITE_FOLDER_NOT_FOUND));
 
-        favoriteFolderAccountService.validateMembership(account, favoriteFolder);
+        favoriteFolderAccountService.validateMembership(member.getAccount(), favoriteFolder);
 
         if (!favoriteFolder.isShared()) {
             favoriteFolder.convertToSharedFolder();
         }
 
-        String invitationToken = invitationTokenProvider.generateToken(account.getId(), favoriteFolderId);
+        String invitationToken = invitationTokenProvider.generateToken(member.getAccount().getId(), favoriteFolderId);
 
         return FolderInvitationTokenResponse.from(invitationToken);
     }

@@ -20,6 +20,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import turip.account.domain.Account;
+import turip.account.domain.Member;
 import turip.account.domain.Role;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.BadRequestException;
@@ -490,15 +491,16 @@ class FavoriteFolderServiceTest {
             Long accountId = 1L;
             Long folderId = 1L;
             Account account = AccountFixture.createCustomAccount(accountId, Role.USER);
+            Member member = new Member(account, "test@naver.com", true);
             FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(folderId, "폴더");
 
             given(favoriteFolderRepository.findById(folderId))
                     .willReturn(Optional.of(favoriteFolder));
-            given(invitationTokenProvider.generateToken(account.getId(), folderId))
+            given(invitationTokenProvider.generateToken(member.getAccount().getId(), folderId))
                     .willReturn("test_token");
 
             // when
-            FolderInvitationTokenResponse actual = favoriteFolderService.createInvitationToken(account, folderId);
+            FolderInvitationTokenResponse actual = favoriteFolderService.createInvitationToken(member, folderId);
 
             // then
             assertThat(actual.invitationCode()).isEqualTo("test_token");
@@ -511,6 +513,7 @@ class FavoriteFolderServiceTest {
             Long accountId = 1L;
             Long folderId = 1L;
             Account account = AccountFixture.createCustomAccount(accountId, Role.USER);
+            Member member = new Member(account, "test@naver.com", true);
             FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(folderId, "폴더");
             boolean before = favoriteFolder.isShared();
 
@@ -518,7 +521,7 @@ class FavoriteFolderServiceTest {
                     .willReturn(Optional.of(favoriteFolder));
 
             // when
-            favoriteFolderService.createInvitationToken(account, folderId);
+            favoriteFolderService.createInvitationToken(member, folderId);
             boolean after = favoriteFolder.isShared();
 
             // then
@@ -533,15 +536,16 @@ class FavoriteFolderServiceTest {
             Long accountId = 1L;
             Long folderId = 1L;
             Account account = AccountFixture.createCustomAccount(accountId, Role.USER);
+            Member member = new Member(account, "test@naver.com", true);
             FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(folderId, "폴더");
 
             given(favoriteFolderRepository.findById(folderId))
                     .willReturn(Optional.of(favoriteFolder));
             willThrow(new ForbiddenException(ErrorTag.FORBIDDEN))
-                    .given(favoriteFolderAccountService).validateMembership(account, favoriteFolder);
+                    .given(favoriteFolderAccountService).validateMembership(member.getAccount(), favoriteFolder);
 
             // when & then
-            assertThatThrownBy(() -> favoriteFolderService.createInvitationToken(account, folderId))
+            assertThatThrownBy(() -> favoriteFolderService.createInvitationToken(member, folderId))
                     .isInstanceOf(ForbiddenException.class)
                     .hasMessage(ErrorTag.FORBIDDEN.getMessage());
 
