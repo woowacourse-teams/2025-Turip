@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -94,7 +95,7 @@ class FavoriteFolderStreamApiTest {
             testDataHelper.insertFavoriteFolderAccount(accountId, folderId, AccountRole.OWNER);
 
             String accessToken = loginAndGetAccessToken("turip", "TestPass1!");
-            URL url = new URL("http://localhost:" + port + "/api/v1/turips/" + folderId + "/stream");
+            URL url = new URI("http://localhost:" + port + "/api/v1/turips/" + folderId + "/stream").toURL();
 
             // when
             BufferedReader reader = connectStreamingAndGetInputBuffer(url, accessToken);
@@ -117,7 +118,7 @@ class FavoriteFolderStreamApiTest {
             testDataHelper.insertFavoriteFolderAccount(accountId, folderId, AccountRole.OWNER);
 
             String accessToken = loginAndGetAccessToken("turip", "TestPass1!");
-            URL url = new URL("http://localhost:" + port + "/api/v1/turips/" + folderId + "/stream");
+            URL url = new URI("http://localhost:" + port + "/api/v1/turips/" + folderId + "/stream").toURL();
 
             // when
             BufferedReader reader = connectStreamingAndGetInputBuffer(url, accessToken);
