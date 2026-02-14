@@ -1,4 +1,4 @@
-package com.on.turip.ui.compose.trip.bottomsheet
+package com.on.turip.ui.compose.trip.turipselection
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -46,15 +46,15 @@ import com.on.turip.ui.common.extensions.showSnackbarWithAction
 import com.on.turip.ui.compose.designsystem.component.TuripDialog
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
-import com.on.turip.ui.compose.trip.bottomsheet.component.TuripDetail
-import com.on.turip.ui.compose.trip.bottomsheet.component.TuripsContent
 import com.on.turip.ui.compose.trip.model.MapModel
 import com.on.turip.ui.compose.trip.model.SelectedPlaceModel
+import com.on.turip.ui.compose.trip.turipselection.component.TuripDetail
+import com.on.turip.ui.compose.trip.turipselection.component.TuripsContent
 import com.on.turip.ui.main.favorite.model.TuripShareModel
 import kotlinx.collections.immutable.persistentListOf
 
 @Composable
-fun PlaceTuripSelectionBottomSheet(
+fun PlaceTuripSelectionScreen(
     selectedPlaceModel: SelectedPlaceModel,
     onNavigateToLogin: () -> Unit,
     onNavigateToAddTurip: () -> Unit,

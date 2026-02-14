@@ -1,4 +1,4 @@
-package com.on.turip.ui.compose.trip.bottomsheet.model
+package com.on.turip.ui.compose.trip.turipselection.model
 
 import androidx.compose.runtime.Stable
 import com.google.android.gms.maps.model.LatLng

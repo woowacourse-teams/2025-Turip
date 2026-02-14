@@ -1,4 +1,4 @@
-package com.on.turip.ui.compose.trip.bottomsheet.util.reorderable
+package com.on.turip.ui.compose.trip.turipselection.util.reorderable
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring

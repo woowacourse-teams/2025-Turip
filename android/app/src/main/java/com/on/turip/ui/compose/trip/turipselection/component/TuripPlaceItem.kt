@@ -1,4 +1,4 @@
-package com.on.turip.ui.compose.trip.bottomsheet.component
+package com.on.turip.ui.compose.trip.turipselection.component
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.BorderStroke
@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.model.LatLng
 import com.on.turip.R
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
-import com.on.turip.ui.compose.trip.bottomsheet.model.TuripPlaceModel
+import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
 
 @Composable
 fun TuripPlaceItem(

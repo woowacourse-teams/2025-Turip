@@ -1,7 +1,7 @@
-package com.on.turip.ui.compose.trip.bottomsheet
+package com.on.turip.ui.compose.trip.turipselection
 
 import androidx.compose.runtime.Immutable
-import com.on.turip.ui.compose.trip.bottomsheet.model.TuripPlaceModel
+import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
 import com.on.turip.ui.main.favorite.model.TuripModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf

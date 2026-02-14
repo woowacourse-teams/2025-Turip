@@ -1,4 +1,4 @@
-package com.on.turip.ui.compose.trip.bottomsheet.component
+package com.on.turip.ui.compose.trip.turipselection.component
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row

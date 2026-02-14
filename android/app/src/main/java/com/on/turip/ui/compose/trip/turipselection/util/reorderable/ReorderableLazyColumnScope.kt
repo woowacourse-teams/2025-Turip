@@ -1,4 +1,4 @@
-package com.on.turip.ui.compose.trip.bottomsheet.util.reorderable
+package com.on.turip.ui.compose.trip.turipselection.util.reorderable
 
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.interaction.DragInteraction
