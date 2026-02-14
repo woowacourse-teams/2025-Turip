@@ -72,7 +72,7 @@ private fun Header(
         title = placeName,
         navigation = {
             Text(
-                text = stringResource(R.string.trip_detail_bottom_sheet_turip_title),
+                text = stringResource(R.string.trip_detail_bottom_sheet_turip_selection_title),
                 style = TuripTheme.typography.body2,
                 color = TuripTheme.colors.gray03,
                 modifier = Modifier.padding(start = TuripTheme.spacing.small),
