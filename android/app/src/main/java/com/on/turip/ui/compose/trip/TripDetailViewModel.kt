@@ -18,6 +18,7 @@ import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.compose.trip.model.DayModel
 import com.on.turip.ui.compose.trip.model.PlaceModel
+import com.on.turip.ui.compose.trip.model.SelectedPlaceModel
 import com.on.turip.ui.compose.trip.model.TripDetailInfoModel
 import com.on.turip.ui.trip.TripDetailActivity.Companion.TRIP_DETAIL_CONTENT_KEY
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -111,6 +112,7 @@ class TripDetailViewModel @Inject constructor(
                             duration = trip.tripDuration.toUiModel(),
                         ),
                     isBookmarked = content.isBookmarked,
+                    selectedPlaceModel = null,
                 )
             }
 
@@ -223,6 +225,15 @@ class TripDetailViewModel @Inject constructor(
                 Timber.e("캐싱데이터에서 placeId를 찾을 수 없습니다. placeID = $placeId")
                 ""
             }
+
+    fun selectPlace(
+        placeId: Long,
+        placeName: String,
+    ) {
+        _uiState.update { state ->
+            state.copy(selectedPlaceModel = SelectedPlaceModel(placeId, placeName))
+        }
+    }
 
     private suspend fun handleError(failure: TuripResult.Failure) {
         val uiError: UiError = failure.errorType.toUiError()

@@ -8,6 +8,7 @@ import kotlinx.collections.immutable.persistentListOf
 
 @Immutable
 data class PlaceTuripSelectionUiState(
+    val selectionPlaceId: Long,
     val screenMode: PlaceTuripSelectionScreenMode,
     val placeName: String,
     val turips: ImmutableList<TuripModel>,
@@ -17,6 +18,7 @@ data class PlaceTuripSelectionUiState(
     companion object {
         val Idle: PlaceTuripSelectionUiState =
             PlaceTuripSelectionUiState(
+                selectionPlaceId = 0L,
                 screenMode = PlaceTuripSelectionScreenMode.Turips,
                 placeName = "",
                 turips = persistentListOf(),

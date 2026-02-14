@@ -1,6 +1,5 @@
 package com.on.turip.ui.compose.trip.bottomsheet
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.on.turip.common.AuthState
@@ -16,8 +15,6 @@ import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.compose.trip.bottomsheet.model.DeletePlaceSnapshot
 import com.on.turip.ui.compose.trip.bottomsheet.model.TuripPlaceModel
-import com.on.turip.ui.main.favorite.PlaceTuripSelectionFragment.Companion.PLACE_TURIP_SELECTION_ARGUMENTS_PLACE_ID
-import com.on.turip.ui.main.favorite.PlaceTuripSelectionFragment.Companion.PLACE_TURIP_SELECTION_ARGUMENTS_PLACE_NAME
 import com.on.turip.ui.main.favorite.model.TuripModel
 import com.on.turip.ui.main.favorite.model.TuripShareModel
 import com.on.turip.ui.main.favorite.toUiModel
@@ -43,22 +40,9 @@ import timber.log.Timber
 
 @HiltViewModel
 class PlaceTuripSelectionViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
     private val turipRepository: TuripRepository,
     private val updateTuripPlaceUseCase: UpdateTuripPlaceUseCase,
 ) : ViewModel() {
-    private val placeId: Long by lazy {
-        checkNotNull(savedStateHandle[PLACE_TURIP_SELECTION_ARGUMENTS_PLACE_ID]) {
-            Timber.e("장소에 대한 튜립 목록 바텀시트, place ID 값이 존재하지 않습니다.")
-        }
-    }
-
-    private val placeName: String by lazy {
-        checkNotNull(savedStateHandle[PLACE_TURIP_SELECTION_ARGUMENTS_PLACE_NAME]) {
-            Timber.e("장소에 대한 튜립 목록 바텀시트, 장소명이 존재하지 않습니다.")
-        }
-    }
-
     // 튜립 목록의 버튼 활성화 여부를 위한 캐싱
     private var originTuripIds: Set<Long> = setOf()
 
@@ -76,11 +60,13 @@ class PlaceTuripSelectionViewModel @Inject constructor(
     val uiEffect: Flow<PlaceTuripSelectionUiEffect> = _uiEffect.receiveAsFlow()
 
     init {
-        loadTuripsByPlace()
         registerDragEndEvents()
     }
 
-    fun loadTuripsByPlace() {
+    fun loadTuripsByPlace(
+        placeId: Long,
+        placeName: String,
+    ) {
         viewModelScope.launch {
             turipRepository
                 .loadTuripsByPlaceId(placeId)
@@ -89,6 +75,7 @@ class PlaceTuripSelectionViewModel @Inject constructor(
 
                     _uiState.update { state: PlaceTuripSelectionUiState ->
                         state.copy(
+                            selectionPlaceId = placeId,
                             screenMode = PlaceTuripSelectionScreenMode.Turips,
                             placeName = placeName,
                             turips = turips,
@@ -106,7 +93,7 @@ class PlaceTuripSelectionViewModel @Inject constructor(
                 }.onFailure { errorType: ErrorType ->
                     sendErrorEffect(
                         errorType = errorType,
-                        retryAction = PlaceTuripSelectionRetryAction.LoadTurips,
+                        retryAction = PlaceTuripSelectionRetryAction.LoadTurips(placeId, placeName),
                     )
                     Timber.e("장소에 대한 튜립 목록 바텀시트, 튜립 목록 불러오기 실패")
                 }
@@ -143,6 +130,8 @@ class PlaceTuripSelectionViewModel @Inject constructor(
                 uiState.value.turips
                     .filter { it.isSelected }
                     .map { it.id }
+
+            val placeId = uiState.value.selectionPlaceId
 
             turipRepository
                 .updatePlaceTurips(placeId, selectedTuripIds)
@@ -272,7 +261,7 @@ class PlaceTuripSelectionViewModel @Inject constructor(
         deletePlace: TuripPlaceModel,
         screenMode: PlaceTuripSelectionScreenMode.TuripDetail,
     ) {
-        if (placeId == deletePlace.placeId) {
+        if (uiState.value.selectionPlaceId == deletePlace.placeId) {
             _uiState.update { state ->
                 val syncTuripStatus =
                     state.turips
@@ -408,8 +397,8 @@ class PlaceTuripSelectionViewModel @Inject constructor(
 
     fun handleErrorRetryRequest(action: PlaceTuripSelectionRetryAction) {
         when (action) {
-            PlaceTuripSelectionRetryAction.LoadTurips -> {
-                loadTuripsByPlace()
+            is PlaceTuripSelectionRetryAction.LoadTurips -> {
+                loadTuripsByPlace(action.placeId, action.placeName)
             }
 
             is PlaceTuripSelectionRetryAction.UpdateTurip -> {

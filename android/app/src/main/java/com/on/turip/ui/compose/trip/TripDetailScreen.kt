@@ -428,6 +428,7 @@ private fun TripContentScreenPreview() {
                                 ),
                             ),
                         isBookmarked = true,
+                        selectedPlaceModel = null,
                     ),
                 listState = rememberLazyListState(),
                 webViewController =

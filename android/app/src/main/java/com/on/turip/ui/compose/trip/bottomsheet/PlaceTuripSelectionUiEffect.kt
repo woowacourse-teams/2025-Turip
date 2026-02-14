@@ -39,9 +39,12 @@ sealed interface PlaceTuripSelectionUiEffect {
 }
 
 sealed interface PlaceTuripSelectionRetryAction {
-    data object LoadTurips : PlaceTuripSelectionRetryAction
-
     data object UpdateTuripsByPlace : PlaceTuripSelectionRetryAction
+
+    data class LoadTurips(
+        val placeId: Long,
+        val placeName: String,
+    ) : PlaceTuripSelectionRetryAction
 
     data class UpdateTurip(
         val turipModel: TuripModel,

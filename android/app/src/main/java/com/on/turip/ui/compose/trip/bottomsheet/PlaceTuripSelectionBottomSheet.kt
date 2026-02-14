@@ -49,11 +49,13 @@ import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.trip.bottomsheet.component.TuripDetail
 import com.on.turip.ui.compose.trip.bottomsheet.component.TuripsContent
 import com.on.turip.ui.compose.trip.model.MapModel
+import com.on.turip.ui.compose.trip.model.SelectedPlaceModel
 import com.on.turip.ui.main.favorite.model.TuripShareModel
 import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun PlaceTuripSelectionBottomSheet(
+    selectedPlaceModel: SelectedPlaceModel,
     onNavigateToLogin: () -> Unit,
     onNavigateToAddTurip: () -> Unit,
     onNavigateToMap: (mapModel: MapModel) -> Unit,
@@ -74,6 +76,10 @@ fun PlaceTuripSelectionBottomSheet(
     val turipsListState = rememberLazyListState()
 
     var showLoginSuggestDialog by remember { mutableStateOf(false) }
+
+    LaunchedEffect(selectedPlaceModel.placeId) {
+        viewModel.loadTuripsByPlace(selectedPlaceModel.placeId, selectedPlaceModel.placeName)
+    }
 
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { uiEffect ->
