@@ -31,6 +31,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
@@ -55,6 +56,8 @@ import com.on.turip.ui.compose.trip.turipselection.component.TuripDetail
 import com.on.turip.ui.compose.trip.turipselection.component.TuripsContent
 import com.on.turip.ui.main.favorite.model.TuripShareModel
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -170,10 +173,11 @@ fun PlaceTuripSelectionBottomSheet(
         )
     }
 
-    LaunchedEffect(sheetState) {
-        if (sheetState.currentValue == SheetValue.Hidden) {
-            viewModel.commitTuripPlaceDelete()
-        }
+    LaunchedEffect(sheetState.currentValue) {
+        snapshotFlow { sheetState.currentValue }
+            .distinctUntilChanged()
+            .filter { it == SheetValue.Hidden }
+            .collect { viewModel.commitTuripPlaceDelete() }
     }
 
     ModalBottomSheet(
