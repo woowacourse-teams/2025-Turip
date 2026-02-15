@@ -257,7 +257,7 @@ class PlaceTuripSelectionViewModel @Inject constructor(
     }
 
     // '바텀 시트 진입할 때 선택한 장소' 와 폴더의 장소가 동일한 경우 데이터 동기화
-    private fun syncTuripForSelectedPlace(
+    private suspend fun syncTuripForSelectedPlace(
         deletePlace: TuripPlaceModel,
         screenMode: PlaceTuripSelectionScreenMode.TuripDetail,
     ) {
@@ -276,6 +276,11 @@ class PlaceTuripSelectionViewModel @Inject constructor(
                     .apply { remove(screenMode.turipId) }
                     .toSet()
             originTuripIds = updateCache
+
+            val hasAnySelectedTurip = uiState.value.turips.any { it.isSelected }
+            if (!hasAnySelectedTurip) {
+                _uiEffect.send(PlaceTuripSelectionUiEffect.HasNoTuripsByPlace(uiState.value.selectionPlaceId))
+            }
         }
     }
 

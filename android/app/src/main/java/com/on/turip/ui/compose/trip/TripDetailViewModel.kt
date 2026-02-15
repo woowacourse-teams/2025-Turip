@@ -208,14 +208,21 @@ class TripDetailViewModel @Inject constructor(
                 }
             }
 
-        viewModelScope.launch {
-            val placeName: String = getPlaceName(placeId)
-            _uiEffect.send(TripDetailUiEffect.ShowUpdatedTuripSelectionByPlace(placeName))
-        }
-
         _uiState.update { state: TripDetailUiState ->
             val currentSelectedDay = state.days.find { it.isSelected }?.day ?: DayModel.ALL_PLACE
             state.copy(places = placeCacheByDay[currentSelectedDay] ?: persistentListOf())
+        }
+    }
+
+    fun confirmPlaceTuripSelection(
+        placeId: Long,
+        hasTurip: Boolean,
+    ) {
+        updatePlaceTuripSelection(placeId, hasTurip)
+
+        viewModelScope.launch {
+            val placeName: String = getPlaceName(placeId)
+            _uiEffect.send(TripDetailUiEffect.ShowUpdatedTuripSelectionByPlace(placeName))
         }
     }
 

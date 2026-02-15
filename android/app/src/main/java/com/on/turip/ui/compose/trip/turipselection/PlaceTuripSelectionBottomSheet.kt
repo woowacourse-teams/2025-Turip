@@ -20,11 +20,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.SheetValue
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -56,18 +55,18 @@ import com.on.turip.ui.compose.trip.turipselection.component.TuripDetail
 import com.on.turip.ui.compose.trip.turipselection.component.TuripsContent
 import com.on.turip.ui.main.favorite.model.TuripShareModel
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlaceTuripSelectionBottomSheet(
+    sheetState: SheetState,
     selectedPlaceModel: SelectedPlaceModel,
     onNavigateToLogin: () -> Unit,
     onNavigateToAddTurip: () -> Unit,
     onNavigateToMap: (mapModel: MapModel) -> Unit,
     onShareTurip: (shareModel: TuripShareModel) -> Unit,
-    onTuripSelectionConfirm: (placeId: Long, hasTurip: Boolean) -> Unit,
+    onPlaceTuripChanged: (placeId: Long, hasTurip: Boolean) -> Unit,
+    onPlaceTuripConfirmed: (placeId: Long, hasTurip: Boolean) -> Unit,
     onDismiss: () -> Unit,
     viewModel: PlaceTuripSelectionViewModel = hiltViewModel(),
 ) {
@@ -83,8 +82,6 @@ fun PlaceTuripSelectionBottomSheet(
     val turipsListState = rememberLazyListState()
 
     var showLoginSuggestDialog by remember { mutableStateOf(false) }
-
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     LaunchedEffect(selectedPlaceModel.placeId) {
         viewModel.loadTuripsByPlace(selectedPlaceModel.placeId, selectedPlaceModel.placeName)
@@ -153,7 +150,15 @@ fun PlaceTuripSelectionBottomSheet(
                 }
 
                 is PlaceTuripSelectionUiEffect.UpdateTuripsByPlace -> {
-                    onTuripSelectionConfirm(uiEffect.placeId, uiEffect.hasTurip)
+                    onPlaceTuripConfirmed(uiEffect.placeId, uiEffect.hasTurip)
+                }
+
+                is PlaceTuripSelectionUiEffect.HasNoTuripsByPlace -> {
+                    onPlaceTuripChanged(uiEffect.placeId, false)
+                }
+
+                PlaceTuripSelectionUiEffect.Dismiss -> {
+                    onDismiss()
                 }
             }
         }

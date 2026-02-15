@@ -25,10 +25,12 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -73,6 +75,7 @@ import com.on.turip.ui.compose.trip.webview.VideoManager
 import com.on.turip.ui.main.favorite.model.TuripShareModel
 import kotlinx.collections.immutable.persistentListOf
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TripDetailScreen(
     navigateToBack: () -> Unit,
@@ -110,6 +113,8 @@ fun TripDetailScreen(
     val isInitialLoading by remember {
         derivedStateOf { uiState.isLoading || webViewController.isLoading }
     }
+
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     HandleFullScreenWindowLaunchedEffect(webViewController.isFullScreen)
 
@@ -217,18 +222,15 @@ fun TripDetailScreen(
 
                         uiState.selectedPlaceModel?.let { place ->
                             PlaceTuripSelectionBottomSheet(
+                                sheetState = sheetState,
                                 selectedPlaceModel = place,
                                 onNavigateToLogin = navigateToLogin,
                                 onNavigateToAddTurip = navigateToAddTurip,
                                 onNavigateToMap = navigateToMap,
                                 onShareTurip = navigateToShareTurip,
-                                onTuripSelectionConfirm = { placeId, hasTurip ->
-                                    viewModel.updatePlaceTuripSelection(placeId, hasTurip)
-                                    viewModel.clearSelectedPlace()
-                                },
-                                onDismiss = {
-                                    viewModel.clearSelectedPlace()
-                                },
+                                onPlaceTuripChanged = viewModel::updatePlaceTuripSelection,
+                                onPlaceTuripConfirmed = viewModel::confirmPlaceTuripSelection,
+                                onDismiss = viewModel::clearSelectedPlace,
                             )
                         }
                     } else {
@@ -367,8 +369,7 @@ private fun TripDetailScreenContent(
                             start = TuripTheme.spacing.extraLarge,
                             end = TuripTheme.spacing.extraLarge,
                             bottom = TuripTheme.spacing.small,
-                        )
-                        .fillMaxWidth(),
+                        ).fillMaxWidth(),
             )
         }
 
@@ -381,8 +382,7 @@ private fun TripDetailScreenContent(
                         .padding(
                             horizontal = TuripTheme.spacing.extraLarge,
                             vertical = TuripTheme.spacing.medium,
-                        )
-                        .fillMaxWidth(),
+                        ).fillMaxWidth(),
             )
         }
     }
