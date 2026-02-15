@@ -1,6 +1,6 @@
 package com.on.turip.ui.compose.trip
 
-import android.content.Context
+import android.content.res.Resources
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
@@ -39,6 +39,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -84,6 +85,7 @@ fun TripDetailScreen(
     val uiState: TripDetailUiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
+    val resources = LocalResources.current
 
     val listState = rememberLazyListState()
     val isAtBottom by remember {
@@ -119,7 +121,7 @@ fun TripDetailScreen(
             handleUiEffect(
                 uiEffect = uiEffect,
                 snackbarHostState = snackbarHostState,
-                context = context,
+                resources = resources,
                 navigateToLogin = navigateToLogin,
                 handleErrorRetryRequest = viewModel::handleErrorRetryRequest,
             )
@@ -223,7 +225,7 @@ fun TripDetailScreen(
 private suspend fun handleUiEffect(
     uiEffect: TripDetailUiEffect,
     snackbarHostState: SnackbarHostState,
-    context: Context,
+    resources: Resources,
     navigateToLogin: () -> Unit,
     handleErrorRetryRequest: (action: TripDetailRetryAction) -> Unit,
 ) {
@@ -236,8 +238,8 @@ private suspend fun handleUiEffect(
             snackbarHostState.showSnackbar(
                 visuals =
                     TuripSnackbarVisuals(
-                        message = context.getString(messageResource),
-                        actionLabel = context.getString(R.string.all_close_description),
+                        message = resources.getString(messageResource),
+                        actionLabel = resources.getString(R.string.all_close_description),
                         iconRes = iconResource,
                     ),
             )
@@ -253,8 +255,8 @@ private suspend fun handleUiEffect(
             snackbarHostState.showSnackbar(
                 visuals =
                     TuripSnackbarVisuals(
-                        message = context.getString(messageResource, uiEffect.placeName),
-                        actionLabel = context.getString(R.string.all_close_description),
+                        message = resources.getString(messageResource, uiEffect.placeName),
+                        actionLabel = resources.getString(R.string.all_close_description),
                         iconRes = iconResource,
                     ),
             )
@@ -264,8 +266,8 @@ private suspend fun handleUiEffect(
             val uiModel: ErrorUiModel =
                 uiEffect.errorUiState.toUiModel() ?: return
             snackbarHostState.showSnackbarWithAction(
-                message = context.getString(uiModel.titleRes),
-                actionLabel = context.getString(uiModel.retryTextRes),
+                message = resources.getString(uiModel.titleRes),
+                actionLabel = resources.getString(uiModel.retryTextRes),
                 duration = SnackbarDuration.Long,
                 onAction = { handleErrorRetryRequest(uiEffect.retryAction) },
             )

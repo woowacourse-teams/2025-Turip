@@ -30,8 +30,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -67,7 +67,7 @@ fun PlaceTuripSelectionScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val snackbarHostState = remember { SnackbarHostState() }
-    val context = LocalContext.current
+    val resources = LocalResources.current
 
     val windowInfo = LocalWindowInfo.current
     val density = LocalDensity.current
@@ -91,7 +91,7 @@ fun PlaceTuripSelectionScreen(
                 is PlaceTuripSelectionUiEffect.ShowTuripPlaceRemoveFailed -> {
                     snackbarHostState.showSnackbar(
                         message =
-                            context.getString(
+                            resources.getString(
                                 R.string.trip_detail_bottom_sheet_snackbar_place_remove_failed,
                                 uiEffect.placeName,
                             ),
@@ -113,8 +113,8 @@ fun PlaceTuripSelectionScreen(
                     val actionLabelResource: Int =
                         R.string.trip_detail_bottom_sheet_snackbar_place_remove_undo
                     snackbarHostState.showSnackbarWithAction(
-                        message = context.getString(messageResource, uiEffect.placeName),
-                        actionLabel = context.getString(actionLabelResource),
+                        message = resources.getString(messageResource, uiEffect.placeName),
+                        actionLabel = resources.getString(actionLabelResource),
                         onAction = viewModel::rollbackTuripPlaceDelete,
                         onDismiss = viewModel::commitTuripPlaceDelete,
                     )
@@ -124,8 +124,8 @@ fun PlaceTuripSelectionScreen(
                     val uiModel: ErrorUiModel =
                         uiEffect.errorUiState.toUiModel() ?: return@collect
                     snackbarHostState.showSnackbarWithAction(
-                        message = context.getString(uiModel.titleRes),
-                        actionLabel = context.getString(uiModel.retryTextRes),
+                        message = resources.getString(uiModel.titleRes),
+                        actionLabel = resources.getString(uiModel.retryTextRes),
                         duration = SnackbarDuration.Long,
                         onAction = { viewModel.handleErrorRetryRequest(uiEffect.retryAction) },
                     )
@@ -137,8 +137,8 @@ fun PlaceTuripSelectionScreen(
                     val actionLabelResource: Int =
                         R.string.trip_detail_bottom_sheet_snackbar_place_reorder_retry
                     snackbarHostState.showSnackbarWithAction(
-                        message = context.getString(messageResource),
-                        actionLabel = context.getString(actionLabelResource),
+                        message = resources.getString(messageResource),
+                        actionLabel = resources.getString(actionLabelResource),
                         onAction = { viewModel.handleErrorRetryRequest(uiEffect.retryAction) },
                     )
                 }
