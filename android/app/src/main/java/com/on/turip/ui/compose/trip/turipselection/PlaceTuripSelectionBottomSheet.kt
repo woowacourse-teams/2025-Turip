@@ -156,18 +156,6 @@ fun PlaceTuripSelectionBottomSheet(
         }
     }
 
-    BackHandler {
-        when (uiState.screenMode) {
-            is PlaceTuripSelectionScreenMode.TuripDetail -> {
-                snackbarHostState.dismissAndExecute { viewModel.onTuripDetailBack() }
-            }
-
-            is PlaceTuripSelectionScreenMode.Turips -> {
-                onDismiss()
-            }
-        }
-    }
-
     if (showLoginSuggestDialog) {
         TuripDialog(
             title = stringResource(R.string.turip_dialog_login_suggest_title),
@@ -195,6 +183,18 @@ fun PlaceTuripSelectionBottomSheet(
         dragHandle = null,
         containerColor = TuripTheme.colors.white,
     ) {
+        BackHandler {
+            when (uiState.screenMode) {
+                is PlaceTuripSelectionScreenMode.TuripDetail -> {
+                    snackbarHostState.dismissAndExecute { viewModel.onTuripDetailBack() }
+                }
+
+                is PlaceTuripSelectionScreenMode.Turips -> {
+                    onDismiss()
+                }
+            }
+        }
+
         Box(
             modifier =
                 Modifier
