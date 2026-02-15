@@ -68,6 +68,7 @@ import com.on.turip.ui.compose.trip.model.DayModel
 import com.on.turip.ui.compose.trip.model.MapModel
 import com.on.turip.ui.compose.trip.model.PlaceModel
 import com.on.turip.ui.compose.trip.model.TripDetailInfoModel
+import com.on.turip.ui.compose.trip.turipselection.PlaceTuripSelectionBottomSheet
 import com.on.turip.ui.compose.trip.webview.VideoManager
 import com.on.turip.ui.main.favorite.model.TuripShareModel
 import kotlinx.collections.immutable.persistentListOf
@@ -207,12 +208,29 @@ fun TripDetailScreen(
                             onDayClick = viewModel::updateDay,
                             onTimeLineClick = webViewController::seekTo,
                             onMapClick = navigateToMap,
-                            onTuripPlaceClick = onTuripPlaceClick,
+                            onTuripPlaceClick = viewModel::selectPlace,
                             onBookmarkClick = {
                                 snackbarHostState.dismissAndExecute { viewModel.updateBookmark() }
                             },
                             onErrorVideoClick = { navigateToWebViewUrl(uiState.tripDetailInfo.videoLink) },
                         )
+
+                        uiState.selectedPlaceModel?.let { place ->
+                            PlaceTuripSelectionBottomSheet(
+                                selectedPlaceModel = place,
+                                onNavigateToLogin = navigateToLogin,
+                                onNavigateToAddTurip = navigateToAddTurip,
+                                onNavigateToMap = navigateToMap,
+                                onShareTurip = navigateToShareTurip,
+                                onTuripSelectionConfirm = { placeId, hasTurip ->
+                                    viewModel.updatePlaceTuripSelection(placeId, hasTurip)
+                                    viewModel.clearSelectedPlace()
+                                },
+                                onDismiss = {
+                                    viewModel.clearSelectedPlace()
+                                },
+                            )
+                        }
                     } else {
                         FullScreenVideo(webViewController.fullScreenVideo)
                     }
@@ -349,7 +367,8 @@ private fun TripDetailScreenContent(
                             start = TuripTheme.spacing.extraLarge,
                             end = TuripTheme.spacing.extraLarge,
                             bottom = TuripTheme.spacing.small,
-                        ).fillMaxWidth(),
+                        )
+                        .fillMaxWidth(),
             )
         }
 
@@ -362,7 +381,8 @@ private fun TripDetailScreenContent(
                         .padding(
                             horizontal = TuripTheme.spacing.extraLarge,
                             vertical = TuripTheme.spacing.medium,
-                        ).fillMaxWidth(),
+                        )
+                        .fillMaxWidth(),
             )
         }
     }
