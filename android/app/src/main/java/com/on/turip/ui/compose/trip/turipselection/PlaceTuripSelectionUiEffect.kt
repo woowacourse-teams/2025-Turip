@@ -11,6 +11,8 @@ sealed interface PlaceTuripSelectionUiEffect {
 
     data object TuripShareNotAllowed : PlaceTuripSelectionUiEffect
 
+    data object Dismiss : PlaceTuripSelectionUiEffect
+
     data class ShowTuripPlaceRemoveFailed(
         val placeName: String,
     ) : PlaceTuripSelectionUiEffect
@@ -32,7 +34,11 @@ sealed interface PlaceTuripSelectionUiEffect {
         val hasTurip: Boolean,
     ) : PlaceTuripSelectionUiEffect
 
-    data class ShowError(
+    data class HasNoTuripsByPlace(
+        val placeId: Long,
+    ) : PlaceTuripSelectionUiEffect
+
+    class ShowError(
         val errorUiState: ErrorUiState,
         val retryAction: PlaceTuripSelectionRetryAction,
     ) : PlaceTuripSelectionUiEffect

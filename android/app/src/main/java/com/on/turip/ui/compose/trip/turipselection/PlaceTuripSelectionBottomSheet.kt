@@ -30,7 +30,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
@@ -178,16 +177,9 @@ fun PlaceTuripSelectionBottomSheet(
         )
     }
 
-    LaunchedEffect(sheetState.currentValue) {
-        snapshotFlow { sheetState.currentValue }
-            .distinctUntilChanged()
-            .filter { it == SheetValue.Hidden }
-            .collect { viewModel.commitTuripPlaceDelete() }
-    }
-
     ModalBottomSheet(
         sheetState = sheetState,
-        onDismissRequest = onDismiss,
+        onDismissRequest = { snackbarHostState.dismissAndExecute { viewModel.requestDismiss() } },
         sheetGesturesEnabled = false,
         dragHandle = null,
         containerColor = TuripTheme.colors.white,
@@ -199,7 +191,7 @@ fun PlaceTuripSelectionBottomSheet(
                 }
 
                 is PlaceTuripSelectionScreenMode.Turips -> {
-                    onDismiss()
+                    viewModel.requestDismiss()
                 }
             }
         }
@@ -221,7 +213,10 @@ fun PlaceTuripSelectionBottomSheet(
                     enter = expandVertically() + fadeIn(),
                     exit = shrinkVertically() + fadeOut(),
                 ) {
-                    CloseButton(onCloseClick = onDismiss, modifier = Modifier.fillMaxWidth())
+                    CloseButton(
+                        onCloseClick = viewModel::requestDismiss,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
                 }
 
                 when (val mode = uiState.screenMode) {

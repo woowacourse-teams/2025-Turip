@@ -36,6 +36,8 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import timber.log.Timber
 
 @HiltViewModel
@@ -142,6 +144,7 @@ class PlaceTuripSelectionViewModel @Inject constructor(
                             hasTurip = selectedTuripIds.isNotEmpty(),
                         ),
                     )
+                    _uiEffect.send(PlaceTuripSelectionUiEffect.Dismiss)
                     Timber.d("바텀시트, 선택한 장소에 대한 튜립들 현황 업데이트 성공")
                 }.onFailure { errorType: ErrorType ->
                     sendErrorEffect(
@@ -159,6 +162,8 @@ class PlaceTuripSelectionViewModel @Inject constructor(
     }
 
     fun onTuripDetailBack() {
+        if (deletePlaceSnapshot.hasSnapshot()) commitTuripPlaceDelete()
+
         _uiState.update {
             it.copy(
                 screenMode = PlaceTuripSelectionScreenMode.Turips,
@@ -229,15 +234,21 @@ class PlaceTuripSelectionViewModel @Inject constructor(
 
     // 낙관적 UI / API 호출 & 조건에 따라 튜립 목록 화면 데이터 동기화
     fun commitTuripPlaceDelete() {
-        if (!deletePlaceSnapshot.hasSnapshot()) {
-            Timber.e("제거할 장소에 대한 정보가 없어요. deletePlaceSnapshot을 확인 해주세요 ")
-            return
-        }
+        viewModelScope.launch { commitTuripPlaceDeleteApi() }
+    }
 
-        val deletePlace = deletePlaceSnapshot.deletePlace
-        val screenMode = uiState.value.screenMode
-        if (screenMode is PlaceTuripSelectionScreenMode.TuripDetail) {
-            viewModelScope.launch {
+    private val commitMutex = Mutex()
+
+    private suspend fun commitTuripPlaceDeleteApi() {
+        commitMutex.withLock {
+            if (!deletePlaceSnapshot.hasSnapshot()) {
+                Timber.e("제거할 장소에 대한 정보가 없어요. deletePlaceSnapshot을 확인 해주세요 ")
+                return
+            }
+
+            val deletePlace = deletePlaceSnapshot.deletePlace
+            val screenMode = uiState.value.screenMode
+            if (screenMode is PlaceTuripSelectionScreenMode.TuripDetail) {
                 updateTuripPlaceUseCase(screenMode.turipId, deletePlace.placeId, false)
                     .onSuccess {
                         syncTuripForSelectedPlace(deletePlace, screenMode)
@@ -371,6 +382,13 @@ class PlaceTuripSelectionViewModel @Inject constructor(
                     }
                 reorderPlacesSnapshot = null
             }
+        }
+    }
+
+    fun requestDismiss() {
+        viewModelScope.launch {
+            if (deletePlaceSnapshot.hasSnapshot()) commitTuripPlaceDeleteApi()
+            _uiEffect.send(PlaceTuripSelectionUiEffect.Dismiss)
         }
     }
 
