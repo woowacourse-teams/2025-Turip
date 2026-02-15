@@ -8,7 +8,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -17,11 +16,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -53,8 +56,9 @@ import com.on.turip.ui.compose.trip.turipselection.component.TuripsContent
 import com.on.turip.ui.main.favorite.model.TuripShareModel
 import kotlinx.collections.immutable.persistentListOf
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PlaceTuripSelectionScreen(
+fun PlaceTuripSelectionBottomSheet(
     selectedPlaceModel: SelectedPlaceModel,
     onNavigateToLogin: () -> Unit,
     onNavigateToAddTurip: () -> Unit,
@@ -76,6 +80,8 @@ fun PlaceTuripSelectionScreen(
     val turipsListState = rememberLazyListState()
 
     var showLoginSuggestDialog by remember { mutableStateOf(false) }
+
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     LaunchedEffect(selectedPlaceModel.placeId) {
         viewModel.loadTuripsByPlace(selectedPlaceModel.placeId, selectedPlaceModel.placeName)
@@ -176,14 +182,25 @@ fun PlaceTuripSelectionScreen(
         )
     }
 
-    Surface(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .height(bottomSheetHeight),
-        shape = TuripTheme.shape.bottomSheetRounded,
+    LaunchedEffect(sheetState) {
+        if (sheetState.currentValue == SheetValue.Hidden) {
+            viewModel.commitTuripPlaceDelete()
+        }
+    }
+
+    ModalBottomSheet(
+        sheetState = sheetState,
+        onDismissRequest = onDismiss,
+        sheetGesturesEnabled = false,
+        dragHandle = null,
+        containerColor = TuripTheme.colors.white,
     ) {
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(bottomSheetHeight),
+        ) {
             Column(
                 modifier =
                     Modifier
