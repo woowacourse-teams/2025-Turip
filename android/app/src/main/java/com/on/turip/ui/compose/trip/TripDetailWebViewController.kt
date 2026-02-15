@@ -97,8 +97,7 @@ fun rememberTripDetailWebViewController(
     navigateToWebViewUrl: (String) -> Unit,
 ): TripDetailWebViewController =
     remember {
-        val webView =
-            WebView(context).apply { applyVideoSettings() }
+        val webView = WebView(context).apply { applyVideoSettings() }
 
         TripDetailWebViewController(
             webView = webView,
