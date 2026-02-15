@@ -68,6 +68,7 @@ import com.on.turip.ui.compose.trip.model.MapModel
 import com.on.turip.ui.compose.trip.model.PlaceModel
 import com.on.turip.ui.compose.trip.model.TripDetailInfoModel
 import com.on.turip.ui.compose.trip.webview.VideoManager
+import com.on.turip.ui.main.favorite.model.TuripShareModel
 import kotlinx.collections.immutable.persistentListOf
 
 @Composable
@@ -76,7 +77,8 @@ fun TripDetailScreen(
     navigateToLogin: () -> Unit,
     navigateToMap: (mapModel: MapModel) -> Unit,
     navigateToWebViewUrl: (url: String) -> Unit,
-    onTuripPlaceClick: (id: Long, placeName: String) -> Unit,
+    navigateToAddTurip: () -> Unit,
+    navigateToShareTurip: (turipShareModel: TuripShareModel) -> Unit,
     viewModel: TripDetailViewModel = hiltViewModel(),
 ) {
     val uiState: TripDetailUiState by viewModel.uiState.collectAsState()
