@@ -1,5 +1,8 @@
 package turip.favorite.stream.service;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
@@ -19,6 +22,7 @@ import turip.favorite.service.FavoriteFolderAccountService;
 import turip.favorite.stream.controller.dto.response.ConnectStreamResponse;
 import turip.favorite.stream.controller.dto.response.FolderUpdateStreamResponse;
 import turip.favorite.stream.controller.dto.response.HeartbeatStreamResponse;
+import turip.favorite.stream.controller.dto.response.MemberUpdateStreamResponse;
 
 @Slf4j
 @Service
@@ -47,15 +51,38 @@ public class FavoriteFolderStreamService {
     }
 
     public void sendFolderUpdateEvents(Long favoriteFolderId, ActionType actionType) {
+        Map<String, SseEmitter> folderEmitters = validateAndGetFolderEmitters(
+                favoriteFolderId);
+        FolderUpdateStreamResponse response = FolderUpdateStreamResponse.of(favoriteFolderId, actionType);
+
+        log.info(SSE_LOG_PREFIX + "폴더 업데이트 이벤트 전송 시작, folderId: {}, 연결된 사용자 수: {}", favoriteFolderId,
+                folderEmitters.size());
+
+        new ArrayList<>(folderEmitters.values()).forEach(emitter ->
+                sendFolderUpdateEvent(favoriteFolderId, response, emitter)
+        );
+    }
+
+    public void sendMemberUpdateEvents(Long favoriteFolderId, ActionType actionType) {
+        Map<String, SseEmitter> folderEmitters = validateAndGetFolderEmitters(
+                favoriteFolderId);
+        List<Member> members = favoriteFolderAccountService.findMembersByFavoriteFolder(favoriteFolderId);
+        MemberUpdateStreamResponse response = MemberUpdateStreamResponse.of(favoriteFolderId, actionType, members);
+
+        log.info(SSE_LOG_PREFIX + "멤버 업데이트 이벤트 전송 시작, folderId: {}, action: {}", favoriteFolderId, actionType);
+
+        new ArrayList<>(folderEmitters.values()).forEach(emitter ->
+                sendMemberUpdateEvent(favoriteFolderId, response, emitter)
+        );
+    }
+
+    private Map<String, SseEmitter> validateAndGetFolderEmitters(Long favoriteFolderId) {
         Map<String, SseEmitter> folderEmitters = emitters.get(favoriteFolderId);
         if (folderEmitters == null || folderEmitters.isEmpty()) {
             log.info(SSE_LOG_PREFIX + "폴더에 연결된 사용자 없음, folderId: {}", favoriteFolderId);
-            return;
+            return Collections.emptyMap();
         }
-        log.info(SSE_LOG_PREFIX + "폴더 업데이트 이벤트 전송 시작, folderId: {}, 연결된 사용자 수: {}", favoriteFolderId,
-                folderEmitters.size());
-        folderEmitters.values()
-                .forEach(emitter -> sendFolderUpdateEvent(favoriteFolderId, actionType, emitter));
+        return folderEmitters;
     }
 
     private String getEmitterKey(Long favoriteFolderId, Long memberId) {
@@ -111,10 +138,8 @@ public class FavoriteFolderStreamService {
         }
     }
 
-    private void sendFolderUpdateEvent(Long favoriteFolderId, ActionType actionType, SseEmitter emitter) {
+    private void sendFolderUpdateEvent(Long favoriteFolderId, FolderUpdateStreamResponse response, SseEmitter emitter) {
         try {
-            FolderUpdateStreamResponse response = FolderUpdateStreamResponse.of(favoriteFolderId, actionType);
-
             SseEventBuilder event = SseEmitter.event()
                     .id(String.valueOf(System.currentTimeMillis()))
                     .name(StreamEventType.FOLDER_UPDATE.getName())
@@ -131,6 +156,24 @@ public class FavoriteFolderStreamService {
         }
     }
 
+    private void sendMemberUpdateEvent(Long favoriteFolderId, MemberUpdateStreamResponse response, SseEmitter emitter) {
+        try {
+            SseEventBuilder event = SseEmitter.event()
+                    .id(String.valueOf(System.currentTimeMillis()))
+                    .name(StreamEventType.MEMBER_UPDATE.getName())
+                    .data(response);
+
+            emitter.send(event);
+        } catch (Exception e) {
+            try {
+                log.error(SSE_LOG_PREFIX + "멤버 업데이트 전송 실패, folderId: {}", favoriteFolderId, e);
+                emitter.completeWithError(e);
+            } catch (Exception completeException) {
+                log.error(SSE_LOG_PREFIX + "completeWithError 실패, folderId: {}", favoriteFolderId, completeException);
+            }
+        }
+    }
+
     private void removeEmitter(Long favoriteFolderId, String emitterKey) {
         emitters.computeIfPresent(favoriteFolderId, (key, folderEmitters) -> {
             folderEmitters.remove(emitterKey);
@@ -140,10 +183,6 @@ public class FavoriteFolderStreamService {
             }
             return folderEmitters;
         });
-    }
-
-    private void sendMemberUpdateEvent() {
-        // TODO: 구현 필요
     }
 
     private void startHeartbeat(String emitterKey, SseEmitter emitter) {

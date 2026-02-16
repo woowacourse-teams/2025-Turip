@@ -15,7 +15,7 @@ import turip.favorite.domain.FavoriteFolderAccount;
 public interface FavoriteFolderAccountRepository extends JpaRepository<FavoriteFolderAccount, Long> {
 
     int countByFavoriteFolder(FavoriteFolder favoriteFolder);
-    
+
     Optional<FavoriteFolderAccount> findByFavoriteFolderAndAccount(FavoriteFolder favoriteFolder, Account account);
 
     @Query("SELECT m FROM FavoriteFolderAccount ffa " +
@@ -23,6 +23,12 @@ public interface FavoriteFolderAccountRepository extends JpaRepository<FavoriteF
             "JOIN Member m ON m.account.id = a.id " +
             "WHERE ffa.favoriteFolder = :favoriteFolder")
     List<Member> findMembersByFavoriteFolder(@Param("favoriteFolder") FavoriteFolder favoriteFolder);
+
+    @Query("SELECT ffa FROM FavoriteFolderAccount ffa " +
+            "JOIN ffa.account a " +
+            "JOIN Member m ON m.account.id = a.id " +
+            "WHERE ffa.favoriteFolder.id = :favoriteFolderId")
+    List<Member> findMembersByFavoriteFolderId(@Param("favoriteFolderId") Long favoriteFolderId);
 
     @Modifying
     @Query("UPDATE FavoriteFolderAccount ffa " +

@@ -62,6 +62,10 @@ public class FavoriteFolderAccountService {
         return favoriteFolderAccountRepository.findMembersByFavoriteFolder(favoriteFolder);
     }
 
+    public List<Member> findMembersByFavoriteFolder(Long favoriteFolderId) {
+        return favoriteFolderAccountRepository.findMembersByFavoriteFolderId(favoriteFolderId);
+    }
+
     @Transactional
     public void deleteByFavoriteFolderAndAccount(FavoriteFolder favoriteFolder, Account account) {
         FavoriteFolderAccount favoriteFolderAccount = favoriteFolderAccountRepository.findByFavoriteFolderAndAccount(
