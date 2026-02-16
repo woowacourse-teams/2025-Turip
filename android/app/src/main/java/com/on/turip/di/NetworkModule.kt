@@ -126,6 +126,8 @@ object NetworkModule {
                                 )
                             },
                             onFailure = {
+                                userStorageRepository.clearTokens()
+                                AuthState.change(UserType.GUEST)
                                 null
                             },
                         )
