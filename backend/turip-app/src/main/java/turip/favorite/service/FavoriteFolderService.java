@@ -18,18 +18,15 @@ import turip.favorite.controller.dto.response.FavoriteFolderDetailResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderExitResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderJoinResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderMembersResponse;
-import turip.favorite.controller.dto.response.FavoriteFolderExitResponse;
-import turip.favorite.controller.dto.response.FavoriteFolderJoinResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersDetailResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithFavoriteStatusResponse;
-import turip.favorite.controller.dto.response.FavoriteFoldersWithPlaceCountResponse;
 import turip.favorite.domain.AccountRole;
 import turip.favorite.domain.FavoriteFolder;
+import turip.favorite.domain.FavoriteFolderAccount;
 import turip.favorite.domain.event.ActionType;
 import turip.favorite.domain.event.FavoriteFolderUpdateEvent;
-import turip.favorite.domain.FavoriteFolderAccount;
 import turip.favorite.repository.FavoriteFolderRepository;
 import turip.favorite.repository.FavoritePlaceRepository;
 import turip.place.domain.Place;
@@ -73,21 +70,22 @@ public class FavoriteFolderService {
         return FavoriteFolderJoinResponse.from(favoriteFolderAccount);
     }
 
-    public FavoriteFolder getById(Long favoriteFolderId) {
-        return favoriteFolderRepository.findById(favoriteFolderId)
-                .orElseThrow(() -> new NotFoundException(ErrorTag.FAVORITE_FOLDER_NOT_FOUND));
-    }
-
-    public FavoriteFoldersWithPlaceCountResponse findAllByAccount(Account account) {
-        List<FavoriteFolderWithPlaceCountResponse> favoriteFoldersWithPlaceCount = favoriteFolderRepository.findAllByAccountOrderByFavoriteFolderAccountIdAsc(
+    public FavoriteFoldersDetailResponse findAllByAccount(Account account) {
+        List<FavoriteFolderDetailResponse> favoriteFoldersWithPlaceCount = favoriteFolderRepository.findAllByAccountOrderByFavoriteFolderAccountIdAsc(
                         account).stream()
                 .map(favoriteFolder -> {
                     int placeCount = favoritePlaceRepository.countByFavoriteFolder(favoriteFolder);
-                    return FavoriteFolderWithPlaceCountResponse.of(favoriteFolder, account, placeCount);
+                    int memberCount = favoriteFolderAccountService.countByFavoriteFolder(favoriteFolder);
+                    return FavoriteFolderDetailResponse.of(favoriteFolder, account, placeCount, memberCount);
                 })
                 .toList();
 
-        return FavoriteFoldersWithPlaceCountResponse.from(favoriteFoldersWithPlaceCount);
+        return FavoriteFoldersDetailResponse.from(favoriteFoldersWithPlaceCount);
+    }
+
+    public FavoriteFolder getById(Long favoriteFolderId) {
+        return favoriteFolderRepository.findById(favoriteFolderId)
+                .orElseThrow(() -> new NotFoundException(ErrorTag.FAVORITE_FOLDER_NOT_FOUND));
     }
 
     public FavoriteFoldersWithFavoriteStatusResponse findAllWithFavoriteStatusByAccountId(Account account,
@@ -150,9 +148,7 @@ public class FavoriteFolderService {
     public void remove(Account account, Long favoriteFolderId) {
         FavoriteFolder favoriteFolder = getById(favoriteFolderId);
         validateRemovableFolder(account, favoriteFolder);
-        favoritePlaceRepository.deleteAllByFavoriteFolder(favoriteFolder);
-        favoriteFolderRepository.deleteById(favoriteFolderId);
-
+        removeFavoriteFolderWithFavoritePlaces(favoriteFolderId, favoriteFolder);
         eventPublisher.publishEvent(FavoriteFolderUpdateEvent.of(favoriteFolderId, ActionType.FOLDER_DELETED));
     }
 
