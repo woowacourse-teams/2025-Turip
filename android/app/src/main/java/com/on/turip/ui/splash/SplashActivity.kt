@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.tasks.Task
 import com.google.android.play.core.appupdate.AppUpdateInfo
 import com.google.android.play.core.appupdate.AppUpdateManager
@@ -18,9 +19,8 @@ import com.on.turip.ui.common.base.BaseActivity
 import com.on.turip.ui.login.LoginActivity
 import com.on.turip.ui.main.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
 import timber.log.Timber
 
 @SuppressLint("CustomSplashScreen")
@@ -46,10 +46,6 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
         super.onCreate(savedInstanceState)
 
         checkUpdateAndProceed()
-
-        CoroutineScope(Dispatchers.IO).launch {
-            viewModel.checkAutoLogin()
-        }
     }
 
     override fun onResume() {
@@ -83,7 +79,7 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
                                 AppUpdateOptions.newBuilder(UPDATE_TYPE).build(),
                             )
                         } else {
-                            navigateToLogin()
+                            autoLogin()
                         }
                     }
 
@@ -98,11 +94,11 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
                     }
 
                     else -> {
-                        navigateToLogin()
+                        autoLogin()
                     }
                 }
             }.addOnFailureListener {
-                navigateToLogin()
+                autoLogin()
             }
     }
 
@@ -117,6 +113,15 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
                 startActivity(LoginActivity.newIntent(this@SplashActivity))
                 finish()
             }
+        }
+    }
+
+    private fun autoLogin() {
+        lifecycleScope.launch {
+            runCatching {
+                withTimeout(2_000) { viewModel.checkAutoLogin() }
+            }
+            navigateToLogin()
         }
     }
 
