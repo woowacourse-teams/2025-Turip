@@ -3,6 +3,7 @@ package turip.favorite.service;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import turip.account.domain.Account;
@@ -19,6 +20,8 @@ import turip.favorite.controller.dto.response.FavoriteFoldersWithFavoriteStatusR
 import turip.favorite.controller.dto.response.FavoriteFoldersWithPlaceCountResponse;
 import turip.favorite.domain.AccountRole;
 import turip.favorite.domain.FavoriteFolder;
+import turip.favorite.domain.event.ActionType;
+import turip.favorite.domain.event.FavoriteFolderUpdateEvent;
 import turip.favorite.repository.FavoriteFolderRepository;
 import turip.favorite.repository.FavoritePlaceRepository;
 import turip.place.domain.Place;
@@ -32,6 +35,7 @@ public class FavoriteFolderService {
     private final FavoritePlaceRepository favoritePlaceRepository;
     private final PlaceRepository placeRepository;
     private final FavoriteFolderAccountService favoriteFolderAccountService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public void createDefaultFavoriteFolder(Account account) {
@@ -102,6 +106,8 @@ public class FavoriteFolderService {
         validateDuplicatedName(newName, account);
         favoriteFolder.rename(newName);
 
+        eventPublisher.publishEvent(FavoriteFolderUpdateEvent.of(favoriteFolderId, ActionType.FOLDER_NAME_CHANGED));
+
         return FavoriteFolderResponse.of(favoriteFolder, account);
     }
 
@@ -111,6 +117,8 @@ public class FavoriteFolderService {
         validateRemovableFolder(account, favoriteFolder);
         favoritePlaceRepository.deleteAllByFavoriteFolder(favoriteFolder);
         favoriteFolderRepository.deleteById(favoriteFolderId);
+
+        eventPublisher.publishEvent(FavoriteFolderUpdateEvent.of(favoriteFolderId, ActionType.FOLDER_DELETED));
     }
 
     private void validateRemovableFolder(Account account, FavoriteFolder favoriteFolder) {
