@@ -20,6 +20,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import turip.account.domain.Account;
+import turip.account.domain.Member;
 import turip.account.domain.Role;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.BadRequestException;
@@ -32,9 +33,11 @@ import turip.favorite.controller.dto.request.FavoriteFolderRequest;
 import turip.favorite.controller.dto.response.FavoriteFolderResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithFavoriteStatusResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithPlaceCountResponse;
+import turip.favorite.controller.dto.response.FolderInvitationTokenResponse;
 import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.repository.FavoriteFolderRepository;
 import turip.favorite.repository.FavoritePlaceRepository;
+import turip.favorite.token.InvitationTokenProvider;
 import turip.place.domain.Place;
 import turip.place.repository.PlaceRepository;
 import turip.util.fixture.AccountFixture;
@@ -57,6 +60,9 @@ class FavoriteFolderServiceTest {
 
     @Mock
     private PlaceRepository placeRepository;
+
+    @Mock
+    private InvitationTokenProvider invitationTokenProvider;
 
     @DisplayName("기본 장소 찜 폴더 생성 테스트")
     @Nested
@@ -471,6 +477,160 @@ class FavoriteFolderServiceTest {
             assertThatThrownBy(() -> favoriteFolderService.remove(member, folderId))
                     .isInstanceOf(BadRequestException.class)
                     .hasMessage(ErrorTag.SHARED_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED.getMessage());
+        }
+    }
+
+    @DisplayName("공유 폴더 초대 토큰 생성 테스트")
+    @Nested
+    class CreateInvitationCode {
+
+        @DisplayName("초대 토큰를 생성할 수 있다")
+        @Test
+        void createInvitationCode() {
+            // given
+            Long accountId = 1L;
+            Long folderId = 1L;
+            Account account = AccountFixture.createCustomAccount(accountId, Role.USER);
+            Member member = new Member(account, "test@naver.com", true);
+            FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(folderId, "폴더");
+
+            given(favoriteFolderRepository.findById(folderId))
+                    .willReturn(Optional.of(favoriteFolder));
+            given(invitationTokenProvider.generateToken(member.getAccount().getId(), folderId))
+                    .willReturn("test_token");
+
+            // when
+            FolderInvitationTokenResponse actual = favoriteFolderService.createInvitationToken(member, folderId);
+
+            // then
+            assertThat(actual.invitationCode()).isEqualTo("test_token");
+        }
+
+        @DisplayName("초대 토큰 최초 생성 시 공유 폴더로 변경된다")
+        @Test
+        void createInvitationCode_convertsToShared() {
+            // given
+            Long accountId = 1L;
+            Long folderId = 1L;
+            Account account = AccountFixture.createCustomAccount(accountId, Role.USER);
+            Member member = new Member(account, "test@naver.com", true);
+            FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(folderId, "폴더");
+            boolean before = favoriteFolder.isShared();
+
+            given(favoriteFolderRepository.findById(folderId))
+                    .willReturn(Optional.of(favoriteFolder));
+
+            // when
+            favoriteFolderService.createInvitationToken(member, folderId);
+            boolean after = favoriteFolder.isShared();
+
+            // then
+            assertThat(before).isFalse();
+            assertThat(after).isTrue();
+        }
+
+        @Test
+        @DisplayName("공유 폴더에 참여하지 않은 멤버가 초대 토큰 생성 시 예외가 발생한다")
+        void createInvitationCode_Forbidden() {
+            // given
+            Long accountId = 1L;
+            Long folderId = 1L;
+            Account account = AccountFixture.createCustomAccount(accountId, Role.USER);
+            Member member = new Member(account, "test@naver.com", true);
+            FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(folderId, "폴더");
+
+            given(favoriteFolderRepository.findById(folderId))
+                    .willReturn(Optional.of(favoriteFolder));
+            willThrow(new ForbiddenException(ErrorTag.FORBIDDEN))
+                    .given(favoriteFolderAccountService).validateMembership(member.getAccount(), favoriteFolder);
+
+            // when & then
+            assertThatThrownBy(() -> favoriteFolderService.createInvitationToken(member, folderId))
+                    .isInstanceOf(ForbiddenException.class)
+                    .hasMessage(ErrorTag.FORBIDDEN.getMessage());
+
+        }
+    }
+
+    @DisplayName("공유 폴더 초대 토큰 검증 테스트")
+    @Nested
+    class VerifyInvitation {
+
+        @DisplayName("유효한 토큰을 검증하고 폴더 id를 응답한다")
+        @Test
+        void verifyInvitation_success() {
+            // given
+            String token = "valid_token";
+            Long folderId = 1L;
+            FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(folderId, "폴더");
+            Account user = AccountFixture.createUser();
+
+            given(invitationTokenProvider.getClaimOfName(token, "fid", Long.class))
+                    .willReturn(folderId);
+            given(favoriteFolderRepository.findById(folderId))
+                    .willReturn(Optional.of(favoriteFolder));
+            given(favoriteFolderAccountService.isFolderMember(user, favoriteFolder))
+                    .willReturn(true);
+
+            // when
+            var response = favoriteFolderService.getInvitationDetails(token, user);
+
+            // then
+            assertAll(
+                    () -> assertThat(response.turipId()).isEqualTo(folderId),
+                    () -> assertThat(response.alreadyJoined()).isTrue()
+            );
+        }
+
+        @DisplayName("토큰에 해당하는 폴더가 존재하지 않으면 NotFoundException을 발생시킨다")
+        @Test
+        void verifyInvitation_folderNotFound() {
+            // given
+            String token = "valid_token";
+            Long folderId = 1L;
+            Account user = AccountFixture.createUser();
+
+            given(invitationTokenProvider.getClaimOfName(token, "fid", Long.class))
+                    .willReturn(folderId);
+            given(favoriteFolderRepository.findById(folderId))
+                    .willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> favoriteFolderService.getInvitationDetails(token, user))
+                    .isInstanceOf(NotFoundException.class)
+                    .hasMessage(ErrorTag.FAVORITE_FOLDER_NOT_FOUND.getMessage());
+        }
+
+        @DisplayName("토큰이 만료되었으면 BadRequestException을 발생시킨다")
+        @Test
+        void verifyInvitation_expiredToken() {
+            // given
+            String token = "expired_token";
+            Account user = AccountFixture.createUser();
+
+            given(invitationTokenProvider.getClaimOfName(token, "fid", Long.class))
+                    .willThrow(new BadRequestException(ErrorTag.INVITATION_TOKEN_EXPIRED));
+
+            // when & then
+            assertThatThrownBy(() -> favoriteFolderService.getInvitationDetails(token, user))
+                    .isInstanceOf(BadRequestException.class)
+                    .hasMessage(ErrorTag.INVITATION_TOKEN_EXPIRED.getMessage());
+        }
+
+        @DisplayName("토큰이 유효하지 않으면 BadRequestException을 발생시킨다")
+        @Test
+        void verifyInvitation_invalidToken() {
+            // given
+            String token = "invalid_token";
+            Account user = AccountFixture.createUser();
+
+            given(invitationTokenProvider.getClaimOfName(token, "fid", Long.class))
+                    .willThrow(new BadRequestException(ErrorTag.INVALID_INVITATION_TOKEN));
+
+            // when & then
+            assertThatThrownBy(() -> favoriteFolderService.getInvitationDetails(token, user))
+                    .isInstanceOf(BadRequestException.class)
+                    .hasMessage(ErrorTag.INVALID_INVITATION_TOKEN.getMessage());
         }
     }
 }
