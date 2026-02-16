@@ -67,6 +67,9 @@ public class FavoriteFolderService {
 
         FavoriteFolderAccount favoriteFolderAccount = favoriteFolderAccountService.findOrCreate(favoriteFolder,
                 member.getAccount());
+
+        eventPublisher.publishEvent(FavoriteFolderUpdateEvent.of(favoriteFolderId, ActionType.MEMBER_JOINED));
+
         return FavoriteFolderJoinResponse.from(favoriteFolderAccount);
     }
 
@@ -157,16 +160,18 @@ public class FavoriteFolderService {
         FavoriteFolder favoriteFolder = getByIdWithLock(favoriteFolderId);
         validateShareAndCustomFolder(favoriteFolder);
         favoriteFolderAccountService.validateMembership(account, favoriteFolder);
+
         favoriteFolderAccountService.deleteByFavoriteFolderAndAccount(favoriteFolder, account);
 
-        boolean isDeleted = false;
         int remainingMemberCount = favoriteFolderAccountService.countByFavoriteFolder(favoriteFolder);
         if (remainingMemberCount == 0) {
             removeFavoriteFolderWithFavoritePlaces(favoriteFolderId, favoriteFolder);
-            isDeleted = true;
+            eventPublisher.publishEvent(FavoriteFolderUpdateEvent.of(favoriteFolderId, ActionType.FOLDER_DELETED));
+            return FavoriteFolderExitResponse.of(true);
         }
 
-        return FavoriteFolderExitResponse.of(isDeleted);
+        eventPublisher.publishEvent(FavoriteFolderUpdateEvent.of(favoriteFolderId, ActionType.MEMBER_EXITED));
+        return FavoriteFolderExitResponse.of(false);
     }
 
     private void validateRemovableFolder(Account account, FavoriteFolder favoriteFolder) {
