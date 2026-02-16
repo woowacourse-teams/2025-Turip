@@ -73,9 +73,7 @@ class LoginViewmodel @Inject constructor(
                                 _uiEffect.send(LoginUiEffect.ShowError(ErrorUiState.Server))
                             }
 
-                            UiError.Global.TokenExpired -> {
-                                _uiEffect.send(LoginUiEffect.ShowError(ErrorUiState.Server))
-                            }
+                            UiError.Global.TokenExpired -> {}
                         }
                     }
                     Timber.e("IdToken불러오기 실패")
