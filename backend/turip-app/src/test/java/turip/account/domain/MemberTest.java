@@ -10,7 +10,7 @@ import turip.util.fixture.AccountFixture;
 
 public class MemberTest {
 
-    @DisplayName("이메일 형식이 올바르지 않은 경우 예외를 발생시킨다.")
+    @DisplayName("이메일 형식이 올바르지 않은 경우 예외를 발생시킨다")
     @Test
     void invalidEmailTest() {
         // given
