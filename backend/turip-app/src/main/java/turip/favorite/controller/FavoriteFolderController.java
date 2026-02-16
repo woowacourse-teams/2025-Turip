@@ -29,7 +29,6 @@ import turip.favorite.controller.dto.response.FavoriteFolderResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithFavoriteStatusResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithPlaceCountResponse;
 import turip.favorite.service.FavoriteFolderService;
-import turip.favorite.stream.service.FavoriteFolderStreamService;
 
 @RestController
 @RequiredArgsConstructor
@@ -38,7 +37,6 @@ import turip.favorite.stream.service.FavoriteFolderStreamService;
 public class FavoriteFolderController {
 
     private final FavoriteFolderService favoriteFolderService;
-    private final FavoriteFolderStreamService favoriteFolderStreamService;
 
     @Operation(
             summary = "튜립 생성 api",
