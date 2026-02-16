@@ -162,9 +162,4 @@ public class FavoriteFolderService {
         return placeRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(ErrorTag.PLACE_NOT_FOUND));
     }
-
-    private FavoriteFolder getById(Long favoriteFolderId) {
-        return favoriteFolderRepository.findById(favoriteFolderId)
-                .orElseThrow(() -> new NotFoundException(ErrorTag.FAVORITE_FOLDER_NOT_FOUND));
-    }
 }
