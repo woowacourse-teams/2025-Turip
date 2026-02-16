@@ -43,8 +43,9 @@ services:
     restart: always
     expose:
       - "8081"
+    env_file:
+      - .env
     environment:
-      <<: *app_env
       SERVER_PORT: 8081
       OTEL_SERVICE_NAME: turip-admin
     networks:
