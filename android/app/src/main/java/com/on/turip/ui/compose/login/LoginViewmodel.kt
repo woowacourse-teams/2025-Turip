@@ -44,6 +44,8 @@ class LoginViewmodel @Inject constructor(
 
     fun onGoogleLogin(googleCredentialManager: GoogleCredentialManager) {
         viewModelScope.launch {
+            AuthState.change(UserType.GUEST)
+
             googleCredentialManager
                 .getIdToken()
                 .onSuccess { result: GoogleIdTokenCredential ->
@@ -72,7 +74,7 @@ class LoginViewmodel @Inject constructor(
                             }
 
                             UiError.Global.TokenExpired -> {
-                                Unit
+                                _uiEffect.send(LoginUiEffect.ShowError(ErrorUiState.Server))
                             }
                         }
                     }
