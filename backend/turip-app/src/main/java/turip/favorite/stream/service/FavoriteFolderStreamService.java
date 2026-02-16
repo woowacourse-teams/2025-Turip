@@ -5,6 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -13,15 +14,15 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.SseEvent
 import turip.account.domain.Member;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.InternalServerException;
-import turip.favorite.domain.FavoriteFolder;
+import turip.favorite.domain.event.ActionType;
 import turip.favorite.service.FavoriteFolderAccountService;
-import turip.favorite.service.FavoriteFolderService;
 import turip.favorite.stream.controller.dto.response.ConnectStreamResponse;
 import turip.favorite.stream.controller.dto.response.FolderUpdateStreamResponse;
 import turip.favorite.stream.controller.dto.response.HeartbeatStreamResponse;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class FavoriteFolderStreamService {
 
     private static final Long DEFAULT_TIMEOUT = 3 * 60 * 1000L; // 3분
@@ -29,24 +30,12 @@ public class FavoriteFolderStreamService {
     private final Map<Long, Map<String, SseEmitter>> emitters = new ConcurrentHashMap<>();
     private final Map<String, ScheduledFuture<?>> heartbeatSchedules = new ConcurrentHashMap<>();
     private final ScheduledExecutorService scheduler;
+    private final FavoriteFolderAccountService favoriteFolderAccountService;
     @Value("${sse.heartbeat.interval:30}")
     private Long heartbeatInterval;
 
-    private final FavoriteFolderService favoriteFolderService;
-    private final FavoriteFolderAccountService favoriteFolderAccountService;
-
-    public FavoriteFolderStreamService(
-            FavoriteFolderService favoriteFolderService,
-            FavoriteFolderAccountService favoriteFolderAccountService,
-            ScheduledExecutorService scheduler
-    ) {
-        this.favoriteFolderService = favoriteFolderService;
-        this.favoriteFolderAccountService = favoriteFolderAccountService;
-        this.scheduler = scheduler;
-    }
-
     public SseEmitter createEmitter(Long favoriteFolderId, Member member) {
-        validateIfMemberJoiningFavoriteFolder(favoriteFolderId, member);
+        favoriteFolderAccountService.validateMembership(member.getAccount(), favoriteFolderId);
         SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
         String emitterKey = getEmitterKey(favoriteFolderId, member.getId());
 
@@ -67,11 +56,6 @@ public class FavoriteFolderStreamService {
                 folderEmitters.size());
         folderEmitters.values()
                 .forEach(emitter -> sendFolderUpdateEvent(favoriteFolderId, actionType, emitter));
-    }
-
-    private void validateIfMemberJoiningFavoriteFolder(Long favoriteFolderId, Member member) {
-        FavoriteFolder favoriteFolder = favoriteFolderService.getById(favoriteFolderId);
-        favoriteFolderAccountService.validateMembership(member.getAccount(), favoriteFolder);
     }
 
     private String getEmitterKey(Long favoriteFolderId, Long memberId) {

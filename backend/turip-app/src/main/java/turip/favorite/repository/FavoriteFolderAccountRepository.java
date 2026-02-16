@@ -11,16 +11,16 @@ import turip.favorite.domain.FavoriteFolderAccount;
 
 public interface FavoriteFolderAccountRepository extends JpaRepository<FavoriteFolderAccount, Long> {
 
-    int countByFavoriteFolder(FavoriteFolder favoriteFolder);
+    @Modifying
+    @Query("UPDATE FavoriteFolderAccount ffa " +
+            "SET ffa.account = :newAccount " +
+            "WHERE ffa.account = :oldAccount")
+    void updateAccount(@Param("oldAccount") Account oldAccount, @Param("newAccount") Account newAccount);
 
     boolean existsByFavoriteFolderAndAccountAndAccountRole(FavoriteFolder favoriteFolder, Account account,
                                                            AccountRole accountRole);
 
     boolean existsByFavoriteFolderAndAccount(FavoriteFolder favoriteFolder, Account account);
 
-    @Modifying
-    @Query("UPDATE FavoriteFolderAccount ffa " +
-            "SET ffa.account = :newAccount " +
-            "WHERE ffa.account = :oldAccount")
-    void updateAccount(@Param("oldAccount") Account oldAccount, @Param("newAccount") Account newAccount);
+    boolean existsByFavoriteFolderIdAndAccount(Long favoriteFolderId, Account account);
 }

@@ -40,4 +40,13 @@ public class FavoriteFolderAccountService {
             throw new ForbiddenException(ErrorTag.FORBIDDEN);
         }
     }
+
+    public void validateMembership(Account account, Long favoriteFolderId) {
+        boolean isMember = favoriteFolderAccountRepository.existsByFavoriteFolderIdAndAccount(favoriteFolderId,
+                account);
+
+        if (!isMember) {
+            throw new ForbiddenException(ErrorTag.FORBIDDEN);
+        }
+    }
 }
