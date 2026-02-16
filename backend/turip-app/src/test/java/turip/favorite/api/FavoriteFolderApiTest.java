@@ -1,6 +1,7 @@
 package turip.favorite.api;
 
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -30,6 +31,7 @@ class FavoriteFolderApiTest {
 
     @Autowired
     private TestDataHelper testDataHelper;
+
 
     @BeforeEach
     void setUp() {
@@ -469,6 +471,468 @@ class FavoriteFolderApiTest {
                     .when().delete("/api/v1/turips/1")
                     .then()
                     .statusCode(400);
+        }
+    }
+
+    @DisplayName("GET /api/v1/turips/{turipId}/members 공유 찜폴더 참여자 목록 조회 테스트")
+    @Nested
+    class ReadMembersById {
+
+        @DisplayName("공유 찜폴더 참여자 목록 조회에 성공한 경우 200 OK 코드와 참여자 정보를 응답한다")
+        @Test
+        void readMembersById1() {
+            // given
+            Long accountId1 = testDataHelper.insertAccount();
+            Long accountId2 = testDataHelper.insertAccount();
+
+            Long memberId1 = testDataHelper.insertMember(accountId1, "test1@example.com", false);
+            Long memberId2 = testDataHelper.insertMember(accountId2, "test2@example.com", false);
+
+            testDataHelper.insertTuripMember(memberId1, "member1", "TestPass1!");
+            testDataHelper.insertTuripMember(memberId2, "member2", "TestPass1!");
+
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId1);
+
+            Long favoriteFolderId = testDataHelper.insertFavoriteFolder("함께 튜립", false, false);
+            testDataHelper.insertFavoriteFolderAccount(accountId1, favoriteFolderId, AccountRole.OWNER);
+            testDataHelper.insertFavoriteFolderAccount(accountId2, favoriteFolderId, AccountRole.MEMBER);
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .when().get("/api/v1/turips/" + favoriteFolderId + "/members")
+                    .then()
+                    .statusCode(200)
+                    .body("members.size()", is(2))
+                    .body("members[0].nickname", notNullValue())
+                    .body("members[1].nickname", notNullValue());
+        }
+
+        @DisplayName("공유 찜폴더가 존재하지 않는 경우 404 NOT FOUND를 응답한다")
+        @Test
+        void readMembersById2() {
+            // given
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .when().get("/api/v1/turips/999/members")
+                    .then()
+                    .statusCode(404);
+        }
+
+        @DisplayName("요청한 account가 찜폴더 참여자가 아닌 경우 403 FORBIDDEN을 응답한다")
+        @Test
+        void readMembersById3() {
+            // given
+            Long ownerAccountId = testDataHelper.insertAccount();
+            Long nonOwnerAccountId = testDataHelper.insertAccount();
+            Long ownerMemberId = testDataHelper.insertMember(ownerAccountId, "owner@example.com", false);
+            Long nonOwnerMemberId = testDataHelper.insertMember(nonOwnerAccountId, "nonowner@example.com", false);
+            testDataHelper.insertTuripMember(ownerMemberId, "owner", "OwnerPass1!");
+            testDataHelper.insertTuripMember(nonOwnerMemberId, "nonowner", "NonOwnerPass1!");
+
+            Long favoriteFolderId = testDataHelper.insertFavoriteFolder("비공개 튜립", false, false);
+            testDataHelper.insertFavoriteFolderAccount(ownerAccountId, favoriteFolderId, AccountRole.OWNER);
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("device-fid", "nonMemberDeviceFid")
+                    .when().get("/api/v1/turips/" + favoriteFolderId + "/members")
+                    .then()
+                    .statusCode(403);
+        }
+    }
+
+    @DisplayName("POST /api/v1/turips/{turipId}/join 공유 찜폴더 참여 테스트")
+    @Nested
+    class Join {
+
+        @DisplayName("공유 찜폴더 참여에 성공한 경우 200 OK 코드와 참여 정보를 응답한다")
+        @Test
+        void join1() {
+            // given
+            Long accountId = testDataHelper.insertAccount();
+            Long memberId = testDataHelper.insertMember(accountId, "test@example.com", false);
+            testDataHelper.insertTuripMember(memberId, "testuser", "TestPass1!");
+
+            Long favoriteFolderId = testDataHelper.insertFavoriteFolder("함께 튜립", false, true);
+            Long ownerAccountId = testDataHelper.insertAccount();
+            testDataHelper.insertFavoriteFolderAccount(ownerAccountId, favoriteFolderId, AccountRole.OWNER);
+
+            // 로그인하여 accessToken 얻기
+            Map<String, String> loginRequest = new HashMap<>(
+                    Map.of("loginId", "testuser", "loginPassword", "TestPass1!"));
+            String accessToken = RestAssured.given()
+                    .port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .contentType(ContentType.JSON)
+                    .body(loginRequest)
+                    .when().post("/api/v1/auth/login/turip")
+                    .then()
+                    .statusCode(200)
+                    .extract()
+                    .cookie("accessToken");
+
+            // when & then
+            RestAssured.given()
+                    .port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .header("Authorization", "Bearer " + accessToken)
+                    .when().post("/api/v1/turips/" + favoriteFolderId + "/join")
+                    .then()
+                    .statusCode(200)
+                    .body("id", is(notNullValue()))
+                    .body("turipId", is(favoriteFolderId.intValue()))
+                    .body("isShared", is(true))
+                    .body("accountId", is(accountId.intValue()));
+        }
+
+        @DisplayName("찜폴더가 존재하지 않는 경우 404 NOT FOUND를 응답한다")
+        @Test
+        void join2() {
+            // given
+            Long accountId = testDataHelper.insertAccount();
+            Long memberId = testDataHelper.insertMember(accountId, "test@example.com", false);
+            testDataHelper.insertTuripMember(memberId, "testuser", "TestPass1!");
+
+            // 로그인하여 accessToken 얻기
+            Map<String, String> loginRequest = new HashMap<>(
+                    Map.of("loginId", "testuser", "loginPassword", "TestPass1!"));
+            String accessToken = RestAssured.given()
+                    .port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .contentType(ContentType.JSON)
+                    .body(loginRequest)
+                    .when().post("/api/v1/auth/login/turip")
+                    .then()
+                    .statusCode(200)
+                    .extract()
+                    .cookie("accessToken");
+
+            // when & then
+            RestAssured.given()
+                    .port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .header("Authorization", "Bearer " + accessToken)
+                    .when().post("/api/v1/turips/999/join")
+                    .then()
+                    .statusCode(404);
+        }
+
+        @DisplayName("개인 찜폴더에 참여하려는 경우 400 BAD REQUEST를 응답한다")
+        @Test
+        void join3() {
+            // given
+            Long accountId = testDataHelper.insertAccount();
+            Long memberId = testDataHelper.insertMember(accountId, "test@example.com", false);
+            testDataHelper.insertTuripMember(memberId, "testuser", "TestPass1!");
+
+            Long favoriteFolderId = testDataHelper.insertFavoriteFolder("개인 폴더", false, false);
+            Long ownerAccountId = testDataHelper.insertAccount();
+            testDataHelper.insertFavoriteFolderAccount(ownerAccountId, favoriteFolderId, AccountRole.OWNER);
+
+            // 로그인하여 accessToken 얻기
+            Map<String, String> loginRequest = new HashMap<>(
+                    Map.of("loginId", "testuser", "loginPassword", "TestPass1!"));
+            String accessToken = RestAssured.given()
+                    .port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .contentType(ContentType.JSON)
+                    .body(loginRequest)
+                    .when().post("/api/v1/auth/login/turip")
+                    .then()
+                    .statusCode(200)
+                    .extract()
+                    .cookie("accessToken");
+
+            // when & then
+            RestAssured.given()
+                    .port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .header("Authorization", "Bearer " + accessToken)
+                    .when().post("/api/v1/turips/" + favoriteFolderId + "/join")
+                    .then()
+                    .statusCode(400);
+        }
+
+        @DisplayName("기본 찜폴더에 참여하려는 경우 400 BAD REQUEST를 응답한다")
+        @Test
+        void join4() {
+            // given
+            Long accountId = testDataHelper.insertAccount();
+            Long memberId = testDataHelper.insertMember(accountId, "test@example.com", false);
+            testDataHelper.insertTuripMember(memberId, "testuser", "TestPass1!");
+
+            Long favoriteFolderId = testDataHelper.insertFavoriteFolder("기본 폴더", true, true);
+            Long ownerAccountId = testDataHelper.insertAccount();
+            testDataHelper.insertFavoriteFolderAccount(ownerAccountId, favoriteFolderId, AccountRole.OWNER);
+
+            // 로그인하여 accessToken 얻기
+            Map<String, String> loginRequest = new HashMap<>(
+                    Map.of("loginId", "testuser", "loginPassword", "TestPass1!"));
+            String accessToken = RestAssured.given()
+                    .port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .contentType(ContentType.JSON)
+                    .body(loginRequest)
+                    .when().post("/api/v1/auth/login/turip")
+                    .then()
+                    .statusCode(200)
+                    .extract()
+                    .cookie("accessToken");
+
+            // when & then
+            RestAssured.given()
+                    .port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .header("Authorization", "Bearer " + accessToken)
+                    .when().post("/api/v1/turips/" + favoriteFolderId + "/join")
+                    .then()
+                    .statusCode(400);
+        }
+    }
+
+    @DisplayName("/api/v1/turips/{turipId}/exit DELETE 공유 찜폴더 나가기 테스트")
+    @Nested
+    class ExitFolder {
+
+        @DisplayName("공유 찜폴더에서 나가기에 성공한 경우 200 OK와 응답 정보를 반환한다 (마지막 참여자가 아닌 경우)")
+        @Test
+        void exit1() {
+            // given
+            Long accountId1 = testDataHelper.insertAccount();
+            Long memberId1 = testDataHelper.insertMember(accountId1, "test1@example.com", false);
+            testDataHelper.insertTuripMember(memberId1, "testuser1", "TestPass1!");
+
+            Long accountId2 = testDataHelper.insertAccount();
+            Long memberId2 = testDataHelper.insertMember(accountId2, "test2@example.com", false);
+            testDataHelper.insertTuripMember(memberId2, "testuser2", "TestPass1!");
+
+            Long favoriteFolderId = testDataHelper.insertFavoriteFolder("함께 튜립", false, true);
+            testDataHelper.insertFavoriteFolderAccount(accountId1, favoriteFolderId, AccountRole.OWNER);
+            testDataHelper.insertFavoriteFolderAccount(accountId2, favoriteFolderId, AccountRole.MEMBER);
+
+            // 로그인하여 accessToken 얻기
+            Map<String, String> loginRequest = new HashMap<>(
+                    Map.of("loginId", "testuser2", "loginPassword", "TestPass1!"));
+            String accessToken = RestAssured.given()
+                    .port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .contentType(ContentType.JSON)
+                    .body(loginRequest)
+                    .when().post("/api/v1/auth/login/turip")
+                    .then()
+                    .statusCode(200)
+                    .extract()
+                    .cookie("accessToken");
+
+            // when & then
+            RestAssured.given()
+                    .port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .header("Authorization", "Bearer " + accessToken)
+                    .when().delete("/api/v1/turips/" + favoriteFolderId + "/exit")
+                    .then()
+                    .statusCode(200)
+                    .body("isDeleted", is(false));
+        }
+
+        @DisplayName("공유 찜폴더에서 나가기에 성공한 경우 200 OK와 응답 정보를 반환한다 (마지막 참여자인 경우)")
+        @Test
+        void exit2() {
+            // given
+            Long accountId = testDataHelper.insertAccount();
+            Long memberId = testDataHelper.insertMember(accountId, "test@example.com", false);
+            testDataHelper.insertTuripMember(memberId, "testuser", "TestPass1!");
+
+            Long favoriteFolderId = testDataHelper.insertFavoriteFolder("함께 튜립", false, true);
+            testDataHelper.insertFavoriteFolderAccount(accountId, favoriteFolderId, AccountRole.OWNER);
+
+            // 로그인하여 accessToken 얻기
+            Map<String, String> loginRequest = new HashMap<>(
+                    Map.of("loginId", "testuser", "loginPassword", "TestPass1!"));
+            String accessToken = RestAssured.given()
+                    .port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .contentType(ContentType.JSON)
+                    .body(loginRequest)
+                    .when().post("/api/v1/auth/login/turip")
+                    .then()
+                    .statusCode(200)
+                    .extract()
+                    .cookie("accessToken");
+
+            // when & then
+            RestAssured.given()
+                    .port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .header("Authorization", "Bearer " + accessToken)
+                    .when().delete("/api/v1/turips/" + favoriteFolderId + "/exit")
+                    .then()
+                    .statusCode(200)
+                    .body("isDeleted", is(true));
+        }
+
+        @DisplayName("찜폴더가 존재하지 않는 경우 404 NOT FOUND를 응답한다")
+        @Test
+        void exit3() {
+            // given
+            Long accountId = testDataHelper.insertAccount();
+            Long memberId = testDataHelper.insertMember(accountId, "test@example.com", false);
+            testDataHelper.insertTuripMember(memberId, "testuser", "TestPass1!");
+
+            // 로그인하여 accessToken 얻기
+            Map<String, String> loginRequest = new HashMap<>(
+                    Map.of("loginId", "testuser", "loginPassword", "TestPass1!"));
+            String accessToken = RestAssured.given()
+                    .port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .contentType(ContentType.JSON)
+                    .body(loginRequest)
+                    .when().post("/api/v1/auth/login/turip")
+                    .then()
+                    .statusCode(200)
+                    .extract()
+                    .cookie("accessToken");
+
+            // when & then
+            RestAssured.given()
+                    .port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .header("Authorization", "Bearer " + accessToken)
+                    .when().delete("/api/v1/turips/999/exit")
+                    .then()
+                    .statusCode(404);
+        }
+
+        @DisplayName("개인 찜폴더에서 나가려는 경우 400 BAD REQUEST를 응답한다")
+        @Test
+        void exit4() {
+            // given
+            Long accountId = testDataHelper.insertAccount();
+            Long memberId = testDataHelper.insertMember(accountId, "test@example.com", false);
+            testDataHelper.insertTuripMember(memberId, "testuser", "TestPass1!");
+
+            Long favoriteFolderId = testDataHelper.insertFavoriteFolder("개인 폴더", false, false);
+            testDataHelper.insertFavoriteFolderAccount(accountId, favoriteFolderId, AccountRole.OWNER);
+
+            // 로그인하여 accessToken 얻기
+            Map<String, String> loginRequest = new HashMap<>(
+                    Map.of("loginId", "testuser", "loginPassword", "TestPass1!"));
+            String accessToken = RestAssured.given()
+                    .port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .contentType(ContentType.JSON)
+                    .body(loginRequest)
+                    .when().post("/api/v1/auth/login/turip")
+                    .then()
+                    .statusCode(200)
+                    .extract()
+                    .cookie("accessToken");
+
+            // when & then
+            RestAssured.given()
+                    .port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .header("Authorization", "Bearer " + accessToken)
+                    .when().delete("/api/v1/turips/" + favoriteFolderId + "/exit")
+                    .then()
+                    .statusCode(400);
+        }
+
+        @DisplayName("기본 찜폴더에서 나가려는 경우 400 BAD REQUEST를 응답한다")
+        @Test
+        void exit5() {
+            // given
+            Long accountId = testDataHelper.insertAccount();
+            Long memberId = testDataHelper.insertMember(accountId, "test@example.com", false);
+            testDataHelper.insertTuripMember(memberId, "testuser", "TestPass1!");
+
+            Long favoriteFolderId = testDataHelper.insertFavoriteFolder("기본 폴더", true, true);
+            testDataHelper.insertFavoriteFolderAccount(accountId, favoriteFolderId, AccountRole.OWNER);
+
+            // 로그인하여 accessToken 얻기
+            Map<String, String> loginRequest = new HashMap<>(
+                    Map.of("loginId", "testuser", "loginPassword", "TestPass1!"));
+            String accessToken = RestAssured.given()
+                    .port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .contentType(ContentType.JSON)
+                    .body(loginRequest)
+                    .when().post("/api/v1/auth/login/turip")
+                    .then()
+                    .statusCode(200)
+                    .extract()
+                    .cookie("accessToken");
+
+            // when & then
+            RestAssured.given()
+                    .port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .header("Authorization", "Bearer " + accessToken)
+                    .when().delete("/api/v1/turips/" + favoriteFolderId + "/exit")
+                    .then()
+                    .statusCode(400);
+        }
+    }
+
+    @DisplayName("GET /api/v1/turips/{turipId} 튜립 상세 조회 테스트")
+    @Nested
+    class ReadById {
+
+        @DisplayName("튜립 멤버가 상세 조회에 성공한 경우 200 OK와 튜립 상세 정보를 응답한다")
+        @Test
+        void readById1() {
+            // given
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
+            Long favoriteFolderId = testDataHelper.insertFavoriteFolder("튜립 부산", false, true);
+            testDataHelper.insertFavoriteFolderAccount(accountId, favoriteFolderId, AccountRole.OWNER);
+
+            // 다른 멤버 추가
+            Long accountId2 = testDataHelper.insertAccount();
+            testDataHelper.insertFavoriteFolderAccount(accountId2, favoriteFolderId, AccountRole.MEMBER);
+
+            Long accountId3 = testDataHelper.insertAccount();
+            testDataHelper.insertFavoriteFolderAccount(accountId3, favoriteFolderId, AccountRole.MEMBER);
+
+            Long accountId4 = testDataHelper.insertAccount();
+            testDataHelper.insertFavoriteFolderAccount(accountId4, favoriteFolderId, AccountRole.MEMBER);
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .when().get("/api/v1/turips/" + favoriteFolderId)
+                    .then()
+                    .statusCode(200)
+                    .body("id", is(favoriteFolderId.intValue()))
+                    .body("name", is("튜립 부산"))
+                    .body("isDefault", is(false))
+                    .body("isShared", is(true))
+                    .body("memberCount", is(4));
+        }
+
+        @DisplayName("해당 폴더에 참여한 멤버가 아닌 경우 403 FORBIDDEN을 응답한다")
+        @Test
+        void readById3() {
+            // given
+            Long ownerAccountId = testDataHelper.insertAccount();
+            Long nonMemberAccountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'nonMemberDeviceFid')",
+                    nonMemberAccountId);
+
+            Long favoriteFolderId = testDataHelper.insertFavoriteFolder("비공개 튜립", false, false);
+            testDataHelper.insertFavoriteFolderAccount(ownerAccountId, favoriteFolderId, AccountRole.OWNER);
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("device-fid", "nonMemberDeviceFid")
+                    .when().get("/api/v1/turips/" + favoriteFolderId)
+                    .then()
+                    .statusCode(403);
         }
     }
 }

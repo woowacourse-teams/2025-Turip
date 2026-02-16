@@ -7,21 +7,29 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import turip.account.domain.Account;
+import turip.account.domain.Member;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.BadRequestException;
 import turip.common.exception.custom.ConflictException;
 import turip.common.exception.custom.NotFoundException;
 import turip.favorite.controller.dto.request.FavoriteFolderNameRequest;
 import turip.favorite.controller.dto.request.FavoriteFolderRequest;
+import turip.favorite.controller.dto.response.FavoriteFolderDetailResponse;
+import turip.favorite.controller.dto.response.FavoriteFolderExitResponse;
+import turip.favorite.controller.dto.response.FavoriteFolderJoinResponse;
+import turip.favorite.controller.dto.response.FavoriteFolderMembersResponse;
+import turip.favorite.controller.dto.response.FavoriteFolderExitResponse;
+import turip.favorite.controller.dto.response.FavoriteFolderJoinResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse;
-import turip.favorite.controller.dto.response.FavoriteFolderWithPlaceCountResponse;
+import turip.favorite.controller.dto.response.FavoriteFoldersDetailResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithFavoriteStatusResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithPlaceCountResponse;
 import turip.favorite.domain.AccountRole;
 import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.domain.event.ActionType;
 import turip.favorite.domain.event.FavoriteFolderUpdateEvent;
+import turip.favorite.domain.FavoriteFolderAccount;
 import turip.favorite.repository.FavoriteFolderRepository;
 import turip.favorite.repository.FavoritePlaceRepository;
 import turip.place.domain.Place;
@@ -53,6 +61,16 @@ public class FavoriteFolderService {
         favoriteFolderAccountService.save(savedFavoriteFolder, account, AccountRole.OWNER);
 
         return FavoriteFolderResponse.of(savedFavoriteFolder, account);
+    }
+
+    @Transactional
+    public FavoriteFolderJoinResponse joinMember(Long favoriteFolderId, Member member) {
+        FavoriteFolder favoriteFolder = getById(favoriteFolderId);
+        validateShareAndCustomFolder(favoriteFolder);
+
+        FavoriteFolderAccount favoriteFolderAccount = favoriteFolderAccountService.findOrCreate(favoriteFolder,
+                member.getAccount());
+        return FavoriteFolderJoinResponse.from(favoriteFolderAccount);
     }
 
     public FavoriteFolder getById(Long favoriteFolderId) {
@@ -93,6 +111,23 @@ public class FavoriteFolderService {
         return favoriteFolderRepository.existsCustomFolderByAccount(account);
     }
 
+    public FavoriteFolderDetailResponse findById(Long favoriteFolderId, Account account) {
+        FavoriteFolder favoriteFolder = getById(favoriteFolderId);
+        favoriteFolderAccountService.validateMembership(account, favoriteFolder);
+
+        int placeCount = favoritePlaceRepository.countByFavoriteFolder(favoriteFolder);
+        int memberCount = favoriteFolderAccountService.countByFavoriteFolder(favoriteFolder);
+        return FavoriteFolderDetailResponse.of(favoriteFolder, account, placeCount, memberCount);
+    }
+
+    public FavoriteFolderMembersResponse findMembersById(Long favoriteFolderId, Account account) {
+        FavoriteFolder favoriteFolder = getById(favoriteFolderId);
+        favoriteFolderAccountService.validateMembership(account, favoriteFolder);
+
+        List<Member> members = favoriteFolderAccountService.findMembersByFavoriteFolder(favoriteFolder);
+        return FavoriteFolderMembersResponse.of(members);
+    }
+
     @Transactional
     public FavoriteFolderResponse updateName(Account account, Long favoriteFolderId,
                                              FavoriteFolderNameRequest request) {
@@ -121,6 +156,23 @@ public class FavoriteFolderService {
         eventPublisher.publishEvent(FavoriteFolderUpdateEvent.of(favoriteFolderId, ActionType.FOLDER_DELETED));
     }
 
+    @Transactional
+    public FavoriteFolderExitResponse exitFolder(Account account, Long favoriteFolderId) {
+        FavoriteFolder favoriteFolder = getByIdWithLock(favoriteFolderId);
+        validateShareAndCustomFolder(favoriteFolder);
+        favoriteFolderAccountService.validateMembership(account, favoriteFolder);
+        favoriteFolderAccountService.deleteByFavoriteFolderAndAccount(favoriteFolder, account);
+
+        boolean isDeleted = false;
+        int remainingMemberCount = favoriteFolderAccountService.countByFavoriteFolder(favoriteFolder);
+        if (remainingMemberCount == 0) {
+            removeFavoriteFolderWithFavoritePlaces(favoriteFolderId, favoriteFolder);
+            isDeleted = true;
+        }
+
+        return FavoriteFolderExitResponse.of(isDeleted);
+    }
+
     private void validateRemovableFolder(Account account, FavoriteFolder favoriteFolder) {
         if (favoriteFolder.isDefault()) {
             throw new BadRequestException(ErrorTag.DEFAULT_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED);
@@ -140,8 +192,27 @@ public class FavoriteFolderService {
                 });
     }
 
+    private void validateShareAndCustomFolder(FavoriteFolder favoriteFolder) {
+        if (!favoriteFolder.isShared()) {
+            throw new BadRequestException(ErrorTag.PERSONAL_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED);
+        }
+        if (favoriteFolder.isDefault()) {
+            throw new BadRequestException(ErrorTag.DEFAULT_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED);
+        }
+    }
+
     private Place getPlaceById(Long id) {
         return placeRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(ErrorTag.PLACE_NOT_FOUND));
+    }
+
+    private FavoriteFolder getByIdWithLock(Long favoriteFolderId) {
+        return favoriteFolderRepository.findByIdWithLock(favoriteFolderId)
+                .orElseThrow(() -> new NotFoundException(ErrorTag.FAVORITE_FOLDER_NOT_FOUND));
+    }
+
+    private void removeFavoriteFolderWithFavoritePlaces(Long favoriteFolderId, FavoriteFolder favoriteFolder) {
+        favoritePlaceRepository.deleteAllByFavoriteFolder(favoriteFolder);
+        favoriteFolderRepository.deleteById(favoriteFolderId);
     }
 }

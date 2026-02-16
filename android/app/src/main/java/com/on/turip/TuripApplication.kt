@@ -33,6 +33,8 @@ class TuripApplication : Application() {
             FirebaseInstallationsInitializer(userStorageRepository)
                 .setupFirebaseInstallationId()
 
+            fidProvider.init()
+
             FirebaseCrashlytics.getInstance().setUserId(fidProvider.cachedFid)
         }
 
