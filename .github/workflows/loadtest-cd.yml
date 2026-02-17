@@ -86,12 +86,6 @@ jobs:
           APP_IMAGE_TAG=${{ env.IMAGE_TAG }}
           SPRING_PROFILES_ACTIVE=${{ env.SPRING_PROFILES_ACTIVE }}
           NGINX_PORT=${{ env.NGINX_PORT }}
-          MYSQL_URL=${{ secrets.MYSQL_URL }}
-          MYSQL_USERNAME=${{ secrets.MYSQL_USERNAME }}
-          MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}
-          FLYWAY_USERNAME=${{ secrets.FLYWAY_USERNAME }}
-          FLYWAY_PASSWORD=${{ secrets.FLYWAY_PASSWORD }}
-          JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}
           INVITATION_JWT_SECRET_KEY=${{ secrets.INVITATION_JWT_SECRET_KEY }}
           GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
           KAKAO_API_KEY=${{ secrets.KAKAO_API_KEY }}
