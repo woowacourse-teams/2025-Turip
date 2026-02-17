@@ -27,7 +27,7 @@ public class FavoriteFolderFixture {
 
     public static FavoriteFolder createSharedFolder(String name) {
         FavoriteFolder customFolder = createCustomFolder(name);
-        customFolder.shareFolder();
+        customFolder.convertToSharedFolder();
         return customFolder;
     }
 

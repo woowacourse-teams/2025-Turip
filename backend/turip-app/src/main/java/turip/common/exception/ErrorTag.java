@@ -16,6 +16,8 @@ public enum ErrorTag {
     EMAIL_INVALID("이메일 형식이 올바르지 않습니다."),
     LOGIN_ID_INVALID("아이디 형식이 올바르지 않습니다."),
     LOGIN_PASSWORD_INVALID("비밀번호 형식이 올바르지 않습니다."),
+    INVITATION_TOKEN_EXPIRED("초대 토큰이 만료됐습니다."),
+    INVALID_INVITATION_TOKEN("유효하지 않은 초대 토큰입니다."),
 
     // 401 Unauthorized
     UNAUTHORIZED("토큰 기반 인증에 실패했습니다."),
@@ -53,6 +55,7 @@ public enum ErrorTag {
     // 500 Internal Server Error
     INTERNAL_SERVER_ERROR("서버에서 예기치 못한 에러가 발생했습니다."),
     ACCOUNT_CREATION_ERROR("계정 생성에 실패했습니다."),
+    SSE_CONNECTION_ERROR("SSE 연결에 실패했습니다."),
 
     // ==== Admin ====
 
