@@ -1,0 +1,120 @@
+name: Load Test CD
+
+on:
+  push:
+    branches: [ loadtest ]
+    paths:
+      - 'backend/**'
+  workflow_dispatch:
+    inputs:
+      skip_build:
+        description: '빌드 스킵하고 현재 이미지로 바로 재배포 (yes/no)'
+        required: false
+        default: 'no'
+
+env:
+  DOCKER_IMAGE_REPO: teamturip/turip-backend
+  WORKING_DIR: backend
+  DOCKERFILE_PATH: backend/app.Dockerfile
+  JAVA_VERSION: '21'
+  IMAGE_TAG: load-test-latest
+  IMAGE_NAME_PREFIX: loadtest
+  NGINX_PORT: 80
+  SPRING_PROFILES_ACTIVE: loadtest
+
+jobs:
+  deploy:
+    runs-on: [ self-hosted, "turip-server-loadtest" ]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        if: github.event.inputs.skip_build != 'yes'
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Build Jar (테스트 스킵)
+        if: github.event.inputs.skip_build != 'yes'
+        working-directory: ${{ env.WORKING_DIR }}
+        run: |
+          chmod +x gradlew
+          ./gradlew :turip-app:bootJar -x test
+
+      - name: Prepare OpenTelemetry agent
+        if: github.event.inputs.skip_build != 'yes'
+        working-directory: ${{ env.WORKING_DIR }}
+        run: |
+          mkdir -p otel
+          curl -L -o otel/opentelemetry-javaagent.jar \
+          https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v2.10.0/opentelemetry-javaagent.jar
+
+      - name: Login to Docker Hub
+        if: github.event.inputs.skip_build != 'yes'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        if: github.event.inputs.skip_build != 'yes'
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: network=host
+
+      - name: Build and push image
+        if: github.event.inputs.skip_build != 'yes'
+        uses: docker/build-push-action@v6
+        with:
+          context: ./${{ env.WORKING_DIR }}
+          file: ./${{ env.DOCKERFILE_PATH }}
+          platforms: linux/arm64
+          push: true
+          tags: ${{ env.DOCKER_IMAGE_REPO }}:${{ env.IMAGE_TAG }}
+          cache-from: type=registry,ref=${{ env.DOCKER_IMAGE_REPO }}:${{ env.IMAGE_TAG }}
+          cache-to:   type=inline
+
+      - name: Write .env
+        working-directory: ${{ env.WORKING_DIR }}
+        run: |
+          cat > .env << ENVEOF
+          IMAGE_NAME_PREFIX=${{ env.IMAGE_NAME_PREFIX }}
+          APP_IMAGE_TAG=${{ env.IMAGE_TAG }}
+          SPRING_PROFILES_ACTIVE=${{ env.SPRING_PROFILES_ACTIVE }}
+          NGINX_PORT=${{ env.NGINX_PORT }}
+          MYSQL_URL=${{ secrets.MYSQL_URL }}
+          MYSQL_USERNAME=${{ secrets.MYSQL_USERNAME }}
+          MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}
+          FLYWAY_USERNAME=${{ secrets.FLYWAY_USERNAME }}
+          FLYWAY_PASSWORD=${{ secrets.FLYWAY_PASSWORD }}
+          JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}
+          INVITATION_JWT_SECRET_KEY=${{ secrets.INVITATION_JWT_SECRET_KEY }}
+          GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+          KAKAO_API_KEY=${{ secrets.KAKAO_API_KEY }}
+          GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}
+          YOUTUBE_API_KEY=${{ secrets.YOUTUBE_API_KEY }}
+          OTEL_EXPORTER_OTLP_ENDPOINT=${{ secrets.OTEL_EXPORTER_OTLP_ENDPOINT }}
+          CSV_LINKS_COLLECTION_URL=${{ secrets.CSV_LINKS_COLLECTION_URL }}
+          DOMESTIC_ETC_IMAGE_URL=${{ secrets.DOMESTIC_ETC_IMAGE_URL }}
+          OVERSEAS_ETC_IMAGE_URL=${{ secrets.OVERSEAS_ETC_IMAGE_URL }}
+          CSV_IMPORT_PASSWORD=${{ secrets.CSV_IMPORT_PASSWORD }}
+          ENVEOF
+
+      # ── 배포 ──────────────────────────────────────────────────────────────
+      - name: Deploy
+        working-directory: ${{ env.WORKING_DIR }}
+        env:
+          NGINX_PORT: ${{ env.NGINX_PORT }}
+        run: |
+          echo "🚀 Load Test 배포 시작 (image: ${{ env.IMAGE_TAG }})"
+          chmod +x /home/ubuntu/deploy/deploy.sh
+          /home/ubuntu/deploy/deploy.sh ${{ env.IMAGE_TAG }}
+
+      # ── 정리 ──────────────────────────────────────────────────────────────
+      - name: Dangling 이미지 정리
+        if: always()
+        run: docker image prune -f
