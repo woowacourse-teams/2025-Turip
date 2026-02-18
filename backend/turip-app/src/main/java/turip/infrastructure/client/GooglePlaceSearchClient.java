@@ -28,6 +28,7 @@ public class GooglePlaceSearchClient implements PlaceSearchClient {
                 .uri(uriBuilder -> uriBuilder
                         .queryParam("query", query)
                         .queryParam("key", googleApiKey)
+                        .queryParam("language", "ko")
                         .build())
                 .retrieve()
                 .body(GooglePlaceSearchResponse.class);
