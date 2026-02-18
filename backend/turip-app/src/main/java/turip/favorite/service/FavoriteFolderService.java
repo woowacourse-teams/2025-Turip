@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import turip.account.domain.Account;
+import turip.account.domain.Member;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.BadRequestException;
 import turip.common.exception.custom.ConflictException;
@@ -17,10 +18,13 @@ import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusRe
 import turip.favorite.controller.dto.response.FavoriteFolderWithPlaceCountResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithFavoriteStatusResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithPlaceCountResponse;
+import turip.favorite.controller.dto.response.FolderInvitationDetailResponse;
+import turip.favorite.controller.dto.response.FolderInvitationTokenResponse;
 import turip.favorite.domain.AccountRole;
 import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.repository.FavoriteFolderRepository;
 import turip.favorite.repository.FavoritePlaceRepository;
+import turip.favorite.token.InvitationTokenProvider;
 import turip.place.domain.Place;
 import turip.place.repository.PlaceRepository;
 
@@ -32,6 +36,7 @@ public class FavoriteFolderService {
     private final FavoritePlaceRepository favoritePlaceRepository;
     private final PlaceRepository placeRepository;
     private final FavoriteFolderAccountService favoriteFolderAccountService;
+    private final InvitationTokenProvider invitationTokenProvider;
 
     @Transactional
     public void createDefaultFavoriteFolder(Account account) {
@@ -49,6 +54,37 @@ public class FavoriteFolderService {
         favoriteFolderAccountService.save(savedFavoriteFolder, account, AccountRole.OWNER);
 
         return FavoriteFolderResponse.of(savedFavoriteFolder, account);
+    }
+
+    @Transactional
+    public FolderInvitationTokenResponse createInvitationToken(Member member, Long favoriteFolderId) {
+        FavoriteFolder favoriteFolder = favoriteFolderRepository.findById(favoriteFolderId)
+                .orElseThrow(() -> new NotFoundException(ErrorTag.FAVORITE_FOLDER_NOT_FOUND));
+
+        favoriteFolderAccountService.validateMembership(member.getAccount(), favoriteFolder);
+
+        if (!favoriteFolder.isShared()) {
+            favoriteFolder.convertToSharedFolder();
+        }
+
+        String invitationToken = invitationTokenProvider.generateToken(member.getAccount().getId(), favoriteFolderId);
+
+        return FolderInvitationTokenResponse.from(invitationToken);
+    }
+
+    public FolderInvitationDetailResponse getInvitationDetails(String token, Account account) {
+        Long favoriteFolderId = invitationTokenProvider.getClaimOfName(token, "fid", Long.class);
+
+        FavoriteFolder favoriteFolder = getById(favoriteFolderId);
+
+        boolean alreadyJoined = favoriteFolderAccountService.isFolderMember(account, favoriteFolder);
+
+        return FolderInvitationDetailResponse.of(favoriteFolderId, alreadyJoined);
+    }
+
+    public FavoriteFolder getById(Long favoriteFolderId) {
+        return favoriteFolderRepository.findById(favoriteFolderId)
+                .orElseThrow(() -> new NotFoundException(ErrorTag.FAVORITE_FOLDER_NOT_FOUND));
     }
 
     public FavoriteFoldersWithPlaceCountResponse findAllByAccount(Account account) {
@@ -130,10 +166,5 @@ public class FavoriteFolderService {
     private Place getPlaceById(Long id) {
         return placeRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(ErrorTag.PLACE_NOT_FOUND));
-    }
-
-    private FavoriteFolder getById(Long favoriteFolderId) {
-        return favoriteFolderRepository.findById(favoriteFolderId)
-                .orElseThrow(() -> new NotFoundException(ErrorTag.FAVORITE_FOLDER_NOT_FOUND));
     }
 }
