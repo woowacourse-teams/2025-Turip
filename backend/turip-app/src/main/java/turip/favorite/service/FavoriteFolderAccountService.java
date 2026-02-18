@@ -58,10 +58,6 @@ public class FavoriteFolderAccountService {
         }
     }
 
-    public List<Member> findMembersByFavoriteFolder(FavoriteFolder favoriteFolder) {
-        return favoriteFolderAccountRepository.findMembersByFavoriteFolder(favoriteFolder);
-    }
-
     public List<Member> findMembersByFavoriteFolder(Long favoriteFolderId) {
         return favoriteFolderAccountRepository.findMembersByFavoriteFolderId(favoriteFolderId);
     }
@@ -76,5 +72,9 @@ public class FavoriteFolderAccountService {
 
     public int countByFavoriteFolder(FavoriteFolder favoriteFolder) {
         return favoriteFolderAccountRepository.countByFavoriteFolder(favoriteFolder);
+    }
+
+    public boolean isMember(FavoriteFolder favoriteFolder, Account account) {
+        return favoriteFolderAccountRepository.existsByFavoriteFolderAndAccount(favoriteFolder, account);
     }
 }

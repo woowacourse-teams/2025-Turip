@@ -19,6 +19,7 @@ import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.InternalServerException;
 import turip.favorite.domain.event.ActionType;
 import turip.favorite.service.FavoriteFolderAccountService;
+import turip.favorite.service.FavoriteFolderService;
 import turip.favorite.stream.controller.dto.response.ConnectStreamResponse;
 import turip.favorite.stream.controller.dto.response.FolderUpdateStreamResponse;
 import turip.favorite.stream.controller.dto.response.HeartbeatStreamResponse;
@@ -34,12 +35,13 @@ public class FavoriteFolderStreamService {
     private final Map<Long, Map<String, SseEmitter>> emitters = new ConcurrentHashMap<>();
     private final Map<String, ScheduledFuture<?>> heartbeatSchedules = new ConcurrentHashMap<>();
     private final ScheduledExecutorService scheduler;
+    private final FavoriteFolderService favoriteFolderService;
     private final FavoriteFolderAccountService favoriteFolderAccountService;
     @Value("${sse.heartbeat.interval:30}")
     private Long heartbeatInterval;
 
     public SseEmitter createEmitter(Long favoriteFolderId, Member member) {
-        favoriteFolderAccountService.validateMembership(member.getAccount(), favoriteFolderId);
+        favoriteFolderService.validateFolderMembership(favoriteFolderId, member);
         SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
         String emitterKey = getEmitterKey(favoriteFolderId, member.getId());
 

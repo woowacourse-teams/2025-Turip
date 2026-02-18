@@ -122,10 +122,9 @@ public class FavoriteFolderService {
     }
 
     public FavoriteFolderMembersResponse findMembersById(Long favoriteFolderId, Account account) {
-        FavoriteFolder favoriteFolder = getById(favoriteFolderId);
-        favoriteFolderAccountService.validateMembership(account, favoriteFolder);
-
-        List<Member> members = favoriteFolderAccountService.findMembersByFavoriteFolder(favoriteFolder);
+        validateFolderExists(favoriteFolderId);
+        favoriteFolderAccountService.validateMembership(account, favoriteFolderId);
+        List<Member> members = favoriteFolderAccountService.findMembersByFavoriteFolder(favoriteFolderId);
         return FavoriteFolderMembersResponse.of(members);
     }
 
@@ -172,6 +171,17 @@ public class FavoriteFolderService {
 
         eventPublisher.publishEvent(FavoriteFolderUpdateEvent.of(favoriteFolderId, ActionType.MEMBER_EXITED));
         return FavoriteFolderExitResponse.of(false);
+    }
+
+    public void validateFolderExists(Long favoriteFolderId) {
+        if (!favoriteFolderRepository.existsById(favoriteFolderId)) {
+            throw new NotFoundException(ErrorTag.FAVORITE_FOLDER_NOT_FOUND);
+        }
+    }
+
+    public void validateFolderMembership(Long favoriteFolderId, Member member) {
+        FavoriteFolder favoriteFolder = getById(favoriteFolderId);
+        favoriteFolderAccountService.validateMembership(member.getAccount(), favoriteFolder);
     }
 
     private void validateRemovableFolder(Account account, FavoriteFolder favoriteFolder) {
