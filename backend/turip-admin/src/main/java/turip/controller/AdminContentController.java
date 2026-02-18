@@ -24,7 +24,7 @@ public class AdminContentController {
     @PostMapping
     public ResponseEntity<Long> save(@AuthMember Member member, @RequestBody AdminContentSaveRequest request) {
         Long contentId = adminContentService.save(request);
-        log.info("[콘텐츠 수집] email: {}", member.getEmail());
+        log.info("[콘텐츠 수집] nickname: {}", member.getAccount().getNickname());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(contentId);
     }
