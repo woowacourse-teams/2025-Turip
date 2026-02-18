@@ -31,7 +31,6 @@ import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.ForbiddenException;
 import turip.common.exception.custom.NotFoundException;
 import turip.favorite.domain.event.ActionType;
-import turip.favorite.service.FavoriteFolderAccountService;
 import turip.favorite.service.FavoriteFolderService;
 import turip.util.fixture.AccountFixture;
 import turip.util.fixture.MemberFixture;
@@ -44,9 +43,6 @@ class FavoriteFolderStreamServiceTest {
 
     @Mock
     private FavoriteFolderService favoriteFolderService;
-
-    @Mock
-    private FavoriteFolderAccountService favoriteFolderAccountService;
 
     @Mock
     private ScheduledExecutorService scheduler;
@@ -63,8 +59,9 @@ class FavoriteFolderStreamServiceTest {
             Account account = AccountFixture.createUser();
             Member member = MemberFixture.createCustomMember(account, "test@example.com", false);
 
-            given(favoriteFolderService.getById(folderId))
-                    .willThrow(new NotFoundException(ErrorTag.FAVORITE_FOLDER_NOT_FOUND));
+            willThrow(new NotFoundException(ErrorTag.FAVORITE_FOLDER_NOT_FOUND))
+                    .given(favoriteFolderService)
+                    .validateFolderMembership(folderId, member);
 
             // when & then
             assertThatThrownBy(() -> favoriteFolderStreamService.createEmitter(folderId, member))
@@ -81,7 +78,9 @@ class FavoriteFolderStreamServiceTest {
             Member member = MemberFixture.createCustomMember(account, "test@example.com", false);
 
             willThrow(new ForbiddenException(ErrorTag.FORBIDDEN))
-                    .given(favoriteFolderAccountService).validateMembership(account, folderId);
+                    .given(favoriteFolderService)
+                    .validateFolderMembership(folderId, member);
+
             // when & then
             assertThatThrownBy(() -> favoriteFolderStreamService.createEmitter(folderId, member))
                     .isInstanceOf(ForbiddenException.class)
