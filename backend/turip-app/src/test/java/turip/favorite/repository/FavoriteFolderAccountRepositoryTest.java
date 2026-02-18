@@ -52,7 +52,7 @@ class FavoriteFolderAccountRepositoryTest {
         favoriteFolderAccountRepository.save(new FavoriteFolderAccount(folder, account2, AccountRole.MEMBER));
 
         // when
-        List<Member> members = favoriteFolderAccountRepository.findMembersByFavoriteFolder(folder);
+        List<Member> members = favoriteFolderAccountRepository.findMembersByFavoriteFolderId(folder.getId());
 
         // then
         assertThat(members).hasSize(2);
@@ -67,7 +67,7 @@ class FavoriteFolderAccountRepositoryTest {
         FavoriteFolder folder = favoriteFolderRepository.save(FavoriteFolder.customFolderOf("빈 폴더"));
 
         // when
-        List<Member> members = favoriteFolderAccountRepository.findMembersByFavoriteFolder(folder);
+        List<Member> members = favoriteFolderAccountRepository.findMembersByFavoriteFolderId(folder.getId());
 
         // then
         assertThat(members).isEmpty();
