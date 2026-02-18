@@ -30,12 +30,10 @@ import turip.account.domain.Member;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.ForbiddenException;
 import turip.common.exception.custom.NotFoundException;
-import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.domain.event.ActionType;
 import turip.favorite.service.FavoriteFolderAccountService;
 import turip.favorite.service.FavoriteFolderService;
 import turip.util.fixture.AccountFixture;
-import turip.util.fixture.FavoriteFolderFixture;
 import turip.util.fixture.MemberFixture;
 
 @ExtendWith(MockitoExtension.class)
@@ -81,12 +79,9 @@ class FavoriteFolderStreamServiceTest {
             Long folderId = 1L;
             Account account = AccountFixture.createUser();
             Member member = MemberFixture.createCustomMember(account, "test@example.com", false);
-            FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(folderId, "테스트 폴더");
 
-            given(favoriteFolderService.getById(folderId)).willReturn(favoriteFolder);
             willThrow(new ForbiddenException(ErrorTag.FORBIDDEN))
-                    .given(favoriteFolderAccountService).validateMembership(account, favoriteFolder);
-
+                    .given(favoriteFolderAccountService).validateMembership(account, folderId);
             // when & then
             assertThatThrownBy(() -> favoriteFolderStreamService.createEmitter(folderId, member))
                     .isInstanceOf(ForbiddenException.class)

@@ -33,6 +33,7 @@ import turip.favorite.controller.dto.request.FavoriteFolderNameRequest;
 import turip.favorite.controller.dto.request.FavoriteFolderRequest;
 import turip.favorite.controller.dto.response.FavoriteFolderExitResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderJoinResponse;
+import turip.favorite.controller.dto.response.FavoriteFolderMembersResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersDetailResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithFavoriteStatusResponse;
@@ -394,20 +395,20 @@ class FavoriteFolderServiceTest {
             // given
             Long turipId = 1L;
             Account account = AccountFixture.createUser();
-            FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(turipId, "함께 튜립");
 
             Account memberAccount1 = new Account(2L, Role.USER, "계정1");
             Account memberAccount2 = new Account(3L, Role.USER, "계정2");
             Member member1 = new Member(1L, memberAccount1, "test1@example.com", false);
             Member member2 = new Member(2L, memberAccount2, "test2@example.com", false);
 
-            given(favoriteFolderRepository.findById(turipId))
-                    .willReturn(Optional.of(favoriteFolder));
-            given(favoriteFolderAccountService.findMembersByFavoriteFolder(favoriteFolder))
+            given(favoriteFolderRepository.existsById(turipId))
+                    .willReturn(true);
+            given(favoriteFolderAccountService.findMembersByFavoriteFolder(turipId))
                     .willReturn(List.of(member1, member2));
 
             // when
-            var response = favoriteFolderService.findMembersById(turipId, account);
+            FavoriteFolderMembersResponse response = favoriteFolderService.findMembersById(turipId,
+                    account);
 
             // then
             assertAll(
@@ -424,8 +425,8 @@ class FavoriteFolderServiceTest {
             Long nonExistentTuripId = 999L;
             Account account = AccountFixture.createUser();
 
-            given(favoriteFolderRepository.findById(nonExistentTuripId))
-                    .willReturn(Optional.empty());
+            given(favoriteFolderRepository.existsById(nonExistentTuripId))
+                    .willReturn(false);
 
             // when & then
             assertThatThrownBy(() -> favoriteFolderService.findMembersById(nonExistentTuripId, account))
@@ -441,8 +442,8 @@ class FavoriteFolderServiceTest {
             Account nonMemberAccount = AccountFixture.createUser();
             FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(turipId, "비공개 튜립");
 
-            given(favoriteFolderRepository.findById(turipId))
-                    .willReturn(Optional.of(favoriteFolder));
+            given(favoriteFolderRepository.existsById(turipId))
+                    .willReturn(true);
             willThrow(new ForbiddenException(ErrorTag.FORBIDDEN))
                     .given(favoriteFolderAccountService).validateMembership(nonMemberAccount, favoriteFolder);
 
