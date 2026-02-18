@@ -60,7 +60,8 @@ class GooglePlaceSearchClientTest {
                 """;
         String query = "testquery";
 
-        this.mockRestServiceServer.expect(requestTo(googleApiUrl + "?query=" + query + "&key=" + googleApiKey))
+        this.mockRestServiceServer.expect(
+                        requestTo(googleApiUrl + "?query=" + query + "&key=" + googleApiKey + "&language=ko"))
                 .andRespond(withSuccess(mockResponse, MediaType.APPLICATION_JSON));
 
         // when

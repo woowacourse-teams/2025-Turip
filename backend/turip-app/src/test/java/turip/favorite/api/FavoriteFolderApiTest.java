@@ -32,7 +32,6 @@ class FavoriteFolderApiTest {
     @Autowired
     private TestDataHelper testDataHelper;
 
-
     @BeforeEach
     void setUp() {
         jdbcTemplate.update("DELETE FROM place_category");
@@ -933,6 +932,50 @@ class FavoriteFolderApiTest {
                     .when().get("/api/v1/turips/" + favoriteFolderId)
                     .then()
                     .statusCode(403);
+        }
+    }
+
+    @DisplayName("/api/v1/turips/invitation-tokens GET 튜립 초대 토큰 검증 테스트")
+    @Nested
+    class VerifyInvitation {
+
+        @DisplayName("유효한 초대 토큰을 검증하고 200 OK와 튜립 정보를 응답한다")
+        @Test
+        void verifyInvitation1() {
+            // given
+            Long accountId = testDataHelper.insertAccount();
+            String accessToken = testDataHelper.createAccessToken(accountId);
+
+            Long folderId = testDataHelper.insertFavoriteFolder("내 튜립");
+            testDataHelper.insertFavoriteFolderAccount(accountId, folderId, AccountRole.OWNER);
+
+            String invitationToken = testDataHelper.createInvitationToken(accountId, folderId);
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + accessToken)
+                    .queryParam("token", invitationToken)
+                    .when().get("/api/v1/turips/invitation-tokens")
+                    .then()
+                    .statusCode(200)
+                    .body("turipId", is(folderId.intValue()))
+                    .body("alreadyJoined", is(true));
+        }
+
+        @DisplayName("유효하지 않은 초대 토큰를 검증하고 400 BAD REQUEST를 응답한다")
+        @Test
+        void verifyInvitation2() {
+            // given
+            Long accountId = testDataHelper.insertAccount();
+            String accessToken = testDataHelper.createAccessToken(accountId);
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + accessToken)
+                    .queryParam("token", "invalid-token")
+                    .when().get("/api/v1/turips/invitation-tokens")
+                    .then()
+                    .statusCode(400);
         }
     }
 }

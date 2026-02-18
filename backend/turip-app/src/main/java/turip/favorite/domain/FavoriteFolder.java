@@ -54,15 +54,6 @@ public class FavoriteFolder {
         return unformattedName.trim();
     }
 
-    public void rename(String newName) {
-        validateName(newName);
-        this.name = newName;
-    }
-
-    public void shareFolder() {
-        this.isShared = true;
-    }
-
     private static void validateName(String name) {
         if (name.isBlank()) {
             throw new IllegalArgumentException(ErrorTag.FAVORITE_FOLDER_NAME_BLANK);
@@ -70,6 +61,15 @@ public class FavoriteFolder {
         if (name.length() > 20) {
             throw new IllegalArgumentException(ErrorTag.FAVORITE_FOLDER_NAME_TOO_LONG);
         }
+    }
+
+    public void rename(String newName) {
+        validateName(newName);
+        this.name = newName;
+    }
+
+    public void convertToSharedFolder() {
+        this.isShared = true;
     }
 
     public boolean isSameFolderName(String folderName) {

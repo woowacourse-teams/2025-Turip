@@ -132,7 +132,7 @@ class FavoriteFolderRepositoryTest {
 
         // Shared folder (isShared = true)
         FavoriteFolder sharedFolder = favoriteFolderRepository.save(FavoriteFolderFixture.createCustomFolder("공유 폴더"));
-        sharedFolder.shareFolder();
+        sharedFolder.convertToSharedFolder();
         favoriteFolderRepository.save(sharedFolder);
 
         // 폴더와 계정 연결

@@ -74,7 +74,7 @@ public class FavoriteFolderAccountService {
         return favoriteFolderAccountRepository.countByFavoriteFolder(favoriteFolder);
     }
 
-    public boolean isMember(FavoriteFolder favoriteFolder, Account account) {
+    public boolean isFolderMember(Account account, FavoriteFolder favoriteFolder) {
         return favoriteFolderAccountRepository.existsByFavoriteFolderAndAccount(favoriteFolder, account);
     }
 }
