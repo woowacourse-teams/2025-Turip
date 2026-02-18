@@ -24,7 +24,7 @@ public interface FavoriteFolderAccountRepository extends JpaRepository<FavoriteF
             "WHERE ffa.favoriteFolder = :favoriteFolder")
     List<Member> findMembersByFavoriteFolder(@Param("favoriteFolder") FavoriteFolder favoriteFolder);
 
-    @Query("SELECT ffa FROM FavoriteFolderAccount ffa " +
+    @Query("SELECT m FROM FavoriteFolderAccount ffa " +
             "JOIN ffa.account a " +
             "JOIN Member m ON m.account.id = a.id " +
             "WHERE ffa.favoriteFolder.id = :favoriteFolderId")

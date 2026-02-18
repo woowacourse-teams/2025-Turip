@@ -3,8 +3,10 @@ package turip.favorite.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import java.util.List;
@@ -33,7 +35,6 @@ import turip.favorite.controller.dto.request.FavoriteFolderNameRequest;
 import turip.favorite.controller.dto.request.FavoriteFolderRequest;
 import turip.favorite.controller.dto.response.FavoriteFolderExitResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderJoinResponse;
-import turip.favorite.controller.dto.response.FavoriteFolderMembersResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersDetailResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithFavoriteStatusResponse;
@@ -407,8 +408,7 @@ class FavoriteFolderServiceTest {
                     .willReturn(List.of(member1, member2));
 
             // when
-            FavoriteFolderMembersResponse response = favoriteFolderService.findMembersById(turipId,
-                    account);
+            var response = favoriteFolderService.findMembersById(turipId, account);
 
             // then
             assertAll(
@@ -440,12 +440,11 @@ class FavoriteFolderServiceTest {
             // given
             Long turipId = 1L;
             Account nonMemberAccount = AccountFixture.createUser();
-            FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(turipId, "비공개 튜립");
 
             given(favoriteFolderRepository.existsById(turipId))
                     .willReturn(true);
             willThrow(new ForbiddenException(ErrorTag.FORBIDDEN))
-                    .given(favoriteFolderAccountService).validateMembership(nonMemberAccount, favoriteFolder);
+                    .given(favoriteFolderAccountService).validateMembership(nonMemberAccount, turipId);
 
             // when & then
             assertThatThrownBy(() -> favoriteFolderService.findMembersById(turipId, nonMemberAccount))
@@ -475,6 +474,7 @@ class FavoriteFolderServiceTest {
 
             given(favoriteFolderRepository.findById(turipId))
                     .willReturn(Optional.of(favoriteFolder));
+            given(favoriteFolderAccountService.isMember(favoriteFolder, account)).willReturn(false);
             given(favoriteFolderAccountService.findOrCreate(favoriteFolder, account))
                     .willReturn(favoriteFolderAccount);
 
@@ -489,6 +489,40 @@ class FavoriteFolderServiceTest {
                     () -> assertThat(response.accountId()).isEqualTo(accountId),
                     () -> verify(eventPublisher).publishEvent(
                             FavoriteFolderUpdateEvent.of(turipId, ActionType.MEMBER_JOINED))
+            );
+        }
+
+        @DisplayName("이미 참여한 공유 찜폴더에 참여요청시 멤버 참여 이벤트를 발행하지 않는다")
+        @Test
+        void joinFavoriteFolder_alreadyJoined() {
+            // given
+            Long turipId = 1L;
+            Long accountId = 1L;
+            Long favoriteFolderAccountId = 1L;
+            Member member = MemberFixture.createMember();
+            Account account = member.getAccount();
+            FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(turipId, "함께 튜립");
+            favoriteFolder.shareFolder();
+            FavoriteFolderAccount favoriteFolderAccount = new FavoriteFolderAccount(
+                    favoriteFolderAccountId, favoriteFolder, account, AccountRole.MEMBER
+            );
+
+            given(favoriteFolderRepository.findById(turipId))
+                    .willReturn(Optional.of(favoriteFolder));
+            given(favoriteFolderAccountService.isMember(favoriteFolder, account)).willReturn(true);
+            given(favoriteFolderAccountService.findOrCreate(favoriteFolder, account))
+                    .willReturn(favoriteFolderAccount);
+
+            // when
+            FavoriteFolderJoinResponse response = favoriteFolderService.joinMember(turipId, member);
+
+            // then
+            assertAll(
+                    () -> assertThat(response.id()).isEqualTo(favoriteFolderAccountId),
+                    () -> assertThat(response.favoriteFolderId()).isEqualTo(turipId),
+                    () -> assertThat(response.isShared()).isTrue(),
+                    () -> assertThat(response.accountId()).isEqualTo(accountId),
+                    () -> verify(eventPublisher, never()).publishEvent(any())
             );
         }
 
