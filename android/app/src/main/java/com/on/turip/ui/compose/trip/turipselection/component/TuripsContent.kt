@@ -30,7 +30,6 @@ import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun TuripsContent(
-    listState: LazyListState,
     placeName: String,
     enableConfirm: Boolean,
     turips: ImmutableList<TuripModel>,
@@ -40,6 +39,8 @@ fun TuripsContent(
     onConfirmClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val listState = rememberLazyListState()
+
     Column(modifier = modifier.fillMaxWidth()) {
         Header(placeName, onAddTuripClick)
 
@@ -144,11 +145,9 @@ private fun ConfirmButton(
 @Preview(showBackground = true)
 @Composable
 private fun TuripsContentPreview() {
-    val listState = rememberLazyListState()
     TuripTheme {
         Surface {
             TuripsContent(
-                listState = listState,
                 placeName = "부산 경포대 해수욕장 해수욕장 해수욕장 해수욕장",
                 enableConfirm = false,
                 turips =

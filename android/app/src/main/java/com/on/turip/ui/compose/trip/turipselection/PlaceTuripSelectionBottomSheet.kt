@@ -78,8 +78,6 @@ fun PlaceTuripSelectionBottomSheet(
     val density = LocalDensity.current
     val bottomSheetHeight = with(density) { windowInfo.containerSize.height.toDp() * 0.8f }
 
-    val turipsListState = rememberLazyListState()
-
     var showLoginSuggestDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(selectedPlaceModel.placeId) {
@@ -222,7 +220,6 @@ fun PlaceTuripSelectionBottomSheet(
                 when (val mode = uiState.screenMode) {
                     PlaceTuripSelectionScreenMode.Turips -> {
                         TuripsContent(
-                            listState = turipsListState,
                             placeName = uiState.placeName,
                             enableConfirm = uiState.isChanged,
                             turips = uiState.turips,
@@ -302,7 +299,6 @@ private fun PlaceTuripSelectionBottomSheetPreview() {
             shape = TuripTheme.shape.bottomSheetRounded,
         ) {
             TuripsContent(
-                listState = listState,
                 placeName = "장소명",
                 enableConfirm = false,
                 turips = persistentListOf(),
