@@ -27,6 +27,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -37,7 +38,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -69,11 +73,13 @@ import com.on.turip.ui.compose.trip.component.TripDetailAppBar
 import com.on.turip.ui.compose.trip.model.DayModel
 import com.on.turip.ui.compose.trip.model.MapModel
 import com.on.turip.ui.compose.trip.model.PlaceModel
+import com.on.turip.ui.compose.trip.model.SelectedPlaceModel
 import com.on.turip.ui.compose.trip.model.TripDetailInfoModel
 import com.on.turip.ui.compose.trip.turipselection.PlaceTuripSelectionBottomSheet
 import com.on.turip.ui.compose.trip.webview.VideoManager
 import com.on.turip.ui.main.favorite.model.TuripShareModel
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -115,6 +121,23 @@ fun TripDetailScreen(
     }
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var selectedPlace by remember { mutableStateOf<SelectedPlaceModel?>(null) }
+    val bottomSheetScope = rememberCoroutineScope()
+
+    // bottomSheet visibility logic
+    LaunchedEffect(uiState.selectedPlaceModel) {
+        val currentSelectedPlace: SelectedPlaceModel? = uiState.selectedPlaceModel
+        if (currentSelectedPlace != null) {
+            selectedPlace = currentSelectedPlace
+            sheetState.show()
+        } else {
+            // 바텀시트 데이터가 초기화되었는데 캐싱 데이터가 존재한다면
+            if (selectedPlace != null) {
+                if (sheetState.currentValue != SheetValue.Hidden) sheetState.hide()
+                selectedPlace = null
+            }
+        }
+    }
 
     HandleFullScreenWindowLaunchedEffect(webViewController.isFullScreen)
 
@@ -220,7 +243,7 @@ fun TripDetailScreen(
                             onErrorVideoClick = { navigateToWebViewUrl(uiState.tripDetailInfo.videoLink) },
                         )
 
-                        uiState.selectedPlaceModel?.let { place ->
+                        selectedPlace?.let { place ->
                             PlaceTuripSelectionBottomSheet(
                                 sheetState = sheetState,
                                 selectedPlaceModel = place,
@@ -230,7 +253,13 @@ fun TripDetailScreen(
                                 onShareTurip = navigateToShareTurip,
                                 onPlaceTuripChanged = viewModel::updatePlaceTuripSelection,
                                 onPlaceTuripConfirmed = viewModel::confirmPlaceTuripSelection,
-                                onDismiss = viewModel::clearSelectedPlace,
+                                onDismiss = {
+                                    bottomSheetScope.launch {
+                                        sheetState.hide()
+                                        viewModel.clearSelectedPlace()
+                                        selectedPlace = null
+                                    }
+                                },
                             )
                         }
                     } else {
@@ -369,7 +398,8 @@ private fun TripDetailScreenContent(
                             start = TuripTheme.spacing.extraLarge,
                             end = TuripTheme.spacing.extraLarge,
                             bottom = TuripTheme.spacing.small,
-                        ).fillMaxWidth(),
+                        )
+                        .fillMaxWidth(),
             )
         }
 
@@ -382,7 +412,8 @@ private fun TripDetailScreenContent(
                         .padding(
                             horizontal = TuripTheme.spacing.extraLarge,
                             vertical = TuripTheme.spacing.medium,
-                        ).fillMaxWidth(),
+                        )
+                        .fillMaxWidth(),
             )
         }
     }
