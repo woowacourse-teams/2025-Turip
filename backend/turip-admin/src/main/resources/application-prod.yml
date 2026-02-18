@@ -12,4 +12,4 @@ spring:
         format_sql: false
     show-sql: false
 jwt:
-  access-token-expiration-ms: 1800000  # 30분
+  access-token-expiration-ms: 10800000  # 3시간
