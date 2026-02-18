@@ -21,9 +21,9 @@ public class AsyncConfiguration {
         executor.setThreadNamePrefix("SSE-EVT-");
 
         executor.setRejectedExecutionHandler((r, executorInstance) -> log.warn(
-                        "[SSE-ThreadPool] 이벤트 전송 거부됨 - Thread pool 포화 상태 (현재 활성 스레드: {}, 잔여 큐: {})",
+                        "[SSE-ThreadPool] 이벤트 전송 거부됨 - Thread pool 포화 상태 (현재 활성 스레드: {}, 잔여 큐 용량: {})",
                         executorInstance.getActiveCount(),
-                        executorInstance.getQueue().size()
+                        executorInstance.getQueue().remainingCapacity()
                 )
         );
 
