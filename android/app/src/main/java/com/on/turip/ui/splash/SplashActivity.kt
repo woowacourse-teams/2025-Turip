@@ -4,7 +4,9 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.gms.tasks.Task
 import com.google.android.play.core.appupdate.AppUpdateInfo
 import com.google.android.play.core.appupdate.AppUpdateManager
@@ -20,7 +22,6 @@ import com.on.turip.ui.login.LoginActivity
 import com.on.turip.ui.main.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeout
 import timber.log.Timber
 
 @SuppressLint("CustomSplashScreen")
@@ -45,6 +46,7 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        observeUiEffect()
         checkUpdateAndProceed()
     }
 
@@ -79,7 +81,7 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
                                 AppUpdateOptions.newBuilder(UPDATE_TYPE).build(),
                             )
                         } else {
-                            autoLogin()
+                            viewModel.checkAutoLogin()
                         }
                     }
 
@@ -94,11 +96,11 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
                     }
 
                     else -> {
-                        autoLogin()
+                        viewModel.checkAutoLogin()
                     }
                 }
             }.addOnFailureListener {
-                autoLogin()
+                viewModel.checkAutoLogin()
             }
     }
 
@@ -116,12 +118,15 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
         }
     }
 
-    private fun autoLogin() {
+    private fun observeUiEffect() {
         lifecycleScope.launch {
-            runCatching {
-                withTimeout(2_000) { viewModel.checkAutoLogin() }
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiEffect.collect { effect ->
+                    when (effect) {
+                        SplashEffect.NavigateMain -> navigateToLogin()
+                    }
+                }
             }
-            navigateToLogin()
         }
     }
 
