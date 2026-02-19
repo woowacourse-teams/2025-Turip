@@ -1,42 +1,24 @@
 package com.on.turip.ui.compose.trip.turipselection
 
-import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -48,11 +30,10 @@ import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.common.extensions.dismissAndExecute
 import com.on.turip.ui.common.extensions.showSnackbarWithAction
 import com.on.turip.ui.compose.designsystem.component.TuripDialog
-import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.trip.model.MapModel
 import com.on.turip.ui.compose.trip.model.SelectedPlaceModel
-import com.on.turip.ui.compose.trip.turipselection.component.TuripDetail
+import com.on.turip.ui.compose.trip.turipselection.component.PlaceTuripSelectionContent
 import com.on.turip.ui.compose.trip.turipselection.component.TuripsContent
 import com.on.turip.ui.main.favorite.model.TuripShareModel
 import kotlinx.collections.immutable.persistentListOf
@@ -75,10 +56,6 @@ fun PlaceTuripSelectionBottomSheet(
 
     val snackbarHostState = remember { SnackbarHostState() }
     val resources = LocalResources.current
-
-    val windowInfo = LocalWindowInfo.current
-    val density = LocalDensity.current
-    val bottomSheetHeight = with(density) { windowInfo.containerSize.height.toDp() * 0.8f }
 
     var showLoginSuggestDialog by remember { mutableStateOf(false) }
 
@@ -191,110 +168,38 @@ fun PlaceTuripSelectionBottomSheet(
         dragHandle = null,
         containerColor = TuripTheme.colors.white,
     ) {
-        BackHandler {
-            when (uiState.screenMode) {
-                is PlaceTuripSelectionScreenMode.TuripDetail -> {
-                    snackbarHostState.dismissAndExecute { viewModel.onTuripDetailBack() }
-                }
+        val windowInfo = LocalWindowInfo.current
+        val density = LocalDensity.current
+        val bottomSheetHeight = with(density) { windowInfo.containerSize.height.toDp() * 0.8f }
 
-                is PlaceTuripSelectionScreenMode.Turips -> {
-                    viewModel.requestDismiss()
-                }
-            }
-        }
-
-        Box(
+        PlaceTuripSelectionContent(
+            uiState = uiState,
+            snackbarHostState = snackbarHostState,
+            onBackFromTuripDetail = {
+                snackbarHostState.dismissAndExecute { viewModel.onTuripDetailBack() }
+            },
+            onDismissRequest = viewModel::requestDismiss,
+            onAddTuripClick = onNavigateToAddTurip,
+            onTuripPlaceClickAtTuripsMode = viewModel::updateTurip,
+            onNavigateToTurip = viewModel::loadPlacesInSelectTurip,
+            onConfirmClick = viewModel::updateTuripsByPlace,
+            onMapClick = onNavigateToMap,
+            onTuripPlaceClickAtTuripDetail = {
+                snackbarHostState.dismissAndExecute { viewModel.applyTuripPlaceDelete(it) }
+            },
+            onShareClick = {
+                snackbarHostState.dismissAndExecute { viewModel.shareTurip() }
+            },
+            onDragStart = {
+                snackbarHostState.dismissAndExecute { viewModel.onDragStart() }
+            },
+            onDragPlace = viewModel::onDragMove,
+            onDragEnd = viewModel::onDragEnd,
             modifier =
                 Modifier
                     .fillMaxWidth()
                     .height(bottomSheetHeight),
-        ) {
-            Column(
-                modifier =
-                    Modifier
-                        .padding(top = TuripTheme.spacing.medium)
-                        .navigationBarsPadding(),
-            ) {
-                AnimatedVisibility(
-                    visible = uiState.screenMode is PlaceTuripSelectionScreenMode.Turips,
-                    enter = expandVertically() + fadeIn(),
-                    exit = shrinkVertically() + fadeOut(),
-                ) {
-                    CloseButton(
-                        onCloseClick = viewModel::requestDismiss,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
-
-                when (val mode = uiState.screenMode) {
-                    PlaceTuripSelectionScreenMode.Turips -> {
-                        TuripsContent(
-                            placeName = uiState.placeName,
-                            enableConfirm = uiState.isChanged,
-                            turips = uiState.turips,
-                            onAddTuripClick = onNavigateToAddTurip,
-                            onTuripPlaceClick = viewModel::updateTurip,
-                            onNavigateToTurip = viewModel::loadPlacesInSelectTurip,
-                            onConfirmClick = viewModel::updateTuripsByPlace,
-                        )
-                    }
-
-                    is PlaceTuripSelectionScreenMode.TuripDetail -> {
-                        TuripDetail(
-                            turipName = mode.turipName,
-                            places = uiState.selectedTuripPlaces,
-                            onMapClick = onNavigateToMap,
-                            onTuripPlaceClick = {
-                                snackbarHostState.dismissAndExecute {
-                                    viewModel.applyTuripPlaceDelete(it)
-                                }
-                            },
-                            onBackClick = {
-                                snackbarHostState.dismissAndExecute { viewModel.onTuripDetailBack() }
-                            },
-                            onShareClick = {
-                                snackbarHostState.dismissAndExecute { viewModel.shareTurip() }
-                            },
-                            onDragStart = {
-                                snackbarHostState.dismissAndExecute { viewModel.onDragStart() }
-                            },
-                            onDragPlace = viewModel::onDragMove,
-                            onDragEnd = viewModel::onDragEnd,
-                        )
-                    }
-                }
-            }
-            TuripSnackbar(
-                snackbarHostState = snackbarHostState,
-                modifier =
-                    Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(bottom = TuripTheme.spacing.medium),
-            )
-        }
-    }
-}
-
-@Composable
-private fun CloseButton(
-    onCloseClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Box(modifier = modifier.padding(end = TuripTheme.spacing.medium)) {
-        IconButton(
-            onClick = onCloseClick,
-            modifier =
-                Modifier
-                    .align(Alignment.CenterEnd)
-                    .size(32.dp),
-        ) {
-            Icon(
-                imageVector = Icons.Default.Close,
-                contentDescription = stringResource(R.string.all_close_description),
-                modifier = Modifier.size(16.dp),
-                tint = TuripTheme.colors.gray04,
-            )
-        }
+        )
     }
 }
 
@@ -302,19 +207,14 @@ private fun CloseButton(
 @Composable
 private fun PlaceTuripSelectionBottomSheetPreview() {
     TuripTheme {
-        Surface(
-            color = TuripTheme.colors.primarySub,
-            shape = TuripTheme.shape.bottomSheetRounded,
-        ) {
-            TuripsContent(
-                placeName = "장소명",
-                enableConfirm = false,
-                turips = persistentListOf(),
-                onAddTuripClick = { },
-                onTuripPlaceClick = { },
-                onNavigateToTurip = { _, _ -> },
-                onConfirmClick = { },
-            )
-        }
+        TuripsContent(
+            placeName = "장소명",
+            enableConfirm = false,
+            turips = persistentListOf(),
+            onAddTuripClick = { },
+            onTuripPlaceClick = { },
+            onNavigateToTurip = { _, _ -> },
+            onConfirmClick = { },
+        )
     }
 }
