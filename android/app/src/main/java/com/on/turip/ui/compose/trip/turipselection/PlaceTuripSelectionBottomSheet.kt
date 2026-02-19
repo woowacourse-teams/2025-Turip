@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -86,7 +85,9 @@ fun PlaceTuripSelectionBottomSheet(
     val lifecycleOwner = LocalLifecycleOwner.current
     val placeId = selectedPlaceModel.placeId
     val placeName = selectedPlaceModel.placeName
-    LaunchedEffect(lifecycleOwner, placeId) {
+    val isTuripsMode = uiState.screenMode is PlaceTuripSelectionScreenMode.Turips
+    LaunchedEffect(lifecycleOwner, placeId, isTuripsMode) {
+        if (!isTuripsMode) return@LaunchedEffect
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
             viewModel.loadTuripsByPlace(placeId, placeName)
         }
@@ -300,7 +301,6 @@ private fun CloseButton(
 @Preview(showBackground = true)
 @Composable
 private fun PlaceTuripSelectionBottomSheetPreview() {
-    val listState = rememberLazyListState()
     TuripTheme {
         Surface(
             color = TuripTheme.colors.primarySub,
