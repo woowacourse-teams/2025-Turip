@@ -83,7 +83,7 @@ class TripDetailViewModel @Inject constructor(
 
             val places =
                 trip.contentPlaces
-                    .sortedBy { it.visitDay }
+                    .sortedWith(compareBy(ContentPlace::visitDay, ContentPlace::visitOrder))
                     .map { contentPlace: ContentPlace -> contentPlace.toUiModel() }
                     .toImmutableList()
 
@@ -160,7 +160,7 @@ class TripDetailViewModel @Inject constructor(
             val places = uiState.value.places
             val name =
                 places.firstOrNull { place -> place.id == placeId }?.name ?: run {
-                    Timber.e("캐싱데이터에서 placeId를 찾을 수 없습니다. placeID = $placeId")
+                    Timber.e("업데이트할 장소의 placeId를 찾을 수 없습니다. placeID = $placeId")
                     ""
                 }
             _uiEffect.send(TripDetailUiEffect.ShowUpdatedTuripSelectionByPlace(name))
