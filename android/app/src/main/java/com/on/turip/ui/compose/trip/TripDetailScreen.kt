@@ -28,7 +28,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -39,8 +38,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -60,7 +57,6 @@ import com.on.turip.ui.compose.trip.component.ContentBookmarkButton
 import com.on.turip.ui.compose.trip.component.ContentInformation
 import com.on.turip.ui.compose.trip.component.ContentVideo
 import com.on.turip.ui.compose.trip.component.CreatorInformation
-import com.on.turip.ui.compose.trip.component.Day
 import com.on.turip.ui.compose.trip.component.PlaceItem
 import com.on.turip.ui.compose.trip.component.TripDetailAppBar
 import com.on.turip.ui.compose.trip.model.MapModel
@@ -303,27 +299,6 @@ private fun TripDetailScreenContent(
             Spacer(modifier = Modifier.height(TuripTheme.spacing.extraLarge))
             ContentInformation(information = uiState.tripDetailInfo)
             Spacer(modifier = Modifier.height(TuripTheme.spacing.large))
-        }
-
-        item {
-            Day(modifier = Modifier.padding(horizontal = TuripTheme.spacing.extraLarge))
-        }
-
-        item {
-            Text(
-                text = stringResource(R.string.trip_detail_day_place_count, uiState.places.size),
-                style = TuripTheme.typography.info1,
-                color = TuripTheme.colors.gray05,
-                textAlign = TextAlign.End,
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = TuripTheme.spacing.extraLarge)
-                        .padding(
-                            top = TuripTheme.spacing.extraSmall,
-                            bottom = TuripTheme.spacing.medium,
-                        ),
-            )
         }
 
         items(items = uiState.places, key = { "${it.id}${it.timeLine}" }) { place ->
