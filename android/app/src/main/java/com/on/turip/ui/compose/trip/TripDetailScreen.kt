@@ -60,10 +60,9 @@ import com.on.turip.ui.compose.trip.component.ContentBookmarkButton
 import com.on.turip.ui.compose.trip.component.ContentInformation
 import com.on.turip.ui.compose.trip.component.ContentVideo
 import com.on.turip.ui.compose.trip.component.CreatorInformation
-import com.on.turip.ui.compose.trip.component.Days
+import com.on.turip.ui.compose.trip.component.Day
 import com.on.turip.ui.compose.trip.component.PlaceItem
 import com.on.turip.ui.compose.trip.component.TripDetailAppBar
-import com.on.turip.ui.compose.trip.model.DayModel
 import com.on.turip.ui.compose.trip.model.MapModel
 import com.on.turip.ui.compose.trip.model.PlaceModel
 import com.on.turip.ui.compose.trip.model.TripDetailInfoModel
@@ -200,7 +199,6 @@ fun TripDetailScreen(
                             uiState = uiState,
                             listState = listState,
                             webViewController = webViewController,
-                            onDayClick = viewModel::updateDay,
                             onTimeLineClick = webViewController::seekTo,
                             onMapClick = navigateToMap,
                             onTuripPlaceClick = onTuripPlaceClick,
@@ -276,7 +274,6 @@ private fun TripDetailScreenContent(
     uiState: TripDetailUiState,
     listState: LazyListState,
     webViewController: TripDetailWebViewController,
-    onDayClick: (day: Int) -> Unit,
     onTimeLineClick: (timeLine: Int) -> Unit,
     onMapClick: (mapModel: MapModel) -> Unit,
     onTuripPlaceClick: (id: Long, placeName: String) -> Unit,
@@ -309,11 +306,7 @@ private fun TripDetailScreenContent(
         }
 
         item {
-            Days(
-                days = uiState.days,
-                onDayClick = onDayClick,
-                modifier = Modifier.padding(horizontal = TuripTheme.spacing.extraLarge),
-            )
+            Day(modifier = Modifier.padding(horizontal = TuripTheme.spacing.extraLarge))
         }
 
         item {
@@ -400,49 +393,46 @@ private fun TripContentScreenPreview() {
         )
     val webView = WebView(LocalContext.current)
     TuripTheme {
-        TuripTheme {
-            TripDetailScreenContent(
-                uiState =
-                    TripDetailUiState(
-                        isLoading = false,
-                        errorUiState = ErrorUiState.None,
-                        tripDetailInfo = tripDetailInfo,
-                        days = persistentListOf(DayModel(1), DayModel(2)),
-                        places =
-                            persistentListOf(
-                                PlaceModel(
-                                    id = 1L,
-                                    name = "우아한테크코스",
-                                    isTuripPlace = true,
-                                    category = "💻 코딩맛집",
-                                    mapLink = "kakao.com/123123",
-                                    timeLine = "01:03",
-                                ),
-                                PlaceModel(
-                                    id = 2L,
-                                    name = "우아한테크코스",
-                                    isTuripPlace = false,
-                                    category = "💻 코딩맛집",
-                                    mapLink = "google.com/123123",
-                                    timeLine = "03:03",
-                                ),
+        TripDetailScreenContent(
+            uiState =
+                TripDetailUiState(
+                    isLoading = false,
+                    errorUiState = ErrorUiState.None,
+                    tripDetailInfo = tripDetailInfo,
+                    places =
+                        persistentListOf(
+                            PlaceModel(
+                                id = 1L,
+                                name = "우아한테크코스",
+                                isTuripPlace = true,
+                                category = "💻 코딩맛집",
+                                mapLink = "kakao.com/123123",
+                                timeLine = "01:03",
                             ),
-                        isBookmarked = true,
-                    ),
-                listState = rememberLazyListState(),
-                webViewController =
-                    TripDetailWebViewController(
-                        webView = webView,
-                        videoManager = VideoManager(webView),
-                        navigateToWebViewUrl = {},
-                    ),
-                onDayClick = {},
-                onTimeLineClick = {},
-                onMapClick = {},
-                onTuripPlaceClick = { _, _ -> },
-                onBookmarkClick = {},
-                onErrorVideoClick = {},
-            )
-        }
+                            PlaceModel(
+                                id = 2L,
+                                name = "우아한테크코스",
+                                isTuripPlace = false,
+                                category = "💻 코딩맛집",
+                                mapLink = "google.com/123123",
+                                timeLine = "03:03",
+                            ),
+                        ),
+                    isBookmarked = true,
+                ),
+            listState = rememberLazyListState(),
+            webViewController =
+                TripDetailWebViewController(
+                    webView = webView,
+                    videoManager = VideoManager(webView),
+                    navigateToWebViewUrl = {},
+                ),
+            onTimeLineClick = {},
+            onMapClick = {},
+            onTuripPlaceClick = { _, _ -> },
+            onBookmarkClick = {},
+            onErrorVideoClick = {},
+            modifier = Modifier.background(color = TuripTheme.colors.white),
+        )
     }
 }
