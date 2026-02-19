@@ -333,7 +333,7 @@ private fun TripDetailScreenContent(
             )
         }
 
-        items(items = uiState.places, key = { it.timeLine }) { place ->
+        items(items = uiState.places, key = { "${it.id}${it.timeLine}" }) { place ->
             PlaceItem(
                 placeModel = place,
                 onTimeLineClick = onTimeLineClick,
