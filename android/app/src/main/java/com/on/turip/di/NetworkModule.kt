@@ -4,6 +4,7 @@ import com.on.turip.BuildConfig
 import com.on.turip.common.AuthState
 import com.on.turip.common.FidProvider
 import com.on.turip.common.UserType
+import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.fold
 import com.on.turip.di.NetworkModule.LOG_PREFIX
 import com.on.turip.domain.login.AuthRepository
@@ -125,9 +126,11 @@ object NetworkModule {
                                     refreshToken = newTokens.refreshToken,
                                 )
                             },
-                            onFailure = {
-                                userStorageRepository.clearTokens()
-                                AuthState.change(UserType.GUEST)
+                            onFailure = { error ->
+                                if (error is ErrorType.Auth) {
+                                    userStorageRepository.clearTokens()
+                                    AuthState.change(UserType.GUEST)
+                                }
                                 null
                             },
                         )
