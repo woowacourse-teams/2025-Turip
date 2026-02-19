@@ -87,6 +87,10 @@ object NetworkModule {
     ) {
         install(plugin = Auth) {
             bearer {
+                sendWithoutRequest { request ->
+                    !request.url.pathSegments.contains("verification")
+                }
+
                 loadTokens {
                     when (AuthState.type) {
                         UserType.MEMBER -> {
