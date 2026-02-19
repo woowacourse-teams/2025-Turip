@@ -265,6 +265,8 @@ private suspend fun handleUiEffect(
     }
 }
 
+private const val LAZY_PLACE_ITEM_KEY_DELIMITER = "_"
+
 @Composable
 private fun TripDetailScreenContent(
     uiState: TripDetailUiState,
@@ -301,7 +303,10 @@ private fun TripDetailScreenContent(
             Spacer(modifier = Modifier.height(TuripTheme.spacing.large))
         }
 
-        items(items = uiState.places, key = { "${it.id}${it.timeLine}" }) { place ->
+        items(
+            items = uiState.places,
+            key = { "${it.id}$LAZY_PLACE_ITEM_KEY_DELIMITER${it.timeLine}" },
+        ) { place ->
             PlaceItem(
                 placeModel = place,
                 onTimeLineClick = onTimeLineClick,
