@@ -1,9 +1,12 @@
 package com.on.turip.ui.compose.mypage
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
@@ -111,6 +114,11 @@ fun MyPageScreen(
     Scaffold(
         topBar = { MyPageAppBar() },
         snackbarHost = { TuripSnackbar(snackbarHostState = snackbarHostState) },
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(TuripTheme.colors.white)
+                .systemBarsPadding(),
     ) { innerPadding ->
         LazyColumn(
             modifier = Modifier.padding(innerPadding),

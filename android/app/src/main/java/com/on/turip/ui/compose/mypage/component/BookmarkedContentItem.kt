@@ -1,7 +1,8 @@
 package com.on.turip.ui.compose.mypage.component
 
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,9 +39,9 @@ import com.on.turip.domain.content.video.VideoData
 import com.on.turip.domain.creator.Creator
 import com.on.turip.domain.region.City
 import com.on.turip.domain.trip.TripDuration
+import com.on.turip.ui.common.TuripUrlConverter
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
-import com.on.turip.ui.compose.login.util.noRippleClickable
 
 @Composable
 fun BookmarkedContentItem(
@@ -50,9 +51,16 @@ fun BookmarkedContentItem(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier.noRippleClickable { onContentClick(item.content.id) },
+        modifier =
+            modifier
+                .padding(TuripTheme.spacing.extraSmall)
+                .clip(TuripTheme.shape.container)
+                .clickable { onContentClick(item.content.id) },
     ) {
-        ContentThumbnail(imageUrl = item.content.videoData.url)
+        ContentThumbnail(
+            imageUrl = item.content.videoData.url,
+            modifier = Modifier.fillMaxWidth(),
+        )
 
         Spacer(modifier = Modifier.height(TuripTheme.spacing.medium))
 
@@ -80,6 +88,7 @@ private fun ContentThumbnail(
     contentDescription: String? = null,
 ) {
     val shape = TuripTheme.shape.container
+    val parsedUrl = TuripUrlConverter.convertVideoThumbnailUrl(imageUrl)
 
     Box(
         modifier =
@@ -87,18 +96,23 @@ private fun ContentThumbnail(
                 .fillMaxWidth()
                 .aspectRatio(16f / 9f)
                 .clip(shape)
-                .background(TuripTheme.colors.primary),
+                .border(
+                    width = 1.dp,
+                    color = TuripTheme.colors.gray01,
+                    shape = shape,
+                ),
     ) {
         AsyncImage(
             model =
                 ImageRequest
                     .Builder(LocalContext.current)
-                    .data(imageUrl)
+                    .data(parsedUrl)
                     .crossfade(true)
                     .build(),
             contentDescription = contentDescription,
             contentScale = ContentScale.Crop,
             modifier = Modifier.matchParentSize(),
+            error = painterResource(R.drawable.bg_image_placeholder),
         )
     }
 }
