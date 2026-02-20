@@ -43,8 +43,8 @@ enum class MyTuripTab(
 @Composable
 private fun MyTuripScreenContent(
     turips: ImmutableList<MyTuripModel>,
-    onTuripClick: (Long) -> Unit = {},
-    onAddClick: () -> Unit = {},
+    onTuripClick: (Long) -> Unit,
+    onAddClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var selectedTab: MyTuripTab by rememberSaveable { mutableStateOf(MyTuripTab.ALL) }
@@ -82,8 +82,7 @@ private fun MyTuripScreenContent(
         ) {
             Text(
                 text = "내 튜립",
-                fontSize = 26.sp,
-                fontWeight = FontWeight.ExtraBold,
+                style = TuripTheme.typography.display,
                 color = Color.Black,
                 modifier =
                     Modifier.padding(
@@ -126,6 +125,6 @@ private fun MyTuripScreenPreview() {
         )
 
     TuripTheme {
-        MyTuripScreenContent(allTurips)
+        MyTuripScreenContent(allTurips,{},{})
     }
 }
