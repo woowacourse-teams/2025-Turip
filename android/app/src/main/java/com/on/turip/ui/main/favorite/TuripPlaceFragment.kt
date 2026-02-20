@@ -18,8 +18,6 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class TuripPlaceFragment : Fragment() {
-    private val viewModel: TuripPlaceViewModel by viewModels()
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -30,10 +28,9 @@ class TuripPlaceFragment : Fragment() {
             setContent {
                 TuripTheme {
                     TuripPlaceScreen(
-                        viewModel = viewModel,
                         onNavigateToLogin = { navigateToLoginScreen() },
                         onShareTurip = { model: TuripShareModel -> navigateToShareTurip(model) },
-                        onManageFolderClick = {},
+                        selectedTuripId = 216,
                         onNavigateToMap = {},
                     )
                 }
