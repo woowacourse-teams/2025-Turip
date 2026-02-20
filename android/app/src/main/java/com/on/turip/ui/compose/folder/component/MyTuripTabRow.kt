@@ -59,7 +59,7 @@ fun MyTuripTabRow(
                 ) {
                     Text(
                         text = myTuripTab.tabName,
-                        style = TuripTheme.typography.title2,
+                        style = TuripTheme.typography.title3,
                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                         color = if (isSelected) TuripTheme.colors.black else TuripTheme.colors.gray03,
                     )

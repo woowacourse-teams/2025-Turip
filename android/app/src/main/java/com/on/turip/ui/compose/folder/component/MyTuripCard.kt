@@ -124,7 +124,7 @@ private fun TuripTypeChip(
     ) {
         Text(
             text = label,
-            style = TuripTheme.typography.info1,
+            style = TuripTheme.typography.info2,
             color = TuripTheme.colors.white,
         )
     }
