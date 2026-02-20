@@ -27,7 +27,8 @@ class MyPageActivity : AppCompatActivity() {
         setContent {
             TuripTheme {
                 MyPageScreen(
-                    navigateToAllBookmarkContents = {}, // 화면 구현 필요
+                    // 화면 구현 필요
+                    navigateToAllBookmarkContents = {},
                     navigateToContent = { contentId: Long ->
                         Timber.d("마이페이지 북마크 콘텐츠 클릭(contentId=$contentId)")
                         val intent: Intent =
