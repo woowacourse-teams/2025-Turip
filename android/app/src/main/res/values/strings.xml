@@ -45,18 +45,23 @@
     <string name="home_top_title">😊 오늘의 기분은, 여행하기 딱 좋아요!</string>
     <string name="home_users_like_content_title">❤️ 한 주간 가장 많이 북마크 된 콘텐츠</string>
 
-    <!-- 환경 설정 화면 -->
-    <string name="setting_inquiry">문의하기</string>
-    <string name="setting_privacy_policy">개인 정보 처리 방침</string>
-    <string name="setting_login">로그인</string>
-    <string name="setting_logout">로그아웃</string>
-    <string name="setting_withdraw">회원 탈퇴</string>
-    <string name="setting_logout_dialog_message">정말 로그아웃 하시겠습니까?</string>
-    <string name="setting_logout_dialog_confirm">로그아웃</string>
-    <string name="setting_logout_dialog_dismiss">취소</string>
-    <string name="setting_withdraw_dialog_message">정말 회원탈퇴 하시겠습니까?</string>
-    <string name="setting_withdraw_dialog_confirm">회원탈퇴</string>
-    <string name="setting_withdraw_dialog_dismiss">취소</string>
+    <!-- 마이 페이지 -->
+    <string name="my_page_profile_image_description">프로필 이미지</string>
+    <string name="my_page_bookmark_content_title">저장한 콘텐츠</string>
+    <string name="my_page_view_all_content">모두 보기</string>
+    <string name="my_page_settings_title">고객 지원 및 설정</string>
+    <string name="my_page_inquiry">문의하기</string>
+    <string name="my_page_privacy_policy">개인 정보 처리 방침</string>
+    <string name="my_page_login">로그인</string>
+    <string name="my_page_logout">로그아웃</string>
+    <string name="my_page_withdraw">회원 탈퇴</string>
+    <string name="my_page_logout_dialog_message">정말 로그아웃 하시겠습니까?</string>
+    <string name="my_page_logout_dialog_confirm">로그아웃</string>
+    <string name="my_page_logout_dialog_dismiss">취소</string>
+    <string name="my_page_withdraw_dialog_message">정말 회원탈퇴 하시겠습니까?</string>
+    <string name="my_page_withdraw_dialog_confirm">회원탈퇴</string>
+    <string name="my_page_withdraw_dialog_dismiss">취소</string>
+    <string name="my_page_empty_bookmark_content">저장한 콘텐츠가 없어요\n홈에서 마음에 드는 콘텐츠를 저장해보세요</string>
 
     <!-- 북마크 컨텐츠 목록 페이지 -->
     <string name="bookmark_content_empty_suggest_title">컨텐츠를 저장 해보세요!</string>

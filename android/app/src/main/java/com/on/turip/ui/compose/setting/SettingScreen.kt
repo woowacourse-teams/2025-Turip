@@ -30,8 +30,8 @@ import com.on.turip.ui.common.extensions.showSnackbarWithAction
 import com.on.turip.ui.compose.designsystem.component.TuripDialog
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
+import com.on.turip.ui.compose.mypage.component.MyPageSettingItem
 import com.on.turip.ui.compose.setting.component.SettingAppBar
-import com.on.turip.ui.compose.setting.component.SettingItem
 import com.on.turip.ui.compose.setting.model.InquiryMail
 import timber.log.Timber
 
@@ -69,10 +69,10 @@ fun SettingScreen(
 
     if (uiState.showLogoutDialog) {
         TuripDialog(
-            title = stringResource(R.string.setting_logout),
-            message = stringResource(R.string.setting_logout_dialog_message),
-            confirmText = stringResource(R.string.setting_logout_dialog_confirm),
-            dismissText = stringResource(R.string.setting_logout_dialog_dismiss),
+            title = stringResource(R.string.my_page_logout),
+            message = stringResource(R.string.my_page_logout_dialog_message),
+            confirmText = stringResource(R.string.my_page_logout_dialog_confirm),
+            dismissText = stringResource(R.string.my_page_logout_dialog_dismiss),
             confirmButtonColor = TuripTheme.colors.primary,
             dismissButtonColor = TuripTheme.colors.gray02,
             onConfirmation = viewModel::confirmLogout,
@@ -82,10 +82,10 @@ fun SettingScreen(
 
     if (uiState.showWithdrawDialog) {
         TuripDialog(
-            title = stringResource(R.string.setting_withdraw),
-            message = stringResource(R.string.setting_withdraw_dialog_message),
-            confirmText = stringResource(R.string.setting_withdraw_dialog_confirm),
-            dismissText = stringResource(R.string.setting_withdraw_dialog_dismiss),
+            title = stringResource(R.string.my_page_withdraw),
+            message = stringResource(R.string.my_page_withdraw_dialog_message),
+            confirmText = stringResource(R.string.my_page_withdraw_dialog_confirm),
+            dismissText = stringResource(R.string.my_page_withdraw_dialog_dismiss),
             confirmButtonColor = TuripTheme.colors.error,
             dismissButtonColor = TuripTheme.colors.gray02,
             onConfirmation = viewModel::confirmWithdraw,
@@ -170,15 +170,15 @@ private fun SettingCommonScreen(
         color = TuripTheme.colors.gray01,
     )
 
-    SettingItem(
+    MyPageSettingItem(
         imageRes = R.drawable.ic_inquire,
-        titleRes = R.string.setting_inquiry,
+        titleRes = R.string.my_page_inquiry,
         onClick = onClickInquiry,
         modifier = Modifier.fillMaxWidth(),
     )
-    SettingItem(
+    MyPageSettingItem(
         imageRes = R.drawable.ic_document,
-        titleRes = R.string.setting_privacy_policy,
+        titleRes = R.string.my_page_privacy_policy,
         onClick = onClickPrivacyPolicy,
         modifier = Modifier.fillMaxWidth(),
     )
@@ -186,9 +186,9 @@ private fun SettingCommonScreen(
 
 @Composable
 private fun SettingForGuestScreen(onClickLogin: () -> Unit) {
-    SettingItem(
+    MyPageSettingItem(
         imageRes = R.drawable.ic_login,
-        titleRes = R.string.setting_login,
+        titleRes = R.string.my_page_login,
         onClick = onClickLogin,
         modifier = Modifier.fillMaxWidth(),
     )
@@ -199,15 +199,15 @@ private fun SettingForMemberScreen(
     onClickLogout: () -> Unit,
     onClickWithdraw: () -> Unit,
 ) {
-    SettingItem(
+    MyPageSettingItem(
         imageRes = R.drawable.ic_logout,
-        titleRes = R.string.setting_logout,
+        titleRes = R.string.my_page_logout,
         onClick = onClickLogout,
         modifier = Modifier.fillMaxWidth(),
     )
-    SettingItem(
+    MyPageSettingItem(
         imageRes = R.drawable.ic_withdraw,
-        titleRes = R.string.setting_withdraw,
+        titleRes = R.string.my_page_withdraw,
         onClick = onClickWithdraw,
         modifier = Modifier.fillMaxWidth(),
     )
