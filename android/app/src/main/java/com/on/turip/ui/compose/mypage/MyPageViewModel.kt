@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
+import com.on.turip.domain.accounts.Account
+import com.on.turip.domain.accounts.AccountRepository
 import com.on.turip.domain.bookmark.PagedBookmarkContents
 import com.on.turip.domain.bookmark.repository.BookmarkRepository
 import com.on.turip.domain.login.MemberRepository
@@ -36,6 +38,7 @@ class MyPageViewModel @Inject constructor(
     private val bookmarkRepository: BookmarkRepository,
     private val userStorageRepository: UserStorageRepository,
     private val memberRepository: MemberRepository,
+    private val accountRepository: AccountRepository,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<MyPageUiState> = MutableStateFlow(MyPageUiState.Idle)
     val uiState: StateFlow<MyPageUiState> = _uiState.asStateFlow()
@@ -44,7 +47,26 @@ class MyPageViewModel @Inject constructor(
     val uiEffect: Flow<MyPageUiEffect> = _uiEffect.receiveAsFlow()
 
     init {
+        loadProfile()
         loadBookmarkContents()
+    }
+
+    fun loadProfile() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(profileState = MyPageSectionState.Loading) }
+
+            accountRepository
+                .loadMyProfile()
+                .onSuccess { result: Account ->
+                    _uiState.update {
+                        Timber.d("마이페이지 프로필 조회 성공")
+                        it.copy(profileState = MyPageSectionState.Success(result.toUiModel()))
+                    }
+                }.onFailure {
+                    Timber.e("마이페이지 프로필 조회 에러 발생")
+                    _uiState.update { it.copy(profileState = MyPageSectionState.Error) }
+                }
+        }
     }
 
     fun loadBookmarkContents() {

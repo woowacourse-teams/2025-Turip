@@ -131,7 +131,8 @@ fun MyPageScreen(
         ) {
             item {
                 ProfileSection(
-                    nickname = "닉네임 넣어주기 필요 123123123123123123123123123123123123123123",
+                    state = uiState.profileState,
+                    onRetry = viewModel::loadProfile,
                     modifier =
                         Modifier
                             .fillMaxWidth()

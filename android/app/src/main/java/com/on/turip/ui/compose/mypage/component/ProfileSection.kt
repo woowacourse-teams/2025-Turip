@@ -2,6 +2,7 @@ package com.on.turip.ui.compose.mypage.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -11,6 +12,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,25 +36,30 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.on.turip.R
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
+import com.on.turip.ui.compose.mypage.model.MyPageSectionState
+import com.on.turip.ui.compose.mypage.model.ProfileModel
 
 @Composable
 fun ProfileSection(
-    nickname: String,
+    state: MyPageSectionState<ProfileModel>,
+    onRetry: () -> Unit,
     modifier: Modifier = Modifier,
-    imageUrl: String? = null,
 ) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(TuripTheme.spacing.extraLarge),
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier,
     ) {
-        ProfileImage(imageUrl = imageUrl, modifier = Modifier.size(84.dp))
-        Text(
-            text = nickname,
-            textAlign = TextAlign.Start,
-            style = TuripTheme.typography.title1,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
+        val imageUrl = (state as? MyPageSectionState.Success)?.data?.imageUrl
+        ProfileImage(
+            imageUrl = imageUrl,
+            modifier = Modifier.size(84.dp),
+        )
+
+        ProfileRightContent(
+            state = state,
+            onRetry = onRetry,
+            modifier = Modifier.weight(1f),
         )
     }
 }
@@ -106,32 +115,124 @@ private fun ProfileImage(
     }
 }
 
-@Preview(showBackground = true, name = "기본 프로필")
 @Composable
-private fun DefaultProfilePreview() {
-    TuripTheme {
-        ProfileSection(
-            nickname = "기본 프로필",
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(TuripTheme.spacing.extraLarge),
-            imageUrl = null,
+private fun ProfileRightContent(
+    state: MyPageSectionState<ProfileModel>,
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.CenterStart,
+    ) {
+        when (state) {
+            MyPageSectionState.Loading -> {
+                CircularProgressIndicator(
+                    modifier = modifier.size(2.dp),
+                    color = TuripTheme.colors.gray03,
+                )
+            }
+
+            MyPageSectionState.Error -> {
+                ProfileError(onRetry = onRetry)
+            }
+
+            is MyPageSectionState.Success -> {
+                Text(
+                    text = state.data.nickname,
+                    textAlign = TextAlign.Start,
+                    style = TuripTheme.typography.title1,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = modifier,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ProfileError(onRetry: () -> Unit) {
+    val shape = TuripTheme.shape.wideButton
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(TuripTheme.spacing.small),
+        modifier =
+            Modifier
+                .clip(shape)
+                .border(
+                    width = 1.dp,
+                    shape = TuripTheme.shape.wideButton,
+                    color = TuripTheme.colors.gray03,
+                )
+                .clickable(onClick = onRetry)
+                .padding(
+                    horizontal = TuripTheme.spacing.medium,
+                    vertical = TuripTheme.spacing.small,
+                ),
+    ) {
+        Icon(
+            imageVector = Icons.Outlined.Refresh,
+            contentDescription = null,
+            tint = TuripTheme.colors.gray03,
+        )
+        Text(
+            text = stringResource(R.string.retry),
+            style = TuripTheme.typography.info1,
+            color = TuripTheme.colors.gray03,
         )
     }
 }
 
-@Preview(showBackground = true, name = "사진 프로필")
+@Preview(showBackground = true, name = "로딩중")
 @Composable
-private fun PhotoProfilePreview() {
+private fun ProfileLoadingPreview() {
     TuripTheme {
         ProfileSection(
-            nickname = "사진 존재하는 프로필",
+            state = MyPageSectionState.Loading,
+            onRetry = {},
             modifier =
                 Modifier
                     .fillMaxWidth()
                     .padding(TuripTheme.spacing.extraLarge),
-            imageUrl = "url",
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "에러")
+@Composable
+private fun ProfileErrorPreview() {
+    TuripTheme {
+        ProfileSection(
+            state = MyPageSectionState.Error,
+            onRetry = {},
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(TuripTheme.spacing.extraLarge),
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "기본 프로필 이미지")
+@Composable
+private fun ProfileDefaultPreview() {
+    TuripTheme {
+        ProfileSection(
+            state =
+                MyPageSectionState.Success(
+                    ProfileModel(
+                        id = 1L,
+                        nickname = "기본 프로필 기본 프로필 기본 프로필 기본 프로필 기본 프로필 이름이 길어지면",
+                        imageUrl = null,
+                    ),
+                ),
+            onRetry = {},
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(TuripTheme.spacing.extraLarge),
         )
     }
 }

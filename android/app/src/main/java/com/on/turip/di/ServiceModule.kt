@@ -1,5 +1,7 @@
 package com.on.turip.di
 
+import com.on.turip.data.accounts.service.AccountService
+import com.on.turip.data.accounts.service.createAccountService
 import com.on.turip.data.bookmarks.service.BookmarkService
 import com.on.turip.data.bookmarks.service.createBookmarkService
 import com.on.turip.data.content.service.ContentService
@@ -51,4 +53,8 @@ object ServiceModule {
     @Provides
     @Singleton
     fun provideGuestService(ktorfit: Ktorfit): GuestService = ktorfit.createGuestService()
+
+    @Provides
+    @Singleton
+    fun provideAccountService(ktorfit: Ktorfit): AccountService = ktorfit.createAccountService()
 }
