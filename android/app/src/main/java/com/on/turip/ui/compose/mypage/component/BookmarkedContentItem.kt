@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -31,24 +32,32 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.on.turip.R
+import com.on.turip.domain.bookmark.BookmarkContent
+import com.on.turip.domain.content.Content
+import com.on.turip.domain.content.video.VideoData
+import com.on.turip.domain.creator.Creator
+import com.on.turip.domain.region.City
+import com.on.turip.domain.trip.TripDuration
+import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.login.util.noRippleClickable
 
 @Composable
 fun BookmarkedContentItem(
-    onContentClick: () -> Unit,
-    onRemoveBookmark: () -> Unit,
+    item: BookmarkContent,
+    onContentClick: (contentId: Long) -> Unit,
+    onRemoveBookmark: (contentId: Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier.noRippleClickable { onContentClick() },
+        modifier = modifier.noRippleClickable { onContentClick(item.content.id) },
     ) {
-        ContentThumbnail(imageUrl = "")
+        ContentThumbnail(imageUrl = item.content.videoData.url)
 
         Spacer(modifier = Modifier.height(TuripTheme.spacing.medium))
 
         Text(
-            text = "콘텐츠 제목 들어오는 곳",
+            text = item.content.videoData.title,
             style = TuripTheme.typography.title2,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -57,7 +66,10 @@ fun BookmarkedContentItem(
 
         Spacer(modifier = Modifier.height(TuripTheme.spacing.small))
 
-        ContentInformation(onRemoveBookmark)
+        ContentInformation(
+            item = item,
+            onRemoveBookmark = onRemoveBookmark,
+        )
     }
 }
 
@@ -92,7 +104,10 @@ private fun ContentThumbnail(
 }
 
 @Composable
-private fun ContentInformation(onRemoveBookmark: () -> Unit) {
+private fun ContentInformation(
+    item: BookmarkContent,
+    onRemoveBookmark: (contentId: Long) -> Unit,
+) {
     Row(
         modifier =
             Modifier
@@ -105,7 +120,12 @@ private fun ContentInformation(onRemoveBookmark: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(TuripTheme.spacing.small),
         ) {
             Text(
-                text = "크리에이터명 & 날짜",
+                text =
+                    stringResource(
+                        R.string.region_result_video_description,
+                        item.content.creator.channelName,
+                        item.content.videoData.uploadedDate,
+                    ),
                 style = TuripTheme.typography.info2,
                 color = TuripTheme.colors.gray03,
                 maxLines = 1,
@@ -116,17 +136,17 @@ private fun ContentInformation(onRemoveBookmark: () -> Unit) {
                 horizontalArrangement = Arrangement.spacedBy(TuripTheme.spacing.small),
             ) {
                 ContentInfoItem(
-                    text = "2박 3일",
+                    text = item.tripDuration.toUiModel().toDisplayText(LocalContext.current),
                     iconPainterRes = R.drawable.ic_calendar,
                 )
                 ContentInfoItem(
-                    text = "12개 장소",
+                    text = stringResource(R.string.all_total_place_count, item.tripPlaceCount),
                     iconPainterRes = R.drawable.ic_place,
                 )
             }
         }
         IconButton(
-            onClick = onRemoveBookmark,
+            onClick = { onRemoveBookmark(item.content.id) },
             modifier = Modifier.size(48.dp),
         ) {
             Icon(
@@ -169,8 +189,22 @@ private fun ContentInfoItem(
 @Preview(showBackground = true)
 @Composable
 private fun BookmarkedContentItemPreview() {
+    val content =
+        BookmarkContent(
+            content =
+                Content(
+                    1L,
+                    Creator(1L, "채널명", ""),
+                    VideoData("콘텐츠 제목이 길면 ...으로 표시되는 것을 확인 ㅇㅇㅇ", "thumbnail", "1박 2일"),
+                    City(""),
+                    true,
+                ),
+            tripDuration = TripDuration(1, 2),
+            tripPlaceCount = 2,
+        )
     TuripTheme {
         BookmarkedContentItem(
+            item = content,
             onContentClick = {},
             onRemoveBookmark = {},
             modifier = Modifier.width(280.dp),
