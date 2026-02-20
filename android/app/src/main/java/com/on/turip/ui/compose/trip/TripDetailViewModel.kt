@@ -18,6 +18,7 @@ import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.compose.trip.model.DayModel
 import com.on.turip.ui.compose.trip.model.PlaceModel
+import com.on.turip.ui.compose.trip.model.SelectedPlaceModel
 import com.on.turip.ui.compose.trip.model.TripDetailInfoModel
 import com.on.turip.ui.trip.TripDetailActivity.Companion.TRIP_DETAIL_CONTENT_KEY
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -111,6 +112,7 @@ class TripDetailViewModel @Inject constructor(
                             duration = trip.tripDuration.toUiModel(),
                         ),
                     isBookmarked = content.isBookmarked,
+                    selectedPlaceModel = null,
                 )
             }
 
@@ -192,8 +194,8 @@ class TripDetailViewModel @Inject constructor(
     }
 
     fun updatePlaceTuripSelection(
-        hasTurip: Boolean,
         placeId: Long,
+        hasTurip: Boolean,
     ) {
         placeCacheByDay =
             placeCacheByDay.mapValues { (_, places: ImmutableList<PlaceModel>) ->
@@ -206,14 +208,21 @@ class TripDetailViewModel @Inject constructor(
                 }
             }
 
-        viewModelScope.launch {
-            val placeName: String = getPlaceName(placeId)
-            _uiEffect.send(TripDetailUiEffect.ShowUpdatedTuripSelectionByPlace(placeName))
-        }
-
         _uiState.update { state: TripDetailUiState ->
             val currentSelectedDay = state.days.find { it.isSelected }?.day ?: DayModel.ALL_PLACE
             state.copy(places = placeCacheByDay[currentSelectedDay] ?: persistentListOf())
+        }
+    }
+
+    fun confirmPlaceTuripSelection(
+        placeId: Long,
+        hasTurip: Boolean,
+    ) {
+        updatePlaceTuripSelection(placeId, hasTurip)
+
+        viewModelScope.launch {
+            val placeName: String = getPlaceName(placeId)
+            _uiEffect.send(TripDetailUiEffect.ShowUpdatedTuripSelectionByPlace(placeName))
         }
     }
 
@@ -223,6 +232,19 @@ class TripDetailViewModel @Inject constructor(
                 Timber.e("캐싱데이터에서 placeId를 찾을 수 없습니다. placeID = $placeId")
                 ""
             }
+
+    fun selectPlace(
+        placeId: Long,
+        placeName: String,
+    ) {
+        _uiState.update { state ->
+            state.copy(selectedPlaceModel = SelectedPlaceModel(placeId, placeName))
+        }
+    }
+
+    fun clearSelectedPlace() {
+        _uiState.update { it.copy(selectedPlaceModel = null) }
+    }
 
     private suspend fun handleError(failure: TuripResult.Failure) {
         val uiError: UiError = failure.errorType.toUiError()

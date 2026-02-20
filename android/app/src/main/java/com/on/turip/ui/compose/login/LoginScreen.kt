@@ -22,7 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -48,7 +48,7 @@ fun LoginScreen(
 ) {
     val uiState: LoginUiState by viewmodel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
-    val context = LocalContext.current
+    val resources = LocalResources.current
 
     LaunchedEffect(Unit) {
         viewmodel.uiEffect.collect { effect: LoginUiEffect ->
@@ -60,7 +60,7 @@ fun LoginScreen(
                 is LoginUiEffect.ShowError -> {
                     val errorUiModel = effect.errorUiState.toUiModel() ?: return@collect
                     snackbarHostState.showSnackbar(
-                        message = context.getString(errorUiModel.titleRes),
+                        message = resources.getString(errorUiModel.titleRes),
                         duration = SnackbarDuration.Long,
                     )
                 }
@@ -154,10 +154,12 @@ private fun LoginScreenContent(
                             .border(
                                 border = BorderStroke(1.dp, TuripTheme.colors.gray02),
                                 shape = TuripTheme.shape.container,
-                            ).background(
+                            )
+                            .background(
                                 color = TuripTheme.colors.gray03,
                                 shape = TuripTheme.shape.container,
-                            ).fillMaxWidth()
+                            )
+                            .fillMaxWidth()
                             .padding(vertical = TuripTheme.spacing.extraLarge),
                     textAlign = TextAlign.Center,
                 )
