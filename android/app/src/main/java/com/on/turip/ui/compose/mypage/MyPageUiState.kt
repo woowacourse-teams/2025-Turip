@@ -9,12 +9,14 @@ import kotlinx.collections.immutable.ImmutableList
 data class MyPageUiState(
     val profileState: MyPageSectionState<Unit>,
     val bookmarkContentState: MyPageSectionState<ImmutableList<BookmarkContent>>,
+    val dialogState: MyPageDialogState?,
 ) {
     companion object {
         val Idle: MyPageUiState =
             MyPageUiState(
                 profileState = MyPageSectionState.Loading,
                 bookmarkContentState = MyPageSectionState.Loading,
+                dialogState = null,
             )
     }
 }

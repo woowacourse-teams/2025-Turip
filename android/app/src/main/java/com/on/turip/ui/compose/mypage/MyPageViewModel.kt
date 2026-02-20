@@ -2,11 +2,20 @@ package com.on.turip.ui.compose.mypage
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
 import com.on.turip.domain.bookmark.PagedBookmarkContents
 import com.on.turip.domain.bookmark.repository.BookmarkRepository
+import com.on.turip.domain.login.MemberRepository
+import com.on.turip.domain.setting.PrivacyPolicy
+import com.on.turip.domain.userstorage.repository.UserStorageRepository
+import com.on.turip.ui.common.error.ErrorUiState
+import com.on.turip.ui.common.error.UiError
+import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.compose.mypage.model.MyPageSectionState
+import com.on.turip.ui.compose.setting.model.InquiryMail
+import com.on.turip.ui.compose.setting.util.AppEnvironmentInfoProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.collections.immutable.toImmutableList
@@ -25,6 +34,8 @@ import timber.log.Timber
 @HiltViewModel
 class MyPageViewModel @Inject constructor(
     private val bookmarkRepository: BookmarkRepository,
+    private val userStorageRepository: UserStorageRepository,
+    private val memberRepository: MemberRepository,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<MyPageUiState> = MutableStateFlow(MyPageUiState.Idle)
     val uiState: StateFlow<MyPageUiState> = _uiState.asStateFlow()
@@ -96,5 +107,117 @@ class MyPageViewModel @Inject constructor(
                 removeBookmarkMutex.withLock { removingIds.remove(contentId) }
             }
         }
+    }
+
+    fun loadInquiryMail() {
+        viewModelScope.launch {
+            val fid =
+                userStorageRepository.loadId().getOrNull()?.fid ?: run {
+                    Timber.e("문의하기 fid 가져오기 실패")
+                    INVALID_FID
+                }
+            val mail =
+                InquiryMail(
+                    appEnvironmentInfo = AppEnvironmentInfoProvider.getAppEnvironmentInfo(),
+                    fid = fid,
+                )
+
+            _uiEffect.send(MyPageUiEffect.NavigateToInquiry(mail))
+        }
+    }
+
+    fun loadPrivacyPolicy() {
+        viewModelScope.launch {
+            _uiEffect.send(MyPageUiEffect.NavigateToPrivacyPolicy(PrivacyPolicy.LINK))
+        }
+    }
+
+    fun loadLogoutDialog() {
+        _uiState.update { it.copy(dialogState = MyPageDialogState.LogoutRequired) }
+    }
+
+    fun loadWithdrawDialog() {
+        _uiState.update { it.copy(dialogState = MyPageDialogState.ConfirmWithdraw) }
+    }
+
+    fun dismissDialog() {
+        _uiState.update { it.copy(dialogState = null) }
+    }
+
+    fun confirmLogout() {
+        viewModelScope.launch {
+            dismissDialog()
+
+            memberRepository
+                .logout()
+                .onSuccess {
+                    userStorageRepository
+                        .clearTokens()
+                        .onSuccess {
+                            _uiEffect.send(MyPageUiEffect.NavigateToLogin)
+                            Timber.d("로그아웃 성공")
+                        }.onFailure {
+                            Timber.e("토큰 초기화 실패")
+                        }
+                }.onFailure { errorType: ErrorType ->
+                    handleError(errorType, MyPageRetryAction.LOGOUT)
+                    Timber.e("로그아웃 실패")
+                }
+        }
+    }
+
+    fun confirmWithdraw() {
+        viewModelScope.launch {
+            dismissDialog()
+
+            memberRepository
+                .deleteMember()
+                .onSuccess {
+                    userStorageRepository
+                        .clearTokens()
+                        .onSuccess {
+                            _uiEffect.send(MyPageUiEffect.NavigateToLogin)
+                            Timber.d("회원탈퇴 성공")
+                        }.onFailure {
+                            Timber.e("토큰 초기화 실패")
+                        }
+                }.onFailure { errorType: ErrorType ->
+                    handleError(errorType, MyPageRetryAction.WITHDRAW)
+                    Timber.e("회원탈퇴 실패 ")
+                }
+        }
+    }
+
+    private suspend fun handleError(
+        errorType: ErrorType,
+        retryAction: MyPageRetryAction,
+    ) {
+        val uiError: UiError = errorType.toUiError()
+        if (uiError is UiError.Global) {
+            when (uiError) {
+                UiError.Global.Network -> {
+                    _uiEffect.send(MyPageUiEffect.ShowError(ErrorUiState.Network, retryAction))
+                }
+
+                UiError.Global.Server -> {
+                    _uiEffect.send(MyPageUiEffect.ShowError(ErrorUiState.Server, retryAction))
+                }
+
+                UiError.Global.TokenExpired -> {
+                    _uiEffect.send(MyPageUiEffect.NavigateToLogin)
+                }
+            }
+        }
+    }
+
+    fun handleErrorRetryRequest(action: MyPageRetryAction) {
+        when (action) {
+            MyPageRetryAction.LOGOUT -> confirmLogout()
+            MyPageRetryAction.WITHDRAW -> confirmWithdraw()
+        }
+    }
+
+    companion object {
+        private const val INVALID_FID = "FID_LOAD_FAIL"
     }
 }

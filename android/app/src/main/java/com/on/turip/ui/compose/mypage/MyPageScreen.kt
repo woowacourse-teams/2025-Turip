@@ -13,22 +13,29 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.on.turip.R
+import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.common.extensions.showSnackbarWithAction
+import com.on.turip.ui.compose.designsystem.component.TuripDialog
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.mypage.component.BookmarkedContentSection
 import com.on.turip.ui.compose.mypage.component.MyPageAppBar
 import com.on.turip.ui.compose.mypage.component.MyPageSettingsSection
 import com.on.turip.ui.compose.mypage.component.ProfileSection
+import com.on.turip.ui.compose.setting.model.InquiryMail
 
 @Composable
 fun MyPageScreen(
     navigateToAllBookmarkContents: () -> Unit,
     navigateToContent: (contentId: Long) -> Unit,
+    navigateToInquiry: (mail: InquiryMail) -> Unit,
+    navigateToPrivacyPolicy: (url: String) -> Unit,
+    navigateToLogin: () -> Unit,
     viewModel: MyPageViewModel = hiltViewModel(),
 ) {
     val uiState: MyPageUiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -46,8 +53,59 @@ fun MyPageScreen(
                         onAction = viewModel::loadBookmarkContents,
                     )
                 }
+
+                is MyPageUiEffect.NavigateToInquiry -> {
+                    navigateToInquiry(uiEffect.mail)
+                }
+
+                MyPageUiEffect.NavigateToLogin -> {
+                    navigateToLogin()
+                }
+
+                is MyPageUiEffect.NavigateToPrivacyPolicy -> {
+                    navigateToPrivacyPolicy(uiEffect.url)
+                }
+
+                is MyPageUiEffect.ShowError -> {
+                    val errorUiModel = uiEffect.errorUiState.toUiModel() ?: return@collect
+                    snackbarHostState.showSnackbarWithAction(
+                        message = resources.getString(errorUiModel.titleRes),
+                        actionLabel = resources.getString(errorUiModel.retryTextRes),
+                        onAction = { viewModel.handleErrorRetryRequest(uiEffect.retryAction) },
+                    )
+                }
             }
         }
+    }
+
+    when (uiState.dialogState) {
+        MyPageDialogState.LogoutRequired -> {
+            TuripDialog(
+                title = stringResource(R.string.my_page_logout),
+                message = stringResource(R.string.my_page_logout_dialog_message),
+                confirmText = stringResource(R.string.my_page_logout_dialog_confirm),
+                dismissText = stringResource(R.string.my_page_logout_dialog_dismiss),
+                confirmButtonColor = TuripTheme.colors.primary,
+                dismissButtonColor = TuripTheme.colors.gray02,
+                onConfirmation = viewModel::confirmLogout,
+                onDismissRequest = viewModel::dismissDialog,
+            )
+        }
+
+        MyPageDialogState.ConfirmWithdraw -> {
+            TuripDialog(
+                title = stringResource(R.string.my_page_withdraw),
+                message = stringResource(R.string.my_page_withdraw_dialog_message),
+                confirmText = stringResource(R.string.my_page_withdraw_dialog_confirm),
+                dismissText = stringResource(R.string.my_page_withdraw_dialog_dismiss),
+                confirmButtonColor = TuripTheme.colors.error,
+                dismissButtonColor = TuripTheme.colors.gray02,
+                onConfirmation = viewModel::confirmWithdraw,
+                onDismissRequest = viewModel::dismissDialog,
+            )
+        }
+
+        null -> {}
     }
 
     Scaffold(
@@ -87,11 +145,11 @@ fun MyPageScreen(
 
             item {
                 MyPageSettingsSection(
-                    onInquiryClick = { },
-                    onPrivacyPolicyClick = { },
-                    onLoginClick = { },
-                    onLogoutClick = { },
-                    onWithdrawClick = { },
+                    onInquiryClick = viewModel::loadInquiryMail,
+                    onPrivacyPolicyClick = viewModel::loadPrivacyPolicy,
+                    onLoginClick = navigateToLogin,
+                    onLogoutClick = viewModel::loadLogoutDialog,
+                    onWithdrawClick = viewModel::loadWithdrawDialog,
                     modifier = Modifier.padding(horizontal = TuripTheme.spacing.medium),
                 )
             }
@@ -106,6 +164,9 @@ private fun MyPageScreenPreview() {
         MyPageScreen(
             navigateToAllBookmarkContents = {},
             navigateToContent = {},
+            navigateToInquiry = {},
+            navigateToPrivacyPolicy = {},
+            navigateToLogin = {},
         )
     }
 }
