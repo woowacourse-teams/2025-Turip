@@ -17,6 +17,7 @@ import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.compose.trip.model.PlaceModel
+import com.on.turip.ui.compose.trip.model.SelectedPlaceModel
 import com.on.turip.ui.compose.trip.model.TripDetailInfoModel
 import com.on.turip.ui.trip.TripDetailActivity.Companion.TRIP_DETAIL_CONTENT_KEY
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -104,6 +105,7 @@ class TripDetailViewModel @Inject constructor(
                             duration = trip.tripDuration.toUiModel(),
                         ),
                     isBookmarked = content.isBookmarked,
+                    selectedPlaceModel = null,
                 )
             }
 
@@ -153,16 +155,11 @@ class TripDetailViewModel @Inject constructor(
     }
 
     fun updatePlaceTuripSelection(
-        hasTurip: Boolean,
         placeId: Long,
+        hasTurip: Boolean,
     ) {
         viewModelScope.launch {
-            val places = uiState.value.places
-            val name =
-                places.firstOrNull { place -> place.id == placeId }?.name ?: run {
-                    Timber.e("업데이트할 장소의 placeId를 찾을 수 없습니다. placeID = $placeId")
-                    ""
-                }
+            val name = getPlaceName(placeId)
             _uiEffect.send(TripDetailUiEffect.ShowUpdatedTuripSelectionByPlace(name))
         }
 
@@ -174,6 +171,27 @@ class TripDetailViewModel @Inject constructor(
                     }.toImmutableList()
             state.copy(places = updatedPlaces)
         }
+    }
+
+    private fun getPlaceName(placeId: Long): String {
+        val places = uiState.value.places
+        return places.firstOrNull { place -> place.id == placeId }?.name ?: run {
+            Timber.e("업데이트할 장소의 placeId를 찾을 수 없습니다. placeID = $placeId")
+            ""
+        }
+    }
+
+    fun selectPlace(
+        placeId: Long,
+        placeName: String,
+    ) {
+        _uiState.update { state ->
+            state.copy(selectedPlaceModel = SelectedPlaceModel(placeId, placeName))
+        }
+    }
+
+    fun clearSelectedPlace() {
+        _uiState.update { it.copy(selectedPlaceModel = null) }
     }
 
     private suspend fun handleError(failure: TuripResult.Failure) {

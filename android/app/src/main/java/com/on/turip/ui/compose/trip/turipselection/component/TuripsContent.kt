@@ -1,4 +1,4 @@
-package com.on.turip.ui.compose.turip.selection.component
+package com.on.turip.ui.compose.trip.turipselection.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -30,7 +30,6 @@ import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun TuripsContent(
-    listState: LazyListState,
     placeName: String,
     enableConfirm: Boolean,
     turips: ImmutableList<TuripModel>,
@@ -40,6 +39,8 @@ fun TuripsContent(
     onConfirmClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val listState = rememberLazyListState()
+
     Column(modifier = modifier.fillMaxWidth()) {
         Header(placeName, onAddTuripClick)
 
@@ -72,7 +73,7 @@ private fun Header(
         title = placeName,
         navigation = {
             Text(
-                text = stringResource(R.string.trip_detail_bottom_sheet_turip_title),
+                text = stringResource(R.string.trip_detail_bottom_sheet_turip_selection_title),
                 style = TuripTheme.typography.body2,
                 color = TuripTheme.colors.gray03,
                 modifier = Modifier.padding(start = TuripTheme.spacing.small),
@@ -144,11 +145,9 @@ private fun ConfirmButton(
 @Preview(showBackground = true)
 @Composable
 private fun TuripsContentPreview() {
-    val listState = rememberLazyListState()
     TuripTheme {
         Surface {
             TuripsContent(
-                listState = listState,
                 placeName = "부산 경포대 해수욕장 해수욕장 해수욕장 해수욕장",
                 enableConfirm = false,
                 turips =

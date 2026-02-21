@@ -1,4 +1,4 @@
-package com.on.turip.ui.compose.turip.selection.util.reorderable
+package com.on.turip.ui.compose.trip.turipselection.util.reorderable
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Box
