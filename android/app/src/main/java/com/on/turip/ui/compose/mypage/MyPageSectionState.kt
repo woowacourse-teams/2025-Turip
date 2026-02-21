@@ -1,4 +1,4 @@
-package com.on.turip.ui.compose.mypage.model
+package com.on.turip.ui.compose.mypage
 
 import androidx.compose.runtime.Immutable
 

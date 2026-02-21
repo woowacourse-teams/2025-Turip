@@ -12,7 +12,7 @@ import com.on.turip.R
 import com.on.turip.ui.common.extensions.safeStartActivityWithToast
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.mypage.MyPageScreen
-import com.on.turip.ui.compose.setting.model.InquiryMail
+import com.on.turip.ui.compose.mypage.model.InquiryMail
 import com.on.turip.ui.login.LoginActivity
 import com.on.turip.ui.trip.TripDetailActivity
 import dagger.hilt.android.AndroidEntryPoint

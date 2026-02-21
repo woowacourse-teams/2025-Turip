@@ -36,7 +36,7 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.on.turip.R
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
-import com.on.turip.ui.compose.mypage.model.MyPageSectionState
+import com.on.turip.ui.compose.mypage.MyPageSectionState
 import com.on.turip.ui.compose.mypage.model.ProfileModel
 
 @Composable
@@ -80,8 +80,7 @@ private fun ProfileImage(
                     shape = shape,
                     ambientColor = TuripTheme.colors.black,
                     spotColor = TuripTheme.colors.black,
-                )
-                .clip(shape)
+                ).clip(shape)
                 .background(TuripTheme.colors.white)
                 .border(
                     width = 2.dp,
@@ -165,8 +164,7 @@ private fun ProfileError(onRetry: () -> Unit) {
                     width = 1.dp,
                     shape = TuripTheme.shape.wideButton,
                     color = TuripTheme.colors.gray03,
-                )
-                .clickable(onClick = onRetry)
+                ).clickable(onClick = onRetry)
                 .padding(
                     horizontal = TuripTheme.spacing.medium,
                     vertical = TuripTheme.spacing.small,

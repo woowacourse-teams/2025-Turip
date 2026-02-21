@@ -39,7 +39,7 @@ import com.on.turip.domain.creator.Creator
 import com.on.turip.domain.region.City
 import com.on.turip.domain.trip.TripDuration
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
-import com.on.turip.ui.compose.mypage.model.MyPageSectionState
+import com.on.turip.ui.compose.mypage.MyPageSectionState
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 

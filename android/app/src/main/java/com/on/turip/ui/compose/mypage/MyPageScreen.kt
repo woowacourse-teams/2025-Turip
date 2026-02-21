@@ -30,7 +30,7 @@ import com.on.turip.ui.compose.mypage.component.BookmarkedContentSection
 import com.on.turip.ui.compose.mypage.component.MyPageAppBar
 import com.on.turip.ui.compose.mypage.component.MyPageSettingsSection
 import com.on.turip.ui.compose.mypage.component.ProfileSection
-import com.on.turip.ui.compose.setting.model.InquiryMail
+import com.on.turip.ui.compose.mypage.model.InquiryMail
 
 @Composable
 fun MyPageScreen(

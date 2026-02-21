@@ -1,7 +1,7 @@
 package com.on.turip.ui.compose.mypage
 
 import com.on.turip.ui.common.error.ErrorUiState
-import com.on.turip.ui.compose.setting.model.InquiryMail
+import com.on.turip.ui.compose.mypage.model.InquiryMail
 
 sealed interface MyPageUiEffect {
     data object ShowBookmarkRemoveFailed : MyPageUiEffect

@@ -2,7 +2,6 @@ package com.on.turip.ui.compose.mypage
 
 import androidx.compose.runtime.Immutable
 import com.on.turip.domain.bookmark.BookmarkContent
-import com.on.turip.ui.compose.mypage.model.MyPageSectionState
 import com.on.turip.ui.compose.mypage.model.ProfileModel
 import kotlinx.collections.immutable.ImmutableList
 

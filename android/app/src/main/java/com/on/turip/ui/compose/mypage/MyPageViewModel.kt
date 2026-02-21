@@ -15,9 +15,8 @@ import com.on.turip.domain.userstorage.repository.UserStorageRepository
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
-import com.on.turip.ui.compose.mypage.model.MyPageSectionState
-import com.on.turip.ui.compose.setting.model.InquiryMail
-import com.on.turip.ui.compose.setting.util.AppEnvironmentInfoProvider
+import com.on.turip.ui.compose.mypage.model.InquiryMail
+import com.on.turip.ui.compose.mypage.util.AppEnvironmentInfoProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.channels.Channel
