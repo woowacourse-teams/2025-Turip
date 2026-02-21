@@ -388,6 +388,7 @@ class PlaceTuripSelectionViewModel @Inject constructor(
     fun requestDismiss() {
         viewModelScope.launch {
             if (deletePlaceSnapshot.hasSnapshot()) commitTuripPlaceDeleteApi()
+            if (uiState.value.screenMode is PlaceTuripSelectionScreenMode.TuripDetail) onTuripDetailBack()
             _uiEffect.send(PlaceTuripSelectionUiEffect.Dismiss)
         }
     }

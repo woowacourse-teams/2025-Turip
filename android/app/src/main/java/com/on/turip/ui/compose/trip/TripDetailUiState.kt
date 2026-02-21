@@ -2,7 +2,6 @@ package com.on.turip.ui.compose.trip
 
 import androidx.compose.runtime.Stable
 import com.on.turip.ui.common.error.ErrorUiState
-import com.on.turip.ui.compose.trip.model.DayModel
 import com.on.turip.ui.compose.trip.model.PlaceModel
 import com.on.turip.ui.compose.trip.model.SelectedPlaceModel
 import com.on.turip.ui.compose.trip.model.TripDetailInfoModel
@@ -13,7 +12,6 @@ import kotlinx.collections.immutable.persistentListOf
 data class TripDetailUiState(
     val isLoading: Boolean,
     val errorUiState: ErrorUiState,
-    val days: ImmutableList<DayModel>,
     val places: ImmutableList<PlaceModel>,
     val tripDetailInfo: TripDetailInfoModel,
     val isBookmarked: Boolean,
@@ -24,7 +22,6 @@ data class TripDetailUiState(
             TripDetailUiState(
                 isLoading = false,
                 errorUiState = ErrorUiState.None,
-                days = persistentListOf(),
                 places = persistentListOf(),
                 tripDetailInfo = TripDetailInfoModel.Idle,
                 isBookmarked = false,

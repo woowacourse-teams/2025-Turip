@@ -48,7 +48,6 @@ fun PlaceTuripSelectionBottomSheet(
     onNavigateToMap: (mapModel: MapModel) -> Unit,
     onShareTurip: (shareModel: TuripShareModel) -> Unit,
     onPlaceTuripChanged: (placeId: Long, hasTurip: Boolean) -> Unit,
-    onPlaceTuripConfirmed: (placeId: Long, hasTurip: Boolean) -> Unit,
     onDismiss: () -> Unit,
     viewModel: PlaceTuripSelectionViewModel = hiltViewModel(),
 ) {
@@ -133,7 +132,7 @@ fun PlaceTuripSelectionBottomSheet(
                 }
 
                 is PlaceTuripSelectionUiEffect.UpdateTuripsByPlace -> {
-                    onPlaceTuripConfirmed(uiEffect.placeId, uiEffect.hasTurip)
+                    onPlaceTuripChanged(uiEffect.placeId, uiEffect.hasTurip)
                 }
 
                 is PlaceTuripSelectionUiEffect.HasNoTuripsByPlace -> {
@@ -180,7 +179,7 @@ fun PlaceTuripSelectionBottomSheet(
             },
             onDismissRequest = viewModel::requestDismiss,
             onAddTuripClick = onNavigateToAddTurip,
-            onTuripPlaceClickAtTuripsMode = viewModel::updateTurip,
+            onTuripPlaceClickAtTurips = viewModel::updateTurip,
             onNavigateToTurip = viewModel::loadPlacesInSelectTurip,
             onConfirmClick = viewModel::updateTuripsByPlace,
             onMapClick = onNavigateToMap,
