@@ -2,6 +2,9 @@ package com.on.turip.ui.compose.favorite
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -205,6 +208,8 @@ private fun TuripPlaceContent(
     }
     var isMapVisible by remember { mutableStateOf(true) }
 
+    var isMapExpanded by remember { mutableStateOf(true) }
+
     Column(
         modifier =
             Modifier
@@ -216,11 +221,14 @@ private fun TuripPlaceContent(
                 places = currentPlaceLatLng,
                 isMapVisible = isMapVisible,
                 onMapToggle = { isMapVisible = !isMapVisible },
+                onAnimationFinished = { visible ->
+                    isMapExpanded = visible
+                },
                 modifier =
                     Modifier
                         .fillMaxWidth()
                         .then(
-                            if (isMapVisible) Modifier.weight(1f) else Modifier.wrapContentHeight(),
+                            if (isMapExpanded) Modifier.weight(1f) else Modifier.wrapContentHeight(),
                         ),
             )
         }
@@ -254,6 +262,7 @@ fun TuripMapContent(
     places: ImmutableList<PlaceLatLngUiModel>,
     isMapVisible: Boolean,
     onMapToggle: () -> Unit,
+    onAnimationFinished: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val cameraPositionState = rememberCameraPositionState()
@@ -275,8 +284,9 @@ fun TuripMapContent(
                 val bounds =
                     LatLngBounds
                         .Builder()
-                        .apply { places.forEach { include(it.latLng) } }
-                        .build()
+                        .apply {
+                            places.forEach { include(it.latLng) }
+                        }.build()
                 cameraPositionState.animate(
                     CameraUpdateFactory.newLatLngBounds(bounds, 100),
                 )
@@ -286,28 +296,58 @@ fun TuripMapContent(
 
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         AnimatedVisibility(
-            modifier = Modifier.weight(1f),
             visible = isMapVisible,
+            enter =
+                slideInVertically(
+                    initialOffsetY = { fullHeight -> -fullHeight },
+                    animationSpec = tween(250),
+                ),
+            exit =
+                slideOutVertically(
+                    targetOffsetY = { fullHeight -> -fullHeight },
+                    animationSpec = tween(250),
+                ),
         ) {
-            GoogleMap(
-                modifier = Modifier.fillMaxSize(),
-                cameraPositionState = cameraPositionState,
-                uiSettings = MapUiSettings(zoomControlsEnabled = true),
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                places.forEach { place ->
-                    Marker(
-                        state = markerStates[place.placeId] ?: MarkerState(position = place.latLng),
-                        title = place.name,
+                GoogleMap(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                    cameraPositionState = cameraPositionState,
+                    uiSettings = MapUiSettings(zoomControlsEnabled = true),
+                ) {
+                    places.forEach { place ->
+                        Marker(
+                            state = markerStates[place.placeId] ?: MarkerState(place.latLng),
+                            title = place.name,
+                        )
+                    }
+                }
+
+                IconButton(onClick = onMapToggle) {
+                    Icon(
+                        imageVector = Icons.Default.KeyboardArrowUp,
+                        contentDescription = null,
                     )
                 }
             }
+
+            LaunchedEffect(transition.isRunning) {
+                if (!transition.isRunning) onAnimationFinished(isMapVisible)
+            }
         }
 
-        IconButton(onClick = onMapToggle) {
-            Icon(
-                imageVector = if (isMapVisible) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                contentDescription = null,
-            )
+        if (!isMapVisible) {
+            IconButton(onClick = onMapToggle) {
+                Icon(
+                    imageVector = Icons.Default.KeyboardArrowDown,
+                    contentDescription = null,
+                )
+            }
         }
     }
 }
