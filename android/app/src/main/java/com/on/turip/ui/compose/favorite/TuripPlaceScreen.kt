@@ -34,7 +34,7 @@ import com.on.turip.ui.compose.designsystem.component.TuripDialog
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.trip.model.MapModel
-import com.on.turip.ui.compose.turip.selection.model.TuripPlaceModel
+import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
 import com.on.turip.ui.main.favorite.model.TuripPlaceUiEffect
 import com.on.turip.ui.main.favorite.model.TuripShareModel
 import kotlinx.collections.immutable.ImmutableList

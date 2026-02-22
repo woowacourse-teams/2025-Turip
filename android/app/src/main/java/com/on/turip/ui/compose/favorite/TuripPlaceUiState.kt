@@ -2,7 +2,7 @@ package com.on.turip.ui.compose.favorite
 
 import androidx.compose.runtime.Immutable
 import com.on.turip.ui.common.error.ErrorUiState
-import com.on.turip.ui.compose.turip.selection.model.TuripPlaceModel
+import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
 import com.on.turip.ui.main.favorite.model.PlaceLatLngUiModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
