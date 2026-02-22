@@ -5,13 +5,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.favorite.TuripPlaceScreen
-import com.on.turip.ui.compose.favorite.TuripPlaceViewModel
+import com.on.turip.ui.compose.myturip.MyTuripScreen
 import com.on.turip.ui.login.LoginActivity
 import com.on.turip.ui.main.favorite.model.TuripShareModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -27,12 +31,28 @@ class TuripPlaceFragment : Fragment() {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 TuripTheme {
-                    TuripPlaceScreen(
-                        onNavigateToLogin = { navigateToLoginScreen() },
-                        onShareTurip = { model: TuripShareModel -> navigateToShareTurip(model) },
-                        selectedTuripId = 216,
-                        onNavigateToMap = {},
-                    )
+                    var selectedTuripId: Long by rememberSaveable { mutableLongStateOf(0L) }
+                    var currentScreen: Int by rememberSaveable { mutableIntStateOf(0) }
+
+                    when (currentScreen) {
+                        0 -> {
+                            MyTuripScreen(
+                                onNavigateToTuripPlace = { newId ->
+                                    selectedTuripId = newId
+                                    currentScreen = 1
+                                },
+                            )
+                        }
+
+                        1 -> {
+                            TuripPlaceScreen(
+                                onNavigateToLogin = ::navigateToLoginScreen,
+                                onShareTurip = ::navigateToShareTurip,
+                                selectedTuripId = selectedTuripId,
+                                onNavigateToMap = {},
+                            )
+                        }
+                    }
                 }
             }
         }

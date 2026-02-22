@@ -5,5 +5,7 @@ data class Turip(
     val name: String,
     val isDefault: Boolean,
     val placeCount: Int,
+    val memberCount: Int,
+    val isShared: Boolean,
     val hasIncludePlace: Boolean = false,
 )

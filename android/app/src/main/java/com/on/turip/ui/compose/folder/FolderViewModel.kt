@@ -5,7 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.on.turip.core.result.onSuccess
 import com.on.turip.domain.turip.Turip
 import com.on.turip.domain.turip.repository.TuripRepository
-import com.on.turip.ui.main.favorite.toUiModel
+import com.on.turip.ui.compose.folder.mapper.toUiModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,6 +15,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@HiltViewModel
 class FolderViewModel @Inject constructor(
     private val turipRepository: TuripRepository,
 ) : ViewModel() {

@@ -15,16 +15,22 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.sp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
+import com.on.turip.ui.compose.folder.FolderUiState
+import com.on.turip.ui.compose.folder.FolderViewModel
 import com.on.turip.ui.compose.folder.component.MyTuripCard
 import com.on.turip.ui.compose.folder.component.MyTuripModel
 import com.on.turip.ui.compose.folder.component.MyTuripTabRow
@@ -38,6 +44,31 @@ enum class MyTuripTab(
     ALL("전체"),
     SOLO("나홀로 튜립"),
     TOGETHER("함께 튜립"),
+}
+
+@Composable
+fun MyTuripScreen(
+    onNavigateToTuripPlace: (Long) -> Unit,
+    viewModel: FolderViewModel = hiltViewModel(),
+) {
+    val uiState: FolderUiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    LaunchedEffect(Unit) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            viewModel.loadTuripFolders()
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.loadTuripFolders()
+    }
+
+    MyTuripScreenContent(
+        turips = uiState.turips,
+        onTuripClick = onNavigateToTuripPlace,
+        onAddClick = { /*TODO*/ },
+    )
 }
 
 @Composable
@@ -125,6 +156,6 @@ private fun MyTuripScreenPreview() {
         )
 
     TuripTheme {
-        MyTuripScreenContent(allTurips,{},{})
+        MyTuripScreenContent(allTurips, {}, {})
     }
 }
