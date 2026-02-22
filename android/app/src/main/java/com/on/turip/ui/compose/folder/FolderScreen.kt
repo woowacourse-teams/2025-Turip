@@ -14,22 +14,29 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
+import com.on.turip.ui.common.error.toUiModel
+import com.on.turip.ui.common.extensions.showSnackbarWithAction
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
+import com.on.turip.ui.compose.folder.FolderUiEffect
 import com.on.turip.ui.compose.folder.FolderUiState
 import com.on.turip.ui.compose.folder.FolderViewModel
 import com.on.turip.ui.compose.folder.component.MyTuripCard
@@ -50,15 +57,38 @@ enum class MyTuripTab(
 @Composable
 fun MyTuripScreen(
     onNavigateToTuripPlace: (Long) -> Unit,
+    onNavigateToLogin: () -> Unit,
     viewModel: FolderViewModel = hiltViewModel(),
     modifier: Modifier = Modifier,
 ) {
     val uiState: FolderUiState by viewModel.uiState.collectAsStateWithLifecycle()
     val lifecycleOwner = LocalLifecycleOwner.current
+    val snackbarHostState = remember { SnackbarHostState() }
+    val resource = LocalResources.current
 
     LaunchedEffect(Unit) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
             viewModel.loadTuripFolders()
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.uiEffect.collect { uiEffect: FolderUiEffect ->
+            when (uiEffect) {
+                FolderUiEffect.NavigateToLogin -> {
+                    onNavigateToLogin()
+                }
+
+                is FolderUiEffect.ShowError -> {
+                    val uiModel = uiEffect.errorUiState.toUiModel() ?: return@collect
+                    snackbarHostState.showSnackbarWithAction(
+                        message = resource.getString(uiModel.titleRes),
+                        actionLabel = resource.getString(uiModel.retryTextRes),
+                        duration = SnackbarDuration.Long,
+                        onAction = { viewModel.handleErrorRetryRequest(uiEffect.retryAction) },
+                    )
+                }
+            }
         }
     }
 

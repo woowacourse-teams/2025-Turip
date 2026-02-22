@@ -41,6 +41,7 @@ class TuripPlaceFragment : Fragment() {
                                     selectedTuripId = newId
                                     currentScreen = 1
                                 },
+                                onNavigateToLogin = ::navigateToLoginScreen,
                             )
                         }
 
