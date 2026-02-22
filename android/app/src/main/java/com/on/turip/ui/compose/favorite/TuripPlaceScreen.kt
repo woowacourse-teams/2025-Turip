@@ -252,7 +252,6 @@ private fun TuripPlaceContent(
                 }
             },
             modifier = Modifier.weight(1f),
-            onShareClick = onShareClick,
         )
     }
 }

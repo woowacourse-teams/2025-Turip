@@ -51,7 +51,6 @@ fun TuripDetail(
     onMapClick: (map: MapModel) -> Unit,
     onTuripPlaceClick: (placeId: Long) -> Unit,
     onDragStart: () -> Unit,
-    onShareClick: () -> Unit,
     onDragPlace: (from: Int, to: Int) -> Unit,
     onDragEnd: () -> Unit,
     modifier: Modifier = Modifier,
@@ -74,7 +73,6 @@ fun TuripDetail(
                 onDragStart = onDragStart,
                 onDragPlace = onDragPlace,
                 onDragEnd = onDragEnd,
-                onShareClick = onShareClick,
                 modifier = Modifier.padding(horizontal = TuripTheme.spacing.large),
             )
         } else {
@@ -97,39 +95,18 @@ private fun TuripPlacesContent(
     onDragStart: () -> Unit,
     onDragPlace: (from: Int, to: Int) -> Unit,
     onDragEnd: () -> Unit,
-    onShareClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(modifier = modifier) {
-        Row {
-            Text(
-                text = stringResource(R.string.all_total_place_count, places.size),
-                style = TuripTheme.typography.info1,
-                color = TuripTheme.colors.gray03,
-                modifier = Modifier.padding(vertical = TuripTheme.spacing.medium),
-            )
-
-            IconButton(
-                onClick = onShareClick,
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_share),
-                    contentDescription = stringResource(R.string.all_share_description),
-                    tint = TuripTheme.colors.gray03,
-                )
-            }
-        }
-
-        TuripPlaces(
-            listState = listState,
-            places = places,
-            onMapClick = onMapClick,
-            onTuripPlaceClick = onTuripPlaceClick,
-            onDragStart = onDragStart,
-            onDragPlace = onDragPlace,
-            onDragEnd = onDragEnd,
-        )
-    }
+    TuripPlaces(
+        listState = listState,
+        places = places,
+        onMapClick = onMapClick,
+        onTuripPlaceClick = onTuripPlaceClick,
+        onDragStart = onDragStart,
+        onDragPlace = onDragPlace,
+        onDragEnd = onDragEnd,
+        modifier = modifier
+    )
 }
 
 @Composable
@@ -294,7 +271,6 @@ private fun TuripDetailPreview(
             onDragStart = {},
             onDragPlace = { _, _ -> },
             onDragEnd = { },
-            onShareClick = {},
         )
     }
 }
