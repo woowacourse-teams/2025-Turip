@@ -2,6 +2,7 @@ package com.on.turip.ui.compose.myturip
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -50,6 +51,7 @@ enum class MyTuripTab(
 fun MyTuripScreen(
     onNavigateToTuripPlace: (Long) -> Unit,
     viewModel: FolderViewModel = hiltViewModel(),
+    modifier: Modifier = Modifier,
 ) {
     val uiState: FolderUiState by viewModel.uiState.collectAsStateWithLifecycle()
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -60,14 +62,11 @@ fun MyTuripScreen(
         }
     }
 
-    LaunchedEffect(Unit) {
-        viewModel.loadTuripFolders()
-    }
-
     MyTuripScreenContent(
         turips = uiState.turips,
         onTuripClick = onNavigateToTuripPlace,
         onAddClick = { /*TODO*/ },
+        modifier = modifier,
     )
 }
 
@@ -90,6 +89,7 @@ private fun MyTuripScreenContent(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         containerColor = TuripTheme.colors.white,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onAddClick,
