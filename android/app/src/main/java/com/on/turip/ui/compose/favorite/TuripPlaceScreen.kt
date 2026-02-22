@@ -1,12 +1,20 @@
 package com.on.turip.ui.compose.favorite
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
@@ -26,6 +34,13 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.LatLngBounds
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.rememberCameraPositionState
 import com.on.turip.R
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.toUiModel
@@ -36,6 +51,7 @@ import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.trip.model.MapModel
 import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
+import com.on.turip.ui.main.favorite.model.PlaceLatLngUiModel
 import com.on.turip.ui.main.favorite.model.TuripPlaceUiEffect
 import com.on.turip.ui.main.favorite.model.TuripShareModel
 import kotlinx.collections.immutable.ImmutableList
@@ -133,6 +149,7 @@ fun TuripPlaceScreen(
                             viewModel.updateTuripPlace(placeId = placeId, isTuripPlace = true)
                         },
                         onUpdateTuripPlacesOrder = viewModel::updateTuripPlacesOrder,
+                        currentPlaceLatLng = uiState.placesLatLng,
                         onShareClick = { viewModel.shareTurip() },
                     )
                 }
@@ -173,6 +190,7 @@ private fun ErrorContent(
 
 @Composable
 private fun TuripPlaceContent(
+    currentPlaceLatLng: ImmutableList<PlaceLatLngUiModel>,
     turipPlaceModel: ImmutableList<TuripPlaceModel>,
     navigateToMap: (map: MapModel) -> Unit,
     onClickTuripPlace: (placeId: Long) -> Unit,
@@ -185,6 +203,7 @@ private fun TuripPlaceContent(
     var dragStartPlaces: ImmutableList<TuripPlaceModel> by remember(turipPlaceModel) {
         mutableStateOf(turipPlaceModel)
     }
+    var isMapVisible by remember { mutableStateOf(true) }
 
     Column(
         modifier =
@@ -192,13 +211,25 @@ private fun TuripPlaceContent(
                 .fillMaxSize()
                 .background(TuripTheme.colors.white),
     ) {
+        if (currentPlaceLatLng.isNotEmpty()) {
+            TuripMapContent(
+                places = currentPlaceLatLng,
+                isMapVisible = isMapVisible,
+                onMapToggle = { isMapVisible = !isMapVisible },
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .then(
+                            if (isMapVisible) Modifier.weight(1f) else Modifier.wrapContentHeight(),
+                        ),
+            )
+        }
+
         TuripDetail(
             places = currentPlaces,
             onMapClick = navigateToMap,
             onTuripPlaceClick = onClickTuripPlace,
-            onDragStart = {
-                dragStartPlaces = currentPlaces
-            },
+            onDragStart = { dragStartPlaces = currentPlaces },
             onDragPlace = { from: Int, to: Int ->
                 if (from == to) return@TuripDetail
                 currentPlaces =
@@ -212,9 +243,72 @@ private fun TuripPlaceContent(
                     onUpdateTuripPlacesOrder(currentPlaces)
                 }
             },
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.weight(1f),
             onShareClick = onShareClick,
         )
+    }
+}
+
+@Composable
+fun TuripMapContent(
+    places: ImmutableList<PlaceLatLngUiModel>,
+    isMapVisible: Boolean,
+    onMapToggle: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val cameraPositionState = rememberCameraPositionState()
+
+    val markerStates: Map<Long, MarkerState> =
+        remember(places) {
+            places.associate { it.placeId to MarkerState(position = it.latLng) }
+        }
+
+    LaunchedEffect(places) {
+        when (places.size) {
+            1 -> {
+                cameraPositionState.animate(
+                    CameraUpdateFactory.newLatLngZoom(places.first().latLng, 15f),
+                )
+            }
+
+            else -> {
+                val bounds =
+                    LatLngBounds
+                        .Builder()
+                        .apply { places.forEach { include(it.latLng) } }
+                        .build()
+                cameraPositionState.animate(
+                    CameraUpdateFactory.newLatLngBounds(bounds, 100),
+                )
+            }
+        }
+    }
+
+    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+        AnimatedVisibility(
+            modifier = Modifier.weight(1f),
+            visible = isMapVisible,
+        ) {
+            GoogleMap(
+                modifier = Modifier.fillMaxSize(),
+                cameraPositionState = cameraPositionState,
+                uiSettings = MapUiSettings(zoomControlsEnabled = true),
+            ) {
+                places.forEach { place ->
+                    Marker(
+                        state = markerStates[place.placeId] ?: MarkerState(position = place.latLng),
+                        title = place.name,
+                    )
+                }
+            }
+        }
+
+        IconButton(onClick = onMapToggle) {
+            Icon(
+                imageVector = if (isMapVisible) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                contentDescription = null,
+            )
+        }
     }
 }
 
@@ -244,6 +338,7 @@ private fun TuripPlaceScreenPreview() {
             onClickTuripPlace = {},
             onShareClick = {},
             onUpdateTuripPlacesOrder = {},
+            currentPlaceLatLng = persistentListOf(),
         )
     }
 }
