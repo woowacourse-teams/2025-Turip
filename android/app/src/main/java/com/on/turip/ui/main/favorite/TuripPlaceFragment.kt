@@ -51,6 +51,9 @@ class TuripPlaceFragment : Fragment() {
                                 onShareTurip = ::navigateToShareTurip,
                                 selectedTuripId = selectedTuripId,
                                 onNavigateToMap = {},
+                                goBack = {
+                                    currentScreen = 0
+                                },
                             )
                         }
                     }

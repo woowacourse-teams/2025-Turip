@@ -1,5 +1,6 @@
 package com.on.turip.ui.compose.favorite
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -47,6 +48,7 @@ fun TuripPlaceScreen(
     onNavigateToLogin: () -> Unit = {},
     onShareTurip: (TuripShareModel) -> Unit = {},
     onNavigateToMap: () -> Unit,
+    goBack: () -> Unit,
     viewModel: TuripPlaceViewModel = hiltViewModel(),
 ) {
     val uiState: TuripPlaceUiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -54,6 +56,10 @@ fun TuripPlaceScreen(
     val resource = LocalResources.current
     var showLoginSuggestDialog by remember { mutableStateOf(false) }
     val lifecycleOwner = LocalLifecycleOwner.current
+
+    BackHandler {
+        goBack()
+    }
 
     LaunchedEffect(Unit) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {

@@ -58,8 +58,8 @@ enum class MyTuripTab(
 fun MyTuripScreen(
     onNavigateToTuripPlace: (Long) -> Unit,
     onNavigateToLogin: () -> Unit,
-    viewModel: FolderViewModel = hiltViewModel(),
     modifier: Modifier = Modifier,
+    viewModel: FolderViewModel = hiltViewModel(),
 ) {
     val uiState: FolderUiState by viewModel.uiState.collectAsStateWithLifecycle()
     val lifecycleOwner = LocalLifecycleOwner.current
