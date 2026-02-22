@@ -34,10 +34,12 @@ public class FavoriteFolderAccountService {
     }
 
     public void validateMembership(Account account, FavoriteFolder favoriteFolder) {
-        boolean isMember = favoriteFolderAccountRepository.existsByFavoriteFolderAndAccount(favoriteFolder, account);
-
-        if (!isMember) {
+        if (!isFolderMember(account, favoriteFolder)) {
             throw new ForbiddenException(ErrorTag.FORBIDDEN);
         }
+    }
+
+    public boolean isFolderMember(Account account, FavoriteFolder favoriteFolder) {
+        return favoriteFolderAccountRepository.existsByFavoriteFolderAndAccount(favoriteFolder, account);
     }
 }

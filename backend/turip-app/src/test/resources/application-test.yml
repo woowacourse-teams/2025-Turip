@@ -62,3 +62,18 @@ region:
       etc:
         image-url: https://test.example.com/overseas-etc.jpg
 
+invitation:
+  jwt:
+    secret-key: turip-test-invitation-jwt-secret-key-for-testing-purposes
+    token-expiration: 1h
+
+# SSE 설정 (테스트용 - 빠른 하트비트)
+sse:
+  heartbeat:
+    interval: 2  # 2초
+
+# test container 로그 설정
+logging:
+  level:
+    org.testcontainers: DEBUG
+    com.github.dockerjava: DEBUG

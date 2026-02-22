@@ -190,7 +190,8 @@ class FavoriteFolderApiTest {
             testDataHelper.insertFavoriteFolderAccount(accountId, favoriteFolder2, AccountRole.OWNER);
             jdbcTemplate.update(
                     "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('루터회관','https://naver.me/5UrZAIeY', '루터회관의 도로명 주소', 38.1234, 127.23123)");
-            jdbcTemplate.update("INSERT INTO favorite_place (favorite_folder_id, place_id) VALUES (2, 1)");
+            jdbcTemplate.update("INSERT INTO favorite_place (favorite_folder_id, place_id) VALUES (?, 1)",
+                    favoriteFolder2);
 
             // when & then
             RestAssured.given().port(port)
@@ -466,6 +467,50 @@ class FavoriteFolderApiTest {
             RestAssured.given().port(port)
                     .header("device-fid", "testDeviceFid")
                     .when().delete("/api/v1/turips/1")
+                    .then()
+                    .statusCode(400);
+        }
+    }
+
+    @DisplayName("/api/v1/turips/invitation-tokens GET 튜립 초대 토큰 검증 테스트")
+    @Nested
+    class VerifyInvitation {
+
+        @DisplayName("유효한 초대 토큰을 검증하고 200 OK와 튜립 정보를 응답한다")
+        @Test
+        void verifyInvitation1() {
+            // given
+            Long accountId = testDataHelper.insertAccount();
+            String accessToken = testDataHelper.createAccessToken(accountId);
+
+            Long folderId = testDataHelper.insertFavoriteFolder("내 튜립");
+            testDataHelper.insertFavoriteFolderAccount(accountId, folderId, AccountRole.OWNER);
+
+            String invitationToken = testDataHelper.createInvitationToken(accountId, folderId);
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + accessToken)
+                    .queryParam("token", invitationToken)
+                    .when().get("/api/v1/turips/invitation-tokens")
+                    .then()
+                    .statusCode(200)
+                    .body("turipId", is(folderId.intValue()))
+                    .body("alreadyJoined", is(true));
+        }
+
+        @DisplayName("유효하지 않은 초대 토큰를 검증하고 400 BAD REQUEST를 응답한다")
+        @Test
+        void verifyInvitation2() {
+            // given
+            Long accountId = testDataHelper.insertAccount();
+            String accessToken = testDataHelper.createAccessToken(accountId);
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + accessToken)
+                    .queryParam("token", "invalid-token")
+                    .when().get("/api/v1/turips/invitation-tokens")
                     .then()
                     .statusCode(400);
         }
