@@ -257,7 +257,7 @@ private fun BookmarkedContentSectionWithItemsPreview() {
                                     VideoData(
                                         "콘텐츠 제목이 길면 ...으로 표시되는 것을 확인 ㅇㅇㅇ",
                                         "thumbnail",
-                                        "1박 2일",
+                                        "2026-01-02",
                                     ),
                                     City(""),
                                     true,

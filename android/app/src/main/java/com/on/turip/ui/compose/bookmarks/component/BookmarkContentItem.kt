@@ -1,6 +1,7 @@
-package com.on.turip.ui.compose.mypage.component
+package com.on.turip.ui.compose.bookmarks.component
 
 import androidx.annotation.DrawableRes
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -9,11 +10,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -44,8 +47,9 @@ import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 
 @Composable
-fun BookmarkedContentItem(
-    item: BookmarkContent,
+fun BookmarkContentItem(
+    content: BookmarkContent,
+    showDivider: Boolean,
     onContentClick: (contentId: Long) -> Unit,
     onRemoveBookmark: (contentId: Long) -> Unit,
     modifier: Modifier = Modifier,
@@ -53,31 +57,42 @@ fun BookmarkedContentItem(
     Column(
         modifier =
             modifier
-                .padding(TuripTheme.spacing.extraSmall)
                 .clip(TuripTheme.shape.container)
-                .clickable { onContentClick(item.content.id) },
+                .padding(TuripTheme.spacing.extraSmall),
     ) {
-        ContentThumbnail(
-            imageUrl = item.content.videoData.url,
-            modifier = Modifier.fillMaxWidth(),
-        )
+        Column(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .clickable { onContentClick(content.content.id) },
+        ) {
+            ContentThumbnail(
+                imageUrl = content.content.videoData.url,
+                modifier = Modifier.fillMaxWidth(),
+            )
 
-        Spacer(modifier = Modifier.height(TuripTheme.spacing.medium))
+            Spacer(modifier = Modifier.height(TuripTheme.spacing.medium))
 
-        Text(
-            text = item.content.videoData.title,
-            style = TuripTheme.typography.title2,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.padding(horizontal = TuripTheme.spacing.extraSmall),
-        )
+            TitleAndChipSection(
+                title = content.content.videoData.title,
+                city = content.content.city.name,
+            )
 
-        Spacer(modifier = Modifier.height(TuripTheme.spacing.small))
+            Spacer(modifier = Modifier.height(TuripTheme.spacing.small))
 
-        ContentInformation(
-            item = item,
-            onRemoveBookmark = onRemoveBookmark,
-        )
+            ContentInformation(
+                item = content,
+                onRemoveBookmark = onRemoveBookmark,
+            )
+        }
+
+        if (showDivider) {
+            HorizontalDivider(
+                modifier = Modifier.fillMaxWidth(),
+                thickness = 1.dp,
+                color = TuripTheme.colors.gray01,
+            )
+        }
     }
 }
 
@@ -113,6 +128,55 @@ private fun ContentThumbnail(
             contentScale = ContentScale.Crop,
             modifier = Modifier.matchParentSize(),
             error = painterResource(R.drawable.bg_image_placeholder),
+        )
+    }
+}
+
+@Composable
+private fun TitleAndChipSection(
+    title: String,
+    city: String,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(TuripTheme.spacing.small),
+    ) {
+        Text(
+            text = title,
+            style = TuripTheme.typography.title2,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f),
+        )
+        BookmarkRegionChip(
+            regionName = city,
+            modifier = Modifier.padding(horizontal = TuripTheme.spacing.small),
+        )
+    }
+}
+
+@Composable
+private fun BookmarkRegionChip(
+    regionName: String,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier =
+            modifier
+                .wrapContentSize()
+                .background(
+                    color = TuripTheme.colors.chipBackground,
+                    shape = TuripTheme.shape.chip,
+                )
+                .padding(
+                    horizontal = TuripTheme.spacing.medium,
+                    vertical = TuripTheme.spacing.extraSmall,
+                ),
+    ) {
+        Text(
+            text = regionName,
+            style = TuripTheme.typography.info1,
+            color = TuripTheme.colors.black,
         )
     }
 }
@@ -202,26 +266,27 @@ private fun ContentInfoItem(
 
 @Preview(showBackground = true)
 @Composable
-private fun BookmarkedContentItemPreview() {
-    val content =
-        BookmarkContent(
-            content =
-                Content(
-                    1L,
-                    Creator(1L, "채널명", ""),
-                    VideoData("콘텐츠 제목이 길면 ...으로 표시되는 것을 확인 ㅇㅇㅇ", "thumbnail", "2026-02-23"),
-                    City(""),
-                    true,
-                ),
-            tripDuration = TripDuration(1, 2),
-            tripPlaceCount = 2,
-        )
+private fun BookmarkContentItemPreview() {
     TuripTheme {
-        BookmarkedContentItem(
-            item = content,
+        val content =
+            BookmarkContent(
+                content =
+                    Content(
+                        1L,
+                        Creator(1L, "채널명", ""),
+                        VideoData("콘텐츠 제목이 길면 ...으로 표시되는 것을 확인 ㅇㅇㅇ", "thumbnail", "2026-02-12"),
+                        City("대구"),
+                        true,
+                    ),
+                tripDuration = TripDuration(1, 2),
+                tripPlaceCount = 2,
+            )
+        BookmarkContentItem(
+            content = content,
+            showDivider = true,
             onContentClick = {},
             onRemoveBookmark = {},
-            modifier = Modifier.width(280.dp),
+            modifier = Modifier.fillMaxSize(),
         )
     }
 }

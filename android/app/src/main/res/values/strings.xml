@@ -67,6 +67,8 @@
     <string name="my_page_snackbar_bookmark_remove_failed_action">새로고침</string>
 
     <!-- 북마크 컨텐츠 목록 페이지 -->
+    <string name="bookmark_content_title">저장한 콘텐츠</string>
+    <string name="bookmark_content_count">콘텐츠 %d개</string>
     <string name="bookmark_content_empty_suggest_title">컨텐츠를 저장 해보세요!</string>
     <string name="bookmark_content_empty_suggest_description">원하는 동선이 담긴\n여행 일정을 저장해 보세요.</string>
 
