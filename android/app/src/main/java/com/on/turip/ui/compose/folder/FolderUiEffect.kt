@@ -7,6 +7,8 @@ sealed interface FolderUiEffect {
 
     data object TuripAdded : FolderUiEffect
 
+    data object TuripDeleted : FolderUiEffect
+
     data class ShowError(
         val errorUiState: ErrorUiState,
         val retryAction: FolderRetryAction,

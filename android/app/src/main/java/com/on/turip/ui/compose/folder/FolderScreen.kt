@@ -1,5 +1,6 @@
 package com.on.turip.ui.compose.myturip
 
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
@@ -27,7 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -97,6 +98,10 @@ fun MyTuripScreen(
                 FolderUiEffect.TuripAdded -> {
                     Unit
                 }
+
+                FolderUiEffect.TuripDeleted -> {
+                    Unit
+                }
             }
         }
     }
@@ -104,6 +109,7 @@ fun MyTuripScreen(
     MyTuripScreenContent(
         turips = uiState.turips,
         onTuripClick = onNavigateToTuripPlace,
+        onTuripDelete = viewModel::deleteTurip,
         onAddClick = viewModel::showAddBottomSheet,
         modifier = modifier,
     )
@@ -123,10 +129,12 @@ fun MyTuripScreen(
 private fun MyTuripScreenContent(
     turips: ImmutableList<MyTuripModel>,
     onTuripClick: (Long) -> Unit,
+    onTuripDelete: (Long) -> Unit,
     onAddClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var selectedTab: MyTuripTab by rememberSaveable { mutableStateOf(MyTuripTab.ALL) }
+    var isDeleteMode: Boolean by rememberSaveable { mutableStateOf(false) }
 
     val filteredTurips: List<MyTuripModel> =
         when (selectedTab) {
@@ -163,7 +171,7 @@ private fun MyTuripScreenContent(
             Text(
                 text = "내 튜립",
                 style = TuripTheme.typography.display,
-                color = Color.Black,
+                color = TuripTheme.colors.black,
                 modifier =
                     Modifier.padding(
                         top = TuripTheme.spacing.extraExtraLarge,
@@ -173,7 +181,10 @@ private fun MyTuripScreenContent(
 
             MyTuripTabRow(
                 selectedTab = selectedTab,
-                onTabSelected = { selectedTab = it },
+                onTabSelected = {
+                    selectedTab = it
+                    isDeleteMode = false
+                },
             )
 
             LazyColumn(
@@ -181,12 +192,29 @@ private fun MyTuripScreenContent(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .padding(top = TuripTheme.spacing.large),
+                        .padding(top = TuripTheme.spacing.large)
+                        .pointerInput(isDeleteMode) {
+                            detectTapGestures {
+                                if (isDeleteMode) isDeleteMode = false
+                            }
+                        },
             ) {
                 items(items = filteredTurips, key = { it.id }) { turip ->
                     MyTuripCard(
                         turip = turip,
-                        onTuripClick = onTuripClick,
+                        isDeleteMode = isDeleteMode,
+                        onTuripClick = { id ->
+                            if (isDeleteMode) {
+                                isDeleteMode = false
+                            } else {
+                                onTuripClick(id)
+                            }
+                        },
+                        onLongPress = { isDeleteMode = true },
+                        onDeleteClick = {
+                            onTuripDelete(turip.id)
+                            if (filteredTurips.size == 1) isDeleteMode = false
+                        },
                     )
                 }
             }
@@ -205,6 +233,6 @@ private fun MyTuripScreenPreview() {
         )
 
     TuripTheme {
-        MyTuripScreenContent(allTurips, {}, {})
+        MyTuripScreenContent(allTurips, {}, {}, {})
     }
 }

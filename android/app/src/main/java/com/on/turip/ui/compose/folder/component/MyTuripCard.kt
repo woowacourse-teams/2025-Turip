@@ -3,12 +3,13 @@ package com.on.turip.ui.compose.folder.component
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -25,6 +26,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,66 +40,99 @@ fun MyTuripCard(
     turip: MyTuripModel,
     onTuripClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
+    isDeleteMode: Boolean,
+    onLongPress: (() -> Unit)? = null,
+    onDeleteClick: (() -> Unit)? = null,
 ) {
-    Card(
-        shape = TuripTheme.shape.largeContainer,
-        colors = CardDefaults.cardColors(containerColor = TuripTheme.colors.white),
-        border = BorderStroke(width = 1.dp, color = TuripTheme.colors.border),
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .clickable { onTuripClick(turip.id) },
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(TuripTheme.spacing.large),
-            modifier = Modifier.padding(TuripTheme.spacing.large),
+    val haptic = LocalHapticFeedback.current
+
+    Box(modifier = modifier) {
+        Card(
+            shape = TuripTheme.shape.largeContainer,
+            colors = CardDefaults.cardColors(containerColor = TuripTheme.colors.white),
+            border = BorderStroke(width = 1.dp, color = TuripTheme.colors.border),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .combinedClickable(
+                        onClick = { onTuripClick(turip.id) },
+                        onLongClick =
+                            onLongPress?.let {
+                                {
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    it()
+                                }
+                            },
+                    ),
         ) {
-            Image(
-                painter = painterResource(R.drawable.ic_launcher_background),
-                contentDescription = null,
-                modifier =
-                    Modifier
-                        .size(88.dp)
-                        .clip(TuripTheme.shape.chip),
-            )
-
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(TuripTheme.spacing.medium),
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(TuripTheme.spacing.large),
+                modifier = Modifier.padding(TuripTheme.spacing.large),
             ) {
-                TuripTypeChip(type = turip.type)
-
-                Text(
-                    text = turip.name,
-                    style = TuripTheme.typography.title1,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
+                Image(
+                    painter = painterResource(R.drawable.ic_launcher_background),
+                    contentDescription = null,
+                    modifier =
+                        Modifier
+                            .size(88.dp)
+                            .clip(TuripTheme.shape.chip),
                 )
 
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(TuripTheme.spacing.medium),
-                    verticalAlignment = Alignment.CenterVertically,
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(TuripTheme.spacing.medium),
                 ) {
-                    if (turip.type == TuripType.TOGETHER) {
+                    TuripTypeChip(type = turip.type)
+
+                    Text(
+                        text = turip.name,
+                        style = TuripTheme.typography.title1,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(TuripTheme.spacing.medium),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        if (turip.type == TuripType.TOGETHER) {
+                            IconWithCount(
+                                imageVector = Icons.Default.Person,
+                                count = turip.memberCount,
+                            )
+                        }
                         IconWithCount(
-                            imageVector = Icons.Default.Person,
-                            count = turip.memberCount,
+                            imageVector = Icons.Default.LocationOn,
+                            count = turip.placeCount,
                         )
                     }
-                    IconWithCount(
-                        imageVector = Icons.Default.LocationOn,
-                        count = turip.placeCount,
-                    )
                 }
-            }
 
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                contentDescription = null,
-                tint = TuripTheme.colors.gray02,
-                modifier = Modifier.size(20.dp),
-            )
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = null,
+                    tint = TuripTheme.colors.gray02,
+                    modifier = Modifier.size(20.dp),
+                )
+            }
+        }
+
+        if (isDeleteMode && onDeleteClick != null) {
+            Box(
+                modifier =
+                    Modifier
+                        .align(Alignment.TopEnd)
+                        .offset(x = 6.dp, y = (-6).dp)
+                        .combinedClickable(onClick = onDeleteClick),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_remove),
+                    contentDescription = null,
+                    tint = Color.Unspecified,
+                )
+            }
         }
     }
 }
@@ -168,6 +204,7 @@ private fun MyTuripCardTogetherPreview() {
                     placeCount = 5,
                 ),
             onTuripClick = {},
+            isDeleteMode = false,
         )
     }
 }
@@ -185,6 +222,28 @@ private fun MyTuripCardSoloPreview() {
                     placeCount = 3,
                 ),
             onTuripClick = {},
+            isDeleteMode = false,
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun MyTuripCardDeletedPreview() {
+    TuripTheme {
+        MyTuripCard(
+            turip =
+                MyTuripModel(
+                    id = 0L,
+                    name = "수원 여행 계획 튜립",
+                    type = TuripType.TOGETHER,
+                    memberCount = 3,
+                    placeCount = 5,
+                ),
+            onTuripClick = {},
+            onLongPress = {},
+            onDeleteClick = {},
+            isDeleteMode = true,
         )
     }
 }

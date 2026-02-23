@@ -2,10 +2,12 @@ package com.on.turip.ui.compose.folder
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
 import com.on.turip.domain.turip.Turip
 import com.on.turip.domain.turip.repository.TuripRepository
+import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.compose.folder.mapper.toUiModel
 import com.on.turip.ui.folder.model.TuripEditModel
 import com.on.turip.ui.folder.model.TuripNameStatusModel
@@ -19,6 +21,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -84,6 +87,26 @@ class FolderViewModel @Inject constructor(
                             retryAction = FolderRetryAction.AddFolder(name),
                         ),
                     )
+                }
+        }
+    }
+
+    fun deleteTurip(folderId: Long) {
+        viewModelScope.launch {
+            turipRepository
+                .deleteTurip(folderId)
+                .onSuccess {
+                    _uiState.update { state: FolderUiState ->
+                        state.copy(
+                            isLoading = false,
+                            errorUiState = ErrorUiState.None,
+                            turips = state.turips.filter { it.id != folderId }.toImmutableList(),
+                        )
+                    }
+                    Timber.d("튜립 삭제 완료(이름 = )")
+                    _uiEffect.send(FolderUiEffect.TuripDeleted)
+                }.onFailure { errorType: ErrorType ->
+                    Timber.e("튜립 삭제 실패(이름 = ")
                 }
         }
     }
