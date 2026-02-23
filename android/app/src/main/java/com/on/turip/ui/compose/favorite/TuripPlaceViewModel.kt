@@ -143,6 +143,23 @@ class TuripPlaceViewModel @Inject constructor(
         }
     }
 
+    fun deleteTurip(selectedTuripId: Long) {
+        viewModelScope.launch {
+            turipRepository
+                .deleteTurip(selectedTuripId)
+                .onSuccess {
+                    _uiState.update { state: TuripPlaceUiState ->
+                        state.copy(
+                            isLoading = false,
+                            errorUiState = ErrorUiState.None,
+                        )
+                    }
+                    _uiEffect.send(TuripPlaceUiEffect.TuripDelete)
+                }.onFailure { errorType: ErrorType ->
+                }
+        }
+    }
+
     fun updateTuripPlacesOrder(updateTuripPlaces: ImmutableList<TuripPlaceModel>) {
         reorderPlacesSnapshot = uiState.value.places
         _uiState.update { state ->

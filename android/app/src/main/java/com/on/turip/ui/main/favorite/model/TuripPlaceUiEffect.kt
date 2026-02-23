@@ -7,6 +7,8 @@ sealed interface TuripPlaceUiEffect {
 
     data object ShowTuripShareNotAllowed : TuripPlaceUiEffect
 
+    data object TuripDelete : TuripPlaceUiEffect
+
     data class ShareTurip(
         val turipShareModel: TuripShareModel,
     ) : TuripPlaceUiEffect

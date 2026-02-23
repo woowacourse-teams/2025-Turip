@@ -122,6 +122,10 @@ fun TuripPlaceScreen(
                         onAction = { viewModel.handleErrorRetryRequest(uiEffect.retryAction) },
                     )
                 }
+
+                TuripPlaceUiEffect.TuripDelete -> {
+                    goBack()
+                }
             }
         }
     }
@@ -147,7 +151,10 @@ fun TuripPlaceScreen(
             onRenameClick = {},
             onShareClick = viewModel::shareTurip,
             onInviteLinkClick = {},
-            onDeleteClick = {},
+            onDeleteClick = {
+                viewModel.deleteTurip(selectedTuripId)
+                viewModel.dismissBottomSheet()
+            },
         )
     }
 
