@@ -11,7 +11,7 @@ public class TestContainerConfig {
     @Bean
     @ServiceConnection
     public MySQLContainer mySQLContainer() {
-        return new MySQLContainer("mysql:8.0.42")
+        return new MySQLContainer("mysql:8.0.45")
                 .withUsername("root")
                 .withPassword("rootpwd")
                 .withDatabaseName("test_db");
