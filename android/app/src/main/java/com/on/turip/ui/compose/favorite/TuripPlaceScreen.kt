@@ -11,16 +11,20 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -32,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -49,6 +54,7 @@ import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.common.extensions.showSnackbarWithAction
 import com.on.turip.ui.compose.designsystem.component.ErrorScreen
+import com.on.turip.ui.compose.designsystem.component.TuripAppBar
 import com.on.turip.ui.compose.designsystem.component.TuripDialog
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
@@ -153,7 +159,8 @@ fun TuripPlaceScreen(
                         },
                         onUpdateTuripPlacesOrder = viewModel::updateTuripPlacesOrder,
                         currentPlaceLatLng = uiState.placesLatLng,
-                        onShareClick = { viewModel.shareTurip() },
+                        onMoreOption = { viewModel.shareTurip() },
+                        goBack = goBack,
                     )
                 }
             }
@@ -197,7 +204,8 @@ private fun TuripPlaceContent(
     turipPlaceModel: ImmutableList<TuripPlaceModel>,
     navigateToMap: (map: MapModel) -> Unit,
     onClickTuripPlace: (placeId: Long) -> Unit,
-    onShareClick: () -> Unit,
+    onMoreOption: () -> Unit,
+    goBack: () -> Unit,
     onUpdateTuripPlacesOrder: (updatePlaces: ImmutableList<TuripPlaceModel>) -> Unit,
 ) {
     var currentPlaces: ImmutableList<TuripPlaceModel> by remember(turipPlaceModel) {
@@ -216,6 +224,12 @@ private fun TuripPlaceContent(
                 .fillMaxSize()
                 .background(TuripTheme.colors.white),
     ) {
+        Header(
+            turipName = currentPlaces.firstOrNull()?.name ?: "",
+            onBackClick = goBack,
+            onMoreOption = onMoreOption,
+        )
+
         if (currentPlaceLatLng.isNotEmpty()) {
             TuripMapContent(
                 places = currentPlaceLatLng,
@@ -254,6 +268,46 @@ private fun TuripPlaceContent(
             modifier = Modifier.weight(1f),
         )
     }
+}
+
+@Composable
+private fun Header(
+    turipName: String,
+    onBackClick: () -> Unit,
+    onMoreOption: () -> Unit,
+) {
+    TuripAppBar(
+        start = {
+            IconButton(
+                onClick = onBackClick,
+                modifier = Modifier.size(40.dp),
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                    contentDescription = stringResource(R.string.all_back_description),
+                    tint = TuripTheme.colors.gray03,
+                )
+            }
+        },
+        center = {
+            Text(
+                text = turipName,
+                style = TuripTheme.typography.display,
+                color = TuripTheme.colors.gray03,
+            )
+        },
+        end = {
+            IconButton(
+                onClick = onMoreOption,
+            ) {
+                Icon(
+                    imageVector = Icons.Default.MoreVert,
+                    contentDescription = null,
+                    tint = TuripTheme.colors.gray03,
+                )
+            }
+        },
+    )
 }
 
 @Composable
@@ -375,9 +429,10 @@ private fun TuripPlaceScreenPreview() {
                 ),
             navigateToMap = {},
             onClickTuripPlace = {},
-            onShareClick = {},
+            onMoreOption = {},
             onUpdateTuripPlacesOrder = {},
             currentPlaceLatLng = persistentListOf(),
+            goBack = {},
         )
     }
 }
