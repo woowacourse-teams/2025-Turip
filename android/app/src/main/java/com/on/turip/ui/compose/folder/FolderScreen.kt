@@ -88,6 +88,8 @@ fun MyTuripScreen(
                         onAction = { viewModel.handleErrorRetryRequest(uiEffect.retryAction) },
                     )
                 }
+
+                FolderUiEffect.TuripAdded -> TODO()
             }
         }
     }

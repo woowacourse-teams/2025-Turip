@@ -34,6 +34,10 @@ class FolderViewModel @Inject constructor(
             is FolderRetryAction.UpdateFolder -> {
                 loadTuripFolders()
             }
+
+            is FolderRetryAction.AddFolder -> {
+                TODO()
+            }
         }
     }
 
