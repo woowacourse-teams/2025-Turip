@@ -10,6 +10,9 @@ spring:
         default_batch_fetch_size: 100
     defer-datasource-initialization: false
 
+  jackson:
+    time-zone: Asia/Seoul
+
 region:
   category:
     domestic:
