@@ -105,7 +105,7 @@ private fun TuripPlacesContent(
         onDragStart = onDragStart,
         onDragPlace = onDragPlace,
         onDragEnd = onDragEnd,
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
