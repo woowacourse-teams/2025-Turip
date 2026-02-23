@@ -8,6 +8,10 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: Asia/Seoul
   flyway:
     enabled: false # Flyway 비활성화
   datasource:
