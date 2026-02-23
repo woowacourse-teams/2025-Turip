@@ -28,6 +28,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -93,6 +94,12 @@ fun TuripPlaceScreen(
 
     BackHandler {
         goBack()
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.resetUiState()
+        }
     }
 
     LaunchedEffect(Unit) {
@@ -197,6 +204,7 @@ fun TuripPlaceScreen(
 
                 else -> {
                     TuripPlaceContent(
+                        selectedTuripId = selectedTuripId,
                         turipPlaceModel = uiState.places,
                         navigateToMap = { _: MapModel -> onNavigateToMap() },
                         onClickTuripPlace = { placeId: Long ->
@@ -246,6 +254,7 @@ private fun ErrorContent(
 
 @Composable
 private fun TuripPlaceContent(
+    selectedTuripId: Long,
     selectedTuripName: String,
     currentPlaceLatLng: ImmutableList<PlaceLatLngUiModel>,
     turipPlaceModel: ImmutableList<TuripPlaceModel>,
@@ -279,6 +288,7 @@ private fun TuripPlaceContent(
 
         if (currentPlaceLatLng.isNotEmpty()) {
             TuripMapContent(
+                selectedTuripId = selectedTuripId,
                 places = currentPlaceLatLng,
                 isMapVisible = isMapVisible,
                 onMapToggle = { isMapVisible = !isMapVisible },
@@ -359,6 +369,7 @@ private fun Header(
 
 @Composable
 fun TuripMapContent(
+    selectedTuripId: Long,
     places: ImmutableList<PlaceLatLngUiModel>,
     isMapVisible: Boolean,
     onMapToggle: () -> Unit,
@@ -372,24 +383,49 @@ fun TuripMapContent(
             places.associate { it.placeId to MarkerState(position = it.latLng) }
         }
 
-    LaunchedEffect(places) {
-        when (places.size) {
-            1 -> {
-                cameraPositionState.animate(
-                    CameraUpdateFactory.newLatLngZoom(places.first().latLng, 15f),
-                )
-            }
+    var isInitialized by remember(selectedTuripId) { mutableStateOf(false) }
 
-            else -> {
-                val bounds =
-                    LatLngBounds
-                        .Builder()
-                        .apply {
-                            places.forEach { include(it.latLng) }
-                        }.build()
-                cameraPositionState.animate(
-                    CameraUpdateFactory.newLatLngBounds(bounds, 100),
-                )
+    LaunchedEffect(places) {
+        if (places.isEmpty()) return@LaunchedEffect
+
+        if (!isInitialized) {
+            when (places.size) {
+                1 -> {
+                    cameraPositionState.move(
+                        CameraUpdateFactory.newLatLngZoom(places.first().latLng, 15f),
+                    )
+                }
+
+                else -> {
+                    val bounds =
+                        LatLngBounds
+                            .Builder()
+                            .apply { places.forEach { include(it.latLng) } }
+                            .build()
+                    cameraPositionState.move(
+                        CameraUpdateFactory.newLatLngBounds(bounds, 100),
+                    )
+                }
+            }
+            isInitialized = true
+        } else {
+            when (places.size) {
+                1 -> {
+                    cameraPositionState.animate(
+                        CameraUpdateFactory.newLatLngZoom(places.first().latLng, 15f),
+                    )
+                }
+
+                else -> {
+                    val bounds =
+                        LatLngBounds
+                            .Builder()
+                            .apply { places.forEach { include(it.latLng) } }
+                            .build()
+                    cameraPositionState.animate(
+                        CameraUpdateFactory.newLatLngBounds(bounds, 100),
+                    )
+                }
             }
         }
     }
@@ -480,6 +516,7 @@ private fun TuripPlaceScreenPreview() {
             onMoreOption = {},
             onUpdateTuripPlacesOrder = {},
             currentPlaceLatLng = persistentListOf(),
+            selectedTuripId = -1L,
             goBack = {},
         )
     }

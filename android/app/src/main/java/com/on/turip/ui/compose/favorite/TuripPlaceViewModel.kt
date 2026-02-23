@@ -133,6 +133,10 @@ class TuripPlaceViewModel @Inject constructor(
         }
     }
 
+    fun resetUiState() {
+        _uiState.update { TuripPlaceUiState.Idle }
+    }
+
     fun showBottomSheet() {
         _uiState.update { it.copy(showBottomSheet = true) }
     }
