@@ -52,6 +52,7 @@ private sealed interface SheetIcon {
 @Composable
 fun MoreOptionBottomSheet(
     sheetState: SheetState,
+    isDefault: Boolean,
     onDismiss: () -> Unit,
     onRenameClick: () -> Unit,
     onShareClick: () -> Unit,
@@ -82,8 +83,8 @@ fun MoreOptionBottomSheet(
             SheetItem(
                 title = "삭제",
                 icon = SheetIcon.Vector(Icons.Default.Delete),
-                color = TuripTheme.colors.error,
-                onClick = onDeleteClick,
+                color = if (isDefault) TuripTheme.colors.errorContainer else TuripTheme.colors.error,
+                onClick = if (isDefault) ({}) else onDeleteClick,
             ),
         )
 
@@ -158,6 +159,17 @@ private fun MoreOptionBottomSheetPreview() {
     val sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     TuripTheme {
-        MoreOptionBottomSheet(sheetState, {}, {}, {}, {}, {})
+        MoreOptionBottomSheet(sheetState, false, {}, {}, {}, {}, {})
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+@Preview(showBackground = true)
+private fun MoreOptionDefaultBottomSheetPreview() {
+    val sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    TuripTheme {
+        MoreOptionBottomSheet(sheetState, true, {}, {}, {}, {}, {})
     }
 }

@@ -34,14 +34,16 @@ class TuripPlaceFragment : Fragment() {
                 TuripTheme {
                     var selectedTuripId: Long by rememberSaveable { mutableLongStateOf(0L) }
                     var selectedTuripName: String by rememberSaveable { mutableStateOf("") }
+                    var isDefault: Boolean by rememberSaveable { mutableStateOf(false) }
                     var currentScreen: Int by rememberSaveable { mutableIntStateOf(0) }
 
                     when (currentScreen) {
                         0 -> {
                             MyTuripScreen(
-                                onNavigateToTuripPlace = { newId, newName ->
+                                onNavigateToTuripPlace = { newId, newName, newIsDefault ->
                                     selectedTuripId = newId
                                     selectedTuripName = newName
+                                    isDefault = newIsDefault
                                     currentScreen = 1
                                 },
                                 onNavigateToLogin = ::navigateToLoginScreen,
@@ -58,6 +60,7 @@ class TuripPlaceFragment : Fragment() {
                                 goBack = {
                                     currentScreen = 0
                                 },
+                                isDefault = isDefault,
                             )
                         }
                     }

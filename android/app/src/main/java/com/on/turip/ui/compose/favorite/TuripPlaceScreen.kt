@@ -76,6 +76,7 @@ import kotlinx.collections.immutable.toImmutableList
 fun TuripPlaceScreen(
     selectedTuripId: Long,
     selectedTuripName: String,
+    isDefault: Boolean,
     onNavigateToLogin: () -> Unit = {},
     onShareTurip: (TuripShareModel) -> Unit = {},
     onNavigateToMap: () -> Unit,
@@ -148,6 +149,7 @@ fun TuripPlaceScreen(
     if (uiState.showBottomSheet) {
         MoreOptionBottomSheet(
             sheetState = sheetState,
+            isDefault = isDefault,
             onDismiss = viewModel::dismissBottomSheet,
             onRenameClick = {},
             onShareClick = viewModel::shareTurip,
