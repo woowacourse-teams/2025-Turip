@@ -1,18 +1,16 @@
 package com.on.turip.ui.compose.favorite
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -92,14 +90,10 @@ fun TuripPlaceScreen(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var dialogState: Boolean by remember { mutableStateOf(false) }
 
-    BackHandler {
-        goBack()
-    }
+    BackHandler { goBack() }
 
     DisposableEffect(Unit) {
-        onDispose {
-            viewModel.resetUiState()
-        }
+        onDispose { viewModel.resetUiState() }
     }
 
     LaunchedEffect(Unit) {
@@ -107,6 +101,7 @@ fun TuripPlaceScreen(
             viewModel.loadPlaces(selectedTuripId)
         }
     }
+
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { uiEffect: TuripPlaceUiEffect ->
             when (uiEffect) {
@@ -161,9 +156,7 @@ fun TuripPlaceScreen(
             onRenameClick = {},
             onShareClick = viewModel::shareTurip,
             onInviteLinkClick = {},
-            onDeleteClick = {
-                dialogState = true
-            },
+            onDeleteClick = { dialogState = true },
         )
     }
 
@@ -205,6 +198,7 @@ fun TuripPlaceScreen(
                 else -> {
                     TuripPlaceContent(
                         selectedTuripId = selectedTuripId,
+                        selectedTuripName = selectedTuripName,
                         turipPlaceModel = uiState.places,
                         navigateToMap = { _: MapModel -> onNavigateToMap() },
                         onClickTuripPlace = { placeId: Long ->
@@ -213,11 +207,11 @@ fun TuripPlaceScreen(
                         onUpdateTuripPlacesOrder = viewModel::updateTuripPlacesOrder,
                         currentPlaceLatLng = uiState.placesLatLng,
                         onMoreOption = viewModel::showBottomSheet,
-                        selectedTuripName = selectedTuripName,
                         goBack = goBack,
                     )
                 }
             }
+
             TuripSnackbar(
                 snackbarHostState = snackbarHostState,
                 modifier =
@@ -270,9 +264,8 @@ private fun TuripPlaceContent(
     var dragStartPlaces: ImmutableList<TuripPlaceModel> by remember(turipPlaceModel) {
         mutableStateOf(turipPlaceModel)
     }
-    var isMapVisible by remember { mutableStateOf(true) }
 
-    var isMapExpanded by remember { mutableStateOf(true) }
+    var isMapVisible by remember { mutableStateOf(true) }
 
     Column(
         modifier =
@@ -292,15 +285,7 @@ private fun TuripPlaceContent(
                 places = currentPlaceLatLng,
                 isMapVisible = isMapVisible,
                 onMapToggle = { isMapVisible = !isMapVisible },
-                onAnimationFinished = { visible ->
-                    isMapExpanded = visible
-                },
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .then(
-                            if (isMapExpanded) Modifier.weight(1f) else Modifier.wrapContentHeight(),
-                        ),
+                modifier = Modifier.fillMaxWidth(),
             )
         }
 
@@ -354,9 +339,7 @@ private fun Header(
             )
         },
         end = {
-            IconButton(
-                onClick = onMoreOption,
-            ) {
+            IconButton(onClick = onMoreOption) {
                 Icon(
                     imageVector = Icons.Default.MoreVert,
                     contentDescription = null,
@@ -373,7 +356,6 @@ fun TuripMapContent(
     places: ImmutableList<PlaceLatLngUiModel>,
     isMapVisible: Boolean,
     onMapToggle: () -> Unit,
-    onAnimationFinished: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val cameraPositionState = rememberCameraPositionState()
@@ -388,12 +370,10 @@ fun TuripMapContent(
     LaunchedEffect(places) {
         if (places.isEmpty()) return@LaunchedEffect
 
-        if (!isInitialized) {
+        val update =
             when (places.size) {
                 1 -> {
-                    cameraPositionState.move(
-                        CameraUpdateFactory.newLatLngZoom(places.first().latLng, 15f),
-                    )
+                    CameraUpdateFactory.newLatLngZoom(places.first().latLng, 15f)
                 }
 
                 else -> {
@@ -402,57 +382,38 @@ fun TuripMapContent(
                             .Builder()
                             .apply { places.forEach { include(it.latLng) } }
                             .build()
-                    cameraPositionState.move(
-                        CameraUpdateFactory.newLatLngBounds(bounds, 100),
-                    )
+                    CameraUpdateFactory.newLatLngBounds(bounds, 100)
                 }
             }
+
+        if (!isInitialized) {
+            cameraPositionState.move(update)
             isInitialized = true
         } else {
-            when (places.size) {
-                1 -> {
-                    cameraPositionState.animate(
-                        CameraUpdateFactory.newLatLngZoom(places.first().latLng, 15f),
-                    )
-                }
-
-                else -> {
-                    val bounds =
-                        LatLngBounds
-                            .Builder()
-                            .apply { places.forEach { include(it.latLng) } }
-                            .build()
-                    cameraPositionState.animate(
-                        CameraUpdateFactory.newLatLngBounds(bounds, 100),
-                    )
-                }
-            }
+            cameraPositionState.animate(update)
         }
     }
 
-    Column(modifier = modifier.clipToBounds(), horizontalAlignment = Alignment.CenterHorizontally) {
-        AnimatedVisibility(
-            visible = isMapVisible,
-            enter =
-                slideInVertically(
-                    initialOffsetY = { fullHeight -> -fullHeight },
-                    animationSpec = tween(250),
-                ),
-            exit =
-                slideOutVertically(
-                    targetOffsetY = { fullHeight -> -fullHeight },
-                    animationSpec = tween(250),
-                ),
+    val mapHeight by animateDpAsState(
+        targetValue = if (isMapVisible) 260.dp else 0.dp,
+        animationSpec = tween(250),
+    )
+
+    Column(
+        modifier =
+            modifier
+                .clipToBounds(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Box(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(mapHeight),
         ) {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
+            if (mapHeight > 0.dp) {
                 GoogleMap(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .weight(1f),
+                    modifier = Modifier.fillMaxSize(),
                     cameraPositionState = cameraPositionState,
                     uiSettings = MapUiSettings(zoomControlsEnabled = true),
                 ) {
@@ -463,27 +424,14 @@ fun TuripMapContent(
                         )
                     }
                 }
-
-                IconButton(onClick = onMapToggle) {
-                    Icon(
-                        imageVector = Icons.Default.KeyboardArrowUp,
-                        contentDescription = null,
-                    )
-                }
-            }
-
-            LaunchedEffect(transition.isRunning) {
-                if (!transition.isRunning) onAnimationFinished(isMapVisible)
             }
         }
 
-        if (!isMapVisible) {
-            IconButton(onClick = onMapToggle) {
-                Icon(
-                    imageVector = Icons.Default.KeyboardArrowDown,
-                    contentDescription = null,
-                )
-            }
+        IconButton(onClick = onMapToggle) {
+            Icon(
+                imageVector = if (isMapVisible) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                contentDescription = null,
+            )
         }
     }
 }
