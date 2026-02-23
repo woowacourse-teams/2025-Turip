@@ -4,6 +4,12 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.waitForUpOrCancellation
+import androidx.compose.foundation.indication
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,13 +26,16 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -35,17 +44,21 @@ import androidx.compose.ui.unit.dp
 import com.on.turip.R
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 
+// 원하는 롱프레스 딜레이 (ms) — 이 값만 바꾸면 됨
+private const val LONG_PRESS_DELAY_MS = 800L
+
 @Composable
 fun MyTuripCard(
     turip: MyTuripModel,
     onTuripClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
-    isDeleteMode: Boolean,
-    isDefaultFolder: Boolean,
+    isDeleteMode: Boolean = false,
+    isDefaultFolder: Boolean = false,
     onLongPress: (() -> Unit)? = null,
     onDeleteClick: (() -> Unit)? = null,
 ) {
     val haptic = LocalHapticFeedback.current
+    val interactionSource = remember { MutableInteractionSource() }
 
     Box(modifier = modifier) {
         Card(
@@ -55,16 +68,33 @@ fun MyTuripCard(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .combinedClickable(
-                        onClick = { onTuripClick(turip.id) },
-                        onLongClick =
-                            onLongPress?.let {
-                                {
-                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                    it()
+                    .indication(
+                        interactionSource = interactionSource,
+                        indication = ripple(),
+                    ).pointerInput(onLongPress, onTuripClick) {
+                        awaitEachGesture {
+                            val down = awaitFirstDown(requireUnconsumed = false)
+
+                            val press = PressInteraction.Press(down.position)
+                            interactionSource.tryEmit(press)
+
+                            val upOrCancel =
+                                withTimeoutOrNull(LONG_PRESS_DELAY_MS) {
+                                    waitForUpOrCancellation()
                                 }
-                            },
-                    ),
+
+                            if (upOrCancel != null) {
+                                interactionSource.tryEmit(PressInteraction.Release(press))
+                                upOrCancel.consume()
+                                onTuripClick(turip.id)
+                            } else {
+                                interactionSource.tryEmit(PressInteraction.Cancel(press))
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                onLongPress?.invoke()
+                                waitForUpOrCancellation()
+                            }
+                        }
+                    },
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
