@@ -71,6 +71,7 @@ import kotlinx.collections.immutable.toImmutableList
 @Composable
 fun TuripPlaceScreen(
     selectedTuripId: Long,
+    selectedTuripName: String,
     onNavigateToLogin: () -> Unit = {},
     onShareTurip: (TuripShareModel) -> Unit = {},
     onNavigateToMap: () -> Unit,
@@ -161,6 +162,7 @@ fun TuripPlaceScreen(
                         onUpdateTuripPlacesOrder = viewModel::updateTuripPlacesOrder,
                         currentPlaceLatLng = uiState.placesLatLng,
                         onMoreOption = { viewModel.shareTurip() },
+                        selectedTuripName = selectedTuripName,
                         goBack = goBack,
                     )
                 }
@@ -201,6 +203,7 @@ private fun ErrorContent(
 
 @Composable
 private fun TuripPlaceContent(
+    selectedTuripName: String,
     currentPlaceLatLng: ImmutableList<PlaceLatLngUiModel>,
     turipPlaceModel: ImmutableList<TuripPlaceModel>,
     navigateToMap: (map: MapModel) -> Unit,
@@ -226,7 +229,7 @@ private fun TuripPlaceContent(
                 .background(TuripTheme.colors.white),
     ) {
         Header(
-            turipName = currentPlaces.firstOrNull()?.name ?: "",
+            turipName = selectedTuripName,
             onBackClick = goBack,
             onMoreOption = onMoreOption,
         )
@@ -293,8 +296,8 @@ private fun Header(
         center = {
             Text(
                 text = turipName,
-                style = TuripTheme.typography.display,
-                color = TuripTheme.colors.gray03,
+                style = TuripTheme.typography.title1,
+                color = TuripTheme.colors.black,
             )
         },
         end = {
@@ -428,6 +431,7 @@ private fun TuripPlaceScreenPreview() {
                         isTuripPlace = true,
                     ),
                 ),
+            selectedTuripName = "폴더폴더",
             navigateToMap = {},
             onClickTuripPlace = {},
             onMoreOption = {},

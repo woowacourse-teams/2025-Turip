@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
@@ -32,13 +33,15 @@ class TuripPlaceFragment : Fragment() {
             setContent {
                 TuripTheme {
                     var selectedTuripId: Long by rememberSaveable { mutableLongStateOf(0L) }
+                    var selectedTuripName: String by rememberSaveable { mutableStateOf("") }
                     var currentScreen: Int by rememberSaveable { mutableIntStateOf(0) }
 
                     when (currentScreen) {
                         0 -> {
                             MyTuripScreen(
-                                onNavigateToTuripPlace = { newId ->
+                                onNavigateToTuripPlace = { newId, newName ->
                                     selectedTuripId = newId
+                                    selectedTuripName = newName
                                     currentScreen = 1
                                 },
                                 onNavigateToLogin = ::navigateToLoginScreen,
@@ -47,9 +50,10 @@ class TuripPlaceFragment : Fragment() {
 
                         1 -> {
                             TuripPlaceScreen(
+                                selectedTuripId = selectedTuripId,
+                                selectedTuripName = selectedTuripName,
                                 onNavigateToLogin = ::navigateToLoginScreen,
                                 onShareTurip = ::navigateToShareTurip,
-                                selectedTuripId = selectedTuripId,
                                 onNavigateToMap = {},
                                 goBack = {
                                     currentScreen = 0
