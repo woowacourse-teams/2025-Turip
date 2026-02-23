@@ -24,7 +24,6 @@ import turip.auth.token.JwtProvider;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.BadRequestException;
 import turip.common.exception.custom.IllegalArgumentException;
-import turip.common.exception.custom.NotFoundException;
 import turip.common.exception.custom.UnauthorizedException;
 
 @Service
@@ -138,7 +137,7 @@ public class AuthService {
     private Member getMemberByAccountId(Long accountId) {
         try {
             return memberService.getByAccountId(accountId);
-        } catch (NotFoundException e) {
+        } catch (Exception e) {
             throw new UnauthorizedException(ErrorTag.UNAUTHORIZED, e);
         }
     }
