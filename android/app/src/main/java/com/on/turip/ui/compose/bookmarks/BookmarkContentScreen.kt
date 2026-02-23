@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,15 +16,19 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
@@ -43,11 +48,14 @@ import com.on.turip.domain.region.City
 import com.on.turip.domain.trip.TripDuration
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.extensions.showSnackbarWithAction
+import com.on.turip.ui.common.paging.PagingState
 import com.on.turip.ui.compose.bookmarks.component.BookmarkContentAppBar
 import com.on.turip.ui.compose.bookmarks.component.BookmarkContentItem
 import com.on.turip.ui.compose.designsystem.component.ErrorScreen
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 
 @Composable
 fun BookmarkContentScreen(
@@ -72,7 +80,7 @@ fun BookmarkContentScreen(
                     snackbarHostState.showSnackbarWithAction(
                         message = resources.getString(R.string.my_page_snackbar_bookmark_remove_failed),
                         actionLabel = resources.getString(R.string.my_page_snackbar_bookmark_remove_failed_action),
-                        onAction = viewModel::loadBookmarkContents,
+                        onAction = viewModel::refreshBookmarkContents,
                     )
                 }
             }
@@ -92,9 +100,10 @@ fun BookmarkContentScreen(
         ) {
             BookmarkContentContent(
                 uiState = uiState,
-                onRetryClick = viewModel::loadBookmarkContents,
+                onRetryClick = viewModel::refreshBookmarkContents,
                 onContentClick = navigateToContent,
                 onBookmarkClick = viewModel::removeBookmark,
+                loadMoreContents = viewModel::loadMoreContents,
             )
         }
     }
@@ -106,6 +115,7 @@ private fun BookmarkContentContent(
     onRetryClick: () -> Unit,
     onContentClick: (contentId: Long) -> Unit,
     onBookmarkClick: (contentId: Long) -> Unit,
+    loadMoreContents: () -> Unit,
 ) {
     when {
         uiState.isLoading -> {
@@ -125,9 +135,10 @@ private fun BookmarkContentContent(
                 BookmarkContentEmpty()
             } else {
                 BookmarkContents(
-                    uiState = uiState,
+                    pagingState = uiState.bookmarkContents,
                     onContentClick = onContentClick,
                     onBookmarkClick = onBookmarkClick,
+                    loadMore = loadMoreContents,
                 )
             }
         }
@@ -176,15 +187,43 @@ private fun BookmarkContentEmpty() {
 
 @Composable
 private fun BookmarkContents(
-    uiState: BookmarkContentUiState,
+    pagingState: PagingState<BookmarkContent>,
     onContentClick: (contentId: Long) -> Unit,
     onBookmarkClick: (contentId: Long) -> Unit,
+    loadMore: () -> Unit,
 ) {
+    val listState = rememberLazyListState()
+    val threshold = 1
+    val shouldLoadMore by remember {
+        derivedStateOf {
+            if (!pagingState.hasNext || pagingState.isAppending || pagingState.errorUiState != ErrorUiState.None ||
+                pagingState.items.isEmpty()
+            ) {
+                return@derivedStateOf false
+            }
+
+            val layoutInfo = listState.layoutInfo
+            val totalCount = layoutInfo.totalItemsCount
+            val lastVisibleIndex =
+                layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: return@derivedStateOf false
+            val lastIndex = totalCount - 1
+
+            lastVisibleIndex >= lastIndex - threshold
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        snapshotFlow { shouldLoadMore }
+            .distinctUntilChanged()
+            .filter { it }
+            .collect { loadMore() }
+    }
+
     Text(
         text =
             stringResource(
                 R.string.bookmark_content_count,
-                uiState.bookmarkContents.size,
+                pagingState.items.size,
             ),
         textAlign = TextAlign.End,
         style = TuripTheme.typography.info2,
@@ -203,18 +242,67 @@ private fun BookmarkContents(
     )
 
     LazyColumn(
+        state = listState,
         contentPadding = PaddingValues(TuripTheme.spacing.medium),
         verticalArrangement = Arrangement.spacedBy(TuripTheme.spacing.medium),
     ) {
         itemsIndexed(
-            items = uiState.bookmarkContents,
+            items = pagingState.items,
             key = { _, item -> item.content.id },
         ) { index, content ->
             BookmarkContentItem(
                 content = content,
-                showDivider = index != uiState.bookmarkContents.lastIndex,
+                showDivider = index != pagingState.items.lastIndex,
                 onContentClick = onContentClick,
                 onRemoveBookmark = onBookmarkClick,
+            )
+        }
+
+        if (pagingState.isAppending) {
+            item {
+                Box(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = TuripTheme.colors.black,
+                    )
+                }
+            }
+        } else if (pagingState.errorUiState != ErrorUiState.None) {
+            item {
+                LoadMoreError(
+                    onRetryClick = loadMore,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun LoadMoreError(onRetryClick: () -> Unit) {
+    Row(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = TuripTheme.spacing.large),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = stringResource(R.string.bookmark_content_load_more_fail_title),
+            style = TuripTheme.typography.info1,
+            modifier = Modifier.weight(1f),
+        )
+
+        TextButton(onClick = onRetryClick) {
+            Text(
+                text = stringResource(R.string.retry),
+                style = TuripTheme.typography.info2,
+                color = TuripTheme.colors.gray04,
             )
         }
     }
@@ -229,6 +317,7 @@ private fun BookmarkContentLoadingPreview() {
             onRetryClick = {},
             onContentClick = {},
             onBookmarkClick = {},
+            loadMoreContents = { },
         )
     }
 }
@@ -241,12 +330,19 @@ private fun BookmarkContentEmptyPreview() {
             uiState =
                 BookmarkContentUiState(
                     isLoading = false,
-                    bookmarkContents = persistentListOf(),
+                    bookmarkContents =
+                        PagingState(
+                            items = persistentListOf(),
+                            hasNext = false,
+                            isAppending = false,
+                            errorUiState = ErrorUiState.None,
+                        ),
                     errorUiState = ErrorUiState.None,
                 ),
             onRetryClick = {},
             onContentClick = {},
             onBookmarkClick = {},
+            loadMoreContents = { },
         )
     }
 }
@@ -259,12 +355,19 @@ private fun BookmarkContentErrorPreview() {
             uiState =
                 BookmarkContentUiState(
                     isLoading = false,
-                    bookmarkContents = persistentListOf(),
+                    bookmarkContents =
+                        PagingState(
+                            items = persistentListOf(),
+                            hasNext = false,
+                            isAppending = false,
+                            errorUiState = ErrorUiState.None,
+                        ),
                     errorUiState = ErrorUiState.Network,
                 ),
             onRetryClick = {},
             onContentClick = {},
             onBookmarkClick = {},
+            loadMoreContents = { },
         )
     }
 }
@@ -304,12 +407,19 @@ private fun BookmarkContentErrorSuccess() {
             uiState =
                 BookmarkContentUiState(
                     isLoading = false,
-                    bookmarkContents = contents,
+                    bookmarkContents =
+                        PagingState(
+                            items = contents,
+                            hasNext = false,
+                            isAppending = false,
+                            errorUiState = ErrorUiState.None,
+                        ),
                     errorUiState = ErrorUiState.None,
                 ),
             onRetryClick = {},
             onContentClick = {},
             onBookmarkClick = {},
+            loadMoreContents = {},
         )
     }
 }
