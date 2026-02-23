@@ -2,10 +2,13 @@ package com.on.turip.ui.compose.folder
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
 import com.on.turip.domain.turip.Turip
 import com.on.turip.domain.turip.repository.TuripRepository
 import com.on.turip.ui.compose.folder.mapper.toUiModel
+import com.on.turip.ui.folder.model.TuripEditModel
+import com.on.turip.ui.folder.model.TuripNameStatusModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.channels.Channel
@@ -29,6 +32,62 @@ class FolderViewModel @Inject constructor(
     private val _uiEffect: Channel<FolderUiEffect> = Channel(Channel.BUFFERED)
     val uiEffect: Flow<FolderUiEffect> = _uiEffect.receiveAsFlow()
 
+    fun loadTuripFolders() {
+        viewModelScope.launch {
+            turipRepository.loadTurips().onSuccess { turips: List<Turip> ->
+                _uiState.update { folderUiState: FolderUiState ->
+                    folderUiState.copy(turips = turips.map { it.toUiModel() }.toImmutableList())
+                }
+            }
+        }
+    }
+
+    fun showAddBottomSheet() {
+        _uiState.update { it.copy(showAddBottomSheet = true) }
+    }
+
+    fun dismissAddBottomSheet() {
+        _uiState.update {
+            it.copy(
+                showAddBottomSheet = false,
+                turipNameStatus = TuripNameStatusModel.EMPTY,
+                currentTuripName = "",
+            )
+        }
+    }
+
+    fun updateTuripName(name: String) {
+        val editModels: List<TuripEditModel> =
+            _uiState.value.turips.map { TuripEditModel(it.id, it.name, 2) }
+        val status = TuripNameStatusModel.of(name, editModels)
+        _uiState.update {
+            it.copy(
+                currentTuripName = name,
+                turipNameStatus = status,
+            )
+        }
+    }
+
+    fun addTurip() {
+        val name = _uiState.value.currentTuripName
+        viewModelScope.launch {
+            turipRepository
+                .createTurip(name)
+                .onSuccess {
+                    _uiEffect.send(FolderUiEffect.TuripAdded)
+                    dismissAddBottomSheet()
+                    loadTuripFolders()
+                }.onFailure {
+                    _uiEffect.send(
+                        FolderUiEffect.ShowError(
+                            errorUiState = uiState.value.errorUiState,
+                            retryAction = FolderRetryAction.AddFolder(name),
+                        ),
+                    )
+                }
+        }
+    }
+
     fun handleErrorRetryRequest(action: FolderRetryAction) {
         when (action) {
             is FolderRetryAction.UpdateFolder -> {
@@ -36,17 +95,8 @@ class FolderViewModel @Inject constructor(
             }
 
             is FolderRetryAction.AddFolder -> {
-                TODO()
-            }
-        }
-    }
-
-    fun loadTuripFolders() {
-        viewModelScope.launch {
-            turipRepository.loadTurips().onSuccess { turips: List<Turip> ->
-                _uiState.update { folderUiState: FolderUiState ->
-                    folderUiState.copy(turips = turips.map { it.toUiModel() }.toImmutableList())
-                }
+                _uiState.update { it.copy(currentTuripName = action.name) }
+                addTurip()
             }
         }
     }

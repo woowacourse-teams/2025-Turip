@@ -11,12 +11,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -39,6 +41,7 @@ import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.folder.FolderUiEffect
 import com.on.turip.ui.compose.folder.FolderUiState
 import com.on.turip.ui.compose.folder.FolderViewModel
+import com.on.turip.ui.compose.folder.component.FolderAddBottomSheet
 import com.on.turip.ui.compose.folder.component.MyTuripCard
 import com.on.turip.ui.compose.folder.component.MyTuripModel
 import com.on.turip.ui.compose.folder.component.MyTuripTabRow
@@ -54,6 +57,7 @@ enum class MyTuripTab(
     TOGETHER("함께 튜립"),
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyTuripScreen(
     onNavigateToTuripPlace: (Long) -> Unit,
@@ -65,6 +69,7 @@ fun MyTuripScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
     val snackbarHostState = remember { SnackbarHostState() }
     val resource = LocalResources.current
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     LaunchedEffect(Unit) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
@@ -89,7 +94,9 @@ fun MyTuripScreen(
                     )
                 }
 
-                FolderUiEffect.TuripAdded -> TODO()
+                FolderUiEffect.TuripAdded -> {
+                    Unit
+                }
             }
         }
     }
@@ -97,9 +104,19 @@ fun MyTuripScreen(
     MyTuripScreenContent(
         turips = uiState.turips,
         onTuripClick = onNavigateToTuripPlace,
-        onAddClick = { /*TODO*/ },
+        onAddClick = viewModel::showAddBottomSheet,
         modifier = modifier,
     )
+
+    if (uiState.showAddBottomSheet) {
+        FolderAddBottomSheet(
+            sheetState = sheetState,
+            turipNameStatus = uiState.turipNameStatus,
+            onNameChanged = viewModel::updateTuripName,
+            onConfirmClick = viewModel::addTurip,
+            onDismiss = viewModel::dismissAddBottomSheet,
+        )
+    }
 }
 
 @Composable

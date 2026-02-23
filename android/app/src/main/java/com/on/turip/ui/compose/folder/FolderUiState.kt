@@ -12,6 +12,7 @@ data class FolderUiState(
     val turips: ImmutableList<MyTuripModel>,
     val showAddBottomSheet: Boolean,
     val turipNameStatus: TuripNameStatusModel,
+    val currentTuripName: String,
 ) {
     companion object {
         val Idle =
@@ -21,6 +22,7 @@ data class FolderUiState(
                 turips = persistentListOf(),
                 showAddBottomSheet = false,
                 turipNameStatus = TuripNameStatusModel.EMPTY,
+                currentTuripName = "",
             )
     }
 }
