@@ -130,7 +130,8 @@ fun MyTuripScreen(
     }
 
     if (dialogState) {
-        val deletedTuripName: String? = uiState.turips.find { it.id == uiState.deletedTuripId }?.name
+        val deletedTuripName: String? =
+            uiState.turips.find { it.id == uiState.deletedTuripId }?.name
         TuripDialog(
             title = "폴더 삭제",
             message = "정말 ${deletedTuripName}폴더를 삭제 하시겠습니까?",
@@ -189,7 +190,12 @@ private fun MyTuripScreenContent(
                 Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
-                    .padding(horizontal = TuripTheme.spacing.extraLarge),
+                    .padding(horizontal = TuripTheme.spacing.extraLarge)
+                    .pointerInput(isDeleteMode) {
+                        detectTapGestures {
+                            if (isDeleteMode) isDeleteMode = false
+                        }
+                    },
         ) {
             Text(
                 text = "내 튜립",
@@ -215,12 +221,7 @@ private fun MyTuripScreenContent(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .padding(top = TuripTheme.spacing.large)
-                        .pointerInput(isDeleteMode) {
-                            detectTapGestures {
-                                if (isDeleteMode) isDeleteMode = false
-                            }
-                        },
+                        .padding(top = TuripTheme.spacing.large),
             ) {
                 items(items = filteredTurips, key = { it.id }) { turip: MyTuripModel ->
                     MyTuripCard(
