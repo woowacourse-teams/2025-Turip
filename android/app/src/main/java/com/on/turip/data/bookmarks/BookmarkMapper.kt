@@ -5,14 +5,14 @@ import com.on.turip.data.bookmarks.dto.BookmarkContentResponse
 import com.on.turip.data.bookmarks.dto.BookmarkContentsResponse
 import com.on.turip.data.content.toDomain
 import com.on.turip.domain.bookmark.BookmarkContent
-import com.on.turip.domain.bookmark.PagedBookmarkContents
+import com.on.turip.domain.common.paging.Page
 
 fun Long.toRequestDto(): BookmarkAddRequest = BookmarkAddRequest(contentId = this)
 
-fun BookmarkContentsResponse.toDomain(): PagedBookmarkContents =
-    PagedBookmarkContents(
-        bookmarkContents = contents.map { it.toDomain() },
-        loadable = loadable,
+fun BookmarkContentsResponse.toDomain(): Page<BookmarkContent> =
+    Page(
+        items = contents.map { it.toDomain() },
+        hasNext = loadable,
     )
 
 fun BookmarkContentResponse.toDomain(): BookmarkContent =

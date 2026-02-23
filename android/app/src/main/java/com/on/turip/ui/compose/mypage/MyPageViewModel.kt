@@ -7,8 +7,9 @@ import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
 import com.on.turip.domain.accounts.Account
 import com.on.turip.domain.accounts.AccountRepository
-import com.on.turip.domain.bookmark.PagedBookmarkContents
+import com.on.turip.domain.bookmark.BookmarkContent
 import com.on.turip.domain.bookmark.repository.BookmarkRepository
+import com.on.turip.domain.common.paging.Page
 import com.on.turip.domain.login.MemberRepository
 import com.on.turip.domain.setting.PrivacyPolicy
 import com.on.turip.domain.userstorage.repository.UserStorageRepository
@@ -18,6 +19,7 @@ import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.compose.mypage.model.InquiryMail
 import com.on.turip.ui.compose.mypage.util.AppEnvironmentInfoProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -30,7 +32,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import timber.log.Timber
-import javax.inject.Inject
 
 @HiltViewModel
 class MyPageViewModel @Inject constructor(
@@ -74,10 +75,10 @@ class MyPageViewModel @Inject constructor(
 
             bookmarkRepository
                 .loadBookmarks(10, 0L)
-                .onSuccess { result: PagedBookmarkContents ->
+                .onSuccess { result: Page<BookmarkContent> ->
                     Timber.d("마이페이지 북마크 목록 조회 성공")
                     _uiState.update {
-                        it.copy(bookmarkContentState = MyPageSectionState.Success(result.bookmarkContents.toImmutableList()))
+                        it.copy(bookmarkContentState = MyPageSectionState.Success(result.items.toImmutableList()))
                     }
                 }.onFailure {
                     Timber.e("마이페이지 북마크 목록 조회 에러 발생")
