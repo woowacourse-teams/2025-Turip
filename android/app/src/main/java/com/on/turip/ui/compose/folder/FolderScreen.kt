@@ -38,6 +38,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.common.extensions.showSnackbarWithAction
+import com.on.turip.ui.compose.designsystem.component.TuripDialog
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.folder.FolderUiEffect
 import com.on.turip.ui.compose.folder.FolderUiState
@@ -71,6 +72,7 @@ fun MyTuripScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val resource = LocalResources.current
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var dialogState: Boolean by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
@@ -109,7 +111,10 @@ fun MyTuripScreen(
     MyTuripScreenContent(
         turips = uiState.turips,
         onTuripClick = onNavigateToTuripPlace,
-        onTuripDelete = viewModel::deleteTurip,
+        onTuripDelete = { id: Long ->
+            viewModel.updateDeleteTuripId(id)
+            dialogState = true
+        },
         onAddClick = viewModel::showAddBottomSheet,
         modifier = modifier,
     )
@@ -121,6 +126,24 @@ fun MyTuripScreen(
             onNameChanged = viewModel::updateTuripName,
             onConfirmClick = viewModel::addTurip,
             onDismiss = viewModel::dismissAddBottomSheet,
+        )
+    }
+
+    if (dialogState) {
+        val deletedTuripName: String? = uiState.turips.find { it.id == uiState.deletedTuripId }?.name
+        TuripDialog(
+            title = "폴더 삭제",
+            message = "정말 ${deletedTuripName}폴더를 삭제 하시겠습니까?",
+            confirmText = "삭제",
+            dismissText = "취소",
+            confirmButtonColor = TuripTheme.colors.error,
+            dismissButtonColor = TuripTheme.colors.gray02,
+            onConfirmation = {
+                viewModel.deleteTurip(uiState.deletedTuripId)
+                dialogState = false
+            },
+            onDismissRequest = { dialogState = false },
+            modifier = Modifier.fillMaxSize(),
         )
     }
 }

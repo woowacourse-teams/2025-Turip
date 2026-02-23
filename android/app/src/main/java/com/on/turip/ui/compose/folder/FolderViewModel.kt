@@ -71,6 +71,14 @@ class FolderViewModel @Inject constructor(
         }
     }
 
+    fun updateDeleteTuripId(id: Long) {
+        _uiState.update {
+            it.copy(
+                deletedTuripId = id,
+            )
+        }
+    }
+
     fun addTurip() {
         val name = _uiState.value.currentTuripName
         viewModelScope.launch {

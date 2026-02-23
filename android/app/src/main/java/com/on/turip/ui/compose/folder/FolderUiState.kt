@@ -13,6 +13,7 @@ data class FolderUiState(
     val showAddBottomSheet: Boolean,
     val turipNameStatus: TuripNameStatusModel,
     val currentTuripName: String,
+    val deletedTuripId: Long,
 ) {
     companion object {
         val Idle =
@@ -23,6 +24,7 @@ data class FolderUiState(
                 showAddBottomSheet = false,
                 turipNameStatus = TuripNameStatusModel.EMPTY,
                 currentTuripName = "",
+                deletedTuripId = -1L,
             )
     }
 }
