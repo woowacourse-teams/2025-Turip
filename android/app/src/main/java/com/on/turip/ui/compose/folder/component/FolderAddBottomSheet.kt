@@ -1,19 +1,21 @@
 package com.on.turip.ui.compose.folder.component
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -25,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
@@ -73,7 +76,7 @@ fun FolderAddBottomSheet(
                         .padding(top = TuripTheme.spacing.medium, bottom = TuripTheme.spacing.huge),
             )
 
-            OutlinedTextField(
+            BasicTextField(
                 value = folderName,
                 onValueChange = { input ->
                     if (input.length <= 20) {
@@ -81,34 +84,45 @@ fun FolderAddBottomSheet(
                         onNameChanged(input)
                     }
                 },
-                placeholder = {
-                    Text(
-                        text = stringResource(R.string.bottom_sheet_turip_add_turip_name_hint),
-                        color = TuripTheme.colors.gray02,
-                        style = TuripTheme.typography.body2,
-                    )
-                },
-                textStyle = TuripTheme.typography.body2,
-                singleLine = true,
-                shape = TuripTheme.shape.largeContainer,
-                colors =
-                    OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = TuripTheme.colors.gray04,
-                        unfocusedBorderColor = TuripTheme.colors.gray04,
-                        focusedTextColor = TuripTheme.colors.black,
-                        unfocusedTextColor = TuripTheme.colors.black,
-                        cursorColor = TuripTheme.colors.black,
-                    ),
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                keyboardActions =
-                    KeyboardActions(
-                        onDone = { if (turipNameStatus.isConfirmEnabled) onConfirmClick() },
-                    ),
                 modifier =
                     Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 36.dp)
                         .focusRequester(focusRequester),
+                textStyle = TuripTheme.typography.title3.copy(color = TuripTheme.colors.black),
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                keyboardActions =
+                    KeyboardActions(
+                        onDone = { if (turipNameStatus.isConfirmEnabled) onConfirmClick() },
+                    ),
+                decorationBox = { innerTextField ->
+                    Box(
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .height(40.dp)
+                                .clip(TuripTheme.shape.container)
+                                .border(
+                                    width = 1.dp,
+                                    color = TuripTheme.colors.gray04,
+                                    shape = TuripTheme.shape.container,
+                                ).background(
+                                    color = TuripTheme.colors.white,
+                                    shape = TuripTheme.shape.container,
+                                ).padding(horizontal = 12.dp, vertical = 6.dp),
+                        contentAlignment = Alignment.CenterStart,
+                    ) {
+                        if (folderName.isEmpty()) {
+                            Text(
+                                text = stringResource(R.string.bottom_sheet_turip_add_turip_name_hint),
+                                color = TuripTheme.colors.gray02,
+                                style = TuripTheme.typography.body2,
+                            )
+                        }
+                        innerTextField()
+                    }
+                },
             )
 
             if (turipNameStatus.errorMessage != null) {
@@ -139,7 +153,7 @@ fun FolderAddBottomSheet(
                         .fillMaxWidth()
                         .padding(horizontal = 36.dp)
                         .padding(top = TuripTheme.spacing.extraSmall),
-                contentPadding = PaddingValues(vertical = TuripTheme.spacing.medium),
+                contentPadding = PaddingValues(vertical = TuripTheme.spacing.small),
             ) {
                 Text(
                     text = stringResource(R.string.all_confirm),
