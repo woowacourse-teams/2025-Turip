@@ -19,12 +19,14 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -59,6 +61,7 @@ import com.on.turip.ui.compose.designsystem.component.TuripAppBar
 import com.on.turip.ui.compose.designsystem.component.TuripDialog
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
+import com.on.turip.ui.compose.favorite.component.MoreOptionBottomSheet
 import com.on.turip.ui.compose.trip.model.MapModel
 import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
 import com.on.turip.ui.main.favorite.model.PlaceLatLngUiModel
@@ -68,6 +71,7 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TuripPlaceScreen(
     selectedTuripId: Long,
@@ -83,6 +87,7 @@ fun TuripPlaceScreen(
     val resource = LocalResources.current
     var showLoginSuggestDialog by remember { mutableStateOf(false) }
     val lifecycleOwner = LocalLifecycleOwner.current
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     BackHandler {
         goBack()
@@ -135,6 +140,17 @@ fun TuripPlaceScreen(
         )
     }
 
+    if (uiState.showAddBottomSheet) {
+        MoreOptionBottomSheet(
+            sheetState = sheetState,
+            onDismiss = viewModel::dismissBottomSheet,
+            onRenameClick = {},
+            onShareClick = viewModel::shareTurip,
+            onInviteLinkClick = {},
+            onDeleteClick = {},
+        )
+    }
+
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = TuripTheme.colors.white,
@@ -161,7 +177,7 @@ fun TuripPlaceScreen(
                         },
                         onUpdateTuripPlacesOrder = viewModel::updateTuripPlacesOrder,
                         currentPlaceLatLng = uiState.placesLatLng,
-                        onMoreOption = { viewModel.shareTurip() },
+                        onMoreOption = viewModel::showBottomSheet,
                         selectedTuripName = selectedTuripName,
                         goBack = goBack,
                     )

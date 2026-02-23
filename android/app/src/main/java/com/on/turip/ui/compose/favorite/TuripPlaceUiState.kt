@@ -13,6 +13,7 @@ data class TuripPlaceUiState(
     val selectedTuripId: Long,
     val selectedTuripName: String,
     val errorUiState: ErrorUiState,
+    val showAddBottomSheet: Boolean,
     val places: ImmutableList<TuripPlaceModel>,
     val placesLatLng: ImmutableList<PlaceLatLngUiModel>,
 ) {
@@ -26,6 +27,7 @@ data class TuripPlaceUiState(
                 selectedTuripId = 0L,
                 selectedTuripName = "",
                 errorUiState = ErrorUiState.None,
+                showAddBottomSheet = false,
                 places = persistentListOf(),
                 placesLatLng = persistentListOf(),
             )

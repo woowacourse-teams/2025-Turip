@@ -133,6 +133,16 @@ class TuripPlaceViewModel @Inject constructor(
         }
     }
 
+    fun showBottomSheet() {
+        _uiState.update { it.copy(showAddBottomSheet = true) }
+    }
+
+    fun dismissBottomSheet() {
+        _uiState.update {
+            it.copy(showAddBottomSheet = false)
+        }
+    }
+
     fun updateTuripPlacesOrder(updateTuripPlaces: ImmutableList<TuripPlaceModel>) {
         reorderPlacesSnapshot = uiState.value.places
         _uiState.update { state ->
