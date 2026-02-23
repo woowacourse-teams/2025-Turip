@@ -199,7 +199,7 @@ private fun MyTuripScreenContent(
                             }
                         },
             ) {
-                items(items = filteredTurips, key = { it.id }) { turip ->
+                items(items = filteredTurips, key = { it.id }) { turip: MyTuripModel ->
                     MyTuripCard(
                         turip = turip,
                         isDeleteMode = isDeleteMode,
@@ -215,6 +215,7 @@ private fun MyTuripScreenContent(
                             onTuripDelete(turip.id)
                             if (filteredTurips.size == 1) isDeleteMode = false
                         },
+                        isDefaultFolder = turip.isDefault,
                     )
                 }
             }
@@ -227,9 +228,16 @@ private fun MyTuripScreenContent(
 private fun MyTuripScreenPreview() {
     val allTurips: ImmutableList<MyTuripModel> =
         persistentListOf(
-            MyTuripModel(0L, "수원 여행 계획 튜립", TuripType.TOGETHER, memberCount = 3, placeCount = 2),
-            MyTuripModel(1L, "수원 여행 계획 튜립", TuripType.SOLO, placeCount = 1),
-            MyTuripModel(2L, "수원 여행 계획 튜립", TuripType.SOLO, placeCount = 3),
+            MyTuripModel(
+                0L,
+                "수원 여행 계획 튜립",
+                TuripType.TOGETHER,
+                memberCount = 3,
+                placeCount = 2,
+                isDefault = true,
+            ),
+            MyTuripModel(1L, "수원 여행 계획 튜립", TuripType.SOLO, placeCount = 1, isDefault = false),
+            MyTuripModel(2L, "수원 여행 계획 튜립", TuripType.SOLO, placeCount = 3, isDefault = false),
         )
 
     TuripTheme {

@@ -41,6 +41,7 @@ fun MyTuripCard(
     onTuripClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
     isDeleteMode: Boolean,
+    isDefaultFolder: Boolean,
     onLongPress: (() -> Unit)? = null,
     onDeleteClick: (() -> Unit)? = null,
 ) {
@@ -118,7 +119,7 @@ fun MyTuripCard(
             }
         }
 
-        if (isDeleteMode && onDeleteClick != null) {
+        if (!isDefaultFolder && isDeleteMode && onDeleteClick != null) {
             Box(
                 modifier =
                     Modifier
@@ -202,9 +203,11 @@ private fun MyTuripCardTogetherPreview() {
                     type = TuripType.TOGETHER,
                     memberCount = 3,
                     placeCount = 5,
+                    isDefault = true,
                 ),
             onTuripClick = {},
             isDeleteMode = false,
+            isDefaultFolder = false,
         )
     }
 }
@@ -220,9 +223,11 @@ private fun MyTuripCardSoloPreview() {
                     name = "수원 여행 계획 튜립",
                     type = TuripType.SOLO,
                     placeCount = 3,
+                    isDefault = false,
                 ),
             onTuripClick = {},
             isDeleteMode = false,
+            isDefaultFolder = false,
         )
     }
 }
@@ -239,11 +244,13 @@ private fun MyTuripCardDeletedPreview() {
                     type = TuripType.TOGETHER,
                     memberCount = 3,
                     placeCount = 5,
+                    isDefault = false,
                 ),
             onTuripClick = {},
             onLongPress = {},
             onDeleteClick = {},
             isDeleteMode = true,
+            isDefaultFolder = false,
         )
     }
 }
