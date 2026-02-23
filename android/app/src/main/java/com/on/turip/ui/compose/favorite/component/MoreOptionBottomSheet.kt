@@ -1,7 +1,9 @@
 package com.on.turip.ui.compose.favorite.component
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -15,6 +17,7 @@ import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,79 +29,124 @@ import androidx.compose.ui.unit.dp
 import com.on.turip.R
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 
+@Immutable
+private data class SheetItem(
+    val title: String,
+    val icon: SheetIcon,
+    val color: Color,
+    val onClick: () -> Unit,
+)
+
+@Immutable
+private sealed interface SheetIcon {
+    data class Vector(
+        val imageVector: ImageVector,
+    ) : SheetIcon
+
+    data class Resource(
+        val resId: Int,
+    ) : SheetIcon
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MoreOptionBottomSheet(
     sheetState: SheetState,
     onDismiss: () -> Unit,
+    onRenameClick: () -> Unit,
+    onShareClick: () -> Unit,
+    onInviteLinkClick: () -> Unit,
+    onDeleteClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val items: List<SheetItem> =
+        listOf(
+            SheetItem(
+                title = "이름 변경",
+                icon = SheetIcon.Vector(Icons.Default.Create),
+                color = TuripTheme.colors.black,
+                onClick = onRenameClick,
+            ),
+            SheetItem(
+                title = "텍스트로 공유하기",
+                icon = SheetIcon.Resource(R.drawable.ic_text_area),
+                color = TuripTheme.colors.black,
+                onClick = onShareClick,
+            ),
+            SheetItem(
+                title = "링크로 초대하기",
+                icon = SheetIcon.Resource(R.drawable.ic_people_fill),
+                color = TuripTheme.colors.black,
+                onClick = onInviteLinkClick,
+            ),
+            SheetItem(
+                title = "삭제",
+                icon = SheetIcon.Vector(Icons.Default.Delete),
+                color = TuripTheme.colors.error,
+                onClick = onDeleteClick,
+            ),
+        )
+
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
         containerColor = TuripTheme.colors.white,
     ) {
         Column(modifier = modifier) {
-            SettingItem(imageVector = Icons.Default.Create, "이름 변경")
-            HorizontalDivider(modifier = Modifier.padding(horizontal = TuripTheme.spacing.extraLarge))
-            SettingItem(imageResource = R.drawable.ic_text_area, "텍스트로 공유하기")
-            HorizontalDivider(modifier = Modifier.padding(horizontal = TuripTheme.spacing.extraLarge))
-            SettingItem(imageResource = R.drawable.ic_people_fill, "링크로 초대하기")
-            HorizontalDivider(modifier = Modifier.padding(horizontal = TuripTheme.spacing.extraLarge))
-            SettingItem(imageVector = Icons.Default.Delete, "삭제", color = TuripTheme.colors.error)
+            items.forEachIndexed { index, item ->
+                SheetSettingItem(item = item)
+
+                if (index != items.lastIndex) {
+                    HorizontalDivider(
+                        modifier = Modifier.padding(horizontal = TuripTheme.spacing.extraLarge),
+                    )
+                }
+            }
         }
     }
 }
 
 @Composable
-private fun SettingItem(
-    imageVector: ImageVector,
-    text: String,
+private fun SheetSettingItem(
+    item: SheetItem,
     modifier: Modifier = Modifier,
-    color: Color = TuripTheme.colors.black,
 ) {
-    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
-        Icon(
-            imageVector = imageVector,
-            contentDescription = null,
-            tint = color,
-            modifier =
-                Modifier
-                    .padding(
-                        horizontal = TuripTheme.spacing.extraHuge,
-                        vertical = TuripTheme.spacing.large,
-                    ).size(18.dp),
-        )
-        Text(
-            text = text,
-            style = TuripTheme.typography.title1.copy(fontWeight = FontWeight.Normal),
-            color = color,
-        )
-    }
-}
-
-@Composable
-private fun SettingItem(
-    imageResource: Int,
-    text: String,
-    modifier: Modifier = Modifier,
-    color: Color = TuripTheme.colors.black,
-) {
-    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
-        Icon(
-            painter = painterResource(imageResource),
-            contentDescription = null,
-            tint = color,
-            modifier =
-                Modifier.padding(
+    Row(
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .clickable(onClick = item.onClick)
+                .padding(
                     horizontal = TuripTheme.spacing.extraHuge,
                     vertical = TuripTheme.spacing.large,
                 ),
-        )
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        when (val icon: SheetIcon = item.icon) {
+            is SheetIcon.Vector -> {
+                Icon(
+                    imageVector = icon.imageVector,
+                    contentDescription = null,
+                    tint = item.color,
+                    modifier = Modifier.size(18.dp),
+                )
+            }
+
+            is SheetIcon.Resource -> {
+                Icon(
+                    painter = painterResource(icon.resId),
+                    contentDescription = null,
+                    tint = item.color,
+                    modifier = Modifier.size(18.dp),
+                )
+            }
+        }
+
         Text(
-            text = text,
+            text = item.title,
             style = TuripTheme.typography.title1.copy(fontWeight = FontWeight.Normal),
-            color = color,
+            color = item.color,
+            modifier = Modifier.padding(start = TuripTheme.spacing.large),
         )
     }
 }
@@ -110,6 +158,6 @@ private fun MoreOptionBottomSheetPreview() {
     val sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     TuripTheme {
-        MoreOptionBottomSheet(sheetState, {})
+        MoreOptionBottomSheet(sheetState, {}, {}, {}, {}, {})
     }
 }
