@@ -3,11 +3,10 @@ package com.on.turip.ui.compose.favorite.component
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -20,7 +19,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.on.turip.R
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -36,13 +39,13 @@ fun MoreOptionBottomSheet(
         containerColor = TuripTheme.colors.white,
     ) {
         Column(modifier = modifier) {
-            SettingItem(Icons.Default.Create, "이름 변경")
+            SettingItem(imageVector = Icons.Default.Create, "이름 변경")
             HorizontalDivider(modifier = Modifier.padding(horizontal = TuripTheme.spacing.extraLarge))
-            SettingItem(Icons.Default.AddCircle, "텍스트로 공유하기")
+            SettingItem(imageResource = R.drawable.ic_text_area, "텍스트로 공유하기")
             HorizontalDivider(modifier = Modifier.padding(horizontal = TuripTheme.spacing.extraLarge))
-            SettingItem(Icons.Default.Person, "링크로 초대하기")
+            SettingItem(imageResource = R.drawable.ic_people_fill, "링크로 초대하기")
             HorizontalDivider(modifier = Modifier.padding(horizontal = TuripTheme.spacing.extraLarge))
-            SettingItem(Icons.Default.Delete, "삭제", color = TuripTheme.colors.error)
+            SettingItem(imageVector = Icons.Default.Delete, "삭제", color = TuripTheme.colors.error)
         }
     }
 }
@@ -60,6 +63,33 @@ private fun SettingItem(
             contentDescription = null,
             tint = color,
             modifier =
+                Modifier
+                    .padding(
+                        horizontal = TuripTheme.spacing.extraHuge,
+                        vertical = TuripTheme.spacing.large,
+                    ).size(18.dp),
+        )
+        Text(
+            text = text,
+            style = TuripTheme.typography.title1.copy(fontWeight = FontWeight.Normal),
+            color = color,
+        )
+    }
+}
+
+@Composable
+private fun SettingItem(
+    imageResource: Int,
+    text: String,
+    modifier: Modifier = Modifier,
+    color: Color = TuripTheme.colors.black,
+) {
+    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
+        Icon(
+            painter = painterResource(imageResource),
+            contentDescription = null,
+            tint = color,
+            modifier =
                 Modifier.padding(
                     horizontal = TuripTheme.spacing.extraHuge,
                     vertical = TuripTheme.spacing.large,
@@ -67,7 +97,7 @@ private fun SettingItem(
         )
         Text(
             text = text,
-            style = TuripTheme.typography.title3,
+            style = TuripTheme.typography.title1.copy(fontWeight = FontWeight.Normal),
             color = color,
         )
     }
