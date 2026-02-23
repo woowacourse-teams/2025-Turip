@@ -229,7 +229,8 @@ private fun MyTuripScreenContent(
                         isDeleteMode = isDeleteMode,
                         onTuripClick = { id ->
                             if (isDeleteMode) {
-                                isDeleteMode = false
+                                onTuripDelete(turip.id)
+                                if (filteredTurips.size == 1) isDeleteMode = false
                             } else {
                                 onTuripClick(id, turip.name, turip.isDefault)
                             }

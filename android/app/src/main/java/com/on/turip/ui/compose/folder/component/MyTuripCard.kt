@@ -44,7 +44,6 @@ import androidx.compose.ui.unit.dp
 import com.on.turip.R
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 
-// 원하는 롱프레스 딜레이 (ms) — 이 값만 바꾸면 됨
 private const val LONG_PRESS_DELAY_MS = 800L
 
 @Composable
@@ -64,7 +63,11 @@ fun MyTuripCard(
         Card(
             shape = TuripTheme.shape.largeContainer,
             colors = CardDefaults.cardColors(containerColor = TuripTheme.colors.white),
-            border = BorderStroke(width = 1.dp, color = TuripTheme.colors.border),
+            border =
+                BorderStroke(
+                    width = 1.dp,
+                    color = if (isDeleteMode && !isDefaultFolder) TuripTheme.colors.error else TuripTheme.colors.border,
+                ),
             modifier =
                 Modifier
                     .fillMaxWidth()
