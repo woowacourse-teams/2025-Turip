@@ -88,6 +88,7 @@ fun TuripPlaceScreen(
     var showLoginSuggestDialog by remember { mutableStateOf(false) }
     val lifecycleOwner = LocalLifecycleOwner.current
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var dialogState: Boolean by remember { mutableStateOf(false) }
 
     BackHandler {
         goBack()
@@ -124,7 +125,7 @@ fun TuripPlaceScreen(
                 }
 
                 TuripPlaceUiEffect.TuripDelete -> {
-                    goBack()
+                    dialogState = true
                 }
             }
         }
@@ -144,7 +145,7 @@ fun TuripPlaceScreen(
         )
     }
 
-    if (uiState.showAddBottomSheet) {
+    if (uiState.showBottomSheet) {
         MoreOptionBottomSheet(
             sheetState = sheetState,
             onDismiss = viewModel::dismissBottomSheet,
@@ -152,9 +153,26 @@ fun TuripPlaceScreen(
             onShareClick = viewModel::shareTurip,
             onInviteLinkClick = {},
             onDeleteClick = {
+                dialogState = true
+            },
+        )
+    }
+
+    if (dialogState) {
+        TuripDialog(
+            title = "폴더 삭제",
+            message = "정말 ${selectedTuripName}폴더를 삭제 하시겠습니까?",
+            confirmText = "삭제",
+            dismissText = "취소",
+            confirmButtonColor = TuripTheme.colors.error,
+            dismissButtonColor = TuripTheme.colors.gray02,
+            onConfirmation = {
                 viewModel.deleteTurip(selectedTuripId)
                 viewModel.dismissBottomSheet()
+                goBack()
             },
+            onDismissRequest = { dialogState = false },
+            modifier = Modifier.fillMaxSize(),
         )
     }
 

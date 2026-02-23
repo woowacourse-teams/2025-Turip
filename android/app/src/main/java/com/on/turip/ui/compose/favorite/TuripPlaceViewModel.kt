@@ -134,12 +134,12 @@ class TuripPlaceViewModel @Inject constructor(
     }
 
     fun showBottomSheet() {
-        _uiState.update { it.copy(showAddBottomSheet = true) }
+        _uiState.update { it.copy(showBottomSheet = true) }
     }
 
     fun dismissBottomSheet() {
         _uiState.update {
-            it.copy(showAddBottomSheet = false)
+            it.copy(showBottomSheet = false)
         }
     }
 
