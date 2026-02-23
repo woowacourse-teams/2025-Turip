@@ -233,7 +233,9 @@ class BookmarkContentViewModel @Inject constructor(
 
                 bookmarkRepository
                     .deleteBookmark(contentId)
-                    .onFailure {
+                    .onSuccess {
+                        _uiEffect.send(BookmarkContentUiEffect.BookmarkRemoved)
+                    }.onFailure {
                         _uiEffect.send(BookmarkContentUiEffect.ShowBookmarkRemoveFailed)
                     }
             } finally {

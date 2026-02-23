@@ -1,5 +1,6 @@
 package com.on.turip.ui.bookmarks
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -14,6 +15,8 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class BookmarkContentActivity : AppCompatActivity() {
+    private var hasBookmarkChanges = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -38,9 +41,21 @@ class BookmarkContentActivity : AppCompatActivity() {
                             TripDetailActivity.newIntent(context = this, contentId = contentId)
                         startActivity(intent)
                     },
+                    onBookmarkChanged = {
+                        hasBookmarkChanges = true
+                    },
                 )
             }
         }
+    }
+
+    override fun finish() {
+        val data =
+            Intent().apply {
+                putExtra("BOOKMARK_CONTENT_HAS_BOOKMARK_CHANGES_FLAG", hasBookmarkChanges)
+            }
+        setResult(Activity.RESULT_OK, data)
+        super.finish()
     }
 
     companion object {

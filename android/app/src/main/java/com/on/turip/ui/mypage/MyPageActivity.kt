@@ -1,11 +1,14 @@
 package com.on.turip.ui.mypage
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import com.on.turip.R
@@ -13,6 +16,7 @@ import com.on.turip.ui.bookmarks.BookmarkContentActivity
 import com.on.turip.ui.common.extensions.safeStartActivityWithToast
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.mypage.MyPageScreen
+import com.on.turip.ui.compose.mypage.MyPageViewModel
 import com.on.turip.ui.compose.mypage.model.InquiryMail
 import com.on.turip.ui.login.LoginActivity
 import com.on.turip.ui.trip.TripDetailActivity
@@ -21,6 +25,8 @@ import timber.log.Timber
 
 @AndroidEntryPoint
 class MyPageActivity : AppCompatActivity() {
+    private val viewModel: MyPageViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -30,7 +36,7 @@ class MyPageActivity : AppCompatActivity() {
                 MyPageScreen(
                     navigateToAllBookmarkContents = {
                         val intent = BookmarkContentActivity.newIntent(this)
-                        startActivity(intent)
+                        bookmarkContentLauncher.launch(intent)
                     },
                     navigateToContent = { contentId: Long ->
                         Timber.d("마이페이지 북마크 콘텐츠 클릭(contentId=$contentId)")
@@ -63,10 +69,26 @@ class MyPageActivity : AppCompatActivity() {
                         startActivity(intent)
                         finish()
                     },
+                    viewModel = viewModel,
                 )
             }
         }
     }
+
+    private val bookmarkContentLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode != Activity.RESULT_OK) return@registerForActivityResult
+
+            val changed =
+                result.data?.getBooleanExtra(
+                    "BOOKMARK_CONTENT_HAS_BOOKMARK_CHANGES_FLAG",
+                    false,
+                ) ?: false
+
+            if (changed) {
+                viewModel.loadBookmarkContents()
+            }
+        }
 
     companion object {
         fun newIntent(context: Context): Intent = Intent(context, MyPageActivity::class.java)
