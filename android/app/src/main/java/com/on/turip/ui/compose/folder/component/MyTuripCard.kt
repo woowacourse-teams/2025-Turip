@@ -77,24 +77,35 @@ fun MyTuripCard(
                     ).pointerInput(onLongPress, onTuripClick) {
                         awaitEachGesture {
                             val down = awaitFirstDown(requireUnconsumed = false)
-
                             val press = PressInteraction.Press(down.position)
                             interactionSource.tryEmit(press)
+
+                            val pressStartTime = System.currentTimeMillis()
 
                             val upOrCancel =
                                 withTimeoutOrNull(LONG_PRESS_DELAY_MS) {
                                     waitForUpOrCancellation()
                                 }
 
-                            if (upOrCancel != null) {
-                                interactionSource.tryEmit(PressInteraction.Release(press))
-                                upOrCancel.consume()
-                                onTuripClick(turip.id)
-                            } else {
-                                interactionSource.tryEmit(PressInteraction.Cancel(press))
-                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                onLongPress?.invoke()
-                                waitForUpOrCancellation()
+                            val elapsed: Long = System.currentTimeMillis() - pressStartTime
+
+                            when {
+                                upOrCancel != null -> {
+                                    interactionSource.tryEmit(PressInteraction.Release(press))
+                                    upOrCancel.consume()
+                                    onTuripClick(turip.id)
+                                }
+
+                                elapsed >= LONG_PRESS_DELAY_MS -> {
+                                    interactionSource.tryEmit(PressInteraction.Cancel(press))
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    onLongPress?.invoke()
+                                    waitForUpOrCancellation()
+                                }
+
+                                else -> {
+                                    interactionSource.tryEmit(PressInteraction.Cancel(press))
+                                }
                             }
                         }
                     },
