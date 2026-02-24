@@ -14,7 +14,7 @@ data class MyTuripModel(
         get() =
             when (type) {
                 TuripType.SOLO -> R.drawable.ic_individual_folder
-                TuripType.TOGETHER -> R.drawable.ic_togethet_folder
+                TuripType.TOGETHER -> R.drawable.ic_together_folder
             }
 
     companion object {

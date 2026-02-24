@@ -95,7 +95,8 @@ fun MyTuripCard(
                     .indication(
                         interactionSource = interactionSource,
                         indication = ripple(),
-                    ).pointerInput(onLongPress, onTuripClick) {
+                    )
+                    .pointerInput(onLongPress, onTuripClick) {
                         awaitEachGesture {
                             val down = awaitFirstDown(requireUnconsumed = false)
                             val press = PressInteraction.Press(down.position)
@@ -289,7 +290,7 @@ private fun IconWithCount(
 private fun MyTuripCardTogetherPreview() {
     TuripTheme {
         MyTuripCard(
-            folderImage = R.drawable.ic_togethet_folder,
+            folderImage = R.drawable.ic_together_folder,
             turip =
                 MyTuripModel(
                     id = 0L,
@@ -311,7 +312,7 @@ private fun MyTuripCardTogetherPreview() {
 private fun MyTuripCardSoloPreview() {
     TuripTheme {
         MyTuripCard(
-            folderImage = R.drawable.ic_togethet_folder,
+            folderImage = R.drawable.ic_together_folder,
             turip =
                 MyTuripModel(
                     id = 1L,
