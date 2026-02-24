@@ -2,6 +2,7 @@ package com.on.turip.ui.compose.myturip
 
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,6 +18,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -27,6 +29,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalResources
@@ -36,9 +39,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
+import com.on.turip.R
 import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.common.extensions.showSnackbarWithAction
 import com.on.turip.ui.compose.designsystem.component.TuripDialog
+import com.on.turip.ui.compose.designsystem.component.TuripSnackbarVisuals
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.folder.FolderUiEffect
 import com.on.turip.ui.compose.folder.FolderUiState
@@ -70,7 +75,7 @@ fun MyTuripScreen(
     val uiState: FolderUiState by viewModel.uiState.collectAsStateWithLifecycle()
     val lifecycleOwner = LocalLifecycleOwner.current
     val snackbarHostState = remember { SnackbarHostState() }
-    val resource = LocalResources.current
+    val resources = LocalResources.current
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var dialogState: Boolean by remember { mutableStateOf(false) }
 
@@ -90,19 +95,39 @@ fun MyTuripScreen(
                 is FolderUiEffect.ShowError -> {
                     val uiModel = uiEffect.errorUiState.toUiModel() ?: return@collect
                     snackbarHostState.showSnackbarWithAction(
-                        message = resource.getString(uiModel.titleRes),
-                        actionLabel = resource.getString(uiModel.retryTextRes),
+                        message = resources.getString(uiModel.titleRes),
+                        actionLabel = resources.getString(uiModel.retryTextRes),
                         duration = SnackbarDuration.Long,
                         onAction = { viewModel.handleErrorRetryRequest(uiEffect.retryAction) },
                     )
                 }
 
-                FolderUiEffect.TuripAdded -> {
-                    Unit
+                is FolderUiEffect.TuripAdded -> {
+                    snackbarHostState.showSnackbar(
+                        visuals =
+                            TuripSnackbarVisuals(
+                                message =
+                                    resources.getString(
+                                        R.string.bottom_sheet_turip_add_turip,
+                                        uiEffect.turipName,
+                                    ),
+                                actionLabel = resources.getString(R.string.all_close_description),
+                            ),
+                    )
                 }
 
-                FolderUiEffect.TuripDeleted -> {
-                    Unit
+                is FolderUiEffect.TuripDeleted -> {
+                    snackbarHostState.showSnackbar(
+                        visuals =
+                            TuripSnackbarVisuals(
+                                message =
+                                    resources.getString(
+                                        R.string.bottom_sheet_turip_delete_turip,
+                                        uiEffect.turipName,
+                                    ),
+                                actionLabel = resources.getString(R.string.all_close_description),
+                            ),
+                    )
                 }
             }
         }
@@ -110,6 +135,7 @@ fun MyTuripScreen(
 
     MyTuripScreenContent(
         turips = uiState.turips,
+        snackbarHostState = snackbarHostState,
         onTuripClick = onNavigateToTuripPlace,
         onTuripDelete = { id: Long ->
             viewModel.updateDeleteTuripId(id)
@@ -152,6 +178,7 @@ fun MyTuripScreen(
 @Composable
 private fun MyTuripScreenContent(
     turips: ImmutableList<MyTuripModel>,
+    snackbarHostState: SnackbarHostState,
     onTuripClick: (Long, String, Boolean) -> Unit,
     onTuripDelete: (Long) -> Unit,
     onAddClick: () -> Unit,
@@ -167,90 +194,101 @@ private fun MyTuripScreenContent(
             MyTuripTab.TOGETHER -> turips.filter { it.type == TuripType.TOGETHER }
         }
 
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        containerColor = TuripTheme.colors.white,
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = onAddClick,
-                shape = CircleShape,
-                containerColor = TuripTheme.colors.primary,
-                contentColor = TuripTheme.colors.white,
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = null,
-                )
-            }
-        },
-    ) { innerPadding ->
-        Column(
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-                    .padding(horizontal = TuripTheme.spacing.extraLarge)
-                    .pointerInput(isDeleteMode) {
-                        detectTapGestures {
-                            if (isDeleteMode) isDeleteMode = false
-                        }
-                    },
-        ) {
-            Text(
-                text = "내 튜립",
-                style = TuripTheme.typography.display,
-                color = TuripTheme.colors.black,
-                modifier =
-                    Modifier.padding(
-                        top = TuripTheme.spacing.extraExtraLarge,
-                        bottom = TuripTheme.spacing.large,
-                    ),
-            )
-
-            MyTuripTabRow(
-                selectedTab = selectedTab,
-                onTabSelected = {
-                    selectedTab = it
-                    isDeleteMode = false
-                },
-            )
-
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(TuripTheme.spacing.medium),
+    Box(Modifier.fillMaxSize()) {
+        Scaffold(
+            modifier = modifier.fillMaxSize(),
+            containerColor = TuripTheme.colors.white,
+            contentWindowInsets = WindowInsets(0, 0, 0, 0),
+            floatingActionButton = {
+                FloatingActionButton(
+                    onClick = onAddClick,
+                    shape = CircleShape,
+                    containerColor = TuripTheme.colors.primary,
+                    contentColor = TuripTheme.colors.white,
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = null,
+                    )
+                }
+            },
+        ) { innerPadding ->
+            Column(
                 modifier =
                     Modifier
-                        .fillMaxWidth()
-                        .padding(top = TuripTheme.spacing.large),
-            ) {
-                items(items = filteredTurips, key = { it.id }) { turip: MyTuripModel ->
-                    MyTuripCard(
-                        turip = turip,
-                        isDeleteMode = isDeleteMode,
-                        onTuripClick = { id ->
-                            if (isDeleteMode) {
-                                onTuripDelete(turip.id)
-                                if (filteredTurips.size == 1) isDeleteMode = false
-                            } else {
-                                onTuripClick(id, turip.name, turip.isDefault)
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                        .padding(horizontal = TuripTheme.spacing.extraLarge)
+                        .pointerInput(isDeleteMode) {
+                            detectTapGestures {
+                                if (isDeleteMode) isDeleteMode = false
                             }
                         },
-                        onLongPress = { isDeleteMode = true },
-                        onDeleteClick = {
-                            onTuripDelete(turip.id)
-                            if (filteredTurips.size == 1) isDeleteMode = false
-                        },
-                        isDefaultFolder = turip.isDefault,
-                    )
+            ) {
+                Text(
+                    text = "내 튜립",
+                    style = TuripTheme.typography.display,
+                    color = TuripTheme.colors.black,
+                    modifier =
+                        Modifier.padding(
+                            top = TuripTheme.spacing.extraExtraLarge,
+                            bottom = TuripTheme.spacing.large,
+                        ),
+                )
+
+                MyTuripTabRow(
+                    selectedTab = selectedTab,
+                    onTabSelected = {
+                        selectedTab = it
+                        isDeleteMode = false
+                    },
+                )
+
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(TuripTheme.spacing.medium),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(top = TuripTheme.spacing.large),
+                ) {
+                    items(items = filteredTurips, key = { it.id }) { turip: MyTuripModel ->
+                        MyTuripCard(
+                            turip = turip,
+                            isDeleteMode = isDeleteMode,
+                            onTuripClick = { id ->
+                                if (isDeleteMode) {
+                                    onTuripDelete(turip.id)
+                                    if (filteredTurips.size == 1) isDeleteMode = false
+                                } else {
+                                    onTuripClick(id, turip.name, turip.isDefault)
+                                }
+                            },
+                            onLongPress = { isDeleteMode = true },
+                            onDeleteClick = {
+                                onTuripDelete(turip.id)
+                                if (filteredTurips.size == 1) isDeleteMode = false
+                            },
+                            isDefaultFolder = turip.isDefault,
+                        )
+                    }
                 }
             }
         }
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier =
+                Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = TuripTheme.spacing.extraLarge),
+        )
     }
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun MyTuripScreenPreview() {
+    val snackbarHostState = remember { SnackbarHostState() }
+
     val allTurips: ImmutableList<MyTuripModel> =
         persistentListOf(
             MyTuripModel(
@@ -266,6 +304,6 @@ private fun MyTuripScreenPreview() {
         )
 
     TuripTheme {
-        MyTuripScreenContent(allTurips, { _, _, _ -> }, {}, {})
+        MyTuripScreenContent(allTurips, snackbarHostState, { _, _, _ -> }, {}, {})
     }
 }

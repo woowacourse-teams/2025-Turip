@@ -85,7 +85,7 @@ class FolderViewModel @Inject constructor(
             turipRepository
                 .createTurip(name)
                 .onSuccess {
-                    _uiEffect.send(FolderUiEffect.TuripAdded)
+                    _uiEffect.send(FolderUiEffect.TuripAdded(name))
                     dismissAddBottomSheet()
                     loadTuripFolders()
                 }.onFailure {
@@ -104,6 +104,13 @@ class FolderViewModel @Inject constructor(
             turipRepository
                 .deleteTurip(folderId)
                 .onSuccess {
+                    _uiEffect.send(
+                        FolderUiEffect.TuripDeleted(
+                            uiState.value.turips
+                                .find { it.id == folderId }
+                                ?.name ?: "",
+                        ),
+                    )
                     _uiState.update { state: FolderUiState ->
                         state.copy(
                             isLoading = false,
@@ -112,7 +119,6 @@ class FolderViewModel @Inject constructor(
                         )
                     }
                     Timber.d("튜립 삭제 완료(이름 = )")
-                    _uiEffect.send(FolderUiEffect.TuripDeleted)
                 }.onFailure { errorType: ErrorType ->
                     Timber.e("튜립 삭제 실패(이름 = ")
                 }

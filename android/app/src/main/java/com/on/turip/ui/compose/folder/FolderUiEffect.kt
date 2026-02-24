@@ -5,9 +5,13 @@ import com.on.turip.ui.common.error.ErrorUiState
 sealed interface FolderUiEffect {
     data object NavigateToLogin : FolderUiEffect
 
-    data object TuripAdded : FolderUiEffect
+    data class TuripAdded(
+        val turipName: String,
+    ) : FolderUiEffect
 
-    data object TuripDeleted : FolderUiEffect
+    data class TuripDeleted(
+        val turipName: String,
+    ) : FolderUiEffect
 
     data class ShowError(
         val errorUiState: ErrorUiState,
