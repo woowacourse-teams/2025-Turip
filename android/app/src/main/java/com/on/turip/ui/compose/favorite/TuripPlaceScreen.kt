@@ -62,8 +62,8 @@ import kotlinx.collections.immutable.toImmutableList
 @Composable
 fun TuripPlaceScreen(
     selectedTuripId: Long,
-    onNavigateToLogin: () -> Unit = {},
-    onShareTurip: (TuripShareModel) -> Unit = {},
+    onNavigateToLogin: () -> Unit,
+    onShareTurip: (TuripShareModel) -> Unit,
     onNavigateToMap: () -> Unit,
     goBack: () -> Unit,
     viewModel: TuripPlaceViewModel = hiltViewModel(),
