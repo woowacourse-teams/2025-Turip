@@ -22,18 +22,19 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
@@ -46,6 +47,24 @@ import com.on.turip.R
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 
 private const val LONG_PRESS_DELAY_MS = 800L
+
+@Immutable
+private data class TuripChipModel(
+    val text: String,
+    val backgroundColor: Color,
+    val textColor: Color,
+)
+
+@Immutable
+private sealed interface TuripChipIcon {
+    data class Vector(
+        val imageVector: ImageVector,
+    ) : TuripChipIcon
+
+    data class PainterChipIcon(
+        val painter: Painter,
+    ) : TuripChipIcon
+}
 
 @Composable
 fun MyTuripCard(
@@ -145,12 +164,12 @@ fun MyTuripCard(
                     ) {
                         if (turip.type == TuripType.TOGETHER) {
                             IconWithCount(
-                                imageVector = Icons.Default.Person,
+                                icon = TuripChipIcon.PainterChipIcon(painterResource(R.drawable.ic_people_fill)),
                                 count = turip.memberCount,
                             )
                         }
                         IconWithCount(
-                            imageVector = Icons.Default.LocationOn,
+                            icon = TuripChipIcon.Vector(Icons.Default.LocationOn),
                             count = turip.placeCount,
                         )
                     }
@@ -189,47 +208,75 @@ private fun TuripTypeChip(
     type: TuripType,
     modifier: Modifier = Modifier,
 ) {
-    val (label: String, backgroundColor: Color) =
+    val turipChipModel: TuripChipModel =
         when (type) {
-            TuripType.TOGETHER -> "함께 튜립" to Color(0xFFD4E157)
-            TuripType.SOLO -> "나홀로 튜립" to Color(0xFF90CAF9)
+            TuripType.TOGETHER -> {
+                TuripChipModel(
+                    text = "함께 튜립",
+                    backgroundColor = TuripTheme.colors.chipBackground,
+                    textColor = TuripTheme.colors.gray03,
+                )
+            }
+
+            TuripType.SOLO -> {
+                TuripChipModel(
+                    text = "나홀로 튜립",
+                    backgroundColor = TuripTheme.colors.primary,
+                    textColor = TuripTheme.colors.white,
+                )
+            }
         }
 
     Box(
         modifier =
             modifier
                 .clip(TuripTheme.shape.container)
-                .background(backgroundColor)
+                .background(turipChipModel.backgroundColor)
                 .padding(
                     horizontal = TuripTheme.spacing.small,
                     vertical = TuripTheme.spacing.extraSmall,
                 ),
     ) {
         Text(
-            text = label,
+            text = turipChipModel.text,
             style = TuripTheme.typography.info2,
-            color = TuripTheme.colors.white,
+            color = turipChipModel.textColor,
         )
     }
 }
 
 @Composable
 private fun IconWithCount(
-    imageVector: ImageVector,
+    icon: TuripChipIcon,
     count: Int,
     modifier: Modifier = Modifier,
+    tint: Color = TuripTheme.colors.gray03,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(TuripTheme.spacing.extraSmall),
         modifier = modifier,
     ) {
-        Icon(
-            imageVector = imageVector,
-            contentDescription = null,
-            tint = TuripTheme.colors.gray03,
-            modifier = Modifier.size(16.dp),
-        )
+        when (icon) {
+            is TuripChipIcon.Vector -> {
+                Icon(
+                    imageVector = icon.imageVector,
+                    contentDescription = null,
+                    tint = tint,
+                    modifier = Modifier.size(16.dp),
+                )
+            }
+
+            is TuripChipIcon.PainterChipIcon -> {
+                Icon(
+                    painter = icon.painter,
+                    contentDescription = null,
+                    tint = tint,
+                    modifier = Modifier.size(16.dp),
+                )
+            }
+        }
+
         Text(
             text = count.toString(),
             style = TuripTheme.typography.info1,
