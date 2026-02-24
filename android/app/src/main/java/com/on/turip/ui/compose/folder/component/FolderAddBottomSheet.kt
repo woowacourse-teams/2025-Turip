@@ -44,6 +44,7 @@ import com.on.turip.ui.folder.model.TuripNameStatusModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FolderAddBottomSheet(
+    title: String,
     sheetState: SheetState,
     turipNameStatus: TuripNameStatusModel,
     onNameChanged: (String) -> Unit,
@@ -66,7 +67,7 @@ fun FolderAddBottomSheet(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                text = stringResource(R.string.bottom_sheet_turip_add_title),
+                text = title,
                 style = TuripTheme.typography.title2,
                 color = TuripTheme.colors.black,
                 textAlign = TextAlign.Center,
@@ -195,6 +196,7 @@ fun FolderAddBottomSheetStatusPreview(
 
     TuripTheme {
         FolderAddBottomSheet(
+            title = "튜립 추가",
             sheetState = sheetState,
             turipNameStatus = status,
             onNameChanged = {},
