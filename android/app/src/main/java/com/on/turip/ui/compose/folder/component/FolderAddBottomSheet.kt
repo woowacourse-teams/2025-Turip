@@ -59,114 +59,136 @@ fun FolderAddBottomSheet(
         sheetState = sheetState,
         containerColor = TuripTheme.colors.white,
     ) {
-        Column(
+        FolderBottomSheetContent(
+            title = title,
+            folderName = folderName,
+            onFolderNameChange = {
+                folderName = it
+            },
+            turipNameStatus = turipNameStatus,
+            onNameChanged = onNameChanged,
+            onConfirmClick = onConfirmClick,
+            focusRequester = focusRequester,
+        )
+    }
+}
+
+@Composable
+fun FolderBottomSheetContent(
+    title: String,
+    folderName: String,
+    onFolderNameChange: (String) -> Unit,
+    turipNameStatus: TuripNameStatusModel,
+    onNameChanged: (String) -> Unit,
+    onConfirmClick: () -> Unit,
+    focusRequester: FocusRequester,
+) {
+    Column(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(bottom = TuripTheme.spacing.extraLarge),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            text = title,
+            style = TuripTheme.typography.title2,
+            color = TuripTheme.colors.black,
+            textAlign = TextAlign.Center,
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .padding(bottom = TuripTheme.spacing.extraLarge),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Text(
-                text = title,
-                style = TuripTheme.typography.title2,
-                color = TuripTheme.colors.black,
-                textAlign = TextAlign.Center,
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(top = TuripTheme.spacing.medium, bottom = TuripTheme.spacing.huge),
-            )
+                    .padding(top = TuripTheme.spacing.medium, bottom = TuripTheme.spacing.huge),
+        )
 
-            BasicTextField(
-                value = folderName,
-                onValueChange = { input ->
-                    if (input.length <= 20) {
-                        folderName = input
-                        onNameChanged(input)
-                    }
-                },
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 36.dp)
-                        .focusRequester(focusRequester),
-                textStyle = TuripTheme.typography.title3.copy(color = TuripTheme.colors.black),
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                keyboardActions =
-                    KeyboardActions(
-                        onDone = { if (turipNameStatus.isConfirmEnabled) onConfirmClick() },
-                    ),
-                decorationBox = { innerTextField ->
-                    Box(
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .height(40.dp)
-                                .clip(TuripTheme.shape.container)
-                                .border(
-                                    width = 1.dp,
-                                    color = TuripTheme.colors.gray04,
-                                    shape = TuripTheme.shape.container,
-                                ).background(
-                                    color = TuripTheme.colors.white,
-                                    shape = TuripTheme.shape.container,
-                                ).padding(horizontal = 12.dp, vertical = 6.dp),
-                        contentAlignment = Alignment.CenterStart,
-                    ) {
-                        if (folderName.isEmpty()) {
-                            Text(
-                                text = stringResource(R.string.bottom_sheet_turip_add_turip_name_hint),
-                                color = TuripTheme.colors.gray02,
-                                style = TuripTheme.typography.body2,
-                            )
-                        }
-                        innerTextField()
-                    }
-                },
-            )
-
-            if (turipNameStatus.errorMessage != null) {
-                Text(
-                    text = stringResource(turipNameStatus.errorMessage),
-                    color = TuripTheme.colors.error,
-                    style = TuripTheme.typography.info2,
+        BasicTextField(
+            value = folderName,
+            onValueChange = { input ->
+                if (input.length <= 20) {
+                    onFolderNameChange(input)
+                    onNameChanged(input)
+                }
+            },
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 36.dp)
+                    .focusRequester(focusRequester),
+            textStyle = TuripTheme.typography.title3.copy(color = TuripTheme.colors.black),
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            keyboardActions =
+                KeyboardActions(
+                    onDone = { if (turipNameStatus.isConfirmEnabled) onConfirmClick() },
+                ),
+            decorationBox = { innerTextField ->
+                Box(
                     modifier =
                         Modifier
                             .fillMaxWidth()
-                            .padding(start = 40.dp, top = TuripTheme.spacing.small),
-                )
-            } else {
-                Spacer(modifier = Modifier.height(TuripTheme.spacing.small))
-            }
+                            .height(40.dp)
+                            .clip(TuripTheme.shape.container)
+                            .border(
+                                width = 1.dp,
+                                color = TuripTheme.colors.gray04,
+                                shape = TuripTheme.shape.container,
+                            ).background(
+                                color = TuripTheme.colors.white,
+                                shape = TuripTheme.shape.container,
+                            ).padding(horizontal = 12.dp, vertical = 6.dp),
+                    contentAlignment = Alignment.CenterStart,
+                ) {
+                    if (folderName.isEmpty()) {
+                        Text(
+                            text = stringResource(R.string.bottom_sheet_turip_add_turip_name_hint),
+                            color = TuripTheme.colors.gray02,
+                            style = TuripTheme.typography.body2,
+                        )
+                    }
+                    innerTextField()
+                }
+            },
+        )
 
-            Button(
-                onClick = onConfirmClick,
-                enabled = turipNameStatus.isConfirmEnabled,
-                shape = TuripTheme.shape.wideButton,
-                colors =
-                    ButtonDefaults.buttonColors(
-                        containerColor = TuripTheme.colors.primary,
-                        disabledContainerColor = TuripTheme.colors.gray02,
-                    ),
+        if (turipNameStatus.errorMessage != null) {
+            Text(
+                text = stringResource(turipNameStatus.errorMessage),
+                color = TuripTheme.colors.error,
+                style = TuripTheme.typography.info2,
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 36.dp)
-                        .padding(top = TuripTheme.spacing.extraSmall),
-                contentPadding = PaddingValues(vertical = TuripTheme.spacing.small),
-            ) {
-                Text(
-                    text = stringResource(R.string.all_confirm),
-                    style = TuripTheme.typography.title3,
-                    color = TuripTheme.colors.white,
-                )
-            }
+                        .padding(start = 40.dp, top = TuripTheme.spacing.small),
+            )
+        } else {
+            Spacer(modifier = Modifier.height(TuripTheme.spacing.small))
         }
 
-        LaunchedEffect(Unit) {
-            focusRequester.requestFocus()
+        Button(
+            onClick = onConfirmClick,
+            enabled = turipNameStatus.isConfirmEnabled,
+            shape = TuripTheme.shape.wideButton,
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = TuripTheme.colors.primary,
+                    disabledContainerColor = TuripTheme.colors.gray02,
+                ),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 36.dp)
+                    .padding(top = TuripTheme.spacing.extraSmall),
+            contentPadding = PaddingValues(vertical = TuripTheme.spacing.small),
+        ) {
+            Text(
+                text = stringResource(R.string.all_confirm),
+                style = TuripTheme.typography.title3,
+                color = TuripTheme.colors.white,
+            )
         }
+    }
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
     }
 }
 

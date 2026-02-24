@@ -49,7 +49,6 @@ import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.favorite.component.MoreOptionBottomSheet
 import com.on.turip.ui.compose.favorite.component.TuripMapContent
-import com.on.turip.ui.compose.folder.component.FolderAddBottomSheet
 import com.on.turip.ui.compose.trip.model.MapModel
 import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
 import com.on.turip.ui.main.favorite.model.PlaceLatLngUiModel
@@ -75,7 +74,6 @@ fun TuripPlaceScreen(
     var showLoginSuggestDialog by remember { mutableStateOf(false) }
     val lifecycleOwner = LocalLifecycleOwner.current
     val modalBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val editBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var dialogState: Boolean by remember { mutableStateOf(false) }
 
     BackHandler { goBack() }
@@ -121,8 +119,7 @@ fun TuripPlaceScreen(
                 }
 
                 TuripPlaceUiEffect.TuripUpdated -> {
-                    viewModel.dismissMoreOptionBottomSheet()
-                    viewModel.dismissEditBottomSheet()
+                    viewModel.dismissBottomSheet()
                 }
             }
         }
@@ -142,26 +139,19 @@ fun TuripPlaceScreen(
         )
     }
 
-    if (uiState.showMoreOptionBottomSheet) {
+    if (uiState.showBottomSheet) {
         MoreOptionBottomSheet(
             sheetState = modalBottomSheetState,
             isDefault = uiState.selectedTurip.isDefault,
-            onDismiss = viewModel::dismissMoreOptionBottomSheet,
+            onDismiss = { viewModel.dismissBottomSheet() },
             onRenameClick = viewModel::showEditNameBottomSheet,
             onShareClick = viewModel::shareTurip,
             onInviteLinkClick = {},
             onDeleteClick = { dialogState = true },
-        )
-    }
-
-    if (uiState.showEditNameBottomSheet) {
-        FolderAddBottomSheet(
-            title = stringResource(id = R.string.bottom_sheet_turip_modify_title),
-            sheetState = editBottomSheetState,
+            screenMode = uiState.screenMode,
             turipNameStatus = uiState.turipNameStatus,
             onNameChanged = viewModel::updateInputName,
             onConfirmClick = viewModel::updateTuripName,
-            onDismiss = viewModel::dismissEditBottomSheet,
         )
     }
 
@@ -175,7 +165,7 @@ fun TuripPlaceScreen(
             dismissButtonColor = TuripTheme.colors.gray02,
             onConfirmation = {
                 viewModel.deleteTurip(selectedTuripId)
-                viewModel.dismissMoreOptionBottomSheet()
+                viewModel.dismissBottomSheet()
                 goBack()
             },
             onDismissRequest = { dialogState = false },

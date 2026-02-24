@@ -150,7 +150,7 @@ class TuripPlaceViewModel @Inject constructor(
     }
 
     fun showEditNameBottomSheet() {
-        _uiState.update { it.copy(showEditNameBottomSheet = true) }
+        _uiState.update { it.copy(screenMode = TuripPlaceScreenMode.Edit) }
     }
 
     fun updateInputName(name: String) {
@@ -189,18 +189,12 @@ class TuripPlaceViewModel @Inject constructor(
     }
 
     fun showBottomSheet() {
-        _uiState.update { it.copy(showMoreOptionBottomSheet = true) }
+        _uiState.update { it.copy(showBottomSheet = true) }
     }
 
-    fun dismissMoreOptionBottomSheet() {
+    fun dismissBottomSheet() {
         _uiState.update {
-            it.copy(showMoreOptionBottomSheet = false)
-        }
-    }
-
-    fun dismissEditBottomSheet() {
-        _uiState.update {
-            it.copy(showEditNameBottomSheet = false)
+            it.copy(showBottomSheet = false, screenMode = TuripPlaceScreenMode.MoreOption)
         }
     }
 

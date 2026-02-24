@@ -18,16 +18,25 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.on.turip.R
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
+import com.on.turip.ui.compose.favorite.TuripPlaceScreenMode
+import com.on.turip.ui.compose.folder.component.FolderBottomSheetContent
+import com.on.turip.ui.folder.model.TuripNameStatusModel
 
 @Immutable
 private data class SheetItem(
@@ -51,6 +60,7 @@ private sealed interface SheetIcon {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MoreOptionBottomSheet(
+    screenMode: TuripPlaceScreenMode,
     sheetState: SheetState,
     isDefault: Boolean,
     onDismiss: () -> Unit,
@@ -59,7 +69,13 @@ fun MoreOptionBottomSheet(
     onInviteLinkClick: () -> Unit,
     onDeleteClick: () -> Unit,
     modifier: Modifier = Modifier,
+    turipNameStatus: TuripNameStatusModel,
+    onNameChanged: (String) -> Unit,
+    onConfirmClick: () -> Unit,
 ) {
+    val focusRequester = remember { FocusRequester() }
+    var folderName by remember { mutableStateOf("") }
+
     val items: List<SheetItem> =
         listOf(
             SheetItem(
@@ -87,21 +103,38 @@ fun MoreOptionBottomSheet(
                 onClick = if (isDefault) ({}) else onDeleteClick,
             ),
         )
-
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
         containerColor = TuripTheme.colors.white,
     ) {
-        Column(modifier = modifier) {
-            items.forEachIndexed { index, item ->
-                SheetSettingItem(item = item)
+        when (screenMode) {
+            TuripPlaceScreenMode.MoreOption -> {
+                Column(modifier = modifier) {
+                    items.forEachIndexed { index, item ->
+                        SheetSettingItem(item = item)
 
-                if (index != items.lastIndex) {
-                    HorizontalDivider(
-                        modifier = Modifier.padding(horizontal = TuripTheme.spacing.extraLarge),
-                    )
+                        if (index != items.lastIndex) {
+                            HorizontalDivider(
+                                modifier = Modifier.padding(horizontal = TuripTheme.spacing.extraLarge),
+                            )
+                        }
+                    }
                 }
+            }
+
+            TuripPlaceScreenMode.Edit -> {
+                FolderBottomSheetContent(
+                    title = stringResource(R.string.bottom_sheet_turip_modify_title),
+                    folderName = folderName,
+                    onFolderNameChange = {
+                        folderName = it
+                    },
+                    turipNameStatus = turipNameStatus,
+                    onNameChanged = onNameChanged,
+                    onConfirmClick = onConfirmClick,
+                    focusRequester = focusRequester,
+                )
             }
         }
     }
@@ -154,22 +187,64 @@ private fun SheetSettingItem(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-@Preview(showBackground = true)
-private fun MoreOptionBottomSheetPreview() {
-    val sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+private fun MoreOptionBottomSheetPreviewContent(
+    screenMode: TuripPlaceScreenMode,
+    isDefault: Boolean,
+) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    // Edit 모드에서 사용할 입력 상태 (프리뷰용)
+    var name by remember { mutableStateOf("내 여행 폴더") }
+    var turipNameStatus by remember { mutableStateOf(TuripNameStatusModel.OK) }
 
     TuripTheme {
-        MoreOptionBottomSheet(sheetState, false, {}, {}, {}, {}, {})
+        MoreOptionBottomSheet(
+            screenMode = screenMode,
+            sheetState = sheetState,
+            isDefault = isDefault,
+            onDismiss = {},
+            onRenameClick = {},
+            onShareClick = {},
+            onInviteLinkClick = {},
+            onDeleteClick = {},
+            turipNameStatus = turipNameStatus,
+            onNameChanged = { newName ->
+                name = newName
+                // 프리뷰에서는 간단히 상태만 흉내냄 (원하면 규칙 더 넣어도 됨)
+                turipNameStatus =
+                    if (newName.isBlank()) TuripNameStatusModel.EMPTY else TuripNameStatusModel.OK
+            },
+            onConfirmClick = {},
+        )
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
+@Preview(name = "MoreOption - 일반", showBackground = true)
 @Composable
-@Preview(showBackground = true)
-private fun MoreOptionDefaultBottomSheetPreview() {
-    val sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+private fun MoreOptionBottomSheetPreview_MoreOption() {
+    MoreOptionBottomSheetPreviewContent(
+        screenMode = TuripPlaceScreenMode.MoreOption,
+        isDefault = false,
+    )
+}
 
-    TuripTheme {
-        MoreOptionBottomSheet(sheetState, true, {}, {}, {}, {}, {})
-    }
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(name = "MoreOption - 기본폴더(삭제 비활성)", showBackground = true)
+@Composable
+private fun MoreOptionBottomSheetPreview_MoreOption_Default() {
+    MoreOptionBottomSheetPreviewContent(
+        screenMode = TuripPlaceScreenMode.MoreOption,
+        isDefault = true,
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(name = "Edit", showBackground = true)
+@Composable
+private fun MoreOptionBottomSheetPreview_Edit() {
+    MoreOptionBottomSheetPreviewContent(
+        screenMode = TuripPlaceScreenMode.Edit,
+        isDefault = false,
+    )
 }

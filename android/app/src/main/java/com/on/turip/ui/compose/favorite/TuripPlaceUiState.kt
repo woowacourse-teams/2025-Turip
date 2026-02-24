@@ -15,9 +15,9 @@ data class TuripPlaceUiState(
     val isLoading: Boolean,
     val inputTuripName: String,
     val errorUiState: ErrorUiState,
-    val showMoreOptionBottomSheet: Boolean,
-    val showEditNameBottomSheet: Boolean,
+    val showBottomSheet: Boolean,
     val turipNameStatus: TuripNameStatusModel,
+    val screenMode: TuripPlaceScreenMode,
     val editModels: ImmutableList<TuripEditModel>,
     val selectedTurip: MyTuripModel,
     val places: ImmutableList<TuripPlaceModel>,
@@ -32,13 +32,19 @@ data class TuripPlaceUiState(
                 isLoading = true,
                 inputTuripName = "",
                 errorUiState = ErrorUiState.None,
-                showMoreOptionBottomSheet = false,
-                showEditNameBottomSheet = false,
+                showBottomSheet = false,
                 turipNameStatus = TuripNameStatusModel.EMPTY,
                 selectedTurip = MyTuripModel.Idle,
                 places = persistentListOf(),
                 placesLatLng = persistentListOf(),
                 editModels = persistentListOf(),
+                screenMode = TuripPlaceScreenMode.MoreOption,
             )
     }
+}
+
+sealed interface TuripPlaceScreenMode {
+    data object MoreOption : TuripPlaceScreenMode
+
+    data object Edit : TuripPlaceScreenMode
 }
