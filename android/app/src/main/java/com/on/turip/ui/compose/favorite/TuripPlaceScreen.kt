@@ -157,10 +157,14 @@ fun TuripPlaceScreen(
 
     if (dialogState) {
         TuripDialog(
-            title = "폴더 삭제",
-            message = "정말 ${uiState.selectedTurip.name}폴더를 삭제 하시겠습니까?",
-            confirmText = "삭제",
-            dismissText = "취소",
+            title = stringResource(R.string.bottom_sheet_turip_delete),
+            message =
+                stringResource(
+                    R.string.bottom_sheet_turip_remove_title,
+                    uiState.selectedTurip.name,
+                ),
+            confirmText = stringResource(R.string.bottom_sheet_turip_remove_approve),
+            dismissText = stringResource(R.string.bottom_sheet_turip_remove_cancel),
             confirmButtonColor = TuripTheme.colors.error,
             dismissButtonColor = TuripTheme.colors.gray02,
             onConfirmation = {

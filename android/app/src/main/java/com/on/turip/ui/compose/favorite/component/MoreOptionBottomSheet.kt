@@ -79,25 +79,25 @@ fun MoreOptionBottomSheet(
     val items: List<SheetItem> =
         listOf(
             SheetItem(
-                title = "이름 변경",
+                title = stringResource(R.string.turip_more_option_bottom_sheet_change_name),
                 icon = SheetIcon.Vector(Icons.Default.Create),
                 color = TuripTheme.colors.black,
                 onClick = onRenameClick,
             ),
             SheetItem(
-                title = "텍스트로 공유하기",
+                title = stringResource(R.string.turip_more_option_bottom_sheet_share_by_text),
                 icon = SheetIcon.Resource(R.drawable.ic_text_area),
                 color = TuripTheme.colors.black,
                 onClick = onShareClick,
             ),
             SheetItem(
-                title = "링크로 초대하기",
+                title = stringResource(R.string.turip_more_option_bottom_sheet_invite_by_link),
                 icon = SheetIcon.Resource(R.drawable.ic_people_fill),
                 color = TuripTheme.colors.black,
                 onClick = onInviteLinkClick,
             ),
             SheetItem(
-                title = "삭제",
+                title = stringResource(R.string.turip_more_option_bottom_sheet_delete),
                 icon = SheetIcon.Vector(Icons.Default.Delete),
                 color = if (isDefault) TuripTheme.colors.errorContainer else TuripTheme.colors.error,
                 onClick = if (isDefault) ({}) else onDeleteClick,
@@ -193,7 +193,6 @@ private fun MoreOptionBottomSheetPreviewContent(
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    // Edit 모드에서 사용할 입력 상태 (프리뷰용)
     var name by remember { mutableStateOf("내 여행 폴더") }
     var turipNameStatus by remember { mutableStateOf(TuripNameStatusModel.OK) }
 
@@ -210,7 +209,6 @@ private fun MoreOptionBottomSheetPreviewContent(
             turipNameStatus = turipNameStatus,
             onNameChanged = { newName ->
                 name = newName
-                // 프리뷰에서는 간단히 상태만 흉내냄 (원하면 규칙 더 넣어도 됨)
                 turipNameStatus =
                     if (newName.isBlank()) TuripNameStatusModel.EMPTY else TuripNameStatusModel.OK
             },
