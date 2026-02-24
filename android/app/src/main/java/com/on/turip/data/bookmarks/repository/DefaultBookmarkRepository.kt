@@ -22,4 +22,6 @@ class DefaultBookmarkRepository @Inject constructor(
         size: Int,
         lastId: Long,
     ): TuripResult<Page<BookmarkContent>> = bookmarkRemoteDataSource.getBookmarks(size, lastId).mapCatching { it.toDomain() }
+
+    override suspend fun loadBookmarkCount(): TuripResult<Int> = bookmarkRemoteDataSource.getBookmarkCount().mapCatching { it.count }
 }

@@ -2,6 +2,7 @@ package com.on.turip.data.bookmarks.service
 
 import com.on.turip.data.bookmarks.dto.BookmarkAddRequest
 import com.on.turip.data.bookmarks.dto.BookmarkContentsResponse
+import com.on.turip.data.bookmarks.dto.BookmarkCountResponse
 import de.jensklingenberg.ktorfit.http.Body
 import de.jensklingenberg.ktorfit.http.DELETE
 import de.jensklingenberg.ktorfit.http.GET
@@ -24,4 +25,7 @@ interface BookmarkService {
         @Query("size") size: Int,
         @Query("lastId") lastId: Long,
     ): BookmarkContentsResponse
+
+    @GET("bookmarks/count")
+    suspend fun getBookmarkCount(): BookmarkCountResponse
 }

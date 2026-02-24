@@ -10,6 +10,7 @@ import kotlinx.collections.immutable.persistentListOf
 data class BookmarkContentUiState(
     val isLoading: Boolean,
     val bookmarkContents: PagingState<BookmarkContent>,
+    val totalBookmarkCount: Int?,
     val errorUiState: ErrorUiState,
 ) {
     val isEmpty: Boolean
@@ -26,6 +27,7 @@ data class BookmarkContentUiState(
                         isAppending = false,
                         errorUiState = ErrorUiState.None,
                     ),
+                totalBookmarkCount = null,
                 errorUiState = ErrorUiState.None,
             )
     }

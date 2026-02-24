@@ -13,4 +13,6 @@ interface BookmarkRepository {
         size: Int,
         lastId: Long,
     ): TuripResult<Page<BookmarkContent>>
+
+    suspend fun loadBookmarkCount(): TuripResult<Int>
 }

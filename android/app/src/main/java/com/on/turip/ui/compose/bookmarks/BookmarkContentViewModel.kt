@@ -47,6 +47,15 @@ class BookmarkContentViewModel @Inject constructor(
         loadBookmarkContents(PagingLoadMode.REFRESH)
     }
 
+    private suspend fun loadBookmarkCount() =
+        bookmarkRepository
+            .loadBookmarkCount()
+            .onSuccess { count: Int ->
+                _uiState.update { state -> state.copy(totalBookmarkCount = count) }
+            }.onFailure {
+                _uiState.update { state -> state.copy(totalBookmarkCount = null) }
+            }
+
     fun loadMoreContents() {
         loadBookmarkContents(PagingLoadMode.APPEND)
     }
@@ -85,6 +94,9 @@ class BookmarkContentViewModel @Inject constructor(
                     }
                 }
             }
+
+            // 새로고침할 때만 전체 콘텐츠 수 API 호출
+            if (loadMode == PagingLoadMode.REFRESH) launch { loadBookmarkCount() }
 
             val lastItemId =
                 when (loadMode) {
@@ -234,6 +246,9 @@ class BookmarkContentViewModel @Inject constructor(
                 bookmarkRepository
                     .deleteBookmark(contentId)
                     .onSuccess {
+                        _uiState.update { state ->
+                            state.copy(totalBookmarkCount = state.totalBookmarkCount?.minus(1))
+                        }
                         _uiEffect.send(BookmarkContentUiEffect.BookmarkRemoved)
                     }.onFailure {
                         _uiEffect.send(BookmarkContentUiEffect.ShowBookmarkRemoveFailed)

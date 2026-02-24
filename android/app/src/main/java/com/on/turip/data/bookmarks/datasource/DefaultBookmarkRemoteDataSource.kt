@@ -3,6 +3,7 @@ package com.on.turip.data.bookmarks.datasource
 import com.on.turip.core.result.TuripResult
 import com.on.turip.data.bookmarks.dto.BookmarkAddRequest
 import com.on.turip.data.bookmarks.dto.BookmarkContentsResponse
+import com.on.turip.data.bookmarks.dto.BookmarkCountResponse
 import com.on.turip.data.bookmarks.service.BookmarkService
 import com.on.turip.data.result.safeApiCall
 import kotlinx.coroutines.Dispatchers
@@ -30,5 +31,10 @@ class DefaultBookmarkRemoteDataSource @Inject constructor(
     ): TuripResult<BookmarkContentsResponse> =
         withContext(coroutineContext) {
             safeApiCall { bookmarkService.getBookmarks(size, lastId) }
+        }
+
+    override suspend fun getBookmarkCount(): TuripResult<BookmarkCountResponse> =
+        withContext(coroutineContext) {
+            safeApiCall { bookmarkService.getBookmarkCount() }
         }
 }

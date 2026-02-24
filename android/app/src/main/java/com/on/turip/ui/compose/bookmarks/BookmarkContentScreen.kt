@@ -140,7 +140,7 @@ private fun BookmarkContentContent(
                 BookmarkContentEmpty()
             } else {
                 BookmarkContents(
-                    pagingState = uiState.bookmarkContents,
+                    uiState = uiState,
                     onContentClick = onContentClick,
                     onBookmarkClick = onBookmarkClick,
                     loadMore = loadMoreContents,
@@ -192,11 +192,12 @@ private fun BookmarkContentEmpty() {
 
 @Composable
 private fun BookmarkContents(
-    pagingState: PagingState<BookmarkContent>,
+    uiState: BookmarkContentUiState,
     onContentClick: (contentId: Long) -> Unit,
     onBookmarkClick: (contentId: Long) -> Unit,
     loadMore: () -> Unit,
 ) {
+    val pagingState: PagingState<BookmarkContent> = uiState.bookmarkContents
     val listState = rememberLazyListState()
     val threshold = 1
     val shouldLoadMore by remember {
@@ -224,12 +225,15 @@ private fun BookmarkContents(
             .collect { loadMore() }
     }
 
+    val totalBookmarkCount =
+        if (uiState.totalBookmarkCount != null) {
+            stringResource(R.string.bookmark_content_count, uiState.totalBookmarkCount)
+        } else {
+            stringResource(R.string.bookmark_content_count_fail)
+        }
+
     Text(
-        text =
-            stringResource(
-                R.string.bookmark_content_count,
-                pagingState.items.size,
-            ),
+        text = totalBookmarkCount,
         textAlign = TextAlign.End,
         style = TuripTheme.typography.info2,
         color = TuripTheme.colors.gray03,
@@ -342,6 +346,7 @@ private fun BookmarkContentEmptyPreview() {
                             isAppending = false,
                             errorUiState = ErrorUiState.None,
                         ),
+                    totalBookmarkCount = null,
                     errorUiState = ErrorUiState.None,
                 ),
             onRetryClick = {},
@@ -367,6 +372,7 @@ private fun BookmarkContentErrorPreview() {
                             isAppending = false,
                             errorUiState = ErrorUiState.None,
                         ),
+                    totalBookmarkCount = null,
                     errorUiState = ErrorUiState.Network,
                 ),
             onRetryClick = {},
@@ -408,23 +414,26 @@ private fun BookmarkContentErrorSuccess() {
             ),
         )
     TuripTheme {
-        BookmarkContentContent(
-            uiState =
-                BookmarkContentUiState(
-                    isLoading = false,
-                    bookmarkContents =
-                        PagingState(
-                            items = contents,
-                            hasNext = false,
-                            isAppending = false,
-                            errorUiState = ErrorUiState.None,
-                        ),
-                    errorUiState = ErrorUiState.None,
-                ),
-            onRetryClick = {},
-            onContentClick = {},
-            onBookmarkClick = {},
-            loadMoreContents = {},
-        )
+        Column {
+            BookmarkContentContent(
+                uiState =
+                    BookmarkContentUiState(
+                        isLoading = false,
+                        bookmarkContents =
+                            PagingState(
+                                items = contents,
+                                hasNext = false,
+                                isAppending = false,
+                                errorUiState = ErrorUiState.None,
+                            ),
+                        totalBookmarkCount = 10,
+                        errorUiState = ErrorUiState.None,
+                    ),
+                onRetryClick = {},
+                onContentClick = {},
+                onBookmarkClick = {},
+                loadMoreContents = {},
+            )
+        }
     }
 }
