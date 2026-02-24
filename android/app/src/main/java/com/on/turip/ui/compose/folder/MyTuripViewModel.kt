@@ -26,21 +26,21 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
-class FolderViewModel @Inject constructor(
+class MyTuripViewModel @Inject constructor(
     private val turipRepository: TuripRepository,
 ) : ViewModel() {
-    private val _uiState: MutableStateFlow<FolderUiState> =
-        MutableStateFlow(FolderUiState.Idle)
-    val uiState: StateFlow<FolderUiState> = _uiState.asStateFlow()
+    private val _uiState: MutableStateFlow<MyTuripUiState> =
+        MutableStateFlow(MyTuripUiState.Idle)
+    val uiState: StateFlow<MyTuripUiState> = _uiState.asStateFlow()
 
-    private val _uiEffect: Channel<FolderUiEffect> = Channel(Channel.BUFFERED)
-    val uiEffect: Flow<FolderUiEffect> = _uiEffect.receiveAsFlow()
+    private val _uiEffect: Channel<MyTuripUiEffect> = Channel(Channel.BUFFERED)
+    val uiEffect: Flow<MyTuripUiEffect> = _uiEffect.receiveAsFlow()
 
     fun loadTuripFolders() {
         viewModelScope.launch {
             turipRepository.loadTurips().onSuccess { turips: List<Turip> ->
-                _uiState.update { folderUiState: FolderUiState ->
-                    folderUiState.copy(
+                _uiState.update { myTuripUiState: MyTuripUiState ->
+                    myTuripUiState.copy(
                         turips =
                             turips
                                 .map { it.toUiMyTuripModel() }
@@ -91,14 +91,14 @@ class FolderViewModel @Inject constructor(
             turipRepository
                 .createTurip(name)
                 .onSuccess {
-                    _uiEffect.send(FolderUiEffect.TuripAdded(name))
+                    _uiEffect.send(MyTuripUiEffect.TuripAdded(name))
                     dismissAddBottomSheet()
                     loadTuripFolders()
                 }.onFailure {
                     _uiEffect.send(
-                        FolderUiEffect.ShowError(
+                        MyTuripUiEffect.ShowError(
                             errorUiState = uiState.value.errorUiState,
-                            retryAction = FolderRetryAction.AddFolder(name),
+                            retryAction = MyTuripRetryAction.AddMyTurip(name),
                         ),
                     )
                 }
@@ -111,13 +111,13 @@ class FolderViewModel @Inject constructor(
                 .deleteTurip(folderId)
                 .onSuccess {
                     _uiEffect.send(
-                        FolderUiEffect.TuripDeleted(
+                        MyTuripUiEffect.TuripDeleted(
                             uiState.value.turips
                                 .find { it.id == folderId }
                                 ?.name ?: "",
                         ),
                     )
-                    _uiState.update { state: FolderUiState ->
+                    _uiState.update { state: MyTuripUiState ->
                         state.copy(
                             isLoading = false,
                             errorUiState = ErrorUiState.None,
@@ -131,13 +131,13 @@ class FolderViewModel @Inject constructor(
         }
     }
 
-    fun handleErrorRetryRequest(action: FolderRetryAction) {
+    fun handleErrorRetryRequest(action: MyTuripRetryAction) {
         when (action) {
-            is FolderRetryAction.UpdateFolder -> {
+            is MyTuripRetryAction.UpdateMyTurip -> {
                 loadTuripFolders()
             }
 
-            is FolderRetryAction.AddFolder -> {
+            is MyTuripRetryAction.AddMyTurip -> {
                 _uiState.update { it.copy(inputTuripName = action.name) }
                 addTurip()
             }

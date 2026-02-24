@@ -6,7 +6,7 @@ import com.on.turip.ui.folder.model.TuripNameStatusModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
-data class FolderUiState(
+data class MyTuripUiState(
     val isLoading: Boolean,
     val errorUiState: ErrorUiState,
     val turips: ImmutableList<MyTuripModel>,
@@ -17,7 +17,7 @@ data class FolderUiState(
 ) {
     companion object {
         val Idle =
-            FolderUiState(
+            MyTuripUiState(
                 isLoading = false,
                 errorUiState = ErrorUiState.None,
                 turips = persistentListOf(),

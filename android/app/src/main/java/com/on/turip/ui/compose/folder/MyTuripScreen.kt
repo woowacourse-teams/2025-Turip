@@ -46,9 +46,9 @@ import com.on.turip.ui.common.extensions.showSnackbarWithAction
 import com.on.turip.ui.compose.designsystem.component.TuripDialog
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbarVisuals
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
-import com.on.turip.ui.compose.folder.FolderUiEffect
-import com.on.turip.ui.compose.folder.FolderUiState
-import com.on.turip.ui.compose.folder.FolderViewModel
+import com.on.turip.ui.compose.folder.MyTuripUiEffect
+import com.on.turip.ui.compose.folder.MyTuripUiState
+import com.on.turip.ui.compose.folder.MyTuripViewModel
 import com.on.turip.ui.compose.folder.component.FolderAddBottomSheet
 import com.on.turip.ui.compose.folder.component.MyTuripCard
 import com.on.turip.ui.compose.folder.component.MyTuripModel
@@ -71,9 +71,9 @@ fun MyTuripScreen(
     onNavigateToTuripPlace: (Long) -> Unit,
     onNavigateToLogin: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: FolderViewModel = hiltViewModel(),
+    viewModel: MyTuripViewModel = hiltViewModel(),
 ) {
-    val uiState: FolderUiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState: MyTuripUiState by viewModel.uiState.collectAsStateWithLifecycle()
     val lifecycleOwner = LocalLifecycleOwner.current
     val snackbarHostState = remember { SnackbarHostState() }
     val resources = LocalResources.current
@@ -87,13 +87,13 @@ fun MyTuripScreen(
     }
 
     LaunchedEffect(Unit) {
-        viewModel.uiEffect.collect { uiEffect: FolderUiEffect ->
+        viewModel.uiEffect.collect { uiEffect: MyTuripUiEffect ->
             when (uiEffect) {
-                FolderUiEffect.NavigateToLogin -> {
+                MyTuripUiEffect.NavigateToLogin -> {
                     onNavigateToLogin()
                 }
 
-                is FolderUiEffect.ShowError -> {
+                is MyTuripUiEffect.ShowError -> {
                     val uiModel = uiEffect.errorUiState.toUiModel() ?: return@collect
                     snackbarHostState.showSnackbarWithAction(
                         message = resources.getString(uiModel.titleRes),
@@ -103,7 +103,7 @@ fun MyTuripScreen(
                     )
                 }
 
-                is FolderUiEffect.TuripAdded -> {
+                is MyTuripUiEffect.TuripAdded -> {
                     snackbarHostState.showSnackbar(
                         visuals =
                             TuripSnackbarVisuals(
@@ -117,7 +117,7 @@ fun MyTuripScreen(
                     )
                 }
 
-                is FolderUiEffect.TuripDeleted -> {
+                is MyTuripUiEffect.TuripDeleted -> {
                     snackbarHostState.showSnackbar(
                         visuals =
                             TuripSnackbarVisuals(
