@@ -19,6 +19,7 @@ import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
 import turip.content.service.ContentPlaceService;
 import turip.favorite.controller.dto.request.FavoriteContentRequest;
+import turip.favorite.controller.dto.response.FavoriteContentCountResponse;
 import turip.favorite.controller.dto.response.FavoriteContentResponse;
 import turip.favorite.domain.FavoriteContent;
 import turip.favorite.repository.FavoriteContentRepository;
@@ -62,6 +63,11 @@ public class FavoriteContentService {
 
     public boolean existsByAccount(Account account) {
         return favoriteContentRepository.existsByAccount(account);
+    }
+
+    public FavoriteContentCountResponse countByAccount(Account account) {
+        int count = favoriteContentRepository.countByAccount(account);
+        return FavoriteContentCountResponse.from(count);
     }
 
     @Transactional

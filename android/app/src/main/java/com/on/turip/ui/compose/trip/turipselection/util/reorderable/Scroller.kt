@@ -1,4 +1,4 @@
-package com.on.turip.ui.compose.turip.selection.util.reorderable
+package com.on.turip.ui.compose.trip.turipselection.util.reorderable
 
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
@@ -9,8 +9,8 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
-import com.on.turip.ui.compose.turip.selection.util.reorderable.Scroller.Direction.BACKWARD
-import com.on.turip.ui.compose.turip.selection.util.reorderable.Scroller.Direction.FORWARD
+import com.on.turip.ui.compose.trip.turipselection.util.reorderable.Scroller.Direction.BACKWARD
+import com.on.turip.ui.compose.trip.turipselection.util.reorderable.Scroller.Direction.FORWARD
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
