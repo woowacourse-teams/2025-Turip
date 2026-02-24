@@ -20,7 +20,9 @@ class BookmarkContentActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
+        hasBookmarkChanges =
+            savedInstanceState?.getBoolean(EXTRA_BOOKMARK_CONTENT_HAS_BOOKMARK_CHANGES, false)
+                ?: false
         setContent {
             TuripTheme {
                 BookmarkContentScreen(
@@ -49,16 +51,24 @@ class BookmarkContentActivity : AppCompatActivity() {
         }
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean(EXTRA_BOOKMARK_CONTENT_HAS_BOOKMARK_CHANGES, hasBookmarkChanges)
+    }
+
     override fun finish() {
         val data =
             Intent().apply {
-                putExtra("BOOKMARK_CONTENT_HAS_BOOKMARK_CHANGES_FLAG", hasBookmarkChanges)
+                putExtra(EXTRA_BOOKMARK_CONTENT_HAS_BOOKMARK_CHANGES, hasBookmarkChanges)
             }
         setResult(Activity.RESULT_OK, data)
         super.finish()
     }
 
     companion object {
+        const val EXTRA_BOOKMARK_CONTENT_HAS_BOOKMARK_CHANGES =
+            "com.on.turip.ui.bookmarks.BOOKMARK_CHANGES"
+
         fun newIntent(context: Context): Intent = Intent(context, BookmarkContentActivity::class.java)
     }
 }

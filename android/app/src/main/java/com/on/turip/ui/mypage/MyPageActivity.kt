@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import com.on.turip.R
 import com.on.turip.ui.bookmarks.BookmarkContentActivity
+import com.on.turip.ui.bookmarks.BookmarkContentActivity.Companion.EXTRA_BOOKMARK_CONTENT_HAS_BOOKMARK_CHANGES
 import com.on.turip.ui.common.extensions.safeStartActivityWithToast
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.mypage.MyPageScreen
@@ -49,9 +50,11 @@ class MyPageActivity : AppCompatActivity() {
                             "mailto:${InquiryMail.RECIPIENT}?subject=${Uri.encode(InquiryMail.TITLE)}&body=${
                                 Uri.encode(mail.content)
                             }".toUri()
-
                         val intent: Intent = Intent(Intent.ACTION_SENDTO).apply { data = uri }
-                        startActivity(intent)
+                        safeStartActivityWithToast(
+                            intent = intent,
+                            errorToastMessage = getString(R.string.all_snackbar_not_found_inquiry_url),
+                        )
                     },
                     navigateToPrivacyPolicy = { url: String ->
                         val intent = Intent(Intent.ACTION_VIEW, url.toUri())
@@ -80,10 +83,8 @@ class MyPageActivity : AppCompatActivity() {
             if (result.resultCode != Activity.RESULT_OK) return@registerForActivityResult
 
             val changed =
-                result.data?.getBooleanExtra(
-                    "BOOKMARK_CONTENT_HAS_BOOKMARK_CHANGES_FLAG",
-                    false,
-                ) ?: false
+                result.data?.getBooleanExtra(EXTRA_BOOKMARK_CONTENT_HAS_BOOKMARK_CHANGES, false)
+                    ?: false
 
             if (changed) {
                 viewModel.loadBookmarkContents()

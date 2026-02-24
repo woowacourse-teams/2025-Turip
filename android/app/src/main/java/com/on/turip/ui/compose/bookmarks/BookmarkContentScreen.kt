@@ -385,7 +385,7 @@ private fun BookmarkContentErrorPreview() {
 
 @Preview(showBackground = true, name = "정상")
 @Composable
-private fun BookmarkContentErrorSuccess() {
+private fun BookmarkContentSuccessPreview() {
     val contents =
         persistentListOf(
             BookmarkContent(

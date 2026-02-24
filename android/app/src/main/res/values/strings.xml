@@ -21,6 +21,7 @@
     <string name="all_snackbar_not_found_map_url">지도 앱으로 이동에 문제가 발생 했어요</string>
     <string name="all_snackbar_not_found_privacy_policy_url">개인 정보 처리 방침 이동에 문제가 발생 했어요</string>
     <string name="all_snackbar_not_found_video_url">영상 앱으로 이동에 문제가 발생 했어요</string>
+    <string name="all_snackbar_not_found_inquiry_url">문의하기 이동에 문제가 발생 했어요</string>
     <string name="all_share_description">공유 하기</string>
     <string name="all_mascot_description">마스코트</string>
 

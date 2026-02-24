@@ -58,7 +58,7 @@ class BookmarkContentViewModel @Inject constructor(
             // 새로고침할 때만 전체 콘텐츠 수 API 호출
             if (loadMode == PagingLoadMode.REFRESH) launch { loadBookmarkCount() }
 
-            val lastItemId: Long = getLastItemId(loadMode)
+            val lastItemId: Long = getLastItemId(loadMode) ?: return@launch
 
             bookmarkRepository
                 .loadBookmarks(PAGE_SIZE, lastItemId)
@@ -132,8 +132,9 @@ class BookmarkContentViewModel @Inject constructor(
 
             PagingLoadMode.APPEND -> {
                 uiState.value.bookmarkContents.items
-                    .last()
-                    .content.id
+                    .lastOrNull()
+                    ?.content
+                    ?.id
             }
         }
 
