@@ -8,6 +8,7 @@ import com.on.turip.core.result.onSuccess
 import com.on.turip.domain.turip.Turip
 import com.on.turip.domain.turip.repository.TuripRepository
 import com.on.turip.ui.common.error.ErrorUiState
+import com.on.turip.ui.compose.folder.mapper.toEditModel
 import com.on.turip.ui.compose.folder.mapper.toUiModel
 import com.on.turip.ui.folder.model.TuripEditModel
 import com.on.turip.ui.folder.model.TuripNameStatusModel
@@ -61,7 +62,7 @@ class FolderViewModel @Inject constructor(
 
     fun updateInputName(name: String) {
         val editModels: List<TuripEditModel> =
-            _uiState.value.turips.map { TuripEditModel(it.id, it.name, 2) }
+            _uiState.value.turips.map { it.toEditModel() }
         val status = TuripNameStatusModel.of(name, editModels)
         _uiState.update {
             it.copy(

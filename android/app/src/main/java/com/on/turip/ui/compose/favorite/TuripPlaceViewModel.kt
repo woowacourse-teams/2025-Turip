@@ -133,6 +133,26 @@ class TuripPlaceViewModel @Inject constructor(
         }
     }
 
+    fun updateTuripName() {
+        viewModelScope.launch {
+            turipRepository
+                .updateTurip(uiState.value.selectedTuripId, uiState.value.inputTuripName)
+                .onSuccess {
+                    _uiState.update { state: TuripPlaceUiState ->
+                        state.copy(
+                            isLoading = false,
+                            errorUiState = ErrorUiState.None,
+                            selectedTuripName = uiState.value.inputTuripName,
+                            inputTuripName = "",
+                        )
+                    }
+                    _uiEffect.send(TuripPlaceUiEffect.TuripUpdated)
+                }.onFailure { errorType: ErrorType ->
+                    sendErrorEffect(errorType, TuripPlaceRetryAction.TuripNameUpdate)
+                }
+        }
+    }
+
     fun resetUiState() {
         _uiState.update { TuripPlaceUiState.Idle }
     }
@@ -241,6 +261,14 @@ class TuripPlaceViewModel @Inject constructor(
             is TuripPlaceRetryAction.UpdateTuripPlace -> {
                 updateTuripPlace(action.placeId, action.isTuripPlace)
             }
+
+            TuripPlaceRetryAction.TuripDelete -> {
+                deleteTurip(uiState.value.selectedTuripId)
+            }
+
+            TuripPlaceRetryAction.TuripNameUpdate -> {
+                updateTuripName()
+            }
         }
     }
 
@@ -305,6 +333,29 @@ class TuripPlaceViewModel @Inject constructor(
 
     private fun clearReorderSnapshot() {
         reorderPlacesSnapshot = null
+    }
+
+    private suspend fun sendErrorEffect(
+        errorType: ErrorType,
+        retryAction: TuripPlaceRetryAction,
+    ) {
+        _uiState.update { it.copy(isLoading = false) }
+        val uiError: UiError = errorType.toUiError()
+        if (uiError is UiError.Global) {
+            when (uiError) {
+                UiError.Global.Network -> {
+                    _uiEffect.send(TuripPlaceUiEffect.ShowError(ErrorUiState.Network, retryAction))
+                }
+
+                UiError.Global.Server -> {
+                    _uiEffect.send(TuripPlaceUiEffect.ShowError(ErrorUiState.Server, retryAction))
+                }
+
+                UiError.Global.TokenExpired -> {
+                    _uiEffect.send(TuripPlaceUiEffect.NavigateToLogin)
+                }
+            }
+        }
     }
 
     companion object {

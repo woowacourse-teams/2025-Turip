@@ -118,6 +118,9 @@ fun TuripPlaceScreen(
                 TuripPlaceUiEffect.TuripDelete -> {
                     dialogState = true
                 }
+
+                TuripPlaceUiEffect.TuripUpdated -> {
+                }
             }
         }
     }
