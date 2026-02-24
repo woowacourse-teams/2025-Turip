@@ -1,4 +1,4 @@
-package com.on.turip.ui.compose.myturip
+package com.on.turip.ui.compose.folder
 
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -46,9 +46,6 @@ import com.on.turip.ui.common.extensions.showSnackbarWithAction
 import com.on.turip.ui.compose.designsystem.component.TuripDialog
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbarVisuals
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
-import com.on.turip.ui.compose.folder.MyTuripUiEffect
-import com.on.turip.ui.compose.folder.MyTuripUiState
-import com.on.turip.ui.compose.folder.MyTuripViewModel
 import com.on.turip.ui.compose.folder.component.FolderAddBottomSheet
 import com.on.turip.ui.compose.folder.component.MyTuripCard
 import com.on.turip.ui.compose.folder.component.MyTuripModel

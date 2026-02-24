@@ -21,8 +21,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
+import com.on.turip.ui.compose.folder.MyTuripTab
 import com.on.turip.ui.compose.login.util.noRippleClickable
-import com.on.turip.ui.compose.myturip.MyTuripTab
 
 @Composable
 fun MyTuripTabRow(
