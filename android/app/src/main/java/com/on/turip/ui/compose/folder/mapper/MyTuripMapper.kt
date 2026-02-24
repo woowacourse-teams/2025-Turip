@@ -5,7 +5,7 @@ import com.on.turip.ui.compose.folder.component.MyTuripModel
 import com.on.turip.ui.compose.folder.component.TuripType
 import com.on.turip.ui.folder.model.TuripEditModel
 
-fun Turip.toUiModel(): MyTuripModel =
+fun Turip.toUiMyTuripModel(): MyTuripModel =
     MyTuripModel(
         id = id,
         name = name,

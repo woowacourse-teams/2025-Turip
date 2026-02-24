@@ -9,10 +9,12 @@ import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
 import com.on.turip.domain.bookmark.TuripPlace
 import com.on.turip.domain.bookmark.usecase.UpdateTuripPlaceUseCase
+import com.on.turip.domain.turip.Turip
 import com.on.turip.domain.turip.repository.TuripRepository
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
+import com.on.turip.ui.compose.folder.mapper.toUiMyTuripModel
 import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
 import com.on.turip.ui.main.favorite.model.PlaceLatLngUiModel
 import com.on.turip.ui.main.favorite.model.TuripPlaceRetryAction
@@ -48,6 +50,19 @@ class TuripPlaceViewModel @Inject constructor(
     private var deleteTuripPlaceSnapshot: DeleteTuripPlaceSnapshot = DeleteTuripPlaceSnapshot.EMPTY
     private var reorderPlacesSnapshot: ImmutableList<TuripPlaceModel>? = null
 
+    fun loadSelectedTurip(selectedTuripId: Long) {
+        viewModelScope.launch {
+            turipRepository.loadTurip(selectedTuripId).onSuccess { turip: Turip ->
+                _uiState.update { state: TuripPlaceUiState ->
+                    state.copy(
+                        errorUiState = ErrorUiState.None,
+                        selectedTurip = turip.toUiMyTuripModel(),
+                    )
+                }
+            }
+        }
+    }
+
     fun loadPlaces(selectedTuripId: Long) {
         viewModelScope.launch {
             turipRepository
@@ -55,7 +70,6 @@ class TuripPlaceViewModel @Inject constructor(
                 .onSuccess { result: List<TuripPlace> ->
                     _uiState.update { state: TuripPlaceUiState ->
                         state.copy(
-                            selectedTuripId = selectedTuripId,
                             isLoading = false,
                             errorUiState = ErrorUiState.None,
                             places =
@@ -89,10 +103,10 @@ class TuripPlaceViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            updateTuripPlaceUseCase(uiState.value.selectedTuripId, placeId, updatedIsTuripPlace)
+            updateTuripPlaceUseCase(uiState.value.selectedTurip.id, placeId, updatedIsTuripPlace)
                 .onSuccess {
-                    if (updatedIsTuripPlace) loadPlaces(uiState.value.selectedTuripId) else clearDeleteSnapshot()
-                    Timber.d("튜립 내 튜립 장소 상태 업데이트 성공, turipId = ${uiState.value.selectedTuripId} placeId = $placeId")
+                    if (updatedIsTuripPlace) loadPlaces(uiState.value.selectedTurip.id) else clearDeleteSnapshot()
+                    Timber.d("튜립 내 튜립 장소 상태 업데이트 성공, turipId = ${uiState.value.selectedTurip.id} placeId = $placeId")
                 }.onFailure { errorType: ErrorType ->
                     rollbackTuripPlaceDelete(placeId)
                     _uiState.update { it.copy(isLoading = false) }
@@ -127,7 +141,7 @@ class TuripPlaceViewModel @Inject constructor(
                         }
                     }
                     Timber.d(
-                        "튜립 내 튜립 장소 상태 업데이트 실패, turipId = ${uiState.value.selectedTuripId} placeId = $placeId originIsTuripPlace =$isTuripPlace",
+                        "튜립 내 튜립 장소 상태 업데이트 실패, turipId = ${uiState.value.selectedTurip.id} placeId = $placeId originIsTuripPlace =$isTuripPlace",
                     )
                 }
         }
@@ -136,13 +150,13 @@ class TuripPlaceViewModel @Inject constructor(
     fun updateTuripName() {
         viewModelScope.launch {
             turipRepository
-                .updateTurip(uiState.value.selectedTuripId, uiState.value.inputTuripName)
+                .updateTurip(uiState.value.selectedTurip.id, uiState.value.inputTuripName)
                 .onSuccess {
                     _uiState.update { state: TuripPlaceUiState ->
                         state.copy(
                             isLoading = false,
                             errorUiState = ErrorUiState.None,
-                            selectedTuripName = uiState.value.inputTuripName,
+                            selectedTurip = uiState.value.selectedTurip.copy(name = uiState.value.inputTuripName),
                             inputTuripName = "",
                         )
                     }
@@ -199,7 +213,7 @@ class TuripPlaceViewModel @Inject constructor(
         viewModelScope.launch {
             turipRepository
                 .updateTuripPlacesOrder(
-                    turipId = uiState.value.selectedTuripId,
+                    turipId = uiState.value.selectedTurip.id,
                     updatedOrder = updateTuripPlaces.map { it.turipPlaceId },
                 ).onSuccess {
                     clearReorderSnapshot()
@@ -219,7 +233,7 @@ class TuripPlaceViewModel @Inject constructor(
             UserType.MEMBER -> {
                 val turipShareModel =
                     TuripShareModel(
-                        name = uiState.value.selectedTuripName,
+                        name = uiState.value.selectedTurip.name,
                         places = uiState.value.places.map { it.toUiModel() },
                     )
                 viewModelScope.launch {
@@ -263,7 +277,7 @@ class TuripPlaceViewModel @Inject constructor(
             }
 
             TuripPlaceRetryAction.TuripDelete -> {
-                deleteTurip(uiState.value.selectedTuripId)
+                deleteTurip(uiState.value.selectedTurip.id)
             }
 
             TuripPlaceRetryAction.TuripNameUpdate -> {

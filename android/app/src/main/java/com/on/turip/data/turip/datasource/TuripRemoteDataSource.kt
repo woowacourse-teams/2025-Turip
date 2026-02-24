@@ -7,10 +7,13 @@ import com.on.turip.data.turip.dto.TuripPatchRequest
 import com.on.turip.data.turip.dto.TuripPlaceOrderRequest
 import com.on.turip.data.turip.dto.TuripPlacesResponse
 import com.on.turip.data.turip.dto.TuripPostRequest
+import com.on.turip.data.turip.dto.TuripResponse
 import com.on.turip.data.turip.dto.TuripsByPlaceResponse
 import com.on.turip.data.turip.dto.TuripsResponse
 
 interface TuripRemoteDataSource {
+    suspend fun getTurip(turipId: Long): TuripResult<TuripResponse>
+
     suspend fun getTurips(): TuripResult<TuripsResponse>
 
     suspend fun postTurip(turipPostRequest: TuripPostRequest): TuripResult<TuripCreationResponse>

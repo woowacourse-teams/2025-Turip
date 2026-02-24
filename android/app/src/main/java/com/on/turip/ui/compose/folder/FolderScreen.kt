@@ -68,7 +68,7 @@ enum class MyTuripTab(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyTuripScreen(
-    onNavigateToTuripPlace: (Long, String, Boolean) -> Unit,
+    onNavigateToTuripPlace: (Long) -> Unit,
     onNavigateToLogin: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: FolderViewModel = hiltViewModel(),
@@ -181,7 +181,7 @@ fun MyTuripScreen(
 private fun MyTuripScreenContent(
     turips: ImmutableList<MyTuripModel>,
     snackbarHostState: SnackbarHostState,
-    onTuripClick: (Long, String, Boolean) -> Unit,
+    onTuripClick: (Long) -> Unit,
     onTuripDelete: (Long) -> Unit,
     onAddClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -263,7 +263,7 @@ private fun MyTuripScreenContent(
                                     onTuripDelete(turip.id)
                                     if (filteredTurips.size == 1) isDeleteMode = false
                                 } else {
-                                    onTuripClick(id, turip.name, turip.isDefault)
+                                    onTuripClick(id)
                                 }
                             },
                             onLongPress = { isDeleteMode = true },
@@ -307,6 +307,6 @@ private fun MyTuripScreenPreview() {
         )
 
     TuripTheme {
-        MyTuripScreenContent(allTurips, snackbarHostState, { _, _, _ -> }, {}, {})
+        MyTuripScreenContent(allTurips, snackbarHostState, {}, {}, {})
     }
 }

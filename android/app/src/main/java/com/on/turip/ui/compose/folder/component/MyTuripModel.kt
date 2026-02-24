@@ -16,4 +16,9 @@ data class MyTuripModel(
                 TuripType.SOLO -> R.drawable.ic_individual_folder
                 TuripType.TOGETHER -> R.drawable.ic_togethet_folder
             }
+
+    companion object {
+        val Idle: MyTuripModel =
+            MyTuripModel(id = -1L, name = "", type = TuripType.SOLO, isDefault = false)
+    }
 }

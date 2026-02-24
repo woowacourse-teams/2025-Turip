@@ -62,8 +62,6 @@ import kotlinx.collections.immutable.toImmutableList
 @Composable
 fun TuripPlaceScreen(
     selectedTuripId: Long,
-    selectedTuripName: String,
-    isDefault: Boolean,
     onNavigateToLogin: () -> Unit = {},
     onShareTurip: (TuripShareModel) -> Unit = {},
     onNavigateToMap: () -> Unit,
@@ -86,6 +84,7 @@ fun TuripPlaceScreen(
 
     LaunchedEffect(Unit) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            viewModel.loadSelectedTurip(selectedTuripId)
             viewModel.loadPlaces(selectedTuripId)
         }
     }
@@ -142,7 +141,7 @@ fun TuripPlaceScreen(
     if (uiState.showBottomSheet) {
         MoreOptionBottomSheet(
             sheetState = sheetState,
-            isDefault = isDefault,
+            isDefault = uiState.selectedTurip.isDefault,
             onDismiss = viewModel::dismissBottomSheet,
             onRenameClick = {},
             onShareClick = viewModel::shareTurip,
@@ -154,7 +153,7 @@ fun TuripPlaceScreen(
     if (dialogState) {
         TuripDialog(
             title = "폴더 삭제",
-            message = "정말 ${selectedTuripName}폴더를 삭제 하시겠습니까?",
+            message = "정말 ${uiState.selectedTurip.name}폴더를 삭제 하시겠습니까?",
             confirmText = "삭제",
             dismissText = "취소",
             confirmButtonColor = TuripTheme.colors.error,
@@ -182,14 +181,17 @@ fun TuripPlaceScreen(
                 uiState.errorUiState != ErrorUiState.None -> {
                     ErrorContent(
                         errorUiState = uiState.errorUiState,
-                        onRetryClick = { viewModel.loadPlaces(selectedTuripId) },
+                        onRetryClick = {
+                            viewModel.loadSelectedTurip(selectedTuripId)
+                            viewModel.loadPlaces(selectedTuripId)
+                        },
                     )
                 }
 
                 else -> {
                     TuripPlaceContent(
-                        selectedTuripId = selectedTuripId,
-                        selectedTuripName = selectedTuripName,
+                        selectedTuripId = uiState.selectedTurip.id,
+                        selectedTuripName = uiState.selectedTurip.name,
                         turipPlaceModel = uiState.places,
                         navigateToMap = { _: MapModel -> onNavigateToMap() },
                         onClickTuripPlace = { placeId: Long ->

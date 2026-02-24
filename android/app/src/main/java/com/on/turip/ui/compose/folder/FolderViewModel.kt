@@ -9,7 +9,7 @@ import com.on.turip.domain.turip.Turip
 import com.on.turip.domain.turip.repository.TuripRepository
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.compose.folder.mapper.toEditModel
-import com.on.turip.ui.compose.folder.mapper.toUiModel
+import com.on.turip.ui.compose.folder.mapper.toUiMyTuripModel
 import com.on.turip.ui.folder.model.TuripEditModel
 import com.on.turip.ui.folder.model.TuripNameStatusModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -40,7 +40,12 @@ class FolderViewModel @Inject constructor(
         viewModelScope.launch {
             turipRepository.loadTurips().onSuccess { turips: List<Turip> ->
                 _uiState.update { folderUiState: FolderUiState ->
-                    folderUiState.copy(turips = turips.map { it.toUiModel() }.toImmutableList())
+                    folderUiState.copy(
+                        turips =
+                            turips
+                                .map { it.toUiMyTuripModel() }
+                                .toImmutableList(),
+                    )
                 }
             }
         }

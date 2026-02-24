@@ -16,6 +16,9 @@ import javax.inject.Inject
 class DefaultTuripRepository @Inject constructor(
     private val turipRemoteDataSource: TuripRemoteDataSource,
 ) : TuripRepository {
+    override suspend fun loadTurip(turipId: Long): TuripResult<Turip> =
+        turipRemoteDataSource.getTurip(turipId).mapCatching { it.toDomain() }
+
     override suspend fun loadTurips(): TuripResult<List<Turip>> = turipRemoteDataSource.getTurips().mapCatching { it.toDomain() }
 
     override suspend fun createTurip(name: String): TuripResult<Turip> =
