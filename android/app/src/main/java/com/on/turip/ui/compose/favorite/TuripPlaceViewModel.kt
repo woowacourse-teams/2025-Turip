@@ -16,6 +16,8 @@ import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.compose.folder.mapper.toUiMyTuripModel
 import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
+import com.on.turip.ui.folder.model.TuripEditModel
+import com.on.turip.ui.folder.model.TuripNameStatusModel
 import com.on.turip.ui.main.favorite.model.PlaceLatLngUiModel
 import com.on.turip.ui.main.favorite.model.TuripPlaceRetryAction
 import com.on.turip.ui.main.favorite.model.TuripPlaceUiEffect
@@ -147,6 +149,21 @@ class TuripPlaceViewModel @Inject constructor(
         }
     }
 
+    fun showEditNameBottomSheet() {
+        _uiState.update { it.copy(showEditNameBottomSheet = true) }
+    }
+
+    fun updateInputName(name: String) {
+        val editModel: ImmutableList<TuripEditModel> = _uiState.value.editModels
+        val status: TuripNameStatusModel = TuripNameStatusModel.of(name, editModel)
+        _uiState.update {
+            it.copy(
+                inputTuripName = name,
+                turipNameStatus = status,
+            )
+        }
+    }
+
     fun updateTuripName() {
         viewModelScope.launch {
             turipRepository
@@ -172,12 +189,18 @@ class TuripPlaceViewModel @Inject constructor(
     }
 
     fun showBottomSheet() {
-        _uiState.update { it.copy(showBottomSheet = true) }
+        _uiState.update { it.copy(showMoreOptionBottomSheet = true) }
     }
 
-    fun dismissBottomSheet() {
+    fun dismissMoreOptionBottomSheet() {
         _uiState.update {
-            it.copy(showBottomSheet = false)
+            it.copy(showMoreOptionBottomSheet = false)
+        }
+    }
+
+    fun dismissEditBottomSheet() {
+        _uiState.update {
+            it.copy(showEditNameBottomSheet = false)
         }
     }
 
