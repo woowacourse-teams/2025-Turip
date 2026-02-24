@@ -54,18 +54,18 @@ class FolderViewModel @Inject constructor(
             it.copy(
                 showAddBottomSheet = false,
                 turipNameStatus = TuripNameStatusModel.EMPTY,
-                currentTuripName = "",
+                inputTuripName = "",
             )
         }
     }
 
-    fun updateTuripName(name: String) {
+    fun updateInputName(name: String) {
         val editModels: List<TuripEditModel> =
             _uiState.value.turips.map { TuripEditModel(it.id, it.name, 2) }
         val status = TuripNameStatusModel.of(name, editModels)
         _uiState.update {
             it.copy(
-                currentTuripName = name,
+                inputTuripName = name,
                 turipNameStatus = status,
             )
         }
@@ -80,7 +80,7 @@ class FolderViewModel @Inject constructor(
     }
 
     fun addTurip() {
-        val name = _uiState.value.currentTuripName
+        val name = _uiState.value.inputTuripName
         viewModelScope.launch {
             turipRepository
                 .createTurip(name)
@@ -132,7 +132,7 @@ class FolderViewModel @Inject constructor(
             }
 
             is FolderRetryAction.AddFolder -> {
-                _uiState.update { it.copy(currentTuripName = action.name) }
+                _uiState.update { it.copy(inputTuripName = action.name) }
                 addTurip()
             }
         }

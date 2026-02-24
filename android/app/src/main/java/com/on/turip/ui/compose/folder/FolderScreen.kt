@@ -151,7 +151,7 @@ fun MyTuripScreen(
             title = stringResource(R.string.bottom_sheet_turip_add_title),
             sheetState = sheetState,
             turipNameStatus = uiState.turipNameStatus,
-            onNameChanged = viewModel::updateTuripName,
+            onNameChanged = viewModel::updateInputName,
             onConfirmClick = viewModel::addTurip,
             onDismiss = viewModel::dismissAddBottomSheet,
         )

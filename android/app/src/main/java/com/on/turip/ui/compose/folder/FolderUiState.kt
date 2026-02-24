@@ -12,7 +12,7 @@ data class FolderUiState(
     val turips: ImmutableList<MyTuripModel>,
     val showAddBottomSheet: Boolean,
     val turipNameStatus: TuripNameStatusModel,
-    val currentTuripName: String,
+    val inputTuripName: String,
     val deletedTuripId: Long,
 ) {
     companion object {
@@ -23,7 +23,7 @@ data class FolderUiState(
                 turips = persistentListOf(),
                 showAddBottomSheet = false,
                 turipNameStatus = TuripNameStatusModel.EMPTY,
-                currentTuripName = "",
+                inputTuripName = "",
                 deletedTuripId = -1L,
             )
     }
