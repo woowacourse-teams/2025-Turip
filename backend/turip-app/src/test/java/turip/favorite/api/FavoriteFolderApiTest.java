@@ -561,19 +561,7 @@ class FavoriteFolderApiTest {
             Long ownerAccountId = testDataHelper.insertAccount();
             testDataHelper.insertFavoriteFolderAccount(ownerAccountId, favoriteFolderId, AccountRole.OWNER);
 
-            // 로그인하여 accessToken 얻기
-            Map<String, String> loginRequest = new HashMap<>(
-                    Map.of("loginId", "testuser", "loginPassword", "TestPass1!"));
-            String accessToken = RestAssured.given()
-                    .port(port)
-                    .header("device-fid", "testDeviceFid")
-                    .contentType(ContentType.JSON)
-                    .body(loginRequest)
-                    .when().post("/api/v1/auth/login/turip")
-                    .then()
-                    .statusCode(200)
-                    .extract()
-                    .cookie("accessToken");
+            String accessToken = testDataHelper.createAccessToken(accountId);
 
             // when & then
             RestAssured.given()
@@ -597,19 +585,7 @@ class FavoriteFolderApiTest {
             Long memberId = testDataHelper.insertMember(accountId, "test@example.com", false);
             testDataHelper.insertTuripMember(memberId, "testuser", "TestPass1!");
 
-            // 로그인하여 accessToken 얻기
-            Map<String, String> loginRequest = new HashMap<>(
-                    Map.of("loginId", "testuser", "loginPassword", "TestPass1!"));
-            String accessToken = RestAssured.given()
-                    .port(port)
-                    .header("device-fid", "testDeviceFid")
-                    .contentType(ContentType.JSON)
-                    .body(loginRequest)
-                    .when().post("/api/v1/auth/login/turip")
-                    .then()
-                    .statusCode(200)
-                    .extract()
-                    .cookie("accessToken");
+            String accessToken = testDataHelper.createAccessToken(accountId);
 
             // when & then
             RestAssured.given()
@@ -633,19 +609,7 @@ class FavoriteFolderApiTest {
             Long ownerAccountId = testDataHelper.insertAccount();
             testDataHelper.insertFavoriteFolderAccount(ownerAccountId, favoriteFolderId, AccountRole.OWNER);
 
-            // 로그인하여 accessToken 얻기
-            Map<String, String> loginRequest = new HashMap<>(
-                    Map.of("loginId", "testuser", "loginPassword", "TestPass1!"));
-            String accessToken = RestAssured.given()
-                    .port(port)
-                    .header("device-fid", "testDeviceFid")
-                    .contentType(ContentType.JSON)
-                    .body(loginRequest)
-                    .when().post("/api/v1/auth/login/turip")
-                    .then()
-                    .statusCode(200)
-                    .extract()
-                    .cookie("accessToken");
+            String accessToken = testDataHelper.createAccessToken(accountId);
 
             // when & then
             RestAssured.given()
@@ -669,19 +633,7 @@ class FavoriteFolderApiTest {
             Long ownerAccountId = testDataHelper.insertAccount();
             testDataHelper.insertFavoriteFolderAccount(ownerAccountId, favoriteFolderId, AccountRole.OWNER);
 
-            // 로그인하여 accessToken 얻기
-            Map<String, String> loginRequest = new HashMap<>(
-                    Map.of("loginId", "testuser", "loginPassword", "TestPass1!"));
-            String accessToken = RestAssured.given()
-                    .port(port)
-                    .header("device-fid", "testDeviceFid")
-                    .contentType(ContentType.JSON)
-                    .body(loginRequest)
-                    .when().post("/api/v1/auth/login/turip")
-                    .then()
-                    .statusCode(200)
-                    .extract()
-                    .cookie("accessToken");
+            String accessToken = testDataHelper.createAccessToken(accountId);
 
             // when & then
             RestAssured.given()
@@ -714,19 +666,7 @@ class FavoriteFolderApiTest {
             testDataHelper.insertFavoriteFolderAccount(accountId1, favoriteFolderId, AccountRole.OWNER);
             testDataHelper.insertFavoriteFolderAccount(accountId2, favoriteFolderId, AccountRole.MEMBER);
 
-            // 로그인하여 accessToken 얻기
-            Map<String, String> loginRequest = new HashMap<>(
-                    Map.of("loginId", "testuser2", "loginPassword", "TestPass1!"));
-            String accessToken = RestAssured.given()
-                    .port(port)
-                    .header("device-fid", "testDeviceFid")
-                    .contentType(ContentType.JSON)
-                    .body(loginRequest)
-                    .when().post("/api/v1/auth/login/turip")
-                    .then()
-                    .statusCode(200)
-                    .extract()
-                    .cookie("accessToken");
+            String accessToken = testDataHelper.createAccessToken(accountId2);
 
             // when & then
             RestAssured.given()
@@ -750,19 +690,7 @@ class FavoriteFolderApiTest {
             Long favoriteFolderId = testDataHelper.insertFavoriteFolder("함께 튜립", false, true);
             testDataHelper.insertFavoriteFolderAccount(accountId, favoriteFolderId, AccountRole.OWNER);
 
-            // 로그인하여 accessToken 얻기
-            Map<String, String> loginRequest = new HashMap<>(
-                    Map.of("loginId", "testuser", "loginPassword", "TestPass1!"));
-            String accessToken = RestAssured.given()
-                    .port(port)
-                    .header("device-fid", "testDeviceFid")
-                    .contentType(ContentType.JSON)
-                    .body(loginRequest)
-                    .when().post("/api/v1/auth/login/turip")
-                    .then()
-                    .statusCode(200)
-                    .extract()
-                    .cookie("accessToken");
+            String accessToken = testDataHelper.createAccessToken(accountId);
 
             // when & then
             RestAssured.given()
@@ -783,19 +711,7 @@ class FavoriteFolderApiTest {
             Long memberId = testDataHelper.insertMember(accountId, "test@example.com", false);
             testDataHelper.insertTuripMember(memberId, "testuser", "TestPass1!");
 
-            // 로그인하여 accessToken 얻기
-            Map<String, String> loginRequest = new HashMap<>(
-                    Map.of("loginId", "testuser", "loginPassword", "TestPass1!"));
-            String accessToken = RestAssured.given()
-                    .port(port)
-                    .header("device-fid", "testDeviceFid")
-                    .contentType(ContentType.JSON)
-                    .body(loginRequest)
-                    .when().post("/api/v1/auth/login/turip")
-                    .then()
-                    .statusCode(200)
-                    .extract()
-                    .cookie("accessToken");
+            String accessToken = testDataHelper.createAccessToken(accountId);
 
             // when & then
             RestAssured.given()
@@ -818,19 +734,7 @@ class FavoriteFolderApiTest {
             Long favoriteFolderId = testDataHelper.insertFavoriteFolder("개인 폴더", false, false);
             testDataHelper.insertFavoriteFolderAccount(accountId, favoriteFolderId, AccountRole.OWNER);
 
-            // 로그인하여 accessToken 얻기
-            Map<String, String> loginRequest = new HashMap<>(
-                    Map.of("loginId", "testuser", "loginPassword", "TestPass1!"));
-            String accessToken = RestAssured.given()
-                    .port(port)
-                    .header("device-fid", "testDeviceFid")
-                    .contentType(ContentType.JSON)
-                    .body(loginRequest)
-                    .when().post("/api/v1/auth/login/turip")
-                    .then()
-                    .statusCode(200)
-                    .extract()
-                    .cookie("accessToken");
+            String accessToken = testDataHelper.createAccessToken(accountId);
 
             // when & then
             RestAssured.given()
@@ -853,19 +757,7 @@ class FavoriteFolderApiTest {
             Long favoriteFolderId = testDataHelper.insertFavoriteFolder("기본 폴더", true, true);
             testDataHelper.insertFavoriteFolderAccount(accountId, favoriteFolderId, AccountRole.OWNER);
 
-            // 로그인하여 accessToken 얻기
-            Map<String, String> loginRequest = new HashMap<>(
-                    Map.of("loginId", "testuser", "loginPassword", "TestPass1!"));
-            String accessToken = RestAssured.given()
-                    .port(port)
-                    .header("device-fid", "testDeviceFid")
-                    .contentType(ContentType.JSON)
-                    .body(loginRequest)
-                    .when().post("/api/v1/auth/login/turip")
-                    .then()
-                    .statusCode(200)
-                    .extract()
-                    .cookie("accessToken");
+            String accessToken = testDataHelper.createAccessToken(accountId);
 
             // when & then
             RestAssured.given()
