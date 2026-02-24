@@ -24,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -44,6 +45,7 @@ private data class SheetItem(
     val icon: SheetIcon,
     val color: Color,
     val onClick: () -> Unit,
+    val enabled: Boolean = true,
 )
 
 @Immutable
@@ -83,6 +85,7 @@ fun MoreOptionBottomSheet(
                 icon = SheetIcon.Vector(Icons.Default.Create),
                 color = TuripTheme.colors.black,
                 onClick = onRenameClick,
+                enabled = !isDefault,
             ),
             SheetItem(
                 title = stringResource(R.string.turip_more_option_bottom_sheet_share_by_text),
@@ -99,8 +102,9 @@ fun MoreOptionBottomSheet(
             SheetItem(
                 title = stringResource(R.string.turip_more_option_bottom_sheet_delete),
                 icon = SheetIcon.Vector(Icons.Default.Delete),
-                color = if (isDefault) TuripTheme.colors.errorContainer else TuripTheme.colors.error,
-                onClick = if (isDefault) ({}) else onDeleteClick,
+                color = TuripTheme.colors.error,
+                onClick = onDeleteClick,
+                enabled = !isDefault,
             ),
         )
     ModalBottomSheet(
@@ -149,7 +153,8 @@ private fun SheetSettingItem(
         modifier =
             modifier
                 .fillMaxWidth()
-                .clickable(onClick = item.onClick)
+                .clickable(enabled = item.enabled, onClick = item.onClick)
+                .then(if (!item.enabled) Modifier.alpha(0.4f) else Modifier)
                 .padding(
                     horizontal = TuripTheme.spacing.extraHuge,
                     vertical = TuripTheme.spacing.large,
