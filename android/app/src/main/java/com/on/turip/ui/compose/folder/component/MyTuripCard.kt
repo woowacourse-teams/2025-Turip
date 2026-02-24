@@ -1,5 +1,6 @@
 package com.on.turip.ui.compose.folder.component
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -50,6 +51,7 @@ private const val LONG_PRESS_DELAY_MS = 800L
 fun MyTuripCard(
     turip: MyTuripModel,
     onTuripClick: (Long) -> Unit,
+    @DrawableRes folderImage: Int,
     modifier: Modifier = Modifier,
     isDeleteMode: Boolean = false,
     isDefaultFolder: Boolean = false,
@@ -116,7 +118,7 @@ fun MyTuripCard(
                 modifier = Modifier.padding(TuripTheme.spacing.large),
             ) {
                 Image(
-                    painter = painterResource(R.drawable.ic_launcher_background),
+                    painter = painterResource(folderImage),
                     contentDescription = null,
                     modifier =
                         Modifier
@@ -240,6 +242,7 @@ private fun IconWithCount(
 private fun MyTuripCardTogetherPreview() {
     TuripTheme {
         MyTuripCard(
+            folderImage = R.drawable.ic_togethet_folder,
             turip =
                 MyTuripModel(
                     id = 0L,
@@ -261,6 +264,7 @@ private fun MyTuripCardTogetherPreview() {
 private fun MyTuripCardSoloPreview() {
     TuripTheme {
         MyTuripCard(
+            folderImage = R.drawable.ic_togethet_folder,
             turip =
                 MyTuripModel(
                     id = 1L,
@@ -281,6 +285,7 @@ private fun MyTuripCardSoloPreview() {
 private fun MyTuripCardDeletedPreview() {
     TuripTheme {
         MyTuripCard(
+            folderImage = R.drawable.ic_individual_folder,
             turip =
                 MyTuripModel(
                     id = 0L,
