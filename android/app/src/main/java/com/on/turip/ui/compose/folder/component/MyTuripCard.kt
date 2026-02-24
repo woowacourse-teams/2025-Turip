@@ -64,7 +64,7 @@ fun MyTuripCard(
     Box(modifier = modifier) {
         Card(
             shape = TuripTheme.shape.largeContainer,
-            colors = CardDefaults.cardColors(containerColor = TuripTheme.colors.white),
+            colors = CardDefaults.cardColors(containerColor = TuripTheme.colors.container),
             border =
                 BorderStroke(
                     width = 1.dp,
