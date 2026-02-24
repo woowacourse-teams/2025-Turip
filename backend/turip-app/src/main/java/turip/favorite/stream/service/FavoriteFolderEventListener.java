@@ -25,6 +25,11 @@ public class FavoriteFolderEventListener {
             return;
         }
 
+        if (action == ActionType.FOLDER_DELETED) {
+            favoriteFolderStreamService.closeAllEmittersForFolder(folderId);
+            return;
+        }
+
         favoriteFolderStreamService.sendFolderUpdateEvents(folderId, action);
     }
 }

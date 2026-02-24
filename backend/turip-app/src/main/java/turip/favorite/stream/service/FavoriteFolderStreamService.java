@@ -78,6 +78,19 @@ public class FavoriteFolderStreamService {
         );
     }
 
+    public void closeAllEmittersForFolder(Long favoriteFolderId) {
+        Map<String, SseEmitter> folderEmitters = emitters.remove(favoriteFolderId);
+        if (folderEmitters != null) {
+            new ArrayList<>(folderEmitters.values()).forEach(emitter -> {
+                try {
+                    emitter.complete();
+                } catch (Exception e) {
+                    log.warn(SSE_LOG_PREFIX + "Emitter close 실패", e);
+                }
+            });
+        }
+    }
+
     private Map<String, SseEmitter> validateAndGetFolderEmitters(Long favoriteFolderId) {
         Map<String, SseEmitter> folderEmitters = emitters.get(favoriteFolderId);
         if (folderEmitters == null || folderEmitters.isEmpty()) {
