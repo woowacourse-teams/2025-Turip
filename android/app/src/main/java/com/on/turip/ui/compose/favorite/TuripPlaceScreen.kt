@@ -1,20 +1,15 @@
 package com.on.turip.ui.compose.favorite
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -34,7 +29,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -44,13 +38,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.model.LatLngBounds
-import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.MapUiSettings
-import com.google.maps.android.compose.Marker
-import com.google.maps.android.compose.MarkerState
-import com.google.maps.android.compose.rememberCameraPositionState
 import com.on.turip.R
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.toUiModel
@@ -61,6 +48,7 @@ import com.on.turip.ui.compose.designsystem.component.TuripDialog
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.favorite.component.MoreOptionBottomSheet
+import com.on.turip.ui.compose.favorite.component.TuripMapContent
 import com.on.turip.ui.compose.trip.model.MapModel
 import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
 import com.on.turip.ui.main.favorite.model.PlaceLatLngUiModel
@@ -348,92 +336,6 @@ private fun Header(
             }
         },
     )
-}
-
-@Composable
-fun TuripMapContent(
-    selectedTuripId: Long,
-    places: ImmutableList<PlaceLatLngUiModel>,
-    isMapVisible: Boolean,
-    onMapToggle: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val cameraPositionState = rememberCameraPositionState()
-
-    val markerStates: Map<Long, MarkerState> =
-        remember(places) {
-            places.associate { it.placeId to MarkerState(position = it.latLng) }
-        }
-
-    var isInitialized by remember(selectedTuripId) { mutableStateOf(false) }
-
-    LaunchedEffect(places) {
-        if (places.isEmpty()) return@LaunchedEffect
-
-        val update =
-            when (places.size) {
-                1 -> {
-                    CameraUpdateFactory.newLatLngZoom(places.first().latLng, 15f)
-                }
-
-                else -> {
-                    val bounds =
-                        LatLngBounds
-                            .Builder()
-                            .apply { places.forEach { include(it.latLng) } }
-                            .build()
-                    CameraUpdateFactory.newLatLngBounds(bounds, 100)
-                }
-            }
-
-        if (!isInitialized) {
-            cameraPositionState.move(update)
-            isInitialized = true
-        } else {
-            cameraPositionState.animate(update)
-        }
-    }
-
-    val mapHeight by animateDpAsState(
-        targetValue = if (isMapVisible) 260.dp else 0.dp,
-        animationSpec = tween(250),
-    )
-
-    Column(
-        modifier =
-            modifier
-                .clipToBounds(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Box(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .height(mapHeight),
-        ) {
-            if (mapHeight > 0.dp) {
-                GoogleMap(
-                    modifier = Modifier.fillMaxSize(),
-                    cameraPositionState = cameraPositionState,
-                    uiSettings = MapUiSettings(zoomControlsEnabled = true),
-                ) {
-                    places.forEach { place ->
-                        Marker(
-                            state = markerStates[place.placeId] ?: MarkerState(place.latLng),
-                            title = place.name,
-                        )
-                    }
-                }
-            }
-        }
-
-        IconButton(onClick = onMapToggle) {
-            Icon(
-                imageVector = if (isMapVisible) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                contentDescription = null,
-            )
-        }
-    }
 }
 
 @Preview(showBackground = true)
