@@ -47,6 +47,74 @@ class BookmarkContentViewModel @Inject constructor(
         loadBookmarkContents(PagingLoadMode.REFRESH)
     }
 
+    fun loadMoreContents() {
+        loadBookmarkContents(PagingLoadMode.APPEND)
+    }
+
+    private fun loadBookmarkContents(loadMode: PagingLoadMode) {
+        viewModelScope.launch {
+            if (!prepareLoadingState(loadMode)) return@launch
+
+            // 새로고침할 때만 전체 콘텐츠 수 API 호출
+            if (loadMode == PagingLoadMode.REFRESH) launch { loadBookmarkCount() }
+
+            val lastItemId: Long = getLastItemId(loadMode)
+
+            bookmarkRepository
+                .loadBookmarks(PAGE_SIZE, lastItemId)
+                .onSuccess { result: Page<BookmarkContent> ->
+                    Timber.d("북마크 화면 조회 성공 mode =$loadMode")
+                    applyBookmarkContents(loadMode, result)
+                }.onFailure { errorType: ErrorType ->
+                    Timber.e("북마크 화면 에러 loadMode = $loadMode")
+                    val uiError: UiError.Global = errorType.toUiError() as UiError.Global
+                    when (loadMode) {
+                        PagingLoadMode.REFRESH -> applyBookmarkContentsRefreshFailure(uiError)
+                        PagingLoadMode.APPEND -> applyBookmarkContentsAppendFailure(uiError)
+                    }
+                }
+        }
+    }
+
+    private fun prepareLoadingState(loadMode: PagingLoadMode): Boolean {
+        return when (loadMode) {
+            PagingLoadMode.REFRESH -> {
+                _uiState.update { state ->
+                    state.copy(
+                        isLoading = true,
+                        errorUiState = ErrorUiState.None,
+                        bookmarkContents =
+                            state.bookmarkContents.copy(
+                                isAppending = false,
+                                errorUiState = ErrorUiState.None,
+                            ),
+                    )
+                }
+                true
+            }
+
+            PagingLoadMode.APPEND -> {
+                val pagingState = uiState.value.bookmarkContents
+                val canAppend =
+                    pagingState.hasNext && pagingState.items.isNotEmpty() && !pagingState.isAppending
+                if (!canAppend) return false
+
+                _uiState.update { state ->
+                    state.copy(
+                        isLoading = false,
+                        bookmarkContents =
+                            state.bookmarkContents.copy(
+                                isAppending = true,
+                                errorUiState = ErrorUiState.None,
+                            ),
+                        errorUiState = ErrorUiState.None,
+                    )
+                }
+                true
+            }
+        }
+    }
+
     private suspend fun loadBookmarkCount() =
         bookmarkRepository
             .loadBookmarkCount()
@@ -56,158 +124,102 @@ class BookmarkContentViewModel @Inject constructor(
                 _uiState.update { state -> state.copy(totalBookmarkCount = null) }
             }
 
-    fun loadMoreContents() {
-        loadBookmarkContents(PagingLoadMode.APPEND)
+    private fun getLastItemId(loadMode: PagingLoadMode) =
+        when (loadMode) {
+            PagingLoadMode.REFRESH -> {
+                0L
+            }
+
+            PagingLoadMode.APPEND -> {
+                uiState.value.bookmarkContents.items
+                    .last()
+                    .content.id
+            }
+        }
+
+    private fun applyBookmarkContents(
+        loadMode: PagingLoadMode,
+        result: Page<BookmarkContent>,
+    ) {
+        _uiState.update { state ->
+            val newItems =
+                when (loadMode) {
+                    PagingLoadMode.REFRESH -> result.items.toImmutableList()
+                    PagingLoadMode.APPEND -> (state.bookmarkContents.items + result.items).toImmutableList()
+                }
+            state.copy(
+                isLoading = false,
+                bookmarkContents =
+                    PagingState(
+                        items = newItems,
+                        hasNext = result.hasNext,
+                        isAppending = false,
+                        errorUiState = ErrorUiState.None,
+                    ),
+                errorUiState = ErrorUiState.None,
+            )
+        }
     }
 
-    private fun loadBookmarkContents(loadMode: PagingLoadMode) {
-        viewModelScope.launch {
-            when (loadMode) {
-                PagingLoadMode.REFRESH -> {
-                    _uiState.update { state ->
-                        state.copy(
-                            isLoading = true,
-                            errorUiState = ErrorUiState.None,
-                            bookmarkContents =
-                                state.bookmarkContents.copy(
-                                    isAppending = false,
-                                    errorUiState = ErrorUiState.None,
-                                ),
-                        )
-                    }
-                }
-
-                PagingLoadMode.APPEND -> {
-                    val pagingState = uiState.value.bookmarkContents
-                    if (!pagingState.hasNext || pagingState.items.isEmpty() || pagingState.isAppending) return@launch
-
-                    _uiState.update { state ->
-                        state.copy(
-                            isLoading = false,
-                            bookmarkContents =
-                                state.bookmarkContents.copy(
-                                    isAppending = true,
-                                    errorUiState = ErrorUiState.None,
-                                ),
-                            errorUiState = ErrorUiState.None,
-                        )
-                    }
+    private suspend fun applyBookmarkContentsRefreshFailure(uiError: UiError.Global) {
+        when (uiError) {
+            UiError.Global.Network -> {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        errorUiState = ErrorUiState.Network,
+                    )
                 }
             }
 
-            // 새로고침할 때만 전체 콘텐츠 수 API 호출
-            if (loadMode == PagingLoadMode.REFRESH) launch { loadBookmarkCount() }
-
-            val lastItemId =
-                when (loadMode) {
-                    PagingLoadMode.REFRESH -> {
-                        0L
-                    }
-
-                    PagingLoadMode.APPEND -> {
-                        uiState.value.bookmarkContents.items
-                            .last()
-                            .content.id
-                    }
+            UiError.Global.Server -> {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        errorUiState = ErrorUiState.Server,
+                    )
                 }
+            }
 
-            bookmarkRepository
-                .loadBookmarks(PAGE_SIZE, lastItemId)
-                .onSuccess { result: Page<BookmarkContent> ->
-                    Timber.d("북마크 화면 조회 성공 mode =$loadMode")
-                    _uiState.update { state ->
-                        val newItems =
-                            when (loadMode) {
-                                PagingLoadMode.REFRESH -> result.items.toImmutableList()
-                                PagingLoadMode.APPEND -> (state.bookmarkContents.items + result.items).toImmutableList()
-                            }
-                        state.copy(
-                            isLoading = false,
-                            bookmarkContents =
-                                PagingState(
-                                    items = newItems,
-                                    hasNext = result.hasNext,
-                                    isAppending = false,
-                                    errorUiState = ErrorUiState.None,
-                                ),
-                            errorUiState = ErrorUiState.None,
-                        )
-                    }
-                }.onFailure { errorType: ErrorType ->
-                    Timber.e("북마크 화면 에러 loadMode = $loadMode")
-                    when (loadMode) {
-                        PagingLoadMode.REFRESH -> {
-                            val uiError: UiError = errorType.toUiError()
-                            if (uiError is UiError.Global) {
-                                when (uiError) {
-                                    UiError.Global.Network -> {
-                                        _uiState.update {
-                                            it.copy(
-                                                isLoading = false,
-                                                errorUiState = ErrorUiState.Network,
-                                            )
-                                        }
-                                    }
+            UiError.Global.TokenExpired -> {
+                _uiState.update { it.copy(isLoading = false) }
+                _uiEffect.send(BookmarkContentUiEffect.NavigateToLogin)
+            }
+        }
+    }
 
-                                    UiError.Global.Server -> {
-                                        _uiState.update {
-                                            it.copy(
-                                                isLoading = false,
-                                                errorUiState = ErrorUiState.Server,
-                                            )
-                                        }
-                                    }
-
-                                    UiError.Global.TokenExpired -> {
-                                        _uiState.update { it.copy(isLoading = false) }
-                                        _uiEffect.send(BookmarkContentUiEffect.NavigateToLogin)
-                                    }
-                                }
-                            }
-                        }
-
-                        PagingLoadMode.APPEND -> {
-                            val uiError: UiError = errorType.toUiError()
-                            if (uiError is UiError.Global) {
-                                when (uiError) {
-                                    UiError.Global.Network -> {
-                                        _uiState.update {
-                                            it.copy(
-                                                bookmarkContents =
-                                                    it.bookmarkContents.copy(
-                                                        isAppending = false,
-                                                        errorUiState = ErrorUiState.Network,
-                                                    ),
-                                            )
-                                        }
-                                    }
-
-                                    UiError.Global.Server -> {
-                                        _uiState.update {
-                                            it.copy(
-                                                bookmarkContents =
-                                                    it.bookmarkContents.copy(
-                                                        isAppending = false,
-                                                        errorUiState = ErrorUiState.Server,
-                                                    ),
-                                            )
-                                        }
-                                    }
-
-                                    UiError.Global.TokenExpired -> {
-                                        _uiState.update {
-                                            it.copy(
-                                                bookmarkContents =
-                                                    it.bookmarkContents.copy(isAppending = false),
-                                            )
-                                        }
-                                        _uiEffect.send(BookmarkContentUiEffect.NavigateToLogin)
-                                    }
-                                }
-                            }
-                        }
-                    }
+    private suspend fun applyBookmarkContentsAppendFailure(uiError: UiError.Global) {
+        when (uiError) {
+            UiError.Global.Network -> {
+                _uiState.update { state ->
+                    state.copy(
+                        bookmarkContents =
+                            state.bookmarkContents.copy(
+                                isAppending = false,
+                                errorUiState = ErrorUiState.Network,
+                            ),
+                    )
                 }
+            }
+
+            UiError.Global.Server -> {
+                _uiState.update { state ->
+                    state.copy(
+                        bookmarkContents =
+                            state.bookmarkContents.copy(
+                                isAppending = false,
+                                errorUiState = ErrorUiState.Server,
+                            ),
+                    )
+                }
+            }
+
+            UiError.Global.TokenExpired -> {
+                _uiState.update { state ->
+                    state.copy(bookmarkContents = state.bookmarkContents.copy(isAppending = false))
+                }
+                _uiEffect.send(BookmarkContentUiEffect.NavigateToLogin)
+            }
         }
     }
 
