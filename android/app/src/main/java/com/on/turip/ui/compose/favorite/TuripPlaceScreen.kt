@@ -116,6 +116,7 @@ fun TuripPlaceScreen(
 
                 TuripPlaceUiEffect.TuripDelete -> {
                     dialogState = false
+                    goBack()
                 }
 
                 TuripPlaceUiEffect.TuripUpdated -> {
@@ -170,7 +171,6 @@ fun TuripPlaceScreen(
             onConfirmation = {
                 viewModel.deleteTurip(selectedTuripId)
                 viewModel.dismissBottomSheet()
-                goBack()
             },
             onDismissRequest = { dialogState = false },
             modifier = Modifier.fillMaxSize(),
