@@ -56,5 +56,7 @@ public interface FavoriteContentRepository extends JpaRepository<FavoriteContent
 
     boolean existsByAccount(Account account);
 
+    int countByAccount(Account account);
+
     void deleteByAccount(Account account);
 }

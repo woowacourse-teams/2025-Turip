@@ -1,4 +1,4 @@
-package com.on.turip.ui.compose.turip.selection.component
+package com.on.turip.ui.compose.trip.turipselection.component
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
@@ -39,9 +39,9 @@ import androidx.compose.ui.unit.dp
 import com.on.turip.R
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.trip.model.MapModel
-import com.on.turip.ui.compose.turip.selection.model.TuripPlaceModel
-import com.on.turip.ui.compose.turip.selection.util.reorderable.ReorderableItem
-import com.on.turip.ui.compose.turip.selection.util.reorderable.rememberReorderableLazyColumnState
+import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
+import com.on.turip.ui.compose.trip.turipselection.util.reorderable.ReorderableItem
+import com.on.turip.ui.compose.trip.turipselection.util.reorderable.rememberReorderableLazyColumnState
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
@@ -212,8 +212,7 @@ private fun TuripPlaces(
                                 shadowElevation = elevation
                                 shape = reorderableItemShape
                                 clip = true
-                            }
-                            .draggableAfterLongPress(
+                            }.draggableAfterLongPress(
                                 interactionSource = interactionSource,
                             ),
                 )

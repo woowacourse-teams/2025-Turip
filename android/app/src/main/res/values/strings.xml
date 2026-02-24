@@ -88,7 +88,7 @@
     <string name="trip_detail_trip_bookmark_normal">이 여행 저장하기</string>
     <string name="trip_detail_trip_bookmark_select">저장된 여행이에요</string>
     <string name="trip_detail_bookmark_description">컨텐츠 북마크</string>
-    <string name="trip_detail_bottom_sheet_turip_title">내 장소</string>
+    <string name="trip_detail_bottom_sheet_turip_selection_title">튜립 선택</string>
     <string name="trip_detail_bottom_sheet_add_turip_description">튜립 추가</string>
     <string name="trip_detail_bottom_sheet_turip_selection_confirm">완료</string>
     <string name="trip_detail_bottom_sheet_snackbar_place_removed">%s을(를) 튜립에서 제거했어요</string>
