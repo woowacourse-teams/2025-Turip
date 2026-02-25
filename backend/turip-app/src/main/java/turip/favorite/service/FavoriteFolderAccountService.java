@@ -3,6 +3,7 @@ package turip.favorite.service;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import turip.account.domain.Account;
 import turip.account.domain.Member;
@@ -20,7 +21,7 @@ public class FavoriteFolderAccountService {
 
     private final FavoriteFolderAccountRepository favoriteFolderAccountRepository;
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRED)
     public FavoriteFolderAccount save(FavoriteFolder favoriteFolder, Account account, AccountRole accountRole) {
         FavoriteFolderAccount favoriteFolderAccount = new FavoriteFolderAccount(favoriteFolder, account, accountRole);
         return favoriteFolderAccountRepository.save(favoriteFolderAccount);
