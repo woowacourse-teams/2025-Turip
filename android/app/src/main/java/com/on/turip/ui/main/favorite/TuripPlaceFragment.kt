@@ -1,6 +1,7 @@
 package com.on.turip.ui.main.favorite
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,6 +14,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
+import com.on.turip.R
+import com.on.turip.ui.common.extensions.safeStartActivityWithToast
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.favorite.TuripPlaceScreen
 import com.on.turip.ui.compose.folder.MyTuripScreen
@@ -50,7 +53,13 @@ class TuripPlaceFragment : Fragment() {
                                 selectedTuripId = selectedTuripId,
                                 onNavigateToLogin = ::navigateToLoginScreen,
                                 onShareTurip = ::navigateToShareTurip,
-                                onNavigateToMap = {},
+                                onNavigateToMap = { uri: Uri ->
+                                    val intent = Intent(Intent.ACTION_VIEW, uri)
+                                    requireContext().safeStartActivityWithToast(
+                                        intent = intent,
+                                        errorToastMessage = getString(R.string.all_snackbar_not_found_map_url),
+                                    )
+                                },
                                 goBack = {
                                     currentScreen = 0
                                 },
