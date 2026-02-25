@@ -1,5 +1,6 @@
 package com.on.turip.ui.compose.favorite.component
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
@@ -23,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapUiSettings
@@ -32,10 +34,12 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import com.on.turip.ui.main.favorite.model.PlaceLatLngUiModel
 import kotlinx.collections.immutable.ImmutableList
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun TuripMapContent(
     selectedTuripId: Long,
     places: ImmutableList<PlaceLatLngUiModel>,
+    selectedPlace: PlaceLatLngUiModel,
     isMapVisible: Boolean,
     onMapToggle: () -> Unit,
     modifier: Modifier = Modifier,
@@ -48,6 +52,16 @@ fun TuripMapContent(
         }
 
     var isInitialized by remember(selectedTuripId) { mutableStateOf(false) }
+
+    LaunchedEffect(selectedPlace) {
+        cameraPositionState.animate(
+            CameraUpdateFactory.newCameraPosition(
+                CameraPosition(selectedPlace.latLng, 15f, 0f, 0f),
+            ),
+            durationMs = 1000,
+        )
+        markerStates[selectedPlace.placeId]?.showInfoWindow()
+    }
 
     LaunchedEffect(places) {
         if (places.isEmpty()) return@LaunchedEffect

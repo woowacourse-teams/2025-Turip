@@ -38,6 +38,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
+import com.google.android.gms.maps.model.LatLng
 import com.on.turip.R
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.toUiModel
@@ -210,6 +211,8 @@ fun TuripPlaceScreen(
                         currentPlaceLatLng = uiState.placesLatLng,
                         onMoreOption = viewModel::showBottomSheet,
                         goBack = goBack,
+                        selectedPlace = uiState.selectedPlace,
+                        onItemClick = viewModel::updateSelectedPlace,
                     )
                 }
             }
@@ -252,6 +255,8 @@ private fun ErrorContent(
 private fun TuripPlaceContent(
     selectedTuripId: Long,
     selectedTuripName: String,
+    selectedPlace: PlaceLatLngUiModel,
+    onItemClick: (placeId: Long) -> Unit,
     currentPlaceLatLng: ImmutableList<PlaceLatLngUiModel>,
     turipPlaceModel: ImmutableList<TuripPlaceModel>,
     navigateToMap: (map: MapModel) -> Unit,
@@ -284,6 +289,7 @@ private fun TuripPlaceContent(
         if (currentPlaceLatLng.isNotEmpty()) {
             TuripMapContent(
                 selectedTuripId = selectedTuripId,
+                selectedPlace = selectedPlace,
                 places = currentPlaceLatLng,
                 isMapVisible = isMapVisible,
                 onMapToggle = { isMapVisible = !isMapVisible },
@@ -293,6 +299,7 @@ private fun TuripPlaceContent(
 
         TuripDetail(
             places = currentPlaces,
+            onItemClick = onItemClick,
             onMapClick = navigateToMap,
             onTuripPlaceClick = onClickTuripPlace,
             onDragStart = { dragStartPlaces = currentPlaces },
@@ -382,6 +389,13 @@ private fun TuripPlaceScreenPreview() {
             currentPlaceLatLng = persistentListOf(),
             selectedTuripId = -1L,
             goBack = {},
+            selectedPlace =
+                PlaceLatLngUiModel(
+                    placeId = 101L,
+                    name = "안국역",
+                    latLng = LatLng(1.1, 1.1),
+                ),
+            onItemClick = {},
         )
     }
 }

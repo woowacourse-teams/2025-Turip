@@ -8,4 +8,8 @@ data class PlaceLatLngUiModel(
     val placeId: Long,
     val name: String,
     val latLng: LatLng,
-)
+) {
+    companion object {
+        val Idle = PlaceLatLngUiModel(0L, "", LatLng(0.0, 0.0))
+    }
+}

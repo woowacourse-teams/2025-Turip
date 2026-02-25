@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,8 +18,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -48,6 +45,7 @@ import kotlinx.collections.immutable.toPersistentList
 @Composable
 fun TuripDetail(
     places: ImmutableList<TuripPlaceModel>,
+    onItemClick: (placeId: Long) -> Unit,
     onMapClick: (map: MapModel) -> Unit,
     onTuripPlaceClick: (placeId: Long) -> Unit,
     onDragStart: () -> Unit,
@@ -67,6 +65,7 @@ fun TuripDetail(
         if (hasPlaces) {
             TuripPlacesContent(
                 listState = listState,
+                onItemClick = onItemClick,
                 places = places,
                 onMapClick = onMapClick,
                 onTuripPlaceClick = onTuripPlaceClick,
@@ -90,6 +89,7 @@ fun TuripDetail(
 private fun TuripPlacesContent(
     listState: LazyListState,
     places: ImmutableList<TuripPlaceModel>,
+    onItemClick: (placeId: Long) -> Unit,
     onMapClick: (map: MapModel) -> Unit,
     onTuripPlaceClick: (placeId: Long) -> Unit,
     onDragStart: () -> Unit,
@@ -104,6 +104,7 @@ private fun TuripPlacesContent(
         onTuripPlaceClick = onTuripPlaceClick,
         onDragStart = onDragStart,
         onDragPlace = onDragPlace,
+        onItemClick = onItemClick,
         onDragEnd = onDragEnd,
         modifier = modifier,
     )
@@ -113,6 +114,7 @@ private fun TuripPlacesContent(
 private fun TuripPlaces(
     listState: LazyListState,
     places: ImmutableList<TuripPlaceModel>,
+    onItemClick: (placeId: Long) -> Unit,
     onMapClick: (map: MapModel) -> Unit,
     onTuripPlaceClick: (placeId: Long) -> Unit,
     onDragStart: () -> Unit,
@@ -148,13 +150,15 @@ private fun TuripPlaces(
                     place = place,
                     onMapClick = { onMapClick(place.mapModel) },
                     onTuripPlaceClick = { onTuripPlaceClick(place.placeId) },
+                    onItemClick = { onItemClick(place.placeId) },
                     modifier =
                         Modifier
                             .graphicsLayer {
                                 shadowElevation = elevation
                                 shape = reorderableItemShape
                                 clip = true
-                            }.draggableAfterLongPress(
+                            }
+                            .draggableAfterLongPress(
                                 interactionSource = interactionSource,
                             ),
                 )
@@ -271,6 +275,7 @@ private fun TuripDetailPreview(
             onDragStart = {},
             onDragPlace = { _, _ -> },
             onDragEnd = { },
+            onItemClick = {},
         )
     }
 }

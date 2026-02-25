@@ -266,6 +266,16 @@ class TuripPlaceViewModel @Inject constructor(
         }
     }
 
+    fun updateSelectedPlace(placeId: Long) {
+        _uiState.update { turipPlaceUiState: TuripPlaceUiState ->
+            turipPlaceUiState.copy(
+                selectedPlace =
+                    _uiState.value.placesLatLng.find { it.placeId == placeId }
+                        ?: throw IllegalStateException("장소를 찾을 수 없습니다."),
+            )
+        }
+    }
+
     private suspend fun handleGlobalError(uiError: UiError.Global) {
         when (uiError) {
             UiError.Global.Network -> {
