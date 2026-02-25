@@ -211,6 +211,7 @@ class TuripPlaceViewModel @Inject constructor(
                     }
                     _uiEffect.send(TuripPlaceUiEffect.TuripDelete)
                 }.onFailure { errorType: ErrorType ->
+                    sendErrorEffect(errorType, TuripPlaceRetryAction.TuripDelete)
                 }
         }
     }
