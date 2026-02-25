@@ -143,7 +143,10 @@ class TuripPlaceViewModel @Inject constructor(
                         }
                     }
                     Timber.d(
-                        "튜립 내 튜립 장소 상태 업데이트 실패, turipId = ${uiState.value.selectedTurip.id} placeId = $placeId originIsTuripPlace =$isTuripPlace",
+                        "튜립 내 튜립 장소 상태 업데이트 실패, " +
+                            "turipId=${uiState.value.selectedTurip.id} " +
+                            "placeId=$placeId " +
+                            "originIsTuripPlace=$isTuripPlace",
                     )
                 }
         }
