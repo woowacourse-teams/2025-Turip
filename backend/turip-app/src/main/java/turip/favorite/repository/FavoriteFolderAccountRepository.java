@@ -11,10 +11,20 @@ import turip.account.domain.Member;
 import turip.favorite.domain.AccountRole;
 import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.domain.FavoriteFolderAccount;
+import turip.favorite.repository.dto.FavoriteFolderItemCountResult;
 
 public interface FavoriteFolderAccountRepository extends JpaRepository<FavoriteFolderAccount, Long> {
 
     int countByFavoriteFolder(FavoriteFolder favoriteFolder);
+
+    @Query("""
+            SELECT new turip.favorite.repository.dto.FavoriteFolderItemCountResult(ff.id, COUNT(ffa))
+            FROM FavoriteFolder ff
+            LEFT JOIN FavoriteFolderAccount ffa ON ffa.favoriteFolder = ff
+            WHERE ff.id IN :folderIds
+            GROUP BY ff.id
+            """)
+    List<FavoriteFolderItemCountResult> countByFavoriteFolderIdsIn(List<Long> folderIds);
 
     boolean existsByFavoriteFolderAndAccountAndAccountRole(FavoriteFolder favoriteFolder, Account account,
                                                            AccountRole accountRole);
@@ -34,4 +44,5 @@ public interface FavoriteFolderAccountRepository extends JpaRepository<FavoriteF
             "SET ffa.account = :newAccount " +
             "WHERE ffa.account = :oldAccount")
     void updateAccount(@Param("oldAccount") Account oldAccount, @Param("newAccount") Account newAccount);
+
 }

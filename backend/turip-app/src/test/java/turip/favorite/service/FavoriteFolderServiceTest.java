@@ -41,6 +41,7 @@ import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.domain.FavoriteFolderAccount;
 import turip.favorite.repository.FavoriteFolderRepository;
 import turip.favorite.repository.FavoritePlaceRepository;
+import turip.favorite.repository.dto.FavoriteFolderItemCountResult;
 import turip.favorite.token.InvitationTokenProvider;
 import turip.place.domain.Place;
 import turip.place.repository.PlaceRepository;
@@ -167,22 +168,30 @@ class FavoriteFolderServiceTest {
             given(favoriteFolderRepository.findAllByAccountOrderByFavoriteFolderAccountIdAsc(savedAccount))
                     .willReturn(List.of(defaultFolder, favoriteFolder));
 
-            int defaultFolderPlaceCount = 3;
-            int favoriteFolderPlaceCount = 4;
-            given(favoritePlaceRepository.countByFavoriteFolder(defaultFolder))
-                    .willReturn(defaultFolderPlaceCount);
-            given(favoritePlaceRepository.countByFavoriteFolder(favoriteFolder))
-                    .willReturn(favoriteFolderPlaceCount);
+            // 일괄 조회 방식으로 변경
+            List<FavoriteFolderItemCountResult> placeCounts = List.of(
+                    new FavoriteFolderItemCountResult(1L, 3L),
+                    new FavoriteFolderItemCountResult(2L, 4L)
+            );
+            List<FavoriteFolderItemCountResult> memberCounts = List.of(
+                    new FavoriteFolderItemCountResult(1L, 1L),
+                    new FavoriteFolderItemCountResult(2L, 1L)
+            );
+            given(favoritePlaceRepository.countByFavoriteFolderIdsIn(List.of(1L, 2L)))
+                    .willReturn(placeCounts);
+            given(favoriteFolderAccountService.countByFavoriteFolderIdsIn(List.of(1L, 2L)))
+                    .willReturn(memberCounts);
 
             // when
             FavoriteFoldersDetailResponse response = favoriteFolderService.findAllByAccount(savedAccount);
 
             // then
             assertAll(
-                    () -> assertThat(response.favoriteFolders().get(0).placeCount()).isEqualTo(defaultFolderPlaceCount),
+                    () -> assertThat(response.favoriteFolders().get(0).placeCount()).isEqualTo(3),
+                    () -> assertThat(response.favoriteFolders().get(0).memberCount()).isEqualTo(1),
                     () -> assertThat(response.favoriteFolders().get(0).name()).isEqualTo("기본 폴더"),
-                    () -> assertThat(response.favoriteFolders().get(1).placeCount()).isEqualTo(
-                            favoriteFolderPlaceCount),
+                    () -> assertThat(response.favoriteFolders().get(1).placeCount()).isEqualTo(4),
+                    () -> assertThat(response.favoriteFolders().get(1).memberCount()).isEqualTo(1),
                     () -> assertThat(response.favoriteFolders().get(1).name()).isEqualTo("커스텀 폴더 1")
             );
         }
