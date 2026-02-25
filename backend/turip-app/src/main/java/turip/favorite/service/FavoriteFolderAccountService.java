@@ -8,6 +8,7 @@ import turip.account.domain.Account;
 import turip.account.domain.Member;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.ForbiddenException;
+import turip.common.exception.custom.NotFoundException;
 import turip.favorite.domain.AccountRole;
 import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.domain.FavoriteFolderAccount;
@@ -59,7 +60,7 @@ public class FavoriteFolderAccountService {
     public void deleteByFavoriteFolderAndAccount(FavoriteFolder favoriteFolder, Account account) {
         FavoriteFolderAccount favoriteFolderAccount = favoriteFolderAccountRepository.findByFavoriteFolderAndAccount(
                         favoriteFolder, account)
-                .orElseThrow(() -> new ForbiddenException(ErrorTag.FORBIDDEN));
+                .orElseThrow(() -> new NotFoundException(ErrorTag.FAVORITE_FOLDER_ACCOUNT_NOT_FOUND));
         favoriteFolderAccountRepository.delete(favoriteFolderAccount);
     }
 

@@ -1354,20 +1354,36 @@ public class FavoriteFolderController {
             @ApiResponse(
                     responseCode = "404",
                     description = "실패 예시",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class),
-                            examples = @ExampleObject(
-                                    name = "turip_not_found",
-                                    summary = "turipId에 대한 튜립을 찾을 수 없는 경우",
-                                    value = """
-                                            {
-                                                "tag": "FAVORITE_FOLDER_NOT_FOUND",
-                                                "message": "찜폴더를 찾을 수 없습니다."
-                                            }
-                                            """
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ErrorResponse.class),
+                                    examples = @ExampleObject(
+                                            name = "turip_not_found",
+                                            summary = "turipId에 대한 튜립을 찾을 수 없는 경우",
+                                            value = """
+                                                    {
+                                                        "tag": "FAVORITE_FOLDER_NOT_FOUND",
+                                                        "message": "찜폴더를 찾을 수 없습니다."
+                                                    }
+                                                    """
+                                    )
+                            ),
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ErrorResponse.class),
+                                    examples = @ExampleObject(
+                                            name = "turip_account_not_found",
+                                            summary = "해당 turip에 참여중인 계정 목록에 존재하지 않는 경우",
+                                            value = """
+                                                    {
+                                                        "tag": "FAVORITE_FOLDER_ACCOUNT_NOT_FOUND",
+                                                        "message": "찜폴더에 참여중인 계정 목록에서 해당 계정을 찾을 수 없습니다."
+                                                    }
+                                                    """
+                                    )
                             )
-                    )
+                    }
             )
     })
     @DeleteMapping("/{turipId}/exit")
