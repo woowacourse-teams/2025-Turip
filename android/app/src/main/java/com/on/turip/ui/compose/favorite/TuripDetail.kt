@@ -157,8 +157,7 @@ private fun TuripPlaces(
                                 shadowElevation = elevation
                                 shape = reorderableItemShape
                                 clip = true
-                            }
-                            .draggableAfterLongPress(
+                            }.draggableAfterLongPress(
                                 interactionSource = interactionSource,
                             ),
                 )
