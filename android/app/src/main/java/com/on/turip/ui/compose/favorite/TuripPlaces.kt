@@ -43,7 +43,7 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 
 @Composable
-fun TuripDetail(
+fun TuripPlaces(
     places: ImmutableList<TuripPlaceModel>,
     onItemClick: (placeId: Long) -> Unit,
     onMapClick: (map: MapModel) -> Unit,
@@ -132,7 +132,8 @@ private fun TuripPlaces(
                                 shadowElevation = elevation
                                 shape = reorderableItemShape
                                 clip = true
-                            }.draggableAfterLongPress(
+                            }
+                            .draggableAfterLongPress(
                                 interactionSource = interactionSource,
                             ),
                 )
@@ -237,12 +238,12 @@ private class TuripDetailPreviewProvider : PreviewParameterProvider<TuripDetailP
 
 @Preview(showBackground = true)
 @Composable
-private fun TuripDetailPreview(
+private fun TuripPlacesPreview(
     @PreviewParameter(TuripDetailPreviewProvider::class)
     state: TuripDetailPreviewState,
 ) {
     TuripTheme {
-        TuripDetail(
+        TuripPlaces(
             places = state.places,
             onMapClick = {},
             onTuripPlaceClick = {},

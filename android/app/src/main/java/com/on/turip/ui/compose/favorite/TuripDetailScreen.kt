@@ -62,7 +62,7 @@ import kotlinx.collections.immutable.toImmutableList
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TuripPlaceScreen(
+fun TuripDetailScreen(
     selectedTuripId: Long,
     onNavigateToLogin: () -> Unit,
     onShareTurip: (turipShareModel: TuripShareModel) -> Unit,
@@ -301,14 +301,14 @@ private fun TuripPlaceContent(
             )
         }
 
-        TuripDetail(
+        TuripPlaces(
             places = currentPlaces,
             onItemClick = onItemClick,
             onMapClick = navigateToMap,
             onTuripPlaceClick = onClickTuripPlace,
             onDragStart = { dragStartPlaces = currentPlaces },
             onDragPlace = { from: Int, to: Int ->
-                if (from == to) return@TuripDetail
+                if (from == to) return@TuripPlaces
                 currentPlaces =
                     currentPlaces
                         .toMutableList()
