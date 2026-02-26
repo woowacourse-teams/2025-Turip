@@ -24,9 +24,6 @@ data class TuripPlaceUiState(
     val places: ImmutableList<TuripPlaceModel>,
     val placesLatLng: ImmutableList<PlaceLatLngUiModel>,
 ) {
-    val isEmpty: Boolean
-        get() = places.isEmpty() && this != Idle
-
     companion object {
         val Idle: TuripPlaceUiState =
             TuripPlaceUiState(
