@@ -65,6 +65,7 @@
     <string name="my_page_error">데이터를 불러오지 못했습니다</string>
     <string name="my_page_snackbar_bookmark_remove_failed">북마크 해제 실패했어요. 새로고침 시 다시 나타날 수 있어요.</string>
     <string name="my_page_snackbar_bookmark_remove_failed_action">새로고침</string>
+    <string name="my_page_title">마이페이지</string>
 
     <!-- 북마크 컨텐츠 목록 페이지 -->
     <string name="bookmark_content_empty_suggest_title">컨텐츠를 저장 해보세요!</string>
