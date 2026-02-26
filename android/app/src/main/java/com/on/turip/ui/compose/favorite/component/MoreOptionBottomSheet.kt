@@ -1,5 +1,11 @@
 package com.on.turip.ui.compose.favorite.component
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -113,36 +119,48 @@ fun MoreOptionBottomSheet(
         containerColor = TuripTheme.colors.white,
         modifier = modifier,
     ) {
-        when (screenMode) {
-            TuripPlaceScreenMode.MoreOption -> {
-                Column {
-                    items.forEachIndexed { index, item ->
-                        MoreOptionRow(item = item)
+        AnimatedContent(
+            targetState = screenMode,
+            transitionSpec = {
+                when (targetState) {
+                    TuripPlaceScreenMode.Edit -> {
+                        slideInHorizontally { it } + fadeIn() togetherWith
+                            slideOutHorizontally { -it } + fadeOut()
+                    }
 
-                        if (index != items.lastIndex) {
-                            HorizontalDivider(
-                                modifier = Modifier.padding(horizontal = TuripTheme.spacing.extraLarge),
-                            )
+                    TuripPlaceScreenMode.MoreOption -> {
+                        slideInHorizontally { -it } + fadeIn() togetherWith
+                            slideOutHorizontally { it } + fadeOut()
+                    }
+                }
+            },
+        ) { mode: TuripPlaceScreenMode ->
+            when (mode) {
+                TuripPlaceScreenMode.MoreOption -> {
+                    Column {
+                        items.forEachIndexed { index, item ->
+                            MoreOptionRow(item = item)
+                            if (index != items.lastIndex) {
+                                HorizontalDivider(
+                                    modifier = Modifier.padding(horizontal = TuripTheme.spacing.extraLarge),
+                                )
+                            }
                         }
                     }
                 }
-            }
 
-            TuripPlaceScreenMode.Edit -> {
-                FolderBottomSheetContent(
-                    title = stringResource(R.string.bottom_sheet_turip_modify_title),
-                    folderName = folderName,
-                    onFolderNameChange = {
-                        folderName = it
-                    },
-                    onBack = {
-                        onScreenModeChange(TuripPlaceScreenMode.MoreOption)
-                    },
-                    turipNameStatus = turipNameStatus,
-                    onNameChanged = onNameChanged,
-                    onConfirmClick = onConfirmClick,
-                    focusRequester = focusRequester,
-                )
+                TuripPlaceScreenMode.Edit -> {
+                    FolderBottomSheetContent(
+                        title = stringResource(R.string.bottom_sheet_turip_modify_title),
+                        folderName = folderName,
+                        onFolderNameChange = { folderName = it },
+                        onBack = { onScreenModeChange(TuripPlaceScreenMode.MoreOption) },
+                        turipNameStatus = turipNameStatus,
+                        onNameChanged = onNameChanged,
+                        onConfirmClick = onConfirmClick,
+                        focusRequester = focusRequester,
+                    )
+                }
             }
         }
     }
