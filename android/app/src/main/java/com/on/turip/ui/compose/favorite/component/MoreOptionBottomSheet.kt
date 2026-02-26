@@ -71,7 +71,7 @@ fun MoreOptionBottomSheet(
     onInviteLinkClick: () -> Unit,
     onDeleteClick: () -> Unit,
     turipNameStatus: TuripNameStatusModel,
-    onNameChanged: (String) -> Unit,
+    onNameChanged: (name: String) -> Unit,
     onConfirmClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {

@@ -69,7 +69,7 @@ private sealed interface TuripChipIcon {
 @Composable
 fun MyTuripCard(
     turip: MyTuripModel,
-    onTuripClick: (Long) -> Unit,
+    onTuripClick: (turipId: Long) -> Unit,
     @DrawableRes folderImage: Int,
     modifier: Modifier = Modifier,
     isDeleteMode: Boolean = false,
@@ -95,7 +95,8 @@ fun MyTuripCard(
                     .indication(
                         interactionSource = interactionSource,
                         indication = ripple(),
-                    ).pointerInput(onLongPress, onTuripClick) {
+                    )
+                    .pointerInput(onLongPress, onTuripClick) {
                         awaitEachGesture {
                             val down = awaitFirstDown(requireUnconsumed = false)
                             val press = PressInteraction.Press(down.position)

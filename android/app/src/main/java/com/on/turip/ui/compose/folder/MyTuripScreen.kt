@@ -65,7 +65,7 @@ enum class MyTuripTab(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyTuripScreen(
-    onNavigateToTuripPlace: (Long) -> Unit,
+    onNavigateToTuripPlace: (turipId: Long) -> Unit,
     onNavigateToLogin: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MyTuripViewModel = hiltViewModel(),
@@ -182,8 +182,8 @@ fun MyTuripScreen(
 private fun MyTuripScreenContent(
     turips: ImmutableList<MyTuripModel>,
     snackbarHostState: SnackbarHostState,
-    onTuripClick: (Long) -> Unit,
-    onTuripDelete: (Long) -> Unit,
+    onTuripClick: (turipId: Long) -> Unit,
+    onTuripDelete: (turipId: Long) -> Unit,
     onAddClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
