@@ -111,10 +111,11 @@ fun MoreOptionBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
         containerColor = TuripTheme.colors.white,
+        modifier = modifier
     ) {
         when (screenMode) {
             TuripPlaceScreenMode.MoreOption -> {
-                Column(modifier = modifier) {
+                Column {
                     items.forEachIndexed { index, item ->
                         MoreOptionRow(item = item)
 
