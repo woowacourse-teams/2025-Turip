@@ -147,11 +147,13 @@ fun TuripPlaceScreen(
             sheetState = modalBottomSheetState,
             isDefault = uiState.selectedTurip.isDefault,
             onDismiss = { viewModel.dismissBottomSheet() },
-            onRenameClick = viewModel::showEditNameBottomSheet,
             onShareClick = viewModel::shareTurip,
             onInviteLinkClick = {},
             onDeleteClick = { dialogState = true },
             screenMode = uiState.screenMode,
+            onScreenModeChange = { screenMode: TuripPlaceScreenMode ->
+                viewModel.updateScreenMode(screenMode)
+            },
             turipNameStatus = uiState.turipNameStatus,
             onNameChanged = viewModel::updateInputName,
             onConfirmClick = viewModel::updateTuripName,

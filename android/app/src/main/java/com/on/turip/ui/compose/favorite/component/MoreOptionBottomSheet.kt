@@ -63,10 +63,10 @@ private sealed interface MoreOptionIcon {
 @Composable
 fun MoreOptionBottomSheet(
     screenMode: TuripPlaceScreenMode,
+    onScreenModeChange: (TuripPlaceScreenMode) -> Unit,
     sheetState: SheetState,
     isDefault: Boolean,
     onDismiss: () -> Unit,
-    onRenameClick: () -> Unit,
     onShareClick: () -> Unit,
     onInviteLinkClick: () -> Unit,
     onDeleteClick: () -> Unit,
@@ -84,7 +84,7 @@ fun MoreOptionBottomSheet(
                 title = stringResource(R.string.turip_more_option_bottom_sheet_change_name),
                 icon = MoreOptionIcon.Vector(Icons.Default.Create),
                 color = TuripTheme.colors.black,
-                onClick = onRenameClick,
+                onClick = { onScreenModeChange(TuripPlaceScreenMode.Edit) },
                 enabled = !isDefault,
             ),
             MoreOptionItem(
@@ -111,7 +111,7 @@ fun MoreOptionBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
         containerColor = TuripTheme.colors.white,
-        modifier = modifier
+        modifier = modifier,
     ) {
         when (screenMode) {
             TuripPlaceScreenMode.MoreOption -> {
@@ -134,6 +134,9 @@ fun MoreOptionBottomSheet(
                     folderName = folderName,
                     onFolderNameChange = {
                         folderName = it
+                    },
+                    onBack = {
+                        onScreenModeChange(TuripPlaceScreenMode.MoreOption)
                     },
                     turipNameStatus = turipNameStatus,
                     onNameChanged = onNameChanged,
@@ -205,10 +208,10 @@ private fun MoreOptionBottomSheetPreviewContent(
     TuripTheme {
         MoreOptionBottomSheet(
             screenMode = screenMode,
+            onScreenModeChange = {},
             sheetState = sheetState,
             isDefault = isDefault,
             onDismiss = {},
-            onRenameClick = {},
             onShareClick = {},
             onInviteLinkClick = {},
             onDeleteClick = {},

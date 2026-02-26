@@ -152,8 +152,8 @@ class TuripPlaceViewModel @Inject constructor(
         }
     }
 
-    fun showEditNameBottomSheet() {
-        _uiState.update { it.copy(screenMode = TuripPlaceScreenMode.Edit) }
+    fun updateScreenMode(turipPlaceScreenMode: TuripPlaceScreenMode) {
+        _uiState.update { it.copy(screenMode = turipPlaceScreenMode) }
     }
 
     fun updateInputName(name: String) {

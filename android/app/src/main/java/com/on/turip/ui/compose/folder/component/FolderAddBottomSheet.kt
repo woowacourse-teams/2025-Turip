@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -12,9 +13,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
@@ -76,30 +81,52 @@ fun FolderAddBottomSheet(
 @Composable
 fun FolderBottomSheetContent(
     title: String,
+    onBack: (() -> Unit)? = null,
     folderName: String,
     onFolderNameChange: (String) -> Unit,
     turipNameStatus: TuripNameStatusModel,
     onNameChanged: (String) -> Unit,
     onConfirmClick: () -> Unit,
     focusRequester: FocusRequester,
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier =
-            Modifier
+            modifier
                 .fillMaxWidth()
                 .padding(bottom = TuripTheme.spacing.extraLarge),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(
-            text = title,
-            style = TuripTheme.typography.title2,
-            color = TuripTheme.colors.black,
-            textAlign = TextAlign.Center,
+        Box(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .padding(top = TuripTheme.spacing.medium, bottom = TuripTheme.spacing.huge),
-        )
+                    .padding(
+                        top = TuripTheme.spacing.medium,
+                        bottom = TuripTheme.spacing.huge,
+                    ),
+        ) {
+            onBack?.let {
+                IconButton(
+                    onClick = it,
+                    modifier = Modifier.align(Alignment.CenterStart),
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                        contentDescription = null,
+                        tint = TuripTheme.colors.gray03,
+                    )
+                }
+            }
+
+            Text(
+                text = title,
+                style = TuripTheme.typography.title2,
+                color = TuripTheme.colors.black,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.align(Alignment.Center),
+            )
+        }
 
         BasicTextField(
             value = folderName,
@@ -224,6 +251,26 @@ fun FolderAddBottomSheetStatusPreview(
             onNameChanged = {},
             onConfirmClick = {},
             onDismiss = {},
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+@Preview(showBackground = true)
+fun FolderAddBottomSheetStatusPreview() {
+    val focusRequester = remember { FocusRequester() }
+
+    TuripTheme {
+        FolderBottomSheetContent(
+            title = "튜립 수정",
+            turipNameStatus = TuripNameStatusModel.EMPTY,
+            onNameChanged = {},
+            onConfirmClick = {},
+            onBack = {},
+            folderName = "",
+            onFolderNameChange = {},
+            focusRequester = focusRequester,
         )
     }
 }
