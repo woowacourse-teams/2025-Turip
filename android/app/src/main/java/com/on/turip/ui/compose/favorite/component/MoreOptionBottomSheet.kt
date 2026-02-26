@@ -23,7 +23,6 @@ import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,8 +31,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -44,26 +41,7 @@ import com.on.turip.ui.compose.designsystem.component.NameEditorSheetContent
 import com.on.turip.ui.compose.designsystem.model.TuripNameStatusModel
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.favorite.TuripPlaceScreenMode
-
-@Immutable
-private data class MoreOptionItem(
-    val title: String,
-    val icon: MoreOptionIcon,
-    val color: Color,
-    val onClick: () -> Unit,
-    val enabled: Boolean = true,
-)
-
-@Immutable
-private sealed interface MoreOptionIcon {
-    data class Vector(
-        val imageVector: ImageVector,
-    ) : MoreOptionIcon
-
-    data class Resource(
-        val resId: Int,
-    ) : MoreOptionIcon
-}
+import com.on.turip.ui.compose.favorite.model.MoreOptionItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
