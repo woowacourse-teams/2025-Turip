@@ -1,4 +1,4 @@
-package com.on.turip.ui.compose.mypage
+package com.on.turip.ui.compose.mypage.util
 
 import com.on.turip.domain.accounts.Account
 import com.on.turip.ui.compose.mypage.model.ProfileModel
