@@ -118,34 +118,34 @@ private fun MyPageScreenContent(
     onDialogConfirmWithdraw: () -> Unit,
     onDialogDismiss: () -> Unit,
 ) {
-    when (uiState.dialogState) {
-        MyPageDialogState.LogoutRequired -> {
-            TuripDialog(
-                title = stringResource(R.string.my_page_logout),
-                message = stringResource(R.string.my_page_logout_dialog_message),
-                confirmText = stringResource(R.string.my_page_logout_dialog_confirm),
-                dismissText = stringResource(R.string.my_page_logout_dialog_dismiss),
-                confirmButtonColor = TuripTheme.colors.primary,
-                dismissButtonColor = TuripTheme.colors.gray02,
-                onConfirmation = onDialogConfirmLogout,
-                onDismissRequest = onDialogDismiss,
-            )
-        }
+    uiState.dialogState?.let { dialogState: MyPageDialogState ->
+        when (dialogState) {
+            MyPageDialogState.LogoutRequired -> {
+                TuripDialog(
+                    title = stringResource(R.string.my_page_logout),
+                    message = stringResource(R.string.my_page_logout_dialog_message),
+                    confirmText = stringResource(R.string.my_page_logout_dialog_confirm),
+                    dismissText = stringResource(R.string.my_page_logout_dialog_dismiss),
+                    confirmButtonColor = TuripTheme.colors.primary,
+                    dismissButtonColor = TuripTheme.colors.gray02,
+                    onConfirmation = onDialogConfirmLogout,
+                    onDismissRequest = onDialogDismiss,
+                )
+            }
 
-        MyPageDialogState.ConfirmWithdraw -> {
-            TuripDialog(
-                title = stringResource(R.string.my_page_withdraw),
-                message = stringResource(R.string.my_page_withdraw_dialog_message),
-                confirmText = stringResource(R.string.my_page_withdraw_dialog_confirm),
-                dismissText = stringResource(R.string.my_page_withdraw_dialog_dismiss),
-                confirmButtonColor = TuripTheme.colors.error,
-                dismissButtonColor = TuripTheme.colors.gray02,
-                onConfirmation = onDialogConfirmWithdraw,
-                onDismissRequest = onDialogDismiss,
-            )
+            MyPageDialogState.ConfirmWithdraw -> {
+                TuripDialog(
+                    title = stringResource(R.string.my_page_withdraw),
+                    message = stringResource(R.string.my_page_withdraw_dialog_message),
+                    confirmText = stringResource(R.string.my_page_withdraw_dialog_confirm),
+                    dismissText = stringResource(R.string.my_page_withdraw_dialog_dismiss),
+                    confirmButtonColor = TuripTheme.colors.error,
+                    dismissButtonColor = TuripTheme.colors.gray02,
+                    onConfirmation = onDialogConfirmWithdraw,
+                    onDismissRequest = onDialogDismiss,
+                )
+            }
         }
-
-        null -> {}
     }
 
     Scaffold(
