@@ -222,30 +222,27 @@ private fun MoreOptionBottomSheetPreviewContent(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Preview(name = "MoreOption - 일반", showBackground = true)
 @Composable
-private fun MoreOptionBottomSheetPreview_MoreOption() {
+private fun MoreOptionBottomSheetPreviewMoreOption() {
     MoreOptionBottomSheetPreviewContent(
         screenMode = TuripPlaceScreenMode.MoreOption,
         isDefault = false,
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Preview(name = "MoreOption - 기본폴더(삭제 비활성)", showBackground = true)
 @Composable
-private fun MoreOptionBottomSheetPreview_MoreOption_Default() {
+private fun MoreOptionBottomSheetPreviewMoreOption_Default() {
     MoreOptionBottomSheetPreviewContent(
         screenMode = TuripPlaceScreenMode.MoreOption,
         isDefault = true,
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Preview(name = "Edit", showBackground = true)
 @Composable
-private fun MoreOptionBottomSheetPreview_Edit() {
+private fun MoreOptionBottomSheetPreviewEdit() {
     MoreOptionBottomSheetPreviewContent(
         screenMode = TuripPlaceScreenMode.Edit,
         isDefault = false,
