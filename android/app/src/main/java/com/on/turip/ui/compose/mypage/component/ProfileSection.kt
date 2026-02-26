@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Refresh
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -125,12 +124,7 @@ private fun ProfileRightContent(
         contentAlignment = Alignment.CenterStart,
     ) {
         when (state) {
-            MyPageSectionState.Loading -> {
-                CircularProgressIndicator(
-                    modifier = modifier.size(2.dp),
-                    color = TuripTheme.colors.gray03,
-                )
-            }
+            MyPageSectionState.Loading -> {}
 
             MyPageSectionState.Error -> {
                 ProfileError(onRetry = onRetry)
