@@ -95,8 +95,7 @@ fun MyTuripCard(
                     .indication(
                         interactionSource = interactionSource,
                         indication = ripple(),
-                    )
-                    .pointerInput(onLongPress, onTuripClick) {
+                    ).pointerInput(onLongPress, onTuripClick) {
                         awaitEachGesture {
                             val down = awaitFirstDown(requireUnconsumed = false)
                             val press = PressInteraction.Press(down.position)
