@@ -136,7 +136,6 @@ private fun ProfileRightContent(
                     style = TuripTheme.typography.title1,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = modifier,
                 )
             }
         }
