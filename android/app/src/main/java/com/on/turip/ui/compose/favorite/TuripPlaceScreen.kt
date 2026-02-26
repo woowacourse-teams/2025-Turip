@@ -155,6 +155,7 @@ fun TuripPlaceScreen(
                 viewModel.updateScreenMode(screenMode)
             },
             turipNameStatus = uiState.turipNameStatus,
+            folderName = uiState.inputTuripName,
             onNameChanged = viewModel::updateInputName,
             onConfirmClick = viewModel::updateTuripName,
         )

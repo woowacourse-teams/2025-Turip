@@ -146,6 +146,7 @@ fun MyTuripScreen(
     if (uiState.showAddBottomSheet) {
         FolderAddBottomSheet(
             title = stringResource(R.string.bottom_sheet_turip_add_title),
+            folderName = uiState.inputTuripName,
             sheetState = sheetState,
             turipNameStatus = uiState.turipNameStatus,
             onNameChanged = viewModel::updateInputName,

@@ -50,6 +50,7 @@ import com.on.turip.ui.folder.model.TuripNameStatusModel
 @Composable
 fun FolderAddBottomSheet(
     title: String,
+    folderName: String,
     sheetState: SheetState,
     turipNameStatus: TuripNameStatusModel,
     onNameChanged: (String) -> Unit,
@@ -57,7 +58,6 @@ fun FolderAddBottomSheet(
     onDismiss: () -> Unit,
 ) {
     val focusRequester = remember { FocusRequester() }
-    var folderName by remember { mutableStateOf("") }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -67,9 +67,6 @@ fun FolderAddBottomSheet(
         FolderBottomSheetContent(
             title = title,
             folderName = folderName,
-            onFolderNameChange = {
-                folderName = it
-            },
             turipNameStatus = turipNameStatus,
             onNameChanged = onNameChanged,
             onConfirmClick = onConfirmClick,
@@ -81,14 +78,13 @@ fun FolderAddBottomSheet(
 @Composable
 fun FolderBottomSheetContent(
     title: String,
-    onBack: (() -> Unit)? = null,
     folderName: String,
-    onFolderNameChange: (String) -> Unit,
     turipNameStatus: TuripNameStatusModel,
     onNameChanged: (String) -> Unit,
     onConfirmClick: () -> Unit,
     focusRequester: FocusRequester,
     modifier: Modifier = Modifier,
+    onBack: (() -> Unit)? = null,
 ) {
     Column(
         modifier =
@@ -132,7 +128,6 @@ fun FolderBottomSheetContent(
             value = folderName,
             onValueChange = { input ->
                 if (input.length <= 20) {
-                    onFolderNameChange(input)
                     onNameChanged(input)
                 }
             },
@@ -246,6 +241,7 @@ fun FolderAddBottomSheetStatusPreview(
     TuripTheme {
         FolderAddBottomSheet(
             title = "튜립 추가",
+            folderName = "",
             sheetState = sheetState,
             turipNameStatus = status,
             onNameChanged = {},
@@ -269,7 +265,6 @@ fun FolderAddBottomSheetStatusPreview() {
             onConfirmClick = {},
             onBack = {},
             folderName = "",
-            onFolderNameChange = {},
             focusRequester = focusRequester,
         )
     }

@@ -77,12 +77,12 @@ fun MoreOptionBottomSheet(
     onInviteLinkClick: () -> Unit,
     onDeleteClick: () -> Unit,
     turipNameStatus: TuripNameStatusModel,
+    folderName: String,
     onNameChanged: (name: String) -> Unit,
     onConfirmClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val focusRequester = remember { FocusRequester() }
-    var folderName by remember { mutableStateOf("") }
 
     val items: List<MoreOptionItem> =
         listOf(
@@ -153,7 +153,6 @@ fun MoreOptionBottomSheet(
                     FolderBottomSheetContent(
                         title = stringResource(R.string.bottom_sheet_turip_modify_title),
                         folderName = folderName,
-                        onFolderNameChange = { folderName = it },
                         onBack = { onScreenModeChange(TuripPlaceScreenMode.MoreOption) },
                         turipNameStatus = turipNameStatus,
                         onNameChanged = onNameChanged,
@@ -234,6 +233,7 @@ private fun MoreOptionBottomSheetPreviewContent(
             onInviteLinkClick = {},
             onDeleteClick = {},
             turipNameStatus = turipNameStatus,
+            folderName = "",
             onNameChanged = { newName ->
                 name = newName
                 turipNameStatus =
