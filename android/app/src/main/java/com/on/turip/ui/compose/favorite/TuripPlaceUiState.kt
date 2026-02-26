@@ -42,6 +42,7 @@ data class TuripPlaceUiState(
     }
 }
 
+@Immutable
 sealed interface TuripPlaceScreenMode {
     data object MoreOption : TuripPlaceScreenMode
 
