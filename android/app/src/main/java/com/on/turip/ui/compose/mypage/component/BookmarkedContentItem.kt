@@ -53,9 +53,10 @@ fun BookmarkedContentItem(
     Column(
         modifier =
             modifier
-                .padding(TuripTheme.spacing.extraSmall)
                 .clip(TuripTheme.shape.container)
-                .clickable { onContentClick(item.content.id) },
+                .clickable { onContentClick(item.content.id) }
+                .border(1.dp, TuripTheme.colors.border, TuripTheme.shape.container)
+                .padding(TuripTheme.spacing.extraSmall),
     ) {
         ContentThumbnail(
             imageUrl = item.content.videoData.url,
