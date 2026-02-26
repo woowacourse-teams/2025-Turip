@@ -40,23 +40,23 @@ import com.on.turip.ui.compose.folder.component.FolderBottomSheetContent
 import com.on.turip.ui.folder.model.TuripNameStatusModel
 
 @Immutable
-private data class SheetItem(
+private data class MoreOptionItem(
     val title: String,
-    val icon: SheetIcon,
+    val icon: MoreOptionIcon,
     val color: Color,
     val onClick: () -> Unit,
     val enabled: Boolean = true,
 )
 
 @Immutable
-private sealed interface SheetIcon {
+private sealed interface MoreOptionIcon {
     data class Vector(
         val imageVector: ImageVector,
-    ) : SheetIcon
+    ) : MoreOptionIcon
 
     data class Resource(
         val resId: Int,
-    ) : SheetIcon
+    ) : MoreOptionIcon
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -78,30 +78,30 @@ fun MoreOptionBottomSheet(
     val focusRequester = remember { FocusRequester() }
     var folderName by remember { mutableStateOf("") }
 
-    val items: List<SheetItem> =
+    val items: List<MoreOptionItem> =
         listOf(
-            SheetItem(
+            MoreOptionItem(
                 title = stringResource(R.string.turip_more_option_bottom_sheet_change_name),
-                icon = SheetIcon.Vector(Icons.Default.Create),
+                icon = MoreOptionIcon.Vector(Icons.Default.Create),
                 color = TuripTheme.colors.black,
                 onClick = onRenameClick,
                 enabled = !isDefault,
             ),
-            SheetItem(
+            MoreOptionItem(
                 title = stringResource(R.string.turip_more_option_bottom_sheet_share_by_text),
-                icon = SheetIcon.Resource(R.drawable.ic_text_area),
+                icon = MoreOptionIcon.Resource(R.drawable.ic_text_area),
                 color = TuripTheme.colors.black,
                 onClick = onShareClick,
             ),
-            SheetItem(
+            MoreOptionItem(
                 title = stringResource(R.string.turip_more_option_bottom_sheet_invite_by_link),
-                icon = SheetIcon.Resource(R.drawable.ic_people_fill),
+                icon = MoreOptionIcon.Resource(R.drawable.ic_people_fill),
                 color = TuripTheme.colors.black,
                 onClick = onInviteLinkClick,
             ),
-            SheetItem(
+            MoreOptionItem(
                 title = stringResource(R.string.turip_more_option_bottom_sheet_delete),
-                icon = SheetIcon.Vector(Icons.Default.Delete),
+                icon = MoreOptionIcon.Vector(Icons.Default.Delete),
                 color = TuripTheme.colors.error,
                 onClick = onDeleteClick,
                 enabled = !isDefault,
@@ -116,7 +116,7 @@ fun MoreOptionBottomSheet(
             TuripPlaceScreenMode.MoreOption -> {
                 Column(modifier = modifier) {
                     items.forEachIndexed { index, item ->
-                        SheetSettingItem(item = item)
+                        MoreOptionRow(item = item)
 
                         if (index != items.lastIndex) {
                             HorizontalDivider(
@@ -145,8 +145,8 @@ fun MoreOptionBottomSheet(
 }
 
 @Composable
-private fun SheetSettingItem(
-    item: SheetItem,
+private fun MoreOptionRow(
+    item: MoreOptionItem,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -161,8 +161,8 @@ private fun SheetSettingItem(
                 ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        when (val icon: SheetIcon = item.icon) {
-            is SheetIcon.Vector -> {
+        when (val icon: MoreOptionIcon = item.icon) {
+            is MoreOptionIcon.Vector -> {
                 Icon(
                     imageVector = icon.imageVector,
                     contentDescription = null,
@@ -171,7 +171,7 @@ private fun SheetSettingItem(
                 )
             }
 
-            is SheetIcon.Resource -> {
+            is MoreOptionIcon.Resource -> {
                 Icon(
                     painter = painterResource(icon.resId),
                     contentDescription = null,
