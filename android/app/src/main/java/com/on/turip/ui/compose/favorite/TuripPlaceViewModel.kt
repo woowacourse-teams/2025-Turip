@@ -152,7 +152,13 @@ class TuripPlaceViewModel @Inject constructor(
         }
     }
 
-    fun updateScreenMode(turipPlaceScreenMode: TuripPlaceScreenMode) = _uiState.update { it.copy(screenMode = turipPlaceScreenMode) }
+    fun updateScreenMode(turipPlaceScreenMode: TuripPlaceScreenMode) {
+        if (turipPlaceScreenMode == TuripPlaceScreenMode.MoreOption) {
+            _uiState.update { it.copy(inputTuripName = "") }
+        }
+
+        _uiState.update { it.copy(screenMode = turipPlaceScreenMode) }
+    }
 
     fun updateInputName(name: String) {
         val editModel: ImmutableList<TuripEditModel> = _uiState.value.editModels
