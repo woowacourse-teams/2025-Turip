@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -46,7 +48,8 @@ fun MyPageSettingItem(
                     width = 1.dp,
                     color = TuripTheme.colors.gray02,
                     shape = shape,
-                ).padding(
+                )
+                .padding(
                     horizontal = TuripTheme.spacing.extraLarge,
                     vertical = TuripTheme.spacing.large,
                 ),
@@ -71,10 +74,12 @@ fun MyPageSettingItem(
                     .weight(1f)
                     .padding(end = TuripTheme.spacing.medium),
         )
+
         Icon(
-            painter = painterResource(R.drawable.btn_chevron_right),
+            imageVector = Icons.AutoMirrored.Default.KeyboardArrowRight,
             tint = TuripTheme.colors.gray02,
             contentDescription = null,
+            modifier = Modifier.size(16.dp),
         )
     }
 }
