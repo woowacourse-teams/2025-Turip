@@ -70,10 +70,10 @@ fun MoreOptionBottomSheet(
     onShareClick: () -> Unit,
     onInviteLinkClick: () -> Unit,
     onDeleteClick: () -> Unit,
-    modifier: Modifier = Modifier,
     turipNameStatus: TuripNameStatusModel,
     onNameChanged: (String) -> Unit,
     onConfirmClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val focusRequester = remember { FocusRequester() }
     var folderName by remember { mutableStateOf("") }
