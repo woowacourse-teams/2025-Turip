@@ -145,13 +145,13 @@ fun TuripDetailScreen(
         MoreOptionBottomSheet(
             sheetState = modalBottomSheetState,
             isDefault = uiState.selectedTurip.isDefault,
-            onDismiss = { viewModel.dismissBottomSheet() },
+            onDismiss = viewModel::dismissBottomSheet,
             onShareClick = viewModel::shareTurip,
             onInviteLinkClick = {},
             onDeleteClick = viewModel::showTuripRemoveDialog,
             screenMode = uiState.screenMode,
             onScreenModeChange = { screenMode: TuripPlaceScreenMode ->
-                viewModel.updateScreenMode(screenMode)
+                viewModel.updateScreenMode(turipPlaceScreenMode = screenMode)
             },
             turipNameStatus = uiState.turipNameStatus,
             folderName = uiState.inputTuripName,
