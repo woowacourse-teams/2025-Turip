@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -21,7 +22,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -79,7 +79,8 @@ private fun ProfileImage(
                     shape = shape,
                     ambientColor = TuripTheme.colors.black,
                     spotColor = TuripTheme.colors.black,
-                ).clip(shape)
+                )
+                .clip(shape)
                 .background(TuripTheme.colors.white)
                 .border(
                     width = 2.dp,
@@ -90,9 +91,8 @@ private fun ProfileImage(
     ) {
         if (imageUrl.isNullOrBlank()) {
             Icon(
-                painter = painterResource(R.drawable.ic_profile_default),
+                imageVector = Icons.Default.Person,
                 contentDescription = stringResource(R.string.my_page_profile_image_description),
-                tint = Color.Unspecified,
                 modifier = Modifier.fillMaxSize(0.4f),
             )
         } else {
@@ -158,7 +158,8 @@ private fun ProfileError(onRetry: () -> Unit) {
                     width = 1.dp,
                     shape = TuripTheme.shape.wideButton,
                     color = TuripTheme.colors.gray03,
-                ).clickable(onClick = onRetry)
+                )
+                .clickable(onClick = onRetry)
                 .padding(
                     horizontal = TuripTheme.spacing.medium,
                     vertical = TuripTheme.spacing.small,
