@@ -60,7 +60,7 @@ class TuripPlaceFragment : Fragment() {
                                         errorToastMessage = getString(R.string.all_snackbar_not_found_map_url),
                                     )
                                 },
-                                goBack = {
+                                onBack = {
                                     currentScreen = 0
                                 },
                             )

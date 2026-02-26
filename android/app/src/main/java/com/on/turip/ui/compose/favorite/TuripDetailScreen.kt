@@ -67,7 +67,7 @@ fun TuripDetailScreen(
     onNavigateToLogin: () -> Unit,
     onShareTurip: (turipShareModel: TuripShareModel) -> Unit,
     onNavigateToMap: (uri: Uri) -> Unit,
-    goBack: () -> Unit,
+    onBack: () -> Unit,
     viewModel: TuripPlaceViewModel = hiltViewModel(),
 ) {
     val uiState: TuripPlaceUiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -78,7 +78,7 @@ fun TuripDetailScreen(
     val modalBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var dialogState: Boolean by remember { mutableStateOf(false) }
 
-    BackHandler { goBack() }
+    BackHandler { onBack() }
 
     DisposableEffect(Unit) {
         onDispose { viewModel.resetUiState() }
@@ -118,7 +118,7 @@ fun TuripDetailScreen(
 
                 TuripPlaceUiEffect.TuripDelete -> {
                     dialogState = false
-                    goBack()
+                    onBack()
                 }
 
                 TuripPlaceUiEffect.TuripUpdated -> {
@@ -214,7 +214,7 @@ fun TuripDetailScreen(
                         onUpdateTuripPlacesOrder = viewModel::updateTuripPlacesOrder,
                         currentPlaceLatLng = uiState.placesLatLng,
                         onMoreOption = viewModel::showBottomSheet,
-                        goBack = goBack,
+                        onBack = onBack,
                         selectedPlace = uiState.selectedPlace,
                         onItemClick = viewModel::updateSelectedPlace,
                     )
@@ -266,7 +266,7 @@ private fun TuripPlaceContent(
     navigateToMap: (map: MapModel) -> Unit,
     onClickTuripPlace: (placeId: Long) -> Unit,
     onMoreOption: () -> Unit,
-    goBack: () -> Unit,
+    onBack: () -> Unit,
     onUpdateTuripPlacesOrder: (updatePlaces: ImmutableList<TuripPlaceModel>) -> Unit,
 ) {
     var currentPlaces: ImmutableList<TuripPlaceModel> by remember(turipPlaceModel) {
@@ -286,7 +286,7 @@ private fun TuripPlaceContent(
     ) {
         Header(
             turipName = selectedTuripName,
-            onBackClick = goBack,
+            onBackClick = onBack,
             onMoreOption = onMoreOption,
         )
 
@@ -392,7 +392,7 @@ private fun TuripPlaceScreenPreview() {
             onUpdateTuripPlacesOrder = {},
             currentPlaceLatLng = persistentListOf(),
             selectedTuripId = -1L,
-            goBack = {},
+            onBack = {},
             selectedPlace =
                 PlaceLatLngUiModel(
                     placeId = 101L,
