@@ -63,14 +63,14 @@ fun TuripDetail(
                 .background(color = TuripTheme.colors.white),
     ) {
         if (hasPlaces) {
-            TuripPlacesContent(
+            TuripPlaces(
                 listState = listState,
-                onItemClick = onItemClick,
                 places = places,
                 onMapClick = onMapClick,
                 onTuripPlaceClick = onTuripPlaceClick,
                 onDragStart = onDragStart,
                 onDragPlace = onDragPlace,
+                onItemClick = onItemClick,
                 onDragEnd = onDragEnd,
                 modifier = Modifier.padding(horizontal = TuripTheme.spacing.large),
             )
@@ -83,31 +83,6 @@ fun TuripDetail(
             )
         }
     }
-}
-
-@Composable
-private fun TuripPlacesContent(
-    listState: LazyListState,
-    places: ImmutableList<TuripPlaceModel>,
-    onItemClick: (placeId: Long) -> Unit,
-    onMapClick: (map: MapModel) -> Unit,
-    onTuripPlaceClick: (placeId: Long) -> Unit,
-    onDragStart: () -> Unit,
-    onDragPlace: (from: Int, to: Int) -> Unit,
-    onDragEnd: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    TuripPlaces(
-        listState = listState,
-        places = places,
-        onMapClick = onMapClick,
-        onTuripPlaceClick = onTuripPlaceClick,
-        onDragStart = onDragStart,
-        onDragPlace = onDragPlace,
-        onItemClick = onItemClick,
-        onDragEnd = onDragEnd,
-        modifier = modifier,
-    )
 }
 
 @Composable
