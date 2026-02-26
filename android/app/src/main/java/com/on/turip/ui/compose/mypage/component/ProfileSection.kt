@@ -79,8 +79,7 @@ private fun ProfileImage(
                     shape = shape,
                     ambientColor = TuripTheme.colors.black,
                     spotColor = TuripTheme.colors.black,
-                )
-                .clip(shape)
+                ).clip(shape)
                 .background(TuripTheme.colors.white)
                 .border(
                     width = 2.dp,
@@ -158,8 +157,7 @@ private fun ProfileError(onRetry: () -> Unit) {
                     width = 1.dp,
                     shape = TuripTheme.shape.wideButton,
                     color = TuripTheme.colors.gray03,
-                )
-                .clickable(onClick = onRetry)
+                ).clickable(onClick = onRetry)
                 .padding(
                     horizontal = TuripTheme.spacing.medium,
                     vertical = TuripTheme.spacing.small,
@@ -174,21 +172,6 @@ private fun ProfileError(onRetry: () -> Unit) {
             text = stringResource(R.string.retry),
             style = TuripTheme.typography.info1,
             color = TuripTheme.colors.gray03,
-        )
-    }
-}
-
-@Preview(showBackground = true, name = "로딩중")
-@Composable
-private fun ProfileLoadingPreview() {
-    TuripTheme {
-        ProfileSection(
-            state = MyPageSectionState.Loading,
-            onRetry = {},
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(TuripTheme.spacing.extraLarge),
         )
     }
 }
