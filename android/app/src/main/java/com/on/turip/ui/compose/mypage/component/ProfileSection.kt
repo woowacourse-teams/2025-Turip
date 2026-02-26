@@ -104,7 +104,7 @@ private fun ProfileImage(
                         .build(),
                 contentDescription = stringResource(R.string.my_page_profile_image_description),
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.matchParentSize(),
+                modifier = Modifier.fillMaxSize(),
                 placeholder = painterResource(R.drawable.bg_image_placeholder),
                 error = painterResource(R.drawable.ic_sorry),
             )
