@@ -34,11 +34,11 @@ import com.on.turip.ui.compose.mypage.model.InquiryMail
 
 @Composable
 fun MyPageScreen(
-    navigateToAllBookmarkContents: () -> Unit,
-    navigateToContent: (contentId: Long) -> Unit,
-    navigateToInquiry: (mail: InquiryMail) -> Unit,
-    navigateToPrivacyPolicy: (url: String) -> Unit,
-    navigateToLogin: () -> Unit,
+    onNavigateToAllBookmarkContents: () -> Unit,
+    onNavigateToContent: (contentId: Long) -> Unit,
+    onNavigateToInquiry: (mail: InquiryMail) -> Unit,
+    onNavigateToPrivacyPolicy: (url: String) -> Unit,
+    onNavigateToLogin: () -> Unit,
     viewModel: MyPageViewModel = hiltViewModel(),
 ) {
     val uiState: MyPageUiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -58,15 +58,15 @@ fun MyPageScreen(
                 }
 
                 is MyPageUiEffect.NavigateToInquiry -> {
-                    navigateToInquiry(uiEffect.mail)
+                    onNavigateToInquiry(uiEffect.mail)
                 }
 
                 MyPageUiEffect.NavigateToLogin -> {
-                    navigateToLogin()
+                    onNavigateToLogin()
                 }
 
                 is MyPageUiEffect.NavigateToPrivacyPolicy -> {
-                    navigateToPrivacyPolicy(uiEffect.url)
+                    onNavigateToPrivacyPolicy(uiEffect.url)
                 }
 
                 is MyPageUiEffect.ShowError -> {
@@ -84,14 +84,14 @@ fun MyPageScreen(
     MyPageScreenContent(
         uiState = uiState,
         snackbarHostState = snackbarHostState,
-        navigateToAllBookmarkContents = navigateToAllBookmarkContents,
-        navigateToContent = navigateToContent,
+        onNavigateToAllBookmarkContents = onNavigateToAllBookmarkContents,
+        onNavigateToContent = onNavigateToContent,
         onRemoveBookmark = viewModel::removeBookmark,
         onProfileRetry = viewModel::loadProfile,
         onBookmarkRetry = viewModel::loadBookmarkContents,
         onInquiryClick = viewModel::loadInquiryMail,
         onPrivacyPolicyClick = viewModel::loadPrivacyPolicy,
-        onLoginClick = navigateToLogin,
+        onLoginClick = onNavigateToLogin,
         onLogoutClick = viewModel::loadLogoutDialog,
         onWithdrawClick = viewModel::loadWithdrawDialog,
         onDialogConfirmLogout = viewModel::confirmLogout,
@@ -104,8 +104,8 @@ fun MyPageScreen(
 private fun MyPageScreenContent(
     uiState: MyPageUiState,
     snackbarHostState: SnackbarHostState,
-    navigateToAllBookmarkContents: () -> Unit,
-    navigateToContent: (contentId: Long) -> Unit,
+    onNavigateToAllBookmarkContents: () -> Unit,
+    onNavigateToContent: (contentId: Long) -> Unit,
     onRemoveBookmark: (Long) -> Unit,
     onProfileRetry: () -> Unit,
     onBookmarkRetry: () -> Unit,
@@ -182,8 +182,8 @@ private fun MyPageScreenContent(
             item {
                 BookmarkedContentSection(
                     state = uiState.bookmarkContentState,
-                    onViewAllContentClick = navigateToAllBookmarkContents,
-                    onContentClick = navigateToContent,
+                    onViewAllContentClick = onNavigateToAllBookmarkContents,
+                    onContentClick = onNavigateToContent,
                     onRemoveBookmark = onRemoveBookmark,
                     onRetry = onBookmarkRetry,
                 )
@@ -210,8 +210,8 @@ private fun MyPageScreenPreview() {
         MyPageScreenContent(
             uiState = MyPageUiState.Idle,
             snackbarHostState = remember { SnackbarHostState() },
-            navigateToAllBookmarkContents = {},
-            navigateToContent = {},
+            onNavigateToAllBookmarkContents = {},
+            onNavigateToContent = {},
             onRemoveBookmark = {},
             onProfileRetry = {},
             onBookmarkRetry = {},

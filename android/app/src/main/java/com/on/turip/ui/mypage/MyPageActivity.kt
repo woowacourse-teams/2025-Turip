@@ -28,14 +28,14 @@ class MyPageActivity : AppCompatActivity() {
             TuripTheme {
                 MyPageScreen(
                     // 화면 구현 필요
-                    navigateToAllBookmarkContents = {},
-                    navigateToContent = { contentId: Long ->
+                    onNavigateToAllBookmarkContents = {},
+                    onNavigateToContent = { contentId: Long ->
                         Timber.d("마이페이지 북마크 콘텐츠 클릭(contentId=$contentId)")
                         val intent: Intent =
                             TripDetailActivity.newIntent(context = this, contentId = contentId)
                         startActivity(intent)
                     },
-                    navigateToInquiry = { mail: InquiryMail ->
+                    onNavigateToInquiry = { mail: InquiryMail ->
                         val uri =
                             "mailto:${InquiryMail.RECIPIENT}?subject=${Uri.encode(InquiryMail.TITLE)}&body=${
                                 Uri.encode(mail.content)
@@ -44,14 +44,14 @@ class MyPageActivity : AppCompatActivity() {
                         val intent: Intent = Intent(Intent.ACTION_SENDTO).apply { data = uri }
                         startActivity(intent)
                     },
-                    navigateToPrivacyPolicy = { url: String ->
+                    onNavigateToPrivacyPolicy = { url: String ->
                         val intent = Intent(Intent.ACTION_VIEW, url.toUri())
                         safeStartActivityWithToast(
                             intent = intent,
                             errorToastMessage = getString(R.string.all_snackbar_not_found_privacy_policy_url),
                         )
                     },
-                    navigateToLogin = {
+                    onNavigateToLogin = {
                         val intent: Intent =
                             LoginActivity.newIntent(this).apply {
                                 flags =
