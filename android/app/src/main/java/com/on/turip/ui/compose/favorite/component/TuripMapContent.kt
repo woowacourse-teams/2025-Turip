@@ -107,7 +107,7 @@ fun TuripMapContent(
                     .fillMaxWidth()
                     .height(mapHeight),
         ) {
-            if (mapHeight > 0.dp) {
+            if (isMapVisible) {
                 GoogleMap(
                     modifier = Modifier.fillMaxSize(),
                     cameraPositionState = cameraPositionState,
