@@ -81,6 +81,43 @@ fun MyPageScreen(
         }
     }
 
+    MyPageScreenContent(
+        uiState = uiState,
+        snackbarHostState = snackbarHostState,
+        navigateToAllBookmarkContents = navigateToAllBookmarkContents,
+        navigateToContent = navigateToContent,
+        onRemoveBookmark = viewModel::removeBookmark,
+        onProfileRetry = viewModel::loadProfile,
+        onBookmarkRetry = viewModel::loadBookmarkContents,
+        onInquiryClick = viewModel::loadInquiryMail,
+        onPrivacyPolicyClick = viewModel::loadPrivacyPolicy,
+        onLoginClick = navigateToLogin,
+        onLogoutClick = viewModel::loadLogoutDialog,
+        onWithdrawClick = viewModel::loadWithdrawDialog,
+        onDialogConfirmLogout = viewModel::confirmLogout,
+        onDialogConfirmWithdraw = viewModel::confirmWithdraw,
+        onDialogDismiss = viewModel::dismissDialog,
+    )
+}
+
+@Composable
+private fun MyPageScreenContent(
+    uiState: MyPageUiState,
+    snackbarHostState: SnackbarHostState,
+    navigateToAllBookmarkContents: () -> Unit,
+    navigateToContent: (contentId: Long) -> Unit,
+    onRemoveBookmark: (Long) -> Unit,
+    onProfileRetry: () -> Unit,
+    onBookmarkRetry: () -> Unit,
+    onInquiryClick: () -> Unit,
+    onPrivacyPolicyClick: () -> Unit,
+    onLoginClick: () -> Unit,
+    onLogoutClick: () -> Unit,
+    onWithdrawClick: () -> Unit,
+    onDialogConfirmLogout: () -> Unit,
+    onDialogConfirmWithdraw: () -> Unit,
+    onDialogDismiss: () -> Unit,
+) {
     when (uiState.dialogState) {
         MyPageDialogState.LogoutRequired -> {
             TuripDialog(
@@ -90,8 +127,8 @@ fun MyPageScreen(
                 dismissText = stringResource(R.string.my_page_logout_dialog_dismiss),
                 confirmButtonColor = TuripTheme.colors.primary,
                 dismissButtonColor = TuripTheme.colors.gray02,
-                onConfirmation = viewModel::confirmLogout,
-                onDismissRequest = viewModel::dismissDialog,
+                onConfirmation = onDialogConfirmLogout,
+                onDismissRequest = onDialogDismiss,
             )
         }
 
@@ -103,8 +140,8 @@ fun MyPageScreen(
                 dismissText = stringResource(R.string.my_page_withdraw_dialog_dismiss),
                 confirmButtonColor = TuripTheme.colors.error,
                 dismissButtonColor = TuripTheme.colors.gray02,
-                onConfirmation = viewModel::confirmWithdraw,
-                onDismissRequest = viewModel::dismissDialog,
+                onConfirmation = onDialogConfirmWithdraw,
+                onDismissRequest = onDialogDismiss,
             )
         }
 
@@ -132,7 +169,7 @@ fun MyPageScreen(
             item {
                 ProfileSection(
                     state = uiState.profileState,
-                    onRetry = viewModel::loadProfile,
+                    onRetry = onProfileRetry,
                     modifier =
                         Modifier
                             .fillMaxWidth()
@@ -147,18 +184,18 @@ fun MyPageScreen(
                     state = uiState.bookmarkContentState,
                     onViewAllContentClick = navigateToAllBookmarkContents,
                     onContentClick = navigateToContent,
-                    onRemoveBookmark = viewModel::removeBookmark,
-                    onRetry = viewModel::loadBookmarkContents,
+                    onRemoveBookmark = onRemoveBookmark,
+                    onRetry = onBookmarkRetry,
                 )
             }
 
             item {
                 MyPageSettingsSection(
-                    onInquiryClick = viewModel::loadInquiryMail,
-                    onPrivacyPolicyClick = viewModel::loadPrivacyPolicy,
-                    onLoginClick = navigateToLogin,
-                    onLogoutClick = viewModel::loadLogoutDialog,
-                    onWithdrawClick = viewModel::loadWithdrawDialog,
+                    onInquiryClick = onInquiryClick,
+                    onPrivacyPolicyClick = onPrivacyPolicyClick,
+                    onLoginClick = onLoginClick,
+                    onLogoutClick = onLogoutClick,
+                    onWithdrawClick = onWithdrawClick,
                     modifier = Modifier.padding(horizontal = TuripTheme.spacing.medium),
                 )
             }
@@ -170,12 +207,22 @@ fun MyPageScreen(
 @Composable
 private fun MyPageScreenPreview() {
     TuripTheme {
-        MyPageScreen(
+        MyPageScreenContent(
+            uiState = MyPageUiState.Idle,
+            snackbarHostState = remember { SnackbarHostState() },
             navigateToAllBookmarkContents = {},
             navigateToContent = {},
-            navigateToInquiry = {},
-            navigateToPrivacyPolicy = {},
-            navigateToLogin = {},
+            onRemoveBookmark = {},
+            onProfileRetry = {},
+            onBookmarkRetry = {},
+            onInquiryClick = {},
+            onPrivacyPolicyClick = {},
+            onLoginClick = {},
+            onLogoutClick = {},
+            onWithdrawClick = {},
+            onDialogConfirmLogout = {},
+            onDialogConfirmWithdraw = {},
+            onDialogDismiss = {},
         )
     }
 }
