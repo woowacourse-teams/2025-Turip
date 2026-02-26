@@ -8,10 +8,10 @@ import com.on.turip.core.result.onSuccess
 import com.on.turip.domain.turip.Turip
 import com.on.turip.domain.turip.repository.TuripRepository
 import com.on.turip.ui.common.error.ErrorUiState
+import com.on.turip.ui.compose.designsystem.model.TuripNameStatusModel
 import com.on.turip.ui.compose.folder.mapper.toEditModel
 import com.on.turip.ui.compose.folder.mapper.toUiMyTuripModel
 import com.on.turip.ui.folder.model.TuripEditModel
-import com.on.turip.ui.folder.model.TuripNameStatusModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.channels.Channel

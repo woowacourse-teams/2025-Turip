@@ -17,7 +17,7 @@ import com.on.turip.ui.common.base.BaseBottomSheetFragment
 import com.on.turip.ui.common.error.ErrorUiModel
 import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.common.extensions.collectOnStarted
-import com.on.turip.ui.folder.model.TuripNameStatusModel
+import com.on.turip.ui.compose.designsystem.model.TuripNameStatusModel
 import com.on.turip.ui.folder.model.TuripUiEffect
 import com.on.turip.ui.login.LoginActivity
 

@@ -14,10 +14,10 @@ import com.on.turip.domain.turip.repository.TuripRepository
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
+import com.on.turip.ui.compose.designsystem.model.TuripNameStatusModel
 import com.on.turip.ui.compose.folder.mapper.toUiMyTuripModel
 import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
 import com.on.turip.ui.folder.model.TuripEditModel
-import com.on.turip.ui.folder.model.TuripNameStatusModel
 import com.on.turip.ui.main.favorite.model.PlaceLatLngUiModel
 import com.on.turip.ui.main.favorite.model.TuripPlaceRetryAction
 import com.on.turip.ui.main.favorite.model.TuripPlaceUiEffect

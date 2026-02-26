@@ -40,10 +40,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.on.turip.R
+import com.on.turip.ui.compose.designsystem.component.NameEditorSheetContent
+import com.on.turip.ui.compose.designsystem.model.TuripNameStatusModel
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.favorite.TuripPlaceScreenMode
-import com.on.turip.ui.compose.folder.component.FolderBottomSheetContent
-import com.on.turip.ui.folder.model.TuripNameStatusModel
 
 @Immutable
 private data class MoreOptionItem(
@@ -150,7 +150,7 @@ fun MoreOptionBottomSheet(
                 }
 
                 TuripPlaceScreenMode.Edit -> {
-                    FolderBottomSheetContent(
+                    NameEditorSheetContent(
                         title = stringResource(R.string.bottom_sheet_turip_modify_title),
                         folderName = folderName,
                         onBack = { onScreenModeChange(TuripPlaceScreenMode.MoreOption) },

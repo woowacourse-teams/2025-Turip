@@ -11,8 +11,8 @@ import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.common.mapper.toEditUiModel
+import com.on.turip.ui.compose.designsystem.model.TuripNameStatusModel
 import com.on.turip.ui.folder.model.TuripEditModel
-import com.on.turip.ui.folder.model.TuripNameStatusModel
 import com.on.turip.ui.folder.model.TuripRetryAction
 import com.on.turip.ui.folder.model.TuripUiEffect
 import com.on.turip.ui.folder.model.TuripUiState

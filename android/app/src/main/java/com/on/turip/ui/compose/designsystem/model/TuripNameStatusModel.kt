@@ -1,8 +1,9 @@
-package com.on.turip.ui.folder.model
+package com.on.turip.ui.compose.designsystem.model
 
 import androidx.annotation.StringRes
 import com.on.turip.R
 import com.on.turip.domain.turip.TuripNameStatus
+import com.on.turip.ui.folder.model.TuripEditModel
 
 enum class TuripNameStatusModel(
     @StringRes val errorMessage: Int?,
@@ -25,7 +26,7 @@ enum class TuripNameStatusModel(
                 originTurips.map { it.name }.toCollection(LinkedHashSet())
 
             val turipNameStatus: TuripNameStatus =
-                TuripNameStatus.of(turipName, originTuripNames)
+                TuripNameStatus.Companion.of(turipName, originTuripNames)
             return when (turipNameStatus) {
                 TuripNameStatus.EMPTY -> EMPTY
                 TuripNameStatus.MAX_LENGTH_TURIP_NAME -> MAX_LENGTH_TURIP_NAME
