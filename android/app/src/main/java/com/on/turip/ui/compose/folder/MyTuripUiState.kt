@@ -14,6 +14,7 @@ data class MyTuripUiState(
     val turipNameStatus: TuripNameStatusModel,
     val inputTuripName: String,
     val deletedTuripId: Long,
+    val showTuripRemoveDialog: Boolean,
 ) {
     companion object {
         val Idle =
@@ -25,6 +26,7 @@ data class MyTuripUiState(
                 turipNameStatus = TuripNameStatusModel.EMPTY,
                 inputTuripName = "",
                 deletedTuripId = -1L,
+                showTuripRemoveDialog = false,
             )
     }
 }

@@ -152,9 +152,7 @@ class TuripPlaceViewModel @Inject constructor(
         }
     }
 
-    fun updateScreenMode(turipPlaceScreenMode: TuripPlaceScreenMode) {
-        _uiState.update { it.copy(screenMode = turipPlaceScreenMode) }
-    }
+    fun updateScreenMode(turipPlaceScreenMode: TuripPlaceScreenMode) = _uiState.update { it.copy(screenMode = turipPlaceScreenMode) }
 
     fun updateInputName(name: String) {
         val editModel: ImmutableList<TuripEditModel> = _uiState.value.editModels
@@ -187,19 +185,21 @@ class TuripPlaceViewModel @Inject constructor(
         }
     }
 
-    fun resetUiState() {
-        _uiState.update { TuripPlaceUiState.Idle }
-    }
+    fun resetUiState() = _uiState.update { TuripPlaceUiState.Idle }
 
-    fun showBottomSheet() {
-        _uiState.update { it.copy(showBottomSheet = true) }
-    }
+    fun showBottomSheet() = _uiState.update { it.copy(showBottomSheet = true) }
 
-    fun dismissBottomSheet() {
+    fun dismissBottomSheet() =
         _uiState.update {
-            it.copy(showBottomSheet = false, screenMode = TuripPlaceScreenMode.MoreOption)
+            it.copy(
+                showBottomSheet = false,
+                screenMode = TuripPlaceScreenMode.MoreOption,
+            )
         }
-    }
+
+    fun showTuripRemoveDialog() = _uiState.update { it.copy(showTuripRemoveDialog = true) }
+
+    fun dismissTuripRemoveDialog() = _uiState.update { it.copy(showTuripRemoveDialog = false) }
 
     fun deleteTurip(selectedTuripId: Long) {
         viewModelScope.launch {

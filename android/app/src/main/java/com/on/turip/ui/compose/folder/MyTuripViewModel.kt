@@ -51,11 +51,9 @@ class MyTuripViewModel @Inject constructor(
         }
     }
 
-    fun showAddBottomSheet() {
-        _uiState.update { it.copy(showAddBottomSheet = true) }
-    }
+    fun showAddBottomSheet() = _uiState.update { it.copy(showAddBottomSheet = true) }
 
-    fun dismissAddBottomSheet() {
+    fun dismissAddBottomSheet() =
         _uiState.update {
             it.copy(
                 showAddBottomSheet = false,
@@ -63,7 +61,10 @@ class MyTuripViewModel @Inject constructor(
                 inputTuripName = "",
             )
         }
-    }
+
+    fun showTuripRemoveDialog() = _uiState.update { it.copy(showTuripRemoveDialog = true) }
+
+    fun dismissTuripRemoveDialog() = _uiState.update { it.copy(showTuripRemoveDialog = false) }
 
     fun updateInputName(name: String) {
         val editModels: List<TuripEditModel> =
@@ -77,13 +78,7 @@ class MyTuripViewModel @Inject constructor(
         }
     }
 
-    fun updateDeleteTuripId(id: Long) {
-        _uiState.update {
-            it.copy(
-                deletedTuripId = id,
-            )
-        }
-    }
+    fun updateDeleteTuripId(id: Long) = _uiState.update { it.copy(deletedTuripId = id) }
 
     fun addTurip() {
         val name = _uiState.value.inputTuripName

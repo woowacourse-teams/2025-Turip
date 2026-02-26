@@ -75,7 +75,6 @@ fun MyTuripScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val resources = LocalResources.current
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    var dialogState: Boolean by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
@@ -137,7 +136,7 @@ fun MyTuripScreen(
         onTuripClick = onNavigateToTuripPlace,
         onTuripDelete = { id: Long ->
             viewModel.updateDeleteTuripId(id)
-            dialogState = true
+            viewModel.showTuripRemoveDialog()
         },
         onAddClick = viewModel::showAddBottomSheet,
         modifier = modifier,
@@ -155,7 +154,7 @@ fun MyTuripScreen(
         )
     }
 
-    if (dialogState) {
+    if (uiState.showTuripRemoveDialog) {
         val deletedTuripName: String? =
             uiState.turips.find { it.id == uiState.deletedTuripId }?.name
         TuripDialog(
@@ -171,9 +170,9 @@ fun MyTuripScreen(
             dismissButtonColor = TuripTheme.colors.gray02,
             onConfirmation = {
                 viewModel.deleteTurip(uiState.deletedTuripId)
-                dialogState = false
+                viewModel.dismissTuripRemoveDialog()
             },
-            onDismissRequest = { dialogState = false },
+            onDismissRequest = viewModel::dismissTuripRemoveDialog,
             modifier = Modifier.fillMaxSize(),
         )
     }

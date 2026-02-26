@@ -76,7 +76,6 @@ fun TuripDetailScreen(
     var showLoginSuggestDialog by remember { mutableStateOf(false) }
     val lifecycleOwner = LocalLifecycleOwner.current
     val modalBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    var dialogState: Boolean by remember { mutableStateOf(false) }
 
     BackHandler { onBack() }
 
@@ -117,7 +116,7 @@ fun TuripDetailScreen(
                 }
 
                 TuripPlaceUiEffect.TuripDelete -> {
-                    dialogState = false
+                    viewModel.dismissTuripRemoveDialog()
                     onBack()
                 }
 
@@ -149,7 +148,7 @@ fun TuripDetailScreen(
             onDismiss = { viewModel.dismissBottomSheet() },
             onShareClick = viewModel::shareTurip,
             onInviteLinkClick = {},
-            onDeleteClick = { dialogState = true },
+            onDeleteClick = viewModel::showTuripRemoveDialog,
             screenMode = uiState.screenMode,
             onScreenModeChange = { screenMode: TuripPlaceScreenMode ->
                 viewModel.updateScreenMode(screenMode)
@@ -161,7 +160,7 @@ fun TuripDetailScreen(
         )
     }
 
-    if (dialogState) {
+    if (uiState.showTuripRemoveDialog) {
         TuripDialog(
             title = stringResource(R.string.bottom_sheet_turip_delete),
             message =
@@ -177,7 +176,7 @@ fun TuripDetailScreen(
                 viewModel.deleteTurip(selectedTuripId)
                 viewModel.dismissBottomSheet()
             },
-            onDismissRequest = { dialogState = false },
+            onDismissRequest = viewModel::dismissTuripRemoveDialog,
             modifier = Modifier.fillMaxSize(),
         )
     }

@@ -21,6 +21,7 @@ data class TuripPlaceUiState(
     val editModels: ImmutableList<TuripEditModel>,
     val selectedTurip: MyTuripModel,
     val selectedPlace: PlaceLatLngUiModel,
+    val showTuripRemoveDialog: Boolean,
     val places: ImmutableList<TuripPlaceModel>,
     val placesLatLng: ImmutableList<PlaceLatLngUiModel>,
 ) {
@@ -37,6 +38,7 @@ data class TuripPlaceUiState(
                 placesLatLng = persistentListOf(),
                 editModels = persistentListOf(),
                 screenMode = TuripPlaceScreenMode.MoreOption,
+                showTuripRemoveDialog = false,
                 selectedPlace = PlaceLatLngUiModel.Idle,
             )
     }
