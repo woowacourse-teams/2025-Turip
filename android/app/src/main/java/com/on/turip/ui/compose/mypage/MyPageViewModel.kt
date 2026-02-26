@@ -18,6 +18,7 @@ import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.compose.mypage.model.InquiryMail
 import com.on.turip.ui.compose.mypage.util.AppEnvironmentInfoProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -30,7 +31,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import timber.log.Timber
-import javax.inject.Inject
 
 @HiltViewModel
 class MyPageViewModel @Inject constructor(
@@ -178,7 +178,8 @@ class MyPageViewModel @Inject constructor(
                             _uiEffect.send(MyPageUiEffect.NavigateToLogin)
                             Timber.d("로그아웃 성공")
                         }.onFailure {
-                            Timber.e("토큰 초기화 실패")
+                            _uiEffect.send(MyPageUiEffect.NavigateToLogin)
+                            Timber.e("토큰 초기화 실패 - 로그인 화면으로 강제 이동")
                         }
                 }.onFailure { errorType: ErrorType ->
                     handleError(errorType, MyPageRetryAction.LOGOUT)
@@ -200,7 +201,8 @@ class MyPageViewModel @Inject constructor(
                             _uiEffect.send(MyPageUiEffect.NavigateToLogin)
                             Timber.d("회원탈퇴 성공")
                         }.onFailure {
-                            Timber.e("토큰 초기화 실패")
+                            _uiEffect.send(MyPageUiEffect.NavigateToLogin)
+                            Timber.e("토큰 초기화 실패 - 로그인 화면으로 강제 이동")
                         }
                 }.onFailure { errorType: ErrorType ->
                     handleError(errorType, MyPageRetryAction.WITHDRAW)
