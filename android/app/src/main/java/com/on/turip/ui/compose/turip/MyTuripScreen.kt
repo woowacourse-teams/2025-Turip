@@ -50,17 +50,10 @@ import com.on.turip.ui.compose.turip.component.MyTuripCard
 import com.on.turip.ui.compose.turip.component.MyTuripTabRow
 import com.on.turip.ui.compose.turip.component.TuripAddBottomSheet
 import com.on.turip.ui.compose.turip.model.MyTuripModel
+import com.on.turip.ui.compose.turip.model.MyTuripTab
 import com.on.turip.ui.compose.turip.model.TuripTypeModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
-
-enum class MyTuripTab(
-    val tabName: String,
-) {
-    ALL("전체"),
-    SOLO("나홀로 튜립"),
-    TOGETHER("함께 튜립"),
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

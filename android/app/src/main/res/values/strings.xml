@@ -148,4 +148,10 @@
     <string name="turip_more_option_bottom_sheet_invite_by_link">링크로 초대하기</string>
     <string name="turip_more_option_bottom_sheet_delete">삭제</string>
 
+    <!-- 튜립 화면 -->
+    <string name="turip_card_together_turip">함께 튜립</string>
+    <string name="turip_card_solo_turip">나홀로 튜립</string>
+    <string name="turip_tab_together_turip">함께 튜립</string>
+    <string name="turip_tab_solo_turip">나홀로 튜립</string>
+    <string name="turip_tab_all">전체</string>
 </resources>

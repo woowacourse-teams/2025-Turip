@@ -17,12 +17,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.login.util.noRippleClickable
-import com.on.turip.ui.compose.turip.MyTuripTab
+import com.on.turip.ui.compose.turip.model.MyTuripTab
 
 @Composable
 fun MyTuripTabRow(
@@ -58,7 +59,7 @@ fun MyTuripTabRow(
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
-                        text = myTuripTab.tabName,
+                        text = stringResource(myTuripTab.tabRes),
                         style = TuripTheme.typography.title3,
                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                         color = if (isSelected) TuripTheme.colors.black else TuripTheme.colors.gray03,

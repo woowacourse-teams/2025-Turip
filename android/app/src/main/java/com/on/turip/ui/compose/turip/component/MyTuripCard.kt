@@ -37,6 +37,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -78,8 +79,7 @@ fun MyTuripCard(
                     .indication(
                         interactionSource = interactionSource,
                         indication = ripple(),
-                    )
-                    .pointerInput(onLongPress, onTuripClick) {
+                    ).pointerInput(onLongPress, onTuripClick) {
                         awaitEachGesture {
                             val down = awaitFirstDown(requireUnconsumed = false)
                             val press = PressInteraction.Press(down.position)
@@ -198,7 +198,7 @@ private fun TuripTypeChip(
         when (type) {
             TuripTypeModel.TOGETHER -> {
                 TuripChipModel(
-                    text = "함께 튜립",
+                    text = stringResource(R.string.turip_card_together_turip),
                     backgroundColor = TuripTheme.colors.chipBackground,
                     textColor = TuripTheme.colors.gray03,
                 )
@@ -206,7 +206,7 @@ private fun TuripTypeChip(
 
             TuripTypeModel.SOLO -> {
                 TuripChipModel(
-                    text = "나홀로 튜립",
+                    text = stringResource(R.string.turip_card_solo_turip),
                     backgroundColor = TuripTheme.colors.primary,
                     textColor = TuripTheme.colors.white,
                 )
