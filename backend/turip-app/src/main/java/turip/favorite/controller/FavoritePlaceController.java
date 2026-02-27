@@ -31,6 +31,8 @@ import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusRe
 import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlacesWithPlaceDetailResponse;
 import turip.favorite.controller.dto.response.FavoritePlaceCountResponse;
 import turip.favorite.service.FavoritePlaceService;
+import turip.favorite.stream.service.ActionType;
+import turip.favorite.stream.service.FavoriteFolderStreamService;
 
 @RestController
 @RequiredArgsConstructor
@@ -39,6 +41,7 @@ import turip.favorite.service.FavoritePlaceService;
 public class FavoritePlaceController {
 
     private final FavoritePlaceService favoritePlaceService;
+    private final FavoriteFolderStreamService favoriteFolderStreamService;
 
     @Operation(
             summary = "튜립 장소 추가 api",
@@ -181,6 +184,7 @@ public class FavoritePlaceController {
             @RequestParam("placeId") Long placeId
     ) {
         FavoritePlaceResponse response = favoritePlaceService.create(account, favoriteFolderId, placeId);
+        favoriteFolderStreamService.sendFolderUpdateEvents(response.favoriteFolderId(), ActionType.PLACE_ADDED);
         return ResponseEntity.created(URI.create("/api/v1/turips/places/" + response.id()))
                 .body(response);
     }

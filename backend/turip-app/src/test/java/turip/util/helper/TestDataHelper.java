@@ -11,13 +11,29 @@ import org.springframework.stereotype.Component;
 import turip.account.domain.Provider;
 import turip.account.domain.Role;
 import turip.account.domain.TuripMember;
+import turip.auth.token.JwtProvider;
 import turip.favorite.domain.AccountRole;
+import turip.favorite.token.InvitationTokenProvider;
 
 @Component
 public class TestDataHelper {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private JwtProvider jwtProvider;
+
+    @Autowired
+    private InvitationTokenProvider invitationTokenProvider;
+
+    public String createAccessToken(Long accountId) {
+        return jwtProvider.generateAccessToken(accountId, Role.USER);
+    }
+
+    public String createInvitationToken(Long accountId, Long folderId) {
+        return invitationTokenProvider.generateToken(accountId, folderId);
+    }
 
     public Long insertAccount() {
         return insertAccount(Role.USER);

@@ -101,13 +101,34 @@ private fun SettingForMember(
         imageRes = R.drawable.ic_withdraw,
         titleRes = R.string.my_page_withdraw,
         onClick = onWithdrawClick,
+        contentColor = TuripTheme.colors.error,
     )
 }
 
 @Preview(showBackground = true)
 @Composable
-private fun MyPageSettingsSectionPreview() {
+private fun MyPageSettingsSectionMemberPreview() {
     TuripTheme {
+        AuthState.change(UserType.MEMBER)
+        MyPageSettingsSection(
+            onInquiryClick = {},
+            onPrivacyPolicyClick = {},
+            onLoginClick = {},
+            onLogoutClick = {},
+            onWithdrawClick = {},
+            modifier =
+                Modifier
+                    .background(color = TuripTheme.colors.white)
+                    .padding(TuripTheme.spacing.large),
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun MyPageSettingsSectionGuestPreview() {
+    TuripTheme {
+        AuthState.change(UserType.GUEST)
         MyPageSettingsSection(
             onInquiryClick = {},
             onPrivacyPolicyClick = {},

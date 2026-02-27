@@ -6,6 +6,10 @@ import com.on.turip.ui.compose.mypage.model.InquiryMail
 sealed interface MyPageUiEffect {
     data object ShowBookmarkRemoveFailed : MyPageUiEffect
 
+    data object ShowBookmarksLoadFailed : MyPageUiEffect
+
+    data object ShowProfileLoadFailed : MyPageUiEffect
+
     data object NavigateToLogin : MyPageUiEffect
 
     data class NavigateToInquiry(

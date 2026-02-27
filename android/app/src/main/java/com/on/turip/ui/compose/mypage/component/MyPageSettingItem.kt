@@ -5,16 +5,20 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -29,6 +33,7 @@ fun MyPageSettingItem(
     @StringRes titleRes: Int,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    contentColor: Color = TuripTheme.colors.gray04,
 ) {
     val shape = TuripTheme.shape.container
 
@@ -43,7 +48,8 @@ fun MyPageSettingItem(
                     width = 1.dp,
                     color = TuripTheme.colors.gray02,
                     shape = shape,
-                ).padding(
+                )
+                .padding(
                     horizontal = TuripTheme.spacing.extraLarge,
                     vertical = TuripTheme.spacing.large,
                 ),
@@ -51,7 +57,7 @@ fun MyPageSettingItem(
     ) {
         Icon(
             painter = painterResource(imageRes),
-            tint = TuripTheme.colors.gray03,
+            tint = contentColor,
             contentDescription = null,
             modifier =
                 Modifier
@@ -61,17 +67,19 @@ fun MyPageSettingItem(
         Text(
             text = stringResource(titleRes),
             style = TuripTheme.typography.info1,
-            color = TuripTheme.colors.gray04,
+            color = contentColor,
             textAlign = TextAlign.Left,
             modifier =
                 Modifier
                     .weight(1f)
                     .padding(end = TuripTheme.spacing.medium),
         )
+
         Icon(
-            painter = painterResource(R.drawable.btn_chevron_right),
+            imageVector = Icons.AutoMirrored.Default.KeyboardArrowRight,
             tint = TuripTheme.colors.gray02,
             contentDescription = null,
+            modifier = Modifier.size(16.dp),
         )
     }
 }
@@ -80,11 +88,21 @@ fun MyPageSettingItem(
 @Composable
 private fun MyPageSettingItemPreview() {
     TuripTheme {
-        MyPageSettingItem(
-            imageRes = R.drawable.ic_inquire,
-            titleRes = R.string.my_page_inquiry,
-            onClick = {},
-            modifier = Modifier.padding(TuripTheme.spacing.small),
-        )
+        Column {
+            MyPageSettingItem(
+                imageRes = R.drawable.ic_inquire,
+                titleRes = R.string.my_page_inquiry,
+                onClick = {},
+                modifier = Modifier.padding(TuripTheme.spacing.small),
+            )
+
+            MyPageSettingItem(
+                imageRes = R.drawable.ic_inquire,
+                titleRes = R.string.my_page_inquiry,
+                onClick = {},
+                modifier = Modifier.padding(TuripTheme.spacing.small),
+                contentColor = TuripTheme.colors.error,
+            )
+        }
     }
 }

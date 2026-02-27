@@ -18,6 +18,7 @@ import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.compose.mypage.model.InquiryMail
 import com.on.turip.ui.compose.mypage.util.AppEnvironmentInfoProvider
+import com.on.turip.ui.compose.mypage.util.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.channels.Channel
@@ -47,14 +48,12 @@ class MyPageViewModel @Inject constructor(
     val uiEffect: Flow<MyPageUiEffect> = _uiEffect.receiveAsFlow()
 
     init {
-        loadProfile()
-        loadBookmarkContents()
+        loadProfile(isRetry = false)
+        loadBookmarkContents(isRetry = false)
     }
 
-    fun loadProfile() {
+    fun loadProfile(isRetry: Boolean) {
         viewModelScope.launch {
-            _uiState.update { it.copy(profileState = MyPageSectionState.Loading) }
-
             accountRepository
                 .loadMyProfile()
                 .onSuccess { result: Account ->
@@ -65,11 +64,12 @@ class MyPageViewModel @Inject constructor(
                 }.onFailure {
                     Timber.e("마이페이지 프로필 조회 에러 발생")
                     _uiState.update { it.copy(profileState = MyPageSectionState.Error) }
+                    if (isRetry) _uiEffect.send(MyPageUiEffect.ShowProfileLoadFailed)
                 }
         }
     }
 
-    fun loadBookmarkContents() {
+    fun loadBookmarkContents(isRetry: Boolean) {
         viewModelScope.launch {
             _uiState.update { it.copy(bookmarkContentState = MyPageSectionState.Loading) }
 
@@ -83,6 +83,7 @@ class MyPageViewModel @Inject constructor(
                 }.onFailure {
                     Timber.e("마이페이지 북마크 목록 조회 에러 발생")
                     _uiState.update { it.copy(bookmarkContentState = MyPageSectionState.Error) }
+                    if (isRetry) _uiEffect.send(MyPageUiEffect.ShowBookmarksLoadFailed)
                 }
         }
     }
@@ -173,14 +174,9 @@ class MyPageViewModel @Inject constructor(
             memberRepository
                 .logout()
                 .onSuccess {
-                    userStorageRepository
-                        .clearTokens()
-                        .onSuccess {
-                            _uiEffect.send(MyPageUiEffect.NavigateToLogin)
-                            Timber.d("로그아웃 성공")
-                        }.onFailure {
-                            Timber.e("토큰 초기화 실패")
-                        }
+                    clearTokens()
+                    _uiEffect.send(MyPageUiEffect.NavigateToLogin)
+                    Timber.d("로그아웃 성공")
                 }.onFailure { errorType: ErrorType ->
                     handleError(errorType, MyPageRetryAction.LOGOUT)
                     Timber.e("로그아웃 실패")
@@ -195,19 +191,24 @@ class MyPageViewModel @Inject constructor(
             memberRepository
                 .deleteMember()
                 .onSuccess {
-                    userStorageRepository
-                        .clearTokens()
-                        .onSuccess {
-                            _uiEffect.send(MyPageUiEffect.NavigateToLogin)
-                            Timber.d("회원탈퇴 성공")
-                        }.onFailure {
-                            Timber.e("토큰 초기화 실패")
-                        }
+                    clearTokens()
+                    _uiEffect.send(MyPageUiEffect.NavigateToLogin)
+                    Timber.d("회원탈퇴 성공")
                 }.onFailure { errorType: ErrorType ->
                     handleError(errorType, MyPageRetryAction.WITHDRAW)
                     Timber.e("회원탈퇴 실패 ")
                 }
         }
+    }
+
+    private suspend fun clearTokens() {
+        userStorageRepository
+            .clearTokens()
+            .onSuccess {
+                Timber.d("토큰 초기화 성공")
+            }.onFailure {
+                Timber.e("토큰 초기화 실패")
+            }
     }
 
     private suspend fun handleError(

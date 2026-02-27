@@ -1,6 +1,5 @@
 package com.on.turip.ui.mypage
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -35,17 +34,17 @@ class MyPageActivity : AppCompatActivity() {
         setContent {
             TuripTheme {
                 MyPageScreen(
-                    navigateToAllBookmarkContents = {
+                    onNavigateToAllBookmarkContents = {
                         val intent = BookmarkContentActivity.newIntent(this)
                         bookmarkContentLauncher.launch(intent)
                     },
-                    navigateToContent = { contentId: Long ->
+                    onNavigateToContent = { contentId: Long ->
                         Timber.d("마이페이지 북마크 콘텐츠 클릭(contentId=$contentId)")
                         val intent: Intent =
                             TripDetailActivity.newIntent(context = this, contentId = contentId)
                         startActivity(intent)
                     },
-                    navigateToInquiry = { mail: InquiryMail ->
+                    onNavigateToInquiry = { mail: InquiryMail ->
                         val uri =
                             "mailto:${InquiryMail.RECIPIENT}?subject=${Uri.encode(InquiryMail.TITLE)}&body=${
                                 Uri.encode(mail.content)
@@ -56,14 +55,14 @@ class MyPageActivity : AppCompatActivity() {
                             errorToastMessage = getString(R.string.all_snackbar_not_found_inquiry_url),
                         )
                     },
-                    navigateToPrivacyPolicy = { url: String ->
+                    onNavigateToPrivacyPolicy = { url: String ->
                         val intent = Intent(Intent.ACTION_VIEW, url.toUri())
                         safeStartActivityWithToast(
                             intent = intent,
                             errorToastMessage = getString(R.string.all_snackbar_not_found_privacy_policy_url),
                         )
                     },
-                    navigateToLogin = {
+                    onNavigateToLogin = {
                         val intent: Intent =
                             LoginActivity.newIntent(this).apply {
                                 flags =
@@ -80,14 +79,14 @@ class MyPageActivity : AppCompatActivity() {
 
     private val bookmarkContentLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode != Activity.RESULT_OK) return@registerForActivityResult
+            if (result.resultCode != RESULT_OK) return@registerForActivityResult
 
             val changed =
                 result.data?.getBooleanExtra(EXTRA_BOOKMARK_CONTENT_HAS_BOOKMARK_CHANGES, false)
                     ?: false
 
             if (changed) {
-                viewModel.loadBookmarkContents()
+                viewModel.loadBookmarkContents(isRetry = false)
             }
         }
 
