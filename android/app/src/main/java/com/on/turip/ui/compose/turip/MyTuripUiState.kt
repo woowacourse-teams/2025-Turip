@@ -13,8 +13,7 @@ data class MyTuripUiState(
     val showAddBottomSheet: Boolean,
     val turipNameStatus: TuripNameStatusModel,
     val inputTuripName: String,
-    val deletedTuripId: Long,
-    val showTuripRemoveDialog: Boolean,
+    val dialogState: MyTuripDialogState?,
 ) {
     companion object {
         val Idle =
@@ -25,8 +24,13 @@ data class MyTuripUiState(
                 showAddBottomSheet = false,
                 turipNameStatus = TuripNameStatusModel.EMPTY,
                 inputTuripName = "",
-                deletedTuripId = -1L,
-                showTuripRemoveDialog = false,
+                dialogState = null,
             )
+    }
+
+    sealed interface MyTuripDialogState {
+        data class RemoveTurip(
+            val turip: MyTuripModel,
+        ) : MyTuripDialogState
     }
 }

@@ -129,10 +129,9 @@ fun MyTuripScreen(
         turips = uiState.turips,
         snackbarHostState = snackbarHostState,
         onTuripClick = onNavigateToTuripPlace,
-        onTuripDelete = { id: Long ->
+        onTuripDelete = { myTuripModel: MyTuripModel ->
             snackbarHostState.dismissAndExecute {
-                viewModel.updateDeleteTuripId(id)
-                viewModel.showTuripRemoveDialog()
+                viewModel.showTuripRemoveDialog(myTuripModel)
             }
         },
         onAddClick = {
@@ -155,27 +154,26 @@ fun MyTuripScreen(
         )
     }
 
-    if (uiState.showTuripRemoveDialog) {
-        val deletedTuripName: String? =
-            uiState.turips.find { it.id == uiState.deletedTuripId }?.name
-        TuripDialog(
-            title = stringResource(R.string.bottom_sheet_turip_delete),
-            message =
-                stringResource(
-                    R.string.bottom_sheet_turip_remove_title,
-                    deletedTuripName ?: "",
-                ),
-            confirmText = stringResource(R.string.bottom_sheet_turip_remove_approve),
-            dismissText = stringResource(R.string.bottom_sheet_turip_remove_cancel),
-            confirmButtonColor = TuripTheme.colors.error,
-            dismissButtonColor = TuripTheme.colors.gray02,
-            onConfirmation = {
-                viewModel.deleteTurip(uiState.deletedTuripId)
-                viewModel.dismissTuripRemoveDialog()
-            },
-            onDismissRequest = viewModel::dismissTuripRemoveDialog,
-            modifier = Modifier.fillMaxSize(),
-        )
+    uiState.dialogState?.let { myTuripDialogState: MyTuripUiState.MyTuripDialogState ->
+        when (myTuripDialogState) {
+            is MyTuripUiState.MyTuripDialogState.RemoveTurip -> {
+                TuripDialog(
+                    title = stringResource(R.string.bottom_sheet_turip_delete),
+                    message =
+                        stringResource(
+                            R.string.bottom_sheet_turip_remove_title,
+                            myTuripDialogState.turip.name,
+                        ),
+                    confirmText = stringResource(R.string.bottom_sheet_turip_remove_approve),
+                    dismissText = stringResource(R.string.bottom_sheet_turip_remove_cancel),
+                    confirmButtonColor = TuripTheme.colors.error,
+                    dismissButtonColor = TuripTheme.colors.gray02,
+                    onConfirmation = { viewModel.deleteTurip(myTuripDialogState.turip) },
+                    onDismissRequest = viewModel::dismissTuripRemoveDialog,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
+        }
     }
 }
 
@@ -184,7 +182,7 @@ private fun MyTuripScreenContent(
     turips: ImmutableList<MyTuripModel>,
     snackbarHostState: SnackbarHostState,
     onTuripClick: (turipId: Long) -> Unit,
-    onTuripDelete: (turipId: Long) -> Unit,
+    onTuripDelete: (myTuripModel: MyTuripModel) -> Unit,
     onAddClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -265,7 +263,7 @@ private fun MyTuripScreenContent(
                             isDeleteMode = isDeleteMode,
                             onTuripClick = { id ->
                                 if (isDeleteMode) {
-                                    onTuripDelete(turip.id)
+                                    onTuripDelete(turip)
                                     if (filteredTurips.size == 1) isDeleteMode = false
                                 } else {
                                     onTuripClick(id)
@@ -273,7 +271,7 @@ private fun MyTuripScreenContent(
                             },
                             onLongPress = { isDeleteMode = true },
                             onDeleteClick = {
-                                onTuripDelete(turip.id)
+                                onTuripDelete(turip)
                                 if (filteredTurips.size == 1) isDeleteMode = false
                             },
                             isDefaultFolder = turip.isDefault,

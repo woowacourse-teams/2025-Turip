@@ -11,6 +11,7 @@ import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.compose.designsystem.model.TuripNameStatusModel
 import com.on.turip.ui.compose.turip.mapper.toEditModel
 import com.on.turip.ui.compose.turip.mapper.toUiMyTuripModel
+import com.on.turip.ui.compose.turip.model.MyTuripModel
 import com.on.turip.ui.folder.model.TuripEditModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
@@ -62,9 +63,17 @@ class MyTuripViewModel @Inject constructor(
             )
         }
 
-    fun showTuripRemoveDialog() = _uiState.update { it.copy(showTuripRemoveDialog = true) }
+    fun showTuripRemoveDialog(myTuripModel: MyTuripModel) =
+        _uiState.update {
+            it.copy(
+                dialogState =
+                    MyTuripUiState.MyTuripDialogState.RemoveTurip(
+                        turip = myTuripModel,
+                    ),
+            )
+        }
 
-    fun dismissTuripRemoveDialog() = _uiState.update { it.copy(showTuripRemoveDialog = false) }
+    fun dismissTuripRemoveDialog() = _uiState.update { it.copy(dialogState = null) }
 
     fun updateInputName(name: String) {
         if (name.length > MAX_NAME_LENGTH) return
@@ -78,8 +87,6 @@ class MyTuripViewModel @Inject constructor(
             )
         }
     }
-
-    fun updateDeleteTuripId(id: Long) = _uiState.update { it.copy(deletedTuripId = id) }
 
     fun addTurip() {
         val name = _uiState.value.inputTuripName
@@ -101,25 +108,25 @@ class MyTuripViewModel @Inject constructor(
         }
     }
 
-    fun deleteTurip(folderId: Long) {
+    fun deleteTurip(myTuripModel: MyTuripModel) {
         viewModelScope.launch {
             turipRepository
-                .deleteTurip(folderId)
+                .deleteTurip(myTuripModel.id)
                 .onSuccess {
                     _uiEffect.send(
-                        MyTuripUiEffect.TuripDeleted(
-                            uiState.value.turips
-                                .find { it.id == folderId }
-                                ?.name ?: "",
-                        ),
+                        MyTuripUiEffect.TuripDeleted(myTuripModel.name),
                     )
                     _uiState.update { state: MyTuripUiState ->
                         state.copy(
                             isLoading = false,
                             errorUiState = ErrorUiState.None,
-                            turips = state.turips.filter { it.id != folderId }.toImmutableList(),
+                            turips =
+                                state.turips
+                                    .filter { it.id != myTuripModel.id }
+                                    .toImmutableList(),
                         )
                     }
+                    dismissTuripRemoveDialog()
                     Timber.d("튜립 삭제 완료(이름 = )")
                 }.onFailure { errorType: ErrorType ->
                     Timber.e("튜립 삭제 실패(이름 = ")
