@@ -198,7 +198,6 @@ private fun MoreOptionBottomSheetPreviewContent(
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    var name by remember { mutableStateOf("내 여행 폴더") }
     var turipNameStatus by remember { mutableStateOf(TuripNameStatusModel.OK) }
 
     TuripTheme {
@@ -214,7 +213,6 @@ private fun MoreOptionBottomSheetPreviewContent(
             turipNameStatus = turipNameStatus,
             turipName = "",
             onNameChanged = { newName ->
-                name = newName
                 turipNameStatus =
                     if (newName.isBlank()) TuripNameStatusModel.EMPTY else TuripNameStatusModel.OK
             },
