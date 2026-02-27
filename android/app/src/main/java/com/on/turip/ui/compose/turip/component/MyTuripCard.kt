@@ -1,4 +1,4 @@
-package com.on.turip.ui.compose.folder.component
+package com.on.turip.ui.compose.turip.component
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.BorderStroke
@@ -95,7 +95,8 @@ fun MyTuripCard(
                     .indication(
                         interactionSource = interactionSource,
                         indication = ripple(),
-                    ).pointerInput(onLongPress, onTuripClick) {
+                    )
+                    .pointerInput(onLongPress, onTuripClick) {
                         awaitEachGesture {
                             val down = awaitFirstDown(requireUnconsumed = false)
                             val press = PressInteraction.Press(down.position)

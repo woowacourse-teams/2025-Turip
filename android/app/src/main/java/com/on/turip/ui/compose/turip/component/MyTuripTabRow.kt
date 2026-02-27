@@ -1,4 +1,4 @@
-package com.on.turip.ui.compose.folder.component
+package com.on.turip.ui.compose.turip.component
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -21,8 +21,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
-import com.on.turip.ui.compose.folder.MyTuripTab
 import com.on.turip.ui.compose.login.util.noRippleClickable
+import com.on.turip.ui.compose.turip.MyTuripTab
 
 @Composable
 fun MyTuripTabRow(

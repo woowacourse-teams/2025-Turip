@@ -1,4 +1,4 @@
-package com.on.turip.ui.compose.folder
+package com.on.turip.ui.compose.turip
 
 import com.on.turip.ui.common.error.ErrorUiState
 

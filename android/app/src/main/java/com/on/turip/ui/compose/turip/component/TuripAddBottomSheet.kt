@@ -1,4 +1,4 @@
-package com.on.turip.ui.compose.folder.component
+package com.on.turip.ui.compose.turip.component
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
@@ -16,9 +16,9 @@ import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FolderAddBottomSheet(
+fun TuripAddBottomSheet(
     title: String,
-    folderName: String,
+    turipName: String,
     sheetState: SheetState,
     turipNameStatus: TuripNameStatusModel,
     onNameChanged: (String) -> Unit,
@@ -34,7 +34,7 @@ fun FolderAddBottomSheet(
     ) {
         NameEditorSheetContent(
             title = title,
-            folderName = folderName,
+            turipName = turipName,
             turipNameStatus = turipNameStatus,
             onNameChanged = onNameChanged,
             onConfirmClick = onConfirmClick,
@@ -61,16 +61,16 @@ class TuripNameStatusPreviewProvider : PreviewParameterProvider<TuripNameStatusM
     showBackground = true,
 )
 @Composable
-fun FolderAddBottomSheetStatusPreview(
+fun TuripAddBottomSheetStatusPreview(
     @PreviewParameter(TuripNameStatusPreviewProvider::class)
     status: TuripNameStatusModel,
 ) {
     val sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     TuripTheme {
-        FolderAddBottomSheet(
+        TuripAddBottomSheet(
             title = "튜립 추가",
-            folderName = "",
+            turipName = "",
             sheetState = sheetState,
             turipNameStatus = status,
             onNameChanged = {},

@@ -1,8 +1,8 @@
-package com.on.turip.ui.compose.folder
+package com.on.turip.ui.compose.turip
 
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.compose.designsystem.model.TuripNameStatusModel
-import com.on.turip.ui.compose.folder.component.MyTuripModel
+import com.on.turip.ui.compose.turip.component.MyTuripModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 

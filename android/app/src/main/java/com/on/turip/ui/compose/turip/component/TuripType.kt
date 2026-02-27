@@ -1,4 +1,4 @@
-package com.on.turip.ui.compose.folder.component
+package com.on.turip.ui.compose.turip.component
 
 enum class TuripType {
     SOLO,

@@ -1,4 +1,4 @@
-package com.on.turip.ui.compose.folder
+package com.on.turip.ui.compose.turip
 
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -46,11 +46,11 @@ import com.on.turip.ui.common.extensions.showSnackbarWithAction
 import com.on.turip.ui.compose.designsystem.component.TuripDialog
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbarVisuals
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
-import com.on.turip.ui.compose.folder.component.FolderAddBottomSheet
-import com.on.turip.ui.compose.folder.component.MyTuripCard
-import com.on.turip.ui.compose.folder.component.MyTuripModel
-import com.on.turip.ui.compose.folder.component.MyTuripTabRow
-import com.on.turip.ui.compose.folder.component.TuripType
+import com.on.turip.ui.compose.turip.component.MyTuripCard
+import com.on.turip.ui.compose.turip.component.MyTuripModel
+import com.on.turip.ui.compose.turip.component.MyTuripTabRow
+import com.on.turip.ui.compose.turip.component.TuripAddBottomSheet
+import com.on.turip.ui.compose.turip.component.TuripType
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
@@ -143,9 +143,9 @@ fun MyTuripScreen(
     )
 
     if (uiState.showAddBottomSheet) {
-        FolderAddBottomSheet(
+        TuripAddBottomSheet(
             title = stringResource(R.string.bottom_sheet_turip_add_title),
-            folderName = uiState.inputTuripName,
+            turipName = uiState.inputTuripName,
             sheetState = sheetState,
             turipNameStatus = uiState.turipNameStatus,
             onNameChanged = viewModel::updateInputName,

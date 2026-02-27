@@ -42,7 +42,7 @@ import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 @Composable
 fun NameEditorSheetContent(
     title: String,
-    folderName: String,
+    turipName: String,
     turipNameStatus: TuripNameStatusModel,
     onNameChanged: (String) -> Unit,
     onConfirmClick: () -> Unit,
@@ -88,7 +88,7 @@ fun NameEditorSheetContent(
         }
 
         BasicTextField(
-            value = folderName,
+            value = turipName,
             onValueChange = { input ->
                 if (input.length <= 20) {
                     onNameChanged(input)
@@ -123,7 +123,7 @@ fun NameEditorSheetContent(
                             ).padding(horizontal = 12.dp, vertical = 6.dp),
                     contentAlignment = Alignment.CenterStart,
                 ) {
-                    if (folderName.isEmpty()) {
+                    if (turipName.isEmpty()) {
                         Text(
                             text = stringResource(R.string.bottom_sheet_turip_add_turip_name_hint),
                             color = TuripTheme.colors.gray02,
@@ -207,7 +207,7 @@ fun NameEditorSheetContentPreview(
             turipNameStatus = status,
             onNameChanged = {},
             onConfirmClick = {},
-            folderName = "",
+            turipName = "",
             focusRequester = focusRequester,
         )
     }
@@ -225,7 +225,7 @@ fun NameEditorSheetContentPreview() {
             onNameChanged = {},
             onConfirmClick = {},
             onBack = {},
-            folderName = "",
+            turipName = "",
             focusRequester = focusRequester,
         )
     }

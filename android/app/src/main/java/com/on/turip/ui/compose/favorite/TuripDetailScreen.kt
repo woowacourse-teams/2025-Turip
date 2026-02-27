@@ -68,7 +68,7 @@ fun TuripDetailScreen(
     onShareTurip: (turipShareModel: TuripShareModel) -> Unit,
     onNavigateToMap: (uri: Uri) -> Unit,
     onBack: () -> Unit,
-    viewModel: TuripPlaceViewModel = hiltViewModel(),
+    viewModel: TuripDetailViewModel = hiltViewModel(),
 ) {
     val uiState: TuripPlaceUiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -154,7 +154,7 @@ fun TuripDetailScreen(
                 viewModel.updateScreenMode(turipPlaceScreenMode = screenMode)
             },
             turipNameStatus = uiState.turipNameStatus,
-            folderName = uiState.inputTuripName,
+            turipName = uiState.inputTuripName,
             onNameChanged = viewModel::updateInputName,
             onConfirmClick = viewModel::updateTuripName,
         )

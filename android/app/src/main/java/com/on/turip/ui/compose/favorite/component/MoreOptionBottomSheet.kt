@@ -55,7 +55,7 @@ fun MoreOptionBottomSheet(
     onInviteLinkClick: () -> Unit,
     onDeleteClick: () -> Unit,
     turipNameStatus: TuripNameStatusModel,
-    folderName: String,
+    turipName: String,
     onNameChanged: (name: String) -> Unit,
     onConfirmClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -130,7 +130,7 @@ fun MoreOptionBottomSheet(
                 TuripPlaceScreenMode.Edit -> {
                     NameEditorSheetContent(
                         title = stringResource(R.string.bottom_sheet_turip_modify_title),
-                        folderName = folderName,
+                        turipName = turipName,
                         onBack = { onScreenModeChange(TuripPlaceScreenMode.MoreOption) },
                         turipNameStatus = turipNameStatus,
                         onNameChanged = onNameChanged,
@@ -211,7 +211,7 @@ private fun MoreOptionBottomSheetPreviewContent(
             onInviteLinkClick = {},
             onDeleteClick = {},
             turipNameStatus = turipNameStatus,
-            folderName = "",
+            turipName = "",
             onNameChanged = { newName ->
                 name = newName
                 turipNameStatus =
