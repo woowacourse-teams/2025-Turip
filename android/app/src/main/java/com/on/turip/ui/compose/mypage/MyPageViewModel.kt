@@ -47,11 +47,11 @@ class MyPageViewModel @Inject constructor(
     val uiEffect: Flow<MyPageUiEffect> = _uiEffect.receiveAsFlow()
 
     init {
-        loadProfile()
+        loadProfile(isRetry = false)
         loadBookmarkContents()
     }
 
-    fun loadProfile() {
+    fun loadProfile(isRetry: Boolean) {
         viewModelScope.launch {
             accountRepository
                 .loadMyProfile()
@@ -63,6 +63,7 @@ class MyPageViewModel @Inject constructor(
                 }.onFailure {
                     Timber.e("마이페이지 프로필 조회 에러 발생")
                     _uiState.update { it.copy(profileState = MyPageSectionState.Error) }
+                    if (isRetry) _uiEffect.send(MyPageUiEffect.ShowProfileLoadFailed)
                 }
         }
     }

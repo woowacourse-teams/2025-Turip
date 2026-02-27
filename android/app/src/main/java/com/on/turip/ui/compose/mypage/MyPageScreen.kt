@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -22,6 +23,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.on.turip.R
 import com.on.turip.ui.common.error.toUiModel
+import com.on.turip.ui.common.extensions.dismissAndExecute
 import com.on.turip.ui.common.extensions.showSnackbarWithAction
 import com.on.turip.ui.compose.designsystem.component.TuripDialog
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
@@ -57,6 +59,14 @@ fun MyPageScreen(
                     )
                 }
 
+                MyPageUiEffect.ShowProfileLoadFailed -> {
+                    snackbarHostState.showSnackbar(
+                        message = resources.getString(R.string.my_page_snackbar_profile_load_failed),
+                        actionLabel = resources.getString(R.string.all_close_description),
+                        duration = SnackbarDuration.Short,
+                    )
+                }
+
                 is MyPageUiEffect.NavigateToInquiry -> {
                     onNavigateToInquiry(uiEffect.mail)
                 }
@@ -87,7 +97,7 @@ fun MyPageScreen(
         onNavigateToAllBookmarkContents = onNavigateToAllBookmarkContents,
         onNavigateToContent = onNavigateToContent,
         onRemoveBookmark = viewModel::removeBookmark,
-        onProfileRetry = viewModel::loadProfile,
+        onProfileRetry = { snackbarHostState.dismissAndExecute { viewModel.loadProfile(isRetry = true) } },
         onBookmarkRetry = viewModel::loadBookmarkContents,
         onInquiryClick = viewModel::loadInquiryMail,
         onPrivacyPolicyClick = viewModel::loadPrivacyPolicy,
