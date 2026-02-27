@@ -2,7 +2,6 @@ package com.on.turip.ui.compose.turip
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
 import com.on.turip.domain.turip.Turip
@@ -127,9 +126,9 @@ class MyTuripViewModel @Inject constructor(
                         )
                     }
                     dismissTuripRemoveDialog()
-                    Timber.d("튜립 삭제 완료(이름 = )")
-                }.onFailure { errorType: ErrorType ->
-                    Timber.e("튜립 삭제 실패(이름 = ")
+                    Timber.d("튜립 삭제 완료(이름 = ${myTuripModel.name})")
+                }.onFailure {
+                    Timber.e("튜립 삭제 실패(이름 = ${myTuripModel.name})")
                 }
         }
     }
