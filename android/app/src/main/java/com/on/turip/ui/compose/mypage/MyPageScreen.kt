@@ -55,7 +55,15 @@ fun MyPageScreen(
                     snackbarHostState.showSnackbarWithAction(
                         message = resources.getString(R.string.my_page_snackbar_bookmark_remove_failed),
                         actionLabel = resources.getString(R.string.my_page_snackbar_bookmark_remove_failed_action),
-                        onAction = viewModel::loadBookmarkContents,
+                        onAction = { viewModel.loadBookmarkContents(isRetry = true) },
+                    )
+                }
+
+                MyPageUiEffect.ShowBookmarksLoadFailed -> {
+                    snackbarHostState.showSnackbar(
+                        message = resources.getString(R.string.my_page_snackbar_bookmarks_load_failed),
+                        actionLabel = resources.getString(R.string.all_close_description),
+                        duration = SnackbarDuration.Short,
                     )
                 }
 
@@ -98,7 +106,9 @@ fun MyPageScreen(
         onNavigateToContent = onNavigateToContent,
         onRemoveBookmark = viewModel::removeBookmark,
         onProfileRetry = { snackbarHostState.dismissAndExecute { viewModel.loadProfile(isRetry = true) } },
-        onBookmarkRetry = viewModel::loadBookmarkContents,
+        onBookmarkRetry = {
+            snackbarHostState.dismissAndExecute { viewModel.loadBookmarkContents(isRetry = true) }
+        },
         onInquiryClick = viewModel::loadInquiryMail,
         onPrivacyPolicyClick = viewModel::loadPrivacyPolicy,
         onLoginClick = onNavigateToLogin,

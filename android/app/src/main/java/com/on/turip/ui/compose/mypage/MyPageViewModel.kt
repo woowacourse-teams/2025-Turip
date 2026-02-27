@@ -48,7 +48,7 @@ class MyPageViewModel @Inject constructor(
 
     init {
         loadProfile(isRetry = false)
-        loadBookmarkContents()
+        loadBookmarkContents(isRetry = false)
     }
 
     fun loadProfile(isRetry: Boolean) {
@@ -68,7 +68,7 @@ class MyPageViewModel @Inject constructor(
         }
     }
 
-    fun loadBookmarkContents() {
+    fun loadBookmarkContents(isRetry: Boolean) {
         viewModelScope.launch {
             _uiState.update { it.copy(bookmarkContentState = MyPageSectionState.Loading) }
 
@@ -82,6 +82,7 @@ class MyPageViewModel @Inject constructor(
                 }.onFailure {
                     Timber.e("마이페이지 북마크 목록 조회 에러 발생")
                     _uiState.update { it.copy(bookmarkContentState = MyPageSectionState.Error) }
+                    if (isRetry) _uiEffect.send(MyPageUiEffect.ShowBookmarksLoadFailed)
                 }
         }
     }

@@ -67,6 +67,7 @@
     <string name="my_page_snackbar_bookmark_remove_failed_action">새로고침</string>
     <string name="my_page_title">마이페이지</string>
     <string name="my_page_snackbar_profile_load_failed">프로필을 불러오지 못했어요.</string>
+    <string name="my_page_snackbar_bookmarks_load_failed">저장한 콘텐츠들을 불러오지 못했어요.</string>
 
     <!-- 북마크 컨텐츠 목록 페이지 -->
     <string name="bookmark_content_empty_suggest_title">컨텐츠를 저장 해보세요!</string>
