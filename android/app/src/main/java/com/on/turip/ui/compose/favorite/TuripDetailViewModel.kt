@@ -161,6 +161,7 @@ class TuripDetailViewModel @Inject constructor(
     }
 
     fun updateInputName(name: String) {
+        if (name.length > MAX_NAME_LENGTH) return
         val editModel: ImmutableList<TuripEditModel> = _uiState.value.editModels
         val status: TuripNameStatusModel = TuripNameStatusModel.of(name, editModel)
         _uiState.update {
@@ -411,6 +412,8 @@ class TuripDetailViewModel @Inject constructor(
 
     companion object {
         private const val NOT_INITIALIZED: Long = 0L
+
+        private const val MAX_NAME_LENGTH = 20
 
         private data class DeleteTuripPlaceSnapshot(
             val deletePlaceId: Long,

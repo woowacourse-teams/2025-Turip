@@ -67,6 +67,7 @@ class MyTuripViewModel @Inject constructor(
     fun dismissTuripRemoveDialog() = _uiState.update { it.copy(showTuripRemoveDialog = false) }
 
     fun updateInputName(name: String) {
+        if (name.length > MAX_NAME_LENGTH) return
         val editModels: List<TuripEditModel> =
             _uiState.value.turips.map { it.toEditModel() }
         val status = TuripNameStatusModel.of(name, editModels)
@@ -137,5 +138,9 @@ class MyTuripViewModel @Inject constructor(
                 addTurip()
             }
         }
+    }
+
+    companion object {
+        private const val MAX_NAME_LENGTH = 20
     }
 }

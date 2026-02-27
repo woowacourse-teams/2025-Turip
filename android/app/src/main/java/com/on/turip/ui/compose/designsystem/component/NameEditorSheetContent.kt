@@ -89,11 +89,7 @@ fun NameEditorSheetContent(
 
         BasicTextField(
             value = turipName,
-            onValueChange = { input ->
-                if (input.length <= 20) {
-                    onNameChanged(input)
-                }
-            },
+            onValueChange = { input -> onNameChanged(input) },
             modifier =
                 Modifier
                     .fillMaxWidth()
