@@ -44,7 +44,7 @@ fun NameEditorSheetContent(
     title: String,
     turipName: String,
     turipNameStatus: TuripNameStatusModel,
-    onNameChanged: (String) -> Unit,
+    onNameChanged: (turipName: String) -> Unit,
     onConfirmClick: () -> Unit,
     focusRequester: FocusRequester,
     modifier: Modifier = Modifier,
@@ -113,17 +113,19 @@ fun NameEditorSheetContent(
                                 width = 1.dp,
                                 color = TuripTheme.colors.gray04,
                                 shape = TuripTheme.shape.container,
-                            ).background(
+                            )
+                            .background(
                                 color = TuripTheme.colors.white,
                                 shape = TuripTheme.shape.container,
-                            ).padding(horizontal = 12.dp, vertical = 6.dp),
+                            )
+                            .padding(horizontal = 12.dp, vertical = 6.dp),
                     contentAlignment = Alignment.CenterStart,
                 ) {
                     if (turipName.isEmpty()) {
                         Text(
                             text = stringResource(R.string.bottom_sheet_turip_add_turip_name_hint),
                             color = TuripTheme.colors.gray02,
-                            style = TuripTheme.typography.body2,
+                            style = TuripTheme.typography.title3,
                         )
                     }
                     innerTextField()
