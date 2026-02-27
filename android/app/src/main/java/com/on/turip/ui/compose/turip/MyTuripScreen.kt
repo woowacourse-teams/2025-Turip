@@ -24,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -183,12 +184,15 @@ private fun MyTuripScreenContent(
     var selectedTab: MyTuripTab by rememberSaveable { mutableStateOf(MyTuripTab.ALL) }
     var isDeleteMode: Boolean by rememberSaveable { mutableStateOf(false) }
 
-    val filteredTurips: List<MyTuripModel> =
-        when (selectedTab) {
-            MyTuripTab.ALL -> turips
-            MyTuripTab.SOLO -> turips.filter { it.type == TuripTypeModel.SOLO }
-            MyTuripTab.TOGETHER -> turips.filter { it.type == TuripTypeModel.TOGETHER }
+    val filteredTurips by remember(turips, selectedTab) {
+        derivedStateOf {
+            when (selectedTab) {
+                MyTuripTab.ALL -> turips
+                MyTuripTab.SOLO -> turips.filter { it.type == TuripTypeModel.SOLO }
+                MyTuripTab.TOGETHER -> turips.filter { it.type == TuripTypeModel.TOGETHER }
+            }
         }
+    }
 
     Box(Modifier.fillMaxSize()) {
         Scaffold(
