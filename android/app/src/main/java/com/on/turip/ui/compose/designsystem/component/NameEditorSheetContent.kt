@@ -29,6 +29,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -129,7 +130,7 @@ fun NameEditorSheetContent(
                         Text(
                             text = stringResource(R.string.bottom_sheet_turip_add_turip_name_hint),
                             color = TuripTheme.colors.gray02,
-                            style = TuripTheme.typography.title3,
+                            style = TuripTheme.typography.title3.copy(fontWeight = FontWeight.Normal),
                         )
                     }
                     innerTextField()
