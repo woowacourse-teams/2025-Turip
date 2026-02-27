@@ -41,6 +41,7 @@ import com.on.turip.ui.compose.designsystem.component.NameEditorSheetContent
 import com.on.turip.ui.compose.designsystem.model.TuripNameStatusModel
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.favorite.TuripPlaceScreenMode
+import com.on.turip.ui.compose.favorite.model.MoreOptionIcon
 import com.on.turip.ui.compose.favorite.model.MoreOptionItem
 
 @OptIn(ExperimentalMaterial3Api::class)
