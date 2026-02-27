@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import com.on.turip.R
 import com.on.turip.ui.compose.designsystem.model.TuripNameStatusModel
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
+import kotlinx.coroutines.android.awaitFrame
 
 @Composable
 fun NameEditorSheetContent(
@@ -50,6 +51,11 @@ fun NameEditorSheetContent(
     modifier: Modifier = Modifier,
     onBack: (() -> Unit)? = null,
 ) {
+    LaunchedEffect(Unit) {
+        awaitFrame()
+        focusRequester.requestFocus()
+    }
+
     Column(
         modifier =
             modifier
@@ -167,9 +173,6 @@ fun NameEditorSheetContent(
                 color = TuripTheme.colors.white,
             )
         }
-    }
-    LaunchedEffect(Unit) {
-        focusRequester.requestFocus()
     }
 }
 
