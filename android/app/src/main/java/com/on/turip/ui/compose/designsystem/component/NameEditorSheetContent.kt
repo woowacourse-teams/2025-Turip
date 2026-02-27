@@ -188,10 +188,7 @@ class TuripNameStatusPreviewProvider : PreviewParameterProvider<TuripNameStatusM
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview(
-    name = "FolderAddBottomSheet - Status Variants",
-    showBackground = true,
-)
+@Preview(showBackground = true)
 @Composable
 fun NameEditorSheetContentPreview(
     @PreviewParameter(TuripNameStatusPreviewProvider::class)
