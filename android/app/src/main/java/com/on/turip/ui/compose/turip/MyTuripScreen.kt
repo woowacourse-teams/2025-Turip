@@ -256,7 +256,7 @@ private fun MyTuripScreenContent(
                 ) {
                     items(items = filteredTurips, key = { it.id }) { turip: MyTuripModel ->
                         MyTuripCard(
-                            folderImage = turip.image,
+                            turipImage = turip.image,
                             turip = turip,
                             isDeleteMode = isDeleteMode,
                             onTuripClick = { id ->

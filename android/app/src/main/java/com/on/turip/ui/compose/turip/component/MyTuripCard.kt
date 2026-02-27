@@ -53,7 +53,7 @@ private const val LONG_PRESS_DELAY_MS = 800L
 fun MyTuripCard(
     turip: MyTuripModel,
     onTuripClick: (turipId: Long) -> Unit,
-    @DrawableRes folderImage: Int,
+    @DrawableRes turipImage: Int,
     modifier: Modifier = Modifier,
     isDeleteMode: Boolean = false,
     isDefaultFolder: Boolean = false,
@@ -121,7 +121,7 @@ fun MyTuripCard(
                 modifier = Modifier.padding(TuripTheme.spacing.large),
             ) {
                 Image(
-                    painter = painterResource(folderImage),
+                    painter = painterResource(turipImage),
                     contentDescription = null,
                     modifier =
                         Modifier
@@ -273,7 +273,7 @@ private fun IconWithCount(
 private fun MyTuripCardTogetherPreview() {
     TuripTheme {
         MyTuripCard(
-            folderImage = R.drawable.ic_together_folder,
+            turipImage = R.drawable.ic_together_folder,
             turip =
                 MyTuripModel(
                     id = 0L,
@@ -295,7 +295,7 @@ private fun MyTuripCardTogetherPreview() {
 private fun MyTuripCardSoloPreview() {
     TuripTheme {
         MyTuripCard(
-            folderImage = R.drawable.ic_together_folder,
+            turipImage = R.drawable.ic_together_folder,
             turip =
                 MyTuripModel(
                     id = 1L,
@@ -316,7 +316,7 @@ private fun MyTuripCardSoloPreview() {
 private fun MyTuripCardDeletedPreview() {
     TuripTheme {
         MyTuripCard(
-            folderImage = R.drawable.ic_individual_folder,
+            turipImage = R.drawable.ic_individual_folder,
             turip =
                 MyTuripModel(
                     id = 0L,
