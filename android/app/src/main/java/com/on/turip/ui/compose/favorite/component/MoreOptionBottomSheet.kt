@@ -48,7 +48,7 @@ import com.on.turip.ui.compose.favorite.model.MoreOptionItem
 @Composable
 fun MoreOptionBottomSheet(
     screenMode: TuripPlaceScreenMode,
-    onScreenModeChange: (TuripPlaceScreenMode) -> Unit,
+    onScreenModeChange: (turipPlaceScreenMode: TuripPlaceScreenMode) -> Unit,
     sheetState: SheetState,
     isDefault: Boolean,
     onDismiss: () -> Unit,
