@@ -18,7 +18,6 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -43,8 +42,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import com.on.turip.R
 import com.on.turip.ui.common.error.toUiModel
+import com.on.turip.ui.common.extensions.dismissAndExecute
 import com.on.turip.ui.common.extensions.showSnackbarWithAction
 import com.on.turip.ui.compose.designsystem.component.TuripDialog
+import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbarVisuals
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.turip.component.MyTuripCard
@@ -129,10 +130,16 @@ fun MyTuripScreen(
         snackbarHostState = snackbarHostState,
         onTuripClick = onNavigateToTuripPlace,
         onTuripDelete = { id: Long ->
-            viewModel.updateDeleteTuripId(id)
-            viewModel.showTuripRemoveDialog()
+            snackbarHostState.dismissAndExecute {
+                viewModel.updateDeleteTuripId(id)
+                viewModel.showTuripRemoveDialog()
+            }
         },
-        onAddClick = viewModel::showAddBottomSheet,
+        onAddClick = {
+            snackbarHostState.dismissAndExecute {
+                viewModel.showAddBottomSheet()
+            }
+        },
         modifier = modifier,
     )
 
@@ -275,8 +282,9 @@ private fun MyTuripScreenContent(
                 }
             }
         }
-        SnackbarHost(
-            hostState = snackbarHostState,
+
+        TuripSnackbar(
+            snackbarHostState = snackbarHostState,
             modifier =
                 Modifier
                     .align(Alignment.BottomCenter)
