@@ -118,7 +118,7 @@ fun NameEditorSheetContent(
                                 color = TuripTheme.colors.white,
                                 shape = TuripTheme.shape.container,
                             )
-                            .padding(horizontal = 12.dp, vertical = 6.dp),
+                            .padding(horizontal = TuripTheme.spacing.medium, vertical = TuripTheme.spacing.small),
                     contentAlignment = Alignment.CenterStart,
                 ) {
                     if (turipName.isEmpty()) {
