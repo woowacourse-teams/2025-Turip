@@ -1,4 +1,4 @@
-package com.on.turip.ui.setting
+package com.on.turip.ui.mypage
 
 import android.content.Context
 import android.content.Intent
@@ -11,38 +11,47 @@ import androidx.core.net.toUri
 import com.on.turip.R
 import com.on.turip.ui.common.extensions.safeStartActivityWithToast
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
-import com.on.turip.ui.compose.setting.SettingScreen
-import com.on.turip.ui.compose.setting.model.InquiryMail
+import com.on.turip.ui.compose.mypage.MyPageScreen
+import com.on.turip.ui.compose.mypage.model.InquiryMail
 import com.on.turip.ui.login.LoginActivity
+import com.on.turip.ui.trip.TripDetailActivity
 import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
 
 @AndroidEntryPoint
-class SettingActivity : AppCompatActivity() {
+class MyPageActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
         setContent {
             TuripTheme {
-                SettingScreen(
-                    navigateToBack = { finish() },
-                    navigateToInquiry = { inquiryMail: InquiryMail ->
+                MyPageScreen(
+                    // 화면 구현 필요
+                    onNavigateToAllBookmarkContents = {},
+                    onNavigateToContent = { contentId: Long ->
+                        Timber.d("마이페이지 북마크 콘텐츠 클릭(contentId=$contentId)")
+                        val intent: Intent =
+                            TripDetailActivity.newIntent(context = this, contentId = contentId)
+                        startActivity(intent)
+                    },
+                    onNavigateToInquiry = { mail: InquiryMail ->
                         val uri =
                             "mailto:${InquiryMail.RECIPIENT}?subject=${Uri.encode(InquiryMail.TITLE)}&body=${
-                                Uri.encode(inquiryMail.content)
+                                Uri.encode(mail.content)
                             }".toUri()
 
                         val intent: Intent = Intent(Intent.ACTION_SENDTO).apply { data = uri }
                         startActivity(intent)
                     },
-                    navigateToPrivacyPolicy = { privacyPolicyLink: String ->
-                        val intent = Intent(Intent.ACTION_VIEW, privacyPolicyLink.toUri())
+                    onNavigateToPrivacyPolicy = { url: String ->
+                        val intent = Intent(Intent.ACTION_VIEW, url.toUri())
                         safeStartActivityWithToast(
                             intent = intent,
                             errorToastMessage = getString(R.string.all_snackbar_not_found_privacy_policy_url),
                         )
                     },
-                    navigateToLoginScreen = {
+                    onNavigateToLogin = {
                         val intent: Intent =
                             LoginActivity.newIntent(this).apply {
                                 flags =
@@ -57,6 +66,6 @@ class SettingActivity : AppCompatActivity() {
     }
 
     companion object {
-        fun newIntent(context: Context): Intent = Intent(context, SettingActivity::class.java)
+        fun newIntent(context: Context): Intent = Intent(context, MyPageActivity::class.java)
     }
 }

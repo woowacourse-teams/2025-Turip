@@ -1,8 +1,8 @@
-package com.on.turip.ui.compose.setting.util
+package com.on.turip.ui.compose.mypage.util
 
 import android.os.Build
 import com.on.turip.BuildConfig
-import com.on.turip.ui.compose.setting.model.AppEnvironmentInfoModel
+import com.on.turip.ui.compose.mypage.model.AppEnvironmentInfoModel
 
 object AppEnvironmentInfoProvider {
     fun getAppEnvironmentInfo(): AppEnvironmentInfoModel =

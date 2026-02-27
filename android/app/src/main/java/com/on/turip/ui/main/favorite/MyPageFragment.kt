@@ -10,8 +10,8 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.on.turip.databinding.FragmentMyPageBinding
 import com.on.turip.ui.common.base.BaseFragment
 import com.on.turip.ui.main.bookmarks.BookmarkContentFragment
-import com.on.turip.ui.setting.SettingActivity
 import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
 
 @AndroidEntryPoint
 class MyPageFragment : BaseFragment<FragmentMyPageBinding>() {
@@ -60,7 +60,7 @@ class MyPageFragment : BaseFragment<FragmentMyPageBinding>() {
 
     private fun setupListeners() {
         binding.ivMyPageMoreOptions.setOnClickListener {
-            startActivity(SettingActivity.newIntent(requireContext()))
+            Timber.d("마이 페이지 컴포즈로 마이그레이션 됨 제거 해도 되는 부분")
         }
     }
 
