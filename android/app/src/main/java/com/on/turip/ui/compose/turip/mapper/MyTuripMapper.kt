@@ -1,8 +1,8 @@
 package com.on.turip.ui.compose.turip.mapper
 
 import com.on.turip.domain.turip.Turip
-import com.on.turip.ui.compose.turip.component.MyTuripModel
-import com.on.turip.ui.compose.turip.component.TuripType
+import com.on.turip.ui.compose.turip.model.MyTuripModel
+import com.on.turip.ui.compose.turip.model.TuripTypeModel
 import com.on.turip.ui.folder.model.TuripEditModel
 
 fun Turip.toUiMyTuripModel(): MyTuripModel =
@@ -11,7 +11,7 @@ fun Turip.toUiMyTuripModel(): MyTuripModel =
         name = name,
         placeCount = placeCount,
         memberCount = memberCount,
-        type = TuripType.of(isShared),
+        type = TuripTypeModel.of(isShared),
         isDefault = isDefault,
     )
 

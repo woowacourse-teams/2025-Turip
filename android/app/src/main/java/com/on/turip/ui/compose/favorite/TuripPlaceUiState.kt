@@ -4,7 +4,7 @@ import androidx.compose.runtime.Immutable
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.compose.designsystem.model.TuripNameStatusModel
 import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
-import com.on.turip.ui.compose.turip.component.MyTuripModel
+import com.on.turip.ui.compose.turip.model.MyTuripModel
 import com.on.turip.ui.folder.model.TuripEditModel
 import com.on.turip.ui.main.favorite.model.PlaceLatLngUiModel
 import kotlinx.collections.immutable.ImmutableList

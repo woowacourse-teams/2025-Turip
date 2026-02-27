@@ -47,10 +47,10 @@ import com.on.turip.ui.compose.designsystem.component.TuripDialog
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbarVisuals
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.turip.component.MyTuripCard
-import com.on.turip.ui.compose.turip.component.MyTuripModel
 import com.on.turip.ui.compose.turip.component.MyTuripTabRow
 import com.on.turip.ui.compose.turip.component.TuripAddBottomSheet
-import com.on.turip.ui.compose.turip.component.TuripType
+import com.on.turip.ui.compose.turip.model.MyTuripModel
+import com.on.turip.ui.compose.turip.model.TuripTypeModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
@@ -193,8 +193,8 @@ private fun MyTuripScreenContent(
     val filteredTurips: List<MyTuripModel> =
         when (selectedTab) {
             MyTuripTab.ALL -> turips
-            MyTuripTab.SOLO -> turips.filter { it.type == TuripType.SOLO }
-            MyTuripTab.TOGETHER -> turips.filter { it.type == TuripType.TOGETHER }
+            MyTuripTab.SOLO -> turips.filter { it.type == TuripTypeModel.SOLO }
+            MyTuripTab.TOGETHER -> turips.filter { it.type == TuripTypeModel.TOGETHER }
         }
 
     Box(Modifier.fillMaxSize()) {
@@ -298,13 +298,13 @@ private fun MyTuripScreenPreview() {
             MyTuripModel(
                 0L,
                 "수원 여행 계획 튜립",
-                TuripType.TOGETHER,
+                TuripTypeModel.TOGETHER,
                 memberCount = 3,
                 placeCount = 2,
                 isDefault = true,
             ),
-            MyTuripModel(1L, "수원 여행 계획 튜립", TuripType.SOLO, placeCount = 1, isDefault = false),
-            MyTuripModel(2L, "수원 여행 계획 튜립", TuripType.SOLO, placeCount = 3, isDefault = false),
+            MyTuripModel(1L, "수원 여행 계획 튜립", TuripTypeModel.SOLO, placeCount = 1, isDefault = false),
+            MyTuripModel(2L, "수원 여행 계획 튜립", TuripTypeModel.SOLO, placeCount = 3, isDefault = false),
         )
 
     TuripTheme {

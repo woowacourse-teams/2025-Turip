@@ -28,14 +28,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -45,26 +42,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.on.turip.R
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
+import com.on.turip.ui.compose.turip.model.MyTuripModel
+import com.on.turip.ui.compose.turip.model.TuripChipIconModel
+import com.on.turip.ui.compose.turip.model.TuripChipModel
+import com.on.turip.ui.compose.turip.model.TuripTypeModel
 
 private const val LONG_PRESS_DELAY_MS = 800L
-
-@Immutable
-private data class TuripChipModel(
-    val text: String,
-    val backgroundColor: Color,
-    val textColor: Color,
-)
-
-@Immutable
-private sealed interface TuripChipIcon {
-    data class Vector(
-        val imageVector: ImageVector,
-    ) : TuripChipIcon
-
-    data class PainterChipIcon(
-        val painter: Painter,
-    ) : TuripChipIcon
-}
 
 @Composable
 fun MyTuripCard(
@@ -163,14 +146,14 @@ fun MyTuripCard(
                         horizontalArrangement = Arrangement.spacedBy(TuripTheme.spacing.medium),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        if (turip.type == TuripType.TOGETHER) {
+                        if (turip.type == TuripTypeModel.TOGETHER) {
                             IconWithCount(
-                                icon = TuripChipIcon.PainterChipIcon(painterResource(R.drawable.ic_people_fill)),
+                                icon = TuripChipIconModel.PainterChipIcon(painterResource(R.drawable.ic_people_fill)),
                                 count = turip.memberCount,
                             )
                         }
                         IconWithCount(
-                            icon = TuripChipIcon.Vector(Icons.Default.LocationOn),
+                            icon = TuripChipIconModel.Vector(Icons.Default.LocationOn),
                             count = turip.placeCount,
                         )
                     }
@@ -206,12 +189,12 @@ fun MyTuripCard(
 
 @Composable
 private fun TuripTypeChip(
-    type: TuripType,
+    type: TuripTypeModel,
     modifier: Modifier = Modifier,
 ) {
     val turipChipModel: TuripChipModel =
         when (type) {
-            TuripType.TOGETHER -> {
+            TuripTypeModel.TOGETHER -> {
                 TuripChipModel(
                     text = "함께 튜립",
                     backgroundColor = TuripTheme.colors.chipBackground,
@@ -219,7 +202,7 @@ private fun TuripTypeChip(
                 )
             }
 
-            TuripType.SOLO -> {
+            TuripTypeModel.SOLO -> {
                 TuripChipModel(
                     text = "나홀로 튜립",
                     backgroundColor = TuripTheme.colors.primary,
@@ -248,7 +231,7 @@ private fun TuripTypeChip(
 
 @Composable
 private fun IconWithCount(
-    icon: TuripChipIcon,
+    icon: TuripChipIconModel,
     count: Int,
     modifier: Modifier = Modifier,
     tint: Color = TuripTheme.colors.gray03,
@@ -259,7 +242,7 @@ private fun IconWithCount(
         modifier = modifier,
     ) {
         when (icon) {
-            is TuripChipIcon.Vector -> {
+            is TuripChipIconModel.Vector -> {
                 Icon(
                     imageVector = icon.imageVector,
                     contentDescription = null,
@@ -268,7 +251,7 @@ private fun IconWithCount(
                 )
             }
 
-            is TuripChipIcon.PainterChipIcon -> {
+            is TuripChipIconModel.PainterChipIcon -> {
                 Icon(
                     painter = icon.painter,
                     contentDescription = null,
@@ -295,7 +278,7 @@ private fun MyTuripCardTogetherPreview() {
                 MyTuripModel(
                     id = 0L,
                     name = "수원 여행 계획 튜립",
-                    type = TuripType.TOGETHER,
+                    type = TuripTypeModel.TOGETHER,
                     memberCount = 3,
                     placeCount = 5,
                     isDefault = true,
@@ -317,7 +300,7 @@ private fun MyTuripCardSoloPreview() {
                 MyTuripModel(
                     id = 1L,
                     name = "수원 여행 계획 튜립",
-                    type = TuripType.SOLO,
+                    type = TuripTypeModel.SOLO,
                     placeCount = 3,
                     isDefault = false,
                 ),
@@ -338,7 +321,7 @@ private fun MyTuripCardDeletedPreview() {
                 MyTuripModel(
                     id = 0L,
                     name = "수원 여행 계획 튜립",
-                    type = TuripType.TOGETHER,
+                    type = TuripTypeModel.TOGETHER,
                     memberCount = 3,
                     placeCount = 5,
                     isDefault = false,
