@@ -168,7 +168,9 @@ fun MyTuripCard(
             }
         }
 
-        if (!isDefaultFolder && isDeleteMode && onDeleteClick != null) {
+        val isRemovable = !isDefaultFolder && isDeleteMode && onDeleteClick != null
+
+        if (isRemovable) {
             Box(
                 modifier =
                     Modifier
