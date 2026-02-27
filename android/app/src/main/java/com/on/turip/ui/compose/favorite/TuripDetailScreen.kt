@@ -77,7 +77,7 @@ fun TuripDetailScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
     val modalBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    BackHandler { onBack() }
+    BackHandler(enabled = !uiState.showBottomSheet) { onBack() }
 
     DisposableEffect(Unit) {
         onDispose { viewModel.resetUiState() }

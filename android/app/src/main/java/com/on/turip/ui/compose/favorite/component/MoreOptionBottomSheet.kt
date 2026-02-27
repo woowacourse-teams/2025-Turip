@@ -1,5 +1,6 @@
 package com.on.turip.ui.compose.favorite.component
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -98,6 +99,18 @@ fun MoreOptionBottomSheet(
         containerColor = TuripTheme.colors.white,
         modifier = modifier,
     ) {
+        BackHandler {
+            when (screenMode) {
+                TuripPlaceScreenMode.Edit -> {
+                    onScreenModeChange(TuripPlaceScreenMode.MoreOption)
+                }
+
+                TuripPlaceScreenMode.MoreOption -> {
+                    onDismiss()
+                }
+            }
+        }
+
         AnimatedContent(
             targetState = screenMode,
             transitionSpec = {
