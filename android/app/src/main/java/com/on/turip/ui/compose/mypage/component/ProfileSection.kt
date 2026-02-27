@@ -120,7 +120,7 @@ private fun ProfileImage(
                 Icon(
                     imageVector = Icons.Default.Person,
                     contentDescription = stringResource(R.string.my_page_profile_image_description),
-                    modifier = Modifier.fillMaxSize(0.4f),
+                    modifier = Modifier.fillMaxSize(0.5f),
                 )
             } else {
                 AsyncImage(
