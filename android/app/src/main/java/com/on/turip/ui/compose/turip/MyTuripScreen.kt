@@ -100,7 +100,7 @@ fun MyTuripScreen(
                             TuripSnackbarVisuals(
                                 message =
                                     resources.getString(
-                                        R.string.bottom_sheet_turip_add_turip,
+                                        R.string.turip_add_turip,
                                         uiEffect.turipName,
                                     ),
                                 actionLabel = resources.getString(R.string.all_close_description),
@@ -114,7 +114,7 @@ fun MyTuripScreen(
                             TuripSnackbarVisuals(
                                 message =
                                     resources.getString(
-                                        R.string.bottom_sheet_turip_delete_turip,
+                                        R.string.turip_delete_turip,
                                         uiEffect.turipName,
                                     ),
                                 actionLabel = resources.getString(R.string.all_close_description),
@@ -136,10 +136,10 @@ fun MyTuripScreen(
                     snackbarHostState.showSnackbarWithAction(
                         message =
                             resources.getString(
-                                R.string.bottom_sheet_turip_delete_turip,
+                                R.string.turip_delete_turip,
                                 uiEffect.turipName,
                             ),
-                        actionLabel = resources.getString(R.string.bottom_sheet_turip_remove_cancel),
+                        actionLabel = resources.getString(R.string.turip_remove_cancel),
                         onAction = viewModel::rollbackTuripDelete,
                         onDismiss = viewModel::commitTuripDelete,
                     )
