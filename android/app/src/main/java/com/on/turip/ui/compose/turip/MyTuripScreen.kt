@@ -231,7 +231,7 @@ private fun MyTuripScreenContent(
                         },
             ) {
                 Text(
-                    text = "내 튜립",
+                    text = stringResource(R.string.my_turip_screen_title),
                     style = TuripTheme.typography.display,
                     color = TuripTheme.colors.black,
                     modifier =
