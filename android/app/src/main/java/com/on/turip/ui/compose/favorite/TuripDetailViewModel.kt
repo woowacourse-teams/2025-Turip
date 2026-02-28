@@ -8,13 +8,13 @@ import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
 import com.on.turip.domain.bookmark.TuripPlace
-import com.on.turip.domain.bookmark.usecase.UpdateTuripPlaceUseCase
 import com.on.turip.domain.turip.Turip
 import com.on.turip.domain.turip.repository.TuripRepository
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.compose.designsystem.model.TuripNameStatusModel
+import com.on.turip.ui.compose.favorite.model.DeleteTuripPlaceSnapshot
 import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
 import com.on.turip.ui.compose.turip.mapper.toUiMyTuripModel
 import com.on.turip.ui.folder.model.TuripEditModel
@@ -35,13 +35,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class TuripDetailViewModel @Inject constructor(
     private val turipRepository: TuripRepository,
-    private val updateTuripPlaceUseCase: UpdateTuripPlaceUseCase,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<TuripPlaceUiState> =
         MutableStateFlow(TuripPlaceUiState.Idle)
@@ -95,60 +96,67 @@ class TuripDetailViewModel @Inject constructor(
         }
     }
 
-    fun updateTuripPlace(
-        placeId: Long,
-        isTuripPlace: Boolean,
-    ) {
-        val updatedIsTuripPlace: Boolean = !isTuripPlace
-        if (!updatedIsTuripPlace) {
-            applyTuripPlaceDelete(placeId)
+    fun applyTuripPlaceDelete(placeId: Long) {
+        val targetPlace =
+            uiState.value.places.find { it.placeId == placeId }
+                ?: run {
+                    Timber.e("삭제할 장소를 찾을 수 없어요. placeId = $placeId")
+                    return
+                }
+
+        if (deleteTuripPlaceSnapshot.hasSnapshot) return
+
+        _uiState.update { state: TuripPlaceUiState ->
+            deleteTuripPlaceSnapshot =
+                DeleteTuripPlaceSnapshot(
+                    deletePlace = targetPlace,
+                    originPlaces = state.places,
+                    originPlacesLatLng = state.placesLatLng,
+                )
+            state.copy(
+                places =
+                    state.places
+                        .filter { it.turipPlaceId != targetPlace.turipPlaceId }
+                        .toImmutableList(),
+                placesLatLng =
+                    state.placesLatLng
+                        .filter { it.placeId != targetPlace.placeId }
+                        .toImmutableList(),
+            )
         }
 
         viewModelScope.launch {
-            updateTuripPlaceUseCase(uiState.value.selectedTurip.id, placeId, updatedIsTuripPlace)
-                .onSuccess {
-                    if (updatedIsTuripPlace) loadPlaces(uiState.value.selectedTurip.id) else clearDeleteSnapshot()
-                    Timber.d("튜립 내 튜립 장소 상태 업데이트 성공, turipId = ${uiState.value.selectedTurip.id} placeId = $placeId")
-                }.onFailure { errorType: ErrorType ->
-                    rollbackTuripPlaceDelete(placeId)
-                    _uiState.update { it.copy(isLoading = false) }
-                    val uiError: UiError = errorType.toUiError()
-                    if (uiError is UiError.Global) {
-                        when (uiError) {
-                            UiError.Global.Network -> {
-                                _uiEffect.send(
-                                    TuripPlaceUiEffect.ShowError(
-                                        errorUiState = ErrorUiState.Network,
-                                        retryAction =
-                                            TuripPlaceRetryAction
-                                                .UpdateTuripPlace(placeId, isTuripPlace),
-                                    ),
-                                )
-                            }
+            _uiEffect.send(
+                TuripPlaceUiEffect.ShowTuripPlaceRemoved(targetPlace.name),
+            )
+        }
+    }
 
-                            UiError.Global.Server -> {
-                                _uiEffect.send(
-                                    TuripPlaceUiEffect.ShowError(
-                                        errorUiState = ErrorUiState.Server,
-                                        retryAction =
-                                            TuripPlaceRetryAction
-                                                .UpdateTuripPlace(placeId, isTuripPlace),
-                                    ),
-                                )
-                            }
+    private val commitMutex = Mutex()
 
-                            UiError.Global.TokenExpired -> {
-                                _uiEffect.send(TuripPlaceUiEffect.NavigateToLogin)
-                            }
-                        }
-                    }
-                    Timber.d(
-                        "튜립 내 튜립 장소 상태 업데이트 실패, " +
-                            "turipId=${uiState.value.selectedTurip.id} " +
-                            "placeId=$placeId " +
-                            "originIsTuripPlace=$isTuripPlace",
-                    )
+    fun commitTuripPlaceDelete() {
+        viewModelScope.launch {
+            commitMutex.withLock {
+                if (!deleteTuripPlaceSnapshot.hasSnapshot) {
+                    Timber.e("제거할 장소에 대한 정보가 없어요. deletePlaceSnapshot을 확인 해주세요 ")
+                    return@launch
                 }
+
+                val deletePlace = deleteTuripPlaceSnapshot.deletePlace
+                turipRepository
+                    .deleteTuripPlace(uiState.value.selectedTurip.id, deletePlace.placeId)
+                    .onSuccess {
+                        Timber.d("튜립 상세 바텀시트, 장소 업데이트 성공")
+                    }.onFailure {
+                        _uiEffect.send(
+                            TuripPlaceUiEffect.ShowTuripPlaceRemoveFailed(deletePlace.name),
+                        )
+                        _uiState.update { it.copy(places = deleteTuripPlaceSnapshot.originPlaces) }
+                        Timber.e("튜립 상세 바텀시트, 장소 업데이트 실패 place = ${deletePlace.name}")
+                    }
+
+                deleteTuripPlaceSnapshot = DeleteTuripPlaceSnapshot.EMPTY
+            }
         }
     }
 
@@ -189,6 +197,16 @@ class TuripDetailViewModel @Inject constructor(
                 }.onFailure { errorType: ErrorType ->
                     sendErrorEffect(errorType, TuripPlaceRetryAction.TuripNameUpdate)
                 }
+        }
+    }
+
+    fun updateSelectedPlace(placeId: Long) {
+        _uiState.update { turipPlaceUiState: TuripPlaceUiState ->
+            turipPlaceUiState.copy(
+                selectedPlace =
+                    _uiState.value.placesLatLng.find { it.placeId == placeId }
+                        ?: throw IllegalStateException("장소를 찾을 수 없습니다."),
+            )
         }
     }
 
@@ -247,10 +265,6 @@ class TuripDetailViewModel @Inject constructor(
                     clearReorderSnapshot()
                 }.onFailure { errorType: ErrorType ->
                     rollbackReorderedPlaces()
-                    when (val uiError: UiError = errorType.toUiError()) {
-                        is UiError.Global -> handleGlobalError(uiError)
-                        is UiError.Feature -> Unit
-                    }
                     Timber.e("장소 순서 변경 API 호출 실패 ")
                 }
         }
@@ -274,16 +288,6 @@ class TuripDetailViewModel @Inject constructor(
                     _uiEffect.send(TuripPlaceUiEffect.ShowTuripShareNotAllowed)
                 }
             }
-        }
-    }
-
-    fun updateSelectedPlace(placeId: Long) {
-        _uiState.update { turipPlaceUiState: TuripPlaceUiState ->
-            turipPlaceUiState.copy(
-                selectedPlace =
-                    _uiState.value.placesLatLng.find { it.placeId == placeId }
-                        ?: throw IllegalStateException("장소를 찾을 수 없습니다."),
-            )
         }
     }
 
@@ -311,7 +315,7 @@ class TuripDetailViewModel @Inject constructor(
     fun handleErrorRetryRequest(action: TuripPlaceRetryAction) {
         when (action) {
             is TuripPlaceRetryAction.UpdateTuripPlace -> {
-                updateTuripPlace(action.placeId, action.isTuripPlace)
+                loadPlaces(action.placeId)
             }
 
             TuripPlaceRetryAction.TuripDelete -> {
@@ -324,28 +328,8 @@ class TuripDetailViewModel @Inject constructor(
         }
     }
 
-    private fun applyTuripPlaceDelete(placeId: Long) {
-        if (deleteTuripPlaceSnapshot.hasSnapshot()) return
-        _uiState.update { state ->
-            deleteTuripPlaceSnapshot =
-                DeleteTuripPlaceSnapshot(
-                    deletePlaceId = placeId,
-                    originPlaces = state.places,
-                    originPlacesLatLng = state.placesLatLng,
-                )
-            state.copy(
-                places = state.places.filter { it.placeId != placeId }.toImmutableList(),
-                placesLatLng =
-                    state.placesLatLng
-                        .filter { it.placeId != placeId }
-                        .toImmutableList(),
-            )
-        }
-    }
-
-    private fun rollbackTuripPlaceDelete(placeId: Long) {
-        if (!deleteTuripPlaceSnapshot.hasSnapshot()) return
-        if (deleteTuripPlaceSnapshot.deletePlaceId != placeId) return
+    fun rollbackTuripPlaceDelete() {
+        if (!deleteTuripPlaceSnapshot.hasSnapshot) return
 
         _uiState.update { state ->
             state.copy(
@@ -357,7 +341,7 @@ class TuripDetailViewModel @Inject constructor(
     }
 
     private fun rollbackReorderedPlaces() {
-        val snapshot = reorderPlacesSnapshot ?: return
+        val snapshot: ImmutableList<TuripPlaceModel> = reorderPlacesSnapshot ?: return
         _uiState.update { state ->
             state.copy(
                 places = snapshot,
@@ -411,25 +395,6 @@ class TuripDetailViewModel @Inject constructor(
     }
 
     companion object {
-        private const val NOT_INITIALIZED: Long = 0L
-
         private const val MAX_NAME_LENGTH = 20
-
-        private data class DeleteTuripPlaceSnapshot(
-            val deletePlaceId: Long,
-            val originPlaces: ImmutableList<TuripPlaceModel>,
-            val originPlacesLatLng: ImmutableList<PlaceLatLngUiModel>,
-        ) {
-            fun hasSnapshot(): Boolean = this != EMPTY
-
-            companion object {
-                val EMPTY =
-                    DeleteTuripPlaceSnapshot(
-                        deletePlaceId = NOT_INITIALIZED,
-                        originPlaces = emptyList<TuripPlaceModel>().toImmutableList(),
-                        originPlacesLatLng = emptyList<PlaceLatLngUiModel>().toImmutableList(),
-                    )
-            }
-        }
     }
 }

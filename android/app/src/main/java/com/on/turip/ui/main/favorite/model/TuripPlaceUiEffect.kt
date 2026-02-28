@@ -11,6 +11,14 @@ sealed interface TuripPlaceUiEffect {
 
     data object TuripDelete : TuripPlaceUiEffect
 
+    data class ShowTuripPlaceRemoveFailed(
+        val placeName: String,
+    ) : TuripPlaceUiEffect
+
+    data class ShowTuripPlaceRemoved(
+        val placeName: String,
+    ) : TuripPlaceUiEffect
+
     data class ShareTurip(
         val turipShareModel: TuripShareModel,
     ) : TuripPlaceUiEffect
@@ -24,7 +32,6 @@ sealed interface TuripPlaceUiEffect {
 sealed interface TuripPlaceRetryAction {
     data class UpdateTuripPlace(
         val placeId: Long,
-        val isTuripPlace: Boolean,
     ) : TuripPlaceRetryAction
 
     data object TuripNameUpdate : TuripPlaceRetryAction

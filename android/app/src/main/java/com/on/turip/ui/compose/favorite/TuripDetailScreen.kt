@@ -42,6 +42,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.gms.maps.model.LatLng
 import com.on.turip.R
 import com.on.turip.ui.common.error.ErrorUiState
+import com.on.turip.ui.common.extensions.dismissAndExecute
 import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.common.extensions.showSnackbarWithAction
 import com.on.turip.ui.compose.designsystem.component.ErrorScreen
@@ -122,6 +123,33 @@ fun TuripDetailScreen(
 
                 TuripPlaceUiEffect.TuripUpdated -> {
                     viewModel.dismissBottomSheet()
+                }
+
+                is TuripPlaceUiEffect.ShowTuripPlaceRemoveFailed -> {
+                    snackbarHostState.showSnackbar(
+                        message =
+                            resource.getString(
+                                R.string.trip_detail_bottom_sheet_snackbar_place_remove_failed,
+                                uiEffect.placeName,
+                            ),
+                        duration = SnackbarDuration.Short,
+                    )
+                }
+
+                is TuripPlaceUiEffect.ShowTuripPlaceRemoved -> {
+                    snackbarHostState.showSnackbarWithAction(
+                        message =
+                            resource.getString(
+                                R.string.trip_detail_bottom_sheet_snackbar_place_removed,
+                                uiEffect.placeName,
+                            ),
+                        actionLabel =
+                            resource.getString(
+                                R.string.trip_detail_bottom_sheet_snackbar_place_remove_undo,
+                            ),
+                        onAction = viewModel::rollbackTuripPlaceDelete,
+                        onDismiss = viewModel::commitTuripPlaceDelete,
+                    )
                 }
             }
         }
@@ -208,7 +236,9 @@ fun TuripDetailScreen(
                         turipPlaceModel = uiState.places,
                         navigateToMap = { mapModel: MapModel -> onNavigateToMap(mapModel.uri) },
                         onClickTuripPlace = { placeId: Long ->
-                            viewModel.updateTuripPlace(placeId = placeId, isTuripPlace = true)
+                            snackbarHostState.dismissAndExecute {
+                                viewModel.applyTuripPlaceDelete(placeId = placeId)
+                            }
                         },
                         onUpdateTuripPlacesOrder = viewModel::updateTuripPlacesOrder,
                         currentPlaceLatLng = uiState.placesLatLng,
