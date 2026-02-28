@@ -203,7 +203,7 @@ private fun MyTuripScreenContent(
         Scaffold(
             modifier = modifier.fillMaxSize(),
             containerColor = TuripTheme.colors.white,
-            contentWindowInsets = WindowInsets(0, 0, 0, 0),
+            contentWindowInsets = WindowInsets(),
             floatingActionButton = {
                 FloatingActionButton(
                     onClick = onAddClick,
