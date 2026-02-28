@@ -8,7 +8,6 @@ import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
 import com.on.turip.domain.bookmark.TuripPlace
-import com.on.turip.domain.bookmark.usecase.UpdateTuripPlaceUseCase
 import com.on.turip.domain.turip.repository.TuripRepository
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
@@ -43,7 +42,6 @@ import javax.inject.Inject
 @HiltViewModel
 class PlaceTuripSelectionViewModel @Inject constructor(
     private val turipRepository: TuripRepository,
-    private val updateTuripPlaceUseCase: UpdateTuripPlaceUseCase,
 ) : ViewModel() {
     // 튜립 목록의 버튼 활성화 여부를 위한 캐싱
     private var originTuripIds: Set<Long> = setOf()
@@ -249,7 +247,8 @@ class PlaceTuripSelectionViewModel @Inject constructor(
             val deletePlace = deletePlaceSnapshot.deletePlace
             val screenMode = uiState.value.screenMode
             if (screenMode is PlaceTuripSelectionScreenMode.TuripDetail) {
-                updateTuripPlaceUseCase(screenMode.turipId, deletePlace.placeId, false)
+                turipRepository
+                    .deleteTuripPlace(screenMode.turipId, deletePlace.placeId)
                     .onSuccess {
                         syncTuripForSelectedPlace(deletePlace, screenMode)
                         Timber.d("튜립 상세 바텀시트, 장소 업데이트 성공")
