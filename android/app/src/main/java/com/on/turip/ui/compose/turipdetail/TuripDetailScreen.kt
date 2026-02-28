@@ -1,4 +1,4 @@
-package com.on.turip.ui.compose.favorite
+package com.on.turip.ui.compose.turipdetail
 
 import android.net.Uri
 import androidx.activity.compose.BackHandler
@@ -42,21 +42,21 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.gms.maps.model.LatLng
 import com.on.turip.R
 import com.on.turip.ui.common.error.ErrorUiState
-import com.on.turip.ui.common.extensions.dismissAndExecute
 import com.on.turip.ui.common.error.toUiModel
+import com.on.turip.ui.common.extensions.dismissAndExecute
 import com.on.turip.ui.common.extensions.showSnackbarWithAction
 import com.on.turip.ui.compose.designsystem.component.ErrorScreen
 import com.on.turip.ui.compose.designsystem.component.TuripAppBar
 import com.on.turip.ui.compose.designsystem.component.TuripDialog
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
-import com.on.turip.ui.compose.favorite.component.MoreOptionBottomSheet
-import com.on.turip.ui.compose.favorite.component.TuripMapContent
-import com.on.turip.ui.compose.favorite.component.TuripPlaces
 import com.on.turip.ui.compose.trip.model.MapModel
 import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
-import com.on.turip.ui.compose.favorite.model.turip.PlaceLatLngUiModel
-import com.on.turip.ui.compose.favorite.model.turip.TuripShareModel
+import com.on.turip.ui.compose.turipdetail.component.MoreOptionBottomSheet
+import com.on.turip.ui.compose.turipdetail.component.TuripMapContent
+import com.on.turip.ui.compose.turipdetail.component.TuripPlaces
+import com.on.turip.ui.compose.turipdetail.model.turip.PlaceLatLngUiModel
+import com.on.turip.ui.compose.turipdetail.model.turip.TuripShareModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 

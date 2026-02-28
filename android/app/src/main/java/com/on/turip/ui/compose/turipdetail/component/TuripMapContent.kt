@@ -1,4 +1,4 @@
-package com.on.turip.ui.compose.favorite.component
+package com.on.turip.ui.compose.turipdetail.component
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.core.animateDpAsState
@@ -31,7 +31,7 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.on.turip.ui.compose.favorite.model.turip.PlaceLatLngUiModel
+import com.on.turip.ui.compose.turipdetail.model.turip.PlaceLatLngUiModel
 import kotlinx.collections.immutable.ImmutableList
 
 @SuppressLint("CoroutineCreationDuringComposition")

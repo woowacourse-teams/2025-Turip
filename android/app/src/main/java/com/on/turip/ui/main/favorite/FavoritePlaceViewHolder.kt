@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.on.turip.databinding.ItemFavoritePlaceBinding
-import com.on.turip.ui.compose.favorite.model.turip.TuripPlaceUiModel
+import com.on.turip.ui.compose.turipdetail.model.turip.TuripPlaceUiModel
 import com.on.turip.ui.main.favorite.model.Maps
 
 class FavoritePlaceViewHolder(

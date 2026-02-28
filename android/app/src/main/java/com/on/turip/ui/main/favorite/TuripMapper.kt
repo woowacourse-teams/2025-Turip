@@ -3,9 +3,9 @@ package com.on.turip.ui.main.favorite
 import com.google.android.gms.maps.model.LatLng
 import com.on.turip.domain.bookmark.TuripPlace
 import com.on.turip.domain.turip.Turip
-import com.on.turip.ui.compose.favorite.model.turip.PlaceLatLngUiModel
-import com.on.turip.ui.compose.favorite.model.turip.TuripPlaceUiModel
 import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
+import com.on.turip.ui.compose.turipdetail.model.turip.PlaceLatLngUiModel
+import com.on.turip.ui.compose.turipdetail.model.turip.TuripPlaceUiModel
 import com.on.turip.ui.main.favorite.model.TuripModel
 import com.on.turip.ui.main.favorite.model.TuripPlaceShareModel
 

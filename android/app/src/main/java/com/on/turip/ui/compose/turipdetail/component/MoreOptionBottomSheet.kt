@@ -1,4 +1,4 @@
-package com.on.turip.ui.compose.favorite.component
+package com.on.turip.ui.compose.turipdetail.component
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
@@ -41,9 +41,9 @@ import com.on.turip.R
 import com.on.turip.ui.compose.designsystem.component.NameEditorSheetContent
 import com.on.turip.ui.compose.designsystem.model.TuripNameStatusModel
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
-import com.on.turip.ui.compose.favorite.TuripPlaceScreenMode
-import com.on.turip.ui.compose.favorite.model.moreoption.MoreOptionIcon
-import com.on.turip.ui.compose.favorite.model.moreoption.MoreOptionItem
+import com.on.turip.ui.compose.turipdetail.TuripPlaceScreenMode
+import com.on.turip.ui.compose.turipdetail.model.moreoption.MoreOptionIcon
+import com.on.turip.ui.compose.turipdetail.model.moreoption.MoreOptionItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

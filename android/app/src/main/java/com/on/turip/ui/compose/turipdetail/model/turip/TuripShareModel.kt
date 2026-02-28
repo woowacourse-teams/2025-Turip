@@ -1,4 +1,4 @@
-package com.on.turip.ui.compose.favorite.model.turip
+package com.on.turip.ui.compose.turipdetail.model.turip
 
 import com.on.turip.ui.main.favorite.model.TuripPlaceShareModel
 

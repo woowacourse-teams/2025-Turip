@@ -1,7 +1,7 @@
-package com.on.turip.ui.compose.favorite.model
+package com.on.turip.ui.compose.turipdetail.model
 
-import com.on.turip.ui.compose.favorite.model.turip.PlaceLatLngUiModel
 import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
+import com.on.turip.ui.compose.turipdetail.model.turip.PlaceLatLngUiModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 

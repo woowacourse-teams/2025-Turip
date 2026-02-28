@@ -1,4 +1,4 @@
-package com.on.turip.ui.compose.favorite
+package com.on.turip.ui.compose.turipdetail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,12 +14,12 @@ import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.compose.designsystem.model.TuripNameStatusModel
-import com.on.turip.ui.compose.favorite.model.DeleteTuripPlaceSnapshot
 import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
 import com.on.turip.ui.compose.turip.mapper.toUiMyTuripModel
+import com.on.turip.ui.compose.turipdetail.model.DeleteTuripPlaceSnapshot
+import com.on.turip.ui.compose.turipdetail.model.turip.PlaceLatLngUiModel
+import com.on.turip.ui.compose.turipdetail.model.turip.TuripShareModel
 import com.on.turip.ui.folder.model.TuripEditModel
-import com.on.turip.ui.compose.favorite.model.turip.PlaceLatLngUiModel
-import com.on.turip.ui.compose.favorite.model.turip.TuripShareModel
 import com.on.turip.ui.main.favorite.toLatLng
 import com.on.turip.ui.main.favorite.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -275,7 +275,10 @@ class TuripDetailViewModel @Inject constructor(
                     rollbackReorderedPlaces()
                     _uiEffect.send(
                         TuripPlaceUiEffect.ShowReorderPlaceFailed(
-                            retryAction = TuripPlaceRetryAction.UpdateReorderedPlaces(reorderedTuripPlaces),
+                            retryAction =
+                                TuripPlaceRetryAction.UpdateReorderedPlaces(
+                                    reorderedTuripPlaces,
+                                ),
                         ),
                     )
                     Timber.e("장소 순서 변경 API 실패")

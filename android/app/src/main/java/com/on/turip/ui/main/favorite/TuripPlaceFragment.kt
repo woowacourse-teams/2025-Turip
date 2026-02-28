@@ -17,10 +17,10 @@ import androidx.fragment.app.Fragment
 import com.on.turip.R
 import com.on.turip.ui.common.extensions.safeStartActivityWithToast
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
-import com.on.turip.ui.compose.favorite.TuripDetailScreen
 import com.on.turip.ui.compose.turip.MyTuripScreen
+import com.on.turip.ui.compose.turipdetail.TuripDetailScreen
+import com.on.turip.ui.compose.turipdetail.model.turip.TuripShareModel
 import com.on.turip.ui.login.LoginActivity
-import com.on.turip.ui.compose.favorite.model.turip.TuripShareModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
