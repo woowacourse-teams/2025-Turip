@@ -60,7 +60,7 @@ import kotlinx.coroutines.flow.filter
 
 @Composable
 fun BookmarkContentListScreen(
-    onNavigateToBack: () -> Unit,
+    onBack: () -> Unit,
     onNavigateToLogin: () -> Unit,
     onNavigateToContent: (contentId: Long) -> Unit,
     onBookmarkChanged: () -> Unit,
@@ -94,7 +94,7 @@ fun BookmarkContentListScreen(
     }
 
     Scaffold(
-        topBar = { BookmarkContentListAppBar(onBackClick = onNavigateToBack) },
+        topBar = { BookmarkContentListAppBar(onBackClick = onBack) },
         modifier =
             Modifier
                 .fillMaxSize()
@@ -107,7 +107,7 @@ fun BookmarkContentListScreen(
             onRetryClick = viewModel::refreshBookmarkContents,
             onContentClick = onNavigateToContent,
             onBookmarkClick = viewModel::removeBookmark,
-            loadMoreContents = viewModel::loadMoreContents,
+            onLoadMore = viewModel::loadMoreContents,
             modifier = Modifier.padding(innerPadding),
         )
     }
@@ -119,7 +119,7 @@ private fun BookmarkContentListContent(
     onRetryClick: () -> Unit,
     onContentClick: (contentId: Long) -> Unit,
     onBookmarkClick: (contentId: Long) -> Unit,
-    loadMoreContents: () -> Unit,
+    onLoadMore: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.fillMaxSize()) {
@@ -144,7 +144,7 @@ private fun BookmarkContentListContent(
                         uiState = uiState,
                         onContentClick = onContentClick,
                         onBookmarkClick = onBookmarkClick,
-                        loadMore = loadMoreContents,
+                        onLoadMore = onLoadMore,
                     )
                 }
             }
@@ -197,7 +197,7 @@ private fun BookmarkContentList(
     uiState: BookmarkContentListUiState,
     onContentClick: (contentId: Long) -> Unit,
     onBookmarkClick: (contentId: Long) -> Unit,
-    loadMore: () -> Unit,
+    onLoadMore: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val pagingState: PagingState<BookmarkContent> = uiState.bookmarkContents
@@ -225,7 +225,7 @@ private fun BookmarkContentList(
         snapshotFlow { shouldLoadMore }
             .distinctUntilChanged()
             .filter { it }
-            .collect { loadMore() }
+            .collect { onLoadMore() }
     }
 
     val totalBookmarkCount =
@@ -298,7 +298,7 @@ private fun BookmarkContentList(
                 }
             } else if (pagingState.errorUiState != ErrorUiState.None) {
                 item {
-                    LoadMoreError(onRetryClick = loadMore)
+                    LoadMoreError(onRetryClick = onLoadMore)
                 }
             }
         }
@@ -339,7 +339,7 @@ private fun BookmarkContentListLoadingPreview() {
             onRetryClick = {},
             onContentClick = {},
             onBookmarkClick = {},
-            loadMoreContents = { },
+            onLoadMore = { },
         )
     }
 }
@@ -365,7 +365,7 @@ private fun BookmarkContentListEmptyPreview() {
             onRetryClick = {},
             onContentClick = {},
             onBookmarkClick = {},
-            loadMoreContents = { },
+            onLoadMore = { },
         )
     }
 }
@@ -391,7 +391,7 @@ private fun BookmarkContentListErrorPreview() {
             onRetryClick = {},
             onContentClick = {},
             onBookmarkClick = {},
-            loadMoreContents = { },
+            onLoadMore = { },
         )
     }
 }
@@ -445,7 +445,7 @@ private fun BookmarkContentListSuccessPreview() {
                 onRetryClick = {},
                 onContentClick = {},
                 onBookmarkClick = {},
-                loadMoreContents = {},
+                onLoadMore = {},
             )
         }
     }

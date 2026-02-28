@@ -25,7 +25,7 @@ class BookmarkContentActivity : AppCompatActivity() {
         setContent {
             TuripTheme {
                 BookmarkContentListScreen(
-                    onNavigateToBack = {
+                    onBack = {
                         finish()
                     },
                     onNavigateToLogin = {
