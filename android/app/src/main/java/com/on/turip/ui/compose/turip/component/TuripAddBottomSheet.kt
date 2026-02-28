@@ -21,7 +21,7 @@ fun TuripAddBottomSheet(
     turipName: String,
     sheetState: SheetState,
     turipNameStatus: TuripNameStatusModel,
-    onNameChanged: (String) -> Unit,
+    onNameChanged: (name: String) -> Unit,
     onConfirmClick: () -> Unit,
     onDismiss: () -> Unit,
 ) {
