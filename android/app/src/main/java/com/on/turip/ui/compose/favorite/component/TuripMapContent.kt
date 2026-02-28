@@ -31,7 +31,7 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.on.turip.ui.main.favorite.model.PlaceLatLngUiModel
+import com.on.turip.ui.compose.favorite.model.turip.PlaceLatLngUiModel
 import kotlinx.collections.immutable.ImmutableList
 
 @SuppressLint("CoroutineCreationDuringComposition")

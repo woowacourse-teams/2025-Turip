@@ -1,4 +1,4 @@
-package com.on.turip.ui.compose.favorite
+package com.on.turip.ui.compose.favorite.component
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
@@ -132,7 +132,8 @@ private fun TuripPlaces(
                                 shadowElevation = elevation
                                 shape = reorderableItemShape
                                 clip = true
-                            }.draggableAfterLongPress(
+                            }
+                            .draggableAfterLongPress(
                                 interactionSource = interactionSource,
                             ),
                 )

@@ -14,7 +14,7 @@ import com.on.turip.ui.compose.trip.TripDetailScreen
 import com.on.turip.ui.compose.trip.model.MapModel
 import com.on.turip.ui.folder.TuripActivity
 import com.on.turip.ui.login.LoginActivity
-import com.on.turip.ui.main.favorite.model.TuripShareModel
+import com.on.turip.ui.compose.favorite.model.turip.TuripShareModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

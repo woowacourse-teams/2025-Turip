@@ -1,4 +1,4 @@
-package com.on.turip.ui.main.favorite.model
+package com.on.turip.ui.compose.favorite.model.turip
 
 import android.net.Uri
 import com.google.android.gms.maps.model.LatLng

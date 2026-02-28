@@ -18,10 +18,8 @@ import com.on.turip.ui.compose.favorite.model.DeleteTuripPlaceSnapshot
 import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
 import com.on.turip.ui.compose.turip.mapper.toUiMyTuripModel
 import com.on.turip.ui.folder.model.TuripEditModel
-import com.on.turip.ui.main.favorite.model.PlaceLatLngUiModel
-import com.on.turip.ui.main.favorite.model.TuripPlaceRetryAction
-import com.on.turip.ui.main.favorite.model.TuripPlaceUiEffect
-import com.on.turip.ui.main.favorite.model.TuripShareModel
+import com.on.turip.ui.compose.favorite.model.turip.PlaceLatLngUiModel
+import com.on.turip.ui.compose.favorite.model.turip.TuripShareModel
 import com.on.turip.ui.main.favorite.toLatLng
 import com.on.turip.ui.main.favorite.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel

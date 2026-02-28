@@ -1,6 +1,7 @@
-package com.on.turip.ui.main.favorite.model
+package com.on.turip.ui.compose.favorite
 
 import com.on.turip.ui.common.error.ErrorUiState
+import com.on.turip.ui.compose.favorite.model.turip.TuripShareModel
 import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
 import kotlinx.collections.immutable.ImmutableList
 

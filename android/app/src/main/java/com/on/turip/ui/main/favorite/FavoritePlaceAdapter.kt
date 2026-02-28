@@ -2,7 +2,7 @@ package com.on.turip.ui.main.favorite
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.on.turip.ui.main.favorite.model.TuripPlaceUiModel
+import com.on.turip.ui.compose.favorite.model.turip.TuripPlaceUiModel
 
 class FavoritePlaceAdapter(
     private val favoritePlaceListener: FavoritePlaceViewHolder.FavoritePlaceListener,

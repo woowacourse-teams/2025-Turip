@@ -1,4 +1,4 @@
-package com.on.turip.ui.compose.favorite.model
+package com.on.turip.ui.compose.favorite.model.moreoption
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color

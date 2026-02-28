@@ -52,14 +52,13 @@ import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.favorite.component.MoreOptionBottomSheet
 import com.on.turip.ui.compose.favorite.component.TuripMapContent
+import com.on.turip.ui.compose.favorite.component.TuripPlaces
 import com.on.turip.ui.compose.trip.model.MapModel
 import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
-import com.on.turip.ui.main.favorite.model.PlaceLatLngUiModel
-import com.on.turip.ui.main.favorite.model.TuripPlaceUiEffect
-import com.on.turip.ui.main.favorite.model.TuripShareModel
+import com.on.turip.ui.compose.favorite.model.turip.PlaceLatLngUiModel
+import com.on.turip.ui.compose.favorite.model.turip.TuripShareModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toImmutableList
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
