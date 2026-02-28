@@ -202,7 +202,7 @@ private fun BookmarkContentList(
 ) {
     val pagingState: PagingState<BookmarkContent> = uiState.bookmarkContents
     val listState = rememberLazyListState()
-    val threshold = 1
+    val threshold = 3
     val shouldLoadMore by remember {
         derivedStateOf {
             if (!pagingState.hasNext || pagingState.isAppending || pagingState.errorUiState != ErrorUiState.None ||
