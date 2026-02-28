@@ -1,4 +1,4 @@
-package com.on.turip.ui.compose.setting.model
+package com.on.turip.ui.compose.mypage.model
 
 data class InquiryMail(
     val appEnvironmentInfo: AppEnvironmentInfoModel,

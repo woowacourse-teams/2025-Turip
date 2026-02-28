@@ -12,6 +12,7 @@ import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.home.HomeScreen
 import com.on.turip.ui.login.LoginActivity
 import com.on.turip.ui.main.home.model.UsersLikeContentModel
+import com.on.turip.ui.mypage.MyPageActivity
 import com.on.turip.ui.search.keywordresult.SearchActivity
 import com.on.turip.ui.search.regionresult.RegionResultActivity
 import com.on.turip.ui.trip.TripDetailActivity
@@ -65,6 +66,10 @@ class HomeFragment : Fragment() {
                                 }
                             startActivity(intent)
                             requireActivity().finish()
+                        },
+                        navigateToMyPage = {
+                            val intent = MyPageActivity.newIntent(requireContext())
+                            startActivity(intent)
                         },
                     )
                 }

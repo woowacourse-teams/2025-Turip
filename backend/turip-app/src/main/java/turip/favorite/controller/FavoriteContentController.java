@@ -23,6 +23,7 @@ import turip.auth.resolver.AuthAccount;
 import turip.common.exception.ErrorResponse;
 import turip.content.controller.dto.response.content.ContentsDetailWithLoadableResponse;
 import turip.favorite.controller.dto.request.FavoriteContentRequest;
+import turip.favorite.controller.dto.response.FavoriteContentCountResponse;
 import turip.favorite.controller.dto.response.FavoriteContentResponse;
 import turip.favorite.service.FavoriteContentService;
 
@@ -258,6 +259,76 @@ public class FavoriteContentController {
     ) {
         ContentsDetailWithLoadableResponse response = favoriteContentService.findMyFavoriteContents(account, pageSize,
                 lastContentId);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "내 콘텐츠 찜(북마크) 수 조회 api",
+            description = "콘텐츠 찜(북마크)이 몇 개인지 반환한다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "성공 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = FavoriteContentCountResponse.class),
+                            examples = @ExampleObject(
+                                    name = "success",
+                                    summary = "북마크 수 조회 성공",
+                                    value = """
+                                            {
+                                                "count": 13
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "access token expired",
+                                            summary = "만료된 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_EXPIRED",
+                                                    	"message": "access token이 만료됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "invalid signature access token",
+                                            summary = "서명값이 올바르지 않은 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_SIGNATURE_INVALID",
+                                                    	"message": "access token이 위조됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "unauthorized",
+                                            summary = "알 수 없는 이유로 인증 실패",
+                                            value = """
+                                                    {
+                                                    	"tag": "UNAUTHORIZED",
+                                                    	"message": "토큰 기반 인증에 실패했습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            )
+    })
+    @GetMapping("/count")
+    public ResponseEntity<FavoriteContentCountResponse> readBookmarkCount(
+            @Parameter(hidden = true) @AuthAccount Account account) {
+        FavoriteContentCountResponse response = favoriteContentService.countByAccount(account);
         return ResponseEntity.ok(response);
     }
 
