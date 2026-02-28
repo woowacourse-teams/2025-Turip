@@ -96,10 +96,11 @@ class MyTuripViewModel @Inject constructor(
             turipRepository
                 .createTurip(name)
                 .onSuccess {
-                    _uiEffect.send(MyTuripUiEffect.TuripAdded(name))
                     dismissAddBottomSheet()
+                    _uiEffect.send(MyTuripUiEffect.TuripAdded(name))
                     loadTuripFolders()
                 }.onFailure { errorType: ErrorType ->
+                    dismissAddBottomSheet()
                     sendErrorEffect(errorType, MyTuripRetryAction.AddMyTurip(name))
                 }
         }
@@ -110,6 +111,7 @@ class MyTuripViewModel @Inject constructor(
             turipRepository
                 .deleteTurip(myTuripModel.id)
                 .onSuccess {
+                    dismissTuripRemoveDialog()
                     _uiEffect.send(
                         MyTuripUiEffect.TuripDeleted(myTuripModel.name),
                     )
@@ -123,10 +125,10 @@ class MyTuripViewModel @Inject constructor(
                                     .toImmutableList(),
                         )
                     }
-                    dismissTuripRemoveDialog()
                     Timber.d("튜립 삭제 완료(이름 = ${myTuripModel.name})")
                 }.onFailure { errorType: ErrorType ->
-                    sendErrorEffect(errorType, MyTuripRetryAction.UpdateMyTurip)
+                    dismissTuripRemoveDialog()
+                    sendErrorEffect(errorType, MyTuripRetryAction.DeleteMyTurip(myTuripModel))
                     Timber.e("튜립 삭제 실패(이름 = ${myTuripModel.name})")
                 }
         }
