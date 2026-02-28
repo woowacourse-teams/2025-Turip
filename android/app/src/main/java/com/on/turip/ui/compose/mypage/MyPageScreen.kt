@@ -28,8 +28,8 @@ import com.on.turip.ui.common.extensions.showSnackbarWithAction
 import com.on.turip.ui.compose.designsystem.component.TuripDialog
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
-import com.on.turip.ui.compose.mypage.component.BookmarkedContentSection
 import com.on.turip.ui.compose.mypage.component.MyPageAppBar
+import com.on.turip.ui.compose.mypage.component.MyPageBookmarkContentSection
 import com.on.turip.ui.compose.mypage.component.MyPageSettingsSection
 import com.on.turip.ui.compose.mypage.component.ProfileSection
 import com.on.turip.ui.compose.mypage.model.InquiryMail
@@ -200,7 +200,7 @@ private fun MyPageScreenContent(
                 )
             }
             item {
-                BookmarkedContentSection(
+                MyPageBookmarkContentSection(
                     state = uiState.bookmarkContentState,
                     onViewAllContentClick = onNavigateToAllBookmarkContents,
                     onContentClick = onNavigateToContent,

@@ -14,6 +14,7 @@ import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.common.paging.PagingLoadMode
 import com.on.turip.ui.common.paging.PagingState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -26,18 +27,17 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import timber.log.Timber
-import javax.inject.Inject
 
 @HiltViewModel
-class BookmarkContentViewModel @Inject constructor(
+class BookmarkContentListViewModel @Inject constructor(
     private val bookmarkRepository: BookmarkRepository,
 ) : ViewModel() {
-    private val _uiState: MutableStateFlow<BookmarkContentUiState> =
-        MutableStateFlow(BookmarkContentUiState.Idle)
-    val uiState: StateFlow<BookmarkContentUiState> = _uiState.asStateFlow()
+    private val _uiState: MutableStateFlow<BookmarkContentListUiState> =
+        MutableStateFlow(BookmarkContentListUiState.Idle)
+    val uiState: StateFlow<BookmarkContentListUiState> = _uiState.asStateFlow()
 
-    private val _uiEffect: Channel<BookmarkContentUiEffect> = Channel(Channel.BUFFERED)
-    val uiEffect: Flow<BookmarkContentUiEffect> = _uiEffect.receiveAsFlow()
+    private val _uiEffect: Channel<BookmarkContentListUiEffect> = Channel(Channel.BUFFERED)
+    val uiEffect: Flow<BookmarkContentListUiEffect> = _uiEffect.receiveAsFlow()
 
     init {
         refreshBookmarkContents()
@@ -185,7 +185,7 @@ class BookmarkContentViewModel @Inject constructor(
 
             UiError.Global.TokenExpired -> {
                 _uiState.update { it.copy(isLoading = false) }
-                _uiEffect.send(BookmarkContentUiEffect.NavigateToLogin)
+                _uiEffect.send(BookmarkContentListUiEffect.NavigateToLogin)
             }
         }
     }
@@ -220,7 +220,7 @@ class BookmarkContentViewModel @Inject constructor(
                 _uiState.update { state ->
                     state.copy(bookmarkContents = state.bookmarkContents.copy(isAppending = false))
                 }
-                _uiEffect.send(BookmarkContentUiEffect.NavigateToLogin)
+                _uiEffect.send(BookmarkContentListUiEffect.NavigateToLogin)
             }
         }
     }
@@ -263,9 +263,9 @@ class BookmarkContentViewModel @Inject constructor(
                         _uiState.update { state ->
                             state.copy(totalBookmarkCount = state.totalBookmarkCount?.minus(1))
                         }
-                        _uiEffect.send(BookmarkContentUiEffect.BookmarkRemoved)
+                        _uiEffect.send(BookmarkContentListUiEffect.BookmarkRemovedList)
                     }.onFailure {
-                        _uiEffect.send(BookmarkContentUiEffect.ShowBookmarkRemoveFailed)
+                        _uiEffect.send(BookmarkContentListUiEffect.ShowBookmarkRemoveFailedList)
                     }
             } finally {
                 // 중복 API 호출 방지 리소스 정리

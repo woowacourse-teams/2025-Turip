@@ -15,7 +15,7 @@ import com.on.turip.ui.compose.designsystem.component.TuripAppBar
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 
 @Composable
-fun BookmarkContentAppBar(
+fun BookmarkContentListAppBar(
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -39,9 +39,9 @@ fun BookmarkContentAppBar(
 
 @Preview(showBackground = true)
 @Composable
-private fun BookmarkContentAppBarPreview() {
+private fun BookmarkContentListAppBarPreview() {
     TuripTheme {
-        BookmarkContentAppBar(
+        BookmarkContentListAppBar(
             onBackClick = {},
             modifier = Modifier.fillMaxWidth(),
         )

@@ -44,7 +44,7 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
 @Composable
-fun BookmarkedContentSection(
+fun MyPageBookmarkContentSection(
     state: MyPageSectionState<ImmutableList<BookmarkContent>>,
     onViewAllContentClick: () -> Unit,
     onContentClick: (contentId: Long) -> Unit,
@@ -81,7 +81,7 @@ fun BookmarkedContentSection(
                         modifier = Modifier.padding(start = TuripTheme.spacing.large),
                     ) {
                         items(items = state.data, key = { it.content.id }) {
-                            BookmarkedContentItem(
+                            MyPageBookmarkContentItem(
                                 item = it,
                                 onContentClick = onContentClick,
                                 onRemoveBookmark = onRemoveBookmark,
@@ -228,24 +228,24 @@ private fun EmptyBookmarkedContent() {
 
 @Preview(showBackground = true, name = "북마크한 컨텐츠 없음 ")
 @Composable
-private fun BookmarkedContentSectionEmptyPreview() {
+private fun MyPageBookmarkContentSectionEmptyPreview() {
     TuripTheme {
-        BookmarkedContentSection(
+        MyPageBookmarkContentSection(
             state = MyPageSectionState.Success(persistentListOf()),
             onViewAllContentClick = {},
             onContentClick = {},
             onRemoveBookmark = {},
             onRetry = {},
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.padding(TuripTheme.spacing.large),
         )
     }
 }
 
 @Preview(showBackground = true, name = "컨텐츠 존재")
 @Composable
-private fun BookmarkedContentSectionWithItemsPreview() {
+private fun MyPageBookmarkContentSectionWithItemsPreview() {
     TuripTheme {
-        BookmarkedContentSection(
+        MyPageBookmarkContentSection(
             state =
                 MyPageSectionState.Success(
                     persistentListOf(
@@ -271,37 +271,46 @@ private fun BookmarkedContentSectionWithItemsPreview() {
             onContentClick = {},
             onRemoveBookmark = {},
             onRetry = {},
-            modifier = Modifier.fillMaxWidth(),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(TuripTheme.spacing.large),
         )
     }
 }
 
 @Preview(showBackground = true, name = "로딩 중")
 @Composable
-private fun BookmarkedContentSectionLoadingPreview() {
+private fun MyPageBookmarkContentSectionLoadingPreview() {
     TuripTheme {
-        BookmarkedContentSection(
+        MyPageBookmarkContentSection(
             state = MyPageSectionState.Loading,
             onViewAllContentClick = {},
             onContentClick = {},
             onRemoveBookmark = {},
             onRetry = {},
-            modifier = Modifier.fillMaxWidth(),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(TuripTheme.spacing.large),
         )
     }
 }
 
 @Preview(showBackground = true, name = "에러")
 @Composable
-private fun BookmarkedContentSectionErrorPreview() {
+private fun MyPageBookmarkContentSectionErrorPreview() {
     TuripTheme {
-        BookmarkedContentSection(
+        MyPageBookmarkContentSection(
             state = MyPageSectionState.Error,
             onViewAllContentClick = {},
             onContentClick = {},
             onRemoveBookmark = {},
             onRetry = {},
-            modifier = Modifier.fillMaxWidth(),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(TuripTheme.spacing.large),
         )
     }
 }

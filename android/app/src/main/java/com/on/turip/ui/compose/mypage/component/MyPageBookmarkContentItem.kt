@@ -26,7 +26,7 @@ import com.on.turip.ui.common.component.content.ContentThumbnail
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 
 @Composable
-fun BookmarkedContentItem(
+fun MyPageBookmarkContentItem(
     item: BookmarkContent,
     onContentClick: (contentId: Long) -> Unit,
     onRemoveBookmark: (contentId: Long) -> Unit,
@@ -61,7 +61,7 @@ fun BookmarkedContentItem(
 
 @Preview(showBackground = true)
 @Composable
-private fun BookmarkedContentItemPreview() {
+private fun MyPageBookmarkContentItemPreview() {
     val content =
         BookmarkContent(
             content =
@@ -76,7 +76,7 @@ private fun BookmarkedContentItemPreview() {
             tripPlaceCount = 2,
         )
     TuripTheme {
-        BookmarkedContentItem(
+        MyPageBookmarkContentItem(
             item = content,
             onContentClick = {},
             onRemoveBookmark = {},

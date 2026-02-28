@@ -49,8 +49,8 @@ import com.on.turip.domain.trip.TripDuration
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.extensions.showSnackbarWithAction
 import com.on.turip.ui.common.paging.PagingState
-import com.on.turip.ui.compose.bookmark.component.BookmarkContentAppBar
-import com.on.turip.ui.compose.bookmark.component.BookmarkContentItem
+import com.on.turip.ui.compose.bookmark.component.BookmarkContentListAppBar
+import com.on.turip.ui.compose.bookmark.component.BookmarkContentListItem
 import com.on.turip.ui.compose.designsystem.component.ErrorScreen
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
@@ -59,12 +59,12 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 
 @Composable
-fun BookmarkContentScreen(
+fun BookmarkContentListScreen(
     onNavigateToBack: () -> Unit,
     onNavigateToLogin: () -> Unit,
     onNavigateToContent: (contentId: Long) -> Unit,
     onBookmarkChanged: () -> Unit,
-    viewModel: BookmarkContentViewModel = hiltViewModel(),
+    viewModel: BookmarkContentListViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -72,17 +72,17 @@ fun BookmarkContentScreen(
     val resources = LocalResources.current
 
     LaunchedEffect(Unit) {
-        viewModel.uiEffect.collect { uiEffect: BookmarkContentUiEffect ->
+        viewModel.uiEffect.collect { uiEffect: BookmarkContentListUiEffect ->
             when (uiEffect) {
-                BookmarkContentUiEffect.NavigateToLogin -> {
+                BookmarkContentListUiEffect.NavigateToLogin -> {
                     onNavigateToLogin()
                 }
 
-                BookmarkContentUiEffect.BookmarkRemoved -> {
+                BookmarkContentListUiEffect.BookmarkRemovedList -> {
                     onBookmarkChanged()
                 }
 
-                BookmarkContentUiEffect.ShowBookmarkRemoveFailed -> {
+                BookmarkContentListUiEffect.ShowBookmarkRemoveFailedList -> {
                     snackbarHostState.showSnackbarWithAction(
                         message = resources.getString(R.string.my_page_snackbar_bookmark_remove_failed),
                         actionLabel = resources.getString(R.string.my_page_snackbar_bookmark_remove_failed_action),
@@ -94,7 +94,7 @@ fun BookmarkContentScreen(
     }
 
     Scaffold(
-        topBar = { BookmarkContentAppBar(onBackClick = onNavigateToBack) },
+        topBar = { BookmarkContentListAppBar(onBackClick = onNavigateToBack) },
         modifier =
             Modifier
                 .fillMaxSize()
@@ -102,7 +102,7 @@ fun BookmarkContentScreen(
                 .systemBarsPadding(),
         snackbarHost = { TuripSnackbar(snackbarHostState = snackbarHostState) },
     ) { innerPadding ->
-        BookmarkContentContent(
+        BookmarkContentListContent(
             uiState = uiState,
             onRetryClick = viewModel::refreshBookmarkContents,
             onContentClick = onNavigateToContent,
@@ -114,8 +114,8 @@ fun BookmarkContentScreen(
 }
 
 @Composable
-private fun BookmarkContentContent(
-    uiState: BookmarkContentUiState,
+private fun BookmarkContentListContent(
+    uiState: BookmarkContentListUiState,
     onRetryClick: () -> Unit,
     onContentClick: (contentId: Long) -> Unit,
     onBookmarkClick: (contentId: Long) -> Unit,
@@ -125,7 +125,7 @@ private fun BookmarkContentContent(
     Column(modifier = modifier.fillMaxSize()) {
         when {
             uiState.isLoading -> {
-                BookmarkLoading()
+                BookmarkContentListLoading()
             }
 
             uiState.errorUiState != ErrorUiState.None -> {
@@ -138,9 +138,9 @@ private fun BookmarkContentContent(
 
             else -> {
                 if (uiState.isEmpty) {
-                    BookmarkContentEmpty()
+                    BookmarkContentListEmpty()
                 } else {
-                    BookmarkContents(
+                    BookmarkContentList(
                         uiState = uiState,
                         onContentClick = onContentClick,
                         onBookmarkClick = onBookmarkClick,
@@ -153,7 +153,7 @@ private fun BookmarkContentContent(
 }
 
 @Composable
-private fun BookmarkLoading(modifier: Modifier = Modifier) {
+private fun BookmarkContentListLoading(modifier: Modifier = Modifier) {
     Box(
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
@@ -166,7 +166,7 @@ private fun BookmarkLoading(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun BookmarkContentEmpty(modifier: Modifier = Modifier) {
+private fun BookmarkContentListEmpty(modifier: Modifier = Modifier) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
@@ -193,8 +193,8 @@ private fun BookmarkContentEmpty(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun BookmarkContents(
-    uiState: BookmarkContentUiState,
+private fun BookmarkContentList(
+    uiState: BookmarkContentListUiState,
     onContentClick: (contentId: Long) -> Unit,
     onBookmarkClick: (contentId: Long) -> Unit,
     loadMore: () -> Unit,
@@ -263,7 +263,7 @@ private fun BookmarkContents(
                 items = pagingState.items,
                 key = { _, item -> item.content.id },
             ) { index, content ->
-                BookmarkContentItem(
+                BookmarkContentListItem(
                     content = content,
                     onContentClick = onContentClick,
                     onRemoveBookmark = onBookmarkClick,
@@ -332,10 +332,10 @@ private fun LoadMoreError(onRetryClick: () -> Unit) {
 
 @Preview(showBackground = true, name = "로딩")
 @Composable
-private fun BookmarkContentLoadingPreview() {
+private fun BookmarkContentListLoadingPreview() {
     TuripTheme {
-        BookmarkContentContent(
-            uiState = BookmarkContentUiState.Idle,
+        BookmarkContentListContent(
+            uiState = BookmarkContentListUiState.Idle,
             onRetryClick = {},
             onContentClick = {},
             onBookmarkClick = {},
@@ -346,11 +346,11 @@ private fun BookmarkContentLoadingPreview() {
 
 @Preview(showBackground = true, name = "북마크 콘텐츠 비어 있는 경우")
 @Composable
-private fun BookmarkContentEmptyPreview() {
+private fun BookmarkContentListEmptyPreview() {
     TuripTheme {
-        BookmarkContentContent(
+        BookmarkContentListContent(
             uiState =
-                BookmarkContentUiState(
+                BookmarkContentListUiState(
                     isLoading = false,
                     bookmarkContents =
                         PagingState(
@@ -372,11 +372,11 @@ private fun BookmarkContentEmptyPreview() {
 
 @Preview(showBackground = true, name = "에러")
 @Composable
-private fun BookmarkContentErrorPreview() {
+private fun BookmarkContentListErrorPreview() {
     TuripTheme {
-        BookmarkContentContent(
+        BookmarkContentListContent(
             uiState =
-                BookmarkContentUiState(
+                BookmarkContentListUiState(
                     isLoading = false,
                     bookmarkContents =
                         PagingState(
@@ -398,7 +398,7 @@ private fun BookmarkContentErrorPreview() {
 
 @Preview(showBackground = true, name = "정상")
 @Composable
-private fun BookmarkContentSuccessPreview() {
+private fun BookmarkContentListSuccessPreview() {
     val contents =
         persistentListOf(
             BookmarkContent(
@@ -428,9 +428,9 @@ private fun BookmarkContentSuccessPreview() {
         )
     TuripTheme {
         Column {
-            BookmarkContentContent(
+            BookmarkContentListContent(
                 uiState =
-                    BookmarkContentUiState(
+                    BookmarkContentListUiState(
                         isLoading = false,
                         bookmarkContents =
                             PagingState(

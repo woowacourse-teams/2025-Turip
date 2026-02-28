@@ -26,7 +26,7 @@ import com.on.turip.ui.common.component.content.ContentThumbnail
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 
 @Composable
-fun BookmarkContentItem(
+fun BookmarkContentListItem(
     content: BookmarkContent,
     onContentClick: (contentId: Long) -> Unit,
     onRemoveBookmark: (contentId: Long) -> Unit,
@@ -79,7 +79,8 @@ private fun BookmarkRegionChip(
                 .background(
                     color = TuripTheme.colors.chipBackground,
                     shape = TuripTheme.shape.chip,
-                ).padding(
+                )
+                .padding(
                     horizontal = TuripTheme.spacing.medium,
                     vertical = TuripTheme.spacing.extraSmall,
                 ),
@@ -94,7 +95,7 @@ private fun BookmarkRegionChip(
 
 @Preview(showBackground = true)
 @Composable
-private fun BookmarkContentItemPreview() {
+private fun BookmarkContentListItemPreview() {
     TuripTheme {
         val content =
             BookmarkContent(
@@ -109,7 +110,7 @@ private fun BookmarkContentItemPreview() {
                 tripDuration = TripDuration(1, 2),
                 tripPlaceCount = 2,
             )
-        BookmarkContentItem(
+        BookmarkContentListItem(
             content = content,
             onContentClick = {},
             onRemoveBookmark = {},

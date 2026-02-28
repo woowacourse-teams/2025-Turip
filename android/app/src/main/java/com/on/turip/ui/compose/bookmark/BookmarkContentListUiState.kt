@@ -7,7 +7,7 @@ import com.on.turip.ui.common.paging.PagingState
 import kotlinx.collections.immutable.persistentListOf
 
 @Immutable
-data class BookmarkContentUiState(
+data class BookmarkContentListUiState(
     val isLoading: Boolean,
     val bookmarkContents: PagingState<BookmarkContent>,
     val totalBookmarkCount: Int?,
@@ -17,8 +17,8 @@ data class BookmarkContentUiState(
         get() = !isLoading && bookmarkContents.items.isEmpty() && errorUiState == ErrorUiState.None
 
     companion object {
-        val Idle: BookmarkContentUiState =
-            BookmarkContentUiState(
+        val Idle: BookmarkContentListUiState =
+            BookmarkContentListUiState(
                 isLoading = true,
                 bookmarkContents =
                     PagingState(
