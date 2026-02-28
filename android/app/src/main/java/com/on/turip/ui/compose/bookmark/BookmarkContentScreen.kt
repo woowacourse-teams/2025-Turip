@@ -99,6 +99,7 @@ fun BookmarkContentScreen(
                 .fillMaxSize()
                 .background(TuripTheme.colors.white)
                 .systemBarsPadding(),
+        snackbarHost = { TuripSnackbar(snackbarHostState = snackbarHostState) },
     ) { innerPadding ->
         Column(
             modifier = Modifier.padding(innerPadding),
