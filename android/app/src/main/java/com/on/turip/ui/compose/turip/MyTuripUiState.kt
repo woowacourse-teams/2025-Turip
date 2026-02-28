@@ -1,7 +1,7 @@
 package com.on.turip.ui.compose.turip
 
 import com.on.turip.ui.common.error.ErrorUiState
-import com.on.turip.ui.compose.designsystem.model.TuripNameStatusModel
+import com.on.turip.ui.common.model.namestatus.TuripNameStatusModel
 import com.on.turip.ui.compose.turip.model.MyTuripModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf

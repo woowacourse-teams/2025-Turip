@@ -1,4 +1,4 @@
-package com.on.turip.ui.compose.designsystem.model
+package com.on.turip.ui.common.model.namestatus
 
 import androidx.annotation.StringRes
 import com.on.turip.R

@@ -13,7 +13,7 @@ import com.on.turip.domain.turip.repository.TuripRepository
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
-import com.on.turip.ui.compose.designsystem.model.TuripNameStatusModel
+import com.on.turip.ui.common.model.namestatus.TuripNameStatusModel
 import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
 import com.on.turip.ui.compose.turip.mapper.toUiMyTuripModel
 import com.on.turip.ui.compose.turipdetail.model.DeleteTuripPlaceSnapshot

@@ -1,4 +1,4 @@
-package com.on.turip.ui.compose.designsystem.component
+package com.on.turip.ui.common.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -37,7 +37,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import com.on.turip.R
-import com.on.turip.ui.compose.designsystem.model.TuripNameStatusModel
+import com.on.turip.ui.common.model.namestatus.TuripNameStatusModel
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import kotlinx.coroutines.android.awaitFrame
 
@@ -120,10 +120,15 @@ fun NameEditorSheetContent(
                                 width = 1.dp,
                                 color = TuripTheme.colors.gray04,
                                 shape = TuripTheme.shape.container,
-                            ).background(
+                            )
+                            .background(
                                 color = TuripTheme.colors.white,
                                 shape = TuripTheme.shape.container,
-                            ).padding(horizontal = TuripTheme.spacing.medium, vertical = TuripTheme.spacing.small),
+                            )
+                            .padding(
+                                horizontal = TuripTheme.spacing.medium,
+                                vertical = TuripTheme.spacing.small,
+                            ),
                     contentAlignment = Alignment.CenterStart,
                 ) {
                     if (turipName.isEmpty()) {
