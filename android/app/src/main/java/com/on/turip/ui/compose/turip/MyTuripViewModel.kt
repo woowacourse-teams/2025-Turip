@@ -38,16 +38,25 @@ class MyTuripViewModel @Inject constructor(
 
     fun loadTuripFolders() {
         viewModelScope.launch {
-            turipRepository.loadTurips().onSuccess { turips: List<Turip> ->
-                _uiState.update { myTuripUiState: MyTuripUiState ->
-                    myTuripUiState.copy(
-                        turips =
-                            turips
-                                .map { it.toUiMyTuripModel() }
-                                .toImmutableList(),
+            turipRepository
+                .loadTurips()
+                .onSuccess { turips: List<Turip> ->
+                    _uiState.update { myTuripUiState: MyTuripUiState ->
+                        myTuripUiState.copy(
+                            turips =
+                                turips
+                                    .map { it.toUiMyTuripModel() }
+                                    .toImmutableList(),
+                        )
+                    }
+                }.onFailure {
+                    _uiEffect.send(
+                        MyTuripUiEffect.ShowError(
+                            errorUiState = uiState.value.errorUiState,
+                            retryAction = MyTuripRetryAction.UpdateMyTurip,
+                        ),
                     )
                 }
-            }
         }
     }
 
