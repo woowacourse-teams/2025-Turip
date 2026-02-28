@@ -396,6 +396,61 @@ private fun BookmarkContentListErrorPreview() {
     }
 }
 
+@Preview(showBackground = true, name = "북마크 콘텐츠 수 조회 API만 에러")
+@Composable
+private fun BookmarkContentListLoadCountErrorPreview() {
+    val contents =
+        persistentListOf(
+            BookmarkContent(
+                content =
+                    Content(
+                        1L,
+                        Creator(1L, "채널명", ""),
+                        VideoData("콘텐츠 제목이 길면 ...으로 표시되는 것을 확인 ㅇㅇㅇ", "thumbnail", "2026-01-12"),
+                        City("대구"),
+                        true,
+                    ),
+                tripDuration = TripDuration(1, 2),
+                tripPlaceCount = 2,
+            ),
+            BookmarkContent(
+                content =
+                    Content(
+                        2L,
+                        Creator(1L, "채널명이 길어지는 경우 채널명이 길어지는 경우 채널명이 길어지는 경우 채널명이 길어지는 경우 ", ""),
+                        VideoData("콘텐츠 제목", "thumbnail", "2025-01-12"),
+                        City("대구"),
+                        true,
+                    ),
+                tripDuration = TripDuration(0, 1),
+                tripPlaceCount = 2,
+            ),
+        )
+    TuripTheme {
+        Column {
+            BookmarkContentListContent(
+                uiState =
+                    BookmarkContentListUiState(
+                        isLoading = false,
+                        bookmarkContents =
+                            PagingState(
+                                items = contents,
+                                hasNext = false,
+                                isAppending = false,
+                                errorUiState = ErrorUiState.None,
+                            ),
+                        totalBookmarkCount = null,
+                        errorUiState = ErrorUiState.None,
+                    ),
+                onRetryClick = {},
+                onContentClick = {},
+                onBookmarkClick = {},
+                onLoadMore = {},
+            )
+        }
+    }
+}
+
 @Preview(showBackground = true, name = "정상")
 @Composable
 private fun BookmarkContentListSuccessPreview() {
