@@ -27,12 +27,16 @@ import com.on.turip.ui.main.favorite.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -55,6 +59,10 @@ class TuripDetailViewModel @Inject constructor(
     private var reorderPlacesSnapshot: ImmutableList<TuripPlaceModel>? = null
 
     private val dragEndEvents = MutableSharedFlow<Unit>(replay = 0, extraBufferCapacity = 1)
+
+    init {
+        registerDragEndEvents()
+    }
 
     fun loadSelectedTurip(selectedTuripId: Long) {
         viewModelScope.launch {
@@ -247,6 +255,14 @@ class TuripDetailViewModel @Inject constructor(
         }
     }
 
+    @OptIn(FlowPreview::class)
+    private fun registerDragEndEvents() {
+        dragEndEvents
+            .debounce(500L)
+            .onEach { updateTuripPlacesOrder(uiState.value.places) }
+            .launchIn(viewModelScope)
+    }
+
     private fun updateTuripPlacesOrder(reorderedTuripPlaces: ImmutableList<TuripPlaceModel>) {
         viewModelScope.launch {
             turipRepository
@@ -255,22 +271,17 @@ class TuripDetailViewModel @Inject constructor(
                     updatedOrder = reorderedTuripPlaces.map { it.turipPlaceId },
                 ).onSuccess {
                     _uiState.update { it.copy(places = reorderedTuripPlaces) }
+                    clearReorderSnapshot()
                     Timber.d("장소 순서 변경 API 성공")
                 }.onFailure {
-                    if (reorderPlacesSnapshot != null) {
-                        _uiState.update { it.copy(selectedTuripPlaces = reorderPlacesSnapshot!!) }
-                    }
+                    rollbackReorderedPlaces()
                     _uiEffect.send(
                         TuripPlaceUiEffect.ShowReorderPlaceFailed(
-                            retryAction =
-                                PlaceTuripSelectionRetryAction.UpdateReorderedPlaces(
-                                    reorderedTuripPlaces,
-                                ),
+                            retryAction = TuripPlaceRetryAction.UpdateReorderedPlaces(reorderedTuripPlaces),
                         ),
                     )
                     Timber.e("장소 순서 변경 API 실패")
                 }
-            reorderPlacesSnapshot = null
         }
     }
 
@@ -320,6 +331,10 @@ class TuripDetailViewModel @Inject constructor(
         when (action) {
             is TuripPlaceRetryAction.UpdateTuripPlace -> {
                 loadPlaces(action.placeId)
+            }
+
+            is TuripPlaceRetryAction.UpdateReorderedPlaces -> {
+                updateTuripPlacesOrder(action.reorderedPlaces)
             }
 
             TuripPlaceRetryAction.TuripDelete -> {

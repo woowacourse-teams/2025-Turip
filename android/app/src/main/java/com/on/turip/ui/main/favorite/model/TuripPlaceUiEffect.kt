@@ -1,6 +1,8 @@
 package com.on.turip.ui.main.favorite.model
 
 import com.on.turip.ui.common.error.ErrorUiState
+import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
+import kotlinx.collections.immutable.ImmutableList
 
 sealed interface TuripPlaceUiEffect {
     data object NavigateToLogin : TuripPlaceUiEffect
@@ -27,11 +29,19 @@ sealed interface TuripPlaceUiEffect {
         val errorUiState: ErrorUiState,
         val retryAction: TuripPlaceRetryAction,
     ) : TuripPlaceUiEffect
+
+    data class ShowReorderPlaceFailed(
+        val retryAction: TuripPlaceRetryAction,
+    ) : TuripPlaceUiEffect
 }
 
 sealed interface TuripPlaceRetryAction {
     data class UpdateTuripPlace(
         val placeId: Long,
+    ) : TuripPlaceRetryAction
+
+    data class UpdateReorderedPlaces(
+        val reorderedPlaces: ImmutableList<TuripPlaceModel>,
     ) : TuripPlaceRetryAction
 
     data object TuripNameUpdate : TuripPlaceRetryAction

@@ -151,6 +151,20 @@ fun TuripDetailScreen(
                         onDismiss = viewModel::commitTuripPlaceDelete,
                     )
                 }
+
+                is TuripPlaceUiEffect.ShowReorderPlaceFailed -> {
+                    snackbarHostState.showSnackbarWithAction(
+                        message =
+                            resource.getString(
+                                R.string.trip_detail_bottom_sheet_snackbar_place_reorder_failed,
+                            ),
+                        actionLabel =
+                            resource.getString(
+                                R.string.trip_detail_bottom_sheet_snackbar_place_reorder_retry,
+                            ),
+                        onAction = { viewModel.handleErrorRetryRequest(uiEffect.retryAction) },
+                    )
+                }
             }
         }
     }
