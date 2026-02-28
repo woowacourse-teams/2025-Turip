@@ -14,6 +14,7 @@ import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.common.paging.PagingLoadMode
 import com.on.turip.ui.common.paging.PagingState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -26,7 +27,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import timber.log.Timber
-import javax.inject.Inject
 
 @HiltViewModel
 class BookmarkContentViewModel @Inject constructor(
@@ -115,7 +115,7 @@ class BookmarkContentViewModel @Inject constructor(
         }
     }
 
-    private suspend fun loadBookmarkCount() =
+    private suspend fun loadBookmarkCount() {
         bookmarkRepository
             .loadBookmarkCount()
             .onSuccess { count: Int ->
@@ -123,6 +123,7 @@ class BookmarkContentViewModel @Inject constructor(
             }.onFailure {
                 _uiState.update { state -> state.copy(totalBookmarkCount = null) }
             }
+    }
 
     private fun getLastItemId(loadMode: PagingLoadMode) =
         when (loadMode) {
