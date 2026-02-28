@@ -29,6 +29,7 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -52,6 +53,8 @@ class TuripDetailViewModel @Inject constructor(
     val uiEffect: Flow<TuripPlaceUiEffect> = _uiEffect.receiveAsFlow()
     private var deleteTuripPlaceSnapshot: DeleteTuripPlaceSnapshot = DeleteTuripPlaceSnapshot.EMPTY
     private var reorderPlacesSnapshot: ImmutableList<TuripPlaceModel>? = null
+
+    private val dragEndEvents = MutableSharedFlow<Unit>(replay = 0, extraBufferCapacity = 1)
 
     fun loadSelectedTurip(selectedTuripId: Long) {
         viewModelScope.launch {
@@ -244,29 +247,30 @@ class TuripDetailViewModel @Inject constructor(
         }
     }
 
-    fun updateTuripPlacesOrder(updateTuripPlaces: ImmutableList<TuripPlaceModel>) {
-        reorderPlacesSnapshot = uiState.value.places
-        _uiState.update { state ->
-            state.copy(
-                places = updateTuripPlaces,
-                placesLatLng =
-                    updateTuripPlaces
-                        .map { it.toPlaceLatLngUiModel() }
-                        .toImmutableList(),
-            )
-        }
-
+    private fun updateTuripPlacesOrder(reorderedTuripPlaces: ImmutableList<TuripPlaceModel>) {
         viewModelScope.launch {
             turipRepository
                 .updateTuripPlacesOrder(
-                    turipId = uiState.value.selectedTurip.id,
-                    updatedOrder = updateTuripPlaces.map { it.turipPlaceId },
+                    turipId = _uiState.value.selectedTurip.id,
+                    updatedOrder = reorderedTuripPlaces.map { it.turipPlaceId },
                 ).onSuccess {
-                    clearReorderSnapshot()
-                }.onFailure { errorType: ErrorType ->
-                    rollbackReorderedPlaces()
-                    Timber.e("장소 순서 변경 API 호출 실패 ")
+                    _uiState.update { it.copy(places = reorderedTuripPlaces) }
+                    Timber.d("장소 순서 변경 API 성공")
+                }.onFailure {
+                    if (reorderPlacesSnapshot != null) {
+                        _uiState.update { it.copy(selectedTuripPlaces = reorderPlacesSnapshot!!) }
+                    }
+                    _uiEffect.send(
+                        TuripPlaceUiEffect.ShowReorderPlaceFailed(
+                            retryAction =
+                                PlaceTuripSelectionRetryAction.UpdateReorderedPlaces(
+                                    reorderedTuripPlaces,
+                                ),
+                        ),
+                    )
+                    Timber.e("장소 순서 변경 API 실패")
                 }
+            reorderPlacesSnapshot = null
         }
     }
 
@@ -369,6 +373,37 @@ class TuripDetailViewModel @Inject constructor(
 
     private fun clearReorderSnapshot() {
         reorderPlacesSnapshot = null
+    }
+
+    // API 호출 실패 시 롤백을 위해 원본 상태 기록
+    // 장소 제거 API가 반영되지 않은 상태라면 제거 전 원본 상태를 기록
+    fun onDragStart() {
+        reorderPlacesSnapshot =
+            if (deleteTuripPlaceSnapshot.hasSnapshot) deleteTuripPlaceSnapshot.originPlaces else uiState.value.places
+    }
+
+    // 드래그 시 아이템 위치 변경
+    fun onDragMove(
+        from: Int,
+        to: Int,
+    ) {
+        if (from == to) return
+        _uiState.update { state ->
+            val reOrderedPlaces =
+                state.places
+                    .toMutableList()
+                    .apply { add(to, removeAt(from)) }
+                    .toImmutableList()
+            state.copy(places = reOrderedPlaces)
+        }
+    }
+
+    // 드래그 후 데이터가 변경되었을 때만 tryEmit
+    fun onDragEnd() {
+        val current = uiState.value.places
+        if (reorderPlacesSnapshot == current) return
+
+        dragEndEvents.tryEmit(Unit)
     }
 
     private suspend fun sendErrorEffect(

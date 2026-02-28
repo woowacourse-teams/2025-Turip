@@ -240,12 +240,14 @@ fun TuripDetailScreen(
                                 viewModel.applyTuripPlaceDelete(placeId = placeId)
                             }
                         },
-                        onUpdateTuripPlacesOrder = viewModel::updateTuripPlacesOrder,
                         currentPlaceLatLng = uiState.placesLatLng,
                         onMoreOption = viewModel::showBottomSheet,
                         onBack = onBack,
                         selectedPlace = uiState.selectedPlace,
                         onItemClick = viewModel::updateSelectedPlace,
+                        onDragStart = viewModel::onDragStart,
+                        onDragPlace = viewModel::onDragMove,
+                        onDragEnd = viewModel::onDragEnd,
                     )
                 }
             }
@@ -295,8 +297,10 @@ private fun TuripPlaceContent(
     navigateToMap: (map: MapModel) -> Unit,
     onClickTuripPlace: (placeId: Long) -> Unit,
     onMoreOption: () -> Unit,
+    onDragStart: () -> Unit,
+    onDragPlace: (from: Int, to: Int) -> Unit,
+    onDragEnd: () -> Unit,
     onBack: () -> Unit,
-    onUpdateTuripPlacesOrder: (updatePlaces: ImmutableList<TuripPlaceModel>) -> Unit,
 ) {
     var currentPlaces: ImmutableList<TuripPlaceModel> by remember(turipPlaceModel) {
         mutableStateOf(turipPlaceModel)
@@ -335,20 +339,9 @@ private fun TuripPlaceContent(
             onItemClick = onItemClick,
             onMapClick = navigateToMap,
             onTuripPlaceClick = onClickTuripPlace,
-            onDragStart = { dragStartPlaces = currentPlaces },
-            onDragPlace = { from: Int, to: Int ->
-                if (from == to) return@TuripPlaces
-                currentPlaces =
-                    currentPlaces
-                        .toMutableList()
-                        .apply { add(to, removeAt(from)) }
-                        .toImmutableList()
-            },
-            onDragEnd = {
-                if (currentPlaces != dragStartPlaces) {
-                    onUpdateTuripPlacesOrder(currentPlaces)
-                }
-            },
+            onDragStart = onDragStart,
+            onDragPlace = onDragPlace,
+            onDragEnd = onDragEnd,
             modifier = Modifier.weight(1f),
         )
     }
@@ -418,7 +411,6 @@ private fun TuripPlaceScreenPreview() {
             navigateToMap = {},
             onClickTuripPlace = {},
             onMoreOption = {},
-            onUpdateTuripPlacesOrder = {},
             currentPlaceLatLng = persistentListOf(),
             selectedTuripId = -1L,
             onBack = {},
@@ -429,6 +421,9 @@ private fun TuripPlaceScreenPreview() {
                     latLng = LatLng(1.1, 1.1),
                 ),
             onItemClick = {},
+            onDragStart = {},
+            onDragPlace = { _, _ -> },
+            onDragEnd = {},
         )
     }
 }
