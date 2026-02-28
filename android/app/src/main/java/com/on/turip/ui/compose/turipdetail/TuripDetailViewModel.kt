@@ -204,7 +204,15 @@ class TuripDetailViewModel @Inject constructor(
                     }
                     _uiEffect.send(TuripPlaceUiEffect.TuripUpdated)
                 }.onFailure { errorType: ErrorType ->
-                    sendErrorEffect(errorType, TuripPlaceRetryAction.TuripNameUpdate)
+                    if (errorType == ErrorType.Turip.DuplicatedName) {
+                        _uiState.update {
+                            it.copy(
+                                turipNameStatus = TuripNameStatusModel.DUPLICATE_NAME,
+                            )
+                        }
+                    } else {
+                        sendErrorEffect(errorType, TuripPlaceRetryAction.TuripNameUpdate)
+                    }
                 }
         }
     }
