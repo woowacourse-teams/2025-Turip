@@ -120,12 +120,10 @@ fun NameEditorSheetContent(
                                 width = 1.dp,
                                 color = TuripTheme.colors.gray04,
                                 shape = TuripTheme.shape.container,
-                            )
-                            .background(
+                            ).background(
                                 color = TuripTheme.colors.white,
                                 shape = TuripTheme.shape.container,
-                            )
-                            .padding(
+                            ).padding(
                                 horizontal = TuripTheme.spacing.medium,
                                 vertical = TuripTheme.spacing.small,
                             ),
