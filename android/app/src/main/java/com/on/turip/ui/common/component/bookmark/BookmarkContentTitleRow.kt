@@ -1,5 +1,6 @@
 package com.on.turip.ui.common.component.bookmark
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -10,7 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
-import com.on.turip.ui.compose.home.component.RegionChip
 
 @Composable
 fun BookmarkContentTitleRow(
@@ -27,10 +27,7 @@ fun BookmarkContentTitleRow(
             style = TuripTheme.typography.title2,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            modifier =
-                Modifier
-                    .weight(1f)
-                    .padding(),
+            modifier = Modifier.weight(1f),
         )
         trailing?.invoke()
     }
@@ -43,9 +40,12 @@ private fun BookmarkContentTitleRowWithTrailingPreview() {
         BookmarkContentTitleRow(
             title = "콘텐츠 제목이 길어질 경우 말줄임 처리 확인용 텍스트입니다",
             trailing = {
-                RegionChip(
-                    regionName = "제주",
-                    modifier = Modifier.padding(start = TuripTheme.spacing.small),
+                Text(
+                    text = "테스트",
+                    modifier =
+                        Modifier
+                            .background(TuripTheme.colors.primary)
+                            .padding(TuripTheme.spacing.medium),
                 )
             },
             modifier =
