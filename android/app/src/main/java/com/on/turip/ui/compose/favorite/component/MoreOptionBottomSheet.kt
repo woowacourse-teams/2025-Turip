@@ -245,7 +245,7 @@ private fun MoreOptionBottomSheetPreviewMoreOption() {
 
 @Preview(name = "MoreOption - 기본폴더(삭제 비활성)", showBackground = true)
 @Composable
-private fun MoreOptionBottomSheetPreviewMoreOption_Default() {
+private fun MoreOptionBottomSheetPreviewMoreOptionDefault() {
     MoreOptionBottomSheetPreviewContent(
         screenMode = TuripPlaceScreenMode.MoreOption,
         isDefault = true,
