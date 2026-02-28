@@ -19,9 +19,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.on.turip.R
+import com.on.turip.domain.bookmark.BookmarkContent
+import com.on.turip.domain.content.Content
+import com.on.turip.domain.content.video.VideoData
+import com.on.turip.domain.creator.Creator
+import com.on.turip.domain.region.City
+import com.on.turip.domain.trip.TripDuration
 import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.common.extensions.dismissAndExecute
 import com.on.turip.ui.common.extensions.showSnackbarWithAction
@@ -33,6 +41,9 @@ import com.on.turip.ui.compose.mypage.component.MyPageBookmarkContentSection
 import com.on.turip.ui.compose.mypage.component.MyPageSettingsSection
 import com.on.turip.ui.compose.mypage.component.ProfileSection
 import com.on.turip.ui.compose.mypage.model.InquiryMail
+import com.on.turip.ui.compose.mypage.model.ProfileModel
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun MyPageScreen(
@@ -223,12 +234,83 @@ private fun MyPageScreenContent(
     }
 }
 
+private class MyPageUiStatePreviewProvider : PreviewParameterProvider<MyPageUiState> {
+    override val values: Sequence<MyPageUiState> =
+        sequenceOf(
+            // 둘 다 성공
+            MyPageUiState.Idle.copy(
+                profileState =
+                    MyPageSectionState.Success(
+                        ProfileModel(
+                            1L,
+                            "닉네임은 최대 2줄 까지 가능하도록 보여지고 있어요 닉네임은 최대 2줄 까지 가능하도록 보여지고 있어요",
+                            null,
+                        ),
+                    ),
+                bookmarkContentState = MyPageSectionState.Success(previewBookmarkContents()),
+            ),
+            // 프로필 & 북마크 에러
+            MyPageUiState.Idle.copy(
+                profileState = MyPageSectionState.Error,
+                bookmarkContentState = MyPageSectionState.Error,
+            ),
+            // 북마크 로딩
+            MyPageUiState.Idle.copy(
+                bookmarkContentState = MyPageSectionState.Loading,
+            ),
+            // 로그아웃 다이얼로그
+            MyPageUiState.Idle.copy(dialogState = MyPageDialogState.LogoutRequired),
+            // 회원 탈퇴 다이얼로그
+            MyPageUiState.Idle.copy(dialogState = MyPageDialogState.ConfirmWithdraw),
+        )
+}
+
+private fun previewBookmarkContents(): ImmutableList<BookmarkContent> =
+    persistentListOf(
+        BookmarkContent(
+            content =
+                Content(
+                    id = 1L,
+                    creator = Creator(1L, "채널명", ""),
+                    videoData =
+                        VideoData(
+                            title = "콘텐츠 제목이 길면 말줄임 처리되는지 확인합니다",
+                            url = "thumbnail",
+                            uploadedDate = "2026-02-23",
+                        ),
+                    city = City("대구"),
+                    isBookmarked = true,
+                ),
+            tripDuration = TripDuration(1, 2),
+            tripPlaceCount = 3,
+        ),
+        BookmarkContent(
+            content =
+                Content(
+                    id = 2L,
+                    creator = Creator(2L, "긴 채널명 긴 채널명 긴 채널명", ""),
+                    videoData =
+                        VideoData(
+                            title = "짧은 제목",
+                            url = "thumbnail",
+                            uploadedDate = "2026-02-10",
+                        ),
+                    city = City("제주"),
+                    isBookmarked = true,
+                ),
+            tripDuration = TripDuration(0, 1),
+            tripPlaceCount = 5,
+        ),
+    )
+
 @Preview(showBackground = true)
 @Composable
-private fun MyPageScreenPreview() {
+private fun MyPageScreenPreview(
+    @PreviewParameter(MyPageUiStatePreviewProvider::class) uiState: MyPageUiState,
+) {
     TuripTheme {
         MyPageScreenContent(
-            uiState = MyPageUiState.Idle,
+            uiState = uiState,
             snackbarHostState = remember { SnackbarHostState() },
             onNavigateToAllBookmarkContents = {},
             onNavigateToContent = {},
