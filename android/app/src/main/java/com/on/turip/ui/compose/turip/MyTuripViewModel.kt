@@ -40,16 +40,14 @@ class MyTuripViewModel @Inject constructor(
     val uiEffect: Flow<MyTuripUiEffect> = _uiEffect.receiveAsFlow()
 
     fun loadTuripFolders() {
-        viewModelScope.launch {
+        launchWithLoading {
             turipRepository
                 .loadTurips()
                 .onSuccess { turips: List<Turip> ->
                     _uiState.update { myTuripUiState: MyTuripUiState ->
                         myTuripUiState.copy(
-                            turips =
-                                turips
-                                    .map { it.toUiMyTuripModel() }
-                                    .toImmutableList(),
+                            turips = turips.map { it.toUiMyTuripModel() }.toImmutableList(),
+                            errorUiState = ErrorUiState.None,
                         )
                     }
                 }.onFailure { errorType: ErrorType ->
@@ -112,12 +110,10 @@ class MyTuripViewModel @Inject constructor(
                 .deleteTurip(myTuripModel.id)
                 .onSuccess {
                     dismissTuripRemoveDialog()
-                    _uiEffect.send(
-                        MyTuripUiEffect.TuripDeleted(myTuripModel.name),
-                    )
+                    _uiEffect.send(MyTuripUiEffect.TuripDeleted(myTuripModel.name))
+
                     _uiState.update { state: MyTuripUiState ->
                         state.copy(
-                            isLoading = false,
                             errorUiState = ErrorUiState.None,
                             turips =
                                 state.turips
@@ -151,19 +147,31 @@ class MyTuripViewModel @Inject constructor(
         }
     }
 
+    private fun launchWithLoading(block: suspend () -> Unit) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            try {
+                block()
+            } finally {
+                _uiState.update { it.copy(isLoading = false) }
+            }
+        }
+    }
+
     private suspend fun sendErrorEffect(
         errorType: ErrorType,
         retryAction: MyTuripRetryAction,
     ) {
-        _uiState.update { it.copy(isLoading = false) }
         val uiError: UiError = errorType.toUiError()
         if (uiError is UiError.Global) {
             when (uiError) {
                 UiError.Global.Network -> {
+                    _uiState.update { it.copy(errorUiState = ErrorUiState.Network) }
                     _uiEffect.send(MyTuripUiEffect.ShowError(ErrorUiState.Network, retryAction))
                 }
 
                 UiError.Global.Server -> {
+                    _uiState.update { it.copy(errorUiState = ErrorUiState.Server) }
                     _uiEffect.send(MyTuripUiEffect.ShowError(ErrorUiState.Server, retryAction))
                 }
 
