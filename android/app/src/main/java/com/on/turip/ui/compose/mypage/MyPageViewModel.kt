@@ -5,8 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
-import com.on.turip.domain.accounts.Account
-import com.on.turip.domain.accounts.AccountRepository
+import com.on.turip.domain.account.Account
+import com.on.turip.domain.account.AccountRepository
 import com.on.turip.domain.bookmark.BookmarkContent
 import com.on.turip.domain.bookmark.repository.BookmarkRepository
 import com.on.turip.domain.common.paging.Page
@@ -20,6 +20,7 @@ import com.on.turip.ui.compose.mypage.model.InquiryMail
 import com.on.turip.ui.compose.mypage.util.AppEnvironmentInfoProvider
 import com.on.turip.ui.compose.mypage.util.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -32,7 +33,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import timber.log.Timber
-import javax.inject.Inject
 
 @HiltViewModel
 class MyPageViewModel @Inject constructor(
