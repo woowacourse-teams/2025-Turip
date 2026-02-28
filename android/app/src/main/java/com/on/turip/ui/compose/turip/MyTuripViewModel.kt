@@ -2,11 +2,14 @@ package com.on.turip.ui.compose.turip
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
 import com.on.turip.domain.turip.Turip
 import com.on.turip.domain.turip.repository.TuripRepository
 import com.on.turip.ui.common.error.ErrorUiState
+import com.on.turip.ui.common.error.UiError
+import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.compose.designsystem.model.TuripNameStatusModel
 import com.on.turip.ui.compose.turip.mapper.toEditModel
 import com.on.turip.ui.compose.turip.mapper.toUiMyTuripModel
@@ -49,12 +52,10 @@ class MyTuripViewModel @Inject constructor(
                                     .toImmutableList(),
                         )
                     }
-                }.onFailure {
-                    _uiEffect.send(
-                        MyTuripUiEffect.ShowError(
-                            errorUiState = uiState.value.errorUiState,
-                            retryAction = MyTuripRetryAction.UpdateMyTurip,
-                        ),
+                }.onFailure { errorType: ErrorType ->
+                    sendErrorEffect(
+                        errorType = errorType,
+                        retryAction = MyTuripRetryAction.UpdateMyTurip,
                     )
                 }
         }
@@ -98,13 +99,8 @@ class MyTuripViewModel @Inject constructor(
                     _uiEffect.send(MyTuripUiEffect.TuripAdded(name))
                     dismissAddBottomSheet()
                     loadTuripFolders()
-                }.onFailure {
-                    _uiEffect.send(
-                        MyTuripUiEffect.ShowError(
-                            errorUiState = uiState.value.errorUiState,
-                            retryAction = MyTuripRetryAction.AddMyTurip(name),
-                        ),
-                    )
+                }.onFailure { errorType: ErrorType ->
+                    sendErrorEffect(errorType, MyTuripRetryAction.AddMyTurip(name))
                 }
         }
     }
@@ -129,7 +125,8 @@ class MyTuripViewModel @Inject constructor(
                     }
                     dismissTuripRemoveDialog()
                     Timber.d("튜립 삭제 완료(이름 = ${myTuripModel.name})")
-                }.onFailure {
+                }.onFailure { errorType: ErrorType ->
+                    sendErrorEffect(errorType, MyTuripRetryAction.UpdateMyTurip)
                     Timber.e("튜립 삭제 실패(이름 = ${myTuripModel.name})")
                 }
         }
@@ -144,6 +141,33 @@ class MyTuripViewModel @Inject constructor(
             is MyTuripRetryAction.AddMyTurip -> {
                 _uiState.update { it.copy(inputTuripName = action.name) }
                 addTurip()
+            }
+
+            is MyTuripRetryAction.DeleteMyTurip -> {
+                deleteTurip(action.myTuripModel)
+            }
+        }
+    }
+
+    private suspend fun sendErrorEffect(
+        errorType: ErrorType,
+        retryAction: MyTuripRetryAction,
+    ) {
+        _uiState.update { it.copy(isLoading = false) }
+        val uiError: UiError = errorType.toUiError()
+        if (uiError is UiError.Global) {
+            when (uiError) {
+                UiError.Global.Network -> {
+                    _uiEffect.send(MyTuripUiEffect.ShowError(ErrorUiState.Network, retryAction))
+                }
+
+                UiError.Global.Server -> {
+                    _uiEffect.send(MyTuripUiEffect.ShowError(ErrorUiState.Server, retryAction))
+                }
+
+                UiError.Global.TokenExpired -> {
+                    _uiEffect.send(MyTuripUiEffect.NavigateToLogin)
+                }
             }
         }
     }
