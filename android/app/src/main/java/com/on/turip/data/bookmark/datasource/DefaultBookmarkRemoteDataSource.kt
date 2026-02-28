@@ -6,6 +6,7 @@ import com.on.turip.data.bookmark.dto.BookmarkContentsResponse
 import com.on.turip.data.bookmark.dto.BookmarkCountResponse
 import com.on.turip.data.bookmark.service.BookmarkService
 import com.on.turip.data.result.safeApiCall
+import com.on.turip.domain.common.paging.Cursor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -25,12 +26,9 @@ class DefaultBookmarkRemoteDataSource @Inject constructor(
             safeApiCall { bookmarkService.deleteBookmark(contentId) }
         }
 
-    override suspend fun getBookmarks(
-        size: Int,
-        lastId: Long,
-    ): TuripResult<BookmarkContentsResponse> =
+    override suspend fun getBookmarks(cursor: Cursor): TuripResult<BookmarkContentsResponse> =
         withContext(coroutineContext) {
-            safeApiCall { bookmarkService.getBookmarks(size, lastId) }
+            safeApiCall { bookmarkService.getBookmarks(cursor.size, cursor.lastId ?: 0L) }
         }
 
     override suspend fun getBookmarkCount(): TuripResult<BookmarkCountResponse> =

@@ -9,6 +9,7 @@ import com.on.turip.domain.account.Account
 import com.on.turip.domain.account.AccountRepository
 import com.on.turip.domain.bookmark.BookmarkContent
 import com.on.turip.domain.bookmark.repository.BookmarkRepository
+import com.on.turip.domain.common.paging.Cursor
 import com.on.turip.domain.common.paging.Page
 import com.on.turip.domain.login.MemberRepository
 import com.on.turip.domain.setting.PrivacyPolicy
@@ -73,8 +74,9 @@ class MyPageViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(bookmarkContentState = MyPageSectionState.Loading) }
 
+            val cursor = Cursor(size = 10, lastId = null)
             bookmarkRepository
-                .loadBookmarks(10, 0L)
+                .loadBookmarks(cursor)
                 .onSuccess { result: Page<BookmarkContent> ->
                     Timber.d("마이페이지 북마크 목록 조회 성공")
                     _uiState.update {

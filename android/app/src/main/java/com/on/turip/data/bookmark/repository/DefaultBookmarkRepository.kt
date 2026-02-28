@@ -7,6 +7,7 @@ import com.on.turip.data.bookmark.toDomain
 import com.on.turip.data.bookmark.toRequestDto
 import com.on.turip.domain.bookmark.BookmarkContent
 import com.on.turip.domain.bookmark.repository.BookmarkRepository
+import com.on.turip.domain.common.paging.Cursor
 import com.on.turip.domain.common.paging.Page
 import javax.inject.Inject
 
@@ -18,10 +19,8 @@ class DefaultBookmarkRepository @Inject constructor(
 
     override suspend fun deleteBookmark(contentId: Long): TuripResult<Unit> = bookmarkRemoteDataSource.deleteBookmark(contentId)
 
-    override suspend fun loadBookmarks(
-        size: Int,
-        lastId: Long,
-    ): TuripResult<Page<BookmarkContent>> = bookmarkRemoteDataSource.getBookmarks(size, lastId).mapCatching { it.toDomain() }
+    override suspend fun loadBookmarks(cursor: Cursor): TuripResult<Page<BookmarkContent>> =
+        bookmarkRemoteDataSource.getBookmarks(cursor).mapCatching { it.toDomain() }
 
     override suspend fun loadBookmarkCount(): TuripResult<Int> = bookmarkRemoteDataSource.getBookmarkCount().mapCatching { it.count }
 }

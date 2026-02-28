@@ -7,6 +7,7 @@ import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
 import com.on.turip.domain.bookmark.BookmarkContent
 import com.on.turip.domain.bookmark.repository.BookmarkRepository
+import com.on.turip.domain.common.paging.Cursor
 import com.on.turip.domain.common.paging.Page
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
@@ -58,12 +59,17 @@ class BookmarkContentListViewModel @Inject constructor(
             // 새로고침할 때만 전체 콘텐츠 수 API 호출
             if (loadMode == PagingLoadMode.REFRESH) launch { loadBookmarkCount() }
 
-            val lastItemId: Long = getLastItemId(loadMode) ?: return@launch
+            val lastItemId: Long? =
+                uiState.value.bookmarkContents.items
+                    .lastOrNull()
+                    ?.content
+                    ?.id
 
+            val cursor = Cursor(size = PAGE_SIZE, lastId = lastItemId)
             bookmarkRepository
-                .loadBookmarks(PAGE_SIZE, lastItemId)
+                .loadBookmarks(cursor)
                 .onSuccess { result: Page<BookmarkContent> ->
-                    Timber.d("북마크 화면 조회 성공 mode =$loadMode")
+                    Timber.d("북마크 화면 조회 성공 mode = $loadMode, cursor = $cursor")
                     applyBookmarkContents(loadMode, result)
                 }.onFailure { errorType: ErrorType ->
                     Timber.e("북마크 화면 에러 loadMode = $loadMode")
@@ -124,20 +130,6 @@ class BookmarkContentListViewModel @Inject constructor(
                 _uiState.update { state -> state.copy(totalBookmarkCount = null) }
             }
     }
-
-    private fun getLastItemId(loadMode: PagingLoadMode) =
-        when (loadMode) {
-            PagingLoadMode.REFRESH -> {
-                0L
-            }
-
-            PagingLoadMode.APPEND -> {
-                uiState.value.bookmarkContents.items
-                    .lastOrNull()
-                    ?.content
-                    ?.id
-            }
-        }
 
     private fun applyBookmarkContents(
         loadMode: PagingLoadMode,
