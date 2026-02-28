@@ -52,6 +52,7 @@ import com.on.turip.ui.common.paging.PagingState
 import com.on.turip.ui.compose.bookmark.component.BookmarkContentAppBar
 import com.on.turip.ui.compose.bookmark.component.BookmarkContentItem
 import com.on.turip.ui.compose.designsystem.component.ErrorScreen
+import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -101,17 +102,14 @@ fun BookmarkContentScreen(
                 .systemBarsPadding(),
         snackbarHost = { TuripSnackbar(snackbarHostState = snackbarHostState) },
     ) { innerPadding ->
-        Column(
+        BookmarkContentContent(
+            uiState = uiState,
+            onRetryClick = viewModel::refreshBookmarkContents,
+            onContentClick = onNavigateToContent,
+            onBookmarkClick = viewModel::removeBookmark,
+            loadMoreContents = viewModel::loadMoreContents,
             modifier = Modifier.padding(innerPadding),
-        ) {
-            BookmarkContentContent(
-                uiState = uiState,
-                onRetryClick = viewModel::refreshBookmarkContents,
-                onContentClick = onNavigateToContent,
-                onBookmarkClick = viewModel::removeBookmark,
-                loadMoreContents = viewModel::loadMoreContents,
-            )
-        }
+        )
     }
 }
 
@@ -122,39 +120,42 @@ private fun BookmarkContentContent(
     onContentClick: (contentId: Long) -> Unit,
     onBookmarkClick: (contentId: Long) -> Unit,
     loadMoreContents: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    when {
-        uiState.isLoading -> {
-            BookmarkLoading()
-        }
+    Column(modifier = modifier.fillMaxSize()) {
+        when {
+            uiState.isLoading -> {
+                BookmarkLoading()
+            }
 
-        uiState.errorUiState != ErrorUiState.None -> {
-            ErrorScreen(
-                errorUiState = uiState.errorUiState,
-                onRetryClick = onRetryClick,
-                modifier = Modifier.fillMaxSize(),
-            )
-        }
-
-        else -> {
-            if (uiState.isEmpty) {
-                BookmarkContentEmpty()
-            } else {
-                BookmarkContents(
-                    uiState = uiState,
-                    onContentClick = onContentClick,
-                    onBookmarkClick = onBookmarkClick,
-                    loadMore = loadMoreContents,
+            uiState.errorUiState != ErrorUiState.None -> {
+                ErrorScreen(
+                    errorUiState = uiState.errorUiState,
+                    onRetryClick = onRetryClick,
+                    modifier = Modifier.fillMaxSize(),
                 )
+            }
+
+            else -> {
+                if (uiState.isEmpty) {
+                    BookmarkContentEmpty()
+                } else {
+                    BookmarkContents(
+                        uiState = uiState,
+                        onContentClick = onContentClick,
+                        onBookmarkClick = onBookmarkClick,
+                        loadMore = loadMoreContents,
+                    )
+                }
             }
         }
     }
 }
 
 @Composable
-private fun BookmarkLoading() {
+private fun BookmarkLoading(modifier: Modifier = Modifier) {
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
         CircularProgressIndicator(
@@ -165,11 +166,11 @@ private fun BookmarkLoading() {
 }
 
 @Composable
-private fun BookmarkContentEmpty() {
+private fun BookmarkContentEmpty(modifier: Modifier = Modifier) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
     ) {
         Spacer(modifier = Modifier.height(TuripTheme.spacing.huge))
 
@@ -197,6 +198,7 @@ private fun BookmarkContents(
     onContentClick: (contentId: Long) -> Unit,
     onBookmarkClick: (contentId: Long) -> Unit,
     loadMore: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val pagingState: PagingState<BookmarkContent> = uiState.bookmarkContents
     val listState = rememberLazyListState()
@@ -233,70 +235,71 @@ private fun BookmarkContents(
             stringResource(R.string.bookmark_content_count_fail)
         }
 
-    Text(
-        text = totalBookmarkCount,
-        textAlign = TextAlign.End,
-        style = TuripTheme.typography.info2,
-        color = TuripTheme.colors.gray03,
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(vertical = TuripTheme.spacing.medium)
-                .padding(end = TuripTheme.spacing.large),
-    )
+    Column(modifier = modifier) {
+        Text(
+            text = totalBookmarkCount,
+            textAlign = TextAlign.End,
+            style = TuripTheme.typography.info2,
+            color = TuripTheme.colors.gray03,
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = TuripTheme.spacing.medium)
+                    .padding(end = TuripTheme.spacing.large),
+        )
 
-    HorizontalDivider(
-        modifier = Modifier.fillMaxWidth(),
-        thickness = 5.dp,
-        color = TuripTheme.colors.gray01,
-    )
+        HorizontalDivider(
+            modifier = Modifier.fillMaxWidth(),
+            thickness = 5.dp,
+            color = TuripTheme.colors.gray01,
+        )
 
-    LazyColumn(
-        state = listState,
-        contentPadding = PaddingValues(TuripTheme.spacing.medium),
-    ) {
-        itemsIndexed(
-            items = pagingState.items,
-            key = { _, item -> item.content.id },
-        ) { index, content ->
-            BookmarkContentItem(
-                content = content,
-                onContentClick = onContentClick,
-                onRemoveBookmark = onBookmarkClick,
-            )
-
-            if (index != pagingState.items.lastIndex) {
-                HorizontalDivider(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = TuripTheme.spacing.medium),
-                    thickness = 1.dp,
-                    color = TuripTheme.colors.gray01,
+        LazyColumn(
+            state = listState,
+            contentPadding = PaddingValues(TuripTheme.spacing.medium),
+            modifier = Modifier.weight(1f),
+        ) {
+            itemsIndexed(
+                items = pagingState.items,
+                key = { _, item -> item.content.id },
+            ) { index, content ->
+                BookmarkContentItem(
+                    content = content,
+                    onContentClick = onContentClick,
+                    onRemoveBookmark = onBookmarkClick,
                 )
-            }
-        }
 
-        if (pagingState.isAppending) {
-            item {
-                Box(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
-                        color = TuripTheme.colors.black,
+                if (index != pagingState.items.lastIndex) {
+                    HorizontalDivider(
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = TuripTheme.spacing.medium),
+                        thickness = 1.dp,
+                        color = TuripTheme.colors.gray01,
                     )
                 }
             }
-        } else if (pagingState.errorUiState != ErrorUiState.None) {
-            item {
-                LoadMoreError(
-                    onRetryClick = loadMore,
-                )
+
+            if (pagingState.isAppending) {
+                item {
+                    Box(
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(TuripTheme.spacing.large),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            color = TuripTheme.colors.black,
+                        )
+                    }
+                }
+            } else if (pagingState.errorUiState != ErrorUiState.None) {
+                item {
+                    LoadMoreError(onRetryClick = loadMore)
+                }
             }
         }
     }
