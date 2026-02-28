@@ -306,12 +306,15 @@ private fun BookmarkContentList(
 }
 
 @Composable
-private fun LoadMoreError(onRetryClick: () -> Unit) {
+private fun LoadMoreError(
+    onRetryClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Row(
         modifier =
-            Modifier
+            modifier
                 .fillMaxWidth()
-                .padding(horizontal = TuripTheme.spacing.large),
+                .padding(horizontal = TuripTheme.spacing.extraSmall),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
@@ -448,6 +451,60 @@ private fun BookmarkContentListLoadCountErrorPreview() {
                 onLoadMore = {},
             )
         }
+    }
+}
+
+@Preview(showBackground = true, name = "더보기 에러")
+@Composable
+private fun BookmarkContentLoadMoreErrorPreview() {
+    val contents =
+        persistentListOf(
+            BookmarkContent(
+                content =
+                    Content(
+                        1L,
+                        Creator(1L, "채널명", ""),
+                        VideoData("콘텐츠 제목", "thumbnail", "2026-01-12"),
+                        City("대구"),
+                        true,
+                    ),
+                tripDuration = TripDuration(1, 2),
+                tripPlaceCount = 2,
+            ),
+            BookmarkContent(
+                content =
+                    Content(
+                        2L,
+                        Creator(2L, "다른 채널", ""),
+                        VideoData("두 번째 콘텐츠", "thumbnail", "2025-01-12"),
+                        City("서울"),
+                        true,
+                    ),
+                tripDuration = TripDuration(0, 1),
+                tripPlaceCount = 1,
+            ),
+        )
+
+    TuripTheme {
+        BookmarkContentListContent(
+            uiState =
+                BookmarkContentListUiState(
+                    isLoading = false,
+                    bookmarkContents =
+                        PagingState(
+                            items = contents,
+                            hasNext = true,
+                            isAppending = false,
+                            errorUiState = ErrorUiState.Network,
+                        ),
+                    totalBookmarkCount = 2,
+                    errorUiState = ErrorUiState.None,
+                ),
+            onRetryClick = {},
+            onContentClick = {},
+            onBookmarkClick = {},
+            onLoadMore = {},
+        )
     }
 }
 
