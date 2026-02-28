@@ -82,8 +82,7 @@ class MyTuripViewModel @Inject constructor(
 
     fun updateInputName(name: String) {
         if (name.length > MAX_NAME_LENGTH) return
-        val editModels: List<TuripEditModel> =
-            _uiState.value.turips.map { it.toEditModel() }
+        val editModels: List<TuripEditModel> = _uiState.value.turips.map { it.toEditModel() }
         val status = TuripNameStatusModel.of(name, editModels)
         _uiState.update {
             it.copy(
