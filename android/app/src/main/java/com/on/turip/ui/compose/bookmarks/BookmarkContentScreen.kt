@@ -253,7 +253,6 @@ private fun BookmarkContents(
     LazyColumn(
         state = listState,
         contentPadding = PaddingValues(TuripTheme.spacing.medium),
-        verticalArrangement = Arrangement.spacedBy(TuripTheme.spacing.medium),
     ) {
         itemsIndexed(
             items = pagingState.items,
@@ -261,10 +260,20 @@ private fun BookmarkContents(
         ) { index, content ->
             BookmarkContentItem(
                 content = content,
-                showDivider = index != pagingState.items.lastIndex,
                 onContentClick = onContentClick,
                 onRemoveBookmark = onBookmarkClick,
             )
+
+            if (index != pagingState.items.lastIndex) {
+                HorizontalDivider(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = TuripTheme.spacing.medium),
+                    thickness = 1.dp,
+                    color = TuripTheme.colors.gray01,
+                )
+            }
         }
 
         if (pagingState.isAppending) {
