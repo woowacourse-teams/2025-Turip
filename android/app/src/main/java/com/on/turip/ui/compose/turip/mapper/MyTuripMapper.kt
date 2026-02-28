@@ -11,7 +11,7 @@ fun Turip.toUiMyTuripModel(): MyTuripModel =
         name = name,
         placeCount = placeCount,
         memberCount = memberCount,
-        type = TuripTypeModel.of(isShared),
+        type = TuripTypeModel.from(isShared),
         isDefault = isDefault,
     )
 

@@ -6,6 +6,6 @@ enum class TuripTypeModel {
     ;
 
     companion object {
-        fun of(isShared: Boolean): TuripTypeModel = if (isShared) TOGETHER else SOLO
+        fun from(isShared: Boolean): TuripTypeModel = if (isShared) TOGETHER else SOLO
     }
 }
