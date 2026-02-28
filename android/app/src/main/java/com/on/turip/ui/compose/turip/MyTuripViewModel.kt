@@ -13,6 +13,7 @@ import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.compose.designsystem.model.TuripNameStatusModel
 import com.on.turip.ui.compose.turip.mapper.toEditModel
 import com.on.turip.ui.compose.turip.mapper.toUiMyTuripModel
+import com.on.turip.ui.compose.turip.model.DeleteTuripSnapShot
 import com.on.turip.ui.compose.turip.model.MyTuripModel
 import com.on.turip.ui.folder.model.TuripEditModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,6 +26,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -38,6 +41,8 @@ class MyTuripViewModel @Inject constructor(
 
     private val _uiEffect: Channel<MyTuripUiEffect> = Channel(Channel.BUFFERED)
     val uiEffect: Flow<MyTuripUiEffect> = _uiEffect.receiveAsFlow()
+
+    private var deleteTuripSnapShot = DeleteTuripSnapShot.EMPTY
 
     fun loadTuripFolders() {
         launchWithLoading {
@@ -85,6 +90,65 @@ class MyTuripViewModel @Inject constructor(
                 inputTuripName = name,
                 turipNameStatus = status,
             )
+        }
+    }
+
+    fun applyTuripDelete(turipId: Long) {
+        val targetTurip: MyTuripModel =
+            uiState.value.turips.find { it.id == turipId }
+                ?: run {
+                    Timber.e("삭제할 튜립을 찾을 수 없어요. turipId = $turipId")
+                    return
+                }
+
+        if (deleteTuripSnapShot.hasSnapshot) return
+
+        _uiState.update { state: MyTuripUiState ->
+            deleteTuripSnapShot =
+                DeleteTuripSnapShot(
+                    deleteTurip = targetTurip,
+                    originTurips = _uiState.value.turips,
+                )
+            state.copy(
+                turips =
+                    state.turips
+                        .filter { it.id != targetTurip.id }
+                        .toImmutableList(),
+            )
+        }
+
+        viewModelScope.launch {
+            _uiEffect.send(
+                MyTuripUiEffect.ShowTuripRemoved(targetTurip.name),
+            )
+        }
+    }
+
+    private val commitMutex = Mutex()
+
+    fun commitTuripDelete() {
+        viewModelScope.launch {
+            commitMutex.withLock {
+                if (!deleteTuripSnapShot.hasSnapshot) {
+                    Timber.e("제거할 튜립이 없어요. deleteTuripSnapShot을 확인 해주세요.")
+                    return@launch
+                }
+
+                val deleteTurip = deleteTuripSnapShot.deleteTurip
+                turipRepository
+                    .deleteTurip(deleteTurip.id)
+                    .onSuccess {
+                        Timber.d("튜립 삭제 성공(이름 = ${deleteTurip.name})")
+                    }.onFailure {
+                        rollbackTuripDelete()
+                        _uiEffect.send(
+                            MyTuripUiEffect.ShowTuripRemoveFailed(deleteTurip.name),
+                        )
+                        Timber.e("튜립 삭제 실패(이름 = ${deleteTurip.name})")
+                    }
+
+                clearDeleteSnapshot()
+            }
         }
     }
 
@@ -156,6 +220,21 @@ class MyTuripViewModel @Inject constructor(
                 _uiState.update { it.copy(isLoading = false) }
             }
         }
+    }
+
+    fun rollbackTuripDelete() {
+        if (!deleteTuripSnapShot.hasSnapshot) return
+
+        _uiState.update { state ->
+            state.copy(
+                turips = deleteTuripSnapShot.originTurips,
+            )
+        }
+        clearDeleteSnapshot()
+    }
+
+    private fun clearDeleteSnapshot() {
+        deleteTuripSnapShot = DeleteTuripSnapShot.EMPTY
     }
 
     private suspend fun sendErrorEffect(
