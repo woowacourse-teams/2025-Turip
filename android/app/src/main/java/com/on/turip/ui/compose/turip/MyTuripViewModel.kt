@@ -63,14 +63,7 @@ class MyTuripViewModel @Inject constructor(
         }
 
     fun showTuripRemoveDialog(myTuripModel: MyTuripModel) =
-        _uiState.update {
-            it.copy(
-                dialogState =
-                    MyTuripUiState.MyTuripDialogState.RemoveTurip(
-                        turip = myTuripModel,
-                    ),
-            )
-        }
+        _uiState.update { it.copy(dialogState = MyTuripUiState.MyTuripDialogState.RemoveTurip(turip = myTuripModel)) }
 
     fun dismissTuripRemoveDialog() = _uiState.update { it.copy(dialogState = null) }
 
