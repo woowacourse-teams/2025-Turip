@@ -160,7 +160,7 @@ class TuripDetailViewModel @Inject constructor(
                         _uiEffect.send(
                             TuripPlaceUiEffect.ShowTuripPlaceRemoveFailed(deletePlace.name),
                         )
-                        _uiState.update { it.copy(places = deleteTuripPlaceSnapshot.originPlaces) }
+                        rollbackTuripPlaceDelete()
                         Timber.e("튜립 상세 바텀시트, 장소 업데이트 실패 place = ${deletePlace.name}")
                     }
 
