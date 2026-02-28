@@ -1,6 +1,5 @@
 package com.on.turip.ui.bookmarks
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -26,10 +25,10 @@ class BookmarkContentActivity : AppCompatActivity() {
         setContent {
             TuripTheme {
                 BookmarkContentScreen(
-                    navigateToBack = {
+                    onNavigateToBack = {
                         finish()
                     },
-                    navigateToLogin = {
+                    onNavigateToLogin = {
                         val intent: Intent =
                             LoginActivity.newIntent(this).apply {
                                 flags =
@@ -38,7 +37,7 @@ class BookmarkContentActivity : AppCompatActivity() {
                         startActivity(intent)
                         finish()
                     },
-                    navigateToContent = { contentId: Long ->
+                    onNavigateToContent = { contentId: Long ->
                         val intent: Intent =
                             TripDetailActivity.newIntent(context = this, contentId = contentId)
                         startActivity(intent)
@@ -61,7 +60,7 @@ class BookmarkContentActivity : AppCompatActivity() {
             Intent().apply {
                 putExtra(EXTRA_BOOKMARK_CONTENT_HAS_BOOKMARK_CHANGES, hasBookmarkChanges)
             }
-        setResult(Activity.RESULT_OK, data)
+        setResult(RESULT_OK, data)
         super.finish()
     }
 

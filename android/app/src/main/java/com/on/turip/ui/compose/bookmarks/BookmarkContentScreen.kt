@@ -59,9 +59,9 @@ import kotlinx.coroutines.flow.filter
 
 @Composable
 fun BookmarkContentScreen(
-    navigateToBack: () -> Unit,
-    navigateToLogin: () -> Unit,
-    navigateToContent: (contentId: Long) -> Unit,
+    onNavigateToBack: () -> Unit,
+    onNavigateToLogin: () -> Unit,
+    onNavigateToContent: (contentId: Long) -> Unit,
     onBookmarkChanged: () -> Unit,
     viewModel: BookmarkContentViewModel = hiltViewModel(),
 ) {
@@ -74,7 +74,7 @@ fun BookmarkContentScreen(
         viewModel.uiEffect.collect { uiEffect: BookmarkContentUiEffect ->
             when (uiEffect) {
                 BookmarkContentUiEffect.NavigateToLogin -> {
-                    navigateToLogin()
+                    onNavigateToLogin()
                 }
 
                 BookmarkContentUiEffect.BookmarkRemoved -> {
@@ -93,7 +93,7 @@ fun BookmarkContentScreen(
     }
 
     Scaffold(
-        topBar = { BookmarkContentAppBar(onBackClick = navigateToBack) },
+        topBar = { BookmarkContentAppBar(onBackClick = onNavigateToBack) },
         modifier =
             Modifier
                 .fillMaxSize()
@@ -106,7 +106,7 @@ fun BookmarkContentScreen(
             BookmarkContentContent(
                 uiState = uiState,
                 onRetryClick = viewModel::refreshBookmarkContents,
-                onContentClick = navigateToContent,
+                onContentClick = onNavigateToContent,
                 onBookmarkClick = viewModel::removeBookmark,
                 loadMoreContents = viewModel::loadMoreContents,
             )
