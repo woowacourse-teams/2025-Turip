@@ -34,8 +34,8 @@ kotlinxCoroutinesCore = "1.10.2"
 kotlinxSerialization = "1.10.0"
 
 # Network
-ktor = "3.3.3"
-ktorfit = "2.7.1"
+ktor = "3.4.0"
+ktorfit = "2.7.2"
 
 # Image
 coil = "2.4.0"
