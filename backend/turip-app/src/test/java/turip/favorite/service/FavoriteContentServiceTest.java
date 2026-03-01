@@ -185,10 +185,6 @@ class FavoriteContentServiceTest {
         given(favoriteContentRepository.findMyFavoriteContentsByAccountId(eq(account.getId()), eq(Long.MAX_VALUE),
                 any()))
                 .willReturn(new SliceImpl<>(favoriteContents));
-        given(contentPlaceService.calculateDurationDays(1L))
-                .willReturn(2); // content1 1박 2일
-        given(contentPlaceService.calculateDurationDays(2L))
-                .willReturn(3); // content2 2박 3일
         given(contentRepository.existsById(1L))
                 .willReturn(true);
         given(contentRepository.existsById(2L))
