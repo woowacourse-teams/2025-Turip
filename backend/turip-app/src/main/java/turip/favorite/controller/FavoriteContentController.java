@@ -297,7 +297,7 @@ public class FavoriteContentController {
                                             	                "channelName": "여행하는 뭉치",
                                             	                "profileImage": "http://turip.com/static/youtuber1"
                                             	        },
-                                            	        "isBookmarked": false
+                                            	        "isBookmarked": true
                                                     },
                                             	    "tripDuration": {
                                             	        "nights": 2,
