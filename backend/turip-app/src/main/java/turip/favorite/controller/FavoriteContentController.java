@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import turip.account.domain.Account;
@@ -29,7 +28,6 @@ import turip.favorite.service.FavoriteContentService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/bookmarks")
 @Tag(name = "Bookmark", description = "북마크 API")
 public class FavoriteContentController {
 
@@ -155,7 +153,7 @@ public class FavoriteContentController {
                     )
             )
     })
-    @PostMapping
+    @PostMapping("/api/v1/bookmarks")
     public ResponseEntity<FavoriteContentResponse> create(
             @Parameter(hidden = true) @AuthAccount Account account,
             @RequestBody FavoriteContentRequest request) {
@@ -251,7 +249,7 @@ public class FavoriteContentController {
                     )
             )
     })
-    @GetMapping
+    @GetMapping("/api/v1/bookmarks")
     public ResponseEntity<ContentsDetailWithLoadableResponse> readMyFavoriteContents(
             @Parameter(hidden = true) @AuthAccount Account account,
             @RequestParam(name = "size") Integer pageSize,
@@ -325,7 +323,7 @@ public class FavoriteContentController {
                     )
             )
     })
-    @GetMapping("/count")
+    @GetMapping("/api/v1/bookmarks/count")
     public ResponseEntity<FavoriteContentCountResponse> readBookmarkCount(
             @Parameter(hidden = true) @AuthAccount Account account) {
         FavoriteContentCountResponse response = favoriteContentService.countByAccount(account);
@@ -412,7 +410,7 @@ public class FavoriteContentController {
                     )
             )
     })
-    @DeleteMapping
+    @DeleteMapping("/api/v1/bookmarks")
     public ResponseEntity<Void> delete(
             @Parameter(hidden = true) @AuthAccount Account account,
             @RequestParam(name = "contentId") Long contentId) {
