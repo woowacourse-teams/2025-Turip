@@ -280,28 +280,28 @@ public class FavoriteContentController {
                                     value = """
                                             {
                                             	"bookmarks" : [
-                                            	  {
-                                            		  "id": 1,
-                                            		  "createdAt": "2025-08-06",
-                                            		  "accountId": 1,
-                                            	    "content": {
-                                            	      "id": 1,
-                                            	      "title": "느좋 감성 대구 여행 어쩌구저쩌구",
-                                            	      "url": "https://youtube.com/watch?v=abc123",
-                                            	      "uploadedDate": "2024-04-21",
-                                            	      "city": {
-                                            	        "name": "속초"
-                                            	      },
-                                            	      "creator": {
-                                            	        "id": 10,
-                                            	        "channelName": "여행하는 뭉치",
-                                            	        "profileImage": "http://turip.com/static/youtuber1"
-                                            	      },
-                                            	      "isBookmarked": false
-                                                  }
+                                            	    {
+                                            		    "id": 1,
+                                            		    "createdAt": "2025-08-06",
+                                            		    "accountId": 1,
+                                            	        "content": {
+                                                            "id": 1,
+                                                            "title": "느좋 감성 대구 여행 어쩌구저쩌구",
+                                                            "url": "https://youtube.com/watch?v=abc123",
+                                                            "uploadedDate": "2024-04-21",
+                                                            "city": {
+                                                                "name": "속초"
+                                                            },
+                                            	            "creator": {
+                                            	                "id": 10,
+                                            	                "channelName": "여행하는 뭉치",
+                                            	                "profileImage": "http://turip.com/static/youtuber1"
+                                            	        },
+                                            	        "isBookmarked": false
+                                                    },
                                             	    "tripDuration": {
-                                            	      "nights": 2,
-                                            	      "days": 3
+                                            	        "nights": 2,
+                                            	        "days": 3
                                             	    },
                                             	    "tripPlaceCount" : 14
                                             	  }
