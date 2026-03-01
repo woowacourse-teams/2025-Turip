@@ -163,7 +163,7 @@ public class FavoriteContentController {
     }
 
     @Operation(
-            summary = "내 북마크 목록 조회 api",
+            summary = "내 북마크 목록 조회 api v1",
             description = "내가 북마크한 콘텐츠 목록을 조회한다."
     )
     @ApiResponses(value = {
@@ -250,7 +250,7 @@ public class FavoriteContentController {
             )
     })
     @GetMapping("/api/v1/bookmarks")
-    public ResponseEntity<ContentsDetailWithLoadableResponse> readMyFavoriteContents(
+    public ResponseEntity<ContentsDetailWithLoadableResponse> readMyFavoriteContentsV1(
             @Parameter(hidden = true) @AuthAccount Account account,
             @RequestParam(name = "size") Integer pageSize,
             @RequestParam(name = "lastId") Long lastContentId
