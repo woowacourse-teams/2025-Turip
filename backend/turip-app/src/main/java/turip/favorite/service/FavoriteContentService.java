@@ -90,8 +90,8 @@ public class FavoriteContentService {
         return favoriteContents.stream()
                 .map(favoriteContent -> {
                     Content content = favoriteContent.getContent();
-                    TripDurationResponse tripDuration = calculateTripDuration(content);
                     validateContentExists(content.getId());
+                    TripDurationResponse tripDuration = calculateTripDuration(content);
                     int tripPlaceCount = contentPlaceService.countByContentId(content.getId());
                     return FavoriteContentDetailResponse.of(favoriteContent, tripDuration, tripPlaceCount);
                 })
