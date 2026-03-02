@@ -157,10 +157,17 @@ class MyTuripViewModel @Inject constructor(
         viewModelScope.launch {
             turipRepository
                 .createTurip(name)
-                .onSuccess {
+                .onSuccess { turip: Turip ->
                     dismissAddBottomSheet()
                     _uiEffect.send(MyTuripUiEffect.TuripAdded(name))
-                    loadTuripFolders()
+                    _uiState.update {
+                        it.copy(
+                            turips =
+                                uiState.value.turips
+                                    .plus(turip.toUiMyTuripModel())
+                                    .toImmutableList(),
+                        )
+                    }
                 }.onFailure { errorType ->
                     _uiState.update {
                         it.copy(showAddBottomSheet = false)
