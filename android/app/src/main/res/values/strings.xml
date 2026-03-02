@@ -64,7 +64,7 @@
     <string name="my_page_withdraw_dialog_dismiss">취소</string>
     <string name="my_page_empty_bookmark_content">저장한 콘텐츠가 없어요\n홈에서 마음에 드는 콘텐츠를 저장해보세요</string>
     <string name="my_page_error">데이터를 불러오지 못했습니다</string>
-    <string name="my_page_snackbar_bookmark_remove_failed">북마크 해제 실패했어요. 새로고침 시 다시 나타날 수 있어요.</string>
+    <string name="my_page_snackbar_bookmark_remove_failed">북마크 해제 실패했어요.</string>
     <string name="my_page_snackbar_bookmark_remove_failed_action">새로고침</string>
     <string name="my_page_title">마이페이지</string>
     <string name="my_page_snackbar_profile_load_failed">프로필을 불러오지 못했어요.</string>

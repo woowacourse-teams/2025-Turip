@@ -4,7 +4,9 @@ import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.compose.mypage.model.InquiryMail
 
 sealed interface MyPageUiEffect {
-    data object ShowBookmarkRemoveFailed : MyPageUiEffect
+    data class ShowBookmarkRemoveFailed(
+        val contentId: Long,
+    ) : MyPageUiEffect
 
     data object ShowBookmarksLoadFailed : MyPageUiEffect
 

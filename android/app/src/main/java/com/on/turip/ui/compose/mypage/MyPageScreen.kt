@@ -62,11 +62,12 @@ fun MyPageScreen(
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { uiEffect: MyPageUiEffect ->
             when (uiEffect) {
-                MyPageUiEffect.ShowBookmarkRemoveFailed -> {
+                is MyPageUiEffect.ShowBookmarkRemoveFailed -> {
                     snackbarHostState.showSnackbarWithAction(
                         message = resources.getString(R.string.my_page_snackbar_bookmark_remove_failed),
-                        actionLabel = resources.getString(R.string.my_page_snackbar_bookmark_remove_failed_action),
-                        onAction = { viewModel.loadBookmarkContents(isRetry = true) },
+                        actionLabel = resources.getString(R.string.all_close_description),
+                        onAction = { viewModel.rollbackBookmarkContentRemove(uiEffect.contentId) },
+                        onDismiss = { viewModel.rollbackBookmarkContentRemove(uiEffect.contentId) },
                     )
                 }
 
@@ -115,7 +116,9 @@ fun MyPageScreen(
         snackbarHostState = snackbarHostState,
         onNavigateToAllBookmarkContents = onNavigateToAllBookmarkContents,
         onNavigateToContent = onNavigateToContent,
-        onRemoveBookmark = viewModel::removeBookmark,
+        onRemoveBookmark = { contentId: Long ->
+            snackbarHostState.dismissAndExecute { viewModel.removeBookmark(contentId) }
+        },
         onProfileRetry = { snackbarHostState.dismissAndExecute { viewModel.loadProfile(isRetry = true) } },
         onBookmarkRetry = {
             snackbarHostState.dismissAndExecute { viewModel.loadBookmarkContents(isRetry = true) }
@@ -137,7 +140,7 @@ private fun MyPageScreenContent(
     snackbarHostState: SnackbarHostState,
     onNavigateToAllBookmarkContents: () -> Unit,
     onNavigateToContent: (contentId: Long) -> Unit,
-    onRemoveBookmark: (Long) -> Unit,
+    onRemoveBookmark: (contentId: Long) -> Unit,
     onProfileRetry: () -> Unit,
     onBookmarkRetry: () -> Unit,
     onInquiryClick: () -> Unit,
