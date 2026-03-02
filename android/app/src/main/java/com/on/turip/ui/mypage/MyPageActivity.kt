@@ -6,12 +6,17 @@ import android.net.Uri
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import com.on.turip.R
+import com.on.turip.ui.bookmarks.BookmarkContentActivity
+import com.on.turip.ui.bookmarks.BookmarkContentActivity.Companion.EXTRA_BOOKMARK_CONTENT_HAS_BOOKMARK_CHANGES
 import com.on.turip.ui.common.extensions.safeStartActivityWithToast
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.mypage.MyPageScreen
+import com.on.turip.ui.compose.mypage.MyPageViewModel
 import com.on.turip.ui.compose.mypage.model.InquiryMail
 import com.on.turip.ui.login.LoginActivity
 import com.on.turip.ui.trip.TripDetailActivity
@@ -20,6 +25,8 @@ import timber.log.Timber
 
 @AndroidEntryPoint
 class MyPageActivity : AppCompatActivity() {
+    private val viewModel: MyPageViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -27,8 +34,10 @@ class MyPageActivity : AppCompatActivity() {
         setContent {
             TuripTheme {
                 MyPageScreen(
-                    // 화면 구현 필요
-                    onNavigateToAllBookmarkContents = {},
+                    onNavigateToAllBookmarkContents = {
+                        val intent = BookmarkContentActivity.newIntent(this)
+                        bookmarkContentLauncher.launch(intent)
+                    },
                     onNavigateToContent = { contentId: Long ->
                         Timber.d("마이페이지 북마크 콘텐츠 클릭(contentId=$contentId)")
                         val intent: Intent =
@@ -40,9 +49,11 @@ class MyPageActivity : AppCompatActivity() {
                             "mailto:${InquiryMail.RECIPIENT}?subject=${Uri.encode(InquiryMail.TITLE)}&body=${
                                 Uri.encode(mail.content)
                             }".toUri()
-
                         val intent: Intent = Intent(Intent.ACTION_SENDTO).apply { data = uri }
-                        startActivity(intent)
+                        safeStartActivityWithToast(
+                            intent = intent,
+                            errorToastMessage = getString(R.string.all_snackbar_not_found_inquiry_url),
+                        )
                     },
                     onNavigateToPrivacyPolicy = { url: String ->
                         val intent = Intent(Intent.ACTION_VIEW, url.toUri())
@@ -60,10 +71,24 @@ class MyPageActivity : AppCompatActivity() {
                         startActivity(intent)
                         finish()
                     },
+                    viewModel = viewModel,
                 )
             }
         }
     }
+
+    private val bookmarkContentLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode != RESULT_OK) return@registerForActivityResult
+
+            val changed =
+                result.data?.getBooleanExtra(EXTRA_BOOKMARK_CONTENT_HAS_BOOKMARK_CHANGES, false)
+                    ?: false
+
+            if (changed) {
+                viewModel.loadBookmarkContents(isRetry = false)
+            }
+        }
 
     companion object {
         fun newIntent(context: Context): Intent = Intent(context, MyPageActivity::class.java)
