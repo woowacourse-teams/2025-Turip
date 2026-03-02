@@ -160,10 +160,10 @@ class MyTuripViewModel @Inject constructor(
                 .onSuccess { turip: Turip ->
                     dismissAddBottomSheet()
                     _uiEffect.send(MyTuripUiEffect.TuripAdded(name))
-                    _uiState.update {
+                    _uiState.update { it: MyTuripUiState ->
                         it.copy(
                             turips =
-                                uiState.value.turips
+                                it.turips
                                     .plus(turip.toUiMyTuripModel())
                                     .toImmutableList(),
                         )
