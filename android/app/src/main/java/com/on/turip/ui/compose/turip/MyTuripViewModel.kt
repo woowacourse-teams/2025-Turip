@@ -44,7 +44,7 @@ class MyTuripViewModel @Inject constructor(
 
     private var deleteTuripSnapShot = DeleteTuripSnapShot.EMPTY
 
-    fun loadTuripFolders() {
+    fun loadTurips() {
         launchWithLoading {
             turipRepository
                 .loadTurips()
@@ -177,7 +177,7 @@ class MyTuripViewModel @Inject constructor(
     fun handleErrorRetryRequest(action: MyTuripRetryAction) {
         when (action) {
             is MyTuripRetryAction.UpdateMyTurip -> {
-                loadTuripFolders()
+                loadTurips()
             }
 
             is MyTuripRetryAction.AddMyTurip -> {

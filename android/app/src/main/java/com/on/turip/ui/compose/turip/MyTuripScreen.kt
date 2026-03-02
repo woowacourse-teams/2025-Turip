@@ -74,7 +74,7 @@ fun MyTuripScreen(
 
     LaunchedEffect(Unit) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-            viewModel.loadTuripFolders()
+            viewModel.loadTurips()
         }
     }
 
