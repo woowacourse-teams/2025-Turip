@@ -18,6 +18,9 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".ui.bookmarks.BookmarkContentActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.mypage.MyPageActivity"
             android:exported="false" />
         <activity
