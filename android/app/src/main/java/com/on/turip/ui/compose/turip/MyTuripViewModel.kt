@@ -169,9 +169,6 @@ class MyTuripViewModel @Inject constructor(
                         )
                     }
                 }.onFailure { errorType ->
-                    _uiState.update {
-                        it.copy(showAddBottomSheet = false)
-                    }
                     sendErrorEffect(errorType, MyTuripRetryAction.AddMyTurip)
                 }
         }
