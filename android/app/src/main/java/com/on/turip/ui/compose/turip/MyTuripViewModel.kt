@@ -166,32 +166,6 @@ class MyTuripViewModel @Inject constructor(
         }
     }
 
-    fun deleteTurip(myTuripModel: MyTuripModel) {
-        viewModelScope.launch {
-            turipRepository
-                .deleteTurip(myTuripModel.id)
-                .onSuccess {
-                    dismissTuripRemoveDialog()
-                    _uiEffect.send(MyTuripUiEffect.TuripDeleted(myTuripModel.name))
-
-                    _uiState.update { state: MyTuripUiState ->
-                        state.copy(
-                            errorUiState = ErrorUiState.None,
-                            turips =
-                                state.turips
-                                    .filter { it.id != myTuripModel.id }
-                                    .toImmutableList(),
-                        )
-                    }
-                    Timber.d("튜립 삭제 완료(이름 = ${myTuripModel.name})")
-                }.onFailure { errorType: ErrorType ->
-                    dismissTuripRemoveDialog()
-                    sendErrorEffect(errorType, MyTuripRetryAction.DeleteMyTurip(myTuripModel))
-                    Timber.e("튜립 삭제 실패(이름 = ${myTuripModel.name})")
-                }
-        }
-    }
-
     fun handleErrorRetryRequest(action: MyTuripRetryAction) {
         when (action) {
             is MyTuripRetryAction.UpdateMyTurip -> {
@@ -200,10 +174,6 @@ class MyTuripViewModel @Inject constructor(
 
             is MyTuripRetryAction.AddMyTurip -> {
                 addTurip(action.name)
-            }
-
-            is MyTuripRetryAction.DeleteMyTurip -> {
-                deleteTurip(action.myTuripModel)
             }
         }
     }
