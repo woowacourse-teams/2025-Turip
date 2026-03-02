@@ -8,6 +8,7 @@ import com.on.turip.data.turip.dto.TuripPatchRequest
 import com.on.turip.data.turip.dto.TuripPlaceOrderRequest
 import com.on.turip.data.turip.dto.TuripPlacesResponse
 import com.on.turip.data.turip.dto.TuripPostRequest
+import com.on.turip.data.turip.dto.TuripResponse
 import com.on.turip.data.turip.dto.TuripsByPlaceResponse
 import com.on.turip.data.turip.dto.TuripsResponse
 import com.on.turip.data.turip.service.TuripService
@@ -20,6 +21,11 @@ class DefaultTuripRemoteDataSource @Inject constructor(
     private val turipService: TuripService,
     private val coroutineContext: CoroutineContext = Dispatchers.IO,
 ) : TuripRemoteDataSource {
+    override suspend fun getTurip(turipId: Long): TuripResult<TuripResponse> =
+        withContext(coroutineContext) {
+            safeApiCall { turipService.getTurip(turipId) }
+        }
+
     override suspend fun getTurips(): TuripResult<TuripsResponse> =
         withContext(coroutineContext) {
             safeApiCall { turipService.getTurips() }

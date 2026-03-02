@@ -6,6 +6,7 @@ import com.on.turip.data.turip.dto.TuripPatchRequest
 import com.on.turip.data.turip.dto.TuripPlaceOrderRequest
 import com.on.turip.data.turip.dto.TuripPlacesResponse
 import com.on.turip.data.turip.dto.TuripPostRequest
+import com.on.turip.data.turip.dto.TuripResponse
 import com.on.turip.data.turip.dto.TuripsByPlaceResponse
 import com.on.turip.data.turip.dto.TuripsResponse
 import de.jensklingenberg.ktorfit.http.Body
@@ -18,6 +19,11 @@ import de.jensklingenberg.ktorfit.http.Path
 import de.jensklingenberg.ktorfit.http.Query
 
 interface TuripService {
+    @GET("turips/{turipId}")
+    suspend fun getTurip(
+        @Path("turipId") turipId: Long,
+    ): TuripResponse
+
     @GET("turips")
     suspend fun getTurips(): TuripsResponse
 
