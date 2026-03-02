@@ -35,6 +35,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -148,65 +149,73 @@ fun MyTuripScreen(
         }
     }
 
-    MyTuripScreenContent(
-        turips = uiState.turips,
-        snackbarHostState = snackbarHostState,
-        onTuripClick = onNavigateToTuripPlace,
-        onTuripDelete = { myTuripModel: MyTuripModel ->
-            snackbarHostState.dismissAndExecute {
-                viewModel.showTuripRemoveDialog(myTuripModel)
-            }
-        },
-        onAddClick = {
-            snackbarHostState.dismissAndExecute {
-                viewModel.showAddBottomSheet()
-            }
-        },
-        modifier = modifier,
-    )
-
-    if (uiState.showAddBottomSheet) {
-        TuripAddBottomSheet(
-            title = stringResource(R.string.bottom_sheet_turip_add_title),
-            turipName = uiState.inputTuripName,
-            sheetState = sheetState,
-            turipNameStatus = uiState.turipNameStatus,
-            onNameChanged = viewModel::updateInputName,
-            onConfirmClick = viewModel::addTurip,
-            onDismiss = viewModel::dismissAddBottomSheet,
+    Box(modifier = modifier.fillMaxSize()) {
+        MyTuripScreenContent(
+            turips = uiState.turips,
+            onTuripClick = onNavigateToTuripPlace,
+            onTuripDelete = { myTuripModel: MyTuripModel ->
+                snackbarHostState.dismissAndExecute {
+                    viewModel.showTuripRemoveDialog(myTuripModel)
+                }
+            },
+            onAddClick = {
+                snackbarHostState.dismissAndExecute {
+                    viewModel.showAddBottomSheet()
+                }
+            },
         )
-    }
 
-    uiState.dialogState?.let { myTuripDialogState: MyTuripUiState.MyTuripDialogState ->
-        when (myTuripDialogState) {
-            is MyTuripUiState.MyTuripDialogState.RemoveTurip -> {
-                TuripDialog(
-                    title = stringResource(R.string.bottom_sheet_turip_delete),
-                    message =
-                        stringResource(
-                            R.string.bottom_sheet_turip_remove_title,
-                            myTuripDialogState.turip.name,
-                        ),
-                    confirmText = stringResource(R.string.bottom_sheet_turip_remove_approve),
-                    dismissText = stringResource(R.string.bottom_sheet_turip_remove_cancel),
-                    confirmButtonColor = TuripTheme.colors.error,
-                    dismissButtonColor = TuripTheme.colors.gray02,
-                    onConfirmation = {
-                        viewModel.dismissTuripRemoveDialog()
-                        viewModel.applyTuripDelete(myTuripDialogState.turip.id)
-                    },
-                    onDismissRequest = viewModel::dismissTuripRemoveDialog,
-                    modifier = Modifier.fillMaxSize(),
-                )
+        if (uiState.showAddBottomSheet) {
+            TuripAddBottomSheet(
+                title = stringResource(R.string.bottom_sheet_turip_add_title),
+                turipName = uiState.inputTuripName,
+                sheetState = sheetState,
+                turipNameStatus = uiState.turipNameStatus,
+                onNameChanged = viewModel::updateInputName,
+                onConfirmClick = viewModel::addTurip,
+                onDismiss = viewModel::dismissAddBottomSheet,
+                snackbarHostState = snackbarHostState,
+            )
+        }
+
+        uiState.dialogState?.let { myTuripDialogState: MyTuripUiState.MyTuripDialogState ->
+            when (myTuripDialogState) {
+                is MyTuripUiState.MyTuripDialogState.RemoveTurip -> {
+                    TuripDialog(
+                        title = stringResource(R.string.bottom_sheet_turip_delete),
+                        message =
+                            stringResource(
+                                R.string.bottom_sheet_turip_remove_title,
+                                myTuripDialogState.turip.name,
+                            ),
+                        confirmText = stringResource(R.string.bottom_sheet_turip_remove_approve),
+                        dismissText = stringResource(R.string.bottom_sheet_turip_remove_cancel),
+                        confirmButtonColor = TuripTheme.colors.error,
+                        dismissButtonColor = TuripTheme.colors.gray02,
+                        onConfirmation = {
+                            viewModel.dismissTuripRemoveDialog()
+                            viewModel.applyTuripDelete(myTuripDialogState.turip.id)
+                        },
+                        onDismissRequest = viewModel::dismissTuripRemoveDialog,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                }
             }
         }
+
+        TuripSnackbar(
+            snackbarHostState = snackbarHostState,
+            modifier =
+                Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 24.dp),
+        )
     }
 }
 
 @Composable
 private fun MyTuripScreenContent(
     turips: ImmutableList<MyTuripModel>,
-    snackbarHostState: SnackbarHostState,
     onTuripClick: (turipId: Long) -> Unit,
     onTuripDelete: (myTuripModel: MyTuripModel) -> Unit,
     onAddClick: () -> Unit,
@@ -225,95 +234,85 @@ private fun MyTuripScreenContent(
         }
     }
 
-    Box(Modifier.fillMaxSize()) {
-        Scaffold(
-            modifier = modifier.fillMaxSize(),
-            containerColor = TuripTheme.colors.white,
-            contentWindowInsets = WindowInsets(),
-            floatingActionButton = {
-                FloatingActionButton(
-                    onClick = onAddClick,
-                    shape = CircleShape,
-                    containerColor = TuripTheme.colors.primary,
-                    contentColor = TuripTheme.colors.white,
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = null,
-                    )
-                }
-            },
-        ) { innerPadding ->
-            Column(
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        containerColor = TuripTheme.colors.white,
+        contentWindowInsets = WindowInsets(),
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = onAddClick,
+                shape = CircleShape,
+                containerColor = TuripTheme.colors.primary,
+                contentColor = TuripTheme.colors.white,
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = null,
+                )
+            }
+        },
+    ) { innerPadding ->
+        Column(
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .padding(horizontal = TuripTheme.spacing.extraLarge)
+                    .pointerInput(isDeleteMode) {
+                        detectTapGestures {
+                            if (isDeleteMode) isDeleteMode = false
+                        }
+                    },
+        ) {
+            Text(
+                text = stringResource(R.string.my_turip_screen_title),
+                style = TuripTheme.typography.display,
+                color = TuripTheme.colors.black,
+                modifier =
+                    Modifier.padding(
+                        top = TuripTheme.spacing.extraExtraLarge,
+                        bottom = TuripTheme.spacing.large,
+                    ),
+            )
+
+            MyTuripTabRow(
+                selectedTab = selectedTab,
+                onTabSelected = {
+                    selectedTab = it
+                    isDeleteMode = false
+                },
+            )
+
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(TuripTheme.spacing.medium),
                 modifier =
                     Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding)
-                        .padding(horizontal = TuripTheme.spacing.extraLarge)
-                        .pointerInput(isDeleteMode) {
-                            detectTapGestures {
-                                if (isDeleteMode) isDeleteMode = false
-                            }
-                        },
+                        .fillMaxWidth()
+                        .padding(top = TuripTheme.spacing.large),
             ) {
-                Text(
-                    text = stringResource(R.string.my_turip_screen_title),
-                    style = TuripTheme.typography.display,
-                    color = TuripTheme.colors.black,
-                    modifier =
-                        Modifier.padding(
-                            top = TuripTheme.spacing.extraExtraLarge,
-                            bottom = TuripTheme.spacing.large,
-                        ),
-                )
-
-                MyTuripTabRow(
-                    selectedTab = selectedTab,
-                    onTabSelected = {
-                        selectedTab = it
-                        isDeleteMode = false
-                    },
-                )
-
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(TuripTheme.spacing.medium),
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(top = TuripTheme.spacing.large),
-                ) {
-                    items(items = filteredTurips, key = { it.id }) { turip: MyTuripModel ->
-                        MyTuripCard(
-                            turipImage = turip.image,
-                            turip = turip,
-                            isDeleteMode = isDeleteMode,
-                            onTuripClick = { id ->
-                                if (isDeleteMode) {
-                                    onTuripDelete(turip)
-                                    if (filteredTurips.size == 1) isDeleteMode = false
-                                } else {
-                                    onTuripClick(id)
-                                }
-                            },
-                            onLongPress = { isDeleteMode = true },
-                            onDeleteClick = {
+                items(items = filteredTurips, key = { it.id }) { turip: MyTuripModel ->
+                    MyTuripCard(
+                        turipImage = turip.image,
+                        turip = turip,
+                        isDeleteMode = isDeleteMode,
+                        onTuripClick = { id ->
+                            if (isDeleteMode) {
                                 onTuripDelete(turip)
                                 if (filteredTurips.size == 1) isDeleteMode = false
-                            },
-                            isDefaultFolder = turip.isDefault,
-                        )
-                    }
+                            } else {
+                                onTuripClick(id)
+                            }
+                        },
+                        onLongPress = { isDeleteMode = true },
+                        onDeleteClick = {
+                            onTuripDelete(turip)
+                            if (filteredTurips.size == 1) isDeleteMode = false
+                        },
+                        isDefaultFolder = turip.isDefault,
+                    )
                 }
             }
         }
-
-        TuripSnackbar(
-            snackbarHostState = snackbarHostState,
-            modifier =
-                Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = TuripTheme.spacing.extraLarge),
-        )
     }
 }
 
@@ -337,6 +336,6 @@ private fun MyTuripScreenPreview() {
         )
 
     TuripTheme {
-        MyTuripScreenContent(allTurips, snackbarHostState, {}, {}, {})
+        MyTuripScreenContent(allTurips, {}, {}, {})
     }
 }
