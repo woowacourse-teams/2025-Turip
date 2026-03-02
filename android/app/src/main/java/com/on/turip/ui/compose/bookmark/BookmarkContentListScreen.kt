@@ -47,6 +47,7 @@ import com.on.turip.domain.creator.Creator
 import com.on.turip.domain.region.City
 import com.on.turip.domain.trip.TripDuration
 import com.on.turip.ui.common.error.ErrorUiState
+import com.on.turip.ui.common.extensions.dismissAndExecute
 import com.on.turip.ui.common.extensions.showSnackbarWithAction
 import com.on.turip.ui.common.paging.PagingState
 import com.on.turip.ui.compose.bookmark.component.BookmarkContentListAppBar
@@ -82,11 +83,12 @@ fun BookmarkContentListScreen(
                     onBookmarkChanged()
                 }
 
-                BookmarkContentListUiEffect.ShowBookmarkRemoveFailedList -> {
+                is BookmarkContentListUiEffect.ShowBookmarkRemoveFailedList -> {
                     snackbarHostState.showSnackbarWithAction(
-                        message = resources.getString(R.string.my_page_snackbar_bookmark_remove_failed),
-                        actionLabel = resources.getString(R.string.my_page_snackbar_bookmark_remove_failed_action),
-                        onAction = viewModel::refreshBookmarkContents,
+                        message = resources.getString(R.string.bookmark_content_snackbar_bookmark_remove_failed),
+                        actionLabel = resources.getString(R.string.all_close_description),
+                        onAction = { viewModel.rollbackBookmarkContentRemove(uiEffect.contentId) },
+                        onDismiss = { viewModel.rollbackBookmarkContentRemove(uiEffect.contentId) },
                     )
                 }
             }
@@ -106,7 +108,7 @@ fun BookmarkContentListScreen(
             uiState = uiState,
             onRetryClick = viewModel::refreshBookmarkContents,
             onContentClick = onNavigateToContent,
-            onBookmarkClick = viewModel::removeBookmark,
+            onBookmarkClick = { snackbarHostState.dismissAndExecute { viewModel.removeBookmark(it) } },
             onLoadMore = viewModel::loadMoreContents,
             modifier = Modifier.padding(innerPadding),
         )

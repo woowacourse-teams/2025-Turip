@@ -77,6 +77,7 @@
     <string name="bookmark_content_empty_suggest_description">원하는 동선이 담긴\n여행 일정을 저장해 보세요.</string>
     <string name="bookmark_content_load_more_fail_title">데이터를 불러올 수 없습니다. 잠시 후 재시도 해주세요</string>
     <string name="bookmark_content_count_fail">콘텐츠 -</string>
+    <string name="bookmark_content_snackbar_bookmark_remove_failed">북마크 해제 실패했어요.</string>
 
     <!-- 튜립장소 목록 페이지 -->
     <string name="turip_place_empty_suggest_title">튜립에 장소를 추가 해보세요!</string>
