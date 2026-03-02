@@ -136,6 +136,9 @@ dependencies {
     implementation(libs.androidx.viewpager2)
     // livedata
     implementation(libs.androidx.lifecycle.livedata.ktx)
+    // navigation3
+    implementation(libs.androidx.navigation3.runtime)
+    implementation(libs.androidx.navigation3.ui)
 
     // compose
     implementation(platform(libs.compose.bom))
