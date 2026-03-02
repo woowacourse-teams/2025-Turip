@@ -151,7 +151,9 @@ class MyTuripViewModel @Inject constructor(
         }
     }
 
-    fun addTurip(name: String = _uiState.value.inputTuripName) {
+    fun addTurip() {
+        val name = uiState.value.inputTuripName
+
         viewModelScope.launch {
             turipRepository
                 .createTurip(name)
@@ -160,8 +162,10 @@ class MyTuripViewModel @Inject constructor(
                     _uiEffect.send(MyTuripUiEffect.TuripAdded(name))
                     loadTuripFolders()
                 }.onFailure { errorType ->
-                    dismissAddBottomSheet()
-                    sendErrorEffect(errorType, MyTuripRetryAction.AddMyTurip(name))
+                    _uiState.update {
+                        it.copy(showAddBottomSheet = false)
+                    }
+                    sendErrorEffect(errorType, MyTuripRetryAction.AddMyTurip)
                 }
         }
     }
@@ -173,7 +177,7 @@ class MyTuripViewModel @Inject constructor(
             }
 
             is MyTuripRetryAction.AddMyTurip -> {
-                addTurip(action.name)
+                addTurip()
             }
         }
     }

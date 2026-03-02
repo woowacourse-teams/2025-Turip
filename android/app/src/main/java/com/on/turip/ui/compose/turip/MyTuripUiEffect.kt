@@ -30,7 +30,5 @@ sealed interface MyTuripUiEffect {
 sealed interface MyTuripRetryAction {
     data object UpdateMyTurip : MyTuripRetryAction
 
-    data class AddMyTurip(
-        val name: String,
-    ) : MyTuripRetryAction
+    data object AddMyTurip : MyTuripRetryAction
 }
