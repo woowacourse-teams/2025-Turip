@@ -3,10 +3,8 @@ package turip.favorite.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willThrow;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import java.util.List;
@@ -46,6 +44,7 @@ import turip.favorite.domain.event.ActionType;
 import turip.favorite.domain.event.FavoriteFolderUpdateEvent;
 import turip.favorite.repository.FavoriteFolderRepository;
 import turip.favorite.repository.FavoritePlaceRepository;
+import turip.favorite.repository.dto.FavoriteFolderItemCountResult;
 import turip.favorite.token.InvitationTokenProvider;
 import turip.place.domain.Place;
 import turip.place.repository.PlaceRepository;
@@ -175,22 +174,30 @@ class FavoriteFolderServiceTest {
             given(favoriteFolderRepository.findAllByAccountOrderByFavoriteFolderAccountIdAsc(savedAccount))
                     .willReturn(List.of(defaultFolder, favoriteFolder));
 
-            int defaultFolderPlaceCount = 3;
-            int favoriteFolderPlaceCount = 4;
-            given(favoritePlaceRepository.countByFavoriteFolder(defaultFolder))
-                    .willReturn(defaultFolderPlaceCount);
-            given(favoritePlaceRepository.countByFavoriteFolder(favoriteFolder))
-                    .willReturn(favoriteFolderPlaceCount);
+            // 일괄 조회 방식으로 변경
+            List<FavoriteFolderItemCountResult> placeCounts = List.of(
+                    new FavoriteFolderItemCountResult(1L, 3L),
+                    new FavoriteFolderItemCountResult(2L, 4L)
+            );
+            List<FavoriteFolderItemCountResult> memberCounts = List.of(
+                    new FavoriteFolderItemCountResult(1L, 1L),
+                    new FavoriteFolderItemCountResult(2L, 1L)
+            );
+            given(favoritePlaceRepository.countByFavoriteFolderIdsIn(List.of(1L, 2L)))
+                    .willReturn(placeCounts);
+            given(favoriteFolderAccountService.countByFavoriteFolderIdsIn(List.of(1L, 2L)))
+                    .willReturn(memberCounts);
 
             // when
             FavoriteFoldersDetailResponse response = favoriteFolderService.findAllByAccount(savedAccount);
 
             // then
             assertAll(
-                    () -> assertThat(response.favoriteFolders().get(0).placeCount()).isEqualTo(defaultFolderPlaceCount),
+                    () -> assertThat(response.favoriteFolders().get(0).placeCount()).isEqualTo(3),
+                    () -> assertThat(response.favoriteFolders().get(0).memberCount()).isEqualTo(1),
                     () -> assertThat(response.favoriteFolders().get(0).name()).isEqualTo("기본 폴더"),
-                    () -> assertThat(response.favoriteFolders().get(1).placeCount()).isEqualTo(
-                            favoriteFolderPlaceCount),
+                    () -> assertThat(response.favoriteFolders().get(1).placeCount()).isEqualTo(4),
+                    () -> assertThat(response.favoriteFolders().get(1).memberCount()).isEqualTo(1),
                     () -> assertThat(response.favoriteFolders().get(1).name()).isEqualTo("커스텀 폴더 1")
             );
         }
@@ -497,38 +504,24 @@ class FavoriteFolderServiceTest {
             );
         }
 
-        @DisplayName("이미 참여한 공유 찜폴더에 참여요청시 멤버 참여 이벤트를 발행하지 않는다")
+        @DisplayName("이미 참여한 공유 찜폴더에 참여요청시 409 Conflict를 발생시킨다")
         @Test
         void joinFavoriteFolder_alreadyJoined() {
             // given
             Long turipId = 1L;
-            Long accountId = 1L;
-            Long favoriteFolderAccountId = 1L;
             Member member = MemberFixture.createMember();
             Account account = member.getAccount();
             FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(turipId, "함께 튜립");
             favoriteFolder.convertToSharedFolder();
-            FavoriteFolderAccount favoriteFolderAccount = new FavoriteFolderAccount(
-                    favoriteFolderAccountId, favoriteFolder, account, AccountRole.MEMBER
-            );
 
             given(favoriteFolderRepository.findById(turipId))
                     .willReturn(Optional.of(favoriteFolder));
             given(favoriteFolderAccountService.isFolderMember(account, favoriteFolder)).willReturn(true);
-            given(favoriteFolderAccountService.findOrCreate(favoriteFolder, account))
-                    .willReturn(favoriteFolderAccount);
 
-            // when
-            FavoriteFolderJoinResponse response = favoriteFolderService.joinMember(turipId, member);
-
-            // then
-            assertAll(
-                    () -> assertThat(response.id()).isEqualTo(favoriteFolderAccountId),
-                    () -> assertThat(response.favoriteFolderId()).isEqualTo(turipId),
-                    () -> assertThat(response.isShared()).isTrue(),
-                    () -> assertThat(response.accountId()).isEqualTo(accountId),
-                    () -> verify(eventPublisher, never()).publishEvent(any())
-            );
+            // when & then
+            assertThatThrownBy(() -> favoriteFolderService.joinMember(turipId, member))
+                    .isInstanceOf(ConflictException.class)
+                    .hasMessage(ErrorTag.FAVORITE_FOLDER_ALREADY_JOINED.getMessage());
         }
 
         @DisplayName("찜폴더가 존재하지 않는 경우 NotFoundException을 발생시킨다")

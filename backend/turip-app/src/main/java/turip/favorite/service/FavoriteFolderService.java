@@ -1,6 +1,7 @@
 package turip.favorite.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -31,6 +32,7 @@ import turip.favorite.domain.event.ActionType;
 import turip.favorite.domain.event.FavoriteFolderUpdateEvent;
 import turip.favorite.repository.FavoriteFolderRepository;
 import turip.favorite.repository.FavoritePlaceRepository;
+import turip.favorite.repository.dto.FavoriteFolderItemCountResult;
 import turip.favorite.token.InvitationTokenProvider;
 import turip.place.domain.Place;
 import turip.place.repository.PlaceRepository;
@@ -97,6 +99,29 @@ public class FavoriteFolderService {
         return FolderInvitationTokenResponse.from(invitationToken);
     }
 
+    public FavoriteFoldersDetailResponse findAllByAccount(Account account) {
+        List<FavoriteFolder> folders = favoriteFolderRepository.findAllByAccountOrderByFavoriteFolderAccountIdAsc(
+                account);
+        List<Long> folderIds = folders.stream().map(FavoriteFolder::getId).toList();
+
+        List<FavoriteFolderItemCountResult> placeCounts = favoritePlaceRepository.countByFavoriteFolderIdsIn(folderIds);
+        List<FavoriteFolderItemCountResult> memberCounts = favoriteFolderAccountService.countByFavoriteFolderIdsIn(
+                folderIds);
+
+        Map<Long, Long> placeCountMap = FavoriteFolderItemCountResult.toCountMap(placeCounts);
+        Map<Long, Long> memberCountMap = FavoriteFolderItemCountResult.toCountMap(memberCounts);
+
+        List<FavoriteFolderDetailResponse> favoriteFoldersWithPlaceCount = folders.stream()
+                .map(folder -> {
+                    int placeCount = placeCountMap.get(folder.getId()).intValue();
+                    int memberCount = memberCountMap.get(folder.getId()).intValue();
+                    return FavoriteFolderDetailResponse.of(folder, account, placeCount, memberCount);
+                })
+                .toList();
+
+        return FavoriteFoldersDetailResponse.from(favoriteFoldersWithPlaceCount);
+    }
+
     public FolderInvitationDetailResponse getInvitationDetails(String token, Account account) {
         Long favoriteFolderId = invitationTokenProvider.getClaimOfName(token, "fid", Long.class);
 
@@ -105,19 +130,6 @@ public class FavoriteFolderService {
         boolean alreadyJoined = favoriteFolderAccountService.isFolderMember(account, favoriteFolder);
 
         return FolderInvitationDetailResponse.of(favoriteFolderId, alreadyJoined);
-    }
-
-    public FavoriteFoldersDetailResponse findAllByAccount(Account account) {
-        List<FavoriteFolderDetailResponse> favoriteFoldersWithPlaceCount = favoriteFolderRepository.findAllByAccountOrderByFavoriteFolderAccountIdAsc(
-                        account).stream()
-                .map(favoriteFolder -> {
-                    int placeCount = favoritePlaceRepository.countByFavoriteFolder(favoriteFolder);
-                    int memberCount = favoriteFolderAccountService.countByFavoriteFolder(favoriteFolder);
-                    return FavoriteFolderDetailResponse.of(favoriteFolder, account, placeCount, memberCount);
-                })
-                .toList();
-
-        return FavoriteFoldersDetailResponse.from(favoriteFoldersWithPlaceCount);
     }
 
     public FavoriteFolder getById(Long favoriteFolderId) {

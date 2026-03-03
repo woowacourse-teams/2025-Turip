@@ -8,10 +8,12 @@ import turip.account.domain.Account;
 import turip.account.domain.Member;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.ForbiddenException;
+import turip.common.exception.custom.NotFoundException;
 import turip.favorite.domain.AccountRole;
 import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.domain.FavoriteFolderAccount;
 import turip.favorite.repository.FavoriteFolderAccountRepository;
+import turip.favorite.repository.dto.FavoriteFolderItemCountResult;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +30,11 @@ public class FavoriteFolderAccountService {
     @Transactional
     public FavoriteFolderAccount findOrCreate(FavoriteFolder favoriteFolder, Account account) {
         return favoriteFolderAccountRepository.findByFavoriteFolderAndAccount(favoriteFolder, account)
-                .orElseGet(() -> save(favoriteFolder, account, AccountRole.MEMBER));
+                .orElseGet(() -> {
+                    FavoriteFolderAccount favoriteFolderAccount = new FavoriteFolderAccount(favoriteFolder, account,
+                            AccountRole.MEMBER);
+                    return favoriteFolderAccountRepository.save(favoriteFolderAccount);
+                });
     }
 
     public void validateOwnership(Account account, FavoriteFolder favoriteFolder) {
@@ -54,23 +60,27 @@ public class FavoriteFolderAccountService {
         }
     }
 
-    public List<Member> findMembersByFavoriteFolder(Long favoriteFolderId) {
-        return favoriteFolderAccountRepository.findMembersByFavoriteFolderId(favoriteFolderId);
+    public boolean isFolderMember(Account account, FavoriteFolder favoriteFolder) {
+        return favoriteFolderAccountRepository.existsByFavoriteFolderAndAccount(favoriteFolder, account);
     }
 
-    @Transactional
-    public void deleteByFavoriteFolderAndAccount(FavoriteFolder favoriteFolder, Account account) {
-        FavoriteFolderAccount favoriteFolderAccount = favoriteFolderAccountRepository.findByFavoriteFolderAndAccount(
-                        favoriteFolder, account)
-                .orElseThrow(() -> new ForbiddenException(ErrorTag.FORBIDDEN));
-        favoriteFolderAccountRepository.delete(favoriteFolderAccount);
+    public List<Member> findMembersByFavoriteFolder(Long favoriteFolderId) {
+        return favoriteFolderAccountRepository.findMembersByFavoriteFolderId(favoriteFolderId);
     }
 
     public int countByFavoriteFolder(FavoriteFolder favoriteFolder) {
         return favoriteFolderAccountRepository.countByFavoriteFolder(favoriteFolder);
     }
 
-    public boolean isFolderMember(Account account, FavoriteFolder favoriteFolder) {
-        return favoriteFolderAccountRepository.existsByFavoriteFolderAndAccount(favoriteFolder, account);
+    public List<FavoriteFolderItemCountResult> countByFavoriteFolderIdsIn(List<Long> folderIds) {
+        return favoriteFolderAccountRepository.countByFavoriteFolderIdsIn(folderIds);
+    }
+
+    @Transactional
+    public void deleteByFavoriteFolderAndAccount(FavoriteFolder favoriteFolder, Account account) {
+        FavoriteFolderAccount favoriteFolderAccount = favoriteFolderAccountRepository.findByFavoriteFolderAndAccount(
+                        favoriteFolder, account)
+                .orElseThrow(() -> new NotFoundException(ErrorTag.FAVORITE_FOLDER_ACCOUNT_NOT_FOUND));
+        favoriteFolderAccountRepository.delete(favoriteFolderAccount);
     }
 }

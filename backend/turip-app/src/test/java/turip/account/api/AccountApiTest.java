@@ -1,12 +1,8 @@
 package turip.account.api;
 
 import static org.hamcrest.Matchers.notNullValue;
-import static org.mockito.Mockito.when;
 
 import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
-import java.util.HashMap;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -87,25 +83,7 @@ class AccountApiTest {
             Long memberId = testDataHelper.insertMember(accountId, email, true);
             testDataHelper.insertSocialMember(memberId, provider, providerId);
 
-            String idToken = "valid-google-id-token";
-
-            when(googleTokenParser.getProvider()).thenReturn(provider);
-            when(googleTokenParser.getProviderId(idToken)).thenReturn(providerId);
-            when(googleTokenParser.getEmail(idToken)).thenReturn(email);
-
-            Map<String, String> loginRequest = new HashMap<>();
-            loginRequest.put("idToken", idToken);
-
-            String accessToken = RestAssured
-                    .given().log().all()
-                    .contentType(ContentType.JSON)
-                    .header("device-fid", "device-123")
-                    .body(loginRequest)
-                    .when().post("/api/v1/auth/login/google")
-                    .then().log().all()
-                    .statusCode(200)
-                    .body("accessToken", notNullValue())
-                    .extract().path("accessToken");
+            String accessToken = testDataHelper.createAccessToken(accountId);
 
             // when & then
             RestAssured

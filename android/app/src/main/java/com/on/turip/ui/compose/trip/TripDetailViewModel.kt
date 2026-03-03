@@ -16,13 +16,11 @@ import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.common.mapper.toUiModel
-import com.on.turip.ui.compose.trip.model.DayModel
 import com.on.turip.ui.compose.trip.model.PlaceModel
+import com.on.turip.ui.compose.trip.model.SelectedPlaceModel
 import com.on.turip.ui.compose.trip.model.TripDetailInfoModel
 import com.on.turip.ui.trip.TripDetailActivity.Companion.TRIP_DETAIL_CONTENT_KEY
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
@@ -42,8 +40,6 @@ class TripDetailViewModel @Inject constructor(
     private val contentRepository: ContentRepository,
     private val updateBookmarkUseCase: UpdateBookmarkUseCase,
 ) : ViewModel() {
-    private var placeCacheByDay: Map<Int, ImmutableList<PlaceModel>> = emptyMap()
-
     private val _uiState: MutableStateFlow<TripDetailUiState> =
         MutableStateFlow(TripDetailUiState.IDLE)
     val uiState: StateFlow<TripDetailUiState> = _uiState.asStateFlow()
@@ -86,19 +82,17 @@ class TripDetailViewModel @Inject constructor(
             val content: Content = (contentResult as TuripResult.Success).value
             val trip: Trip = (tripInfoResult as TuripResult.Success).value
 
-            setupCached(trip)
+            val places =
+                trip.contentPlaces
+                    .sortedWith(compareBy(ContentPlace::visitDay, ContentPlace::visitOrder))
+                    .map { contentPlace: ContentPlace -> contentPlace.toUiModel() }
+                    .toImmutableList()
 
             _uiState.update { state: TripDetailUiState ->
                 state.copy(
                     isLoading = false,
                     errorUiState = ErrorUiState.None,
-                    days =
-                        placeCacheByDay.keys
-                            .sorted()
-                            .map { day: Int ->
-                                DayModel(day = day, isSelected = day == DayModel.ALL_PLACE)
-                            }.toImmutableList(),
-                    places = placeCacheByDay[DayModel.ALL_PLACE] ?: persistentListOf(),
+                    places = places,
                     tripDetailInfo =
                         TripDetailInfoModel(
                             creatorName = content.creator.channelName,
@@ -111,42 +105,11 @@ class TripDetailViewModel @Inject constructor(
                             duration = trip.tripDuration.toUiModel(),
                         ),
                     isBookmarked = content.isBookmarked,
+                    selectedPlaceModel = null,
                 )
             }
 
             Timber.d("컨텐츠 상세 화면 모든 데이터 불러오기 성공")
-        }
-    }
-
-    private fun setupCached(trip: Trip) {
-        val placesByDay: MutableMap<Int, ImmutableList<PlaceModel>> =
-            trip.contentPlaces
-                .sortedBy { it.visitDay }
-                .groupBy(
-                    keySelector = { contentPlace: ContentPlace -> contentPlace.visitDay },
-                    valueTransform = { contentPlace: ContentPlace -> contentPlace.toUiModel() },
-                ).mapValues { it.value.toImmutableList() }
-                .toMutableMap()
-
-        placesByDay[DayModel.ALL_PLACE] =
-            placesByDay
-                .toSortedMap()
-                .values
-                .flatten()
-                .toImmutableList()
-        placeCacheByDay = placesByDay
-    }
-
-    fun updateDay(selectDay: Int) {
-        _uiState.update { state: TripDetailUiState ->
-            val updatedDays: ImmutableList<DayModel> =
-                state.days
-                    .map { dayModel: DayModel -> dayModel.copy(isSelected = dayModel.day == selectDay) }
-                    .toImmutableList()
-            state.copy(
-                days = updatedDays,
-                places = placeCacheByDay[selectDay] ?: persistentListOf(),
-            )
         }
     }
 
@@ -192,37 +155,44 @@ class TripDetailViewModel @Inject constructor(
     }
 
     fun updatePlaceTuripSelection(
-        hasTurip: Boolean,
         placeId: Long,
+        hasTurip: Boolean,
     ) {
-        placeCacheByDay =
-            placeCacheByDay.mapValues { (_, places: ImmutableList<PlaceModel>) ->
-                if (places.any { it.id == placeId }) {
-                    places
-                        .map { place: PlaceModel -> if (place.id == placeId) place.copy(isTuripPlace = hasTurip) else place }
-                        .toImmutableList()
-                } else {
-                    places
-                }
-            }
-
         viewModelScope.launch {
-            val placeName: String = getPlaceName(placeId)
-            _uiEffect.send(TripDetailUiEffect.ShowUpdatedTuripSelectionByPlace(placeName))
+            val name = getPlaceName(placeId)
+            _uiEffect.send(TripDetailUiEffect.ShowUpdatedTuripSelectionByPlace(name))
         }
 
         _uiState.update { state: TripDetailUiState ->
-            val currentSelectedDay = state.days.find { it.isSelected }?.day ?: DayModel.ALL_PLACE
-            state.copy(places = placeCacheByDay[currentSelectedDay] ?: persistentListOf())
+            val updatedPlaces =
+                state.places
+                    .map { place: PlaceModel ->
+                        if (place.id == placeId) place.copy(isTuripPlace = hasTurip) else place
+                    }.toImmutableList()
+            state.copy(places = updatedPlaces)
         }
     }
 
-    private fun getPlaceName(placeId: Long): String =
-        placeCacheByDay[DayModel.ALL_PLACE]?.firstOrNull { place -> place.id == placeId }?.name
-            ?: run {
-                Timber.e("캐싱데이터에서 placeId를 찾을 수 없습니다. placeID = $placeId")
-                ""
-            }
+    private fun getPlaceName(placeId: Long): String {
+        val places = uiState.value.places
+        return places.firstOrNull { place -> place.id == placeId }?.name ?: run {
+            Timber.e("업데이트할 장소의 placeId를 찾을 수 없습니다. placeID = $placeId")
+            ""
+        }
+    }
+
+    fun selectPlace(
+        placeId: Long,
+        placeName: String,
+    ) {
+        _uiState.update { state ->
+            state.copy(selectedPlaceModel = SelectedPlaceModel(placeId, placeName))
+        }
+    }
+
+    fun clearSelectedPlace() {
+        _uiState.update { it.copy(selectedPlaceModel = null) }
+    }
 
     private suspend fun handleError(failure: TuripResult.Failure) {
         val uiError: UiError = failure.errorType.toUiError()

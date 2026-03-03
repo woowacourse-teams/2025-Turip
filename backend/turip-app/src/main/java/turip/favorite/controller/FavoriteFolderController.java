@@ -37,7 +37,6 @@ import turip.favorite.controller.dto.response.FavoriteFoldersWithFavoriteStatusR
 import turip.favorite.controller.dto.response.FolderInvitationDetailResponse;
 import turip.favorite.controller.dto.response.FolderInvitationTokenResponse;
 import turip.favorite.service.FavoriteFolderService;
-import turip.favorite.stream.service.FavoriteFolderStreamService;
 
 @RestController
 @RequiredArgsConstructor
@@ -46,7 +45,6 @@ import turip.favorite.stream.service.FavoriteFolderStreamService;
 public class FavoriteFolderController {
 
     private final FavoriteFolderService favoriteFolderService;
-    private final FavoriteFolderStreamService favoriteFolderStreamService;
 
     @Operation(
             summary = "튜립 생성 api",
@@ -1329,35 +1327,63 @@ public class FavoriteFolderController {
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
-                            examples = @ExampleObject(
-                                    name = "forbidden",
-                                    summary = "게스트가 해당 기능에 접근하려는 경우",
-                                    value = """
-                                            {
-                                                "tag": "FORBIDDEN",
-                                                "message": "접근 권한이 없습니다."
-                                            }
-                                            """
-                            )
+                            examples = {
+                                    @ExampleObject(
+                                            name = "guest_forbidden",
+                                            summary = "게스트가 해당 기능에 접근하려는 경우",
+                                            value = """
+                                                    {
+                                                        "tag": "FORBIDDEN",
+                                                        "message": "접근 권한이 없습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "not_member",
+                                            summary = "해당 폴더 참여자가 아닌 경우",
+                                            value = """
+                                                    {
+                                                        "tag": "FORBIDDEN",
+                                                        "message": "접근 권한이 없습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
                     )
             ),
             @ApiResponse(
                     responseCode = "404",
                     description = "실패 예시",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class),
-                            examples = @ExampleObject(
-                                    name = "turip_not_found",
-                                    summary = "turipId에 대한 튜립을 찾을 수 없는 경우",
-                                    value = """
-                                            {
-                                                "tag": "FAVORITE_FOLDER_NOT_FOUND",
-                                                "message": "찜폴더를 찾을 수 없습니다."
-                                            }
-                                            """
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ErrorResponse.class),
+                                    examples = @ExampleObject(
+                                            name = "turip_not_found",
+                                            summary = "turipId에 대한 튜립을 찾을 수 없는 경우",
+                                            value = """
+                                                    {
+                                                        "tag": "FAVORITE_FOLDER_NOT_FOUND",
+                                                        "message": "찜폴더를 찾을 수 없습니다."
+                                                    }
+                                                    """
+                                    )
+                            ),
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ErrorResponse.class),
+                                    examples = @ExampleObject(
+                                            name = "turip_account_not_found",
+                                            summary = "해당 turip에 참여중인 계정 목록에 존재하지 않는 경우",
+                                            value = """
+                                                    {
+                                                        "tag": "FAVORITE_FOLDER_ACCOUNT_NOT_FOUND",
+                                                        "message": "찜폴더에 참여중인 계정 목록에서 해당 계정을 찾을 수 없습니다."
+                                                    }
+                                                    """
+                                    )
                             )
-                    )
+                    }
             )
     })
     @DeleteMapping("/{turipId}/exit")

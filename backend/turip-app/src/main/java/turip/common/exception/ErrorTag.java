@@ -44,6 +44,7 @@ public enum ErrorTag {
     FAVORITE_PLACE_NOT_FOUND("찜한 장소를 찾을 수 없습니다."),
     CREATOR_NOT_FOUND("크리에이터를 찾을 수 없습니다."),
     FAVORITE_CONTENT_NOT_FOUND("찜한 컨텐츠를 찾을 수 없습니다."),
+    FAVORITE_FOLDER_ACCOUNT_NOT_FOUND("찜폴더에 참여중인 계정 목록에서 해당 계정을 찾을 수 없습니다."),
 
     // 409 Conflict
     FAVORITE_FOLDER_NAME_CONFLICT("이미 존재하는 찜폴더 이름입니다."),

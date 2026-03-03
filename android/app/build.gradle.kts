@@ -16,7 +16,7 @@ plugins {
 
 android {
     namespace = "com.on.turip"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.on.turip"
@@ -142,6 +142,7 @@ dependencies {
     androidTestImplementation(platform(libs.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.material.icons.core)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.ui.tooling.preview)
@@ -151,7 +152,7 @@ dependencies {
     implementation(libs.coil.network.okhttp)
 
     // maps
-    implementation(libs.play.services.maps)
+    implementation(libs.google.map)
 
     // app update
     implementation(libs.app.update)

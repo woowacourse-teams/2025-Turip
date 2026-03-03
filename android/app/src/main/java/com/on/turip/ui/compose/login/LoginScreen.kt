@@ -22,7 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -48,7 +48,7 @@ fun LoginScreen(
 ) {
     val uiState: LoginUiState by viewmodel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
-    val context = LocalContext.current
+    val resources = LocalResources.current
 
     LaunchedEffect(Unit) {
         viewmodel.uiEffect.collect { effect: LoginUiEffect ->
@@ -60,7 +60,7 @@ fun LoginScreen(
                 is LoginUiEffect.ShowError -> {
                     val errorUiModel = effect.errorUiState.toUiModel() ?: return@collect
                     snackbarHostState.showSnackbar(
-                        message = context.getString(errorUiModel.titleRes),
+                        message = resources.getString(errorUiModel.titleRes),
                         duration = SnackbarDuration.Long,
                     )
                 }
@@ -73,7 +73,7 @@ fun LoginScreen(
             title = stringResource(R.string.login_dialog_migration_title),
             message = stringResource(R.string.login_dialog_migration_message),
             confirmText = stringResource(R.string.login_dialog_confirm_text),
-            dismissText = stringResource(R.string.setting_logout_dialog_dismiss),
+            dismissText = stringResource(R.string.my_page_logout_dialog_dismiss),
             onConfirmation = viewmodel::migration,
             onDismissRequest = viewmodel::clearGuestData,
         )

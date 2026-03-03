@@ -1,7 +1,9 @@
 package com.on.turip.di
 
-import com.on.turip.data.bookmarks.datasource.BookmarkRemoteDataSource
-import com.on.turip.data.bookmarks.datasource.DefaultBookmarkRemoteDataSource
+import com.on.turip.data.account.datasource.AccountRemoteDataSource
+import com.on.turip.data.account.datasource.DefaultAccountRemoteDataSource
+import com.on.turip.data.bookmark.datasource.BookmarkRemoteDataSource
+import com.on.turip.data.bookmark.datasource.DefaultBookmarkRemoteDataSource
 import com.on.turip.data.content.datasource.ContentRemoteDataSource
 import com.on.turip.data.content.datasource.DefaultContentRemoteDataSource
 import com.on.turip.data.login.datasource.AuthDataSource
@@ -64,4 +66,8 @@ abstract class DataSourceModule {
     @Binds
     @Singleton
     abstract fun bindGuestRemoteDataSource(guestRemoteDataSource: GuestRemoteDataSource): GuestDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindAccountRemoteDataSource(defaultAccountRemoteDataSource: DefaultAccountRemoteDataSource): AccountRemoteDataSource
 }
