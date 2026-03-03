@@ -8,4 +8,8 @@ public class BadRequestException extends HttpStatusException {
     public BadRequestException(ErrorTag errorTag) {
         super(HttpStatus.BAD_REQUEST, errorTag);
     }
+
+    public BadRequestException(ErrorTag errorTag, Throwable cause) {
+        super(HttpStatus.BAD_REQUEST, errorTag, cause);
+    }
 }

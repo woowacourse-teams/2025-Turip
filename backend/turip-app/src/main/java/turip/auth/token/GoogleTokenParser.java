@@ -9,9 +9,9 @@ import java.util.Collections;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import turip.account.domain.Provider;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.UnauthorizedException;
-import turip.account.domain.Provider;
 
 @Slf4j
 @Component
@@ -20,14 +20,9 @@ public class GoogleTokenParser implements IdTokenParser {
     private final GoogleIdTokenVerifier verifier;
 
     public GoogleTokenParser(@Value("${google.client-id}") String clientId) {
-        try {
-            this.verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
-                    .setAudience(Collections.singletonList(clientId))
-                    .build();
-        } catch (Exception e) {
-            log.error("id token을 해석하기 위한 GoogleTokenVerifier 빌드 실패");
-            throw new RuntimeException("Failed to initialize Google token verifier", e);
-        }
+        this.verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
+                .setAudience(Collections.singletonList(clientId))
+                .build();
     }
 
     @Override
@@ -57,7 +52,7 @@ public class GoogleTokenParser implements IdTokenParser {
 
             return idToken.getPayload();
         } catch (Exception e) {
-            throw new UnauthorizedException(ErrorTag.ID_TOKEN_NOT_VALID);
+            throw new UnauthorizedException(ErrorTag.ID_TOKEN_NOT_VALID, e);
         }
     }
 }

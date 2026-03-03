@@ -3,7 +3,6 @@ package turip.favorite.stream.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willThrow;
@@ -31,11 +30,9 @@ import turip.account.domain.Member;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.ForbiddenException;
 import turip.common.exception.custom.NotFoundException;
-import turip.favorite.domain.FavoriteFolder;
-import turip.favorite.service.FavoriteFolderAccountService;
+import turip.favorite.domain.event.ActionType;
 import turip.favorite.service.FavoriteFolderService;
 import turip.util.fixture.AccountFixture;
-import turip.util.fixture.FavoriteFolderFixture;
 import turip.util.fixture.MemberFixture;
 
 @ExtendWith(MockitoExtension.class)
@@ -46,9 +43,6 @@ class FavoriteFolderStreamServiceTest {
 
     @Mock
     private FavoriteFolderService favoriteFolderService;
-
-    @Mock
-    private FavoriteFolderAccountService favoriteFolderAccountService;
 
     @Mock
     private ScheduledExecutorService scheduler;
@@ -65,8 +59,9 @@ class FavoriteFolderStreamServiceTest {
             Account account = AccountFixture.createUser();
             Member member = MemberFixture.createCustomMember(account, "test@example.com", false);
 
-            given(favoriteFolderService.getById(folderId))
-                    .willThrow(new NotFoundException(ErrorTag.FAVORITE_FOLDER_NOT_FOUND));
+            willThrow(new NotFoundException(ErrorTag.FAVORITE_FOLDER_NOT_FOUND))
+                    .given(favoriteFolderService)
+                    .validateFolderMembership(folderId, member);
 
             // when & then
             assertThatThrownBy(() -> favoriteFolderStreamService.createEmitter(folderId, member))
@@ -81,11 +76,10 @@ class FavoriteFolderStreamServiceTest {
             Long folderId = 1L;
             Account account = AccountFixture.createUser();
             Member member = MemberFixture.createCustomMember(account, "test@example.com", false);
-            FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(folderId, "테스트 폴더");
 
-            given(favoriteFolderService.getById(folderId)).willReturn(favoriteFolder);
             willThrow(new ForbiddenException(ErrorTag.FORBIDDEN))
-                    .given(favoriteFolderAccountService).validateMembership(account, favoriteFolder);
+                    .given(favoriteFolderService)
+                    .validateFolderMembership(folderId, member);
 
             // when & then
             assertThatThrownBy(() -> favoriteFolderStreamService.createEmitter(folderId, member))

@@ -63,7 +63,7 @@ public class AuthAdminArgumentResolver implements HandlerMethodArgumentResolver 
         } catch (ForbiddenException e) {
             throw e;
         } catch (Exception e) {
-            throw new UnauthorizedException(ErrorTag.UNAUTHORIZED);
+            throw new UnauthorizedException(ErrorTag.UNAUTHORIZED, e);
         }
     }
 }

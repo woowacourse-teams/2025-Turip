@@ -5,6 +5,8 @@ import com.on.turip.domain.bookmark.TuripPlace
 import com.on.turip.domain.turip.Turip
 
 interface TuripRepository {
+    suspend fun loadTurip(turipId: Long): TuripResult<Turip>
+
     suspend fun loadTurips(): TuripResult<List<Turip>>
 
     suspend fun createTurip(name: String): TuripResult<Turip>

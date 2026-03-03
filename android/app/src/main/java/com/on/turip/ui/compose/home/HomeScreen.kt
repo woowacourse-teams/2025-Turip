@@ -1,5 +1,6 @@
 package com.on.turip.ui.compose.home
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -48,6 +49,7 @@ fun HomeScreen(
     onRegionClick: (String) -> Unit,
     onContentClick: (UsersLikeContentModel) -> Unit,
     navigateToLoginScreen: () -> Unit,
+    navigateToMyPage: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val uiState: HomeUiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -71,6 +73,7 @@ fun HomeScreen(
             onContentClick = onContentClick,
             onRegionClick = onRegionClick,
             onDomesticClick = { viewModel.updateDomesticSelected(it) },
+            onNavigateToMyPage = navigateToMyPage,
             modifier = Modifier.padding(innerPadding),
         )
     }
@@ -84,6 +87,7 @@ private fun HomeScreenContent(
     onContentClick: (UsersLikeContentModel) -> Unit,
     onRegionClick: (String) -> Unit,
     onDomesticClick: (Boolean) -> Unit,
+    onNavigateToMyPage: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var keyword: String by rememberSaveable { mutableStateOf("") }
@@ -166,6 +170,14 @@ private fun HomeScreenContent(
                     regions = uiState.regionCategories,
                     onRegionClick = onRegionClick,
                 )
+
+                Text(
+                    text = "임시 마이페이지 확인용 텍스트",
+                    modifier =
+                        Modifier
+                            .padding(top = TuripTheme.spacing.large)
+                            .clickable(onClick = onNavigateToMyPage),
+                )
             }
         }
     }
@@ -184,6 +196,7 @@ private fun HomeLoadingPreview() {
                 onContentClick = { },
                 onRegionClick = { },
                 onDomesticClick = { },
+                onNavigateToMyPage = {},
                 modifier = Modifier.padding(innerPadding),
             )
         }
@@ -210,6 +223,7 @@ private fun HomeSuccessPreview() {
                 onContentClick = { },
                 onRegionClick = { },
                 onDomesticClick = { },
+                onNavigateToMyPage = {},
                 modifier = Modifier.padding(innerPadding),
             )
         }
@@ -229,6 +243,7 @@ private fun HomeServerErrorPreview() {
                 onContentClick = { },
                 onRegionClick = { },
                 onDomesticClick = { },
+                onNavigateToMyPage = {},
                 modifier = Modifier.padding(innerPadding),
             )
         }
@@ -248,6 +263,7 @@ private fun HomeNetworkErrorPreview() {
                 onContentClick = { },
                 onRegionClick = { },
                 onDomesticClick = { },
+                onNavigateToMyPage = {},
                 modifier = Modifier.padding(innerPadding),
             )
         }

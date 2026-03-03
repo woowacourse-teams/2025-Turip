@@ -1,26 +1,13 @@
 package com.on.turip.ui.main.favorite
 
-import androidx.core.net.toUri
 import com.google.android.gms.maps.model.LatLng
 import com.on.turip.domain.bookmark.TuripPlace
 import com.on.turip.domain.turip.Turip
 import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
-import com.on.turip.ui.main.favorite.model.PlaceLatLngUiModel
+import com.on.turip.ui.compose.turipdetail.model.turip.PlaceLatLngUiModel
+import com.on.turip.ui.compose.turipdetail.model.turip.TuripPlaceUiModel
 import com.on.turip.ui.main.favorite.model.TuripModel
 import com.on.turip.ui.main.favorite.model.TuripPlaceShareModel
-import com.on.turip.ui.main.favorite.model.TuripPlaceUiModel
-
-fun TuripPlace.toModel(): TuripPlaceUiModel =
-    TuripPlaceUiModel(
-        turipPlaceId = id,
-        order = order,
-        placeId = place.placeId,
-        name = place.name,
-        uri = place.url.toUri(),
-        category = place.category.joinToString(),
-        isTuripPlace = true,
-        latLng = LatLng(place.latitude, place.longitude),
-    )
 
 fun TuripPlace.toUiModel(): TuripPlaceModel =
     TuripPlaceModel(
