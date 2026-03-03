@@ -3,7 +3,6 @@ package turip.favorite.service;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import turip.account.domain.Account;
 import turip.account.domain.Member;
@@ -22,7 +21,7 @@ public class FavoriteFolderAccountService {
 
     private final FavoriteFolderAccountRepository favoriteFolderAccountRepository;
 
-    @Transactional(propagation = Propagation.REQUIRED)
+    @Transactional
     public FavoriteFolderAccount save(FavoriteFolder favoriteFolder, Account account, AccountRole accountRole) {
         FavoriteFolderAccount favoriteFolderAccount = new FavoriteFolderAccount(favoriteFolder, account, accountRole);
         return favoriteFolderAccountRepository.save(favoriteFolderAccount);
@@ -31,7 +30,11 @@ public class FavoriteFolderAccountService {
     @Transactional
     public FavoriteFolderAccount findOrCreate(FavoriteFolder favoriteFolder, Account account) {
         return favoriteFolderAccountRepository.findByFavoriteFolderAndAccount(favoriteFolder, account)
-                .orElseGet(() -> save(favoriteFolder, account, AccountRole.MEMBER));
+                .orElseGet(() -> {
+                    FavoriteFolderAccount favoriteFolderAccount = new FavoriteFolderAccount(favoriteFolder, account,
+                            AccountRole.MEMBER);
+                    return favoriteFolderAccountRepository.save(favoriteFolderAccount);
+                });
     }
 
     public void validateOwnership(Account account, FavoriteFolder favoriteFolder) {
