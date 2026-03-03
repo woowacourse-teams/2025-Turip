@@ -6,13 +6,11 @@ import android.net.Uri
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import com.on.turip.R
 import com.on.turip.ui.bookmarks.BookmarkContentActivity
-import com.on.turip.ui.bookmarks.BookmarkContentActivity.Companion.EXTRA_BOOKMARK_CONTENT_HAS_BOOKMARK_CHANGES
 import com.on.turip.ui.common.extensions.safeStartActivityWithToast
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.mypage.MyPageScreen
@@ -36,7 +34,7 @@ class MyPageActivity : AppCompatActivity() {
                 MyPageScreen(
                     onNavigateToAllBookmarkContents = {
                         val intent = BookmarkContentActivity.newIntent(this)
-                        bookmarkContentLauncher.launch(intent)
+                        startActivity(intent)
                     },
                     onNavigateToContent = { contentId: Long ->
                         Timber.d("마이페이지 북마크 콘텐츠 클릭(contentId=$contentId)")
@@ -76,19 +74,6 @@ class MyPageActivity : AppCompatActivity() {
             }
         }
     }
-
-    private val bookmarkContentLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode != RESULT_OK) return@registerForActivityResult
-
-            val changed =
-                result.data?.getBooleanExtra(EXTRA_BOOKMARK_CONTENT_HAS_BOOKMARK_CHANGES, false)
-                    ?: false
-
-            if (changed) {
-                viewModel.loadBookmarkContents(isRetry = false)
-            }
-        }
 
     companion object {
         fun newIntent(context: Context): Intent = Intent(context, MyPageActivity::class.java)

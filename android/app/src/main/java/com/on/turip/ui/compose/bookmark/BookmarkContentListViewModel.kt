@@ -9,6 +9,7 @@ import com.on.turip.domain.bookmark.BookmarkContent
 import com.on.turip.domain.bookmark.repository.BookmarkRepository
 import com.on.turip.domain.common.paging.Cursor
 import com.on.turip.domain.common.paging.Page
+import com.on.turip.ui.common.BookmarkChangeEventBus
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
@@ -33,6 +34,7 @@ import javax.inject.Inject
 @HiltViewModel
 class BookmarkContentListViewModel @Inject constructor(
     private val bookmarkRepository: BookmarkRepository,
+    private val bookmarkChangeEventBus: BookmarkChangeEventBus,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<BookmarkContentListUiState> =
         MutableStateFlow(BookmarkContentListUiState.Idle)
@@ -264,7 +266,7 @@ class BookmarkContentListViewModel @Inject constructor(
                         _uiState.update { state ->
                             state.copy(totalBookmarkCount = state.totalBookmarkCount?.minus(1))
                         }
-                        _uiEffect.send(BookmarkContentListUiEffect.BookmarkRemovedList)
+                        bookmarkChangeEventBus.notifyChanged()
                     }.onFailure {
                         _uiEffect.send(
                             BookmarkContentListUiEffect.ShowBookmarkRemoveFailedList(contentId),

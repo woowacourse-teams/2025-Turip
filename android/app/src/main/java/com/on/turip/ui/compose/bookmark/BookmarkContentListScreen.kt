@@ -64,7 +64,6 @@ fun BookmarkContentListScreen(
     onBack: () -> Unit,
     onNavigateToLogin: () -> Unit,
     onNavigateToContent: (contentId: Long) -> Unit,
-    onBookmarkChanged: () -> Unit,
     viewModel: BookmarkContentListViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -77,10 +76,6 @@ fun BookmarkContentListScreen(
             when (uiEffect) {
                 BookmarkContentListUiEffect.NavigateToLogin -> {
                     onNavigateToLogin()
-                }
-
-                BookmarkContentListUiEffect.BookmarkRemovedList -> {
-                    onBookmarkChanged()
                 }
 
                 is BookmarkContentListUiEffect.ShowBookmarkRemoveFailedList -> {

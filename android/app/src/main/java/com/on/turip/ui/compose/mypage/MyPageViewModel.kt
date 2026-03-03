@@ -14,6 +14,7 @@ import com.on.turip.domain.common.paging.Page
 import com.on.turip.domain.login.MemberRepository
 import com.on.turip.domain.setting.PrivacyPolicy
 import com.on.turip.domain.userstorage.repository.UserStorageRepository
+import com.on.turip.ui.common.BookmarkChangeEventBus
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
@@ -42,6 +43,7 @@ class MyPageViewModel @Inject constructor(
     private val userStorageRepository: UserStorageRepository,
     private val memberRepository: MemberRepository,
     private val accountRepository: AccountRepository,
+    private val bookmarkChangeEventBus: BookmarkChangeEventBus,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<MyPageUiState> = MutableStateFlow(MyPageUiState.Idle)
     val uiState: StateFlow<MyPageUiState> = _uiState.asStateFlow()
@@ -52,6 +54,15 @@ class MyPageViewModel @Inject constructor(
     init {
         loadProfile(isRetry = false)
         loadBookmarkContents(isRetry = false)
+        observeBookmarkChanges()
+    }
+
+    private fun observeBookmarkChanges() {
+        viewModelScope.launch {
+            bookmarkChangeEventBus.changes.collect {
+                loadBookmarkContents(isRetry = false)
+            }
+        }
     }
 
     fun loadProfile(isRetry: Boolean) {

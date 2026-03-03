@@ -14,14 +14,9 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class BookmarkContentActivity : AppCompatActivity() {
-    private var hasBookmarkChanges = false
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        hasBookmarkChanges =
-            savedInstanceState?.getBoolean(EXTRA_BOOKMARK_CONTENT_HAS_BOOKMARK_CHANGES, false)
-                ?: false
         setContent {
             TuripTheme {
                 BookmarkContentListScreen(
@@ -42,32 +37,12 @@ class BookmarkContentActivity : AppCompatActivity() {
                             TripDetailActivity.newIntent(context = this, contentId = contentId)
                         startActivity(intent)
                     },
-                    onBookmarkChanged = {
-                        hasBookmarkChanges = true
-                    },
                 )
             }
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putBoolean(EXTRA_BOOKMARK_CONTENT_HAS_BOOKMARK_CHANGES, hasBookmarkChanges)
-    }
-
-    override fun finish() {
-        val data =
-            Intent().apply {
-                putExtra(EXTRA_BOOKMARK_CONTENT_HAS_BOOKMARK_CHANGES, hasBookmarkChanges)
-            }
-        setResult(RESULT_OK, data)
-        super.finish()
-    }
-
     companion object {
-        const val EXTRA_BOOKMARK_CONTENT_HAS_BOOKMARK_CHANGES =
-            "com.on.turip.ui.bookmarks.BOOKMARK_CHANGES"
-
         fun newIntent(context: Context): Intent = Intent(context, BookmarkContentActivity::class.java)
     }
 }
