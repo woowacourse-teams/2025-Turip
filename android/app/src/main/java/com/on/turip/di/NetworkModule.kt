@@ -1,14 +1,12 @@
 package com.on.turip.di
 
 import com.on.turip.BuildConfig
-import com.on.turip.common.AuthState
 import com.on.turip.common.FidProvider
-import com.on.turip.common.UserType
 import com.on.turip.core.result.fold
 import com.on.turip.di.NetworkModule.LOG_PREFIX
 import com.on.turip.domain.login.AuthRepository
 import com.on.turip.domain.login.AuthTokens
-import com.on.turip.domain.userstorage.repository.UserStorageRepository
+import com.on.turip.domain.session.TokenManager
 import dagger.Lazy
 import dagger.Module
 import dagger.Provides
@@ -45,10 +43,11 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideHttpClient(
-        userStorageRepository: UserStorageRepository,
+        tokenManager: TokenManager,
         authRepository: Lazy<AuthRepository>,
         fidProvider: FidProvider,
     ): HttpClient =
+        @Suppress("ktlint:standard:kdoc")
         HttpClient(OkHttp) {
             /**
              * HTTP 응답이 성공(2xx)이 아닐 경우
@@ -76,42 +75,28 @@ object NetworkModule {
                 )
             }
 
-            headerInterceptor(userStorageRepository, authRepository, fidProvider)
+            headerInterceptor(tokenManager, authRepository, fidProvider)
         }
 
     private fun HttpClientConfig<OkHttpConfig>.headerInterceptor(
-        userStorageRepository: UserStorageRepository,
+        tokenManager: TokenManager,
         authRepository: Lazy<AuthRepository>,
         fidProvider: FidProvider,
     ) {
         install(plugin = Auth) {
             bearer {
                 loadTokens {
-                    when (AuthState.type) {
-                        UserType.MEMBER -> {
-                            val accessToken: String? =
-                                userStorageRepository.loadAccessToken().getOrNull()
-                            val refreshToken: String? =
-                                userStorageRepository.loadRefreshToken().getOrNull()
-                            if (accessToken != null && refreshToken != null) {
-                                BearerTokens(
-                                    accessToken = accessToken,
-                                    refreshToken = refreshToken,
-                                )
-                            } else {
-                                null
-                            }
-                        }
-
-                        UserType.GUEST, UserType.NONE -> {
-                            null
-                        }
+                    tokenManager.currentTokens()?.let { tokens: AuthTokens ->
+                        BearerTokens(
+                            accessToken = tokens.accessToken,
+                            refreshToken = tokens.refreshToken,
+                        )
                     }
                 }
 
                 refreshTokens {
                     val storedRefreshToken: String =
-                        userStorageRepository.loadRefreshToken().getOrNull()
+                        tokenManager.currentTokens()?.refreshToken
                             ?: return@refreshTokens null
 
                     return@refreshTokens authRepository
@@ -119,13 +104,14 @@ object NetworkModule {
                         .requestTokens(storedRefreshToken)
                         .fold(
                             onSuccess = { newTokens: AuthTokens ->
-                                userStorageRepository.createTokens(newTokens)
+                                tokenManager.setTokens(newTokens)
                                 BearerTokens(
                                     accessToken = newTokens.accessToken,
                                     refreshToken = newTokens.refreshToken,
                                 )
                             },
                             onFailure = {
+                                // #591 이슈에서 처리 필요
                                 null
                             },
                         )
