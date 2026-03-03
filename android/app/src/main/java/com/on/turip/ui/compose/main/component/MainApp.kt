@@ -53,7 +53,10 @@ fun MainApp(savedStateConfigurationProvider: SavedStateConfigurationProvider) {
                 }
             },
             snackbarHost = {
-                TuripSnackbar(snackbarHostState = appState.snackbarHostState)
+                TuripSnackbar(
+                    snackbarHostState = appState.snackbarHostState,
+                    modifier = Modifier.padding(bottom = appState.snackbarBottomPadding),
+                )
             },
             contentWindowInsets = WindowInsets.systemBars,
         ) { paddingValues ->

@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.unit.Dp
 import androidx.navigation3.runtime.NavKey
 import com.on.turip.navigation.NavigationState
 import com.on.turip.ui.compose.designsystem.snackbar.SnackbarDelegate
@@ -16,6 +17,8 @@ class TuripAppState(
     val navigationState: NavigationState,
 ) {
     val snackbarHostState: SnackbarHostState = snackbarDelegate.snackbarHostState
+    val snackbarBottomPadding: Dp
+        get() = snackbarDelegate.bottomPadding
 
     val currentScreenKey: NavKey
         get() = navigationState.currentKey

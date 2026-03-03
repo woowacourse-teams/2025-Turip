@@ -99,6 +99,19 @@ fun TripDetailScreen(
     val isInitialLoading by remember {
         derivedStateOf { uiState.isLoading || webViewController.isLoading }
     }
+    val isAtBottom by remember(
+        listState,
+        isInitialLoading,
+        uiState.errorUiState,
+        webViewController.isFullScreen,
+    ) {
+        derivedStateOf {
+            !isInitialLoading &&
+                uiState.errorUiState == ErrorUiState.None &&
+                !webViewController.isFullScreen &&
+                !listState.canScrollForward
+        }
+    }
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var selectedPlace by remember { mutableStateOf<SelectedPlaceModel?>(null) }
@@ -140,6 +153,11 @@ fun TripDetailScreen(
             )
         }
     }
+    LaunchedEffect(isAtBottom) {
+        snackbarDelegate.updateBottomPadding(
+            if (isAtBottom) TRIP_DETAIL_SNACKBAR_BOTTOM_PADDING else 0.dp,
+        )
+    }
 
     BackHandler {
         when {
@@ -149,7 +167,10 @@ fun TripDetailScreen(
     }
 
     DisposableEffect(Unit) {
-        onDispose { webViewController.clear() }
+        onDispose {
+            snackbarDelegate.updateBottomPadding(0.dp)
+            webViewController.clear()
+        }
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -281,6 +302,7 @@ private suspend fun handleUiEffect(
 }
 
 private const val LAZY_PLACE_ITEM_KEY_DELIMITER = "_"
+private val TRIP_DETAIL_SNACKBAR_BOTTOM_PADDING = 72.dp
 
 @Composable
 private fun TripDetailScreenContent(
