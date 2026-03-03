@@ -1,7 +1,5 @@
 package com.on.turip.ui.compose.search.keyword
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.on.turip.core.result.TuripResult
@@ -43,23 +41,17 @@ class SearchViewModel @Inject constructor(
     private val _uiEffect: Channel<SearchUiEffect> = Channel(Channel.BUFFERED)
     val uiEffect: Flow<SearchUiEffect> = _uiEffect.receiveAsFlow()
 
-    private val _searchingWord: MutableLiveData<String> = MutableLiveData()
-    val searchingWord: LiveData<String> get() = _searchingWord
+    private val _searchingWord = MutableStateFlow("")
+    val searchingWord: StateFlow<String> = _searchingWord.asStateFlow()
 
-    private val _searchHistory: MutableLiveData<ImmutableList<SearchHistory>> =
-        MutableLiveData(
-            persistentListOf(),
-        )
-    val searchHistory: LiveData<ImmutableList<SearchHistory>> get() = _searchHistory
+    private val _searchHistory = MutableStateFlow<ImmutableList<SearchHistory>>(persistentListOf())
+    val searchHistory: StateFlow<ImmutableList<SearchHistory>> = _searchHistory.asStateFlow()
 
-    private var initKeyword: String = ""
-
-    fun initKeywordIfNeeded(keyword: String) {
-        initKeyword = keyword
-        _searchingWord.value = initKeyword
+    fun initKeyword(keyword: String) {
+        _searchingWord.update { keyword }
         loadSearchHistory()
-        loadByKeyword(initKeyword)
-        createSearchHistory(initKeyword)
+        loadByKeyword(keyword)
+        createSearchHistory(keyword)
     }
 
     private fun loadSearchHistory() {
@@ -68,13 +60,13 @@ class SearchViewModel @Inject constructor(
                 .loadRecentSearches(MAX_SEARCH_HISTORY_COUNT)
                 .onSuccess { result: List<SearchHistory> ->
                     Timber.d("최근 검색 목록 받아옴 $result")
-                    _searchHistory.value = result.toImmutableList()
+                    _searchHistory.update { result.toImmutableList() }
                 }
         }
     }
 
     fun updateSearchingWord(newWord: String) {
-        _searchingWord.value = newWord
+        _searchingWord.update { newWord }
     }
 
     fun loadByKeyword(searchingKeyword: String = searchingWord.value.orEmpty()) {
@@ -153,10 +145,12 @@ class SearchViewModel @Inject constructor(
         newItem: SearchHistory,
         limit: Int,
     ) {
-        val currentList = _searchHistory.value?.toMutableList()
-        val updatedList = currentList?.filterNot { it.keyword == newItem.keyword }?.toMutableList()
-        updatedList?.add(FIRST_INDEX, newItem)
-        _searchHistory.value = updatedList?.take(limit)?.toImmutableList()
+        _searchHistory.update { currentList ->
+            val updatedList =
+                currentList.filterNot { it.keyword == newItem.keyword }.toMutableList()
+            updatedList.add(FIRST_INDEX, newItem)
+            updatedList.take(limit).toImmutableList()
+        }
     }
 
     fun deleteSearchHistory(keyword: String) {
@@ -164,8 +158,11 @@ class SearchViewModel @Inject constructor(
             searchHistoryRepository
                 .deleteSearch(keyword)
                 .onSuccess {
-                    _searchHistory.value =
-                        searchHistory.value?.filterNot { it.keyword == keyword }?.toImmutableList()
+                    _searchHistory.update {
+                        it
+                            .filterNot { it.keyword == keyword }
+                            .toImmutableList()
+                    }
                     Timber.d("${keyword}가 최근 검색 목록에서 삭제")
                 }
         }

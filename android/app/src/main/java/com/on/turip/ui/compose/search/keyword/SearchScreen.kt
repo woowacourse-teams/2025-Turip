@@ -11,7 +11,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -28,7 +27,6 @@ import com.on.turip.ui.compose.search.component.SearchResultList
 import com.on.turip.ui.compose.search.keyword.component.SearchAppBar
 import com.on.turip.ui.compose.search.keyword.component.SearchEmptyView
 import com.on.turip.ui.compose.search.keyword.component.SearchHistoryList
-import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun SearchScreen(
@@ -39,8 +37,8 @@ fun SearchScreen(
     viewModel: SearchViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val searchingWord by viewModel.searchingWord.observeAsState("")
-    val searchHistory by viewModel.searchHistory.observeAsState(persistentListOf())
+    val searchingWord by viewModel.searchingWord.collectAsStateWithLifecycle()
+    val searchHistory by viewModel.searchHistory.collectAsStateWithLifecycle()
 
     val focusManager = LocalFocusManager.current
     var isHistoryVisible by remember { mutableStateOf(false) }
@@ -55,7 +53,7 @@ fun SearchScreen(
     }
 
     LaunchedEffect(Unit) {
-        viewModel.initKeywordIfNeeded(keyword)
+        viewModel.initKeyword(keyword)
     }
 
     LaunchedEffect(Unit) {
