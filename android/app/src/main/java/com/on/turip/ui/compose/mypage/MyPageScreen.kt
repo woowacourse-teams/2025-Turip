@@ -29,6 +29,7 @@ import com.on.turip.domain.content.Content
 import com.on.turip.domain.content.video.VideoData
 import com.on.turip.domain.creator.Creator
 import com.on.turip.domain.region.City
+import com.on.turip.domain.session.SessionState
 import com.on.turip.domain.trip.TripDuration
 import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.common.extensions.dismissAndExecute
@@ -55,6 +56,7 @@ fun MyPageScreen(
     viewModel: MyPageViewModel = hiltViewModel(),
 ) {
     val uiState: MyPageUiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val sessionState: SessionState by viewModel.sessionState.collectAsStateWithLifecycle()
 
     val snackbarHostState = remember { SnackbarHostState() }
     val resources = LocalResources.current
@@ -113,6 +115,7 @@ fun MyPageScreen(
 
     MyPageScreenContent(
         uiState = uiState,
+        sessionState = sessionState,
         snackbarHostState = snackbarHostState,
         onNavigateToAllBookmarkContents = onNavigateToAllBookmarkContents,
         onNavigateToContent = onNavigateToContent,
@@ -137,6 +140,7 @@ fun MyPageScreen(
 @Composable
 private fun MyPageScreenContent(
     uiState: MyPageUiState,
+    sessionState: SessionState,
     snackbarHostState: SnackbarHostState,
     onNavigateToAllBookmarkContents: () -> Unit,
     onNavigateToContent: (contentId: Long) -> Unit,
@@ -225,6 +229,7 @@ private fun MyPageScreenContent(
 
             item {
                 MyPageSettingsSection(
+                    sessionState = sessionState,
                     onInquiryClick = onInquiryClick,
                     onPrivacyPolicyClick = onPrivacyPolicyClick,
                     onLoginClick = onLoginClick,
@@ -314,6 +319,7 @@ private fun MyPageScreenPreview(
     TuripTheme {
         MyPageScreenContent(
             uiState = uiState,
+            sessionState = SessionState.Uninitialized,
             snackbarHostState = remember { SnackbarHostState() },
             onNavigateToAllBookmarkContents = {},
             onNavigateToContent = {},

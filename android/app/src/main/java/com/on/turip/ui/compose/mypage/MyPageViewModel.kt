@@ -12,6 +12,8 @@ import com.on.turip.domain.bookmark.repository.BookmarkRepository
 import com.on.turip.domain.common.paging.Cursor
 import com.on.turip.domain.common.paging.Page
 import com.on.turip.domain.login.MemberRepository
+import com.on.turip.domain.session.SessionState
+import com.on.turip.domain.session.SessionStore
 import com.on.turip.domain.setting.PrivacyPolicy
 import com.on.turip.domain.userstorage.repository.UserStorageRepository
 import com.on.turip.ui.common.error.ErrorUiState
@@ -42,12 +44,15 @@ class MyPageViewModel @Inject constructor(
     private val userStorageRepository: UserStorageRepository,
     private val memberRepository: MemberRepository,
     private val accountRepository: AccountRepository,
+    sessionStore: SessionStore,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<MyPageUiState> = MutableStateFlow(MyPageUiState.Idle)
     val uiState: StateFlow<MyPageUiState> = _uiState.asStateFlow()
 
     private val _uiEffect: Channel<MyPageUiEffect> = Channel(Channel.BUFFERED)
     val uiEffect: Flow<MyPageUiEffect> = _uiEffect.receiveAsFlow()
+
+    val sessionState: StateFlow<SessionState> = sessionStore.state
 
     init {
         loadProfile(isRetry = false)

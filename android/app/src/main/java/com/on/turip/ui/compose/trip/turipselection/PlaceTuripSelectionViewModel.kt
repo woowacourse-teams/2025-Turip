@@ -2,12 +2,12 @@ package com.on.turip.ui.compose.trip.turipselection
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.on.turip.common.AuthState
-import com.on.turip.common.UserType
 import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
 import com.on.turip.domain.bookmark.TuripPlace
+import com.on.turip.domain.session.SessionState
+import com.on.turip.domain.session.SessionStore
 import com.on.turip.domain.turip.repository.TuripRepository
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
@@ -42,6 +42,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PlaceTuripSelectionViewModel @Inject constructor(
     private val turipRepository: TuripRepository,
+    sessionStore: SessionStore,
 ) : ViewModel() {
     // 튜립 목록의 버튼 활성화 여부를 위한 캐싱
     private var originTuripIds: Set<Long> = setOf()
@@ -58,6 +59,8 @@ class PlaceTuripSelectionViewModel @Inject constructor(
 
     private val _uiEffect: Channel<PlaceTuripSelectionUiEffect> = Channel(Channel.BUFFERED)
     val uiEffect: Flow<PlaceTuripSelectionUiEffect> = _uiEffect.receiveAsFlow()
+
+    private val sessionState: StateFlow<SessionState> = sessionStore.state
 
     init {
         registerDragEndEvents()
@@ -297,8 +300,8 @@ class PlaceTuripSelectionViewModel @Inject constructor(
     fun shareTurip() {
         val screenMode = uiState.value.screenMode
         if (screenMode is PlaceTuripSelectionScreenMode.TuripDetail) {
-            when (AuthState.type) {
-                UserType.MEMBER -> {
+            when (sessionState.value) {
+                SessionState.Member -> {
                     val turipShareModel =
                         TuripShareModel(
                             name = screenMode.turipName,
@@ -314,7 +317,7 @@ class PlaceTuripSelectionViewModel @Inject constructor(
                     }
                 }
 
-                UserType.GUEST, UserType.NONE -> {
+                SessionState.Guest, SessionState.Uninitialized -> {
                     viewModelScope.launch {
                         _uiEffect.send(PlaceTuripSelectionUiEffect.TuripShareNotAllowed)
                     }

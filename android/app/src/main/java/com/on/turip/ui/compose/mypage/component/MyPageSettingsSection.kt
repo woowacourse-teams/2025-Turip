@@ -13,13 +13,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.on.turip.R
-import com.on.turip.common.AuthState
-import com.on.turip.common.UserType
+import com.on.turip.domain.session.SessionState
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
-import timber.log.Timber
 
 @Composable
 fun MyPageSettingsSection(
+    sessionState: SessionState,
     onInquiryClick: () -> Unit,
     onPrivacyPolicyClick: () -> Unit,
     onLoginClick: () -> Unit,
@@ -44,17 +43,12 @@ fun MyPageSettingsSection(
 
         SettingForAll(onInquiryClick, onPrivacyPolicyClick)
 
-        when (AuthState.type) {
-            UserType.MEMBER -> {
+        when (sessionState) {
+            SessionState.Member -> {
                 SettingForMember(onLogoutClick, onWithdrawClick)
             }
 
-            UserType.GUEST -> {
-                SettingForGuest(onLoginClick)
-            }
-
-            UserType.NONE -> {
-                Timber.e("멤버가 지정되지 않았습니다.")
+            SessionState.Guest, SessionState.Uninitialized -> {
                 SettingForGuest(onLoginClick)
             }
         }
@@ -109,8 +103,8 @@ private fun SettingForMember(
 @Composable
 private fun MyPageSettingsSectionMemberPreview() {
     TuripTheme {
-        AuthState.change(UserType.MEMBER)
         MyPageSettingsSection(
+            sessionState = SessionState.Member,
             onInquiryClick = {},
             onPrivacyPolicyClick = {},
             onLoginClick = {},
@@ -128,8 +122,8 @@ private fun MyPageSettingsSectionMemberPreview() {
 @Composable
 private fun MyPageSettingsSectionGuestPreview() {
     TuripTheme {
-        AuthState.change(UserType.GUEST)
         MyPageSettingsSection(
+            sessionState = SessionState.Guest,
             onInquiryClick = {},
             onPrivacyPolicyClick = {},
             onLoginClick = {},
