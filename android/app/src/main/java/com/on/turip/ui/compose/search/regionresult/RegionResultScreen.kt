@@ -21,6 +21,7 @@ import com.on.turip.ui.compose.search.regionresult.component.RegionResultAppBar
 
 @Composable
 fun RegionResultScreen(
+    regionCategoryName: String,
     onBackClick: () -> Unit,
     onItemClick: (id: Long) -> Unit,
     onNavigateToLogin: () -> Unit,
@@ -36,6 +37,10 @@ fun RegionResultScreen(
         }
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.initRegionCategoryName(regionCategoryName)
+    }
+
     Scaffold(
         topBar = {
             Surface(
@@ -43,7 +48,7 @@ fun RegionResultScreen(
                 modifier = Modifier.statusBarsPadding(),
             ) {
                 RegionResultAppBar(
-                    title = viewModel.regionCategoryName,
+                    title = regionCategoryName,
                     onBackClick = onBackClick,
                 )
             }
@@ -76,7 +81,7 @@ fun RegionResultScreen(
                 is RegionResultUiState.Error -> {
                     ErrorScreen(
                         errorUiState = state.errorUiState,
-                        onRetryClick = { viewModel.loadContentsFromRegion() },
+                        onRetryClick = { viewModel.loadContentsFromRegion(regionCategoryName) },
                     )
                 }
             }

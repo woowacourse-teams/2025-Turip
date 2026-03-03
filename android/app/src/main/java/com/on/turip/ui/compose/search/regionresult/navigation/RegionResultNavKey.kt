@@ -4,4 +4,6 @@ import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
 @Serializable
-data object RegionResultNavKey : NavKey
+data class RegionResultNavKey(
+    val regionCategoryName: String,
+) : NavKey

@@ -10,6 +10,7 @@ import com.on.turip.ui.compose.trip.navigation.TripDetailNavKey
 fun EntryProviderScope<NavKey>.regionResultScreen(navigator: Navigator) {
     entry<RegionResultNavKey> {
         RegionResultScreen(
+            regionCategoryName = it.regionCategoryName,
             onBackClick = navigator::goBack,
             onItemClick = { navigator.navigate(TripDetailNavKey) },
             onNavigateToLogin = { navigator.navigate(LoginNavKey) },

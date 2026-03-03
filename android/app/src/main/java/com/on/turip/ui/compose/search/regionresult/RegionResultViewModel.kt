@@ -1,6 +1,5 @@
 package com.on.turip.ui.compose.search.regionresult
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.on.turip.core.result.TuripResult
@@ -29,15 +28,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RegionResultViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
     private val contentRepository: ContentRepository,
 ) : ViewModel() {
-    val regionCategoryName: String by lazy {
-        checkNotNull(savedStateHandle["com.on.turip.REGION_RESULT_REGION_CATEGORY_NAME_KEY"]) {
-            Timber.e("지역 검색 화면 지역 이름이 존재하지 않습니다.")
-        }
-    }
-
     private val _uiState: MutableStateFlow<RegionResultUiState> =
         MutableStateFlow(RegionResultUiState.Loading)
     val uiState: StateFlow<RegionResultUiState> = _uiState.asStateFlow()
@@ -45,11 +37,11 @@ class RegionResultViewModel @Inject constructor(
     private val _uiEffect: Channel<RegionResultUiEffect> = Channel(Channel.BUFFERED)
     val uiEffect: Flow<RegionResultUiEffect> = _uiEffect.receiveAsFlow()
 
-    init {
-        loadContentsFromRegion()
+    fun initRegionCategoryName(regionCategoryName: String) {
+        loadContentsFromRegion(regionCategoryName)
     }
 
-    fun loadContentsFromRegion() {
+    fun loadContentsFromRegion(regionCategoryName: String) {
         viewModelScope.launch {
             _uiState.update { RegionResultUiState.Loading }
 

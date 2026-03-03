@@ -16,7 +16,9 @@ fun EntryProviderScope<NavKey>.homeScreen(navigator: Navigator) {
             onSearchClick = { keyword: String ->
                 navigator.navigate(SearchNavKey(keyword))
             },
-            onRegionClick = { navigator.navigate(RegionResultNavKey) },
+            onRegionClick = { regionCategoryName: String ->
+                navigator.navigate(RegionResultNavKey(regionCategoryName))
+            },
             onContentClick = { navigator.navigate(TripDetailNavKey) },
             navigateToLoginScreen = { navigator.navigate(LoginNavKey) },
             navigateToMyPage = { navigator.navigate(MyPageNavKey) },
