@@ -35,7 +35,7 @@ import com.on.turip.ui.compose.trip.model.MapModel
 import com.on.turip.ui.compose.trip.model.SelectedPlaceModel
 import com.on.turip.ui.compose.trip.turipselection.component.PlaceTuripSelectionContent
 import com.on.turip.ui.compose.trip.turipselection.component.TuripsContent
-import com.on.turip.ui.main.favorite.model.TuripShareModel
+import com.on.turip.ui.compose.turipdetail.model.turip.TuripShareModel
 import kotlinx.collections.immutable.persistentListOf
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -16,9 +16,8 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : BaseActivity<ActivityMainBinding>() {
-    override val binding: ActivityMainBinding by lazy {
-        ActivityMainBinding.inflate(layoutInflater)
-    }
+    override val binding: ActivityMainBinding by lazy { ActivityMainBinding.inflate(layoutInflater) }
+
     private var backPressedTime: Long = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {

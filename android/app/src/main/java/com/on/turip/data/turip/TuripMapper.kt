@@ -20,6 +20,8 @@ fun TuripResponse.toDomain(): Turip =
         name = name,
         isDefault = isDefault,
         placeCount = placeCount,
+        memberCount = memberCount,
+        isShared = isShared,
     )
 
 fun TuripCreationResponse.toDomain(): Turip =
@@ -28,6 +30,8 @@ fun TuripCreationResponse.toDomain(): Turip =
         name = name,
         isDefault = isDefault,
         placeCount = 0,
+        memberCount = 0,
+        isShared = false,
     )
 
 fun String.toPostRequestDto(): TuripPostRequest = TuripPostRequest(name = this)
@@ -42,6 +46,8 @@ fun TuripByPlaceResponse.toDomain(): Turip =
         name = name,
         isDefault = false,
         placeCount = 0,
+        memberCount = 0,
+        isShared = false,
         hasIncludePlace = isTuripPlace,
     )
 
