@@ -179,7 +179,7 @@ public class ContentService {
                 .collect(Collectors.toSet());
     }
 
-    private ContentDetailsWithLoadableResponse convertToContentsDetailWithLoadableResponse(Account aqccount,
+    private ContentDetailsWithLoadableResponse convertToContentsDetailWithLoadableResponse(Account account,
                                                                                            Slice<Content> contentSlice) {
         List<Content> contents = contentSlice.getContent();
         if (contents.isEmpty()) {
@@ -189,7 +189,7 @@ public class ContentService {
                 .map(Content::getId)
                 .toList();
 
-        Set<Long> favoritedContentIds = findFavoritedContentIds(aqccount, contents);
+        Set<Long> favoritedContentIds = findFavoritedContentIds(account, contents);
         Map<Long, TripDurationResponse> durations = contentPlaceService.calculateDurations(contentIds);
         Map<Long, Integer> placeCounts = contentPlaceService.countPlacesByContentIds(contentIds);
 
