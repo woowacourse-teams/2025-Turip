@@ -16,7 +16,7 @@ import kotlin.concurrent.Volatile
 @Singleton
 class DefaultTokenManager @Inject constructor(
     private val userStorageRepository: UserStorageRepository,
-    private val cacheClearer: AuthTokenCacheController,
+    private val authCacheController: AuthTokenCacheController,
 ) : TokenManager {
     @Volatile
     private var tokens: AuthTokens? = null
@@ -42,7 +42,7 @@ class DefaultTokenManager @Inject constructor(
             .fold(
                 onSuccess = {
                     this.tokens = tokens
-                    cacheClearer.clear()
+                    authCacheController.clear()
                     Result.success(Unit)
                 },
                 onFailure = {
@@ -54,7 +54,7 @@ class DefaultTokenManager @Inject constructor(
     // 인메모리 & 로컬 저장소 토큰 제거 (프레임워크 캐싱된 토큰 초기화)
     override suspend fun clearTokens(): Result<Unit> {
         tokens = null
-        cacheClearer.clear()
+        authCacheController.clear()
 
         return userStorageRepository
             .clearTokens()

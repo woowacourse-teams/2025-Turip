@@ -4,7 +4,7 @@ import com.on.turip.domain.session.SessionStore
 import com.on.turip.domain.session.TokenManager
 import javax.inject.Inject
 
-class MoveToGuestUseCase @Inject constructor(
+class SwitchToGuestUseCase @Inject constructor(
     private val tokenManager: TokenManager,
     private val sessionStore: SessionStore,
 ) {

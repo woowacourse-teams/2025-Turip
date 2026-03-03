@@ -16,7 +16,7 @@ class DetermineInitialSessionUseCase @Inject constructor(
     private val tokenManager: TokenManager,
     private val sessionStore: SessionStore,
     private val authRepository: AuthRepository,
-    private val moveToGuestUseCase: MoveToGuestUseCase,
+    private val switchToGuestUseCase: SwitchToGuestUseCase,
 ) {
     suspend operator fun invoke(): SessionState {
         tokenManager.initialize()
@@ -36,7 +36,7 @@ class DetermineInitialSessionUseCase @Inject constructor(
             onFailure = { errorType ->
                 when (errorType) {
                     is ErrorType.Auth -> {
-                        moveToGuestUseCase()
+                        switchToGuestUseCase()
                         return SessionState.Guest
                     }
 

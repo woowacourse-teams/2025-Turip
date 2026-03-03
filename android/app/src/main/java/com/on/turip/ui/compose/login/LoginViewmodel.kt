@@ -9,7 +9,7 @@ import com.on.turip.data.login.datasource.GoogleCredentialManager
 import com.on.turip.domain.login.GuestRepository
 import com.on.turip.domain.login.MemberRepository
 import com.on.turip.domain.login.usecase.LoginUseCase
-import com.on.turip.domain.session.usecase.MoveToGuestUseCase
+import com.on.turip.domain.session.usecase.SwitchToGuestUseCase
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
@@ -29,7 +29,7 @@ class LoginViewmodel @Inject constructor(
     private val loginUseCase: LoginUseCase,
     private val memberRepository: MemberRepository,
     private val guestRepository: GuestRepository,
-    private val moveToGuestUseCase: MoveToGuestUseCase,
+    private val switchToGuestUseCase: SwitchToGuestUseCase,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<LoginUiState> = MutableStateFlow(LoginUiState.IDLE)
     val uiState: StateFlow<LoginUiState> = _uiState
@@ -90,7 +90,7 @@ class LoginViewmodel @Inject constructor(
 
     fun continueAsGuest() {
         viewModelScope.launch {
-            moveToGuestUseCase()
+            switchToGuestUseCase()
             _uiEffect.send(LoginUiEffect.NavigateToMain)
         }
     }
