@@ -16,7 +16,6 @@ import com.on.turip.common.AuthState
 import com.on.turip.common.UserType
 import com.on.turip.databinding.ActivitySplashBinding
 import com.on.turip.ui.common.base.BaseActivity
-import com.on.turip.ui.login.LoginActivity
 import com.on.turip.ui.main.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -112,7 +111,7 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
             }
 
             UserType.GUEST, UserType.NONE -> {
-                startActivity(LoginActivity.newIntent(this@SplashActivity))
+                startActivity(MainActivity.newIntent(this@SplashActivity))
                 finish()
             }
         }

@@ -1,7 +1,6 @@
 package com.on.turip.ui.folder
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.InputFilter
@@ -19,7 +18,6 @@ import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.common.extensions.collectOnStarted
 import com.on.turip.ui.common.model.namestatus.TuripNameStatusModel
 import com.on.turip.ui.folder.model.TuripUiEffect
-import com.on.turip.ui.login.LoginActivity
 
 class FolderModifyBottomSheetFragment : BaseBottomSheetFragment<BottomSheetFragmentFolderModifyBinding>() {
     private val sharedViewModel: TuripViewModel by activityViewModels()
@@ -69,7 +67,6 @@ class FolderModifyBottomSheetFragment : BaseBottomSheetFragment<BottomSheetFragm
         collectOnStarted(sharedViewModel.uiEffect) { uiEffect: TuripUiEffect ->
             when (uiEffect) {
                 TuripUiEffect.NavigateToLogin -> {
-                    navigateToLoginScreen()
                 }
 
                 TuripUiEffect.TuripUpdated -> {
@@ -104,15 +101,6 @@ class FolderModifyBottomSheetFragment : BaseBottomSheetFragment<BottomSheetFragm
         binding.etBottomSheetFolderModifyFolderName.addTextChangedListener { text: Editable? ->
             sharedViewModel.updateTuripName(text.toString())
         }
-    }
-
-    private fun navigateToLoginScreen() {
-        val intent: Intent =
-            LoginActivity
-                .newIntent(requireActivity())
-                .apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK }
-        startActivity(intent)
-        requireActivity().finish()
     }
 
     companion object {

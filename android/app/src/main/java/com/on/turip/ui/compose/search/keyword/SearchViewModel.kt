@@ -16,7 +16,6 @@ import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.compose.search.model.VideoInformationModel
-import com.on.turip.ui.search.keywordresult.SearchActivity.Companion.SEARCH_KEYWORD_KEY
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -56,7 +55,7 @@ class SearchViewModel @Inject constructor(
     val searchHistory: LiveData<ImmutableList<SearchHistory>> get() = _searchHistory
 
     private val searchKeyword: String by lazy {
-        checkNotNull(savedStateHandle[SEARCH_KEYWORD_KEY]) {
+        checkNotNull(savedStateHandle["com.on.turip.SEARCH_KEYWORD_KEY"]) {
             Timber.e("검색 완료 화면 검색 결과가 존재하지 않습니다.")
         }
     }

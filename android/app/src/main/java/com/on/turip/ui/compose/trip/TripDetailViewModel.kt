@@ -19,7 +19,6 @@ import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.compose.trip.model.PlaceModel
 import com.on.turip.ui.compose.trip.model.SelectedPlaceModel
 import com.on.turip.ui.compose.trip.model.TripDetailInfoModel
-import com.on.turip.ui.trip.TripDetailActivity.Companion.TRIP_DETAIL_CONTENT_KEY
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.async
@@ -48,7 +47,7 @@ class TripDetailViewModel @Inject constructor(
     val uiEffect: Flow<TripDetailUiEffect> = _uiEffect.receiveAsFlow()
 
     private val contentId: Long by lazy {
-        checkNotNull(savedStateHandle[TRIP_DETAIL_CONTENT_KEY]) {
+        checkNotNull(savedStateHandle["com.on.turip.TRIP_DETAIL_CONTENT_KEY"]) {
             Timber.e("컨텐츠 상세 화면 Content ID 값이 존재하지 않습니다.")
         }
     }
