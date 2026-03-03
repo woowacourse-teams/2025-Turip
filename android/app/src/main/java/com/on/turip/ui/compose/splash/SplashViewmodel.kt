@@ -1,4 +1,4 @@
-package com.on.turip.ui.splash
+package com.on.turip.ui.compose.splash
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
