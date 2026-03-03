@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import turip.account.domain.Account;
 import turip.auth.resolver.AuthAccount;
 import turip.common.exception.ErrorResponse;
-import turip.content.controller.dto.response.content.ContentsDetailWithLoadableResponse;
+import turip.content.controller.dto.response.content.ContentDetailsWithLoadableResponse;
 import turip.favorite.controller.dto.request.FavoriteContentRequest;
 import turip.favorite.controller.dto.response.FavoriteContentCountResponse;
 import turip.favorite.controller.dto.response.FavoriteContentDetailsWithLoadableResponse;
@@ -174,7 +174,7 @@ public class FavoriteContentController {
                     description = "성공 예시",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ContentsDetailWithLoadableResponse.class),
+                            schema = @Schema(implementation = ContentDetailsWithLoadableResponse.class),
                             examples = @ExampleObject(
                                     name = "success",
                                     summary = "내가 찜한 컨텐츠 목록 조회 성공",
@@ -252,14 +252,14 @@ public class FavoriteContentController {
             )
     })
     @GetMapping("/api/v1/bookmarks")
-    public ResponseEntity<ContentsDetailWithLoadableResponse> readMyFavoriteContentsV1(
+    public ResponseEntity<ContentDetailsWithLoadableResponse> readMyFavoriteContentsV1(
             @Parameter(hidden = true) @AuthAccount Account account,
             @RequestParam(name = "size") Integer pageSize,
             @RequestParam(name = "lastId") Long lastId
     ) {
         FavoriteContentWithLoadableResult result = favoriteContentService.findMyFavoriteContents(account, pageSize,
                 lastId);
-        ContentsDetailWithLoadableResponse response = ContentsDetailWithLoadableResponse.from(result);
+        ContentDetailsWithLoadableResponse response = ContentDetailsWithLoadableResponse.from(result);
         return ResponseEntity.ok(response);
     }
 

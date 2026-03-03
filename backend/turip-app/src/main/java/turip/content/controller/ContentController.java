@@ -19,8 +19,8 @@ import turip.account.domain.Account;
 import turip.auth.resolver.AuthAccount;
 import turip.common.exception.ErrorResponse;
 import turip.content.controller.dto.response.content.ContentCountResponse;
+import turip.content.controller.dto.response.content.ContentDetailsWithLoadableResponse;
 import turip.content.controller.dto.response.content.ContentResponse;
-import turip.content.controller.dto.response.content.ContentsDetailWithLoadableResponse;
 import turip.content.controller.dto.response.favorite.WeeklyPopularFavoriteContentsResponse;
 import turip.content.service.ContentService;
 
@@ -119,7 +119,7 @@ public class ContentController {
                     description = "성공 예시",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ContentsDetailWithLoadableResponse.class),
+                            schema = @Schema(implementation = ContentDetailsWithLoadableResponse.class),
                             examples = @ExampleObject(
                                     name = "success",
                                     summary = "성공적으로 컨텐츠 목록 조회",
@@ -237,13 +237,13 @@ public class ContentController {
             )
     })
     @GetMapping
-    public ResponseEntity<ContentsDetailWithLoadableResponse> readContentsByRegionCategory(
+    public ResponseEntity<ContentDetailsWithLoadableResponse> readContentsByRegionCategory(
             @Parameter(hidden = true) @AuthAccount Account account,
             @RequestParam(name = "regionCategory") String regionCategory,
             @RequestParam(name = "size") Integer pageSize,
             @RequestParam(name = "lastId") Long lastContentId
     ) {
-        ContentsDetailWithLoadableResponse response = contentService.findContentsByRegionCategory(account,
+        ContentDetailsWithLoadableResponse response = contentService.findContentsByRegionCategory(account,
                 regionCategory,
                 pageSize, lastContentId);
         return ResponseEntity.ok(response);
@@ -259,7 +259,7 @@ public class ContentController {
                     description = "성공 예시",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ContentsDetailWithLoadableResponse.class),
+                            schema = @Schema(implementation = ContentDetailsWithLoadableResponse.class),
                             examples = @ExampleObject(
                                     name = "success",
                                     summary = "성공적으로 컨텐츠 목록 조회",
@@ -359,13 +359,13 @@ public class ContentController {
             )
     })
     @GetMapping("/keyword")
-    public ResponseEntity<ContentsDetailWithLoadableResponse> readContentsByKeyword(
+    public ResponseEntity<ContentDetailsWithLoadableResponse> readContentsByKeyword(
             @Parameter(hidden = true) @AuthAccount Account account,
             @RequestParam(name = "keyword") String keyword,
             @RequestParam(name = "size") Integer pageSize,
             @RequestParam(name = "lastId") Long lastContentId
     ) {
-        ContentsDetailWithLoadableResponse response = contentService.searchContentsByKeyword(account, keyword, pageSize,
+        ContentDetailsWithLoadableResponse response = contentService.searchContentsByKeyword(account, keyword, pageSize,
                 lastContentId);
         return ResponseEntity.ok(response);
     }

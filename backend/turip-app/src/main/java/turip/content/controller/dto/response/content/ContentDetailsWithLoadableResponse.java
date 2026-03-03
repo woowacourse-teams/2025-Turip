@@ -3,20 +3,20 @@ package turip.content.controller.dto.response.content;
 import java.util.List;
 import turip.favorite.service.dto.FavoriteContentWithLoadableResult;
 
-public record ContentsDetailWithLoadableResponse(
+public record ContentDetailsWithLoadableResponse(
         List<ContentDetailResponse> contents,
         boolean loadable
 ) {
 
-    public static ContentsDetailWithLoadableResponse of(List<ContentDetailResponse> contents, boolean loadable) {
-        return new ContentsDetailWithLoadableResponse(contents, loadable);
+    public static ContentDetailsWithLoadableResponse of(List<ContentDetailResponse> contents, boolean loadable) {
+        return new ContentDetailsWithLoadableResponse(contents, loadable);
     }
 
-    public static ContentsDetailWithLoadableResponse from(FavoriteContentWithLoadableResult result) {
+    public static ContentDetailsWithLoadableResponse from(FavoriteContentWithLoadableResult result) {
         List<ContentDetailResponse> contents = result.favoriteContents().stream()
                 .map(ContentDetailResponse::from)
                 .toList();
         boolean loadable = result.loadable();
-        return new ContentsDetailWithLoadableResponse(contents, loadable);
+        return new ContentDetailsWithLoadableResponse(contents, loadable);
     }
 }
