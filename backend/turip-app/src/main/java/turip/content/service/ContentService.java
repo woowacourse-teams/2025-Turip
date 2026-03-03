@@ -15,20 +15,20 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
+import turip.account.domain.Account;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.BadRequestException;
 import turip.common.exception.custom.NotFoundException;
 import turip.content.controller.dto.response.content.ContentCountResponse;
 import turip.content.controller.dto.response.content.ContentDetailResponse;
+import turip.content.controller.dto.response.content.ContentDetailsWithLoadableResponse;
 import turip.content.controller.dto.response.content.ContentResponse;
-import turip.content.controller.dto.response.content.ContentsDetailWithLoadableResponse;
 import turip.content.controller.dto.response.content.TripDurationResponse;
 import turip.content.controller.dto.response.favorite.WeeklyPopularFavoriteContentResponse;
 import turip.content.controller.dto.response.favorite.WeeklyPopularFavoriteContentsResponse;
 import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
 import turip.favorite.repository.FavoriteContentRepository;
-import turip.account.domain.Account;
 import turip.region.domain.DomesticRegionCategory;
 import turip.region.domain.OverseasRegionCategory;
 
@@ -55,7 +55,7 @@ public class ContentService {
         return ContentCountResponse.from(count);
     }
 
-    public ContentsDetailWithLoadableResponse searchContentsByKeyword(
+    public ContentDetailsWithLoadableResponse searchContentsByKeyword(
             Account account,
             String keyword,
             int pageSize,
@@ -70,7 +70,7 @@ public class ContentService {
         return convertToContentsDetailWithLoadableResponse(account, contentSlice);
     }
 
-    public ContentsDetailWithLoadableResponse findContentsByRegionCategory(
+    public ContentDetailsWithLoadableResponse findContentsByRegionCategory(
             Account account,
             String regionCategory,
             int size,
@@ -179,17 +179,17 @@ public class ContentService {
                 .collect(Collectors.toSet());
     }
 
-    private ContentsDetailWithLoadableResponse convertToContentsDetailWithLoadableResponse(Account aqccount,
+    private ContentDetailsWithLoadableResponse convertToContentsDetailWithLoadableResponse(Account account,
                                                                                            Slice<Content> contentSlice) {
         List<Content> contents = contentSlice.getContent();
         if (contents.isEmpty()) {
-            return ContentsDetailWithLoadableResponse.of(new ArrayList<>(), contentSlice.hasNext());
+            return ContentDetailsWithLoadableResponse.of(new ArrayList<>(), contentSlice.hasNext());
         }
         List<Long> contentIds = contents.stream()
                 .map(Content::getId)
                 .toList();
 
-        Set<Long> favoritedContentIds = findFavoritedContentIds(aqccount, contents);
+        Set<Long> favoritedContentIds = findFavoritedContentIds(account, contents);
         Map<Long, TripDurationResponse> durations = contentPlaceService.calculateDurations(contentIds);
         Map<Long, Integer> placeCounts = contentPlaceService.countPlacesByContentIds(contentIds);
 
@@ -205,7 +205,7 @@ public class ContentService {
                 .toList();
 
         boolean loadable = contentSlice.hasNext();
-        return ContentsDetailWithLoadableResponse.of(contentDetails, loadable);
+        return ContentDetailsWithLoadableResponse.of(contentDetails, loadable);
     }
 
     private List<LocalDate> getLastWeekPeriod() {

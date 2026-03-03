@@ -21,7 +21,7 @@ import org.springframework.data.domain.SliceImpl;
 import turip.account.domain.Account;
 import turip.common.exception.custom.BadRequestException;
 import turip.content.controller.dto.response.content.ContentCountResponse;
-import turip.content.controller.dto.response.content.ContentsDetailWithLoadableResponse;
+import turip.content.controller.dto.response.content.ContentDetailsWithLoadableResponse;
 import turip.content.controller.dto.response.content.TripDurationResponse;
 import turip.content.controller.dto.response.favorite.WeeklyPopularFavoriteContentsResponse;
 import turip.content.domain.Content;
@@ -91,7 +91,7 @@ class ContentServiceTest {
             given(contentPlaceService.countPlacesByContentIds(contentIds)).willReturn(placeCounts);
 
             // when
-            ContentsDetailWithLoadableResponse contentsByKeyword = contentService.searchContentsByKeyword(account,
+            ContentDetailsWithLoadableResponse contentsByKeyword = contentService.searchContentsByKeyword(account,
                     keyword,
                     pageSize,
                     lastContentId);
