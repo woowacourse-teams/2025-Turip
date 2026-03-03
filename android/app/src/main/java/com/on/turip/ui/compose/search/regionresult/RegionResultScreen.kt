@@ -23,7 +23,7 @@ import com.on.turip.ui.compose.search.regionresult.component.RegionResultAppBar
 fun RegionResultScreen(
     regionCategoryName: String,
     onBackClick: () -> Unit,
-    onItemClick: (id: Long) -> Unit,
+    onNavigateToTripDetail: (id: Long) -> Unit,
     onNavigateToLogin: () -> Unit,
     viewModel: RegionResultViewModel = hiltViewModel(),
 ) {
@@ -74,7 +74,7 @@ fun RegionResultScreen(
                     SearchResultList(
                         totalCount = state.totalCount,
                         videos = state.videos,
-                        onItemClick = onItemClick,
+                        onItemClick = onNavigateToTripDetail,
                     )
                 }
 

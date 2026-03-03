@@ -12,7 +12,9 @@ fun EntryProviderScope<NavKey>.regionResultScreen(navigator: Navigator) {
         RegionResultScreen(
             regionCategoryName = it.regionCategoryName,
             onBackClick = navigator::goBack,
-            onItemClick = { navigator.navigate(TripDetailNavKey) },
+            onNavigateToTripDetail = { turipId: Long ->
+                navigator.navigate(TripDetailNavKey(turipId))
+            },
             onNavigateToLogin = { navigator.navigate(LoginNavKey) },
         )
     }

@@ -12,7 +12,9 @@ fun EntryProviderScope<NavKey>.searchScreen(navigator: Navigator) {
         SearchScreen(
             keyword = it.keyword,
             onNavigateBack = navigator::goBack,
-            onNavigateToDetail = { navigator.navigate(TripDetailNavKey) },
+            onNavigateToDetail = { turipId: Long ->
+                navigator.navigate(TripDetailNavKey(turipId))
+            },
             onNavigateToLogin = { navigator.navigate(LoginNavKey) },
         )
     }

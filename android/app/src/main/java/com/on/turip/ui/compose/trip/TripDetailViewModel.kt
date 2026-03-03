@@ -1,6 +1,5 @@
 package com.on.turip.ui.compose.trip
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.on.turip.core.result.ErrorType
@@ -35,7 +34,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TripDetailViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
     private val contentRepository: ContentRepository,
     private val updateBookmarkUseCase: UpdateBookmarkUseCase,
 ) : ViewModel() {
@@ -46,11 +44,7 @@ class TripDetailViewModel @Inject constructor(
     private val _uiEffect: Channel<TripDetailUiEffect> = Channel(Channel.BUFFERED)
     val uiEffect: Flow<TripDetailUiEffect> = _uiEffect.receiveAsFlow()
 
-    private val contentId: Long by lazy {
-        checkNotNull(savedStateHandle["com.on.turip.TRIP_DETAIL_CONTENT_KEY"]) {
-            Timber.e("컨텐츠 상세 화면 Content ID 값이 존재하지 않습니다.")
-        }
-    }
+    private var contentId: Long = 0L
 
     init {
         loadTripDetails()

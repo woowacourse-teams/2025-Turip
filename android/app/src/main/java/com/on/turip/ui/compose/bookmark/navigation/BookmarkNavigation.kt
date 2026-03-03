@@ -12,7 +12,9 @@ fun EntryProviderScope<NavKey>.bookmarkContentListScreen(navigator: Navigator) {
         BookmarkContentListScreen(
             onBack = navigator::goBack,
             onNavigateToLogin = { navigator.navigate(LoginNavKey) },
-            onNavigateToContent = { navigator.navigate(TripDetailNavKey) },
+            onNavigateToContent = { turipId: Long ->
+                navigator.navigate(TripDetailNavKey(turipId))
+            },
         )
     }
 }

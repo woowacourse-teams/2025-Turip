@@ -17,6 +17,7 @@ fun EntryProviderScope<NavKey>.tripDetailScreen(
 ) {
     entry<TripDetailNavKey> {
         TripDetailScreen(
+            turipId = it.turipId,
             navigateToBack = navigator::goBack,
             navigateToLogin = { navigator.navigate(LoginNavKey) },
             navigateToMap = navigateToMap,

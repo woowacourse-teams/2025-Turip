@@ -47,7 +47,7 @@ import kotlinx.coroutines.flow.collectLatest
 fun HomeScreen(
     onSearchClick: (String) -> Unit,
     onRegionClick: (String) -> Unit,
-    onContentClick: (UsersLikeContentModel) -> Unit,
+    onContentClick: (Long) -> Unit,
     navigateToLoginScreen: () -> Unit,
     navigateToMyPage: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
@@ -70,7 +70,9 @@ fun HomeScreen(
             uiState = uiState,
             onSearchClick = onSearchClick,
             onRetryLoadContents = viewModel::loadContents,
-            onContentClick = onContentClick,
+            onContentClick = { usersLikeContent: UsersLikeContentModel ->
+                onContentClick(usersLikeContent.content.id)
+            },
             onRegionClick = onRegionClick,
             onDomesticClick = { viewModel.updateDomesticSelected(it) },
             onNavigateToMyPage = navigateToMyPage,

@@ -17,7 +17,9 @@ fun EntryProviderScope<NavKey>.myPageScreen(
     entry<MyPageNavKey> {
         MyPageScreen(
             onNavigateToAllBookmarkContents = { navigator.navigate(BookmarkNavKey) },
-            onNavigateToContent = { navigator.navigate(TripDetailNavKey) },
+            onNavigateToContent = { turipId: Long ->
+                navigator.navigate(TripDetailNavKey(turipId))
+            },
             onNavigateToInquiry = openInquiry,
             onNavigateToPrivacyPolicy = openPrivacyPolicy,
             onNavigateToLogin = { navigator.navigate(LoginNavKey) },

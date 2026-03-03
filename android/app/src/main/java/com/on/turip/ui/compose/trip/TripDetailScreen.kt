@@ -79,6 +79,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TripDetailScreen(
+    turipId: Long,
     navigateToBack: () -> Unit,
     navigateToLogin: () -> Unit,
     navigateToMap: (mapModel: MapModel) -> Unit,
@@ -370,7 +371,8 @@ private fun TripDetailScreenContent(
                             start = TuripTheme.spacing.extraLarge,
                             end = TuripTheme.spacing.extraLarge,
                             bottom = TuripTheme.spacing.small,
-                        ).fillMaxWidth(),
+                        )
+                        .fillMaxWidth(),
             )
         }
 
@@ -383,7 +385,8 @@ private fun TripDetailScreenContent(
                         .padding(
                             horizontal = TuripTheme.spacing.extraLarge,
                             vertical = TuripTheme.spacing.medium,
-                        ).fillMaxWidth(),
+                        )
+                        .fillMaxWidth(),
             )
         }
     }
