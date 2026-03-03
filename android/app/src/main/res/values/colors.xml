@@ -16,4 +16,5 @@
     <color name="turip_light_gray_f2f2f2_50">#80F2F2F2</color>
     <color name="turip_black_000000_06">#0F000000</color>
 
+    <color name="splash_background">#FF232323</color>
 </resources>
