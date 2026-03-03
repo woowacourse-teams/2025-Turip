@@ -5,5 +5,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class TripDetailNavKey(
-    val turipId: Long,
+    val contentId: Long,
 ) : NavKey
