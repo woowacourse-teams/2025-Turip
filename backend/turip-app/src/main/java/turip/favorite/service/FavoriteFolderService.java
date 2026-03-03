@@ -70,11 +70,13 @@ public class FavoriteFolderService {
         validateShareAndCustomFolder(favoriteFolder);
 
         boolean isAlreadyJoined = favoriteFolderAccountService.isFolderMember(member.getAccount(), favoriteFolder);
+        if (isAlreadyJoined) {
+            throw new ConflictException(ErrorTag.FAVORITE_FOLDER_ALREADY_JOINED);
+        }
+
         FavoriteFolderAccount favoriteFolderAccount = favoriteFolderAccountService.findOrCreate(favoriteFolder,
                 member.getAccount());
-        if (!isAlreadyJoined) {
-            eventPublisher.publishEvent(FavoriteFolderUpdateEvent.of(favoriteFolderId, ActionType.MEMBER_JOINED));
-        }
+        eventPublisher.publishEvent(FavoriteFolderUpdateEvent.of(favoriteFolderId, ActionType.MEMBER_JOINED));
 
         return FavoriteFolderJoinResponse.from(favoriteFolderAccount);
     }
