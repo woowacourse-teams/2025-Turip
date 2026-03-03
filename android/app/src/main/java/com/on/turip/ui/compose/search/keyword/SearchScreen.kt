@@ -32,6 +32,7 @@ import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun SearchScreen(
+    keyword: String,
     onNavigateBack: () -> Unit,
     onNavigateToDetail: (id: Long) -> Unit,
     onNavigateToLogin: () -> Unit,
@@ -51,6 +52,10 @@ fun SearchScreen(
             isHistoryVisible = false
             focusManager.clearFocus()
         }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.initKeywordIfNeeded(keyword)
     }
 
     LaunchedEffect(Unit) {

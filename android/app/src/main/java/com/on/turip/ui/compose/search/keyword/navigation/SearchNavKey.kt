@@ -4,4 +4,6 @@ import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
 @Serializable
-data object SearchNavKey : NavKey
+data class SearchNavKey(
+    val keyword: String,
+) : NavKey

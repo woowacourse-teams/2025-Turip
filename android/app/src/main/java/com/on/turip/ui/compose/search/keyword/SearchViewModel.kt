@@ -2,7 +2,6 @@ package com.on.turip.ui.compose.search.keyword
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.on.turip.core.result.TuripResult
@@ -35,7 +34,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
     private val contentRepository: ContentRepository,
     private val searchHistoryRepository: SearchHistoryRepository,
 ) : ViewModel() {
@@ -54,17 +52,14 @@ class SearchViewModel @Inject constructor(
         )
     val searchHistory: LiveData<ImmutableList<SearchHistory>> get() = _searchHistory
 
-    private val searchKeyword: String by lazy {
-        checkNotNull(savedStateHandle["com.on.turip.SEARCH_KEYWORD_KEY"]) {
-            Timber.e("검색 완료 화면 검색 결과가 존재하지 않습니다.")
-        }
-    }
+    private var initKeyword: String = ""
 
-    init {
-        _searchingWord.value = searchKeyword
+    fun initKeywordIfNeeded(keyword: String) {
+        initKeyword = keyword
+        _searchingWord.value = initKeyword
         loadSearchHistory()
-        loadByKeyword(searchKeyword)
-        createSearchHistory(searchKeyword)
+        loadByKeyword(initKeyword)
+        createSearchHistory(initKeyword)
     }
 
     private fun loadSearchHistory() {

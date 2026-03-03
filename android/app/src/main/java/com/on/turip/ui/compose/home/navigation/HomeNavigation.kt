@@ -13,7 +13,9 @@ import com.on.turip.ui.compose.trip.navigation.TripDetailNavKey
 fun EntryProviderScope<NavKey>.homeScreen(navigator: Navigator) {
     entry<HomeNavKey> {
         HomeScreen(
-            onSearchClick = { navigator.navigate(SearchNavKey) },
+            onSearchClick = { keyword: String ->
+                navigator.navigate(SearchNavKey(keyword))
+            },
             onRegionClick = { navigator.navigate(RegionResultNavKey) },
             onContentClick = { navigator.navigate(TripDetailNavKey) },
             navigateToLoginScreen = { navigator.navigate(LoginNavKey) },

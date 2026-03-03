@@ -10,6 +10,7 @@ import com.on.turip.ui.compose.trip.navigation.TripDetailNavKey
 fun EntryProviderScope<NavKey>.searchScreen(navigator: Navigator) {
     entry<SearchNavKey> {
         SearchScreen(
+            keyword = it.keyword,
             onNavigateBack = navigator::goBack,
             onNavigateToDetail = { navigator.navigate(TripDetailNavKey) },
             onNavigateToLogin = { navigator.navigate(LoginNavKey) },
