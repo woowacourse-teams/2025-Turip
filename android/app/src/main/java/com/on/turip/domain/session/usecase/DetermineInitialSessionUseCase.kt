@@ -16,6 +16,7 @@ class DetermineInitialSessionUseCase @Inject constructor(
     private val tokenManager: TokenManager,
     private val sessionStore: SessionStore,
     private val authRepository: AuthRepository,
+    private val moveToGuestUseCase: MoveToGuestUseCase,
 ) {
     suspend operator fun invoke(): SessionState {
         tokenManager.initialize()
@@ -27,26 +28,22 @@ class DetermineInitialSessionUseCase @Inject constructor(
         }
 
         // 토큰이 유효한지 검증
-        return authRepository.getTokenVerification(tokens.accessToken).fold(
+        authRepository.getTokenVerification(tokens.accessToken).fold(
             onSuccess = {
                 sessionStore.setMember()
-
-                SessionState.Member
+                return SessionState.Member
             },
             onFailure = { errorType ->
                 when (errorType) {
                     is ErrorType.Auth -> {
-                        tokenManager.clearTokens()
-                        sessionStore.setGuest()
-
-                        SessionState.Guest
+                        moveToGuestUseCase()
+                        return SessionState.Guest
                     }
 
                     else -> {
                         // Auth 관련 오류가 아닌 경우는 토큰 초기화하지 않고 멤버로 내려주기
                         sessionStore.setMember()
-
-                        SessionState.Member
+                        return SessionState.Member
                     }
                 }
             },
