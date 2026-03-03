@@ -47,7 +47,6 @@ object NetworkModule {
         authRepository: Lazy<AuthRepository>,
         fidProvider: FidProvider,
     ): HttpClient =
-        @Suppress("ktlint:standard:kdoc")
         HttpClient(OkHttp) {
             /**
              * HTTP 응답이 성공(2xx)이 아닐 경우
