@@ -103,10 +103,17 @@ object NetworkModule {
                         .requestTokens(storedRefreshToken)
                         .fold(
                             onSuccess = { newTokens: AuthTokens ->
-                                tokenManager.setTokens(newTokens)
-                                BearerTokens(
-                                    accessToken = newTokens.accessToken,
-                                    refreshToken = newTokens.refreshToken,
+                                tokenManager.setTokens(newTokens).fold(
+                                    onSuccess = {
+                                        BearerTokens(
+                                            accessToken = newTokens.accessToken,
+                                            refreshToken = newTokens.refreshToken,
+                                        )
+                                    },
+                                    onFailure = {
+                                        tokenManager.clearTokens()
+                                        null
+                                    },
                                 )
                             },
                             onFailure = {
