@@ -1,6 +1,5 @@
 package com.on.turip.ui.compose.turipdetail
 
-import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -66,7 +65,7 @@ fun TuripDetailScreen(
     selectedTuripId: Long,
     onNavigateToLogin: () -> Unit,
     onShareTurip: (turipShareModel: TuripShareModel) -> Unit,
-    onNavigateToMap: (uri: Uri) -> Unit,
+    onNavigateToMap: (map: MapModel) -> Unit,
     onBack: () -> Unit,
     viewModel: TuripDetailViewModel = hiltViewModel(),
 ) {
@@ -247,7 +246,7 @@ fun TuripDetailScreen(
                         selectedTuripId = uiState.selectedTurip.id,
                         selectedTuripName = uiState.selectedTurip.name,
                         turipPlaceModel = uiState.places,
-                        navigateToMap = { mapModel: MapModel -> onNavigateToMap(mapModel.uri) },
+                        navigateToMap = { mapModel: MapModel -> onNavigateToMap(mapModel) },
                         onClickTuripPlace = { placeId: Long ->
                             snackbarHostState.dismissAndExecute {
                                 viewModel.applyTuripPlaceDelete(placeId = placeId)

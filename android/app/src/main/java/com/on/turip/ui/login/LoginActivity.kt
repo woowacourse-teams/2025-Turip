@@ -25,7 +25,7 @@ class LoginActivity : AppCompatActivity() {
         setContent {
             TuripTheme {
                 LoginScreen(
-                    navigateToMain = {
+                    navigateToHome = {
                         startActivity(MainActivity.newIntent(this@LoginActivity))
                         finish()
                     },

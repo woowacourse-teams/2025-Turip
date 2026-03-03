@@ -42,7 +42,7 @@ import com.on.turip.ui.compose.login.util.noRippleClickable
 
 @Composable
 fun LoginScreen(
-    navigateToMain: () -> Unit,
+    navigateToHome: () -> Unit,
     googleCredentialManager: GoogleCredentialManager,
     viewmodel: LoginViewmodel = hiltViewModel(),
 ) {
@@ -54,7 +54,7 @@ fun LoginScreen(
         viewmodel.uiEffect.collect { effect: LoginUiEffect ->
             when (effect) {
                 LoginUiEffect.NavigateToMain -> {
-                    navigateToMain()
+                    navigateToHome()
                 }
 
                 is LoginUiEffect.ShowError -> {

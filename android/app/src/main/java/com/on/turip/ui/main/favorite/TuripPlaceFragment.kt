@@ -1,7 +1,6 @@
 package com.on.turip.ui.main.favorite
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,6 +16,7 @@ import androidx.fragment.app.Fragment
 import com.on.turip.R
 import com.on.turip.ui.common.extensions.safeStartActivityWithToast
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
+import com.on.turip.ui.compose.trip.model.MapModel
 import com.on.turip.ui.compose.turip.MyTuripScreen
 import com.on.turip.ui.compose.turipdetail.TuripDetailScreen
 import com.on.turip.ui.compose.turipdetail.model.turip.TuripShareModel
@@ -53,8 +53,8 @@ class TuripPlaceFragment : Fragment() {
                                 selectedTuripId = selectedTuripId,
                                 onNavigateToLogin = ::navigateToLoginScreen,
                                 onShareTurip = ::navigateToShareTurip,
-                                onNavigateToMap = { uri: Uri ->
-                                    val intent = Intent(Intent.ACTION_VIEW, uri)
+                                onNavigateToMap = { mapModel: MapModel ->
+                                    val intent = Intent(Intent.ACTION_VIEW, mapModel.uri)
                                     requireContext().safeStartActivityWithToast(
                                         intent = intent,
                                         errorToastMessage = getString(R.string.all_snackbar_not_found_map_url),
