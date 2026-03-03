@@ -7,7 +7,7 @@ import com.on.turip.ui.compose.login.navigation.LoginNavKey
 import com.on.turip.ui.compose.turip.MyTuripScreen
 import com.on.turip.ui.compose.turipdetail.navigation.TuripDetailNavKey
 
-fun EntryProviderScope<NavKey>.myTuripNavigation(navigator: Navigator) {
+fun EntryProviderScope<NavKey>.myTuripScreen(navigator: Navigator) {
     entry<MyTuripNavKey> {
         MyTuripScreen(
             onNavigateToTuripPlace = { navigator.navigate(TuripDetailNavKey) },
