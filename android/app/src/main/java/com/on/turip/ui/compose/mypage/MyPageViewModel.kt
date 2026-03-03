@@ -5,10 +5,12 @@ import androidx.lifecycle.viewModelScope
 import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
-import com.on.turip.domain.accounts.Account
-import com.on.turip.domain.accounts.AccountRepository
-import com.on.turip.domain.bookmark.PagedBookmarkContents
+import com.on.turip.domain.account.Account
+import com.on.turip.domain.account.AccountRepository
+import com.on.turip.domain.bookmark.BookmarkContent
 import com.on.turip.domain.bookmark.repository.BookmarkRepository
+import com.on.turip.domain.common.paging.Cursor
+import com.on.turip.domain.common.paging.Page
 import com.on.turip.domain.login.MemberRepository
 import com.on.turip.domain.setting.PrivacyPolicy
 import com.on.turip.domain.userstorage.repository.UserStorageRepository
@@ -19,6 +21,7 @@ import com.on.turip.ui.compose.mypage.model.InquiryMail
 import com.on.turip.ui.compose.mypage.util.AppEnvironmentInfoProvider
 import com.on.turip.ui.compose.mypage.util.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -72,12 +75,13 @@ class MyPageViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(bookmarkContentState = MyPageSectionState.Loading) }
 
+            val cursor = Cursor(size = 10, lastId = null)
             bookmarkRepository
-                .loadBookmarks(10, 0L)
-                .onSuccess { result: PagedBookmarkContents ->
+                .loadBookmarks(cursor)
+                .onSuccess { result: Page<BookmarkContent> ->
                     Timber.d("마이페이지 북마크 목록 조회 성공")
                     _uiState.update {
-                        it.copy(bookmarkContentState = MyPageSectionState.Success(result.bookmarkContents.toImmutableList()))
+                        it.copy(bookmarkContentState = MyPageSectionState.Success(result.items.toImmutableList()))
                     }
                 }.onFailure {
                     Timber.e("마이페이지 북마크 목록 조회 에러 발생")
@@ -91,6 +95,8 @@ class MyPageViewModel @Inject constructor(
 
     // 삭제 진행 중인 콘텐츠에 대해 중복 API 호출 방지용
     private val removingIds = mutableSetOf<Long>()
+
+    private val removingSnapshots = mutableMapOf<Long, BookmarkRemoveSnapshot>()
 
     // 낙관적 UI
     fun removeBookmark(contentId: Long) {
@@ -106,8 +112,13 @@ class MyPageViewModel @Inject constructor(
                         val contents =
                             (current as? MyPageSectionState.Success)?.data ?: return@withLock false
 
-                        // 이미 UI 제거 완료된 상태 (API 호출 완료)
-                        if (contents.none { it.content.id == contentId }) return@withLock false
+                        val removeContentIndex: Int =
+                            contents.indexOfFirst { it.content.id == contentId }
+                        if (removeContentIndex == -1) return@withLock false
+
+                        val removeContent = contents[removeContentIndex]
+                        removingSnapshots[contentId] =
+                            BookmarkRemoveSnapshot(removeContent, removeContentIndex)
 
                         val updated =
                             contents.filter { it.content.id != contentId }.toImmutableList()
@@ -121,12 +132,45 @@ class MyPageViewModel @Inject constructor(
 
                 bookmarkRepository
                     .deleteBookmark(contentId)
-                    .onFailure {
-                        _uiEffect.send(MyPageUiEffect.ShowBookmarkRemoveFailed)
+                    .onSuccess {
+                        removeBookmarkMutex.withLock { removingSnapshots.remove(contentId) }
+                    }.onFailure {
+                        _uiEffect.send(MyPageUiEffect.ShowBookmarkRemoveFailed(contentId))
                     }
             } finally {
                 // 중복 API 호출 방지 리소스 정리
                 removeBookmarkMutex.withLock { removingIds.remove(contentId) }
+            }
+        }
+    }
+
+    fun rollbackBookmarkContentRemove(contentId: Long) {
+        viewModelScope.launch {
+            removeBookmarkMutex.withLock {
+                val snapshot = removingSnapshots.remove(contentId) ?: return@withLock
+
+                val current = _uiState.value.bookmarkContentState
+                val contents =
+                    (current as? MyPageSectionState.Success)?.data ?: return@withLock
+
+                // 중복 복구 방지
+                if (contents.any { it.content.id == contentId }) return@withLock
+
+                // 스냅샷 시점 기준 다른 콘텐츠들이 제거되어 순서가 변경되었을 가능성 존재
+                val safeIndex = snapshot.index.coerceIn(0, contents.size)
+
+                val rollbackContents: ImmutableList<BookmarkContent> =
+                    contents
+                        .toMutableList()
+                        .apply { add(safeIndex, snapshot.content) }
+                        .toImmutableList()
+
+                _uiState.update {
+                    it.copy(
+                        bookmarkContentState =
+                            MyPageSectionState.Success(rollbackContents),
+                    )
+                }
             }
         }
     }
@@ -243,3 +287,8 @@ class MyPageViewModel @Inject constructor(
         private const val INVALID_FID = "FID_LOAD_FAIL"
     }
 }
+
+private data class BookmarkRemoveSnapshot(
+    val content: BookmarkContent,
+    val index: Int,
+)

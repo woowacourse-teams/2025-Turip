@@ -22,4 +22,10 @@ public class FavoriteFolderAccountFixture {
                                                                     AccountRole accountRole) {
         return new FavoriteFolderAccount(favoriteFolder, account, accountRole);
     }
+
+    public static FavoriteFolderAccount createFavoriteFolderAccountWithId(Long id, FavoriteFolder favoriteFolder,
+                                                                          Account account,
+                                                                          AccountRole accountRole) {
+        return new FavoriteFolderAccount(id, favoriteFolder, account, accountRole);
+    }
 }

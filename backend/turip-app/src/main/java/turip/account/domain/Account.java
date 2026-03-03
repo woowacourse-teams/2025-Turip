@@ -18,8 +18,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @Table(name = "account")
-@NoArgsConstructor(access = AccessLevel.PUBLIC)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Account {
 
     @Id

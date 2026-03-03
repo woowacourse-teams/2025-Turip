@@ -40,6 +40,7 @@ import turip.auth.service.dto.TuripLoginResult;
 import turip.auth.token.GoogleTokenParser;
 import turip.auth.token.JwtProvider;
 import turip.common.exception.ErrorTag;
+import turip.common.exception.custom.NotFoundException;
 import turip.common.exception.custom.UnauthorizedException;
 import turip.util.fixture.AccountFixture;
 import turip.util.fixture.MemberFixture;
@@ -401,12 +402,11 @@ class AuthServiceTest {
         @DisplayName("존재하지 않는 계정으로 로그아웃 시도 시 UnauthorizedException이 발생한다")
         void logoutWithNonExistentAccount() {
             // given
-            Long accountId = 999L;
             String deviceFid = "device-123";
-            Account account = AccountFixture.createUser();
+            Account account = AccountFixture.createEntity();
 
-            when(memberService.getByAccountId(accountId))
-                    .thenThrow(new UnauthorizedException(ErrorTag.UNAUTHORIZED));
+            when(memberService.getByAccountId(account.getId()))
+                    .thenThrow(new NotFoundException(ErrorTag.UNAUTHORIZED));
 
             // when & then
             assertThatThrownBy(() -> authService.logout(account, deviceFid))

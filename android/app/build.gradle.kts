@@ -16,7 +16,7 @@ plugins {
 
 android {
     namespace = "com.on.turip"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.on.turip"
@@ -152,7 +152,7 @@ dependencies {
     implementation(libs.coil.network.okhttp)
 
     // maps
-    implementation(libs.play.services.maps)
+    implementation(libs.google.map)
 
     // app update
     implementation(libs.app.update)

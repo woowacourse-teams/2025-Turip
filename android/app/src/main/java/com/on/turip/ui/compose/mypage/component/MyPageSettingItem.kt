@@ -48,8 +48,7 @@ fun MyPageSettingItem(
                     width = 1.dp,
                     color = TuripTheme.colors.gray02,
                     shape = shape,
-                )
-                .padding(
+                ).padding(
                     horizontal = TuripTheme.spacing.extraLarge,
                     vertical = TuripTheme.spacing.large,
                 ),
