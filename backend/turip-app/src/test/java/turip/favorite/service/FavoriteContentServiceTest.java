@@ -228,7 +228,7 @@ class FavoriteContentServiceTest {
         void deleteFavoriteContent2() {
             // given
             Long contentId = 1L;
-            Account account = new Account();
+            Account account = AccountFixture.createUser();
 
             given(contentRepository.findById(contentId))
                     .willReturn(Optional.empty());

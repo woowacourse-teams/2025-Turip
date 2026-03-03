@@ -68,7 +68,7 @@ class ContentServiceTest {
             Country country = new Country("대한민국", "대한민국 사진 경로");
             Province province = new Province("강원도");
             City city = new City(country, province, "속초", "시 이미지 경로");
-            Account account = new Account();
+            Account account = AccountFixture.createUser();
 
             Content content1 = new Content(1L, creator, city, "메이의 속초 브이로그 1편", "url1", LocalDate.of(2025, 7, 8));
             Content content2 = new Content(2L, creator, city, "메이의 속초 브이로그 2편", "url2", LocalDate.of(2025, 7, 8));
