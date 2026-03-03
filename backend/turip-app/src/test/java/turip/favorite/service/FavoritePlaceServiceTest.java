@@ -4,8 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,6 +18,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import turip.account.domain.Account;
 import turip.account.domain.Role;
 import turip.common.exception.ErrorTag;
@@ -29,6 +32,8 @@ import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusRe
 import turip.favorite.controller.dto.response.FavoritePlaceCountResponse;
 import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.domain.FavoritePlace;
+import turip.favorite.domain.event.ActionType;
+import turip.favorite.domain.event.FavoriteFolderUpdateEvent;
 import turip.favorite.repository.FavoriteFolderRepository;
 import turip.favorite.repository.FavoritePlaceRepository;
 import turip.place.domain.Place;
@@ -54,11 +59,14 @@ class FavoritePlaceServiceTest {
     @Mock
     private FavoriteFolderAccountService favoriteFolderAccountService;
 
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
+
     @DisplayName("장소 찜 생성 테스트")
     @Nested
     class Create {
 
-        @DisplayName("장소 찜을 생성할 수 있다")
+        @DisplayName("장소 찜을 생성하고 알림 이벤트를 발행한다")
         @Test
         void create1() {
             // given
@@ -86,7 +94,9 @@ class FavoritePlaceServiceTest {
             assertAll(
                     () -> assertThat(response.id()).isEqualTo(favoriteFolderId),
                     () -> assertThat(response.favoriteFolderId()).isEqualTo(favoriteFolderId),
-                    () -> assertThat(response.placeId()).isEqualTo(placeId)
+                    () -> assertThat(response.placeId()).isEqualTo(placeId),
+                    () -> verify(eventPublisher).publishEvent(
+                            FavoriteFolderUpdateEvent.of(favoriteFolderId, ActionType.PLACE_ADDED))
             );
         }
 
@@ -247,12 +257,13 @@ class FavoritePlaceServiceTest {
     @Nested
     class UpdatePlaceOrder {
 
-        @DisplayName("장소 찜 순서를 변경할 수 있다")
+        @DisplayName("장소 찜 순서를 변경하고 알림 이벤트를 발행한다")
         @Test
         void updatePlaceOrder1() {
             // given
             Account account = AccountFixture.createUser();
-            FavoriteFolder favoriteFolder = FavoriteFolderFixture.createDefaultFolder();
+            Long favoriteFolderId = 1L;
+            FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(favoriteFolderId, "폴더");
             FavoritePlace firstFavoritePlace = new FavoritePlace(1L, favoriteFolder, null, 1);
             FavoritePlace secondFavoritePlace = new FavoritePlace(2L, favoriteFolder, null, 2);
             given(favoriteFolderRepository.findById(favoriteFolder.getId()))
@@ -269,7 +280,9 @@ class FavoritePlaceServiceTest {
             // then
             assertAll(
                     () -> assertThat(firstFavoritePlace.getFavoriteOrder()).isEqualTo(2),
-                    () -> assertThat(secondFavoritePlace.getFavoriteOrder()).isEqualTo(1)
+                    () -> assertThat(secondFavoritePlace.getFavoriteOrder()).isEqualTo(1),
+                    () -> verify(eventPublisher).publishEvent(
+                            FavoriteFolderUpdateEvent.of(favoriteFolderId, ActionType.PLACE_REORDERED))
             );
         }
 
@@ -321,11 +334,48 @@ class FavoritePlaceServiceTest {
         }
     }
 
+    @DisplayName("여러 폴더의 장소 업데이트 테스트")
+    @Nested
+    class UpdateFavoriteFolders {
+
+        @Test
+        @DisplayName("여러 폴더의 장소를 업데이트하면 영향을 받은 모든 폴더에 이벤트를 발행한다")
+        void updateFavoriteFolders_Success() {
+            // given
+            Account account = AccountFixture.createUser();
+            Long placeId = 1L;
+            Place place = new Place(placeId, "장소", "url", "주소", 1, 1);
+
+            // 기존 폴더: 1번 / 요청 폴더: 2번 -> 영향을 받은 폴더: 1, 2번
+            Long existingFolderId = 1L;
+            Long requestFolderId = 2L;
+            FavoriteFolder existingFolder = FavoriteFolderFixture.createCustomFolderWithId(existingFolderId, "기존");
+            FavoriteFolder requestFolder = FavoriteFolderFixture.createCustomFolderWithId(requestFolderId, "새요청");
+
+            FavoritePlace existingPlace = new FavoritePlace(10L, existingFolder, place, 1);
+
+            given(placeRepository.findById(placeId)).willReturn(Optional.of(place));
+            given(favoriteFolderRepository.findAllById(any())).willReturn(List.of(requestFolder));
+            given(favoritePlaceRepository.findAllByPlaceAndAccount(place, account)).willReturn(List.of(existingPlace));
+
+            // when
+            favoritePlaceService.updateFavoriteFolders(account, List.of(requestFolderId), placeId);
+
+            // then
+            assertAll(
+                    () -> verify(eventPublisher).publishEvent(
+                            FavoriteFolderUpdateEvent.of(existingFolderId, ActionType.FOLDER_PLACE_CHANGED)),
+                    () -> verify(eventPublisher).publishEvent(
+                            FavoriteFolderUpdateEvent.of(requestFolderId, ActionType.FOLDER_PLACE_CHANGED))
+            );
+        }
+    }
+
     @DisplayName("장소 찜 삭제 테스트")
     @Nested
     class Remove {
 
-        @DisplayName("장소 찜을 삭제할 수 있다")
+        @DisplayName("장소 찜을 삭제하고 알림 이벤트를 발행한다")
         @Test
         void remove1() {
             // given
@@ -345,7 +395,11 @@ class FavoritePlaceServiceTest {
                     .willReturn(Optional.of(favoritePlace));
 
             // when & then
-            assertDoesNotThrow(() -> favoritePlaceService.remove(account, favoriteFolderId, placeId));
+            assertAll(
+                    () -> assertDoesNotThrow(() -> favoritePlaceService.remove(account, favoriteFolderId, placeId)),
+                    () -> verify(eventPublisher).publishEvent(
+                            FavoriteFolderUpdateEvent.of(favoriteFolderId, ActionType.PLACE_DELETED))
+            );
         }
 
         @DisplayName("폴더 소유자의 기기id와 요청자의 기기id가 같지 않은 경우 ForbiddenException을 발생시킨다")

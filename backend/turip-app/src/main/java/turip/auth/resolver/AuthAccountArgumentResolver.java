@@ -52,7 +52,7 @@ public class AuthAccountArgumentResolver implements HandlerMethodArgumentResolve
         } catch (IllegalArgumentException e) {
             throw new UnauthorizedException(e.getErrorTag());
         } catch (Exception e) {
-            throw new UnauthorizedException(ErrorTag.UNAUTHORIZED);
+            throw new UnauthorizedException(ErrorTag.UNAUTHORIZED, e);
         }
     }
 

@@ -19,6 +19,9 @@ services:
       - "8080"
     env_file:
       - .env
+    environment:
+      OTEL_SERVICE_NAME: turip-app
+      OTEL_RESOURCE_ATTRIBUTES: "deployment.environment.name=${SPRING_PROFILES_ACTIVE:-unknown}"
     networks:
       - turip-network
     volumes:
@@ -32,6 +35,9 @@ services:
       - "8080"
     env_file:
       - .env
+    environment:
+      OTEL_SERVICE_NAME: turip-app
+      OTEL_RESOURCE_ATTRIBUTES: "deployment.environment.name=${SPRING_PROFILES_ACTIVE:-unknown}"
     networks:
       - turip-network
     volumes:
@@ -48,6 +54,7 @@ services:
     environment:
       SERVER_PORT: 8081
       OTEL_SERVICE_NAME: turip-admin
+      OTEL_RESOURCE_ATTRIBUTES: "deployment.environment.name=${SPRING_PROFILES_ACTIVE:-unknown}"
     networks:
       - turip-network
     volumes:

@@ -3,7 +3,6 @@ package turip.favorite.stream.api;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -11,9 +10,7 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -94,7 +91,7 @@ class FavoriteFolderStreamApiTest {
             Long folderId = testDataHelper.insertFavoriteFolder("테스트 폴더");
             testDataHelper.insertFavoriteFolderAccount(accountId, folderId, AccountRole.OWNER);
 
-            String accessToken = loginAndGetAccessToken("turip", "TestPass1!");
+            String accessToken = testDataHelper.createAccessToken(accountId);
             URL url = new URI("http://localhost:" + port + "/api/v1/turips/" + folderId + "/stream").toURL();
 
             // when
@@ -118,7 +115,7 @@ class FavoriteFolderStreamApiTest {
             Long folderId = testDataHelper.insertFavoriteFolder("테스트 폴더");
             testDataHelper.insertFavoriteFolderAccount(accountId, folderId, AccountRole.OWNER);
 
-            String accessToken = loginAndGetAccessToken("turip", "TestPass1!");
+            String accessToken = testDataHelper.createAccessToken(accountId);
             URL url = new URI("http://localhost:" + port + "/api/v1/turips/" + folderId + "/stream").toURL();
 
             // when
@@ -145,7 +142,7 @@ class FavoriteFolderStreamApiTest {
             Long notOwnerMemberId = testDataHelper.insertMember(notOwnerAccountId, "test2@example.com", false);
             testDataHelper.insertTuripMember(notOwnerMemberId, "notowner", "TestPass1!");
 
-            String accessToken = loginAndGetAccessToken("notowner", "TestPass1!");
+            String accessToken = testDataHelper.createAccessToken(notOwnerAccountId);
 
             // when & then
             RestAssured.given().port(port)
@@ -155,20 +152,6 @@ class FavoriteFolderStreamApiTest {
                     .statusCode(403);
 
         }
-    }
-
-    private String loginAndGetAccessToken(String loginId, String loginPassword) {
-        Map<String, String> loginRequest = new HashMap<>(Map.of("loginId", loginId, "loginPassword", loginPassword));
-        return RestAssured.given()
-                .port(port)
-                .header("device-fid", "testDeviceFid")
-                .contentType(ContentType.JSON)
-                .body(loginRequest)
-                .when().post("/api/v1/auth/login/turip")
-                .then()
-                .statusCode(200)
-                .extract()
-                .cookie("accessToken");
     }
 
     private BufferedReader connectStreamingAndGetInputBuffer(URL url, String accessToken) throws IOException {
