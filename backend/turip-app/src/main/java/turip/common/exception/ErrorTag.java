@@ -11,6 +11,8 @@ public enum ErrorTag {
     DEVICE_FID_REQUIRED("요청 헤더에 device_fid가 존재하지 않습니다."),
     FAVORITE_PLACE_FOLDER_MISMATCH("장소 찜이 해당 폴더에 존재하지 않습니다."),
     SHARED_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED("공유 찜폴더에는 이 작업을 수행할 수 없습니다."),
+    PERSONAL_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED("개인 찜폴더에는 이 작업을 수행할 수 없습니다."),
+
     EMAIL_INVALID("이메일 형식이 올바르지 않습니다."),
     LOGIN_ID_INVALID("아이디 형식이 올바르지 않습니다."),
     LOGIN_PASSWORD_INVALID("비밀번호 형식이 올바르지 않습니다."),
@@ -42,6 +44,7 @@ public enum ErrorTag {
     FAVORITE_PLACE_NOT_FOUND("찜한 장소를 찾을 수 없습니다."),
     CREATOR_NOT_FOUND("크리에이터를 찾을 수 없습니다."),
     FAVORITE_CONTENT_NOT_FOUND("찜한 컨텐츠를 찾을 수 없습니다."),
+    FAVORITE_FOLDER_ACCOUNT_NOT_FOUND("찜폴더에 참여중인 계정 목록에서 해당 계정을 찾을 수 없습니다."),
 
     // 409 Conflict
     FAVORITE_FOLDER_NAME_CONFLICT("이미 존재하는 찜폴더 이름입니다."),

@@ -122,26 +122,7 @@ class MemberApiTest {
                     , guestAccountId
             );
 
-            // 4. Member 로그인해서 access token 받기
-            String idToken = "valid-google-id-token";
-
-            when(googleTokenParser.getProvider()).thenReturn(provider);
-            when(googleTokenParser.getProviderId(idToken)).thenReturn(providerId);
-            when(googleTokenParser.getEmail(idToken)).thenReturn("migration@gmail.com");
-
-            Map<String, String> loginRequest = new HashMap<>();
-            loginRequest.put("idToken", idToken);
-
-            String accessToken = RestAssured
-                    .given().log().all()
-                    .contentType(ContentType.JSON)
-                    .header("device-fid", guestDeviceFid)
-                    .body(loginRequest)
-                    .when().post("/api/v1/auth/login/google")
-                    .then().log().all()
-                    .statusCode(200)
-                    .body("accessToken", notNullValue())
-                    .extract().path("accessToken");
+            String accessToken = testDataHelper.createAccessToken(memberAccountId);
 
             // when & then
             RestAssured
@@ -197,26 +178,12 @@ class MemberApiTest {
             Provider provider = Provider.GOOGLE;
             String providerId = "google-user-no-device";
 
-            testDataHelper.insertSocialMember(email, true, provider, providerId);
+            Long socialMemberId = testDataHelper.insertSocialMember(email, true, provider, providerId);
+            Long accountId = jdbcTemplate.queryForObject(
+                    "SELECT account_id FROM member WHERE id = (SELECT member_id FROM social_member WHERE id = ?)",
+                    Long.class, socialMemberId);
 
-            String idToken = "valid-google-id-token";
-
-            when(googleTokenParser.getProvider()).thenReturn(provider);
-            when(googleTokenParser.getProviderId(idToken)).thenReturn(providerId);
-            when(googleTokenParser.getEmail(idToken)).thenReturn(email);
-
-            Map<String, String> loginRequest = new HashMap<>();
-            loginRequest.put("idToken", idToken);
-
-            String accessToken = RestAssured
-                    .given().log().all()
-                    .contentType(ContentType.JSON)
-                    .header("device-fid", "temp-device")
-                    .body(loginRequest)
-                    .when().post("/api/v1/auth/login/google")
-                    .then().log().all()
-                    .statusCode(200)
-                    .extract().path("accessToken");
+            String accessToken = testDataHelper.createAccessToken(accountId);
 
             // when & then
             RestAssured
@@ -271,26 +238,7 @@ class MemberApiTest {
                     "INSERT INTO favorite_content (id, account_id, content_id, created_at) VALUES (1, 1, 1, '2024-01-01')"
             );
 
-            // 5. Member 로그인해서 access token 받기
-            String idToken = "valid-google-id-token";
-
-            when(googleTokenParser.getProvider()).thenReturn(provider);
-            when(googleTokenParser.getProviderId(idToken)).thenReturn(providerId);
-            when(googleTokenParser.getEmail(idToken)).thenReturn(email);
-
-            Map<String, String> loginRequest = new HashMap<>();
-            loginRequest.put("idToken", idToken);
-
-            String accessToken = RestAssured
-                    .given().log().all()
-                    .contentType(ContentType.JSON)
-                    .header("device-fid", "device-123")
-                    .body(loginRequest)
-                    .when().post("/api/v1/auth/login/google")
-                    .then().log().all()
-                    .statusCode(200)
-                    .body("accessToken", notNullValue())
-                    .extract().path("accessToken");
+            String accessToken = testDataHelper.createAccessToken(accountId);
 
             // when & then
             RestAssured

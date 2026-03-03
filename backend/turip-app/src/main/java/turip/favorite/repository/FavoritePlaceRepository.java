@@ -10,11 +10,21 @@ import org.springframework.data.repository.query.Param;
 import turip.account.domain.Account;
 import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.domain.FavoritePlace;
+import turip.favorite.repository.dto.FavoriteFolderItemCountResult;
 import turip.place.domain.Place;
 
 public interface FavoritePlaceRepository extends JpaRepository<FavoritePlace, Long> {
 
     int countByFavoriteFolder(FavoriteFolder favoriteFolder);
+
+    @Query("""
+            SELECT new turip.favorite.repository.dto.FavoriteFolderItemCountResult(ff.id, COUNT(fp))
+            FROM FavoriteFolder ff
+            LEFT JOIN FavoritePlace fp ON fp.favoriteFolder = ff
+            WHERE ff.id IN :folderIds
+            GROUP BY ff.id
+            """)
+    List<FavoriteFolderItemCountResult> countByFavoriteFolderIdsIn(@Param("folderIds") List<Long> folderIds);
 
     boolean existsByFavoriteFolderAndPlace(FavoriteFolder favoriteFolder, Place place);
 
