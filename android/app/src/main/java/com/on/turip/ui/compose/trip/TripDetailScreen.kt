@@ -120,6 +120,10 @@ fun TripDetailScreen(
     var selectedPlace by remember { mutableStateOf<SelectedPlaceModel?>(null) }
     val bottomSheetScope = rememberCoroutineScope()
 
+    LaunchedEffect(Unit) {
+        viewModel.initContentId(turipId)
+    }
+
     // bottomSheet visibility logic
     LaunchedEffect(uiState.selectedPlaceModel) {
         val currentSelectedPlace: SelectedPlaceModel? = uiState.selectedPlaceModel

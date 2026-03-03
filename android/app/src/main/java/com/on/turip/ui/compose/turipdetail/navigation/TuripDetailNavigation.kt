@@ -15,8 +15,7 @@ fun EntryProviderScope<NavKey>.turipDetailScreen(
 ) {
     entry<TuripDetailNavKey> {
         TuripDetailScreen(
-            // TODO 네비게이션 이후 변경
-            selectedTuripId = 0L,
+            selectedTuripId = it.turipId,
             onNavigateToLogin = { navigator.navigate(LoginNavKey) },
             onShareTurip = onShareTurip,
             onNavigateToMap = navigateToMap,

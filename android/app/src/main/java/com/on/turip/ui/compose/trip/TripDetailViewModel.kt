@@ -44,13 +44,15 @@ class TripDetailViewModel @Inject constructor(
     private val _uiEffect: Channel<TripDetailUiEffect> = Channel(Channel.BUFFERED)
     val uiEffect: Flow<TripDetailUiEffect> = _uiEffect.receiveAsFlow()
 
-    private var contentId: Long = 0L
+    private var contentId: Long = INVALID_ID
 
-    init {
+    fun initContentId(contentId: Long) {
+        this.contentId = contentId
         loadTripDetails()
     }
 
     fun loadTripDetails() {
+        if (contentId == INVALID_ID) return
         if (uiState.value.isLoading) return
 
         viewModelScope.launch {
@@ -215,5 +217,9 @@ class TripDetailViewModel @Inject constructor(
         when (action) {
             TripDetailRetryAction.UpdateBookmark -> updateBookmark()
         }
+    }
+
+    private companion object {
+        private const val INVALID_ID = -1L
     }
 }

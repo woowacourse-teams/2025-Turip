@@ -4,4 +4,6 @@ import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
 @Serializable
-data object TuripDetailNavKey : NavKey
+data class TuripDetailNavKey(
+    val turipId: Long,
+) : NavKey

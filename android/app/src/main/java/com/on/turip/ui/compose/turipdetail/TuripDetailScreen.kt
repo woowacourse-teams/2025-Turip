@@ -34,10 +34,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.gms.maps.model.LatLng
 import com.on.turip.R
 import com.on.turip.ui.common.error.ErrorUiState
@@ -73,7 +70,6 @@ fun TuripDetailScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val resource = LocalResources.current
     var showLoginSuggestDialog by remember { mutableStateOf(false) }
-    val lifecycleOwner = LocalLifecycleOwner.current
     val modalBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     BackHandler(enabled = !uiState.showBottomSheet) { onBack() }
@@ -82,11 +78,8 @@ fun TuripDetailScreen(
         onDispose { viewModel.resetUiState() }
     }
 
-    LaunchedEffect(Unit) {
-        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-            viewModel.loadSelectedTurip(selectedTuripId)
-            viewModel.loadPlaces(selectedTuripId)
-        }
+    LaunchedEffect(selectedTuripId) {
+        viewModel.initIfNeeded(selectedTuripId)
     }
 
     LaunchedEffect(Unit) {
