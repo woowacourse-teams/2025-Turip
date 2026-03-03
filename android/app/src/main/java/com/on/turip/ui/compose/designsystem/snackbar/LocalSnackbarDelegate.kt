@@ -1,5 +1,6 @@
 package com.on.turip.ui.compose.designsystem.snackbar
 
+import androidx.annotation.DrawableRes
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
@@ -26,6 +27,7 @@ class SnackbarDelegate(
         duration: SnackbarDuration = SnackbarDuration.Short,
         onDismiss: () -> Unit = {},
         onAction: () -> Unit = {},
+        @DrawableRes iconRes: Int? = null,
     ) {
         coroutineScope.launch {
             val visuals =
@@ -34,6 +36,7 @@ class SnackbarDelegate(
                     actionLabel = actionLabel,
                     withDismissAction = withDismissAction,
                     duration = duration,
+                    iconRes = iconRes,
                 )
 
             snackbarHostState.currentSnackbarData?.dismiss()

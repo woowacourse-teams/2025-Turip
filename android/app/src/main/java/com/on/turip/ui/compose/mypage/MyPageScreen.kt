@@ -2,19 +2,17 @@ package com.on.turip.ui.compose.mypage
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
@@ -31,10 +29,8 @@ import com.on.turip.domain.creator.Creator
 import com.on.turip.domain.region.City
 import com.on.turip.domain.trip.TripDuration
 import com.on.turip.ui.common.error.toUiModel
-import com.on.turip.ui.common.extensions.dismissAndExecute
-import com.on.turip.ui.common.extensions.showSnackbarWithAction
 import com.on.turip.ui.compose.designsystem.component.TuripDialog
-import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
+import com.on.turip.ui.compose.designsystem.snackbar.LocalSnackbarDelegate
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.mypage.component.MyPageAppBar
 import com.on.turip.ui.compose.mypage.component.MyPageBookmarkContentSection
@@ -55,15 +51,14 @@ fun MyPageScreen(
     viewModel: MyPageViewModel = hiltViewModel(),
 ) {
     val uiState: MyPageUiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-    val snackbarHostState = remember { SnackbarHostState() }
     val resources = LocalResources.current
+    val snackbarDelegate = LocalSnackbarDelegate.current
 
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { uiEffect: MyPageUiEffect ->
             when (uiEffect) {
                 is MyPageUiEffect.ShowBookmarkRemoveFailed -> {
-                    snackbarHostState.showSnackbarWithAction(
+                    snackbarDelegate.showSnackbar(
                         message = resources.getString(R.string.my_page_snackbar_bookmark_remove_failed),
                         actionLabel = resources.getString(R.string.all_close_description),
                         onAction = { viewModel.rollbackBookmarkContentRemove(uiEffect.contentId) },
@@ -72,7 +67,7 @@ fun MyPageScreen(
                 }
 
                 MyPageUiEffect.ShowBookmarksLoadFailed -> {
-                    snackbarHostState.showSnackbar(
+                    snackbarDelegate.showSnackbar(
                         message = resources.getString(R.string.my_page_snackbar_bookmarks_load_failed),
                         actionLabel = resources.getString(R.string.all_close_description),
                         duration = SnackbarDuration.Short,
@@ -80,7 +75,7 @@ fun MyPageScreen(
                 }
 
                 MyPageUiEffect.ShowProfileLoadFailed -> {
-                    snackbarHostState.showSnackbar(
+                    snackbarDelegate.showSnackbar(
                         message = resources.getString(R.string.my_page_snackbar_profile_load_failed),
                         actionLabel = resources.getString(R.string.all_close_description),
                         duration = SnackbarDuration.Short,
@@ -101,7 +96,7 @@ fun MyPageScreen(
 
                 is MyPageUiEffect.ShowError -> {
                     val errorUiModel = uiEffect.errorUiState.toUiModel() ?: return@collect
-                    snackbarHostState.showSnackbarWithAction(
+                    snackbarDelegate.showSnackbar(
                         message = resources.getString(errorUiModel.titleRes),
                         actionLabel = resources.getString(errorUiModel.retryTextRes),
                         onAction = { viewModel.handleErrorRetryRequest(uiEffect.retryAction) },
@@ -113,15 +108,16 @@ fun MyPageScreen(
 
     MyPageScreenContent(
         uiState = uiState,
-        snackbarHostState = snackbarHostState,
         onNavigateToAllBookmarkContents = onNavigateToAllBookmarkContents,
         onNavigateToContent = onNavigateToContent,
         onRemoveBookmark = { contentId: Long ->
-            snackbarHostState.dismissAndExecute { viewModel.removeBookmark(contentId) }
+            viewModel.removeBookmark(contentId)
         },
-        onProfileRetry = { snackbarHostState.dismissAndExecute { viewModel.loadProfile(isRetry = true) } },
+        onProfileRetry = {
+            viewModel.loadProfile(isRetry = true)
+        },
         onBookmarkRetry = {
-            snackbarHostState.dismissAndExecute { viewModel.loadBookmarkContents(isRetry = true) }
+            viewModel.loadBookmarkContents(isRetry = true)
         },
         onInquiryClick = viewModel::loadInquiryMail,
         onPrivacyPolicyClick = viewModel::loadPrivacyPolicy,
@@ -137,7 +133,6 @@ fun MyPageScreen(
 @Composable
 private fun MyPageScreenContent(
     uiState: MyPageUiState,
-    snackbarHostState: SnackbarHostState,
     onNavigateToAllBookmarkContents: () -> Unit,
     onNavigateToContent: (contentId: Long) -> Unit,
     onRemoveBookmark: (contentId: Long) -> Unit,
@@ -182,17 +177,15 @@ private fun MyPageScreenContent(
         }
     }
 
-    Scaffold(
-        topBar = { MyPageAppBar() },
-        snackbarHost = { TuripSnackbar(snackbarHostState = snackbarHostState) },
+    Column(
         modifier =
             Modifier
                 .fillMaxSize()
                 .background(TuripTheme.colors.white)
                 .systemBarsPadding(),
-    ) { innerPadding ->
+    ) {
+        MyPageAppBar()
         LazyColumn(
-            modifier = Modifier.padding(innerPadding),
             contentPadding =
                 PaddingValues(
                     top = TuripTheme.spacing.extraLarge,
@@ -314,7 +307,6 @@ private fun MyPageScreenPreview(
     TuripTheme {
         MyPageScreenContent(
             uiState = uiState,
-            snackbarHostState = remember { SnackbarHostState() },
             onNavigateToAllBookmarkContents = {},
             onNavigateToContent = {},
             onRemoveBookmark = {},

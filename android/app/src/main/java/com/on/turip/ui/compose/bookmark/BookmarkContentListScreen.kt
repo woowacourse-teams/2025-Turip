@@ -19,8 +19,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -47,13 +45,11 @@ import com.on.turip.domain.creator.Creator
 import com.on.turip.domain.region.City
 import com.on.turip.domain.trip.TripDuration
 import com.on.turip.ui.common.error.ErrorUiState
-import com.on.turip.ui.common.extensions.dismissAndExecute
-import com.on.turip.ui.common.extensions.showSnackbarWithAction
 import com.on.turip.ui.common.paging.PagingState
 import com.on.turip.ui.compose.bookmark.component.BookmarkContentListAppBar
 import com.on.turip.ui.compose.bookmark.component.BookmarkContentListItem
 import com.on.turip.ui.compose.designsystem.component.ErrorScreen
-import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
+import com.on.turip.ui.compose.designsystem.snackbar.LocalSnackbarDelegate
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -67,9 +63,8 @@ fun BookmarkContentListScreen(
     viewModel: BookmarkContentListViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-    val snackbarHostState = remember { SnackbarHostState() }
     val resources = LocalResources.current
+    val snackbarDelegate = LocalSnackbarDelegate.current
 
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { uiEffect: BookmarkContentListUiEffect ->
@@ -79,7 +74,7 @@ fun BookmarkContentListScreen(
                 }
 
                 is BookmarkContentListUiEffect.ShowBookmarkRemoveFailedList -> {
-                    snackbarHostState.showSnackbarWithAction(
+                    snackbarDelegate.showSnackbar(
                         message = resources.getString(R.string.bookmark_content_snackbar_bookmark_remove_failed),
                         actionLabel = resources.getString(R.string.all_close_description),
                         onAction = { viewModel.rollbackBookmarkContentRemove(uiEffect.contentId) },
@@ -90,22 +85,22 @@ fun BookmarkContentListScreen(
         }
     }
 
-    Scaffold(
-        topBar = { BookmarkContentListAppBar(onBackClick = onBack) },
+    Column(
         modifier =
             Modifier
                 .fillMaxSize()
                 .background(TuripTheme.colors.white)
                 .systemBarsPadding(),
-        snackbarHost = { TuripSnackbar(snackbarHostState = snackbarHostState) },
-    ) { innerPadding ->
+    ) {
+        BookmarkContentListAppBar(onBackClick = onBack)
         BookmarkContentListContent(
             uiState = uiState,
             onRetryClick = viewModel::refreshBookmarkContents,
             onContentClick = onNavigateToContent,
-            onBookmarkClick = { snackbarHostState.dismissAndExecute { viewModel.removeBookmark(it) } },
+            onBookmarkClick = {
+                viewModel.removeBookmark(it)
+            },
             onLoadMore = viewModel::loadMoreContents,
-            modifier = Modifier.padding(innerPadding),
         )
     }
 }

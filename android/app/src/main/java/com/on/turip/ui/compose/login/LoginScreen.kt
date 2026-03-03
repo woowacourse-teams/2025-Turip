@@ -11,14 +11,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -34,7 +31,7 @@ import com.on.turip.R
 import com.on.turip.data.login.datasource.GoogleCredentialManager
 import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.compose.designsystem.component.TuripDialog
-import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
+import com.on.turip.ui.compose.designsystem.snackbar.LocalSnackbarDelegate
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.login.component.GoogleLoginButton
 import com.on.turip.ui.compose.login.component.HelpText
@@ -47,8 +44,8 @@ fun LoginScreen(
     viewmodel: LoginViewmodel = hiltViewModel(),
 ) {
     val uiState: LoginUiState by viewmodel.uiState.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
     val resources = LocalResources.current
+    val snackbarDelegate = LocalSnackbarDelegate.current
 
     LaunchedEffect(Unit) {
         viewmodel.uiEffect.collect { effect: LoginUiEffect ->
@@ -59,7 +56,7 @@ fun LoginScreen(
 
                 is LoginUiEffect.ShowError -> {
                     val errorUiModel = effect.errorUiState.toUiModel() ?: return@collect
-                    snackbarHostState.showSnackbar(
+                    snackbarDelegate.showSnackbar(
                         message = resources.getString(errorUiModel.titleRes),
                         duration = SnackbarDuration.Long,
                     )
@@ -79,19 +76,16 @@ fun LoginScreen(
         )
     }
 
-    Scaffold(
+    LoginScreenContent(
+        isHelpTextVisible = uiState.showHelpText,
         modifier =
-            Modifier.noRippleClickable { viewmodel.updateHelpTextVisible(false) },
-        snackbarHost = { TuripSnackbar(snackbarHostState = snackbarHostState) },
-    ) { innerPadding ->
-        LoginScreenContent(
-            isHelpTextVisible = uiState.showHelpText,
-            modifier = Modifier.padding(innerPadding),
-            onClickHelpText = { viewmodel.updateHelpTextVisible(!uiState.showHelpText) },
-            onClickGoogleLogin = { viewmodel.onGoogleLogin(googleCredentialManager) },
-            onClickGuestLogin = viewmodel::onGuestLogin,
-        )
-    }
+            Modifier
+                .fillMaxSize()
+                .noRippleClickable { viewmodel.updateHelpTextVisible(false) },
+        onClickHelpText = { viewmodel.updateHelpTextVisible(!uiState.showHelpText) },
+        onClickGoogleLogin = { viewmodel.onGoogleLogin(googleCredentialManager) },
+        onClickGuestLogin = viewmodel::onGuestLogin,
+    )
 }
 
 @Composable

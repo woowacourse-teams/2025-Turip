@@ -2,11 +2,11 @@ package com.on.turip.ui.compose.search.keyword
 
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -64,33 +64,34 @@ fun SearchScreen(
         }
     }
 
-    Scaffold(
-        topBar = {
-            Surface(
-                color = TuripTheme.colors.white,
-                modifier = Modifier.statusBarsPadding(),
-            ) {
-                SearchAppBar(
-                    searchText = searchingWord,
-                    onSearchTextChanged = { viewModel.updateSearchingWord(it) },
-                    onSearchAction = onSearchAction,
-                    onClearClick = { viewModel.updateSearchingWord("") },
-                    onBackClick = onNavigateBack,
-                    onFocusChanged = { hasFocus ->
-                        if (hasFocus && uiState !is SearchUiState.Error) {
-                            isHistoryVisible = true
-                        }
-                    },
-                )
-            }
-        },
-        containerColor = TuripTheme.colors.white,
-    ) { paddingValues ->
+    Column(
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(top = TuripTheme.spacing.medium),
+    ) {
+        Surface(
+            color = TuripTheme.colors.white,
+            modifier = Modifier.statusBarsPadding(),
+        ) {
+            SearchAppBar(
+                searchText = searchingWord,
+                onSearchTextChanged = { viewModel.updateSearchingWord(it) },
+                onSearchAction = onSearchAction,
+                onClearClick = { viewModel.updateSearchingWord("") },
+                onBackClick = onNavigateBack,
+                onFocusChanged = { hasFocus ->
+                    if (hasFocus && uiState !is SearchUiState.Error) {
+                        isHistoryVisible = true
+                    }
+                },
+            )
+        }
+
         Box(
             modifier =
                 Modifier
                     .fillMaxSize()
-                    .padding(paddingValues)
                     .addFocusCleaner(focusManager),
         ) {
             when (val state = uiState) {

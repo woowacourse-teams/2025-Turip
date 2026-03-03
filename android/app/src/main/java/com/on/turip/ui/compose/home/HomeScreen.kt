@@ -5,7 +5,6 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -62,10 +61,8 @@ fun HomeScreen(
         }
     }
 
-    Scaffold(
-        contentWindowInsets = WindowInsets(),
-        topBar = { HomeAppBar() },
-    ) { innerPadding ->
+    Column(modifier = Modifier.fillMaxSize()) {
+        HomeAppBar()
         HomeScreenContent(
             uiState = uiState,
             onSearchClick = onSearchClick,
@@ -76,7 +73,6 @@ fun HomeScreen(
             onRegionClick = onRegionClick,
             onDomesticClick = { viewModel.updateDomesticSelected(it) },
             onNavigateToMyPage = navigateToMyPage,
-            modifier = Modifier.padding(innerPadding),
         )
     }
 }

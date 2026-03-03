@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarData
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
@@ -22,6 +20,7 @@ import com.on.turip.navigation.Navigator
 import com.on.turip.navigation.rememberNavigationState
 import com.on.turip.navigation.toEntries
 import com.on.turip.ui.common.TuripNavigationBar
+import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
 import com.on.turip.ui.compose.designsystem.snackbar.LocalSnackbarDelegate
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.home.navigation.HomeNavKey
@@ -54,12 +53,7 @@ fun MainApp(savedStateConfigurationProvider: SavedStateConfigurationProvider) {
                 }
             },
             snackbarHost = {
-                SnackbarHost(
-                    hostState = appState.snackbarHostState,
-                    snackbar = { snackbarData: SnackbarData ->
-//                        TuripSnackbar(snackbarHostState = snackbarData)
-                    },
-                )
+                TuripSnackbar(snackbarHostState = appState.snackbarHostState)
             },
             contentWindowInsets = WindowInsets.systemBars,
         ) { paddingValues ->

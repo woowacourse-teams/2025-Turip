@@ -1,11 +1,10 @@
 package com.on.turip.ui.compose.search.regionresult
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -41,25 +40,21 @@ fun RegionResultScreen(
         viewModel.initRegionCategoryName(regionCategoryName)
     }
 
-    Scaffold(
-        topBar = {
-            Surface(
-                color = TuripTheme.colors.white,
-                modifier = Modifier.statusBarsPadding(),
-            ) {
-                RegionResultAppBar(
-                    title = regionCategoryName,
-                    onBackClick = onBackClick,
-                )
-            }
-        },
-        containerColor = TuripTheme.colors.white,
-    ) { paddingValues ->
+    Column(modifier = Modifier.fillMaxSize()) {
+        Surface(
+            color = TuripTheme.colors.white,
+            modifier = Modifier.statusBarsPadding(),
+        ) {
+            RegionResultAppBar(
+                title = regionCategoryName,
+                onBackClick = onBackClick,
+            )
+        }
+
         Box(
             modifier =
                 Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
+                    .fillMaxSize(),
         ) {
             when (val state = uiState) {
                 is RegionResultUiState.Loading -> {
