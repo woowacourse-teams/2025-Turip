@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import turip.account.domain.Account;
@@ -27,6 +28,8 @@ import turip.favorite.controller.dto.response.FolderInvitationTokenResponse;
 import turip.favorite.domain.AccountRole;
 import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.domain.FavoriteFolderAccount;
+import turip.favorite.domain.event.ActionType;
+import turip.favorite.domain.event.FavoriteFolderUpdateEvent;
 import turip.favorite.repository.FavoriteFolderRepository;
 import turip.favorite.repository.FavoritePlaceRepository;
 import turip.favorite.repository.dto.FavoriteFolderItemCountResult;
@@ -42,6 +45,7 @@ public class FavoriteFolderService {
     private final FavoritePlaceRepository favoritePlaceRepository;
     private final PlaceRepository placeRepository;
     private final FavoriteFolderAccountService favoriteFolderAccountService;
+    private final ApplicationEventPublisher eventPublisher;
     private final InvitationTokenProvider invitationTokenProvider;
 
     @Transactional
@@ -67,9 +71,32 @@ public class FavoriteFolderService {
         FavoriteFolder favoriteFolder = getById(favoriteFolderId);
         validateShareAndCustomFolder(favoriteFolder);
 
+        boolean isAlreadyJoined = favoriteFolderAccountService.isFolderMember(member.getAccount(), favoriteFolder);
+        if (isAlreadyJoined) {
+            throw new ConflictException(ErrorTag.FAVORITE_FOLDER_ALREADY_JOINED);
+        }
+
         FavoriteFolderAccount favoriteFolderAccount = favoriteFolderAccountService.findOrCreate(favoriteFolder,
                 member.getAccount());
+        eventPublisher.publishEvent(FavoriteFolderUpdateEvent.of(favoriteFolderId, ActionType.MEMBER_JOINED));
+
         return FavoriteFolderJoinResponse.from(favoriteFolderAccount);
+    }
+
+    @Transactional
+    public FolderInvitationTokenResponse createInvitationToken(Member member, Long favoriteFolderId) {
+        FavoriteFolder favoriteFolder = favoriteFolderRepository.findById(favoriteFolderId)
+                .orElseThrow(() -> new NotFoundException(ErrorTag.FAVORITE_FOLDER_NOT_FOUND));
+
+        favoriteFolderAccountService.validateMembership(member.getAccount(), favoriteFolder);
+
+        if (!favoriteFolder.isShared()) {
+            favoriteFolder.convertToSharedFolder();
+        }
+
+        String invitationToken = invitationTokenProvider.generateToken(member.getAccount().getId(), favoriteFolderId);
+
+        return FolderInvitationTokenResponse.from(invitationToken);
     }
 
     public FavoriteFoldersDetailResponse findAllByAccount(Account account) {
@@ -95,20 +122,19 @@ public class FavoriteFolderService {
         return FavoriteFoldersDetailResponse.from(favoriteFoldersWithPlaceCount);
     }
 
-    @Transactional
-    public FolderInvitationTokenResponse createInvitationToken(Member member, Long favoriteFolderId) {
-        FavoriteFolder favoriteFolder = favoriteFolderRepository.findById(favoriteFolderId)
+    public FolderInvitationDetailResponse getInvitationDetails(String token, Account account) {
+        Long favoriteFolderId = invitationTokenProvider.getClaimOfName(token, "fid", Long.class);
+
+        FavoriteFolder favoriteFolder = getById(favoriteFolderId);
+
+        boolean alreadyJoined = favoriteFolderAccountService.isFolderMember(account, favoriteFolder);
+
+        return FolderInvitationDetailResponse.of(favoriteFolderId, alreadyJoined);
+    }
+
+    public FavoriteFolder getById(Long favoriteFolderId) {
+        return favoriteFolderRepository.findById(favoriteFolderId)
                 .orElseThrow(() -> new NotFoundException(ErrorTag.FAVORITE_FOLDER_NOT_FOUND));
-
-        favoriteFolderAccountService.validateMembership(member.getAccount(), favoriteFolder);
-
-        if (!favoriteFolder.isShared()) {
-            favoriteFolder.convertToSharedFolder();
-        }
-
-        String invitationToken = invitationTokenProvider.generateToken(member.getAccount().getId(), favoriteFolderId);
-
-        return FolderInvitationTokenResponse.from(invitationToken);
     }
 
     public FavoriteFoldersWithFavoriteStatusResponse findAllWithFavoriteStatusByAccountId(Account account,
@@ -142,26 +168,10 @@ public class FavoriteFolderService {
     }
 
     public FavoriteFolderMembersResponse findMembersById(Long favoriteFolderId, Account account) {
-        FavoriteFolder favoriteFolder = getById(favoriteFolderId);
-        favoriteFolderAccountService.validateMembership(account, favoriteFolder);
-
-        List<Member> members = favoriteFolderAccountService.findMembersByFavoriteFolder(favoriteFolder);
+        validateFolderExists(favoriteFolderId);
+        favoriteFolderAccountService.validateMembership(account, favoriteFolderId);
+        List<Member> members = favoriteFolderAccountService.findMembersByFavoriteFolder(favoriteFolderId);
         return FavoriteFolderMembersResponse.of(members);
-    }
-
-    public FavoriteFolder getById(Long favoriteFolderId) {
-        return favoriteFolderRepository.findById(favoriteFolderId)
-                .orElseThrow(() -> new NotFoundException(ErrorTag.FAVORITE_FOLDER_NOT_FOUND));
-    }
-
-    public FolderInvitationDetailResponse getInvitationDetails(String token, Account account) {
-        Long favoriteFolderId = invitationTokenProvider.getClaimOfName(token, "fid", Long.class);
-
-        FavoriteFolder favoriteFolder = getById(favoriteFolderId);
-
-        boolean alreadyJoined = favoriteFolderAccountService.isFolderMember(account, favoriteFolder);
-
-        return FolderInvitationDetailResponse.of(favoriteFolderId, alreadyJoined);
     }
 
     @Transactional
@@ -177,6 +187,8 @@ public class FavoriteFolderService {
         validateDuplicatedName(newName, account);
         favoriteFolder.rename(newName);
 
+        eventPublisher.publishEvent(FavoriteFolderUpdateEvent.of(favoriteFolderId, ActionType.FOLDER_NAME_CHANGED));
+
         return FavoriteFolderResponse.of(favoriteFolder, account);
     }
 
@@ -185,6 +197,7 @@ public class FavoriteFolderService {
         FavoriteFolder favoriteFolder = getById(favoriteFolderId);
         validateRemovableFolder(account, favoriteFolder);
         removeFavoriteFolderWithFavoritePlaces(favoriteFolderId, favoriteFolder);
+        eventPublisher.publishEvent(FavoriteFolderUpdateEvent.of(favoriteFolderId, ActionType.FOLDER_DELETED));
     }
 
     @Transactional
@@ -192,16 +205,29 @@ public class FavoriteFolderService {
         FavoriteFolder favoriteFolder = getByIdWithLock(favoriteFolderId);
         validateShareAndCustomFolder(favoriteFolder);
         favoriteFolderAccountService.validateMembership(account, favoriteFolder);
+
         favoriteFolderAccountService.deleteByFavoriteFolderAndAccount(favoriteFolder, account);
 
-        boolean isDeleted = false;
         int remainingMemberCount = favoriteFolderAccountService.countByFavoriteFolder(favoriteFolder);
         if (remainingMemberCount == 0) {
             removeFavoriteFolderWithFavoritePlaces(favoriteFolderId, favoriteFolder);
-            isDeleted = true;
+            eventPublisher.publishEvent(FavoriteFolderUpdateEvent.of(favoriteFolderId, ActionType.FOLDER_DELETED));
+            return FavoriteFolderExitResponse.of(true);
         }
 
-        return FavoriteFolderExitResponse.of(isDeleted);
+        eventPublisher.publishEvent(FavoriteFolderUpdateEvent.of(favoriteFolderId, ActionType.MEMBER_EXITED));
+        return FavoriteFolderExitResponse.of(false);
+    }
+
+    public void validateFolderExists(Long favoriteFolderId) {
+        if (!favoriteFolderRepository.existsById(favoriteFolderId)) {
+            throw new NotFoundException(ErrorTag.FAVORITE_FOLDER_NOT_FOUND);
+        }
+    }
+
+    public void validateFolderMembership(Long favoriteFolderId, Member member) {
+        FavoriteFolder favoriteFolder = getById(favoriteFolderId);
+        favoriteFolderAccountService.validateMembership(member.getAccount(), favoriteFolder);
     }
 
     private void validateRemovableFolder(Account account, FavoriteFolder favoriteFolder) {

@@ -19,6 +19,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import turip.account.domain.Account;
 import turip.account.domain.Member;
 import turip.account.domain.Role;
@@ -39,6 +40,8 @@ import turip.favorite.controller.dto.response.FolderInvitationTokenResponse;
 import turip.favorite.domain.AccountRole;
 import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.domain.FavoriteFolderAccount;
+import turip.favorite.domain.event.ActionType;
+import turip.favorite.domain.event.FavoriteFolderUpdateEvent;
 import turip.favorite.repository.FavoriteFolderRepository;
 import turip.favorite.repository.FavoritePlaceRepository;
 import turip.favorite.repository.dto.FavoriteFolderItemCountResult;
@@ -66,6 +69,9 @@ class FavoriteFolderServiceTest {
 
     @Mock
     private PlaceRepository placeRepository;
+
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
 
     @Mock
     private InvitationTokenProvider invitationTokenProvider;
@@ -252,7 +258,7 @@ class FavoriteFolderServiceTest {
     @Nested
     class UpdateName {
 
-        @DisplayName("찜 폴더의 이름을 변경할 수 있다")
+        @DisplayName("찜 폴더의 이름을 변경하고 실시간 알림 이벤트를 발행한다")
         @Test
         void updateName1() {
             // given
@@ -276,7 +282,9 @@ class FavoriteFolderServiceTest {
                     () -> assertThat(response.id()).isEqualTo(folderId),
                     () -> assertThat(response.name()).isEqualTo(newName),
                     () -> assertThat(response.accountId()).isEqualTo(accountId),
-                    () -> assertThat(response.isDefault()).isFalse()
+                    () -> assertThat(response.isDefault()).isFalse(),
+                    () -> verify(eventPublisher).publishEvent(
+                            FavoriteFolderUpdateEvent.of(folderId, ActionType.FOLDER_NAME_CHANGED))
             );
         }
 
@@ -400,25 +408,26 @@ class FavoriteFolderServiceTest {
             // given
             Long turipId = 1L;
             Account account = AccountFixture.createUser();
-            FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(turipId, "함께 튜립");
 
             Account memberAccount1 = new Account(2L, Role.USER, "계정1");
             Account memberAccount2 = new Account(3L, Role.USER, "계정2");
             Member member1 = new Member(1L, memberAccount1, "test1@example.com", false);
             Member member2 = new Member(2L, memberAccount2, "test2@example.com", false);
 
-            given(favoriteFolderRepository.findById(turipId))
-                    .willReturn(Optional.of(favoriteFolder));
-            given(favoriteFolderAccountService.findMembersByFavoriteFolder(favoriteFolder))
+            given(favoriteFolderRepository.existsById(turipId))
+                    .willReturn(true);
+            given(favoriteFolderAccountService.findMembersByFavoriteFolder(turipId))
                     .willReturn(List.of(member1, member2));
 
             // when
             var response = favoriteFolderService.findMembersById(turipId, account);
 
             // then
-            assertThat(response.members()).hasSize(2);
-            assertThat(response.members().get(0).nickname()).isEqualTo("계정1");
-            assertThat(response.members().get(1).nickname()).isEqualTo("계정2");
+            assertAll(
+                    () -> assertThat(response.members()).hasSize(2),
+                    () -> assertThat(response.members().get(0).nickname()).isEqualTo("계정1"),
+                    () -> assertThat(response.members().get(1).nickname()).isEqualTo("계정2")
+            );
         }
 
         @DisplayName("찜폴더가 존재하지 않는 경우 NotFoundException을 발생시킨다")
@@ -428,8 +437,8 @@ class FavoriteFolderServiceTest {
             Long nonExistentTuripId = 999L;
             Account account = AccountFixture.createUser();
 
-            given(favoriteFolderRepository.findById(nonExistentTuripId))
-                    .willReturn(Optional.empty());
+            given(favoriteFolderRepository.existsById(nonExistentTuripId))
+                    .willReturn(false);
 
             // when & then
             assertThatThrownBy(() -> favoriteFolderService.findMembersById(nonExistentTuripId, account))
@@ -443,12 +452,11 @@ class FavoriteFolderServiceTest {
             // given
             Long turipId = 1L;
             Account nonMemberAccount = AccountFixture.createUser();
-            FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(turipId, "비공개 튜립");
 
-            given(favoriteFolderRepository.findById(turipId))
-                    .willReturn(Optional.of(favoriteFolder));
+            given(favoriteFolderRepository.existsById(turipId))
+                    .willReturn(true);
             willThrow(new ForbiddenException(ErrorTag.FORBIDDEN))
-                    .given(favoriteFolderAccountService).validateMembership(nonMemberAccount, favoriteFolder);
+                    .given(favoriteFolderAccountService).validateMembership(nonMemberAccount, turipId);
 
             // when & then
             assertThatThrownBy(() -> favoriteFolderService.findMembersById(turipId, nonMemberAccount))
@@ -461,7 +469,7 @@ class FavoriteFolderServiceTest {
     @Nested
     class JoinFavoriteFolder {
 
-        @DisplayName("공유 찜폴더에 참여할 수 있다")
+        @DisplayName("공유 찜폴더에 참여하고 멤버 참여 이벤트를 발행한다")
         @Test
         void joinFavoriteFolder1() {
             // given
@@ -478,6 +486,7 @@ class FavoriteFolderServiceTest {
 
             given(favoriteFolderRepository.findById(turipId))
                     .willReturn(Optional.of(favoriteFolder));
+            given(favoriteFolderAccountService.isFolderMember(account, favoriteFolder)).willReturn(false);
             given(favoriteFolderAccountService.findOrCreate(favoriteFolder, account))
                     .willReturn(favoriteFolderAccount);
 
@@ -489,8 +498,30 @@ class FavoriteFolderServiceTest {
                     () -> assertThat(response.id()).isEqualTo(favoriteFolderAccountId),
                     () -> assertThat(response.favoriteFolderId()).isEqualTo(turipId),
                     () -> assertThat(response.isShared()).isTrue(),
-                    () -> assertThat(response.accountId()).isEqualTo(accountId)
+                    () -> assertThat(response.accountId()).isEqualTo(accountId),
+                    () -> verify(eventPublisher).publishEvent(
+                            FavoriteFolderUpdateEvent.of(turipId, ActionType.MEMBER_JOINED))
             );
+        }
+
+        @DisplayName("이미 참여한 공유 찜폴더에 참여요청시 409 Conflict를 발생시킨다")
+        @Test
+        void joinFavoriteFolder_alreadyJoined() {
+            // given
+            Long turipId = 1L;
+            Member member = MemberFixture.createMember();
+            Account account = member.getAccount();
+            FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(turipId, "함께 튜립");
+            favoriteFolder.convertToSharedFolder();
+
+            given(favoriteFolderRepository.findById(turipId))
+                    .willReturn(Optional.of(favoriteFolder));
+            given(favoriteFolderAccountService.isFolderMember(account, favoriteFolder)).willReturn(true);
+
+            // when & then
+            assertThatThrownBy(() -> favoriteFolderService.joinMember(turipId, member))
+                    .isInstanceOf(ConflictException.class)
+                    .hasMessage(ErrorTag.FAVORITE_FOLDER_ALREADY_JOINED.getMessage());
         }
 
         @DisplayName("찜폴더가 존재하지 않는 경우 NotFoundException을 발생시킨다")
@@ -549,7 +580,7 @@ class FavoriteFolderServiceTest {
     @Nested
     class Remove {
 
-        @DisplayName("장소 찜 폴더를 삭제할 수 있다")
+        @DisplayName("장소 찜 폴더를 삭제하고 폴더 삭제 이벤트를 발행한다")
         @Test
         void remove1() {
             // given
@@ -567,8 +598,12 @@ class FavoriteFolderServiceTest {
             favoriteFolderService.remove(member, folderId);
 
             // then
-            verify(favoritePlaceRepository).deleteAllByFavoriteFolder(favoriteFolder);
-            verify(favoriteFolderRepository).deleteById(folderId);
+            assertAll(
+                    () -> verify(favoritePlaceRepository).deleteAllByFavoriteFolder(favoriteFolder),
+                    () -> verify(favoriteFolderRepository).deleteById(folderId),
+                    () -> verify(eventPublisher).publishEvent(
+                            FavoriteFolderUpdateEvent.of(folderId, ActionType.FOLDER_DELETED))
+            );
         }
 
         @DisplayName("favoriteFolderId에 대한 회원이 존재하지 않는 경우 NotFoundException을 발생시킨다")
@@ -653,7 +688,7 @@ class FavoriteFolderServiceTest {
     @Nested
     class ExitFolder {
 
-        @DisplayName("공유 찜폴더에서 나갈 수 있다 (마지막 참여자가 아닌 경우)")
+        @DisplayName("마지막 참여자가 아닌 경우, 참여 정보만 삭제하고 멤버 탈퇴 이벤트를 발행한다")
         @Test
         void exitFolder1() {
             // given
@@ -672,11 +707,16 @@ class FavoriteFolderServiceTest {
             FavoriteFolderExitResponse response = favoriteFolderService.exitFolder(account, folderId);
 
             // then
-            assertThat(response.isDeleted()).isFalse();
-            verify(favoriteFolderAccountService).deleteByFavoriteFolderAndAccount(favoriteFolder, account);
+            assertAll(
+                    () -> assertThat(response.isDeleted()).isFalse(),
+                    () -> verify(favoriteFolderAccountService).deleteByFavoriteFolderAndAccount(favoriteFolder,
+                            account),
+                    () -> verify(eventPublisher).publishEvent(
+                            FavoriteFolderUpdateEvent.of(folderId, ActionType.MEMBER_EXITED))
+            );
         }
 
-        @DisplayName("공유 찜폴더에서 나갈 수 있다 (마지막 참여자인 경우 폴더 삭제)")
+        @DisplayName("마지막 참여자인 경우, 폴더를 삭제하고 폴더 삭제 이벤트를 발행한다")
         @Test
         void exitFolder2() {
             // given
@@ -695,10 +735,15 @@ class FavoriteFolderServiceTest {
             FavoriteFolderExitResponse response = favoriteFolderService.exitFolder(account, folderId);
 
             // then
-            assertThat(response.isDeleted()).isTrue();
-            verify(favoriteFolderAccountService).deleteByFavoriteFolderAndAccount(favoriteFolder, account);
-            verify(favoritePlaceRepository).deleteAllByFavoriteFolder(favoriteFolder);
-            verify(favoriteFolderRepository).deleteById(folderId);
+            assertAll(
+                    () -> assertThat(response.isDeleted()).isTrue(),
+                    () -> verify(favoriteFolderAccountService).deleteByFavoriteFolderAndAccount(favoriteFolder,
+                            account),
+                    () -> verify(favoritePlaceRepository).deleteAllByFavoriteFolder(favoriteFolder),
+                    () -> verify(favoriteFolderRepository).deleteById(folderId),
+                    () -> verify(eventPublisher).publishEvent(
+                            FavoriteFolderUpdateEvent.of(folderId, ActionType.FOLDER_DELETED))
+            );
         }
 
         @DisplayName("찜폴더가 존재하지 않는 경우 NotFoundException을 발생시킨다")

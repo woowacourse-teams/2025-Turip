@@ -26,18 +26,13 @@ public interface FavoriteFolderAccountRepository extends JpaRepository<FavoriteF
             """)
     List<FavoriteFolderItemCountResult> countByFavoriteFolderIdsIn(List<Long> folderIds);
 
-    boolean existsByFavoriteFolderAndAccountAndAccountRole(FavoriteFolder favoriteFolder, Account account,
-                                                           AccountRole accountRole);
-
-    boolean existsByFavoriteFolderAndAccount(FavoriteFolder favoriteFolder, Account account);
-
     Optional<FavoriteFolderAccount> findByFavoriteFolderAndAccount(FavoriteFolder favoriteFolder, Account account);
 
-    @Query("SELECT m FROM FavoriteFolderAccount ffa " +
-            "JOIN ffa.account a " +
-            "JOIN Member m ON m.account.id = a.id " +
-            "WHERE ffa.favoriteFolder = :favoriteFolder")
-    List<Member> findMembersByFavoriteFolder(@Param("favoriteFolder") FavoriteFolder favoriteFolder);
+    @Query("SELECT m FROM Member m " +
+            "JOIN FETCH m.account a " +
+            "JOIN FavoriteFolderAccount ffa ON ffa.account.id = a.id " +
+            "WHERE ffa.favoriteFolder.id = :favoriteFolderId")
+    List<Member> findMembersByFavoriteFolderId(@Param("favoriteFolderId") Long favoriteFolderId);
 
     @Modifying
     @Query("UPDATE FavoriteFolderAccount ffa " +
@@ -45,4 +40,10 @@ public interface FavoriteFolderAccountRepository extends JpaRepository<FavoriteF
             "WHERE ffa.account = :oldAccount")
     void updateAccount(@Param("oldAccount") Account oldAccount, @Param("newAccount") Account newAccount);
 
+    boolean existsByFavoriteFolderAndAccountAndAccountRole(FavoriteFolder favoriteFolder, Account account,
+                                                           AccountRole accountRole);
+
+    boolean existsByFavoriteFolderAndAccount(FavoriteFolder favoriteFolder, Account account);
+
+    boolean existsByFavoriteFolderIdAndAccount(Long favoriteFolderId, Account account);
 }

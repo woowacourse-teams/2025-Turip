@@ -48,7 +48,14 @@ public class FavoriteFolderAccountService {
     }
 
     public void validateMembership(Account account, FavoriteFolder favoriteFolder) {
-        if (!isFolderMember(account, favoriteFolder)) {
+        validateMembership(account, favoriteFolder.getId());
+    }
+
+    public void validateMembership(Account account, Long favoriteFolderId) {
+        boolean isMember = favoriteFolderAccountRepository.existsByFavoriteFolderIdAndAccount(favoriteFolderId,
+                account);
+
+        if (!isMember) {
             throw new ForbiddenException(ErrorTag.FORBIDDEN);
         }
     }
@@ -57,8 +64,8 @@ public class FavoriteFolderAccountService {
         return favoriteFolderAccountRepository.existsByFavoriteFolderAndAccount(favoriteFolder, account);
     }
 
-    public List<Member> findMembersByFavoriteFolder(FavoriteFolder favoriteFolder) {
-        return favoriteFolderAccountRepository.findMembersByFavoriteFolder(favoriteFolder);
+    public List<Member> findMembersByFavoriteFolder(Long favoriteFolderId) {
+        return favoriteFolderAccountRepository.findMembersByFavoriteFolderId(favoriteFolderId);
     }
 
     public int countByFavoriteFolder(FavoriteFolder favoriteFolder) {
