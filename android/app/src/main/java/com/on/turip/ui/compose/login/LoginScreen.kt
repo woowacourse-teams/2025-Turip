@@ -42,7 +42,7 @@ import com.on.turip.ui.compose.login.util.noRippleClickable
 
 @Composable
 fun LoginScreen(
-    navigateToMain: () -> Unit,
+    onNavigateToMain: () -> Unit,
     googleCredentialManager: GoogleCredentialManager,
     viewmodel: LoginViewmodel = hiltViewModel(),
 ) {
@@ -54,7 +54,7 @@ fun LoginScreen(
         viewmodel.uiEffect.collect { effect: LoginUiEffect ->
             when (effect) {
                 LoginUiEffect.NavigateToMain -> {
-                    navigateToMain()
+                    onNavigateToMain()
                 }
 
                 is LoginUiEffect.ShowError -> {
@@ -165,12 +165,11 @@ private fun LoginScreenContent(
 
             GoogleLoginButton(onClickLoginButton = onClickGoogleLogin)
 
-            HelpText(
+            GuestModeSection(
                 text = stringResource(R.string.login_start_to_guest),
-                style = TuripTheme.typography.body1,
                 color = TuripTheme.colors.white,
-                onClickIcon = onClickHelpText,
-                onClickText = onClickGuestLogin,
+                onHelpClick = onHelpClick,
+                onTextClick = onGuestLoginClick,
             )
         }
     }
