@@ -47,7 +47,7 @@ class FavoriteContentRepositoryTest {
     private CountryRepository countryRepository;
 
     @Test
-    @DisplayName("컨텐츠를 최신 찜 기준으로 정렬하여 반환한다")
+    @DisplayName("콘텐츠 찜 목록을 최신 찜 기준으로 정렬하여 반환한다")
     void findMyFavoriteContentsByDeviceFid() {
         // given
         Country country = countryRepository.findByName("대한민국")
@@ -73,12 +73,12 @@ class FavoriteContentRepositoryTest {
         favoriteContentRepository.save(favoriteContent2);
 
         // when
-        Slice<Content> result = favoriteContentRepository.findMyFavoriteContentsByAccountId(
+        Slice<FavoriteContent> result = favoriteContentRepository.findMyFavoriteContentsByAccountId(
                 account.getId(), Long.MAX_VALUE, PageRequest.of(0, 10));
-        List<Content> contents = result.getContent();
+        List<FavoriteContent> favoriteContents = result.getContent();
 
         // then
-        assertThat(contents.get(0).getId()).isEqualTo(content2.getId());
-        assertThat(contents.get(1).getId()).isEqualTo(content1.getId());
+        assertThat(favoriteContents.get(0).getId()).isEqualTo(favoriteContent2.getId());
+        assertThat(favoriteContents.get(1).getId()).isEqualTo(favoriteContent1.getId());
     }
 }

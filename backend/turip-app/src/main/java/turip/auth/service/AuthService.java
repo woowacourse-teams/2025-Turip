@@ -87,9 +87,9 @@ public class AuthService {
         } catch (UnauthorizedException e) {
             throw e;
         } catch (IllegalArgumentException e) {
-            throw new UnauthorizedException(e.getErrorTag());
+            throw new UnauthorizedException(e.getErrorTag(), e);
         } catch (Exception e) {
-            throw new UnauthorizedException(ErrorTag.UNAUTHORIZED);
+            throw new UnauthorizedException(ErrorTag.UNAUTHORIZED, e);
         }
     }
 
@@ -138,7 +138,7 @@ public class AuthService {
         try {
             return memberService.getByAccountId(accountId);
         } catch (Exception e) {
-            throw new UnauthorizedException(ErrorTag.UNAUTHORIZED);
+            throw new UnauthorizedException(ErrorTag.UNAUTHORIZED, e);
         }
     }
 
@@ -148,9 +148,9 @@ public class AuthService {
             LocalDateTime expiration = jwtProvider.getExpiration(refreshToken);
             refreshTokenService.save(member, deviceFid, jwtProvider.hashToken(refreshToken), issuedAt, expiration);
         } catch (IllegalArgumentException e) {
-            throw new UnauthorizedException(e.getErrorTag());
+            throw new UnauthorizedException(e.getErrorTag(), e);
         } catch (Exception e) {
-            throw new UnauthorizedException(ErrorTag.UNAUTHORIZED);
+            throw new UnauthorizedException(ErrorTag.UNAUTHORIZED, e);
         }
     }
 
