@@ -155,7 +155,7 @@ fun TripDetailScreen(
     }
     LaunchedEffect(isAtBottom) {
         snackbarDelegate.updateBottomPadding(
-            if (isAtBottom) TRIP_DETAIL_SNACKBAR_BOTTOM_PADDING else 0.dp,
+            if (isAtBottom) 50.dp else 0.dp,
         )
     }
 
@@ -301,9 +301,6 @@ private suspend fun handleUiEffect(
     }
 }
 
-private const val LAZY_PLACE_ITEM_KEY_DELIMITER = "_"
-private val TRIP_DETAIL_SNACKBAR_BOTTOM_PADDING = 72.dp
-
 @Composable
 private fun TripDetailScreenContent(
     uiState: TripDetailUiState,
@@ -342,7 +339,7 @@ private fun TripDetailScreenContent(
 
         items(
             items = uiState.places,
-            key = { "${it.id}$LAZY_PLACE_ITEM_KEY_DELIMITER${it.timeLine}" },
+            key = { "${it.id}_${it.timeLine}" },
         ) { place ->
             PlaceItem(
                 placeModel = place,
@@ -355,8 +352,7 @@ private fun TripDetailScreenContent(
                             start = TuripTheme.spacing.extraLarge,
                             end = TuripTheme.spacing.extraLarge,
                             bottom = TuripTheme.spacing.small,
-                        )
-                        .fillMaxWidth(),
+                        ).fillMaxWidth(),
             )
         }
 
@@ -369,8 +365,7 @@ private fun TripDetailScreenContent(
                         .padding(
                             horizontal = TuripTheme.spacing.extraLarge,
                             vertical = TuripTheme.spacing.medium,
-                        )
-                        .fillMaxWidth(),
+                        ).fillMaxWidth(),
             )
         }
     }

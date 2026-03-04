@@ -1,6 +1,7 @@
 package com.on.turip.ui.compose.main.component
 
 import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -12,8 +13,10 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.on.turip.navigation.Navigator
@@ -41,6 +44,11 @@ fun MainApp(savedStateConfigurationProvider: SavedStateConfigurationProvider) {
     val appState = rememberDialogAppState(navigationState = navigationState)
     val navigator = remember { Navigator(appState.navigationState) }
 
+    val animatedSnackbarBottomPadding: Dp by animateDpAsState(
+        targetValue = appState.snackbarBottomPadding,
+        animationSpec = tween(durationMillis = 220),
+    )
+
     TuripTheme {
         Scaffold(
             bottomBar = {
@@ -55,7 +63,7 @@ fun MainApp(savedStateConfigurationProvider: SavedStateConfigurationProvider) {
             snackbarHost = {
                 TuripSnackbar(
                     snackbarHostState = appState.snackbarHostState,
-                    modifier = Modifier.padding(bottom = appState.snackbarBottomPadding),
+                    modifier = Modifier.padding(bottom = animatedSnackbarBottomPadding),
                 )
             },
             contentWindowInsets = WindowInsets.systemBars,
