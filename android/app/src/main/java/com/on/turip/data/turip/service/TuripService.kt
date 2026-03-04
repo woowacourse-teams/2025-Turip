@@ -1,5 +1,6 @@
 package com.on.turip.data.turip.service
 
+import com.on.turip.core.network.ApiPath
 import com.on.turip.data.turip.dto.PlaceTuripsRequest
 import com.on.turip.data.turip.dto.TuripCreationResponse
 import com.on.turip.data.turip.dto.TuripPatchRequest
@@ -19,59 +20,59 @@ import de.jensklingenberg.ktorfit.http.Path
 import de.jensklingenberg.ktorfit.http.Query
 
 interface TuripService {
-    @GET("turips/{turipId}")
+    @GET(ApiPath.V1 + "turips/{turipId}")
     suspend fun getTurip(
         @Path("turipId") turipId: Long,
     ): TuripResponse
 
-    @GET("turips")
+    @GET(ApiPath.V1 + "turips")
     suspend fun getTurips(): TuripsResponse
 
-    @POST("turips")
+    @POST(ApiPath.V1 + "turips")
     suspend fun postTurip(
         @Body turipPostRequest: TuripPostRequest,
     ): TuripCreationResponse
 
-    @PATCH("turips/{turipId}")
+    @PATCH(ApiPath.V1 + "turips/{turipId}")
     suspend fun patchTurip(
         @Path("turipId") turipId: Long,
         @Body turipPatchRequest: TuripPatchRequest,
     )
 
-    @DELETE("turips/{turipId}")
+    @DELETE(ApiPath.V1 + "turips/{turipId}")
     suspend fun deleteTurip(
         @Path("turipId") turipId: Long,
     )
 
-    @GET("turips/turip-status")
+    @GET(ApiPath.V1 + "turips/turip-status")
     suspend fun getTuripsByPlaceId(
         @Query("placeId") placeId: Long,
     ): TuripsByPlaceResponse
 
-    @GET("turips/places")
+    @GET(ApiPath.V1 + "turips/places")
     suspend fun getTuripPlaces(
         @Query("turipId") turipId: Long,
     ): TuripPlacesResponse
 
-    @POST("turips/places")
+    @POST(ApiPath.V1 + "turips/places")
     suspend fun postTuripPlace(
         @Query("turipId") turipId: Long,
         @Query("placeId") placeId: Long,
     )
 
-    @DELETE("turips/places")
+    @DELETE(ApiPath.V1 + "turips/places")
     suspend fun deleteTuripPlace(
         @Query("turipId") turipId: Long,
         @Query("placeId") placeId: Long,
     )
 
-    @PATCH("turips/places/turip-order")
+    @PATCH(ApiPath.V1 + "turips/places/turip-order")
     suspend fun patchTuripPlaceOrder(
         @Query("turipId") turipId: Long,
         @Body turipPlaceOrderRequest: TuripPlaceOrderRequest,
     )
 
-    @PUT("turips/places/{placeId}")
+    @PUT(ApiPath.V1 + "turips/places/{placeId}")
     suspend fun putPlaceTurips(
         @Path("placeId") placeId: Long,
         @Body placeTuripsRequest: PlaceTuripsRequest,
