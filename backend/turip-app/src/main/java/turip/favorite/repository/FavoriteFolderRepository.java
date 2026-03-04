@@ -45,11 +45,11 @@ public interface FavoriteFolderRepository extends JpaRepository<FavoriteFolder, 
 
     @Modifying
     @Query("DELETE FROM FavoriteFolder ff " +
-            "WHERE ff.id IN (" +
+            "WHERE ff.id = (" +
             "   SELECT ffa.favoriteFolder.id " +
             "   FROM FavoriteFolderAccount ffa " +
             "   WHERE ffa.account = :account " +
-            ") " +
-            "AND ff.isDefault = true")
+            "   AND ffa.favoriteFolder.isDefault = true" +
+            ")")
     void deleteDefaultFolderByAccount(@Param("account") Account account);
 }
