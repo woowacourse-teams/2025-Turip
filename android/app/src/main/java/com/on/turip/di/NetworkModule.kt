@@ -17,6 +17,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.engine.okhttp.OkHttpConfig
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.auth.providers.BearerTokens
 import io.ktor.client.plugins.auth.providers.bearer
@@ -39,6 +40,9 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
     const val LOG_PREFIX = "moongjenut"
+    private const val CONNECT_TIMEOUT_MILLIS = 10_000L
+    private const val SOCKET_TIMEOUT_MILLIS = 20_000L
+    private const val REQUEST_TIMEOUT_MILLIS = 20_000L
 
     @Provides
     @Singleton
@@ -62,20 +66,41 @@ object NetworkModule {
              */
             expectSuccess = true
 
+            timeoutInterceptor()
             loggingInterceptor()
-
-            install(plugin = ContentNegotiation) {
-                json(
-                    Json {
-                        ignoreUnknownKeys = true
-                        isLenient = true
-                        encodeDefaults = true
-                    },
-                )
-            }
-
+            contentNegotiationInterceptor()
             headerInterceptor(tokenManager, authRepository, fidProvider)
         }
+
+    private fun HttpClientConfig<OkHttpConfig>.timeoutInterceptor() {
+        install(HttpTimeout) {
+            // 서버와 TCP 연결을 맺는 시간 제한
+            connectTimeoutMillis = CONNECT_TIMEOUT_MILLIS
+            // 서버와 연결된 후 데이터를 읽는 동안 아무 데이터도 안 오면 기다리는 최대 시간
+            socketTimeoutMillis = SOCKET_TIMEOUT_MILLIS
+            // 전체 HTTP 요청이 완료될 때까지 기다리는 최대 시간
+            requestTimeoutMillis = REQUEST_TIMEOUT_MILLIS
+        }
+    }
+
+    private fun HttpClientConfig<OkHttpConfig>.loggingInterceptor() {
+        install(plugin = Logging) {
+            logger = PrettyLogger
+            level = if (BuildConfig.DEBUG) LogLevel.ALL else LogLevel.NONE
+        }
+    }
+
+    private fun HttpClientConfig<OkHttpConfig>.contentNegotiationInterceptor() {
+        install(plugin = ContentNegotiation) {
+            json(
+                Json {
+                    ignoreUnknownKeys = true
+                    isLenient = true
+                    encodeDefaults = true
+                },
+            )
+        }
+    }
 
     private fun HttpClientConfig<OkHttpConfig>.headerInterceptor(
         tokenManager: TokenManager,
@@ -127,13 +152,6 @@ object NetworkModule {
         defaultRequest {
             header("device-fid", fidProvider.cachedFid)
             contentType(type = ContentType.Application.Json)
-        }
-    }
-
-    private fun HttpClientConfig<OkHttpConfig>.loggingInterceptor() {
-        install(plugin = Logging) {
-            logger = PrettyLogger
-            level = if (BuildConfig.DEBUG) LogLevel.ALL else LogLevel.NONE
         }
     }
 
