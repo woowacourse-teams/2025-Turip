@@ -2,7 +2,6 @@ package turip.account.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -24,15 +23,11 @@ import turip.account.repository.MemberRepository;
 import turip.auth.service.RefreshTokenService;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.BadRequestException;
-import turip.favorite.domain.AccountRole;
 import turip.favorite.domain.FavoriteContent;
-import turip.favorite.domain.FavoriteFolder;
-import turip.favorite.domain.FavoriteFolderAccount;
 import turip.favorite.repository.FavoriteContentRepository;
 import turip.favorite.repository.FavoriteFolderAccountRepository;
 import turip.favorite.repository.FavoriteFolderRepository;
 import turip.util.fixture.AccountFixture;
-import turip.util.fixture.FavoriteFolderFixture;
 import turip.util.fixture.GuestFixture;
 import turip.util.fixture.MemberFixture;
 
@@ -125,7 +120,7 @@ class MemberServiceTest {
             memberService.migrate(member, guest);
 
             // then
-            verify(favoriteFolderRepository).deletePersonalFoldersByAccount(guestAccount);
+            verify(favoriteFolderRepository).deleteDefaultFolderByAccount(memberAccount);
             verify(favoriteFolderAccountRepository).updateAccount(guestAccount, memberAccount);
         }
 
