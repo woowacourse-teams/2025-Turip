@@ -109,19 +109,15 @@ class MyPageViewModel @Inject constructor(
                 val removed =
                     removeBookmarkMutex.withLock {
                         val current = _uiState.value.bookmarkContentState
-                        val contents =
-                            (current as? MyPageSectionState.Success)?.data ?: return@withLock false
+                        val contents = (current as? MyPageSectionState.Success)?.data ?: return@withLock false
 
-                        val removeContentIndex: Int =
-                            contents.indexOfFirst { it.content.id == contentId }
+                        val removeContentIndex: Int = contents.indexOfFirst { it.content.id == contentId }
                         if (removeContentIndex == -1) return@withLock false
 
                         val removeContent = contents[removeContentIndex]
-                        removingSnapshots[contentId] =
-                            BookmarkRemoveSnapshot(removeContent, removeContentIndex)
+                        removingSnapshots[contentId] = BookmarkRemoveSnapshot(removeContent)
 
-                        val updated =
-                            contents.filter { it.content.id != contentId }.toImmutableList()
+                        val updated = contents.filter { it.content.id != contentId }.toImmutableList()
                         _uiState.update {
                             it.copy(bookmarkContentState = MyPageSectionState.Success(updated))
                         }
@@ -150,26 +146,20 @@ class MyPageViewModel @Inject constructor(
                 val snapshot = removingSnapshots.remove(contentId) ?: return@withLock
 
                 val current = _uiState.value.bookmarkContentState
-                val contents =
-                    (current as? MyPageSectionState.Success)?.data ?: return@withLock
+                val contents = (current as? MyPageSectionState.Success)?.data ?: return@withLock
 
                 // 중복 복구 방지
                 if (contents.any { it.content.id == contentId }) return@withLock
 
-                // 스냅샷 시점 기준 다른 콘텐츠들이 제거되어 순서가 변경되었을 가능성 존재
-                val safeIndex = snapshot.index.coerceIn(0, contents.size)
-
                 val rollbackContents: ImmutableList<BookmarkContent> =
                     contents
                         .toMutableList()
-                        .apply { add(safeIndex, snapshot.content) }
+                        .apply { add(snapshot.content) }
+                        .sortedByDescending { it.bookmarkId }
                         .toImmutableList()
 
                 _uiState.update {
-                    it.copy(
-                        bookmarkContentState =
-                            MyPageSectionState.Success(rollbackContents),
-                    )
+                    it.copy(bookmarkContentState = MyPageSectionState.Success(rollbackContents))
                 }
             }
         }
@@ -290,5 +280,4 @@ class MyPageViewModel @Inject constructor(
 
 private data class BookmarkRemoveSnapshot(
     val content: BookmarkContent,
-    val index: Int,
 )

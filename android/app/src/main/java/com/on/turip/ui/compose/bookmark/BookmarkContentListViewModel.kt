@@ -60,12 +60,12 @@ class BookmarkContentListViewModel @Inject constructor(
             // 새로고침할 때만 전체 콘텐츠 수 API 호출
             if (loadMode == PagingLoadMode.REFRESH) launch { loadBookmarkCount() }
 
-            val lastItemId: Long? =
+            val lastBookmarkId: Long? =
                 uiState.value.bookmarkContents.items
                     .lastOrNull()
                     ?.bookmarkId
 
-            val cursor = Cursor(size = PAGE_SIZE, lastId = lastItemId)
+            val cursor = Cursor(size = PAGE_SIZE, lastId = lastBookmarkId)
             bookmarkRepository
                 .loadBookmarks(cursor)
                 .onSuccess { result: Page<BookmarkContent> ->
@@ -159,19 +159,13 @@ class BookmarkContentListViewModel @Inject constructor(
         when (uiError) {
             UiError.Global.Network -> {
                 _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        errorUiState = ErrorUiState.Network,
-                    )
+                    it.copy(isLoading = false, errorUiState = ErrorUiState.Network)
                 }
             }
 
             UiError.Global.Server -> {
                 _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        errorUiState = ErrorUiState.Server,
-                    )
+                    it.copy(isLoading = false, errorUiState = ErrorUiState.Server)
                 }
             }
 
@@ -236,17 +230,14 @@ class BookmarkContentListViewModel @Inject constructor(
                     removeBookmarkMutex.withLock {
                         val contents = _uiState.value.bookmarkContents.items
 
-                        val removeContentIndex: Int =
-                            contents.indexOfFirst { it.content.id == contentId }
+                        val removeContentIndex: Int = contents.indexOfFirst { it.content.id == contentId }
                         // 이미 UI 제거 완료된 상태 (API 호출 완료)
                         if (removeContentIndex == -1) return@withLock false
 
                         val removeContent = contents[removeContentIndex]
-                        removingSnapshots[contentId] =
-                            BookmarkRemoveSnapshot(removeContent, removeContentIndex)
+                        removingSnapshots[contentId] = BookmarkRemoveSnapshot(removeContent)
 
-                        val updated =
-                            contents.filter { it.content.id != contentId }.toImmutableList()
+                        val updated = contents.filter { it.content.id != contentId }.toImmutableList()
                         _uiState.update { state ->
                             state.copy(bookmarkContents = state.bookmarkContents.copy(items = updated))
                         }
@@ -265,9 +256,7 @@ class BookmarkContentListViewModel @Inject constructor(
                         }
                         _uiEffect.send(BookmarkContentListUiEffect.BookmarkRemovedList)
                     }.onFailure {
-                        _uiEffect.send(
-                            BookmarkContentListUiEffect.ShowBookmarkRemoveFailedList(contentId),
-                        )
+                        _uiEffect.send(BookmarkContentListUiEffect.ShowBookmarkRemoveFailedList(contentId))
                     }
             } finally {
                 // 중복 API 호출 방지 리소스 정리
@@ -286,13 +275,11 @@ class BookmarkContentListViewModel @Inject constructor(
                 // 중복 복구 방지
                 if (contents.any { it.content.id == contentId }) return@withLock
 
-                // 스냅샷 시점 기준 다른 콘텐츠들이 제거되어 순서가 변경되었을 가능성 존재
-                val safeIndex = (snapshot.index).coerceIn(0, contents.size)
-
                 val rollbackContents: ImmutableList<BookmarkContent> =
                     contents
                         .toMutableList()
-                        .apply { add(safeIndex, snapshot.content) }
+                        .apply { add(snapshot.content) }
+                        .sortedByDescending { it.bookmarkId }
                         .toImmutableList()
 
                 _uiState.update { state ->
@@ -309,5 +296,4 @@ class BookmarkContentListViewModel @Inject constructor(
 
 private data class BookmarkRemoveSnapshot(
     val content: BookmarkContent,
-    val index: Int,
 )
