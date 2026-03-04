@@ -79,8 +79,7 @@ private fun BookmarkRegionChip(
                 .background(
                     color = TuripTheme.colors.chipBackground,
                     shape = TuripTheme.shape.chip,
-                )
-                .padding(
+                ).padding(
                     horizontal = TuripTheme.spacing.medium,
                     vertical = TuripTheme.spacing.extraSmall,
                 ),
@@ -99,6 +98,7 @@ private fun BookmarkContentListItemPreview() {
     TuripTheme {
         val content =
             BookmarkContent(
+                1L,
                 content =
                     Content(
                         1L,
@@ -109,6 +109,7 @@ private fun BookmarkContentListItemPreview() {
                     ),
                 tripDuration = TripDuration(1, 2),
                 tripPlaceCount = 2,
+                createdAt = "",
             )
         BookmarkContentListItem(
             content = content,

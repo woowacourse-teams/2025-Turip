@@ -407,6 +407,7 @@ private fun BookmarkContentListLoadCountErrorPreview() {
     val contents =
         persistentListOf(
             BookmarkContent(
+                bookmarkId = 1L,
                 content =
                     Content(
                         1L,
@@ -417,8 +418,10 @@ private fun BookmarkContentListLoadCountErrorPreview() {
                     ),
                 tripDuration = TripDuration(1, 2),
                 tripPlaceCount = 2,
+                createdAt = "",
             ),
             BookmarkContent(
+                bookmarkId = 2L,
                 content =
                     Content(
                         2L,
@@ -429,6 +432,7 @@ private fun BookmarkContentListLoadCountErrorPreview() {
                     ),
                 tripDuration = TripDuration(0, 1),
                 tripPlaceCount = 2,
+                createdAt = "",
             ),
         )
     TuripTheme {
@@ -462,6 +466,7 @@ private fun BookmarkContentLoadMoreErrorPreview() {
     val contents =
         persistentListOf(
             BookmarkContent(
+                bookmarkId = 1L,
                 content =
                     Content(
                         1L,
@@ -472,8 +477,10 @@ private fun BookmarkContentLoadMoreErrorPreview() {
                     ),
                 tripDuration = TripDuration(1, 2),
                 tripPlaceCount = 2,
+                createdAt = "",
             ),
             BookmarkContent(
+                bookmarkId = 2L,
                 content =
                     Content(
                         2L,
@@ -484,6 +491,7 @@ private fun BookmarkContentLoadMoreErrorPreview() {
                     ),
                 tripDuration = TripDuration(0, 1),
                 tripPlaceCount = 1,
+                createdAt = "",
             ),
         )
 
@@ -516,6 +524,7 @@ private fun BookmarkContentListSuccessPreview() {
     val contents =
         persistentListOf(
             BookmarkContent(
+                bookmarkId = 1L,
                 content =
                     Content(
                         1L,
@@ -526,8 +535,10 @@ private fun BookmarkContentListSuccessPreview() {
                     ),
                 tripDuration = TripDuration(1, 2),
                 tripPlaceCount = 2,
+                createdAt = "",
             ),
             BookmarkContent(
+                bookmarkId = 2L,
                 content =
                     Content(
                         2L,
@@ -538,6 +549,7 @@ private fun BookmarkContentListSuccessPreview() {
                     ),
                 tripDuration = TripDuration(0, 1),
                 tripPlaceCount = 2,
+                createdAt = "",
             ),
         )
     TuripTheme {

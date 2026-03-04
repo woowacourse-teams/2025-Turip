@@ -7,6 +7,12 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class BookmarkContentResponse(
+    @SerialName("id")
+    val id: Long,
+    @SerialName("createdAt")
+    val createdAt: String,
+    @SerialName("accountId")
+    val accountId: Long,
     @SerialName("content")
     val content: ContentResponse,
     @SerialName("tripDuration")

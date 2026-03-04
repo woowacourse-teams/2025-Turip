@@ -117,6 +117,7 @@ private fun BookmarkContentMetaSectionPreview() {
     TuripTheme {
         val content =
             BookmarkContent(
+                bookmarkId = 1L,
                 content =
                     Content(
                         1L,
@@ -127,6 +128,7 @@ private fun BookmarkContentMetaSectionPreview() {
                     ),
                 tripDuration = TripDuration(0, 1),
                 tripPlaceCount = 100,
+                createdAt = "2026-03-04",
             )
 
         BookmarkContentMetaSection(

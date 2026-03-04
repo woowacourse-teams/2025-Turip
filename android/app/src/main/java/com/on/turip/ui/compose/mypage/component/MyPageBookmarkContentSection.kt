@@ -250,6 +250,7 @@ private fun MyPageBookmarkContentSectionWithItemsPreview() {
                 MyPageSectionState.Success(
                     persistentListOf(
                         BookmarkContent(
+                            bookmarkId = 1L,
                             content =
                                 Content(
                                     1L,
@@ -264,6 +265,7 @@ private fun MyPageBookmarkContentSectionWithItemsPreview() {
                                 ),
                             tripDuration = TripDuration(1, 2),
                             tripPlaceCount = 2,
+                            createdAt = "2026-03-04",
                         ),
                     ),
                 ),

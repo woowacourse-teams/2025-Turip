@@ -11,13 +11,15 @@ fun Long.toRequestDto(): BookmarkAddRequest = BookmarkAddRequest(contentId = thi
 
 fun BookmarkContentsResponse.toDomain(): Page<BookmarkContent> =
     Page(
-        items = contents.map { it.toDomain() },
+        items = bookmarks.map { it.toDomain() },
         hasNext = loadable,
     )
 
 fun BookmarkContentResponse.toDomain(): BookmarkContent =
     BookmarkContent(
+        bookmarkId = id,
         content = content.toDomain(),
         tripDuration = tripDuration.toDomain(),
         tripPlaceCount = tripPlaceCount,
+        createdAt = createdAt,
     )

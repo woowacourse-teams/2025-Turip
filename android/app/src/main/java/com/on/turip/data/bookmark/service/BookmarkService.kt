@@ -21,6 +21,10 @@ interface BookmarkService {
         @Query("contentId") contentId: Long,
     )
 
+    /**
+     * @param size : 불러올 데이터 크기
+     * @param lastId : 북마크 콘텐츠의 ID (콘텐츠 ID 아님!)
+     */
     @GET(ApiPath.V2 + "bookmarks")
     suspend fun getBookmarks(
         @Query("size") size: Int,
