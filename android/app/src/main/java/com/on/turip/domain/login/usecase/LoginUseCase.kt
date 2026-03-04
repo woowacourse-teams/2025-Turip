@@ -30,7 +30,7 @@ class LoginUseCase @Inject constructor(
                     .setTokens(authResult.authTokens)
                     .fold(
                         onSuccess = {
-                            Timber.e("로그인 성공")
+                            Timber.d("로그인 성공")
                             sessionStore.setMember()
                             TuripResult.Success(authResult.isNewMember)
                         },
