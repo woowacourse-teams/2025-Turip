@@ -21,17 +21,17 @@ class DefaultTokenManager @Inject constructor(
     private val authCacheController: AuthTokenCacheController,
 ) : TokenManager {
     @Volatile
-    private var tokens: AuthTokens? = null
+    private var _currentTokens: AuthTokens? = null
     private val mutex = Mutex()
 
-    override fun currentTokens(): AuthTokens? = tokens
+    override val currentTokens: AuthTokens? get() = _currentTokens
 
     override suspend fun initialize() {
         mutex.withLock {
             val accessToken = userStorageRepository.loadAccessToken().getOrNull()
             val refreshToken = userStorageRepository.loadRefreshToken().getOrNull()
 
-            tokens =
+            _currentTokens =
                 if (!accessToken.isNullOrBlank() && !refreshToken.isNullOrBlank()) {
                     AuthTokens(accessToken, refreshToken)
                 } else {
@@ -47,7 +47,7 @@ class DefaultTokenManager @Inject constructor(
                 .createTokens(tokens)
                 .fold(
                     onSuccess = {
-                        this.tokens = tokens
+                        this._currentTokens = tokens
                         authCacheController.clear()
                         Result.success(Unit)
                     },
@@ -61,7 +61,7 @@ class DefaultTokenManager @Inject constructor(
     // 인메모리 & 로컬 저장소 토큰 제거 (프레임워크 캐싱된 토큰 초기화)
     override suspend fun clearTokens(): Result<Unit> {
         mutex.withLock {
-            tokens = null
+            _currentTokens = null
             authCacheController.clear()
 
             return userStorageRepository

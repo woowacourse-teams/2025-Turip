@@ -85,7 +85,7 @@ object NetworkModule {
         install(plugin = Auth) {
             bearer {
                 loadTokens {
-                    tokenManager.currentTokens()?.let { tokens: AuthTokens ->
+                    tokenManager.currentTokens?.let { tokens: AuthTokens ->
                         BearerTokens(
                             accessToken = tokens.accessToken,
                             refreshToken = tokens.refreshToken,
@@ -95,8 +95,7 @@ object NetworkModule {
 
                 refreshTokens {
                     val storedRefreshToken: String =
-                        tokenManager.currentTokens()?.refreshToken
-                            ?: return@refreshTokens null
+                        tokenManager.currentTokens?.refreshToken ?: return@refreshTokens null
 
                     return@refreshTokens authRepository
                         .get()
