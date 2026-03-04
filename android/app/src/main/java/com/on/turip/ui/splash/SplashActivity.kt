@@ -16,7 +16,7 @@ import com.on.turip.ui.common.extensions.collectOnStarted
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.splash.SplashScreen
 import com.on.turip.ui.compose.splash.SplashUiEffect
-import com.on.turip.ui.compose.splash.SplashViewmodel
+import com.on.turip.ui.compose.splash.SplashViewModel
 import com.on.turip.ui.login.LoginActivity
 import com.on.turip.ui.main.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
@@ -25,7 +25,7 @@ import timber.log.Timber
 @SuppressLint("CustomSplashScreen")
 @AndroidEntryPoint
 class SplashActivity : ComponentActivity() {
-    private val viewModel: SplashViewmodel by viewModels()
+    private val viewModel: SplashViewModel by viewModels()
     private val appUpdateManager: AppUpdateManager by lazy { AppUpdateManagerFactory.create(this) }
 
     private val updateLauncher =

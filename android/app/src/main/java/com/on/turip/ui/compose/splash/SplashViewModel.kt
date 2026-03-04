@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SplashViewmodel @Inject constructor(
+class SplashViewModel @Inject constructor(
     private val determineInitialSessionUseCase: DetermineInitialSessionUseCase,
 ) : ViewModel() {
     private val _uiEffect: Channel<SplashUiEffect> = Channel(Channel.BUFFERED)
