@@ -63,8 +63,7 @@ class BookmarkContentListViewModel @Inject constructor(
             val lastItemId: Long? =
                 uiState.value.bookmarkContents.items
                     .lastOrNull()
-                    ?.content
-                    ?.id
+                    ?.bookmarkId
 
             val cursor = Cursor(size = PAGE_SIZE, lastId = lastItemId)
             bookmarkRepository

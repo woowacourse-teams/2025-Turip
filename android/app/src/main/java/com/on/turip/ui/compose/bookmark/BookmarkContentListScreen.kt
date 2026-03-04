@@ -263,7 +263,7 @@ private fun BookmarkContentList(
         ) {
             itemsIndexed(
                 items = pagingState.items,
-                key = { _, item -> item.content.id },
+                key = { _, item -> item.bookmarkId },
             ) { index, content ->
                 BookmarkContentListItem(
                     content = content,

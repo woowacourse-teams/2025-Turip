@@ -80,7 +80,7 @@ fun MyPageBookmarkContentSection(
                         horizontalArrangement = Arrangement.spacedBy(TuripTheme.spacing.large),
                         modifier = Modifier.padding(start = TuripTheme.spacing.large),
                     ) {
-                        items(items = state.data, key = { it.content.id }) {
+                        items(items = state.data, key = { it.bookmarkId }) {
                             MyPageBookmarkContentItem(
                                 item = it,
                                 onContentClick = onContentClick,
