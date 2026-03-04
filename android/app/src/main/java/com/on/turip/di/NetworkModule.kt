@@ -122,29 +122,28 @@ object NetworkModule {
                     val storedRefreshToken: String =
                         tokenManager.currentTokens?.refreshToken ?: return@refreshTokens null
 
-                    return@refreshTokens authRepository
-                        .get()
-                        .requestTokens(storedRefreshToken)
-                        .fold(
-                            onSuccess = { newTokens: AuthTokens ->
-                                tokenManager.setTokens(newTokens).fold(
-                                    onSuccess = {
-                                        BearerTokens(
-                                            accessToken = newTokens.accessToken,
-                                            refreshToken = newTokens.refreshToken,
-                                        )
-                                    },
-                                    onFailure = {
-                                        tokenManager.clearTokens()
-                                        null
-                                    },
-                                )
-                            },
-                            onFailure = {
-                                // #591 이슈에서 처리 필요
-                                null
-                            },
-                        )
+                    authRepository.get().requestTokens(storedRefreshToken).fold(
+                        onSuccess = { newTokens: AuthTokens ->
+                            val currentRefreshToken = tokenManager.currentTokens?.refreshToken
+
+                            // 중단함수 처리 중 이미 토큰 재발급이 되었거나 제거가 발생했을 경우
+                            if (currentRefreshToken != storedRefreshToken) return@fold null
+
+                            tokenManager.setTokens(newTokens).fold(
+                                onSuccess = {
+                                    BearerTokens(accessToken = newTokens.accessToken, refreshToken = newTokens.refreshToken)
+                                },
+                                onFailure = {
+                                    tokenManager.clearTokens()
+                                    null
+                                },
+                            )
+                        },
+                        onFailure = {
+                            // #591 이슈에서 처리 필요
+                            null
+                        },
+                    )
                 }
             }
         }
