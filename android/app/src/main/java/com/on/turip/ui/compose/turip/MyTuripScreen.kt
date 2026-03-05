@@ -207,6 +207,15 @@ private fun MyTuripScreenContent(
             }
         }
     }
+    val userTuripCount by remember(turips) {
+        derivedStateOf { turips.count { !it.isDefault } }
+    }
+
+    LaunchedEffect(userTuripCount, isDeleteMode) {
+        if (isDeleteMode && userTuripCount == 0) {
+            isDeleteMode = false
+        }
+    }
 
     Box(modifier = modifier.fillMaxSize()) {
         Column(
@@ -247,7 +256,6 @@ private fun MyTuripScreenContent(
                         .padding(top = TuripTheme.spacing.large),
             ) {
                 items(items = filteredTurips, key = { it.id }) { turip: MyTuripModel ->
-                    val userTurips: List<MyTuripModel> = filteredTurips.filterNot { it.isDefault }
                     MyTuripCard(
                         turipImage = turip.image,
                         turip = turip,
@@ -255,16 +263,12 @@ private fun MyTuripScreenContent(
                         onTuripClick = { id ->
                             if (isDeleteMode) {
                                 onTuripDelete(turip)
-                                if (userTurips.size == 1) isDeleteMode = false
                             } else {
                                 onTuripClick(id)
                             }
                         },
                         onLongPress = { isDeleteMode = true },
-                        onDeleteClick = {
-                            onTuripDelete(turip)
-                            if (userTurips.size == 1) isDeleteMode = false
-                        },
+                        onDeleteClick = { onTuripDelete(turip) },
                         isDefaultFolder = turip.isDefault,
                     )
                 }
