@@ -34,22 +34,16 @@ fun TuripAddBottomSheet(
         sheetState = sheetState,
         containerColor = TuripTheme.colors.white,
     ) {
-        ModalBottomSheet(
-            onDismissRequest = onDismiss,
-            sheetState = sheetState,
-            containerColor = TuripTheme.colors.white,
-        ) {
-            Box {
-                NameEditorSheetContent(
-                    title = title,
-                    turipName = turipName,
-                    turipNameStatus = turipNameStatus,
-                    isConfirmEnabled = isConfirmEnabled,
-                    onNameChanged = onNameChanged,
-                    onConfirmClick = onConfirmClick,
-                    focusRequester = focusRequester,
-                )
-            }
+        Box {
+            NameEditorSheetContent(
+                title = title,
+                turipName = turipName,
+                turipNameStatus = turipNameStatus,
+                isConfirmEnabled = isConfirmEnabled,
+                onNameChanged = onNameChanged,
+                onConfirmClick = onConfirmClick,
+                focusRequester = focusRequester,
+            )
         }
     }
 }
