@@ -1,5 +1,6 @@
 package com.on.turip.ui.compose.mypage.navigation
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.core.net.toUri
@@ -13,7 +14,6 @@ import com.on.turip.ui.compose.mypage.model.InquiryMail
 import dagger.hilt.android.qualifiers.ActivityContext
 import jakarta.inject.Inject
 import kotlinx.serialization.modules.PolymorphicModuleBuilder
-import android.content.Context
 
 class MyPageNavKeyProvider @Inject constructor(
     @ActivityContext private val context: Context,

@@ -79,8 +79,7 @@ private fun BookmarkRegionChip(
                 .background(
                     color = TuripTheme.colors.chipBackground,
                     shape = TuripTheme.shape.chip,
-                )
-                .padding(
+                ).padding(
                     horizontal = TuripTheme.spacing.medium,
                     vertical = TuripTheme.spacing.extraSmall,
                 ),

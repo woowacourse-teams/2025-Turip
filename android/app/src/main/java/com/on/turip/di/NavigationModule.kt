@@ -20,7 +20,6 @@ import dagger.multibindings.IntoSet
 @Module
 @InstallIn(ActivityComponent::class)
 abstract class NavigationModule {
-
     @Binds
     @IntoSet
     abstract fun bindBookMarkNavKeyProvider(impl: BookMarkNavKeyProvider): NavKeyProvider
@@ -59,8 +58,7 @@ abstract class NavigationModule {
 
     companion object {
         @Provides
-        fun provideNavKeyProviders(
-            providers: Set<@JvmSuppressWildcards NavKeyProvider>,
-        ): List<@JvmSuppressWildcards NavKeyProvider> = providers.toList()
+        fun provideNavKeyProviders(providers: Set<@JvmSuppressWildcards NavKeyProvider>): List<@JvmSuppressWildcards NavKeyProvider> =
+            providers.toList()
     }
 }
