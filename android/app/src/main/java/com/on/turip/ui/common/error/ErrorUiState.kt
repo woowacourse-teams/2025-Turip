@@ -10,6 +10,8 @@ import com.on.turip.R
 sealed interface ErrorUiState {
     data object None : ErrorUiState
 
+    data object Unexpected : ErrorUiState
+
     data object Server : ErrorUiState
 
     data object Network : ErrorUiState
@@ -31,6 +33,15 @@ fun ErrorUiState.toUiModel(): ErrorUiModel? =
                 imageRes = R.drawable.ic_network_error,
                 titleRes = R.string.cannot_connect_network,
                 descriptionRes = R.string.check_connection_status,
+                retryTextRes = R.string.retry,
+            )
+        }
+
+        ErrorUiState.Unexpected -> {
+            ErrorUiModel(
+                imageRes = R.drawable.mascot,
+                titleRes = R.string.unexpected_error,
+                descriptionRes = R.string.retry_later,
                 retryTextRes = R.string.retry,
             )
         }
