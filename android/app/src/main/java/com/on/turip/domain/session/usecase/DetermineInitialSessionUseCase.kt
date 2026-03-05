@@ -21,7 +21,7 @@ class DetermineInitialSessionUseCase @Inject constructor(
     suspend operator fun invoke(): SessionState {
         tokenManager.initialize()
 
-        val tokens: AuthTokens? = tokenManager.currentTokens()
+        val tokens: AuthTokens? = tokenManager.currentTokens
         if (tokens == null) {
             sessionStore.setGuest()
             return SessionState.Guest
