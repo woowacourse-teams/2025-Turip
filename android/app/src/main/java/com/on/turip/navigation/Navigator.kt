@@ -33,6 +33,18 @@ class Navigator(
         log(action = "goBack")
     }
 
+    fun goWithAllClear(key: NavKey) {
+        clearAllStacks()
+        when (key) {
+            in state.topLevelKeys -> state.topLevelStack.add(key)
+            else -> {
+                state.topLevelStack.add(state.startKey)
+                state.currentSubStack.add(key)
+            }
+        }
+        log(action = "goWithAllClear to $key")
+    }
+
     private fun goToKey(key: NavKey) {
         state.currentSubStack.apply {
             remove(key)
@@ -58,6 +70,14 @@ class Navigator(
     private fun clearSubStack() {
         state.currentSubStack.run {
             if (size > 1) subList(1, size).clear()
+        }
+    }
+
+    private fun clearAllStacks() {
+        state.topLevelStack.clear()
+        state.subStacks.forEach { (topLevelKey, stack) ->
+            stack.clear()
+            stack.add(topLevelKey)
         }
     }
 

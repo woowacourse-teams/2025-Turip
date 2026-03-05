@@ -8,9 +8,7 @@ import kotlinx.serialization.modules.PolymorphicModuleBuilder
  * Feature 단위로 **Navigation 구성 요소(NavKey + Screen)를 등록**하기 위한 Provider 인터페이스.
  *
  * ## 사용 대상
- * - KMP 기반 Feature 구현 모듈
- *   (예: feature:discussion:impl)
- * - Navigation 상태(`NavKey`)와 화면 구현을 함께 소유하는 Feature
+ * - Feature 구현 모듈
  *
  * ## 사용 예시
  * ```kotlin

@@ -15,7 +15,7 @@ fun EntryProviderScope<NavKey>.regionResultScreen(navigator: Navigator) {
             onNavigateToTripDetail = { turipId: Long ->
                 navigator.navigate(TripDetailNavKey(turipId))
             },
-            onNavigateToLogin = { navigator.navigate(LoginNavKey) },
+            onNavigateToLogin = { navigator.goWithAllClear(LoginNavKey) },
         )
     }
 }

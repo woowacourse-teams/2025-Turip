@@ -11,7 +11,7 @@ fun EntryProviderScope<NavKey>.splashScreen(navigator: Navigator) {
     entry<SplashNavKey> {
         SplashScreen(
             navigateToHome = { navigator.navigate(HomeNavKey) },
-            navigateToLogin = { navigator.navigate(LoginNavKey) },
+            navigateToLogin = { navigator.goWithAllClear(LoginNavKey) },
             onFinish = navigator::goBack,
         )
     }

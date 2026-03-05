@@ -13,7 +13,7 @@ fun EntryProviderScope<NavKey>.myTuripScreen(navigator: Navigator) {
             onNavigateToTuripPlace = { turipId: Long ->
                 navigator.navigate(TuripDetailNavKey(turipId))
             },
-            onNavigateToLogin = { navigator.navigate(LoginNavKey) },
+            onNavigateToLogin = { navigator.goWithAllClear(LoginNavKey) },
         )
     }
 }
