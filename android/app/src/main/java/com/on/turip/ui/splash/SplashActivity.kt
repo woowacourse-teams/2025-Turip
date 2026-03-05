@@ -17,7 +17,6 @@ import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.splash.SplashScreen
 import com.on.turip.ui.compose.splash.SplashUiEffect
 import com.on.turip.ui.compose.splash.SplashViewModel
-import com.on.turip.ui.login.LoginActivity
 import com.on.turip.ui.main.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
@@ -92,7 +91,8 @@ class SplashActivity : ComponentActivity() {
         collectOnStarted(viewModel.uiEffect) { uiEffect ->
             when (uiEffect) {
                 SplashUiEffect.NavigateToLogin -> {
-                    startActivity(LoginActivity.newIntent(this@SplashActivity))
+                    // TODO LoginScreen으로 가도록 수정
+                    startActivity(MainActivity.newIntent(this@SplashActivity))
                     finish()
                 }
 
