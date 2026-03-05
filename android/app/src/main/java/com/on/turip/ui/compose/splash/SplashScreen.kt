@@ -1,6 +1,7 @@
 package com.on.turip.ui.compose.splash
 
 import android.app.Activity.RESULT_OK
+import android.content.Context
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -28,6 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.play.core.appupdate.AppUpdateInfo
@@ -51,9 +54,10 @@ fun SplashScreen(
     modifier: Modifier = Modifier,
     viewModel: SplashViewModel = hiltViewModel(),
 ) {
-    val localContext = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
-    val appUpdateManager: AppUpdateManager by lazy { AppUpdateManagerFactory.create(localContext) }
+    val localContext: Context = LocalContext.current
+    val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
+    val appUpdateManager: AppUpdateManager =
+        remember(localContext) { AppUpdateManagerFactory.create(localContext) }
 
     val updateLauncher: ManagedActivityResultLauncher<IntentSenderRequest, ActivityResult> =
         rememberLauncherForActivityResult(
