@@ -18,8 +18,14 @@ class SplashActivity : ComponentActivity() {
         setContent {
             TuripTheme {
                 SplashScreen(
-                    navigateToHome = { startActivity(MainActivity.newIntent(this@SplashActivity)) },
-                    navigateToLogin = { startActivity(MainActivity.newIntent(this@SplashActivity)) },
+                    navigateToHome = {
+                        startActivity(MainActivity.newIntent(this@SplashActivity))
+                        finish()
+                    },
+                    navigateToLogin = {
+                        startActivity(MainActivity.newIntent(this@SplashActivity))
+                        finish()
+                    },
                     onFinish = ::finish,
                 )
             }

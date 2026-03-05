@@ -16,6 +16,14 @@ class Navigator(
         log(action = "navigate to $key")
     }
 
+    fun replace(key: NavKey) {
+        when (key) {
+            in state.topLevelKeys -> goToTopLevel(key)
+            else -> replaceToKey(key)
+        }
+        log(action = "replace to $key")
+    }
+
     fun goBack() {
         when (state.currentKey) {
             state.startKey -> Unit
@@ -35,6 +43,14 @@ class Navigator(
     private fun goToTopLevel(key: NavKey) {
         state.topLevelStack.apply {
             if (key == state.startKey) clear() else remove(key)
+            add(key)
+        }
+    }
+
+    private fun replaceToKey(key: NavKey) {
+        state.currentSubStack.apply {
+            if (size > 1) removeLastOrNull()
+            remove(key)
             add(key)
         }
     }
