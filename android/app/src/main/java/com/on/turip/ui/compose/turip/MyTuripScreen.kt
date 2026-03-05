@@ -247,6 +247,7 @@ private fun MyTuripScreenContent(
                         .padding(top = TuripTheme.spacing.large),
             ) {
                 items(items = filteredTurips, key = { it.id }) { turip: MyTuripModel ->
+                    val userTurips: List<MyTuripModel> = filteredTurips.filterNot { it.isDefault }
                     MyTuripCard(
                         turipImage = turip.image,
                         turip = turip,
@@ -254,7 +255,7 @@ private fun MyTuripScreenContent(
                         onTuripClick = { id ->
                             if (isDeleteMode) {
                                 onTuripDelete(turip)
-                                if (filteredTurips.size == 1) isDeleteMode = false
+                                if (userTurips.size == 1) isDeleteMode = false
                             } else {
                                 onTuripClick(id)
                             }
@@ -262,7 +263,7 @@ private fun MyTuripScreenContent(
                         onLongPress = { isDeleteMode = true },
                         onDeleteClick = {
                             onTuripDelete(turip)
-                            if (filteredTurips.size == 1) isDeleteMode = false
+                            if (userTurips.size == 1) isDeleteMode = false
                         },
                         isDefaultFolder = turip.isDefault,
                     )
