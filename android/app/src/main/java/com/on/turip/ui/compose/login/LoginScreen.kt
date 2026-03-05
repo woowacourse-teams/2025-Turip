@@ -37,12 +37,12 @@ import com.on.turip.ui.compose.designsystem.component.TuripDialog
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.login.component.GoogleLoginButton
-import com.on.turip.ui.compose.login.component.HelpText
+import com.on.turip.ui.compose.login.component.GuestModeSection
 import com.on.turip.ui.compose.login.util.noRippleClickable
 
 @Composable
 fun LoginScreen(
-    navigateToMain: () -> Unit,
+    onNavigateToMain: () -> Unit,
     googleCredentialManager: GoogleCredentialManager,
     viewmodel: LoginViewmodel = hiltViewModel(),
 ) {
@@ -54,14 +54,15 @@ fun LoginScreen(
         viewmodel.uiEffect.collect { effect: LoginUiEffect ->
             when (effect) {
                 LoginUiEffect.NavigateToMain -> {
-                    navigateToMain()
+                    onNavigateToMain()
                 }
 
                 is LoginUiEffect.ShowError -> {
                     val errorUiModel = effect.errorUiState.toUiModel() ?: return@collect
                     snackbarHostState.showSnackbar(
                         message = resources.getString(errorUiModel.titleRes),
-                        duration = SnackbarDuration.Long,
+                        actionLabel = resources.getString(R.string.all_close_description),
+                        duration = SnackbarDuration.Short,
                     )
                 }
             }
@@ -74,7 +75,7 @@ fun LoginScreen(
             message = stringResource(R.string.login_dialog_migration_message),
             confirmText = stringResource(R.string.login_dialog_confirm_text),
             dismissText = stringResource(R.string.my_page_logout_dialog_dismiss),
-            onConfirmation = viewmodel::migration,
+            onConfirmation = viewmodel::confirmMigration,
             onDismissRequest = viewmodel::clearGuestData,
         )
     }
@@ -87,9 +88,9 @@ fun LoginScreen(
         LoginScreenContent(
             isHelpTextVisible = uiState.showHelpText,
             modifier = Modifier.padding(innerPadding),
-            onClickHelpText = { viewmodel.updateHelpTextVisible(!uiState.showHelpText) },
-            onClickGoogleLogin = { viewmodel.onGoogleLogin(googleCredentialManager) },
-            onClickGuestLogin = viewmodel::onGuestLogin,
+            onHelpClick = { viewmodel.updateHelpTextVisible(!uiState.showHelpText) },
+            onGoogleLoginClick = { viewmodel.loginWithGoogle(googleCredentialManager) },
+            onGuestLoginClick = viewmodel::continueAsGuest,
         )
     }
 }
@@ -97,9 +98,9 @@ fun LoginScreen(
 @Composable
 private fun LoginScreenContent(
     isHelpTextVisible: Boolean,
-    onClickHelpText: () -> Unit,
-    onClickGoogleLogin: () -> Unit,
-    onClickGuestLogin: () -> Unit,
+    onHelpClick: () -> Unit,
+    onGoogleLoginClick: () -> Unit,
+    onGuestLoginClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Image(
@@ -163,14 +164,13 @@ private fun LoginScreenContent(
                 )
             }
 
-            GoogleLoginButton(onClickLoginButton = onClickGoogleLogin)
+            GoogleLoginButton(onLoginClick = onGoogleLoginClick)
 
-            HelpText(
+            GuestModeSection(
                 text = stringResource(R.string.login_start_to_guest),
-                style = TuripTheme.typography.body1,
                 color = TuripTheme.colors.white,
-                onClickIcon = onClickHelpText,
-                onClickText = onClickGuestLogin,
+                onHelpClick = onHelpClick,
+                onTextClick = onGuestLoginClick,
             )
         }
     }
@@ -182,9 +182,9 @@ private fun HelpVisibleLoginScreenPreview() {
     TuripTheme {
         LoginScreenContent(
             isHelpTextVisible = true,
-            onClickHelpText = { },
-            onClickGoogleLogin = { },
-            onClickGuestLogin = { },
+            onHelpClick = { },
+            onGoogleLoginClick = { },
+            onGuestLoginClick = { },
         )
     }
 }
@@ -195,9 +195,9 @@ private fun HelpInvisibleLoginScreenPreview() {
     TuripTheme {
         LoginScreenContent(
             isHelpTextVisible = false,
-            onClickHelpText = { },
-            onClickGoogleLogin = { },
-            onClickGuestLogin = { },
+            onHelpClick = { },
+            onGoogleLoginClick = { },
+            onGuestLoginClick = { },
         )
     }
 }

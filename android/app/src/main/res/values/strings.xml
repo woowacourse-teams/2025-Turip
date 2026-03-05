@@ -141,6 +141,9 @@
     <string name="server_error">서버에 오류가 발생했습니다.</string>
     <string name="retry_later">나중에 다시 시도해주세요</string>
 
+    <!-- 네트워크, 서버 외 오류 -->
+    <string name="unexpected_error">예상치 못한 문제가 발생했어요</string>
+
     <!-- 지역 타입(국내, 해외) 버튼 -->
     <string name="region_type_buttons_domestic">국내</string>
     <string name="region_type_buttons_abroad">해외</string>

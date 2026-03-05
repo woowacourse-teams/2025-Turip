@@ -2,12 +2,12 @@ package com.on.turip.ui.compose.turipdetail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.on.turip.common.AuthState
-import com.on.turip.common.UserType
 import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
 import com.on.turip.domain.bookmark.TuripPlace
+import com.on.turip.domain.session.SessionState
+import com.on.turip.domain.session.SessionStore
 import com.on.turip.domain.turip.Turip
 import com.on.turip.domain.turip.repository.TuripRepository
 import com.on.turip.ui.common.error.ErrorUiState
@@ -46,6 +46,7 @@ import javax.inject.Inject
 @HiltViewModel
 class TuripDetailViewModel @Inject constructor(
     private val turipRepository: TuripRepository,
+    private val sessionStore: SessionStore,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<TuripPlaceUiState> =
         MutableStateFlow(TuripPlaceUiState.Idle)
@@ -53,6 +54,9 @@ class TuripDetailViewModel @Inject constructor(
 
     private val _uiEffect: Channel<TuripPlaceUiEffect> = Channel(Channel.BUFFERED)
     val uiEffect: Flow<TuripPlaceUiEffect> = _uiEffect.receiveAsFlow()
+
+    private val sessionState: StateFlow<SessionState> = sessionStore.state
+
     private var deleteTuripPlaceSnapshot: DeleteTuripPlaceSnapshot = DeleteTuripPlaceSnapshot.EMPTY
     private var reorderPlacesSnapshot: ImmutableList<TuripPlaceModel>? = null
 
@@ -295,8 +299,8 @@ class TuripDetailViewModel @Inject constructor(
     }
 
     fun shareTurip() {
-        when (AuthState.type) {
-            UserType.MEMBER -> {
+        when (sessionState.value) {
+            SessionState.Member -> {
                 val turipShareModel =
                     TuripShareModel(
                         name = uiState.value.selectedTurip.name,
@@ -307,7 +311,7 @@ class TuripDetailViewModel @Inject constructor(
                 }
             }
 
-            UserType.GUEST, UserType.NONE -> {
+            SessionState.Guest, SessionState.Uninitialized -> {
                 viewModelScope.launch {
                     _uiEffect.send(TuripPlaceUiEffect.ShowTuripShareNotAllowed)
                 }
