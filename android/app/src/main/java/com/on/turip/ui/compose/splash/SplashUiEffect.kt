@@ -1,4 +1,4 @@
-package com.on.turip.ui.splash
+package com.on.turip.ui.compose.splash
 
 sealed interface SplashUiEffect {
     data object NavigateToMain : SplashUiEffect
