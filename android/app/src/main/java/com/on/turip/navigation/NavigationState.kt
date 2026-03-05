@@ -55,6 +55,8 @@ class NavigationState(
     val topLevelStack: NavBackStack<NavKey>,
     val subStacks: Map<NavKey, NavBackStack<NavKey>>,
 ) {
+    val isTopLevelKey
+        get() = topLevelKeys.contains(currentKey)
     val currentTopLevelKey: NavKey by derivedStateOf { topLevelStack.last() }
     val currentKey: NavKey by derivedStateOf { currentSubStack.last() }
 

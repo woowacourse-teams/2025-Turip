@@ -25,18 +25,17 @@ class Navigator(
     }
 
     fun goBack() {
-        when (state.currentKey) {
-            state.startKey -> Unit
-            state.currentTopLevelKey -> state.topLevelStack.removeLastOrNull()
-            else -> state.currentSubStack.removeLastOrNull()
-        }
+        state.currentSubStack.removeLastOrNull()
         log(action = "goBack")
     }
 
     fun goWithAllClear(key: NavKey) {
         clearAllStacks()
         when (key) {
-            in state.topLevelKeys -> state.topLevelStack.add(key)
+            in state.topLevelKeys -> {
+                state.topLevelStack.add(key)
+            }
+
             else -> {
                 state.topLevelStack.add(state.startKey)
                 state.currentSubStack.add(key)
