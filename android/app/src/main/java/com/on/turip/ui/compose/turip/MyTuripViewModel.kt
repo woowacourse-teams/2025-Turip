@@ -78,6 +78,7 @@ class MyTuripViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 showAddBottomSheet = false,
+                isCreatingTurip = false,
                 turipNameStatus = TuripNameStatusModel.EMPTY,
                 inputTuripName = "",
             )
@@ -160,26 +161,34 @@ class MyTuripViewModel @Inject constructor(
     }
 
     fun addTurip() {
-        val name = uiState.value.inputTuripName
+        val currentState = uiState.value
+        if (currentState.isCreatingTurip || !currentState.turipNameStatus.isConfirmEnabled) return
+
+        _uiState.update { it.copy(isCreatingTurip = true) }
+        val name = currentState.inputTuripName
 
         viewModelScope.launch {
-            turipRepository
-                .createTurip(name)
-                .onSuccess { turip: Turip ->
-                    dismissAddBottomSheet()
-                    _uiEffect.send(MyTuripUiEffect.TuripAdded(name))
-                    _uiState.update { it: MyTuripUiState ->
-                        it.copy(
-                            turips =
-                                it.turips
-                                    .plus(turip.toUiMyTuripModel())
-                                    .toImmutableList(),
-                        )
+            try {
+                turipRepository
+                    .createTurip(name)
+                    .onSuccess { turip: Turip ->
+                        dismissAddBottomSheet()
+                        _uiEffect.send(MyTuripUiEffect.TuripAdded(name))
+                        _uiState.update { it: MyTuripUiState ->
+                            it.copy(
+                                turips =
+                                    it.turips
+                                        .plus(turip.toUiMyTuripModel())
+                                        .toImmutableList(),
+                            )
+                        }
+                    }.onFailure { errorType ->
+                        sendErrorEffect(errorType, MyTuripRetryAction.AddMyTurip)
                     }
-                }.onFailure { errorType ->
-                    sendErrorEffect(errorType, MyTuripRetryAction.AddMyTurip)
+            } finally {
+                _uiState.update { it.copy(isCreatingTurip = false) }
                 }
-        }
+            }
     }
 
     fun handleErrorRetryRequest(action: MyTuripRetryAction) {

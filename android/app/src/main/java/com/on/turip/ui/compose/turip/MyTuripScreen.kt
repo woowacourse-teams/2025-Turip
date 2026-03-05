@@ -153,6 +153,7 @@ fun MyTuripScreen(
                 turipName = uiState.inputTuripName,
                 sheetState = sheetState,
                 turipNameStatus = uiState.turipNameStatus,
+                isConfirmEnabled = uiState.turipNameStatus.isConfirmEnabled && !uiState.isCreatingTurip,
                 onNameChanged = viewModel::updateInputName,
                 onConfirmClick = viewModel::addTurip,
                 onDismiss = viewModel::dismissAddBottomSheet,

@@ -8,6 +8,7 @@ import kotlinx.collections.immutable.persistentListOf
 
 data class MyTuripUiState(
     val isLoading: Boolean,
+    val isCreatingTurip: Boolean,
     val errorUiState: ErrorUiState,
     val turips: ImmutableList<MyTuripModel>,
     val showAddBottomSheet: Boolean,
@@ -19,6 +20,7 @@ data class MyTuripUiState(
         val Idle =
             MyTuripUiState(
                 isLoading = false,
+                isCreatingTurip = false,
                 errorUiState = ErrorUiState.None,
                 turips = persistentListOf(),
                 showAddBottomSheet = false,
