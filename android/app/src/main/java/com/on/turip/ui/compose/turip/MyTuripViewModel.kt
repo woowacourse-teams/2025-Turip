@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
+import com.on.turip.domain.session.SessionState
+import com.on.turip.domain.session.SessionStore
 import com.on.turip.domain.turip.Turip
 import com.on.turip.domain.turip.repository.TuripRepository
 import com.on.turip.ui.common.error.ErrorUiState
@@ -23,6 +25,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -34,6 +37,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MyTuripViewModel @Inject constructor(
     private val turipRepository: TuripRepository,
+    sessionStore: SessionStore,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<MyTuripUiState> =
         MutableStateFlow(MyTuripUiState.Idle)
@@ -43,6 +47,10 @@ class MyTuripViewModel @Inject constructor(
     val uiEffect: Flow<MyTuripUiEffect> = _uiEffect.receiveAsFlow()
 
     private var deleteTuripSnapShot = DeleteTuripSnapShot.EMPTY
+
+    init {
+        observeSessionChange(sessionStore.state)
+    }
 
     fun loadTurips() {
         launchWithLoading {
@@ -233,6 +241,17 @@ class MyTuripViewModel @Inject constructor(
                     _uiEffect.send(MyTuripUiEffect.NavigateToLogin)
                 }
             }
+        }
+    }
+
+    private fun observeSessionChange(sessionState: StateFlow<SessionState>) {
+        viewModelScope.launch {
+            sessionState
+                .drop(1)
+                .collect {
+                    clearDeleteSnapshot()
+                    _uiState.update { MyTuripUiState.Idle }
+                }
         }
     }
 
