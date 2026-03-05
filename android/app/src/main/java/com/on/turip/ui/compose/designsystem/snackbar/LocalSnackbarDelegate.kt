@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbarVisuals
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 val LocalSnackbarDelegate =
@@ -25,6 +26,7 @@ class SnackbarDelegate(
     val snackbarHostState: SnackbarHostState,
     val coroutineScope: CoroutineScope,
 ) {
+    private var snackbarJob: Job? = null
     var bottomPadding: Dp by mutableStateOf(0.dp)
         private set
 
@@ -41,23 +43,33 @@ class SnackbarDelegate(
         onAction: () -> Unit = {},
         @DrawableRes iconRes: Int? = null,
     ) {
-        coroutineScope.launch {
-            val visuals =
-                TuripSnackbarVisuals(
-                    message = message,
-                    actionLabel = actionLabel,
-                    withDismissAction = withDismissAction,
-                    duration = duration,
-                    iconRes = iconRes,
-                )
+        snackbarJob?.cancel()
+        snackbarJob =
+            coroutineScope.launch {
+                val visuals =
+                    TuripSnackbarVisuals(
+                        message = message,
+                        actionLabel = actionLabel,
+                        withDismissAction = withDismissAction,
+                        duration = duration,
+                        iconRes = iconRes,
+                    )
 
-            snackbarHostState.currentSnackbarData?.dismiss()
-            val result = snackbarHostState.showSnackbar(visuals)
+                snackbarHostState.currentSnackbarData?.dismiss()
+                val result = snackbarHostState.showSnackbar(visuals)
 
-            when (result) {
-                SnackbarResult.Dismissed -> onDismiss()
-                SnackbarResult.ActionPerformed -> onAction()
+                when (result) {
+                    SnackbarResult.Dismissed -> onDismiss()
+                    SnackbarResult.ActionPerformed -> onAction()
+                }
+
+                snackbarJob = null
             }
-        }
+    }
+
+    fun dismissCurrentSnackbar() {
+        snackbarJob?.cancel()
+        snackbarJob = null
+        snackbarHostState.currentSnackbarData?.dismiss()
     }
 }
