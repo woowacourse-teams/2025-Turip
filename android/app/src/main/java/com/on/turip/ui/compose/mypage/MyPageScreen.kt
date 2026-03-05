@@ -27,6 +27,7 @@ import com.on.turip.domain.content.Content
 import com.on.turip.domain.content.video.VideoData
 import com.on.turip.domain.creator.Creator
 import com.on.turip.domain.region.City
+import com.on.turip.domain.session.SessionState
 import com.on.turip.domain.trip.TripDuration
 import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.compose.designsystem.component.TuripDialog
@@ -51,6 +52,8 @@ fun MyPageScreen(
     viewModel: MyPageViewModel = hiltViewModel(),
 ) {
     val uiState: MyPageUiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val sessionState: SessionState by viewModel.sessionState.collectAsStateWithLifecycle()
+
     val resources = LocalResources.current
     val snackbarDelegate = LocalSnackbarDelegate.current
 
@@ -108,6 +111,7 @@ fun MyPageScreen(
 
     MyPageScreenContent(
         uiState = uiState,
+        sessionState = sessionState,
         onNavigateToAllBookmarkContents = onNavigateToAllBookmarkContents,
         onNavigateToContent = onNavigateToContent,
         onRemoveBookmark = { contentId: Long ->
@@ -133,6 +137,7 @@ fun MyPageScreen(
 @Composable
 private fun MyPageScreenContent(
     uiState: MyPageUiState,
+    sessionState: SessionState,
     onNavigateToAllBookmarkContents: () -> Unit,
     onNavigateToContent: (contentId: Long) -> Unit,
     onRemoveBookmark: (contentId: Long) -> Unit,
@@ -218,6 +223,7 @@ private fun MyPageScreenContent(
 
             item {
                 MyPageSettingsSection(
+                    sessionState = sessionState,
                     onInquiryClick = onInquiryClick,
                     onPrivacyPolicyClick = onPrivacyPolicyClick,
                     onLoginClick = onLoginClick,
@@ -307,6 +313,7 @@ private fun MyPageScreenPreview(
     TuripTheme {
         MyPageScreenContent(
             uiState = uiState,
+            sessionState = SessionState.Uninitialized,
             onNavigateToAllBookmarkContents = {},
             onNavigateToContent = {},
             onRemoveBookmark = {},

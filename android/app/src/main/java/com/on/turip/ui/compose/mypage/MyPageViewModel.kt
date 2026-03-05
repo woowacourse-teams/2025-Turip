@@ -12,6 +12,9 @@ import com.on.turip.domain.bookmark.repository.BookmarkRepository
 import com.on.turip.domain.common.paging.Cursor
 import com.on.turip.domain.common.paging.Page
 import com.on.turip.domain.login.MemberRepository
+import com.on.turip.domain.session.SessionState
+import com.on.turip.domain.session.SessionStore
+import com.on.turip.domain.session.usecase.SwitchToGuestUseCase
 import com.on.turip.domain.setting.PrivacyPolicy
 import com.on.turip.domain.userstorage.repository.UserStorageRepository
 import com.on.turip.ui.common.BookmarkChangeEventBus
@@ -44,12 +47,16 @@ class MyPageViewModel @Inject constructor(
     private val memberRepository: MemberRepository,
     private val accountRepository: AccountRepository,
     private val bookmarkChangeEventBus: BookmarkChangeEventBus,
+    private val switchToGuestUseCase: SwitchToGuestUseCase,
+    sessionStore: SessionStore,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<MyPageUiState> = MutableStateFlow(MyPageUiState.Idle)
     val uiState: StateFlow<MyPageUiState> = _uiState.asStateFlow()
 
     private val _uiEffect: Channel<MyPageUiEffect> = Channel(Channel.BUFFERED)
     val uiEffect: Flow<MyPageUiEffect> = _uiEffect.receiveAsFlow()
+
+    val sessionState: StateFlow<SessionState> = sessionStore.state
 
     init {
         loadProfile(isRetry = false)
@@ -228,7 +235,7 @@ class MyPageViewModel @Inject constructor(
             memberRepository
                 .logout()
                 .onSuccess {
-                    clearTokens()
+                    switchToGuestUseCase()
                     _uiEffect.send(MyPageUiEffect.NavigateToLogin)
                     Timber.d("로그아웃 성공")
                 }.onFailure { errorType: ErrorType ->
@@ -245,24 +252,14 @@ class MyPageViewModel @Inject constructor(
             memberRepository
                 .deleteMember()
                 .onSuccess {
-                    clearTokens()
+                    switchToGuestUseCase()
                     _uiEffect.send(MyPageUiEffect.NavigateToLogin)
                     Timber.d("회원탈퇴 성공")
                 }.onFailure { errorType: ErrorType ->
                     handleError(errorType, MyPageRetryAction.WITHDRAW)
-                    Timber.e("회원탈퇴 실패 ")
+                    Timber.e("회원탈퇴 실패")
                 }
         }
-    }
-
-    private suspend fun clearTokens() {
-        userStorageRepository
-            .clearTokens()
-            .onSuccess {
-                Timber.d("토큰 초기화 성공")
-            }.onFailure {
-                Timber.e("토큰 초기화 실패")
-            }
     }
 
     private suspend fun handleError(

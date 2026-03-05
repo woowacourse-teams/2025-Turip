@@ -12,19 +12,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import com.on.turip.R
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 
 @Composable
-fun HelpText(
+fun GuestModeSection(
     text: String,
-    style: TextStyle,
     color: Color,
-    onClickIcon: () -> Unit,
-    onClickText: () -> Unit,
+    onHelpClick: () -> Unit,
+    onTextClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -33,37 +31,32 @@ fun HelpText(
     ) {
         Text(
             text = text,
-            style = style,
+            style = TuripTheme.typography.body1,
             color = color,
             textDecoration = TextDecoration.Underline,
-            modifier =
-                Modifier.clickable {
-                    onClickText()
-                },
+            modifier = Modifier.clickable(onClick = onTextClick),
         )
+
         Spacer(modifier = Modifier.width(TuripTheme.spacing.small))
+
         Image(
             painter = painterResource(R.drawable.btn_help),
             contentDescription = null,
             colorFilter = ColorFilter.tint(color),
-            modifier =
-                Modifier.clickable {
-                    onClickIcon()
-                },
+            modifier = Modifier.clickable(onClick = onHelpClick),
         )
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
-private fun HelpTextPreview() {
+private fun GuestModeSectionPreview() {
     TuripTheme {
-        HelpText(
-            text = "도움말",
-            style = TuripTheme.typography.title1,
+        GuestModeSection(
+            text = "게스트모드로 시작하기",
             color = TuripTheme.colors.white,
-            onClickIcon = {},
-            onClickText = {},
+            onHelpClick = {},
+            onTextClick = {},
         )
     }
 }

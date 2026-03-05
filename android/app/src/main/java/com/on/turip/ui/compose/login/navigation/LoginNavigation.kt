@@ -13,7 +13,7 @@ fun EntryProviderScope<NavKey>.loginScreen(
 ) {
     entry<LoginNavKey> {
         LoginScreen(
-            navigateToHome = { navigator.navigate(HomeNavKey) },
+            onNavigateToMain = { navigator.navigate(HomeNavKey) },
             googleCredentialManager = googleCredentialManager,
         )
     }
