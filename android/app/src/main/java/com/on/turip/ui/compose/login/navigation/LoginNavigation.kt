@@ -13,7 +13,14 @@ fun EntryProviderScope<NavKey>.loginScreen(
 ) {
     entry<LoginNavKey> {
         LoginScreen(
-            onNavigateToMain = { navigator.replace(HomeNavKey) },
+            onNavigateToMain = {
+                if (navigator.state.currentSubStack.size > 1) {
+                    navigator.goBack()
+                    navigator.navigate(HomeNavKey)
+                } else {
+                    navigator.replace(HomeNavKey)
+                }
+            },
             googleCredentialManager = googleCredentialManager,
         )
     }
