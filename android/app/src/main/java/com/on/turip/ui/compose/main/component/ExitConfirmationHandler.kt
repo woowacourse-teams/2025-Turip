@@ -1,6 +1,7 @@
 package com.on.turip.ui.compose.main.component
 
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -13,6 +14,7 @@ import com.on.turip.ui.compose.main.navigation.TuripAppState
 
 @Composable
 fun ExitConfirmationHandler(appState: TuripAppState) {
+    val activity = LocalActivity.current
     var canExit: Boolean by rememberSaveable { mutableStateOf(false) }
     val isTopLevelRoot: Boolean = appState.navigationState.isTopLevelKey
 
@@ -38,7 +40,13 @@ fun ExitConfirmationHandler(appState: TuripAppState) {
     }
 
     BackHandler(
-        enabled = isTopLevelRoot && !canExit,
-        onBack = { canExit = true },
+        enabled = isTopLevelRoot,
+        onBack = {
+            if (canExit) {
+                activity?.finish()
+            } else {
+                canExit = true
+            }
+        },
     )
 }

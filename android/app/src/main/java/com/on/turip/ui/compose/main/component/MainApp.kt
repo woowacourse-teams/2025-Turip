@@ -43,7 +43,6 @@ fun MainApp(savedStateConfigurationProvider: SavedStateConfigurationProvider) {
 
     val appState = rememberDialogAppState(navigationState = navigationState)
     val navigator = remember { Navigator(appState.navigationState) }
-    ExitConfirmationHandler(appState = appState)
 
     val animatedSnackbarBottomPadding: Dp by animateDpAsState(
         targetValue = appState.snackbarBottomPadding,
@@ -98,6 +97,7 @@ fun MainApp(savedStateConfigurationProvider: SavedStateConfigurationProvider) {
                         )
                     },
                 )
+                ExitConfirmationHandler(appState = appState)
             }
         }
     }
