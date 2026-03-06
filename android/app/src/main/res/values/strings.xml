@@ -27,6 +27,7 @@
 
     <!-- 바텀 네비게이션 -->
     <string name="bottom_navigation_home">홈</string>
+    <string name="bottom_navigation_my_turip">내 튜립</string>
     <string name="bottom_navigation_my_page">마이페이지</string>
 
     <!-- 검색 결과 페이지 -->

@@ -5,6 +5,7 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.navigation3.runtime.NavKey
+import com.on.turip.R
 import com.on.turip.ui.common.model.navigation.NavigationItem
 import com.on.turip.ui.compose.home.navigation.HomeNavKey
 import com.on.turip.ui.compose.mypage.navigation.MyPageNavKey
@@ -17,17 +18,17 @@ object TopLevel {
             HomeNavKey to
                 NavigationItem(
                     icon = Icons.Default.Home,
-                    label = "홈화면",
+                    labelRes = R.string.bottom_navigation_home,
                 ),
             MyTuripNavKey to
                 NavigationItem(
                     icon = Icons.Default.Email,
-                    label = "내 튜립",
+                    labelRes = R.string.bottom_navigation_my_turip,
                 ),
             MyPageNavKey to
                 NavigationItem(
                     icon = Icons.Default.Person,
-                    label = "마이페이지",
+                    labelRes = R.string.bottom_navigation_my_page,
                 ),
         )
 }

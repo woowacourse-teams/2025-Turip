@@ -21,9 +21,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavKey
+import com.on.turip.R
 import com.on.turip.ui.common.model.navigation.NavigationItem
 import com.on.turip.ui.compose.designsystem.source.NoRippleInteractionSource
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
@@ -68,12 +70,12 @@ fun TuripNavigationBar(
                         ) {
                             Icon(
                                 imageVector = item.icon,
-                                contentDescription = item.label,
+                                contentDescription = stringResource(item.labelRes),
                                 tint = iconColor,
                                 modifier = Modifier.size(32.dp),
                             )
                             Text(
-                                text = item.label,
+                                text = stringResource(item.labelRes),
                                 style = TuripTheme.typography.info1,
                                 color = textColor,
                             )
@@ -112,17 +114,17 @@ private fun TuripNavigationBarPreview() {
                     Example1 to
                         NavigationItem(
                             icon = Icons.Default.Home,
-                            label = "홈화면",
+                            labelRes = R.string.bottom_navigation_home,
                         ),
                     Example2 to
                         NavigationItem(
                             icon = Icons.Default.Email,
-                            label = "내 튜립",
+                            labelRes = R.string.bottom_navigation_my_turip,
                         ),
                     Example3 to
                         NavigationItem(
                             icon = Icons.Default.Person,
-                            label = "마이페이지",
+                            labelRes = R.string.bottom_navigation_my_page,
                         ),
                 ),
             selectedKey = selectedIndex,
