@@ -57,11 +57,6 @@ fun TuripNavigationBar(
         ) {
             items.forEach { (navKey, item) ->
                 val isSelected = selectedKey == navKey
-                val iconColor =
-                    if (isSelected) TuripTheme.colors.gray03 else TuripTheme.colors.gray02
-                val textColor =
-                    if (isSelected) TuripTheme.colors.gray03 else TuripTheme.colors.gray02
-
                 NavigationBarItem(
                     selected = isSelected,
                     onClick = { onSelectedKeyChange(navKey) },
@@ -90,7 +85,6 @@ fun TuripNavigationBar(
                             Text(
                                 text = stringResource(item.labelRes),
                                 style = TuripTheme.typography.info1,
-                                color = textColor,
                             )
                         }
                     },
