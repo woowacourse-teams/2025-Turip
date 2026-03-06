@@ -17,6 +17,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
+import androidx.navigation3.runtime.NavEntry
+import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.on.turip.navigation.Navigator
@@ -48,6 +50,15 @@ fun MainApp(savedStateConfigurationProvider: SavedStateConfigurationProvider) {
         animationSpec = tween(durationMillis = 220),
     )
 
+    val appEntryProvider: (navKey: NavKey) -> NavEntry<NavKey> =
+        remember(navigator, savedStateConfigurationProvider.providers) {
+            entryProvider {
+                appScreens(navigator, savedStateConfigurationProvider.providers)
+            }
+        }
+
+    val appEntries: List<NavEntry<NavKey>> = appState.navigationState.toEntries(appEntryProvider)
+
     TuripTheme {
         Scaffold(
             bottomBar = {
@@ -71,12 +82,7 @@ fun MainApp(savedStateConfigurationProvider: SavedStateConfigurationProvider) {
                 LocalSnackbarDelegate provides appState.snackbarDelegate,
             ) {
                 NavDisplay(
-                    entries =
-                        appState.navigationState.toEntries { key ->
-                            entryProvider {
-                                appScreens(navigator, savedStateConfigurationProvider.providers)
-                            }.invoke(key)
-                        },
+                    entries = appEntries,
                     onBack = navigator::goBack,
                     modifier =
                         Modifier
