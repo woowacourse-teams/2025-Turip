@@ -10,8 +10,8 @@ import com.on.turip.ui.compose.splash.SplashScreen
 fun EntryProviderScope<NavKey>.splashScreen(navigator: Navigator) {
     entry<SplashNavKey> {
         SplashScreen(
-            navigateToHome = { navigator.navigate(HomeNavKey) },
-            navigateToLogin = { navigator.goWithAllClear(LoginNavKey) },
+            onNavigateToHome = { navigator.navigate(HomeNavKey) },
+            onNavigateToLogin = { navigator.goWithAllClear(LoginNavKey) },
             onFinish = navigator::goBack,
         )
     }

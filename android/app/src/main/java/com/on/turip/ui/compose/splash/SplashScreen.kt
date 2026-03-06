@@ -48,8 +48,8 @@ private const val UPDATE_TYPE = AppUpdateType.IMMEDIATE
 
 @Composable
 fun SplashScreen(
-    navigateToHome: () -> Unit,
-    navigateToLogin: () -> Unit,
+    onNavigateToHome: () -> Unit,
+    onNavigateToLogin: () -> Unit,
     onFinish: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SplashViewModel = hiltViewModel(),
@@ -80,8 +80,8 @@ fun SplashScreen(
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collectLatest { uiEffect: SplashUiEffect ->
             when (uiEffect) {
-                SplashUiEffect.NavigateToLogin -> navigateToLogin()
-                SplashUiEffect.NavigateToMain -> navigateToHome()
+                SplashUiEffect.NavigateToLogin -> onNavigateToLogin()
+                SplashUiEffect.NavigateToMain -> onNavigateToHome()
             }
         }
     }

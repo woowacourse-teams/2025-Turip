@@ -47,8 +47,8 @@ fun HomeScreen(
     onSearchClick: (String) -> Unit,
     onRegionClick: (String) -> Unit,
     onContentClick: (Long) -> Unit,
-    navigateToLoginScreen: () -> Unit,
-    navigateToMyPage: () -> Unit,
+    onNavigateToLoginScreen: () -> Unit,
+    onNavigateToMyPage: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val uiState: HomeUiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -56,7 +56,7 @@ fun HomeScreen(
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collectLatest { uiEffect: HomeUiEffect ->
             when (uiEffect) {
-                HomeUiEffect.NavigateToLogin -> navigateToLoginScreen()
+                HomeUiEffect.NavigateToLogin -> onNavigateToLoginScreen()
             }
         }
     }
@@ -72,7 +72,7 @@ fun HomeScreen(
             },
             onRegionClick = onRegionClick,
             onDomesticClick = { viewModel.updateDomesticSelected(it) },
-            onNavigateToMyPage = navigateToMyPage,
+            onNavigateToMyPage = onNavigateToMyPage,
         )
     }
 }
