@@ -156,7 +156,7 @@ class NamedFunctionTypeParameterDetector :
                     """.trimIndent(),
                 category = Category.CORRECTNESS,
                 priority = 6,
-                severity = Severity.ERROR,
+                severity = Severity.WARNING,
                 implementation =
                     Implementation(
                         NamedFunctionTypeParameterDetector::class.java,
