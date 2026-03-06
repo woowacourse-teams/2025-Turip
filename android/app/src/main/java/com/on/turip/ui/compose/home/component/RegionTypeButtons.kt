@@ -12,7 +12,7 @@ import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 
 @Composable
 fun RegionTypeButtons(
-    onDomesticClick: (Boolean) -> Unit,
+    onDomesticClick: (isDomestic: Boolean) -> Unit,
     modifier: Modifier = Modifier,
     isSelectedDomestic: Boolean = true,
 ) {

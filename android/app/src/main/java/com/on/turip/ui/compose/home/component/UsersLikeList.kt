@@ -27,7 +27,7 @@ import com.on.turip.ui.main.home.model.UsersLikeContentModel
 @Composable
 fun UsersLikeList(
     usersLikeContents: List<UsersLikeContentModel>,
-    onContentClick: (UsersLikeContentModel) -> Unit,
+    onContentClick: (usersLikeContent: UsersLikeContentModel) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyRow(

@@ -81,10 +81,10 @@ fun HomeScreen(
 private fun HomeScreenContent(
     uiState: HomeUiState,
     onRetryLoadContents: () -> Unit,
-    onSearchClick: (String) -> Unit,
-    onContentClick: (UsersLikeContentModel) -> Unit,
-    onRegionClick: (String) -> Unit,
-    onDomesticClick: (Boolean) -> Unit,
+    onSearchClick: (keyword: String) -> Unit,
+    onContentClick: (usersLikeContentModel: UsersLikeContentModel) -> Unit,
+    onRegionClick: (regionName: String) -> Unit,
+    onDomesticClick: (isDomestic: Boolean) -> Unit,
     onNavigateToMyPage: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -123,8 +123,7 @@ private fun HomeScreenContent(
                                 focusManager.clearFocus()
                                 keyboardController?.hide()
                             })
-                        }
-                        .padding(horizontal = TuripTheme.spacing.extraLarge)
+                        }.padding(horizontal = TuripTheme.spacing.extraLarge)
                         .verticalScroll(scrollState),
                 verticalArrangement = Arrangement.spacedBy(TuripTheme.spacing.medium),
             ) {

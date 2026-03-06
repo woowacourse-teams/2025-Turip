@@ -11,8 +11,8 @@ import com.on.turip.ui.compose.trip.navigation.TripDetailNavKey
 
 fun EntryProviderScope<NavKey>.myPageScreen(
     navigator: Navigator,
-    openInquiry: (InquiryMail) -> Unit,
-    openPrivacyPolicy: (String) -> Unit,
+    openInquiry: (inquireMail: InquiryMail) -> Unit,
+    openPrivacyPolicy: (url: String) -> Unit,
 ) {
     entry<MyPageNavKey> {
         MyPageScreen(

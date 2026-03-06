@@ -68,7 +68,7 @@ class NavigationState(
 }
 
 @Composable
-fun NavigationState.toEntries(entryProvider: (NavKey) -> NavEntry<NavKey>): List<NavEntry<NavKey>> {
+fun NavigationState.toEntries(entryProvider: (navKey: NavKey) -> NavEntry<NavKey>): List<NavEntry<NavKey>> {
     val decoratedEntries =
         subStacks.mapValues { (_, stack) ->
             val decorators =
