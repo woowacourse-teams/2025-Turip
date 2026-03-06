@@ -1,6 +1,7 @@
 package com.on.turip.ui.compose.main.component
 
-import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -20,6 +21,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -61,18 +63,30 @@ fun TuripNavigationBar(
             contentColor = TuripTheme.colors.black,
             modifier = modifier,
         ) {
-            items.forEach { (navKey, item) ->
-                val isSelected = selectedKey == navKey
-                val textColor =
-                    if (isSelected) TuripTheme.colors.gray03 else TuripTheme.colors.gray02
+            items.forEach { (navKey: NavKey, item: NavigationItem) ->
+                val isSelected: Boolean = selectedKey == navKey
+                val interactionSource: MutableInteractionSource =
+                    remember(navKey) { MutableInteractionSource() }
+                val isPressed: Boolean by interactionSource.collectIsPressedAsState()
 
-                val interactionSource = remember(navKey) { MutableInteractionSource() }
-                val isPressed by interactionSource.collectIsPressedAsState()
-                val iconScale by animateFloatAsState(
-                    targetValue = if (isPressed) 0.9f else 1f,
-                    animationSpec = tween(durationMillis = 120),
-                    label = "bottom_nav_icon_scale",
-                )
+                val iconScale: Animatable<Float, AnimationVector1D> =
+                    remember(navKey) { Animatable(1f) }
+                var wasPressedBefore by remember(navKey) { mutableStateOf(false) }
+
+                LaunchedEffect(isPressed) {
+                    if (isPressed) {
+                        wasPressedBefore = true
+                    } else if (wasPressedBefore) {
+                        iconScale.animateTo(
+                            targetValue = 0.75f,
+                            animationSpec = tween(durationMillis = 100),
+                        )
+                        iconScale.animateTo(
+                            targetValue = 1f,
+                            animationSpec = tween(durationMillis = 150),
+                        )
+                    }
+                }
 
                 CompositionLocalProvider(LocalRippleConfiguration provides null) {
                     NavigationBarItem(
@@ -92,8 +106,8 @@ fun TuripNavigationBar(
                                                 Modifier
                                                     .size(32.dp)
                                                     .graphicsLayer(
-                                                        scaleX = iconScale,
-                                                        scaleY = iconScale,
+                                                        scaleX = iconScale.value,
+                                                        scaleY = iconScale.value,
                                                     ),
                                         )
                                     }
@@ -106,8 +120,8 @@ fun TuripNavigationBar(
                                                 Modifier
                                                     .size(32.dp)
                                                     .graphicsLayer(
-                                                        scaleX = iconScale,
-                                                        scaleY = iconScale,
+                                                        scaleX = iconScale.value,
+                                                        scaleY = iconScale.value,
                                                     ),
                                         )
                                     }
@@ -115,7 +129,6 @@ fun TuripNavigationBar(
                                 Text(
                                     text = stringResource(item.labelRes),
                                     style = TuripTheme.typography.info1,
-                                    color = textColor,
                                 )
                             }
                         },
