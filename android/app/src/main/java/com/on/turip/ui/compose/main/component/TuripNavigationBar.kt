@@ -1,5 +1,9 @@
 package com.on.turip.ui.compose.main.component
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
@@ -8,12 +12,14 @@ import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalRippleConfiguration
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -21,13 +27,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavKey
 import com.on.turip.R
-import com.on.turip.ui.compose.designsystem.source.NoRippleInteractionSource
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.main.navigation.model.NavigationIconModel
 import com.on.turip.ui.compose.main.navigation.model.NavigationItem
@@ -46,7 +52,7 @@ import kotlinx.serialization.Serializable
 fun TuripNavigationBar(
     items: Map<NavKey, NavigationItem>,
     selectedKey: NavKey,
-    onSelectedKeyChange: (selectNavKey: NavKey) -> Unit,
+    onSelectedKeyChange: (navKey: NavKey) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Surface(shadowElevation = 8.dp) {
@@ -57,45 +63,71 @@ fun TuripNavigationBar(
         ) {
             items.forEach { (navKey, item) ->
                 val isSelected = selectedKey == navKey
-                NavigationBarItem(
-                    selected = isSelected,
-                    onClick = { onSelectedKeyChange(navKey) },
-                    icon = {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(2.dp),
-                        ) {
-                            when (item.icon) {
-                                is NavigationIconModel.Vector -> {
-                                    Icon(
-                                        imageVector = item.icon.imageVector,
-                                        contentDescription = stringResource(item.labelRes),
-                                        modifier = Modifier.size(32.dp),
-                                    )
-                                }
+                val textColor =
+                    if (isSelected) TuripTheme.colors.gray03 else TuripTheme.colors.gray02
 
-                                is NavigationIconModel.PainterIcon -> {
-                                    Icon(
-                                        painter = painterResource(item.icon.drawRes),
-                                        contentDescription = stringResource(item.labelRes),
-                                        modifier = Modifier.size(32.dp),
-                                    )
-                                }
-                            }
-                            Text(
-                                text = stringResource(item.labelRes),
-                                style = TuripTheme.typography.info1,
-                            )
-                        }
-                    },
-                    colors =
-                        NavigationBarItemDefaults.colors(
-                            indicatorColor = Color.Transparent,
-                            selectedIconColor = TuripTheme.colors.gray03,
-                            unselectedIconColor = TuripTheme.colors.gray02,
-                        ),
-                    interactionSource = NoRippleInteractionSource,
+                val interactionSource = remember(navKey) { MutableInteractionSource() }
+                val isPressed by interactionSource.collectIsPressedAsState()
+                val iconScale by animateFloatAsState(
+                    targetValue = if (isPressed) 0.9f else 1f,
+                    animationSpec = tween(durationMillis = 120),
+                    label = "bottom_nav_icon_scale",
                 )
+
+                CompositionLocalProvider(LocalRippleConfiguration provides null) {
+                    NavigationBarItem(
+                        selected = isSelected,
+                        onClick = { onSelectedKeyChange(navKey) },
+                        icon = {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(2.dp),
+                            ) {
+                                when (item.icon) {
+                                    is NavigationIconModel.Vector -> {
+                                        Icon(
+                                            imageVector = item.icon.imageVector,
+                                            contentDescription = stringResource(item.labelRes),
+                                            modifier =
+                                                Modifier
+                                                    .size(32.dp)
+                                                    .graphicsLayer(
+                                                        scaleX = iconScale,
+                                                        scaleY = iconScale,
+                                                    ),
+                                        )
+                                    }
+
+                                    is NavigationIconModel.PainterIcon -> {
+                                        Icon(
+                                            painter = painterResource(item.icon.drawRes),
+                                            contentDescription = stringResource(item.labelRes),
+                                            modifier =
+                                                Modifier
+                                                    .size(32.dp)
+                                                    .graphicsLayer(
+                                                        scaleX = iconScale,
+                                                        scaleY = iconScale,
+                                                    ),
+                                        )
+                                    }
+                                }
+                                Text(
+                                    text = stringResource(item.labelRes),
+                                    style = TuripTheme.typography.info1,
+                                    color = textColor,
+                                )
+                            }
+                        },
+                        colors =
+                            NavigationBarItemDefaults.colors(
+                                indicatorColor = Color.Transparent,
+                                selectedIconColor = TuripTheme.colors.gray03,
+                                unselectedIconColor = TuripTheme.colors.gray02,
+                            ),
+                        interactionSource = interactionSource,
+                    )
+                }
             }
         }
     }
