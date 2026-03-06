@@ -113,7 +113,7 @@ androidx-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview
 androidx-runtime-livedata = { module = "androidx.compose.runtime:runtime-livedata" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 google-map = { module = "com.google.maps.android:maps-compose", version.ref = "googleMap" }
-material-icons-extended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
+material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
 
 # kotlin
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }
