@@ -27,10 +27,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavKey
 import com.on.turip.R
-import com.on.turip.ui.common.model.navigation.NavigationIconModel
-import com.on.turip.ui.common.model.navigation.NavigationItem
 import com.on.turip.ui.compose.designsystem.source.NoRippleInteractionSource
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
+import com.on.turip.ui.compose.main.navigation.model.NavigationIconModel
+import com.on.turip.ui.compose.main.navigation.model.NavigationItem
 import kotlinx.serialization.Serializable
 
 /**

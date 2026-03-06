@@ -1,4 +1,4 @@
-package com.on.turip.ui.common.model.navigation
+package com.on.turip.ui.compose.main.navigation.model
 
 import androidx.annotation.DrawableRes
 import androidx.compose.runtime.Immutable

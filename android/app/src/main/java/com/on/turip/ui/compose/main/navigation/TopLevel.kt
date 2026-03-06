@@ -6,9 +6,9 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.navigation3.runtime.NavKey
 import com.on.turip.R
-import com.on.turip.ui.common.model.navigation.NavigationIconModel
-import com.on.turip.ui.common.model.navigation.NavigationItem
 import com.on.turip.ui.compose.home.navigation.HomeNavKey
+import com.on.turip.ui.compose.main.navigation.model.NavigationIconModel
+import com.on.turip.ui.compose.main.navigation.model.NavigationItem
 import com.on.turip.ui.compose.mypage.navigation.MyPageNavKey
 import com.on.turip.ui.compose.turip.navigation.MyTuripNavKey
 
