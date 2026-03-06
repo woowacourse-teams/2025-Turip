@@ -31,7 +31,7 @@ import com.on.turip.ui.compose.home.navigation.HomeNavKey
 import com.on.turip.ui.compose.main.navigation.SavedStateConfigurationProvider
 import com.on.turip.ui.compose.main.navigation.TopLevel
 import com.on.turip.ui.compose.main.navigation.appScreens
-import com.on.turip.ui.compose.main.navigation.rememberDialogAppState
+import com.on.turip.ui.compose.main.navigation.rememberTuripAppState
 
 @Composable
 fun MainApp(savedStateConfigurationProvider: SavedStateConfigurationProvider) {
@@ -42,7 +42,7 @@ fun MainApp(savedStateConfigurationProvider: SavedStateConfigurationProvider) {
             configuration = savedStateConfigurationProvider.savedStateConfiguration,
         )
 
-    val appState = rememberDialogAppState(navigationState = navigationState)
+    val appState = rememberTuripAppState(navigationState = navigationState)
     val navigator = remember { Navigator(appState.navigationState) }
 
     val animatedSnackbarBottomPadding: Dp by animateDpAsState(

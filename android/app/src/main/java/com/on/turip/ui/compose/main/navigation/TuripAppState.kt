@@ -28,7 +28,7 @@ class TuripAppState(
 }
 
 @Composable
-fun rememberDialogAppState(
+fun rememberTuripAppState(
     navigationState: NavigationState,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
