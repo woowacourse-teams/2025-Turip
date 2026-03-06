@@ -44,9 +44,9 @@ import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun HomeScreen(
-    onSearchClick: (String) -> Unit,
-    onRegionClick: (String) -> Unit,
-    onContentClick: (Long) -> Unit,
+    onSearchClick: (keyword: String) -> Unit,
+    onRegionClick: (regionName: String) -> Unit,
+    onContentClick: (contentId: Long) -> Unit,
     onNavigateToLoginScreen: () -> Unit,
     onNavigateToMyPage: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
@@ -123,7 +123,8 @@ private fun HomeScreenContent(
                                 focusManager.clearFocus()
                                 keyboardController?.hide()
                             })
-                        }.padding(horizontal = TuripTheme.spacing.extraLarge)
+                        }
+                        .padding(horizontal = TuripTheme.spacing.extraLarge)
                         .verticalScroll(scrollState),
                 verticalArrangement = Arrangement.spacedBy(TuripTheme.spacing.medium),
             ) {
