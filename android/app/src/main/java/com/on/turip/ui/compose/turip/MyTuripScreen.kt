@@ -54,7 +54,7 @@ import kotlinx.collections.immutable.persistentListOf
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyTuripScreen(
-    onNavigateToTuripPlace: (turipId: Long) -> Unit,
+    onNavigateToTuripDetail: (turipId: Long) -> Unit,
     onNavigateToLogin: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MyTuripViewModel = hiltViewModel(),
@@ -139,7 +139,7 @@ fun MyTuripScreen(
         MyTuripScreenContent(
             turips = uiState.turips,
             isLoading = uiState.isLoading && uiState.turips.isEmpty(),
-            onTuripClick = onNavigateToTuripPlace,
+            onTuripClick = onNavigateToTuripDetail,
             onTuripDelete = { myTuripModel: MyTuripModel ->
                 viewModel.showTuripRemoveDialog(myTuripModel)
             },
