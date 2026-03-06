@@ -12,6 +12,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbarVisuals
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -54,16 +55,20 @@ class SnackbarDelegate(
                         duration = duration,
                         iconRes = iconRes,
                     )
+                try {
+                    snackbarHostState.currentSnackbarData?.dismiss()
+                    val result = snackbarHostState.showSnackbar(visuals)
 
-                snackbarHostState.currentSnackbarData?.dismiss()
-                val result = snackbarHostState.showSnackbar(visuals)
-
-                when (result) {
-                    SnackbarResult.Dismissed -> onDismiss()
-                    SnackbarResult.ActionPerformed -> onAction()
+                    when (result) {
+                        SnackbarResult.Dismissed -> onDismiss()
+                        SnackbarResult.ActionPerformed -> onAction()
+                    }
+                } catch (e: CancellationException) {
+                    onDismiss()
+                    throw e
+                } finally {
+                    snackbarJob = null
                 }
-
-                snackbarJob = null
             }
     }
 
