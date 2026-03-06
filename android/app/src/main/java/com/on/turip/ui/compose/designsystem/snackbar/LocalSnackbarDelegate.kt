@@ -45,7 +45,7 @@ class SnackbarDelegate(
         @DrawableRes iconRes: Int? = null,
     ) {
         snackbarJob?.cancel()
-        snackbarJob =
+        val currentJob: Job =
             coroutineScope.launch {
                 val visuals =
                     TuripSnackbarVisuals(
@@ -58,7 +58,6 @@ class SnackbarDelegate(
                 try {
                     snackbarHostState.currentSnackbarData?.dismiss()
                     val result = snackbarHostState.showSnackbar(visuals)
-
                     when (result) {
                         SnackbarResult.Dismissed -> onDismiss()
                         SnackbarResult.ActionPerformed -> onAction()
@@ -66,10 +65,14 @@ class SnackbarDelegate(
                 } catch (e: CancellationException) {
                     onDismiss()
                     throw e
-                } finally {
-                    snackbarJob = null
                 }
             }
+        snackbarJob = currentJob
+        currentJob.invokeOnCompletion {
+            if (snackbarJob === currentJob) {
+                snackbarJob = null
+            }
+        }
     }
 
     fun dismissCurrentSnackbar() {
