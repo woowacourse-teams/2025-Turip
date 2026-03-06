@@ -46,7 +46,7 @@ fun NameEditorSheetContent(
     title: String,
     turipName: String,
     turipNameStatus: TuripNameStatusModel,
-    isConfirmEnabled: Boolean = turipNameStatus.isConfirmEnabled,
+    isConfirmEnabled: Boolean,
     onNameChanged: (turipName: String) -> Unit,
     onConfirmClick: () -> Unit,
     focusRequester: FocusRequester,
@@ -209,6 +209,7 @@ fun NameEditorSheetContentPreview(
             onNameChanged = {},
             onConfirmClick = {},
             turipName = "",
+            isConfirmEnabled = false,
             focusRequester = focusRequester,
         )
     }
@@ -227,6 +228,7 @@ fun NameEditorSheetContentPreview() {
             onConfirmClick = {},
             onBack = {},
             turipName = "",
+            isConfirmEnabled = true,
             focusRequester = focusRequester,
         )
     }
