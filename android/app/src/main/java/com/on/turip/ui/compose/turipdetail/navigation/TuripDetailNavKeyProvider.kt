@@ -56,7 +56,10 @@ class TuripDetailNavKeyProvider @Inject constructor(
                 .createChooser(intent, folderShareModel.name)
                 .apply { putExtra(Intent.EXTRA_INITIAL_INTENTS, initialIntents) }
 
-        context.startActivity(chooserIntent)
+        context.safeStartActivityWithToast(
+            intent = chooserIntent,
+            errorToastMessage = context.getString(R.string.all_snackbar_not_found_share),
+        )
     }
 
     private fun createShareIntent(

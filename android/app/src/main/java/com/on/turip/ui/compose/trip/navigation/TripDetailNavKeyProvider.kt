@@ -51,7 +51,10 @@ class TripDetailNavKeyProvider @Inject constructor(
 
     private fun navigateToAddTurip() {
         val intent: Intent = TuripActivity.newIntent(context)
-        context.startActivity(intent)
+        context.safeStartActivityWithToast(
+            intent = intent,
+            errorToastMessage = context.getString(R.string.all_snackbar_not_found_trip_add),
+        )
     }
 
     private fun navigateToShareTurip(folderShareModel: TuripShareModel) {
@@ -73,7 +76,10 @@ class TripDetailNavKeyProvider @Inject constructor(
                 .createChooser(intent, folderShareModel.name)
                 .apply { putExtra(Intent.EXTRA_INITIAL_INTENTS, initialIntents) }
 
-        context.startActivity(chooserIntent)
+        context.safeStartActivityWithToast(
+            intent = chooserIntent,
+            errorToastMessage = context.getString(R.string.all_snackbar_not_found_share),
+        )
     }
 
     private fun createShareIntent(
