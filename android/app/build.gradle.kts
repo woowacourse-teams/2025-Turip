@@ -155,6 +155,7 @@ dependencies {
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
+    implementation(libs.material.icons.extended)
 
     // maps
     implementation(libs.google.map)

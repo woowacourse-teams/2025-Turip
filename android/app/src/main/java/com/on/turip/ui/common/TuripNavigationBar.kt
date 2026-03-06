@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
@@ -21,11 +22,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavKey
 import com.on.turip.R
+import com.on.turip.ui.common.model.navigation.NavigationIconModel
 import com.on.turip.ui.common.model.navigation.NavigationItem
 import com.on.turip.ui.compose.designsystem.source.NoRippleInteractionSource
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
@@ -68,12 +71,23 @@ fun TuripNavigationBar(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.spacedBy(2.dp),
                         ) {
-                            Icon(
-                                imageVector = item.icon,
-                                contentDescription = stringResource(item.labelRes),
-                                tint = iconColor,
-                                modifier = Modifier.size(32.dp),
-                            )
+                            when (item.icon) {
+                                is NavigationIconModel.Vector -> {
+                                    Icon(
+                                        imageVector = item.icon.imageVector,
+                                        contentDescription = stringResource(item.labelRes),
+                                        modifier = Modifier.size(32.dp),
+                                    )
+                                }
+
+                                is NavigationIconModel.PainterIcon -> {
+                                    Icon(
+                                        painter = painterResource(item.icon.drawRes),
+                                        contentDescription = stringResource(item.labelRes),
+                                        modifier = Modifier.size(32.dp),
+                                    )
+                                }
+                            }
                             Text(
                                 text = stringResource(item.labelRes),
                                 style = TuripTheme.typography.info1,
@@ -113,17 +127,17 @@ private fun TuripNavigationBarPreview() {
                 mapOf(
                     Example1 to
                         NavigationItem(
-                            icon = Icons.Default.Home,
+                            icon = NavigationIconModel.Vector(Icons.Default.Home),
                             labelRes = R.string.bottom_navigation_home,
                         ),
                     Example2 to
                         NavigationItem(
-                            icon = Icons.Default.Email,
+                            icon = NavigationIconModel.Vector(Icons.Default.Folder),
                             labelRes = R.string.bottom_navigation_my_turip,
                         ),
                     Example3 to
                         NavigationItem(
-                            icon = Icons.Default.Person,
+                            icon = NavigationIconModel.Vector(Icons.Default.Person),
                             labelRes = R.string.bottom_navigation_my_page,
                         ),
                 ),
