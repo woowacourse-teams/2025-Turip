@@ -7,7 +7,7 @@ import com.on.turip.navigation.Navigator
 import jakarta.inject.Inject
 import kotlinx.serialization.modules.PolymorphicModuleBuilder
 
-class BookMarkNavKeyProvider @Inject constructor() : NavKeyProvider {
+class BookmarkNavKeyProvider @Inject constructor() : NavKeyProvider {
     override fun PolymorphicModuleBuilder<NavKey>.registerNavKeys() {
         subclass(BookmarkNavKey::class, BookmarkNavKey.serializer())
     }

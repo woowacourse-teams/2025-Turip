@@ -1,7 +1,7 @@
 package com.on.turip.di
 
 import com.on.turip.navigation.NavKeyProvider
-import com.on.turip.ui.compose.bookmark.navigation.BookMarkNavKeyProvider
+import com.on.turip.ui.compose.bookmark.navigation.BookmarkNavKeyProvider
 import com.on.turip.ui.compose.home.navigation.HomeNavKeyProvider
 import com.on.turip.ui.compose.login.navigation.LoginNavKeyProvider
 import com.on.turip.ui.compose.mypage.navigation.MyPageNavKeyProvider
@@ -22,7 +22,7 @@ import dagger.multibindings.IntoSet
 abstract class NavigationModule {
     @Binds
     @IntoSet
-    abstract fun bindBookMarkNavKeyProvider(impl: BookMarkNavKeyProvider): NavKeyProvider
+    abstract fun bindBookMarkNavKeyProvider(impl: BookmarkNavKeyProvider): NavKeyProvider
 
     @Binds
     @IntoSet
