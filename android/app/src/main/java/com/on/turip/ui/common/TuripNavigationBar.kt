@@ -46,7 +46,7 @@ import kotlinx.serialization.Serializable
 fun TuripNavigationBar(
     items: Map<NavKey, NavigationItem>,
     selectedKey: NavKey,
-    onSelectedKeyChange: (NavKey) -> Unit,
+    onSelectedKeyChange: (selectNavKey: NavKey) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Surface(shadowElevation = 8.dp) {
