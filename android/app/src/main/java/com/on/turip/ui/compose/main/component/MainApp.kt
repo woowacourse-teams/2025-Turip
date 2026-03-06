@@ -90,16 +90,10 @@ fun MainApp(savedStateConfigurationProvider: SavedStateConfigurationProvider) {
                             .consumeWindowInsets(paddingValues)
                             .background(TuripTheme.colors.container),
                     transitionSpec = {
-                        ContentTransform(
-                            targetContentEnter = fadeIn(animationSpec = tween(durationMillis = 300)),
-                            initialContentExit = fadeOut(animationSpec = tween(durationMillis = 300)),
-                        )
+                        fadeTransition()
                     },
                     popTransitionSpec = {
-                        ContentTransform(
-                            targetContentEnter = fadeIn(animationSpec = tween(durationMillis = 300)),
-                            initialContentExit = fadeOut(animationSpec = tween(durationMillis = 300)),
-                        )
+                        fadeTransition()
                     },
                 )
                 ExitConfirmationHandler(appState = appState)
@@ -107,3 +101,9 @@ fun MainApp(savedStateConfigurationProvider: SavedStateConfigurationProvider) {
         }
     }
 }
+
+private fun fadeTransition(): ContentTransform =
+    ContentTransform(
+        targetContentEnter = fadeIn(animationSpec = tween(durationMillis = 300)),
+        initialContentExit = fadeOut(animationSpec = tween(durationMillis = 300)),
+    )
