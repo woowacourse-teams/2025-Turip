@@ -1,4 +1,4 @@
-package com.on.turip.ui.common
+package com.on.turip.ui.compose.main.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

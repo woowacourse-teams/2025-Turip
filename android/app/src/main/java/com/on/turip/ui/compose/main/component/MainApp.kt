@@ -22,7 +22,6 @@ import androidx.navigation3.ui.NavDisplay
 import com.on.turip.navigation.Navigator
 import com.on.turip.navigation.rememberNavigationState
 import com.on.turip.navigation.toEntries
-import com.on.turip.ui.common.TuripNavigationBar
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
 import com.on.turip.ui.compose.designsystem.snackbar.LocalSnackbarDelegate
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
