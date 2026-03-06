@@ -15,3 +15,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Turip"
 include(":app")
+include(":lint-rules")
