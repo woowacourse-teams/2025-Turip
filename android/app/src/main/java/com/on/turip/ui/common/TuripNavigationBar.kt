@@ -37,7 +37,7 @@ import kotlinx.serialization.Serializable
  * 튜립 디자인 시스템의 하단 내비게이션 바.
  * 화면 하단에 메뉴 목록을 표시하고, 선택된 메뉴를 강조합니다.
  *
- * @param items 표시할 [NavigationItem] 리스트. 각 아이템은 라벨, 기본 아이콘으로 구성됩니다.
+ * @param items 표시할 [NavKey]와[NavigationItem]의 Map. 각 아이템은 라벨, 기본 아이콘으로 구성됩니다.
  * @param selectedKey 현재 선택된 아이템의 인덱스.
  * @param onSelectedKeyChange 아이템을 클릭했을 때 호출될 콜백. 클릭된 아이템의 인덱스를 전달합니다.
  * @param modifier 내비게이션 바에 적용할 [Modifier].
