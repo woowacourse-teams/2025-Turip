@@ -1,7 +1,7 @@
 package com.on.turip.lint
 
-import com.android.tools.lint.detector.api.Category
 import com.android.tools.lint.client.api.UElementHandler
+import com.android.tools.lint.detector.api.Category
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Implementation
 import com.android.tools.lint.detector.api.Issue
@@ -12,7 +12,9 @@ import org.jetbrains.uast.UElement
 import org.jetbrains.uast.UMethod
 import java.util.EnumSet
 
-class NamedFunctionTypeParameterDetector : Detector(), Detector.UastScanner {
+class NamedFunctionTypeParameterDetector :
+    Detector(),
+    Detector.UastScanner {
     override fun getApplicableUastTypes(): List<Class<out UElement>> = listOf(UMethod::class.java)
 
     override fun createUastHandler(context: JavaContext): UElementHandler =
@@ -24,10 +26,11 @@ class NamedFunctionTypeParameterDetector : Detector(), Detector.UastScanner {
                     if (typeText.isEmpty()) return@forEach
 
                     val functionArgsText = extractFunctionArgumentList(typeText) ?: return@forEach
-                    val hasUnnamedFunctionArg = splitTopLevel(functionArgsText, ',')
-                        .map { it.trim() }
-                        .filter { it.isNotEmpty() }
-                        .any { !containsTopLevelColon(it) }
+                    val hasUnnamedFunctionArg =
+                        splitTopLevel(functionArgsText, ',')
+                            .map { it.trim() }
+                            .filter { it.isNotEmpty() }
+                            .any { !containsTopLevelColon(it) }
 
                     if (hasUnnamedFunctionArg) {
                         context.report(
@@ -53,11 +56,17 @@ class NamedFunctionTypeParameterDetector : Detector(), Detector.UastScanner {
         return trimmed.substring(start + 1, end)
     }
 
-    private fun findMatchingParen(text: String, openIndex: Int): Int? {
+    private fun findMatchingParen(
+        text: String,
+        openIndex: Int,
+    ): Int? {
         var depth = 0
         for (i in openIndex until text.length) {
             when (text[i]) {
-                '(' -> depth++
+                '(' -> {
+                    depth++
+                }
+
                 ')' -> {
                     depth--
                     if (depth == 0) return i
@@ -67,7 +76,10 @@ class NamedFunctionTypeParameterDetector : Detector(), Detector.UastScanner {
         return null
     }
 
-    private fun splitTopLevel(text: String, delimiter: Char): List<String> {
+    private fun splitTopLevel(
+        text: String,
+        delimiter: Char,
+    ): List<String> {
         val result = mutableListOf<String>()
         var parenDepth = 0
         var angleDepth = 0
@@ -76,12 +88,30 @@ class NamedFunctionTypeParameterDetector : Detector(), Detector.UastScanner {
 
         text.forEachIndexed { index, ch ->
             when (ch) {
-                '(' -> parenDepth++
-                ')' -> if (parenDepth > 0) parenDepth--
-                '<' -> angleDepth++
-                '>' -> if (angleDepth > 0) angleDepth--
-                '[' -> bracketDepth++
-                ']' -> if (bracketDepth > 0) bracketDepth--
+                '(' -> {
+                    parenDepth++
+                }
+
+                ')' -> {
+                    if (parenDepth > 0) parenDepth--
+                }
+
+                '<' -> {
+                    angleDepth++
+                }
+
+                '>' -> {
+                    if (angleDepth > 0) angleDepth--
+                }
+
+                '[' -> {
+                    bracketDepth++
+                }
+
+                ']' -> {
+                    if (bracketDepth > 0) bracketDepth--
+                }
+
                 delimiter -> {
                     if (parenDepth == 0 && angleDepth == 0 && bracketDepth == 0) {
                         result.add(text.substring(last, index))
@@ -119,10 +149,11 @@ class NamedFunctionTypeParameterDetector : Detector(), Detector.UastScanner {
             Issue.create(
                 id = "UnnamedFunctionTypeArgument",
                 briefDescription = "Function type argument name is missing",
-                explanation = """
+                explanation =
+                    """
                     Function type parameters in method signatures should name each argument for readability.
                     For example, prefer '(contentId: Long) -> Unit' over '(Long) -> Unit'.
-                """.trimIndent(),
+                    """.trimIndent(),
                 category = Category.CORRECTNESS,
                 priority = 6,
                 severity = Severity.ERROR,
