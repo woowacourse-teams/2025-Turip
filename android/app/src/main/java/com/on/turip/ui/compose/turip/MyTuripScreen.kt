@@ -138,6 +138,7 @@ fun MyTuripScreen(
     Box(modifier = modifier.fillMaxSize()) {
         MyTuripScreenContent(
             turips = uiState.turips,
+            isLoading = uiState.isLoading && uiState.turips.isEmpty(),
             onTuripClick = onNavigateToTuripPlace,
             onTuripDelete = { myTuripModel: MyTuripModel ->
                 viewModel.showTuripRemoveDialog(myTuripModel)
@@ -190,6 +191,7 @@ fun MyTuripScreen(
 @Composable
 private fun MyTuripScreenContent(
     turips: ImmutableList<MyTuripModel>,
+    isLoading: Boolean,
     onTuripClick: (turipId: Long) -> Unit,
     onTuripDelete: (myTuripModel: MyTuripModel) -> Unit,
     onAddClick: () -> Unit,
@@ -248,29 +250,31 @@ private fun MyTuripScreenContent(
                 },
             )
 
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(TuripTheme.spacing.medium),
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(top = TuripTheme.spacing.large),
-            ) {
-                items(items = filteredTurips, key = { it.id }) { turip: MyTuripModel ->
-                    MyTuripCard(
-                        turipImage = turip.image,
-                        turip = turip,
-                        isDeleteMode = isDeleteMode,
-                        onTuripClick = { id ->
-                            if (isDeleteMode) {
-                                onTuripDelete(turip)
-                            } else {
-                                onTuripClick(id)
-                            }
-                        },
-                        onLongPress = { isDeleteMode = true },
-                        onDeleteClick = { onTuripDelete(turip) },
-                        isDefaultFolder = turip.isDefault,
-                    )
+            if (!isLoading) {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(TuripTheme.spacing.medium),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(top = TuripTheme.spacing.large),
+                ) {
+                    items(items = filteredTurips, key = { it.id }) { turip: MyTuripModel ->
+                        MyTuripCard(
+                            turipImage = turip.image,
+                            turip = turip,
+                            isDeleteMode = isDeleteMode,
+                            onTuripClick = { id ->
+                                if (isDeleteMode) {
+                                    onTuripDelete(turip)
+                                } else {
+                                    onTuripClick(id)
+                                }
+                            },
+                            onLongPress = { isDeleteMode = true },
+                            onDeleteClick = { onTuripDelete(turip) },
+                            isDefaultFolder = turip.isDefault,
+                        )
+                    }
                 }
             }
         }
@@ -311,6 +315,12 @@ private fun MyTuripScreenPreview() {
         )
 
     TuripTheme {
-        MyTuripScreenContent(allTurips, {}, {}, {})
+        MyTuripScreenContent(
+            turips = allTurips,
+            isLoading = false,
+            onTuripClick = {},
+            onTuripDelete = {},
+            onAddClick = {},
+        )
     }
 }
