@@ -88,6 +88,7 @@ android {
 }
 
 dependencies {
+    lintChecks(project(":lint-rules"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
