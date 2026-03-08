@@ -43,7 +43,7 @@ fun MainApp(savedStateConfigurationProvider: SavedStateConfigurationProvider) {
         )
 
     val appState = rememberTuripAppState(navigationState = navigationState)
-    val navigator = remember { Navigator(appState.navigationState) }
+    val navigator = remember(appState.navigationState) { Navigator(appState.navigationState) }
 
     val animatedSnackbarBottomPadding: Dp by animateDpAsState(
         targetValue = appState.snackbarBottomPadding,
