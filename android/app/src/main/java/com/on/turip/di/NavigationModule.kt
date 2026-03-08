@@ -22,7 +22,7 @@ import dagger.multibindings.IntoSet
 abstract class NavigationModule {
     @Binds
     @IntoSet
-    abstract fun bindBookMarkNavKeyProvider(impl: BookmarkNavKeyProvider): NavKeyProvider
+    abstract fun bindBookmarkNavKeyProvider(impl: BookmarkNavKeyProvider): NavKeyProvider
 
     @Binds
     @IntoSet
