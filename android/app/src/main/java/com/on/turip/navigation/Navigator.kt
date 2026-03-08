@@ -123,7 +123,7 @@ class Navigator(
     }
 
     private fun log(action: String) {
-        Timber.tag("Navigator").i(
+        Timber.tag("Navigator").d(
             message =
                 """
                 ------------------------ Navigator --------------------------------
