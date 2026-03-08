@@ -270,6 +270,7 @@ private class MyPageUiStatePreviewProvider : PreviewParameterProvider<MyPageUiSt
 private fun previewBookmarkContents(): ImmutableList<BookmarkContent> =
     persistentListOf(
         BookmarkContent(
+            bookmarkId = 1L,
             content =
                 Content(
                     id = 1L,
@@ -285,8 +286,10 @@ private fun previewBookmarkContents(): ImmutableList<BookmarkContent> =
                 ),
             tripDuration = TripDuration(1, 2),
             tripPlaceCount = 3,
+            createdAt = "",
         ),
         BookmarkContent(
+            bookmarkId = 2L,
             content =
                 Content(
                     id = 2L,
@@ -302,6 +305,7 @@ private fun previewBookmarkContents(): ImmutableList<BookmarkContent> =
                 ),
             tripDuration = TripDuration(0, 1),
             tripPlaceCount = 5,
+            createdAt = "",
         ),
     )
 

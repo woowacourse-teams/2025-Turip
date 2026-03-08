@@ -80,7 +80,7 @@ fun MyPageBookmarkContentSection(
                         horizontalArrangement = Arrangement.spacedBy(TuripTheme.spacing.large),
                         modifier = Modifier.padding(start = TuripTheme.spacing.large),
                     ) {
-                        items(items = state.data, key = { it.content.id }) {
+                        items(items = state.data, key = { it.bookmarkId }) {
                             MyPageBookmarkContentItem(
                                 item = it,
                                 onContentClick = onContentClick,
@@ -250,6 +250,7 @@ private fun MyPageBookmarkContentSectionWithItemsPreview() {
                 MyPageSectionState.Success(
                     persistentListOf(
                         BookmarkContent(
+                            bookmarkId = 1L,
                             content =
                                 Content(
                                     1L,
@@ -264,6 +265,7 @@ private fun MyPageBookmarkContentSectionWithItemsPreview() {
                                 ),
                             tripDuration = TripDuration(1, 2),
                             tripPlaceCount = 2,
+                            createdAt = "2026-03-04",
                         ),
                     ),
                 ),

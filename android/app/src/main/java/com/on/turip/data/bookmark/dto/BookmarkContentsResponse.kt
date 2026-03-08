@@ -5,8 +5,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class BookmarkContentsResponse(
-    @SerialName("contents")
-    val contents: List<BookmarkContentResponse>,
+    @SerialName("bookmarks")
+    val bookmarks: List<BookmarkContentResponse>,
     @SerialName("loadable")
     val loadable: Boolean,
 )

@@ -98,6 +98,7 @@ private fun BookmarkContentListItemPreview() {
     TuripTheme {
         val content =
             BookmarkContent(
+                1L,
                 content =
                     Content(
                         1L,
@@ -108,6 +109,7 @@ private fun BookmarkContentListItemPreview() {
                     ),
                 tripDuration = TripDuration(1, 2),
                 tripPlaceCount = 2,
+                createdAt = "",
             )
         BookmarkContentListItem(
             content = content,

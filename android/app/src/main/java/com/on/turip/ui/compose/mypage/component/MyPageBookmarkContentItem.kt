@@ -64,6 +64,7 @@ fun MyPageBookmarkContentItem(
 private fun MyPageBookmarkContentItemPreview() {
     val content =
         BookmarkContent(
+            bookmarkId = 1L,
             content =
                 Content(
                     1L,
@@ -74,6 +75,7 @@ private fun MyPageBookmarkContentItemPreview() {
                 ),
             tripDuration = TripDuration(1, 2),
             tripPlaceCount = 2,
+            createdAt = "2026-03-04",
         )
     TuripTheme {
         MyPageBookmarkContentItem(
