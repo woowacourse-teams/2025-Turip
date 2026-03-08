@@ -16,17 +16,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.on.turip.R
-import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.trip.model.MapModel
 import com.on.turip.ui.compose.trip.turipselection.PlaceTuripSelectionScreenMode
@@ -38,7 +35,6 @@ import kotlinx.collections.immutable.persistentListOf
 @Composable
 fun PlaceTuripSelectionContent(
     uiState: PlaceTuripSelectionUiState,
-    snackbarHostState: SnackbarHostState,
     onBackFromTuripDetail: () -> Unit,
     onDismissRequest: () -> Unit,
     onAddTuripClick: () -> Unit,
@@ -106,13 +102,6 @@ fun PlaceTuripSelectionContent(
                 }
             }
         }
-        TuripSnackbar(
-            snackbarHostState = snackbarHostState,
-            modifier =
-                Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = TuripTheme.spacing.medium),
-        )
     }
 }
 
@@ -144,8 +133,6 @@ private fun CloseButton(
 private fun PlaceTuripSelectionContentTuripsPreview() {
     TuripTheme {
         Surface(color = TuripTheme.colors.white) {
-            val snackbarHostState = remember { SnackbarHostState() }
-
             PlaceTuripSelectionContent(
                 uiState =
                     PlaceTuripSelectionUiState(
@@ -176,7 +163,6 @@ private fun PlaceTuripSelectionContentTuripsPreview() {
                         selectedTuripPlaces = persistentListOf(),
                         selectionPlaceId = 0L,
                     ),
-                snackbarHostState = snackbarHostState,
                 onBackFromTuripDetail = {},
                 onDismissRequest = {},
                 onAddTuripClick = {},
@@ -199,8 +185,6 @@ private fun PlaceTuripSelectionContentTuripsPreview() {
 private fun PlaceTuripSelectionContentTuripDetailPreview() {
     TuripTheme {
         Surface(color = TuripTheme.colors.white) {
-            val snackbarHostState = remember { SnackbarHostState() }
-
             PlaceTuripSelectionContent(
                 uiState =
                     PlaceTuripSelectionUiState(
@@ -233,7 +217,6 @@ private fun PlaceTuripSelectionContentTuripDetailPreview() {
                             ),
                         selectionPlaceId = 1L,
                     ),
-                snackbarHostState = snackbarHostState,
                 onBackFromTuripDetail = {},
                 onDismissRequest = {},
                 onAddTuripClick = {},

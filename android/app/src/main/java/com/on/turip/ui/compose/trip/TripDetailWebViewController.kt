@@ -26,7 +26,7 @@ import com.on.turip.ui.compose.trip.webview.resumeVideo
 class TripDetailWebViewController(
     val webView: WebView,
     private val videoManager: VideoManager,
-    val navigateToWebViewUrl: (String) -> Unit,
+    val navigateToWebViewUrl: (webUrl: String) -> Unit,
 ) {
     var isFullScreen by mutableStateOf(false)
         private set
@@ -94,7 +94,7 @@ class TripDetailWebViewController(
 @Composable
 fun rememberTripDetailWebViewController(
     context: Context,
-    navigateToWebViewUrl: (String) -> Unit,
+    navigateToWebViewUrl: (webUrl: String) -> Unit,
 ): TripDetailWebViewController =
     remember {
         val webView = WebView(context).apply { applyVideoSettings() }

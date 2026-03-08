@@ -307,7 +307,7 @@ class ReorderableLazyColumnState(
         draggingItemEndOffsetY: Float,
         items: List<LazyListItemInfo>,
         direction: Scroller.Direction,
-        additionPredicate: (LazyListItemInfo) -> Boolean = { true },
+        additionPredicate: (lazyListItemInfo: LazyListItemInfo) -> Boolean = { true },
     ): LazyListItemInfo? {
         val isTargetItem = { item: LazyListItemInfo ->
             val candidateCenterY = item.offset + item.size / 2f

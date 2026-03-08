@@ -46,6 +46,7 @@ fun NameEditorSheetContent(
     title: String,
     turipName: String,
     turipNameStatus: TuripNameStatusModel,
+    isConfirmEnabled: Boolean,
     onNameChanged: (turipName: String) -> Unit,
     onConfirmClick: () -> Unit,
     focusRequester: FocusRequester,
@@ -107,7 +108,7 @@ fun NameEditorSheetContent(
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             keyboardActions =
                 KeyboardActions(
-                    onDone = { if (turipNameStatus.isConfirmEnabled) onConfirmClick() },
+                    onDone = { if (isConfirmEnabled) onConfirmClick() },
                 ),
             decorationBox = { innerTextField ->
                 Box(
@@ -157,7 +158,7 @@ fun NameEditorSheetContent(
 
         Button(
             onClick = onConfirmClick,
-            enabled = turipNameStatus.isConfirmEnabled,
+            enabled = isConfirmEnabled,
             shape = TuripTheme.shape.wideButton,
             colors =
                 ButtonDefaults.buttonColors(
@@ -208,6 +209,7 @@ fun NameEditorSheetContentPreview(
             onNameChanged = {},
             onConfirmClick = {},
             turipName = "",
+            isConfirmEnabled = false,
             focusRequester = focusRequester,
         )
     }
@@ -226,6 +228,7 @@ fun NameEditorSheetContentPreview() {
             onConfirmClick = {},
             onBack = {},
             turipName = "",
+            isConfirmEnabled = true,
             focusRequester = focusRequester,
         )
     }

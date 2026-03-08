@@ -25,8 +25,8 @@ import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 @Composable
 fun SearchTextField(
     keyword: String,
-    onKeywordChange: (String) -> Unit,
-    onSearch: (String) -> Unit,
+    onKeywordChange: (keyword: String) -> Unit,
+    onSearch: (keyword: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     OutlinedTextField(

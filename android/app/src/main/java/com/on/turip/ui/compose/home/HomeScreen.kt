@@ -5,7 +5,6 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -45,11 +44,11 @@ import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun HomeScreen(
-    onSearchClick: (String) -> Unit,
-    onRegionClick: (String) -> Unit,
-    onContentClick: (UsersLikeContentModel) -> Unit,
-    navigateToLoginScreen: () -> Unit,
-    navigateToMyPage: () -> Unit,
+    onSearchClick: (keyword: String) -> Unit,
+    onRegionClick: (regionName: String) -> Unit,
+    onContentClick: (contentId: Long) -> Unit,
+    onNavigateToLoginScreen: () -> Unit,
+    onNavigateToMyPage: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val uiState: HomeUiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -57,24 +56,23 @@ fun HomeScreen(
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collectLatest { uiEffect: HomeUiEffect ->
             when (uiEffect) {
-                HomeUiEffect.NavigateToLogin -> navigateToLoginScreen()
+                HomeUiEffect.NavigateToLogin -> onNavigateToLoginScreen()
             }
         }
     }
 
-    Scaffold(
-        contentWindowInsets = WindowInsets(),
-        topBar = { HomeAppBar() },
-    ) { innerPadding ->
+    Column(modifier = Modifier.fillMaxSize()) {
+        HomeAppBar()
         HomeScreenContent(
             uiState = uiState,
             onSearchClick = onSearchClick,
             onRetryLoadContents = viewModel::loadContents,
-            onContentClick = onContentClick,
+            onContentClick = { usersLikeContent: UsersLikeContentModel ->
+                onContentClick(usersLikeContent.content.id)
+            },
             onRegionClick = onRegionClick,
             onDomesticClick = { viewModel.updateDomesticSelected(it) },
-            onNavigateToMyPage = navigateToMyPage,
-            modifier = Modifier.padding(innerPadding),
+            onNavigateToMyPage = onNavigateToMyPage,
         )
     }
 }
@@ -83,10 +81,10 @@ fun HomeScreen(
 private fun HomeScreenContent(
     uiState: HomeUiState,
     onRetryLoadContents: () -> Unit,
-    onSearchClick: (String) -> Unit,
-    onContentClick: (UsersLikeContentModel) -> Unit,
-    onRegionClick: (String) -> Unit,
-    onDomesticClick: (Boolean) -> Unit,
+    onSearchClick: (keyword: String) -> Unit,
+    onContentClick: (usersLikeContentModel: UsersLikeContentModel) -> Unit,
+    onRegionClick: (regionName: String) -> Unit,
+    onDomesticClick: (isDomestic: Boolean) -> Unit,
     onNavigateToMyPage: () -> Unit,
     modifier: Modifier = Modifier,
 ) {

@@ -17,6 +17,7 @@ import com.on.turip.domain.session.SessionStore
 import com.on.turip.domain.session.usecase.SwitchToGuestUseCase
 import com.on.turip.domain.setting.PrivacyPolicy
 import com.on.turip.domain.userstorage.repository.UserStorageRepository
+import com.on.turip.ui.common.BookmarkChangeEventBus
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
@@ -45,6 +46,7 @@ class MyPageViewModel @Inject constructor(
     private val userStorageRepository: UserStorageRepository,
     private val memberRepository: MemberRepository,
     private val accountRepository: AccountRepository,
+    private val bookmarkChangeEventBus: BookmarkChangeEventBus,
     private val switchToGuestUseCase: SwitchToGuestUseCase,
     sessionStore: SessionStore,
 ) : ViewModel() {
@@ -59,6 +61,15 @@ class MyPageViewModel @Inject constructor(
     init {
         loadProfile(isRetry = false)
         loadBookmarkContents(isRetry = false)
+        observeBookmarkChanges()
+    }
+
+    private fun observeBookmarkChanges() {
+        viewModelScope.launch {
+            bookmarkChangeEventBus.changes.collect {
+                loadBookmarkContents(isRetry = false)
+            }
+        }
     }
 
     fun loadProfile(isRetry: Boolean) {

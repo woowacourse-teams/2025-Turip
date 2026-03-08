@@ -147,6 +147,7 @@ fun MoreOptionBottomSheet(
                         turipName = turipName,
                         onBack = { onScreenModeChange(TuripPlaceScreenMode.MoreOption) },
                         turipNameStatus = turipNameStatus,
+                        isConfirmEnabled = turipNameStatus.isConfirmEnabled,
                         onNameChanged = onNameChanged,
                         onConfirmClick = onConfirmClick,
                         focusRequester = focusRequester,

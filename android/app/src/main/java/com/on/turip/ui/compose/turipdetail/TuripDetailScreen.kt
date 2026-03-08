@@ -1,13 +1,11 @@
 package com.on.turip.ui.compose.turipdetail
 
-import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -17,7 +15,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -35,20 +32,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.gms.maps.model.LatLng
 import com.on.turip.R
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.toUiModel
-import com.on.turip.ui.common.extensions.dismissAndExecute
-import com.on.turip.ui.common.extensions.showSnackbarWithAction
 import com.on.turip.ui.compose.designsystem.component.ErrorScreen
 import com.on.turip.ui.compose.designsystem.component.TuripAppBar
 import com.on.turip.ui.compose.designsystem.component.TuripDialog
-import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
+import com.on.turip.ui.compose.designsystem.snackbar.LocalSnackbarDelegate
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.trip.model.MapModel
 import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
@@ -66,15 +58,14 @@ fun TuripDetailScreen(
     selectedTuripId: Long,
     onNavigateToLogin: () -> Unit,
     onShareTurip: (turipShareModel: TuripShareModel) -> Unit,
-    onNavigateToMap: (uri: Uri) -> Unit,
+    onNavigateToMap: (map: MapModel) -> Unit,
     onBack: () -> Unit,
     viewModel: TuripDetailViewModel = hiltViewModel(),
 ) {
     val uiState: TuripPlaceUiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
+    val snackbarDelegate = LocalSnackbarDelegate.current
     val resource = LocalResources.current
     var showLoginSuggestDialog by remember { mutableStateOf(false) }
-    val lifecycleOwner = LocalLifecycleOwner.current
     val modalBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     BackHandler(enabled = !uiState.showBottomSheet) { onBack() }
@@ -83,11 +74,8 @@ fun TuripDetailScreen(
         onDispose { viewModel.resetUiState() }
     }
 
-    LaunchedEffect(Unit) {
-        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-            viewModel.loadSelectedTurip(selectedTuripId)
-            viewModel.loadPlaces(selectedTuripId)
-        }
+    LaunchedEffect(selectedTuripId) {
+        viewModel.initIfNeeded(selectedTuripId)
     }
 
     LaunchedEffect(Unit) {
@@ -107,7 +95,7 @@ fun TuripDetailScreen(
 
                 is TuripPlaceUiEffect.ShowError -> {
                     val uiModel = uiEffect.errorUiState.toUiModel() ?: return@collect
-                    snackbarHostState.showSnackbarWithAction(
+                    snackbarDelegate.showSnackbar(
                         message = resource.getString(uiModel.titleRes),
                         actionLabel = resource.getString(uiModel.retryTextRes),
                         duration = SnackbarDuration.Long,
@@ -125,7 +113,7 @@ fun TuripDetailScreen(
                 }
 
                 is TuripPlaceUiEffect.ShowTuripPlaceRemoveFailed -> {
-                    snackbarHostState.showSnackbar(
+                    snackbarDelegate.showSnackbar(
                         message =
                             resource.getString(
                                 R.string.trip_detail_bottom_sheet_snackbar_place_remove_failed,
@@ -136,7 +124,7 @@ fun TuripDetailScreen(
                 }
 
                 is TuripPlaceUiEffect.ShowTuripPlaceRemoved -> {
-                    snackbarHostState.showSnackbarWithAction(
+                    snackbarDelegate.showSnackbar(
                         message =
                             resource.getString(
                                 R.string.trip_detail_bottom_sheet_snackbar_place_removed,
@@ -152,7 +140,7 @@ fun TuripDetailScreen(
                 }
 
                 is TuripPlaceUiEffect.ShowReorderPlaceFailed -> {
-                    snackbarHostState.showSnackbarWithAction(
+                    snackbarDelegate.showSnackbar(
                         message =
                             resource.getString(
                                 R.string.trip_detail_bottom_sheet_snackbar_place_reorder_failed,
@@ -247,11 +235,9 @@ fun TuripDetailScreen(
                         selectedTuripId = uiState.selectedTurip.id,
                         selectedTuripName = uiState.selectedTurip.name,
                         turipPlaceModel = uiState.places,
-                        navigateToMap = { mapModel: MapModel -> onNavigateToMap(mapModel.uri) },
+                        navigateToMap = { mapModel: MapModel -> onNavigateToMap(mapModel) },
                         onClickTuripPlace = { placeId: Long ->
-                            snackbarHostState.dismissAndExecute {
-                                viewModel.applyTuripPlaceDelete(placeId = placeId)
-                            }
+                            viewModel.applyTuripPlaceDelete(placeId = placeId)
                         },
                         currentPlaceLatLng = uiState.placesLatLng,
                         onMoreOption = viewModel::showBottomSheet,
@@ -264,14 +250,6 @@ fun TuripDetailScreen(
                     )
                 }
             }
-
-            TuripSnackbar(
-                snackbarHostState = snackbarHostState,
-                modifier =
-                    Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(bottom = TuripTheme.spacing.medium),
-            )
         }
     }
 }

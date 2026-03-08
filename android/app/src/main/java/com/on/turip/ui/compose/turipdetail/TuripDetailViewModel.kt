@@ -59,11 +59,22 @@ class TuripDetailViewModel @Inject constructor(
 
     private var deleteTuripPlaceSnapshot: DeleteTuripPlaceSnapshot = DeleteTuripPlaceSnapshot.EMPTY
     private var reorderPlacesSnapshot: ImmutableList<TuripPlaceModel>? = null
+    private var selectedTuripId: Long = INVALID_ID
 
     private val dragEndEvents = MutableSharedFlow<Unit>(replay = 0, extraBufferCapacity = 1)
 
     init {
         registerDragEndEvents()
+    }
+
+    fun initIfNeeded(turipId: Long) {
+        if (turipId == INVALID_ID) return
+        if (selectedTuripId == turipId && uiState.value.selectedTurip.id == turipId) return
+
+        selectedTuripId = turipId
+
+        loadSelectedTurip(turipId)
+        loadPlaces(turipId)
     }
 
     fun loadSelectedTurip(selectedTuripId: Long) {
@@ -458,6 +469,7 @@ class TuripDetailViewModel @Inject constructor(
     }
 
     companion object {
+        private const val INVALID_ID = -1L
         private const val MAX_NAME_LENGTH = 20
     }
 }

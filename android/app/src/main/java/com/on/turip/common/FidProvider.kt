@@ -1,10 +1,10 @@
 package com.on.turip.common
 
 import com.on.turip.domain.userstorage.repository.UserStorageRepository
-import jakarta.inject.Inject
 import jakarta.inject.Singleton
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import javax.inject.Inject
 
 @Singleton
 class FidProvider @Inject constructor(

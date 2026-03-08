@@ -6,6 +6,4 @@ sealed interface BookmarkContentListUiEffect {
     data class ShowBookmarkRemoveFailedList(
         val contentId: Long,
     ) : BookmarkContentListUiEffect
-
-    data object BookmarkRemovedList : BookmarkContentListUiEffect
 }

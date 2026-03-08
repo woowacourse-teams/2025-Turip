@@ -6,7 +6,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -27,9 +26,8 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.on.turip.R
 import com.on.turip.ui.common.error.ErrorUiModel
 import com.on.turip.ui.common.error.toUiModel
-import com.on.turip.ui.common.extensions.dismissAndExecute
-import com.on.turip.ui.common.extensions.showSnackbarWithAction
 import com.on.turip.ui.compose.designsystem.component.TuripDialog
+import com.on.turip.ui.compose.designsystem.snackbar.LocalSnackbarDelegate
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.trip.model.MapModel
 import com.on.turip.ui.compose.trip.model.SelectedPlaceModel
@@ -53,7 +51,7 @@ fun PlaceTuripSelectionBottomSheet(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    val snackbarHostState = remember { SnackbarHostState() }
+    val snackbarDelegate = LocalSnackbarDelegate.current
     val resources = LocalResources.current
 
     var showLoginSuggestDialog by remember { mutableStateOf(false) }
@@ -77,7 +75,7 @@ fun PlaceTuripSelectionBottomSheet(
                 }
 
                 is PlaceTuripSelectionUiEffect.ShowTuripPlaceRemoveFailed -> {
-                    snackbarHostState.showSnackbar(
+                    snackbarDelegate.showSnackbar(
                         message =
                             resources.getString(
                                 R.string.trip_detail_bottom_sheet_snackbar_place_remove_failed,
@@ -100,7 +98,7 @@ fun PlaceTuripSelectionBottomSheet(
                         R.string.trip_detail_bottom_sheet_snackbar_place_removed
                     val actionLabelResource: Int =
                         R.string.trip_detail_bottom_sheet_snackbar_place_remove_undo
-                    snackbarHostState.showSnackbarWithAction(
+                    snackbarDelegate.showSnackbar(
                         message = resources.getString(messageResource, uiEffect.placeName),
                         actionLabel = resources.getString(actionLabelResource),
                         onAction = viewModel::rollbackTuripPlaceDelete,
@@ -111,7 +109,7 @@ fun PlaceTuripSelectionBottomSheet(
                 is PlaceTuripSelectionUiEffect.ShowError -> {
                     val uiModel: ErrorUiModel =
                         uiEffect.errorUiState.toUiModel() ?: return@collect
-                    snackbarHostState.showSnackbarWithAction(
+                    snackbarDelegate.showSnackbar(
                         message = resources.getString(uiModel.titleRes),
                         actionLabel = resources.getString(uiModel.retryTextRes),
                         duration = SnackbarDuration.Long,
@@ -124,7 +122,7 @@ fun PlaceTuripSelectionBottomSheet(
                         R.string.trip_detail_bottom_sheet_snackbar_place_reorder_failed
                     val actionLabelResource: Int =
                         R.string.trip_detail_bottom_sheet_snackbar_place_reorder_retry
-                    snackbarHostState.showSnackbarWithAction(
+                    snackbarDelegate.showSnackbar(
                         message = resources.getString(messageResource),
                         actionLabel = resources.getString(actionLabelResource),
                         onAction = { viewModel.handleErrorRetryRequest(uiEffect.retryAction) },
@@ -162,7 +160,7 @@ fun PlaceTuripSelectionBottomSheet(
 
     ModalBottomSheet(
         sheetState = sheetState,
-        onDismissRequest = { snackbarHostState.dismissAndExecute { viewModel.requestDismiss() } },
+        onDismissRequest = { viewModel.requestDismiss() },
         sheetGesturesEnabled = false,
         dragHandle = null,
         containerColor = TuripTheme.colors.white,
@@ -173,9 +171,8 @@ fun PlaceTuripSelectionBottomSheet(
 
         PlaceTuripSelectionContent(
             uiState = uiState,
-            snackbarHostState = snackbarHostState,
             onBackFromTuripDetail = {
-                snackbarHostState.dismissAndExecute { viewModel.onTuripDetailBack() }
+                viewModel.onTuripDetailBack()
             },
             onDismissRequest = viewModel::requestDismiss,
             onAddTuripClick = onNavigateToAddTurip,
@@ -184,13 +181,13 @@ fun PlaceTuripSelectionBottomSheet(
             onConfirmClick = viewModel::updateTuripsByPlace,
             onMapClick = onNavigateToMap,
             onTuripPlaceClickAtTuripDetail = {
-                snackbarHostState.dismissAndExecute { viewModel.applyTuripPlaceDelete(it) }
+                viewModel.applyTuripPlaceDelete(it)
             },
             onShareClick = {
-                snackbarHostState.dismissAndExecute { viewModel.shareTurip() }
+                viewModel.shareTurip()
             },
             onDragStart = {
-                snackbarHostState.dismissAndExecute { viewModel.onDragStart() }
+                viewModel.onDragStart()
             },
             onDragPlace = viewModel::onDragMove,
             onDragEnd = viewModel::onDragEnd,

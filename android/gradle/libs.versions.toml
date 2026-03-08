@@ -47,6 +47,10 @@ coilNetworkOkhttp = "3.3.0"
 roomRuntime = "2.7.2"
 datastorePreferences = "1.1.7"
 
+# Navigation
+nav3 = "1.0.1"
+lifecycleViewmodelNav3 = "2.10.0"
+
 # Google / Firebase
 playServicesMaps = "19.2.0"
 credentials = "1.5.0"
@@ -81,6 +85,9 @@ androidx-activity = { module = "androidx.activity:activity", version.ref = "acti
 androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activity" }
 androidx-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragmentKtx" }
 androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintlayout" }
+androidx-lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycleViewmodelNav3" }
+androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "nav3" }
+androidx-navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "nav3" }
 androidx-viewpager2 = { module = "androidx.viewpager2:viewpager2", version.ref = "viewpager2" }
 androidx-webkit = { module = "androidx.webkit:webkit", version.ref = "webkit" }
 androidx-credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }
@@ -104,6 +111,7 @@ androidx-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview
 androidx-runtime-livedata = { module = "androidx.compose.runtime:runtime-livedata" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 google-map = { module = "com.google.maps.android:maps-compose", version.ref = "googleMap" }
+material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 
 # kotlin
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }

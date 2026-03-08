@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 
 fun <T> LifecycleOwner.collectOnStarted(
     flow: Flow<T>,
-    collector: suspend (T) -> Unit,
+    collector: suspend (t: T) -> Unit,
 ) {
     lifecycleScope.launch {
         lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -21,7 +21,7 @@ fun <T> LifecycleOwner.collectOnStarted(
 
 fun <T> Fragment.collectOnStarted(
     flow: Flow<T>,
-    collector: suspend (T) -> Unit,
+    collector: suspend (t: T) -> Unit,
 ) {
     viewLifecycleOwner.lifecycleScope.launch {
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {

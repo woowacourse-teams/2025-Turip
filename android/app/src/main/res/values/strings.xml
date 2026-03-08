@@ -20,6 +20,8 @@
     <string name="all_text_collapse">접기</string>
     <string name="all_snackbar_not_found_map_url">지도 앱으로 이동에 문제가 발생 했어요</string>
     <string name="all_snackbar_not_found_privacy_policy_url">개인 정보 처리 방침 이동에 문제가 발생 했어요</string>
+    <string name="all_snackbar_not_found_share">튜립을 이동하는 과정에 문제가 발생 했어요</string>
+    <string name="all_snackbar_not_found_trip_add">튜립 생성 화면으로 이동하는 과정에 문제가 발생 했어요</string>
     <string name="all_snackbar_not_found_video_url">영상 앱으로 이동에 문제가 발생 했어요</string>
     <string name="all_snackbar_not_found_inquiry_url">문의하기 이동에 문제가 발생 했어요</string>
     <string name="all_share_description">공유 하기</string>
@@ -27,6 +29,7 @@
 
     <!-- 바텀 네비게이션 -->
     <string name="bottom_navigation_home">홈</string>
+    <string name="bottom_navigation_my_turip">내 튜립</string>
     <string name="bottom_navigation_my_page">마이페이지</string>
 
     <!-- 검색 결과 페이지 -->

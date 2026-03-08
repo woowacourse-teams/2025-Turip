@@ -137,6 +137,11 @@ dependencies {
     implementation(libs.androidx.viewpager2)
     // livedata
     implementation(libs.androidx.lifecycle.livedata.ktx)
+    // navigation3
+    implementation(libs.androidx.navigation3.runtime)
+    implementation(libs.androidx.navigation3.ui)
+    // ViewModel integration with Navigation3
+    implementation(libs.androidx.lifecycle.viewmodel.navigation3)
 
     // compose
     implementation(platform(libs.compose.bom))
@@ -151,6 +156,7 @@ dependencies {
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
+    implementation(libs.material.icons.extended)
 
     // maps
     implementation(libs.google.map)

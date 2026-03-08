@@ -28,7 +28,7 @@ import com.on.turip.ui.compose.turip.model.MyTuripTab
 @Composable
 fun MyTuripTabRow(
     selectedTab: MyTuripTab,
-    onTabSelected: (MyTuripTab) -> Unit,
+    onTabSelected: (myTuripTab: MyTuripTab) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Card(
