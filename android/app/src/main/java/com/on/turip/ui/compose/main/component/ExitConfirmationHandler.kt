@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import com.on.turip.R
@@ -15,7 +15,7 @@ import com.on.turip.ui.compose.main.navigation.TuripAppState
 @Composable
 fun ExitConfirmationHandler(appState: TuripAppState) {
     val activity = LocalActivity.current
-    var canExit: Boolean by rememberSaveable { mutableStateOf(false) }
+    var canExit: Boolean by remember { mutableStateOf(false) }
     val isTopLevelRoot: Boolean = appState.navigationState.isTopLevelKey
 
     val exit: String = stringResource(R.string.main_double_back_pressed_to_exit)
