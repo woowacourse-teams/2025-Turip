@@ -55,8 +55,12 @@ class NavigationState(
 ) {
     val isTopLevelKey
         get() = topLevelKeys.contains(currentKey)
-    val currentTopLevelKey: NavKey by derivedStateOf { topLevelStack.last() }
-    val currentKey: NavKey by derivedStateOf { currentSubStack.last() }
+    val currentTopLevelKey: NavKey by derivedStateOf {
+        topLevelStack.lastOrNull() ?: throw IllegalStateException("등록된 Top키가 존재하지 않습니다.")
+    }
+    val currentKey: NavKey by derivedStateOf {
+        currentSubStack.lastOrNull() ?: throw IllegalStateException("등록된 키가 존재하지 않습니다.")
+    }
 
     val topLevelKeys
         get() = subStacks.keys
