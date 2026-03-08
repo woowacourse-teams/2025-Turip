@@ -12,8 +12,8 @@ import com.on.turip.navigation.Navigator
 import com.on.turip.ui.common.extensions.safeStartActivityWithToast
 import com.on.turip.ui.compose.mypage.model.InquiryMail
 import dagger.hilt.android.qualifiers.ActivityContext
-import jakarta.inject.Inject
 import kotlinx.serialization.modules.PolymorphicModuleBuilder
+import javax.inject.Inject
 
 class MyPageNavKeyProvider @Inject constructor(
     @ActivityContext private val context: Context,

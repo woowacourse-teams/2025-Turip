@@ -4,8 +4,8 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import com.on.turip.navigation.NavKeyProvider
 import com.on.turip.navigation.Navigator
-import jakarta.inject.Inject
 import kotlinx.serialization.modules.PolymorphicModuleBuilder
+import javax.inject.Inject
 
 class HomeNavKeyProvider @Inject constructor() : NavKeyProvider {
     override fun PolymorphicModuleBuilder<NavKey>.registerNavKeys() {

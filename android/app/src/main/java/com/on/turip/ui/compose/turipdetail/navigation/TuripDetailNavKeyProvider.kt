@@ -11,8 +11,8 @@ import com.on.turip.ui.common.extensions.safeStartActivityWithToast
 import com.on.turip.ui.compose.trip.model.MapModel
 import com.on.turip.ui.compose.turipdetail.model.turip.TuripShareModel
 import dagger.hilt.android.qualifiers.ActivityContext
-import jakarta.inject.Inject
 import kotlinx.serialization.modules.PolymorphicModuleBuilder
+import javax.inject.Inject
 
 class TuripDetailNavKeyProvider @Inject constructor(
     @ActivityContext private val context: Context,
