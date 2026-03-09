@@ -44,10 +44,9 @@ jobs:
 
       - name: Create local.properties
         run: |
-          echo "base_url=${{ secrets.BASE_URL }}" > local.properties
-          echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> local.properties
-          echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> local.properties
-          echo "storePassword=${{ secrets.STORE_PASSWORD }}" >> local.properties
+          echo "debug_base_url=${{ secrets.DEBUG_BASE_URL }}" > ./local.properties
+          echo "release_base_url=${{ secrets.RELEASE_BASE_URL }}" >> ./local.properties
+          echo "client_id=${{ secrets.GOOGLE_CLIENT_ID }}" >> ./local.properties
           echo "google_maps_api_key=${{ secrets.GOOGLE_MAPS_API_KEY }}" >> ./local.properties
 
       - name: Write google-services.json for release
@@ -55,8 +54,21 @@ jobs:
           mkdir -p ./app
           echo '${{ secrets.GOOGLE_SERVICES_JSON_RELEASE }}' > ./app/google-services.json
 
-      - name: Generate Keystore
-        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > ./app/release-keystore.jks
+      - name: Generate Keystores
+        run: |
+          echo "${{ secrets.DEBUG_KEYSTORE_BASE64 }}" | base64 -d > ./app/debug-keystore.jks
+          echo "${{ secrets.RELEASE_KEYSTORE_BASE64 }}" | base64 -d > ./app/release-keystore.jks
+
+      - name: Create keystore.properties
+        run: |
+          echo "debug_store_file=./app/debug-keystore.jks" > ./keystore.properties
+          echo "debug_store_password=${{ secrets.DEBUG_STORE_PASSWORD }}" >> ./keystore.properties
+          echo "debug_key_alias=${{ secrets.DEBUG_KEY_ALIAS }}" >> ./keystore.properties
+          echo "debug_key_password=${{ secrets.DEBUG_KEY_PASSWORD }}" >> ./keystore.properties
+          echo "release_store_file=./app/release-keystore.jks" >> ./keystore.properties
+          echo "release_store_password=${{ secrets.RELEASE_STORE_PASSWORD }}" >> ./keystore.properties
+          echo "release_key_alias=${{ secrets.RELEASE_KEY_ALIAS }}" >> ./keystore.properties
+          echo "release_key_password=${{ secrets.RELEASE_KEY_PASSWORD }}" >> ./keystore.properties
 
       - name: Build Release AAB
         run: ./gradlew bundleRelease --stacktrace
@@ -94,4 +106,3 @@ jobs:
           curl -H "Content-Type: application/json" \
             -d '{"username": "Turip Android", "content": "❌ Turip Android PR Check Failure - Please Check!"}' \
             ${{ secrets.DISCORD_WEBHOOK_URL }}
-
