@@ -58,11 +58,11 @@ jobs:
 
       - name: Create keystore.properties
         run: |
-          echo "debug_store_file=./app/debug-keystore.jks" > ./keystore.properties
+          echo "debug_store_file=./debug-keystore.jks" > ./keystore.properties
           echo "debug_store_password=${{ secrets.DEBUG_STORE_PASSWORD }}" >> ./keystore.properties
           echo "debug_key_alias=${{ secrets.DEBUG_KEY_ALIAS }}" >> ./keystore.properties
           echo "debug_key_password=${{ secrets.DEBUG_KEY_PASSWORD }}" >> ./keystore.properties
-          echo "release_store_file=./app/release-keystore.jks" >> ./keystore.properties
+          echo "release_store_file=./release-keystore.jks" >> ./keystore.properties
           echo "release_store_password=${{ secrets.RELEASE_STORE_PASSWORD }}" >> ./keystore.properties
           echo "release_key_alias=${{ secrets.RELEASE_KEY_ALIAS }}" >> ./keystore.properties
           echo "release_key_password=${{ secrets.RELEASE_KEY_PASSWORD }}" >> ./keystore.properties
@@ -110,7 +110,7 @@ jobs:
         run: |
           echo "debug_base_url=${{ secrets.DEBUG_BASE_URL }}" > ./local.properties
           echo "release_base_url=${{ secrets.RELEASE_BASE_URL }}" >> ./local.properties
-          echo "client_id=${{ secrets.CLIENT_ID }}" >> ./local.properties
+          echo "client_id=${{ secrets.GOOGLE_CLIENT_ID }}" >> ./local.properties
           echo "google_maps_api_key=${{ secrets.GOOGLE_MAPS_API_KEY }}" >> ./local.properties
 
       - name: Generate Keystores
@@ -120,11 +120,11 @@ jobs:
 
       - name: Create keystore.properties
         run: |
-          echo "debug_store_file=./app/debug-keystore.jks" > ./keystore.properties
+          echo "debug_store_file=./debug-keystore.jks" > ./keystore.properties
           echo "debug_store_password=${{ secrets.DEBUG_STORE_PASSWORD }}" >> ./keystore.properties
           echo "debug_key_alias=${{ secrets.DEBUG_KEY_ALIAS }}" >> ./keystore.properties
           echo "debug_key_password=${{ secrets.DEBUG_KEY_PASSWORD }}" >> ./keystore.properties
-          echo "release_store_file=./app/release-keystore.jks" >> ./keystore.properties
+          echo "release_store_file=./release-keystore.jks" >> ./keystore.properties
           echo "release_store_password=${{ secrets.RELEASE_STORE_PASSWORD }}" >> ./keystore.properties
           echo "release_key_alias=${{ secrets.RELEASE_KEY_ALIAS }}" >> ./keystore.properties
           echo "release_key_password=${{ secrets.RELEASE_KEY_PASSWORD }}" >> ./keystore.properties
@@ -162,7 +162,7 @@ jobs:
         run: |
           echo "debug_base_url=${{ secrets.DEBUG_BASE_URL }}" > ./local.properties
           echo "release_base_url=${{ secrets.RELEASE_BASE_URL }}" >> ./local.properties
-          echo "client_id=${{ secrets.CLIENT_ID }}" >> ./local.properties
+          echo "client_id=${{ secrets.GOOGLE_CLIENT_ID }}" >> ./local.properties
           echo "google_maps_api_key=${{ secrets.GOOGLE_MAPS_API_KEY }}" >> ./local.properties
 
       - name: Generate Keystores
@@ -172,11 +172,11 @@ jobs:
 
       - name: Create keystore.properties
         run: |
-          echo "debug_store_file=./app/debug-keystore.jks" > ./keystore.properties
+          echo "debug_store_file=./debug-keystore.jks" > ./keystore.properties
           echo "debug_store_password=${{ secrets.DEBUG_STORE_PASSWORD }}" >> ./keystore.properties
           echo "debug_key_alias=${{ secrets.DEBUG_KEY_ALIAS }}" >> ./keystore.properties
           echo "debug_key_password=${{ secrets.DEBUG_KEY_PASSWORD }}" >> ./keystore.properties
-          echo "release_store_file=./app/release-keystore.jks" >> ./keystore.properties
+          echo "release_store_file=./release-keystore.jks" >> ./keystore.properties
           echo "release_store_password=${{ secrets.RELEASE_STORE_PASSWORD }}" >> ./keystore.properties
           echo "release_key_alias=${{ secrets.RELEASE_KEY_ALIAS }}" >> ./keystore.properties
           echo "release_key_password=${{ secrets.RELEASE_KEY_PASSWORD }}" >> ./keystore.properties
