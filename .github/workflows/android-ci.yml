@@ -46,10 +46,12 @@ jobs:
 
       - name: Create local.properties
         run: |
-          echo "debug_base_url=${{ secrets.DEBUG_BASE_URL }}" > ./local.properties
-          echo "release_base_url=${{ secrets.RELEASE_BASE_URL }}" >> ./local.properties
-          echo "client_id=${{ secrets.GOOGLE_CLIENT_ID }}" >> ./local.properties
-          echo "google_maps_api_key=${{ secrets.GOOGLE_MAPS_API_KEY }}" >> ./local.properties
+          cat > ./local.properties <<'EOF'
+          debug_base_url=${{ secrets.DEBUG_BASE_URL }}
+          release_base_url=${{ secrets.RELEASE_BASE_URL }}
+          client_id=${{ secrets.GOOGLE_CLIENT_ID }}
+          google_maps_api_key=${{ secrets.GOOGLE_MAPS_API_KEY }}
+          EOF
 
       - name: Generate Keystores
         run: |
@@ -58,14 +60,16 @@ jobs:
 
       - name: Create keystore.properties
         run: |
-          echo "debug_store_file=./debug-keystore.jks" > ./keystore.properties
-          echo "debug_store_password=${{ secrets.DEBUG_STORE_PASSWORD }}" >> ./keystore.properties
-          echo "debug_key_alias=${{ secrets.DEBUG_KEY_ALIAS }}" >> ./keystore.properties
-          echo "debug_key_password=${{ secrets.DEBUG_KEY_PASSWORD }}" >> ./keystore.properties
-          echo "release_store_file=./release-keystore.jks" >> ./keystore.properties
-          echo "release_store_password=${{ secrets.RELEASE_STORE_PASSWORD }}" >> ./keystore.properties
-          echo "release_key_alias=${{ secrets.RELEASE_KEY_ALIAS }}" >> ./keystore.properties
-          echo "release_key_password=${{ secrets.RELEASE_KEY_PASSWORD }}" >> ./keystore.properties
+          cat > ./keystore.properties <<'EOF'
+          debug_store_file=./debug-keystore.jks
+          debug_store_password=${{ secrets.DEBUG_STORE_PASSWORD }}
+          debug_key_alias=${{ secrets.DEBUG_KEY_ALIAS }}
+          debug_key_password=${{ secrets.DEBUG_KEY_PASSWORD }}
+          release_store_file=./release-keystore.jks
+          release_store_password=${{ secrets.RELEASE_STORE_PASSWORD }}
+          release_key_alias=${{ secrets.RELEASE_KEY_ALIAS }}
+          release_key_password=${{ secrets.RELEASE_KEY_PASSWORD }}
+          EOF
 
       - name: Write google-services.json for debug
         run: |
@@ -108,10 +112,12 @@ jobs:
 
       - name: Create local.properties
         run: |
-          echo "debug_base_url=${{ secrets.DEBUG_BASE_URL }}" > ./local.properties
-          echo "release_base_url=${{ secrets.RELEASE_BASE_URL }}" >> ./local.properties
-          echo "client_id=${{ secrets.GOOGLE_CLIENT_ID }}" >> ./local.properties
-          echo "google_maps_api_key=${{ secrets.GOOGLE_MAPS_API_KEY }}" >> ./local.properties
+          cat > ./local.properties <<'EOF'
+          debug_base_url=${{ secrets.DEBUG_BASE_URL }}
+          release_base_url=${{ secrets.RELEASE_BASE_URL }}
+          client_id=${{ secrets.GOOGLE_CLIENT_ID }}
+          google_maps_api_key=${{ secrets.GOOGLE_MAPS_API_KEY }}
+          EOF
 
       - name: Generate Keystores
         run: |
@@ -120,14 +126,16 @@ jobs:
 
       - name: Create keystore.properties
         run: |
-          echo "debug_store_file=./debug-keystore.jks" > ./keystore.properties
-          echo "debug_store_password=${{ secrets.DEBUG_STORE_PASSWORD }}" >> ./keystore.properties
-          echo "debug_key_alias=${{ secrets.DEBUG_KEY_ALIAS }}" >> ./keystore.properties
-          echo "debug_key_password=${{ secrets.DEBUG_KEY_PASSWORD }}" >> ./keystore.properties
-          echo "release_store_file=./release-keystore.jks" >> ./keystore.properties
-          echo "release_store_password=${{ secrets.RELEASE_STORE_PASSWORD }}" >> ./keystore.properties
-          echo "release_key_alias=${{ secrets.RELEASE_KEY_ALIAS }}" >> ./keystore.properties
-          echo "release_key_password=${{ secrets.RELEASE_KEY_PASSWORD }}" >> ./keystore.properties
+          cat > ./keystore.properties <<'EOF'
+          debug_store_file=./debug-keystore.jks
+          debug_store_password=${{ secrets.DEBUG_STORE_PASSWORD }}
+          debug_key_alias=${{ secrets.DEBUG_KEY_ALIAS }}
+          debug_key_password=${{ secrets.DEBUG_KEY_PASSWORD }}
+          release_store_file=./release-keystore.jks
+          release_store_password=${{ secrets.RELEASE_STORE_PASSWORD }}
+          release_key_alias=${{ secrets.RELEASE_KEY_ALIAS }}
+          release_key_password=${{ secrets.RELEASE_KEY_PASSWORD }}
+          EOF
 
       - name: Run ktlintCheck
         run: ./gradlew ktlintCheck --stacktrace
@@ -160,10 +168,12 @@ jobs:
 
       - name: Create local.properties
         run: |
-          echo "debug_base_url=${{ secrets.DEBUG_BASE_URL }}" > ./local.properties
-          echo "release_base_url=${{ secrets.RELEASE_BASE_URL }}" >> ./local.properties
-          echo "client_id=${{ secrets.GOOGLE_CLIENT_ID }}" >> ./local.properties
-          echo "google_maps_api_key=${{ secrets.GOOGLE_MAPS_API_KEY }}" >> ./local.properties
+          cat > ./local.properties <<'EOF'
+          debug_base_url=${{ secrets.DEBUG_BASE_URL }}
+          release_base_url=${{ secrets.RELEASE_BASE_URL }}
+          client_id=${{ secrets.GOOGLE_CLIENT_ID }}
+          google_maps_api_key=${{ secrets.GOOGLE_MAPS_API_KEY }}
+          EOF
 
       - name: Generate Keystores
         run: |
@@ -172,14 +182,16 @@ jobs:
 
       - name: Create keystore.properties
         run: |
-          echo "debug_store_file=./debug-keystore.jks" > ./keystore.properties
-          echo "debug_store_password=${{ secrets.DEBUG_STORE_PASSWORD }}" >> ./keystore.properties
-          echo "debug_key_alias=${{ secrets.DEBUG_KEY_ALIAS }}" >> ./keystore.properties
-          echo "debug_key_password=${{ secrets.DEBUG_KEY_PASSWORD }}" >> ./keystore.properties
-          echo "release_store_file=./release-keystore.jks" >> ./keystore.properties
-          echo "release_store_password=${{ secrets.RELEASE_STORE_PASSWORD }}" >> ./keystore.properties
-          echo "release_key_alias=${{ secrets.RELEASE_KEY_ALIAS }}" >> ./keystore.properties
-          echo "release_key_password=${{ secrets.RELEASE_KEY_PASSWORD }}" >> ./keystore.properties
+          cat > ./keystore.properties <<'EOF'
+          debug_store_file=./debug-keystore.jks
+          debug_store_password=${{ secrets.DEBUG_STORE_PASSWORD }}
+          debug_key_alias=${{ secrets.DEBUG_KEY_ALIAS }}
+          debug_key_password=${{ secrets.DEBUG_KEY_PASSWORD }}
+          release_store_file=./release-keystore.jks
+          release_store_password=${{ secrets.RELEASE_STORE_PASSWORD }}
+          release_key_alias=${{ secrets.RELEASE_KEY_ALIAS }}
+          release_key_password=${{ secrets.RELEASE_KEY_PASSWORD }}
+          EOF
 
       - name: Write google-services.json for debug
         run: |
