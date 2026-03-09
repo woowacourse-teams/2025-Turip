@@ -23,7 +23,6 @@ android {
         minSdk = 24
         //noinspection OldTargetApi
         targetSdk = 35
-        versionCode = 1
         versionName = libs.versions.versionName.get()
         versionCode =
             libs.versions.versionCode
