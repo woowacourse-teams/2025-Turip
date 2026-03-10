@@ -118,8 +118,11 @@ class MyTuripViewModel @Inject constructor(
                     }
                     _uiEffect.send(MyTuripUiEffect.TuripDeleted(targetTurip.name))
                     Timber.d("튜립 삭제 성공(이름 = ${targetTurip.name})")
-                }.onFailure {
-                    _uiEffect.send(MyTuripUiEffect.ShowTuripRemoveFailed(targetTurip.name))
+                }.onFailure { errorType: ErrorType ->
+                    sendErrorEffect(
+                        errorType = errorType,
+                        retryAction = MyTuripRetryAction.DeleteMyTurip(turipId),
+                    )
                     Timber.e("튜립 삭제 실패(이름 = ${targetTurip.name})")
                 }
         }
@@ -164,6 +167,10 @@ class MyTuripViewModel @Inject constructor(
 
             is MyTuripRetryAction.AddMyTurip -> {
                 addTurip()
+            }
+
+            is MyTuripRetryAction.DeleteMyTurip -> {
+                deleteTurip(action.turipId)
             }
         }
     }

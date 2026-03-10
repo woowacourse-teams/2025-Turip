@@ -13,10 +13,6 @@ sealed interface MyTuripUiEffect {
         val turipName: String,
     ) : MyTuripUiEffect
 
-    data class ShowTuripRemoveFailed(
-        val turipName: String,
-    ) : MyTuripUiEffect
-
     data class ShowError(
         val errorUiState: ErrorUiState,
         val retryAction: MyTuripRetryAction,
@@ -27,4 +23,8 @@ sealed interface MyTuripRetryAction {
     data object UpdateMyTurip : MyTuripRetryAction
 
     data object AddMyTurip : MyTuripRetryAction
+
+    data class DeleteMyTurip(
+        val turipId: Long,
+    ) : MyTuripRetryAction
 }

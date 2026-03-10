@@ -110,13 +110,6 @@ fun MyTuripScreen(
                         actionLabel = resources.getString(R.string.all_close_description),
                     )
                 }
-
-                is MyTuripUiEffect.ShowTuripRemoveFailed -> {
-                    snackbarDelegate.showSnackbar(
-                        message = resources.getString(R.string.retry_later),
-                        actionLabel = resources.getString(R.string.all_close_description),
-                    )
-                }
             }
         }
     }
