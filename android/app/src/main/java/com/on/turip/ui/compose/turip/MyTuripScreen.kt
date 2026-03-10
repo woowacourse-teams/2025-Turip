@@ -107,7 +107,6 @@ fun MyTuripScreen(
                                 R.string.turip_delete_turip,
                                 uiEffect.turipName,
                             ),
-                        iconRes = R.drawable.btn_turip_normal,
                         actionLabel = resources.getString(R.string.all_close_description),
                     )
                 }
@@ -116,19 +115,6 @@ fun MyTuripScreen(
                     snackbarDelegate.showSnackbar(
                         message = resources.getString(R.string.retry_later),
                         actionLabel = resources.getString(R.string.all_close_description),
-                    )
-                }
-
-                is MyTuripUiEffect.ShowTuripRemoved -> {
-                    snackbarDelegate.showSnackbar(
-                        message =
-                            resources.getString(
-                                R.string.turip_delete_turip,
-                                uiEffect.turipName,
-                            ),
-                        actionLabel = resources.getString(R.string.turip_remove_cancel),
-                        onAction = viewModel::rollbackTuripDelete,
-                        onDismiss = viewModel::commitTuripDelete,
                     )
                 }
             }
@@ -177,7 +163,7 @@ fun MyTuripScreen(
                         dismissButtonColor = TuripTheme.colors.gray02,
                         onConfirmation = {
                             viewModel.dismissTuripRemoveDialog()
-                            viewModel.applyTuripDelete(myTuripDialogState.turip.id)
+                            viewModel.deleteTurip(myTuripDialogState.turip.id)
                         },
                         onDismissRequest = viewModel::dismissTuripRemoveDialog,
                         modifier = Modifier.fillMaxSize(),

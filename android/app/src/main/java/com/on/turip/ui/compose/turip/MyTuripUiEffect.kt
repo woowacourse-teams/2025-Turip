@@ -13,10 +13,6 @@ sealed interface MyTuripUiEffect {
         val turipName: String,
     ) : MyTuripUiEffect
 
-    data class ShowTuripRemoved(
-        val turipName: String,
-    ) : MyTuripUiEffect
-
     data class ShowTuripRemoveFailed(
         val turipName: String,
     ) : MyTuripUiEffect
