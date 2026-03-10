@@ -61,6 +61,7 @@ fun MainApp(savedStateConfigurationProvider: SavedStateConfigurationProvider) {
 
     TuripTheme {
         Scaffold(
+            containerColor = TuripTheme.colors.background,
             bottomBar = {
                 if (appState.shouldShowBottomBar) {
                     TuripNavigationBar(
@@ -88,7 +89,7 @@ fun MainApp(savedStateConfigurationProvider: SavedStateConfigurationProvider) {
                         Modifier
                             .padding(paddingValues)
                             .consumeWindowInsets(paddingValues)
-                            .background(TuripTheme.colors.container),
+                            .background(TuripTheme.colors.background),
                     transitionSpec = {
                         fadeTransition()
                     },
