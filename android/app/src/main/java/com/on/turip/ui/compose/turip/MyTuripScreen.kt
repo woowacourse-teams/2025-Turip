@@ -41,7 +41,6 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import com.on.turip.R
-import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.compose.designsystem.component.TuripDialog
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbarVisuals
 import com.on.turip.ui.compose.designsystem.snackbar.LocalSnackbarDelegate
@@ -84,7 +83,8 @@ fun MyTuripScreen(
                 }
 
                 is MyTuripUiEffect.ShowError -> {
-                    val uiModel = uiEffect.errorUiState.toUiModel() ?: return@collect
+                    val uiModel = uiEffect.errorUiModel ?: return@collect
+
                     if (uiState.showAddBottomSheet && uiEffect.retryAction is MyTuripRetryAction.AddMyTurip) {
                         val result =
                             bottomSheetSnackbarHostState.showSnackbar(

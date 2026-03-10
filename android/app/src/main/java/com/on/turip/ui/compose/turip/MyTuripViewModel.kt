@@ -12,6 +12,7 @@ import com.on.turip.domain.turip.repository.TuripRepository
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
+import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.common.model.namestatus.TuripNameStatusModel
 import com.on.turip.ui.compose.turip.mapper.toEditModel
 import com.on.turip.ui.compose.turip.mapper.toUiMyTuripModel
@@ -195,12 +196,22 @@ class MyTuripViewModel @Inject constructor(
             when (uiError) {
                 UiError.Global.Network -> {
                     _uiState.update { it.copy(errorUiState = ErrorUiState.Network) }
-                    _uiEffect.send(MyTuripUiEffect.ShowError(ErrorUiState.Network, retryAction))
+                    _uiEffect.send(
+                        MyTuripUiEffect.ShowError(
+                            ErrorUiState.Network.toUiModel(),
+                            retryAction,
+                        ),
+                    )
                 }
 
                 UiError.Global.Server -> {
                     _uiState.update { it.copy(errorUiState = ErrorUiState.Server) }
-                    _uiEffect.send(MyTuripUiEffect.ShowError(ErrorUiState.Server, retryAction))
+                    _uiEffect.send(
+                        MyTuripUiEffect.ShowError(
+                            ErrorUiState.Network.toUiModel(),
+                            retryAction,
+                        ),
+                    )
                 }
 
                 UiError.Global.TokenExpired -> {
