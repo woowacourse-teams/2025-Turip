@@ -10,7 +10,6 @@ import androidx.compose.ui.graphics.Color
 
 @Immutable
 data class SystemBarStyle(
-    val statusBarColor: Color = Color.Transparent,
     val isLightStatusBarIcons: Boolean = true,
     val isLightNavigationBarIcons: Boolean = true,
 )

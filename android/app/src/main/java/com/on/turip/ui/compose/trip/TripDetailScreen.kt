@@ -170,7 +170,6 @@ fun TripDetailScreen(
                 SystemBarStyle()
             } else {
                 SystemBarStyle(
-                    statusBarColor = primaryColor,
                     isLightStatusBarIcons = false,
                     isLightNavigationBarIcons = false,
                 )
