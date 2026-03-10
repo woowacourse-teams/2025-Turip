@@ -136,7 +136,10 @@ fun TripDetailScreen(
         }
     }
 
-    HandleFullScreenWindowLaunchedEffect(webViewController.isFullScreen)
+    HandleFullScreenWindowLaunchedEffect(
+        isFullScreen = webViewController.isFullScreen,
+        statusBarColor = TuripTheme.colors.primary,
+    )
 
     LaunchedEffect(uiState.tripDetailInfo.videoLink) {
         webViewController.loadVideo(uiState.tripDetailInfo.videoLink)

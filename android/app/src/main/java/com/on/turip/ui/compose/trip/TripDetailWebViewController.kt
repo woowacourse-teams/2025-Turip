@@ -13,6 +13,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -108,7 +110,10 @@ fun rememberTripDetailWebViewController(
     }
 
 @Composable
-fun HandleFullScreenWindowLaunchedEffect(isFullScreen: Boolean) {
+fun HandleFullScreenWindowLaunchedEffect(
+    isFullScreen: Boolean,
+    statusBarColor: Color,
+) {
     val activity = LocalActivity.current ?: return
 
     DisposableEffect(activity) {
@@ -117,6 +122,7 @@ fun HandleFullScreenWindowLaunchedEffect(isFullScreen: Boolean) {
             val controller = WindowCompat.getInsetsController(window, window.decorView)
 
             activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+            window.statusBarColor = Color.Transparent.toArgb()
             controller.show(WindowInsetsCompat.Type.systemBars())
             controller.isAppearanceLightStatusBars = true
             controller.isAppearanceLightNavigationBars = true
@@ -130,11 +136,13 @@ fun HandleFullScreenWindowLaunchedEffect(isFullScreen: Boolean) {
 
         if (isFullScreen) {
             activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+            window.statusBarColor = Color.Transparent.toArgb()
             controller.hide(WindowInsetsCompat.Type.systemBars())
             controller.systemBarsBehavior =
                 WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         } else {
             activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+            window.statusBarColor = statusBarColor.toArgb()
             controller.show(WindowInsetsCompat.Type.systemBars())
 
             controller.isAppearanceLightStatusBars = false
