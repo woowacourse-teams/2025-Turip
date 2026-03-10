@@ -18,6 +18,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -85,14 +86,18 @@ fun MyTuripScreen(
                 is MyTuripUiEffect.ShowError -> {
                     val uiModel = uiEffect.errorUiState.toUiModel() ?: return@collect
                     if (uiState.showAddBottomSheet && uiEffect.retryAction is MyTuripRetryAction.AddMyTurip) {
-                        bottomSheetSnackbarHostState.showSnackbar(
-                            visuals =
-                                TuripSnackbarVisuals(
-                                    message = resources.getString(uiModel.titleRes),
-                                    actionLabel = resources.getString(uiModel.retryTextRes),
-                                    duration = SnackbarDuration.Long,
-                                ),
-                        )
+                        val result =
+                            bottomSheetSnackbarHostState.showSnackbar(
+                                visuals =
+                                    TuripSnackbarVisuals(
+                                        message = resources.getString(uiModel.titleRes),
+                                        actionLabel = resources.getString(uiModel.retryTextRes),
+                                        duration = SnackbarDuration.Long,
+                                    ),
+                            )
+                        if (result == SnackbarResult.ActionPerformed) {
+                            viewModel.handleErrorRetryRequest(uiEffect.retryAction)
+                        }
                     } else {
                         snackbarDelegate.showSnackbar(
                             message = resources.getString(uiModel.titleRes),
