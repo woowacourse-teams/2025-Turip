@@ -23,6 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.core.view.WindowCompat
 import androidx.navigation3.runtime.NavEntry
@@ -117,13 +118,9 @@ fun MainApp(savedStateConfigurationProvider: SavedStateConfigurationProvider) {
                             fadeTransition()
                         },
                     )
-                    Box(
-                        modifier =
-                            Modifier
-                                .align(Alignment.TopStart)
-                                .fillMaxWidth()
-                                .windowInsetsTopHeight(WindowInsets.statusBars)
-                                .background(systemBarStyle.statusBarColor),
+                    StatusBarOverlay(
+                        color = systemBarStyle.statusBarColor,
+                        modifier = Modifier.align(Alignment.TopStart),
                     )
                     ExitConfirmationHandler(appState = appState)
                 }
@@ -137,3 +134,17 @@ private fun fadeTransition(): ContentTransform =
         targetContentEnter = fadeIn(animationSpec = tween(durationMillis = 300)),
         initialContentExit = fadeOut(animationSpec = tween(durationMillis = 300)),
     )
+
+@Composable
+private fun StatusBarOverlay(
+    color: Color,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .windowInsetsTopHeight(WindowInsets.statusBars)
+                .background(color),
+    )
+}
