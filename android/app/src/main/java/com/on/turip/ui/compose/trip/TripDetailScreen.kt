@@ -31,6 +31,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -52,6 +53,8 @@ import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.common.model.trip.TripDurationModel
 import com.on.turip.ui.compose.designsystem.component.ErrorScreen
+import com.on.turip.ui.compose.main.component.LocalSystemBarStyleController
+import com.on.turip.ui.compose.main.component.SystemBarStyle
 import com.on.turip.ui.compose.designsystem.snackbar.LocalSnackbarDelegate
 import com.on.turip.ui.compose.designsystem.snackbar.SnackbarDelegate
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
@@ -85,8 +88,10 @@ fun TripDetailScreen(
 ) {
     val uiState: TripDetailUiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarDelegate = LocalSnackbarDelegate.current
+    val systemBarStyleController = LocalSystemBarStyleController.current
     val context = LocalContext.current
     val resources = LocalResources.current
+    val primaryColor = TuripTheme.colors.primary
 
     val listState = rememberLazyListState()
 
@@ -136,10 +141,7 @@ fun TripDetailScreen(
         }
     }
 
-    HandleFullScreenWindowLaunchedEffect(
-        isFullScreen = webViewController.isFullScreen,
-        statusBarColor = TuripTheme.colors.primary,
-    )
+    HandleFullScreenWindowLaunchedEffect(isFullScreen = webViewController.isFullScreen)
 
     LaunchedEffect(uiState.tripDetailInfo.videoLink) {
         webViewController.loadVideo(uiState.tripDetailInfo.videoLink)
@@ -162,6 +164,20 @@ fun TripDetailScreen(
         )
     }
 
+    SideEffect {
+        systemBarStyleController.update(
+            if (webViewController.isFullScreen) {
+                SystemBarStyle()
+            } else {
+                SystemBarStyle(
+                    statusBarColor = primaryColor,
+                    isLightStatusBarIcons = false,
+                    isLightNavigationBarIcons = false,
+                )
+            },
+        )
+    }
+
     BackHandler {
         when {
             webViewController.canHandleBack() -> webViewController.handleBack()
@@ -171,6 +187,7 @@ fun TripDetailScreen(
 
     DisposableEffect(Unit) {
         onDispose {
+            systemBarStyleController.reset()
             snackbarDelegate.updateBottomPadding(0.dp)
             webViewController.clear()
         }

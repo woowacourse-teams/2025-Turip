@@ -9,12 +9,14 @@ import androidx.compose.ui.unit.Dp
 import androidx.navigation3.runtime.NavKey
 import com.on.turip.navigation.NavigationState
 import com.on.turip.ui.compose.designsystem.snackbar.SnackbarDelegate
+import com.on.turip.ui.compose.main.component.SystemBarStyleController
 import kotlinx.coroutines.CoroutineScope
 
 @Stable
 class TuripAppState(
     val snackbarDelegate: SnackbarDelegate,
     val navigationState: NavigationState,
+    val systemBarStyleController: SystemBarStyleController,
 ) {
     val snackbarHostState: SnackbarHostState = snackbarDelegate.snackbarHostState
     val snackbarBottomPadding: Dp
@@ -31,11 +33,13 @@ class TuripAppState(
 fun rememberTuripAppState(
     navigationState: NavigationState,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    systemBarStyleController: SystemBarStyleController = remember { SystemBarStyleController() },
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
 ): TuripAppState =
     remember(snackbarHostState, coroutineScope, navigationState) {
         TuripAppState(
             snackbarDelegate = SnackbarDelegate(snackbarHostState, coroutineScope),
             navigationState = navigationState,
+            systemBarStyleController = systemBarStyleController,
         )
     }
