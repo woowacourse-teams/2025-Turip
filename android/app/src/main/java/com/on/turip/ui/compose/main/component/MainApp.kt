@@ -10,20 +10,17 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.core.view.WindowCompat
 import androidx.navigation3.runtime.NavEntry
@@ -96,7 +93,7 @@ fun MainApp(savedStateConfigurationProvider: SavedStateConfigurationProvider) {
                     modifier = Modifier.padding(bottom = animatedSnackbarBottomPadding),
                 )
             },
-            contentWindowInsets = WindowInsets.systemBars,
+            contentWindowInsets = WindowInsets.systemBars.only(WindowInsetsSides.Bottom),
         ) { paddingValues ->
             CompositionLocalProvider(
                 LocalSnackbarDelegate provides appState.snackbarDelegate,
@@ -118,10 +115,6 @@ fun MainApp(savedStateConfigurationProvider: SavedStateConfigurationProvider) {
                             fadeTransition()
                         },
                     )
-                    StatusBarOverlay(
-                        color = systemBarStyle.statusBarColor,
-                        modifier = Modifier.align(Alignment.TopStart),
-                    )
                     ExitConfirmationHandler(appState = appState)
                 }
             }
@@ -134,17 +127,3 @@ private fun fadeTransition(): ContentTransform =
         targetContentEnter = fadeIn(animationSpec = tween(durationMillis = 300)),
         initialContentExit = fadeOut(animationSpec = tween(durationMillis = 300)),
     )
-
-@Composable
-private fun StatusBarOverlay(
-    color: Color,
-    modifier: Modifier = Modifier,
-) {
-    Box(
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .windowInsetsTopHeight(WindowInsets.statusBars)
-                .background(color),
-    )
-}

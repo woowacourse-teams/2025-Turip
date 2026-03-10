@@ -1,12 +1,16 @@
 package com.on.turip.ui.compose.home
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -60,6 +64,13 @@ fun HomeScreen(
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
+        Spacer(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .systemBarsPadding()
+                    .background(TuripTheme.colors.white),
+        )
         HomeAppBar()
         HomeScreenContent(
             uiState = uiState,
@@ -119,7 +130,8 @@ private fun HomeScreenContent(
                                 focusManager.clearFocus()
                                 keyboardController?.hide()
                             })
-                        }.padding(horizontal = TuripTheme.spacing.extraLarge)
+                        }
+                        .padding(horizontal = TuripTheme.spacing.extraLarge)
                         .verticalScroll(scrollState),
                 verticalArrangement = Arrangement.spacedBy(TuripTheme.spacing.medium),
             ) {
