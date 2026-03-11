@@ -11,8 +11,8 @@ import com.on.turip.data.turip.dto.TuripsByPlaceResponse
 import com.on.turip.data.turip.dto.TuripsResponse
 import com.on.turip.domain.bookmark.TuripPlace
 import com.on.turip.domain.trip.Place
-import com.on.turip.domain.turip.InvitationToken
 import com.on.turip.domain.turip.Turip
+import com.on.turip.domain.turip.TuripInvitationToken
 
 fun TuripsResponse.toDomain(): List<Turip> = turipsResponse.map { it.toDomain() }
 
@@ -71,4 +71,4 @@ fun TuripPlacesResponse.toDomain(): List<TuripPlace> =
         )
     }
 
-fun TuripInvitationTokenResponse.toDomain(): InvitationToken = InvitationToken(value = invitationToken)
+fun TuripInvitationTokenResponse.toDomain(): TuripInvitationToken = TuripInvitationToken(value = invitationToken)

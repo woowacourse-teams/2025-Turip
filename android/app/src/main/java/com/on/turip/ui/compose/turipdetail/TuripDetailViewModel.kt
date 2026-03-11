@@ -8,8 +8,8 @@ import com.on.turip.core.result.onSuccess
 import com.on.turip.domain.bookmark.TuripPlace
 import com.on.turip.domain.session.SessionState
 import com.on.turip.domain.session.SessionStore
-import com.on.turip.domain.turip.InvitationToken
 import com.on.turip.domain.turip.Turip
+import com.on.turip.domain.turip.TuripInvitationToken
 import com.on.turip.domain.turip.repository.TuripRepository
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
@@ -317,7 +317,7 @@ class TuripDetailViewModel @Inject constructor(
                 viewModelScope.launch {
                     turipRepository
                         .createInvitationToken(selectedTuripId)
-                        .onSuccess { token: InvitationToken ->
+                        .onSuccess { token: TuripInvitationToken ->
                             _uiEffect.send(TuripDetailUiEffect.ShareTuripInvitationLink(invitationLink = token.toUrl()))
                         }.onFailure { errorType ->
                             sendErrorEffect(
