@@ -3,6 +3,7 @@ package com.on.turip.data.turip.datasource
 import com.on.turip.core.result.TuripResult
 import com.on.turip.data.turip.dto.PlaceTuripsRequest
 import com.on.turip.data.turip.dto.TuripCreationResponse
+import com.on.turip.data.turip.dto.TuripInvitationInformationResponse
 import com.on.turip.data.turip.dto.TuripInvitationTokenResponse
 import com.on.turip.data.turip.dto.TuripPatchRequest
 import com.on.turip.data.turip.dto.TuripPlaceOrderRequest
@@ -51,4 +52,6 @@ interface TuripRemoteDataSource {
     ): TuripResult<Unit>
 
     suspend fun createInvitationToken(turipId: Long): TuripResult<TuripInvitationTokenResponse>
+
+    suspend fun getInvitationInformation(token: String): TuripResult<TuripInvitationInformationResponse>
 }
