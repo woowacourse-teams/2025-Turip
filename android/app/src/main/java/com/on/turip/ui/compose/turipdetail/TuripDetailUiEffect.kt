@@ -5,39 +5,39 @@ import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
 import com.on.turip.ui.compose.turipdetail.model.turip.TuripShareModel
 import kotlinx.collections.immutable.ImmutableList
 
-sealed interface TuripPlaceUiEffect {
-    data object NavigateToLogin : TuripPlaceUiEffect
+sealed interface TuripDetailUiEffect {
+    data object NavigateToLogin : TuripDetailUiEffect
 
-    data object ShowTuripShareNotAllowed : TuripPlaceUiEffect
+    data object ShowTuripShareNotAllowed : TuripDetailUiEffect
 
-    data object TuripUpdated : TuripPlaceUiEffect
+    data object TuripUpdated : TuripDetailUiEffect
 
-    data object TuripDelete : TuripPlaceUiEffect
+    data object TuripDelete : TuripDetailUiEffect
 
-    data class ShowTuripPlaceRemoveFailed(
+    data class ShowTuripDetailRemoveFailed(
         val placeName: String,
-    ) : TuripPlaceUiEffect
+    ) : TuripDetailUiEffect
 
-    data class ShowTuripPlaceRemoved(
+    data class ShowTuripDetailRemoved(
         val placeName: String,
-    ) : TuripPlaceUiEffect
+    ) : TuripDetailUiEffect
 
     data class ShareTuripByText(
         val turipShareModel: TuripShareModel,
-    ) : TuripPlaceUiEffect
+    ) : TuripDetailUiEffect
 
     data class ShareTuripInvitationLink(
         val invitationLink: String,
-    ) : TuripPlaceUiEffect
+    ) : TuripDetailUiEffect
 
     data class ShowError(
         val errorUiState: ErrorUiState,
         val retryAction: TuripPlaceRetryAction,
-    ) : TuripPlaceUiEffect
+    ) : TuripDetailUiEffect
 
-    data class ShowReorderPlaceFailed(
+    data class ShowReorderDetailFailed(
         val retryAction: TuripPlaceRetryAction,
-    ) : TuripPlaceUiEffect
+    ) : TuripDetailUiEffect
 }
 
 sealed interface TuripPlaceRetryAction {

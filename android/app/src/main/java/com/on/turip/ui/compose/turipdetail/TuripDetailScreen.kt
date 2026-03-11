@@ -63,7 +63,7 @@ fun TuripDetailScreen(
     onBack: () -> Unit,
     viewModel: TuripDetailViewModel = hiltViewModel(),
 ) {
-    val uiState: TuripPlaceUiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState: TuripDetailUiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarDelegate = LocalSnackbarDelegate.current
     val resource = LocalResources.current
     var showLoginSuggestDialog by remember { mutableStateOf(false) }
@@ -80,27 +80,27 @@ fun TuripDetailScreen(
     }
 
     LaunchedEffect(Unit) {
-        viewModel.uiEffect.collect { uiEffect: TuripPlaceUiEffect ->
+        viewModel.uiEffect.collect { uiEffect: TuripDetailUiEffect ->
             when (uiEffect) {
-                TuripPlaceUiEffect.ShowTuripShareNotAllowed -> {
+                TuripDetailUiEffect.ShowTuripShareNotAllowed -> {
                     showLoginSuggestDialog = true
                 }
 
-                is TuripPlaceUiEffect.ShareTuripByText -> {
+                is TuripDetailUiEffect.ShareTuripByText -> {
                     viewModel.dismissBottomSheet()
                     onShareTuripByText(uiEffect.turipShareModel)
                 }
 
-                is TuripPlaceUiEffect.ShareTuripInvitationLink -> {
+                is TuripDetailUiEffect.ShareTuripInvitationLink -> {
                     viewModel.dismissBottomSheet()
                     onShareTuripInvitationLink(uiEffect.invitationLink)
                 }
 
-                TuripPlaceUiEffect.NavigateToLogin -> {
+                TuripDetailUiEffect.NavigateToLogin -> {
                     onNavigateToLogin()
                 }
 
-                is TuripPlaceUiEffect.ShowError -> {
+                is TuripDetailUiEffect.ShowError -> {
                     val uiModel = uiEffect.errorUiState.toUiModel() ?: return@collect
                     snackbarDelegate.showSnackbar(
                         message = resource.getString(uiModel.titleRes),
@@ -110,16 +110,16 @@ fun TuripDetailScreen(
                     )
                 }
 
-                TuripPlaceUiEffect.TuripDelete -> {
+                TuripDetailUiEffect.TuripDelete -> {
                     viewModel.dismissTuripRemoveDialog()
                     onBack()
                 }
 
-                TuripPlaceUiEffect.TuripUpdated -> {
+                TuripDetailUiEffect.TuripUpdated -> {
                     viewModel.dismissBottomSheet()
                 }
 
-                is TuripPlaceUiEffect.ShowTuripPlaceRemoveFailed -> {
+                is TuripDetailUiEffect.ShowTuripDetailRemoveFailed -> {
                     snackbarDelegate.showSnackbar(
                         message =
                             resource.getString(
@@ -130,7 +130,7 @@ fun TuripDetailScreen(
                     )
                 }
 
-                is TuripPlaceUiEffect.ShowTuripPlaceRemoved -> {
+                is TuripDetailUiEffect.ShowTuripDetailRemoved -> {
                     snackbarDelegate.showSnackbar(
                         message =
                             resource.getString(
@@ -146,7 +146,7 @@ fun TuripDetailScreen(
                     )
                 }
 
-                is TuripPlaceUiEffect.ShowReorderPlaceFailed -> {
+                is TuripDetailUiEffect.ShowReorderDetailFailed -> {
                     snackbarDelegate.showSnackbar(
                         message =
                             resource.getString(
