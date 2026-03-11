@@ -57,7 +57,8 @@ import kotlinx.collections.immutable.persistentListOf
 fun TuripDetailScreen(
     selectedTuripId: Long,
     onNavigateToLogin: () -> Unit,
-    onShareTurip: (turipShareModel: TuripShareModel) -> Unit,
+    onShareTuripByText: (turipShareModel: TuripShareModel) -> Unit,
+    onShareTuripInvitationLink: (invitationLink: String) -> Unit,
     onNavigateToMap: (map: MapModel) -> Unit,
     onBack: () -> Unit,
     viewModel: TuripDetailViewModel = hiltViewModel(),
@@ -85,8 +86,14 @@ fun TuripDetailScreen(
                     showLoginSuggestDialog = true
                 }
 
-                is TuripPlaceUiEffect.ShareTurip -> {
-                    onShareTurip(uiEffect.turipShareModel)
+                is TuripPlaceUiEffect.ShareTuripByText -> {
+                    viewModel.dismissBottomSheet()
+                    onShareTuripByText(uiEffect.turipShareModel)
+                }
+
+                is TuripPlaceUiEffect.ShareTuripInvitationLink -> {
+                    viewModel.dismissBottomSheet()
+                    onShareTuripInvitationLink(uiEffect.invitationLink)
                 }
 
                 TuripPlaceUiEffect.NavigateToLogin -> {
@@ -163,8 +170,8 @@ fun TuripDetailScreen(
             confirmText = stringResource(R.string.turip_dialog_login_suggest_confirm),
             dismissText = stringResource(R.string.turip_dialog_login_suggest_dismiss),
             onConfirmation = {
-                onNavigateToLogin()
                 showLoginSuggestDialog = false
+                onNavigateToLogin()
             },
             onDismissRequest = { showLoginSuggestDialog = false },
         )
@@ -175,8 +182,8 @@ fun TuripDetailScreen(
             sheetState = modalBottomSheetState,
             isDefault = uiState.selectedTurip.isDefault,
             onDismiss = viewModel::dismissBottomSheet,
-            onShareClick = viewModel::shareTurip,
-            onInviteLinkClick = {},
+            onShareTuripByTextClick = viewModel::shareTuripByText,
+            onShareTuripInvitationLinkClick = viewModel::shareTuripInvitationLink,
             onDeleteClick = viewModel::showTuripRemoveDialog,
             screenMode = uiState.screenMode,
             onScreenModeChange = { screenMode: TuripPlaceScreenMode ->

@@ -22,8 +22,12 @@ sealed interface TuripPlaceUiEffect {
         val placeName: String,
     ) : TuripPlaceUiEffect
 
-    data class ShareTurip(
+    data class ShareTuripByText(
         val turipShareModel: TuripShareModel,
+    ) : TuripPlaceUiEffect
+
+    data class ShareTuripInvitationLink(
+        val invitationLink: String,
     ) : TuripPlaceUiEffect
 
     data class ShowError(
@@ -48,4 +52,6 @@ sealed interface TuripPlaceRetryAction {
     data object TuripNameUpdate : TuripPlaceRetryAction
 
     data object TuripDelete : TuripPlaceRetryAction
+
+    data object ShareTuripInvitationLink : TuripPlaceRetryAction
 }

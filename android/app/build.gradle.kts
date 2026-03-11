@@ -44,6 +44,12 @@ android {
                 .toInt()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField(
+            "String",
+            "APP_LINK_TURIP_INVITATION_HOST",
+            "\"${requireLocalProperty("app_link_turip_invitation_host")}\"",
+        )
     }
 
     signingConfigs {

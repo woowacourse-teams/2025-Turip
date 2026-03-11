@@ -17,8 +17,12 @@ sealed interface PlaceTuripSelectionUiEffect {
         val placeName: String,
     ) : PlaceTuripSelectionUiEffect
 
-    data class ShareTurip(
+    data class ShareTuripByText(
         val turipShareModel: TuripShareModel,
+    ) : PlaceTuripSelectionUiEffect
+
+    data class ShareTuripInvitationLink(
+        val invitationLink: String,
     ) : PlaceTuripSelectionUiEffect
 
     data class ShowTuripPlaceRemoved(
@@ -46,6 +50,8 @@ sealed interface PlaceTuripSelectionUiEffect {
 
 sealed interface PlaceTuripSelectionRetryAction {
     data object UpdateTuripsByPlace : PlaceTuripSelectionRetryAction
+
+    data object ShareTuripInvitationLink : PlaceTuripSelectionRetryAction
 
     data class LoadTurips(
         val placeId: Long,

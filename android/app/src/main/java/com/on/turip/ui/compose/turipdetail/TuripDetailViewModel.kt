@@ -8,11 +8,13 @@ import com.on.turip.core.result.onSuccess
 import com.on.turip.domain.bookmark.TuripPlace
 import com.on.turip.domain.session.SessionState
 import com.on.turip.domain.session.SessionStore
+import com.on.turip.domain.turip.InvitationToken
 import com.on.turip.domain.turip.Turip
 import com.on.turip.domain.turip.repository.TuripRepository
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
+import com.on.turip.ui.common.extensions.toUrl
 import com.on.turip.ui.common.model.namestatus.TuripNameStatusModel
 import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
 import com.on.turip.ui.compose.turip.mapper.toUiMyTuripModel
@@ -309,7 +311,32 @@ class TuripDetailViewModel @Inject constructor(
         }
     }
 
-    fun shareTurip() {
+    fun shareTuripInvitationLink() {
+        when (sessionState.value) {
+            SessionState.Member -> {
+                viewModelScope.launch {
+                    turipRepository
+                        .createInvitationToken(selectedTuripId)
+                        .onSuccess { token: InvitationToken ->
+                            _uiEffect.send(TuripPlaceUiEffect.ShareTuripInvitationLink(invitationLink = token.toUrl()))
+                        }.onFailure { errorType ->
+                            sendErrorEffect(
+                                errorType = errorType,
+                                retryAction = TuripPlaceRetryAction.ShareTuripInvitationLink,
+                            )
+                        }
+                }
+            }
+
+            SessionState.Guest, SessionState.Uninitialized -> {
+                viewModelScope.launch {
+                    _uiEffect.send(TuripPlaceUiEffect.ShowTuripShareNotAllowed)
+                }
+            }
+        }
+    }
+
+    fun shareTuripByText() {
         when (sessionState.value) {
             SessionState.Member -> {
                 val turipShareModel =
@@ -318,7 +345,7 @@ class TuripDetailViewModel @Inject constructor(
                         places = uiState.value.places.map { it.toUiModel() },
                     )
                 viewModelScope.launch {
-                    _uiEffect.send(TuripPlaceUiEffect.ShareTurip(turipShareModel))
+                    _uiEffect.send(TuripPlaceUiEffect.ShareTuripByText(turipShareModel))
                 }
             }
 
@@ -367,6 +394,10 @@ class TuripDetailViewModel @Inject constructor(
 
             TuripPlaceRetryAction.TuripNameUpdate -> {
                 updateTuripName()
+            }
+
+            TuripPlaceRetryAction.ShareTuripInvitationLink -> {
+                shareTuripInvitationLink()
             }
         }
     }

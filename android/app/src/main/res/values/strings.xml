@@ -20,12 +20,14 @@
     <string name="all_text_collapse">접기</string>
     <string name="all_snackbar_not_found_map_url">지도 앱으로 이동에 문제가 발생 했어요</string>
     <string name="all_snackbar_not_found_privacy_policy_url">개인 정보 처리 방침 이동에 문제가 발생 했어요</string>
-    <string name="all_snackbar_not_found_share">튜립을 이동하는 과정에 문제가 발생 했어요</string>
+    <string name="all_snackbar_not_found_share">튜립을 공유하는 과정에 문제가 발생 했어요</string>
     <string name="all_snackbar_not_found_trip_add">튜립 생성 화면으로 이동하는 과정에 문제가 발생 했어요</string>
     <string name="all_snackbar_not_found_video_url">영상 앱으로 이동에 문제가 발생 했어요</string>
     <string name="all_snackbar_not_found_inquiry_url">문의하기 이동에 문제가 발생 했어요</string>
     <string name="all_share_description">공유 하기</string>
     <string name="all_mascot_description">마스코트</string>
+    <string name="all_turip_share_by_text">텍스트로 공유하기</string>
+    <string name="all_turip_invite_by_link">링크로 초대하기</string>
 
     <!-- 바텀 네비게이션 -->
     <string name="bottom_navigation_home">홈</string>
@@ -167,8 +169,6 @@
 
     <!-- 추가 옵션 창 -->
     <string name="turip_more_option_bottom_sheet_change_name">이름 변경</string>
-    <string name="turip_more_option_bottom_sheet_share_by_text">텍스트로 공유하기</string>
-    <string name="turip_more_option_bottom_sheet_invite_by_link">링크로 초대하기</string>
     <string name="turip_more_option_bottom_sheet_delete">삭제</string>
 
     <!-- 튜립 화면 -->

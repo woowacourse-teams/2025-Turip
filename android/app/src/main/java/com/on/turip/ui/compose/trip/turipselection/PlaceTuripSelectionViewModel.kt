@@ -8,10 +8,12 @@ import com.on.turip.core.result.onSuccess
 import com.on.turip.domain.bookmark.TuripPlace
 import com.on.turip.domain.session.SessionState
 import com.on.turip.domain.session.SessionStore
+import com.on.turip.domain.turip.InvitationToken
 import com.on.turip.domain.turip.repository.TuripRepository
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
+import com.on.turip.ui.common.extensions.toUrl
 import com.on.turip.ui.compose.trip.turipselection.model.DeletePlaceSnapshot
 import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
 import com.on.turip.ui.compose.turipdetail.model.turip.TuripShareModel
@@ -297,7 +299,35 @@ class PlaceTuripSelectionViewModel @Inject constructor(
         }
     }
 
-    fun shareTurip() {
+    fun shareTuripInvitationLink() {
+        val screenMode = uiState.value.screenMode
+        if (screenMode is PlaceTuripSelectionScreenMode.TuripDetail) {
+            when (sessionState.value) {
+                SessionState.Member -> {
+                    viewModelScope.launch {
+                        turipRepository
+                            .createInvitationToken(screenMode.turipId)
+                            .onSuccess { token: InvitationToken ->
+                                _uiEffect.send(PlaceTuripSelectionUiEffect.ShareTuripInvitationLink(invitationLink = token.toUrl()))
+                            }.onFailure { errorType ->
+                                sendErrorEffect(
+                                    errorType = errorType,
+                                    retryAction = PlaceTuripSelectionRetryAction.ShareTuripInvitationLink,
+                                )
+                            }
+                    }
+                }
+
+                SessionState.Guest, SessionState.Uninitialized -> {
+                    viewModelScope.launch {
+                        _uiEffect.send(PlaceTuripSelectionUiEffect.TuripShareNotAllowed)
+                    }
+                }
+            }
+        }
+    }
+
+    fun shareTuripByText() {
         val screenMode = uiState.value.screenMode
         if (screenMode is PlaceTuripSelectionScreenMode.TuripDetail) {
             when (sessionState.value) {
@@ -312,7 +342,7 @@ class PlaceTuripSelectionViewModel @Inject constructor(
                         )
                     viewModelScope.launch {
                         _uiEffect.send(
-                            PlaceTuripSelectionUiEffect.ShareTurip(turipShareModel),
+                            PlaceTuripSelectionUiEffect.ShareTuripByText(turipShareModel),
                         )
                     }
                 }
@@ -436,6 +466,10 @@ class PlaceTuripSelectionViewModel @Inject constructor(
                     turipId = action.turipId,
                     turipName = action.turipName,
                 )
+            }
+
+            is PlaceTuripSelectionRetryAction.ShareTuripInvitationLink -> {
+                shareTuripInvitationLink()
             }
 
             is PlaceTuripSelectionRetryAction.UpdateReorderedPlaces -> {

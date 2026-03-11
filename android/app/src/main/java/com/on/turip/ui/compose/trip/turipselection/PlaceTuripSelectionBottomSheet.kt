@@ -6,6 +6,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -32,6 +33,7 @@ import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.trip.model.MapModel
 import com.on.turip.ui.compose.trip.model.SelectedPlaceModel
 import com.on.turip.ui.compose.trip.turipselection.component.PlaceTuripSelectionContent
+import com.on.turip.ui.compose.trip.turipselection.component.ShareOptionBottomSheet
 import com.on.turip.ui.compose.trip.turipselection.component.TuripsContent
 import com.on.turip.ui.compose.turipdetail.model.turip.TuripShareModel
 import kotlinx.collections.immutable.persistentListOf
@@ -44,7 +46,8 @@ fun PlaceTuripSelectionBottomSheet(
     onNavigateToLogin: () -> Unit,
     onNavigateToAddTurip: () -> Unit,
     onNavigateToMap: (mapModel: MapModel) -> Unit,
-    onShareTurip: (shareModel: TuripShareModel) -> Unit,
+    onShareTuripByText: (shareModel: TuripShareModel) -> Unit,
+    onShareTuripInvitationLink: (invitationLink: String) -> Unit,
     onPlaceTuripChanged: (placeId: Long, hasTurip: Boolean) -> Unit,
     onDismiss: () -> Unit,
     viewModel: PlaceTuripSelectionViewModel = hiltViewModel(),
@@ -55,6 +58,8 @@ fun PlaceTuripSelectionBottomSheet(
     val resources = LocalResources.current
 
     var showLoginSuggestDialog by remember { mutableStateOf(false) }
+    var showShareOptionSheet by remember { mutableStateOf(false) }
+    val shareOptionSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     val lifecycleOwner = LocalLifecycleOwner.current
     val placeId = selectedPlaceModel.placeId
@@ -89,8 +94,12 @@ fun PlaceTuripSelectionBottomSheet(
                     showLoginSuggestDialog = true
                 }
 
-                is PlaceTuripSelectionUiEffect.ShareTurip -> {
-                    onShareTurip(uiEffect.turipShareModel)
+                is PlaceTuripSelectionUiEffect.ShareTuripByText -> {
+                    onShareTuripByText(uiEffect.turipShareModel)
+                }
+
+                is PlaceTuripSelectionUiEffect.ShareTuripInvitationLink -> {
+                    onShareTuripInvitationLink(uiEffect.invitationLink)
                 }
 
                 is PlaceTuripSelectionUiEffect.ShowTuripPlaceRemoved -> {
@@ -171,30 +180,37 @@ fun PlaceTuripSelectionBottomSheet(
 
         PlaceTuripSelectionContent(
             uiState = uiState,
-            onBackFromTuripDetail = {
-                viewModel.onTuripDetailBack()
-            },
+            onBackFromTuripDetail = viewModel::onTuripDetailBack,
             onDismissRequest = viewModel::requestDismiss,
             onAddTuripClick = onNavigateToAddTurip,
             onTuripPlaceClickAtTurips = viewModel::updateTurip,
             onNavigateToTurip = viewModel::loadPlacesInSelectTurip,
             onConfirmClick = viewModel::updateTuripsByPlace,
             onMapClick = onNavigateToMap,
-            onTuripPlaceClickAtTuripDetail = {
-                viewModel.applyTuripPlaceDelete(it)
-            },
-            onShareClick = {
-                viewModel.shareTurip()
-            },
-            onDragStart = {
-                viewModel.onDragStart()
-            },
+            onTuripPlaceClickAtTuripDetail = viewModel::applyTuripPlaceDelete,
+            onShareClick = { showShareOptionSheet = true },
+            onDragStart = viewModel::onDragStart,
             onDragPlace = viewModel::onDragMove,
             onDragEnd = viewModel::onDragEnd,
             modifier =
                 Modifier
                     .fillMaxWidth()
                     .height(bottomSheetHeight),
+        )
+    }
+
+    if (showShareOptionSheet) {
+        ShareOptionBottomSheet(
+            sheetState = shareOptionSheetState,
+            onDismiss = { showShareOptionSheet = false },
+            onShareByTextClick = {
+                showShareOptionSheet = false
+                viewModel.shareTuripByText()
+            },
+            onInviteLinkClick = {
+                showShareOptionSheet = false
+                viewModel.shareTuripInvitationLink()
+            },
         )
     }
 }

@@ -80,7 +80,8 @@ fun TripDetailScreen(
     navigateToMap: (mapModel: MapModel) -> Unit,
     navigateToWebViewUrl: (url: String) -> Unit,
     navigateToAddTurip: () -> Unit,
-    navigateToShareTurip: (turipShareModel: TuripShareModel) -> Unit,
+    navigateToShareTuripByText: (turipShareModel: TuripShareModel) -> Unit,
+    navigateToShareTuripInvitationLink: (invitationLink: String) -> Unit,
     viewModel: TripDetailViewModel = hiltViewModel(),
 ) {
     val uiState: TripDetailUiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -234,7 +235,8 @@ fun TripDetailScreen(
                                 onNavigateToLogin = navigateToLogin,
                                 onNavigateToAddTurip = navigateToAddTurip,
                                 onNavigateToMap = navigateToMap,
-                                onShareTurip = navigateToShareTurip,
+                                onShareTuripByText = navigateToShareTuripByText,
+                                onShareTuripInvitationLink = navigateToShareTuripInvitationLink,
                                 onPlaceTuripChanged = viewModel::updatePlaceTuripSelection,
                                 onDismiss = {
                                     bottomSheetScope.launch {
