@@ -50,6 +50,7 @@ android {
             "APP_LINK_TURIP_INVITATION_HOST",
             "\"${requireLocalProperty("app_link_turip_invitation_host")}\"",
         )
+        manifestPlaceholders["appLinkTuripInvitationHost"] = requireLocalProperty("app_link_turip_invitation_host")
     }
 
     signingConfigs {
@@ -189,6 +190,7 @@ dependencies {
     // app update
     implementation(libs.app.update)
     implementation(libs.app.update.ktx)
+    implementation(libs.install.referrer)
 
     // hilt
     implementation(libs.hilt.android)
