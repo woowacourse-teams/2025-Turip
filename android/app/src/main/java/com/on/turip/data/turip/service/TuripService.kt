@@ -3,6 +3,7 @@ package com.on.turip.data.turip.service
 import com.on.turip.core.network.ApiPath
 import com.on.turip.data.turip.dto.PlaceTuripsRequest
 import com.on.turip.data.turip.dto.TuripCreationResponse
+import com.on.turip.data.turip.dto.TuripInvitationTokenResponse
 import com.on.turip.data.turip.dto.TuripPatchRequest
 import com.on.turip.data.turip.dto.TuripPlaceOrderRequest
 import com.on.turip.data.turip.dto.TuripPlacesResponse
@@ -77,4 +78,9 @@ interface TuripService {
         @Path("placeId") placeId: Long,
         @Body placeTuripsRequest: PlaceTuripsRequest,
     )
+
+    @POST(ApiPath.V1 + "turips/{turipId}/invitation-tokens")
+    suspend fun postInvitationToken(
+        @Path("turipId") turipId: Long,
+    ): TuripInvitationTokenResponse
 }

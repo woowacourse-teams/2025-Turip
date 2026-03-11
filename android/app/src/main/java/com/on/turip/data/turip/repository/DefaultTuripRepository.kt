@@ -9,6 +9,7 @@ import com.on.turip.data.turip.toDomain
 import com.on.turip.data.turip.toPatchRequestDto
 import com.on.turip.data.turip.toPostRequestDto
 import com.on.turip.domain.bookmark.TuripPlace
+import com.on.turip.domain.turip.InvitationToken
 import com.on.turip.domain.turip.Turip
 import com.on.turip.domain.turip.repository.TuripRepository
 import javax.inject.Inject
@@ -69,4 +70,7 @@ class DefaultTuripRepository @Inject constructor(
             placeId = placeId,
             placeTuripsRequest = PlaceTuripsRequest(turipIds),
         )
+
+    override suspend fun createInvitationToken(turipId: Long): TuripResult<InvitationToken> =
+        turipRemoteDataSource.createInvitationToken(turipId).mapCatching { it.toDomain() }
 }

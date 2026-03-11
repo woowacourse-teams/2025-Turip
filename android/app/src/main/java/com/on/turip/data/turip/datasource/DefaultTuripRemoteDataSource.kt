@@ -4,6 +4,7 @@ import com.on.turip.core.result.TuripResult
 import com.on.turip.data.result.safeApiCall
 import com.on.turip.data.turip.dto.PlaceTuripsRequest
 import com.on.turip.data.turip.dto.TuripCreationResponse
+import com.on.turip.data.turip.dto.TuripInvitationTokenResponse
 import com.on.turip.data.turip.dto.TuripPatchRequest
 import com.on.turip.data.turip.dto.TuripPlaceOrderRequest
 import com.on.turip.data.turip.dto.TuripPlacesResponse
@@ -82,4 +83,7 @@ class DefaultTuripRemoteDataSource @Inject constructor(
         placeId: Long,
         placeTuripsRequest: PlaceTuripsRequest,
     ): TuripResult<Unit> = safeApiCall { turipService.putPlaceTurips(placeId, placeTuripsRequest) }
+
+    override suspend fun createInvitationToken(turipId: Long): TuripResult<TuripInvitationTokenResponse> =
+        safeApiCall { turipService.postInvitationToken(turipId) }
 }

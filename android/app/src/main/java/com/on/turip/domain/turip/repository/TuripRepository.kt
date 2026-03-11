@@ -2,6 +2,7 @@ package com.on.turip.domain.turip.repository
 
 import com.on.turip.core.result.TuripResult
 import com.on.turip.domain.bookmark.TuripPlace
+import com.on.turip.domain.turip.InvitationToken
 import com.on.turip.domain.turip.Turip
 
 interface TuripRepository {
@@ -41,4 +42,6 @@ interface TuripRepository {
         placeId: Long,
         turipIds: List<Long>,
     ): TuripResult<Unit>
+
+    suspend fun createInvitationToken(turipId: Long): TuripResult<InvitationToken>
 }
