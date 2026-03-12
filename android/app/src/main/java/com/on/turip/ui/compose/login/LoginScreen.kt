@@ -39,7 +39,8 @@ import com.on.turip.ui.compose.login.util.noRippleClickable
 
 @Composable
 fun LoginScreen(
-    onNavigateToMain: () -> Unit,
+    deepLinkUrl: String?,
+    onNavigateToMain: (deepLinkUrl: String?) -> Unit,
     googleCredentialManager: GoogleCredentialManager,
     viewmodel: LoginViewmodel = hiltViewModel(),
 ) {
@@ -47,11 +48,19 @@ fun LoginScreen(
     val resources = LocalResources.current
     val snackbarDelegate = LocalSnackbarDelegate.current
 
+    LaunchedEffect(deepLinkUrl) {
+        viewmodel.initDeepLinkUrl(deepLinkUrl)
+    }
+
     LaunchedEffect(Unit) {
         viewmodel.uiEffect.collect { effect: LoginUiEffect ->
             when (effect) {
-                LoginUiEffect.NavigateToMain -> {
-                    onNavigateToMain()
+                LoginUiEffect.RequestAutoLogin -> {
+                    viewmodel.loginWithGoogle(googleCredentialManager)
+                }
+
+                is LoginUiEffect.NavigateToMain -> {
+                    onNavigateToMain(effect.deepLinkUrl)
                 }
 
                 is LoginUiEffect.ShowError -> {
@@ -158,7 +167,9 @@ private fun LoginScreenContent(
                 )
             }
 
-            GoogleLoginButton(onLoginClick = onGoogleLoginClick)
+            GoogleLoginButton(
+                onLoginClick = onGoogleLoginClick,
+            )
 
             GuestModeSection(
                 text = stringResource(R.string.login_start_to_guest),

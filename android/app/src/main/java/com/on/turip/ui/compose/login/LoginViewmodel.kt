@@ -37,29 +37,51 @@ class LoginViewmodel @Inject constructor(
     private val _uiEffect: Channel<LoginUiEffect> = Channel(Channel.BUFFERED)
     val uiEffect: Flow<LoginUiEffect> = _uiEffect.receiveAsFlow()
 
+    // 딥링크 자동 로그인할 때 네트워크 지연으로 사용자가 직접 로그인을 누르게 되는 경우 중복 요청 방지
+    private var isLoginInProgress: Boolean = false
+
+    fun initDeepLinkUrl(deepLinkUrl: String?) {
+        val trimmedDeepLinkUrl: String? = deepLinkUrl?.trim()?.takeIf(String::isNotEmpty)
+        if (_uiState.value.deepLinkUrl == trimmedDeepLinkUrl) return
+
+        _uiState.update { it.copy(deepLinkUrl = trimmedDeepLinkUrl) }
+
+        if (!trimmedDeepLinkUrl.isNullOrBlank()) {
+            viewModelScope.launch {
+                _uiEffect.send(LoginUiEffect.RequestAutoLogin)
+            }
+        }
+    }
+
     fun updateHelpTextVisible(show: Boolean) {
         _uiState.update { it.copy(showHelpText = show) }
     }
 
     fun loginWithGoogle(googleCredentialManager: GoogleCredentialManager) {
+        if (isLoginInProgress) return
+        isLoginInProgress = true
         viewModelScope.launch {
-            googleCredentialManager
-                .getIdToken()
-                .onSuccess { idToken: String ->
-                    loginUseCase(idToken)
-                        .onSuccess { isNewMember: Boolean ->
-                            if (isNewMember) {
-                                _uiState.update { it.copy(showMigrationDialog = true) }
-                            } else {
-                                _uiEffect.send(LoginUiEffect.NavigateToMain)
+            try {
+                googleCredentialManager
+                    .getIdToken()
+                    .onSuccess { idToken: String ->
+                        loginUseCase(idToken)
+                            .onSuccess { isNewMember: Boolean ->
+                                if (isNewMember) {
+                                    _uiState.update { it.copy(showMigrationDialog = true) }
+                                } else {
+                                    _uiEffect.send(LoginUiEffect.NavigateToMain(_uiState.value.deepLinkUrl))
+                                }
+                            }.onFailure { errorType ->
+                                handleError(errorType)
                             }
-                        }.onFailure { errorType ->
-                            handleError(errorType)
-                        }
-                }.onFailure { errorType: ErrorType ->
-                    handleError(errorType)
-                    Timber.e("googleCredentialManager 에서 IdToken 불러오기 실패")
-                }
+                    }.onFailure { errorType: ErrorType ->
+                        handleError(errorType)
+                        Timber.e("googleCredentialManager 에서 IdToken 불러오기 실패")
+                    }
+            } finally {
+                isLoginInProgress = false
+            }
         }
     }
 
@@ -69,7 +91,7 @@ class LoginViewmodel @Inject constructor(
                 .updateMigration()
                 .onSuccess {
                     _uiState.update { it.copy(showMigrationDialog = false) }
-                    _uiEffect.send(LoginUiEffect.NavigateToMain)
+                    _uiEffect.send(LoginUiEffect.NavigateToMain(_uiState.value.deepLinkUrl))
                 }.onFailure {
                     Timber.e("마이그레이션 실패")
                 }
@@ -81,7 +103,7 @@ class LoginViewmodel @Inject constructor(
             guestRepository
                 .deleteGuest()
                 .onSuccess {
-                    _uiEffect.send(LoginUiEffect.NavigateToMain)
+                    _uiEffect.send(LoginUiEffect.NavigateToMain(_uiState.value.deepLinkUrl))
                 }.onFailure {
                     Timber.e("게스트 데이터 삭제 실패")
                 }
@@ -91,7 +113,7 @@ class LoginViewmodel @Inject constructor(
     fun continueAsGuest() {
         viewModelScope.launch {
             switchToGuestUseCase()
-            _uiEffect.send(LoginUiEffect.NavigateToMain)
+            _uiEffect.send(LoginUiEffect.NavigateToMain())
         }
     }
 
