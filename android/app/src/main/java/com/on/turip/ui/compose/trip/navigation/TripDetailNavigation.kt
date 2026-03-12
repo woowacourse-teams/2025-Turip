@@ -20,7 +20,7 @@ fun EntryProviderScope<NavKey>.tripDetailScreen(
         TripDetailScreen(
             contentId = it.contentId,
             navigateToBack = navigator::goBack,
-            navigateToLogin = { navigator.goWithAllClear(LoginNavKey) },
+            navigateToLogin = { navigator.goWithAllClear(LoginNavKey()) },
             navigateToMap = navigateToMap,
             navigateToWebViewUrl = navigateToWebViewUrl,
             navigateToAddTurip = navigateToAddTurip,

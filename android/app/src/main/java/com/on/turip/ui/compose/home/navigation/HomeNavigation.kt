@@ -22,7 +22,7 @@ fun EntryProviderScope<NavKey>.homeScreen(navigator: Navigator) {
             onContentClick = { contentId: Long ->
                 navigator.navigate(TripDetailNavKey(contentId))
             },
-            onNavigateToLoginScreen = { navigator.goWithAllClear(LoginNavKey) },
+            onNavigateToLoginScreen = { navigator.goWithAllClear(LoginNavKey()) },
             onNavigateToMyPage = { navigator.navigate(MyPageNavKey) },
         )
     }

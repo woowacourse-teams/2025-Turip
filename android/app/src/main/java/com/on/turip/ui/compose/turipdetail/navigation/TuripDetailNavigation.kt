@@ -17,7 +17,7 @@ fun EntryProviderScope<NavKey>.turipDetailScreen(
     entry<TuripDetailNavKey> {
         TuripDetailScreen(
             selectedTuripId = it.turipId,
-            onNavigateToLogin = { navigator.goWithAllClear(LoginNavKey) },
+            onNavigateToLogin = { navigator.goWithAllClear(LoginNavKey()) },
             onShareTuripByText = onShareTuripByText,
             onShareTuripInvitationLink = onShareTuripInvitationLink,
             onNavigateToMap = navigateToMap,
