@@ -51,6 +51,7 @@ jobs:
           release_base_url=${{ secrets.RELEASE_BASE_URL }}
           client_id=${{ secrets.GOOGLE_CLIENT_ID }}
           google_maps_api_key=${{ secrets.GOOGLE_MAPS_API_KEY }}
+          app_link_turip_invitation_host=${{ secrets.APP_LINK_TURIP_INVITATION_HOST }}
           EOF
 
       - name: Generate Keystores
@@ -117,6 +118,7 @@ jobs:
           release_base_url=${{ secrets.RELEASE_BASE_URL }}
           client_id=${{ secrets.GOOGLE_CLIENT_ID }}
           google_maps_api_key=${{ secrets.GOOGLE_MAPS_API_KEY }}
+          app_link_turip_invitation_host=${{ secrets.APP_LINK_TURIP_INVITATION_HOST }}
           EOF
 
       - name: Generate Keystores
@@ -173,6 +175,7 @@ jobs:
           release_base_url=${{ secrets.RELEASE_BASE_URL }}
           client_id=${{ secrets.GOOGLE_CLIENT_ID }}
           google_maps_api_key=${{ secrets.GOOGLE_MAPS_API_KEY }}
+          app_link_turip_invitation_host=${{ secrets.APP_LINK_TURIP_INVITATION_HOST }}
           EOF
 
       - name: Generate Keystores
