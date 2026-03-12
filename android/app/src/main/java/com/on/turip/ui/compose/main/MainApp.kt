@@ -1,4 +1,4 @@
-package com.on.turip.ui.compose.main.component
+package com.on.turip.ui.compose.main
 
 import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.core.animateDpAsState
@@ -21,6 +21,7 @@ import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
+import com.on.turip.core.navigation.InitialNavigationTarget
 import com.on.turip.navigation.Navigator
 import com.on.turip.navigation.rememberNavigationState
 import com.on.turip.navigation.toEntries
@@ -28,17 +29,25 @@ import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
 import com.on.turip.ui.compose.designsystem.snackbar.LocalSnackbarDelegate
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.home.navigation.HomeNavKey
+import com.on.turip.ui.compose.main.component.ExitConfirmationHandler
+import com.on.turip.ui.compose.main.component.TuripNavigationBar
 import com.on.turip.ui.compose.main.navigation.SavedStateConfigurationProvider
 import com.on.turip.ui.compose.main.navigation.TopLevel
 import com.on.turip.ui.compose.main.navigation.appScreens
 import com.on.turip.ui.compose.main.navigation.rememberTuripAppState
+import com.on.turip.ui.compose.main.navigation.util.toInitialEntryKey
 
 @Composable
-fun MainApp(savedStateConfigurationProvider: SavedStateConfigurationProvider) {
+fun MainApp(
+    savedStateConfigurationProvider: SavedStateConfigurationProvider,
+    initialNavigationTarget: InitialNavigationTarget?,
+) {
+    val initialEntryKey: NavKey? = initialNavigationTarget?.toInitialEntryKey()
     val navigationState =
         rememberNavigationState(
             startKey = HomeNavKey,
             topLevelKeys = TopLevel.routes.keys,
+            initialEntryKey = initialEntryKey,
             configuration = savedStateConfigurationProvider.savedStateConfiguration,
         )
 

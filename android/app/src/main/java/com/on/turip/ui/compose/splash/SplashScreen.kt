@@ -40,6 +40,7 @@ import com.google.android.play.core.appupdate.AppUpdateOptions
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.UpdateAvailability
 import com.on.turip.R
+import com.on.turip.core.navigation.InitialNavigationTarget
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
@@ -48,8 +49,8 @@ private const val UPDATE_TYPE = AppUpdateType.IMMEDIATE
 
 @Composable
 fun SplashScreen(
-    onNavigateToHome: () -> Unit,
-    onNavigateToLogin: () -> Unit,
+    deepLinkUrl: String?,
+    onNavigateToMain: (target: InitialNavigationTarget) -> Unit,
     onFinish: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SplashViewModel = hiltViewModel(),
@@ -66,6 +67,8 @@ fun SplashScreen(
             if (result.resultCode != RESULT_OK) {
                 Timber.d("업데이트 실패/취소 ${result.resultCode}")
                 onFinish()
+            } else {
+                viewModel.determineStartDestination(deepLinkUrl)
             }
         }
 
@@ -73,15 +76,15 @@ fun SplashScreen(
         checkUpdateAndProceed(
             appUpdateManager = appUpdateManager,
             updateLauncher = updateLauncher,
-            proceed = viewModel::determineStartDestination,
+            proceed = { viewModel.determineStartDestination(deepLinkUrl) },
         )
     }
-
     LaunchedEffect(Unit) {
-        viewModel.uiEffect.collectLatest { uiEffect: SplashUiEffect ->
+        viewModel.uiEffect.collectLatest { uiEffect ->
             when (uiEffect) {
-                SplashUiEffect.NavigateToLogin -> onNavigateToLogin()
-                SplashUiEffect.NavigateToMain -> onNavigateToHome()
+                is SplashUiEffect.NavigateToMain -> {
+                    onNavigateToMain(uiEffect.initialNavigationTarget)
+                }
             }
         }
     }
