@@ -6,6 +6,20 @@ import org.junit.Test
 
 class InvitationTokenParserTest {
     @Test
+    fun `url이 null이면 null을 반환한다`() {
+        val actual = InvitationTokenParser.extractTokenFromUrl(null)
+
+        assertThat(actual).isNull()
+    }
+
+    @Test
+    fun `url이 blank면 null을 반환한다`() {
+        val actual = InvitationTokenParser.extractTokenFromUrl(" ")
+
+        assertThat(actual).isNull()
+    }
+
+    @Test
     fun `uri token을 우선 추출한다`() {
         val actual =
             InvitationTokenParser.extractTokenFromUrl("https://turip.app/invitations?token=abc123")

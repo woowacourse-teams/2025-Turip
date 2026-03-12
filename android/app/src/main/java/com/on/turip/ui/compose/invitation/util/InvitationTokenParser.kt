@@ -7,7 +7,7 @@ object InvitationTokenParser {
     private const val INVITATION_TOKEN_QUERY = "token"
     private const val INVITATION_REFERRER_QUERY = "referrer"
 
-    fun extractTokenFromUrl(url: String): String? {
+    fun extractTokenFromUrl(url: String?): String? {
         val query = extractQueryFromUrl(url) ?: return null
         return extractQueryParameter(query, INVITATION_TOKEN_QUERY)
     }
@@ -19,7 +19,8 @@ object InvitationTokenParser {
         return extractQueryParameter(queryOrRaw, INVITATION_REFERRER_QUERY)
     }
 
-    private fun extractQueryFromUrl(url: String): String? {
+    private fun extractQueryFromUrl(url: String?): String? {
+        if (url.isNullOrBlank()) return null
         val query = url.substringAfter('?', missingDelimiterValue = "")
         return query.takeIf(String::isNotBlank)
     }
