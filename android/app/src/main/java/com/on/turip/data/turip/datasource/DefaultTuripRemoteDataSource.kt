@@ -89,8 +89,7 @@ class DefaultTuripRemoteDataSource @Inject constructor(
     override suspend fun createInvitationToken(turipId: Long): TuripResult<TuripInvitationTokenResponse> =
         safeApiCall { turipService.postInvitationToken(turipId) }
 
-    override suspend fun joinTurip(turipId: Long): TuripResult<TuripJoinResponse> =
-        safeApiCall { turipService.postJoinTurip(turipId) }
+    override suspend fun joinTurip(turipId: Long): TuripResult<TuripJoinResponse> = safeApiCall { turipService.postJoinTurip(turipId) }
 
     override suspend fun getInvitationInformation(token: String): TuripResult<TuripInvitationInformationResponse> =
         safeApiCall { turipService.getInvitationInformation(token) }
