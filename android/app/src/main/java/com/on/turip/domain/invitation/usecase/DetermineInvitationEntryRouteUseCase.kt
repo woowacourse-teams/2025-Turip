@@ -56,6 +56,7 @@ class DetermineInvitationEntryRouteUseCase @Inject constructor(
                     }
                 },
                 onFailure = { errorType ->
+                    // TODO: 서버에서 "유효하지 않은 초대 토큰" 오류를 명시적으로 내려주기 시작하면 InvalidInvitationToken 으로 처리 필요
                     Timber.e("튜립 초대 토큰 검증 실패 invitationToken = $invitationToken")
                     InvitationEntryResult.Failure(errorType)
                 },
