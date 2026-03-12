@@ -67,11 +67,14 @@ class Navigator(
      * 모든 내비게이션 스택을 초기화한 뒤 [key]로 이동합니다.
      *
      * - [key]가 TopLevel이면 해당 키를 TopLevel 스택의 시작으로 설정합니다.
-     * - [key]가 TopLevel이 아니면 시작 TopLevel로 초기화한 뒤 해당 서브 스택에 [key]를 추가합니다.
+     * - [key]가 TopLevel이 아니면 [parentTopLevelKey] (없거나 invalid면 startKey)로 초기화한 뒤 해당 서브 스택에 [key]를 추가합니다.
      *
      * 로그인 전환, 세션 전환처럼 기존 히스토리를 완전히 비워야 하는 시나리오에 사용합니다.
      */
-    fun goWithAllClear(key: NavKey) {
+    fun goWithAllClear(
+        key: NavKey,
+        parentTopLevelKey: NavKey = state.startKey,
+    ) {
         clearAllStacks()
         when (key) {
             in state.topLevelKeys -> {
@@ -79,8 +82,13 @@ class Navigator(
             }
 
             else -> {
-                state.topLevelStack.add(state.startKey)
-                state.currentSubStack.add(key)
+                val topLevelKey: NavKey =
+                    parentTopLevelKey.takeIf { it in state.topLevelKeys } ?: state.startKey
+                state.topLevelStack.add(topLevelKey)
+                val parentSubStack: NavBackStack<NavKey> =
+                    state.subStacks[topLevelKey]
+                        ?: error("Sub stack for $topLevelKey does not exist")
+                parentSubStack.add(key)
             }
         }
         log(action = "goWithAllClear to $key")
