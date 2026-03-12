@@ -5,6 +5,7 @@ import com.on.turip.data.turip.dto.PlaceTuripsRequest
 import com.on.turip.data.turip.dto.TuripCreationResponse
 import com.on.turip.data.turip.dto.TuripInvitationInformationResponse
 import com.on.turip.data.turip.dto.TuripInvitationTokenResponse
+import com.on.turip.data.turip.dto.TuripJoinResponse
 import com.on.turip.data.turip.dto.TuripPatchRequest
 import com.on.turip.data.turip.dto.TuripPlaceOrderRequest
 import com.on.turip.data.turip.dto.TuripPlacesResponse
@@ -84,6 +85,11 @@ interface TuripService {
     suspend fun postInvitationToken(
         @Path("turipId") turipId: Long,
     ): TuripInvitationTokenResponse
+
+    @POST(ApiPath.V1 + "turips/{turipId}/join")
+    suspend fun postJoinTurip(
+        @Path("turipId") turipId: Long,
+    ): TuripJoinResponse
 
     @GET(ApiPath.V1 + "turips/invitation-tokens")
     suspend fun getInvitationInformation(

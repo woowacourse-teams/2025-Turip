@@ -3,10 +3,13 @@ package com.on.turip.ui.compose.invitation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.on.turip.core.result.ErrorType
+import com.on.turip.core.result.onFailure
+import com.on.turip.core.result.onSuccess
 import com.on.turip.domain.invitation.usecase.DetermineInvitationEntryRouteUseCase
 import com.on.turip.domain.invitation.usecase.model.InvitationEntryResult
 import com.on.turip.domain.session.SessionState
 import com.on.turip.domain.session.SessionStore
+import com.on.turip.domain.turip.repository.TuripRepository
 import com.on.turip.ui.compose.invitation.util.InvitationTokenParser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -22,6 +25,7 @@ import javax.inject.Inject
 @HiltViewModel
 class InvitationEntryViewModel @Inject constructor(
     private val determineInvitationEntryRouteUseCase: DetermineInvitationEntryRouteUseCase,
+    private val turipRepository: TuripRepository,
     sessionStore: SessionStore,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<InvitationEntryUiState> =
@@ -126,7 +130,27 @@ class InvitationEntryViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            _uiEffect.send(InvitationEntryUiEffect.NavigateToTuripDetail(turipId))
+            turipRepository
+                .joinTurip(turipId)
+                .onSuccess {
+                    _uiEffect.send(InvitationEntryUiEffect.NavigateToTuripDetail(turipId))
+                }.onFailure { errorType ->
+                    val target =
+                        when (sessionState.value) {
+                            SessionState.Member -> InvalidInvitationTarget.Home
+                            SessionState.Guest, SessionState.Uninitialized -> InvalidInvitationTarget.Login
+                        }
+                    val retryable = errorType == ErrorType.Network
+                    _uiState.update {
+                        it.copy(
+                            dialogState =
+                                InvitationEntryDialogState.Failure(
+                                    target = target,
+                                    retryable = retryable,
+                                ),
+                        )
+                    }
+                }
         }
     }
 

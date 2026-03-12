@@ -46,5 +46,7 @@ interface TuripRepository {
 
     suspend fun createInvitationToken(turipId: Long): TuripResult<TuripInvitationToken>
 
+    suspend fun joinTurip(turipId: Long): TuripResult<Unit>
+
     suspend fun verifyInvitationToken(token: String): TuripResult<TuripInvitationInformation>
 }

@@ -75,6 +75,8 @@ class DefaultTuripRepository @Inject constructor(
     override suspend fun createInvitationToken(turipId: Long): TuripResult<TuripInvitationToken> =
         turipRemoteDataSource.createInvitationToken(turipId).mapCatching { it.toDomain() }
 
+    override suspend fun joinTurip(turipId: Long): TuripResult<Unit> = turipRemoteDataSource.joinTurip(turipId).mapCatching { Unit }
+
     override suspend fun verifyInvitationToken(token: String): TuripResult<TuripInvitationInformation> =
         turipRemoteDataSource.getInvitationInformation(token).mapCatching { it.toDomain() }
 }
