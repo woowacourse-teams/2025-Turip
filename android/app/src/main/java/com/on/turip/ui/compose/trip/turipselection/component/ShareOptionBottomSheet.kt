@@ -22,6 +22,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -37,6 +38,7 @@ fun ShareOptionBottomSheet(
     onDismiss: () -> Unit,
     onShareByTextClick: () -> Unit,
     onInviteLinkClick: () -> Unit,
+    isInviteLinkEnabled: Boolean,
     modifier: Modifier = Modifier,
 ) {
     BackHandler(onBack = onDismiss)
@@ -75,6 +77,7 @@ fun ShareOptionBottomSheet(
                 iconRes = R.drawable.ic_people_fill,
                 title = stringResource(R.string.all_turip_invite_by_link),
                 onClick = onInviteLinkClick,
+                enabled = isInviteLinkEnabled,
             )
         }
     }
@@ -109,13 +112,15 @@ private fun ShareOptionRow(
     title: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier =
             modifier
                 .fillMaxWidth()
-                .clickable(onClick = onClick)
+                .clickable(enabled = enabled, onClick = onClick)
+                .then(if (!enabled) Modifier.alpha(0.4f) else Modifier)
                 .padding(
                     horizontal = TuripTheme.spacing.extraHuge,
                     vertical = TuripTheme.spacing.large,
@@ -137,15 +142,31 @@ private fun ShareOptionRow(
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true)
+@Preview(showBackground = true, name = "초대 링크 사용 가능")
 @Composable
-private fun ShareOptionBottomSheetPreview() {
+private fun ShareOptionBottomSheetEnabledPreview() {
     TuripTheme {
         ShareOptionBottomSheet(
             sheetState = rememberModalBottomSheetState(),
             onDismiss = {},
             onShareByTextClick = {},
             onInviteLinkClick = {},
+            isInviteLinkEnabled = true,
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true, name = "초대 링크 사용 불가능")
+@Composable
+private fun ShareOptionBottomSheetDisabledPreview() {
+    TuripTheme {
+        ShareOptionBottomSheet(
+            sheetState = rememberModalBottomSheetState(),
+            onDismiss = {},
+            onShareByTextClick = {},
+            onInviteLinkClick = {},
+            isInviteLinkEnabled = false,
         )
     }
 }

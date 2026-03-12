@@ -48,7 +48,7 @@ fun TuripByPlaceResponse.toDomain(): Turip =
     Turip(
         id = id,
         name = name,
-        isDefault = false,
+        isDefault = isDefault,
         placeCount = 0,
         memberCount = 0,
         isShared = false,

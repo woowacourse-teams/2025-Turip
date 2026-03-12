@@ -200,6 +200,9 @@ fun PlaceTuripSelectionBottomSheet(
     }
 
     if (showShareOptionSheet) {
+        val isInviteLinkEnabled =
+            (uiState.screenMode as? PlaceTuripSelectionScreenMode.TuripDetail)?.turipModel?.isDefault == false
+
         ShareOptionBottomSheet(
             sheetState = shareOptionSheetState,
             onDismiss = { showShareOptionSheet = false },
@@ -211,6 +214,7 @@ fun PlaceTuripSelectionBottomSheet(
                 showShareOptionSheet = false
                 viewModel.shareTuripInvitationLink()
             },
+            isInviteLinkEnabled = isInviteLinkEnabled,
         )
     }
 }
@@ -225,7 +229,7 @@ private fun PlaceTuripSelectionBottomSheetPreview() {
             turips = persistentListOf(),
             onAddTuripClick = { },
             onTuripPlaceClick = { },
-            onNavigateToTurip = { _, _ -> },
+            onNavigateToTurip = { },
             onConfirmClick = { },
         )
     }

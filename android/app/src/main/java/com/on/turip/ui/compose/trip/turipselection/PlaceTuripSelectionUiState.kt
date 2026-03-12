@@ -33,7 +33,6 @@ sealed interface PlaceTuripSelectionScreenMode {
     data object Turips : PlaceTuripSelectionScreenMode
 
     data class TuripDetail(
-        val turipId: Long,
-        val turipName: String,
+        val turipModel: TuripModel,
     ) : PlaceTuripSelectionScreenMode
 }

@@ -84,6 +84,7 @@ fun MoreOptionBottomSheet(
                 icon = MoreOptionIcon.Resource(R.drawable.ic_people_fill),
                 color = TuripTheme.colors.black,
                 onClick = onShareTuripInvitationLinkClick,
+                enabled = !isDefault,
             ),
             MoreOptionItem(
                 title = stringResource(R.string.turip_more_option_bottom_sheet_delete),

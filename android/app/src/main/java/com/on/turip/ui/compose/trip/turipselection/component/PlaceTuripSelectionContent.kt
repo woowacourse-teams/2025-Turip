@@ -39,7 +39,7 @@ fun PlaceTuripSelectionContent(
     onDismissRequest: () -> Unit,
     onAddTuripClick: () -> Unit,
     onTuripPlaceClickAtTurips: (turipModel: TuripModel) -> Unit,
-    onNavigateToTurip: (turipId: Long, turipName: String) -> Unit,
+    onNavigateToTurip: (turipModel: TuripModel) -> Unit,
     onConfirmClick: () -> Unit,
     onMapClick: (mapModel: MapModel) -> Unit,
     onTuripPlaceClickAtTuripDetail: (place: TuripPlaceModel) -> Unit,
@@ -89,7 +89,7 @@ fun PlaceTuripSelectionContent(
 
                 is PlaceTuripSelectionScreenMode.TuripDetail -> {
                     TuripDetail(
-                        turipName = mode.turipName,
+                        turipName = mode.turipModel.name,
                         places = uiState.selectedTuripPlaces,
                         onMapClick = onMapClick,
                         onTuripPlaceClick = onTuripPlaceClickAtTuripDetail,
@@ -146,18 +146,21 @@ private fun PlaceTuripSelectionContentTuripsPreview() {
                                     name = "서울 1박2일",
                                     placeCount = 10,
                                     isSelected = true,
+                                    isDefault = true,
                                 ),
                                 TuripModel(
                                     id = 2L,
                                     name = "경주 1박2일",
                                     placeCount = 2,
                                     isSelected = false,
+                                    isDefault = false,
                                 ),
                                 TuripModel(
                                     id = 3L,
                                     name = "부산 1박2일",
                                     placeCount = 5,
                                     isSelected = false,
+                                    isDefault = false,
                                 ),
                             ),
                         selectedTuripPlaces = persistentListOf(),
@@ -167,7 +170,7 @@ private fun PlaceTuripSelectionContentTuripsPreview() {
                 onDismissRequest = {},
                 onAddTuripClick = {},
                 onTuripPlaceClickAtTurips = {},
-                onNavigateToTurip = { _, _ -> },
+                onNavigateToTurip = { },
                 onConfirmClick = {},
                 onMapClick = {},
                 onTuripPlaceClickAtTuripDetail = {},
@@ -190,8 +193,14 @@ private fun PlaceTuripSelectionContentTuripDetailPreview() {
                     PlaceTuripSelectionUiState(
                         screenMode =
                             PlaceTuripSelectionScreenMode.TuripDetail(
-                                turipId = 1L,
-                                turipName = "서울 1박2일",
+                                turipModel =
+                                    TuripModel(
+                                        id = 1L,
+                                        name = "서울 1박2일",
+                                        placeCount = 10,
+                                        isSelected = false,
+                                        isDefault = true,
+                                    ),
                             ),
                         placeName = "",
                         isChanged = true,
@@ -221,7 +230,7 @@ private fun PlaceTuripSelectionContentTuripDetailPreview() {
                 onDismissRequest = {},
                 onAddTuripClick = {},
                 onTuripPlaceClickAtTurips = {},
-                onNavigateToTurip = { _, _ -> },
+                onNavigateToTurip = { },
                 onConfirmClick = {},
                 onMapClick = {},
                 onTuripPlaceClickAtTuripDetail = {},

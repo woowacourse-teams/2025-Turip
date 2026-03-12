@@ -8,4 +8,5 @@ data class TuripModel(
     val name: String,
     val placeCount: Int,
     val isSelected: Boolean,
+    val isDefault: Boolean,
 )

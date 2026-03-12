@@ -63,8 +63,7 @@ sealed interface PlaceTuripSelectionRetryAction {
     ) : PlaceTuripSelectionRetryAction
 
     data class LoadPlacesInTurip(
-        val turipId: Long,
-        val turipName: String,
+        val turipModel: TuripModel,
     ) : PlaceTuripSelectionRetryAction
 
     data class UpdateReorderedPlaces(

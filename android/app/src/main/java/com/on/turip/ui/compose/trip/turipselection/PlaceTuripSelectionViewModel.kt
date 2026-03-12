@@ -175,21 +175,14 @@ class PlaceTuripSelectionViewModel @Inject constructor(
         }
     }
 
-    fun loadPlacesInSelectTurip(
-        turipId: Long,
-        turipName: String,
-    ) {
+    fun loadPlacesInSelectTurip(turipModel: TuripModel) {
         viewModelScope.launch {
             turipRepository
-                .loadTuripPlaces(turipId)
+                .loadTuripPlaces(turipModel.id)
                 .onSuccess { turipPlaces: List<TuripPlace> ->
                     _uiState.update { state: PlaceTuripSelectionUiState ->
                         state.copy(
-                            screenMode =
-                                PlaceTuripSelectionScreenMode.TuripDetail(
-                                    turipId,
-                                    turipName,
-                                ),
+                            screenMode = PlaceTuripSelectionScreenMode.TuripDetail(turipModel),
                             selectedTuripPlaces =
                                 turipPlaces.map { it.toUiModel() }.toImmutableList(),
                         )
@@ -197,13 +190,9 @@ class PlaceTuripSelectionViewModel @Inject constructor(
                 }.onFailure { errorType: ErrorType ->
                     sendErrorEffect(
                         errorType = errorType,
-                        retryAction =
-                            PlaceTuripSelectionRetryAction.LoadPlacesInTurip(
-                                turipId = turipId,
-                                turipName = turipName,
-                            ),
+                        retryAction = PlaceTuripSelectionRetryAction.LoadPlacesInTurip(turipModel = turipModel),
                     )
-                    Timber.e("튜립에 담긴 장소들을 불러오는 API 호출 실패 turipName = $turipName")
+                    Timber.e("튜립에 담긴 장소들을 불러오는 API 호출 실패 turipName = ${turipModel.name}")
                 }
         }
     }
@@ -253,7 +242,7 @@ class PlaceTuripSelectionViewModel @Inject constructor(
             val screenMode = uiState.value.screenMode
             if (screenMode is PlaceTuripSelectionScreenMode.TuripDetail) {
                 turipRepository
-                    .deleteTuripPlace(screenMode.turipId, deletePlace.placeId)
+                    .deleteTuripPlace(screenMode.turipModel.id, deletePlace.placeId)
                     .onSuccess {
                         syncTuripForSelectedPlace(deletePlace, screenMode)
                         Timber.d("튜립 상세 바텀시트, 장소 업데이트 성공")
@@ -280,7 +269,7 @@ class PlaceTuripSelectionViewModel @Inject constructor(
             _uiState.update { state ->
                 val syncTuripStatus =
                     state.turips
-                        .map { if (it.id == screenMode.turipId) it.copy(isSelected = false) else it }
+                        .map { if (it.id == screenMode.turipModel.id) it.copy(isSelected = false) else it }
                         .toImmutableList()
 
                 state.copy(turips = syncTuripStatus)
@@ -288,7 +277,7 @@ class PlaceTuripSelectionViewModel @Inject constructor(
             val updateCache =
                 originTuripIds
                     .toMutableSet()
-                    .apply { remove(screenMode.turipId) }
+                    .apply { remove(screenMode.turipModel.id) }
                     .toSet()
             originTuripIds = updateCache
 
@@ -306,7 +295,7 @@ class PlaceTuripSelectionViewModel @Inject constructor(
                 SessionState.Member -> {
                     viewModelScope.launch {
                         turipRepository
-                            .createInvitationToken(screenMode.turipId)
+                            .createInvitationToken(screenMode.turipModel.id)
                             .onSuccess { token: TuripInvitationToken ->
                                 _uiEffect.send(PlaceTuripSelectionUiEffect.ShareTuripInvitationLink(invitationLink = token.toUrl()))
                             }.onFailure { errorType ->
@@ -334,7 +323,7 @@ class PlaceTuripSelectionViewModel @Inject constructor(
                 SessionState.Member -> {
                     val turipShareModel =
                         TuripShareModel(
-                            name = screenMode.turipName,
+                            name = screenMode.turipModel.name,
                             places =
                                 uiState.value.selectedTuripPlaces
                                     .map { it.toUiModel() }
@@ -393,7 +382,7 @@ class PlaceTuripSelectionViewModel @Inject constructor(
             viewModelScope.launch {
                 turipRepository
                     .updateTuripPlacesOrder(
-                        turipId = screenMode.turipId,
+                        turipId = screenMode.turipModel.id,
                         updatedOrder = reorderedTuripPlaces.map { it.turipPlaceId },
                     ).onSuccess {
                         _uiState.update { it.copy(selectedTuripPlaces = reorderedTuripPlaces) }
@@ -462,10 +451,7 @@ class PlaceTuripSelectionViewModel @Inject constructor(
             }
 
             is PlaceTuripSelectionRetryAction.LoadPlacesInTurip -> {
-                loadPlacesInSelectTurip(
-                    turipId = action.turipId,
-                    turipName = action.turipName,
-                )
+                loadPlacesInSelectTurip(action.turipModel)
             }
 
             is PlaceTuripSelectionRetryAction.ShareTuripInvitationLink -> {

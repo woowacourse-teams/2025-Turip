@@ -10,6 +10,7 @@ fun Turip.toUiModel(selectTuripId: Long): TuripModel =
         name = name,
         placeCount = placeCount,
         isSelected = id == selectTuripId,
+        isDefault = isDefault,
     )
 
 fun Turip.toEditUiModel(): TuripEditModel =
