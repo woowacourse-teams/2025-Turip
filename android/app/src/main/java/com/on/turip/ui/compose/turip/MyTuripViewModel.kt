@@ -208,7 +208,7 @@ class MyTuripViewModel @Inject constructor(
                     _uiState.update { it.copy(errorUiState = ErrorUiState.Server) }
                     _uiEffect.send(
                         MyTuripUiEffect.ShowError(
-                            ErrorUiState.Network.toUiModel(),
+                            ErrorUiState.Server.toUiModel(),
                             retryAction,
                         ),
                     )
