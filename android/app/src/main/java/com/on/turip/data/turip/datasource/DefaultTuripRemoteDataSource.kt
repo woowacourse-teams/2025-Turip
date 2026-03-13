@@ -111,7 +111,7 @@ class DefaultTuripRemoteDataSource @Inject constructor(
 
     override fun streamTuripEvents(turipId: Long): Flow<TuripResult<TuripStreamEvent>> =
         flow {
-            val result =
+            val result: TuripResult<Unit> =
                 safeApiCall {
                     httpClient.sse(
                         urlString = "${BuildConfig.BASE_URL}${ApiPath.V1}turips/$turipId/stream",
@@ -119,11 +119,10 @@ class DefaultTuripRemoteDataSource @Inject constructor(
                         val parser = TuripSseParser()
 
                         incoming.collect { event ->
+                            val eventType: String = event.event ?: return@collect
+                            val data: String = event.data ?: return@collect
 
-                            val eventType = event.event ?: return@collect
-                            val data = event.data ?: return@collect
-
-                            val parsed =
+                            val parsed: TuripStreamEvent =
                                 parser.parse(
                                     event.id,
                                     eventType,
@@ -136,7 +135,7 @@ class DefaultTuripRemoteDataSource @Inject constructor(
                 }
 
             if (result is TuripResult.Failure) {
-                emit(result)
+                emit(TuripResult.Failure(errorType = result.errorType, cause = result.cause))
             }
         }.flowOn(coroutineContext)
 }
