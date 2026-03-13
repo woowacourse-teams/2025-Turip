@@ -26,6 +26,7 @@ import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.plugins.sse.SSE
 import io.ktor.client.request.header
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
@@ -35,6 +36,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import timber.log.Timber
 import javax.inject.Singleton
+import kotlin.time.Duration.Companion.milliseconds
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -66,6 +68,7 @@ object NetworkModule {
              */
             expectSuccess = true
 
+            sseInterceptor()
             timeoutInterceptor()
             loggingInterceptor()
             contentNegotiationInterceptor()
@@ -80,6 +83,13 @@ object NetworkModule {
             socketTimeoutMillis = SOCKET_TIMEOUT_MILLIS
             // 전체 HTTP 요청이 완료될 때까지 기다리는 최대 시간
             requestTimeoutMillis = REQUEST_TIMEOUT_MILLIS
+        }
+    }
+
+    private fun HttpClientConfig<OkHttpConfig>.sseInterceptor() {
+        install(SSE) {
+            // 자동 reconnection
+            reconnectionTime = 3000.milliseconds
         }
     }
 
@@ -131,7 +141,10 @@ object NetworkModule {
 
                             tokenManager.setTokens(newTokens).fold(
                                 onSuccess = {
-                                    BearerTokens(accessToken = newTokens.accessToken, refreshToken = newTokens.refreshToken)
+                                    BearerTokens(
+                                        accessToken = newTokens.accessToken,
+                                        refreshToken = newTokens.refreshToken,
+                                    )
                                 },
                                 onFailure = {
                                     tokenManager.clearTokens()
