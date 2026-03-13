@@ -52,6 +52,11 @@ class DefaultTuripRemoteDataSource @Inject constructor(
             safeApiCall { turipService.deleteTurip(turipId) }
         }
 
+    override suspend fun exitTurip(turipId: Long): TuripResult<Unit> =
+        withContext(coroutineContext) {
+            safeApiCall { turipService.exitTurip(turipId) }
+        }
+
     override suspend fun getTuripsByPlaceId(placeId: Long): TuripResult<TuripsByPlaceResponse> =
         withContext(coroutineContext) {
             safeApiCall { turipService.getTuripsByPlaceId(placeId) }

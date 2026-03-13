@@ -35,6 +35,8 @@ class DefaultTuripRepository @Inject constructor(
 
     override suspend fun deleteTurip(turipId: Long): TuripResult<Unit> = turipRemoteDataSource.deleteTurip(turipId)
 
+    override suspend fun exitTurip(turipId: Long): TuripResult<Unit> = turipRemoteDataSource.exitTurip(turipId)
+
     override suspend fun loadTuripsByPlaceId(placeId: Long): TuripResult<List<Turip>> =
         turipRemoteDataSource
             .getTuripsByPlaceId(placeId)

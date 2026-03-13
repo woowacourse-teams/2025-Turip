@@ -47,6 +47,11 @@ interface TuripService {
         @Path("turipId") turipId: Long,
     )
 
+    @DELETE(ApiPath.V1 + "turips/{turipId}/exit")
+    suspend fun exitTurip(
+        @Path("turipId") turipId: Long,
+    )
+
     @GET(ApiPath.V1 + "turips/turip-status")
     suspend fun getTuripsByPlaceId(
         @Query("placeId") placeId: Long,

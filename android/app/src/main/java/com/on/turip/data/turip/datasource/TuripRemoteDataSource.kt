@@ -28,6 +28,8 @@ interface TuripRemoteDataSource {
 
     suspend fun deleteTurip(turipId: Long): TuripResult<Unit>
 
+    suspend fun exitTurip(turipId: Long): TuripResult<Unit>
+
     suspend fun getTuripsByPlaceId(placeId: Long): TuripResult<TuripsByPlaceResponse>
 
     suspend fun getTuripPlaces(turipId: Long): TuripResult<TuripPlacesResponse>

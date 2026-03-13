@@ -20,6 +20,8 @@ interface TuripRepository {
 
     suspend fun deleteTurip(turipId: Long): TuripResult<Unit>
 
+    suspend fun exitTurip(turipId: Long): TuripResult<Unit>
+
     suspend fun loadTuripsByPlaceId(placeId: Long): TuripResult<List<Turip>>
 
     suspend fun loadTuripPlaces(turipId: Long): TuripResult<List<TuripPlace>>
