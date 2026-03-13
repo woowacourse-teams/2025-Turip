@@ -20,25 +20,25 @@ class TuripSseParser(
         data: String,
     ): TuripStreamEvent? =
         when (eventType) {
-            "connect" -> {
+            TuripSseEventType.CONNECT -> {
                 json
                     .decodeFromString<TuripStreamConnectPayload>(data)
                     .toDomain(eventId ?: "")
             }
 
-            "folder-update" -> {
+            TuripSseEventType.FOLDER_UPDATE -> {
                 json
                     .decodeFromString<TuripStreamFolderUpdatePayload>(data)
                     .toDomain(eventId ?: "")
             }
 
-            "member-update" -> {
+            TuripSseEventType.MEMBER_UPDATE -> {
                 json
                     .decodeFromString<TuripStreamMemberUpdatePayload>(data)
                     .toDomain(eventId ?: "")
             }
 
-            "heartbeat", "heart-beat" -> {
+            TuripSseEventType.HEARTBEAT -> {
                 json
                     .decodeFromString<TuripStreamHeartbeatPayload>(data)
                     .toDomain(eventId ?: "")
