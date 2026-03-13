@@ -18,6 +18,7 @@ import com.on.turip.ui.common.extensions.toUrl
 import com.on.turip.ui.common.model.namestatus.TuripNameStatusModel
 import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
 import com.on.turip.ui.compose.turip.mapper.toUiMyTuripModel
+import com.on.turip.ui.compose.turip.model.TuripTypeModel
 import com.on.turip.ui.compose.turipdetail.model.DeleteTuripPlaceSnapshot
 import com.on.turip.ui.compose.turipdetail.model.turip.PlaceLatLngUiModel
 import com.on.turip.ui.compose.turipdetail.model.turip.TuripShareModel
@@ -260,22 +261,45 @@ class TuripDetailViewModel @Inject constructor(
 
     fun dismissTuripRemoveDialog() = _uiState.update { it.copy(showTuripRemoveDialog = false) }
 
-    fun deleteTurip(selectedTuripId: Long) {
+    fun deleteTurip() {
         viewModelScope.launch {
-            turipRepository
-                .deleteTurip(selectedTuripId)
-                .onSuccess {
-                    _uiState.update { state: TuripDetailUiState ->
-                        state.copy(
-                            isLoading = false,
-                            errorUiState = ErrorUiState.None,
-                        )
-                    }
-                    _uiEffect.send(TuripDetailUiEffect.TuripDelete)
-                }.onFailure { errorType: ErrorType ->
-                    sendErrorEffect(errorType, TuripPlaceRetryAction.TuripDelete)
-                }
+            when (uiState.value.selectedTurip.type) {
+                TuripTypeModel.SOLO -> deleteSoloTurip()
+                TuripTypeModel.TOGETHER -> deleteTogetherTurip()
+            }
         }
+    }
+
+    suspend fun deleteTogetherTurip() {
+        turipRepository
+            .exitTurip(selectedTuripId)
+            .onSuccess {
+                _uiState.update { state: TuripDetailUiState ->
+                    state.copy(
+                        isLoading = false,
+                        errorUiState = ErrorUiState.None,
+                    )
+                }
+                _uiEffect.send(TuripDetailUiEffect.TuripDelete)
+            }.onFailure { errorType: ErrorType ->
+                sendErrorEffect(errorType, TuripPlaceRetryAction.TuripDelete)
+            }
+    }
+
+    suspend fun deleteSoloTurip() {
+        turipRepository
+            .deleteTurip(selectedTuripId)
+            .onSuccess {
+                _uiState.update { state: TuripDetailUiState ->
+                    state.copy(
+                        isLoading = false,
+                        errorUiState = ErrorUiState.None,
+                    )
+                }
+                _uiEffect.send(TuripDetailUiEffect.TuripDelete)
+            }.onFailure { errorType: ErrorType ->
+                sendErrorEffect(errorType, TuripPlaceRetryAction.TuripDelete)
+            }
     }
 
     @OptIn(FlowPreview::class)
@@ -318,7 +342,11 @@ class TuripDetailViewModel @Inject constructor(
                     turipRepository
                         .createInvitationToken(selectedTuripId)
                         .onSuccess { token: TuripInvitationToken ->
-                            _uiEffect.send(TuripDetailUiEffect.ShareTuripInvitationLink(invitationLink = token.toUrl()))
+                            _uiEffect.send(
+                                TuripDetailUiEffect.ShareTuripInvitationLink(
+                                    invitationLink = token.toUrl(),
+                                ),
+                            )
                         }.onFailure { errorType ->
                             sendErrorEffect(
                                 errorType = errorType,
@@ -389,7 +417,7 @@ class TuripDetailViewModel @Inject constructor(
             }
 
             TuripPlaceRetryAction.TuripDelete -> {
-                deleteTurip(uiState.value.selectedTurip.id)
+                deleteTurip()
             }
 
             TuripPlaceRetryAction.TuripNameUpdate -> {

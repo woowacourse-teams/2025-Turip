@@ -209,7 +209,7 @@ fun TuripDetailScreen(
             confirmButtonColor = TuripTheme.colors.error,
             dismissButtonColor = TuripTheme.colors.gray02,
             onConfirmation = {
-                viewModel.deleteTurip(selectedTuripId)
+                viewModel.deleteTurip()
                 viewModel.dismissBottomSheet()
             },
             onDismissRequest = viewModel::dismissTuripRemoveDialog,
