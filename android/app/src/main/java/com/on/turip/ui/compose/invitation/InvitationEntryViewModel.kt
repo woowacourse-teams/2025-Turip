@@ -5,12 +5,12 @@ import androidx.lifecycle.viewModelScope
 import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
+import com.on.turip.domain.invitation.InvitationTokenParser
 import com.on.turip.domain.invitation.usecase.DetermineInvitationEntryRouteUseCase
 import com.on.turip.domain.invitation.usecase.model.InvitationEntryResult
 import com.on.turip.domain.session.SessionState
 import com.on.turip.domain.session.SessionStore
 import com.on.turip.domain.turip.repository.TuripRepository
-import com.on.turip.ui.compose.invitation.util.InvitationTokenParser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
