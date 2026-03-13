@@ -212,7 +212,7 @@ public class FavoritePlaceService {
         if (requestedFavoriteFolders.size() != requestedFavoriteFolderIds.size()) {
             throw new NotFoundException(ErrorTag.FAVORITE_FOLDER_NOT_FOUND);
         }
-        requestedFavoriteFolders.forEach(folder -> favoriteFolderAccountService.validateOwnership(account, folder));
+        requestedFavoriteFolders.forEach(folder -> favoriteFolderAccountService.validateMembership(account, folder));
     }
 
     private void validateDuplicated(FavoriteFolder favoriteFolder, Place place) {
