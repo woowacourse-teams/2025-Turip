@@ -12,7 +12,9 @@ import com.on.turip.domain.bookmark.TuripPlace
 import com.on.turip.domain.turip.Turip
 import com.on.turip.domain.turip.TuripInvitationInformation
 import com.on.turip.domain.turip.TuripInvitationToken
+import com.on.turip.domain.turip.TuripStreamEvent
 import com.on.turip.domain.turip.repository.TuripRepository
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class DefaultTuripRepository @Inject constructor(
@@ -81,4 +83,6 @@ class DefaultTuripRepository @Inject constructor(
 
     override suspend fun verifyInvitationToken(token: String): TuripResult<TuripInvitationInformation> =
         turipRemoteDataSource.getInvitationInformation(token).mapCatching { it.toDomain() }
+
+    override fun streamTuripEvents(turipId: Long): Flow<TuripResult<TuripStreamEvent>> = turipRemoteDataSource.streamTuripEvents(turipId)
 }

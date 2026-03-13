@@ -13,6 +13,8 @@ import com.on.turip.data.turip.dto.TuripPostRequest
 import com.on.turip.data.turip.dto.TuripResponse
 import com.on.turip.data.turip.dto.TuripsByPlaceResponse
 import com.on.turip.data.turip.dto.TuripsResponse
+import com.on.turip.domain.turip.TuripStreamEvent
+import kotlinx.coroutines.flow.Flow
 
 interface TuripRemoteDataSource {
     suspend fun getTurip(turipId: Long): TuripResult<TuripResponse>
@@ -59,4 +61,6 @@ interface TuripRemoteDataSource {
     suspend fun joinTurip(turipId: Long): TuripResult<TuripJoinResponse>
 
     suspend fun getInvitationInformation(token: String): TuripResult<TuripInvitationInformationResponse>
+
+    fun streamTuripEvents(turipId: Long): Flow<TuripResult<TuripStreamEvent>>
 }

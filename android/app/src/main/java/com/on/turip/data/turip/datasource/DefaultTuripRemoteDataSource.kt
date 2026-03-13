@@ -1,5 +1,7 @@
 package com.on.turip.data.turip.datasource
 
+import com.on.turip.BuildConfig
+import com.on.turip.core.network.ApiPath
 import com.on.turip.core.result.TuripResult
 import com.on.turip.data.result.safeApiCall
 import com.on.turip.data.turip.dto.PlaceTuripsRequest
@@ -15,13 +17,21 @@ import com.on.turip.data.turip.dto.TuripResponse
 import com.on.turip.data.turip.dto.TuripsByPlaceResponse
 import com.on.turip.data.turip.dto.TuripsResponse
 import com.on.turip.data.turip.service.TuripService
+import com.on.turip.domain.turip.TuripSseParser
+import com.on.turip.domain.turip.TuripStreamEvent
+import io.ktor.client.HttpClient
+import io.ktor.client.plugins.sse.sse
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
 class DefaultTuripRemoteDataSource @Inject constructor(
     private val turipService: TuripService,
+    private val httpClient: HttpClient,
     private val coroutineContext: CoroutineContext = Dispatchers.IO,
 ) : TuripRemoteDataSource {
     override suspend fun getTurip(turipId: Long): TuripResult<TuripResponse> =
@@ -98,4 +108,35 @@ class DefaultTuripRemoteDataSource @Inject constructor(
 
     override suspend fun getInvitationInformation(token: String): TuripResult<TuripInvitationInformationResponse> =
         safeApiCall { turipService.getInvitationInformation(token) }
+
+    override fun streamTuripEvents(turipId: Long): Flow<TuripResult<TuripStreamEvent>> =
+        flow {
+            val result =
+                safeApiCall {
+                    httpClient.sse(
+                        urlString = "${BuildConfig.BASE_URL}${ApiPath.V1}turips/$turipId/stream",
+                    ) {
+                        val parser = TuripSseParser()
+
+                        incoming.collect { event ->
+
+                            val eventType = event.event ?: return@collect
+                            val data = event.data ?: return@collect
+
+                            val parsed =
+                                parser.parse(
+                                    event.id,
+                                    eventType,
+                                    data,
+                                ) ?: return@collect
+
+                            emit(TuripResult.Success(parsed))
+                        }
+                    }
+                }
+
+            if (result is TuripResult.Failure) {
+                emit(result)
+            }
+        }.flowOn(coroutineContext)
 }

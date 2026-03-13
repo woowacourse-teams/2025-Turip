@@ -10,11 +10,16 @@ import com.on.turip.data.turip.dto.TuripPostRequest
 import com.on.turip.data.turip.dto.TuripResponse
 import com.on.turip.data.turip.dto.TuripsByPlaceResponse
 import com.on.turip.data.turip.dto.TuripsResponse
+import com.on.turip.data.turip.stream.TuripStreamConnectPayload
+import com.on.turip.data.turip.stream.TuripStreamFolderUpdatePayload
+import com.on.turip.data.turip.stream.TuripStreamHeartbeatPayload
+import com.on.turip.data.turip.stream.TuripStreamMemberUpdatePayload
 import com.on.turip.domain.bookmark.TuripPlace
 import com.on.turip.domain.trip.Place
 import com.on.turip.domain.turip.Turip
 import com.on.turip.domain.turip.TuripInvitationInformation
 import com.on.turip.domain.turip.TuripInvitationToken
+import com.on.turip.domain.turip.TuripStreamEvent
 
 fun TuripsResponse.toDomain(): List<Turip> = turipsResponse.map { it.toDomain() }
 
@@ -80,3 +85,52 @@ fun TuripInvitationInformationResponse.toDomain(): TuripInvitationInformation =
         turipId = turipId,
         alreadyJoined = alreadyJoined,
     )
+
+fun TuripStreamConnectPayload.toDomain(id: String): TuripStreamEvent =
+    TuripStreamEvent.Connect(
+        id = id,
+        turipId = turipId,
+        timestamp = timestamp,
+    )
+
+fun TuripStreamFolderUpdatePayload.toDomain(id: String): TuripStreamEvent =
+    TuripStreamEvent.FolderUpdate(
+        id = id,
+        turipId = turipId,
+        action = action.toFolderAction(),
+        timestamp = timestamp,
+    )
+
+fun TuripStreamMemberUpdatePayload.toDomain(id: String): TuripStreamEvent =
+    TuripStreamEvent.MemberUpdate(
+        id = id,
+        turipId = turipId,
+        action = action.toMemberAction(),
+        memberCount = memberCount,
+        members = members.map { TuripStreamEvent.Member(nickname = it.nickname) },
+        timestamp = timestamp,
+    )
+
+fun TuripStreamHeartbeatPayload.toDomain(id: String): TuripStreamEvent =
+    TuripStreamEvent.Heartbeat(
+        id = id,
+        timestamp = timestamp,
+    )
+
+private fun String.toFolderAction(): TuripStreamEvent.FolderAction =
+    when (this) {
+        "PLACE_REORDERED" -> TuripStreamEvent.FolderAction.PLACE_REORDERED
+        "PLACE_ADDED" -> TuripStreamEvent.FolderAction.PLACE_ADDED
+        "PLACE_DELETED" -> TuripStreamEvent.FolderAction.PLACE_DELETED
+        "FOLDER_NAME_CHANGED" -> TuripStreamEvent.FolderAction.FOLDER_NAME_CHANGED
+        "FOLDER_DELETED" -> TuripStreamEvent.FolderAction.FOLDER_DELETED
+        "FOLDER_PLACE_CHANGED" -> TuripStreamEvent.FolderAction.FOLDER_PLACE_CHANGED
+        else -> TuripStreamEvent.FolderAction.UNKNOWN
+    }
+
+private fun String.toMemberAction(): TuripStreamEvent.MemberAction =
+    when (this) {
+        "MEMBER_JOINED" -> TuripStreamEvent.MemberAction.MEMBER_JOINED
+        "MEMBER_EXITED" -> TuripStreamEvent.MemberAction.MEMBER_EXITED
+        else -> TuripStreamEvent.MemberAction.UNKNOWN
+    }
