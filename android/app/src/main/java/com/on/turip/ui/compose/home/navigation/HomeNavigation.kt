@@ -5,7 +5,6 @@ import androidx.navigation3.runtime.NavKey
 import com.on.turip.navigation.Navigator
 import com.on.turip.ui.compose.home.HomeScreen
 import com.on.turip.ui.compose.login.navigation.LoginNavKey
-import com.on.turip.ui.compose.mypage.navigation.MyPageNavKey
 import com.on.turip.ui.compose.search.keyword.navigation.SearchNavKey
 import com.on.turip.ui.compose.search.regionresult.navigation.RegionResultNavKey
 import com.on.turip.ui.compose.trip.navigation.TripDetailNavKey
@@ -23,7 +22,6 @@ fun EntryProviderScope<NavKey>.homeScreen(navigator: Navigator) {
                 navigator.navigate(TripDetailNavKey(contentId))
             },
             onNavigateToLoginScreen = { navigator.goWithAllClear(LoginNavKey) },
-            onNavigateToMyPage = { navigator.navigate(MyPageNavKey) },
         )
     }
 }

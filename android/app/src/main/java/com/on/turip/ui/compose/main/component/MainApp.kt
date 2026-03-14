@@ -1,22 +1,28 @@
 package com.on.turip.ui.compose.main.component
 
+import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
+import androidx.core.view.WindowCompat
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
@@ -44,6 +50,9 @@ fun MainApp(savedStateConfigurationProvider: SavedStateConfigurationProvider) {
 
     val appState = rememberTuripAppState(navigationState = navigationState)
     val navigator = remember(appState.navigationState) { Navigator(appState.navigationState) }
+    val systemBarStyleController = appState.systemBarStyleController
+    val activity = LocalActivity.current
+    val systemBarStyle = systemBarStyleController.style
 
     val animatedSnackbarBottomPadding: Dp by animateDpAsState(
         targetValue = appState.snackbarBottomPadding,
@@ -60,7 +69,15 @@ fun MainApp(savedStateConfigurationProvider: SavedStateConfigurationProvider) {
     val appEntries: List<NavEntry<NavKey>> = appState.navigationState.toEntries(appEntryProvider)
 
     TuripTheme {
+        SideEffect {
+            val window = activity?.window ?: return@SideEffect
+            val controller = WindowCompat.getInsetsController(window, window.decorView)
+            controller.isAppearanceLightStatusBars = systemBarStyle.isLightStatusBarIcons
+            controller.isAppearanceLightNavigationBars = systemBarStyle.isLightNavigationBarIcons
+        }
+
         Scaffold(
+            containerColor = TuripTheme.colors.background,
             bottomBar = {
                 if (appState.shouldShowBottomBar) {
                     TuripNavigationBar(
@@ -76,27 +93,30 @@ fun MainApp(savedStateConfigurationProvider: SavedStateConfigurationProvider) {
                     modifier = Modifier.padding(bottom = animatedSnackbarBottomPadding),
                 )
             },
-            contentWindowInsets = WindowInsets.systemBars,
+            contentWindowInsets = WindowInsets.systemBars.only(WindowInsetsSides.Bottom),
         ) { paddingValues ->
             CompositionLocalProvider(
                 LocalSnackbarDelegate provides appState.snackbarDelegate,
+                LocalSystemBarStyleController provides appState.systemBarStyleController,
             ) {
-                NavDisplay(
-                    entries = appEntries,
-                    onBack = navigator::goBack,
-                    modifier =
-                        Modifier
-                            .padding(paddingValues)
-                            .consumeWindowInsets(paddingValues)
-                            .background(TuripTheme.colors.container),
-                    transitionSpec = {
-                        fadeTransition()
-                    },
-                    popTransitionSpec = {
-                        fadeTransition()
-                    },
-                )
-                ExitConfirmationHandler(appState = appState)
+                Box(modifier = Modifier.background(TuripTheme.colors.background)) {
+                    NavDisplay(
+                        entries = appEntries,
+                        onBack = navigator::goBack,
+                        modifier =
+                            Modifier
+                                .padding(paddingValues)
+                                .consumeWindowInsets(paddingValues)
+                                .background(TuripTheme.colors.background),
+                        transitionSpec = {
+                            fadeTransition()
+                        },
+                        popTransitionSpec = {
+                            fadeTransition()
+                        },
+                    )
+                    ExitConfirmationHandler(appState = appState)
+                }
             }
         }
     }
