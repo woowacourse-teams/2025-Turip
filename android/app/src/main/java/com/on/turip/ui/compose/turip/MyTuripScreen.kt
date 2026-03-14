@@ -85,27 +85,12 @@ fun MyTuripScreen(
                 is MyTuripUiEffect.ShowError -> {
                     val uiModel = uiEffect.errorUiModel ?: return@collect
 
-                    if (uiState.showAddBottomSheet && uiEffect.retryAction is MyTuripRetryAction.AddMyTurip) {
-                        val result =
-                            bottomSheetSnackbarHostState.showSnackbar(
-                                visuals =
-                                    TuripSnackbarVisuals(
-                                        message = resources.getString(uiModel.titleRes),
-                                        actionLabel = resources.getString(uiModel.retryTextRes),
-                                        duration = SnackbarDuration.Long,
-                                    ),
-                            )
-                        if (result == SnackbarResult.ActionPerformed) {
-                            viewModel.handleErrorRetryRequest(uiEffect.retryAction)
-                        }
-                    } else {
-                        snackbarDelegate.showSnackbar(
-                            message = resources.getString(uiModel.titleRes),
-                            actionLabel = resources.getString(uiModel.retryTextRes),
-                            duration = SnackbarDuration.Long,
-                            onAction = { viewModel.handleErrorRetryRequest(uiEffect.retryAction) },
-                        )
-                    }
+                    snackbarDelegate.showSnackbar(
+                        message = resources.getString(uiModel.titleRes),
+                        actionLabel = resources.getString(uiModel.retryTextRes),
+                        duration = SnackbarDuration.Long,
+                        onAction = { viewModel.handleErrorRetryRequest(uiEffect.retryAction) },
+                    )
                 }
 
                 is MyTuripUiEffect.TuripAdded -> {
@@ -129,6 +114,22 @@ fun MyTuripScreen(
                             ),
                         actionLabel = resources.getString(R.string.all_close_description),
                     )
+                }
+
+                is MyTuripUiEffect.ShowBottomSheetError -> {
+                    val uiModel = uiEffect.errorUiModel ?: return@collect
+                    val result =
+                        bottomSheetSnackbarHostState.showSnackbar(
+                            visuals =
+                                TuripSnackbarVisuals(
+                                    message = resources.getString(uiModel.titleRes),
+                                    actionLabel = resources.getString(uiModel.retryTextRes),
+                                    duration = SnackbarDuration.Long,
+                                ),
+                        )
+                    if (result == SnackbarResult.ActionPerformed) {
+                        viewModel.handleErrorRetryRequest(uiEffect.retryAction)
+                    }
                 }
             }
         }

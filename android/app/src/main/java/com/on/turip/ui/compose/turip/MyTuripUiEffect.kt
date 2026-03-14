@@ -17,6 +17,11 @@ sealed interface MyTuripUiEffect {
         val errorUiModel: ErrorUiModel?,
         val retryAction: MyTuripRetryAction,
     ) : MyTuripUiEffect
+
+    data class ShowBottomSheetError(
+        val errorUiModel: ErrorUiModel?,
+        val retryAction: MyTuripRetryAction,
+    ) : MyTuripUiEffect
 }
 
 sealed interface MyTuripRetryAction {

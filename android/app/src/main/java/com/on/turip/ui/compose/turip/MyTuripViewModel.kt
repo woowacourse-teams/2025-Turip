@@ -16,6 +16,7 @@ import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.common.model.namestatus.TuripNameStatusModel
 import com.on.turip.ui.compose.turip.mapper.toEditModel
 import com.on.turip.ui.compose.turip.mapper.toUiMyTuripModel
+import com.on.turip.ui.compose.turip.model.ErrorPresentation
 import com.on.turip.ui.compose.turip.model.MyTuripModel
 import com.on.turip.ui.folder.model.TuripEditModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -63,6 +64,7 @@ class MyTuripViewModel @Inject constructor(
                     sendErrorEffect(
                         errorType = errorType,
                         retryAction = MyTuripRetryAction.UpdateMyTurip,
+                        presentation = ErrorPresentation.FullScreen,
                     )
                 }
         }
@@ -123,6 +125,7 @@ class MyTuripViewModel @Inject constructor(
                     sendErrorEffect(
                         errorType = errorType,
                         retryAction = MyTuripRetryAction.DeleteMyTurip(turipId),
+                        presentation = ErrorPresentation.FullScreen,
                     )
                     Timber.e("튜립 삭제 실패(이름 = ${targetTurip.name})")
                 }
@@ -152,7 +155,11 @@ class MyTuripViewModel @Inject constructor(
                             )
                         }
                     }.onFailure { errorType ->
-                        sendErrorEffect(errorType, MyTuripRetryAction.AddMyTurip)
+                        sendErrorEffect(
+                            errorType = errorType,
+                            retryAction = MyTuripRetryAction.AddMyTurip,
+                            presentation = ErrorPresentation.BottomSheetSnackbar,
+                        )
                     }
             } finally {
                 _uiState.update { it.copy(isCreatingTurip = false) }
@@ -190,33 +197,49 @@ class MyTuripViewModel @Inject constructor(
     private suspend fun sendErrorEffect(
         errorType: ErrorType,
         retryAction: MyTuripRetryAction,
+        presentation: ErrorPresentation,
     ) {
         val uiError: UiError = errorType.toUiError()
         if (uiError is UiError.Global) {
             when (uiError) {
                 UiError.Global.Network -> {
-                    _uiState.update { it.copy(errorUiState = ErrorUiState.Network) }
-                    _uiEffect.send(
-                        MyTuripUiEffect.ShowError(
-                            ErrorUiState.Network.toUiModel(),
-                            retryAction,
-                        ),
-                    )
+                    handleErrorPresentation(presentation, retryAction, ErrorUiState.Network)
                 }
 
                 UiError.Global.Server -> {
-                    _uiState.update { it.copy(errorUiState = ErrorUiState.Server) }
-                    _uiEffect.send(
-                        MyTuripUiEffect.ShowError(
-                            ErrorUiState.Server.toUiModel(),
-                            retryAction,
-                        ),
-                    )
+                    handleErrorPresentation(presentation, retryAction, ErrorUiState.Server)
                 }
 
                 UiError.Global.TokenExpired -> {
                     _uiEffect.send(MyTuripUiEffect.NavigateToLogin)
                 }
+            }
+        }
+    }
+
+    private suspend fun handleErrorPresentation(
+        presentation: ErrorPresentation,
+        retryAction: MyTuripRetryAction,
+        errorUiState: ErrorUiState,
+    ) {
+        _uiState.update { it.copy(errorUiState = errorUiState) }
+        when (presentation) {
+            ErrorPresentation.FullScreen -> {
+                _uiEffect.send(
+                    MyTuripUiEffect.ShowError(
+                        errorUiState.toUiModel(),
+                        retryAction,
+                    ),
+                )
+            }
+
+            ErrorPresentation.BottomSheetSnackbar -> {
+                _uiEffect.send(
+                    MyTuripUiEffect.ShowBottomSheetError(
+                        errorUiState.toUiModel(),
+                        retryAction,
+                    ),
+                )
             }
         }
     }
