@@ -1,18 +1,24 @@
 package com.on.turip.ui.compose.turip.component
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.on.turip.ui.common.component.NameEditorSheetContent
 import com.on.turip.ui.common.model.namestatus.TuripNameStatusModel
+import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -25,6 +31,7 @@ fun TuripAddBottomSheet(
     isConfirmEnabled: Boolean,
     onNameChanged: (name: String) -> Unit,
     onConfirmClick: () -> Unit,
+    snackbarHostState: SnackbarHostState,
     onDismiss: () -> Unit,
 ) {
     val focusRequester = remember { FocusRequester() }
@@ -34,7 +41,7 @@ fun TuripAddBottomSheet(
         sheetState = sheetState,
         containerColor = TuripTheme.colors.white,
     ) {
-        Box {
+        Box(modifier = Modifier.imePadding()) {
             NameEditorSheetContent(
                 title = title,
                 turipName = turipName,
@@ -43,6 +50,13 @@ fun TuripAddBottomSheet(
                 onNameChanged = onNameChanged,
                 onConfirmClick = onConfirmClick,
                 focusRequester = focusRequester,
+            )
+            TuripSnackbar(
+                snackbarHostState = snackbarHostState,
+                modifier =
+                    Modifier
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth(),
             )
         }
     }
@@ -71,6 +85,7 @@ fun TuripAddBottomSheetStatusPreview(
     status: TuripNameStatusModel,
 ) {
     val sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val snackbarHostState = remember { SnackbarHostState() }
 
     TuripTheme {
         TuripAddBottomSheet(
@@ -81,6 +96,7 @@ fun TuripAddBottomSheetStatusPreview(
             isConfirmEnabled = true,
             onNameChanged = {},
             onConfirmClick = {},
+            snackbarHostState = snackbarHostState,
             onDismiss = {},
         )
     }

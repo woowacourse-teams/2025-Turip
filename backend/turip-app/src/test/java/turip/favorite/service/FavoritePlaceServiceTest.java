@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 
 import java.util.List;
@@ -368,6 +369,30 @@ class FavoritePlaceServiceTest {
                     () -> verify(eventPublisher).publishEvent(
                             FavoriteFolderUpdateEvent.of(requestFolderId, ActionType.FOLDER_PLACE_CHANGED))
             );
+        }
+
+        @Test
+        @DisplayName("폴더 소유자가 아닌 참여자인 경우에도 업데이트 할 수 있다.")
+        void updateFavoriteFolders_validateMembership() {
+            // given
+            Account account = AccountFixture.createUser();
+            Long placeId = 1L;
+            Place place = new Place(placeId, "장소", "url", "주소", 1, 1);
+
+            Long folderId = 1L;
+            FavoriteFolder folder = FavoriteFolderFixture.createSharedFolderWithId(folderId, "공유 찜폴더");
+
+            given(placeRepository.findById(placeId)).willReturn(Optional.of(place));
+            given(favoriteFolderRepository.findAllById(any())).willReturn(List.of(folder));
+            given(favoritePlaceRepository.findAllByPlaceAndAccount(place, account)).willReturn(List.of());
+
+            lenient().doThrow(new ForbiddenException(ErrorTag.FORBIDDEN))
+                    .when(favoriteFolderAccountService)
+                    .validateOwnership(account, folder);
+
+            // when & then
+            assertDoesNotThrow(
+                    () -> favoritePlaceService.updateFavoriteFolders(account, List.of(folderId), placeId));
         }
     }
 

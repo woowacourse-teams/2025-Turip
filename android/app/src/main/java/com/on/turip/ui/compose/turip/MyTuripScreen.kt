@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -16,6 +17,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -38,8 +41,8 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import com.on.turip.R
-import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.compose.designsystem.component.TuripDialog
+import com.on.turip.ui.compose.designsystem.component.TuripSnackbarVisuals
 import com.on.turip.ui.compose.designsystem.snackbar.LocalSnackbarDelegate
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.turip.component.MyTuripCard
@@ -64,6 +67,7 @@ fun MyTuripScreen(
     val resources = LocalResources.current
     val snackbarDelegate = LocalSnackbarDelegate.current
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val bottomSheetSnackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
@@ -79,7 +83,8 @@ fun MyTuripScreen(
                 }
 
                 is MyTuripUiEffect.ShowError -> {
-                    val uiModel = uiEffect.errorUiState.toUiModel() ?: return@collect
+                    val uiModel = uiEffect.errorUiModel ?: return@collect
+
                     snackbarDelegate.showSnackbar(
                         message = resources.getString(uiModel.titleRes),
                         actionLabel = resources.getString(uiModel.retryTextRes),
@@ -107,29 +112,24 @@ fun MyTuripScreen(
                                 R.string.turip_delete_turip,
                                 uiEffect.turipName,
                             ),
-                        iconRes = R.drawable.btn_turip_normal,
                         actionLabel = resources.getString(R.string.all_close_description),
                     )
                 }
 
-                is MyTuripUiEffect.ShowTuripRemoveFailed -> {
-                    snackbarDelegate.showSnackbar(
-                        message = resources.getString(R.string.retry_later),
-                        actionLabel = resources.getString(R.string.all_close_description),
-                    )
-                }
-
-                is MyTuripUiEffect.ShowTuripRemoved -> {
-                    snackbarDelegate.showSnackbar(
-                        message =
-                            resources.getString(
-                                R.string.turip_delete_turip,
-                                uiEffect.turipName,
-                            ),
-                        actionLabel = resources.getString(R.string.turip_remove_cancel),
-                        onAction = viewModel::rollbackTuripDelete,
-                        onDismiss = viewModel::commitTuripDelete,
-                    )
+                is MyTuripUiEffect.ShowBottomSheetError -> {
+                    val uiModel = uiEffect.errorUiModel ?: return@collect
+                    val result =
+                        bottomSheetSnackbarHostState.showSnackbar(
+                            visuals =
+                                TuripSnackbarVisuals(
+                                    message = resources.getString(uiModel.titleRes),
+                                    actionLabel = resources.getString(uiModel.retryTextRes),
+                                    duration = SnackbarDuration.Long,
+                                ),
+                        )
+                    if (result == SnackbarResult.ActionPerformed) {
+                        viewModel.handleErrorRetryRequest(uiEffect.retryAction)
+                    }
                 }
             }
         }
@@ -157,6 +157,7 @@ fun MyTuripScreen(
                 isConfirmEnabled = uiState.turipNameStatus.isConfirmEnabled && !uiState.isCreatingTurip,
                 onNameChanged = viewModel::updateInputName,
                 onConfirmClick = viewModel::addTurip,
+                snackbarHostState = bottomSheetSnackbarHostState,
                 onDismiss = viewModel::dismissAddBottomSheet,
             )
         }
@@ -177,7 +178,7 @@ fun MyTuripScreen(
                         dismissButtonColor = TuripTheme.colors.gray02,
                         onConfirmation = {
                             viewModel.dismissTuripRemoveDialog()
-                            viewModel.applyTuripDelete(myTuripDialogState.turip.id)
+                            viewModel.deleteTurip(myTuripDialogState.turip.id)
                         },
                         onDismissRequest = viewModel::dismissTuripRemoveDialog,
                         modifier = Modifier.fillMaxSize(),
@@ -224,6 +225,7 @@ private fun MyTuripScreenContent(
             modifier =
                 Modifier
                     .fillMaxSize()
+                    .systemBarsPadding()
                     .padding(horizontal = TuripTheme.spacing.extraLarge)
                     .pointerInput(isDeleteMode) {
                         detectTapGestures {

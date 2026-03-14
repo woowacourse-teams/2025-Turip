@@ -59,7 +59,7 @@ fun TuripNavigationBar(
 ) {
     Surface(shadowElevation = 8.dp) {
         NavigationBar(
-            containerColor = TuripTheme.colors.white,
+            containerColor = TuripTheme.colors.background,
             contentColor = TuripTheme.colors.black,
             modifier = modifier,
         ) {
