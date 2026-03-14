@@ -9,11 +9,9 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.consumeWindowInsets
-import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -100,10 +98,13 @@ fun MainApp(
             snackbarHost = {
                 TuripSnackbar(
                     snackbarHostState = appState.snackbarHostState,
-                    modifier = Modifier.padding(bottom = animatedSnackbarBottomPadding),
+                    modifier =
+                        Modifier
+                            .padding(bottom = animatedSnackbarBottomPadding)
+                            .navigationBarsPadding(),
                 )
             },
-            contentWindowInsets = WindowInsets.systemBars.only(WindowInsetsSides.Bottom),
+            contentWindowInsets = WindowInsets(),
         ) { paddingValues ->
             CompositionLocalProvider(
                 LocalSnackbarDelegate provides appState.snackbarDelegate,
