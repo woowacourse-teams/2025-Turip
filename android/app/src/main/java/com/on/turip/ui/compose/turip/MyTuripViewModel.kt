@@ -7,6 +7,7 @@ import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
 import com.on.turip.domain.session.SessionState
 import com.on.turip.domain.session.SessionStore
+import com.on.turip.domain.turip.DeleteTuripUseCase
 import com.on.turip.domain.turip.Turip
 import com.on.turip.domain.turip.repository.TuripRepository
 import com.on.turip.ui.common.error.ErrorUiState
@@ -36,6 +37,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MyTuripViewModel @Inject constructor(
     private val turipRepository: TuripRepository,
+    private val deleteTuripUseCase: DeleteTuripUseCase,
     sessionStore: SessionStore,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<MyTuripUiState> =
@@ -108,27 +110,28 @@ class MyTuripViewModel @Inject constructor(
                         return@launch
                     }
 
-            turipRepository
-                .deleteTurip(targetTurip.id)
-                .onSuccess {
-                    _uiState.update { state ->
-                        state.copy(
-                            turips =
-                                state.turips
-                                    .filter { it.id != targetTurip.id }
-                                    .toImmutableList(),
-                        )
-                    }
-                    _uiEffect.send(MyTuripUiEffect.TuripDeleted(targetTurip.name))
-                    Timber.d("튜립 삭제 성공(이름 = ${targetTurip.name})")
-                }.onFailure { errorType: ErrorType ->
-                    sendErrorEffect(
-                        errorType = errorType,
-                        retryAction = MyTuripRetryAction.DeleteMyTurip(turipId),
-                        presentation = ErrorPresentation.FullScreen,
+            deleteTuripUseCase(
+                turipId = targetTurip.id,
+                type = targetTurip.type,
+            ).onSuccess {
+                _uiState.update { state ->
+                    state.copy(
+                        turips =
+                            state.turips
+                                .filter { it.id != targetTurip.id }
+                                .toImmutableList(),
                     )
-                    Timber.e("튜립 삭제 실패(이름 = ${targetTurip.name})")
                 }
+                _uiEffect.send(MyTuripUiEffect.TuripDeleted(targetTurip.name))
+                Timber.d("튜립 삭제 성공(이름 = ${targetTurip.name})")
+            }.onFailure { errorType: ErrorType ->
+                sendErrorEffect(
+                    errorType = errorType,
+                    retryAction = MyTuripRetryAction.DeleteMyTurip(turipId),
+                    presentation = ErrorPresentation.FullScreen,
+                )
+                Timber.e("튜립 삭제 실패(이름 = ${targetTurip.name})")
+            }
         }
     }
 
