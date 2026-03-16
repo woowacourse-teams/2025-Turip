@@ -27,11 +27,12 @@ public class MemberService {
     private final RefreshTokenService refreshTokenService;
     private final FavoriteFolderAccountRepository favoriteFolderAccountRepository;
     private final FavoriteFolderRepository favoriteFolderRepository;
+    private final RandomNicknameCreator randomNicknameCreator;
 
     @Transactional
     public Member create(String email) {
         try {
-            Account account = accountService.create();
+            Account account = accountService.create(randomNicknameCreator);
             Member member = new Member(account, email, true);
             return memberRepository.save(member);
         } catch (IllegalArgumentException e) {
