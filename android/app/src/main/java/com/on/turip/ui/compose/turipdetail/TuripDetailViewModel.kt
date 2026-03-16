@@ -3,6 +3,7 @@ package com.on.turip.ui.compose.turipdetail
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.on.turip.core.result.ErrorType
+import com.on.turip.core.result.TuripResult
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
 import com.on.turip.domain.bookmark.TuripPlace
@@ -11,6 +12,8 @@ import com.on.turip.domain.session.SessionStore
 import com.on.turip.domain.turip.DeleteTuripUseCase
 import com.on.turip.domain.turip.Turip
 import com.on.turip.domain.turip.TuripInvitationToken
+import com.on.turip.domain.turip.TuripStreamEvent
+import com.on.turip.domain.turip.TuripStreamHeartbeatManager
 import com.on.turip.domain.turip.repository.TuripRepository
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
@@ -29,7 +32,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -49,8 +54,9 @@ import javax.inject.Inject
 @HiltViewModel
 class TuripDetailViewModel @Inject constructor(
     private val turipRepository: TuripRepository,
-    private val sessionStore: SessionStore,
     private val deleteTuripUseCase: DeleteTuripUseCase,
+    private val heartbeatManager: TuripStreamHeartbeatManager,
+    sessionStore: SessionStore,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<TuripDetailUiState> =
         MutableStateFlow(TuripDetailUiState.Idle)
@@ -64,6 +70,9 @@ class TuripDetailViewModel @Inject constructor(
     private var deleteTuripPlaceSnapshot: DeleteTuripPlaceSnapshot = DeleteTuripPlaceSnapshot.EMPTY
     private var reorderPlacesSnapshot: ImmutableList<TuripPlaceModel>? = null
     private var selectedTuripId: Long = INVALID_ID
+
+    private var streamJob: Job? = null
+    private var streamAttemptJob: Job? = null
 
     private val dragEndEvents = MutableSharedFlow<Unit>(replay = 0, extraBufferCapacity = 1)
 
@@ -79,6 +88,7 @@ class TuripDetailViewModel @Inject constructor(
 
         loadSelectedTurip(turipId)
         loadPlaces(turipId)
+        observeTuripStream(turipId)
     }
 
     fun loadSelectedTurip(selectedTuripId: Long) {
@@ -123,6 +133,150 @@ class TuripDetailViewModel @Inject constructor(
                 }
         }
     }
+
+    private fun observeTuripStream(turipId: Long) {
+        streamJob?.cancel()
+        streamJob =
+            viewModelScope.launch {
+                while (selectedTuripId == turipId) {
+                    var shouldRetry = true
+                    var streamResult: TuripResult<Unit>? = null
+                    heartbeatManager.prepareNextAttempt()
+
+                    streamAttemptJob =
+                        launch {
+                            turipRepository
+                                .streamTuripEvents(turipId)
+                                .collect { eventResult: TuripResult<TuripStreamEvent> ->
+                                    when (eventResult) {
+                                        is TuripResult.Success -> handleTuripStreamEvent(eventResult.value)
+                                        is TuripResult.Failure -> streamResult = eventResult
+                                    }
+                                }
+
+                            if (streamResult == null) {
+                                streamResult = TuripResult.Success(Unit)
+                            }
+                        }
+
+                    streamAttemptJob?.join()
+                    streamAttemptJob = null
+                    heartbeatManager.stop()
+                    when {
+                        selectedTuripId != turipId -> {
+                            break
+                        }
+
+                        heartbeatManager.isTimedOut -> {
+                            Timber.w("튜립 SSE 하트비트 타임아웃으로 재연결합니다. turipId=%s", turipId)
+                        }
+
+                        streamResult is TuripResult.Failure -> {
+                            shouldRetry =
+                                handleTuripStreamFailure((streamResult as TuripResult.Failure).errorType)
+                        }
+
+                        streamResult is TuripResult.Success -> {
+                            Timber.w("튜립 SSE 연결이 종료되어 재연결합니다. turipId=%s", turipId)
+                        }
+
+                        else -> {
+                            break
+                        }
+                    }
+
+                    heartbeatManager.clearTimedOutState()
+
+                    if (!shouldRetry) break
+                    delay(TuripStreamHeartbeatManager.STREAM_RECONNECT_DELAY_MILLIS)
+                }
+            }
+    }
+
+    private fun handleTuripStreamEvent(event: TuripStreamEvent) {
+        when (event) {
+            is TuripStreamEvent.Connect -> {
+                heartbeatManager.onHeartbeat(
+                    scope = viewModelScope,
+                    onTimeout = { streamAttemptJob?.cancel() },
+                )
+                Timber.d("튜립 SSE 연결 성공: turipId=%s, eventId=%s", event.turipId, event.id)
+            }
+
+            is TuripStreamEvent.FolderUpdate -> {
+                Timber.d(
+                    "튜립 SSE 폴더 업데이트 수신: turipId=%s, action=%s, eventId=%s",
+                    event.turipId,
+                    event.action,
+                    event.id,
+                )
+                when (event.action) {
+                    TuripStreamEvent.FolderAction.FOLDER_NAME_CHANGED,
+                    TuripStreamEvent.FolderAction.FOLDER_DELETED,
+                    -> {
+                        loadSelectedTurip(event.turipId)
+                    }
+
+                    TuripStreamEvent.FolderAction.PLACE_REORDERED,
+                    TuripStreamEvent.FolderAction.PLACE_ADDED,
+                    TuripStreamEvent.FolderAction.PLACE_DELETED,
+                    TuripStreamEvent.FolderAction.FOLDER_PLACE_CHANGED,
+                    -> {
+                        loadSelectedTurip(event.turipId)
+                        loadPlaces(event.turipId)
+                    }
+
+                    TuripStreamEvent.FolderAction.UNKNOWN -> {
+                        loadSelectedTurip(event.turipId)
+                        loadPlaces(event.turipId)
+                    }
+                }
+            }
+
+            is TuripStreamEvent.MemberUpdate -> {
+                Timber.d(
+                    "튜립 SSE 멤버 업데이트 수신: turipId=%s, action=%s, memberCount=%s, eventId=%s",
+                    event.turipId,
+                    event.action,
+                    event.memberCount,
+                    event.id,
+                )
+                loadSelectedTurip(event.turipId)
+            }
+
+            is TuripStreamEvent.Heartbeat -> {
+                heartbeatManager.onHeartbeat(
+                    scope = viewModelScope,
+                    onTimeout = { streamAttemptJob?.cancel() },
+                )
+                Timber.v("튜립 SSE 하트비트 수신: eventId=%s", event.id)
+            }
+        }
+    }
+
+    private suspend fun handleTuripStreamFailure(errorType: ErrorType): Boolean =
+        when (errorType) {
+            ErrorType.Auth.TokenExpired -> {
+                _uiEffect.send(TuripDetailUiEffect.NavigateToLogin)
+                false
+            }
+
+            ErrorType.Auth.Forbidden -> {
+                Timber.w("튜립 SSE 권한이 없어 스트림을 중단합니다.")
+                false
+            }
+
+            ErrorType.Network,
+            ErrorType.Unknown,
+            -> {
+                true
+            }
+
+            else -> {
+                Timber.w("튜립 SSE 에러로 스트림을 중단합니다. errorType=%s", errorType)
+                false
+            }
+        }
 
     fun applyTuripPlaceDelete(placeId: Long) {
         val targetPlace =
