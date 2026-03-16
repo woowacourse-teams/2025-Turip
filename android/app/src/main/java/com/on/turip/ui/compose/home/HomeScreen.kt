@@ -1,13 +1,16 @@
 package com.on.turip.ui.compose.home
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -48,7 +51,6 @@ fun HomeScreen(
     onRegionClick: (regionName: String) -> Unit,
     onContentClick: (contentId: Long) -> Unit,
     onNavigateToLoginScreen: () -> Unit,
-    onNavigateToMyPage: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val uiState: HomeUiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -62,6 +64,13 @@ fun HomeScreen(
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
+        Spacer(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .systemBarsPadding()
+                    .background(TuripTheme.colors.white),
+        )
         HomeAppBar()
         HomeScreenContent(
             uiState = uiState,
@@ -72,7 +81,6 @@ fun HomeScreen(
             },
             onRegionClick = onRegionClick,
             onDomesticClick = { viewModel.updateDomesticSelected(it) },
-            onNavigateToMyPage = onNavigateToMyPage,
         )
     }
 }
@@ -85,7 +93,6 @@ private fun HomeScreenContent(
     onContentClick: (usersLikeContentModel: UsersLikeContentModel) -> Unit,
     onRegionClick: (regionName: String) -> Unit,
     onDomesticClick: (isDomestic: Boolean) -> Unit,
-    onNavigateToMyPage: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var keyword: String by rememberSaveable { mutableStateOf("") }
@@ -168,14 +175,6 @@ private fun HomeScreenContent(
                     regions = uiState.regionCategories,
                     onRegionClick = onRegionClick,
                 )
-
-                Text(
-                    text = "임시 마이페이지 확인용 텍스트",
-                    modifier =
-                        Modifier
-                            .padding(top = TuripTheme.spacing.large)
-                            .clickable(onClick = onNavigateToMyPage),
-                )
             }
         }
     }
@@ -194,7 +193,6 @@ private fun HomeLoadingPreview() {
                 onContentClick = { },
                 onRegionClick = { },
                 onDomesticClick = { },
-                onNavigateToMyPage = {},
                 modifier = Modifier.padding(innerPadding),
             )
         }
@@ -221,7 +219,6 @@ private fun HomeSuccessPreview() {
                 onContentClick = { },
                 onRegionClick = { },
                 onDomesticClick = { },
-                onNavigateToMyPage = {},
                 modifier = Modifier.padding(innerPadding),
             )
         }
@@ -241,7 +238,6 @@ private fun HomeServerErrorPreview() {
                 onContentClick = { },
                 onRegionClick = { },
                 onDomesticClick = { },
-                onNavigateToMyPage = {},
                 modifier = Modifier.padding(innerPadding),
             )
         }
@@ -261,7 +257,6 @@ private fun HomeNetworkErrorPreview() {
                 onContentClick = { },
                 onRegionClick = { },
                 onDomesticClick = { },
-                onNavigateToMyPage = {},
                 modifier = Modifier.padding(innerPadding),
             )
         }

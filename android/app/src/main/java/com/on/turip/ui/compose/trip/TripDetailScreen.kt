@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
@@ -31,6 +32,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -55,6 +57,8 @@ import com.on.turip.ui.compose.designsystem.component.ErrorScreen
 import com.on.turip.ui.compose.designsystem.snackbar.LocalSnackbarDelegate
 import com.on.turip.ui.compose.designsystem.snackbar.SnackbarDelegate
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
+import com.on.turip.ui.compose.main.component.LocalSystemBarStyleController
+import com.on.turip.ui.compose.main.component.SystemBarStyle
 import com.on.turip.ui.compose.trip.component.ContentBookmarkButton
 import com.on.turip.ui.compose.trip.component.ContentInformation
 import com.on.turip.ui.compose.trip.component.ContentVideo
@@ -86,6 +90,7 @@ fun TripDetailScreen(
 ) {
     val uiState: TripDetailUiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarDelegate = LocalSnackbarDelegate.current
+    val systemBarStyleController = LocalSystemBarStyleController.current
     val context = LocalContext.current
     val resources = LocalResources.current
 
@@ -137,7 +142,7 @@ fun TripDetailScreen(
         }
     }
 
-    HandleFullScreenWindowLaunchedEffect(webViewController.isFullScreen)
+    HandleFullScreenWindowLaunchedEffect(isFullScreen = webViewController.isFullScreen)
 
     LaunchedEffect(uiState.tripDetailInfo.videoLink) {
         webViewController.loadVideo(uiState.tripDetailInfo.videoLink)
@@ -155,8 +160,19 @@ fun TripDetailScreen(
         }
     }
     LaunchedEffect(isAtBottom) {
-        snackbarDelegate.updateBottomPadding(
-            if (isAtBottom) 50.dp else 0.dp,
+        snackbarDelegate.updateBottomPadding(if (isAtBottom) 50.dp else 0.dp)
+    }
+
+    SideEffect {
+        systemBarStyleController.update(
+            if (webViewController.isFullScreen) {
+                SystemBarStyle()
+            } else {
+                SystemBarStyle(
+                    isLightStatusBarIcons = false,
+                    isLightNavigationBarIcons = false,
+                )
+            },
         )
     }
 
@@ -169,6 +185,7 @@ fun TripDetailScreen(
 
     DisposableEffect(Unit) {
         onDispose {
+            systemBarStyleController.reset()
             snackbarDelegate.updateBottomPadding(0.dp)
             webViewController.clear()
         }
@@ -256,7 +273,7 @@ fun TripDetailScreen(
     }
 }
 
-private suspend fun handleUiEffect(
+private fun handleUiEffect(
     uiEffect: TripDetailUiEffect,
     snackbarDelegate: SnackbarDelegate,
     resources: Resources,
@@ -317,7 +334,7 @@ private fun TripDetailScreenContent(
 ) {
     LazyColumn(
         state = listState,
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize().navigationBarsPadding(),
     ) {
         item {
             CreatorInformation(

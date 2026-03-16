@@ -1,6 +1,6 @@
 package com.on.turip.ui.compose.turip
 
-import com.on.turip.ui.common.error.ErrorUiState
+import com.on.turip.ui.common.error.ErrorUiModel
 
 sealed interface MyTuripUiEffect {
     data object NavigateToLogin : MyTuripUiEffect
@@ -13,16 +13,13 @@ sealed interface MyTuripUiEffect {
         val turipName: String,
     ) : MyTuripUiEffect
 
-    data class ShowTuripRemoved(
-        val turipName: String,
-    ) : MyTuripUiEffect
-
-    data class ShowTuripRemoveFailed(
-        val turipName: String,
-    ) : MyTuripUiEffect
-
     data class ShowError(
-        val errorUiState: ErrorUiState,
+        val errorUiModel: ErrorUiModel?,
+        val retryAction: MyTuripRetryAction,
+    ) : MyTuripUiEffect
+
+    data class ShowBottomSheetError(
+        val errorUiModel: ErrorUiModel?,
         val retryAction: MyTuripRetryAction,
     ) : MyTuripUiEffect
 }
@@ -31,4 +28,8 @@ sealed interface MyTuripRetryAction {
     data object UpdateMyTurip : MyTuripRetryAction
 
     data object AddMyTurip : MyTuripRetryAction
+
+    data class DeleteMyTurip(
+        val turipId: Long,
+    ) : MyTuripRetryAction
 }
