@@ -148,6 +148,7 @@ class TuripDetailViewModel @Inject constructor(
 
                             is TuripStreamResult.Reconnecting -> {
                                 // TODO UI에 재연결 중 상태 표시
+                                Timber.w("SSE 재연결 중. turipId=$turipId")
                             }
 
                             TuripStreamResult.Fatal.TokenExpired -> {
