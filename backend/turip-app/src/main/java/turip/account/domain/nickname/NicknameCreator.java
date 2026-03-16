@@ -1,4 +1,4 @@
-package turip.account.service;
+package turip.account.domain.nickname;
 
 @FunctionalInterface
 public interface NicknameCreator {

@@ -1,4 +1,4 @@
-package turip.account.service;
+package turip.account.domain.nickname;
 
 import java.security.SecureRandom;
 import java.util.Random;

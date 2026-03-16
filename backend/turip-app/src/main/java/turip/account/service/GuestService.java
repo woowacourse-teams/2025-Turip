@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import turip.account.controller.dto.response.MigrationAvailabilityResponse;
 import turip.account.domain.Account;
 import turip.account.domain.Guest;
+import turip.account.domain.nickname.GuestNicknameCreator;
 import turip.account.repository.GuestRepository;
 import turip.favorite.service.FavoriteContentService;
 import turip.favorite.service.FavoriteFolderService;

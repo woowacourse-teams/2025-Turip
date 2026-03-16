@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import turip.account.domain.Account;
 import turip.account.domain.Role;
+import turip.account.domain.nickname.NicknameCreator;
 import turip.account.repository.AccountInsertRepository;
 import turip.account.repository.AccountRepository;
 import turip.common.exception.ErrorTag;

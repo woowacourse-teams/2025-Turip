@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import turip.account.domain.Account;
 import turip.account.domain.Guest;
 import turip.account.domain.Member;
+import turip.account.domain.nickname.RandomNicknameCreator;
 import turip.account.repository.MemberRepository;
 import turip.auth.service.RefreshTokenService;
 import turip.common.exception.ErrorTag;
