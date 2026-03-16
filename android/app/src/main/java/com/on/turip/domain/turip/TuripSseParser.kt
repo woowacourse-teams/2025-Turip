@@ -6,6 +6,7 @@ import com.on.turip.data.turip.stream.TuripStreamHeartbeatPayload
 import com.on.turip.data.turip.stream.TuripStreamMemberUpdatePayload
 import com.on.turip.data.turip.toDomain
 import kotlinx.serialization.json.Json
+import timber.log.Timber
 
 class TuripSseParser(
     private val json: Json =
@@ -45,6 +46,12 @@ class TuripSseParser(
             }
 
             else -> {
+                Timber.e(
+                    "튜립 SSE 미지원 타입. id=%s, type=%s, dataLen=%s",
+                    eventId,
+                    eventType,
+                    data.length,
+                )
                 null
             }
         }
