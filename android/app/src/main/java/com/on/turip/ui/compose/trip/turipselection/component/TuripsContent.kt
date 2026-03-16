@@ -34,7 +34,7 @@ fun TuripsContent(
     enableConfirm: Boolean,
     turips: ImmutableList<TuripModel>,
     onAddTuripClick: () -> Unit,
-    onNavigateToTurip: (turipId: Long, turipName: String) -> Unit,
+    onNavigateToTurip: (turip: TuripModel) -> Unit,
     onTuripPlaceClick: (turip: TuripModel) -> Unit,
     onConfirmClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -96,7 +96,7 @@ private fun Header(
 private fun Turips(
     listState: LazyListState,
     turips: ImmutableList<TuripModel>,
-    onNavigateToTurip: (turipId: Long, turipName: String) -> Unit,
+    onNavigateToTurip: (turip: TuripModel) -> Unit,
     onTuripPlaceClick: (turip: TuripModel) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -108,7 +108,7 @@ private fun Turips(
         items(items = turips, key = { it.id }) { turip ->
             TuripItem(
                 turip = turip,
-                onItemClick = { onNavigateToTurip(turip.id, turip.name) },
+                onItemClick = { onNavigateToTurip(turip) },
                 onTuripPlaceClick = { onTuripPlaceClick(turip) },
             )
         }
@@ -152,13 +152,13 @@ private fun TuripsContentPreview() {
                 enableConfirm = false,
                 turips =
                     persistentListOf(
-                        TuripModel(1L, "서울 여행", 2, false),
-                        TuripModel(3L, "캐나다 여행 여행 여행 여행 여행 여행 여행 여행 여행 여행", 3, true),
-                        TuripModel(2L, "일본 여행", 1, true),
+                        TuripModel(1L, "서울 여행", 2, false, true),
+                        TuripModel(3L, "캐나다 여행 여행 여행 여행 여행 여행 여행 여행 여행 여행", 3, true, false),
+                        TuripModel(2L, "일본 여행", 1, true, false),
                     ),
                 onAddTuripClick = { },
                 onTuripPlaceClick = { },
-                onNavigateToTurip = { _, _ -> },
+                onNavigateToTurip = { },
                 onConfirmClick = {},
             )
         }

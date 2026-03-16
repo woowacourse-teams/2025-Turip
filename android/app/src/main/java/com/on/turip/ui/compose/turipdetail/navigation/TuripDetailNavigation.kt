@@ -11,13 +11,15 @@ import com.on.turip.ui.compose.turipdetail.model.turip.TuripShareModel
 fun EntryProviderScope<NavKey>.turipDetailScreen(
     navigator: Navigator,
     navigateToMap: (mapModel: MapModel) -> Unit,
-    onShareTurip: (turipShareModel: TuripShareModel) -> Unit,
+    onShareTuripByText: (turipShareModel: TuripShareModel) -> Unit,
+    onShareTuripInvitationLink: (invitationLink: String) -> Unit,
 ) {
     entry<TuripDetailNavKey> {
         TuripDetailScreen(
             selectedTuripId = it.turipId,
-            onNavigateToLogin = { navigator.goWithAllClear(LoginNavKey) },
-            onShareTurip = onShareTurip,
+            onNavigateToLogin = { navigator.goWithAllClear(LoginNavKey()) },
+            onShareTuripByText = onShareTuripByText,
+            onShareTuripInvitationLink = onShareTuripInvitationLink,
             onNavigateToMap = navigateToMap,
             onBack = navigator::goBack,
         )

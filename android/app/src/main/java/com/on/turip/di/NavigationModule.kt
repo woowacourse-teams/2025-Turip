@@ -3,6 +3,7 @@ package com.on.turip.di
 import com.on.turip.navigation.NavKeyProvider
 import com.on.turip.ui.compose.bookmark.navigation.BookmarkNavKeyProvider
 import com.on.turip.ui.compose.home.navigation.HomeNavKeyProvider
+import com.on.turip.ui.compose.invitation.navigation.InvitationEntryNavKeyProvider
 import com.on.turip.ui.compose.login.navigation.LoginNavKeyProvider
 import com.on.turip.ui.compose.mypage.navigation.MyPageNavKeyProvider
 import com.on.turip.ui.compose.search.keyword.navigation.SearchNavKeyProvider
@@ -27,6 +28,10 @@ abstract class NavigationModule {
     @Binds
     @IntoSet
     abstract fun bindHomeNavKeyProvider(impl: HomeNavKeyProvider): NavKeyProvider
+
+    @Binds
+    @IntoSet
+    abstract fun bindInvitationEntryNavKeyProvider(impl: InvitationEntryNavKeyProvider): NavKeyProvider
 
     @Binds
     @IntoSet

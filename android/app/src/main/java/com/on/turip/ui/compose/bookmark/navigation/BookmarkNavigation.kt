@@ -11,7 +11,7 @@ fun EntryProviderScope<NavKey>.bookmarkContentListScreen(navigator: Navigator) {
     entry<BookmarkNavKey> {
         BookmarkContentListScreen(
             onBack = navigator::goBack,
-            onNavigateToLogin = { navigator.goWithAllClear(LoginNavKey) },
+            onNavigateToLogin = { navigator.goWithAllClear(LoginNavKey()) },
             onNavigateToContent = { turipId: Long ->
                 navigator.navigate(TripDetailNavKey(turipId))
             },

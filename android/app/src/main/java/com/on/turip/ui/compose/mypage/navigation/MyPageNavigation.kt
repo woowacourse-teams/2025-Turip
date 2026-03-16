@@ -22,7 +22,7 @@ fun EntryProviderScope<NavKey>.myPageScreen(
             },
             onNavigateToInquiry = openInquiry,
             onNavigateToPrivacyPolicy = openPrivacyPolicy,
-            onNavigateToLogin = { navigator.goWithAllClear(LoginNavKey) },
+            onNavigateToLogin = { navigator.goWithAllClear(LoginNavKey()) },
         )
     }
 }

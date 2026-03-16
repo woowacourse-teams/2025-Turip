@@ -34,6 +34,7 @@ fun Turip.toUiModel(): TuripModel =
         name = name,
         placeCount = placeCount,
         isSelected = hasIncludePlace,
+        isDefault = isDefault,
     )
 
 fun TuripPlaceUiModel.toUiModel(): TuripPlaceShareModel =

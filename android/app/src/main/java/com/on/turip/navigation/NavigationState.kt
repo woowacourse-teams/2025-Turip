@@ -18,23 +18,54 @@ import androidx.savedstate.serialization.SavedStateConfiguration
 fun rememberNavigationState(
     startKey: NavKey,
     topLevelKeys: Set<NavKey>,
+    initialEntryKey: NavKey?,
     configuration: SavedStateConfiguration,
 ): NavigationState {
     val topLevelStack = rememberNavBackStack(configuration = configuration, startKey)
     val subStacks =
         topLevelKeys.associateWith { key ->
-            rememberNavBackStack(
-                configuration = configuration,
-                key,
-            )
+            rememberNavBackStack(configuration = configuration, key)
         }
 
-    return remember(startKey, topLevelKeys) {
+    return remember(startKey, topLevelKeys, initialEntryKey) {
+        if (initialEntryKey != null) {
+            clearAllStacks(topLevelStack = topLevelStack, subStacks = subStacks)
+            when (initialEntryKey) {
+                in subStacks.keys -> {
+                    topLevelStack.add(initialEntryKey)
+                }
+
+                else -> {
+                    topLevelStack.add(startKey)
+                    val startSubStack: NavBackStack<NavKey> =
+                        subStacks[startKey] ?: error("Sub stack for $startKey does not exist")
+                    startSubStack.add(initialEntryKey)
+                }
+            }
+        }
+
         NavigationState(
             startKey = startKey,
             topLevelStack = topLevelStack,
             subStacks = subStacks,
         )
+    }
+}
+
+/**
+ * 모든 네비게이션 스택을 초기 상태로 되돌린다.
+ *
+ * - `topLevelStack`은 완전히 비운다.
+ * - 각 서브 스택은 비운 뒤, 자신의 top-level 키 1개만 다시 넣어 기본 상태를 만든다.
+ */
+private fun clearAllStacks(
+    topLevelStack: NavBackStack<NavKey>,
+    subStacks: Map<NavKey, NavBackStack<NavKey>>,
+) {
+    topLevelStack.clear()
+    subStacks.forEach { (topLevelKey: NavKey, stack: NavBackStack<NavKey>) ->
+        stack.clear()
+        stack.add(topLevelKey)
     }
 }
 

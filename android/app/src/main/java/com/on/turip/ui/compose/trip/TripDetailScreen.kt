@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
@@ -83,7 +84,8 @@ fun TripDetailScreen(
     navigateToMap: (mapModel: MapModel) -> Unit,
     navigateToWebViewUrl: (url: String) -> Unit,
     navigateToAddTurip: () -> Unit,
-    navigateToShareTurip: (turipShareModel: TuripShareModel) -> Unit,
+    navigateToShareTuripByText: (turipShareModel: TuripShareModel) -> Unit,
+    navigateToShareTuripInvitationLink: (invitationLink: String) -> Unit,
     viewModel: TripDetailViewModel = hiltViewModel(),
 ) {
     val uiState: TripDetailUiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -91,7 +93,6 @@ fun TripDetailScreen(
     val systemBarStyleController = LocalSystemBarStyleController.current
     val context = LocalContext.current
     val resources = LocalResources.current
-    val primaryColor = TuripTheme.colors.primary
 
     val listState = rememberLazyListState()
 
@@ -159,9 +160,7 @@ fun TripDetailScreen(
         }
     }
     LaunchedEffect(isAtBottom) {
-        snackbarDelegate.updateBottomPadding(
-            if (isAtBottom) 50.dp else 0.dp,
-        )
+        snackbarDelegate.updateBottomPadding(if (isAtBottom) 50.dp else 0.dp)
     }
 
     SideEffect {
@@ -253,7 +252,8 @@ fun TripDetailScreen(
                                 onNavigateToLogin = navigateToLogin,
                                 onNavigateToAddTurip = navigateToAddTurip,
                                 onNavigateToMap = navigateToMap,
-                                onShareTurip = navigateToShareTurip,
+                                onShareTuripByText = navigateToShareTuripByText,
+                                onShareTuripInvitationLink = navigateToShareTuripInvitationLink,
                                 onPlaceTuripChanged = viewModel::updatePlaceTuripSelection,
                                 onDismiss = {
                                     bottomSheetScope.launch {
@@ -273,7 +273,7 @@ fun TripDetailScreen(
     }
 }
 
-private suspend fun handleUiEffect(
+private fun handleUiEffect(
     uiEffect: TripDetailUiEffect,
     snackbarDelegate: SnackbarDelegate,
     resources: Resources,
@@ -334,7 +334,7 @@ private fun TripDetailScreenContent(
 ) {
     LazyColumn(
         state = listState,
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize().navigationBarsPadding(),
     ) {
         item {
             CreatorInformation(

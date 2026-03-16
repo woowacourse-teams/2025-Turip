@@ -9,10 +9,12 @@ import com.on.turip.domain.bookmark.TuripPlace
 import com.on.turip.domain.session.SessionState
 import com.on.turip.domain.session.SessionStore
 import com.on.turip.domain.turip.Turip
+import com.on.turip.domain.turip.TuripInvitationToken
 import com.on.turip.domain.turip.repository.TuripRepository
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
+import com.on.turip.ui.common.extensions.toUrl
 import com.on.turip.ui.common.model.namestatus.TuripNameStatusModel
 import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
 import com.on.turip.ui.compose.turip.mapper.toUiMyTuripModel
@@ -48,12 +50,12 @@ class TuripDetailViewModel @Inject constructor(
     private val turipRepository: TuripRepository,
     private val sessionStore: SessionStore,
 ) : ViewModel() {
-    private val _uiState: MutableStateFlow<TuripPlaceUiState> =
-        MutableStateFlow(TuripPlaceUiState.Idle)
-    val uiState: StateFlow<TuripPlaceUiState> = _uiState.asStateFlow()
+    private val _uiState: MutableStateFlow<TuripDetailUiState> =
+        MutableStateFlow(TuripDetailUiState.Idle)
+    val uiState: StateFlow<TuripDetailUiState> = _uiState.asStateFlow()
 
-    private val _uiEffect: Channel<TuripPlaceUiEffect> = Channel(Channel.BUFFERED)
-    val uiEffect: Flow<TuripPlaceUiEffect> = _uiEffect.receiveAsFlow()
+    private val _uiEffect: Channel<TuripDetailUiEffect> = Channel(Channel.BUFFERED)
+    val uiEffect: Flow<TuripDetailUiEffect> = _uiEffect.receiveAsFlow()
 
     private val sessionState: StateFlow<SessionState> = sessionStore.state
 
@@ -80,7 +82,7 @@ class TuripDetailViewModel @Inject constructor(
     fun loadSelectedTurip(selectedTuripId: Long) {
         viewModelScope.launch {
             turipRepository.loadTurip(selectedTuripId).onSuccess { turip: Turip ->
-                _uiState.update { state: TuripPlaceUiState ->
+                _uiState.update { state: TuripDetailUiState ->
                     state.copy(
                         errorUiState = ErrorUiState.None,
                         selectedTurip = turip.toUiMyTuripModel(),
@@ -95,7 +97,7 @@ class TuripDetailViewModel @Inject constructor(
             turipRepository
                 .loadTuripPlaces(selectedTuripId)
                 .onSuccess { result: List<TuripPlace> ->
-                    _uiState.update { state: TuripPlaceUiState ->
+                    _uiState.update { state: TuripDetailUiState ->
                         state.copy(
                             isLoading = false,
                             errorUiState = ErrorUiState.None,
@@ -130,7 +132,7 @@ class TuripDetailViewModel @Inject constructor(
 
         if (deleteTuripPlaceSnapshot.hasSnapshot) return
 
-        _uiState.update { state: TuripPlaceUiState ->
+        _uiState.update { state: TuripDetailUiState ->
             deleteTuripPlaceSnapshot =
                 DeleteTuripPlaceSnapshot(
                     deletePlace = targetPlace,
@@ -151,7 +153,7 @@ class TuripDetailViewModel @Inject constructor(
 
         viewModelScope.launch {
             _uiEffect.send(
-                TuripPlaceUiEffect.ShowTuripPlaceRemoved(targetPlace.name),
+                TuripDetailUiEffect.ShowTuripDetailRemoved(targetPlace.name),
             )
         }
     }
@@ -173,7 +175,7 @@ class TuripDetailViewModel @Inject constructor(
                         Timber.d("튜립 상세 바텀시트, 장소 업데이트 성공")
                     }.onFailure {
                         _uiEffect.send(
-                            TuripPlaceUiEffect.ShowTuripPlaceRemoveFailed(deletePlace.name),
+                            TuripDetailUiEffect.ShowTuripDetailRemoveFailed(deletePlace.name),
                         )
                         rollbackTuripPlaceDelete()
                         Timber.e("튜립 상세 바텀시트, 장소 업데이트 실패 place = ${deletePlace.name}")
@@ -209,7 +211,7 @@ class TuripDetailViewModel @Inject constructor(
             turipRepository
                 .updateTurip(uiState.value.selectedTurip.id, uiState.value.inputTuripName)
                 .onSuccess {
-                    _uiState.update { state: TuripPlaceUiState ->
+                    _uiState.update { state: TuripDetailUiState ->
                         state.copy(
                             isLoading = false,
                             errorUiState = ErrorUiState.None,
@@ -217,7 +219,7 @@ class TuripDetailViewModel @Inject constructor(
                             inputTuripName = "",
                         )
                     }
-                    _uiEffect.send(TuripPlaceUiEffect.TuripUpdated)
+                    _uiEffect.send(TuripDetailUiEffect.TuripUpdated)
                 }.onFailure { errorType: ErrorType ->
                     if (errorType == ErrorType.Turip.DuplicatedName) {
                         _uiState.update {
@@ -233,8 +235,8 @@ class TuripDetailViewModel @Inject constructor(
     }
 
     fun updateSelectedPlace(placeId: Long) {
-        _uiState.update { turipPlaceUiState: TuripPlaceUiState ->
-            turipPlaceUiState.copy(
+        _uiState.update { turipDetailUiState: TuripDetailUiState ->
+            turipDetailUiState.copy(
                 selectedPlace =
                     _uiState.value.placesLatLng.find { it.placeId == placeId }
                         ?: throw IllegalStateException("장소를 찾을 수 없습니다."),
@@ -242,7 +244,7 @@ class TuripDetailViewModel @Inject constructor(
         }
     }
 
-    fun resetUiState() = _uiState.update { TuripPlaceUiState.Idle }
+    fun resetUiState() = _uiState.update { TuripDetailUiState.Idle }
 
     fun showBottomSheet() = _uiState.update { it.copy(showBottomSheet = true) }
 
@@ -263,13 +265,13 @@ class TuripDetailViewModel @Inject constructor(
             turipRepository
                 .deleteTurip(selectedTuripId)
                 .onSuccess {
-                    _uiState.update { state: TuripPlaceUiState ->
+                    _uiState.update { state: TuripDetailUiState ->
                         state.copy(
                             isLoading = false,
                             errorUiState = ErrorUiState.None,
                         )
                     }
-                    _uiEffect.send(TuripPlaceUiEffect.TuripDelete)
+                    _uiEffect.send(TuripDetailUiEffect.TuripDelete)
                 }.onFailure { errorType: ErrorType ->
                     sendErrorEffect(errorType, TuripPlaceRetryAction.TuripDelete)
                 }
@@ -297,7 +299,7 @@ class TuripDetailViewModel @Inject constructor(
                 }.onFailure {
                     rollbackReorderedPlaces()
                     _uiEffect.send(
-                        TuripPlaceUiEffect.ShowReorderPlaceFailed(
+                        TuripDetailUiEffect.ShowReorderDetailFailed(
                             retryAction =
                                 TuripPlaceRetryAction.UpdateReorderedPlaces(
                                     reorderedTuripPlaces,
@@ -309,7 +311,32 @@ class TuripDetailViewModel @Inject constructor(
         }
     }
 
-    fun shareTurip() {
+    fun shareTuripInvitationLink() {
+        when (sessionState.value) {
+            SessionState.Member -> {
+                viewModelScope.launch {
+                    turipRepository
+                        .createInvitationToken(selectedTuripId)
+                        .onSuccess { token: TuripInvitationToken ->
+                            _uiEffect.send(TuripDetailUiEffect.ShareTuripInvitationLink(invitationLink = token.toUrl()))
+                        }.onFailure { errorType ->
+                            sendErrorEffect(
+                                errorType = errorType,
+                                retryAction = TuripPlaceRetryAction.ShareTuripInvitationLink,
+                            )
+                        }
+                }
+            }
+
+            SessionState.Guest, SessionState.Uninitialized -> {
+                viewModelScope.launch {
+                    _uiEffect.send(TuripDetailUiEffect.ShowTuripShareNotAllowed)
+                }
+            }
+        }
+    }
+
+    fun shareTuripByText() {
         when (sessionState.value) {
             SessionState.Member -> {
                 val turipShareModel =
@@ -318,13 +345,13 @@ class TuripDetailViewModel @Inject constructor(
                         places = uiState.value.places.map { it.toUiModel() },
                     )
                 viewModelScope.launch {
-                    _uiEffect.send(TuripPlaceUiEffect.ShareTurip(turipShareModel))
+                    _uiEffect.send(TuripDetailUiEffect.ShareTuripByText(turipShareModel))
                 }
             }
 
             SessionState.Guest, SessionState.Uninitialized -> {
                 viewModelScope.launch {
-                    _uiEffect.send(TuripPlaceUiEffect.ShowTuripShareNotAllowed)
+                    _uiEffect.send(TuripDetailUiEffect.ShowTuripShareNotAllowed)
                 }
             }
         }
@@ -346,7 +373,7 @@ class TuripDetailViewModel @Inject constructor(
 
             UiError.Global.TokenExpired -> {
                 _uiState.update { it.copy(isLoading = false) }
-                _uiEffect.send(TuripPlaceUiEffect.NavigateToLogin)
+                _uiEffect.send(TuripDetailUiEffect.NavigateToLogin)
             }
         }
     }
@@ -367,6 +394,10 @@ class TuripDetailViewModel @Inject constructor(
 
             TuripPlaceRetryAction.TuripNameUpdate -> {
                 updateTuripName()
+            }
+
+            TuripPlaceRetryAction.ShareTuripInvitationLink -> {
+                shareTuripInvitationLink()
             }
         }
     }
@@ -454,15 +485,15 @@ class TuripDetailViewModel @Inject constructor(
         if (uiError is UiError.Global) {
             when (uiError) {
                 UiError.Global.Network -> {
-                    _uiEffect.send(TuripPlaceUiEffect.ShowError(ErrorUiState.Network, retryAction))
+                    _uiEffect.send(TuripDetailUiEffect.ShowError(ErrorUiState.Network, retryAction))
                 }
 
                 UiError.Global.Server -> {
-                    _uiEffect.send(TuripPlaceUiEffect.ShowError(ErrorUiState.Server, retryAction))
+                    _uiEffect.send(TuripDetailUiEffect.ShowError(ErrorUiState.Server, retryAction))
                 }
 
                 UiError.Global.TokenExpired -> {
-                    _uiEffect.send(TuripPlaceUiEffect.NavigateToLogin)
+                    _uiEffect.send(TuripDetailUiEffect.NavigateToLogin)
                 }
             }
         }

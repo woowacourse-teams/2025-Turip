@@ -106,18 +106,21 @@ private class TuripItemPreviewParameterProvider : PreviewParameterProvider<Turip
                 name = "튜립에 포함된 상태",
                 placeCount = 5,
                 isSelected = true,
+                isDefault = true,
             ),
             TuripModel(
                 id = 2L,
                 name = "튜립에 포함되지 않은 상태",
                 placeCount = 0,
                 isSelected = false,
+                isDefault = false,
             ),
             TuripModel(
                 id = 3L,
                 name = "이름이 긴 여행 폴더명 서울 여행 서울 여행 서울 여행 서울 여행 서울 여행",
                 placeCount = 10,
                 isSelected = true,
+                isDefault = false,
             ),
         )
 }

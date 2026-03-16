@@ -59,6 +59,7 @@ firebaseBom = "34.0.0"
 firebaseInstallations = "19.0.0"
 appUpdate = "2.1.0"
 appUpdateKtx = "2.1.0"
+installReferrer = "2.2"
 
 # DI
 hilt = "2.57.1"
@@ -139,6 +140,7 @@ play-services-maps = { module = "com.google.android.gms:play-services-maps", ver
 googleid = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleid" }
 app-update = { module = "com.google.android.play:app-update", version.ref = "appUpdate" }
 app-update-ktx = { module = "com.google.android.play:app-update-ktx", version.ref = "appUpdateKtx" }
+install-referrer = { module = "com.android.installreferrer:installreferrer", version.ref = "installReferrer" }
 
 # Network
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }

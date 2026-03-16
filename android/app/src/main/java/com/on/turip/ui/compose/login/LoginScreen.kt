@@ -9,8 +9,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -39,7 +41,8 @@ import com.on.turip.ui.compose.login.util.noRippleClickable
 
 @Composable
 fun LoginScreen(
-    onNavigateToMain: () -> Unit,
+    deepLinkUrl: String?,
+    onNavigateToMain: (deepLinkUrl: String?) -> Unit,
     googleCredentialManager: GoogleCredentialManager,
     viewmodel: LoginViewmodel = hiltViewModel(),
 ) {
@@ -47,11 +50,19 @@ fun LoginScreen(
     val resources = LocalResources.current
     val snackbarDelegate = LocalSnackbarDelegate.current
 
+    LaunchedEffect(deepLinkUrl) {
+        viewmodel.initDeepLinkUrl(deepLinkUrl)
+    }
+
     LaunchedEffect(Unit) {
         viewmodel.uiEffect.collect { effect: LoginUiEffect ->
             when (effect) {
-                LoginUiEffect.NavigateToMain -> {
-                    onNavigateToMain()
+                LoginUiEffect.RequestAutoLogin -> {
+                    viewmodel.loginWithGoogle(googleCredentialManager)
+                }
+
+                is LoginUiEffect.NavigateToMain -> {
+                    onNavigateToMain(effect.deepLinkUrl)
                 }
 
                 is LoginUiEffect.ShowError -> {
@@ -111,7 +122,8 @@ private fun LoginScreenContent(
                 .padding(
                     vertical = TuripTheme.spacing.extraHuge,
                     horizontal = TuripTheme.spacing.extraLarge,
-                ),
+                ).statusBarsPadding()
+                .navigationBarsPadding(),
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
@@ -158,7 +170,9 @@ private fun LoginScreenContent(
                 )
             }
 
-            GoogleLoginButton(onLoginClick = onGoogleLoginClick)
+            GoogleLoginButton(
+                onLoginClick = onGoogleLoginClick,
+            )
 
             GuestModeSection(
                 text = stringResource(R.string.login_start_to_guest),

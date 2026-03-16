@@ -1,4 +1,4 @@
-package com.on.turip.ui.compose.splash.navigation
+package com.on.turip.ui.compose.invitation.navigation
 
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
@@ -7,12 +7,12 @@ import com.on.turip.navigation.Navigator
 import kotlinx.serialization.modules.PolymorphicModuleBuilder
 import javax.inject.Inject
 
-class SplashNavKeyProvider @Inject constructor() : NavKeyProvider {
+class InvitationEntryNavKeyProvider @Inject constructor() : NavKeyProvider {
     override fun PolymorphicModuleBuilder<NavKey>.registerNavKeys() {
-        subclass(SplashNavKey::class, SplashNavKey.serializer())
+        subclass(InvitationEntryNavKey::class, InvitationEntryNavKey.serializer())
     }
 
     override fun EntryProviderScope<NavKey>.registerScreens(navigator: Navigator) {
-        splashScreen(navigator)
+        invitationEntryScreen(navigator)
     }
 }

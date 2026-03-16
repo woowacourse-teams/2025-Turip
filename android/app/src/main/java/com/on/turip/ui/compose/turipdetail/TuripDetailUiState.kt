@@ -11,7 +11,7 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
 @Immutable
-data class TuripPlaceUiState(
+data class TuripDetailUiState(
     val isLoading: Boolean,
     val inputTuripName: String,
     val errorUiState: ErrorUiState,
@@ -26,8 +26,8 @@ data class TuripPlaceUiState(
     val placesLatLng: ImmutableList<PlaceLatLngUiModel>,
 ) {
     companion object {
-        val Idle: TuripPlaceUiState =
-            TuripPlaceUiState(
+        val Idle: TuripDetailUiState =
+            TuripDetailUiState(
                 isLoading = true,
                 inputTuripName = "",
                 errorUiState = ErrorUiState.None,

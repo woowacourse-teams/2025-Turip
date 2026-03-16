@@ -25,7 +25,8 @@ class TuripDetailNavKeyProvider @Inject constructor(
         turipDetailScreen(
             navigator = navigator,
             navigateToMap = ::navigateToMap,
-            onShareTurip = ::navigateToShareTurip,
+            onShareTuripByText = ::shareTuripByText,
+            onShareTuripInvitationLink = ::shareTuripInvitationLink,
         )
     }
 
@@ -37,29 +38,53 @@ class TuripDetailNavKeyProvider @Inject constructor(
         )
     }
 
-    private fun navigateToShareTurip(folderShareModel: TuripShareModel) {
+    private fun shareTuripByText(folderShareModel: TuripShareModel) {
         val sharedContents: String = folderShareModel.toShareFormat()
-
-        val intent =
-            createShareIntent(text = sharedContents).apply {
-                putExtra(Intent.EXTRA_TITLE, folderShareModel.name)
-            }
-
-        val initialIntents =
-            arrayOf(
-                createShareIntent(text = sharedContents, packageName = KAKAO_PACKAGE),
-                createShareIntent(text = sharedContents, packageName = INSTAGRAM_PACKAGE),
-            )
-
         val chooserIntent =
-            Intent
-                .createChooser(intent, folderShareModel.name)
-                .apply { putExtra(Intent.EXTRA_INITIAL_INTENTS, initialIntents) }
+            createShareChooserIntent(
+                text = sharedContents,
+                title = folderShareModel.name,
+                baseIntentTitle = folderShareModel.name,
+            )
 
         context.safeStartActivityWithToast(
             intent = chooserIntent,
             errorToastMessage = context.getString(R.string.all_snackbar_not_found_share),
         )
+    }
+
+    private fun shareTuripInvitationLink(invitationLink: String) {
+        val chooserIntent =
+            createShareChooserIntent(
+                text = invitationLink,
+                title = context.getString(R.string.all_turip_invite_by_link),
+            )
+
+        context.safeStartActivityWithToast(
+            intent = chooserIntent,
+            errorToastMessage = context.getString(R.string.all_snackbar_not_found_share),
+        )
+    }
+
+    private fun createShareChooserIntent(
+        text: String,
+        title: String,
+        baseIntentTitle: String? = null,
+    ): Intent {
+        val intent =
+            createShareIntent(text = text).apply {
+                baseIntentTitle?.let { putExtra(Intent.EXTRA_TITLE, it) }
+            }
+
+        val initialIntents =
+            arrayOf(
+                createShareIntent(text = text, packageName = KAKAO_PACKAGE),
+                createShareIntent(text = text, packageName = INSTAGRAM_PACKAGE),
+            )
+
+        return Intent
+            .createChooser(intent, title)
+            .apply { putExtra(Intent.EXTRA_INITIAL_INTENTS, initialIntents) }
     }
 
     private fun createShareIntent(

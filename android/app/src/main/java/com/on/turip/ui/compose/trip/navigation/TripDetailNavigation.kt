@@ -13,17 +13,19 @@ fun EntryProviderScope<NavKey>.tripDetailScreen(
     navigateToMap: (mapModel: MapModel) -> Unit,
     navigateToWebViewUrl: (url: String) -> Unit,
     navigateToAddTurip: () -> Unit,
-    navigateToShareTurip: (turipShareModel: TuripShareModel) -> Unit,
+    navigateToShareTuripByText: (turipShareModel: TuripShareModel) -> Unit,
+    navigateToShareTuripInvitationLink: (invitationLink: String) -> Unit,
 ) {
     entry<TripDetailNavKey> {
         TripDetailScreen(
             contentId = it.contentId,
             navigateToBack = navigator::goBack,
-            navigateToLogin = { navigator.goWithAllClear(LoginNavKey) },
+            navigateToLogin = { navigator.goWithAllClear(LoginNavKey()) },
             navigateToMap = navigateToMap,
             navigateToWebViewUrl = navigateToWebViewUrl,
             navigateToAddTurip = navigateToAddTurip,
-            navigateToShareTurip = navigateToShareTurip,
+            navigateToShareTuripByText = navigateToShareTuripByText,
+            navigateToShareTuripInvitationLink = navigateToShareTuripInvitationLink,
         )
     }
 }

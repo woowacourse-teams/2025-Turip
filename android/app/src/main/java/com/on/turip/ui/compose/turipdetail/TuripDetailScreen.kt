@@ -58,12 +58,13 @@ import kotlinx.collections.immutable.persistentListOf
 fun TuripDetailScreen(
     selectedTuripId: Long,
     onNavigateToLogin: () -> Unit,
-    onShareTurip: (turipShareModel: TuripShareModel) -> Unit,
+    onShareTuripByText: (turipShareModel: TuripShareModel) -> Unit,
+    onShareTuripInvitationLink: (invitationLink: String) -> Unit,
     onNavigateToMap: (map: MapModel) -> Unit,
     onBack: () -> Unit,
     viewModel: TuripDetailViewModel = hiltViewModel(),
 ) {
-    val uiState: TuripPlaceUiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState: TuripDetailUiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarDelegate = LocalSnackbarDelegate.current
     val resource = LocalResources.current
     var showLoginSuggestDialog by remember { mutableStateOf(false) }
@@ -80,21 +81,27 @@ fun TuripDetailScreen(
     }
 
     LaunchedEffect(Unit) {
-        viewModel.uiEffect.collect { uiEffect: TuripPlaceUiEffect ->
+        viewModel.uiEffect.collect { uiEffect: TuripDetailUiEffect ->
             when (uiEffect) {
-                TuripPlaceUiEffect.ShowTuripShareNotAllowed -> {
+                TuripDetailUiEffect.ShowTuripShareNotAllowed -> {
                     showLoginSuggestDialog = true
                 }
 
-                is TuripPlaceUiEffect.ShareTurip -> {
-                    onShareTurip(uiEffect.turipShareModel)
+                is TuripDetailUiEffect.ShareTuripByText -> {
+                    viewModel.dismissBottomSheet()
+                    onShareTuripByText(uiEffect.turipShareModel)
                 }
 
-                TuripPlaceUiEffect.NavigateToLogin -> {
+                is TuripDetailUiEffect.ShareTuripInvitationLink -> {
+                    viewModel.dismissBottomSheet()
+                    onShareTuripInvitationLink(uiEffect.invitationLink)
+                }
+
+                TuripDetailUiEffect.NavigateToLogin -> {
                     onNavigateToLogin()
                 }
 
-                is TuripPlaceUiEffect.ShowError -> {
+                is TuripDetailUiEffect.ShowError -> {
                     val uiModel = uiEffect.errorUiState.toUiModel() ?: return@collect
                     snackbarDelegate.showSnackbar(
                         message = resource.getString(uiModel.titleRes),
@@ -104,16 +111,16 @@ fun TuripDetailScreen(
                     )
                 }
 
-                TuripPlaceUiEffect.TuripDelete -> {
+                TuripDetailUiEffect.TuripDelete -> {
                     viewModel.dismissTuripRemoveDialog()
                     onBack()
                 }
 
-                TuripPlaceUiEffect.TuripUpdated -> {
+                TuripDetailUiEffect.TuripUpdated -> {
                     viewModel.dismissBottomSheet()
                 }
 
-                is TuripPlaceUiEffect.ShowTuripPlaceRemoveFailed -> {
+                is TuripDetailUiEffect.ShowTuripDetailRemoveFailed -> {
                     snackbarDelegate.showSnackbar(
                         message =
                             resource.getString(
@@ -124,7 +131,7 @@ fun TuripDetailScreen(
                     )
                 }
 
-                is TuripPlaceUiEffect.ShowTuripPlaceRemoved -> {
+                is TuripDetailUiEffect.ShowTuripDetailRemoved -> {
                     snackbarDelegate.showSnackbar(
                         message =
                             resource.getString(
@@ -140,7 +147,7 @@ fun TuripDetailScreen(
                     )
                 }
 
-                is TuripPlaceUiEffect.ShowReorderPlaceFailed -> {
+                is TuripDetailUiEffect.ShowReorderDetailFailed -> {
                     snackbarDelegate.showSnackbar(
                         message =
                             resource.getString(
@@ -164,8 +171,8 @@ fun TuripDetailScreen(
             confirmText = stringResource(R.string.turip_dialog_login_suggest_confirm),
             dismissText = stringResource(R.string.turip_dialog_login_suggest_dismiss),
             onConfirmation = {
-                onNavigateToLogin()
                 showLoginSuggestDialog = false
+                onNavigateToLogin()
             },
             onDismissRequest = { showLoginSuggestDialog = false },
         )
@@ -176,8 +183,8 @@ fun TuripDetailScreen(
             sheetState = modalBottomSheetState,
             isDefault = uiState.selectedTurip.isDefault,
             onDismiss = viewModel::dismissBottomSheet,
-            onShareClick = viewModel::shareTurip,
-            onInviteLinkClick = {},
+            onShareTuripByTextClick = viewModel::shareTuripByText,
+            onShareTuripInvitationLinkClick = viewModel::shareTuripInvitationLink,
             onDeleteClick = viewModel::showTuripRemoveDialog,
             screenMode = uiState.screenMode,
             onScreenModeChange = { screenMode: TuripPlaceScreenMode ->

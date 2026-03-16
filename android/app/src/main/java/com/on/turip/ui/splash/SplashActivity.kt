@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import com.on.turip.core.navigation.InitialNavigationTarget
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.splash.SplashScreen
 import com.on.turip.ui.main.MainActivity
@@ -18,12 +19,14 @@ class SplashActivity : ComponentActivity() {
         setContent {
             TuripTheme {
                 SplashScreen(
-                    onNavigateToHome = {
-                        startActivity(MainActivity.newIntent(this@SplashActivity))
-                        finish()
-                    },
-                    onNavigateToLogin = {
-                        startActivity(MainActivity.newIntent(this@SplashActivity))
+                    deepLinkUrl = intent?.dataString,
+                    onNavigateToMain = { target: InitialNavigationTarget ->
+                        startActivity(
+                            MainActivity.newIntent(
+                                context = this@SplashActivity,
+                                initialNavigationTarget = target,
+                            ),
+                        )
                         finish()
                     },
                     onFinish = ::finish,

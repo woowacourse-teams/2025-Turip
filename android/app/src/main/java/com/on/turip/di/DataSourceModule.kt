@@ -6,6 +6,10 @@ import com.on.turip.data.bookmark.datasource.BookmarkRemoteDataSource
 import com.on.turip.data.bookmark.datasource.DefaultBookmarkRemoteDataSource
 import com.on.turip.data.content.datasource.ContentRemoteDataSource
 import com.on.turip.data.content.datasource.DefaultContentRemoteDataSource
+import com.on.turip.data.invitation.datasource.DefaultDeferredDeepLinkLocalDataSource
+import com.on.turip.data.invitation.datasource.DefaultInstallReferrerDataSource
+import com.on.turip.data.invitation.datasource.DeferredDeepLinkLocalDataSource
+import com.on.turip.data.invitation.datasource.InstallReferrerDataSource
 import com.on.turip.data.login.datasource.AuthDataSource
 import com.on.turip.data.login.datasource.AuthRemoteDataSource
 import com.on.turip.data.login.datasource.GuestDataSource
@@ -70,4 +74,16 @@ abstract class DataSourceModule {
     @Binds
     @Singleton
     abstract fun bindAccountRemoteDataSource(defaultAccountRemoteDataSource: DefaultAccountRemoteDataSource): AccountRemoteDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindInstallReferrerDataSource(
+        defaultInstallReferrerDataSource: DefaultInstallReferrerDataSource,
+    ): InstallReferrerDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindDeferredDeepLinkLocalDataSource(
+        defaultDeferredDeepLinkLocalDataSource: DefaultDeferredDeepLinkLocalDataSource,
+    ): DeferredDeepLinkLocalDataSource
 }
