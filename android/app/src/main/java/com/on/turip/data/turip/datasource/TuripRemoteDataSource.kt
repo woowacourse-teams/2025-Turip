@@ -6,6 +6,7 @@ import com.on.turip.data.turip.dto.TuripCreationResponse
 import com.on.turip.data.turip.dto.TuripInvitationInformationResponse
 import com.on.turip.data.turip.dto.TuripInvitationTokenResponse
 import com.on.turip.data.turip.dto.TuripJoinResponse
+import com.on.turip.data.turip.dto.TuripMembersResponse
 import com.on.turip.data.turip.dto.TuripPatchRequest
 import com.on.turip.data.turip.dto.TuripPlaceOrderRequest
 import com.on.turip.data.turip.dto.TuripPlacesResponse
@@ -20,6 +21,8 @@ interface TuripRemoteDataSource {
     suspend fun getTurip(turipId: Long): TuripResult<TuripResponse>
 
     suspend fun getTurips(): TuripResult<TuripsResponse>
+
+    suspend fun getTuripMembers(turipId: Long): TuripResult<TuripMembersResponse>
 
     suspend fun postTurip(turipPostRequest: TuripPostRequest): TuripResult<TuripCreationResponse>
 

@@ -9,6 +9,7 @@ import com.on.turip.data.turip.dto.TuripCreationResponse
 import com.on.turip.data.turip.dto.TuripInvitationInformationResponse
 import com.on.turip.data.turip.dto.TuripInvitationTokenResponse
 import com.on.turip.data.turip.dto.TuripJoinResponse
+import com.on.turip.data.turip.dto.TuripMembersResponse
 import com.on.turip.data.turip.dto.TuripPatchRequest
 import com.on.turip.data.turip.dto.TuripPlaceOrderRequest
 import com.on.turip.data.turip.dto.TuripPlacesResponse
@@ -45,6 +46,11 @@ class DefaultTuripRemoteDataSource @Inject constructor(
     override suspend fun getTurips(): TuripResult<TuripsResponse> =
         withContext(coroutineContext) {
             safeApiCall { turipService.getTurips() }
+        }
+
+    override suspend fun getTuripMembers(turipId: Long): TuripResult<TuripMembersResponse> =
+        withContext(coroutineContext) {
+            safeApiCall { turipService.getTuripMembers(turipId) }
         }
 
     override suspend fun postTurip(turipPostRequest: TuripPostRequest): TuripResult<TuripCreationResponse> =

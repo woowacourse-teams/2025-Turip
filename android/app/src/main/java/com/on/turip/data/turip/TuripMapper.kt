@@ -4,6 +4,7 @@ import com.on.turip.data.turip.dto.TuripByPlaceResponse
 import com.on.turip.data.turip.dto.TuripCreationResponse
 import com.on.turip.data.turip.dto.TuripInvitationInformationResponse
 import com.on.turip.data.turip.dto.TuripInvitationTokenResponse
+import com.on.turip.data.turip.dto.TuripMembersResponse
 import com.on.turip.data.turip.dto.TuripPatchRequest
 import com.on.turip.data.turip.dto.TuripPlacesResponse
 import com.on.turip.data.turip.dto.TuripPostRequest
@@ -22,6 +23,8 @@ import com.on.turip.domain.turip.TuripInvitationToken
 import com.on.turip.domain.turip.TuripStreamEvent
 
 fun TuripsResponse.toDomain(): List<Turip> = turipsResponse.map { it.toDomain() }
+
+fun TuripMembersResponse.toDomain(): List<String> = members.map { it.nickname }
 
 fun TuripResponse.toDomain(): Turip =
     Turip(

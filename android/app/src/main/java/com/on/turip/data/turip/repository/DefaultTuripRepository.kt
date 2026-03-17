@@ -25,6 +25,9 @@ class DefaultTuripRepository @Inject constructor(
 
     override suspend fun loadTurips(): TuripResult<List<Turip>> = turipRemoteDataSource.getTurips().mapCatching { it.toDomain() }
 
+    override suspend fun loadTuripMembers(turipId: Long): TuripResult<List<String>> =
+        turipRemoteDataSource.getTuripMembers(turipId).mapCatching { it.toDomain() }
+
     override suspend fun createTurip(name: String): TuripResult<Turip> =
         turipRemoteDataSource
             .postTurip(name.toPostRequestDto())

@@ -6,6 +6,7 @@ import com.on.turip.data.turip.dto.TuripCreationResponse
 import com.on.turip.data.turip.dto.TuripInvitationInformationResponse
 import com.on.turip.data.turip.dto.TuripInvitationTokenResponse
 import com.on.turip.data.turip.dto.TuripJoinResponse
+import com.on.turip.data.turip.dto.TuripMembersResponse
 import com.on.turip.data.turip.dto.TuripPatchRequest
 import com.on.turip.data.turip.dto.TuripPlaceOrderRequest
 import com.on.turip.data.turip.dto.TuripPlacesResponse
@@ -30,6 +31,11 @@ interface TuripService {
 
     @GET(ApiPath.V1 + "turips")
     suspend fun getTurips(): TuripsResponse
+
+    @GET(ApiPath.V1 + "turips/{turipId}/members")
+    suspend fun getTuripMembers(
+        @Path("turipId") turipId: Long,
+    ): TuripMembersResponse
 
     @POST(ApiPath.V1 + "turips")
     suspend fun postTurip(

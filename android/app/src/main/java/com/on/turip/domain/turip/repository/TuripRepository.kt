@@ -13,6 +13,8 @@ interface TuripRepository {
 
     suspend fun loadTurips(): TuripResult<List<Turip>>
 
+    suspend fun loadTuripMembers(turipId: Long): TuripResult<List<String>>
+
     suspend fun createTurip(name: String): TuripResult<Turip>
 
     suspend fun updateTurip(
