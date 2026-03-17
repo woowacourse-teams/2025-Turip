@@ -5,10 +5,12 @@ import com.on.turip.core.result.TuripResult
 import com.on.turip.data.result.StreamFailureAction
 import com.on.turip.data.result.TuripStreamResult
 import com.on.turip.domain.turip.repository.TuripRepository
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
-import kotlinx.coroutines.job
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -23,12 +25,17 @@ class ObserveTuripStreamUseCase @Inject constructor(
 
             while (true) {
                 var streamResult: TuripResult<Unit>? = null
+                var timedOut = false
 
-                heartbeatManager.prepareNextAttempt()
+                heartbeatManager.start(this)
+
+                val timeoutObserveJob: Job =
+                    heartbeatManager.timeoutEvent
+                        .onEach { timedOut = true }
+                        .launchIn(this)
 
                 val currentAttemptJob =
                     launch {
-                        val self = coroutineContext.job
                         turipRepository
                             .streamTuripEvents(turipId)
                             .collect { eventResult ->
@@ -37,10 +44,7 @@ class ObserveTuripStreamUseCase @Inject constructor(
                                         val event = eventResult.value
                                         if (event is TuripStreamEvent.Connect || event is TuripStreamEvent.Heartbeat) {
                                             if (event is TuripStreamEvent.Connect) retryCount = 0
-                                            heartbeatManager.onHeartbeat(
-                                                scope = this@channelFlow,
-                                                onTimeout = { self.cancel() },
-                                            )
+                                            heartbeatManager.onHeartbeat()
                                         }
                                         send(TuripStreamResult.Event(event))
                                     }
@@ -57,9 +61,8 @@ class ObserveTuripStreamUseCase @Inject constructor(
                     }
 
                 currentAttemptJob.join()
-                val timedOut: Boolean = heartbeatManager.isTimedOut
+                timeoutObserveJob.cancel()
                 heartbeatManager.stop()
-                heartbeatManager.clearTimedOutState()
 
                 when {
                     timedOut -> {

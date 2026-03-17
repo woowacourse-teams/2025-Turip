@@ -5,47 +5,39 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
 class TuripStreamHeartbeatManager @Inject constructor() {
     private var heartbeatTimer: Job? = null
+    private var scope: CoroutineScope? = null
 
-    @Volatile
-    private var _isTimedOut: Boolean = false
+    private val _timeoutEvent = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    val timeoutEvent: Flow<Unit> = _timeoutEvent.asSharedFlow()
 
-    val isTimedOut: Boolean
-        get() = _isTimedOut
-
-    fun onHeartbeat(
-        scope: CoroutineScope,
-        onTimeout: () -> Unit,
-    ) {
-        reset(scope, onTimeout)
+    fun start(scope: CoroutineScope) {
+        this.scope = scope
+        resetTimer()
     }
 
-    fun prepareNextAttempt() {
-        _isTimedOut = false
+    fun onHeartbeat() {
+        resetTimer()
     }
 
     suspend fun stop() {
         heartbeatTimer?.cancelAndJoin()
         heartbeatTimer = null
+        scope = null
     }
 
-    fun clearTimedOutState() {
-        _isTimedOut = false
-    }
-
-    private fun reset(
-        scope: CoroutineScope,
-        onTimeout: () -> Unit,
-    ) {
+    private fun resetTimer() {
         heartbeatTimer?.cancel()
         heartbeatTimer =
-            scope.launch {
+            scope?.launch {
                 delay(HEARTBEAT_TIMEOUT_MILLIS)
-                _isTimedOut = true
-                onTimeout()
+                _timeoutEvent.tryEmit(Unit)
             }
     }
 
