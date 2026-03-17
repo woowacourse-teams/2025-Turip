@@ -383,6 +383,10 @@ class TuripDetailViewModel @Inject constructor(
             )
         }
 
+    fun showMemberBottomSheet() = _uiState.update { it.copy(showMemberBottomSheet = true) }
+
+    fun dismissMemberBottomSheet() = _uiState.update { it.copy(showMemberBottomSheet = false) }
+
     fun showTuripRemoveDialog() = _uiState.update { it.copy(showTuripRemoveDialog = true) }
 
     fun dismissTuripRemoveDialog() = _uiState.update { it.copy(showTuripRemoveDialog = false) }

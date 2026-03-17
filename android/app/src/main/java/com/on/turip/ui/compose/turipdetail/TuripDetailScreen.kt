@@ -47,6 +47,7 @@ import com.on.turip.ui.compose.designsystem.snackbar.LocalSnackbarDelegate
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.trip.model.MapModel
 import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
+import com.on.turip.ui.compose.turipdetail.component.MemberListSheet
 import com.on.turip.ui.compose.turipdetail.component.MoreOptionBottomSheet
 import com.on.turip.ui.compose.turipdetail.component.ProfileRow
 import com.on.turip.ui.compose.turipdetail.component.TuripMapContent
@@ -228,6 +229,15 @@ fun TuripDetailScreen(
         )
     }
 
+    if (uiState.showMemberBottomSheet) {
+        MemberListSheet(
+            title = uiState.selectedTurip.name,
+            nickNames = uiState.members,
+            onDismiss = viewModel::dismissMemberBottomSheet,
+            sheetState = modalBottomSheetState,
+        )
+    }
+
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = TuripTheme.colors.white,
@@ -266,6 +276,7 @@ fun TuripDetailScreen(
                         onDragStart = viewModel::onDragStart,
                         onDragPlace = viewModel::onDragMove,
                         onDragEnd = viewModel::onDragEnd,
+                        onClickMembers = viewModel::showMemberBottomSheet,
                     )
                 }
             }
@@ -307,6 +318,7 @@ private fun TuripPlaceContent(
     turipPlaceModel: ImmutableList<TuripPlaceModel>,
     navigateToMap: (map: MapModel) -> Unit,
     onClickTuripPlace: (placeId: Long) -> Unit,
+    onClickMembers: () -> Unit,
     onMoreOption: () -> Unit,
     onDragStart: () -> Unit,
     onDragPlace: (from: Int, to: Int) -> Unit,
@@ -330,6 +342,7 @@ private fun TuripPlaceContent(
             turipName = selectedTuripName,
             nicknames = nicknames,
             onBackClick = onBack,
+            onClickMembers = onClickMembers,
             onMoreOption = onMoreOption,
         )
 
@@ -361,6 +374,7 @@ private fun TuripPlaceContent(
 private fun Header(
     turipName: String,
     nicknames: ImmutableList<String>,
+    onClickMembers: () -> Unit,
     onBackClick: () -> Unit,
     onMoreOption: () -> Unit,
 ) {
@@ -389,9 +403,10 @@ private fun Header(
 
                 ProfileRow(
                     labels = nicknames,
-                    modifier = Modifier.clickable{
-
-                    }
+                    modifier =
+                        Modifier.clickable {
+                            onClickMembers()
+                        },
                 )
             }
         },
@@ -412,7 +427,7 @@ private fun Header(
 private fun TuripPlaceScreenPreview() {
     TuripTheme {
         TuripPlaceContent(
-            nicknames = persistentListOf("안녕","하세","요"),
+            nicknames = persistentListOf("안녕", "하세", "요"),
             turipPlaceModel =
                 persistentListOf(
                     TuripPlaceModel.Idle.copy(
@@ -447,6 +462,7 @@ private fun TuripPlaceScreenPreview() {
             onDragStart = {},
             onDragPlace = { _, _ -> },
             onDragEnd = {},
+            onClickMembers = {},
         )
     }
 }
