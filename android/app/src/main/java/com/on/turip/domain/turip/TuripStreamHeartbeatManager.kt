@@ -51,6 +51,6 @@ class TuripStreamHeartbeatManager @Inject constructor() {
 
     companion object {
         const val STREAM_RECONNECT_DELAY_MILLIS = 3_000L
-        const val HEARTBEAT_TIMEOUT_MILLIS = 30_000L
+        const val HEARTBEAT_TIMEOUT_MILLIS = 40_000L
     }
 }
