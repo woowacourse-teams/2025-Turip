@@ -6,6 +6,7 @@ import com.on.turip.data.result.StreamFailureAction
 import com.on.turip.data.result.TuripStreamResult
 import com.on.turip.domain.turip.repository.TuripRepository
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
@@ -64,40 +65,7 @@ class ObserveTuripStreamUseCase @Inject constructor(
                 timeoutObserveJob.cancel()
                 heartbeatManager.stop()
 
-                when {
-                    timedOut -> {
-                        Timber.w("튜립 SSE 하트비트 타임아웃으로 재연결합니다. turipId=%s", turipId)
-                    }
-
-                    streamResult is TuripResult.Failure -> {
-                        val failure = streamResult as TuripResult.Failure
-                        Timber.w(
-                            "튜립 SSE 스트림 실패. turipId=%s, errorType=%s, cause=%s",
-                            turipId,
-                            failure.errorType,
-                            failure.cause.javaClass.simpleName,
-                        )
-                        when (handleTuripStreamFailure(failure.errorType, turipId)) {
-                            StreamFailureAction.Retry -> {
-                                Unit
-                            }
-
-                            StreamFailureAction.Stop -> {
-                                return@channelFlow
-                            }
-
-                            StreamFailureAction.FatalTokenExpired -> {
-                                send(TuripStreamResult.Fatal.TokenExpired)
-                                return@channelFlow
-                            }
-
-                            StreamFailureAction.FatalForbidden -> {
-                                send(TuripStreamResult.Fatal.Forbidden)
-                                return@channelFlow
-                            }
-                        }
-                    }
-                }
+                if (shouldExitStream(timedOut, turipId, streamResult)) return@channelFlow
 
                 val isErrorRetry = streamResult is TuripResult.Failure && !timedOut
 
@@ -107,11 +75,7 @@ class ObserveTuripStreamUseCase @Inject constructor(
                         MAX_RETRY_EXPONENT,
                         turipId,
                     )
-                    send(
-                        TuripStreamResult.Fatal.ConnectionLost(
-                            (streamResult as TuripResult.Failure).errorType,
-                        ),
-                    )
+                    send(TuripStreamResult.Fatal.ConnectionLost((streamResult as TuripResult.Failure).errorType))
                     return@channelFlow
                 }
 
@@ -138,6 +102,48 @@ class ObserveTuripStreamUseCase @Inject constructor(
                 delay(reconnectDelay)
             }
         }
+
+    private suspend fun ProducerScope<TuripStreamResult>.shouldExitStream(
+        timedOut: Boolean,
+        turipId: Long,
+        streamResult: TuripResult<Unit>?,
+    ): Boolean {
+        when {
+            timedOut -> {
+                Timber.w("튜립 SSE 하트비트 타임아웃으로 재연결합니다. turipId=%s", turipId)
+            }
+
+            streamResult is TuripResult.Failure -> {
+                val failure = streamResult as TuripResult.Failure
+                Timber.w(
+                    "튜립 SSE 스트림 실패. turipId=%s, errorType=%s, cause=%s",
+                    turipId,
+                    failure.errorType,
+                    failure.cause.javaClass.simpleName,
+                )
+                when (handleTuripStreamFailure(failure.errorType, turipId)) {
+                    StreamFailureAction.Retry -> {
+                        Unit
+                    }
+
+                    StreamFailureAction.Stop -> {
+                        return true
+                    }
+
+                    StreamFailureAction.FatalTokenExpired -> {
+                        send(TuripStreamResult.Fatal.TokenExpired)
+                        return true
+                    }
+
+                    StreamFailureAction.FatalForbidden -> {
+                        send(TuripStreamResult.Fatal.Forbidden)
+                        return true
+                    }
+                }
+            }
+        }
+        return false
+    }
 
     private fun handleTuripStreamFailure(
         errorType: ErrorType,
