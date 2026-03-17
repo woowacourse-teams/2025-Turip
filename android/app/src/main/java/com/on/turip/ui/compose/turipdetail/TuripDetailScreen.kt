@@ -161,7 +161,12 @@ fun TuripDetailScreen(
                     )
                 }
 
-                TuripPlaceRetryAction.StreamConnectionLost -> {}
+                TuripDetailUiEffect.ShowNetworkUnstable -> {
+                    snackbarDelegate.showSnackbar(
+                        message = "네트워크 오류로 재연결 중입니다...",
+                        duration = SnackbarDuration.Short,
+                    )
+                }
             }
         }
     }

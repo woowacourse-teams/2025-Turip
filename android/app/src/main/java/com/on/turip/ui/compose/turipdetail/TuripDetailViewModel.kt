@@ -141,8 +141,10 @@ class TuripDetailViewModel @Inject constructor(
                             }
 
                             is TuripStreamResult.Reconnecting -> {
-                                // TODO UI에 재연결 중 상태 표시
-                                Timber.w("SSE 재연결 중. turipId=$turipId")
+                                Timber.w("SSE 재연결 중. turipId=$turipId, retryCount=${result.retryCount}")
+                                if (result.retryCount >= UNSTABLE_NETWORK_RETRY_THRESHOLD) {
+                                    _uiEffect.send(TuripDetailUiEffect.ShowNetworkUnstable)
+                                }
                             }
 
                             TuripStreamResult.Fatal.TokenExpired -> {
@@ -611,5 +613,6 @@ class TuripDetailViewModel @Inject constructor(
     companion object {
         private const val INVALID_ID = -1L
         private const val MAX_NAME_LENGTH = 20
+        private const val UNSTABLE_NETWORK_RETRY_THRESHOLD = 2
     }
 }

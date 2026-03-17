@@ -16,7 +16,7 @@ sealed interface TuripStreamResult {
         val event: TuripStreamEvent,
     ) : TuripStreamResult
 
-    data object Reconnecting : TuripStreamResult
+    data class Reconnecting(val retryCount: Int) : TuripStreamResult
 
     sealed interface Fatal : TuripStreamResult {
         data object TokenExpired : Fatal
@@ -128,7 +128,7 @@ class ObserveTuripStreamUseCase @Inject constructor(
                     return@channelFlow
                 }
 
-                send(TuripStreamResult.Reconnecting)
+                send(TuripStreamResult.Reconnecting(retryCount))
 
                 // 에러로 인한 재시도: Exponential Backoff (3s → 6s → 12s → 24s → 48s)
                 // 하트비트 타임아웃 또는 정상 종료: 고정 3s (연결이 건강했으므로 빠르게 재연결)
