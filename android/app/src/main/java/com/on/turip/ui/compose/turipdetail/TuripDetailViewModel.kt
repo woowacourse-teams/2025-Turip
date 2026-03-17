@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
+import com.on.turip.data.result.TuripStreamResult
 import com.on.turip.domain.bookmark.TuripPlace
 import com.on.turip.domain.session.SessionState
 import com.on.turip.domain.session.SessionStore
@@ -13,7 +14,6 @@ import com.on.turip.domain.turip.ObserveTuripStreamUseCase
 import com.on.turip.domain.turip.Turip
 import com.on.turip.domain.turip.TuripInvitationToken
 import com.on.turip.domain.turip.TuripStreamEvent
-import com.on.turip.domain.turip.TuripStreamResult
 import com.on.turip.domain.turip.repository.TuripRepository
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError

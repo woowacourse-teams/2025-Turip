@@ -2,6 +2,8 @@ package com.on.turip.domain.turip
 
 import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.TuripResult
+import com.on.turip.data.result.StreamFailureAction
+import com.on.turip.data.result.TuripStreamResult
 import com.on.turip.domain.turip.repository.TuripRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -10,24 +12,6 @@ import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
-
-sealed interface TuripStreamResult {
-    data class Event(
-        val event: TuripStreamEvent,
-    ) : TuripStreamResult
-
-    data class Reconnecting(val retryCount: Int) : TuripStreamResult
-
-    sealed interface Fatal : TuripStreamResult {
-        data object TokenExpired : Fatal
-
-        data object Forbidden : Fatal
-
-        data class ConnectionLost(
-            val errorType: ErrorType,
-        ) : Fatal
-    }
-}
 
 class ObserveTuripStreamUseCase @Inject constructor(
     private val turipRepository: TuripRepository,
@@ -177,13 +161,6 @@ class ObserveTuripStreamUseCase @Inject constructor(
                 StreamFailureAction.Stop
             }
         }
-
-    private enum class StreamFailureAction {
-        Retry,
-        Stop,
-        FatalTokenExpired,
-        FatalForbidden,
-    }
 
     companion object {
         private const val INITIAL_RETRY_DELAY_MILLIS = 3_000L
