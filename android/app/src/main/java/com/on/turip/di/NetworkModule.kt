@@ -18,6 +18,7 @@ import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.engine.okhttp.OkHttpConfig
 import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.plugins.HttpTimeoutConfig.Companion.INFINITE_TIMEOUT_MS
 import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.auth.providers.BearerTokens
 import io.ktor.client.plugins.auth.providers.bearer
@@ -166,6 +167,29 @@ object NetworkModule {
             contentType(type = ContentType.Application.Json)
         }
     }
+
+    @SseHttpClient
+    @Provides
+    @Singleton
+    fun provideSseHttpClient(
+        tokenManager: TokenManager,
+        authRepository: Lazy<AuthRepository>,
+        fidProvider: FidProvider,
+    ): HttpClient =
+        HttpClient(OkHttp) {
+            expectSuccess = true
+            install(SSE) {
+                reconnectionTime = 3000.milliseconds
+            }
+            install(HttpTimeout) {
+                connectTimeoutMillis = CONNECT_TIMEOUT_MILLIS
+                socketTimeoutMillis = INFINITE_TIMEOUT_MS
+                requestTimeoutMillis = INFINITE_TIMEOUT_MS
+            }
+            loggingInterceptor()
+            contentNegotiationInterceptor()
+            headerInterceptor(tokenManager, authRepository, fidProvider)
+        }
 
     @Provides
     @Singleton

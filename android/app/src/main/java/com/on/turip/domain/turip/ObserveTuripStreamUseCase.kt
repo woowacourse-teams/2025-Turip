@@ -72,7 +72,7 @@ class ObserveTuripStreamUseCase @Inject constructor(
                             "튜립 SSE 스트림 실패. turipId=%s, errorType=%s, cause=%s",
                             turipId,
                             failure.errorType,
-                            failure.cause?.javaClass?.simpleName,
+                            failure.cause.javaClass.simpleName,
                         )
                         when (handleTuripStreamFailure(failure.errorType, turipId)) {
                             StreamFailureAction.Retry -> {

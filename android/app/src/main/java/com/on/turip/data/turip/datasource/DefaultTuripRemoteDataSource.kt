@@ -17,6 +17,7 @@ import com.on.turip.data.turip.dto.TuripResponse
 import com.on.turip.data.turip.dto.TuripsByPlaceResponse
 import com.on.turip.data.turip.dto.TuripsResponse
 import com.on.turip.data.turip.service.TuripService
+import com.on.turip.di.SseHttpClient
 import com.on.turip.domain.turip.TuripSseParser
 import com.on.turip.domain.turip.TuripStreamEvent
 import io.ktor.client.HttpClient
@@ -33,7 +34,7 @@ import kotlin.coroutines.CoroutineContext
 
 class DefaultTuripRemoteDataSource @Inject constructor(
     private val turipService: TuripService,
-    private val httpClient: HttpClient,
+    @SseHttpClient private val httpClient: HttpClient,
     private val coroutineContext: CoroutineContext = Dispatchers.IO,
 ) : TuripRemoteDataSource {
     override suspend fun getTurip(turipId: Long): TuripResult<TuripResponse> =
