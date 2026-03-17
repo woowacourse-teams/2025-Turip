@@ -23,6 +23,7 @@ import com.on.turip.ui.common.model.namestatus.TuripNameStatusModel
 import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
 import com.on.turip.ui.compose.turip.mapper.toUiMyTuripModel
 import com.on.turip.ui.compose.turipdetail.model.DeleteTuripPlaceSnapshot
+import com.on.turip.ui.compose.turipdetail.model.RefreshScope
 import com.on.turip.ui.compose.turipdetail.model.turip.PlaceLatLngUiModel
 import com.on.turip.ui.compose.turipdetail.model.turip.TuripShareModel
 import com.on.turip.ui.folder.model.TuripEditModel
@@ -32,6 +33,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -70,9 +72,15 @@ class TuripDetailViewModel @Inject constructor(
     private var selectedTuripId: Long = INVALID_ID
 
     private val dragEndEvents = MutableSharedFlow<Unit>(replay = 0, extraBufferCapacity = 1)
+    private val refreshTrigger =
+        MutableSharedFlow<RefreshScope>(
+            extraBufferCapacity = 1,
+            onBufferOverflow = BufferOverflow.DROP_OLDEST,
+        )
 
     init {
         registerDragEndEvents()
+        registerStreamRefresh()
     }
 
     fun initIfNeeded(turipId: Long) {
@@ -166,8 +174,7 @@ class TuripDetailViewModel @Inject constructor(
         when (event) {
             is TuripStreamEvent.Connect -> {
                 Timber.d("튜립 SSE 연결 성공: turipId=%s, eventId=%s", event.turipId, event.id)
-                loadSelectedTurip(event.turipId)
-                loadPlaces(event.turipId)
+                requestRefresh(turip = true, places = true)
             }
 
             is TuripStreamEvent.FolderUpdate -> {
@@ -181,7 +188,7 @@ class TuripDetailViewModel @Inject constructor(
                     TuripStreamEvent.FolderAction.FOLDER_NAME_CHANGED,
                     TuripStreamEvent.FolderAction.FOLDER_DELETED,
                     -> {
-                        loadSelectedTurip(event.turipId)
+                        requestRefresh(turip = true, places = false)
                     }
 
                     TuripStreamEvent.FolderAction.PLACE_REORDERED,
@@ -189,13 +196,11 @@ class TuripDetailViewModel @Inject constructor(
                     TuripStreamEvent.FolderAction.PLACE_DELETED,
                     TuripStreamEvent.FolderAction.FOLDER_PLACE_CHANGED,
                     -> {
-                        loadSelectedTurip(event.turipId)
-                        loadPlaces(event.turipId)
+                        requestRefresh(turip = true, places = true)
                     }
 
                     TuripStreamEvent.FolderAction.UNKNOWN -> {
-                        loadSelectedTurip(event.turipId)
-                        loadPlaces(event.turipId)
+                        requestRefresh(turip = true, places = true)
                     }
                 }
             }
@@ -208,13 +213,30 @@ class TuripDetailViewModel @Inject constructor(
                     event.memberCount,
                     event.id,
                 )
-                loadSelectedTurip(event.turipId)
+                requestRefresh(turip = true, places = false)
             }
 
             is TuripStreamEvent.Heartbeat -> {
                 Timber.v("튜립 SSE 하트비트 수신: eventId=%s", event.id)
             }
         }
+    }
+
+    private fun requestRefresh(
+        turip: Boolean,
+        places: Boolean,
+    ) {
+        refreshTrigger.tryEmit(RefreshScope(turip = turip, places = places))
+    }
+
+    @OptIn(FlowPreview::class)
+    private fun registerStreamRefresh() {
+        refreshTrigger
+            .debounce(300L)
+            .onEach { scope: RefreshScope ->
+                if (scope.turip) loadSelectedTurip(selectedTuripId)
+                if (scope.places) loadPlaces(selectedTuripId)
+            }.launchIn(viewModelScope)
     }
 
     fun applyTuripPlaceDelete(placeId: Long) {
