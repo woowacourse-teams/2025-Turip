@@ -1,6 +1,5 @@
 package com.on.turip.ui.compose.turipdetail.component
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,7 +11,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
@@ -27,11 +25,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+
 private val AVATAR_OVERLAP = 18.dp
 
 @Composable
 fun ProfileRow(
-    labels: List<String>,
+    labels: ImmutableList<String>,
     modifier: Modifier = Modifier,
 ) {
     val visibleLabels = labels.take(3)
@@ -69,7 +70,7 @@ fun ProfileRow(
                                 .offset(x = (AVATAR_SIZE - AVATAR_OVERLAP) * index)
                                 .zIndex((count - index).toFloat()),
                     ) {
-                        AvatarCircle(label = label)
+                        AvatarCircle(label = label.first())
                     }
                 }
             }
@@ -96,16 +97,16 @@ fun ProfileRowAllVariantsPreview() {
             verticalArrangement = Arrangement.spacedBy(TuripTheme.spacing.extraLarge),
         ) {
             Text("1명", fontSize = 12.sp, color = Color.Gray)
-            ProfileRow(labels = listOf("유"))
+            ProfileRow(labels = persistentListOf("유"))
 
             Text("2명", fontSize = 12.sp, color = Color.Gray)
-            ProfileRow(labels = listOf("유", "현"))
+            ProfileRow(labels = persistentListOf("유", "현"))
 
             Text("3명", fontSize = 12.sp, color = Color.Gray)
-            ProfileRow(labels = listOf("유", "현", "민"))
+            ProfileRow(labels = persistentListOf("유", "현", "민"))
 
             Text("4명 이상 → 앞 3명만 표시", fontSize = 12.sp, color = Color.Gray)
-            ProfileRow(labels = listOf("유", "현", "민", "지", "호"))
+            ProfileRow(labels = persistentListOf("유", "현", "민", "지", "호"))
         }
     }
 }

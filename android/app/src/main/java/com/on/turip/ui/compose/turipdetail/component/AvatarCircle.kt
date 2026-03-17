@@ -18,7 +18,7 @@ import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 internal val AVATAR_SIZE = 48.dp
 @Composable
 fun AvatarCircle(
-    label: String,
+    label: Char,
     modifier: Modifier = Modifier,
     backgroundColor: Color = TuripTheme.colors.gray05,
     textColor: Color = TuripTheme.colors.white,
@@ -33,7 +33,7 @@ fun AvatarCircle(
         contentAlignment = Alignment.Center,
     ) {
         Text(
-            text = label,
+            text = label.toString(),
             color = textColor,
             style = TuripTheme.typography.title1,
         )
@@ -45,7 +45,7 @@ fun AvatarCircle(
 private fun AvatarCirclePreview() {
     TuripTheme{
         AvatarCircle(
-            label = "유",
+            label = '유',
             modifier = Modifier.size(AVATAR_SIZE)
         )
     }
