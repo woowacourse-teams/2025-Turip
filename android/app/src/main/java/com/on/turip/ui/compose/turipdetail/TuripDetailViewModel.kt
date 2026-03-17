@@ -134,6 +134,14 @@ class TuripDetailViewModel @Inject constructor(
         }
     }
 
+    private fun loadMembers() {
+        viewModelScope.launch {
+            turipRepository.loadTuripMembers(selectedTuripId).onSuccess { members: List<String> ->
+                _uiState.update { it.copy(members = members.toImmutableList()) }
+            }
+        }
+    }
+
     private fun observeTuripStream(turipId: Long) {
         viewModelScope.launch {
             observeTuripStreamUseCase(turipId)
@@ -175,6 +183,7 @@ class TuripDetailViewModel @Inject constructor(
             is TuripStreamEvent.Connect -> {
                 Timber.d("튜립 SSE 연결 성공: turipId=%s, eventId=%s", event.turipId, event.id)
                 requestRefresh(turip = true, places = true)
+                loadMembers()
             }
 
             is TuripStreamEvent.FolderUpdate -> {
@@ -214,6 +223,7 @@ class TuripDetailViewModel @Inject constructor(
                     event.id,
                 )
                 requestRefresh(turip = true, places = false)
+                loadMembers()
             }
 
             is TuripStreamEvent.Heartbeat -> {
