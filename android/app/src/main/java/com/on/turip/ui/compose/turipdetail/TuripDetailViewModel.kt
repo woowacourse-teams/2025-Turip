@@ -32,7 +32,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -69,8 +68,6 @@ class TuripDetailViewModel @Inject constructor(
     private var deleteTuripPlaceSnapshot: DeleteTuripPlaceSnapshot = DeleteTuripPlaceSnapshot.EMPTY
     private var reorderPlacesSnapshot: ImmutableList<TuripPlaceModel>? = null
     private var selectedTuripId: Long = INVALID_ID
-
-    private var streamJob: Job? = null
 
     private val dragEndEvents = MutableSharedFlow<Unit>(replay = 0, extraBufferCapacity = 1)
 
@@ -130,41 +127,39 @@ class TuripDetailViewModel @Inject constructor(
     }
 
     private fun observeTuripStream(turipId: Long) {
-        streamJob?.cancel()
-        streamJob =
-            viewModelScope.launch {
-                observeTuripStreamUseCase(turipId)
-                    .collect { result ->
-                        when (result) {
-                            is TuripStreamResult.Event -> {
-                                handleTuripStreamEvent(result.event)
-                            }
+        viewModelScope.launch {
+            observeTuripStreamUseCase(turipId)
+                .collect { result ->
+                    when (result) {
+                        is TuripStreamResult.Event -> {
+                            handleTuripStreamEvent(result.event)
+                        }
 
-                            is TuripStreamResult.Reconnecting -> {
-                                Timber.w("SSE 재연결 중. turipId=$turipId, retryCount=${result.retryCount}")
-                                if (result.retryCount >= UNSTABLE_NETWORK_RETRY_THRESHOLD) {
-                                    _uiEffect.send(TuripDetailUiEffect.ShowNetworkUnstable)
-                                }
-                            }
-
-                            TuripStreamResult.Fatal.TokenExpired -> {
-                                _uiEffect.send(TuripDetailUiEffect.NavigateToLogin)
-                            }
-
-                            TuripStreamResult.Fatal.Forbidden -> {
-                                Timber.w("SSE 권한 없음, 스트림 중단. turipId=$turipId")
-                            }
-
-                            is TuripStreamResult.Fatal.ConnectionLost -> {
-                                Timber.e("SSE 최대 재시도 초과, 스트림 종료. turipId=$turipId")
-                                sendErrorEffect(
-                                    errorType = result.errorType,
-                                    retryAction = TuripPlaceRetryAction.StreamConnectionLost,
-                                )
+                        is TuripStreamResult.Reconnecting -> {
+                            Timber.w("SSE 재연결 중. turipId=$turipId, retryCount=${result.retryCount}")
+                            if (result.retryCount >= UNSTABLE_NETWORK_RETRY_THRESHOLD) {
+                                _uiEffect.send(TuripDetailUiEffect.ShowNetworkUnstable)
                             }
                         }
+
+                        TuripStreamResult.Fatal.TokenExpired -> {
+                            _uiEffect.send(TuripDetailUiEffect.NavigateToLogin)
+                        }
+
+                        TuripStreamResult.Fatal.Forbidden -> {
+                            Timber.w("SSE 권한 없음, 스트림 중단. turipId=$turipId")
+                        }
+
+                        is TuripStreamResult.Fatal.ConnectionLost -> {
+                            Timber.e("SSE 최대 재시도 초과, 스트림 종료. turipId=$turipId")
+                            sendErrorEffect(
+                                errorType = result.errorType,
+                                retryAction = TuripPlaceRetryAction.StreamConnectionLost,
+                            )
+                        }
                     }
-            }
+                }
+        }
     }
 
     private fun handleTuripStreamEvent(event: TuripStreamEvent) {
