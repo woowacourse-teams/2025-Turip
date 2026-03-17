@@ -67,6 +67,12 @@ class ObserveTuripStreamUseCase @Inject constructor(
 
                     streamResult is TuripResult.Failure -> {
                         val errorType = (streamResult as TuripResult.Failure).errorType
+                        Timber.w(
+                            "튜립 SSE 스트림 실패. turipId=%s, errorType=%s, cause=%s",
+                            turipId,
+                            errorType,
+                            (streamResult as TuripResult.Failure).cause?.javaClass?.simpleName,
+                        )
                         val fatal = mapToFatalOrNull(errorType) ?: return@channelFlow
                         send(fatal)
                         return@channelFlow
