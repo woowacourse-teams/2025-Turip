@@ -6,6 +6,7 @@ import com.on.turip.domain.turip.repository.TuripRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -37,12 +38,20 @@ class ObserveTuripStreamUseCase @Inject constructor(
 
                 val currentAttemptJob =
                     launch {
+                        val self = coroutineContext.job
                         turipRepository
                             .streamTuripEvents(turipId)
                             .collect { eventResult ->
                                 when (eventResult) {
                                     is TuripResult.Success -> {
-                                        send(TuripStreamResult.Event(eventResult.value))
+                                        val event = eventResult.value
+                                        if (event is TuripStreamEvent.Connect || event is TuripStreamEvent.Heartbeat) {
+                                            heartbeatManager.onHeartbeat(
+                                                scope = this@channelFlow,
+                                                onTimeout = { self.cancel() },
+                                            )
+                                        }
+                                        send(TuripStreamResult.Event(event))
                                     }
 
                                     is TuripResult.Failure -> {
@@ -57,11 +66,12 @@ class ObserveTuripStreamUseCase @Inject constructor(
                     }
 
                 currentAttemptJob.join()
+                val timedOut: Boolean = heartbeatManager.isTimedOut
                 heartbeatManager.stop()
                 heartbeatManager.clearTimedOutState()
 
                 when {
-                    heartbeatManager.isTimedOut -> {
+                    timedOut -> {
                         Timber.w("튜립 SSE 하트비트 타임아웃으로 재연결합니다. turipId=%s", turipId)
                     }
 

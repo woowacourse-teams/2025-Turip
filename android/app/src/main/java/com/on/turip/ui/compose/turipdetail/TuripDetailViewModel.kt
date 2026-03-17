@@ -13,7 +13,6 @@ import com.on.turip.domain.turip.ObserveTuripStreamUseCase
 import com.on.turip.domain.turip.Turip
 import com.on.turip.domain.turip.TuripInvitationToken
 import com.on.turip.domain.turip.TuripStreamEvent
-import com.on.turip.domain.turip.TuripStreamHeartbeatManager
 import com.on.turip.domain.turip.TuripStreamResult
 import com.on.turip.domain.turip.repository.TuripRepository
 import com.on.turip.ui.common.error.ErrorUiState
@@ -55,7 +54,6 @@ import javax.inject.Inject
 class TuripDetailViewModel @Inject constructor(
     private val turipRepository: TuripRepository,
     private val deleteTuripUseCase: DeleteTuripUseCase,
-    private val heartbeatManager: TuripStreamHeartbeatManager,
     private val observeTuripStreamUseCase: ObserveTuripStreamUseCase,
     sessionStore: SessionStore,
 ) : ViewModel() {
@@ -73,7 +71,6 @@ class TuripDetailViewModel @Inject constructor(
     private var selectedTuripId: Long = INVALID_ID
 
     private var streamJob: Job? = null
-    private var streamAttemptJob: Job? = null
 
     private val dragEndEvents = MutableSharedFlow<Unit>(replay = 0, extraBufferCapacity = 1)
 
@@ -166,10 +163,6 @@ class TuripDetailViewModel @Inject constructor(
     private fun handleTuripStreamEvent(event: TuripStreamEvent) {
         when (event) {
             is TuripStreamEvent.Connect -> {
-                heartbeatManager.onHeartbeat(
-                    scope = viewModelScope,
-                    onTimeout = { streamAttemptJob?.cancel() },
-                )
                 Timber.d("튜립 SSE 연결 성공: turipId=%s, eventId=%s", event.turipId, event.id)
             }
 
@@ -215,10 +208,6 @@ class TuripDetailViewModel @Inject constructor(
             }
 
             is TuripStreamEvent.Heartbeat -> {
-                heartbeatManager.onHeartbeat(
-                    scope = viewModelScope,
-                    onTimeout = { streamAttemptJob?.cancel() },
-                )
                 Timber.v("튜립 SSE 하트비트 수신: eventId=%s", event.id)
             }
         }
