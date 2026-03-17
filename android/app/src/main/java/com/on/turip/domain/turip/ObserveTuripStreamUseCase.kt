@@ -73,9 +73,25 @@ class ObserveTuripStreamUseCase @Inject constructor(
                             errorType,
                             (streamResult as TuripResult.Failure).cause?.javaClass?.simpleName,
                         )
-                        val fatal = mapToFatalOrNull(errorType) ?: return@channelFlow
-                        send(fatal)
-                        return@channelFlow
+                        when (handleTuripStreamFailure(errorType, turipId)) {
+                            StreamFailureAction.Retry -> {
+                                Unit
+                            }
+
+                            StreamFailureAction.Stop -> {
+                                return@channelFlow
+                            }
+
+                            StreamFailureAction.FatalTokenExpired -> {
+                                send(TuripStreamResult.Fatal.TokenExpired)
+                                return@channelFlow
+                            }
+
+                            StreamFailureAction.FatalForbidden -> {
+                                send(TuripStreamResult.Fatal.Forbidden)
+                                return@channelFlow
+                            }
+                        }
                     }
                 }
 
@@ -84,10 +100,36 @@ class ObserveTuripStreamUseCase @Inject constructor(
             }
         }
 
-    private fun mapToFatalOrNull(errorType: ErrorType): TuripStreamResult.Fatal? =
+    private fun handleTuripStreamFailure(
+        errorType: ErrorType,
+        turipId: Long,
+    ): StreamFailureAction =
         when (errorType) {
-            ErrorType.Auth.TokenExpired -> TuripStreamResult.Fatal.TokenExpired
-            ErrorType.Auth.Forbidden -> TuripStreamResult.Fatal.Forbidden
-            else -> null
+            ErrorType.Auth.TokenExpired -> {
+                StreamFailureAction.FatalTokenExpired
+            }
+
+            ErrorType.Auth.Forbidden -> {
+                Timber.w("튜립 SSE 권한이 없어 스트림을 중단합니다. turipId=%s", turipId)
+                StreamFailureAction.FatalForbidden
+            }
+
+            ErrorType.Network,
+            ErrorType.Unknown,
+            -> {
+                StreamFailureAction.Retry
+            }
+
+            else -> {
+                Timber.w("튜립 SSE 에러로 스트림을 중단합니다. turipId=%s, errorType=%s", turipId, errorType)
+                StreamFailureAction.Stop
+            }
         }
+
+    private enum class StreamFailureAction {
+        Retry,
+        Stop,
+        FatalTokenExpired,
+        FatalForbidden,
+    }
 }
