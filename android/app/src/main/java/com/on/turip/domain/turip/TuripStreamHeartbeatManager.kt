@@ -8,7 +8,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class TuripStreamHeartbeatManager @Inject constructor() {
-    private var watchdogJob: Job? = null
+    private var heartbeatTimer: Job? = null
 
     @Volatile
     private var _isTimedOut: Boolean = false
@@ -28,8 +28,8 @@ class TuripStreamHeartbeatManager @Inject constructor() {
     }
 
     suspend fun stop() {
-        watchdogJob?.cancelAndJoin()
-        watchdogJob = null
+        heartbeatTimer?.cancelAndJoin()
+        heartbeatTimer = null
     }
 
     fun clearTimedOutState() {
@@ -40,8 +40,8 @@ class TuripStreamHeartbeatManager @Inject constructor() {
         scope: CoroutineScope,
         onTimeout: () -> Unit,
     ) {
-        watchdogJob?.cancel()
-        watchdogJob =
+        heartbeatTimer?.cancel()
+        heartbeatTimer =
             scope.launch {
                 delay(HEARTBEAT_TIMEOUT_MILLIS)
                 _isTimedOut = true
