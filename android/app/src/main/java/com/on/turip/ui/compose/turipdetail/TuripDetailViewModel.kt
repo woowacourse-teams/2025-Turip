@@ -83,9 +83,6 @@ class TuripDetailViewModel @Inject constructor(
         if (selectedTuripId == turipId && uiState.value.selectedTurip.id == turipId) return
 
         selectedTuripId = turipId
-
-        loadSelectedTurip(turipId)
-        loadPlaces(turipId)
         observeTuripStream(turipId)
     }
 
@@ -172,6 +169,8 @@ class TuripDetailViewModel @Inject constructor(
         when (event) {
             is TuripStreamEvent.Connect -> {
                 Timber.d("튜립 SSE 연결 성공: turipId=%s, eventId=%s", event.turipId, event.id)
+                loadSelectedTurip(event.turipId)
+                loadPlaces(event.turipId)
             }
 
             is TuripStreamEvent.FolderUpdate -> {
