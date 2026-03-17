@@ -21,16 +21,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
-
-private val AVATAR_SIZE = 48.dp
 private val AVATAR_OVERLAP = 18.dp
 
 @Composable
@@ -85,31 +81,6 @@ fun ProfileRow(
                 modifier = Modifier.size(TuripTheme.spacing.extraLarge),
             )
         }
-    }
-}
-
-@Composable
-fun AvatarCircle(
-    label: String,
-    modifier: Modifier = Modifier,
-    backgroundColor: Color = TuripTheme.colors.gray05,
-    textColor: Color = TuripTheme.colors.white,
-) {
-    Box(
-        modifier =
-            modifier
-                .size(AVATAR_SIZE)
-                .clip(CircleShape)
-                .background(backgroundColor)
-                .border(width = 2.dp, color = TuripTheme.colors.white, shape = CircleShape),
-        contentAlignment = Alignment.Center,
-    ) {
-        Text(
-            text = label,
-            color = textColor,
-            fontSize = 17.sp,
-            fontWeight = FontWeight.Bold,
-        )
     }
 }
 
