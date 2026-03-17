@@ -22,6 +22,10 @@ sealed interface TuripStreamResult {
         data object TokenExpired : Fatal
 
         data object Forbidden : Fatal
+
+        data class ConnectionLost(
+            val errorType: ErrorType,
+        ) : Fatal
     }
 }
 
@@ -108,12 +112,28 @@ class ObserveTuripStreamUseCase @Inject constructor(
                     }
                 }
 
+                val isErrorRetry = streamResult is TuripResult.Failure && !timedOut
+
+                if (isErrorRetry && retryCount >= MAX_RETRY_EXPONENT) {
+                    Timber.e(
+                        "튜립 SSE 최대 재시도 횟수(%d) 초과. 스트림 종료. turipId=%s",
+                        MAX_RETRY_EXPONENT,
+                        turipId,
+                    )
+                    send(
+                        TuripStreamResult.Fatal.ConnectionLost(
+                            (streamResult as TuripResult.Failure).errorType,
+                        ),
+                    )
+                    return@channelFlow
+                }
+
                 send(TuripStreamResult.Reconnecting)
 
-                // 에러로 인한 재시도: Exponential Backoff (3s → 6s → 12s → 24s → 48s → 최대 60s)
+                // 에러로 인한 재시도: Exponential Backoff (3s → 6s → 12s → 24s → 48s)
                 // 하트비트 타임아웃 또는 정상 종료: 고정 3s (연결이 건강했으므로 빠르게 재연결)
                 val reconnectDelay =
-                    if (streamResult is TuripResult.Failure && !timedOut) {
+                    if (isErrorRetry) {
                         val backoff =
                             minOf(INITIAL_RETRY_DELAY_MILLIS shl retryCount, MAX_RETRY_DELAY_MILLIS)
                         Timber.d(
@@ -122,7 +142,7 @@ class ObserveTuripStreamUseCase @Inject constructor(
                             retryCount,
                             turipId,
                         )
-                        retryCount = minOf(retryCount + 1, MAX_RETRY_EXPONENT)
+                        retryCount++
                         backoff
                     } else {
                         TuripStreamHeartbeatManager.STREAM_RECONNECT_DELAY_MILLIS

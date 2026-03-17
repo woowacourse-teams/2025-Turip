@@ -155,6 +155,14 @@ class TuripDetailViewModel @Inject constructor(
                             TuripStreamResult.Fatal.Forbidden -> {
                                 Timber.w("SSE 권한 없음, 스트림 중단. turipId=$turipId")
                             }
+
+                            is TuripStreamResult.Fatal.ConnectionLost -> {
+                                Timber.e("SSE 최대 재시도 초과, 스트림 종료. turipId=$turipId")
+                                sendErrorEffect(
+                                    errorType = result.errorType,
+                                    retryAction = TuripPlaceRetryAction.StreamConnectionLost,
+                                )
+                            }
                         }
                     }
             }
@@ -494,6 +502,12 @@ class TuripDetailViewModel @Inject constructor(
 
             TuripPlaceRetryAction.ShareTuripInvitationLink -> {
                 shareTuripInvitationLink()
+            }
+
+            TuripPlaceRetryAction.StreamConnectionLost -> {
+                loadPlaces(selectedTuripId)
+                loadSelectedTurip(selectedTuripId)
+                observeTuripStream(selectedTuripId)
             }
         }
     }

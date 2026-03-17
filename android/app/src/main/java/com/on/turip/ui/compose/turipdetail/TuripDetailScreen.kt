@@ -160,6 +160,8 @@ fun TuripDetailScreen(
                         onAction = { viewModel.handleErrorRetryRequest(uiEffect.retryAction) },
                     )
                 }
+
+                TuripPlaceRetryAction.StreamConnectionLost -> {}
             }
         }
     }

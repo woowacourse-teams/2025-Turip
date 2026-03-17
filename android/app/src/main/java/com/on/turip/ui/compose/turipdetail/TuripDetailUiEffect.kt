@@ -54,4 +54,6 @@ sealed interface TuripPlaceRetryAction {
     data object TuripDelete : TuripPlaceRetryAction
 
     data object ShareTuripInvitationLink : TuripPlaceRetryAction
+
+    data object StreamConnectionLost : TuripPlaceRetryAction
 }
