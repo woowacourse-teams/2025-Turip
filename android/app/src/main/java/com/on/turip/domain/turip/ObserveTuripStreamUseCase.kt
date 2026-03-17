@@ -31,6 +31,8 @@ class ObserveTuripStreamUseCase @Inject constructor(
 ) {
     operator fun invoke(turipId: Long): Flow<TuripStreamResult> =
         channelFlow {
+            var retryCount = 0
+
             while (true) {
                 var streamResult: TuripResult<Unit>? = null
 
@@ -46,6 +48,7 @@ class ObserveTuripStreamUseCase @Inject constructor(
                                     is TuripResult.Success -> {
                                         val event = eventResult.value
                                         if (event is TuripStreamEvent.Connect || event is TuripStreamEvent.Heartbeat) {
+                                            if (event is TuripStreamEvent.Connect) retryCount = 0
                                             heartbeatManager.onHeartbeat(
                                                 scope = this@channelFlow,
                                                 onTimeout = { self.cancel() },
@@ -76,14 +79,14 @@ class ObserveTuripStreamUseCase @Inject constructor(
                     }
 
                     streamResult is TuripResult.Failure -> {
-                        val errorType = (streamResult as TuripResult.Failure).errorType
+                        val failure = streamResult as TuripResult.Failure
                         Timber.w(
                             "튜립 SSE 스트림 실패. turipId=%s, errorType=%s, cause=%s",
                             turipId,
-                            errorType,
-                            (streamResult as TuripResult.Failure).cause?.javaClass?.simpleName,
+                            failure.errorType,
+                            failure.cause?.javaClass?.simpleName,
                         )
-                        when (handleTuripStreamFailure(errorType, turipId)) {
+                        when (handleTuripStreamFailure(failure.errorType, turipId)) {
                             StreamFailureAction.Retry -> {
                                 Unit
                             }
@@ -106,7 +109,26 @@ class ObserveTuripStreamUseCase @Inject constructor(
                 }
 
                 send(TuripStreamResult.Reconnecting)
-                delay(TuripStreamHeartbeatManager.STREAM_RECONNECT_DELAY_MILLIS)
+
+                // 에러로 인한 재시도: Exponential Backoff (3s → 6s → 12s → 24s → 48s → 최대 60s)
+                // 하트비트 타임아웃 또는 정상 종료: 고정 3s (연결이 건강했으므로 빠르게 재연결)
+                val reconnectDelay =
+                    if (streamResult is TuripResult.Failure && !timedOut) {
+                        val backoff =
+                            minOf(INITIAL_RETRY_DELAY_MILLIS shl retryCount, MAX_RETRY_DELAY_MILLIS)
+                        Timber.d(
+                            "튜립 SSE 에러 재연결 대기. delay=%dms, retryCount=%d, turipId=%s",
+                            backoff,
+                            retryCount,
+                            turipId,
+                        )
+                        retryCount = minOf(retryCount + 1, MAX_RETRY_EXPONENT)
+                        backoff
+                    } else {
+                        TuripStreamHeartbeatManager.STREAM_RECONNECT_DELAY_MILLIS
+                    }
+
+                delay(reconnectDelay)
             }
         }
 
@@ -141,5 +163,11 @@ class ObserveTuripStreamUseCase @Inject constructor(
         Stop,
         FatalTokenExpired,
         FatalForbidden,
+    }
+
+    companion object {
+        private const val INITIAL_RETRY_DELAY_MILLIS = 3_000L
+        private const val MAX_RETRY_DELAY_MILLIS = 60_000L
+        private const val MAX_RETRY_EXPONENT = 5
     }
 }
