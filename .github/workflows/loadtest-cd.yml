@@ -106,7 +106,7 @@ jobs:
           NGINX_PORT: ${{ env.NGINX_PORT }}
         run: |
           echo "🚀 Load Test 배포 시작 (image: ${{ env.IMAGE_TAG }})"
-          chmod +x /home/ubuntu/deploy/deploy-deploy.sh
+          chmod +x /home/ubuntu/deploy/deploy-loadtest.sh
           /home/ubuntu/deploy/deploy-loadtest.sh ${{ env.IMAGE_TAG }}
 
       # ── 정리 ──────────────────────────────────────────────────────────────
