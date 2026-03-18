@@ -3,6 +3,8 @@ name: Load Test CD
 on:
   push:
     branches: [ loadtest ]
+    paths:
+      - 'backend/**'
   workflow_dispatch:
     inputs:
       skip_build:
