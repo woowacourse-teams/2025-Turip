@@ -106,8 +106,8 @@ jobs:
           NGINX_PORT: ${{ env.NGINX_PORT }}
         run: |
           echo "🚀 Load Test 배포 시작 (image: ${{ env.IMAGE_TAG }})"
-          chmod +x /home/ubuntu/deploy/loadtest-deploy.sh
-          /home/ubuntu/deploy/loadtest-deploy.sh ${{ env.IMAGE_TAG }}
+          chmod +x /home/ubuntu/deploy/deploy-deploy.sh
+          /home/ubuntu/deploy/deploy-loadtest.sh ${{ env.IMAGE_TAG }}
 
       # ── 정리 ──────────────────────────────────────────────────────────────
       - name: Dangling 이미지 정리
