@@ -44,6 +44,7 @@ fun TuripMapContent(
     places: ImmutableList<PlaceLatLngUiModel>,
     selectedPlace: PlaceLatLngUiModel,
     nicknames: ImmutableList<String>,
+    showMembers: Boolean,
     isMapVisible: Boolean,
     onMapToggle: () -> Unit,
     onClickMembers: () -> Unit,
@@ -141,18 +142,17 @@ fun TuripMapContent(
                 )
             }
 
-            ProfileRow(
-                labels = nicknames,
-                modifier =
-                    Modifier
-                        .align(Alignment.CenterEnd)
-                        .padding(
-                            top = TuripTheme.spacing.small,
-                            end = TuripTheme.spacing.large,
-                        ),
-                profileRowStyle = ProfileRowStyle.SMALL,
-                onClick = onClickMembers,
-            )
+            if (showMembers) {
+                ProfileRow(
+                    labels = nicknames,
+                    modifier =
+                        Modifier
+                            .align(Alignment.CenterEnd)
+                            .padding(end = TuripTheme.spacing.large),
+                    profileRowStyle = ProfileRowStyle.SMALL,
+                    onClick = onClickMembers,
+                )
+            }
         }
     }
 }

@@ -4,7 +4,6 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
@@ -259,6 +258,7 @@ fun TuripDetailScreen(
                 else -> {
                     TuripPlaceContent(
                         nicknames = uiState.members,
+                        isDefaultTurip = uiState.selectedTurip.isDefault,
                         selectedTuripId = uiState.selectedTurip.id,
                         selectedTuripName = uiState.selectedTurip.name,
                         turipPlaceModel = uiState.places,
@@ -308,6 +308,7 @@ private fun ErrorContent(
 @Composable
 private fun TuripPlaceContent(
     nicknames: ImmutableList<String>,
+    isDefaultTurip: Boolean,
     selectedTuripId: Long,
     selectedTuripName: String,
     selectedPlace: PlaceLatLngUiModel,
@@ -348,6 +349,7 @@ private fun TuripPlaceContent(
                 selectedPlace = selectedPlace,
                 places = currentPlaceLatLng,
                 nicknames = nicknames,
+                showMembers = !isDefaultTurip,
                 isMapVisible = isMapVisible,
                 onMapToggle = { isMapVisible = !isMapVisible },
                 onClickMembers = onClickMembers,
@@ -447,6 +449,7 @@ private fun TuripPlaceScreenPreview() {
             onDragPlace = { _, _ -> },
             onDragEnd = {},
             onClickMembers = {},
+            isDefaultTurip = false,
         )
     }
 }
