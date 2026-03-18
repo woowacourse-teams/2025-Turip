@@ -5,6 +5,11 @@ spring:
     username: turip
     password: turip_pw
 
+    hikari:
+      maximum-pool-size: ${HIKARI_MAX_POOL_SIZE:10}
+      minimum-idle: ${HIKARI_MIN_IDLE:5}
+      connection-timeout: ${HIKARI_CONNECTION_TIMEOUT:30000}
+
   jpa:
     hibernate:
       ddl-auto: validate
@@ -23,6 +28,12 @@ spring:
     baseline-on-migrate: true
     validate-on-migrate: true
     encoding: UTF-8
+
+server:
+  tomcat:
+    threads:
+      max: ${TOMCAT_MAX_THREADS:200}
+      min-spare: ${TOMCAT_MIN_THREADS:10}
 
 jwt:
   access-token-expiration-ms: 86400000  # 1일
