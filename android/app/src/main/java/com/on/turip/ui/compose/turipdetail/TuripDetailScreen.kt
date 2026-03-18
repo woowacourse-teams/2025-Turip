@@ -2,16 +2,13 @@ package com.on.turip.ui.compose.turipdetail
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
@@ -51,10 +48,8 @@ import com.on.turip.ui.compose.trip.model.MapModel
 import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
 import com.on.turip.ui.compose.turipdetail.component.MemberListSheet
 import com.on.turip.ui.compose.turipdetail.component.MoreOptionBottomSheet
-import com.on.turip.ui.compose.turipdetail.component.ProfileRow
 import com.on.turip.ui.compose.turipdetail.component.TuripMapContent
 import com.on.turip.ui.compose.turipdetail.component.TuripPlaces
-import com.on.turip.ui.compose.turipdetail.model.ProfileRowStyle
 import com.on.turip.ui.compose.turipdetail.model.turip.PlaceLatLngUiModel
 import com.on.turip.ui.compose.turipdetail.model.turip.TuripShareModel
 import kotlinx.collections.immutable.ImmutableList
@@ -343,9 +338,7 @@ private fun TuripPlaceContent(
     ) {
         Header(
             turipName = selectedTuripName,
-            nicknames = nicknames,
             onBackClick = onBack,
-            onClickMembers = onClickMembers,
             onMoreOption = onMoreOption,
         )
 
@@ -354,8 +347,10 @@ private fun TuripPlaceContent(
                 selectedTuripId = selectedTuripId,
                 selectedPlace = selectedPlace,
                 places = currentPlaceLatLng,
+                nicknames = nicknames,
                 isMapVisible = isMapVisible,
                 onMapToggle = { isMapVisible = !isMapVisible },
+                onClickMembers = onClickMembers,
                 modifier = Modifier.fillMaxWidth(),
             )
         }
@@ -376,8 +371,6 @@ private fun TuripPlaceContent(
 @Composable
 private fun Header(
     turipName: String,
-    nicknames: ImmutableList<String>,
-    onClickMembers: () -> Unit,
     onBackClick: () -> Unit,
     onMoreOption: () -> Unit,
 ) {
@@ -395,26 +388,11 @@ private fun Header(
             }
         },
         center = {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = turipName,
-                    style = TuripTheme.typography.title1,
-                    color = TuripTheme.colors.black,
-                )
-
-                Spacer(modifier = Modifier.width(TuripTheme.spacing.small))
-
-                ProfileRow(
-                    labels = nicknames,
-                    modifier =
-                        Modifier.clickable {
-                            onClickMembers()
-                        },
-                    profileRowStyle = ProfileRowStyle.SMALL,
-                )
-            }
+            Text(
+                text = turipName,
+                style = TuripTheme.typography.title1,
+                color = TuripTheme.colors.black,
+            )
         },
         end = {
             IconButton(onClick = onMoreOption) {

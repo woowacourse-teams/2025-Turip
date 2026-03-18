@@ -3,11 +3,15 @@ package com.on.turip.ui.compose.turipdetail.component
 import android.annotation.SuppressLint
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -32,6 +36,7 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.on.turip.ui.compose.turipdetail.model.turip.PlaceLatLngUiModel
+import com.on.turip.ui.compose.turipdetail.model.ProfileRowStyle
 import kotlinx.collections.immutable.ImmutableList
 
 @SuppressLint("CoroutineCreationDuringComposition")
@@ -40,8 +45,10 @@ fun TuripMapContent(
     selectedTuripId: Long,
     places: ImmutableList<PlaceLatLngUiModel>,
     selectedPlace: PlaceLatLngUiModel,
+    nicknames: ImmutableList<String>,
     isMapVisible: Boolean,
     onMapToggle: () -> Unit,
+    onClickMembers: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val cameraPositionState = rememberCameraPositionState()
@@ -123,10 +130,25 @@ fun TuripMapContent(
             }
         }
 
-        IconButton(onClick = onMapToggle) {
-            Icon(
-                imageVector = if (isMapVisible) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                contentDescription = null,
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            IconButton(onClick = onMapToggle) {
+                Icon(
+                    imageVector = if (isMapVisible) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                    contentDescription = null,
+                )
+            }
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            ProfileRow(
+                labels = nicknames,
+                modifier =
+                    Modifier.clickable {
+                        onClickMembers()
+                    },
+                profileRowStyle = ProfileRowStyle.SMALL,
             )
         }
     }
