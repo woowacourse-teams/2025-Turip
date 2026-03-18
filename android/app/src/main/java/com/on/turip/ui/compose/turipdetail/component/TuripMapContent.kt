@@ -3,7 +3,6 @@ package com.on.turip.ui.compose.turipdetail.component
 import android.annotation.SuppressLint
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -147,11 +146,12 @@ fun TuripMapContent(
                 modifier =
                     Modifier
                         .align(Alignment.CenterEnd)
-                        .padding(end = TuripTheme.spacing.large)
-                        .clickable {
-                            onClickMembers()
-                        },
+                        .padding(
+                            top = TuripTheme.spacing.small,
+                            end = TuripTheme.spacing.large,
+                        ),
                 profileRowStyle = ProfileRowStyle.SMALL,
+                onClick = onClickMembers,
             )
         }
     }
