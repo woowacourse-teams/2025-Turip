@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -28,17 +29,19 @@ import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
-private val AVATAR_OVERLAP = 18.dp
+private const val AVATAR_OVERLAP_RATIO = 0.375f
 
 @Composable
 fun ProfileRow(
     labels: ImmutableList<String>,
     modifier: Modifier = Modifier,
+    avatarSize: Dp,
 ) {
     val visibleLabels = labels.take(3)
     val count = visibleLabels.size
 
-    val groupWidth = AVATAR_SIZE + (AVATAR_SIZE - AVATAR_OVERLAP) * (count - 1)
+    val overlap = avatarSize * AVATAR_OVERLAP_RATIO
+    val groupWidth = avatarSize + (avatarSize - overlap) * (count - 1)
 
     Box(
         modifier =
@@ -47,7 +50,8 @@ fun ProfileRow(
                     width = 1.5.dp,
                     color = TuripTheme.colors.gray02,
                     shape = RoundedCornerShape(50.dp),
-                ).padding(
+                )
+                .padding(
                     horizontal = TuripTheme.spacing.medium,
                     vertical = TuripTheme.spacing.small,
                 ),
@@ -61,23 +65,23 @@ fun ProfileRow(
                 modifier =
                     Modifier
                         .width(groupWidth)
-                        .height(AVATAR_SIZE),
+                        .height(avatarSize),
             ) {
                 visibleLabels.forEachIndexed { index, label ->
                     Box(
                         modifier =
                             Modifier
-                                .offset(x = (AVATAR_SIZE - AVATAR_OVERLAP) * index)
+                                .offset(x = (avatarSize - overlap) * index)
                                 .zIndex((count - index).toFloat()),
                     ) {
-                        AvatarCircle(label = label.first())
+                        AvatarCircle(label = label.first(), size = avatarSize)
                     }
                 }
             }
 
             Icon(
                 imageVector = Icons.Default.ChevronRight,
-                contentDescription = "더보기",
+                contentDescription = null,
                 tint = TuripTheme.colors.gray03,
                 modifier = Modifier.size(TuripTheme.spacing.extraLarge),
             )
@@ -88,6 +92,8 @@ fun ProfileRow(
 @Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
 @Composable
 fun ProfileRowAllVariantsPreview() {
+    val sampleLabels = persistentListOf("유", "현", "민")
+
     TuripTheme {
         Column(
             modifier =
@@ -96,17 +102,14 @@ fun ProfileRowAllVariantsPreview() {
                     .fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(TuripTheme.spacing.extraLarge),
         ) {
-            Text("1명", fontSize = 12.sp, color = Color.Gray)
-            ProfileRow(labels = persistentListOf("유"))
+            Text("기본 (48dp)", fontSize = 12.sp, color = Color.Gray)
+            ProfileRow(labels = sampleLabels, avatarSize = 48.dp)
 
-            Text("2명", fontSize = 12.sp, color = Color.Gray)
-            ProfileRow(labels = persistentListOf("유", "현"))
+            Text("중간 (36dp)", fontSize = 12.sp, color = Color.Gray)
+            ProfileRow(labels = sampleLabels, avatarSize = 36.dp)
 
-            Text("3명", fontSize = 12.sp, color = Color.Gray)
-            ProfileRow(labels = persistentListOf("유", "현", "민"))
-
-            Text("4명 이상 → 앞 3명만 표시", fontSize = 12.sp, color = Color.Gray)
-            ProfileRow(labels = persistentListOf("유", "현", "민", "지", "호"))
+            Text("작은 (28dp)", fontSize = 12.sp, color = Color.Gray)
+            ProfileRow(labels = sampleLabels, avatarSize = 28.dp)
         }
     }
 }

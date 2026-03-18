@@ -12,21 +12,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 
-internal val AVATAR_SIZE = 48.dp
 @Composable
 fun AvatarCircle(
     label: Char,
     modifier: Modifier = Modifier,
+    size: Dp,
     backgroundColor: Color = TuripTheme.colors.gray05,
     textColor: Color = TuripTheme.colors.white,
 ) {
     Box(
         modifier =
             modifier
-                .size(AVATAR_SIZE)
+                .size(size)
                 .clip(CircleShape)
                 .background(backgroundColor)
                 .border(width = 2.dp, color = TuripTheme.colors.white, shape = CircleShape),
@@ -43,10 +44,10 @@ fun AvatarCircle(
 @Composable
 @Preview(showBackground = true)
 private fun AvatarCirclePreview() {
-    TuripTheme{
+    TuripTheme {
         AvatarCircle(
             label = '유',
-            modifier = Modifier.size(AVATAR_SIZE)
+            size = 48.dp,
         )
     }
 }

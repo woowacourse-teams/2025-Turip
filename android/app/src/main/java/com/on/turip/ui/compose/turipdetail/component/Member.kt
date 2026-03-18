@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -85,8 +84,8 @@ fun MemberItem(
     ) {
         AvatarCircle(
             label = member.first(),
+            size = 52.dp,
             textColor = TuripTheme.colors.white,
-            modifier = Modifier.size(52.dp),
         )
 
         Spacer(modifier = Modifier.width(TuripTheme.spacing.large))
