@@ -15,6 +15,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
+import com.on.turip.ui.compose.turipdetail.model.ProfileRowStyle
+import com.on.turip.ui.compose.turipdetail.model.ProfileRowStyle.Companion.avatarSize
+import com.on.turip.ui.compose.turipdetail.model.ProfileRowStyle.Companion.textStyle
 
 @Composable
 fun AvatarCircle(
@@ -43,23 +46,6 @@ fun AvatarCircle(
         )
     }
 }
-
-@Composable
-private fun ProfileRowStyle.avatarSize(): Dp =
-    when (this) {
-        ProfileRowStyle.SMALL -> 28.dp
-        ProfileRowStyle.MEDIUM -> 36.dp
-        ProfileRowStyle.LARGE -> 48.dp
-    }
-
-@Composable
-private fun ProfileRowStyle.textStyle() =
-    when (this) {
-        ProfileRowStyle.SMALL -> TuripTheme.typography.info1
-        ProfileRowStyle.MEDIUM -> TuripTheme.typography.title3
-        ProfileRowStyle.LARGE -> TuripTheme.typography.title1
-    }
-
 @Composable
 @Preview(showBackground = true)
 private fun AvatarCirclePreview() {

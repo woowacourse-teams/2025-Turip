@@ -20,19 +20,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
+import com.on.turip.ui.compose.turipdetail.model.ProfileRowStyle
+import com.on.turip.ui.compose.turipdetail.model.ProfileRowStyle.Companion.avatarSize
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
 private const val AVATAR_OVERLAP_RATIO = 0.375f
-
-enum class ProfileRowStyle { SMALL, MEDIUM, LARGE }
 
 @Composable
 fun ProfileRow(
@@ -54,7 +52,8 @@ fun ProfileRow(
                     width = 1.5.dp,
                     color = TuripTheme.colors.gray02,
                     shape = RoundedCornerShape(50.dp),
-                ).padding(
+                )
+                .padding(
                     horizontal = TuripTheme.spacing.medium,
                     vertical = TuripTheme.spacing.small,
                 ),
@@ -91,22 +90,6 @@ fun ProfileRow(
         }
     }
 }
-
-@Composable
-private fun ProfileRowStyle.avatarSize(): Dp =
-    when (this) {
-        ProfileRowStyle.SMALL -> 28.dp
-        ProfileRowStyle.MEDIUM -> 36.dp
-        ProfileRowStyle.LARGE -> 48.dp
-    }
-
-@Composable
-private fun ProfileRowStyle.textStyle() =
-    when (this) {
-        ProfileRowStyle.SMALL -> TuripTheme.typography.title3
-        ProfileRowStyle.MEDIUM -> TuripTheme.typography.title2
-        ProfileRowStyle.LARGE -> TuripTheme.typography.title1
-    }
 
 @Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
 @Composable

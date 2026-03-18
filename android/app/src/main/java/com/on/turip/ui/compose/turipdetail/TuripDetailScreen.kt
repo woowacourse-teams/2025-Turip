@@ -52,9 +52,9 @@ import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
 import com.on.turip.ui.compose.turipdetail.component.MemberListSheet
 import com.on.turip.ui.compose.turipdetail.component.MoreOptionBottomSheet
 import com.on.turip.ui.compose.turipdetail.component.ProfileRow
-import com.on.turip.ui.compose.turipdetail.component.ProfileRowStyle
 import com.on.turip.ui.compose.turipdetail.component.TuripMapContent
 import com.on.turip.ui.compose.turipdetail.component.TuripPlaces
+import com.on.turip.ui.compose.turipdetail.model.ProfileRowStyle
 import com.on.turip.ui.compose.turipdetail.model.turip.PlaceLatLngUiModel
 import com.on.turip.ui.compose.turipdetail.model.turip.TuripShareModel
 import kotlinx.collections.immutable.ImmutableList
