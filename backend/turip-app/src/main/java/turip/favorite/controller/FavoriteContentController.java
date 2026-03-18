@@ -15,21 +15,21 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import turip.account.domain.Account;
 import turip.auth.resolver.AuthAccount;
 import turip.common.exception.ErrorResponse;
-import turip.content.controller.dto.response.content.ContentsDetailWithLoadableResponse;
+import turip.content.controller.dto.response.content.ContentDetailsWithLoadableResponse;
 import turip.favorite.controller.dto.request.FavoriteContentRequest;
 import turip.favorite.controller.dto.response.FavoriteContentCountResponse;
+import turip.favorite.controller.dto.response.FavoriteContentDetailsWithLoadableResponse;
 import turip.favorite.controller.dto.response.FavoriteContentResponse;
 import turip.favorite.service.FavoriteContentService;
+import turip.favorite.service.dto.FavoriteContentWithLoadableResult;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/bookmarks")
 @Tag(name = "Bookmark", description = "북마크 API")
 public class FavoriteContentController {
 
@@ -155,7 +155,7 @@ public class FavoriteContentController {
                     )
             )
     })
-    @PostMapping
+    @PostMapping("/api/v1/bookmarks")
     public ResponseEntity<FavoriteContentResponse> create(
             @Parameter(hidden = true) @AuthAccount Account account,
             @RequestBody FavoriteContentRequest request) {
@@ -165,7 +165,7 @@ public class FavoriteContentController {
     }
 
     @Operation(
-            summary = "내 북마크 목록 조회 api",
+            summary = "내 북마크 목록 조회 api v1",
             description = "내가 북마크한 콘텐츠 목록을 조회한다."
     )
     @ApiResponses(value = {
@@ -174,7 +174,7 @@ public class FavoriteContentController {
                     description = "성공 예시",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ContentsDetailWithLoadableResponse.class),
+                            schema = @Schema(implementation = ContentDetailsWithLoadableResponse.class),
                             examples = @ExampleObject(
                                     name = "success",
                                     summary = "내가 찜한 컨텐츠 목록 조회 성공",
@@ -251,14 +251,117 @@ public class FavoriteContentController {
                     )
             )
     })
-    @GetMapping
-    public ResponseEntity<ContentsDetailWithLoadableResponse> readMyFavoriteContents(
+    @GetMapping("/api/v1/bookmarks")
+    public ResponseEntity<ContentDetailsWithLoadableResponse> readMyFavoriteContentsV1(
             @Parameter(hidden = true) @AuthAccount Account account,
             @RequestParam(name = "size") Integer pageSize,
-            @RequestParam(name = "lastId") Long lastContentId
+            @RequestParam(name = "lastId") Long lastId
     ) {
-        ContentsDetailWithLoadableResponse response = favoriteContentService.findMyFavoriteContents(account, pageSize,
-                lastContentId);
+        FavoriteContentWithLoadableResult result = favoriteContentService.findMyFavoriteContents(account, pageSize,
+                lastId);
+        ContentDetailsWithLoadableResponse response = ContentDetailsWithLoadableResponse.from(result);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "내 북마크 목록 조회 api v2",
+            description = "내가 북마크한 콘텐츠 목록을 조회한다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "성공 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = FavoriteContentDetailsWithLoadableResponse.class),
+                            examples = @ExampleObject(
+                                    name = "success",
+                                    summary = "내가 찜한 컨텐츠 목록 조회 성공",
+                                    value = """
+                                            {
+                                            	"bookmarks" : [
+                                            	    {
+                                            		    "id": 1,
+                                            		    "createdAt": "2025-08-06",
+                                            		    "accountId": 1,
+                                            	        "content": {
+                                                            "id": 1,
+                                                            "title": "느좋 감성 대구 여행 어쩌구저쩌구",
+                                                            "url": "https://youtube.com/watch?v=abc123",
+                                                            "uploadedDate": "2024-04-21",
+                                                            "city": {
+                                                                "name": "속초"
+                                                            },
+                                            	            "creator": {
+                                            	                "id": 10,
+                                            	                "channelName": "여행하는 뭉치",
+                                            	                "profileImage": "http://turip.com/static/youtuber1"
+                                            	        },
+                                            	        "isBookmarked": true
+                                                    },
+                                            	    "tripDuration": {
+                                            	        "nights": 2,
+                                            	        "days": 3
+                                            	    },
+                                            	    "tripPlaceCount" : 14
+                                            	  }
+                                            	],
+                                            	"loadable" : true
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "access token expired",
+                                            summary = "만료된 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_EXPIRED",
+                                                    	"message": "access token이 만료됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "invalid signature access token",
+                                            summary = "서명값이 올바르지 않은 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_SIGNATURE_INVALID",
+                                                    	"message": "access token이 위조됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "unauthorized",
+                                            summary = "알 수 없는 이유로 인증 실패",
+                                            value = """
+                                                    {
+                                                    	"tag": "UNAUTHORIZED",
+                                                    	"message": "토큰 기반 인증에 실패했습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            )
+    })
+    @GetMapping("/api/v2/bookmarks")
+    public ResponseEntity<FavoriteContentDetailsWithLoadableResponse> readMyFavoriteContentsV2(
+            @Parameter(hidden = true) @AuthAccount Account account,
+            @RequestParam(name = "size") Integer pageSize,
+            @RequestParam(name = "lastId") Long lastId
+    ) {
+        FavoriteContentWithLoadableResult result = favoriteContentService.findMyFavoriteContents(account, pageSize,
+                lastId);
+        FavoriteContentDetailsWithLoadableResponse response = FavoriteContentDetailsWithLoadableResponse.from(result);
         return ResponseEntity.ok(response);
     }
 
@@ -325,7 +428,7 @@ public class FavoriteContentController {
                     )
             )
     })
-    @GetMapping("/count")
+    @GetMapping("/api/v1/bookmarks/count")
     public ResponseEntity<FavoriteContentCountResponse> readBookmarkCount(
             @Parameter(hidden = true) @AuthAccount Account account) {
         FavoriteContentCountResponse response = favoriteContentService.countByAccount(account);
@@ -412,7 +515,7 @@ public class FavoriteContentController {
                     )
             )
     })
-    @DeleteMapping
+    @DeleteMapping("/api/v1/bookmarks")
     public ResponseEntity<Void> delete(
             @Parameter(hidden = true) @AuthAccount Account account,
             @RequestParam(name = "contentId") Long contentId) {

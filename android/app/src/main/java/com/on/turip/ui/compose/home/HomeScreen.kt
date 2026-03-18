@@ -1,13 +1,16 @@
 package com.on.turip.ui.compose.home
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -44,10 +47,10 @@ import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun HomeScreen(
-    onSearchClick: (String) -> Unit,
-    onRegionClick: (String) -> Unit,
-    onContentClick: (UsersLikeContentModel) -> Unit,
-    navigateToLoginScreen: () -> Unit,
+    onSearchClick: (keyword: String) -> Unit,
+    onRegionClick: (regionName: String) -> Unit,
+    onContentClick: (contentId: Long) -> Unit,
+    onNavigateToLoginScreen: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val uiState: HomeUiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -55,23 +58,29 @@ fun HomeScreen(
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collectLatest { uiEffect: HomeUiEffect ->
             when (uiEffect) {
-                HomeUiEffect.NavigateToLogin -> navigateToLoginScreen()
+                HomeUiEffect.NavigateToLogin -> onNavigateToLoginScreen()
             }
         }
     }
 
-    Scaffold(
-        contentWindowInsets = WindowInsets(),
-        topBar = { HomeAppBar() },
-    ) { innerPadding ->
+    Column(modifier = Modifier.fillMaxSize()) {
+        Spacer(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .systemBarsPadding()
+                    .background(TuripTheme.colors.white),
+        )
+        HomeAppBar()
         HomeScreenContent(
             uiState = uiState,
             onSearchClick = onSearchClick,
             onRetryLoadContents = viewModel::loadContents,
-            onContentClick = onContentClick,
+            onContentClick = { usersLikeContent: UsersLikeContentModel ->
+                onContentClick(usersLikeContent.content.id)
+            },
             onRegionClick = onRegionClick,
             onDomesticClick = { viewModel.updateDomesticSelected(it) },
-            modifier = Modifier.padding(innerPadding),
         )
     }
 }
@@ -80,10 +89,10 @@ fun HomeScreen(
 private fun HomeScreenContent(
     uiState: HomeUiState,
     onRetryLoadContents: () -> Unit,
-    onSearchClick: (String) -> Unit,
-    onContentClick: (UsersLikeContentModel) -> Unit,
-    onRegionClick: (String) -> Unit,
-    onDomesticClick: (Boolean) -> Unit,
+    onSearchClick: (keyword: String) -> Unit,
+    onContentClick: (usersLikeContentModel: UsersLikeContentModel) -> Unit,
+    onRegionClick: (regionName: String) -> Unit,
+    onDomesticClick: (isDomestic: Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var keyword: String by rememberSaveable { mutableStateOf("") }

@@ -2,16 +2,14 @@ package com.on.turip.ui.compose.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
-import com.on.turip.common.AuthState
-import com.on.turip.common.UserType
 import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
 import com.on.turip.data.login.datasource.GoogleCredentialManager
 import com.on.turip.domain.login.GuestRepository
 import com.on.turip.domain.login.MemberRepository
-import com.on.turip.domain.login.usecase.LoginUserUseCase
+import com.on.turip.domain.login.usecase.LoginUseCase
+import com.on.turip.domain.session.usecase.SwitchToGuestUseCase
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
@@ -28,9 +26,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewmodel @Inject constructor(
-    private val loginUserUseCase: LoginUserUseCase,
+    private val loginUseCase: LoginUseCase,
     private val memberRepository: MemberRepository,
     private val guestRepository: GuestRepository,
+    private val switchToGuestUseCase: SwitchToGuestUseCase,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<LoginUiState> = MutableStateFlow(LoginUiState.IDLE)
     val uiState: StateFlow<LoginUiState> = _uiState
@@ -38,59 +37,61 @@ class LoginViewmodel @Inject constructor(
     private val _uiEffect: Channel<LoginUiEffect> = Channel(Channel.BUFFERED)
     val uiEffect: Flow<LoginUiEffect> = _uiEffect.receiveAsFlow()
 
+    // 딥링크 자동 로그인할 때 네트워크 지연으로 사용자가 직접 로그인을 누르게 되는 경우 중복 요청 방지
+    private var isLoginInProgress: Boolean = false
+
+    fun initDeepLinkUrl(deepLinkUrl: String?) {
+        val trimmedDeepLinkUrl: String? = deepLinkUrl?.trim()?.takeIf(String::isNotEmpty)
+        if (_uiState.value.deepLinkUrl == trimmedDeepLinkUrl) return
+
+        _uiState.update { it.copy(deepLinkUrl = trimmedDeepLinkUrl) }
+
+        if (!trimmedDeepLinkUrl.isNullOrBlank()) {
+            viewModelScope.launch {
+                _uiEffect.send(LoginUiEffect.RequestAutoLogin)
+            }
+        }
+    }
+
     fun updateHelpTextVisible(show: Boolean) {
         _uiState.update { it.copy(showHelpText = show) }
     }
 
-    fun onGoogleLogin(googleCredentialManager: GoogleCredentialManager) {
+    fun loginWithGoogle(googleCredentialManager: GoogleCredentialManager) {
+        if (isLoginInProgress) return
+        isLoginInProgress = true
         viewModelScope.launch {
-            googleCredentialManager
-                .getIdToken()
-                .onSuccess { result: GoogleIdTokenCredential ->
-                    loginUserUseCase(result.idToken)
-                        .onSuccess { isNewMember: Boolean ->
-                            AuthState.change(UserType.MEMBER)
-                            if (isNewMember) {
-                                showMigrationDialog(true)
-                            } else {
-                                _uiEffect.send(LoginUiEffect.NavigateToMain)
+            try {
+                googleCredentialManager
+                    .getIdToken()
+                    .onSuccess { idToken: String ->
+                        loginUseCase(idToken)
+                            .onSuccess { isNewMember: Boolean ->
+                                if (isNewMember) {
+                                    _uiState.update { it.copy(showMigrationDialog = true) }
+                                } else {
+                                    _uiEffect.send(LoginUiEffect.NavigateToMain(_uiState.value.deepLinkUrl))
+                                }
+                            }.onFailure { errorType ->
+                                handleError(errorType)
                             }
-                        }.onFailure {
-                            Timber.e("Token 저장 실패")
-                            _uiEffect.send(LoginUiEffect.ShowError(ErrorUiState.Server))
-                        }
-                }.onFailure { errorType: ErrorType ->
-                    val uiError: UiError = errorType.toUiError()
-                    if (uiError is UiError.Global) {
-                        when (uiError) {
-                            UiError.Global.Network -> {
-                                _uiEffect.send(LoginUiEffect.ShowError(ErrorUiState.Network))
-                            }
-
-                            UiError.Global.Server -> {
-                                _uiEffect.send(LoginUiEffect.ShowError(ErrorUiState.Server))
-                            }
-
-                            UiError.Global.TokenExpired -> {
-                                Unit
-                            }
-                        }
+                    }.onFailure { errorType: ErrorType ->
+                        handleError(errorType)
+                        Timber.e("googleCredentialManager 에서 IdToken 불러오기 실패")
                     }
-                    Timber.e("IdToken불러오기 실패")
-                }
+            } finally {
+                isLoginInProgress = false
+            }
         }
     }
 
-    private fun showMigrationDialog(show: Boolean) {
-        _uiState.update { it.copy(showMigrationDialog = show) }
-    }
-
-    fun migration() {
+    fun confirmMigration() {
         viewModelScope.launch {
             memberRepository
                 .updateMigration()
                 .onSuccess {
-                    _uiEffect.send(LoginUiEffect.NavigateToMain)
+                    _uiState.update { it.copy(showMigrationDialog = false) }
+                    _uiEffect.send(LoginUiEffect.NavigateToMain(_uiState.value.deepLinkUrl))
                 }.onFailure {
                     Timber.e("마이그레이션 실패")
                 }
@@ -102,17 +103,34 @@ class LoginViewmodel @Inject constructor(
             guestRepository
                 .deleteGuest()
                 .onSuccess {
-                    _uiEffect.send(LoginUiEffect.NavigateToMain)
+                    _uiEffect.send(LoginUiEffect.NavigateToMain(_uiState.value.deepLinkUrl))
                 }.onFailure {
                     Timber.e("게스트 데이터 삭제 실패")
                 }
         }
     }
 
-    fun onGuestLogin() {
+    fun continueAsGuest() {
         viewModelScope.launch {
-            AuthState.change(UserType.GUEST)
-            _uiEffect.send(LoginUiEffect.NavigateToMain)
+            switchToGuestUseCase()
+            _uiEffect.send(LoginUiEffect.NavigateToMain())
+        }
+    }
+
+    private suspend fun handleError(errorType: ErrorType) {
+        val uiError = errorType.toUiError()
+        when (uiError) {
+            UiError.Global.Network -> {
+                _uiEffect.send(LoginUiEffect.ShowError(ErrorUiState.Network))
+            }
+
+            UiError.Global.Server -> {
+                _uiEffect.send(LoginUiEffect.ShowError(ErrorUiState.Server))
+            }
+
+            else -> {
+                _uiEffect.send(LoginUiEffect.ShowError(ErrorUiState.Unexpected))
+            }
         }
     }
 }

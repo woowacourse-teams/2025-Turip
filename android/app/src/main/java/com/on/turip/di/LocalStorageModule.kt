@@ -2,9 +2,9 @@ package com.on.turip.di
 
 import android.content.Context
 import androidx.datastore.core.DataStore
-import androidx.datastore.dataStoreFile
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.room.Room
 import com.on.turip.data.database.TuripDatabase
 import com.on.turip.data.searchhistory.dao.SearchHistoryDao
@@ -27,7 +27,7 @@ object LocalStorageModule {
         @ApplicationContext context: Context,
     ): DataStore<Preferences> =
         PreferenceDataStoreFactory.create {
-            context.dataStoreFile(USER_PREFERENCES_FILE_NAME)
+            context.preferencesDataStoreFile(USER_PREFERENCES_FILE_NAME)
         }
 
     @Provides

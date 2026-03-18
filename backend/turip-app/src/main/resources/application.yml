@@ -8,7 +8,12 @@ spring:
       hibernate:
         format_sql: true
         default_batch_fetch_size: 100
+        jdbc:
+          time_zone: Asia/Seoul
     defer-datasource-initialization: false
+
+  jackson:
+    time-zone: Asia/Seoul
 
 region:
   category:

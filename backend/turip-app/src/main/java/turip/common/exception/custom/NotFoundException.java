@@ -8,4 +8,8 @@ public class NotFoundException extends HttpStatusException {
     public NotFoundException(ErrorTag errorTag) {
         super(HttpStatus.NOT_FOUND, errorTag);
     }
+
+    public NotFoundException(ErrorTag errorTag, Throwable cause) {
+        super(HttpStatus.NOT_FOUND, errorTag, cause);
+    }
 }

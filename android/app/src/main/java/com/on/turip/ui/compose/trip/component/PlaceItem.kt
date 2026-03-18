@@ -55,12 +55,10 @@ fun PlaceItem(
                     width = 1.dp,
                     color = TuripTheme.colors.border,
                     shape = TuripTheme.shape.container,
-                )
-                .background(
+                ).background(
                     color = TuripTheme.colors.container,
                     shape = TuripTheme.shape.container,
-                )
-                .padding(
+                ).padding(
                     start = TuripTheme.spacing.large,
                     end = TuripTheme.spacing.large,
                     top = TuripTheme.spacing.medium,
@@ -146,8 +144,7 @@ private fun PlaceActionItem(
                     onClick = onClick,
                     interactionSource = interactionSource,
                     indication = ripple(color = TuripTheme.colors.gray03),
-                )
-                .padding(
+                ).padding(
                     horizontal = TuripTheme.spacing.medium,
                     vertical = TuripTheme.spacing.extraSmall,
                 ),

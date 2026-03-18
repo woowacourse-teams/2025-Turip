@@ -66,7 +66,7 @@ fun ErrorScreen(
     }
 }
 
-@Preview(showBackground = true, name = "네트워크 에러 시")
+@Preview(showBackground = true, name = "네트워크 에러")
 @Composable
 private fun NetworkErrorScreenPreview() {
     TuripTheme {
@@ -77,12 +77,23 @@ private fun NetworkErrorScreenPreview() {
     }
 }
 
-@Preview(showBackground = true, name = "커스텀 에러 외 에러 발생")
+@Preview(showBackground = true, name = "서버 에러")
 @Composable
-private fun AppErrorScreenPreview() {
+private fun ServerErrorScreenPreview() {
     TuripTheme {
         ErrorScreen(
             errorUiState = ErrorUiState.Server,
+            onRetryClick = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "서버, 네트워크 외 에러")
+@Composable
+private fun UnknownErrorScreenPreview() {
+    TuripTheme {
+        ErrorScreen(
+            errorUiState = ErrorUiState.Unexpected,
             onRetryClick = {},
         )
     }

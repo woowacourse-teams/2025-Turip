@@ -25,7 +25,7 @@ import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 
 @Composable
 fun GoogleLoginButton(
-    onClickLoginButton: () -> Unit,
+    onLoginClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -36,7 +36,7 @@ fun GoogleLoginButton(
                     shape = RoundedCornerShape(30.dp),
                 ).background(color = TuripTheme.colors.white, shape = RoundedCornerShape(30.dp))
                 .clip(RoundedCornerShape(30.dp))
-                .clickable { onClickLoginButton() }
+                .clickable { onLoginClick() }
                 .padding(vertical = TuripTheme.spacing.large, horizontal = TuripTheme.spacing.large),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -62,7 +62,7 @@ fun GoogleLoginButton(
 private fun GoogleLoginButtonPreView() {
     TuripTheme {
         GoogleLoginButton(
-            onClickLoginButton = {},
+            onLoginClick = {},
             modifier =
                 Modifier.padding(20.dp),
         )

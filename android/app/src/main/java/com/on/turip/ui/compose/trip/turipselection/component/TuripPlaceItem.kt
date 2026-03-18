@@ -33,8 +33,10 @@ fun TuripPlaceItem(
     onMapClick: () -> Unit,
     onTuripPlaceClick: () -> Unit,
     modifier: Modifier = Modifier,
+    onItemClick: () -> Unit = {},
 ) {
     Surface(
+        onClick = onItemClick,
         shape = TuripTheme.shape.container,
         border = BorderStroke(1.dp, TuripTheme.colors.gray02),
         color = TuripTheme.colors.container,
@@ -188,6 +190,7 @@ private fun TuripPlaceItemPreview(
     TuripTheme {
         TuripPlaceItem(
             place = state.place,
+            onItemClick = {},
             onMapClick = {},
             onTuripPlaceClick = {},
         )

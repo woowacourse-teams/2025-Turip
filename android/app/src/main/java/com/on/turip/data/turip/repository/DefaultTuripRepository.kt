@@ -10,12 +10,17 @@ import com.on.turip.data.turip.toPatchRequestDto
 import com.on.turip.data.turip.toPostRequestDto
 import com.on.turip.domain.bookmark.TuripPlace
 import com.on.turip.domain.turip.Turip
+import com.on.turip.domain.turip.TuripInvitationInformation
+import com.on.turip.domain.turip.TuripInvitationToken
 import com.on.turip.domain.turip.repository.TuripRepository
 import javax.inject.Inject
 
 class DefaultTuripRepository @Inject constructor(
     private val turipRemoteDataSource: TuripRemoteDataSource,
 ) : TuripRepository {
+    override suspend fun loadTurip(turipId: Long): TuripResult<Turip> =
+        turipRemoteDataSource.getTurip(turipId).mapCatching { it.toDomain() }
+
     override suspend fun loadTurips(): TuripResult<List<Turip>> = turipRemoteDataSource.getTurips().mapCatching { it.toDomain() }
 
     override suspend fun createTurip(name: String): TuripResult<Turip> =
@@ -66,4 +71,12 @@ class DefaultTuripRepository @Inject constructor(
             placeId = placeId,
             placeTuripsRequest = PlaceTuripsRequest(turipIds),
         )
+
+    override suspend fun createInvitationToken(turipId: Long): TuripResult<TuripInvitationToken> =
+        turipRemoteDataSource.createInvitationToken(turipId).mapCatching { it.toDomain() }
+
+    override suspend fun joinTurip(turipId: Long): TuripResult<Unit> = turipRemoteDataSource.joinTurip(turipId).mapCatching { Unit }
+
+    override suspend fun verifyInvitationToken(token: String): TuripResult<TuripInvitationInformation> =
+        turipRemoteDataSource.getInvitationInformation(token).mapCatching { it.toDomain() }
 }

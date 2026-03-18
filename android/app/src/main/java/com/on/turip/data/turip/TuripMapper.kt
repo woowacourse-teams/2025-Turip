@@ -2,6 +2,8 @@ package com.on.turip.data.turip
 
 import com.on.turip.data.turip.dto.TuripByPlaceResponse
 import com.on.turip.data.turip.dto.TuripCreationResponse
+import com.on.turip.data.turip.dto.TuripInvitationInformationResponse
+import com.on.turip.data.turip.dto.TuripInvitationTokenResponse
 import com.on.turip.data.turip.dto.TuripPatchRequest
 import com.on.turip.data.turip.dto.TuripPlacesResponse
 import com.on.turip.data.turip.dto.TuripPostRequest
@@ -11,6 +13,8 @@ import com.on.turip.data.turip.dto.TuripsResponse
 import com.on.turip.domain.bookmark.TuripPlace
 import com.on.turip.domain.trip.Place
 import com.on.turip.domain.turip.Turip
+import com.on.turip.domain.turip.TuripInvitationInformation
+import com.on.turip.domain.turip.TuripInvitationToken
 
 fun TuripsResponse.toDomain(): List<Turip> = turipsResponse.map { it.toDomain() }
 
@@ -20,6 +24,8 @@ fun TuripResponse.toDomain(): Turip =
         name = name,
         isDefault = isDefault,
         placeCount = placeCount,
+        memberCount = memberCount,
+        isShared = isShared,
     )
 
 fun TuripCreationResponse.toDomain(): Turip =
@@ -28,6 +34,8 @@ fun TuripCreationResponse.toDomain(): Turip =
         name = name,
         isDefault = isDefault,
         placeCount = 0,
+        memberCount = 0,
+        isShared = false,
     )
 
 fun String.toPostRequestDto(): TuripPostRequest = TuripPostRequest(name = this)
@@ -40,8 +48,10 @@ fun TuripByPlaceResponse.toDomain(): Turip =
     Turip(
         id = id,
         name = name,
-        isDefault = false,
+        isDefault = isDefault,
         placeCount = 0,
+        memberCount = 0,
+        isShared = false,
         hasIncludePlace = isTuripPlace,
     )
 
@@ -62,3 +72,11 @@ fun TuripPlacesResponse.toDomain(): List<TuripPlace> =
                 ),
         )
     }
+
+fun TuripInvitationTokenResponse.toDomain(): TuripInvitationToken = TuripInvitationToken(value = invitationToken)
+
+fun TuripInvitationInformationResponse.toDomain(): TuripInvitationInformation =
+    TuripInvitationInformation(
+        turipId = turipId,
+        alreadyJoined = alreadyJoined,
+    )

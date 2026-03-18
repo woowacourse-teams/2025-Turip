@@ -21,7 +21,7 @@ class GoogleCredentialManager @Inject constructor(
 ) : CredentialProvider {
     private val credentialManager by lazy { CredentialManager.create(context) }
 
-    override suspend fun getIdToken(): TuripResult<GoogleIdTokenCredential> =
+    override suspend fun getIdToken(): TuripResult<String> =
         try {
             val googleIdTokenCredential =
                 credentialManager.getCredential(request = getCredentialRequest, context = context)
@@ -34,11 +34,12 @@ class GoogleCredentialManager @Inject constructor(
             }
         }
 
-    private fun handleSignIn(result: GetCredentialResponse): GoogleIdTokenCredential {
+    private fun handleSignIn(result: GetCredentialResponse): String {
         val credential: Credential = result.credential
         if (credential is CustomCredential && credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
             try {
-                return GoogleIdTokenCredential.createFrom(credential.data)
+                val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+                return googleIdTokenCredential.idToken
             } catch (e: GoogleIdTokenParsingException) {
                 throw IllegalArgumentException("유효하지 않은 ID Token", e)
             }

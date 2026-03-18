@@ -8,7 +8,7 @@ import android.webkit.WebViewClient
 class TuripWebViewClient(
     private val onLoadingStarted: () -> Unit,
     private val onLoadingFinished: () -> Unit,
-    private val onNavigateExternalUrl: (String) -> Unit,
+    private val onNavigateExternalUrl: (url: String) -> Unit,
 ) : WebViewClient() {
     override fun shouldOverrideUrlLoading(
         view: WebView?,

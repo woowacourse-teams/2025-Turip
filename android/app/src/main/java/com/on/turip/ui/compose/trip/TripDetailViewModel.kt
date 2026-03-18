@@ -1,6 +1,5 @@
 package com.on.turip.ui.compose.trip
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.on.turip.core.result.ErrorType
@@ -19,7 +18,6 @@ import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.compose.trip.model.PlaceModel
 import com.on.turip.ui.compose.trip.model.SelectedPlaceModel
 import com.on.turip.ui.compose.trip.model.TripDetailInfoModel
-import com.on.turip.ui.trip.TripDetailActivity.Companion.TRIP_DETAIL_CONTENT_KEY
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.async
@@ -36,7 +34,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TripDetailViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
     private val contentRepository: ContentRepository,
     private val updateBookmarkUseCase: UpdateBookmarkUseCase,
 ) : ViewModel() {
@@ -47,17 +44,15 @@ class TripDetailViewModel @Inject constructor(
     private val _uiEffect: Channel<TripDetailUiEffect> = Channel(Channel.BUFFERED)
     val uiEffect: Flow<TripDetailUiEffect> = _uiEffect.receiveAsFlow()
 
-    private val contentId: Long by lazy {
-        checkNotNull(savedStateHandle[TRIP_DETAIL_CONTENT_KEY]) {
-            Timber.e("컨텐츠 상세 화면 Content ID 값이 존재하지 않습니다.")
-        }
-    }
+    private var contentId: Long = INVALID_ID
 
-    init {
+    fun initContentId(contentId: Long) {
+        this.contentId = contentId
         loadTripDetails()
     }
 
     fun loadTripDetails() {
+        if (contentId == INVALID_ID) return
         if (uiState.value.isLoading) return
 
         viewModelScope.launch {
@@ -222,5 +217,9 @@ class TripDetailViewModel @Inject constructor(
         when (action) {
             TripDetailRetryAction.UpdateBookmark -> updateBookmark()
         }
+    }
+
+    private companion object {
+        private const val INVALID_ID = -1L
     }
 }

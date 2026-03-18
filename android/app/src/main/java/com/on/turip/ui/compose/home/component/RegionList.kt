@@ -21,7 +21,7 @@ private const val MAX_REGION_COUNT_IN_EACH_ROW = 4
 @Composable
 fun RegionList(
     regions: List<RegionCategory>,
-    onRegionClick: (String) -> Unit,
+    onRegionClick: (regionName: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val rowCount = (regions.lastIndex / MAX_REGION_COUNT_IN_EACH_ROW) + 1

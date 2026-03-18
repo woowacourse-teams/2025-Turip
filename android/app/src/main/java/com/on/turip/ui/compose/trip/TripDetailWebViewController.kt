@@ -6,6 +6,7 @@ import android.view.View
 import android.webkit.WebView
 import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -26,7 +27,7 @@ import com.on.turip.ui.compose.trip.webview.resumeVideo
 class TripDetailWebViewController(
     val webView: WebView,
     private val videoManager: VideoManager,
-    val navigateToWebViewUrl: (String) -> Unit,
+    val navigateToWebViewUrl: (webUrl: String) -> Unit,
 ) {
     var isFullScreen by mutableStateOf(false)
         private set
@@ -94,7 +95,7 @@ class TripDetailWebViewController(
 @Composable
 fun rememberTripDetailWebViewController(
     context: Context,
-    navigateToWebViewUrl: (String) -> Unit,
+    navigateToWebViewUrl: (webUrl: String) -> Unit,
 ): TripDetailWebViewController =
     remember {
         val webView = WebView(context).apply { applyVideoSettings() }
@@ -110,6 +111,17 @@ fun rememberTripDetailWebViewController(
 fun HandleFullScreenWindowLaunchedEffect(isFullScreen: Boolean) {
     val activity = LocalActivity.current ?: return
 
+    DisposableEffect(activity) {
+        onDispose {
+            val window = activity.window
+            val controller = WindowCompat.getInsetsController(window, window.decorView)
+
+            activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+            controller.show(WindowInsetsCompat.Type.systemBars())
+            controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_DEFAULT
+        }
+    }
+
     LaunchedEffect(isFullScreen) {
         val window = activity.window
         val controller = WindowCompat.getInsetsController(window, window.decorView)
@@ -122,10 +134,6 @@ fun HandleFullScreenWindowLaunchedEffect(isFullScreen: Boolean) {
         } else {
             activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
             controller.show(WindowInsetsCompat.Type.systemBars())
-
-            controller.isAppearanceLightStatusBars = false
-            controller.isAppearanceLightNavigationBars = false
-
             controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_DEFAULT
         }
     }

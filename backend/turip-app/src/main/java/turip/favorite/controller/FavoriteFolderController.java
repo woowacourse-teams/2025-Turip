@@ -27,13 +27,16 @@ import turip.auth.resolver.AuthMember;
 import turip.common.exception.ErrorResponse;
 import turip.favorite.controller.dto.request.FavoriteFolderNameRequest;
 import turip.favorite.controller.dto.request.FavoriteFolderRequest;
+import turip.favorite.controller.dto.response.FavoriteFolderDetailResponse;
+import turip.favorite.controller.dto.response.FavoriteFolderExitResponse;
+import turip.favorite.controller.dto.response.FavoriteFolderJoinResponse;
+import turip.favorite.controller.dto.response.FavoriteFolderMembersResponse;
 import turip.favorite.controller.dto.response.FavoriteFolderResponse;
+import turip.favorite.controller.dto.response.FavoriteFoldersDetailResponse;
 import turip.favorite.controller.dto.response.FavoriteFoldersWithFavoriteStatusResponse;
-import turip.favorite.controller.dto.response.FavoriteFoldersWithPlaceCountResponse;
 import turip.favorite.controller.dto.response.FolderInvitationDetailResponse;
 import turip.favorite.controller.dto.response.FolderInvitationTokenResponse;
 import turip.favorite.service.FavoriteFolderService;
-import turip.favorite.stream.service.FavoriteFolderStreamService;
 
 @RestController
 @RequiredArgsConstructor
@@ -42,7 +45,6 @@ import turip.favorite.stream.service.FavoriteFolderStreamService;
 public class FavoriteFolderController {
 
     private final FavoriteFolderService favoriteFolderService;
-    private final FavoriteFolderStreamService favoriteFolderStreamService;
 
     @Operation(
             summary = "튜립 생성 api",
@@ -167,6 +169,146 @@ public class FavoriteFolderController {
         FavoriteFolderResponse response = favoriteFolderService.createCustomFavoriteFolder(request, account);
         return ResponseEntity.created(URI.create("/api/v1/turips/" + response.id()))
                 .body(response);
+    }
+
+    @Operation(
+            summary = "튜립 참여 api",
+            description = "회원을 공유 폴더에 참여시킨다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "성공 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = FavoriteFolderJoinResponse.class),
+                            examples = @ExampleObject(
+                                    name = "success",
+                                    summary = "튜립 참여 성공",
+                                    value = """
+                                            {
+                                                "id": 1,
+                                                "turipId": 1,
+                                                "isShared": true,
+                                                "accountId": 1
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "personal folder not valid",
+                                            summary = "개인 찜폴더인 경우",
+                                            value = """
+                                                    {
+                                                    	"tag": "PERSONAL_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED",
+                                                    	"message": "개인 찜폴더에는 이 작업을 수행할 수 없습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "default folder not valid",
+                                            summary = "기본 찜폴더인 경우",
+                                            value = """
+                                                    {
+                                                    	"tag": "DEFAULT_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED",
+                                                    	"message": "기본 찜폴더에는 이 작업을 수행할 수 없습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "access token expired",
+                                            summary = "만료된 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_EXPIRED",
+                                                    	"message": "access token이 만료됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "invalid signature access token",
+                                            summary = "서명값이 올바르지 않은 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_SIGNATURE_INVALID",
+                                                    	"message": "access token이 위조됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "unauthorized",
+                                            summary = "알 수 없는 이유로 인증 실패",
+                                            value = """
+                                                    {
+                                                    	"tag": "UNAUTHORIZED",
+                                                    	"message": "토큰 기반 인증에 실패했습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "forbidden",
+                                    summary = "게스트가 해당 기능에 접근하려는 경우",
+                                    value = """
+                                            {
+                                                "tag": "FORBIDDEN",
+                                                "message": "접근 권한이 없습니다."
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "turip_not_found",
+                                    summary = "turipId에 대한 튜립을 찾을 수 없는 경우",
+                                    value = """
+                                            {
+                                                "tag": "FAVORITE_FOLDER_NOT_FOUND",
+                                                "message": "찜폴더를 찾을 수 없습니다."
+                                            }
+                                            """
+                            )
+                    )
+            )
+    })
+    @PostMapping("/{turipId}/join")
+    public ResponseEntity<FavoriteFolderJoinResponse> join(
+            @Parameter(hidden = true) @AuthMember Member member,
+            @PathVariable("turipId") Long favoriteFolderId) {
+        FavoriteFolderJoinResponse response = favoriteFolderService.joinMember(favoriteFolderId, member);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(
@@ -381,7 +523,7 @@ public class FavoriteFolderController {
                     description = "성공 예시",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = FavoriteFoldersWithPlaceCountResponse.class),
+                            schema = @Schema(implementation = FavoriteFoldersDetailResponse.class),
                             examples = @ExampleObject(
                                     name = "success",
                                     summary = "튜립 조회 성공",
@@ -393,14 +535,18 @@ public class FavoriteFolderController {
                                                         "accountId": 8,
                                                         "name": "기본 폴더",
                                                         "isDefault": true,
-                                                        "placeCount": 0
+                                                        "placeCount": 0,
+                                                        "memberCount": 1,
+                                                        "isShared": false
                                                     },
                                                     {
                                                         "id": 6,
                                                         "accountId": 8,
                                                         "name": "뭉치가 가고싶은 맛집들",
                                                         "isDefault": false,
-                                                        "placeCount": 0
+                                                        "placeCount": 0,
+                                                        "memberCount": 5,
+                                                        "isShared": true
                                                     }
                                                 ]
                                             }
@@ -450,9 +596,9 @@ public class FavoriteFolderController {
             )
     })
     @GetMapping
-    public ResponseEntity<FavoriteFoldersWithPlaceCountResponse> readAllByMember(
+    public ResponseEntity<FavoriteFoldersDetailResponse> readAllByMember(
             @Parameter(hidden = true) @AuthAccount Account account) {
-        FavoriteFoldersWithPlaceCountResponse response = favoriteFolderService.findAllByAccount(account);
+        FavoriteFoldersDetailResponse response = favoriteFolderService.findAllByAccount(account);
         return ResponseEntity.ok(response);
     }
 
@@ -558,6 +704,232 @@ public class FavoriteFolderController {
             @RequestParam("placeId") Long placeId) {
         FavoriteFoldersWithFavoriteStatusResponse response = favoriteFolderService.findAllWithFavoriteStatusByAccountId(
                 account, placeId);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "튜립 상세 조회 api",
+            description = "특정 튜립의 상세 정보를 조회한다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "성공 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = FavoriteFolderDetailResponse.class),
+                            examples = @ExampleObject(
+                                    name = "success",
+                                    summary = "튜립 상세 조회 성공",
+                                    value = """
+                                            {
+                                                "id": 1,
+                                                "accountId": 1,
+                                                "name": "튜립 부산",
+                                                "isDefault": false,
+                                                "placeCount": 2,
+                                                "isShared": true,
+                                                "memberCount": 4
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "access token expired",
+                                            summary = "만료된 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_EXPIRED",
+                                                    	"message": "access token이 만료됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "invalid signature access token",
+                                            summary = "서명값이 올바르지 않은 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_SIGNATURE_INVALID",
+                                                    	"message": "access token이 위조됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "unauthorized",
+                                            summary = "알 수 없는 이유로 인증 실패",
+                                            value = """
+                                                    {
+                                                    	"tag": "UNAUTHORIZED",
+                                                    	"message": "토큰 기반 인증에 실패했습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "forbidden",
+                                    summary = "해당 계정이 튜립에 대한 접근 권한이 없는 경우",
+                                    value = """
+                                            {
+                                                "tag": "FORBIDDEN",
+                                                "message": "접근 권한이 없습니다."
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "turip_not_found",
+                                    summary = "turipId에 대한 튜립을 찾을 수 없는 경우",
+                                    value = """
+                                            {
+                                                "tag": "FAVORITE_FOLDER_NOT_FOUND",
+                                                "message": "찜폴더를 찾을 수 없습니다."
+                                            }
+                                            """
+                            )
+                    )
+            )
+    })
+    @GetMapping("/{turipId}")
+    public ResponseEntity<FavoriteFolderDetailResponse> readById(
+            @Parameter(hidden = true) @AuthAccount Account account,
+            @PathVariable("turipId") Long favoriteFolderId) {
+        FavoriteFolderDetailResponse response = favoriteFolderService.findById(favoriteFolderId, account);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "튜립 참여자 목록 조회 api",
+            description = "함께 튜립의 참여들의 정보를 조회한다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "성공 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = FavoriteFolderMembersResponse.class),
+                            examples = @ExampleObject(
+                                    name = "success",
+                                    summary = "튜립 참여자 목록 조회 성공",
+                                    value = """
+                                            {
+                                                "members" : [
+                                                    {
+                                                        "nickname" : "하루"
+                                                    },
+                                                    {
+                                                        "nickname" : "메이"
+                                                    }
+                                                ]
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "access token expired",
+                                            summary = "만료된 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_EXPIRED",
+                                                    	"message": "access token이 만료됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "invalid signature access token",
+                                            summary = "서명값이 올바르지 않은 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_SIGNATURE_INVALID",
+                                                    	"message": "access token이 위조됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "unauthorized",
+                                            summary = "알 수 없는 이유로 인증 실패",
+                                            value = """
+                                                    {
+                                                    	"tag": "UNAUTHORIZED",
+                                                    	"message": "토큰 기반 인증에 실패했습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "forbidden",
+                                    summary = "요청한 account가 해당 튜립에 참여중이지 않은 경우",
+                                    value = """
+                                            {
+                                                "tag": "FORBIDDEN",
+                                                "message": "접근 권한이 없습니다."
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "turip_not_found",
+                                    summary = "id에 대한 튜립을 찾을 수 없는 경우",
+                                    value = """
+                                            {
+                                                "tag": "FAVORITE_FOLDER_NOT_FOUND",
+                                                "message": "찜폴더를 찾을 수 없습니다."
+                                            }
+                                            """
+                            )
+                    )
+            ),
+    })
+    @GetMapping("/{turipId}/members")
+    public ResponseEntity<FavoriteFolderMembersResponse> readMembersById(
+            @Parameter(hidden = true) @AuthAccount Account account, @PathVariable("turipId") Long favoriteFolderId) {
+        FavoriteFolderMembersResponse response = favoriteFolderService.findMembersById(favoriteFolderId, account);
         return ResponseEntity.ok(response);
     }
 
@@ -855,5 +1227,169 @@ public class FavoriteFolderController {
             @PathVariable("turipId") Long favoriteFolderId) {
         favoriteFolderService.remove(account, favoriteFolderId);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(
+            summary = "튜립 나가기 api",
+            description = "함께 튜립에서 나간다. 함께 튜립의 마지막 참여자인 경우 튜립을 삭제한다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "성공 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = FavoriteFolderExitResponse.class),
+                            examples = @ExampleObject(
+                                    name = "success",
+                                    summary = "튜립 나가기 성공",
+                                    value = """
+                                            {
+                                                "isDeleted": true
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "personal folder not valid",
+                                            summary = "개인 찜폴더인 경우",
+                                            value = """
+                                                    {
+                                                    	"tag": "PERSONAL_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED",
+                                                    	"message": "개인 찜폴더에는 이 작업을 수행할 수 없습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "default folder not valid",
+                                            summary = "기본 찜폴더인 경우",
+                                            value = """
+                                                    {
+                                                    	"tag": "DEFAULT_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED",
+                                                    	"message": "기본 찜폴더에는 이 작업을 수행할 수 없습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "access token expired",
+                                            summary = "만료된 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_EXPIRED",
+                                                    	"message": "access token이 만료됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "invalid signature access token",
+                                            summary = "서명값이 올바르지 않은 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_SIGNATURE_INVALID",
+                                                    	"message": "access token이 위조됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "unauthorized",
+                                            summary = "알 수 없는 이유로 인증 실패",
+                                            value = """
+                                                    {
+                                                    	"tag": "UNAUTHORIZED",
+                                                    	"message": "토큰 기반 인증에 실패했습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "guest_forbidden",
+                                            summary = "게스트가 해당 기능에 접근하려는 경우",
+                                            value = """
+                                                    {
+                                                        "tag": "FORBIDDEN",
+                                                        "message": "접근 권한이 없습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "not_member",
+                                            summary = "해당 폴더 참여자가 아닌 경우",
+                                            value = """
+                                                    {
+                                                        "tag": "FORBIDDEN",
+                                                        "message": "접근 권한이 없습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "실패 예시",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ErrorResponse.class),
+                                    examples = @ExampleObject(
+                                            name = "turip_not_found",
+                                            summary = "turipId에 대한 튜립을 찾을 수 없는 경우",
+                                            value = """
+                                                    {
+                                                        "tag": "FAVORITE_FOLDER_NOT_FOUND",
+                                                        "message": "찜폴더를 찾을 수 없습니다."
+                                                    }
+                                                    """
+                                    )
+                            ),
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ErrorResponse.class),
+                                    examples = @ExampleObject(
+                                            name = "turip_account_not_found",
+                                            summary = "해당 turip에 참여중인 계정 목록에 존재하지 않는 경우",
+                                            value = """
+                                                    {
+                                                        "tag": "FAVORITE_FOLDER_ACCOUNT_NOT_FOUND",
+                                                        "message": "찜폴더에 참여중인 계정 목록에서 해당 계정을 찾을 수 없습니다."
+                                                    }
+                                                    """
+                                    )
+                            )
+                    }
+            )
+    })
+    @DeleteMapping("/{turipId}/exit")
+    public ResponseEntity<FavoriteFolderExitResponse> exit(@Parameter(hidden = true) @AuthMember Member member,
+                                                           @PathVariable("turipId") Long favoriteFolderId) {
+        FavoriteFolderExitResponse response = favoriteFolderService.exitFolder(member.getAccount(), favoriteFolderId);
+        return ResponseEntity.ok(response);
     }
 }
