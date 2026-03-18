@@ -6,12 +6,10 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -35,8 +33,9 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.on.turip.ui.compose.turipdetail.model.turip.PlaceLatLngUiModel
+import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.turipdetail.model.ProfileRowStyle
+import com.on.turip.ui.compose.turipdetail.model.turip.PlaceLatLngUiModel
 import kotlinx.collections.immutable.ImmutableList
 
 @SuppressLint("CoroutineCreationDuringComposition")
@@ -130,24 +129,28 @@ fun TuripMapContent(
             }
         }
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
+        Box(
+            modifier = Modifier.fillMaxWidth(),
         ) {
-            IconButton(onClick = onMapToggle) {
+            IconButton(
+                onClick = onMapToggle,
+                modifier = Modifier.align(Alignment.Center),
+            ) {
                 Icon(
                     imageVector = if (isMapVisible) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                     contentDescription = null,
                 )
             }
 
-            Spacer(modifier = Modifier.width(8.dp))
-
             ProfileRow(
                 labels = nicknames,
                 modifier =
-                    Modifier.clickable {
-                        onClickMembers()
-                    },
+                    Modifier
+                        .align(Alignment.CenterEnd)
+                        .padding(end = TuripTheme.spacing.large)
+                        .clickable {
+                            onClickMembers()
+                        },
                 profileRowStyle = ProfileRowStyle.SMALL,
             )
         }
