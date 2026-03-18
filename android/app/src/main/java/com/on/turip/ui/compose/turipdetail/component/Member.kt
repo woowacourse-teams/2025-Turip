@@ -84,8 +84,7 @@ fun MemberItem(
     ) {
         AvatarCircle(
             label = member.first(),
-            size = 52.dp,
-            textColor = TuripTheme.colors.white,
+            profileRowStyle = ProfileRowStyle.LARGE,
         )
 
         Spacer(modifier = Modifier.width(TuripTheme.spacing.large))

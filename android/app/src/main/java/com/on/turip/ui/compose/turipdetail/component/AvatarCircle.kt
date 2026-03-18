@@ -19,15 +19,18 @@ import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 @Composable
 fun AvatarCircle(
     label: Char,
+    profileRowStyle: ProfileRowStyle,
     modifier: Modifier = Modifier,
-    size: Dp,
     backgroundColor: Color = TuripTheme.colors.gray05,
     textColor: Color = TuripTheme.colors.white,
 ) {
+    val avatarSize = profileRowStyle.avatarSize()
+    val textStyle = profileRowStyle.textStyle()
+
     Box(
         modifier =
             modifier
-                .size(size)
+                .size(avatarSize)
                 .clip(CircleShape)
                 .background(backgroundColor)
                 .border(width = 2.dp, color = TuripTheme.colors.white, shape = CircleShape),
@@ -36,10 +39,26 @@ fun AvatarCircle(
         Text(
             text = label.toString(),
             color = textColor,
-            style = TuripTheme.typography.title1,
+            style = textStyle,
         )
     }
 }
+
+@Composable
+private fun ProfileRowStyle.avatarSize(): Dp =
+    when (this) {
+        ProfileRowStyle.SMALL -> 28.dp
+        ProfileRowStyle.MEDIUM -> 36.dp
+        ProfileRowStyle.LARGE -> 48.dp
+    }
+
+@Composable
+private fun ProfileRowStyle.textStyle() =
+    when (this) {
+        ProfileRowStyle.SMALL -> TuripTheme.typography.info1
+        ProfileRowStyle.MEDIUM -> TuripTheme.typography.title3
+        ProfileRowStyle.LARGE -> TuripTheme.typography.title1
+    }
 
 @Composable
 @Preview(showBackground = true)
@@ -47,7 +66,7 @@ private fun AvatarCirclePreview() {
     TuripTheme {
         AvatarCircle(
             label = '유',
-            size = 48.dp,
+            profileRowStyle = ProfileRowStyle.LARGE,
         )
     }
 }

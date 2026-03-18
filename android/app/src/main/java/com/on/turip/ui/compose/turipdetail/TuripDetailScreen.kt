@@ -52,6 +52,7 @@ import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
 import com.on.turip.ui.compose.turipdetail.component.MemberListSheet
 import com.on.turip.ui.compose.turipdetail.component.MoreOptionBottomSheet
 import com.on.turip.ui.compose.turipdetail.component.ProfileRow
+import com.on.turip.ui.compose.turipdetail.component.ProfileRowStyle
 import com.on.turip.ui.compose.turipdetail.component.TuripMapContent
 import com.on.turip.ui.compose.turipdetail.component.TuripPlaces
 import com.on.turip.ui.compose.turipdetail.model.turip.PlaceLatLngUiModel
@@ -411,7 +412,7 @@ private fun Header(
                         Modifier.clickable {
                             onClickMembers()
                         },
-                    avatarSize = 28.dp,
+                    profileRowStyle = ProfileRowStyle.SMALL,
                 )
             }
         },

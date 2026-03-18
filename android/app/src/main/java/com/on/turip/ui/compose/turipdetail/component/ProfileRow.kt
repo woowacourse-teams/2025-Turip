@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -31,14 +32,17 @@ import kotlinx.collections.immutable.persistentListOf
 
 private const val AVATAR_OVERLAP_RATIO = 0.375f
 
+enum class ProfileRowStyle { SMALL, MEDIUM, LARGE }
+
 @Composable
 fun ProfileRow(
     labels: ImmutableList<String>,
     modifier: Modifier = Modifier,
-    avatarSize: Dp,
+    profileRowStyle: ProfileRowStyle,
 ) {
     val visibleLabels = labels.take(3)
     val count = visibleLabels.size
+    val avatarSize = profileRowStyle.avatarSize()
 
     val overlap = avatarSize * AVATAR_OVERLAP_RATIO
     val groupWidth = avatarSize + (avatarSize - overlap) * (count - 1)
@@ -50,8 +54,7 @@ fun ProfileRow(
                     width = 1.5.dp,
                     color = TuripTheme.colors.gray02,
                     shape = RoundedCornerShape(50.dp),
-                )
-                .padding(
+                ).padding(
                     horizontal = TuripTheme.spacing.medium,
                     vertical = TuripTheme.spacing.small,
                 ),
@@ -74,7 +77,7 @@ fun ProfileRow(
                                 .offset(x = (avatarSize - overlap) * index)
                                 .zIndex((count - index).toFloat()),
                     ) {
-                        AvatarCircle(label = label.first(), size = avatarSize)
+                        AvatarCircle(label = label.first(), profileRowStyle = profileRowStyle)
                     }
                 }
             }
@@ -88,6 +91,22 @@ fun ProfileRow(
         }
     }
 }
+
+@Composable
+private fun ProfileRowStyle.avatarSize(): Dp =
+    when (this) {
+        ProfileRowStyle.SMALL -> 28.dp
+        ProfileRowStyle.MEDIUM -> 36.dp
+        ProfileRowStyle.LARGE -> 48.dp
+    }
+
+@Composable
+private fun ProfileRowStyle.textStyle() =
+    when (this) {
+        ProfileRowStyle.SMALL -> TuripTheme.typography.title3
+        ProfileRowStyle.MEDIUM -> TuripTheme.typography.title2
+        ProfileRowStyle.LARGE -> TuripTheme.typography.title1
+    }
 
 @Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
 @Composable
@@ -103,13 +122,13 @@ fun ProfileRowAllVariantsPreview() {
             verticalArrangement = Arrangement.spacedBy(TuripTheme.spacing.extraLarge),
         ) {
             Text("기본 (48dp)", fontSize = 12.sp, color = Color.Gray)
-            ProfileRow(labels = sampleLabels, avatarSize = 48.dp)
+            ProfileRow(labels = sampleLabels, profileRowStyle = ProfileRowStyle.LARGE)
 
             Text("중간 (36dp)", fontSize = 12.sp, color = Color.Gray)
-            ProfileRow(labels = sampleLabels, avatarSize = 36.dp)
+            ProfileRow(labels = sampleLabels, profileRowStyle = ProfileRowStyle.MEDIUM)
 
             Text("작은 (28dp)", fontSize = 12.sp, color = Color.Gray)
-            ProfileRow(labels = sampleLabels, avatarSize = 28.dp)
+            ProfileRow(labels = sampleLabels, profileRowStyle = ProfileRowStyle.SMALL)
         }
     }
 }
