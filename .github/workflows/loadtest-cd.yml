@@ -24,7 +24,7 @@ env:
 
 jobs:
   deploy:
-    runs-on: [ self-hosted, "turip-server-loadtest" ]
+    runs-on: [ self-hosted, "turip-server-dev" ]
 
     steps:
       - name: Checkout repository
@@ -96,6 +96,7 @@ jobs:
           DOMESTIC_ETC_IMAGE_URL=${{ secrets.DOMESTIC_ETC_IMAGE_URL }}
           OVERSEAS_ETC_IMAGE_URL=${{ secrets.OVERSEAS_ETC_IMAGE_URL }}
           CSV_IMPORT_PASSWORD=${{ secrets.CSV_IMPORT_PASSWORD }}
+          INVITATION_JWT_SECRET_KEY=${{ secrets.INVITATION_JWT_SECRET_KEY }}
           ENVEOF
 
       # ── 배포 ──────────────────────────────────────────────────────────────
@@ -105,8 +106,8 @@ jobs:
           NGINX_PORT: ${{ env.NGINX_PORT }}
         run: |
           echo "🚀 Load Test 배포 시작 (image: ${{ env.IMAGE_TAG }})"
-          chmod +x /home/ubuntu/deploy/deploy.sh
-          /home/ubuntu/deploy/deploy.sh ${{ env.IMAGE_TAG }}
+          chmod +x /home/ubuntu/deploy/loadtest-deploy.sh
+          /home/ubuntu/deploy/loadtest-deploy.sh ${{ env.IMAGE_TAG }}
 
       # ── 정리 ──────────────────────────────────────────────────────────────
       - name: Dangling 이미지 정리
