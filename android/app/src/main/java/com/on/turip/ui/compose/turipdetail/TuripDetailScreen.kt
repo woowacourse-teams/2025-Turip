@@ -47,6 +47,7 @@ import com.on.turip.ui.compose.trip.model.MapModel
 import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
 import com.on.turip.ui.compose.turipdetail.component.MemberListSheet
 import com.on.turip.ui.compose.turipdetail.component.MoreOptionBottomSheet
+import com.on.turip.ui.compose.turipdetail.component.TuripInfoRow
 import com.on.turip.ui.compose.turipdetail.component.TuripMapContent
 import com.on.turip.ui.compose.turipdetail.component.TuripPlaces
 import com.on.turip.ui.compose.turipdetail.model.turip.PlaceLatLngUiModel
@@ -342,6 +343,8 @@ private fun TuripPlaceContent(
             onBackClick = onBack,
             onMoreOption = onMoreOption,
         )
+
+        TuripInfoRow(savedPlaceCount = currentPlaceLatLng.size, participantCount = nicknames.size)
 
         if (currentPlaceLatLng.isNotEmpty()) {
             TuripMapContent(

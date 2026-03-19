@@ -97,6 +97,8 @@
     <string name="trip_detail_snackbar_bookmark_save">북마크에 저장했어요</string>
     <string name="trip_detail_snackbar_bookmark_remove">북마크를 해제했어요</string>
     <string name="trip_detail_info">%s • %d개 장소 • %s</string>
+    <string name="trip_detail_saved_places_label">저장된 장소</string>
+    <string name="trip_detail_participant_count_label">참여인원</string>
     <string name="bottom_sheet_turip_title">튜립 목록</string>
     <string name="bottom_sheet_turip_place_save_in_turip">%s에 저장했어요</string>
     <string name="bottom_sheet_turip_place_remove_in_turip">%s에서 삭제했어요</string>
