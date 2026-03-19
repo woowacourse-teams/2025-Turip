@@ -1,5 +1,6 @@
 package com.on.turip.ui.compose.turipdetail.component
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -27,6 +28,8 @@ import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 fun TuripInfoRow(
     savedPlaceCount: Int,
     participantCount: Int,
+    onClickMembers: () -> Unit,
+    onClickPlaces: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -38,11 +41,13 @@ fun TuripInfoRow(
             icon = Icons.Default.LocationOn,
             label = stringResource(R.string.trip_detail_saved_places_label),
             count = savedPlaceCount,
+            onClick = onClickPlaces,
         )
         TuripInfoItem(
             icon = Icons.Default.Group,
             label = stringResource(R.string.trip_detail_participant_count_label),
             count = participantCount,
+            onClick = onClickMembers,
         )
     }
 }
@@ -52,10 +57,11 @@ private fun TuripInfoItem(
     icon: ImageVector,
     label: String,
     count: Int,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier,
+        modifier = modifier.clickable(onClick = onClick),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
     ) {
@@ -81,6 +87,8 @@ private fun TuripInfoItemPreview() {
         TuripInfoRow(
             savedPlaceCount = 10,
             participantCount = 10,
+            onClickMembers = {},
+            onClickPlaces = {},
         )
     }
 }

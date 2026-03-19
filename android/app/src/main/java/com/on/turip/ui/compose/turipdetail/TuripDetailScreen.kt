@@ -4,6 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
@@ -344,7 +345,14 @@ private fun TuripPlaceContent(
             onMoreOption = onMoreOption,
         )
 
-        TuripInfoRow(savedPlaceCount = currentPlaceLatLng.size, participantCount = nicknames.size)
+        TuripInfoRow(
+            savedPlaceCount = currentPlaceLatLng.size,
+            participantCount = nicknames.size,
+            onClickMembers = onClickMembers,
+            onClickPlaces = { isMapVisible = false },
+        )
+
+        Spacer(modifier = Modifier.size(TuripTheme.spacing.extraSmall))
 
         if (currentPlaceLatLng.isNotEmpty()) {
             TuripMapContent(
