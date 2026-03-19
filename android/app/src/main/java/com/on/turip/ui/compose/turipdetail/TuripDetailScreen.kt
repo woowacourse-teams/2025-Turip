@@ -348,11 +348,8 @@ private fun TuripPlaceContent(
                 selectedTuripId = selectedTuripId,
                 selectedPlace = selectedPlace,
                 places = currentPlaceLatLng,
-                nicknames = nicknames,
-                showMembers = !isDefaultTurip,
                 isMapVisible = isMapVisible,
                 onMapToggle = { isMapVisible = !isMapVisible },
-                onClickMembers = onClickMembers,
                 modifier = Modifier.fillMaxWidth(),
             )
         }

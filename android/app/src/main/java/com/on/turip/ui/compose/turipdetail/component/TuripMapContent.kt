@@ -43,11 +43,8 @@ fun TuripMapContent(
     selectedTuripId: Long,
     places: ImmutableList<PlaceLatLngUiModel>,
     selectedPlace: PlaceLatLngUiModel,
-    nicknames: ImmutableList<String>,
-    showMembers: Boolean,
     isMapVisible: Boolean,
     onMapToggle: () -> Unit,
-    onClickMembers: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val cameraPositionState = rememberCameraPositionState()
@@ -139,18 +136,6 @@ fun TuripMapContent(
                 Icon(
                     imageVector = if (isMapVisible) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                     contentDescription = null,
-                )
-            }
-
-            if (showMembers) {
-                ProfileRow(
-                    labels = nicknames,
-                    modifier =
-                        Modifier
-                            .align(Alignment.CenterEnd)
-                            .padding(end = TuripTheme.spacing.large),
-                    profileRowStyle = ProfileRowStyle.SMALL,
-                    onClick = onClickMembers,
                 )
             }
         }
