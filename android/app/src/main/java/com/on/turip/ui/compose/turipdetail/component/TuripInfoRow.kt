@@ -28,6 +28,7 @@ import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 fun TuripInfoRow(
     savedPlaceCount: Int,
     participantCount: Int,
+    showParticipant: Boolean,
     onClickMembers: () -> Unit,
     onClickPlaces: () -> Unit,
     modifier: Modifier = Modifier,
@@ -43,12 +44,14 @@ fun TuripInfoRow(
             count = savedPlaceCount,
             onClick = onClickPlaces,
         )
-        TuripInfoItem(
-            icon = Icons.Default.Group,
-            label = stringResource(R.string.trip_detail_participant_count_label),
-            count = participantCount,
-            onClick = onClickMembers,
-        )
+        if (showParticipant) {
+            TuripInfoItem(
+                icon = Icons.Default.Group,
+                label = stringResource(R.string.trip_detail_participant_count_label),
+                count = participantCount,
+                onClick = onClickMembers,
+            )
+        }
     }
 }
 
@@ -87,6 +90,7 @@ private fun TuripInfoItemPreview() {
         TuripInfoRow(
             savedPlaceCount = 10,
             participantCount = 10,
+            showParticipant = true,
             onClickMembers = {},
             onClickPlaces = {},
         )

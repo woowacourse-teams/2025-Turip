@@ -53,6 +53,7 @@ import com.on.turip.ui.compose.turipdetail.component.TuripMapContent
 import com.on.turip.ui.compose.turipdetail.component.TuripPlaces
 import com.on.turip.ui.compose.turipdetail.model.turip.PlaceLatLngUiModel
 import com.on.turip.ui.compose.turipdetail.model.turip.TuripShareModel
+import com.on.turip.ui.compose.turip.model.TuripTypeModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
@@ -260,7 +261,7 @@ fun TuripDetailScreen(
                 else -> {
                     TuripPlaceContent(
                         nicknames = uiState.members,
-                        isDefaultTurip = uiState.selectedTurip.isDefault,
+                        isTogetherTurip = uiState.selectedTurip.type == TuripTypeModel.TOGETHER,
                         selectedTuripId = uiState.selectedTurip.id,
                         selectedTuripName = uiState.selectedTurip.name,
                         turipPlaceModel = uiState.places,
@@ -310,7 +311,7 @@ private fun ErrorContent(
 @Composable
 private fun TuripPlaceContent(
     nicknames: ImmutableList<String>,
-    isDefaultTurip: Boolean,
+    isTogetherTurip: Boolean,
     selectedTuripId: Long,
     selectedTuripName: String,
     selectedPlace: PlaceLatLngUiModel,
@@ -348,6 +349,7 @@ private fun TuripPlaceContent(
         TuripInfoRow(
             savedPlaceCount = currentPlaceLatLng.size,
             participantCount = nicknames.size,
+            showParticipant = isTogetherTurip,
             onClickMembers = onClickMembers,
             onClickPlaces = { isMapVisible = false },
         )
@@ -457,7 +459,7 @@ private fun TuripPlaceScreenPreview() {
             onDragPlace = { _, _ -> },
             onDragEnd = {},
             onClickMembers = {},
-            isDefaultTurip = false,
+            isTogetherTurip = false,
         )
     }
 }
