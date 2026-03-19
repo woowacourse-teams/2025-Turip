@@ -1,14 +1,12 @@
 package turip.account.service;
 
-import java.security.SecureRandom;
 import java.util.Optional;
-import java.util.Random;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import turip.account.domain.Account;
-import turip.account.domain.NicknameWord;
 import turip.account.domain.Role;
+import turip.account.domain.nickname.NicknameCreator;
 import turip.account.repository.AccountInsertRepository;
 import turip.account.repository.AccountRepository;
 import turip.common.exception.ErrorTag;
@@ -22,8 +20,6 @@ import turip.favorite.service.FavoriteFolderService;
 @RequiredArgsConstructor
 public class AccountService {
 
-    private static final Random RANDOM = new SecureRandom();
-
     private final AccountRepository accountRepository;
     private final FavoriteContentRepository favoriteContentRepository;
     private final FavoriteFolderRepository favoriteFolderRepository;
@@ -31,10 +27,10 @@ public class AccountService {
     private final AccountInsertRepository accountInsertRepository;
 
     @Transactional
-    public Account create() {
+    public Account create(NicknameCreator nicknameCreator) {
         int maxAttempts = 5;
         for (int attempt = 0; attempt < maxAttempts; attempt++) {
-            String nickname = NicknameWord.createRandomNickname(RANDOM);
+            String nickname = nicknameCreator.create();
             Account account = new Account(Role.USER, nickname);
             Optional<Account> savedAccountResult = accountInsertRepository.trySave(account);
             if (savedAccountResult.isEmpty()) {

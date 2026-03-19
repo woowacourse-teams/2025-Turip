@@ -1,4 +1,4 @@
-package turip.account.domain;
+package turip.account.domain.nickname;
 
 import static java.util.Arrays.stream;
 

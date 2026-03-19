@@ -64,7 +64,7 @@ class GuestServiceTest {
 
             // then
             assertThat(result).isEqualTo(existingGuest);
-            verify(accountService, never()).create();
+            verify(accountService, never()).create(any());
             verify(guestRepository, never()).save(any());
         }
 
@@ -78,7 +78,7 @@ class GuestServiceTest {
 
             given(guestRepository.findByDeviceFid(deviceFid))
                     .willReturn(Optional.empty());
-            given(accountService.create())
+            given(accountService.create(any()))
                     .willReturn(newAccount);
             given(guestRepository.save(any(Guest.class)))
                     .willReturn(newGuest);
@@ -88,7 +88,7 @@ class GuestServiceTest {
 
             // then
             assertThat(result).isEqualTo(newGuest);
-            verify(accountService).create();
+            verify(accountService).create(any());
             verify(guestRepository).save(any(Guest.class));
         }
     }
