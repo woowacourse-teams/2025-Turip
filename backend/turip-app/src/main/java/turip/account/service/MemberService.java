@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import turip.account.domain.Account;
 import turip.account.domain.Guest;
 import turip.account.domain.Member;
+import turip.account.domain.nickname.RandomNicknameCreator;
 import turip.account.repository.MemberRepository;
 import turip.auth.service.RefreshTokenService;
 import turip.common.exception.ErrorTag;
@@ -27,11 +28,12 @@ public class MemberService {
     private final RefreshTokenService refreshTokenService;
     private final FavoriteFolderAccountRepository favoriteFolderAccountRepository;
     private final FavoriteFolderRepository favoriteFolderRepository;
+    private final RandomNicknameCreator randomNicknameCreator;
 
     @Transactional
     public Member create(String email) {
         try {
-            Account account = accountService.create();
+            Account account = accountService.create(randomNicknameCreator);
             Member member = new Member(account, email, true);
             return memberRepository.save(member);
         } catch (IllegalArgumentException e) {

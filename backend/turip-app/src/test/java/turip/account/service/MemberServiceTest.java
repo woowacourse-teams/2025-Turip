@@ -68,7 +68,7 @@ class MemberServiceTest {
             // given
             String invalidEmail = "invalid-email";
             Account account = AccountFixture.createUser();
-            given(accountService.create())
+            given(accountService.create(any()))
                     .willReturn(account);
 
             // when & then

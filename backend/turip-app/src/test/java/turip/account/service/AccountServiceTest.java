@@ -61,7 +61,7 @@ class AccountServiceTest {
                     .willReturn(Optional.of(savedAccount));
 
             // when
-            Account result = accountService.create();
+            Account result = accountService.create(() -> "");
 
             // then
             assertThat(result).isEqualTo(savedAccount);
@@ -81,7 +81,7 @@ class AccountServiceTest {
                     .thenReturn(Optional.empty());
 
             // when & then
-            assertThatThrownBy(() -> accountService.create())
+            assertThatThrownBy(() -> accountService.create(() -> ""))
                     .isInstanceOf(InternalServerException.class)
                     .hasMessage(ErrorTag.ACCOUNT_CREATION_ERROR.getMessage());
         }
