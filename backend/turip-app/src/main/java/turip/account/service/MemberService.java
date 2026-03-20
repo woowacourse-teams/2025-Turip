@@ -64,7 +64,7 @@ public class MemberService {
     }
 
     private void migrateFavoriteFolders(Member member, Guest guest) {
-        favoriteFolderRepository.deletePersonalFoldersByAccount(guest.getAccount());
+        favoriteFolderRepository.deleteDefaultFolderByAccount(member.getAccount());
         favoriteFolderAccountRepository.updateAccount(guest.getAccount(), member.getAccount());
     }
 }

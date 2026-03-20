@@ -153,4 +153,26 @@ class FavoriteFolderRepositoryTest {
         assertThat(favoriteFolderRepository.findById(personalFolder2.getId())).isEmpty();
         assertThat(favoriteFolderRepository.findById(sharedFolder.getId())).isPresent();
     }
+
+    @Test
+    @DisplayName("특정 계정의 기본 폴더를 삭제할 수 있다")
+    void deleteDefaultFoldersByAccount() {
+        // given
+        Account account = accountRepository.save(AccountFixture.createEntity());
+
+        FavoriteFolder defaultFolder = favoriteFolderRepository.save(FavoriteFolderFixture.createDefaultFolder());
+
+        // 폴더와 계정 연결
+        favoriteFolderAccountRepository.save(
+                FavoriteFolderAccountFixture.createFavoriteFolderAccount(defaultFolder, account, AccountRole.OWNER));
+
+        // when
+        favoriteFolderRepository.deleteDefaultFolderByAccount(account);
+        entityManager.flush();
+        entityManager.clear();
+
+        // then
+        assertThat(favoriteFolderRepository.findById(defaultFolder.getId())).isEmpty();
+        assertThat(favoriteFolderAccountRepository.findByFavoriteFolderAndAccount(defaultFolder, account)).isEmpty();
+    }
 }
