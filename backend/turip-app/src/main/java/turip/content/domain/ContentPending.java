@@ -62,6 +62,24 @@ public class ContentPending {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+    public ContentPending(
+            String contentData,
+            ContentPendingStatus status,
+            Account collectorAccount,
+            Account validatorAccount,
+            String rejectReason,
+            Content content
+    ) {
+        this.contentData = contentData;
+        this.status = status;
+        this.collectorAccount = collectorAccount;
+        this.validatorAccount = validatorAccount;
+        this.rejectReason = rejectReason;
+        this.content = content;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
     public void approve(Account validatorAccount, Content content) {
         this.status = ContentPendingStatus.APPROVED;
         this.validatorAccount = validatorAccount;
