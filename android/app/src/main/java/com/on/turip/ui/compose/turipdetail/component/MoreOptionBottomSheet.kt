@@ -90,17 +90,21 @@ fun MoreOptionBottomSheet(
             ),
             MoreOptionItem(
                 title =
-                    if (isTogetherTurip) {
-                        stringResource(R.string.turip_more_option_bottom_sheet_leave)
-                    } else {
-                        stringResource(R.string.turip_more_option_bottom_sheet_delete)
-                    },
+                    stringResource(
+                        if (isTogetherTurip) {
+                            R.string.turip_more_option_bottom_sheet_leave
+                        } else {
+                            R.string.turip_more_option_bottom_sheet_delete
+                        },
+                    ),
                 icon =
-                    if (isTogetherTurip) {
-                        MoreOptionIcon.Vector(Icons.AutoMirrored.Filled.Logout)
-                    } else {
-                        MoreOptionIcon.Vector(Icons.Default.Delete)
-                    },
+                    MoreOptionIcon.Vector(
+                        if (isTogetherTurip) {
+                            Icons.AutoMirrored.Filled.Logout
+                        } else {
+                            Icons.Default.Delete
+                        },
+                    ),
                 color = TuripTheme.colors.error,
                 onClick = onDeleteClick,
                 enabled = !isDefault,
