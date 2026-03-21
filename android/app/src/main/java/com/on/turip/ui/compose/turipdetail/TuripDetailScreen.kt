@@ -215,14 +215,34 @@ fun TuripDetailScreen(
     }
 
     if (uiState.showTuripRemoveDialog) {
+        val isTogetherTurip = uiState.selectedTurip.type == TuripTypeModel.TOGETHER
+
         TuripDialog(
-            title = stringResource(R.string.bottom_sheet_turip_delete),
+            title =
+                stringResource(
+                    if (isTogetherTurip) {
+                        R.string.bottom_sheet_turip_leave
+                    } else {
+                        R.string.bottom_sheet_turip_delete
+                    },
+                ),
             message =
                 stringResource(
-                    R.string.bottom_sheet_turip_remove_title,
+                    if (isTogetherTurip) {
+                        R.string.bottom_sheet_turip_leave_title
+                    } else {
+                        R.string.bottom_sheet_turip_remove_title
+                    },
                     uiState.selectedTurip.name,
                 ),
-            confirmText = stringResource(R.string.bottom_sheet_turip_remove_approve),
+            confirmText =
+                stringResource(
+                    if (isTogetherTurip) {
+                        R.string.bottom_sheet_turip_leave_approve
+                    } else {
+                        R.string.bottom_sheet_turip_remove_approve
+                    },
+                ),
             dismissText = stringResource(R.string.bottom_sheet_turip_remove_cancel),
             confirmButtonColor = TuripTheme.colors.error,
             dismissButtonColor = TuripTheme.colors.gray02,

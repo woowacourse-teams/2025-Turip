@@ -127,14 +127,17 @@
     <string name="turip_title">튜립 편집</string>
     <string name="bottom_sheet_turip_add_title">튜립 추가</string>
     <string name="bottom_sheet_turip_delete">튜립 삭제</string>
+    <string name="bottom_sheet_turip_leave">튜립 나가기</string>
     <string name="bottom_sheet_turip_add_turip_name_hint">생성할 튜립명을 입력해주세요.</string>
     <string name="bottom_sheet_turip_modify_title">튜립 수정</string>
     <string name="bottom_sheet_turip_modify_turip_name_hint">변경할 튜립명을 입력해주세요.</string>
     <string name="bottom_sheet_turip_remove_title">%s을 삭제하시겠습니까?</string>
+    <string name="bottom_sheet_turip_leave_title">%s에서 나가시겠습니까?</string>
     <string name="bottom_sheet_turip_add_turip">%s 튜립을 추가하였습니다.</string>
     <string name="bottom_sheet_turip_delete_turip">%s 튜립을 제거하였습니다.</string>
     <string name="bottom_sheet_turip_remove_cancel">취소</string>
     <string name="bottom_sheet_turip_remove_approve">삭제</string>
+    <string name="bottom_sheet_turip_leave_approve">나가기</string>
     <string name="turip_empty_suggest_title">나만의 튜립을 만들어보세요!</string>
     <string name="turip_empty_suggest_description">튜립을 만들면 다양한 장소들을\n내 마음대로 나누어 보관할 수 있어요.</string>
     <string name="main_double_back_pressed_to_exit">한 번 더 누르면 종료됩니다.</string>
