@@ -22,7 +22,6 @@ import com.on.turip.ui.common.model.namestatus.TuripNameStatusModel
 import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
 import com.on.turip.ui.compose.turip.mapper.toUiMyTuripModel
 import com.on.turip.ui.compose.turip.model.TuripTypeModel
-import com.on.turip.ui.compose.turipdetail.model.DeleteTuripPlaceSnapshot
 import com.on.turip.ui.compose.turipdetail.model.RefreshScope
 import com.on.turip.ui.compose.turipdetail.model.turip.PlaceLatLngUiModel
 import com.on.turip.ui.compose.turipdetail.model.turip.TuripShareModel
@@ -70,8 +69,6 @@ class TuripDetailViewModel @Inject constructor(
     val uiEffect: Flow<TuripDetailUiEffect> = _uiEffect.receiveAsFlow()
 
     private val sessionState: StateFlow<SessionState> = sessionStore.state
-
-    private var deleteTuripPlaceSnapshot: DeleteTuripPlaceSnapshot = DeleteTuripPlaceSnapshot.EMPTY
     private var reorderPlacesSnapshot: ImmutableList<TuripPlaceModel>? = null
     private var selectedTuripId: Long = INVALID_ID
 
@@ -634,12 +631,7 @@ class TuripDetailViewModel @Inject constructor(
         )
 
     private fun clearSnapshots() {
-        clearDeleteSnapshot()
         clearReorderSnapshot()
-    }
-
-    private fun clearDeleteSnapshot() {
-        deleteTuripPlaceSnapshot = DeleteTuripPlaceSnapshot.EMPTY
     }
 
     private fun clearReorderSnapshot() {
@@ -649,8 +641,7 @@ class TuripDetailViewModel @Inject constructor(
     // API 호출 실패 시 롤백을 위해 원본 상태 기록
     // 장소 제거 API가 반영되지 않은 상태라면 제거 전 원본 상태를 기록
     fun onDragStart() {
-        reorderPlacesSnapshot =
-            if (deleteTuripPlaceSnapshot.hasSnapshot) deleteTuripPlaceSnapshot.originPlaces else uiState.value.places
+        reorderPlacesSnapshot = uiState.value.places
     }
 
     // 드래그 시 아이템 위치 변경
