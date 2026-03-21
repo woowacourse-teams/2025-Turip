@@ -5,7 +5,6 @@ import com.on.turip.core.result.TuripResult
 import com.on.turip.data.result.StreamFailureAction
 import com.on.turip.data.result.TuripStreamResult
 import com.on.turip.domain.turip.repository.TuripRepository
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -29,11 +28,6 @@ class ObserveTuripStreamUseCase @Inject constructor(
                 var timedOut = false
 
                 heartbeatManager.start(this)
-
-                val timeoutObserveJob: Job =
-                    heartbeatManager.timeoutEvent
-                        .onEach { timedOut = true }
-                        .launchIn(this)
 
                 val currentAttemptJob =
                     launch {
@@ -60,6 +54,13 @@ class ObserveTuripStreamUseCase @Inject constructor(
                             streamResult = TuripResult.Success(Unit)
                         }
                     }
+
+                val timeoutObserveJob =
+                    heartbeatManager.timeoutEvent
+                        .onEach {
+                            timedOut = true
+                            currentAttemptJob.cancel()
+                        }.launchIn(this)
 
                 currentAttemptJob.join()
                 timeoutObserveJob.cancel()
