@@ -38,12 +38,14 @@ fun TuripInfoRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        TuripInfoItem(
-            icon = Icons.Default.LocationOn,
-            label = stringResource(R.string.trip_detail_saved_places_label),
-            count = savedPlaceCount,
-            onClick = onClickPlaces,
-        )
+        if (savedPlaceCount > 0) {
+            TuripInfoItem(
+                icon = Icons.Default.LocationOn,
+                label = stringResource(R.string.trip_detail_saved_places_label),
+                count = savedPlaceCount,
+                onClick = onClickPlaces,
+            )
+        }
         if (showParticipant) {
             TuripInfoItem(
                 icon = Icons.Default.Group,
