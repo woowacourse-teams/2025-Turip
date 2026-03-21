@@ -20,6 +20,8 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import turip.account.domain.Account;
+import turip.common.exception.ErrorTag;
+import turip.common.exception.custom.IllegalStateException;
 
 @Getter
 @Entity
@@ -81,6 +83,8 @@ public class ContentPending {
     }
 
     public void approve(Account validatorAccount, Content content) {
+        validateStatusNotApproved();
+
         this.status = ContentPendingStatus.APPROVED;
         this.validatorAccount = validatorAccount;
         this.rejectReason = "";
@@ -89,9 +93,17 @@ public class ContentPending {
     }
 
     public void reject(Account validatorAccount, String rejectReason) {
+        validateStatusNotApproved();
+
         this.status = ContentPendingStatus.REJECTED;
         this.validatorAccount = validatorAccount;
         this.rejectReason = rejectReason;
         this.updatedAt = LocalDateTime.now();
+    }
+
+    private void validateStatusNotApproved() {
+        if (this.status == ContentPendingStatus.APPROVED) {
+            throw new IllegalStateException(ErrorTag.IS_ALREADY_APPROVED);
+        }
     }
 }
