@@ -74,16 +74,14 @@ fun TuripDetailScreen(
     val resource = LocalResources.current
     var showLoginSuggestDialog by remember { mutableStateOf(false) }
     val modalBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val scope = rememberCoroutineScope()
 
     BackHandler(enabled = !uiState.showBottomSheet) { onBack() }
 
-    // Screen
-    val scope = rememberCoroutineScope()
-
     BackHandler {
         scope.launch {
-            viewModel.flushDeleteQueueAndAwait() // API 완료 후
-            onBack() // 그 다음 뒤로가기
+            viewModel.flushDeleteQueueAndAwait()
+            onBack()
         }
     }
 
