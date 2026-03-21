@@ -2,9 +2,9 @@ package com.on.turip.domain.turip
 
 import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.TuripResult
-import com.on.turip.data.result.StreamFailureAction
-import com.on.turip.data.result.TuripStreamResult
 import com.on.turip.domain.turip.repository.TuripRepository
+import com.on.turip.domain.turip.result.StreamFailureAction
+import com.on.turip.domain.turip.result.TuripStreamResult
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow

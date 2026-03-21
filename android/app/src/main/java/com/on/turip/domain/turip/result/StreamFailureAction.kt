@@ -1,4 +1,4 @@
-package com.on.turip.data.result
+package com.on.turip.domain.turip.result
 
 enum class StreamFailureAction {
     Retry,

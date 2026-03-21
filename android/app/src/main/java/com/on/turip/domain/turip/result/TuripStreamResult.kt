@@ -1,4 +1,4 @@
-package com.on.turip.data.result
+package com.on.turip.domain.turip.result
 
 import com.on.turip.core.result.ErrorType
 import com.on.turip.domain.turip.TuripStreamEvent
