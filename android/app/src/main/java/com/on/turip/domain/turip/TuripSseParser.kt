@@ -39,7 +39,7 @@ class TuripSseParser(
                     .toDomain(eventId ?: "")
             }
 
-            TuripSseEventType.HEARTBEAT, TuripSseEventType.HEARTBEAT2 -> {
+            TuripSseEventType.HEARTBEAT -> {
                 json
                     .decodeFromString<TuripStreamHeartbeatPayload>(data)
                     .toDomain(eventId ?: "")
