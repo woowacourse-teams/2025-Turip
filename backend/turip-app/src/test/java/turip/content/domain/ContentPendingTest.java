@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import turip.account.domain.Account;
 import turip.common.exception.custom.IllegalStateException;
 import turip.util.fixture.AccountFixture;
+import turip.util.fixture.ContentPendingFixture;
 
 class ContentPendingTest {
 
@@ -26,14 +27,7 @@ class ContentPendingTest {
                 // given
                 Account collector = AccountFixture.createAdmin();
                 Account validator = AccountFixture.createAdmin();
-                ContentPending pendingContent = new ContentPending(
-                        "{\"cityName\":\"서울\"}",
-                        ContentPendingStatus.PENDING,
-                        collector,
-                        null,
-                        "거절 사유",
-                        null
-                );
+                ContentPending pendingContent = ContentPendingFixture.createPending(collector);
                 Content content = null;
 
                 // when
@@ -51,14 +45,7 @@ class ContentPendingTest {
                 // given
                 Account collector = AccountFixture.createAdmin();
                 Account validator = AccountFixture.createAdmin();
-                ContentPending pendingContent = new ContentPending(
-                        "{\"cityName\":\"서울\"}",
-                        ContentPendingStatus.APPROVED,
-                        collector,
-                        null,
-                        "거절 사유",
-                        null
-                );
+                ContentPending pendingContent = ContentPendingFixture.createApproved(collector, validator, null);
                 Content content = null;
 
                 // when & then
@@ -78,14 +65,7 @@ class ContentPendingTest {
                 // given
                 Account collector = AccountFixture.createAdmin();
                 Account validator = AccountFixture.createAdmin();
-                ContentPending pendingContent = new ContentPending(
-                        "{\"cityName\":\"서울\"}",
-                        ContentPendingStatus.PENDING,
-                        collector,
-                        null,
-                        null,
-                        null
-                );
+                ContentPending pendingContent = ContentPendingFixture.createPending(collector);
                 String rejectReason = "장소 하나가 빠졌어요";
 
                 // when
@@ -103,14 +83,7 @@ class ContentPendingTest {
                 // given
                 Account collector = AccountFixture.createAdmin();
                 Account validator = AccountFixture.createAdmin();
-                ContentPending pendingContent = new ContentPending(
-                        "{\"cityName\":\"서울\"}",
-                        ContentPendingStatus.APPROVED,
-                        collector,
-                        null,
-                        null,
-                        null
-                );
+                ContentPending pendingContent = ContentPendingFixture.createApproved(collector, validator, null);
                 String rejectReason = "장소 하나가 빠졌어요";
 
                 // when
@@ -124,20 +97,13 @@ class ContentPendingTest {
         void createWithPendingStatus() {
             // given
             Account collector = AccountFixture.createUser();
-            String contentData = "{\"cityName\":\"부산\",\"video\":{\"videoId\":\"abc123\"}}";
 
             // when
-            ContentPending pendingContent = new ContentPending(
-                    contentData,
-                    ContentPendingStatus.PENDING,
-                    collector,
-                    null,
-                    null,
-                    null
-            );
+            ContentPending pendingContent = ContentPendingFixture.createPending(collector);
 
             // then
             assertThat(pendingContent.getStatus()).isEqualTo(ContentPendingStatus.PENDING);
+            assertThat(pendingContent.getContentData().cityName()).isEqualTo("부산");
         }
     }
 }

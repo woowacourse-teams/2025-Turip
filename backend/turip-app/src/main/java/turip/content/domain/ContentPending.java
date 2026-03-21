@@ -37,7 +37,7 @@ public class ContentPending {
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "content_data", nullable = false, columnDefinition = "JSON")
-    private String contentData;
+    private ContentPendingData contentData;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
@@ -65,8 +65,7 @@ public class ContentPending {
     private LocalDateTime updatedAt;
 
     public ContentPending(
-            String contentData,
-            ContentPendingStatus status,
+            ContentPendingData contentData,
             Account collectorAccount,
             Account validatorAccount,
             String rejectReason,
