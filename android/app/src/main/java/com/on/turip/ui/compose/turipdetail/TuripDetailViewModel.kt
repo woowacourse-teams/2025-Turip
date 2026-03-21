@@ -365,10 +365,12 @@ class TuripDetailViewModel @Inject constructor(
         remainingQueue
             .map { place ->
                 flushScope.async {
-                    turipRepository.deleteTuripPlace(
-                        uiState.value.selectedTurip.id,
-                        place.placeId,
-                    )
+                    runCatching {
+                        turipRepository.deleteTuripPlace(
+                            uiState.value.selectedTurip.id,
+                            place.placeId,
+                        )
+                    }
                 }
             }.awaitAll()
     }
