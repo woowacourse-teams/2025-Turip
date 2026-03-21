@@ -252,7 +252,7 @@ fun TuripDetailScreen(
                     ErrorContent(
                         errorUiState = uiState.errorUiState,
                         onRetryClick = {
-                            viewModel.loadSelectedTurip(selectedTuripId)
+                            viewModel.loadSelectedTuripAsync(selectedTuripId)
                             viewModel.loadPlaces(selectedTuripId)
                         },
                     )

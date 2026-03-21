@@ -22,6 +22,7 @@ import com.on.turip.ui.common.extensions.toUrl
 import com.on.turip.ui.common.model.namestatus.TuripNameStatusModel
 import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
 import com.on.turip.ui.compose.turip.mapper.toUiMyTuripModel
+import com.on.turip.ui.compose.turip.model.TuripTypeModel
 import com.on.turip.ui.compose.turipdetail.model.DeleteTuripPlaceSnapshot
 import com.on.turip.ui.compose.turipdetail.model.RefreshScope
 import com.on.turip.ui.compose.turipdetail.model.turip.PlaceLatLngUiModel
@@ -88,18 +89,32 @@ class TuripDetailViewModel @Inject constructor(
         if (selectedTuripId == turipId && uiState.value.selectedTurip.id == turipId) return
 
         selectedTuripId = turipId
-        observeTuripStream(turipId)
+        loadTuripData(turipId)
     }
 
-    fun loadSelectedTurip(selectedTuripId: Long) {
+    private fun loadTuripData(turipId: Long) {
         viewModelScope.launch {
-            turipRepository.loadTurip(selectedTuripId).onSuccess { turip: Turip ->
-                _uiState.update { state: TuripDetailUiState ->
-                    state.copy(
-                        errorUiState = ErrorUiState.None,
-                        selectedTurip = turip.toUiMyTuripModel(),
-                    )
-                }
+            loadSelectedTurip(turipId)
+            if (uiState.value.selectedTurip.type == TuripTypeModel.TOGETHER) {
+                observeTuripStream(turipId)
+            }
+        }
+        loadPlaces(turipId)
+    }
+
+    fun loadSelectedTuripAsync(selectedTuripId: Long) {
+        viewModelScope.launch {
+            loadSelectedTurip(selectedTuripId)
+        }
+    }
+
+    private suspend fun loadSelectedTurip(selectedTuripId: Long) {
+        turipRepository.loadTurip(selectedTuripId).onSuccess { turip: Turip ->
+            _uiState.update { state: TuripDetailUiState ->
+                state.copy(
+                    errorUiState = ErrorUiState.None,
+                    selectedTurip = turip.toUiMyTuripModel(),
+                )
             }
         }
     }
@@ -538,8 +553,12 @@ class TuripDetailViewModel @Inject constructor(
 
             TuripPlaceRetryAction.StreamConnectionLost -> {
                 loadPlaces(selectedTuripId)
-                loadSelectedTurip(selectedTuripId)
-                observeTuripStream(selectedTuripId)
+                viewModelScope.launch {
+                    loadSelectedTurip(selectedTuripId)
+                    if (uiState.value.selectedTurip.type == TuripTypeModel.TOGETHER) {
+                        observeTuripStream(selectedTuripId)
+                    }
+                }
             }
         }
     }
