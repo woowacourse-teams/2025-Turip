@@ -1,6 +1,5 @@
 package com.on.turip.domain.turip
 
-import jakarta.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
@@ -9,6 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 class TuripStreamHeartbeatManager @Inject constructor() {
     private var heartbeatTimer: Job? = null
