@@ -21,6 +21,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -74,6 +75,12 @@ fun TuripDetailScreen(
     val modalBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     BackHandler(enabled = !uiState.showBottomSheet) { onBack() }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.flushDeleteQueue()
+        }
+    }
 
     LaunchedEffect(selectedTuripId) {
         viewModel.initIfNeeded(selectedTuripId)
