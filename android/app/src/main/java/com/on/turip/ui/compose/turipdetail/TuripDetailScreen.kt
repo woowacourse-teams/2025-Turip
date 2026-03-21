@@ -21,11 +21,11 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,6 +56,7 @@ import com.on.turip.ui.compose.turipdetail.model.turip.PlaceLatLngUiModel
 import com.on.turip.ui.compose.turipdetail.model.turip.TuripShareModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -76,9 +77,13 @@ fun TuripDetailScreen(
 
     BackHandler(enabled = !uiState.showBottomSheet) { onBack() }
 
-    DisposableEffect(Unit) {
-        onDispose {
-            viewModel.flushDeleteQueue()
+    // Screen
+    val scope = rememberCoroutineScope()
+
+    BackHandler {
+        scope.launch {
+            viewModel.flushDeleteQueueAndAwait() // API 완료 후
+            onBack() // 그 다음 뒤로가기
         }
     }
 

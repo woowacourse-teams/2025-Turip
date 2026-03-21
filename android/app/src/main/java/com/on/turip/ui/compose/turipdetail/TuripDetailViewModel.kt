@@ -37,6 +37,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -356,18 +358,19 @@ class TuripDetailViewModel @Inject constructor(
         deletePlaceQueue.clear()
     }
 
-    fun flushDeleteQueue() {
-        val remainingQueue: List<TuripPlaceModel> = deletePlaceQueue.toList()
+    suspend fun flushDeleteQueueAndAwait() {
+        val remainingQueue = deletePlaceQueue.toList()
         clearDeleteSession()
 
-        remainingQueue.forEach { place ->
-            flushScope.launch {
-                turipRepository.deleteTuripPlace(
-                    uiState.value.selectedTurip.id,
-                    place.placeId,
-                )
-            }
-        }
+        remainingQueue
+            .map { place ->
+                flushScope.async {
+                    turipRepository.deleteTuripPlace(
+                        uiState.value.selectedTurip.id,
+                        place.placeId,
+                    )
+                }
+            }.awaitAll()
     }
 
     fun updateScreenMode(turipPlaceScreenMode: TuripPlaceScreenMode) {
