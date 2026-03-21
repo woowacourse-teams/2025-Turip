@@ -6,7 +6,6 @@ import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
 import com.on.turip.data.result.TuripStreamResult
-import com.on.turip.domain.bookmark.TuripPlace
 import com.on.turip.domain.session.SessionState
 import com.on.turip.domain.session.SessionStore
 import com.on.turip.domain.turip.DeleteTuripUseCase
@@ -28,7 +27,6 @@ import com.on.turip.ui.compose.turipdetail.model.RefreshScope
 import com.on.turip.ui.compose.turipdetail.model.turip.PlaceLatLngUiModel
 import com.on.turip.ui.compose.turipdetail.model.turip.TuripShareModel
 import com.on.turip.ui.folder.model.TuripEditModel
-import com.on.turip.ui.main.favorite.toLatLng
 import com.on.turip.ui.main.favorite.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
@@ -136,28 +134,35 @@ class TuripDetailViewModel @Inject constructor(
         viewModelScope.launch {
             turipRepository
                 .loadTuripPlaces(selectedTuripId)
-                .onSuccess { result: List<TuripPlace> ->
-                    _uiState.update { state: TuripDetailUiState ->
+                .onSuccess { result ->
+                    val serverPlaces = result.map { it.toUiModel() }
+
+                    val mergedPlaces =
+                        if (deletePlaceQueue.isNotEmpty()) {
+                            val deletingIds = deletePlaceQueue.map { it.placeId }.toSet()
+                            serverPlaces.filter { it.placeId !in deletingIds }
+                        } else {
+                            serverPlaces
+                        }
+
+                    _uiState.update { state ->
                         state.copy(
                             isLoading = false,
                             errorUiState = ErrorUiState.None,
-                            places =
-                                result
-                                    .map { turipPlace: TuripPlace -> turipPlace.toUiModel() }
-                                    .toImmutableList(),
+                            places = mergedPlaces.toImmutableList(),
                             placesLatLng =
-                                result
-                                    .map { it.toLatLng() }
+                                mergedPlaces
+                                    .map { it.toPlaceLatLngUiModel() }
                                     .toImmutableList(),
                         )
                     }
-                    clearSnapshots()
-                }.onFailure { errorType: ErrorType ->
-                    when (val uiError: UiError = errorType.toUiError()) {
-                        is UiError.Global -> handleGlobalError(uiError)
-                        is UiError.Feature -> Unit
+
+                    if (deletePlaceQueue.isNotEmpty()) {
+                        originBeforeDeleteSession = serverPlaces.toImmutableList() to
+                            serverPlaces.map { it.toPlaceLatLngUiModel() }.toImmutableList()
+                    } else {
+                        clearSnapshots()
                     }
-                    Timber.e("튜립 장소 목록 조회 API 호출 실패")
                 }
         }
     }
