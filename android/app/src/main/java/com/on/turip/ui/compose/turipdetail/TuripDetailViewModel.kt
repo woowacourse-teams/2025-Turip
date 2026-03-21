@@ -79,6 +79,12 @@ class TuripDetailViewModel @Inject constructor(
             onBufferOverflow = BufferOverflow.DROP_OLDEST,
         )
 
+    private val deletePlaceQueue = ArrayDeque<TuripPlaceModel>()
+    private val committedPlaceIds = mutableSetOf<Long>()
+    private var originBeforeDeleteSession: Pair<ImmutableList<TuripPlaceModel>, ImmutableList<PlaceLatLngUiModel>>? =
+        null
+    private val commitMutex = Mutex()
+
     init {
         registerDragEndEvents()
         registerStreamRefresh()
@@ -272,15 +278,13 @@ class TuripDetailViewModel @Inject constructor(
                     return
                 }
 
-        if (deleteTuripPlaceSnapshot.hasSnapshot) return
+        if (deletePlaceQueue.isEmpty()) {
+            originBeforeDeleteSession = uiState.value.places to uiState.value.placesLatLng
+        }
+
+        deletePlaceQueue.addLast(targetPlace)
 
         _uiState.update { state: TuripDetailUiState ->
-            deleteTuripPlaceSnapshot =
-                DeleteTuripPlaceSnapshot(
-                    deletePlace = targetPlace,
-                    originPlaces = state.places,
-                    originPlacesLatLng = state.placesLatLng,
-                )
             state.copy(
                 places =
                     state.places
@@ -294,38 +298,57 @@ class TuripDetailViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            _uiEffect.send(
-                TuripDetailUiEffect.ShowTuripDetailRemoved(targetPlace.name),
-            )
+            _uiEffect.send(TuripDetailUiEffect.ShowTuripDetailRemoved(targetPlace.name))
         }
     }
-
-    private val commitMutex = Mutex()
 
     fun commitTuripPlaceDelete() {
         viewModelScope.launch {
             commitMutex.withLock {
-                if (!deleteTuripPlaceSnapshot.hasSnapshot) {
-                    Timber.e("제거할 장소에 대한 정보가 없어요. deletePlaceSnapshot을 확인 해주세요 ")
-                    return@launch
-                }
+                val deletePlace = deletePlaceQueue.removeFirstOrNull() ?: return@launch
 
-                val deletePlace = deleteTuripPlaceSnapshot.deletePlace
                 turipRepository
                     .deleteTuripPlace(uiState.value.selectedTurip.id, deletePlace.placeId)
                     .onSuccess {
-                        Timber.d("튜립 상세 바텀시트, 장소 업데이트 성공")
+                        committedPlaceIds.add(deletePlace.placeId)
+                        if (deletePlaceQueue.isEmpty()) {
+                            clearDeleteSession()
+                        }
                     }.onFailure {
                         _uiEffect.send(
                             TuripDetailUiEffect.ShowTuripDetailRemoveFailed(deletePlace.name),
                         )
                         rollbackTuripPlaceDelete()
-                        Timber.e("튜립 상세 바텀시트, 장소 업데이트 실패 place = ${deletePlace.name}")
                     }
-
-                deleteTuripPlaceSnapshot = DeleteTuripPlaceSnapshot.EMPTY
             }
         }
+    }
+
+    fun rollbackTuripPlaceDelete() {
+        val (originPlaces, originPlacesLatLng) = originBeforeDeleteSession ?: return
+
+        val rolledBackPlaces =
+            originPlaces
+                .filter { it.placeId !in committedPlaceIds }
+                .toImmutableList()
+        val rolledBackLatLng =
+            originPlacesLatLng
+                .filter { it.placeId !in committedPlaceIds }
+                .toImmutableList()
+
+        _uiState.update { state ->
+            state.copy(
+                places = rolledBackPlaces,
+                placesLatLng = rolledBackLatLng,
+            )
+        }
+        clearDeleteSession()
+    }
+
+    private fun clearDeleteSession() {
+        originBeforeDeleteSession = null
+        committedPlaceIds.clear()
+        deletePlaceQueue.clear()
     }
 
     fun updateScreenMode(turipPlaceScreenMode: TuripPlaceScreenMode) {
@@ -561,18 +584,6 @@ class TuripDetailViewModel @Inject constructor(
                 }
             }
         }
-    }
-
-    fun rollbackTuripPlaceDelete() {
-        if (!deleteTuripPlaceSnapshot.hasSnapshot) return
-
-        _uiState.update { state ->
-            state.copy(
-                places = deleteTuripPlaceSnapshot.originPlaces,
-                placesLatLng = deleteTuripPlaceSnapshot.originPlacesLatLng,
-            )
-        }
-        clearDeleteSnapshot()
     }
 
     private fun rollbackReorderedPlaces() {
