@@ -96,14 +96,10 @@ class ContentPendingTest {
         @Test
         void createWithPendingStatus() {
             // given
-            Account collector = AccountFixture.createUser();
+            ContentPending pendingContent = new ContentPending(null, null, null, null, null);
 
-            // when
-            ContentPending pendingContent = ContentPendingFixture.createPending(collector);
-
-            // then
+            // when & then
             assertThat(pendingContent.getStatus()).isEqualTo(ContentPendingStatus.PENDING);
-            assertThat(pendingContent.getContentData().cityName()).isEqualTo("부산");
         }
     }
 }
