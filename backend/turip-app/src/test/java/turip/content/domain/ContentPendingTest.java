@@ -25,7 +25,7 @@ class ContentPendingTest {
                     ContentPendingStatus.PENDING,
                     collector,
                     null,
-                    null,
+                    "거절 사유",
                     null
             );
             Content content = null;
@@ -36,6 +36,7 @@ class ContentPendingTest {
             // then
             assertThat(pendingContent.getStatus()).isEqualTo(ContentPendingStatus.APPROVED);
             assertThat(pendingContent.getValidatorAccount()).isEqualTo(validator);
+            assertThat(pendingContent.getRejectReason()).isBlank();
         }
 
         @DisplayName("PENDING -> REJECTED 상태 변경 테스트")

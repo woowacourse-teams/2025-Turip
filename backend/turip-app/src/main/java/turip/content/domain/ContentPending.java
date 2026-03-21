@@ -83,6 +83,7 @@ public class ContentPending {
     public void approve(Account validatorAccount, Content content) {
         this.status = ContentPendingStatus.APPROVED;
         this.validatorAccount = validatorAccount;
+        this.rejectReason = "";
         this.content = content;
         this.updatedAt = LocalDateTime.now();
     }
