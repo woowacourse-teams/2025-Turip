@@ -72,7 +72,7 @@ public class ContentPending {
             Content content
     ) {
         this.contentData = contentData;
-        this.status = status;
+        this.status = ContentPendingStatus.PENDING;
         this.collectorAccount = collectorAccount;
         this.validatorAccount = validatorAccount;
         this.rejectReason = rejectReason;
