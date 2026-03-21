@@ -409,8 +409,6 @@ class TuripDetailViewModel @Inject constructor(
         }
     }
 
-    fun resetUiState() = _uiState.update { TuripDetailUiState.Idle }
-
     fun showBottomSheet() = _uiState.update { it.copy(showBottomSheet = true) }
 
     fun dismissBottomSheet() =
