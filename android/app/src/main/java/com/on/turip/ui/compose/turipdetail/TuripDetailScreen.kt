@@ -198,6 +198,7 @@ fun TuripDetailScreen(
         MoreOptionBottomSheet(
             sheetState = modalBottomSheetState,
             isDefault = uiState.selectedTurip.isDefault,
+            isTogetherTurip = uiState.selectedTurip.type == TuripTypeModel.TOGETHER,
             onDismiss = viewModel::dismissBottomSheet,
             onShareTuripByTextClick = viewModel::shareTuripByText,
             onShareTuripInvitationLinkClick = viewModel::shareTuripInvitationLink,
