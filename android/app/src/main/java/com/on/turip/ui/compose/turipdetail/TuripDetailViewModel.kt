@@ -113,7 +113,7 @@ class TuripDetailViewModel @Inject constructor(
         loadPlaces(turipId)
     }
 
-    fun loadSelectedTuripAsync(selectedTuripId: Long) {
+    fun loadTurip(selectedTuripId: Long) {
         viewModelScope.launch {
             loadSelectedTurip(selectedTuripId)
         }
