@@ -2,4 +2,6 @@ dependencies {
     implementation project(':turip-app')
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.json:json:20231013'
+
+    testImplementation project(':turip-app').sourceSets.test.output
 }
