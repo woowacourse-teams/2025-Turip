@@ -8,6 +8,7 @@ import com.on.turip.core.result.onSuccess
 import com.on.turip.domain.session.SessionState
 import com.on.turip.domain.session.SessionStore
 import com.on.turip.domain.turip.DeleteTuripUseCase
+import com.on.turip.domain.turip.Nickname
 import com.on.turip.domain.turip.ObserveTuripStreamUseCase
 import com.on.turip.domain.turip.Turip
 import com.on.turip.domain.turip.TuripInvitationToken
@@ -166,8 +167,8 @@ class TuripDetailViewModel @Inject constructor(
 
     private fun loadMembers() {
         viewModelScope.launch {
-            turipRepository.loadTuripMembers(selectedTuripId).onSuccess { members: List<String> ->
-                _uiState.update { it.copy(members = members.toImmutableList()) }
+            turipRepository.loadTuripMembers(selectedTuripId).onSuccess { members: List<Nickname> ->
+                _uiState.update { it.copy(members = members.map { it.value }.toImmutableList()) }
             }
         }
     }

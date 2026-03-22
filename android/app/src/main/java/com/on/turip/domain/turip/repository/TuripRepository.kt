@@ -2,6 +2,7 @@ package com.on.turip.domain.turip.repository
 
 import com.on.turip.core.result.TuripResult
 import com.on.turip.domain.bookmark.TuripPlace
+import com.on.turip.domain.turip.Nickname
 import com.on.turip.domain.turip.Turip
 import com.on.turip.domain.turip.TuripInvitationInformation
 import com.on.turip.domain.turip.TuripInvitationToken
@@ -13,7 +14,7 @@ interface TuripRepository {
 
     suspend fun loadTurips(): TuripResult<List<Turip>>
 
-    suspend fun loadTuripMembers(turipId: Long): TuripResult<List<String>>
+    suspend fun loadTuripMembers(turipId: Long): TuripResult<List<Nickname>>
 
     suspend fun createTurip(name: String): TuripResult<Turip>
 

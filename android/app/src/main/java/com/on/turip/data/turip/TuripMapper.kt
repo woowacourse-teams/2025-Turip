@@ -17,6 +17,7 @@ import com.on.turip.data.turip.stream.TuripStreamHeartbeatPayload
 import com.on.turip.data.turip.stream.TuripStreamMemberUpdatePayload
 import com.on.turip.domain.bookmark.TuripPlace
 import com.on.turip.domain.trip.Place
+import com.on.turip.domain.turip.Nickname
 import com.on.turip.domain.turip.Turip
 import com.on.turip.domain.turip.TuripInvitationInformation
 import com.on.turip.domain.turip.TuripInvitationToken
@@ -24,7 +25,7 @@ import com.on.turip.domain.turip.TuripStreamEvent
 
 fun TuripsResponse.toDomain(): List<Turip> = turipsResponse.map { it.toDomain() }
 
-fun TuripMembersResponse.toDomain(): List<String> = members.map { it.nickname }
+fun TuripMembersResponse.toDomain(): List<Nickname> = members.map { Nickname(it.nickname) }
 
 fun TuripResponse.toDomain(): Turip =
     Turip(
