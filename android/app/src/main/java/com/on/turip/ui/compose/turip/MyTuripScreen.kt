@@ -41,6 +41,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import com.on.turip.R
+import com.on.turip.domain.turip.TuripType
 import com.on.turip.ui.compose.designsystem.component.TuripDialog
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbarVisuals
 import com.on.turip.ui.compose.designsystem.snackbar.LocalSnackbarDelegate
@@ -50,7 +51,6 @@ import com.on.turip.ui.compose.turip.component.MyTuripTabRow
 import com.on.turip.ui.compose.turip.component.TuripAddBottomSheet
 import com.on.turip.ui.compose.turip.model.MyTuripModel
 import com.on.turip.ui.compose.turip.model.MyTuripTab
-import com.on.turip.ui.compose.turip.model.TuripTypeModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
@@ -205,8 +205,8 @@ private fun MyTuripScreenContent(
         derivedStateOf {
             when (selectedTab) {
                 MyTuripTab.ALL -> turips
-                MyTuripTab.SOLO -> turips.filter { it.type == TuripTypeModel.SOLO }
-                MyTuripTab.TOGETHER -> turips.filter { it.type == TuripTypeModel.TOGETHER }
+                MyTuripTab.SOLO -> turips.filter { it.type == TuripType.SOLO }
+                MyTuripTab.TOGETHER -> turips.filter { it.type == TuripType.TOGETHER }
             }
         }
     }
@@ -307,13 +307,13 @@ private fun MyTuripScreenPreview() {
             MyTuripModel(
                 0L,
                 "수원 여행 계획 튜립",
-                TuripTypeModel.TOGETHER,
+                TuripType.TOGETHER,
                 memberCount = 3,
                 placeCount = 2,
                 isDefault = true,
             ),
-            MyTuripModel(1L, "수원 여행 계획 튜립", TuripTypeModel.SOLO, placeCount = 1, isDefault = false),
-            MyTuripModel(2L, "수원 여행 계획 튜립", TuripTypeModel.SOLO, placeCount = 3, isDefault = false),
+            MyTuripModel(1L, "수원 여행 계획 튜립", TuripType.SOLO, placeCount = 1, isDefault = false),
+            MyTuripModel(2L, "수원 여행 계획 튜립", TuripType.SOLO, placeCount = 3, isDefault = false),
         )
 
     TuripTheme {

@@ -2,7 +2,6 @@ package com.on.turip.domain.turip
 
 import com.on.turip.core.result.TuripResult
 import com.on.turip.domain.turip.repository.TuripRepository
-import com.on.turip.ui.compose.turip.model.TuripTypeModel
 import javax.inject.Inject
 
 class DeleteTuripUseCase @Inject constructor(
@@ -10,10 +9,10 @@ class DeleteTuripUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(
         turipId: Long,
-        type: TuripTypeModel,
+        type: TuripType,
     ): TuripResult<Unit> =
         when (type) {
-            TuripTypeModel.SOLO -> turipRepository.deleteTurip(turipId)
-            TuripTypeModel.TOGETHER -> turipRepository.exitTurip(turipId)
+            TuripType.SOLO -> turipRepository.deleteTurip(turipId)
+            TuripType.TOGETHER -> turipRepository.exitTurip(turipId)
         }
 }

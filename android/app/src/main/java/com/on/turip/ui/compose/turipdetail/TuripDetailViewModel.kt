@@ -13,6 +13,7 @@ import com.on.turip.domain.turip.ObserveTuripStreamUseCase
 import com.on.turip.domain.turip.Turip
 import com.on.turip.domain.turip.TuripInvitationToken
 import com.on.turip.domain.turip.TuripStreamEvent
+import com.on.turip.domain.turip.TuripType
 import com.on.turip.domain.turip.repository.TuripRepository
 import com.on.turip.domain.turip.result.TuripStreamResult
 import com.on.turip.ui.common.error.ErrorUiState
@@ -22,7 +23,6 @@ import com.on.turip.ui.common.extensions.toUrl
 import com.on.turip.ui.common.model.namestatus.TuripNameStatusModel
 import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
 import com.on.turip.ui.compose.turip.mapper.toUiMyTuripModel
-import com.on.turip.ui.compose.turip.model.TuripTypeModel
 import com.on.turip.ui.compose.turipdetail.model.RefreshScope
 import com.on.turip.ui.compose.turipdetail.model.turip.PlaceLatLngUiModel
 import com.on.turip.ui.compose.turipdetail.model.turip.TuripShareModel
@@ -102,7 +102,7 @@ class TuripDetailViewModel @Inject constructor(
     private fun loadTuripData(turipId: Long) {
         viewModelScope.launch {
             loadSelectedTurip(turipId)
-            if (uiState.value.selectedTurip.type == TuripTypeModel.TOGETHER) {
+            if (uiState.value.selectedTurip.type == TuripType.TOGETHER) {
                 observeTuripStream(turipId)
             }
         }
@@ -588,7 +588,7 @@ class TuripDetailViewModel @Inject constructor(
                 loadPlaces(selectedTuripId)
                 viewModelScope.launch {
                     loadSelectedTurip(selectedTuripId)
-                    if (uiState.value.selectedTurip.type == TuripTypeModel.TOGETHER) {
+                    if (uiState.value.selectedTurip.type == TuripType.TOGETHER) {
                         observeTuripStream(selectedTuripId)
                     }
                 }

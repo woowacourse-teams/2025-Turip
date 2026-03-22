@@ -42,11 +42,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.on.turip.R
+import com.on.turip.domain.turip.TuripType
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.turip.model.MyTuripModel
 import com.on.turip.ui.compose.turip.model.TuripChipIconModel
 import com.on.turip.ui.compose.turip.model.TuripChipModel
-import com.on.turip.ui.compose.turip.model.TuripTypeModel
 
 private const val LONG_PRESS_DELAY_MS = 800L
 
@@ -146,7 +146,7 @@ fun MyTuripCard(
                         horizontalArrangement = Arrangement.spacedBy(TuripTheme.spacing.medium),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        if (turip.type == TuripTypeModel.TOGETHER) {
+                        if (turip.type == TuripType.TOGETHER) {
                             IconWithCount(
                                 icon = TuripChipIconModel.PainterChipIcon(painterResource(R.drawable.ic_people_fill)),
                                 count = turip.memberCount,
@@ -191,12 +191,12 @@ fun MyTuripCard(
 
 @Composable
 private fun TuripTypeChip(
-    type: TuripTypeModel,
+    type: TuripType,
     modifier: Modifier = Modifier,
 ) {
     val turipChipModel: TuripChipModel =
         when (type) {
-            TuripTypeModel.TOGETHER -> {
+            TuripType.TOGETHER -> {
                 TuripChipModel(
                     text = stringResource(R.string.turip_card_together_turip),
                     backgroundColor = TuripTheme.colors.chipBackground,
@@ -204,7 +204,7 @@ private fun TuripTypeChip(
                 )
             }
 
-            TuripTypeModel.SOLO -> {
+            TuripType.SOLO -> {
                 TuripChipModel(
                     text = stringResource(R.string.turip_card_solo_turip),
                     backgroundColor = TuripTheme.colors.primary,
@@ -280,7 +280,7 @@ private fun MyTuripCardTogetherPreview() {
                 MyTuripModel(
                     id = 0L,
                     name = "수원 여행 계획 튜립",
-                    type = TuripTypeModel.TOGETHER,
+                    type = TuripType.TOGETHER,
                     memberCount = 3,
                     placeCount = 5,
                     isDefault = true,
@@ -302,7 +302,7 @@ private fun MyTuripCardSoloPreview() {
                 MyTuripModel(
                     id = 1L,
                     name = "수원 여행 계획 튜립",
-                    type = TuripTypeModel.SOLO,
+                    type = TuripType.SOLO,
                     placeCount = 3,
                     isDefault = false,
                 ),
@@ -323,7 +323,7 @@ private fun MyTuripCardDeletedPreview() {
                 MyTuripModel(
                     id = 0L,
                     name = "수원 여행 계획 튜립",
-                    type = TuripTypeModel.TOGETHER,
+                    type = TuripType.TOGETHER,
                     memberCount = 3,
                     placeCount = 5,
                     isDefault = false,

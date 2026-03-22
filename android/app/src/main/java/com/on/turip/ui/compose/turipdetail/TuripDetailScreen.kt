@@ -37,6 +37,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.maps.model.LatLng
 import com.on.turip.R
+import com.on.turip.domain.turip.TuripType
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.compose.designsystem.component.ErrorScreen
@@ -46,7 +47,6 @@ import com.on.turip.ui.compose.designsystem.snackbar.LocalSnackbarDelegate
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.trip.model.MapModel
 import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
-import com.on.turip.ui.compose.turip.model.TuripTypeModel
 import com.on.turip.ui.compose.turipdetail.component.MemberListSheet
 import com.on.turip.ui.compose.turipdetail.component.MoreOptionBottomSheet
 import com.on.turip.ui.compose.turipdetail.component.TuripInfoRow
@@ -206,7 +206,7 @@ fun TuripDetailScreen(
         MoreOptionBottomSheet(
             sheetState = modalBottomSheetState,
             isDefault = uiState.selectedTurip.isDefault,
-            isTogetherTurip = uiState.selectedTurip.type == TuripTypeModel.TOGETHER,
+            isTogetherTurip = uiState.selectedTurip.type == TuripType.TOGETHER,
             onDismiss = viewModel::dismissBottomSheet,
             onShareTuripByTextClick = viewModel::shareTuripByText,
             onShareTuripInvitationLinkClick = viewModel::shareTuripInvitationLink,
@@ -223,7 +223,7 @@ fun TuripDetailScreen(
     }
 
     if (uiState.showTuripRemoveDialog) {
-        val isTogetherTurip = uiState.selectedTurip.type == TuripTypeModel.TOGETHER
+        val isTogetherTurip = uiState.selectedTurip.type == TuripType.TOGETHER
 
         TuripDialog(
             title =
@@ -295,7 +295,7 @@ fun TuripDetailScreen(
                 else -> {
                     TuripPlaceContent(
                         nicknames = uiState.members,
-                        isTogetherTurip = uiState.selectedTurip.type == TuripTypeModel.TOGETHER,
+                        isTogetherTurip = uiState.selectedTurip.type == TuripType.TOGETHER,
                         selectedTuripId = uiState.selectedTurip.id,
                         selectedTuripName = uiState.selectedTurip.name,
                         turipPlaceModel = uiState.places,
