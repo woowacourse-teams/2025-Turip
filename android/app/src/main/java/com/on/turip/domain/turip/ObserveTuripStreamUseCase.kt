@@ -75,7 +75,10 @@ class ObserveTuripStreamUseCase @Inject constructor(
                         MAX_RETRY_EXPONENT,
                         turipId,
                     )
-                    send(TuripStreamResult.Fatal.ConnectionLost((streamFailure as TuripStreamResult.Fatal.ConnectionLost).errorType))
+                    val errorType =
+                        (streamFailure as? TuripStreamResult.Fatal.ConnectionLost)?.errorType
+                            ?: ErrorType.Unknown
+                    send(TuripStreamResult.Fatal.ConnectionLost(errorType))
                     return@channelFlow
                 }
 
