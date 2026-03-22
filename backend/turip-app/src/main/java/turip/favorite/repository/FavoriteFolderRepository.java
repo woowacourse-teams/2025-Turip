@@ -42,4 +42,14 @@ public interface FavoriteFolderRepository extends JpaRepository<FavoriteFolder, 
             ") " +
             "AND ff.isShared = false")
     void deletePersonalFoldersByAccount(@Param("account") Account account);
+
+    @Modifying
+    @Query("DELETE FROM FavoriteFolder ff " +
+            "WHERE ff.id = (" +
+            "   SELECT ffa.favoriteFolder.id " +
+            "   FROM FavoriteFolderAccount ffa " +
+            "   WHERE ffa.account = :account " +
+            "   AND ffa.favoriteFolder.isDefault = true" +
+            ")")
+    void deleteDefaultFolderByAccount(@Param("account") Account account);
 }

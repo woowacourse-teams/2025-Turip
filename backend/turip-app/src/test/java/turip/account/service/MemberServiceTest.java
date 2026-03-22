@@ -120,7 +120,7 @@ class MemberServiceTest {
             memberService.migrate(member, guest);
 
             // then
-            verify(favoriteFolderRepository).deletePersonalFoldersByAccount(guestAccount);
+            verify(favoriteFolderRepository).deleteDefaultFolderByAccount(memberAccount);
             verify(favoriteFolderAccountRepository).updateAccount(guestAccount, memberAccount);
         }
 
