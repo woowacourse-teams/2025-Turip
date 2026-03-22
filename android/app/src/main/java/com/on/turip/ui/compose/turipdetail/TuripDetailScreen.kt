@@ -76,12 +76,14 @@ fun TuripDetailScreen(
     val modalBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
 
-    BackHandler(enabled = !uiState.showBottomSheet) { onBack() }
-
     BackHandler {
-        scope.launch {
-            viewModel.flushDeleteQueueAndAwait()
-            onBack()
+        if (uiState.showBottomSheet) {
+            viewModel.dismissBottomSheet()
+        } else {
+            scope.launch {
+                viewModel.flushDeleteQueueAndAwait()
+                onBack()
+            }
         }
     }
 
