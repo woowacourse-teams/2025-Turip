@@ -131,12 +131,12 @@ class ObserveTuripStreamUseCase @Inject constructor(
                         return true
                     }
 
-                    StreamFailureAction.FatalTokenExpired -> {
+                    StreamFailureAction.TokenExpired -> {
                         send(TuripStreamResult.Fatal.TokenExpired)
                         return true
                     }
 
-                    StreamFailureAction.FatalForbidden -> {
+                    StreamFailureAction.Forbidden -> {
                         send(TuripStreamResult.Fatal.Forbidden)
                         return true
                     }
@@ -152,12 +152,12 @@ class ObserveTuripStreamUseCase @Inject constructor(
     ): StreamFailureAction =
         when (errorType) {
             ErrorType.Auth.TokenExpired -> {
-                StreamFailureAction.FatalTokenExpired
+                StreamFailureAction.TokenExpired
             }
 
             ErrorType.Auth.Forbidden -> {
                 Timber.w("튜립 SSE 권한이 없어 스트림을 중단합니다. turipId=%s", turipId)
-                StreamFailureAction.FatalForbidden
+                StreamFailureAction.Forbidden
             }
 
             ErrorType.Network,
