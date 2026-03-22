@@ -1,9 +1,7 @@
 package com.on.turip.domain.turip
 
 import com.on.turip.core.result.ErrorType
-import com.on.turip.core.result.TuripResult
 import com.on.turip.domain.turip.repository.TuripRepository
-import com.on.turip.domain.turip.result.StreamFailureAction
 import com.on.turip.domain.turip.result.TuripStreamResult
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.delay
@@ -24,7 +22,7 @@ class ObserveTuripStreamUseCase @Inject constructor(
             var retryCount = 0
 
             while (true) {
-                var streamResult: TuripResult<Unit>? = null
+                var streamFailure: TuripStreamResult.Fatal? = null
                 var timedOut = false
 
                 heartbeatManager.start(this)
@@ -35,8 +33,8 @@ class ObserveTuripStreamUseCase @Inject constructor(
                             .streamTuripEvents(turipId)
                             .collect { eventResult ->
                                 when (eventResult) {
-                                    is TuripResult.Success -> {
-                                        val event = eventResult.value
+                                    is TuripStreamResult.Event -> {
+                                        val event = eventResult.event
                                         if (event is TuripStreamEvent.Connect || event is TuripStreamEvent.Heartbeat) {
                                             if (event is TuripStreamEvent.Connect) retryCount = 0
                                             heartbeatManager.onHeartbeat()
@@ -44,15 +42,15 @@ class ObserveTuripStreamUseCase @Inject constructor(
                                         send(TuripStreamResult.Event(event))
                                     }
 
-                                    is TuripResult.Failure -> {
-                                        streamResult = eventResult
+                                    is TuripStreamResult.Fatal -> {
+                                        streamFailure = eventResult
+                                    }
+
+                                    is TuripStreamResult.Reconnecting -> {
+                                        Unit
                                     }
                                 }
                             }
-
-                        if (streamResult == null) {
-                            streamResult = TuripResult.Success(Unit)
-                        }
                     }
 
                 val timeoutObserveJob =
@@ -66,9 +64,10 @@ class ObserveTuripStreamUseCase @Inject constructor(
                 timeoutObserveJob.cancel()
                 heartbeatManager.stop()
 
-                if (shouldExitStream(timedOut, turipId, streamResult)) return@channelFlow
+                if (shouldExitStream(timedOut, turipId, streamFailure)) return@channelFlow
 
-                val isErrorRetry = streamResult is TuripResult.Failure && !timedOut
+                val isErrorRetry =
+                    streamFailure is TuripStreamResult.Fatal && !timedOut
 
                 if (isErrorRetry && retryCount >= MAX_RETRY_EXPONENT) {
                     Timber.e(
@@ -76,7 +75,7 @@ class ObserveTuripStreamUseCase @Inject constructor(
                         MAX_RETRY_EXPONENT,
                         turipId,
                     )
-                    send(TuripStreamResult.Fatal.ConnectionLost((streamResult as TuripResult.Failure).errorType))
+                    send(TuripStreamResult.Fatal.ConnectionLost((streamFailure as TuripStreamResult.Fatal.ConnectionLost).errorType))
                     return@channelFlow
                 }
 
@@ -107,38 +106,34 @@ class ObserveTuripStreamUseCase @Inject constructor(
     private suspend fun ProducerScope<TuripStreamResult>.shouldExitStream(
         timedOut: Boolean,
         turipId: Long,
-        streamResult: TuripResult<Unit>?,
+        streamFailure: TuripStreamResult.Fatal?,
     ): Boolean {
         when {
             timedOut -> {
                 Timber.d("튜립 SSE 하트비트 타임아웃으로 재연결합니다. turipId=%s", turipId)
             }
 
-            streamResult is TuripResult.Failure -> {
-                val failure = streamResult as TuripResult.Failure
+            streamFailure != null -> {
                 Timber.e(
-                    "튜립 SSE 스트림 실패. turipId=%s, errorType=%s, cause=%s",
+                    "튜립 SSE 스트림 실패. turipId=%s, failure=%s",
                     turipId,
-                    failure.errorType,
-                    failure.cause.javaClass.simpleName,
+                    streamFailure::class.simpleName,
                 )
-                when (handleTuripStreamFailure(failure.errorType, turipId)) {
-                    StreamFailureAction.Retry -> {
-                        Unit
-                    }
-
-                    StreamFailureAction.Stop -> {
-                        return true
-                    }
-
-                    StreamFailureAction.TokenExpired -> {
+                when (streamFailure) {
+                    TuripStreamResult.Fatal.TokenExpired -> {
                         send(TuripStreamResult.Fatal.TokenExpired)
                         return true
                     }
 
-                    StreamFailureAction.Forbidden -> {
+                    TuripStreamResult.Fatal.Forbidden -> {
                         send(TuripStreamResult.Fatal.Forbidden)
                         return true
+                    }
+
+                    is TuripStreamResult.Fatal.ConnectionLost -> {
+                        if (!isRetryableConnectionError(streamFailure.errorType, turipId)) {
+                            return true
+                        }
                     }
                 }
             }
@@ -146,29 +141,20 @@ class ObserveTuripStreamUseCase @Inject constructor(
         return false
     }
 
-    private fun handleTuripStreamFailure(
+    private fun isRetryableConnectionError(
         errorType: ErrorType,
         turipId: Long,
-    ): StreamFailureAction =
+    ): Boolean =
         when (errorType) {
-            ErrorType.Auth.TokenExpired -> {
-                StreamFailureAction.TokenExpired
-            }
-
-            ErrorType.Auth.Forbidden -> {
-                Timber.e("튜립 SSE 권한이 없어 스트림을 중단합니다. turipId=%s", turipId)
-                StreamFailureAction.Forbidden
-            }
-
             ErrorType.Network,
             ErrorType.Unknown,
             -> {
-                StreamFailureAction.Retry
+                true
             }
 
             else -> {
                 Timber.e("튜립 SSE 에러로 스트림을 중단합니다. turipId=%s, errorType=%s", turipId, errorType)
-                StreamFailureAction.Stop
+                false
             }
         }
 

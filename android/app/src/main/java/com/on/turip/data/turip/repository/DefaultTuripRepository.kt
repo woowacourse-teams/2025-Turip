@@ -1,5 +1,6 @@
 package com.on.turip.data.turip.repository
 
+import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.TuripResult
 import com.on.turip.core.result.mapCatching
 import com.on.turip.data.result.toErrorType
@@ -17,6 +18,7 @@ import com.on.turip.domain.turip.TuripInvitationInformation
 import com.on.turip.domain.turip.TuripInvitationToken
 import com.on.turip.domain.turip.TuripStreamEvent
 import com.on.turip.domain.turip.repository.TuripRepository
+import com.on.turip.domain.turip.result.TuripStreamResult
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -94,19 +96,22 @@ class DefaultTuripRepository @Inject constructor(
     override suspend fun verifyInvitationToken(token: String): TuripResult<TuripInvitationInformation> =
         turipRestRemoteDataSource.getInvitationInformation(token).mapCatching { it.toDomain() }
 
-    override fun streamTuripEvents(turipId: Long): Flow<TuripResult<TuripStreamEvent>> =
+    override fun streamTuripEvents(turipId: Long): Flow<TuripStreamResult> =
         turipSseStreamDataSource
             .streamTuripEvents(turipId)
-            .map<TuripStreamEvent, TuripResult<TuripStreamEvent>> { event ->
-                TuripResult.Success(event)
+            .map<TuripStreamEvent, TuripStreamResult> { event ->
+                TuripStreamResult.Event(event)
             }.catch { throwable ->
                 if (throwable is CancellationException) throw throwable
 
-                emit(
-                    TuripResult.Failure(
-                        errorType = throwable.toErrorType(),
-                        cause = throwable,
-                    ),
-                )
+                val errorType = throwable.toErrorType()
+                val fatalResult =
+                    when (errorType) {
+                        ErrorType.Auth.TokenExpired -> TuripStreamResult.Fatal.TokenExpired
+                        ErrorType.Auth.Forbidden -> TuripStreamResult.Fatal.Forbidden
+                        else -> TuripStreamResult.Fatal.ConnectionLost(errorType)
+                    }
+
+                emit(fatalResult)
             }
 }

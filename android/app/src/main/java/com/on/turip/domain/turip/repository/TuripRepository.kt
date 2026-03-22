@@ -6,7 +6,7 @@ import com.on.turip.domain.turip.Nickname
 import com.on.turip.domain.turip.Turip
 import com.on.turip.domain.turip.TuripInvitationInformation
 import com.on.turip.domain.turip.TuripInvitationToken
-import com.on.turip.domain.turip.TuripStreamEvent
+import com.on.turip.domain.turip.result.TuripStreamResult
 import kotlinx.coroutines.flow.Flow
 
 interface TuripRepository {
@@ -57,5 +57,5 @@ interface TuripRepository {
 
     suspend fun verifyInvitationToken(token: String): TuripResult<TuripInvitationInformation>
 
-    fun streamTuripEvents(turipId: Long): Flow<TuripResult<TuripStreamEvent>>
+    fun streamTuripEvents(turipId: Long): Flow<TuripStreamResult>
 }
