@@ -7,6 +7,7 @@ CREATE TABLE content_pending (
     validator_account_id BIGINT NULL,
     reject_reason TEXT NULL,
     content_id BIGINT NULL,
+    content_data_updated_at DATETIME NOT NULL,
     created_at DATETIME NOT NULL,
     updated_at DATETIME NOT NULL,
 

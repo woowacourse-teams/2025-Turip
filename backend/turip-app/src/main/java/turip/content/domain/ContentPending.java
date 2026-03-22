@@ -20,6 +20,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import turip.account.domain.Account;
+import turip.common.domain.BaseTimeEntity;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.IllegalStateException;
 
@@ -28,7 +29,7 @@ import turip.common.exception.custom.IllegalStateException;
 @Table(name = "content_pending")
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ContentPending {
+public class ContentPending extends BaseTimeEntity {
 
     @Id
     @EqualsAndHashCode.Include
@@ -58,11 +59,8 @@ public class ContentPending {
     @JoinColumn(name = "content_id", foreignKey = @ForeignKey(name = "fk_content_pending__content"))
     private Content content;
 
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
+    @Column(name = "content_data_updated_at", nullable = false)
+    private LocalDateTime contentDataUpdatedAt;
 
     public ContentPending(
             ContentPendingData contentData,
@@ -77,8 +75,7 @@ public class ContentPending {
         this.validatorAccount = validatorAccount;
         this.rejectReason = rejectReason;
         this.content = content;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+        this.contentDataUpdatedAt = LocalDateTime.now();
     }
 
     public void approve(Account validatorAccount, Content content) {
@@ -88,7 +85,6 @@ public class ContentPending {
         this.validatorAccount = validatorAccount;
         this.rejectReason = "";
         this.content = content;
-        this.updatedAt = LocalDateTime.now();
     }
 
     public void reject(Account validatorAccount, String rejectReason) {
@@ -97,7 +93,6 @@ public class ContentPending {
         this.status = ContentPendingStatus.REJECTED;
         this.validatorAccount = validatorAccount;
         this.rejectReason = rejectReason;
-        this.updatedAt = LocalDateTime.now();
     }
 
     private void validateStatusNotApproved() {
