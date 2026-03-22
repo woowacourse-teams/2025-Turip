@@ -67,6 +67,7 @@ public enum ErrorTag {
     INVALID_YOUTUBE_URL("유효하지 않은 유튜브 URL입니다."),
     INVALID_TIMELINE_FORMAT("타임라인 형식이 올바르지 않습니다."),
     IS_ALREADY_APPROVED("이미 승인된 콘텐츠입니다."),
+    CONTENT_PENDING_NOT_FOUND("펜딩 콘텐츠를 찾을 수 없습니다."),
 
     // 404 Not Found
     YOUTUBE_VIDEO_NOT_FOUND("유튜브 영상을 찾을 수 없습니다."),
