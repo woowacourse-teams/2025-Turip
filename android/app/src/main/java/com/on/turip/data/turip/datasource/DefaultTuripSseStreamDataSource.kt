@@ -24,34 +24,21 @@ class DefaultTuripSseStreamDataSource @Inject constructor(
                             val event = result.value
                             val eventType: String =
                                 event.event ?: run {
-                                    Timber.e(
-                                        "튜립 SSE 이벤트 타입 누락. id=%s, dataLen=%s",
-                                        event.id,
-                                        event.data?.length,
-                                    )
+                                    Timber.e("튜립 SSE 이벤트 타입 누락. id=%s", event.id)
                                     return@collect
                                 }
                             val data: String =
                                 event.data ?: run {
-                                    Timber.e(
-                                        "튜립 SSE 이벤트 데이터 누락. id=%s, type=%s",
-                                        event.id,
-                                        eventType,
-                                    )
+                                    Timber.e("튜립 SSE 이벤트 데이터 누락. id=%s", event.id)
                                     return@collect
                                 }
 
                             val parsed: TuripStreamEvent =
-                                parser.parse(
-                                    event.id,
-                                    eventType,
-                                    data,
-                                ) ?: run {
+                                parser.parse(event.id, eventType, data) ?: run {
                                     Timber.e(
-                                        "튜립 SSE 이벤트 파싱 실패. id=%s, type=%s, dataLen=%s",
+                                        "튜립 SSE 이벤트 파싱 실패. id=%s, type=%s",
                                         event.id,
                                         eventType,
-                                        data.length,
                                     )
                                     return@collect
                                 }
