@@ -367,16 +367,18 @@ class TuripDetailViewModel @Inject constructor(
     }
 
     suspend fun flushDeleteQueueAndAwait() {
-        val remainingQueue = deletePlaceQueue.toList()
-        clearDeleteSession()
+        commitMutex.withLock {
+            val remainingQueue = deletePlaceQueue.toList()
+            clearDeleteSession()
 
-        withContext(Dispatchers.IO) {
-            remainingQueue.forEach { place ->
-                runCatching {
-                    turipRepository.deleteTuripPlace(
-                        uiState.value.selectedTurip.id,
-                        place.placeId,
-                    )
+            withContext(Dispatchers.IO) {
+                remainingQueue.forEach { place ->
+                    runCatching {
+                        turipRepository.deleteTuripPlace(
+                            uiState.value.selectedTurip.id,
+                            place.placeId,
+                        )
+                    }
                 }
             }
         }
