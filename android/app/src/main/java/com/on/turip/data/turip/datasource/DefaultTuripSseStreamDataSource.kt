@@ -34,7 +34,7 @@ class DefaultTuripSseStreamDataSource @Inject constructor(
                         incoming.collect { event: ServerSentEvent ->
                             val eventType: String =
                                 event.event ?: run {
-                                    Timber.w(
+                                    Timber.e(
                                         "튜립 SSE 이벤트 타입 누락. id=%s, dataLen=%s",
                                         event.id,
                                         event.data?.length,
@@ -43,7 +43,7 @@ class DefaultTuripSseStreamDataSource @Inject constructor(
                                 }
                             val data: String =
                                 event.data ?: run {
-                                    Timber.w(
+                                    Timber.e(
                                         "튜립 SSE 이벤트 데이터 누락. id=%s, type=%s",
                                         event.id,
                                         eventType,
@@ -57,7 +57,7 @@ class DefaultTuripSseStreamDataSource @Inject constructor(
                                     eventType,
                                     data,
                                 ) ?: run {
-                                    Timber.w(
+                                    Timber.e(
                                         "튜립 SSE 이벤트 파싱 실패. id=%s, type=%s, dataLen=%s",
                                         event.id,
                                         eventType,

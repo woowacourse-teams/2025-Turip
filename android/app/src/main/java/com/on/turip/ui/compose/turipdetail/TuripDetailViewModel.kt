@@ -182,7 +182,7 @@ class TuripDetailViewModel @Inject constructor(
                         }
 
                         is TuripStreamResult.Reconnecting -> {
-                            Timber.w("SSE 재연결 중. turipId=$turipId, retryCount=${result.retryCount}")
+                            Timber.d("SSE 재연결 중. turipId=$turipId, retryCount=${result.retryCount}")
                             if (result.retryCount >= UNSTABLE_NETWORK_RETRY_THRESHOLD) {
                                 _uiEffect.send(TuripDetailUiEffect.ShowNetworkUnstable)
                             }
@@ -193,7 +193,7 @@ class TuripDetailViewModel @Inject constructor(
                         }
 
                         TuripStreamResult.Fatal.Forbidden -> {
-                            Timber.w("SSE 권한 없음, 스트림 중단. turipId=$turipId")
+                            Timber.e("SSE 권한 없음, 스트림 중단. turipId=$turipId")
                         }
 
                         is TuripStreamResult.Fatal.ConnectionLost -> {

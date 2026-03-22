@@ -111,12 +111,12 @@ class ObserveTuripStreamUseCase @Inject constructor(
     ): Boolean {
         when {
             timedOut -> {
-                Timber.w("튜립 SSE 하트비트 타임아웃으로 재연결합니다. turipId=%s", turipId)
+                Timber.d("튜립 SSE 하트비트 타임아웃으로 재연결합니다. turipId=%s", turipId)
             }
 
             streamResult is TuripResult.Failure -> {
                 val failure = streamResult as TuripResult.Failure
-                Timber.w(
+                Timber.e(
                     "튜립 SSE 스트림 실패. turipId=%s, errorType=%s, cause=%s",
                     turipId,
                     failure.errorType,
@@ -156,7 +156,7 @@ class ObserveTuripStreamUseCase @Inject constructor(
             }
 
             ErrorType.Auth.Forbidden -> {
-                Timber.w("튜립 SSE 권한이 없어 스트림을 중단합니다. turipId=%s", turipId)
+                Timber.e("튜립 SSE 권한이 없어 스트림을 중단합니다. turipId=%s", turipId)
                 StreamFailureAction.Forbidden
             }
 
@@ -167,7 +167,7 @@ class ObserveTuripStreamUseCase @Inject constructor(
             }
 
             else -> {
-                Timber.w("튜립 SSE 에러로 스트림을 중단합니다. turipId=%s, errorType=%s", turipId, errorType)
+                Timber.e("튜립 SSE 에러로 스트림을 중단합니다. turipId=%s, errorType=%s", turipId, errorType)
                 StreamFailureAction.Stop
             }
         }
