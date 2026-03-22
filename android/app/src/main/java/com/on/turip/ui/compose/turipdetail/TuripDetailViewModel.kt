@@ -48,6 +48,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -384,20 +385,28 @@ class TuripDetailViewModel @Inject constructor(
     }
 
     suspend fun flushDeleteQueueAndAwait() {
-        commitMutex.withLock {
-            val remainingQueue = deletePlaceQueue.toList()
-            clearDeleteSession()
+        val flushed =
+            withTimeoutOrNull(FLUSH_DELETE_TIMEOUT_MILLIS) {
+                commitMutex.withLock {
+                    val remainingQueue = deletePlaceQueue.toList()
+                    clearDeleteSession()
 
-            withContext(Dispatchers.IO) {
-                remainingQueue.forEach { place ->
-                    runCatching {
-                        turipRepository.deleteTuripPlace(
-                            uiState.value.selectedTurip.id,
-                            place.placeId,
-                        )
+                    withContext(Dispatchers.IO) {
+                        remainingQueue.forEach { place ->
+                            runCatching {
+                                turipRepository.deleteTuripPlace(
+                                    uiState.value.selectedTurip.id,
+                                    place.placeId,
+                                )
+                            }
+                        }
                     }
                 }
-            }
+                true
+            } ?: false
+
+        if (!flushed) {
+            Timber.w("삭제 큐 flush 타임아웃. turipId=%s", selectedTuripId)
         }
     }
 
@@ -702,5 +711,6 @@ class TuripDetailViewModel @Inject constructor(
         private const val INVALID_ID = -1L
         private const val MAX_NAME_LENGTH = 20
         private const val UNSTABLE_NETWORK_RETRY_THRESHOLD = 2
+        private const val FLUSH_DELETE_TIMEOUT_MILLIS = 3_000L
     }
 }
