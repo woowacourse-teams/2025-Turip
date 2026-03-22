@@ -31,12 +31,8 @@ import com.on.turip.ui.main.favorite.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -52,6 +48,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -87,7 +84,6 @@ class TuripDetailViewModel @Inject constructor(
         null
 
     private val commitMutex = Mutex()
-    private val flushScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     init {
         registerDragEndEvents()
@@ -374,17 +370,16 @@ class TuripDetailViewModel @Inject constructor(
         val remainingQueue = deletePlaceQueue.toList()
         clearDeleteSession()
 
-        remainingQueue
-            .map { place ->
-                flushScope.async {
-                    runCatching {
-                        turipRepository.deleteTuripPlace(
-                            uiState.value.selectedTurip.id,
-                            place.placeId,
-                        )
-                    }
+        withContext(Dispatchers.IO) {
+            remainingQueue.forEach { place ->
+                runCatching {
+                    turipRepository.deleteTuripPlace(
+                        uiState.value.selectedTurip.id,
+                        place.placeId,
+                    )
                 }
-            }.awaitAll()
+            }
+        }
     }
 
     fun updateScreenMode(turipPlaceScreenMode: TuripPlaceScreenMode) {
