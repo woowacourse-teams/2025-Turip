@@ -79,7 +79,6 @@ object NetworkModule {
              */
             expectSuccess = true
 
-            sseInterceptor()
             timeoutInterceptor()
             loggingInterceptor()
             contentNegotiationInterceptor(json)
@@ -94,13 +93,6 @@ object NetworkModule {
             socketTimeoutMillis = SOCKET_TIMEOUT_MILLIS
             // 전체 HTTP 요청이 완료될 때까지 기다리는 최대 시간
             requestTimeoutMillis = REQUEST_TIMEOUT_MILLIS
-        }
-    }
-
-    private fun HttpClientConfig<OkHttpConfig>.sseInterceptor() {
-        install(SSE) {
-            // 자동 reconnection
-            reconnectionTime = 3000.milliseconds
         }
     }
 

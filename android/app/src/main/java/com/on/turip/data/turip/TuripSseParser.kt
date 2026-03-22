@@ -44,7 +44,7 @@ class TuripSseParser @Inject constructor(
             }
 
             else -> {
-                Timber.Forest.e(
+                Timber.e(
                     "튜립 SSE 미지원 타입. id=%s, type=%s, dataLen=%s",
                     eventId,
                     eventType,
