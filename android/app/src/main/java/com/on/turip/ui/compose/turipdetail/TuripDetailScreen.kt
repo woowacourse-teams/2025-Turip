@@ -176,6 +176,14 @@ fun TuripDetailScreen(
                         duration = SnackbarDuration.Short,
                     )
                 }
+
+                TuripDetailUiEffect.ShowNetworkRecovered -> {
+                    snackbarDelegate.showSnackbar(
+                        message = "재연결 되었습니다.",
+                        duration = SnackbarDuration.Short,
+                        iconRes = R.drawable.btn_turip_selected,
+                    )
+                }
             }
         }
     }

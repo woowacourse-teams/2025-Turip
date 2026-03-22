@@ -40,6 +40,8 @@ sealed interface TuripDetailUiEffect {
     ) : TuripDetailUiEffect
 
     data object ShowNetworkUnstable : TuripDetailUiEffect
+
+    data object ShowNetworkRecovered : TuripDetailUiEffect
 }
 
 sealed interface TuripPlaceRetryAction {

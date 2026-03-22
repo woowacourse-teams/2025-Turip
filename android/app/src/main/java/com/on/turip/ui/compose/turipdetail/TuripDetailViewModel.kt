@@ -72,6 +72,7 @@ class TuripDetailViewModel @Inject constructor(
     private val sessionState: StateFlow<SessionState> = sessionStore.state
     private var reorderPlacesSnapshot: ImmutableList<TuripPlaceModel>? = null
     private var selectedTuripId: Long = INVALID_ID
+    private var isNetworkUnstable: Boolean = false
 
     private val dragEndEvents = MutableSharedFlow<Unit>(replay = 0, extraBufferCapacity = 1)
     private val refreshTrigger =
@@ -98,6 +99,7 @@ class TuripDetailViewModel @Inject constructor(
         if (selectedTuripId == turipId && uiState.value.selectedTurip.id == turipId) return
 
         selectedTuripId = turipId
+        isNetworkUnstable = false
         loadTuripData(turipId)
     }
 
@@ -184,7 +186,8 @@ class TuripDetailViewModel @Inject constructor(
 
                         is TuripStreamResult.Reconnecting -> {
                             Timber.d("SSE 재연결 중. turipId=$turipId, retryCount=${result.retryCount}")
-                            if (result.retryCount >= UNSTABLE_NETWORK_RETRY_THRESHOLD) {
+                            if (result.retryCount >= UNSTABLE_NETWORK_RETRY_THRESHOLD && !isNetworkUnstable) {
+                                isNetworkUnstable = true
                                 _uiEffect.send(TuripDetailUiEffect.ShowNetworkUnstable)
                             }
                         }
@@ -213,6 +216,12 @@ class TuripDetailViewModel @Inject constructor(
         when (event) {
             is TuripStreamEvent.Connect -> {
                 Timber.d("튜립 SSE 연결 성공: turipId=%s, eventId=%s", event.turipId, event.id)
+                if (isNetworkUnstable) {
+                    isNetworkUnstable = false
+                    viewModelScope.launch {
+                        _uiEffect.send(TuripDetailUiEffect.ShowNetworkRecovered)
+                    }
+                }
                 requestRefresh(turip = true, places = true)
                 loadMembers()
             }
@@ -552,27 +561,6 @@ class TuripDetailViewModel @Inject constructor(
                 viewModelScope.launch {
                     _uiEffect.send(TuripDetailUiEffect.ShowTuripShareNotAllowed)
                 }
-            }
-        }
-    }
-
-    private suspend fun handleGlobalError(uiError: UiError.Global) {
-        when (uiError) {
-            UiError.Global.Network -> {
-                _uiState.update {
-                    it.copy(isLoading = false, errorUiState = ErrorUiState.Network)
-                }
-            }
-
-            UiError.Global.Server -> {
-                _uiState.update {
-                    it.copy(isLoading = false, errorUiState = ErrorUiState.Server)
-                }
-            }
-
-            UiError.Global.TokenExpired -> {
-                _uiState.update { it.copy(isLoading = false) }
-                _uiEffect.send(TuripDetailUiEffect.NavigateToLogin)
             }
         }
     }
