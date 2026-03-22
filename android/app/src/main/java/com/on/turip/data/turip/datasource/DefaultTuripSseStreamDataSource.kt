@@ -1,36 +1,27 @@
 package com.on.turip.data.turip.datasource
 
-import com.on.turip.BuildConfig
-import com.on.turip.core.network.ApiPath
 import com.on.turip.core.result.TuripResult
-import com.on.turip.data.result.safeApiCall
 import com.on.turip.data.turip.TuripSseParser
-import com.on.turip.di.SseHttpClient
+import com.on.turip.data.turip.service.TuripStreamService
 import com.on.turip.domain.turip.TuripStreamEvent
-import io.ktor.client.HttpClient
-import io.ktor.client.plugins.sse.sse
 import io.ktor.sse.ServerSentEvent
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
 import timber.log.Timber
 import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 
 class DefaultTuripSseStreamDataSource @Inject constructor(
-    @SseHttpClient private val httpClient: HttpClient,
-    private val coroutineContext: CoroutineContext = Dispatchers.IO,
+    private val turipStreamService: TuripStreamService,
     private val parser: TuripSseParser,
 ) : TuripSseStreamDataSource {
     override fun streamTuripEvents(turipId: Long): Flow<TuripResult<TuripStreamEvent>> =
         flow {
-            val result: TuripResult<Unit> =
-                safeApiCall {
-                    httpClient.sse(
-                        urlString = "${BuildConfig.BASE_URL}${ApiPath.V1}turips/$turipId/stream",
-                    ) {
-                        incoming.collect { event: ServerSentEvent ->
+            turipStreamService
+                .streamTuripEvents(turipId)
+                .collect { result: TuripResult<ServerSentEvent> ->
+                    when (result) {
+                        is TuripResult.Success -> {
+                            val event = result.value
                             val eventType: String =
                                 event.event ?: run {
                                     Timber.e(
@@ -67,11 +58,16 @@ class DefaultTuripSseStreamDataSource @Inject constructor(
 
                             emit(TuripResult.Success(parsed))
                         }
+
+                        is TuripResult.Failure -> {
+                            emit(
+                                TuripResult.Failure(
+                                    errorType = result.errorType,
+                                    cause = result.cause,
+                                ),
+                            )
+                        }
                     }
                 }
-
-            if (result is TuripResult.Failure) {
-                emit(TuripResult.Failure(errorType = result.errorType, cause = result.cause))
-            }
-        }.flowOn(coroutineContext)
+        }
 }

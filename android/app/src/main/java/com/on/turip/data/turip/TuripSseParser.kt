@@ -11,11 +11,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 class TuripSseParser @Inject constructor(
-    private val json: Json =
-        Json {
-            ignoreUnknownKeys = true
-            isLenient = true
-        },
+    private val json: Json,
 ) {
     fun parse(
         eventId: String?,

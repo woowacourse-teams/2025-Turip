@@ -49,10 +49,20 @@ object NetworkModule {
 
     @Provides
     @Singleton
+    fun provideJson(): Json =
+        Json {
+            ignoreUnknownKeys = true
+            isLenient = true
+            encodeDefaults = true
+        }
+
+    @Provides
+    @Singleton
     fun provideHttpClient(
         tokenManager: TokenManager,
         authRepository: Lazy<AuthRepository>,
         fidProvider: FidProvider,
+        json: Json,
     ): HttpClient =
         HttpClient(OkHttp) {
             /**
@@ -72,7 +82,7 @@ object NetworkModule {
             sseInterceptor()
             timeoutInterceptor()
             loggingInterceptor()
-            contentNegotiationInterceptor()
+            contentNegotiationInterceptor(json)
             headerInterceptor(tokenManager, authRepository, fidProvider)
         }
 
@@ -101,15 +111,9 @@ object NetworkModule {
         }
     }
 
-    private fun HttpClientConfig<OkHttpConfig>.contentNegotiationInterceptor() {
+    private fun HttpClientConfig<OkHttpConfig>.contentNegotiationInterceptor(json: Json) {
         install(plugin = ContentNegotiation) {
-            json(
-                Json {
-                    ignoreUnknownKeys = true
-                    isLenient = true
-                    encodeDefaults = true
-                },
-            )
+            json(json)
         }
     }
 
@@ -175,6 +179,7 @@ object NetworkModule {
         tokenManager: TokenManager,
         authRepository: Lazy<AuthRepository>,
         fidProvider: FidProvider,
+        json: Json,
     ): HttpClient =
         HttpClient(OkHttp) {
             expectSuccess = true
@@ -187,7 +192,7 @@ object NetworkModule {
                 requestTimeoutMillis = INFINITE_TIMEOUT_MS
             }
             loggingInterceptor()
-            contentNegotiationInterceptor()
+            contentNegotiationInterceptor(json)
             headerInterceptor(tokenManager, authRepository, fidProvider)
         }
 
