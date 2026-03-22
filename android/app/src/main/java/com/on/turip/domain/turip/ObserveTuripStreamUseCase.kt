@@ -132,6 +132,7 @@ class ObserveTuripStreamUseCase @Inject constructor(
 
                     is TuripStreamResult.Fatal.ConnectionLost -> {
                         if (!isRetryableConnectionError(streamFailure.errorType, turipId)) {
+                            send(TuripStreamResult.Fatal.ConnectionLost(streamFailure.errorType))
                             return true
                         }
                     }
