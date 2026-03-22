@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+import turip.account.domain.Account;
 import turip.account.domain.Provider;
 import turip.account.domain.Role;
 import turip.account.domain.TuripMember;
@@ -31,6 +32,10 @@ public class TestDataHelper {
         return jwtProvider.generateAccessToken(accountId, Role.USER);
     }
 
+    public String createAccessToken(Long accountId, Role role) {
+        return jwtProvider.generateAccessToken(accountId, role);
+    }
+
     public String createInvitationToken(Long accountId, Long folderId) {
         return invitationTokenProvider.generateToken(accountId, folderId);
     }
@@ -41,18 +46,23 @@ public class TestDataHelper {
 
     public Long insertAccount(Role role) {
         String nickname = UUID.randomUUID().toString().substring(0, 8);
+        return insertAccount(new Account(role, nickname));
+    }
+
+    public Long insertAccount(Account account) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection.prepareStatement("INSERT INTO account (role, nickname) VALUES (?, ?)",
                     Statement.RETURN_GENERATED_KEYS);
-            ps.setString(1, role.name());
-            ps.setString(2, nickname);
+            ps.setString(1, account.getRole().name());
+            ps.setString(2, account.getNickname());
             return ps;
         }, keyHolder);
 
         return extractGeneratedKey(keyHolder);
     }
+
 
     public Long insertMember(Long accountId, String email, boolean isFirstLogin) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
