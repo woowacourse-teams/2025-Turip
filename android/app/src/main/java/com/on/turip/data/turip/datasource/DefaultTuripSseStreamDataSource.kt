@@ -4,8 +4,8 @@ import com.on.turip.BuildConfig
 import com.on.turip.core.network.ApiPath
 import com.on.turip.core.result.TuripResult
 import com.on.turip.data.result.safeApiCall
+import com.on.turip.data.turip.TuripSseParser
 import com.on.turip.di.SseHttpClient
-import com.on.turip.domain.turip.TuripSseParser
 import com.on.turip.domain.turip.TuripStreamEvent
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.sse.sse
@@ -21,6 +21,7 @@ import kotlin.coroutines.CoroutineContext
 class DefaultTuripSseStreamDataSource @Inject constructor(
     @SseHttpClient private val httpClient: HttpClient,
     private val coroutineContext: CoroutineContext = Dispatchers.IO,
+    private val parser: TuripSseParser,
 ) : TuripSseStreamDataSource {
     override fun streamTuripEvents(turipId: Long): Flow<TuripResult<TuripStreamEvent>> =
         flow {
@@ -29,8 +30,6 @@ class DefaultTuripSseStreamDataSource @Inject constructor(
                     httpClient.sse(
                         urlString = "${BuildConfig.BASE_URL}${ApiPath.V1}turips/$turipId/stream",
                     ) {
-                        val parser = TuripSseParser()
-
                         incoming.collect { event: ServerSentEvent ->
                             val eventType: String =
                                 event.event ?: run {
