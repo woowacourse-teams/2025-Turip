@@ -373,8 +373,6 @@ class TuripDetailViewModel @Inject constructor(
                             uiState.value.selectedTurip.id,
                             place.placeId,
                         )
-                    }.onFailure {
-                        _uiEffect.send(TuripDetailUiEffect.ShowTuripDetailRemoveFailed(place.name))
                     }
                 }
             }.awaitAll()

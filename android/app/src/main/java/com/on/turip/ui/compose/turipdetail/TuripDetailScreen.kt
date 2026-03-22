@@ -297,7 +297,12 @@ fun TuripDetailScreen(
                         },
                         currentPlaceLatLng = uiState.placesLatLng,
                         onMoreOption = viewModel::showBottomSheet,
-                        onBack = onBack,
+                        onBack = {
+                            scope.launch {
+                                viewModel.flushDeleteQueueAndAwait()
+                                onBack()
+                            }
+                        },
                         selectedPlace = uiState.selectedPlace,
                         onItemClick = viewModel::updateSelectedPlace,
                         onDragStart = viewModel::onDragStart,
