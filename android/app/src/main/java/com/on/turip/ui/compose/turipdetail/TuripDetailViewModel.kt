@@ -479,9 +479,15 @@ class TuripDetailViewModel @Inject constructor(
 
     fun deleteTurip() {
         viewModelScope.launch {
+            val selectedTurip = uiState.value.selectedTurip
+            if (selectedTuripId == INVALID_ID || selectedTurip.id != selectedTuripId) {
+                Timber.e("튜립 정보가 아직 초기화되지 않아 삭제를 중단합니다. turipId=%s", selectedTuripId)
+                return@launch
+            }
+
             deleteTuripUseCase(
-                turipId = selectedTuripId,
-                type = uiState.value.selectedTurip.type,
+                turipId = selectedTurip.id,
+                type = selectedTurip.type,
             ).onSuccess {
                 _uiState.update { state ->
                     state.copy(
