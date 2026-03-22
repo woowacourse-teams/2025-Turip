@@ -83,8 +83,9 @@ fun MemberItem(
                 .padding(vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
+        val avatarLabel = member.firstOrNull() ?: '?'
         AvatarCircle(
-            label = member.first(),
+            label = avatarLabel,
             profileRowStyle = ProfileRowStyle.LARGE,
         )
 
