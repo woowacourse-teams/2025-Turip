@@ -1,11 +1,13 @@
 package turip.container;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.context.annotation.Bean;
 import org.testcontainers.containers.MySQLContainer;
 
 @TestConfiguration
+@ConditionalOnClass(MySQLContainer.class)
 public class TestContainerConfig {
 
     @Bean
