@@ -21,6 +21,7 @@ suspend fun <T> safeApiCall(apiCall: suspend () -> T): TuripResult<T> =
 
 suspend fun Throwable.toErrorType(): ErrorType =
     when (this) {
+        is CancellationException -> throw this
         is ClientRequestException -> response.toErrorType()
         is ServerResponseException -> response.toErrorType()
         is IOException -> ErrorType.Network

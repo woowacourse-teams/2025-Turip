@@ -19,7 +19,6 @@ import com.on.turip.domain.turip.TuripInvitationToken
 import com.on.turip.domain.turip.TuripStreamEvent
 import com.on.turip.domain.turip.repository.TuripRepository
 import com.on.turip.domain.turip.result.TuripStreamResult
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
@@ -102,11 +101,8 @@ class DefaultTuripRepository @Inject constructor(
             .map<TuripStreamEvent, TuripStreamResult> { event ->
                 TuripStreamResult.Event(event)
             }.catch { throwable ->
-                if (throwable is CancellationException) throw throwable
-
-                val errorType = throwable.toErrorType()
                 val fatalResult =
-                    when (errorType) {
+                    when (val errorType = throwable.toErrorType()) {
                         ErrorType.Auth.TokenExpired -> TuripStreamResult.Fatal.TokenExpired
                         ErrorType.Auth.Forbidden -> TuripStreamResult.Fatal.Forbidden
                         else -> TuripStreamResult.Fatal.ConnectionLost(errorType)
