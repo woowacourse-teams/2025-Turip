@@ -183,6 +183,8 @@
     <string name="turip_tab_together_turip">함께 튜립</string>
     <string name="turip_tab_solo_turip">나홀로 튜립</string>
     <string name="turip_tab_all">전체</string>
+    <string name="turip_detail_sse_reconnecting">네트워크 오류로 재연결 중입니다...</string>
+    <string name="turip_detail_sse_reconnected">재연결 되었습니다.</string>
     <string name="my_turip_screen_title">내 튜립</string>
     <string name="turip_add_turip">%s 튜립을 추가하였습니다.</string>
     <string name="turip_delete_turip">%s 튜립을 제거하였습니다.</string>

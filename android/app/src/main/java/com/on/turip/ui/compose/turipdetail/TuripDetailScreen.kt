@@ -71,7 +71,7 @@ fun TuripDetailScreen(
 ) {
     val uiState: TuripDetailUiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarDelegate = LocalSnackbarDelegate.current
-    val resource = LocalResources.current
+    val resources = LocalResources.current
     var showLoginSuggestDialog by remember { mutableStateOf(false) }
     val modalBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
@@ -113,8 +113,8 @@ fun TuripDetailScreen(
                 is TuripDetailUiEffect.ShowError -> {
                     val uiModel = uiEffect.errorUiState.toUiModel() ?: return@collect
                     snackbarDelegate.showSnackbar(
-                        message = resource.getString(uiModel.titleRes),
-                        actionLabel = resource.getString(uiModel.retryTextRes),
+                        message = resources.getString(uiModel.titleRes),
+                        actionLabel = resources.getString(uiModel.retryTextRes),
                         duration = SnackbarDuration.Long,
                         onAction = { viewModel.handleErrorRetryRequest(uiEffect.retryAction) },
                     )
@@ -132,7 +132,7 @@ fun TuripDetailScreen(
                 is TuripDetailUiEffect.ShowTuripDetailRemoveFailed -> {
                     snackbarDelegate.showSnackbar(
                         message =
-                            resource.getString(
+                            resources.getString(
                                 R.string.trip_detail_bottom_sheet_snackbar_place_remove_failed,
                                 uiEffect.placeName,
                             ),
@@ -143,12 +143,12 @@ fun TuripDetailScreen(
                 is TuripDetailUiEffect.ShowTuripDetailRemoved -> {
                     snackbarDelegate.showSnackbar(
                         message =
-                            resource.getString(
+                            resources.getString(
                                 R.string.trip_detail_bottom_sheet_snackbar_place_removed,
                                 uiEffect.placeName,
                             ),
                         actionLabel =
-                            resource.getString(
+                            resources.getString(
                                 R.string.trip_detail_bottom_sheet_snackbar_place_remove_undo,
                             ),
                         onAction = viewModel::rollbackTuripPlaceDelete,
@@ -159,11 +159,11 @@ fun TuripDetailScreen(
                 is TuripDetailUiEffect.ShowReorderDetailFailed -> {
                     snackbarDelegate.showSnackbar(
                         message =
-                            resource.getString(
+                            resources.getString(
                                 R.string.trip_detail_bottom_sheet_snackbar_place_reorder_failed,
                             ),
                         actionLabel =
-                            resource.getString(
+                            resources.getString(
                                 R.string.trip_detail_bottom_sheet_snackbar_place_reorder_retry,
                             ),
                         onAction = { viewModel.handleErrorRetryRequest(uiEffect.retryAction) },
@@ -172,16 +172,17 @@ fun TuripDetailScreen(
 
                 TuripDetailUiEffect.ShowNetworkUnstable -> {
                     snackbarDelegate.showSnackbar(
-                        message = "네트워크 오류로 재연결 중입니다...",
+                        message = resources.getString(R.string.turip_detail_sse_reconnecting),
                         duration = SnackbarDuration.Short,
                     )
                 }
 
                 TuripDetailUiEffect.ShowNetworkRecovered -> {
                     snackbarDelegate.showSnackbar(
-                        message = "재연결 되었습니다.",
+                        message = resources.getString(R.string.turip_detail_sse_reconnected),
                         duration = SnackbarDuration.Short,
                         iconRes = R.drawable.btn_turip_selected,
+                        actionLabel = resources.getString(R.string.all_close_description),
                     )
                 }
             }
