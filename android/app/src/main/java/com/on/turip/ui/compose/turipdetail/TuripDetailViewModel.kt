@@ -33,7 +33,6 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -72,11 +71,7 @@ class TuripDetailViewModel @Inject constructor(
     private var isNetworkUnstable: Boolean = false
 
     private val dragEndEvents = MutableSharedFlow<Unit>(replay = 0, extraBufferCapacity = 1)
-    private val refreshTrigger =
-        MutableSharedFlow<RefreshScope>(
-            extraBufferCapacity = 1,
-            onBufferOverflow = BufferOverflow.DROP_OLDEST,
-        )
+    private val refreshTrigger = MutableStateFlow(RefreshScope(turip = false, places = false))
 
     private val deletePlaceQueue = ArrayDeque<TuripPlaceModel>()
     private val committedPlaceIds = mutableSetOf<Long>()
@@ -272,7 +267,12 @@ class TuripDetailViewModel @Inject constructor(
         turip: Boolean,
         places: Boolean,
     ) {
-        refreshTrigger.tryEmit(RefreshScope(turip = turip, places = places))
+        refreshTrigger.update { current ->
+            RefreshScope(
+                turip = current.turip || turip,
+                places = current.places || places,
+            )
+        }
     }
 
     @OptIn(FlowPreview::class)
@@ -280,8 +280,25 @@ class TuripDetailViewModel @Inject constructor(
         refreshTrigger
             .debounce(300L)
             .onEach { scope: RefreshScope ->
-                if (scope.turip) loadSelectedTurip(selectedTuripId)
-                if (scope.places) loadPlaces(selectedTuripId)
+                when {
+                    scope.turip && scope.places -> {
+                        loadSelectedTurip(selectedTuripId)
+                        loadPlaces(selectedTuripId)
+                    }
+
+                    scope.turip -> {
+                        loadSelectedTurip(selectedTuripId)
+                    }
+
+                    scope.places -> {
+                        loadPlaces(selectedTuripId)
+                    }
+
+                    else -> {
+                        return@onEach
+                    }
+                }
+                refreshTrigger.value = RefreshScope(turip = false, places = false)
             }.launchIn(viewModelScope)
     }
 
