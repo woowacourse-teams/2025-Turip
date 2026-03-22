@@ -15,15 +15,16 @@ suspend fun <T> safeApiCall(apiCall: suspend () -> T): TuripResult<T> =
     } catch (e: Exception) {
         if (e is CancellationException) throw e
 
-        val errorType: ErrorType =
-            when (e) {
-                is ClientRequestException -> e.response.toErrorType()
-                is ServerResponseException -> e.response.toErrorType()
-                is IOException -> ErrorType.Network
-                else -> ErrorType.Unknown
-            }
-
+        val errorType: ErrorType = e.toErrorType()
         TuripResult.Failure(errorType, cause = e)
+    }
+
+suspend fun Throwable.toErrorType(): ErrorType =
+    when (this) {
+        is ClientRequestException -> response.toErrorType()
+        is ServerResponseException -> response.toErrorType()
+        is IOException -> ErrorType.Network
+        else -> ErrorType.Unknown
     }
 
 private suspend fun HttpResponse.toErrorType(): ErrorType =

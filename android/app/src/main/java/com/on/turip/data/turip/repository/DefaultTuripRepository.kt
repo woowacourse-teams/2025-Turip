@@ -2,6 +2,7 @@ package com.on.turip.data.turip.repository
 
 import com.on.turip.core.result.TuripResult
 import com.on.turip.core.result.mapCatching
+import com.on.turip.data.result.toErrorType
 import com.on.turip.data.turip.datasource.TuripRemoteDataSource
 import com.on.turip.data.turip.datasource.TuripSseStreamDataSource
 import com.on.turip.data.turip.dto.PlaceTuripsRequest
@@ -15,7 +16,10 @@ import com.on.turip.domain.turip.TuripInvitationInformation
 import com.on.turip.domain.turip.TuripInvitationToken
 import com.on.turip.domain.turip.TuripStreamEvent
 import com.on.turip.domain.turip.repository.TuripRepository
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class DefaultTuripRepository @Inject constructor(
@@ -89,5 +93,19 @@ class DefaultTuripRepository @Inject constructor(
     override suspend fun verifyInvitationToken(token: String): TuripResult<TuripInvitationInformation> =
         turipRestRemoteDataSource.getInvitationInformation(token).mapCatching { it.toDomain() }
 
-    override fun streamTuripEvents(turipId: Long): Flow<TuripResult<TuripStreamEvent>> = turipSseStreamDataSource.streamTuripEvents(turipId)
+    override fun streamTuripEvents(turipId: Long): Flow<TuripResult<TuripStreamEvent>> =
+        turipSseStreamDataSource
+            .streamTuripEvents(turipId)
+            .map<TuripStreamEvent, TuripResult<TuripStreamEvent>> { event ->
+                TuripResult.Success(event)
+            }.catch { throwable ->
+                if (throwable is CancellationException) throw throwable
+
+                emit(
+                    TuripResult.Failure(
+                        errorType = throwable.toErrorType(),
+                        cause = throwable,
+                    ),
+                )
+            }
 }

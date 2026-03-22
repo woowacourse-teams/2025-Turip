@@ -2,8 +2,6 @@ package com.on.turip.data.turip.service
 
 import com.on.turip.BuildConfig
 import com.on.turip.core.network.ApiPath
-import com.on.turip.core.result.TuripResult
-import com.on.turip.data.result.safeApiCall
 import com.on.turip.di.SseHttpClient
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.sse.sse
@@ -19,21 +17,14 @@ class DefaultTuripStreamService @Inject constructor(
     @SseHttpClient private val httpClient: HttpClient,
     private val coroutineContext: CoroutineContext = Dispatchers.IO,
 ) : TuripStreamService {
-    override fun streamTuripEvents(turipId: Long): Flow<TuripResult<ServerSentEvent>> =
+    override fun streamTuripEvents(turipId: Long): Flow<ServerSentEvent> =
         flow {
-            val result: TuripResult<Unit> =
-                safeApiCall {
-                    httpClient.sse(
-                        urlString = "${BuildConfig.BASE_URL}${ApiPath.V1}turips/$turipId/stream",
-                    ) {
-                        incoming.collect { event: ServerSentEvent ->
-                            emit(TuripResult.Success(event))
-                        }
-                    }
+            httpClient.sse(
+                urlString = "${BuildConfig.BASE_URL}${ApiPath.V1}turips/$turipId/stream",
+            ) {
+                incoming.collect { event: ServerSentEvent ->
+                    emit(event)
                 }
-
-            if (result is TuripResult.Failure) {
-                emit(TuripResult.Failure(errorType = result.errorType, cause = result.cause))
             }
         }.flowOn(coroutineContext)
 }
