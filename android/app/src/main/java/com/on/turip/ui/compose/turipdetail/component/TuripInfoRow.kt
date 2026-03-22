@@ -29,8 +29,8 @@ fun TuripInfoRow(
     savedPlaceCount: Int,
     participantCount: Int,
     showParticipant: Boolean,
-    onClickMembers: () -> Unit,
-    onClickPlaces: () -> Unit,
+    onMembersClick: () -> Unit,
+    onPlacesClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -46,7 +46,7 @@ fun TuripInfoRow(
                 icon = Icons.Default.LocationOn,
                 label = stringResource(R.string.trip_detail_saved_places_label),
                 count = savedPlaceCount,
-                onClick = onClickPlaces,
+                onClick = onPlacesClick,
             )
         }
         if (showParticipant) {
@@ -54,7 +54,7 @@ fun TuripInfoRow(
                 icon = Icons.Default.Group,
                 label = stringResource(R.string.trip_detail_participant_count_label),
                 count = participantCount,
-                onClick = onClickMembers,
+                onClick = onMembersClick,
             )
         }
     }
@@ -96,8 +96,8 @@ private fun TuripInfoItemPreview() {
             savedPlaceCount = 10,
             participantCount = 10,
             showParticipant = true,
-            onClickMembers = {},
-            onClickPlaces = {},
+            onMembersClick = {},
+            onPlacesClick = {},
         )
     }
 }

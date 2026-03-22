@@ -381,8 +381,8 @@ private fun TuripPlaceContent(
             savedPlaceCount = currentPlaceLatLng.size,
             participantCount = nicknames.size,
             showParticipant = isTogetherTurip,
-            onClickMembers = onClickMembers,
-            onClickPlaces = { isMapVisible = false },
+            onMembersClick = onClickMembers,
+            onPlacesClick = { isMapVisible = false },
         )
 
         Spacer(modifier = Modifier.size(TuripTheme.spacing.extraSmall))
