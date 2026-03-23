@@ -9,12 +9,10 @@ import com.on.turip.domain.bookmark.BookmarkContent
 import com.on.turip.domain.bookmark.repository.BookmarkRepository
 import com.on.turip.domain.common.paging.Cursor
 import com.on.turip.domain.common.paging.Page
-import com.on.turip.ui.common.BookmarkChangeEventBus
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.common.paging.PagingLoadMode
-import com.on.turip.ui.common.paging.PagingState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
@@ -34,7 +32,6 @@ import javax.inject.Inject
 @HiltViewModel
 class BookmarkContentListViewModel @Inject constructor(
     private val bookmarkRepository: BookmarkRepository,
-    private val bookmarkChangeEventBus: BookmarkChangeEventBus,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<BookmarkContentListUiState> =
         MutableStateFlow(BookmarkContentListUiState.Idle)
@@ -44,7 +41,18 @@ class BookmarkContentListViewModel @Inject constructor(
     val uiEffect: Flow<BookmarkContentListUiEffect> = _uiEffect.receiveAsFlow()
 
     init {
+        observeBookmarkContents()
         refreshBookmarkContents()
+    }
+
+    private fun observeBookmarkContents() {
+        viewModelScope.launch {
+            bookmarkRepository.bookmarkContents.collect { contents ->
+                _uiState.update { state ->
+                    state.copy(bookmarkContents = state.bookmarkContents.copy(items = contents))
+                }
+            }
+        }
     }
 
     fun refreshBookmarkContents() {
@@ -138,16 +146,10 @@ class BookmarkContentListViewModel @Inject constructor(
         result: Page<BookmarkContent>,
     ) {
         _uiState.update { state ->
-            val newItems =
-                when (loadMode) {
-                    PagingLoadMode.REFRESH -> result.items.toImmutableList()
-                    PagingLoadMode.APPEND -> (state.bookmarkContents.items + result.items).toImmutableList()
-                }
             state.copy(
                 isLoading = false,
                 bookmarkContents =
-                    PagingState(
-                        items = newItems,
+                    state.bookmarkContents.copy(
                         hasNext = result.hasNext,
                         isAppending = false,
                         errorUiState = ErrorUiState.None,
@@ -232,14 +234,16 @@ class BookmarkContentListViewModel @Inject constructor(
                     removeBookmarkMutex.withLock {
                         val contents = _uiState.value.bookmarkContents.items
 
-                        val removeContentIndex: Int = contents.indexOfFirst { it.content.id == contentId }
+                        val removeContentIndex: Int =
+                            contents.indexOfFirst { it.content.id == contentId }
                         // 이미 UI 제거 완료된 상태 (API 호출 완료)
                         if (removeContentIndex == -1) return@withLock false
 
                         val removeContent = contents[removeContentIndex]
                         removingSnapshots[contentId] = BookmarkRemoveSnapshot(removeContent)
 
-                        val updated = contents.filter { it.content.id != contentId }.toImmutableList()
+                        val updated =
+                            contents.filter { it.content.id != contentId }.toImmutableList()
                         _uiState.update { state ->
                             state.copy(bookmarkContents = state.bookmarkContents.copy(items = updated))
                         }
@@ -256,9 +260,12 @@ class BookmarkContentListViewModel @Inject constructor(
                         _uiState.update { state ->
                             state.copy(totalBookmarkCount = state.totalBookmarkCount?.minus(1))
                         }
-                        bookmarkChangeEventBus.notifyChanged()
                     }.onFailure {
-                        _uiEffect.send(BookmarkContentListUiEffect.ShowBookmarkRemoveFailedList(contentId))
+                        _uiEffect.send(
+                            BookmarkContentListUiEffect.ShowBookmarkRemoveFailedList(
+                                contentId,
+                            ),
+                        )
                     }
             } finally {
                 // 중복 API 호출 방지 리소스 정리

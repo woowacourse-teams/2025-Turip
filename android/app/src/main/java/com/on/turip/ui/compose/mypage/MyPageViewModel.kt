@@ -10,14 +10,12 @@ import com.on.turip.domain.account.AccountRepository
 import com.on.turip.domain.bookmark.BookmarkContent
 import com.on.turip.domain.bookmark.repository.BookmarkRepository
 import com.on.turip.domain.common.paging.Cursor
-import com.on.turip.domain.common.paging.Page
 import com.on.turip.domain.login.MemberRepository
 import com.on.turip.domain.session.SessionState
 import com.on.turip.domain.session.SessionStore
 import com.on.turip.domain.session.usecase.SwitchToGuestUseCase
 import com.on.turip.domain.setting.PrivacyPolicy
 import com.on.turip.domain.userstorage.repository.UserStorageRepository
-import com.on.turip.ui.common.BookmarkChangeEventBus
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
@@ -46,7 +44,6 @@ class MyPageViewModel @Inject constructor(
     private val userStorageRepository: UserStorageRepository,
     private val memberRepository: MemberRepository,
     private val accountRepository: AccountRepository,
-    private val bookmarkChangeEventBus: BookmarkChangeEventBus,
     private val switchToGuestUseCase: SwitchToGuestUseCase,
     sessionStore: SessionStore,
 ) : ViewModel() {
@@ -60,14 +57,26 @@ class MyPageViewModel @Inject constructor(
 
     init {
         loadProfile(isRetry = false)
+        observeBookmarkContents()
         loadBookmarkContents(isRetry = false)
-        observeBookmarkChanges()
     }
 
-    private fun observeBookmarkChanges() {
+    private fun observeBookmarkContents() {
         viewModelScope.launch {
-            bookmarkChangeEventBus.changes.collect {
-                loadBookmarkContents(isRetry = false)
+            bookmarkRepository.bookmarkContents.collect { contents ->
+                _uiState.update { state ->
+                    val shouldUpdate =
+                        when {
+                            state.bookmarkContentState is MyPageSectionState.Error -> false
+                            contents.isEmpty() && state.bookmarkContentState !is MyPageSectionState.Success -> false
+                            else -> true
+                        }
+                    if (shouldUpdate) {
+                        state.copy(bookmarkContentState = MyPageSectionState.Success(contents))
+                    } else {
+                        state
+                    }
+                }
             }
         }
     }
@@ -96,11 +105,8 @@ class MyPageViewModel @Inject constructor(
             val cursor = Cursor(size = 10, lastId = null)
             bookmarkRepository
                 .loadBookmarks(cursor)
-                .onSuccess { result: Page<BookmarkContent> ->
+                .onSuccess {
                     Timber.d("마이페이지 북마크 목록 조회 성공")
-                    _uiState.update {
-                        it.copy(bookmarkContentState = MyPageSectionState.Success(result.items.toImmutableList()))
-                    }
                 }.onFailure {
                     Timber.e("마이페이지 북마크 목록 조회 에러 발생")
                     _uiState.update { it.copy(bookmarkContentState = MyPageSectionState.Error) }
@@ -127,15 +133,18 @@ class MyPageViewModel @Inject constructor(
                 val removed =
                     removeBookmarkMutex.withLock {
                         val current = _uiState.value.bookmarkContentState
-                        val contents = (current as? MyPageSectionState.Success)?.data ?: return@withLock false
+                        val contents =
+                            (current as? MyPageSectionState.Success)?.data ?: return@withLock false
 
-                        val removeContentIndex: Int = contents.indexOfFirst { it.content.id == contentId }
+                        val removeContentIndex: Int =
+                            contents.indexOfFirst { it.content.id == contentId }
                         if (removeContentIndex == -1) return@withLock false
 
                         val removeContent = contents[removeContentIndex]
                         removingSnapshots[contentId] = BookmarkRemoveSnapshot(removeContent)
 
-                        val updated = contents.filter { it.content.id != contentId }.toImmutableList()
+                        val updated =
+                            contents.filter { it.content.id != contentId }.toImmutableList()
                         _uiState.update {
                             it.copy(bookmarkContentState = MyPageSectionState.Success(updated))
                         }
