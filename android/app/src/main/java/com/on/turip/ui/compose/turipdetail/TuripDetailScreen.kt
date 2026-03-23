@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.icons.Icons
@@ -394,6 +395,7 @@ private fun TuripPlaceContent(
             showParticipant = isTogetherTurip,
             onMembersClick = onClickMembers,
             onPlacesClick = { isMapVisible = false },
+            modifier = Modifier.padding(vertical = TuripTheme.spacing.small),
         )
 
         Spacer(modifier = Modifier.size(TuripTheme.spacing.extraSmall))
