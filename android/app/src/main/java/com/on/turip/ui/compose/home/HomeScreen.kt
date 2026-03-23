@@ -174,6 +174,7 @@ private fun HomeScreenContent(
                 RegionList(
                     regions = uiState.regionCategories,
                     onRegionClick = onRegionClick,
+                    modifier = Modifier.padding(bottom = TuripTheme.spacing.large),
                 )
             }
         }
