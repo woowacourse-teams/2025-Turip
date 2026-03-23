@@ -18,6 +18,7 @@ import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.engine.okhttp.OkHttpConfig
 import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.plugins.HttpTimeoutConfig.Companion.INFINITE_TIMEOUT_MS
 import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.auth.providers.BearerTokens
 import io.ktor.client.plugins.auth.providers.bearer
@@ -26,6 +27,7 @@ import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.plugins.sse.SSE
 import io.ktor.client.request.header
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
@@ -35,6 +37,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import timber.log.Timber
 import javax.inject.Singleton
+import kotlin.time.Duration.Companion.milliseconds
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -46,10 +49,20 @@ object NetworkModule {
 
     @Provides
     @Singleton
+    fun provideJson(): Json =
+        Json {
+            ignoreUnknownKeys = true
+            isLenient = true
+            encodeDefaults = true
+        }
+
+    @Provides
+    @Singleton
     fun provideHttpClient(
         tokenManager: TokenManager,
         authRepository: Lazy<AuthRepository>,
         fidProvider: FidProvider,
+        json: Json,
     ): HttpClient =
         HttpClient(OkHttp) {
             /**
@@ -68,7 +81,7 @@ object NetworkModule {
 
             timeoutInterceptor()
             loggingInterceptor()
-            contentNegotiationInterceptor()
+            contentNegotiationInterceptor(json)
             headerInterceptor(tokenManager, authRepository, fidProvider)
         }
 
@@ -90,15 +103,9 @@ object NetworkModule {
         }
     }
 
-    private fun HttpClientConfig<OkHttpConfig>.contentNegotiationInterceptor() {
+    private fun HttpClientConfig<OkHttpConfig>.contentNegotiationInterceptor(json: Json) {
         install(plugin = ContentNegotiation) {
-            json(
-                Json {
-                    ignoreUnknownKeys = true
-                    isLenient = true
-                    encodeDefaults = true
-                },
-            )
+            json(json)
         }
     }
 
@@ -131,7 +138,10 @@ object NetworkModule {
 
                             tokenManager.setTokens(newTokens).fold(
                                 onSuccess = {
-                                    BearerTokens(accessToken = newTokens.accessToken, refreshToken = newTokens.refreshToken)
+                                    BearerTokens(
+                                        accessToken = newTokens.accessToken,
+                                        refreshToken = newTokens.refreshToken,
+                                    )
                                 },
                                 onFailure = {
                                     tokenManager.clearTokens()
@@ -153,6 +163,30 @@ object NetworkModule {
             contentType(type = ContentType.Application.Json)
         }
     }
+
+    @SseHttpClient
+    @Provides
+    @Singleton
+    fun provideSseHttpClient(
+        tokenManager: TokenManager,
+        authRepository: Lazy<AuthRepository>,
+        fidProvider: FidProvider,
+        json: Json,
+    ): HttpClient =
+        HttpClient(OkHttp) {
+            expectSuccess = true
+            install(SSE) {
+                reconnectionTime = 3000.milliseconds
+            }
+            install(HttpTimeout) {
+                connectTimeoutMillis = CONNECT_TIMEOUT_MILLIS
+                socketTimeoutMillis = INFINITE_TIMEOUT_MS
+                requestTimeoutMillis = INFINITE_TIMEOUT_MS
+            }
+            loggingInterceptor()
+            contentNegotiationInterceptor(json)
+            headerInterceptor(tokenManager, authRepository, fidProvider)
+        }
 
     @Provides
     @Singleton

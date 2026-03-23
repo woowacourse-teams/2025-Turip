@@ -7,6 +7,7 @@ import com.on.turip.data.turip.dto.TuripCreationResponse
 import com.on.turip.data.turip.dto.TuripInvitationInformationResponse
 import com.on.turip.data.turip.dto.TuripInvitationTokenResponse
 import com.on.turip.data.turip.dto.TuripJoinResponse
+import com.on.turip.data.turip.dto.TuripMembersResponse
 import com.on.turip.data.turip.dto.TuripPatchRequest
 import com.on.turip.data.turip.dto.TuripPlaceOrderRequest
 import com.on.turip.data.turip.dto.TuripPlacesResponse
@@ -34,6 +35,11 @@ class DefaultTuripRemoteDataSource @Inject constructor(
             safeApiCall { turipService.getTurips() }
         }
 
+    override suspend fun getTuripMembers(turipId: Long): TuripResult<TuripMembersResponse> =
+        withContext(coroutineContext) {
+            safeApiCall { turipService.getTuripMembers(turipId) }
+        }
+
     override suspend fun postTurip(turipPostRequest: TuripPostRequest): TuripResult<TuripCreationResponse> =
         withContext(coroutineContext) {
             safeApiCall { turipService.postTurip(turipPostRequest) }
@@ -50,6 +56,11 @@ class DefaultTuripRemoteDataSource @Inject constructor(
     override suspend fun deleteTurip(turipId: Long): TuripResult<Unit> =
         withContext(coroutineContext) {
             safeApiCall { turipService.deleteTurip(turipId) }
+        }
+
+    override suspend fun exitTurip(turipId: Long): TuripResult<Unit> =
+        withContext(coroutineContext) {
+            safeApiCall { turipService.exitTurip(turipId) }
         }
 
     override suspend fun getTuripsByPlaceId(placeId: Long): TuripResult<TuripsByPlaceResponse> =

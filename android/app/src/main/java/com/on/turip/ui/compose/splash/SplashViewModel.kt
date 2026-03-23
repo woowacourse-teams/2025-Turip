@@ -43,8 +43,13 @@ class SplashViewModel @Inject constructor(
             try {
                 val trimmedDeepLinkUrl: String? = deepLinkUrl?.trim()?.takeIf(String::isNotEmpty)
                 if (trimmedDeepLinkUrl != null) {
+                    determineInitialSessionUseCase()
                     _uiEffect.send(
-                        SplashUiEffect.NavigateToMain(InitialNavigationTarget.InvitationEntry(deepLinkUrl = trimmedDeepLinkUrl)),
+                        SplashUiEffect.NavigateToMain(
+                            InitialNavigationTarget.InvitationEntry(
+                                deepLinkUrl = trimmedDeepLinkUrl,
+                            ),
+                        ),
                     )
                     return@launch
                 }
@@ -54,7 +59,12 @@ class SplashViewModel @Inject constructor(
                 coroutineScope {
                     val sessionStateDeferred = async { determineInitialSessionUseCase() }
                     val deferredDeepLinkUrlDeferred =
-                        async { deferredDeepLinkRepository.resolveDeferredInvitationToken().getOrNull()?.toUrl() }
+                        async {
+                            deferredDeepLinkRepository
+                                .resolveDeferredInvitationToken()
+                                .getOrNull()
+                                ?.toUrl()
+                        }
                     sessionState = sessionStateDeferred.await()
                     deferredDeepLinkUrl = deferredDeepLinkUrlDeferred.await()
                 }

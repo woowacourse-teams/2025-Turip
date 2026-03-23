@@ -21,7 +21,9 @@ import com.on.turip.data.region.datasource.RegionRemoteDataSource
 import com.on.turip.data.searchhistory.datasource.DefaultSearchHistoryDataSource
 import com.on.turip.data.searchhistory.datasource.SearchHistoryDataSource
 import com.on.turip.data.turip.datasource.DefaultTuripRemoteDataSource
+import com.on.turip.data.turip.datasource.DefaultTuripSseStreamDataSource
 import com.on.turip.data.turip.datasource.TuripRemoteDataSource
+import com.on.turip.data.turip.datasource.TuripSseStreamDataSource
 import com.on.turip.data.userstorage.datasource.DefaultUserStorageLocalDataSource
 import com.on.turip.data.userstorage.datasource.UserStorageLocalDataSource
 import dagger.Binds
@@ -58,6 +60,10 @@ abstract class DataSourceModule {
     @Binds
     @Singleton
     abstract fun bindTuripRemoteDataSource(defaultTuripRemoteDataSource: DefaultTuripRemoteDataSource): TuripRemoteDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindTuripSseStreamDataSource(defaultTuripSseStreamDataSource: DefaultTuripSseStreamDataSource): TuripSseStreamDataSource
 
     @Binds
     @Singleton

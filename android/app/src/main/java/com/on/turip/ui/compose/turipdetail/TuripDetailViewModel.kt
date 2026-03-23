@@ -5,12 +5,17 @@ import androidx.lifecycle.viewModelScope
 import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
-import com.on.turip.domain.bookmark.TuripPlace
 import com.on.turip.domain.session.SessionState
 import com.on.turip.domain.session.SessionStore
+import com.on.turip.domain.turip.DeleteTuripUseCase
+import com.on.turip.domain.turip.ObserveTuripStreamUseCase
 import com.on.turip.domain.turip.Turip
 import com.on.turip.domain.turip.TuripInvitationToken
+import com.on.turip.domain.turip.TuripMember
+import com.on.turip.domain.turip.TuripStreamEvent
+import com.on.turip.domain.turip.TuripType
 import com.on.turip.domain.turip.repository.TuripRepository
+import com.on.turip.domain.turip.result.TuripStreamResult
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
@@ -18,15 +23,15 @@ import com.on.turip.ui.common.extensions.toUrl
 import com.on.turip.ui.common.model.namestatus.TuripNameStatusModel
 import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
 import com.on.turip.ui.compose.turip.mapper.toUiMyTuripModel
-import com.on.turip.ui.compose.turipdetail.model.DeleteTuripPlaceSnapshot
+import com.on.turip.ui.compose.turipdetail.model.RefreshScope
 import com.on.turip.ui.compose.turipdetail.model.turip.PlaceLatLngUiModel
 import com.on.turip.ui.compose.turipdetail.model.turip.TuripShareModel
 import com.on.turip.ui.folder.model.TuripEditModel
-import com.on.turip.ui.main.favorite.toLatLng
 import com.on.turip.ui.main.favorite.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -42,13 +47,17 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class TuripDetailViewModel @Inject constructor(
     private val turipRepository: TuripRepository,
-    private val sessionStore: SessionStore,
+    private val deleteTuripUseCase: DeleteTuripUseCase,
+    private val observeTuripStreamUseCase: ObserveTuripStreamUseCase,
+    sessionStore: SessionStore,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<TuripDetailUiState> =
         MutableStateFlow(TuripDetailUiState.Idle)
@@ -58,15 +67,23 @@ class TuripDetailViewModel @Inject constructor(
     val uiEffect: Flow<TuripDetailUiEffect> = _uiEffect.receiveAsFlow()
 
     private val sessionState: StateFlow<SessionState> = sessionStore.state
-
-    private var deleteTuripPlaceSnapshot: DeleteTuripPlaceSnapshot = DeleteTuripPlaceSnapshot.EMPTY
     private var reorderPlacesSnapshot: ImmutableList<TuripPlaceModel>? = null
     private var selectedTuripId: Long = INVALID_ID
+    private var isNetworkUnstable: Boolean = false
 
     private val dragEndEvents = MutableSharedFlow<Unit>(replay = 0, extraBufferCapacity = 1)
+    private val refreshTrigger = MutableStateFlow(RefreshScope(turip = false, places = false))
+
+    private val deletePlaceQueue = ArrayDeque<TuripPlaceModel>()
+    private val committedPlaceIds = mutableSetOf<Long>()
+    private var originBeforeDeleteSession: Pair<ImmutableList<TuripPlaceModel>, ImmutableList<PlaceLatLngUiModel>>? =
+        null
+
+    private val commitMutex = Mutex()
 
     init {
         registerDragEndEvents()
+        registerStreamRefresh()
     }
 
     fun initIfNeeded(turipId: Long) {
@@ -74,20 +91,33 @@ class TuripDetailViewModel @Inject constructor(
         if (selectedTuripId == turipId && uiState.value.selectedTurip.id == turipId) return
 
         selectedTuripId = turipId
+        isNetworkUnstable = false
+        loadTuripData(turipId)
+    }
 
-        loadSelectedTurip(turipId)
+    private fun loadTuripData(turipId: Long) {
+        viewModelScope.launch {
+            loadSelectedTurip(turipId)
+            if (uiState.value.selectedTurip.type == TuripType.TOGETHER) {
+                observeTuripStream(turipId)
+            }
+        }
         loadPlaces(turipId)
     }
 
-    fun loadSelectedTurip(selectedTuripId: Long) {
+    fun loadTurip(selectedTuripId: Long) {
         viewModelScope.launch {
-            turipRepository.loadTurip(selectedTuripId).onSuccess { turip: Turip ->
-                _uiState.update { state: TuripDetailUiState ->
-                    state.copy(
-                        errorUiState = ErrorUiState.None,
-                        selectedTurip = turip.toUiMyTuripModel(),
-                    )
-                }
+            loadSelectedTurip(selectedTuripId)
+        }
+    }
+
+    private suspend fun loadSelectedTurip(selectedTuripId: Long) {
+        turipRepository.loadTurip(selectedTuripId).onSuccess { turip: Turip ->
+            _uiState.update { state: TuripDetailUiState ->
+                state.copy(
+                    errorUiState = ErrorUiState.None,
+                    selectedTurip = turip.toUiMyTuripModel(),
+                )
             }
         }
     }
@@ -96,30 +126,185 @@ class TuripDetailViewModel @Inject constructor(
         viewModelScope.launch {
             turipRepository
                 .loadTuripPlaces(selectedTuripId)
-                .onSuccess { result: List<TuripPlace> ->
-                    _uiState.update { state: TuripDetailUiState ->
+                .onSuccess { result ->
+                    val serverPlaces = result.map { it.toUiModel() }
+
+                    val mergedPlaces =
+                        if (deletePlaceQueue.isNotEmpty()) {
+                            val deletingIds = deletePlaceQueue.map { it.placeId }.toSet()
+                            serverPlaces.filter { it.placeId !in deletingIds }
+                        } else {
+                            serverPlaces
+                        }
+
+                    _uiState.update { state ->
                         state.copy(
                             isLoading = false,
                             errorUiState = ErrorUiState.None,
-                            places =
-                                result
-                                    .map { turipPlace: TuripPlace -> turipPlace.toUiModel() }
-                                    .toImmutableList(),
+                            places = mergedPlaces.toImmutableList(),
                             placesLatLng =
-                                result
-                                    .map { it.toLatLng() }
+                                mergedPlaces
+                                    .map { it.toPlaceLatLngUiModel() }
                                     .toImmutableList(),
                         )
                     }
-                    clearSnapshots()
-                }.onFailure { errorType: ErrorType ->
-                    when (val uiError: UiError = errorType.toUiError()) {
-                        is UiError.Global -> handleGlobalError(uiError)
-                        is UiError.Feature -> Unit
+
+                    if (deletePlaceQueue.isNotEmpty()) {
+                        originBeforeDeleteSession = serverPlaces.toImmutableList() to
+                            serverPlaces.map { it.toPlaceLatLngUiModel() }.toImmutableList()
+                    } else {
+                        clearSnapshots()
                     }
-                    Timber.e("튜립 장소 목록 조회 API 호출 실패")
                 }
         }
+    }
+
+    private fun loadMembers() {
+        viewModelScope.launch {
+            turipRepository
+                .loadTuripMembers(selectedTuripId)
+                .onSuccess { members: List<TuripMember> ->
+                    _uiState.update {
+                        it.copy(members = members.map { it.nickName }.toImmutableList())
+                    }
+                }
+        }
+    }
+
+    private fun observeTuripStream(turipId: Long) {
+        viewModelScope.launch {
+            observeTuripStreamUseCase(turipId)
+                .collect { result ->
+                    when (result) {
+                        is TuripStreamResult.Event -> {
+                            handleTuripStreamEvent(result.event)
+                        }
+
+                        is TuripStreamResult.Reconnecting -> {
+                            Timber.d("SSE 재연결 중. turipId=$turipId, retryCount=${result.retryCount}")
+                            if (result.retryCount >= UNSTABLE_NETWORK_RETRY_THRESHOLD && !isNetworkUnstable) {
+                                isNetworkUnstable = true
+                                _uiEffect.send(TuripDetailUiEffect.ShowNetworkUnstable)
+                            }
+                        }
+
+                        TuripStreamResult.Fatal.TokenExpired -> {
+                            _uiEffect.send(TuripDetailUiEffect.NavigateToLogin)
+                        }
+
+                        TuripStreamResult.Fatal.Forbidden -> {
+                            Timber.e("SSE 권한 없음, 스트림 중단. turipId=$turipId")
+                        }
+
+                        is TuripStreamResult.Fatal.ConnectionLost -> {
+                            Timber.e("SSE 최대 재시도 초과, 스트림 종료. turipId=$turipId")
+                            sendErrorEffect(
+                                errorType = result.errorType,
+                                retryAction = TuripPlaceRetryAction.StreamConnectionLost,
+                            )
+                        }
+                    }
+                }
+        }
+    }
+
+    private fun handleTuripStreamEvent(event: TuripStreamEvent) {
+        when (event) {
+            is TuripStreamEvent.Connect -> {
+                Timber.d("튜립 SSE 연결 성공: turipId=%s, eventId=%s", event.turipId, event.id)
+                if (isNetworkUnstable) {
+                    isNetworkUnstable = false
+                    viewModelScope.launch {
+                        _uiEffect.send(TuripDetailUiEffect.ShowNetworkRecovered)
+                    }
+                }
+                requestRefresh(turip = true, places = true)
+                loadMembers()
+            }
+
+            is TuripStreamEvent.FolderUpdate -> {
+                Timber.d(
+                    "튜립 SSE 폴더 업데이트 수신: turipId=%s, action=%s, eventId=%s",
+                    event.turipId,
+                    event.action,
+                    event.id,
+                )
+                when (event.action) {
+                    TuripStreamEvent.FolderAction.FOLDER_NAME_CHANGED,
+                    TuripStreamEvent.FolderAction.FOLDER_DELETED,
+                    -> {
+                        requestRefresh(turip = true, places = false)
+                    }
+
+                    TuripStreamEvent.FolderAction.PLACE_REORDERED,
+                    TuripStreamEvent.FolderAction.PLACE_ADDED,
+                    TuripStreamEvent.FolderAction.PLACE_DELETED,
+                    TuripStreamEvent.FolderAction.FOLDER_PLACE_CHANGED,
+                    -> {
+                        requestRefresh(turip = true, places = true)
+                    }
+
+                    TuripStreamEvent.FolderAction.UNKNOWN -> {
+                        requestRefresh(turip = true, places = true)
+                    }
+                }
+            }
+
+            is TuripStreamEvent.MemberUpdate -> {
+                Timber.d(
+                    "튜립 SSE 멤버 업데이트 수신: turipId=%s, action=%s, memberCount=%s, eventId=%s",
+                    event.turipId,
+                    event.action,
+                    event.memberCount,
+                    event.id,
+                )
+                requestRefresh(turip = true, places = false)
+                loadMembers()
+            }
+
+            is TuripStreamEvent.Heartbeat -> {
+                Timber.v("튜립 SSE 하트비트 수신: eventId=%s", event.id)
+            }
+        }
+    }
+
+    private fun requestRefresh(
+        turip: Boolean,
+        places: Boolean,
+    ) {
+        refreshTrigger.update { current ->
+            RefreshScope(
+                turip = current.turip || turip,
+                places = current.places || places,
+            )
+        }
+    }
+
+    @OptIn(FlowPreview::class)
+    private fun registerStreamRefresh() {
+        refreshTrigger
+            .debounce(300L)
+            .onEach { scope: RefreshScope ->
+                when {
+                    scope.turip && scope.places -> {
+                        loadSelectedTurip(selectedTuripId)
+                        loadPlaces(selectedTuripId)
+                    }
+
+                    scope.turip -> {
+                        loadSelectedTurip(selectedTuripId)
+                    }
+
+                    scope.places -> {
+                        loadPlaces(selectedTuripId)
+                    }
+
+                    else -> {
+                        return@onEach
+                    }
+                }
+                refreshTrigger.value = RefreshScope(turip = false, places = false)
+            }.launchIn(viewModelScope)
     }
 
     fun applyTuripPlaceDelete(placeId: Long) {
@@ -130,15 +315,13 @@ class TuripDetailViewModel @Inject constructor(
                     return
                 }
 
-        if (deleteTuripPlaceSnapshot.hasSnapshot) return
+        if (deletePlaceQueue.isEmpty()) {
+            originBeforeDeleteSession = uiState.value.places to uiState.value.placesLatLng
+        }
+
+        deletePlaceQueue.addLast(targetPlace)
 
         _uiState.update { state: TuripDetailUiState ->
-            deleteTuripPlaceSnapshot =
-                DeleteTuripPlaceSnapshot(
-                    deletePlace = targetPlace,
-                    originPlaces = state.places,
-                    originPlacesLatLng = state.placesLatLng,
-                )
             state.copy(
                 places =
                     state.places
@@ -152,37 +335,82 @@ class TuripDetailViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            _uiEffect.send(
-                TuripDetailUiEffect.ShowTuripDetailRemoved(targetPlace.name),
-            )
+            _uiEffect.send(TuripDetailUiEffect.ShowTuripDetailRemoved(targetPlace.name))
         }
     }
-
-    private val commitMutex = Mutex()
 
     fun commitTuripPlaceDelete() {
         viewModelScope.launch {
             commitMutex.withLock {
-                if (!deleteTuripPlaceSnapshot.hasSnapshot) {
-                    Timber.e("제거할 장소에 대한 정보가 없어요. deletePlaceSnapshot을 확인 해주세요 ")
-                    return@launch
-                }
+                val deletePlace = deletePlaceQueue.removeFirstOrNull() ?: return@launch
 
-                val deletePlace = deleteTuripPlaceSnapshot.deletePlace
                 turipRepository
                     .deleteTuripPlace(uiState.value.selectedTurip.id, deletePlace.placeId)
                     .onSuccess {
-                        Timber.d("튜립 상세 바텀시트, 장소 업데이트 성공")
+                        committedPlaceIds.add(deletePlace.placeId)
+                        if (deletePlaceQueue.isEmpty()) {
+                            clearDeleteSession()
+                        }
                     }.onFailure {
                         _uiEffect.send(
                             TuripDetailUiEffect.ShowTuripDetailRemoveFailed(deletePlace.name),
                         )
                         rollbackTuripPlaceDelete()
-                        Timber.e("튜립 상세 바텀시트, 장소 업데이트 실패 place = ${deletePlace.name}")
                     }
-
-                deleteTuripPlaceSnapshot = DeleteTuripPlaceSnapshot.EMPTY
             }
+        }
+    }
+
+    fun rollbackTuripPlaceDelete() {
+        val (originPlaces, originPlacesLatLng) = originBeforeDeleteSession ?: return
+
+        val rolledBackPlaces =
+            originPlaces
+                .filter { it.placeId !in committedPlaceIds }
+                .toImmutableList()
+        val rolledBackLatLng =
+            originPlacesLatLng
+                .filter { it.placeId !in committedPlaceIds }
+                .toImmutableList()
+
+        _uiState.update { state ->
+            state.copy(
+                places = rolledBackPlaces,
+                placesLatLng = rolledBackLatLng,
+            )
+        }
+        clearDeleteSession()
+    }
+
+    private fun clearDeleteSession() {
+        originBeforeDeleteSession = null
+        committedPlaceIds.clear()
+        deletePlaceQueue.clear()
+    }
+
+    suspend fun flushDeleteQueueAndAwait() {
+        val flushed =
+            withTimeoutOrNull(FLUSH_DELETE_TIMEOUT_MILLIS) {
+                commitMutex.withLock {
+                    val remainingQueue = deletePlaceQueue.toList()
+                    clearDeleteSession()
+
+                    withContext(Dispatchers.IO) {
+                        remainingQueue.forEach { place ->
+                            runCatching {
+                                turipRepository.deleteTuripPlace(
+                                    uiState.value.selectedTurip.id,
+                                    place.placeId,
+                                )
+                            }
+                        }
+                    }
+                }
+                true
+            } ?: false
+
+        if (!flushed) {
+            Timber.w("삭제 큐 flush 타임아웃. turipId=%s", selectedTuripId)
         }
     }
 
@@ -244,8 +472,6 @@ class TuripDetailViewModel @Inject constructor(
         }
     }
 
-    fun resetUiState() = _uiState.update { TuripDetailUiState.Idle }
-
     fun showBottomSheet() = _uiState.update { it.copy(showBottomSheet = true) }
 
     fun dismissBottomSheet() =
@@ -256,25 +482,36 @@ class TuripDetailViewModel @Inject constructor(
             )
         }
 
+    fun showMemberBottomSheet() = _uiState.update { it.copy(showMemberBottomSheet = true) }
+
+    fun dismissMemberBottomSheet() = _uiState.update { it.copy(showMemberBottomSheet = false) }
+
     fun showTuripRemoveDialog() = _uiState.update { it.copy(showTuripRemoveDialog = true) }
 
     fun dismissTuripRemoveDialog() = _uiState.update { it.copy(showTuripRemoveDialog = false) }
 
-    fun deleteTurip(selectedTuripId: Long) {
+    fun deleteTurip() {
         viewModelScope.launch {
-            turipRepository
-                .deleteTurip(selectedTuripId)
-                .onSuccess {
-                    _uiState.update { state: TuripDetailUiState ->
-                        state.copy(
-                            isLoading = false,
-                            errorUiState = ErrorUiState.None,
-                        )
-                    }
-                    _uiEffect.send(TuripDetailUiEffect.TuripDelete)
-                }.onFailure { errorType: ErrorType ->
-                    sendErrorEffect(errorType, TuripPlaceRetryAction.TuripDelete)
+            val selectedTurip = uiState.value.selectedTurip
+            if (selectedTuripId == INVALID_ID || selectedTurip.id != selectedTuripId) {
+                Timber.e("튜립 정보가 아직 초기화되지 않아 삭제를 중단합니다. turipId=%s", selectedTuripId)
+                return@launch
+            }
+
+            deleteTuripUseCase(
+                turipId = selectedTurip.id,
+                type = selectedTurip.type,
+            ).onSuccess {
+                _uiState.update { state ->
+                    state.copy(
+                        isLoading = false,
+                        errorUiState = ErrorUiState.None,
+                    )
                 }
+                _uiEffect.send(TuripDetailUiEffect.TuripDelete)
+            }.onFailure { errorType ->
+                sendErrorEffect(errorType, TuripPlaceRetryAction.TuripDelete)
+            }
         }
     }
 
@@ -318,7 +555,11 @@ class TuripDetailViewModel @Inject constructor(
                     turipRepository
                         .createInvitationToken(selectedTuripId)
                         .onSuccess { token: TuripInvitationToken ->
-                            _uiEffect.send(TuripDetailUiEffect.ShareTuripInvitationLink(invitationLink = token.toUrl()))
+                            _uiEffect.send(
+                                TuripDetailUiEffect.ShareTuripInvitationLink(
+                                    invitationLink = token.toUrl(),
+                                ),
+                            )
                         }.onFailure { errorType ->
                             sendErrorEffect(
                                 errorType = errorType,
@@ -357,27 +598,6 @@ class TuripDetailViewModel @Inject constructor(
         }
     }
 
-    private suspend fun handleGlobalError(uiError: UiError.Global) {
-        when (uiError) {
-            UiError.Global.Network -> {
-                _uiState.update {
-                    it.copy(isLoading = false, errorUiState = ErrorUiState.Network)
-                }
-            }
-
-            UiError.Global.Server -> {
-                _uiState.update {
-                    it.copy(isLoading = false, errorUiState = ErrorUiState.Server)
-                }
-            }
-
-            UiError.Global.TokenExpired -> {
-                _uiState.update { it.copy(isLoading = false) }
-                _uiEffect.send(TuripDetailUiEffect.NavigateToLogin)
-            }
-        }
-    }
-
     fun handleErrorRetryRequest(action: TuripPlaceRetryAction) {
         when (action) {
             is TuripPlaceRetryAction.UpdateTuripPlace -> {
@@ -389,7 +609,7 @@ class TuripDetailViewModel @Inject constructor(
             }
 
             TuripPlaceRetryAction.TuripDelete -> {
-                deleteTurip(uiState.value.selectedTurip.id)
+                deleteTurip()
             }
 
             TuripPlaceRetryAction.TuripNameUpdate -> {
@@ -399,19 +619,17 @@ class TuripDetailViewModel @Inject constructor(
             TuripPlaceRetryAction.ShareTuripInvitationLink -> {
                 shareTuripInvitationLink()
             }
-        }
-    }
 
-    fun rollbackTuripPlaceDelete() {
-        if (!deleteTuripPlaceSnapshot.hasSnapshot) return
-
-        _uiState.update { state ->
-            state.copy(
-                places = deleteTuripPlaceSnapshot.originPlaces,
-                placesLatLng = deleteTuripPlaceSnapshot.originPlacesLatLng,
-            )
+            TuripPlaceRetryAction.StreamConnectionLost -> {
+                loadPlaces(selectedTuripId)
+                viewModelScope.launch {
+                    loadSelectedTurip(selectedTuripId)
+                    if (uiState.value.selectedTurip.type == TuripType.TOGETHER) {
+                        observeTuripStream(selectedTuripId)
+                    }
+                }
+            }
         }
-        clearDeleteSnapshot()
     }
 
     private fun rollbackReorderedPlaces() {
@@ -433,12 +651,7 @@ class TuripDetailViewModel @Inject constructor(
         )
 
     private fun clearSnapshots() {
-        clearDeleteSnapshot()
         clearReorderSnapshot()
-    }
-
-    private fun clearDeleteSnapshot() {
-        deleteTuripPlaceSnapshot = DeleteTuripPlaceSnapshot.EMPTY
     }
 
     private fun clearReorderSnapshot() {
@@ -448,8 +661,7 @@ class TuripDetailViewModel @Inject constructor(
     // API 호출 실패 시 롤백을 위해 원본 상태 기록
     // 장소 제거 API가 반영되지 않은 상태라면 제거 전 원본 상태를 기록
     fun onDragStart() {
-        reorderPlacesSnapshot =
-            if (deleteTuripPlaceSnapshot.hasSnapshot) deleteTuripPlaceSnapshot.originPlaces else uiState.value.places
+        reorderPlacesSnapshot = uiState.value.places
     }
 
     // 드래그 시 아이템 위치 변경
@@ -502,5 +714,7 @@ class TuripDetailViewModel @Inject constructor(
     companion object {
         private const val INVALID_ID = -1L
         private const val MAX_NAME_LENGTH = 20
+        private const val UNSTABLE_NETWORK_RETRY_THRESHOLD = 2
+        private const val FLUSH_DELETE_TIMEOUT_MILLIS = 3_000L
     }
 }
