@@ -1,12 +1,9 @@
 package com.on.turip.ui.compose.trip
 
 import android.content.res.Resources
-import android.view.View
-import android.view.ViewGroup
-import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.webkit.WebView
-import android.widget.FrameLayout
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -45,7 +42,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.on.turip.R
@@ -231,20 +227,20 @@ fun TripDetailScreen(
                 }
 
                 else -> {
-                    if (!webViewController.isFullScreen) {
-                        TripDetailScreenContent(
-                            uiState = uiState,
-                            listState = listState,
-                            webViewController = webViewController,
-                            onTimeLineClick = webViewController::seekTo,
-                            onMapClick = navigateToMap,
-                            onTuripPlaceClick = viewModel::selectPlace,
-                            onBookmarkClick = {
-                                viewModel.updateBookmark()
-                            },
-                            onErrorVideoClick = { navigateToWebViewUrl(uiState.tripDetailInfo.videoLink) },
-                        )
+                    TripDetailScreenContent(
+                        uiState = uiState,
+                        listState = listState,
+                        webViewController = webViewController,
+                        onTimeLineClick = webViewController::seekTo,
+                        onMapClick = navigateToMap,
+                        onTuripPlaceClick = viewModel::selectPlace,
+                        onBookmarkClick = {
+                            viewModel.updateBookmark()
+                        },
+                        onErrorVideoClick = { navigateToWebViewUrl(uiState.tripDetailInfo.videoLink) },
+                    )
 
+                    if (!webViewController.isFullScreen) {
                         selectedPlace?.let { place ->
                             PlaceTuripSelectionBottomSheet(
                                 sheetState = sheetState,
@@ -264,8 +260,6 @@ fun TripDetailScreen(
                                 },
                             )
                         }
-                    } else {
-                        FullScreenVideo(webViewController.fullScreenVideo)
                     }
                 }
             }
@@ -390,26 +384,6 @@ private fun TripDetailScreenContent(
     }
 }
 
-@Composable
-private fun FullScreenVideo(fullScreenVideo: View?) {
-    if (fullScreenVideo == null) return
-    AndroidView(
-        factory = { context ->
-            FrameLayout(context).apply {
-                layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT)
-            }
-        },
-        update = { view: FrameLayout ->
-            if (view.getChildAt(0) == fullScreenVideo) return@AndroidView
-            (fullScreenVideo.parent as? ViewGroup)?.removeView(fullScreenVideo)
-            view.removeAllViews()
-            view.addView(fullScreenVideo)
-        },
-        modifier = Modifier.fillMaxSize(),
-        onRelease = { (fullScreenVideo.parent as? ViewGroup)?.removeView(fullScreenVideo) },
-    )
-}
-
 @Preview(showBackground = true)
 @Composable
 private fun TripContentScreenPreview() {
@@ -460,6 +434,7 @@ private fun TripContentScreenPreview() {
                     webView = webView,
                     videoManager = VideoManager(webView),
                     navigateToWebViewUrl = {},
+                    activity = LocalActivity.current!!,
                 ),
             onTimeLineClick = {},
             onMapClick = {},

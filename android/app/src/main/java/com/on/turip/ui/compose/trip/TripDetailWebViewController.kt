@@ -1,9 +1,12 @@
 package com.on.turip.ui.compose.trip
 
+import android.app.Activity
 import android.content.Context
 import android.content.pm.ActivityInfo
 import android.view.View
+import android.view.ViewGroup
 import android.webkit.WebView
+import android.widget.FrameLayout
 import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -28,6 +31,7 @@ class TripDetailWebViewController(
     val webView: WebView,
     private val videoManager: VideoManager,
     val navigateToWebViewUrl: (webUrl: String) -> Unit,
+    private val activity: Activity,
 ) {
     var isFullScreen by mutableStateOf(false)
         private set
@@ -35,21 +39,45 @@ class TripDetailWebViewController(
         private set
     var isError by mutableStateOf(false)
         private set
-    var fullScreenVideo by mutableStateOf<View?>(null)
-        private set
+
+    private var fullscreenContainer: FrameLayout? = null
 
     private val webChromeClient =
         TuripWebChromeClient(
             onShowFullScreen = { video: View ->
-                fullScreenVideo = video
-                isFullScreen = true
+                // Compose state 변경 없이 decorView에 직접 추가 → config change 무관하게 안정적
+                val container =
+                    FrameLayout(activity).apply {
+                        layoutParams =
+                            ViewGroup.LayoutParams(
+                                ViewGroup.LayoutParams.MATCH_PARENT,
+                                ViewGroup.LayoutParams.MATCH_PARENT,
+                            )
+                    }
+                container.addView(
+                    video,
+                    ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                    ),
+                )
+                (activity.window.decorView as ViewGroup).addView(container)
+                fullscreenContainer = container
 
+                isFullScreen = true
+                webView.resumeTimers()
                 webView.resumeVideo()
             },
             onHideFullScreen = {
-                fullScreenVideo = null
+                fullscreenContainer?.let { container ->
+                    container.removeAllViews()
+                    (activity.window.decorView as ViewGroup).removeView(container)
+                }
+                fullscreenContainer = null
                 isFullScreen = false
 
+                webView.onResume()
+                webView.resumeTimers()
                 webView.resumeVideo()
             },
         )
@@ -87,6 +115,11 @@ class TripDetailWebViewController(
     }
 
     fun clear() {
+        fullscreenContainer?.let { container ->
+            container.removeAllViews()
+            (activity.window.decorView as ViewGroup).removeView(container)
+        }
+        fullscreenContainer = null
         videoManager.clear()
         webView.destroy()
     }
@@ -96,16 +129,18 @@ class TripDetailWebViewController(
 fun rememberTripDetailWebViewController(
     context: Context,
     navigateToWebViewUrl: (webUrl: String) -> Unit,
-): TripDetailWebViewController =
-    remember {
+): TripDetailWebViewController {
+    val activity = LocalActivity.current as? Activity
+    return remember {
         val webView = WebView(context).apply { applyVideoSettings() }
-
         TripDetailWebViewController(
             webView = webView,
             videoManager = VideoManager(webView),
             navigateToWebViewUrl = navigateToWebViewUrl,
+            activity = requireNotNull(activity) { "TripDetailWebViewController requires an Activity" },
         )
     }
+}
 
 @Composable
 fun HandleFullScreenWindowLaunchedEffect(isFullScreen: Boolean) {
