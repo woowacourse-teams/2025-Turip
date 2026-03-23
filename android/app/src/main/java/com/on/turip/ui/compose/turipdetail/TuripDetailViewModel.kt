@@ -8,10 +8,10 @@ import com.on.turip.core.result.onSuccess
 import com.on.turip.domain.session.SessionState
 import com.on.turip.domain.session.SessionStore
 import com.on.turip.domain.turip.DeleteTuripUseCase
-import com.on.turip.domain.turip.Nickname
 import com.on.turip.domain.turip.ObserveTuripStreamUseCase
 import com.on.turip.domain.turip.Turip
 import com.on.turip.domain.turip.TuripInvitationToken
+import com.on.turip.domain.turip.TuripMember
 import com.on.turip.domain.turip.TuripStreamEvent
 import com.on.turip.domain.turip.TuripType
 import com.on.turip.domain.turip.repository.TuripRepository
@@ -161,9 +161,13 @@ class TuripDetailViewModel @Inject constructor(
 
     private fun loadMembers() {
         viewModelScope.launch {
-            turipRepository.loadTuripMembers(selectedTuripId).onSuccess { members: List<Nickname> ->
-                _uiState.update { it.copy(members = members.map { it.value }.toImmutableList()) }
-            }
+            turipRepository
+                .loadTuripMembers(selectedTuripId)
+                .onSuccess { members: List<TuripMember> ->
+                    _uiState.update {
+                        it.copy(members = members.map { it.nickName }.toImmutableList())
+                    }
+                }
         }
     }
 

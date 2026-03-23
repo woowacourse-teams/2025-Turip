@@ -12,10 +12,10 @@ import com.on.turip.data.turip.toDomain
 import com.on.turip.data.turip.toPatchRequestDto
 import com.on.turip.data.turip.toPostRequestDto
 import com.on.turip.domain.bookmark.TuripPlace
-import com.on.turip.domain.turip.Nickname
 import com.on.turip.domain.turip.Turip
 import com.on.turip.domain.turip.TuripInvitationInformation
 import com.on.turip.domain.turip.TuripInvitationToken
+import com.on.turip.domain.turip.TuripMember
 import com.on.turip.domain.turip.TuripStreamEvent
 import com.on.turip.domain.turip.repository.TuripRepository
 import com.on.turip.domain.turip.result.TuripStreamResult
@@ -33,7 +33,7 @@ class DefaultTuripRepository @Inject constructor(
 
     override suspend fun loadTurips(): TuripResult<List<Turip>> = turipRestRemoteDataSource.getTurips().mapCatching { it.toDomain() }
 
-    override suspend fun loadTuripMembers(turipId: Long): TuripResult<List<Nickname>> =
+    override suspend fun loadTuripMembers(turipId: Long): TuripResult<List<TuripMember>> =
         turipRestRemoteDataSource.getTuripMembers(turipId).mapCatching { it.toDomain() }
 
     override suspend fun createTurip(name: String): TuripResult<Turip> =
