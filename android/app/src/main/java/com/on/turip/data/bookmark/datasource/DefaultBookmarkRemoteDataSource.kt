@@ -1,6 +1,7 @@
 package com.on.turip.data.bookmark.datasource
 
 import com.on.turip.core.result.TuripResult
+import com.on.turip.core.result.mapCatching
 import com.on.turip.data.bookmark.dto.BookmarkAddRequest
 import com.on.turip.data.bookmark.dto.BookmarkContentsResponse
 import com.on.turip.data.bookmark.dto.BookmarkCountResponse
@@ -18,7 +19,7 @@ class DefaultBookmarkRemoteDataSource @Inject constructor(
 ) : BookmarkRemoteDataSource {
     override suspend fun postBookmark(bookmarkAddRequest: BookmarkAddRequest): TuripResult<Unit> =
         withContext(coroutineContext) {
-            safeApiCall { bookmarkService.postBookmark(bookmarkAddRequest) }
+            safeApiCall { bookmarkService.postBookmark(bookmarkAddRequest) }.mapCatching { Unit }
         }
 
     override suspend fun deleteBookmark(contentId: Long): TuripResult<Unit> =
