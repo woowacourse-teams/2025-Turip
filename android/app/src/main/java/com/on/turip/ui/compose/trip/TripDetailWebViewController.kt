@@ -110,13 +110,19 @@ fun rememberTripDetailWebViewController(
 @Composable
 fun HandleFullScreenWindowLaunchedEffect(isFullScreen: Boolean) {
     val activity = LocalActivity.current ?: return
+    val defaultOrientation =
+        if (activity.resources.configuration.smallestScreenWidthDp < 600) {
+            ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        } else {
+            ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        }
 
     DisposableEffect(activity) {
         onDispose {
             val window = activity.window
             val controller = WindowCompat.getInsetsController(window, window.decorView)
 
-            activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+            activity.requestedOrientation = defaultOrientation
             controller.show(WindowInsetsCompat.Type.systemBars())
             controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_DEFAULT
         }
@@ -132,7 +138,7 @@ fun HandleFullScreenWindowLaunchedEffect(isFullScreen: Boolean) {
             controller.systemBarsBehavior =
                 WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         } else {
-            activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+            activity.requestedOrientation = defaultOrientation
             controller.show(WindowInsetsCompat.Type.systemBars())
             controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_DEFAULT
         }
