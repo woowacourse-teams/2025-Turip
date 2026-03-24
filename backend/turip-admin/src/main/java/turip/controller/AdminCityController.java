@@ -17,7 +17,7 @@ public class AdminCityController {
     private final CityService cityService;
 
     @GetMapping
-    public ResponseEntity<List<AdminCityResponse>> getAllCities() {
+    public ResponseEntity<List<AdminCityResponse>> findAll() {
         List<AdminCityResponse> cities = cityService.findAll().stream()
                 .map(AdminCityResponse::from)
                 .toList();
