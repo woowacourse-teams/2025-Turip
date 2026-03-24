@@ -1,5 +1,6 @@
 package turip.region.service;
 
+import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,8 @@ public class CityService {
     }
 
     public List<City> findAll() {
-        return cityRepository.findAll();
+        return cityRepository.findAll().stream()
+                .sorted(Comparator.comparing(City::getName))
+                .toList();
     }
 }
