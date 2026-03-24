@@ -274,6 +274,7 @@
     let collectedPlaces = [];
     let isYouTubeApiReady = false;
     let videoIdToLoad = null;
+    let previewMarker = null;
 
     async function authFetch(url, options = {}) {
         const defaultOptions = {headers: {'Content-Type': 'application/json'}};
@@ -345,6 +346,45 @@
         else if (collectedPlaces.length === 1) map.setCenter(markers[0].getPosition());
     }
 
+    function showPreviewMarker(item) {
+        if (!map) return;
+
+        // 기존 미리보기 마커 제거
+        if (previewMarker) {
+            previewMarker.setMap(null);
+        }
+
+        // 새로운 미리보기 마커 생성 (노란색 핀)
+        const pos = {lat: item.latitude, lng: item.longitude};
+        previewMarker = new google.maps.Marker({
+            position: pos,
+            map: map,
+            icon: {
+                url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                    <svg xmlns="http://www.w3.org/2000/svg" width="27" height="43" viewBox="0 0 27 43">
+                        <path fill="#FFEB3B" stroke="#F57F17" stroke-width="2"
+                              d="M12.5 0C5.596 0 0 5.596 0 12.5c0 1.986.461 3.856 1.281 5.524l11.095 24.038c.112.243.357.438.624.438s.512-.195.624-.438l11.094-24.038C25.539 16.356 26 14.486 26 12.5 26 5.596 20.404 0 13.5 0h-1z"/>
+                        <circle fill="#FFF176" cx="13" cy="12" r="7"/>
+                    </svg>
+                `),
+                scaledSize: new google.maps.Size(27, 43),
+                anchor: new google.maps.Point(13, 43)
+            },
+            title: item.name,
+            animation: google.maps.Animation.DROP
+        });
+
+        // 미리보기 마커 클릭 시 정보 표시
+        previewMarker.addListener("click", () => {
+            infoWindow.setContent(`<div><strong>${item.name}</strong><br><small>${item.address}</small></div>`);
+            infoWindow.open(map, previewMarker);
+        });
+
+        // 지도 중심을 마커로 이동하고 줌 조정
+        map.setCenter(pos);
+        map.setZoom(15);
+    }
+
     async function fetchChannelImage(channelId) {
         try {
             const url = `https://www.googleapis.com/youtube/v3/channels?part=snippet&id=${channelId}&key=${YOUTUBE_API_KEY}`;
@@ -413,7 +453,7 @@
                     }
                     container.style.display = 'none';
                     document.getElementById('btnAddPlace').disabled = false;
-                    if (map) map.setCenter({lat: item.latitude, lng: item.longitude});
+                    showPreviewMarker(item);
                 };
                 container.appendChild(div);
             });
@@ -444,6 +484,13 @@
             timeLine: document.getElementById('timeLine').value || "00:00",
             place: {...selectedPlaceData}
         });
+
+        // 미리보기 마커 제거
+        if (previewMarker) {
+            previewMarker.setMap(null);
+            previewMarker = null;
+        }
+
         renderPlaceList();
         calculateDuration();
         updateMapMarkers();
