@@ -447,6 +447,12 @@
             const data = await res.json();
             container.innerHTML = '';
             container.style.display = 'block';
+
+            if (!data.items || data.items.length === 0) {
+                container.innerHTML = '<div style="padding: 20px; text-align: center; color: #999;">검색 결과가 없습니다.<br><small>다른 검색어로 시도해보세요.</small></div>';
+                return;
+            }
+
             data.items.forEach(item => {
                 const div = document.createElement('div');
                 div.className = 'search-result-item';
