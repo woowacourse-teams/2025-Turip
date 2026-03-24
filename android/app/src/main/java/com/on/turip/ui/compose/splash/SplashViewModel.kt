@@ -2,7 +2,6 @@ package com.on.turip.ui.compose.splash
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.on.turip.core.navigation.InitialNavigationTarget
 import com.on.turip.domain.invitation.repository.DeferredDeepLinkRepository
 import com.on.turip.domain.session.SessionState
 import com.on.turip.domain.session.usecase.DetermineInitialSessionUseCase
@@ -67,15 +66,17 @@ class SplashViewModel @Inject constructor(
                     deferredDeepLinkUrl = deferredDeepLinkUrlDeferred.await()
                 }
 
-                deferredDeepLinkUrl?.let { url: String ->
-                    InitialNavigationTarget.InvitationEntry(deepLinkUrl = url)
-                } ?: when (sessionState) {
-                    SessionState.Member -> {
-                        _uiEffect.send(SplashUiEffect.NavigateToMain)
-                    }
+                if (deferredDeepLinkUrl != null) {
+                    _uiEffect.send(SplashUiEffect.NavigateToInvitationEntry(deepLinkUrl = deferredDeepLinkUrl))
+                } else {
+                    when (sessionState) {
+                        SessionState.Member -> {
+                            _uiEffect.send(SplashUiEffect.NavigateToMain)
+                        }
 
-                    SessionState.Guest, SessionState.Uninitialized -> {
-                        _uiEffect.send(SplashUiEffect.NavigateToLogin)
+                        SessionState.Guest, SessionState.Uninitialized -> {
+                            _uiEffect.send(SplashUiEffect.NavigateToLogin)
+                        }
                     }
                 }
             } catch (exception: Throwable) {

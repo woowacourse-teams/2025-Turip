@@ -15,9 +15,9 @@ fun EntryProviderScope<NavKey>.splashScreen(
     entry<SplashNavKey> {
         SplashScreen(
             deepLinkUrl = deepLinkUrl,
-            onNavigateToMain = { navigator.navigate(HomeNavKey) },
+            onNavigateToMain = { navigator.goWithAllClear(HomeNavKey) },
             onNavigateToLogin = { navigator.goWithAllClear(LoginNavKey(deepLinkUrl)) },
-            onNavigateToInvitationEntry = { navigator.navigate(InvitationEntryNavKey(it)) },
+            onNavigateToInvitationEntry = { navigator.goWithAllClear(InvitationEntryNavKey(it)) },
             onFinish = { navigator.goBack() },
         )
     }

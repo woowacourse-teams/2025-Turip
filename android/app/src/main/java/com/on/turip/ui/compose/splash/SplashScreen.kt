@@ -40,7 +40,6 @@ import com.google.android.play.core.appupdate.AppUpdateOptions
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.UpdateAvailability
 import com.on.turip.R
-import com.on.turip.core.navigation.InitialNavigationTarget
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
