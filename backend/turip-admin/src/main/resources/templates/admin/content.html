@@ -103,6 +103,13 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            transition: all 0.2s;
+        }
+
+        .place-item:hover {
+            background-color: #f1f4ff;
+            border-color: #6e8efb;
+            transform: translateX(4px);
         }
 
         #map {
@@ -514,7 +521,7 @@
             container.appendChild(dayBox);
             const listDiv = document.getElementById(`day-list-${day}`);
             grouped[day].forEach(item => {
-                listDiv.insertAdjacentHTML('beforeend', `<div class="place-item" data-id="${item.id}"><div><b>${item.place.name}</b> <small>🕒 ${item.timeLine}</small></div><button class="btn btn-sm text-danger" onclick="removePlace(${item.id})">✕</button></div>`);
+                listDiv.insertAdjacentHTML('beforeend', `<div class="place-item" data-id="${item.id}" onclick="focusOnPlace(${item.id})" style="cursor: pointer;"><div><b>${item.place.name}</b> <small>🕒 ${item.timeLine}</small></div><button class="btn btn-sm text-danger" onclick="event.stopPropagation(); removePlace(${item.id})">✕</button></div>`);
             });
             Sortable.create(listDiv, {
                 group: 'places', animation: 150,
@@ -600,6 +607,27 @@
         renderPlaceList();
         calculateDuration();
         updateMapMarkers();
+    }
+
+    function focusOnPlace(id) {
+        if (!map) return;
+
+        // 해당 장소 찾기
+        const placeIndex = collectedPlaces.findIndex(p => p.id === id);
+        if (placeIndex === -1) return;
+
+        const place = collectedPlaces[placeIndex];
+
+        // 지도를 해당 위치로 이동하고 줌 조정
+        const pos = {lat: place.place.latitude, lng: place.place.longitude};
+        map.setCenter(pos);
+        map.setZoom(15);
+
+        // 해당 마커의 정보창 열기
+        if (markers[placeIndex]) {
+            infoWindow.setContent(`<div><strong>${place.visitDay}일차: ${place.place.name}</strong><br>🕒 ${place.timeLine}</div>`);
+            infoWindow.open(map, markers[placeIndex]);
+        }
     }
 
     async function loadCities() {
