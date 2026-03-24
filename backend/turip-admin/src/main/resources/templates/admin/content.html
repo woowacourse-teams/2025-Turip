@@ -339,7 +339,7 @@
             const pos = {lat: p.place.latitude, lng: p.place.longitude};
             const marker = new google.maps.Marker({
                 position: pos, map: map,
-                label: {text: String(idx + 1), color: "white", fontWeight: "bold"},
+                label: {text: `${p.visitDay}-${p.visitOrder}`, color: "white", fontWeight: "bold", fontSize: "12px"},
                 title: p.place.name
             });
             marker.addListener("click", () => {
@@ -485,9 +485,15 @@
     function addPlaceToList() {
         if (!selectedPlaceData) return;
         const day = parseInt(document.getElementById('visitDay').value);
+
+        // 해당 일차의 현재 장소 개수를 세서 visitOrder 설정
+        const placesInSameDay = collectedPlaces.filter(p => p.visitDay === day);
+        const visitOrder = placesInSameDay.length + 1;
+
         collectedPlaces.push({
             id: Date.now(),
             visitDay: day,
+            visitOrder: visitOrder,
             timeLine: document.getElementById('timeLine').value || "00:00",
             place: {...selectedPlaceData}
         });
