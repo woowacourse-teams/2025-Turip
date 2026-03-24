@@ -249,7 +249,10 @@
                 <h3 class="section-title text-start">5. 최종 콘텐츠 저장</h3>
                 <div class="row mb-3 justify-content-center align-items-center">
                     <div class="col-md-3"><label class="small text-muted">도시 이름</label><input
-                            class="form-control text-center" id="cityName" placeholder="예: 서울" type="text"></div>
+                            class="form-control text-center" id="cityName" placeholder="예: 서울" type="text" list="cityList">
+                        <datalist id="cityList">
+                        </datalist>
+                    </div>
                     <div class="col-md-3"><label class="small text-muted">여행 기간</label><h4 class="fw-bold text-primary"
                                                                                            id="durationText">0박 1일</h4>
                         <input id="tripNights" type="hidden" value="0"><input id="tripDays" type="hidden" value="1">
@@ -551,6 +554,25 @@
         calculateDuration();
         updateMapMarkers();
     }
+
+    async function loadCities() {
+        try {
+            const response = await authFetch('/api/v1/admin/cities');
+            const cities = await response.json();
+
+            const datalist = document.getElementById('cityList');
+            cities.forEach(city => {
+                const option = document.createElement('option');
+                option.value = city.name;
+                datalist.appendChild(option);
+            });
+        } catch (error) {
+            console.error('도시 목록 로드 실패:', error);
+        }
+    }
+
+    // 페이지 로드 시 도시 목록 불러오기
+    document.addEventListener('DOMContentLoaded', loadCities);
 
     /*]]>*/
 </script>
