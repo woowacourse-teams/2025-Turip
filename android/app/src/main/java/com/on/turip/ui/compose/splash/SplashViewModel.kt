@@ -45,10 +45,8 @@ class SplashViewModel @Inject constructor(
                 if (trimmedDeepLinkUrl != null) {
                     determineInitialSessionUseCase()
                     _uiEffect.send(
-                        SplashUiEffect.NavigateToMain(
-                            InitialNavigationTarget.InvitationEntry(
-                                deepLinkUrl = trimmedDeepLinkUrl,
-                            ),
+                        SplashUiEffect.NavigateToInvitationEntry(
+                            deepLinkUrl = trimmedDeepLinkUrl,
                         ),
                     )
                     return@launch
@@ -69,15 +67,17 @@ class SplashViewModel @Inject constructor(
                     deferredDeepLinkUrl = deferredDeepLinkUrlDeferred.await()
                 }
 
-                val initialNavigationTarget: InitialNavigationTarget =
-                    deferredDeepLinkUrl?.let { url: String ->
-                        InitialNavigationTarget.InvitationEntry(deepLinkUrl = url)
-                    } ?: when (sessionState) {
-                        SessionState.Member -> InitialNavigationTarget.Home
-                        SessionState.Guest, SessionState.Uninitialized -> InitialNavigationTarget.Login
+                deferredDeepLinkUrl?.let { url: String ->
+                    InitialNavigationTarget.InvitationEntry(deepLinkUrl = url)
+                } ?: when (sessionState) {
+                    SessionState.Member -> {
+                        _uiEffect.send(SplashUiEffect.NavigateToMain)
                     }
 
-                _uiEffect.send(SplashUiEffect.NavigateToMain(initialNavigationTarget))
+                    SessionState.Guest, SessionState.Uninitialized -> {
+                        _uiEffect.send(SplashUiEffect.NavigateToLogin)
+                    }
+                }
             } catch (exception: Throwable) {
                 Timber.e(exception, "초기 진입 목적지 결정 실패")
                 hasDeterminedStartDestination.set(false)

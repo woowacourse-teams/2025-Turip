@@ -50,7 +50,9 @@ private const val UPDATE_TYPE = AppUpdateType.IMMEDIATE
 @Composable
 fun SplashScreen(
     deepLinkUrl: String?,
-    onNavigateToMain: (target: InitialNavigationTarget) -> Unit,
+    onNavigateToMain: () -> Unit,
+    onNavigateToLogin: () -> Unit,
+    onNavigateToInvitationEntry: (deepLinkUrl: String) -> Unit,
     onFinish: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SplashViewModel = hiltViewModel(),
@@ -82,8 +84,16 @@ fun SplashScreen(
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collectLatest { uiEffect ->
             when (uiEffect) {
-                is SplashUiEffect.NavigateToMain -> {
-                    onNavigateToMain(uiEffect.initialNavigationTarget)
+                SplashUiEffect.NavigateToMain -> {
+                    onNavigateToMain()
+                }
+
+                SplashUiEffect.NavigateToLogin -> {
+                    onNavigateToLogin()
+                }
+
+                is SplashUiEffect.NavigateToInvitationEntry -> {
+                    onNavigateToInvitationEntry(uiEffect.deepLinkUrl)
                 }
             }
         }

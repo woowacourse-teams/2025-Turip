@@ -22,14 +22,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import kotlinx.coroutines.delay
 import androidx.compose.ui.unit.Dp
 import androidx.core.view.WindowCompat
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
-import com.on.turip.core.navigation.InitialNavigationTarget
 import com.on.turip.navigation.Navigator
 import com.on.turip.navigation.rememberNavigationState
 import com.on.turip.navigation.toEntries
@@ -44,14 +42,12 @@ import com.on.turip.ui.compose.main.navigation.SavedStateConfigurationProvider
 import com.on.turip.ui.compose.main.navigation.TopLevel
 import com.on.turip.ui.compose.main.navigation.appScreens
 import com.on.turip.ui.compose.main.navigation.rememberTuripAppState
-import com.on.turip.ui.compose.main.navigation.util.toInitialEntryKey
+import com.on.turip.ui.compose.splash.navigation.SplashNavKey
+import kotlinx.coroutines.delay
 
 @Composable
-fun MainApp(
-    savedStateConfigurationProvider: SavedStateConfigurationProvider,
-    initialNavigationTarget: InitialNavigationTarget?,
-) {
-    val initialEntryKey: NavKey? = initialNavigationTarget?.toInitialEntryKey()
+fun MainApp(savedStateConfigurationProvider: SavedStateConfigurationProvider) {
+    val initialEntryKey: NavKey = SplashNavKey
     val navigationState =
         rememberNavigationState(
             startKey = HomeNavKey,
