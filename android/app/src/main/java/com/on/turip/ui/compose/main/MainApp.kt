@@ -42,11 +42,16 @@ import com.on.turip.ui.compose.main.navigation.SavedStateConfigurationProvider
 import com.on.turip.ui.compose.main.navigation.TopLevel
 import com.on.turip.ui.compose.main.navigation.appScreens
 import com.on.turip.ui.compose.main.navigation.rememberTuripAppState
+import com.on.turip.ui.compose.invitation.navigation.InvitationEntryNavKey
 import com.on.turip.ui.compose.splash.navigation.SplashNavKey
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 
 @Composable
-fun MainApp(savedStateConfigurationProvider: SavedStateConfigurationProvider) {
+fun MainApp(
+    savedStateConfigurationProvider: SavedStateConfigurationProvider,
+    newDeepLinkFlow: Flow<String>,
+) {
     val initialEntryKey: NavKey = SplashNavKey
     val navigationState =
         rememberNavigationState(
@@ -58,6 +63,12 @@ fun MainApp(savedStateConfigurationProvider: SavedStateConfigurationProvider) {
 
     val appState = rememberTuripAppState(navigationState = navigationState)
     val navigator = remember(appState.navigationState) { Navigator(appState.navigationState) }
+
+    LaunchedEffect(Unit) {
+        newDeepLinkFlow.collect { deepLinkUrl ->
+            navigator.goWithAllClear(InvitationEntryNavKey(deepLinkUrl))
+        }
+    }
 
     // shouldShowBottomBar가 true로 바뀔 때 화면 전환 애니메이션(300ms)이 끝난 뒤
     // 바텀 바를 표시해 로그인 화면 위에 겹쳐 보이는 현상을 방지한다.

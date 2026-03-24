@@ -1,5 +1,6 @@
 package com.on.turip.ui.main
 
+import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -8,12 +9,18 @@ import androidx.activity.enableEdgeToEdge
 import com.on.turip.ui.compose.main.MainApp
 import com.on.turip.ui.compose.main.navigation.SavedStateConfigurationProvider
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     @Inject
     lateinit var savedStateConfigurationProvider: SavedStateConfigurationProvider
+
+    private val _newDeepLinkChannel = Channel<String>(Channel.CONFLATED)
+    val newDeepLinkFlow: Flow<String> = _newDeepLinkChannel.receiveAsFlow()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -22,6 +29,17 @@ class MainActivity : ComponentActivity() {
         requestedOrientation =
             if (shouldLockPortrait) ActivityInfo.SCREEN_ORIENTATION_PORTRAIT else ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
 
-        setContent { MainApp(savedStateConfigurationProvider = savedStateConfigurationProvider) }
+        setContent {
+            MainApp(
+                savedStateConfigurationProvider = savedStateConfigurationProvider,
+                newDeepLinkFlow = newDeepLinkFlow,
+            )
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        intent.dataString?.let { _newDeepLinkChannel.trySend(it) }
     }
 }
