@@ -2,7 +2,9 @@ package com.on.turip.di
 
 import com.on.turip.BuildConfig
 import com.on.turip.common.FidProvider
+import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.fold
+import com.on.turip.data.result.ApiException
 import com.on.turip.di.NetworkModule.LOG_PREFIX
 import com.on.turip.domain.login.AuthRepository
 import com.on.turip.domain.login.AuthTokens
@@ -32,12 +34,12 @@ import io.ktor.client.request.header
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
+import javax.inject.Singleton
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import timber.log.Timber
-import javax.inject.Singleton
-import kotlin.time.Duration.Companion.milliseconds
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -127,31 +129,37 @@ object NetworkModule {
 
                 refreshTokens {
                     val storedRefreshToken: String =
-                        tokenManager.currentTokens?.refreshToken ?: return@refreshTokens null
+                        tokenManager.currentTokens?.refreshToken ?: throw ApiException.Auth
 
                     authRepository.get().requestTokens(storedRefreshToken).fold(
                         onSuccess = { newTokens: AuthTokens ->
+                            Timber.d("refreshToken으로 토큰 재발급 성공")
                             val currentRefreshToken = tokenManager.currentTokens?.refreshToken
 
                             // 중단함수 처리 중 이미 토큰 재발급이 되었거나 제거가 발생했을 경우
-                            if (currentRefreshToken != storedRefreshToken) return@fold null
+                            if (currentRefreshToken != storedRefreshToken) throw ApiException.Auth
 
                             tokenManager.setTokens(newTokens).fold(
                                 onSuccess = {
+                                    Timber.d("refreshToken으로 재발급 받은 토큰 저장 성공")
                                     BearerTokens(
                                         accessToken = newTokens.accessToken,
                                         refreshToken = newTokens.refreshToken,
                                     )
                                 },
                                 onFailure = {
-                                    tokenManager.clearTokens()
-                                    null
+                                    Timber.e("refreshToken으로= 재발급 받은 토큰 저장 실패")
+                                    throw ApiException.Auth
                                 },
                             )
                         },
-                        onFailure = {
-                            // #591 이슈에서 처리 필요
-                            null
+                        onFailure = { errorType ->
+                            Timber.e("refreshToken으로 토큰 재발급 실패 errorType =$errorType")
+                            when (errorType) {
+                                ErrorType.Network -> throw ApiException.Network
+                                is ErrorType.Auth -> throw ApiException.Auth
+                                else -> throw ApiException.Error(errorType)
+                            }
                         },
                     )
                 }
