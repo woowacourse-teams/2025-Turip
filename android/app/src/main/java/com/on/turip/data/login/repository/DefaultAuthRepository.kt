@@ -17,5 +17,5 @@ class DefaultAuthRepository @Inject constructor(
     override suspend fun requestTokens(refreshToken: String): TuripResult<AuthTokens> =
         authDataSource.postReissueToken(refreshToken).mapCatching { it.toDomain() }
 
-    override suspend fun getTokenVerification(accessToken: String): TuripResult<Unit> = authDataSource.getTokenVerification(accessToken)
+    override suspend fun verifyToken(): TuripResult<Unit> = authDataSource.verifyToken()
 }

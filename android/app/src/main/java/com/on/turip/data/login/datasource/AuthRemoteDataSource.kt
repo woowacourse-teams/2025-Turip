@@ -30,14 +30,10 @@ class AuthRemoteDataSource @Inject constructor(
             }
         }
 
-    override suspend fun getTokenVerification(accessToken: String): TuripResult<Unit> =
+    override suspend fun verifyToken(): TuripResult<Unit> =
         withContext(coroutineContext) {
             safeApiCall {
-                authService.getTokenVerification(AUTHORIZATION_PREFIX + accessToken)
+                authService.verifyToken()
             }
         }
-
-    companion object {
-        private const val AUTHORIZATION_PREFIX = "Bearer "
-    }
 }
