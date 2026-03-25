@@ -11,17 +11,17 @@ import turip.account.domain.Account;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.ConflictException;
 import turip.common.exception.custom.NotFoundException;
-import turip.content.controller.dto.response.content.ContentDetailResponse;
-import turip.content.controller.dto.response.content.ContentResponse;
-import turip.content.controller.dto.response.content.ContentsDetailWithLoadableResponse;
 import turip.content.controller.dto.response.content.TripDurationResponse;
 import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
 import turip.content.service.ContentPlaceService;
 import turip.favorite.controller.dto.request.FavoriteContentRequest;
+import turip.favorite.controller.dto.response.FavoriteContentCountResponse;
+import turip.favorite.controller.dto.response.FavoriteContentDetailResponse;
 import turip.favorite.controller.dto.response.FavoriteContentResponse;
 import turip.favorite.domain.FavoriteContent;
 import turip.favorite.repository.FavoriteContentRepository;
+import turip.favorite.service.dto.FavoriteContentWithLoadableResult;
 
 @Service
 @RequiredArgsConstructor
@@ -44,24 +44,30 @@ public class FavoriteContentService {
         return FavoriteContentResponse.from(savedFavoriteContent);
     }
 
-    public ContentsDetailWithLoadableResponse findMyFavoriteContents(Account account, int pageSize,
-                                                                     long lastContentId) {
-        if (lastContentId == 0) {
-            lastContentId = Long.MAX_VALUE;
+    public FavoriteContentWithLoadableResult findMyFavoriteContents(Account account, int pageSize,
+                                                                    long lastFavoriteContentId) {
+        if (lastFavoriteContentId == 0) {
+            lastFavoriteContentId = Long.MAX_VALUE;
         }
-        Slice<Content> contentSlice = favoriteContentRepository.findMyFavoriteContentsByAccountId(account.getId(),
-                lastContentId,
+        Slice<FavoriteContent> favoriteContentSlice = favoriteContentRepository.findMyFavoriteContentsByAccountId(
+                account.getId(),
+                lastFavoriteContentId,
                 PageRequest.of(0, pageSize));
-        List<Content> contents = contentSlice.getContent();
-        List<ContentDetailResponse> contentsWithTripInfo = convertToContentWithTripInfoResponses(
+        List<FavoriteContent> contents = favoriteContentSlice.getContent();
+        List<FavoriteContentDetailResponse> favoriteContentDetailResponse = convertToFavoriteContentDetailResponses(
                 contents);
-        boolean loadable = contentSlice.hasNext();
+        boolean loadable = favoriteContentSlice.hasNext();
 
-        return ContentsDetailWithLoadableResponse.of(contentsWithTripInfo, loadable);
+        return FavoriteContentWithLoadableResult.of(favoriteContentDetailResponse, loadable);
     }
 
     public boolean existsByAccount(Account account) {
         return favoriteContentRepository.existsByAccount(account);
+    }
+
+    public FavoriteContentCountResponse countByAccount(Account account) {
+        int count = favoriteContentRepository.countByAccount(account);
+        return FavoriteContentCountResponse.from(count);
     }
 
     @Transactional
@@ -79,15 +85,15 @@ public class FavoriteContentService {
         return TripDurationResponse.of(totalTripDay - 1, totalTripDay);
     }
 
-    private List<ContentDetailResponse> convertToContentWithTripInfoResponses(List<Content> contents) {
-        return contents.stream()
-                .map(content -> {
-                    ContentResponse contentWithCreatorAndCity = ContentResponse.of(content, true);
-                    TripDurationResponse tripDuration = calculateTripDuration(content);
+    private List<FavoriteContentDetailResponse> convertToFavoriteContentDetailResponses(
+            List<FavoriteContent> favoriteContents) {
+        return favoriteContents.stream()
+                .map(favoriteContent -> {
+                    Content content = favoriteContent.getContent();
                     validateContentExists(content.getId());
+                    TripDurationResponse tripDuration = calculateTripDuration(content);
                     int tripPlaceCount = contentPlaceService.countByContentId(content.getId());
-                    return ContentDetailResponse.of(contentWithCreatorAndCity, tripDuration,
-                            tripPlaceCount);
+                    return FavoriteContentDetailResponse.of(favoriteContent, tripDuration, tripPlaceCount);
                 })
                 .toList();
     }

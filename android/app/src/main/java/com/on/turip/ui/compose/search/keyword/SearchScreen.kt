@@ -2,16 +2,15 @@ package com.on.turip.ui.compose.search.keyword
 
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -28,18 +27,18 @@ import com.on.turip.ui.compose.search.component.SearchResultList
 import com.on.turip.ui.compose.search.keyword.component.SearchAppBar
 import com.on.turip.ui.compose.search.keyword.component.SearchEmptyView
 import com.on.turip.ui.compose.search.keyword.component.SearchHistoryList
-import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun SearchScreen(
+    keyword: String,
     onNavigateBack: () -> Unit,
     onNavigateToDetail: (id: Long) -> Unit,
     onNavigateToLogin: () -> Unit,
     viewModel: SearchViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val searchingWord by viewModel.searchingWord.observeAsState("")
-    val searchHistory by viewModel.searchHistory.observeAsState(persistentListOf())
+    val searchingWord by viewModel.searchingWord.collectAsStateWithLifecycle()
+    val searchHistory by viewModel.searchHistory.collectAsStateWithLifecycle()
 
     val focusManager = LocalFocusManager.current
     var isHistoryVisible by remember { mutableStateOf(false) }
@@ -54,6 +53,10 @@ fun SearchScreen(
     }
 
     LaunchedEffect(Unit) {
+        viewModel.initKeyword(keyword)
+    }
+
+    LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { effect ->
             when (effect) {
                 SearchUiEffect.NavigateToLogin -> onNavigateToLogin()
@@ -61,33 +64,34 @@ fun SearchScreen(
         }
     }
 
-    Scaffold(
-        topBar = {
-            Surface(
-                color = TuripTheme.colors.white,
-                modifier = Modifier.statusBarsPadding(),
-            ) {
-                SearchAppBar(
-                    searchText = searchingWord,
-                    onSearchTextChanged = { viewModel.updateSearchingWord(it) },
-                    onSearchAction = onSearchAction,
-                    onClearClick = { viewModel.updateSearchingWord("") },
-                    onBackClick = onNavigateBack,
-                    onFocusChanged = { hasFocus ->
-                        if (hasFocus && uiState !is SearchUiState.Error) {
-                            isHistoryVisible = true
-                        }
-                    },
-                )
-            }
-        },
-        containerColor = TuripTheme.colors.white,
-    ) { paddingValues ->
+    Column(
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(top = TuripTheme.spacing.medium),
+    ) {
+        Surface(
+            color = TuripTheme.colors.white,
+            modifier = Modifier.statusBarsPadding(),
+        ) {
+            SearchAppBar(
+                searchText = searchingWord,
+                onSearchTextChanged = { viewModel.updateSearchingWord(it) },
+                onSearchAction = onSearchAction,
+                onClearClick = { viewModel.updateSearchingWord("") },
+                onBackClick = onNavigateBack,
+                onFocusChanged = { hasFocus ->
+                    if (hasFocus && uiState !is SearchUiState.Error) {
+                        isHistoryVisible = true
+                    }
+                },
+            )
+        }
+
         Box(
             modifier =
                 Modifier
                     .fillMaxSize()
-                    .padding(paddingValues)
                     .addFocusCleaner(focusManager),
         ) {
             when (val state = uiState) {

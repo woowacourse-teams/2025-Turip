@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import turip.account.controller.dto.response.MigrationAvailabilityResponse;
 import turip.account.domain.Account;
 import turip.account.domain.Guest;
+import turip.account.domain.nickname.GuestNicknameCreator;
 import turip.account.repository.GuestRepository;
 import turip.favorite.service.FavoriteContentService;
 import turip.favorite.service.FavoriteFolderService;
@@ -20,12 +21,13 @@ public class GuestService {
     private final FavoriteContentService favoriteContentService;
     private final FavoritePlaceService favoritePlaceService;
     private final FavoriteFolderService favoriteFolderService;
+    private final GuestNicknameCreator guestNicknameCreator;
 
     @Transactional
     public Guest findOrCreateByDeviceFid(String deviceFid) {
         return guestRepository.findByDeviceFid(deviceFid)
                 .orElseGet(() -> {
-                    Account savedAccount = accountService.create();
+                    Account savedAccount = accountService.create(guestNicknameCreator);
                     return guestRepository.save(new Guest(savedAccount, deviceFid));
                 });
     }

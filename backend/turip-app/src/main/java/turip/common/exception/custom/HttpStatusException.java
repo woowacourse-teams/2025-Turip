@@ -14,6 +14,12 @@ public class HttpStatusException extends RuntimeException {
         this.errorTag = errorTag;
     }
 
+    public HttpStatusException(HttpStatus status, ErrorTag errorTag, Throwable cause) {
+        super(errorTag.getMessage(), cause);
+        this.status = status;
+        this.errorTag = errorTag;
+    }
+
     public HttpStatus getStatus() {
         return status;
     }

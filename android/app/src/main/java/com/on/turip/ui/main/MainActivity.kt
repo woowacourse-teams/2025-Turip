@@ -2,105 +2,97 @@ package com.on.turip.ui.main
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.os.Bundle
-import android.widget.Toast
-import androidx.activity.OnBackPressedCallback
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.commit
-import com.on.turip.R
-import com.on.turip.databinding.ActivityMainBinding
-import com.on.turip.ui.common.base.BaseActivity
-import com.on.turip.ui.main.favorite.MyPageFragment
-import com.on.turip.ui.main.home.HomeFragment
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import com.on.turip.core.navigation.InitialNavigationTarget
+import com.on.turip.ui.compose.main.MainApp
+import com.on.turip.ui.compose.main.navigation.SavedStateConfigurationProvider
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainActivity : BaseActivity<ActivityMainBinding>() {
-    override val binding: ActivityMainBinding by lazy {
-        ActivityMainBinding.inflate(layoutInflater)
-    }
-    private var backPressedTime: Long = 0L
+class MainActivity : ComponentActivity() {
+    @Inject
+    lateinit var savedStateConfigurationProvider: SavedStateConfigurationProvider
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        val shouldLockPortrait = resources.configuration.smallestScreenWidthDp < 600
+        requestedOrientation =
+            if (shouldLockPortrait) ActivityInfo.SCREEN_ORIENTATION_PORTRAIT else ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
 
-        handleDoubleBackPressToExit()
-        initBottomNavigation()
-        setupBottomNavigation()
-
-        if (savedInstanceState == null) {
-            binding.bnvMain.selectedItemId = R.id.menu_fragment_home
+        val initialNavigationTarget = resolveInitialNavigationTarget(savedInstanceState)
+        setContent {
+            MainApp(
+                savedStateConfigurationProvider = savedStateConfigurationProvider,
+                initialNavigationTarget = initialNavigationTarget,
+            )
         }
     }
 
-    private fun initBottomNavigation() {
-        binding.bnvMain.itemIconTintList = null
+    /**
+     * 최초 생성일 때만 초기 진입 타겟을 만든다.
+     *
+     * Activity 재생성 시에는 `savedInstanceState`로 복원된 네비게이션 상태를 우선 사용한다.
+     */
+    private fun resolveInitialNavigationTarget(savedInstanceState: Bundle?): InitialNavigationTarget? {
+        if (savedInstanceState != null) return null
 
-        binding.bnvMain.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.menu_fragment_home -> {
-                    HomeFragment::class.java.let { switchFragment(it, it.simpleName) }
-                    return@setOnItemSelectedListener true
-                }
+        val targetType: String = intent.getStringExtra(EXTRA_INITIAL_TARGET_TYPE) ?: return InitialNavigationTarget.Login
+        val deepLinkUrl: String? = intent.getStringExtra(EXTRA_DEEP_LINK_URL)
 
-                R.id.menu_fragment_my_page -> {
-                    MyPageFragment::class.java.let { switchFragment(it, it.simpleName) }
-                    return@setOnItemSelectedListener true
-                }
+        return when (targetType) {
+            TARGET_HOME -> {
+                InitialNavigationTarget.Home
+            }
 
-                else -> {
-                    return@setOnItemSelectedListener false
-                }
+            TARGET_LOGIN -> {
+                InitialNavigationTarget.Login
+            }
+
+            TARGET_INVITATION_ENTRY -> {
+                deepLinkUrl
+                    ?.takeIf(String::isNotBlank)
+                    ?.let { url: String -> InitialNavigationTarget.InvitationEntry(deepLinkUrl = url) }
+                    ?: InitialNavigationTarget.Login
+            }
+
+            else -> {
+                InitialNavigationTarget.Login
             }
         }
-    }
-
-    private fun setupBottomNavigation() {
-        binding.bnvMain.setOnApplyWindowInsetsListener(null)
-    }
-
-    private fun switchFragment(
-        target: Class<out Fragment>,
-        tag: String,
-    ) {
-        val fragments = supportFragmentManager.fragments
-        val targetFragment = supportFragmentManager.findFragmentByTag(tag)
-
-        if (targetFragment?.isVisible == true) return
-
-        supportFragmentManager.commit {
-            fragments.filter { it.isVisible }.forEach { hide(it) }
-
-            if (targetFragment == null) {
-                add(R.id.fcv_main, target, null, tag)
-            } else {
-                show(targetFragment)
-            }
-        }
-    }
-
-    private fun handleDoubleBackPressToExit() {
-        onBackPressedDispatcher.addCallback(
-            this,
-            object : OnBackPressedCallback(true) {
-                override fun handleOnBackPressed() {
-                    if (System.currentTimeMillis() - backPressedTime <= 2000) {
-                        finish()
-                    } else {
-                        backPressedTime = System.currentTimeMillis()
-                        Toast
-                            .makeText(
-                                this@MainActivity,
-                                getString(R.string.main_double_back_pressed_to_exit),
-                                Toast.LENGTH_SHORT,
-                            ).show()
-                    }
-                }
-            },
-        )
     }
 
     companion object {
-        fun newIntent(context: Context): Intent = Intent(context, MainActivity::class.java)
+        private const val EXTRA_INITIAL_TARGET_TYPE = "EXTRA_INITIAL_TARGET_TYPE"
+        private const val EXTRA_DEEP_LINK_URL = "EXTRA_DEEP_LINK_URL"
+        private const val TARGET_HOME = "TARGET_HOME"
+        private const val TARGET_LOGIN = "TARGET_LOGIN"
+        private const val TARGET_INVITATION_ENTRY = "TARGET_INVITATION_ENTRY"
+
+        fun newIntent(
+            context: Context,
+            initialNavigationTarget: InitialNavigationTarget,
+        ): Intent =
+            Intent(context, MainActivity::class.java).apply {
+                when (initialNavigationTarget) {
+                    InitialNavigationTarget.Home -> {
+                        putExtra(EXTRA_INITIAL_TARGET_TYPE, TARGET_HOME)
+                    }
+
+                    InitialNavigationTarget.Login -> {
+                        putExtra(EXTRA_INITIAL_TARGET_TYPE, TARGET_LOGIN)
+                    }
+
+                    is InitialNavigationTarget.InvitationEntry -> {
+                        putExtra(EXTRA_INITIAL_TARGET_TYPE, TARGET_INVITATION_ENTRY)
+                        putExtra(EXTRA_DEEP_LINK_URL, initialNavigationTarget.deepLinkUrl)
+                    }
+                }
+            }
     }
 }

@@ -15,4 +15,8 @@ data class TuripResponse(
     val isDefault: Boolean,
     @SerialName("placeCount")
     val placeCount: Int,
+    @SerialName("memberCount")
+    val memberCount: Int,
+    @SerialName("isShared")
+    val isShared: Boolean,
 )

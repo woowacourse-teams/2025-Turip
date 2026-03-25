@@ -11,6 +11,11 @@ public class IllegalArgumentException extends RuntimeException {
         this.errorTag = errorTag;
     }
 
+    public IllegalArgumentException(final ErrorTag errorTag, final Throwable cause) {
+        super(errorTag.getMessage(), cause);
+        this.errorTag = errorTag;
+    }
+
     public ErrorTag getErrorTag() {
         return errorTag;
     }

@@ -1,13 +1,8 @@
 package turip.account.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.mockito.Mockito.when;
 
 import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
-import java.util.HashMap;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -98,8 +93,10 @@ class MemberApiTest {
             testDataHelper.insertSocialMember(memberId, provider, providerId);
 
             // 3. Guest의 FavoriteFolder와 FavoriteContent 생성
+            Long folderId0 = testDataHelper.insertFavoriteFolder("기본 폴더", true, false);
             Long folderId1 = testDataHelper.insertFavoriteFolder("기본 폴더", true, false);
             Long folderId2 = testDataHelper.insertFavoriteFolder("커스텀 폴더");
+            testDataHelper.insertFavoriteFolderAccount(memberAccountId, folderId0, AccountRole.OWNER);
             testDataHelper.insertFavoriteFolderAccount(guestAccountId, folderId1, AccountRole.OWNER);
             testDataHelper.insertFavoriteFolderAccount(guestAccountId, folderId2, AccountRole.OWNER);
 
@@ -122,26 +119,7 @@ class MemberApiTest {
                     , guestAccountId
             );
 
-            // 4. Member 로그인해서 access token 받기
-            String idToken = "valid-google-id-token";
-
-            when(googleTokenParser.getProvider()).thenReturn(provider);
-            when(googleTokenParser.getProviderId(idToken)).thenReturn(providerId);
-            when(googleTokenParser.getEmail(idToken)).thenReturn("migration@gmail.com");
-
-            Map<String, String> loginRequest = new HashMap<>();
-            loginRequest.put("idToken", idToken);
-
-            String accessToken = RestAssured
-                    .given().log().all()
-                    .contentType(ContentType.JSON)
-                    .header("device-fid", guestDeviceFid)
-                    .body(loginRequest)
-                    .when().post("/api/v1/auth/login/google")
-                    .then().log().all()
-                    .statusCode(200)
-                    .body("accessToken", notNullValue())
-                    .extract().path("accessToken");
+            String accessToken = testDataHelper.createAccessToken(memberAccountId);
 
             // when & then
             RestAssured
@@ -159,11 +137,20 @@ class MemberApiTest {
             );
             assertThat(favoriteContentCount).isEqualTo(1);
 
+            // 검증: 게스트에 존재하던 폴더가 모두 제거됐는지 확인
             Integer favoriteFolderAccountCount = jdbcTemplate.queryForObject(
-                    "SELECT COUNT(*) FROM favorite_folder_account WHERE account_id = 2",
-                    Integer.class
+                    "SELECT COUNT(*) FROM favorite_folder_account WHERE account_id = ?",
+                    Integer.class,
+                    guestAccountId
             );
-            assertThat(favoriteFolderAccountCount).isEqualTo(0); // Guest의 개인 폴더는 모두 삭제됨
+            assertThat(favoriteFolderAccountCount).isEqualTo(0);
+
+            // 검증: 기존에 member에 존재하던 폴더는 제거되고, 마이그레이션 된 폴더만 존재하는지 확인
+            Integer migratedFolderCount = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM favorite_folder_account WHERE account_id = ?",
+                    Integer.class,
+                    memberAccountId);
+            assertThat(migratedFolderCount).isEqualTo(2);
 
             // 검증: Guest가 삭제되었는지 확인
             Integer guestCount = jdbcTemplate.queryForObject(
@@ -197,26 +184,12 @@ class MemberApiTest {
             Provider provider = Provider.GOOGLE;
             String providerId = "google-user-no-device";
 
-            testDataHelper.insertSocialMember(email, true, provider, providerId);
+            Long socialMemberId = testDataHelper.insertSocialMember(email, true, provider, providerId);
+            Long accountId = jdbcTemplate.queryForObject(
+                    "SELECT account_id FROM member WHERE id = (SELECT member_id FROM social_member WHERE id = ?)",
+                    Long.class, socialMemberId);
 
-            String idToken = "valid-google-id-token";
-
-            when(googleTokenParser.getProvider()).thenReturn(provider);
-            when(googleTokenParser.getProviderId(idToken)).thenReturn(providerId);
-            when(googleTokenParser.getEmail(idToken)).thenReturn(email);
-
-            Map<String, String> loginRequest = new HashMap<>();
-            loginRequest.put("idToken", idToken);
-
-            String accessToken = RestAssured
-                    .given().log().all()
-                    .contentType(ContentType.JSON)
-                    .header("device-fid", "temp-device")
-                    .body(loginRequest)
-                    .when().post("/api/v1/auth/login/google")
-                    .then().log().all()
-                    .statusCode(200)
-                    .extract().path("accessToken");
+            String accessToken = testDataHelper.createAccessToken(accountId);
 
             // when & then
             RestAssured
@@ -271,26 +244,7 @@ class MemberApiTest {
                     "INSERT INTO favorite_content (id, account_id, content_id, created_at) VALUES (1, 1, 1, '2024-01-01')"
             );
 
-            // 5. Member 로그인해서 access token 받기
-            String idToken = "valid-google-id-token";
-
-            when(googleTokenParser.getProvider()).thenReturn(provider);
-            when(googleTokenParser.getProviderId(idToken)).thenReturn(providerId);
-            when(googleTokenParser.getEmail(idToken)).thenReturn(email);
-
-            Map<String, String> loginRequest = new HashMap<>();
-            loginRequest.put("idToken", idToken);
-
-            String accessToken = RestAssured
-                    .given().log().all()
-                    .contentType(ContentType.JSON)
-                    .header("device-fid", "device-123")
-                    .body(loginRequest)
-                    .when().post("/api/v1/auth/login/google")
-                    .then().log().all()
-                    .statusCode(200)
-                    .body("accessToken", notNullValue())
-                    .extract().path("accessToken");
+            String accessToken = testDataHelper.createAccessToken(accountId);
 
             // when & then
             RestAssured

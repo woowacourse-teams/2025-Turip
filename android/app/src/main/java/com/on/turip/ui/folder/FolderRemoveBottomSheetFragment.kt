@@ -1,6 +1,5 @@
 package com.on.turip.ui.folder
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,7 +13,6 @@ import com.on.turip.ui.common.error.ErrorUiModel
 import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.common.extensions.collectOnStarted
 import com.on.turip.ui.folder.model.TuripUiEffect
-import com.on.turip.ui.login.LoginActivity
 
 class FolderRemoveBottomSheetFragment : BaseBottomSheetFragment<BottomSheetFragmentFolderRemoveBinding>() {
     private val sharedViewModel: TuripViewModel by activityViewModels()
@@ -54,7 +52,6 @@ class FolderRemoveBottomSheetFragment : BaseBottomSheetFragment<BottomSheetFragm
         collectOnStarted(sharedViewModel.uiEffect) { uiEffect: TuripUiEffect ->
             when (uiEffect) {
                 TuripUiEffect.NavigateToLogin -> {
-                    navigateToLoginScreen()
                 }
 
                 TuripUiEffect.TuripDeleted -> {
@@ -80,15 +77,6 @@ class FolderRemoveBottomSheetFragment : BaseBottomSheetFragment<BottomSheetFragm
                 }
             }
         }
-    }
-
-    private fun navigateToLoginScreen() {
-        val intent: Intent =
-            LoginActivity
-                .newIntent(requireActivity())
-                .apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK }
-        startActivity(intent)
-        requireActivity().finish()
     }
 
     companion object {

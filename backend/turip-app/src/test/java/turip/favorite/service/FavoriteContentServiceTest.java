@@ -22,7 +22,6 @@ import turip.account.domain.Account;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.ConflictException;
 import turip.common.exception.custom.NotFoundException;
-import turip.content.controller.dto.response.content.ContentsDetailWithLoadableResponse;
 import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
 import turip.content.service.ContentPlaceService;
@@ -31,6 +30,7 @@ import turip.favorite.controller.dto.request.FavoriteContentRequest;
 import turip.favorite.controller.dto.response.FavoriteContentResponse;
 import turip.favorite.domain.FavoriteContent;
 import turip.favorite.repository.FavoriteContentRepository;
+import turip.favorite.service.dto.FavoriteContentWithLoadableResult;
 import turip.region.domain.City;
 import turip.region.domain.Country;
 import turip.region.domain.Province;
@@ -133,12 +133,15 @@ class FavoriteContentServiceTest {
         City city = new City(1L, country, province, "속초", "시 이미지 경로");
         Content content1 = new Content(1L, creator, city, "뭉치의 속초 브이로그 1편", "속초 브이로그 Url 1", LocalDate.of(2025, 7, 8));
         Content content2 = new Content(2L, creator, city, "뭉치의 속초 브이로그 2편", "속초 브이로그 Url 2", LocalDate.of(2025, 7, 8));
-        List<Content> contents = List.of(content1, content2);
         Account account = AccountFixture.createUser();
+
+        FavoriteContent favoriteContent1 = new FavoriteContent(LocalDate.now(), account, content1);
+        FavoriteContent favoriteContent2 = new FavoriteContent(LocalDate.now(), account, content2);
+        List<FavoriteContent> favoriteContents = List.of(favoriteContent1, favoriteContent2);
 
         given(favoriteContentRepository.findMyFavoriteContentsByAccountId(eq(account.getId()), eq(Long.MAX_VALUE),
                 any()))
-                .willReturn(new SliceImpl<>(contents));
+                .willReturn(new SliceImpl<>(favoriteContents));
         given(contentPlaceService.calculateDurationDays(1L))
                 .willReturn(2); // content1 1박 2일
         given(contentPlaceService.calculateDurationDays(2L))
@@ -148,15 +151,15 @@ class FavoriteContentServiceTest {
         given(contentRepository.existsById(2L))
                 .willReturn(true);
 
-        ContentsDetailWithLoadableResponse response = favoriteContentService.findMyFavoriteContents(account,
+        FavoriteContentWithLoadableResult result = favoriteContentService.findMyFavoriteContents(account,
                 pageSize, lastContentId);
 
         // then
         assertAll(
-                () -> assertThat(response.contents()).hasSize(2),
-                () -> assertThat(response.loadable()).isFalse(),
-                () -> assertThat(response.contents().getFirst().tripDuration().days()).isEqualTo(2),
-                () -> assertThat(response.contents().get(1).tripDuration().days()).isEqualTo(3)
+                () -> assertThat(result.favoriteContents()).hasSize(2),
+                () -> assertThat(result.loadable()).isFalse(),
+                () -> assertThat(result.favoriteContents().getFirst().tripDuration().days()).isEqualTo(2),
+                () -> assertThat(result.favoriteContents().get(1).tripDuration().days()).isEqualTo(3)
         );
     }
 
@@ -173,16 +176,15 @@ class FavoriteContentServiceTest {
         City city = new City(1L, country, province, "속초", "시 이미지 경로");
         Content content1 = new Content(1L, creator, city, "뭉치의 속초 브이로그 1편", "속초 브이로그 Url 1", LocalDate.of(2025, 7, 8));
         Content content2 = new Content(2L, creator, city, "뭉치의 속초 브이로그 2편", "속초 브이로그 Url 2", LocalDate.of(2025, 7, 8));
-        List<Content> contents = List.of(content1, content2);
         Account account = AccountFixture.createUser();
+
+        FavoriteContent favoriteContent1 = new FavoriteContent(LocalDate.now(), account, content1);
+        FavoriteContent favoriteContent2 = new FavoriteContent(LocalDate.now(), account, content2);
+        List<FavoriteContent> favoriteContents = List.of(favoriteContent1, favoriteContent2);
 
         given(favoriteContentRepository.findMyFavoriteContentsByAccountId(eq(account.getId()), eq(Long.MAX_VALUE),
                 any()))
-                .willReturn(new SliceImpl<>(contents));
-        given(contentPlaceService.calculateDurationDays(1L))
-                .willReturn(2); // content1 1박 2일
-        given(contentPlaceService.calculateDurationDays(2L))
-                .willReturn(3); // content2 2박 3일
+                .willReturn(new SliceImpl<>(favoriteContents));
         given(contentRepository.existsById(1L))
                 .willReturn(true);
         given(contentRepository.existsById(2L))
@@ -228,7 +230,7 @@ class FavoriteContentServiceTest {
         void deleteFavoriteContent2() {
             // given
             Long contentId = 1L;
-            Account account = new Account();
+            Account account = AccountFixture.createUser();
 
             given(contentRepository.findById(contentId))
                     .willReturn(Optional.empty());

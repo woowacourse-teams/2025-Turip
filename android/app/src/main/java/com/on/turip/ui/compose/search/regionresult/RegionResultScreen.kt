@@ -1,11 +1,10 @@
 package com.on.turip.ui.compose.search.regionresult
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -21,8 +20,9 @@ import com.on.turip.ui.compose.search.regionresult.component.RegionResultAppBar
 
 @Composable
 fun RegionResultScreen(
+    regionCategoryName: String,
     onBackClick: () -> Unit,
-    onItemClick: (id: Long) -> Unit,
+    onNavigateToTripDetail: (id: Long) -> Unit,
     onNavigateToLogin: () -> Unit,
     viewModel: RegionResultViewModel = hiltViewModel(),
 ) {
@@ -36,25 +36,25 @@ fun RegionResultScreen(
         }
     }
 
-    Scaffold(
-        topBar = {
-            Surface(
-                color = TuripTheme.colors.white,
-                modifier = Modifier.statusBarsPadding(),
-            ) {
-                RegionResultAppBar(
-                    title = viewModel.regionCategoryName,
-                    onBackClick = onBackClick,
-                )
-            }
-        },
-        containerColor = TuripTheme.colors.white,
-    ) { paddingValues ->
+    LaunchedEffect(Unit) {
+        viewModel.initRegionCategoryName(regionCategoryName)
+    }
+
+    Column(modifier = Modifier.fillMaxSize()) {
+        Surface(
+            color = TuripTheme.colors.white,
+            modifier = Modifier.statusBarsPadding(),
+        ) {
+            RegionResultAppBar(
+                title = regionCategoryName,
+                onBackClick = onBackClick,
+            )
+        }
+
         Box(
             modifier =
                 Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
+                    .fillMaxSize(),
         ) {
             when (val state = uiState) {
                 is RegionResultUiState.Loading -> {
@@ -69,14 +69,14 @@ fun RegionResultScreen(
                     SearchResultList(
                         totalCount = state.totalCount,
                         videos = state.videos,
-                        onItemClick = onItemClick,
+                        onItemClick = onNavigateToTripDetail,
                     )
                 }
 
                 is RegionResultUiState.Error -> {
                     ErrorScreen(
                         errorUiState = state.errorUiState,
-                        onRetryClick = { viewModel.loadContentsFromRegion() },
+                        onRetryClick = { viewModel.loadContentsFromRegion(regionCategoryName) },
                     )
                 }
             }
