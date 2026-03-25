@@ -18,7 +18,7 @@ import turip.favorite.service.FavoriteFolderService;
 
 @Service
 @RequiredArgsConstructor
-public class AccountService {
+public class AccountService { 
 
     private final AccountRepository accountRepository;
     private final FavoriteContentRepository favoriteContentRepository;
