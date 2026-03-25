@@ -22,12 +22,12 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.on.turip.R
+import com.on.turip.core.session.SessionState
 import com.on.turip.domain.bookmark.BookmarkContent
 import com.on.turip.domain.content.Content
 import com.on.turip.domain.content.video.VideoData
 import com.on.turip.domain.creator.Creator
 import com.on.turip.domain.region.City
-import com.on.turip.domain.session.SessionState
 import com.on.turip.domain.trip.TripDuration
 import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.compose.designsystem.component.TuripDialog

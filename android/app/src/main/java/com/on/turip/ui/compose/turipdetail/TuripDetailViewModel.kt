@@ -5,8 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
-import com.on.turip.domain.session.SessionState
-import com.on.turip.domain.session.SessionStore
+import com.on.turip.core.session.SessionManager
+import com.on.turip.core.session.SessionState
 import com.on.turip.domain.turip.DeleteTuripUseCase
 import com.on.turip.domain.turip.ObserveTuripStreamUseCase
 import com.on.turip.domain.turip.Turip
@@ -57,7 +57,7 @@ class TuripDetailViewModel @Inject constructor(
     private val turipRepository: TuripRepository,
     private val deleteTuripUseCase: DeleteTuripUseCase,
     private val observeTuripStreamUseCase: ObserveTuripStreamUseCase,
-    sessionStore: SessionStore,
+    sessionManager: SessionManager,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<TuripDetailUiState> =
         MutableStateFlow(TuripDetailUiState.Idle)
@@ -66,7 +66,7 @@ class TuripDetailViewModel @Inject constructor(
     private val _uiEffect: Channel<TuripDetailUiEffect> = Channel(Channel.BUFFERED)
     val uiEffect: Flow<TuripDetailUiEffect> = _uiEffect.receiveAsFlow()
 
-    private val sessionState: StateFlow<SessionState> = sessionStore.state
+    private val sessionState: StateFlow<SessionState> = sessionManager.state
     private var reorderPlacesSnapshot: ImmutableList<TuripPlaceModel>? = null
     private var selectedTuripId: Long = INVALID_ID
     private var isNetworkUnstable: Boolean = false

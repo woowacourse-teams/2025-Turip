@@ -5,9 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
+import com.on.turip.core.session.SessionManager
+import com.on.turip.core.session.SessionState
 import com.on.turip.domain.bookmark.TuripPlace
-import com.on.turip.domain.session.SessionState
-import com.on.turip.domain.session.SessionStore
 import com.on.turip.domain.turip.TuripInvitationToken
 import com.on.turip.domain.turip.repository.TuripRepository
 import com.on.turip.ui.common.error.ErrorUiState
@@ -44,7 +44,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PlaceTuripSelectionViewModel @Inject constructor(
     private val turipRepository: TuripRepository,
-    sessionStore: SessionStore,
+    sessionManager: SessionManager,
 ) : ViewModel() {
     // 튜립 목록의 버튼 활성화 여부를 위한 캐싱
     private var originTuripIds: Set<Long> = setOf()
@@ -62,7 +62,7 @@ class PlaceTuripSelectionViewModel @Inject constructor(
     private val _uiEffect: Channel<PlaceTuripSelectionUiEffect> = Channel(Channel.BUFFERED)
     val uiEffect: Flow<PlaceTuripSelectionUiEffect> = _uiEffect.receiveAsFlow()
 
-    private val sessionState: StateFlow<SessionState> = sessionStore.state
+    private val sessionState: StateFlow<SessionState> = sessionManager.state
 
     init {
         registerDragEndEvents()

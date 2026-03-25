@@ -5,11 +5,11 @@ import androidx.lifecycle.viewModelScope
 import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
+import com.on.turip.core.session.SessionManager
 import com.on.turip.data.login.datasource.GoogleCredentialManager
 import com.on.turip.domain.login.GuestRepository
 import com.on.turip.domain.login.MemberRepository
 import com.on.turip.domain.login.usecase.LoginUseCase
-import com.on.turip.domain.session.usecase.SwitchToGuestUseCase
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
@@ -29,7 +29,7 @@ class LoginViewmodel @Inject constructor(
     private val loginUseCase: LoginUseCase,
     private val memberRepository: MemberRepository,
     private val guestRepository: GuestRepository,
-    private val switchToGuestUseCase: SwitchToGuestUseCase,
+    private val sessionManager: SessionManager,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<LoginUiState> = MutableStateFlow(LoginUiState.IDLE)
     val uiState: StateFlow<LoginUiState> = _uiState
@@ -112,7 +112,7 @@ class LoginViewmodel @Inject constructor(
 
     fun continueAsGuest() {
         viewModelScope.launch {
-            switchToGuestUseCase()
+            sessionManager.switchToGuest()
             _uiEffect.send(LoginUiEffect.NavigateToMain())
         }
     }
@@ -126,6 +126,10 @@ class LoginViewmodel @Inject constructor(
 
             UiError.Global.Server -> {
                 _uiEffect.send(LoginUiEffect.ShowError(ErrorUiState.Server))
+            }
+
+            UiError.Global.TokenExpired -> {
+                sessionManager.switchToGuest()
             }
 
             else -> {

@@ -5,11 +5,11 @@ import androidx.lifecycle.viewModelScope
 import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
+import com.on.turip.core.session.SessionManager
+import com.on.turip.core.session.SessionState
 import com.on.turip.domain.invitation.InvitationTokenParser
 import com.on.turip.domain.invitation.usecase.DetermineInvitationEntryRouteUseCase
 import com.on.turip.domain.invitation.usecase.model.InvitationEntryResult
-import com.on.turip.domain.session.SessionState
-import com.on.turip.domain.session.SessionStore
 import com.on.turip.domain.turip.repository.TuripRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -26,7 +26,7 @@ import javax.inject.Inject
 class InvitationEntryViewModel @Inject constructor(
     private val determineInvitationEntryRouteUseCase: DetermineInvitationEntryRouteUseCase,
     private val turipRepository: TuripRepository,
-    sessionStore: SessionStore,
+    sessionManager: SessionManager,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<InvitationEntryUiState> =
         MutableStateFlow(InvitationEntryUiState.Idle)
@@ -35,7 +35,7 @@ class InvitationEntryViewModel @Inject constructor(
     private val _uiEffect = Channel<InvitationEntryUiEffect>(Channel.BUFFERED)
     val uiEffect: Flow<InvitationEntryUiEffect> = _uiEffect.receiveAsFlow()
 
-    private val sessionState: StateFlow<SessionState> = sessionStore.state
+    private val sessionState: StateFlow<SessionState> = sessionManager.state
 
     fun initDeepLinkUrl(deepLinkUrl: String?) {
         _uiState.update { it.copy(deepLinkUrl = deepLinkUrl?.trim()?.takeIf(String::isNotEmpty)) }
@@ -46,7 +46,7 @@ class InvitationEntryViewModel @Inject constructor(
             val invitationToken: String? = InvitationTokenParser.extractTokenFromUrl(_uiState.value.deepLinkUrl)
             when (
                 val result: InvitationEntryResult =
-                    determineInvitationEntryRouteUseCase(invitationToken)
+                    determineInvitationEntryRouteUseCase(sessionState.value, invitationToken)
             ) {
                 is InvitationEntryResult.MemberValidated -> {
                     val isJoinedTurip = result.invitationInformation.alreadyJoined
