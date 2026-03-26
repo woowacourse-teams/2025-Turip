@@ -79,7 +79,6 @@ fun TripDetailScreen(
     navigateToLogin: () -> Unit,
     navigateToMap: (mapModel: MapModel) -> Unit,
     navigateToWebViewUrl: (url: String) -> Unit,
-    navigateToAddTurip: () -> Unit,
     navigateToShareTuripByText: (turipShareModel: TuripShareModel) -> Unit,
     navigateToShareTuripInvitationLink: (invitationLink: String) -> Unit,
     viewModel: TripDetailViewModel = hiltViewModel(),
@@ -246,7 +245,9 @@ fun TripDetailScreen(
                                 sheetState = sheetState,
                                 selectedPlaceModel = place,
                                 onNavigateToLogin = navigateToLogin,
-                                onNavigateToAddTurip = navigateToAddTurip,
+                                onNavigateToAddTurip = {
+                                // TODO 추가 예정
+                                },
                                 onNavigateToMap = navigateToMap,
                                 onShareTuripByText = navigateToShareTuripByText,
                                 onShareTuripInvitationLink = navigateToShareTuripInvitationLink,
