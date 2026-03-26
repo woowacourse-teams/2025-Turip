@@ -39,7 +39,7 @@ fun PlaceTuripSelectionContent(
     onDismissRequest: () -> Unit,
     onAddTuripClick: () -> Unit,
     onTuripPlaceClickAtTurips: (turipModel: TuripModel) -> Unit,
-    onNavigateToTurip: (turipModel: TuripModel) -> Unit,
+    onNavigateToTurip: (turipId: Long) -> Unit,
     onConfirmClick: () -> Unit,
     onMapClick: (mapModel: MapModel) -> Unit,
     onTuripPlaceClickAtTuripDetail: (place: TuripPlaceModel) -> Unit,

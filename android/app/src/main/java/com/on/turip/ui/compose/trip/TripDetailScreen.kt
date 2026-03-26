@@ -77,6 +77,7 @@ fun TripDetailScreen(
     contentId: Long,
     navigateToBack: () -> Unit,
     navigateToLogin: () -> Unit,
+    navigateToTuripDetail: (turipId: Long) -> Unit,
     navigateToMap: (mapModel: MapModel) -> Unit,
     navigateToWebViewUrl: (url: String) -> Unit,
     navigateToShareTuripByText: (turipShareModel: TuripShareModel) -> Unit,
@@ -248,6 +249,7 @@ fun TripDetailScreen(
                                 onNavigateToAddTurip = {
                                 // TODO 추가 예정
                                 },
+                                onNavigateToTuripDetail = navigateToTuripDetail,
                                 onNavigateToMap = navigateToMap,
                                 onShareTuripByText = navigateToShareTuripByText,
                                 onShareTuripInvitationLink = navigateToShareTuripInvitationLink,

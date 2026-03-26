@@ -45,6 +45,7 @@ fun PlaceTuripSelectionBottomSheet(
     selectedPlaceModel: SelectedPlaceModel,
     onNavigateToLogin: () -> Unit,
     onNavigateToAddTurip: () -> Unit,
+    onNavigateToTuripDetail: (turipId: Long) -> Unit,
     onNavigateToMap: (mapModel: MapModel) -> Unit,
     onShareTuripByText: (shareModel: TuripShareModel) -> Unit,
     onShareTuripInvitationLink: (invitationLink: String) -> Unit,
@@ -65,6 +66,7 @@ fun PlaceTuripSelectionBottomSheet(
     val placeId = selectedPlaceModel.placeId
     val placeName = selectedPlaceModel.placeName
     val isTuripsMode = uiState.screenMode is PlaceTuripSelectionScreenMode.Turips
+
     LaunchedEffect(lifecycleOwner, placeId, isTuripsMode) {
         if (!isTuripsMode) return@LaunchedEffect
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
@@ -184,7 +186,9 @@ fun PlaceTuripSelectionBottomSheet(
             onDismissRequest = viewModel::requestDismiss,
             onAddTuripClick = onNavigateToAddTurip,
             onTuripPlaceClickAtTurips = viewModel::updateTurip,
-            onNavigateToTurip = viewModel::loadPlacesInSelectTurip,
+            onNavigateToTurip = { turipId: Long ->
+                onNavigateToTuripDetail(turipId)
+            },
             onConfirmClick = viewModel::updateTuripsByPlace,
             onMapClick = onNavigateToMap,
             onTuripPlaceClickAtTuripDetail = viewModel::applyTuripPlaceDelete,
