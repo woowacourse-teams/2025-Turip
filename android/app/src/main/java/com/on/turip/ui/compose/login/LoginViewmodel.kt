@@ -76,6 +76,9 @@ class LoginViewmodel @Inject constructor(
                                 handleError(errorType)
                             }
                     }.onFailure { errorType: ErrorType ->
+                        // 로그인 도중 사용자가 포기한 경우는 예외로 판단하지 않고 무시
+                        if (errorType == ErrorType.Unknown) return@onFailure
+
                         handleError(errorType)
                         Timber.e("googleCredentialManager 에서 IdToken 불러오기 실패")
                     }
