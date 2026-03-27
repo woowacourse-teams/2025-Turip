@@ -2,7 +2,7 @@ package com.on.turip.data.turip.service
 
 import com.on.turip.BuildConfig
 import com.on.turip.core.network.ApiPath
-import com.on.turip.di.SseHttpClient
+import com.on.turip.di.qualifier.SseHttpClient
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.sse.sse
 import io.ktor.sse.ServerSentEvent
