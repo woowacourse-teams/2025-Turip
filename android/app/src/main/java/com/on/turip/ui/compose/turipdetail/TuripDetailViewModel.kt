@@ -189,6 +189,7 @@ class TuripDetailViewModel @Inject constructor(
                         }
 
                         TuripStreamResult.Fatal.TokenExpired -> {
+                            sessionManager.switchToGuest()
                             _uiEffect.send(TuripDetailUiEffect.NavigateToLogin)
                         }
 

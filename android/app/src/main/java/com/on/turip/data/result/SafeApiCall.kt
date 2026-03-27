@@ -18,7 +18,7 @@ suspend fun <T> safeApiCall(apiCall: suspend () -> T): TuripResult<T> =
         when (e) {
             ApiException.Network -> TuripResult.Failure(ErrorType.Network, e)
             ApiException.Auth -> TuripResult.Failure(ErrorType.Auth.UnAuthorized, e)
-            is ApiException.Error -> TuripResult.Failure(e.toErrorType(), e)
+            is ApiException.Error -> TuripResult.Failure(e.errorType, e)
         }
     } catch (e: Exception) {
         TuripResult.Failure(e.toErrorType(), e)

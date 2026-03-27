@@ -26,7 +26,7 @@ import javax.inject.Inject
 class InvitationEntryViewModel @Inject constructor(
     private val determineInvitationEntryRouteUseCase: DetermineInvitationEntryRouteUseCase,
     private val turipRepository: TuripRepository,
-    sessionManager: SessionManager,
+    private val sessionManager: SessionManager,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<InvitationEntryUiState> =
         MutableStateFlow(InvitationEntryUiState.Idle)
@@ -94,6 +94,7 @@ class InvitationEntryViewModel @Inject constructor(
 
                 is InvitationEntryResult.Failure -> {
                     if (result.errorType is ErrorType.Auth) {
+                        sessionManager.switchToGuest()
                         _uiEffect.send(InvitationEntryUiEffect.NavigateToLogin)
                         return@launch
                     }
@@ -142,6 +143,7 @@ class InvitationEntryViewModel @Inject constructor(
                     _uiEffect.send(InvitationEntryUiEffect.NavigateToTuripDetail(turipId))
                 }.onFailure { errorType ->
                     if (errorType is ErrorType.Auth) {
+                        sessionManager.switchToGuest()
                         _uiEffect.send(InvitationEntryUiEffect.NavigateToLogin)
                         return@launch
                     }
