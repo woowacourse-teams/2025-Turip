@@ -10,13 +10,13 @@ import com.on.turip.data.invitation.datasource.DefaultDeferredDeepLinkLocalDataS
 import com.on.turip.data.invitation.datasource.DefaultInstallReferrerDataSource
 import com.on.turip.data.invitation.datasource.DeferredDeepLinkLocalDataSource
 import com.on.turip.data.invitation.datasource.InstallReferrerDataSource
-import com.on.turip.data.login.datasource.AuthDataSource
 import com.on.turip.data.login.datasource.AuthRefreshRemoteDataSource
 import com.on.turip.data.login.datasource.AuthRemoteDataSource
-import com.on.turip.data.login.datasource.DefaultAuthRefreshRemoteRemoteDataSource
-import com.on.turip.data.login.datasource.GuestDataSource
+import com.on.turip.data.login.datasource.DefaultAuthRefreshRemoteDataSource
+import com.on.turip.data.login.datasource.DefaultAuthRemoteDataSource
+import com.on.turip.data.login.datasource.DefaultGuestRemoteDataSource
+import com.on.turip.data.login.datasource.DefaultMemberRemoteDataSource
 import com.on.turip.data.login.datasource.GuestRemoteDataSource
-import com.on.turip.data.login.datasource.MemberDataSource
 import com.on.turip.data.login.datasource.MemberRemoteDataSource
 import com.on.turip.data.region.datasource.DefaultRegionRemoteDataSource
 import com.on.turip.data.region.datasource.RegionRemoteDataSource
@@ -69,21 +69,21 @@ abstract class DataSourceModule {
 
     @Binds
     @Singleton
-    abstract fun bindAuthRemoteDataSource(authRemoteDataSource: AuthRemoteDataSource): AuthDataSource
+    abstract fun bindAuthRemoteDataSource(defaultAuthRemoteDataSource: DefaultAuthRemoteDataSource): AuthRemoteDataSource
 
     @Binds
     @Singleton
-    abstract fun bindRefreshAuthRemoteDataSource(
-        defaultAuthRefreshRemoteRemoteDataSource: DefaultAuthRefreshRemoteRemoteDataSource,
+    abstract fun bindAuthRefreshRemoteDataSource(
+        defaultAuthRefreshRemoteDataSource: DefaultAuthRefreshRemoteDataSource,
     ): AuthRefreshRemoteDataSource
 
     @Binds
     @Singleton
-    abstract fun bindMemberRemoteDataSource(memberRemoteDataSource: MemberRemoteDataSource): MemberDataSource
+    abstract fun bindMemberRemoteDataSource(defaultMemberRemoteDataSource: DefaultMemberRemoteDataSource): MemberRemoteDataSource
 
     @Binds
     @Singleton
-    abstract fun bindGuestRemoteDataSource(guestRemoteDataSource: GuestRemoteDataSource): GuestDataSource
+    abstract fun bindGuestRemoteDataSource(defaultGuestRemoteDataSource: DefaultGuestRemoteDataSource): GuestRemoteDataSource
 
     @Binds
     @Singleton

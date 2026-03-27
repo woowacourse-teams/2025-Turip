@@ -11,7 +11,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
-class DefaultAuthRefreshRemoteRemoteDataSource @Inject constructor(
+class DefaultAuthRefreshRemoteDataSource @Inject constructor(
     @NoAuthAuthService private val authService: AuthService,
     private val coroutineContext: CoroutineContext = Dispatchers.IO,
 ) : AuthRefreshRemoteDataSource {
