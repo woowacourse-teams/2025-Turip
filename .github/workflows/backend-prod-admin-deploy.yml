@@ -2,12 +2,12 @@ name: Prod Admin CI/CD
 
 on:
   push:
-    branches: [ 'release-be/**' ]
+    branches: [ 'release-be' ]
     paths:
       - 'backend/turip-admin/**'
       - 'backend/build.gradle'
   pull_request:
-    branches: [ 'release-be/**' ]
+    branches: [ 'release-be' ]
     paths:
       - 'backend/turip-admin/**'
       - 'backend/build.gradle'
