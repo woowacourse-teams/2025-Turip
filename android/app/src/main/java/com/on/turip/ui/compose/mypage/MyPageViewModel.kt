@@ -99,8 +99,15 @@ class MyPageViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(bookmarkContentState = MyPageSectionState.Success(result.items.toImmutableList()))
                     }
-                }.onFailure {
+                }.onFailure { errorType ->
                     Timber.e("마이페이지 북마크 목록 조회 에러 발생")
+
+                    if (errorType is ErrorType.Auth) {
+                        sessionManager.switchToGuest()
+                        _uiEffect.send(MyPageUiEffect.NavigateToLogin)
+                        return@onFailure
+                    }
+
                     _uiState.update { it.copy(bookmarkContentState = MyPageSectionState.Error) }
                     if (isRetry) _uiEffect.send(MyPageUiEffect.ShowBookmarksLoadFailed)
                 }
@@ -266,6 +273,7 @@ class MyPageViewModel @Inject constructor(
                 }
 
                 UiError.Global.TokenExpired -> {
+                    sessionManager.switchToGuest()
                     _uiEffect.send(MyPageUiEffect.NavigateToLogin)
                 }
             }

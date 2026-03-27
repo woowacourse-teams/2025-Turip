@@ -3,6 +3,7 @@ package com.on.turip.ui.compose.search.regionresult
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.on.turip.core.result.TuripResult
+import com.on.turip.core.session.SessionManager
 import com.on.turip.domain.content.PagedContentsResult
 import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.content.video.VideoInformation
@@ -29,6 +30,7 @@ import javax.inject.Inject
 @HiltViewModel
 class RegionResultViewModel @Inject constructor(
     private val contentRepository: ContentRepository,
+    private val sessionManager: SessionManager,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<RegionResultUiState> =
         MutableStateFlow(RegionResultUiState.Loading)
@@ -96,9 +98,18 @@ class RegionResultViewModel @Inject constructor(
         val uiError: UiError = failure.errorType.toUiError()
         if (uiError is UiError.Global) {
             when (uiError) {
-                UiError.Global.Network -> _uiState.update { RegionResultUiState.Error(ErrorUiState.Network) }
-                UiError.Global.Server -> _uiState.update { RegionResultUiState.Error(ErrorUiState.Server) }
-                UiError.Global.TokenExpired -> _uiEffect.send(RegionResultUiEffect.NavigateToLogin)
+                UiError.Global.Network -> {
+                    _uiState.update { RegionResultUiState.Error(ErrorUiState.Network) }
+                }
+
+                UiError.Global.Server -> {
+                    _uiState.update { RegionResultUiState.Error(ErrorUiState.Server) }
+                }
+
+                UiError.Global.TokenExpired -> {
+                    sessionManager.switchToGuest()
+                    _uiEffect.send(RegionResultUiEffect.NavigateToLogin)
+                }
             }
         }
     }

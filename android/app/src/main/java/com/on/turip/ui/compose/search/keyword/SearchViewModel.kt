@@ -3,6 +3,7 @@ package com.on.turip.ui.compose.search.keyword
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.on.turip.core.result.TuripResult
+import com.on.turip.core.session.SessionManager
 import com.on.turip.domain.content.PagedContentsResult
 import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.content.video.VideoInformation
@@ -34,6 +35,7 @@ import javax.inject.Inject
 class SearchViewModel @Inject constructor(
     private val contentRepository: ContentRepository,
     private val searchHistoryRepository: SearchHistoryRepository,
+    private val sessionManager: SessionManager,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<SearchUiState>(SearchUiState.Loading)
     val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
@@ -172,9 +174,18 @@ class SearchViewModel @Inject constructor(
         val uiError: UiError = failure.errorType.toUiError()
         if (uiError is UiError.Global) {
             when (uiError) {
-                UiError.Global.Network -> _uiState.update { SearchUiState.Error(ErrorUiState.Network) }
-                UiError.Global.Server -> _uiState.update { SearchUiState.Error(ErrorUiState.Server) }
-                UiError.Global.TokenExpired -> _uiEffect.send(SearchUiEffect.NavigateToLogin)
+                UiError.Global.Network -> {
+                    _uiState.update { SearchUiState.Error(ErrorUiState.Network) }
+                }
+
+                UiError.Global.Server -> {
+                    _uiState.update { SearchUiState.Error(ErrorUiState.Server) }
+                }
+
+                UiError.Global.TokenExpired -> {
+                    sessionManager.switchToGuest()
+                    _uiEffect.send(SearchUiEffect.NavigateToLogin)
+                }
             }
         }
     }

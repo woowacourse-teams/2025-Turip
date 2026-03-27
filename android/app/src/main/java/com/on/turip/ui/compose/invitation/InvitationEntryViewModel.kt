@@ -43,7 +43,8 @@ class InvitationEntryViewModel @Inject constructor(
 
     fun resolveInvitationEntry() {
         viewModelScope.launch {
-            val invitationToken: String? = InvitationTokenParser.extractTokenFromUrl(_uiState.value.deepLinkUrl)
+            val invitationToken: String? =
+                InvitationTokenParser.extractTokenFromUrl(_uiState.value.deepLinkUrl)
             when (
                 val result: InvitationEntryResult =
                     determineInvitationEntryRouteUseCase(sessionState.value, invitationToken)
@@ -92,6 +93,11 @@ class InvitationEntryViewModel @Inject constructor(
                 }
 
                 is InvitationEntryResult.Failure -> {
+                    if (result.errorType is ErrorType.Auth) {
+                        _uiEffect.send(InvitationEntryUiEffect.NavigateToLogin)
+                        return@launch
+                    }
+
                     val target =
                         when (sessionState.value) {
                             SessionState.Member -> InvalidInvitationTarget.Home
@@ -135,6 +141,11 @@ class InvitationEntryViewModel @Inject constructor(
                 .onSuccess {
                     _uiEffect.send(InvitationEntryUiEffect.NavigateToTuripDetail(turipId))
                 }.onFailure { errorType ->
+                    if (errorType is ErrorType.Auth) {
+                        _uiEffect.send(InvitationEntryUiEffect.NavigateToLogin)
+                        return@launch
+                    }
+
                     val target =
                         when (sessionState.value) {
                             SessionState.Member -> InvalidInvitationTarget.Home

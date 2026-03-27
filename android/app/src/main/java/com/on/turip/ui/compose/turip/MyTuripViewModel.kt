@@ -38,7 +38,7 @@ import javax.inject.Inject
 class MyTuripViewModel @Inject constructor(
     private val turipRepository: TuripRepository,
     private val deleteTuripUseCase: DeleteTuripUseCase,
-    sessionManager: SessionManager,
+    private val sessionManager: SessionManager,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<MyTuripUiState> =
         MutableStateFlow(MyTuripUiState.Idle)
@@ -214,6 +214,7 @@ class MyTuripViewModel @Inject constructor(
                 }
 
                 UiError.Global.TokenExpired -> {
+                    sessionManager.switchToGuest()
                     _uiEffect.send(MyTuripUiEffect.NavigateToLogin)
                 }
             }

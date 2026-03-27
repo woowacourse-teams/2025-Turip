@@ -128,10 +128,6 @@ class LoginViewmodel @Inject constructor(
                 _uiEffect.send(LoginUiEffect.ShowError(ErrorUiState.Server))
             }
 
-            UiError.Global.TokenExpired -> {
-                sessionManager.switchToGuest()
-            }
-
             else -> {
                 _uiEffect.send(LoginUiEffect.ShowError(ErrorUiState.Unexpected))
             }

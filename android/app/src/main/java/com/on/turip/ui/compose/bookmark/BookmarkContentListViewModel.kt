@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
+import com.on.turip.core.session.SessionManager
 import com.on.turip.domain.bookmark.BookmarkContent
 import com.on.turip.domain.bookmark.repository.BookmarkRepository
 import com.on.turip.domain.common.paging.Cursor
@@ -35,6 +36,7 @@ import javax.inject.Inject
 class BookmarkContentListViewModel @Inject constructor(
     private val bookmarkRepository: BookmarkRepository,
     private val bookmarkChangeEventBus: BookmarkChangeEventBus,
+    private val sessionManager: SessionManager,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<BookmarkContentListUiState> =
         MutableStateFlow(BookmarkContentListUiState.Idle)
@@ -172,6 +174,7 @@ class BookmarkContentListViewModel @Inject constructor(
             }
 
             UiError.Global.TokenExpired -> {
+                sessionManager.switchToGuest()
                 _uiState.update { it.copy(isLoading = false) }
                 _uiEffect.send(BookmarkContentListUiEffect.NavigateToLogin)
             }
@@ -205,6 +208,7 @@ class BookmarkContentListViewModel @Inject constructor(
             }
 
             UiError.Global.TokenExpired -> {
+                sessionManager.switchToGuest()
                 _uiState.update { state ->
                     state.copy(bookmarkContents = state.bookmarkContents.copy(isAppending = false))
                 }
@@ -232,14 +236,16 @@ class BookmarkContentListViewModel @Inject constructor(
                     removeBookmarkMutex.withLock {
                         val contents = _uiState.value.bookmarkContents.items
 
-                        val removeContentIndex: Int = contents.indexOfFirst { it.content.id == contentId }
+                        val removeContentIndex: Int =
+                            contents.indexOfFirst { it.content.id == contentId }
                         // 이미 UI 제거 완료된 상태 (API 호출 완료)
                         if (removeContentIndex == -1) return@withLock false
 
                         val removeContent = contents[removeContentIndex]
                         removingSnapshots[contentId] = BookmarkRemoveSnapshot(removeContent)
 
-                        val updated = contents.filter { it.content.id != contentId }.toImmutableList()
+                        val updated =
+                            contents.filter { it.content.id != contentId }.toImmutableList()
                         _uiState.update { state ->
                             state.copy(bookmarkContents = state.bookmarkContents.copy(items = updated))
                         }
