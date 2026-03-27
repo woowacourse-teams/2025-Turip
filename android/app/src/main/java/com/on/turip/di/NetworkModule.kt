@@ -203,13 +203,13 @@ object NetworkModule {
                                     )
                                 },
                                 onFailure = {
-                                    Timber.e("refreshToken으로= 재발급 받은 토큰 저장 실패")
+                                    Timber.e("refreshToken으로 재발급 받은 토큰 저장 실패")
                                     throw ApiException.Auth
                                 },
                             )
                         },
                         onFailure = { errorType ->
-                            Timber.e("refreshToken으로 토큰 재발급 실패 errorType =$errorType")
+                            Timber.e("refreshToken으로 토큰 재발급 실패 errorType = $errorType")
                             when (errorType) {
                                 ErrorType.Network -> throw ApiException.Network
                                 is ErrorType.Auth -> throw ApiException.Auth
