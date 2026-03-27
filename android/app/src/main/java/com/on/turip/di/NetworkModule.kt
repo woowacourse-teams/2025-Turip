@@ -6,6 +6,11 @@ import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.fold
 import com.on.turip.data.result.ApiException
 import com.on.turip.di.NetworkModule.LOG_PREFIX
+import com.on.turip.di.qualifier.DefaultHttpClient
+import com.on.turip.di.qualifier.DefaultKtorfit
+import com.on.turip.di.qualifier.NoAuthHttpClient
+import com.on.turip.di.qualifier.NoAuthKtorfit
+import com.on.turip.di.qualifier.SseHttpClient
 import com.on.turip.domain.login.AuthRepository
 import com.on.turip.domain.login.AuthTokens
 import com.on.turip.domain.session.TokenManager
@@ -34,12 +39,12 @@ import io.ktor.client.request.header
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
-import javax.inject.Singleton
-import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import timber.log.Timber
+import javax.inject.Singleton
+import kotlin.time.Duration.Companion.milliseconds
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -60,7 +65,8 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideHttpClient(
+    @DefaultHttpClient
+    fun provideDefaultHttpClient(
         tokenManager: TokenManager,
         authRepository: Lazy<AuthRepository>,
         fidProvider: FidProvider,
@@ -84,7 +90,49 @@ object NetworkModule {
             timeoutInterceptor()
             loggingInterceptor()
             contentNegotiationInterceptor(json)
-            headerInterceptor(tokenManager, authRepository, fidProvider)
+            defaultRequestInterceptor(fidProvider)
+            headerInterceptor(tokenManager, authRepository)
+        }
+
+    @Provides
+    @Singleton
+    @NoAuthHttpClient
+    fun provideNoAuthHttpClient(
+        fidProvider: FidProvider,
+        json: Json,
+    ): HttpClient =
+        HttpClient(OkHttp) {
+            expectSuccess = true
+
+            timeoutInterceptor()
+            loggingInterceptor()
+            contentNegotiationInterceptor(json)
+            defaultRequestInterceptor(fidProvider)
+        }
+
+    @Provides
+    @Singleton
+    @SseHttpClient
+    fun provideSseHttpClient(
+        tokenManager: TokenManager,
+        authRepository: Lazy<AuthRepository>,
+        fidProvider: FidProvider,
+        json: Json,
+    ): HttpClient =
+        HttpClient(OkHttp) {
+            expectSuccess = true
+            install(SSE) {
+                reconnectionTime = 3000.milliseconds
+            }
+            install(HttpTimeout) {
+                connectTimeoutMillis = CONNECT_TIMEOUT_MILLIS
+                socketTimeoutMillis = INFINITE_TIMEOUT_MS
+                requestTimeoutMillis = INFINITE_TIMEOUT_MS
+            }
+            loggingInterceptor()
+            contentNegotiationInterceptor(json)
+            defaultRequestInterceptor(fidProvider)
+            headerInterceptor(tokenManager, authRepository)
         }
 
     private fun HttpClientConfig<OkHttpConfig>.timeoutInterceptor() {
@@ -111,10 +159,16 @@ object NetworkModule {
         }
     }
 
+    private fun HttpClientConfig<OkHttpConfig>.defaultRequestInterceptor(fidProvider: FidProvider) {
+        defaultRequest {
+            header("device-fid", fidProvider.cachedFid)
+            contentType(type = ContentType.Application.Json)
+        }
+    }
+
     private fun HttpClientConfig<OkHttpConfig>.headerInterceptor(
         tokenManager: TokenManager,
         authRepository: Lazy<AuthRepository>,
-        fidProvider: FidProvider,
     ) {
         install(plugin = Auth) {
             bearer {
@@ -131,6 +185,7 @@ object NetworkModule {
                     val storedRefreshToken: String =
                         tokenManager.currentTokens?.refreshToken ?: throw ApiException.Auth
 
+                    // 리프레시 토큰으로 토큰 갱신 요청 API는 header 없도록 구성되어 있음(header 있을 경우 이미 만료된 엑세스 토큰이어서 401 발생)
                     authRepository.get().requestTokens(storedRefreshToken).fold(
                         onSuccess = { newTokens: AuthTokens ->
                             Timber.d("refreshToken으로 토큰 재발급 성공")
@@ -165,40 +220,26 @@ object NetworkModule {
                 }
             }
         }
-
-        defaultRequest {
-            header("device-fid", fidProvider.cachedFid)
-            contentType(type = ContentType.Application.Json)
-        }
     }
 
-    @SseHttpClient
     @Provides
     @Singleton
-    fun provideSseHttpClient(
-        tokenManager: TokenManager,
-        authRepository: Lazy<AuthRepository>,
-        fidProvider: FidProvider,
-        json: Json,
-    ): HttpClient =
-        HttpClient(OkHttp) {
-            expectSuccess = true
-            install(SSE) {
-                reconnectionTime = 3000.milliseconds
-            }
-            install(HttpTimeout) {
-                connectTimeoutMillis = CONNECT_TIMEOUT_MILLIS
-                socketTimeoutMillis = INFINITE_TIMEOUT_MS
-                requestTimeoutMillis = INFINITE_TIMEOUT_MS
-            }
-            loggingInterceptor()
-            contentNegotiationInterceptor(json)
-            headerInterceptor(tokenManager, authRepository, fidProvider)
-        }
+    @DefaultKtorfit
+    fun provideDefaultKtrofit(
+        @DefaultHttpClient httpClient: HttpClient,
+    ): Ktorfit =
+        Ktorfit
+            .Builder()
+            .baseUrl(BuildConfig.BASE_URL)
+            .httpClient(httpClient)
+            .build()
 
     @Provides
     @Singleton
-    fun provideKtorfit(httpClient: HttpClient): Ktorfit =
+    @NoAuthKtorfit
+    fun provideNoAuthKtrofit(
+        @NoAuthHttpClient httpClient: HttpClient,
+    ): Ktorfit =
         Ktorfit
             .Builder()
             .baseUrl(BuildConfig.BASE_URL)

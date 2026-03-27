@@ -3,6 +3,7 @@ package com.on.turip.data.login.repository
 import com.on.turip.core.result.TuripResult
 import com.on.turip.core.result.mapCatching
 import com.on.turip.data.login.datasource.AuthDataSource
+import com.on.turip.data.login.datasource.AuthRefreshRemoteDataSource
 import com.on.turip.data.login.toDomain
 import com.on.turip.domain.login.AuthRepository
 import com.on.turip.domain.login.AuthResult
@@ -11,11 +12,12 @@ import javax.inject.Inject
 
 class DefaultAuthRepository @Inject constructor(
     private val authDataSource: AuthDataSource,
+    private val authRefreshRemoteDataSource: AuthRefreshRemoteDataSource,
 ) : AuthRepository {
     override suspend fun login(idToken: String): TuripResult<AuthResult> = authDataSource.postIdToken(idToken).mapCatching { it.toDomain() }
 
     override suspend fun requestTokens(refreshToken: String): TuripResult<AuthTokens> =
-        authDataSource.postReissueToken(refreshToken).mapCatching { it.toDomain() }
+        authRefreshRemoteDataSource.postReissueToken(refreshToken).mapCatching { it.toDomain() }
 
     override suspend fun verifyToken(): TuripResult<Unit> = authDataSource.verifyToken()
 }

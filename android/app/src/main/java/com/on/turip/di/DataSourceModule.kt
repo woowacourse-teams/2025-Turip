@@ -11,7 +11,9 @@ import com.on.turip.data.invitation.datasource.DefaultInstallReferrerDataSource
 import com.on.turip.data.invitation.datasource.DeferredDeepLinkLocalDataSource
 import com.on.turip.data.invitation.datasource.InstallReferrerDataSource
 import com.on.turip.data.login.datasource.AuthDataSource
+import com.on.turip.data.login.datasource.AuthRefreshRemoteDataSource
 import com.on.turip.data.login.datasource.AuthRemoteDataSource
+import com.on.turip.data.login.datasource.DefaultAuthRefreshRemoteRemoteDataSource
 import com.on.turip.data.login.datasource.GuestDataSource
 import com.on.turip.data.login.datasource.GuestRemoteDataSource
 import com.on.turip.data.login.datasource.MemberDataSource
@@ -68,6 +70,12 @@ abstract class DataSourceModule {
     @Binds
     @Singleton
     abstract fun bindAuthRemoteDataSource(authRemoteDataSource: AuthRemoteDataSource): AuthDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindRefreshAuthRemoteDataSource(
+        defaultAuthRefreshRemoteRemoteDataSource: DefaultAuthRefreshRemoteRemoteDataSource,
+    ): AuthRefreshRemoteDataSource
 
     @Binds
     @Singleton
