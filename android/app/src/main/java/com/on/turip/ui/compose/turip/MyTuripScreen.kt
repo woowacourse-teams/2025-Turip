@@ -36,10 +36,7 @@ import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.repeatOnLifecycle
 import com.on.turip.R
 import com.on.turip.domain.turip.TuripType
 import com.on.turip.ui.compose.designsystem.component.TuripDialog
@@ -63,17 +60,10 @@ fun MyTuripScreen(
     viewModel: MyTuripViewModel = hiltViewModel(),
 ) {
     val uiState: MyTuripUiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val lifecycleOwner = LocalLifecycleOwner.current
     val resources = LocalResources.current
     val snackbarDelegate = LocalSnackbarDelegate.current
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val bottomSheetSnackbarHostState = remember { SnackbarHostState() }
-
-    LaunchedEffect(Unit) {
-        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-            viewModel.loadTurips()
-        }
-    }
 
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { uiEffect: MyTuripUiEffect ->

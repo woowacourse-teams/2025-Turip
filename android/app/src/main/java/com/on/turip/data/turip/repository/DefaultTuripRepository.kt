@@ -88,12 +88,41 @@ class DefaultTuripRepository @Inject constructor(
     override suspend fun createTuripPlace(
         turipId: Long,
         placeId: Long,
-    ): TuripResult<Unit> = turipRestRemoteDataSource.createTuripPlace(turipId = turipId, placeId = placeId)
+    ): TuripResult<Unit> =
+        turipRestRemoteDataSource
+            .createTuripPlace(turipId = turipId, placeId = placeId)
+            .also { result ->
+                result.onSuccess {
+                    _turips.update { current ->
+                        current.map { if (it.id == turipId) it.copy(placeCount = it.placeCount + 1) else it }
+                    }
+                }
+            }
 
     override suspend fun deleteTuripPlace(
         turipId: Long,
         placeId: Long,
-    ): TuripResult<Unit> = turipRestRemoteDataSource.deleteTuripPlace(turipId = turipId, placeId = placeId)
+    ): TuripResult<Unit> =
+        turipRestRemoteDataSource
+            .deleteTuripPlace(turipId = turipId, placeId = placeId)
+            .also { result ->
+                result.onSuccess {
+                    _turips.update { current ->
+                        current.map {
+                            if (it.id == turipId) {
+                                it.copy(
+                                    placeCount =
+                                        (it.placeCount - 1).coerceAtLeast(
+                                            0,
+                                        ),
+                                )
+                            } else {
+                                it
+                            }
+                        }
+                    }
+                }
+            }
 
     override suspend fun updateTuripPlacesOrder(
         turipId: Long,
@@ -108,11 +137,41 @@ class DefaultTuripRepository @Inject constructor(
     override suspend fun updatePlaceTurips(
         placeId: Long,
         turipIds: List<Long>,
-    ): TuripResult<Unit> =
-        turipRestRemoteDataSource.putPlaceTurips(
-            placeId = placeId,
-            placeTuripsRequest = PlaceTuripsRequest(turipIds),
-        )
+    ): TuripResult<Unit> {
+        val turipIdsSet = turipIds.toSet()
+        val previouslySelectedIds =
+            _turips.value
+                .filter { it.hasIncludePlace }
+                .map { it.id }
+                .toSet()
+        return turipRestRemoteDataSource
+            .putPlaceTurips(
+                placeId = placeId,
+                placeTuripsRequest = PlaceTuripsRequest(turipIds),
+            ).also { result ->
+                result.onSuccess {
+                    _turips.update { current ->
+                        current.map { turip ->
+                            val wasSelected = turip.id in previouslySelectedIds
+                            val isNowSelected = turip.id in turipIdsSet
+                            when {
+                                !wasSelected && isNowSelected -> {
+                                    turip.copy(placeCount = turip.placeCount + 1)
+                                }
+
+                                wasSelected && !isNowSelected -> {
+                                    turip.copy(placeCount = (turip.placeCount - 1).coerceAtLeast(0))
+                                }
+
+                                else -> {
+                                    turip
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+    }
 
     override suspend fun createInvitationToken(turipId: Long): TuripResult<TuripInvitationToken> =
         turipRestRemoteDataSource.createInvitationToken(turipId).mapCatching { it.toDomain() }

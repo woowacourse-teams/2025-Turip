@@ -8,7 +8,6 @@ import com.on.turip.core.result.onSuccess
 import com.on.turip.domain.session.SessionState
 import com.on.turip.domain.session.SessionStore
 import com.on.turip.domain.turip.DeleteTuripUseCase
-import com.on.turip.domain.turip.Turip
 import com.on.turip.domain.turip.repository.TuripRepository
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
@@ -28,6 +27,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -48,20 +49,26 @@ class MyTuripViewModel @Inject constructor(
     val uiEffect: Flow<MyTuripUiEffect> = _uiEffect.receiveAsFlow()
 
     init {
+        loadTurips()
         observeSessionChange(sessionStore.state)
+        observeTurips()
+    }
+
+    private fun observeTurips() {
+        turipRepository.turips
+            .onEach { turips ->
+                _uiState.update { state ->
+                    state.copy(turips = turips.map { it.toUiMyTuripModel() }.toImmutableList())
+                }
+            }.launchIn(viewModelScope)
     }
 
     fun loadTurips() {
         launchWithLoading {
             turipRepository
                 .loadTurips()
-                .onSuccess { turips: List<Turip> ->
-                    _uiState.update { myTuripUiState: MyTuripUiState ->
-                        myTuripUiState.copy(
-                            turips = turips.map { it.toUiMyTuripModel() }.toImmutableList(),
-                            errorUiState = ErrorUiState.None,
-                        )
-                    }
+                .onSuccess {
+                    _uiState.update { it.copy(errorUiState = ErrorUiState.None) }
                 }.onFailure { errorType: ErrorType ->
                     sendErrorEffect(
                         errorType = errorType,
@@ -114,14 +121,6 @@ class MyTuripViewModel @Inject constructor(
                 turipId = targetTurip.id,
                 type = targetTurip.type,
             ).onSuccess {
-                _uiState.update { state ->
-                    state.copy(
-                        turips =
-                            state.turips
-                                .filter { it.id != targetTurip.id }
-                                .toImmutableList(),
-                    )
-                }
                 _uiEffect.send(MyTuripUiEffect.TuripDeleted(targetTurip.name))
                 Timber.d("튜립 삭제 성공(이름 = ${targetTurip.name})")
             }.onFailure { errorType: ErrorType ->
@@ -146,17 +145,9 @@ class MyTuripViewModel @Inject constructor(
             try {
                 turipRepository
                     .createTurip(name)
-                    .onSuccess { turip: Turip ->
+                    .onSuccess {
                         dismissAddBottomSheet()
                         _uiEffect.send(MyTuripUiEffect.TuripAdded(name))
-                        _uiState.update { it: MyTuripUiState ->
-                            it.copy(
-                                turips =
-                                    it.turips
-                                        .plus(turip.toUiMyTuripModel())
-                                        .toImmutableList(),
-                            )
-                        }
                     }.onFailure { errorType ->
                         sendErrorEffect(
                             errorType = errorType,
