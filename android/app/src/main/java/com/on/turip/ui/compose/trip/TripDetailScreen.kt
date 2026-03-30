@@ -27,6 +27,7 @@ import androidx.compose.material3.SheetState
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -125,6 +126,7 @@ fun TripDetailScreen(
 
     val addTuripSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val addTuripSnackbarHostState = remember { SnackbarHostState() }
+    val addTuripSheetSnackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
         viewModel.initContentId(contentId)
@@ -162,6 +164,7 @@ fun TripDetailScreen(
                 addTuripSheetState = addTuripSheetState,
                 dismissAddTuripBottomSheet = viewModel::dismissAddTuripBottomSheet,
                 snackbarState = addTuripSnackbarHostState,
+                addTuripSheetSnackbarState = addTuripSheetSnackbarHostState,
             )
         }
     }
@@ -283,6 +286,7 @@ fun TripDetailScreen(
                                 onNameChanged = viewModel::updateAddTuripInputName,
                                 onConfirmClick = viewModel::addTurip,
                                 onDismiss = viewModel::dismissAddTuripBottomSheet,
+                                snackbarHostState = addTuripSheetSnackbarHostState,
                             )
                         }
                     }
@@ -297,6 +301,7 @@ private suspend fun handleUiEffect(
     uiEffect: TripDetailUiEffect,
     snackbarDelegate: SnackbarDelegate,
     snackbarState: SnackbarHostState,
+    addTuripSheetSnackbarState: SnackbarHostState,
     resources: Resources,
     navigateToLogin: () -> Unit,
     handleErrorRetryRequest: (action: TripDetailRetryAction) -> Unit,
@@ -333,12 +338,31 @@ private suspend fun handleUiEffect(
         is TripDetailUiEffect.ShowError -> {
             val uiModel: ErrorUiModel =
                 uiEffect.errorUiState.toUiModel() ?: return
-            snackbarDelegate.showSnackbar(
-                message = resources.getString(uiModel.titleRes),
-                actionLabel = resources.getString(uiModel.retryTextRes),
-                duration = SnackbarDuration.Long,
-                onAction = { handleErrorRetryRequest(uiEffect.retryAction) },
-            )
+            when (uiEffect.retryAction) {
+                is TripDetailRetryAction.AddTurip -> {
+                    val result =
+                        addTuripSheetSnackbarState.showSnackbar(
+                            visuals =
+                                TuripSnackbarVisuals(
+                                    message = resources.getString(uiModel.titleRes),
+                                    actionLabel = resources.getString(uiModel.retryTextRes),
+                                    duration = SnackbarDuration.Long,
+                                ),
+                        )
+                    if (result == SnackbarResult.ActionPerformed) {
+                        handleErrorRetryRequest(uiEffect.retryAction)
+                    }
+                }
+
+                else -> {
+                    snackbarDelegate.showSnackbar(
+                        message = resources.getString(uiModel.titleRes),
+                        actionLabel = resources.getString(uiModel.retryTextRes),
+                        duration = SnackbarDuration.Long,
+                        onAction = { handleErrorRetryRequest(uiEffect.retryAction) },
+                    )
+                }
+            }
         }
 
         is TripDetailUiEffect.TuripAdded -> {
