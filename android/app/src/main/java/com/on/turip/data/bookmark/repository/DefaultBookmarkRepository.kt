@@ -4,12 +4,14 @@ import com.on.turip.core.result.TuripResult
 import com.on.turip.core.result.mapCatching
 import com.on.turip.core.result.onSuccess
 import com.on.turip.data.bookmark.datasource.BookmarkRemoteDataSource
+import com.on.turip.data.bookmark.dto.BookmarkCreationResponse
 import com.on.turip.data.bookmark.toDomain
 import com.on.turip.data.bookmark.toRequestDto
 import com.on.turip.domain.bookmark.BookmarkContent
 import com.on.turip.domain.bookmark.repository.BookmarkRepository
 import com.on.turip.domain.common.paging.Cursor
 import com.on.turip.domain.common.paging.Page
+import com.on.turip.domain.content.repository.ContentRepository
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -21,6 +23,7 @@ import javax.inject.Inject
 
 class DefaultBookmarkRepository @Inject constructor(
     private val bookmarkRemoteDataSource: BookmarkRemoteDataSource,
+    private val contentRepository: ContentRepository,
 ) : BookmarkRepository {
     private val _bookmarkContents =
         MutableStateFlow<ImmutableList<BookmarkContent>>(persistentListOf())
@@ -28,7 +31,16 @@ class DefaultBookmarkRepository @Inject constructor(
         _bookmarkContents.asStateFlow()
 
     override suspend fun createBookmark(contentId: Long): TuripResult<Unit> =
-        bookmarkRemoteDataSource.postBookmark(contentId.toRequestDto())
+        bookmarkRemoteDataSource
+            .postBookmark(contentId.toRequestDto())
+            .also { result ->
+                result.onSuccess { response: BookmarkCreationResponse ->
+                    val trip = contentRepository.tripCache.value[contentId] ?: return@onSuccess
+                    _bookmarkContents.update { current ->
+                        (listOf(response.toDomain(trip)) + current).toImmutableList()
+                    }
+                }
+            }.mapCatching { }
 
     override suspend fun deleteBookmark(contentId: Long): TuripResult<Unit> =
         bookmarkRemoteDataSource.deleteBookmark(contentId).also { result ->
