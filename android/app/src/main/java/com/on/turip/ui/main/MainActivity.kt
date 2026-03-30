@@ -19,8 +19,8 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var savedStateConfigurationProvider: SavedStateConfigurationProvider
 
-    private val _newDeepLinkChannel = Channel<String>(Channel.CONFLATED)
-    val newDeepLinkFlow: Flow<String> = _newDeepLinkChannel.receiveAsFlow()
+    private val _newDeepLink = Channel<String>(Channel.CONFLATED)
+    val newDeepLink: Flow<String> = _newDeepLink.receiveAsFlow()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -32,7 +32,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             MainApp(
                 savedStateConfigurationProvider = savedStateConfigurationProvider,
-                newDeepLinkFlow = newDeepLinkFlow,
+                newDeepLinkFlow = newDeepLink,
             )
         }
     }
@@ -40,6 +40,6 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
-        intent.dataString?.let { _newDeepLinkChannel.trySend(it) }
+        intent.dataString?.let { _newDeepLink.trySend(it) }
     }
 }

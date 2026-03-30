@@ -35,6 +35,7 @@ import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
 import com.on.turip.ui.compose.designsystem.snackbar.LocalSnackbarDelegate
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.home.navigation.HomeNavKey
+import com.on.turip.ui.compose.invitation.navigation.InvitationEntryNavKey
 import com.on.turip.ui.compose.main.component.ExitConfirmationHandler
 import com.on.turip.ui.compose.main.component.LocalSystemBarStyleController
 import com.on.turip.ui.compose.main.component.TuripNavigationBar
@@ -42,7 +43,6 @@ import com.on.turip.ui.compose.main.navigation.SavedStateConfigurationProvider
 import com.on.turip.ui.compose.main.navigation.TopLevel
 import com.on.turip.ui.compose.main.navigation.appScreens
 import com.on.turip.ui.compose.main.navigation.rememberTuripAppState
-import com.on.turip.ui.compose.invitation.navigation.InvitationEntryNavKey
 import com.on.turip.ui.compose.splash.navigation.SplashNavKey
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow

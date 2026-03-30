@@ -1,7 +1,6 @@
 package com.on.turip.data.bookmark.datasource
 
 import com.on.turip.core.result.TuripResult
-import com.on.turip.core.result.mapCatching
 import com.on.turip.data.bookmark.dto.BookmarkAddRequest
 import com.on.turip.data.bookmark.dto.BookmarkContentsResponse
 import com.on.turip.data.bookmark.dto.BookmarkCountResponse

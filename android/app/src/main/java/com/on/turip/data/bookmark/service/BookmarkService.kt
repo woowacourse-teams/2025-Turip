@@ -2,9 +2,9 @@ package com.on.turip.data.bookmark.service
 
 import com.on.turip.core.network.ApiPath
 import com.on.turip.data.bookmark.dto.BookmarkAddRequest
-import com.on.turip.data.bookmark.dto.BookmarkCreationResponse
 import com.on.turip.data.bookmark.dto.BookmarkContentsResponse
 import com.on.turip.data.bookmark.dto.BookmarkCountResponse
+import com.on.turip.data.bookmark.dto.BookmarkCreationResponse
 import de.jensklingenberg.ktorfit.http.Body
 import de.jensklingenberg.ktorfit.http.DELETE
 import de.jensklingenberg.ktorfit.http.GET

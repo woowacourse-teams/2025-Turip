@@ -7,8 +7,8 @@ import com.on.turip.ui.compose.invitation.navigation.InvitationEntryNavKeyProvid
 import com.on.turip.ui.compose.login.navigation.LoginNavKeyProvider
 import com.on.turip.ui.compose.mypage.navigation.MyPageNavKeyProvider
 import com.on.turip.ui.compose.search.keyword.navigation.SearchNavKeyProvider
-import com.on.turip.ui.compose.splash.navigation.SplashNavKeyProvider
 import com.on.turip.ui.compose.search.regionresult.navigation.RegionResultNavKeyProvider
+import com.on.turip.ui.compose.splash.navigation.SplashNavKeyProvider
 import com.on.turip.ui.compose.trip.navigation.TripDetailNavKeyProvider
 import com.on.turip.ui.compose.turip.navigation.MyTuripNavKeyProvider
 import com.on.turip.ui.compose.turipdetail.navigation.TuripDetailNavKeyProvider
