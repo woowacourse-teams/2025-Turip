@@ -3,7 +3,9 @@ package turip.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -21,10 +23,15 @@ import turip.account.domain.Account;
 import turip.account.domain.Role;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.NotFoundException;
+import turip.content.domain.Content;
 import turip.content.domain.ContentPending;
 import turip.content.domain.ContentPendingData;
 import turip.content.repository.ContentPendingRepository;
+import turip.content.repository.ContentRepository;
+import turip.controller.dto.request.AdminContentSaveRequest;
+import turip.controller.dto.response.ContentApprovalResponse;
 import turip.util.fixture.AccountFixture;
+import turip.util.fixture.ContentFixture;
 
 @ExtendWith(MockitoExtension.class)
 class AdminContentPendingServiceTest {
@@ -34,6 +41,12 @@ class AdminContentPendingServiceTest {
 
     @Mock
     private ContentPendingRepository contentPendingRepository;
+
+    @Mock
+    private ContentRepository contentRepository;
+
+    @Mock
+    private AdminContentService adminContentService;
 
     private ContentPending contentPending;
     private Account validatorAccount;
@@ -114,6 +127,69 @@ class AdminContentPendingServiceTest {
             assertThatThrownBy(() -> adminContentPendingService.findById(contentPending.getId()))
                     .isInstanceOf(NotFoundException.class)
                     .hasMessage(ErrorTag.CONTENT_PENDING_NOT_FOUND.getMessage());
+        }
+    }
+
+    @DisplayName("approve() 테스트")
+    @Nested
+    class Approve {
+
+        @DisplayName("펜딩 콘텐츠를 승인하면 Content가 생성되고 ContentApprovalResponse를 반환한다")
+        @Test
+        void approve1() {
+            // given
+            given(contentPendingRepository.findById(contentPending.getId()))
+                    .willReturn(Optional.of(contentPending));
+            given(adminContentService.save(any(AdminContentSaveRequest.class)))
+                    .willReturn(1L);
+
+            Content mockContent = ContentFixture.createContentWithId(1L);
+            given(contentRepository.findById(1L))
+                    .willReturn(Optional.of(mockContent));
+
+            // when
+            ContentApprovalResponse response = adminContentPendingService.approve(contentPending.getId(),
+                    validatorAccount);
+
+            // then
+            assertAll(
+                    () -> assertThat(response.contentId()).isEqualTo(1L),
+                    () -> assertThat(response.contentPendingId()).isEqualTo(contentPending.getId()),
+                    () -> verify(contentPendingRepository).findById(contentPending.getId()),
+                    () -> verify(adminContentService).save(any(AdminContentSaveRequest.class)),
+                    () -> verify(contentRepository).findById(1L)
+            );
+        }
+
+        @DisplayName("존재하지 않는 펜딩 콘텐츠를 승인하려 하면 NotFoundException을 발생시킨다")
+        @Test
+        void approve2() {
+            // given
+            Long invalidId = 999L;
+            given(contentPendingRepository.findById(invalidId))
+                    .willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> adminContentPendingService.approve(invalidId, validatorAccount))
+                    .isInstanceOf(NotFoundException.class)
+                    .hasMessage(ErrorTag.CONTENT_PENDING_NOT_FOUND.getMessage());
+        }
+
+        @DisplayName("승인 후 생성된 Content를 찾을 수 없으면 NotFoundException을 발생시킨다")
+        @Test
+        void approve3() {
+            // given
+            given(contentPendingRepository.findById(contentPending.getId()))
+                    .willReturn(Optional.of(contentPending));
+            given(adminContentService.save(any(AdminContentSaveRequest.class)))
+                    .willReturn(1L);
+            given(contentRepository.findById(1L))
+                    .willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> adminContentPendingService.approve(contentPending.getId(), validatorAccount))
+                    .isInstanceOf(NotFoundException.class)
+                    .hasMessage(ErrorTag.CONTENT_NOT_FOUND.getMessage());
         }
     }
 }
