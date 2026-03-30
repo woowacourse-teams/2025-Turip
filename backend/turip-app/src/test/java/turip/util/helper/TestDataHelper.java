@@ -169,6 +169,77 @@ public class TestDataHelper {
         return extractGeneratedKey(keyHolder);
     }
 
+    public Long insertCountry(String name, String imageUrl) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(
+                    "INSERT INTO country (name, image_url) VALUES (?, ?)",
+                    Statement.RETURN_GENERATED_KEYS);
+            ps.setString(1, name);
+            ps.setString(2, imageUrl);
+            return ps;
+        }, keyHolder);
+
+        return extractGeneratedKey(keyHolder);
+    }
+
+    public Long insertProvince(String name) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(
+                    "INSERT INTO province (name) VALUES (?)",
+                    Statement.RETURN_GENERATED_KEYS);
+            ps.setString(1, name);
+            return ps;
+        }, keyHolder);
+
+        return extractGeneratedKey(keyHolder);
+    }
+
+    public Long insertCity(String name, Long countryId, Long provinceId, String imageUrl) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(
+                    "INSERT INTO city (name, country_id, province_id, image_url) VALUES (?, ?, ?, ?)",
+                    Statement.RETURN_GENERATED_KEYS);
+            ps.setString(1, name);
+            ps.setLong(2, countryId);
+            if (provinceId != null) {
+                ps.setLong(3, provinceId);
+            } else {
+                ps.setNull(3, java.sql.Types.BIGINT);
+            }
+            ps.setString(4, imageUrl);
+            return ps;
+        }, keyHolder);
+
+        return extractGeneratedKey(keyHolder);
+    }
+
+    public Long insertCity(String name) {
+        Long countryId = insertCountry("대한민국", "");
+        Long provinceId = insertProvince(name);
+        return insertCity(name, countryId, provinceId, "");
+    }
+
+    public Long insertContentPending(Long collectorAccountId, String contentDataJson) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(
+                    "INSERT INTO content_pending (collector_account_id, content_data, status, content_data_updated_at, created_at, updated_at) VALUES (?, ?, 'PENDING', NOW(), NOW(), NOW())",
+                    Statement.RETURN_GENERATED_KEYS);
+            ps.setLong(1, collectorAccountId);
+            ps.setString(2, contentDataJson);
+            return ps;
+        }, keyHolder);
+
+        return extractGeneratedKey(keyHolder);
+    }
+
     private Long extractGeneratedKey(KeyHolder keyHolder) {
         Number key = keyHolder.getKey();
         if (key == null) {
