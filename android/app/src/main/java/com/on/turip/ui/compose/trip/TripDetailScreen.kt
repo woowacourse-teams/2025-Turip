@@ -23,8 +23,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -50,6 +52,7 @@ import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.common.model.trip.TripDurationModel
 import com.on.turip.ui.compose.designsystem.component.ErrorScreen
+import com.on.turip.ui.compose.designsystem.component.TuripSnackbarVisuals
 import com.on.turip.ui.compose.designsystem.snackbar.LocalSnackbarDelegate
 import com.on.turip.ui.compose.designsystem.snackbar.SnackbarDelegate
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
@@ -67,6 +70,7 @@ import com.on.turip.ui.compose.trip.model.SelectedPlaceModel
 import com.on.turip.ui.compose.trip.model.TripDetailInfoModel
 import com.on.turip.ui.compose.trip.turipselection.PlaceTuripSelectionBottomSheet
 import com.on.turip.ui.compose.trip.webview.VideoManager
+import com.on.turip.ui.compose.turip.component.TuripAddBottomSheet
 import com.on.turip.ui.compose.turipdetail.model.turip.TuripShareModel
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
@@ -119,6 +123,9 @@ fun TripDetailScreen(
     var selectedPlace by remember { mutableStateOf<SelectedPlaceModel?>(null) }
     val bottomSheetScope = rememberCoroutineScope()
 
+    val addTuripSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val addTuripSnackbarHostState = remember { SnackbarHostState() }
+
     LaunchedEffect(Unit) {
         viewModel.initContentId(contentId)
     }
@@ -152,6 +159,9 @@ fun TripDetailScreen(
                 resources = resources,
                 navigateToLogin = navigateToLogin,
                 handleErrorRetryRequest = viewModel::handleErrorRetryRequest,
+                addTuripSheetState = addTuripSheetState,
+                dismissAddTuripBottomSheet = viewModel::dismissAddTuripBottomSheet,
+                snackbarState = addTuripSnackbarHostState,
             )
         }
     }
@@ -245,10 +255,9 @@ fun TripDetailScreen(
                             PlaceTuripSelectionBottomSheet(
                                 sheetState = sheetState,
                                 selectedPlaceModel = place,
+                                snackbarHostState = addTuripSnackbarHostState,
                                 onNavigateToLogin = navigateToLogin,
-                                onNavigateToAddTurip = {
-                                // TODO 추가 예정
-                                },
+                                onNavigateToAddTurip = { viewModel.showAddTuripBottomSheet() },
                                 onNavigateToTuripDetail = navigateToTuripDetail,
                                 onNavigateToMap = navigateToMap,
                                 onShareTuripByText = navigateToShareTuripByText,
@@ -263,6 +272,19 @@ fun TripDetailScreen(
                                 },
                             )
                         }
+
+                        if (uiState.showAddTuripBottomSheet) {
+                            TuripAddBottomSheet(
+                                title = resources.getString(R.string.bottom_sheet_turip_add_title),
+                                turipName = uiState.addTuripInputName,
+                                sheetState = addTuripSheetState,
+                                turipNameStatus = uiState.addTuripNameStatus,
+                                isConfirmEnabled = uiState.addTuripNameStatus.isConfirmEnabled && !uiState.isCreatingTurip,
+                                onNameChanged = viewModel::updateAddTuripInputName,
+                                onConfirmClick = viewModel::addTurip,
+                                onDismiss = viewModel::dismissAddTuripBottomSheet,
+                            )
+                        }
                     }
                 }
             }
@@ -270,12 +292,16 @@ fun TripDetailScreen(
     }
 }
 
-private fun handleUiEffect(
+@OptIn(ExperimentalMaterial3Api::class)
+private suspend fun handleUiEffect(
     uiEffect: TripDetailUiEffect,
     snackbarDelegate: SnackbarDelegate,
+    snackbarState: SnackbarHostState,
     resources: Resources,
     navigateToLogin: () -> Unit,
     handleErrorRetryRequest: (action: TripDetailRetryAction) -> Unit,
+    addTuripSheetState: SheetState,
+    dismissAddTuripBottomSheet: () -> Unit,
 ) {
     when (uiEffect) {
         is TripDetailUiEffect.ShowBookmarkStatus -> {
@@ -312,6 +338,19 @@ private fun handleUiEffect(
                 actionLabel = resources.getString(uiModel.retryTextRes),
                 duration = SnackbarDuration.Long,
                 onAction = { handleErrorRetryRequest(uiEffect.retryAction) },
+            )
+        }
+
+        is TripDetailUiEffect.TuripAdded -> {
+            addTuripSheetState.hide()
+            dismissAddTuripBottomSheet()
+            snackbarState.showSnackbar(
+                visuals =
+                    TuripSnackbarVisuals(
+                        message = resources.getString(R.string.turip_add_turip, uiEffect.turipName),
+                        iconRes = R.drawable.btn_turip_selected,
+                        actionLabel = resources.getString(R.string.all_close_description),
+                    ),
             )
         }
     }

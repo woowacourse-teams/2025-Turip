@@ -1,11 +1,13 @@
 package com.on.turip.ui.compose.trip.turipselection
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -13,12 +15,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -43,6 +47,7 @@ import kotlinx.collections.immutable.persistentListOf
 fun PlaceTuripSelectionBottomSheet(
     sheetState: SheetState,
     selectedPlaceModel: SelectedPlaceModel,
+    snackbarHostState: SnackbarHostState,
     onNavigateToLogin: () -> Unit,
     onNavigateToAddTurip: () -> Unit,
     onNavigateToTuripDetail: (turipId: Long) -> Unit,
@@ -180,27 +185,30 @@ fun PlaceTuripSelectionBottomSheet(
         val density = LocalDensity.current
         val bottomSheetHeight = with(density) { windowInfo.containerSize.height.toDp() * 0.8f }
 
-        PlaceTuripSelectionContent(
-            uiState = uiState,
-            onBackFromTuripDetail = viewModel::onTuripDetailBack,
-            onDismissRequest = viewModel::requestDismiss,
-            onAddTuripClick = onNavigateToAddTurip,
-            onTuripPlaceClickAtTurips = viewModel::updateTurip,
-            onNavigateToTurip = { turipId: Long ->
-                onNavigateToTuripDetail(turipId)
-            },
-            onConfirmClick = viewModel::updateTuripsByPlace,
-            onMapClick = onNavigateToMap,
-            onTuripPlaceClickAtTuripDetail = viewModel::applyTuripPlaceDelete,
-            onShareClick = { showShareOptionSheet = true },
-            onDragStart = viewModel::onDragStart,
-            onDragPlace = viewModel::onDragMove,
-            onDragEnd = viewModel::onDragEnd,
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .height(bottomSheetHeight),
-        )
+        Box(modifier = Modifier.fillMaxWidth().height(bottomSheetHeight)) {
+            PlaceTuripSelectionContent(
+                uiState = uiState,
+                onBackFromTuripDetail = viewModel::onTuripDetailBack,
+                onDismissRequest = viewModel::requestDismiss,
+                onAddTuripClick = onNavigateToAddTurip,
+                onTuripPlaceClickAtTurips = viewModel::updateTurip,
+                onNavigateToTurip = { turipId: Long ->
+                    onNavigateToTuripDetail(turipId)
+                },
+                onConfirmClick = viewModel::updateTuripsByPlace,
+                onMapClick = onNavigateToMap,
+                onTuripPlaceClickAtTuripDetail = viewModel::applyTuripPlaceDelete,
+                onShareClick = { showShareOptionSheet = true },
+                onDragStart = viewModel::onDragStart,
+                onDragPlace = viewModel::onDragMove,
+                onDragEnd = viewModel::onDragEnd,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            TuripSnackbar(
+                snackbarHostState = snackbarHostState,
+                modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth(),
+            )
+        }
     }
 
     if (showShareOptionSheet) {
