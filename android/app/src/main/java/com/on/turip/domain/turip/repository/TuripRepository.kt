@@ -8,8 +8,11 @@ import com.on.turip.domain.turip.TuripInvitationToken
 import com.on.turip.domain.turip.TuripMember
 import com.on.turip.domain.turip.result.TuripStreamResult
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 interface TuripRepository {
+    val turips: StateFlow<List<Turip>>
+
     suspend fun loadTurip(turipId: Long): TuripResult<Turip>
 
     suspend fun loadTurips(): TuripResult<List<Turip>>

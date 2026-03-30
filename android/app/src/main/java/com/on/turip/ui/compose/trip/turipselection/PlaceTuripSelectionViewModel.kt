@@ -31,6 +31,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -66,6 +67,18 @@ class PlaceTuripSelectionViewModel @Inject constructor(
 
     init {
         registerDragEndEvents()
+        observeTuripChanges()
+    }
+
+    private fun observeTuripChanges() {
+        turipRepository.turips
+            .drop(1)
+            .onEach {
+                val state = uiState.value
+                if (state.screenMode is PlaceTuripSelectionScreenMode.Turips && state.selectionPlaceId != 0L) {
+                    loadTuripsByPlace(state.selectionPlaceId, state.placeName)
+                }
+            }.launchIn(viewModelScope)
     }
 
     fun loadTuripsByPlace(
