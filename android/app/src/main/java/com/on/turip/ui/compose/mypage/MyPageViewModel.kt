@@ -106,6 +106,13 @@ class MyPageViewModel @Inject constructor(
             bookmarkRepository
                 .loadBookmarks(cursor)
                 .onSuccess {
+                    _uiState.update { state ->
+                        if (state.bookmarkContentState is MyPageSectionState.Loading) {
+                            state.copy(bookmarkContentState = MyPageSectionState.Success(emptyList<BookmarkContent>().toImmutableList()))
+                        } else {
+                            state
+                        }
+                    }
                     Timber.d("마이페이지 북마크 목록 조회 성공")
                 }.onFailure {
                     Timber.e("마이페이지 북마크 목록 조회 에러 발생")
