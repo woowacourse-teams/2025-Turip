@@ -5,10 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import turip.account.domain.TuripMember;
 import turip.content.domain.ContentPending;
+import turip.controller.dto.response.ContentApprovalResponse;
 import turip.controller.dto.response.ContentPendingResponse;
 import turip.resolver.AuthAdmin;
 import turip.service.AdminContentPendingService;
@@ -29,6 +31,15 @@ public class AdminPendingContentController {
     ) {
         ContentPending contentPending = adminContentPendingService.findById(id);
         ContentPendingResponse response = ContentPendingResponse.from(contentPending);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/{id}/approve")
+    public ResponseEntity<ContentApprovalResponse> approve(
+            @AuthAdmin TuripMember admin,
+            @PathVariable Long id
+    ) {
+        ContentApprovalResponse response = adminContentPendingService.approve(id, admin.getMember().getAccount());
         return ResponseEntity.ok(response);
     }
 }
