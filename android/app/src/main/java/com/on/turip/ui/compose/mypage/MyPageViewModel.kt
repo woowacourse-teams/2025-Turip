@@ -72,7 +72,15 @@ class MyPageViewModel @Inject constructor(
                             else -> true
                         }
                     if (shouldUpdate) {
-                        state.copy(bookmarkContentState = MyPageSectionState.Success(contents))
+                        state.copy(
+                            bookmarkContentState =
+                                MyPageSectionState.Success(
+                                    contents
+                                        .take(
+                                            MAX_BOOKMARK_DISPLAY_COUNT,
+                                        ).toImmutableList(),
+                                ),
+                        )
                     } else {
                         state
                     }
@@ -108,7 +116,15 @@ class MyPageViewModel @Inject constructor(
                 .onSuccess { page ->
                     _uiState.update { state ->
                         if (state.bookmarkContentState is MyPageSectionState.Loading) {
-                            state.copy(bookmarkContentState = MyPageSectionState.Success(page.items.toImmutableList()))
+                            state.copy(
+                                bookmarkContentState =
+                                    MyPageSectionState.Success(
+                                        page.items
+                                            .take(
+                                                MAX_BOOKMARK_DISPLAY_COUNT,
+                                            ).toImmutableList(),
+                                    ),
+                            )
                         } else {
                             state
                         }
@@ -299,6 +315,7 @@ class MyPageViewModel @Inject constructor(
 
     companion object {
         private const val INVALID_FID = "FID_LOAD_FAIL"
+        private const val MAX_BOOKMARK_DISPLAY_COUNT = 10
     }
 }
 
