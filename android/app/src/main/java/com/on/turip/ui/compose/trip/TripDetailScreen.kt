@@ -339,30 +339,28 @@ private suspend fun handleUiEffect(
         is TripDetailUiEffect.ShowError -> {
             val uiModel: ErrorUiModel =
                 uiEffect.errorUiState.toUiModel() ?: return
-            when (uiEffect.retryAction) {
-                is TripDetailRetryAction.AddTurip -> {
-                    val result =
-                        addTuripSheetSnackbarState.showSnackbar(
-                            visuals =
-                                TuripSnackbarVisuals(
-                                    message = resources.getString(uiModel.titleRes),
-                                    actionLabel = resources.getString(uiModel.retryTextRes),
-                                    duration = SnackbarDuration.Long,
-                                ),
-                        )
-                    if (result == SnackbarResult.ActionPerformed) {
-                        handleErrorRetryRequest(uiEffect.retryAction)
-                    }
-                }
+            snackbarDelegate.showSnackbar(
+                message = resources.getString(uiModel.titleRes),
+                actionLabel = resources.getString(uiModel.retryTextRes),
+                duration = SnackbarDuration.Long,
+                onAction = { handleErrorRetryRequest(uiEffect.retryAction) },
+            )
+        }
 
-                else -> {
-                    snackbarDelegate.showSnackbar(
-                        message = resources.getString(uiModel.titleRes),
-                        actionLabel = resources.getString(uiModel.retryTextRes),
-                        duration = SnackbarDuration.Long,
-                        onAction = { handleErrorRetryRequest(uiEffect.retryAction) },
-                    )
-                }
+        is TripDetailUiEffect.ShowAddedError -> {
+            val uiModel: ErrorUiModel =
+                uiEffect.errorUiState.toUiModel() ?: return
+            val result =
+                addTuripSheetSnackbarState.showSnackbar(
+                    visuals =
+                        TuripSnackbarVisuals(
+                            message = resources.getString(uiModel.titleRes),
+                            actionLabel = resources.getString(uiModel.retryTextRes),
+                            duration = SnackbarDuration.Long,
+                        ),
+                )
+            if (result == SnackbarResult.ActionPerformed) {
+                handleErrorRetryRequest(uiEffect.retryAction)
             }
         }
 

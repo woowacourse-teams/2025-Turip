@@ -18,6 +18,11 @@ sealed interface TripDetailUiEffect {
         val retryAction: TripDetailRetryAction,
     ) : TripDetailUiEffect
 
+    data class ShowAddedError(
+        val errorUiState: ErrorUiState,
+        val retryAction: TripDetailRetryAction,
+    ) : TripDetailUiEffect
+
     data class TuripAdded(
         val turipName: String,
     ) : TripDetailUiEffect

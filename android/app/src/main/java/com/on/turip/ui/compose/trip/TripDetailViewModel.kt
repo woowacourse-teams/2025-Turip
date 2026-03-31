@@ -281,11 +281,19 @@ class TripDetailViewModel @Inject constructor(
         if (uiError is UiError.Global) {
             when (uiError) {
                 UiError.Global.Network -> {
-                    _uiEffect.send(TripDetailUiEffect.ShowError(ErrorUiState.Network, retryAction))
+                    if (retryAction is TripDetailRetryAction.AddTurip) {
+                        _uiEffect.send(TripDetailUiEffect.ShowAddedError(ErrorUiState.Network, retryAction))
+                    } else {
+                        _uiEffect.send(TripDetailUiEffect.ShowError(ErrorUiState.Network, retryAction))
+                    }
                 }
 
                 UiError.Global.Server -> {
-                    _uiEffect.send(TripDetailUiEffect.ShowError(ErrorUiState.Server, retryAction))
+                    if (retryAction is TripDetailRetryAction.AddTurip) {
+                        _uiEffect.send(TripDetailUiEffect.ShowAddedError(ErrorUiState.Server, retryAction))
+                    } else {
+                        _uiEffect.send(TripDetailUiEffect.ShowError(ErrorUiState.Server, retryAction))
+                    }
                 }
 
                 UiError.Global.TokenExpired -> {
