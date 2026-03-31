@@ -152,7 +152,7 @@ class PlaceTuripSelectionViewModel @Inject constructor(
             val placeId = uiState.value.selectionPlaceId
 
             turipRepository
-                .updatePlaceTurips(placeId, selectedTuripIds)
+                .updatePlaceTurips(placeId, selectedTuripIds, originTuripIds)
                 .onSuccess {
                     _uiEffect.send(
                         PlaceTuripSelectionUiEffect.UpdateTuripsByPlace(

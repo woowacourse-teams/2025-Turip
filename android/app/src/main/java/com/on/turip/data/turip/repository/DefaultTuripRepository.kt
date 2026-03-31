@@ -137,13 +137,9 @@ class DefaultTuripRepository @Inject constructor(
     override suspend fun updatePlaceTurips(
         placeId: Long,
         turipIds: List<Long>,
+        previouslySelectedIds: Set<Long>,
     ): TuripResult<Unit> {
         val turipIdsSet = turipIds.toSet()
-        val previouslySelectedIds =
-            _turips.value
-                .filter { it.hasIncludePlace }
-                .map { it.id }
-                .toSet()
         return turipRestRemoteDataSource
             .putPlaceTurips(
                 placeId = placeId,

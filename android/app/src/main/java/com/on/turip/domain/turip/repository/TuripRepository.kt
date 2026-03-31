@@ -52,6 +52,7 @@ interface TuripRepository {
     suspend fun updatePlaceTurips(
         placeId: Long,
         turipIds: List<Long>,
+        previouslySelectedIds: Set<Long>,
     ): TuripResult<Unit>
 
     suspend fun createInvitationToken(turipId: Long): TuripResult<TuripInvitationToken>
