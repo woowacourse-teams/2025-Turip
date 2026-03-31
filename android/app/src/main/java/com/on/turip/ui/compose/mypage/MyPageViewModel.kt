@@ -105,10 +105,10 @@ class MyPageViewModel @Inject constructor(
             val cursor = Cursor(size = 10, lastId = null)
             bookmarkRepository
                 .loadBookmarks(cursor)
-                .onSuccess {
+                .onSuccess { page ->
                     _uiState.update { state ->
                         if (state.bookmarkContentState is MyPageSectionState.Loading) {
-                            state.copy(bookmarkContentState = MyPageSectionState.Success(emptyList<BookmarkContent>().toImmutableList()))
+                            state.copy(bookmarkContentState = MyPageSectionState.Success(page.items.toImmutableList()))
                         } else {
                             state
                         }
