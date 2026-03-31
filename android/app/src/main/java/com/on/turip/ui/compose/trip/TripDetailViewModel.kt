@@ -221,12 +221,15 @@ class TripDetailViewModel @Inject constructor(
 
     fun dismissAddTuripBottomSheet() =
         _uiState.update {
-            it.copy(
-                showAddTuripBottomSheet = false,
-                isCreatingTurip = false,
-                addTuripInputName = "",
-                addTuripNameStatus = TuripNameStatusModel.EMPTY,
-            )
+            if (it.isCreatingTurip) {
+                it.copy(showAddTuripBottomSheet = false)
+            } else {
+                it.copy(
+                    showAddTuripBottomSheet = false,
+                    addTuripInputName = "",
+                    addTuripNameStatus = TuripNameStatusModel.EMPTY,
+                )
+            }
         }
 
     fun updateAddTuripInputName(name: String) {
@@ -249,6 +252,7 @@ class TripDetailViewModel @Inject constructor(
             turipRepository
                 .createTurip(name)
                 .onSuccess {
+                    _uiState.update { it.copy(isCreatingTurip = false) }
                     _uiEffect.send(TripDetailUiEffect.TuripAdded(name))
                 }.onFailure { errorType: ErrorType ->
                     if (errorType == ErrorType.Turip.DuplicatedName) {
