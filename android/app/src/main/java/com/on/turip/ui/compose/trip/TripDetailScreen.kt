@@ -505,7 +505,7 @@ private fun TripContentScreenPreview() {
                     webView = webView,
                     videoManager = VideoManager(webView),
                     navigateToWebViewUrl = {},
-                    activity = LocalActivity.current!!,
+                    activity = LocalActivity.current ?: return@TuripTheme,
                 ),
             onTimeLineClick = {},
             onMapClick = {},
