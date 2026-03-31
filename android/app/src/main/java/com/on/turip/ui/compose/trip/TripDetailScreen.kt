@@ -371,7 +371,11 @@ private suspend fun handleUiEffect(
             snackbarState.showSnackbar(
                 visuals =
                     TuripSnackbarVisuals(
-                        message = resources.getString(R.string.turip_add_turip, uiEffect.turipName),
+                        message =
+                            resources.getString(
+                                R.string.turip_added_snackbar_message,
+                                uiEffect.turipName,
+                            ),
                         iconRes = R.drawable.btn_turip_selected,
                         actionLabel = resources.getString(R.string.all_close_description),
                     ),
