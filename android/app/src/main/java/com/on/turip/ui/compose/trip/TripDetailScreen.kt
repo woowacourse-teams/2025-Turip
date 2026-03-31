@@ -211,6 +211,7 @@ fun TripDetailScreen(
             )
             TripDetailAppBar(
                 isError = uiState.errorUiState != ErrorUiState.None,
+                isLoading = isInitialLoading,
                 isBookmarked = uiState.isBookmarked,
                 onBackClick = navigateToBack,
                 onBookmarkClick = {

@@ -18,6 +18,7 @@ import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 @Composable
 fun TripDetailAppBar(
     isError: Boolean,
+    isLoading: Boolean,
     isBookmarked: Boolean,
     onBackClick: () -> Unit,
     onBookmarkClick: () -> Unit,
@@ -37,7 +38,7 @@ fun TripDetailAppBar(
             )
         },
         end = {
-            if (!isError) {
+            if (!isError && !isLoading) {
                 Icon(
                     painter = painterResource(bookmarkIconRes),
                     contentDescription = stringResource(R.string.trip_detail_bookmark_description),
@@ -58,6 +59,7 @@ private fun IsBookmarkedTripDetailAppBarPreview() {
     TuripTheme {
         TripDetailAppBar(
             isError = false,
+            isLoading = false,
             isBookmarked = true,
             onBackClick = { },
             onBookmarkClick = { },
@@ -74,6 +76,7 @@ private fun IsNotBookmarkedTripDetailAppBarPreview() {
             isBookmarked = false,
             onBackClick = { },
             onBookmarkClick = { },
+            isLoading = false,
         )
     }
 }
@@ -87,6 +90,7 @@ private fun ErrorTripDetailAppBarPreview() {
             isBookmarked = false,
             onBackClick = { },
             onBookmarkClick = { },
+            isLoading = true,
         )
     }
 }
