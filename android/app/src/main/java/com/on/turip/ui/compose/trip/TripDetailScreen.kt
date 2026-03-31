@@ -125,8 +125,10 @@ fun TripDetailScreen(
     val bottomSheetScope = rememberCoroutineScope()
 
     val addTuripSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val addTuripSnackbarHostState = remember { SnackbarHostState() }
-    val addTuripSheetSnackbarHostState = remember { SnackbarHostState() }
+    // PlaceTuripSelectionBottomSheet 용 (바깥 시트)
+    val placeTuripSelectionSnackbarHostState = remember { SnackbarHostState() }
+    // TuripAddBottomSheet 용 (안쪽 시트)
+    val turipAddSnackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
         viewModel.initContentId(contentId)
@@ -163,8 +165,8 @@ fun TripDetailScreen(
                 handleErrorRetryRequest = viewModel::handleErrorRetryRequest,
                 addTuripSheetState = addTuripSheetState,
                 dismissAddTuripBottomSheet = viewModel::dismissAddTuripBottomSheet,
-                snackbarState = addTuripSnackbarHostState,
-                addTuripSheetSnackbarState = addTuripSheetSnackbarHostState,
+                placeTuripSelectionSnackbarHostState = placeTuripSelectionSnackbarHostState,
+                turipAddSnackbarHostState = turipAddSnackbarHostState,
             )
         }
     }
@@ -259,7 +261,7 @@ fun TripDetailScreen(
                             PlaceTuripSelectionBottomSheet(
                                 sheetState = sheetState,
                                 selectedPlaceModel = place,
-                                snackbarHostState = addTuripSnackbarHostState,
+                                snackbarHostState = placeTuripSelectionSnackbarHostState,
                                 onNavigateToLogin = navigateToLogin,
                                 onNavigateToAddTurip = { viewModel.showAddTuripBottomSheet() },
                                 onNavigateToTuripDetail = navigateToTuripDetail,
@@ -287,7 +289,7 @@ fun TripDetailScreen(
                                 onNameChanged = viewModel::updateAddTuripInputName,
                                 onConfirmClick = viewModel::addTurip,
                                 onDismiss = viewModel::dismissAddTuripBottomSheet,
-                                snackbarHostState = addTuripSheetSnackbarHostState,
+                                snackbarHostState = turipAddSnackbarHostState,
                             )
                         }
                     }
@@ -301,8 +303,8 @@ fun TripDetailScreen(
 private suspend fun handleUiEffect(
     uiEffect: TripDetailUiEffect,
     snackbarDelegate: SnackbarDelegate,
-    snackbarState: SnackbarHostState,
-    addTuripSheetSnackbarState: SnackbarHostState,
+    placeTuripSelectionSnackbarHostState: SnackbarHostState,
+    turipAddSnackbarHostState: SnackbarHostState,
     resources: Resources,
     navigateToLogin: () -> Unit,
     handleErrorRetryRequest: (action: TripDetailRetryAction) -> Unit,
@@ -351,7 +353,7 @@ private suspend fun handleUiEffect(
             val uiModel: ErrorUiModel =
                 uiEffect.errorUiState.toUiModel() ?: return
             val result =
-                addTuripSheetSnackbarState.showSnackbar(
+                turipAddSnackbarHostState.showSnackbar(
                     visuals =
                         TuripSnackbarVisuals(
                             message = resources.getString(uiModel.titleRes),
@@ -367,7 +369,7 @@ private suspend fun handleUiEffect(
         is TripDetailUiEffect.TuripAdded -> {
             addTuripSheetState.hide()
             dismissAddTuripBottomSheet()
-            snackbarState.showSnackbar(
+            placeTuripSelectionSnackbarHostState.showSnackbar(
                 visuals =
                     TuripSnackbarVisuals(
                         message =
