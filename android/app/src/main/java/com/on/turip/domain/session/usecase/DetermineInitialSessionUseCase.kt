@@ -17,6 +17,9 @@ class DetermineInitialSessionUseCase @Inject constructor(
     suspend operator fun invoke(): AuthStatus {
         tokenManager.initialize()
 
+        // 게스트 모드 상태인 경우
+        if (tokenManager.currentTokens == null) return AuthStatus.UnAuthenticated
+
         // 토큰이 유효한지 검증
         authRepository.verifyToken().fold(
             onSuccess = {
