@@ -110,12 +110,7 @@ class DefaultTuripRepository @Inject constructor(
                     _turips.update { current ->
                         current.map {
                             if (it.id == turipId) {
-                                it.copy(
-                                    placeCount =
-                                        (it.placeCount - 1).coerceAtLeast(
-                                            0,
-                                        ),
-                                )
+                                it.copy(placeCount = (it.placeCount - 1).coerceAtLeast(0))
                             } else {
                                 it
                             }
