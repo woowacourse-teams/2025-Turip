@@ -2,7 +2,6 @@ package com.on.turip.data.content.repository
 
 import com.on.turip.core.result.TuripResult
 import com.on.turip.core.result.mapCatching
-import com.on.turip.core.result.onSuccess
 import com.on.turip.data.content.datasource.ContentRemoteDataSource
 import com.on.turip.data.content.toDomain
 import com.on.turip.domain.content.Content
@@ -10,18 +9,11 @@ import com.on.turip.domain.content.PagedContentsResult
 import com.on.turip.domain.content.UsersLikeContent
 import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.trip.Trip
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 class DefaultContentRepository @Inject constructor(
     private val contentRemoteDataSource: ContentRemoteDataSource,
 ) : ContentRepository {
-    private val _tripCache = MutableStateFlow<Map<Long, Trip>>(emptyMap())
-    override val tripCache: StateFlow<Map<Long, Trip>> = _tripCache.asStateFlow()
-
     override suspend fun loadContentsSizeByRegion(regionCategoryName: String): TuripResult<Int> =
         contentRemoteDataSource
             .getContentsSizeByRegion(regionCategoryName)
@@ -64,9 +56,4 @@ class DefaultContentRepository @Inject constructor(
         contentRemoteDataSource
             .getTrip(contentId)
             .mapCatching { it.toDomain() }
-            .also { result ->
-                result.onSuccess { trip ->
-                    _tripCache.update { it + (contentId to trip) }
-                }
-            }
 }

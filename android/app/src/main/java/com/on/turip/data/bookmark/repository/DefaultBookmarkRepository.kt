@@ -35,17 +35,11 @@ class DefaultBookmarkRepository @Inject constructor(
             .postBookmark(contentId.toRequestDto())
             .also { result ->
                 result.onSuccess { response ->
-                    val trip = contentRepository.tripCache.value[contentId] ?: return@onSuccess
-                    _bookmarkContents.update { current ->
-                        (
-                            listOf(
-                                BookmarkContent.of(
-                                    response.toDomain(),
-                                    trip.tripDuration,
-                                    trip.tripPlaceCount,
-                                ),
-                            ) + current
-                        ).toImmutableList()
+                    val bookmark = response.toDomain()
+                    contentRepository.loadTripInfo(contentId).onSuccess { trip ->
+                        _bookmarkContents.update { current ->
+                            (listOf(BookmarkContent.of(bookmark, trip.tripDuration, trip.tripPlaceCount)) + current).toImmutableList()
+                        }
                     }
                 }
             }.map { }

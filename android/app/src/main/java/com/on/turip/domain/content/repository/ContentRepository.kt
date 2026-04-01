@@ -5,11 +5,8 @@ import com.on.turip.domain.content.Content
 import com.on.turip.domain.content.PagedContentsResult
 import com.on.turip.domain.content.UsersLikeContent
 import com.on.turip.domain.trip.Trip
-import kotlinx.coroutines.flow.StateFlow
 
 interface ContentRepository {
-    val tripCache: StateFlow<Map<Long, Trip>>
-
     suspend fun loadContentsSizeByRegion(regionCategoryName: String): TuripResult<Int>
 
     suspend fun loadContentsSizeByKeyword(keyword: String): TuripResult<Int>
