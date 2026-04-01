@@ -4,7 +4,6 @@ import com.on.turip.core.result.TuripResult
 import com.on.turip.core.result.mapCatching
 import com.on.turip.core.result.onSuccess
 import com.on.turip.data.bookmark.datasource.BookmarkRemoteDataSource
-import com.on.turip.data.bookmark.dto.BookmarkCreationResponse
 import com.on.turip.data.bookmark.toDomain
 import com.on.turip.data.bookmark.toRequestDto
 import com.on.turip.domain.bookmark.BookmarkContent
@@ -34,10 +33,18 @@ class DefaultBookmarkRepository @Inject constructor(
         bookmarkRemoteDataSource
             .postBookmark(contentId.toRequestDto())
             .also { result ->
-                result.onSuccess { response: BookmarkCreationResponse ->
+                result.onSuccess { response ->
                     val trip = contentRepository.tripCache.value[contentId] ?: return@onSuccess
                     _bookmarkContents.update { current ->
-                        (listOf(response.toDomain(trip)) + current).toImmutableList()
+                        (
+                            listOf(
+                                BookmarkContent.of(
+                                    response.toDomain(),
+                                    trip.tripDuration,
+                                    trip.tripPlaceCount,
+                                ),
+                            ) + current
+                        ).toImmutableList()
                     }
                 }
             }.mapCatching { }

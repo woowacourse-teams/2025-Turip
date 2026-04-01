@@ -9,4 +9,19 @@ data class BookmarkContent(
     val tripDuration: TripDuration,
     val tripPlaceCount: Int,
     val createdAt: String,
-)
+) {
+    companion object {
+        fun of(
+            bookmark: Bookmark,
+            tripDuration: TripDuration,
+            tripPlaceCount: Int,
+        ): BookmarkContent =
+            BookmarkContent(
+                bookmarkId = bookmark.id,
+                content = bookmark.content,
+                tripDuration = tripDuration,
+                tripPlaceCount = tripPlaceCount,
+                createdAt = bookmark.createdAt,
+            )
+    }
+}
