@@ -1,6 +1,7 @@
 package com.on.turip.data.bookmark.repository
 
 import com.on.turip.core.result.TuripResult
+import com.on.turip.core.result.map
 import com.on.turip.core.result.mapCatching
 import com.on.turip.core.result.onSuccess
 import com.on.turip.data.bookmark.datasource.BookmarkRemoteDataSource
@@ -47,7 +48,7 @@ class DefaultBookmarkRepository @Inject constructor(
                         ).toImmutableList()
                     }
                 }
-            }.mapCatching { }
+            }.map { }
 
     override suspend fun deleteBookmark(contentId: Long): TuripResult<Unit> =
         bookmarkRemoteDataSource.deleteBookmark(contentId).also { result ->
