@@ -192,9 +192,7 @@ fun PlaceTuripSelectionBottomSheet(
                 onDismissRequest = viewModel::requestDismiss,
                 onAddTuripClick = onNavigateToAddTurip,
                 onTuripPlaceClickAtTurips = viewModel::updateTurip,
-                onNavigateToTurip = { turipId: Long ->
-                    onNavigateToTuripDetail(turipId)
-                },
+                onNavigateToTurip = onNavigateToTuripDetail,
                 onConfirmClick = viewModel::updateTuripsByPlace,
                 onMapClick = onNavigateToMap,
                 onTuripPlaceClickAtTuripDetail = viewModel::applyTuripPlaceDelete,
