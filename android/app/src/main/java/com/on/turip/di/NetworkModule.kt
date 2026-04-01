@@ -225,7 +225,7 @@ object NetworkModule {
     @Provides
     @Singleton
     @DefaultKtorfit
-    fun provideDefaultKtrofit(
+    fun provideDefaultKtorfit(
         @DefaultHttpClient httpClient: HttpClient,
     ): Ktorfit =
         Ktorfit
@@ -237,7 +237,7 @@ object NetworkModule {
     @Provides
     @Singleton
     @NoAuthKtorfit
-    fun provideNoAuthKtrofit(
+    fun provideNoAuthKtorfit(
         @NoAuthHttpClient httpClient: HttpClient,
     ): Ktorfit =
         Ktorfit
