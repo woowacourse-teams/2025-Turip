@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -49,14 +48,6 @@ class ContentRepositoryTest extends TestContainerConfig {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
-
-    @BeforeAll
-    void setUp() {
-        jdbcTemplate.execute("ALTER TABLE content ADD FULLTEXT INDEX idx_title (title) WITH PARSER ngram");
-        jdbcTemplate.execute(
-                "ALTER TABLE creator ADD FULLTEXT INDEX idx_channel_name (channel_name) WITH PARSER ngram");
-        jdbcTemplate.execute("ALTER TABLE place ADD FULLTEXT INDEX idx_name (name) WITH PARSER ngram");
-    }
 
     @BeforeEach
     void clear() {

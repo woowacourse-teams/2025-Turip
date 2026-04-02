@@ -1,10 +1,12 @@
 spring:
   sql:
     init:
-      mode: never
+      mode: always
+      schema-locations: classpath:init-test-db.sql
       data-locations: [ ]
-
+      continue-on-error: false
   jpa:
+    defer-datasource-initialization: true
     hibernate:
       ddl-auto: create-drop
     properties:

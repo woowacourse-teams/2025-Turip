@@ -3,7 +3,6 @@ package turip.content.api;
 import static org.hamcrest.Matchers.is;
 
 import io.restassured.RestAssured;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -28,15 +27,6 @@ public class ContentKeywordApiTest extends TestContainerConfig {
 
     @LocalServerPort
     protected int port;
-
-    @BeforeAll
-    void setUp() {
-        // Fulltext index 생성
-        jdbcTemplate.execute("ALTER TABLE content ADD FULLTEXT INDEX idx_title (title) WITH PARSER ngram");
-        jdbcTemplate.execute(
-                "ALTER TABLE creator ADD FULLTEXT INDEX idx_channel_name (channel_name) WITH PARSER ngram");
-        jdbcTemplate.execute("ALTER TABLE place ADD FULLTEXT INDEX idx_name (name) WITH PARSER ngram");
-    }
 
     @BeforeEach
     void clear() {
