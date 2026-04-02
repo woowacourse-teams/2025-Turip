@@ -12,18 +12,16 @@ import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import turip.container.TestContainerConfig;
 import turip.favorite.domain.AccountRole;
 import turip.util.helper.TestDataHelper;
 
-@ActiveProfiles("test")
-@Import(TestContainerConfig.class)
+@ActiveProfiles("test-mysql")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class GuestApiTest {
+class GuestApiTest extends TestContainerConfig {
 
     @LocalServerPort
     private int port;

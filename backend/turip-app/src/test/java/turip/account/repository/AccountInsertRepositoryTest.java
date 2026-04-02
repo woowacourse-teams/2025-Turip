@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import turip.account.domain.Account;
@@ -17,10 +16,9 @@ import turip.account.domain.Role;
 import turip.container.TestContainerConfig;
 
 @SpringBootTest
-@ActiveProfiles("test")
-@Import(TestContainerConfig.class)
+@ActiveProfiles("test-mysql")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class AccountInsertRepositoryTest {
+class AccountInsertRepositoryTest extends TestContainerConfig {
 
     @Autowired
     private AccountInsertRepository accountInsertRepository;

@@ -15,7 +15,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -32,10 +31,9 @@ import turip.region.repository.CityRepository;
 import turip.region.repository.CountryRepository;
 
 @DataJpaTest
-@ActiveProfiles("test")
-@Import(TestContainerConfig.class)
+@ActiveProfiles("test-mysql")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class ContentRepositoryTest {
+class ContentRepositoryTest extends TestContainerConfig {
 
     @Autowired
     private CreatorRepository creatorRepository;

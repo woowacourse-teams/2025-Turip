@@ -1,19 +1,30 @@
 package turip.container;
 
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
-import org.springframework.context.annotation.Bean;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
-@TestConfiguration
-public class TestContainerConfig {
+@Testcontainers
+public abstract class TestContainerConfig {
 
-    @Bean
-    @ServiceConnection
-    public MySQLContainer mySQLContainer() {
-        return new MySQLContainer("mysql:8.0.42")
-                .withUsername("root")
-                .withPassword("rootpwd")
-                .withDatabaseName("test_db");
+    static final MySQLContainer<?> MYSQL_CONTAINER =
+            new MySQLContainer<>("mysql:8.0.42")
+                    .withDatabaseName("test_db")
+                    .withUsername("root")
+                    .withPassword("rootpwd")
+                    .withReuse(true);
+
+    static {
+        MYSQL_CONTAINER.start();
+    }
+
+    @DynamicPropertySource
+    static void overrideProps(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", MYSQL_CONTAINER::getJdbcUrl);
+        registry.add("spring.datasource.username", MYSQL_CONTAINER::getUsername);
+        registry.add("spring.datasource.password", MYSQL_CONTAINER::getPassword);
+        registry.add("spring.datasource.driver-class-name",
+                MYSQL_CONTAINER::getDriverClassName);
     }
 }
