@@ -6,11 +6,13 @@ import jakarta.persistence.EntityManager;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 import turip.account.domain.Account;
 import turip.account.repository.AccountRepository;
+import turip.container.TestContainerConfig;
 import turip.favorite.domain.AccountRole;
 import turip.favorite.domain.FavoriteFolder;
 import turip.util.fixture.AccountFixture;
@@ -18,8 +20,9 @@ import turip.util.fixture.FavoriteFolderAccountFixture;
 import turip.util.fixture.FavoriteFolderFixture;
 
 @DataJpaTest
-@ActiveProfiles("test")
-class FavoriteFolderRepositoryTest {
+@ActiveProfiles("test-mysql")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class FavoriteFolderRepositoryTest extends TestContainerConfig {
 
     @Autowired
     private FavoriteFolderRepository favoriteFolderRepository;
