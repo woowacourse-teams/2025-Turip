@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -15,7 +14,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -32,10 +30,9 @@ import turip.region.repository.CityRepository;
 import turip.region.repository.CountryRepository;
 
 @DataJpaTest
-@ActiveProfiles("test")
-@Import(TestContainerConfig.class)
+@ActiveProfiles("test-mysql")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class ContentRepositoryTest {
+class ContentRepositoryTest extends TestContainerConfig {
 
     @Autowired
     private CreatorRepository creatorRepository;
@@ -51,14 +48,6 @@ class ContentRepositoryTest {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
-
-    @BeforeAll
-    void setUp() {
-        jdbcTemplate.execute("ALTER TABLE content ADD FULLTEXT INDEX idx_title (title) WITH PARSER ngram");
-        jdbcTemplate.execute(
-                "ALTER TABLE creator ADD FULLTEXT INDEX idx_channel_name (channel_name) WITH PARSER ngram");
-        jdbcTemplate.execute("ALTER TABLE place ADD FULLTEXT INDEX idx_name (name) WITH PARSER ngram");
-    }
 
     @BeforeEach
     void clear() {

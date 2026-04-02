@@ -34,22 +34,18 @@ public interface FavoriteFolderRepository extends JpaRepository<FavoriteFolder, 
     boolean existsCustomFolderByAccount(@Param("account") Account account);
 
     @Modifying
-    @Query("DELETE FROM FavoriteFolder ff " +
-            "WHERE ff.id IN (" +
-            "   SELECT ffa.favoriteFolder.id " +
-            "   FROM FavoriteFolderAccount ffa " +
-            "   WHERE ffa.account = :account " +
-            ") " +
-            "AND ff.isShared = false")
+    @Query(value = "DELETE ff FROM favorite_folder ff " +
+            "JOIN favorite_folder_account ffa ON ffa.favorite_folder_id = ff.id " +
+            "WHERE ffa.account_id = :#{#account.id} " +
+            "AND ff.is_shared = false",
+            nativeQuery = true)
     void deletePersonalFoldersByAccount(@Param("account") Account account);
 
     @Modifying
-    @Query("DELETE FROM FavoriteFolder ff " +
-            "WHERE ff.id = (" +
-            "   SELECT ffa.favoriteFolder.id " +
-            "   FROM FavoriteFolderAccount ffa " +
-            "   WHERE ffa.account = :account " +
-            "   AND ffa.favoriteFolder.isDefault = true" +
-            ")")
+    @Query(value = "DELETE ff FROM favorite_folder ff " +
+            "JOIN favorite_folder_account ffa ON ffa.favorite_folder_id = ff.id " +
+            "WHERE ffa.account_id = :#{#account.id} " +
+            "AND ff.is_default = true",
+            nativeQuery = true)
     void deleteDefaultFolderByAccount(@Param("account") Account account);
 }
