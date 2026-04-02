@@ -172,6 +172,10 @@ class DefaultTuripRepository @Inject constructor(
     override suspend fun verifyInvitationToken(token: String): TuripResult<TuripInvitationInformation> =
         turipRestRemoteDataSource.getInvitationInformation(token).mapCatching { it.toDomain() }
 
+    override fun clearCache() {
+        _turips.value = emptyList()
+    }
+
     override fun streamTuripEvents(turipId: Long): Flow<TuripStreamResult> =
         turipSseStreamDataSource
             .streamTuripEvents(turipId)

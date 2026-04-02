@@ -62,4 +62,6 @@ interface TuripRepository {
     suspend fun verifyInvitationToken(token: String): TuripResult<TuripInvitationInformation>
 
     fun streamTuripEvents(turipId: Long): Flow<TuripStreamResult>
+
+    fun clearCache()
 }

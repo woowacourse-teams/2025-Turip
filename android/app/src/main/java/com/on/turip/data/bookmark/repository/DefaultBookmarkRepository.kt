@@ -67,4 +67,8 @@ class DefaultBookmarkRepository @Inject constructor(
         }
 
     override suspend fun loadBookmarkCount(): TuripResult<Int> = bookmarkRemoteDataSource.getBookmarkCount().mapCatching { it.count }
+
+    override fun clearCache() {
+        _bookmarkContents.value = persistentListOf()
+    }
 }

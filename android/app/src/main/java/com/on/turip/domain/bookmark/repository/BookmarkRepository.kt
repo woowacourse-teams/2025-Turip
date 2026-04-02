@@ -17,4 +17,6 @@ interface BookmarkRepository {
     suspend fun loadBookmarks(cursor: Cursor): TuripResult<Page<BookmarkContent>>
 
     suspend fun loadBookmarkCount(): TuripResult<Int>
+
+    fun clearCache()
 }
