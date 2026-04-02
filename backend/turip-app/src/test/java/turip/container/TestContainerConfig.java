@@ -3,9 +3,7 @@ package turip.container;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.MySQLContainer;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
-@Testcontainers
 public abstract class TestContainerConfig {
 
     static final MySQLContainer<?> MYSQL_CONTAINER =
