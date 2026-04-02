@@ -64,9 +64,3 @@ invitation:
 sse:
   heartbeat:
     interval: 2  # 2초
-
-# test container 로그 설정
-logging:
-  level:
-    org.testcontainers: DEBUG
-    com.github.dockerjava: DEBUG
