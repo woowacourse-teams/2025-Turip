@@ -79,6 +79,7 @@ class Navigator(
         when (key) {
             in state.topLevelKeys -> {
                 state.topLevelStack.add(key)
+                state.subStacks[key]?.add(key)
             }
 
             else -> {
@@ -106,6 +107,10 @@ class Navigator(
             if (key == state.startKey) clear() else remove(key)
             add(key)
         }
+        val subStack = state.subStacks[key]
+        if (subStack != null && subStack.isEmpty()) {
+            subStack.add(key)
+        }
     }
 
     private fun replaceToKey(key: NavKey) {
@@ -124,9 +129,8 @@ class Navigator(
 
     private fun clearAllStacks() {
         state.topLevelStack.clear()
-        state.subStacks.forEach { (topLevelKey, stack) ->
+        state.subStacks.forEach { (_, stack) ->
             stack.clear()
-            stack.add(topLevelKey)
         }
     }
 
