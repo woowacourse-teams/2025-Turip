@@ -94,6 +94,7 @@ class LoginViewmodel @Inject constructor(
                     _uiEffect.send(LoginUiEffect.NavigateToMain(_uiState.value.deepLinkUrl))
                 }.onFailure { errorType ->
                     Timber.e("마이그레이션 실패")
+                    _uiState.update { it.copy(showMigrationDialog = false) }
                     handleError(errorType)
                 }
         }
