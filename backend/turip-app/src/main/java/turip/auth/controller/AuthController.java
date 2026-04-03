@@ -26,11 +26,12 @@ import turip.auth.controller.dto.request.GoogleLoginRequest;
 import turip.auth.controller.dto.request.RefreshTokenRequest;
 import turip.auth.controller.dto.request.TuripLoginRequest;
 import turip.auth.controller.dto.response.RefreshTokenResponse;
-import turip.auth.controller.dto.response.SocialLoginResponse;
+import turip.auth.controller.dto.response.SocialLoginResponseV1;
 import turip.auth.controller.dto.response.TuripLoginResponse;
 import turip.auth.resolver.AuthAccount;
 import turip.auth.resolver.AuthMember;
 import turip.auth.service.AuthService;
+import turip.auth.service.dto.SocialLoginResult;
 import turip.auth.service.dto.TuripLoginResult;
 import turip.auth.util.TokenCookieUtil;
 import turip.common.exception.ErrorResponse;
@@ -130,7 +131,7 @@ public class AuthController {
                     description = "성공 예시",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = SocialLoginResponse.class),
+                            schema = @Schema(implementation = SocialLoginResult.class),
                             examples = @ExampleObject(
                                     name = "success",
                                     summary = "로그인 성공",
@@ -187,10 +188,11 @@ public class AuthController {
             )
     })
     @PostMapping("/login/google")
-    public ResponseEntity<SocialLoginResponse> loginWithGoogle(
+    public ResponseEntity<SocialLoginResponseV1> loginWithGoogle(
             @Parameter(hidden = true) @RequestHeader("device-fid") String deviceFid,
             @RequestBody GoogleLoginRequest request) {
-        SocialLoginResponse response = authService.loginWithSocial(request, Provider.GOOGLE, deviceFid);
+        SocialLoginResult result = authService.loginWithSocial(request, Provider.GOOGLE, deviceFid);
+        SocialLoginResponseV1 response = SocialLoginResponseV1.of(result);
         return ResponseEntity.ok(response);
     }
 
