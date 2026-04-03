@@ -1,5 +1,6 @@
 package turip.account.domain;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.jupiter.api.DisplayName;
@@ -21,5 +22,18 @@ public class MemberTest {
         assertThatThrownBy(() -> new Member(account, invalidEmail, true))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage(ErrorTag.EMAIL_INVALID.getMessage());
+    }
+
+    @DisplayName("회원의 초기 마이그레이션 결정 여부는 false이다.")
+    @Test
+    void isMigrationDecided() {
+        // given
+        Account account = AccountFixture.createUser();
+
+        // when
+        Member member = new Member(account, "test@email.com", true);
+
+        // then
+        assertThat(member.isMigrationDecided()).isFalse();
     }
 }

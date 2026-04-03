@@ -275,6 +275,98 @@ class AuthApiTest {
     }
 
     @Nested
+    @DisplayName("/api/v2/auth/login/google POST 구글 로그인 V2 테스트")
+    class LoginWithGoogleV2Test {
+
+        @Test
+        @DisplayName("신규 소셜 회원 로그인 성공 시 200 Ok와 토큰을 응답하고, 마이그레이션 여부를 false로 응답한다.")
+        void loginNewMemberSuccess() {
+            // given
+            String idToken = "valid-google-id-token";
+            String deviceFid = "device-123";
+
+            when(googleTokenParser.getProvider()).thenReturn(Provider.GOOGLE);
+            when(googleTokenParser.getProviderId(idToken)).thenReturn("google-user-123");
+            when(googleTokenParser.getEmail(idToken)).thenReturn("newuser@gmail.com");
+
+            Map<String, String> requestBody = new HashMap<>();
+            requestBody.put("idToken", idToken);
+
+            // when & then
+            RestAssured
+                    .given().log().all()
+                    .contentType(ContentType.JSON)
+                    .header("device-fid", deviceFid)
+                    .body(requestBody)
+                    .when().post("/api/v2/auth/login/google")
+                    .then().log().all()
+                    .statusCode(200)
+                    .body("accessToken", notNullValue())
+                    .body("refreshToken", notNullValue())
+                    .body("isMigrationDecided", is(false));
+        }
+
+        @Test
+        @DisplayName("유효하지 않은 ID 토큰인 경우 401 Unauthorized를 응답한다")
+        void loginWithInvalidIdToken() {
+            // given
+            String invalidIdToken = "invalid-token";
+            String deviceFid = "device-123";
+
+            when(googleTokenParser.getProvider()).thenReturn(Provider.GOOGLE);
+            when(googleTokenParser.getProviderId(anyString()))
+                    .thenThrow(new turip.common.exception.custom.UnauthorizedException(
+                            turip.common.exception.ErrorTag.ID_TOKEN_NOT_VALID));
+
+            Map<String, String> requestBody = new HashMap<>();
+            requestBody.put("idToken", invalidIdToken);
+
+            // when & then
+            RestAssured
+                    .given().log().all()
+                    .contentType(ContentType.JSON)
+                    .header("device-fid", deviceFid)
+                    .body(requestBody)
+                    .when().post("/api/v2/auth/login/google")
+                    .then().log().all()
+                    .statusCode(401)
+                    .body("tag", is("ID_TOKEN_NOT_VALID"));
+        }
+
+        @Test
+        @DisplayName("계정 생성에 실패한 경우 500 Internal Server Error를 응답한다")
+        void accountCreationFailed() {
+            // given
+            String email = "newuser@gmail.com";
+            Provider provider = Provider.GOOGLE;
+            String providerId = "google-user-new";
+
+            String idToken = "valid-google-id-token";
+            String deviceFid = "device-456";
+
+            when(googleTokenParser.getProvider()).thenReturn(provider);
+            when(googleTokenParser.getProviderId(idToken)).thenReturn(providerId);
+            when(googleTokenParser.getEmail(idToken)).thenReturn(email);
+            doThrow(new InternalServerException(ErrorTag.ACCOUNT_CREATION_ERROR))
+                    .when(accountService)
+                    .create(any());
+            Map<String, String> requestBody = new HashMap<>();
+            requestBody.put("idToken", idToken);
+
+            // when & then
+            RestAssured
+                    .given().log().all()
+                    .contentType(ContentType.JSON)
+                    .header("device-fid", deviceFid)
+                    .body(requestBody)
+                    .when().post("/api/v2/auth/login/google")
+                    .then().log().all()
+                    .statusCode(500)
+                    .body("tag", is("ACCOUNT_CREATION_ERROR"));
+        }
+    }
+
+    @Nested
     @DisplayName("/api/v1/auth/tokens POST 토큰 갱신 테스트")
     class RefreshTest {
 
