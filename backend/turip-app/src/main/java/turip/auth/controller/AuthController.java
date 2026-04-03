@@ -130,7 +130,7 @@ public class AuthController {
                     description = "성공 예시",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = SocialLoginResult.class),
+                            schema = @Schema(implementation = SocialLoginResponseV1.class),
                             examples = @ExampleObject(
                                     name = "success",
                                     summary = "로그인 성공",
