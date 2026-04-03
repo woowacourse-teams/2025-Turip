@@ -34,8 +34,8 @@ import turip.auth.controller.dto.request.GoogleLoginRequest;
 import turip.auth.controller.dto.request.RefreshTokenRequest;
 import turip.auth.controller.dto.request.TuripLoginRequest;
 import turip.auth.controller.dto.response.RefreshTokenResponse;
-import turip.auth.controller.dto.response.SocialLoginResponse;
 import turip.auth.domain.RefreshToken;
+import turip.auth.service.dto.SocialLoginResult;
 import turip.auth.service.dto.TuripLoginResult;
 import turip.auth.token.GoogleTokenParser;
 import turip.auth.token.JwtProvider;
@@ -155,7 +155,7 @@ class AuthServiceTest {
             when(jwtProvider.hashToken(anyString())).thenReturn("hashed-token");
 
             // when
-            SocialLoginResponse response = authService.loginWithSocial(request, provider, deviceFid);
+            SocialLoginResult response = authService.loginWithSocial(request, provider, deviceFid);
 
             // then
             assertThat(member.isFirstLogin()).isFalse();
@@ -198,7 +198,7 @@ class AuthServiceTest {
             when(jwtProvider.hashToken(anyString())).thenReturn("hashed-token");
 
             // when
-            SocialLoginResponse response = authService.loginWithSocial(request, provider, deviceFid);
+            SocialLoginResult response = authService.loginWithSocial(request, provider, deviceFid);
 
             // then
             assertThat(response.isNewMember()).isTrue();
