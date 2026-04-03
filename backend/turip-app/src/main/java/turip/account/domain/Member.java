@@ -40,21 +40,29 @@ public class Member {
     @Column(name = "is_first_login")
     private boolean isFirstLogin;
 
-    public Member(Long id, Account account, String email, boolean isFirstLogin) {
+    @Column(name = "is_migration_decided")
+    private boolean isMigrationDecided = false;
+
+    public Member(Long id, Account account, String email, boolean isFirstLogin, boolean isMigrationDecided) {
         validateEmail(email);
 
         this.id = id;
         this.account = account;
         this.email = email;
         this.isFirstLogin = isFirstLogin;
+        this.isMigrationDecided = isMigrationDecided;
     }
 
     public Member(Account account, String email, boolean isFirstLogin) {
-        this(null, account, email, isFirstLogin);
+        this(null, account, email, isFirstLogin, false);
     }
 
     public void completeFirstLogin() {
         this.isFirstLogin = false;
+    }
+
+    public void decideMigration() {
+        this.isMigrationDecided = true;
     }
 
     private void validateEmail(String email) {
