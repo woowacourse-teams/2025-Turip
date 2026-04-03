@@ -11,6 +11,4 @@ data class LoginJwtTokenResponse(
     val refreshToken: String,
     @SerialName("isMigrationDecided")
     val isMigrationDecided: Boolean,
-    @SerialName("isNewMember")
-    val isNewMember: Boolean,
 )

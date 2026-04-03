@@ -32,7 +32,7 @@ class LoginUseCase @Inject constructor(
                         onSuccess = {
                             Timber.d("로그인 성공")
                             sessionStore.setMember()
-                            TuripResult.Success(authResult.isNewMember && !authResult.isMigrationDecided)
+                            TuripResult.Success(!authResult.isMigrationDecided)
                         },
                         onFailure = { exception ->
                             Timber.e("토큰 저장 실패로 인한 로그인 실패")
