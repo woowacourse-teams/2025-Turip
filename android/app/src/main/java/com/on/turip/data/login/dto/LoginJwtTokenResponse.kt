@@ -9,6 +9,8 @@ data class LoginJwtTokenResponse(
     val accessToken: String,
     @SerialName("refreshToken")
     val refreshToken: String,
+    @SerialName("isMigrationDecided")
+    val isMigrationDecided: Boolean,
     @SerialName("isNewMember")
     val isNewMember: Boolean,
 )
