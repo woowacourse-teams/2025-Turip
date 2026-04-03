@@ -164,6 +164,26 @@ class MemberServiceTest {
         }
     }
 
+    @DisplayName("마이그레이션 여부 결정 테스트")
+    @Nested
+    class DecideMigration {
+
+        @DisplayName("마이그레이션 여부를 결정하면 isMigrationDecided가 true로 변경된다")
+        @Test
+        void decideMigration1() {
+            // given
+            Account memberAccount = AccountFixture.createCustomAccount(1L, Role.USER);
+            Member member = MemberFixture.createCustomMember(memberAccount, "email@test.com", true);
+
+            // when
+            assertThat(member.isMigrationDecided()).isFalse();
+            memberService.decideMigration(member);
+
+            // then
+            assertThat(member.isMigrationDecided()).isTrue();
+        }
+    }
+
     @DisplayName("Member 삭제(회원 탈퇴) 테스트")
     @Nested
     class DeleteTest {

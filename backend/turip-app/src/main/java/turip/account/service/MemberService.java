@@ -55,6 +55,11 @@ public class MemberService {
     }
 
     @Transactional
+    public void decideMigration(Member member) {
+        member.decideMigration();
+    }
+
+    @Transactional
     public void delete(Member member) {
         refreshTokenService.deleteByMember(member);
         memberRepository.delete(member);

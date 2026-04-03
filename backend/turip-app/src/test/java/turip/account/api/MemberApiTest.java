@@ -195,6 +195,71 @@ class MemberApiTest extends TestContainerConfig {
     }
 
     @Nested
+    @DisplayName("/api/v1/members/migration/reject POST 마이그레이션 거절 테스트")
+    class RejectMigrateTest {
+
+        @Test
+        @DisplayName("마이그레이션을 거절한 뒤 204 No Content를 응답한다")
+        void reject1() {
+            // given
+            Long memberAccountId = testDataHelper.insertAccount(); // Member account
+            Long memberId = testDataHelper.insertMember(memberAccountId, "migration@gmail.com", true);
+            Provider provider = Provider.GOOGLE;
+            String providerId = "google-user-migration";
+            testDataHelper.insertSocialMember(memberId, provider, providerId);
+            String accessToken = testDataHelper.createAccessToken(memberAccountId);
+
+            // when & then
+            RestAssured
+                    .given().log().all()
+                    .header("Authorization", "Bearer " + accessToken)
+                    .when().post("/api/v1/members/migration/reject")
+                    .then().log().all()
+                    .statusCode(204);
+        }
+
+        @Test
+        @DisplayName("Authorization 헤더 없이 요청 시 401 Unauthorized를 응답한다")
+        void migrationWithoutAuthorizationHeader() {
+            // given
+            String deviceFid = "device-123";
+
+            // when & then
+            RestAssured
+                    .given().log().all()
+                    .header("device-fid", deviceFid)
+                    .when().post("/api/v1/members/migration")
+                    .then().log().all()
+                    .statusCode(401);
+        }
+
+        @Test
+        @DisplayName("device-fid 헤더 없이 요청 시 400 Bad Request를 응답한다")
+        void migrationWithoutDeviceFidHeader() {
+            // given
+            // Member 생성 및 로그인
+            String email = "nodevice@gmail.com";
+            Provider provider = Provider.GOOGLE;
+            String providerId = "google-user-no-device";
+
+            Long socialMemberId = testDataHelper.insertSocialMember(email, true, provider, providerId);
+            Long accountId = jdbcTemplate.queryForObject(
+                    "SELECT account_id FROM member WHERE id = (SELECT member_id FROM social_member WHERE id = ?)",
+                    Long.class, socialMemberId);
+
+            String accessToken = testDataHelper.createAccessToken(accountId);
+
+            // when & then
+            RestAssured
+                    .given().log().all()
+                    .header("Authorization", "Bearer " + accessToken)
+                    .when().post("/api/v1/members/migration")
+                    .then().log().all()
+                    .statusCode(400);
+        }
+    }
+
+    @Nested
     @DisplayName("/api/v1/members/me DELETE 회원 탈퇴 테스트")
     class DeleteMemberTest {
 
