@@ -13,4 +13,7 @@ interface MemberService {
 
     @DELETE(ApiPath.V1 + "members/me")
     suspend fun deleteMember()
+
+    @POST(ApiPath.V1 + "members/migration/reject")
+    suspend fun postMigrationReject()
 }

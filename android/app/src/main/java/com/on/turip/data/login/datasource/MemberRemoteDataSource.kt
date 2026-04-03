@@ -22,4 +22,9 @@ class MemberRemoteDataSource @Inject constructor(
         safeApiCall {
             memberService.deleteMember()
         }
+
+    override suspend fun postMigrationReject(): TuripResult<Unit> =
+        safeApiCall {
+            memberService.postMigrationReject()
+        }
 }

@@ -13,4 +13,6 @@ class DefaultMemberRepository @Inject constructor(
     override suspend fun logout(): TuripResult<Unit> = memberDataSource.postLogout()
 
     override suspend fun deleteMember(): TuripResult<Unit> = memberDataSource.deleteMember()
+
+    override suspend fun rejectMigration(): TuripResult<Unit> = memberDataSource.postMigrationReject()
 }

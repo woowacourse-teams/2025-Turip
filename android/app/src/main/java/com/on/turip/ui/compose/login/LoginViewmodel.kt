@@ -100,6 +100,21 @@ class LoginViewmodel @Inject constructor(
         }
     }
 
+    fun rejectMigration() {
+        viewModelScope.launch {
+            memberRepository
+                .rejectMigration()
+                .onSuccess {
+                    _uiState.update { it.copy(showMigrationDialog = false) }
+                    _uiEffect.send(LoginUiEffect.NavigateToMain(_uiState.value.deepLinkUrl))
+                }.onFailure { errorType ->
+                    Timber.e("마이그레이션 거절 실패")
+                    _uiState.update { it.copy(showMigrationDialog = false) }
+                    handleError(errorType)
+                }
+        }
+    }
+
     fun clearGuestData() {
         viewModelScope.launch {
             guestRepository
