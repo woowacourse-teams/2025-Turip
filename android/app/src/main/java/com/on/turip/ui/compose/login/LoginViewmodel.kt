@@ -106,7 +106,7 @@ class LoginViewmodel @Inject constructor(
                 .rejectMigration()
                 .onSuccess {
                     _uiState.update { it.copy(showMigrationDialog = false) }
-                    _uiEffect.send(LoginUiEffect.NavigateToMain(_uiState.value.deepLinkUrl))
+                    clearGuestData()
                 }.onFailure { errorType ->
                     Timber.e("마이그레이션 거절 실패")
                     _uiState.update { it.copy(showMigrationDialog = false) }
@@ -115,16 +115,14 @@ class LoginViewmodel @Inject constructor(
         }
     }
 
-    fun clearGuestData() {
-        viewModelScope.launch {
-            guestRepository
-                .deleteGuest()
-                .onSuccess {
-                    _uiEffect.send(LoginUiEffect.NavigateToMain(_uiState.value.deepLinkUrl))
-                }.onFailure {
-                    Timber.e("게스트 데이터 삭제 실패")
-                }
-        }
+    private suspend fun clearGuestData() {
+        guestRepository
+            .deleteGuest()
+            .onSuccess {
+                _uiEffect.send(LoginUiEffect.NavigateToMain(_uiState.value.deepLinkUrl))
+            }.onFailure {
+                Timber.e("게스트 데이터 삭제 실패")
+            }
     }
 
     fun continueAsGuest() {
