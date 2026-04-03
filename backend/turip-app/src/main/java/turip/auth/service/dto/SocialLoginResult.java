@@ -7,7 +7,8 @@ public record SocialLoginResult(
         String accessToken,
         String refreshToken,
         boolean isNewMember,
-        Member member
+        String nickname,
+        boolean isMigrationDecided
 ) {
 
     public static SocialLoginResult of(
@@ -19,7 +20,8 @@ public record SocialLoginResult(
                 tokenResult.accessToken(),
                 tokenResult.refreshToken(),
                 isNewMember,
-                member
+                member.getAccount().getNickname(),
+                member.isMigrationDecided()
         );
     }
 }

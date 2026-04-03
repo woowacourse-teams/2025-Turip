@@ -12,8 +12,8 @@ public record SocialLoginResponseV2(
         return new SocialLoginResponseV2(
                 result.accessToken(),
                 result.refreshToken(),
-                result.member().getAccount().getNickname(),
-                result.member().isMigrationDecided()
+                result.nickname(),
+                result.isMigrationDecided()
         );
     }
 }

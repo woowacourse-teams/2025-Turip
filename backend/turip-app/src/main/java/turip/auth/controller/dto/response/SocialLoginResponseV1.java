@@ -12,7 +12,7 @@ public record SocialLoginResponseV1(
         return new SocialLoginResponseV1(
                 result.accessToken(),
                 result.refreshToken(),
-                result.member().getAccount().getNickname(),
+                result.nickname(),
                 result.isNewMember()
         );
     }
