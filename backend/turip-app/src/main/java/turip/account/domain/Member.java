@@ -43,18 +43,18 @@ public class Member {
     @Column(name = "is_migration_decided")
     private boolean isMigrationDecided = false;
 
-    public Member(Long id, Account account, String email, boolean isFirstLogin, boolean isMigrationDecided) {
+    public Member(Long id, Account account, String email, boolean isFirstLogin) {
         validateEmail(email);
 
         this.id = id;
         this.account = account;
         this.email = email;
         this.isFirstLogin = isFirstLogin;
-        this.isMigrationDecided = isMigrationDecided;
+        this.isMigrationDecided = false;
     }
 
     public Member(Account account, String email, boolean isFirstLogin) {
-        this(null, account, email, isFirstLogin, false);
+        this(null, account, email, isFirstLogin);
     }
 
     public void completeFirstLogin() {
