@@ -58,7 +58,7 @@ class AdminPendingContentApiTest {
     }
 
     @Nested
-    @DisplayName("/api/v1/admin/pending-contents/{id} GET 특정 펜딩 콘텐츠 상세 조회 테스트")
+    @DisplayName("/api/v1/admin/content-pendings/{id} GET 특정 펜딩 콘텐츠 상세 조회 테스트")
     class FindContentPendingByIdTest {
 
         @Test
@@ -80,7 +80,7 @@ class AdminPendingContentApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("Authorization", "Bearer " + adminAccessToken)
-                    .when().get("/api/v1/admin/pending-contents/{id}", 1)
+                    .when().get("/api/v1/admin/content-pendings/{id}", 1)
                     .then()
                     .statusCode(200)
                     .body("id", is(1))
@@ -100,7 +100,7 @@ class AdminPendingContentApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("Authorization", "Bearer " + userAccessToken)
-                    .when().get("/api/v1/admin/pending-contents/{id}", 1)
+                    .when().get("/api/v1/admin/content-pendings/{id}", 1)
                     .then()
                     .statusCode(403);
         }
@@ -116,13 +116,13 @@ class AdminPendingContentApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("Authorization", "Bearer " + adminAccessToken)
-                    .when().get("/api/v1/admin/pending-contents/{id}", 999)
+                    .when().get("/api/v1/admin/content-pendings/{id}", 999)
                     .then()
                     .statusCode(404);
         }
     }
 
-    @DisplayName("/api/v1/admin/pending-contents/{id}/approve POST 펜딩 콘텐츠 승인 테스트")
+    @DisplayName("/api/v1/admin/content-pendings/{id}/approve POST 펜딩 콘텐츠 승인 테스트")
     @Nested
     class ApproveContentPendingTest {
 
@@ -146,7 +146,7 @@ class AdminPendingContentApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("Authorization", "Bearer " + adminAccessToken)
-                    .when().post("/api/v1/admin/pending-contents/{id}/approve", 1)
+                    .when().post("/api/v1/admin/content-pendings/{id}/approve", 1)
                     .then()
                     .log().all()
                     .statusCode(200)
@@ -164,7 +164,7 @@ class AdminPendingContentApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("Authorization", "Bearer " + userAccessToken)
-                    .when().post("/api/v1/admin/pending-contents/{id}/approve", 1)
+                    .when().post("/api/v1/admin/content-pendings/{id}/approve", 1)
                     .then()
                     .statusCode(403);
         }
@@ -180,7 +180,7 @@ class AdminPendingContentApiTest {
             // when & then
             RestAssured.given().port(port)
                     .header("Authorization", "Bearer " + adminAccessToken)
-                    .when().post("/api/v1/admin/pending-contents/{id}/approve", 999)
+                    .when().post("/api/v1/admin/content-pendings/{id}/approve", 999)
                     .then()
                     .statusCode(404);
         }

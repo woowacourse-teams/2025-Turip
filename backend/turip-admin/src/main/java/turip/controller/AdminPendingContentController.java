@@ -19,7 +19,7 @@ import turip.service.AdminContentPendingService;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/admin/pending-contents")
+@RequestMapping("/api/v1/admin/content-pendings")
 public class AdminPendingContentController {
 
     private final AdminContentPendingService adminContentPendingService;
