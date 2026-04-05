@@ -143,6 +143,8 @@ class LoginViewmodel @Inject constructor(
                 _uiEffect.send(LoginUiEffect.ShowError(ErrorUiState.Server))
             }
 
+            UiError.Feature.Cancelled -> {}
+
             else -> {
                 _uiEffect.send(LoginUiEffect.ShowError(ErrorUiState.Unexpected))
             }

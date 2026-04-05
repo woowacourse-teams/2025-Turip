@@ -46,5 +46,10 @@ sealed interface UiError {
          * 비어있는 데이터, 허용 범위를 초과하는 데이터, 변경 불가능한 데이터 조작 시도 등
          */
         data object InValid : Feature
+
+        /**
+         * 사용자가 직접 작업을 취소했다는 정보를 전달
+         */
+        data object Cancelled : Feature
     }
 }

@@ -33,5 +33,7 @@ fun ErrorType.toUiError(): UiError =
 
         ErrorType.Network -> UiError.Global.Network
 
+        ErrorType.Cancelled -> UiError.Feature.Cancelled
+
         else -> UiError.Global.Server
     }
