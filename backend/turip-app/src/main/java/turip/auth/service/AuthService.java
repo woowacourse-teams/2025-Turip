@@ -15,8 +15,8 @@ import turip.auth.controller.dto.request.GoogleLoginRequest;
 import turip.auth.controller.dto.request.RefreshTokenRequest;
 import turip.auth.controller.dto.request.TuripLoginRequest;
 import turip.auth.controller.dto.response.RefreshTokenResponse;
-import turip.auth.controller.dto.response.SocialLoginResponse;
 import turip.auth.domain.RefreshToken;
+import turip.auth.service.dto.SocialLoginResult;
 import turip.auth.service.dto.TokenResult;
 import turip.auth.service.dto.TuripLoginResult;
 import turip.auth.token.GoogleTokenParser;
@@ -58,7 +58,7 @@ public class AuthService {
     }
 
     @Transactional
-    public SocialLoginResponse loginWithSocial(GoogleLoginRequest request, Provider provider, String deviceFid) {
+    public SocialLoginResult loginWithSocial(GoogleLoginRequest request, Provider provider, String deviceFid) {
         if (provider == Provider.GOOGLE) {
             return loginWithGoogle(request, deviceFid);
         }
@@ -110,7 +110,7 @@ public class AuthService {
         return TokenResult.of(accessToken, refreshToken);
     }
 
-    private SocialLoginResponse loginWithGoogle(GoogleLoginRequest request, String deviceFid) {
+    private SocialLoginResult loginWithGoogle(GoogleLoginRequest request, String deviceFid) {
         String idToken = request.idToken();
         validateIdToken(idToken);
 
@@ -127,7 +127,7 @@ public class AuthService {
         }
         TokenResult tokenResult = issueToken(deviceFid, member);
 
-        return SocialLoginResponse.of(tokenResult, isNewMember, member);
+        return SocialLoginResult.of(tokenResult, isNewMember, member);
     }
 
     private Member findOrCreateSocialMember(Provider provider, String providerId, String email) {

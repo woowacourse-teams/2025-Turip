@@ -38,6 +38,10 @@ sealed interface TuripDetailUiEffect {
     data class ShowReorderDetailFailed(
         val retryAction: TuripPlaceRetryAction,
     ) : TuripDetailUiEffect
+
+    data object ShowNetworkUnstable : TuripDetailUiEffect
+
+    data object ShowNetworkRecovered : TuripDetailUiEffect
 }
 
 sealed interface TuripPlaceRetryAction {
@@ -54,4 +58,6 @@ sealed interface TuripPlaceRetryAction {
     data object TuripDelete : TuripPlaceRetryAction
 
     data object ShareTuripInvitationLink : TuripPlaceRetryAction
+
+    data object StreamConnectionLost : TuripPlaceRetryAction
 }

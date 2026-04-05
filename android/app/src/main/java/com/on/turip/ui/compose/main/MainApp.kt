@@ -67,6 +67,15 @@ fun MainApp(
         animationSpec = tween(durationMillis = 220),
     )
 
+    val snackbarHostModifier: Modifier =
+        if (appState.shouldShowBottomBar) {
+            Modifier.padding(bottom = animatedSnackbarBottomPadding)
+        } else {
+            Modifier
+                .padding(bottom = animatedSnackbarBottomPadding)
+                .navigationBarsPadding()
+        }
+
     val appEntryProvider: (navKey: NavKey) -> NavEntry<NavKey> =
         remember(navigator, savedStateConfigurationProvider.providers) {
             entryProvider {
@@ -98,10 +107,7 @@ fun MainApp(
             snackbarHost = {
                 TuripSnackbar(
                     snackbarHostState = appState.snackbarHostState,
-                    modifier =
-                        Modifier
-                            .padding(bottom = animatedSnackbarBottomPadding)
-                            .navigationBarsPadding(),
+                    modifier = snackbarHostModifier,
                 )
             },
             contentWindowInsets = WindowInsets(),

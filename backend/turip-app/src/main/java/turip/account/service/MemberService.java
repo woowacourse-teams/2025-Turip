@@ -51,6 +51,12 @@ public class MemberService {
         migrateFavoriteContents(member, guest);
         migrateFavoriteFolders(member, guest);
         guestService.delete(guest);
+        member.decideMigration();
+    }
+
+    @Transactional
+    public void decideMigration(Member member) {
+        member.decideMigration();
     }
 
     @Transactional

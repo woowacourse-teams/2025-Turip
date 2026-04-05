@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
 import turip.account.domain.Account;
 import turip.account.domain.Member;
 import turip.account.domain.Provider;
@@ -26,18 +25,19 @@ import turip.auth.controller.dto.request.GoogleLoginRequest;
 import turip.auth.controller.dto.request.RefreshTokenRequest;
 import turip.auth.controller.dto.request.TuripLoginRequest;
 import turip.auth.controller.dto.response.RefreshTokenResponse;
-import turip.auth.controller.dto.response.SocialLoginResponse;
+import turip.auth.controller.dto.response.SocialLoginResponseV1;
+import turip.auth.controller.dto.response.SocialLoginResponseV2;
 import turip.auth.controller.dto.response.TuripLoginResponse;
 import turip.auth.resolver.AuthAccount;
 import turip.auth.resolver.AuthMember;
 import turip.auth.service.AuthService;
+import turip.auth.service.dto.SocialLoginResult;
 import turip.auth.service.dto.TuripLoginResult;
 import turip.auth.util.TokenCookieUtil;
 import turip.common.exception.ErrorResponse;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/auth")
 @Tag(name = "Auth", description = "인증 API")
 public class AuthController {
 
@@ -104,7 +104,7 @@ public class AuthController {
                     )
             )
     })
-    @PostMapping("/login/turip")
+    @PostMapping("/api/v1/auth/login/turip")
     public ResponseEntity<TuripLoginResponse> loginWithTurip(
             @Parameter(hidden = true) @RequestHeader("device-fid") String deviceFid,
             @RequestBody TuripLoginRequest request) {
@@ -130,7 +130,7 @@ public class AuthController {
                     description = "성공 예시",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = SocialLoginResponse.class),
+                            schema = @Schema(implementation = SocialLoginResponseV1.class),
                             examples = @ExampleObject(
                                     name = "success",
                                     summary = "로그인 성공",
@@ -186,11 +186,87 @@ public class AuthController {
                     )
             )
     })
-    @PostMapping("/login/google")
-    public ResponseEntity<SocialLoginResponse> loginWithGoogle(
+    @PostMapping("/api/v1/auth/login/google")
+    public ResponseEntity<SocialLoginResponseV1> loginWithGoogle(
             @Parameter(hidden = true) @RequestHeader("device-fid") String deviceFid,
             @RequestBody GoogleLoginRequest request) {
-        SocialLoginResponse response = authService.loginWithSocial(request, Provider.GOOGLE, deviceFid);
+        SocialLoginResult result = authService.loginWithSocial(request, Provider.GOOGLE, deviceFid);
+        SocialLoginResponseV1 response = SocialLoginResponseV1.of(result);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "구글 로그인 api v2",
+            description = "id token 기반 구글 소셜 로그인을 진행한다. v2에서는 마이그레이션 결정 여부를 응답에 포함한다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "성공 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SocialLoginResponseV2.class),
+                            examples = @ExampleObject(
+                                    name = "success",
+                                    summary = "로그인 성공",
+                                    value = """
+                                            {
+                                              "accessToken": "jwt-access",
+                                              "refreshToken": "jwt-refresh",
+                                              "nickname": "여행하는 튜립",
+                                              "isMigrationDecided": false
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "invalid id token",
+                                            summary = "올바르지 않은 id token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ID_TOKEN_NOT_VALID",
+                                                    	"message": "유효하지 않은 id token입니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "account creation error",
+                                            summary = "계정 생성 실패(재시도 5번에 모두 실패)",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCOUNT_CREATION_ERROR",
+                                                    	"message": "계정 생성에 실패했습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            )
+    })
+    @PostMapping("/api/v2/auth/login/google")
+    public ResponseEntity<SocialLoginResponseV2> loginWithGoogleV2(
+            @Parameter(hidden = true) @RequestHeader("device-fid") String deviceFid,
+            @RequestBody GoogleLoginRequest request) {
+        SocialLoginResult result = authService.loginWithSocial(request, Provider.GOOGLE, deviceFid);
+        SocialLoginResponseV2 response = SocialLoginResponseV2.of(result);
         return ResponseEntity.ok(response);
     }
 
@@ -268,7 +344,7 @@ public class AuthController {
                     )
             )
     })
-    @PostMapping("/tokens")
+    @PostMapping("/api/v1/auth/tokens")
     public ResponseEntity<RefreshTokenResponse> refresh(
             @Parameter(hidden = true) @RequestHeader("device-fid") String deviceFid,
             @RequestBody RefreshTokenRequest request) {
@@ -345,7 +421,7 @@ public class AuthController {
                     )
             )
     })
-    @PostMapping("/logout")
+    @PostMapping("/api/v1/auth/logout")
     public ResponseEntity<Void> logout(@Parameter(hidden = true) @RequestHeader("device-fid") String deviceFid,
                                        @Parameter(hidden = true) @AuthAccount Account account) {
         authService.logout(account, deviceFid);
@@ -410,7 +486,7 @@ public class AuthController {
                     )
             )
     })
-    @GetMapping("/tokens/verification")
+    @GetMapping("/api/v1/auth/tokens/verification")
     public ResponseEntity<Void> verify(@Parameter(hidden = true) @AuthMember Member member) {
         return ResponseEntity.noContent().build();
     }

@@ -123,11 +123,18 @@ fun TuripMapContent(
             }
         }
 
-        IconButton(onClick = onMapToggle) {
-            Icon(
-                imageVector = if (isMapVisible) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                contentDescription = null,
-            )
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            IconButton(
+                onClick = onMapToggle,
+                modifier = Modifier.align(Alignment.Center),
+            ) {
+                Icon(
+                    imageVector = if (isMapVisible) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                    contentDescription = null,
+                )
+            }
         }
     }
 }

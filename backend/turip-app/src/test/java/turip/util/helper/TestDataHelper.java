@@ -69,11 +69,12 @@ public class TestDataHelper {
 
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(
-                    "INSERT INTO member (account_id, email, is_first_login) VALUES (?, ?, ?)",
+                    "INSERT INTO member (account_id, email, is_first_login, is_migration_decided) VALUES (?, ?, ?, ?)",
                     Statement.RETURN_GENERATED_KEYS);
             ps.setLong(1, accountId);
             ps.setString(2, email);
             ps.setBoolean(3, isFirstLogin);
+            ps.setBoolean(4, false);
             return ps;
         }, keyHolder);
 

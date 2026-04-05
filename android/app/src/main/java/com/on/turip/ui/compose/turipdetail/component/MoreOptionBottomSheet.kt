@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -52,6 +53,7 @@ fun MoreOptionBottomSheet(
     onScreenModeChange: (turipPlaceScreenMode: TuripPlaceScreenMode) -> Unit,
     sheetState: SheetState,
     isDefault: Boolean,
+    isTogetherTurip: Boolean,
     onDismiss: () -> Unit,
     onShareTuripByTextClick: () -> Unit,
     onShareTuripInvitationLinkClick: () -> Unit,
@@ -87,8 +89,22 @@ fun MoreOptionBottomSheet(
                 enabled = !isDefault,
             ),
             MoreOptionItem(
-                title = stringResource(R.string.turip_more_option_bottom_sheet_delete),
-                icon = MoreOptionIcon.Vector(Icons.Default.Delete),
+                title =
+                    stringResource(
+                        if (isTogetherTurip) {
+                            R.string.turip_more_option_bottom_sheet_leave
+                        } else {
+                            R.string.turip_more_option_bottom_sheet_delete
+                        },
+                    ),
+                icon =
+                    MoreOptionIcon.Vector(
+                        if (isTogetherTurip) {
+                            Icons.AutoMirrored.Filled.Logout
+                        } else {
+                            Icons.Default.Delete
+                        },
+                    ),
                 color = TuripTheme.colors.error,
                 onClick = onDeleteClick,
                 enabled = !isDefault,
@@ -221,6 +237,7 @@ private fun MoreOptionBottomSheetPreviewContent(
             onScreenModeChange = {},
             sheetState = sheetState,
             isDefault = isDefault,
+            isTogetherTurip = false,
             onDismiss = {},
             onShareTuripByTextClick = {},
             onShareTuripInvitationLinkClick = {},
