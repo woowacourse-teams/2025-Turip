@@ -105,7 +105,7 @@ class AdminContentPendingServiceTest {
                     .willReturn(Optional.of(contentPending));
 
             // when
-            ContentPending foundContentPending = adminContentPendingService.findById(contentPending.getId());
+            ContentPending foundContentPending = adminContentPendingService.getById(contentPending.getId());
 
             // then
             assertAll(
@@ -124,7 +124,7 @@ class AdminContentPendingServiceTest {
                     .willReturn(Optional.empty());
 
             // when & then
-            assertThatThrownBy(() -> adminContentPendingService.findById(contentPending.getId()))
+            assertThatThrownBy(() -> adminContentPendingService.getById(contentPending.getId()))
                     .isInstanceOf(NotFoundException.class)
                     .hasMessage(ErrorTag.CONTENT_PENDING_NOT_FOUND.getMessage());
         }

@@ -15,7 +15,9 @@ import turip.content.repository.ContentRepository;
 import turip.controller.dto.request.AdminContentSaveRequest;
 import turip.controller.dto.request.AdminContentSaveRequest.ContentPlaceRequest;
 import turip.controller.dto.request.AdminContentSaveRequest.VideoRequest;
+import turip.controller.dto.request.ContentPendingRejectRequest;
 import turip.controller.dto.response.ContentPendingApprovalResponse;
+import turip.controller.dto.response.ContentPendingRejectResponse;
 
 @Service
 @RequiredArgsConstructor
@@ -26,14 +28,14 @@ public class AdminContentPendingService {
     private final AdminContentService adminContentService;
 
     @Transactional
-    public ContentPending findById(Long id) {
+    public ContentPending getById(Long id) {
         return contentPendingRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(ErrorTag.CONTENT_PENDING_NOT_FOUND));
     }
 
     @Transactional
     public ContentPendingApprovalResponse approve(Long contentPendingId, Account validatorAccount) {
-        ContentPending contentPending = findById(contentPendingId);
+        ContentPending contentPending = getById(contentPendingId);
         ContentPendingData data = contentPending.getContentData();
 
         AdminContentSaveRequest request = convertToSaveRequest(data);
@@ -44,6 +46,18 @@ public class AdminContentPendingService {
         contentPending.approve(validatorAccount, content);
 
         return new ContentPendingApprovalResponse(content.getId(), contentPending.getId());
+    }
+
+    @Transactional
+    public ContentPendingRejectResponse reject(
+            Long contentPendingId,
+            Account validatorAccount,
+            ContentPendingRejectRequest request
+    ) {
+        ContentPending contentPending = getById(contentPendingId);
+        String rejectReason = request.rejectReason();
+        contentPending.reject(validatorAccount, rejectReason);
+        return ContentPendingRejectResponse.from(contentPendingId);
     }
 
     private AdminContentSaveRequest convertToSaveRequest(ContentPendingData data) {
