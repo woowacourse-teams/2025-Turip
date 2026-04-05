@@ -6,7 +6,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import turip.account.domain.Account;
+import turip.common.exception.custom.IllegalArgumentException;
 import turip.common.exception.custom.IllegalStateException;
 import turip.util.fixture.AccountFixture;
 import turip.util.fixture.ContentPendingFixture;
@@ -89,6 +92,34 @@ class ContentPendingTest {
                 // when
                 assertThatThrownBy(() -> pendingContent.reject(validator, rejectReason))
                         .isInstanceOf(IllegalStateException.class);
+            }
+
+            @DisplayName("거절 사유는 빈 값이 될 수 없다.")
+            @ParameterizedTest
+            @ValueSource(strings = {"", " ", "    "})
+            void reject3(String rejectReason) {
+                // given
+                Account collector = AccountFixture.createAdmin();
+                Account validator = AccountFixture.createAdmin();
+                ContentPending pendingContent = ContentPendingFixture.createPending(collector);
+
+                // when
+                assertThatThrownBy(() -> pendingContent.reject(validator, rejectReason))
+                        .isInstanceOf(IllegalArgumentException.class);
+            }
+
+            @DisplayName("거절 사유는 null이 될 수 없다.")
+            @Test
+            void reject4() {
+                // given
+                Account collector = AccountFixture.createAdmin();
+                Account validator = AccountFixture.createAdmin();
+                ContentPending pendingContent = ContentPendingFixture.createPending(collector);
+                String rejectReason = null;
+
+                // when
+                assertThatThrownBy(() -> pendingContent.reject(validator, rejectReason))
+                        .isInstanceOf(IllegalArgumentException.class);
             }
         }
 

@@ -26,9 +26,11 @@ import turip.common.exception.custom.NotFoundException;
 import turip.content.domain.Content;
 import turip.content.domain.ContentPending;
 import turip.content.domain.ContentPendingData;
+import turip.content.domain.ContentPendingStatus;
 import turip.content.repository.ContentPendingRepository;
 import turip.content.repository.ContentRepository;
 import turip.controller.dto.request.AdminContentSaveRequest;
+import turip.controller.dto.request.ContentPendingRejectRequest;
 import turip.controller.dto.response.ContentPendingApprovalResponse;
 import turip.util.fixture.AccountFixture;
 import turip.util.fixture.ContentFixture;
@@ -190,6 +192,44 @@ class AdminContentPendingServiceTest {
             assertThatThrownBy(() -> adminContentPendingService.approve(contentPending.getId(), validatorAccount))
                     .isInstanceOf(NotFoundException.class)
                     .hasMessage(ErrorTag.CONTENT_NOT_FOUND.getMessage());
+        }
+    }
+
+    @DisplayName("reject() 테스트")
+    @Nested
+    class Reject {
+
+        @DisplayName("펜딩 콘텐츠를 거절하면 상태를 REJECTED로 변경하고 거절 사유를 업데이트 한 뒤, ContentRejectResponse를 반환한다")
+        @Test
+        void reject1() {
+            // given
+            given(contentPendingRepository.findById(contentPending.getId()))
+                    .willReturn(Optional.of(contentPending));
+            ContentPendingRejectRequest request = new ContentPendingRejectRequest("거절 사유");
+
+            // when
+            adminContentPendingService.reject(contentPending.getId(), validatorAccount, request);
+
+            // then
+            assertAll(
+                    () -> assertThat(contentPending.getStatus()).isEqualTo(ContentPendingStatus.REJECTED),
+                    () -> assertThat(contentPending.getRejectReason()).isEqualTo(request.rejectReason())
+            );
+        }
+
+        @DisplayName("존재하지 않는 펜딩 콘텐츠를 거절하려 하면 NotFoundException을 발생시킨다")
+        @Test
+        void reject2() {
+            // given
+            Long invalidId = 999L;
+            given(contentPendingRepository.findById(invalidId))
+                    .willReturn(Optional.empty());
+            ContentPendingRejectRequest request = new ContentPendingRejectRequest("거절 사유");
+
+            // when & then
+            assertThatThrownBy(() -> adminContentPendingService.reject(invalidId, validatorAccount, request))
+                    .isInstanceOf(NotFoundException.class)
+                    .hasMessage(ErrorTag.CONTENT_PENDING_NOT_FOUND.getMessage());
         }
     }
 }
