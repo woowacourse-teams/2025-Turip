@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import turip.account.domain.TuripMember;
 import turip.content.domain.ContentPending;
-import turip.controller.dto.response.ContentApprovalResponse;
+import turip.controller.dto.response.ContentPendingApprovalResponse;
 import turip.controller.dto.response.ContentPendingResponse;
 import turip.resolver.AuthAdmin;
 import turip.service.AdminContentPendingService;
@@ -35,11 +35,12 @@ public class AdminPendingContentController {
     }
 
     @PostMapping("/{id}/approve")
-    public ResponseEntity<ContentApprovalResponse> approve(
+    public ResponseEntity<ContentPendingApprovalResponse> approve(
             @AuthAdmin TuripMember admin,
             @PathVariable Long id
     ) {
-        ContentApprovalResponse response = adminContentPendingService.approve(id, admin.getMember().getAccount());
+        ContentPendingApprovalResponse response = adminContentPendingService.approve(id,
+                admin.getMember().getAccount());
         return ResponseEntity.ok(response);
     }
 }

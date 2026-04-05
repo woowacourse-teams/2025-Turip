@@ -29,7 +29,7 @@ import turip.content.domain.ContentPendingData;
 import turip.content.repository.ContentPendingRepository;
 import turip.content.repository.ContentRepository;
 import turip.controller.dto.request.AdminContentSaveRequest;
-import turip.controller.dto.response.ContentApprovalResponse;
+import turip.controller.dto.response.ContentPendingApprovalResponse;
 import turip.util.fixture.AccountFixture;
 import turip.util.fixture.ContentFixture;
 
@@ -148,7 +148,7 @@ class AdminContentPendingServiceTest {
                     .willReturn(Optional.of(mockContent));
 
             // when
-            ContentApprovalResponse response = adminContentPendingService.approve(contentPending.getId(),
+            ContentPendingApprovalResponse response = adminContentPendingService.approve(contentPending.getId(),
                     validatorAccount);
 
             // then

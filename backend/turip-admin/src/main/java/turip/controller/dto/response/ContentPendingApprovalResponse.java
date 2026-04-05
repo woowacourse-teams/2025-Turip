@@ -1,6 +1,6 @@
 package turip.controller.dto.response;
 
-public record ContentApprovalResponse(
+public record ContentPendingApprovalResponse(
         Long contentId,
         Long contentPendingId
 ) {
