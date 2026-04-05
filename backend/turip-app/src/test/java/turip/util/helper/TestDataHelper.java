@@ -27,6 +27,52 @@ public class TestDataHelper {
 
     @Autowired
     private InvitationTokenProvider invitationTokenProvider;
+    
+    public void cleanDatabase() {
+        jdbcTemplate.update("DELETE FROM place_category");
+        jdbcTemplate.update("DELETE FROM content_place");
+        jdbcTemplate.update("DELETE FROM favorite_place");
+        jdbcTemplate.update("DELETE FROM favorite_content");
+        jdbcTemplate.update("DELETE FROM favorite_folder_account");
+
+        jdbcTemplate.update("DELETE FROM content_pending");
+        jdbcTemplate.update("DELETE FROM place");
+        jdbcTemplate.update("DELETE FROM favorite_folder");
+        jdbcTemplate.update("DELETE FROM turip_member");
+        jdbcTemplate.update("DELETE FROM social_member");
+        jdbcTemplate.update("DELETE FROM guest");
+        jdbcTemplate.update("DELETE FROM refresh_token");
+        jdbcTemplate.update("DELETE FROM member");
+
+        jdbcTemplate.update("DELETE FROM account");
+        jdbcTemplate.update("DELETE FROM content");
+        jdbcTemplate.update("DELETE FROM category");
+        jdbcTemplate.update("DELETE FROM creator");
+        jdbcTemplate.update("DELETE FROM city");
+        jdbcTemplate.update("DELETE FROM province");
+        jdbcTemplate.update("DELETE FROM country");
+
+        jdbcTemplate.update("ALTER TABLE place_category ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE content_place ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE favorite_place ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE favorite_content ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE favorite_folder_account ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE content_pending ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE place ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE favorite_folder ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE turip_member ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE social_member ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE guest ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE refresh_token ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE member ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE account ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE content ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE category ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE creator ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE city ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE province ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE country ALTER COLUMN id RESTART WITH 1");
+    }
 
     public String createAccessToken(Long accountId) {
         return jwtProvider.generateAccessToken(accountId, Role.USER);

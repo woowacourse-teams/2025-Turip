@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
 import turip.account.domain.Account;
@@ -36,9 +35,6 @@ class AdminPendingContentApiTest {
     private int port;
 
     @Autowired
-    private JdbcTemplate jdbcTemplate;
-
-    @Autowired
     private TestDataHelper testDataHelper;
 
     @Autowired
@@ -47,16 +43,7 @@ class AdminPendingContentApiTest {
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
-
-        jdbcTemplate.update("DELETE FROM content_pending");
-        jdbcTemplate.update("DELETE FROM turip_member");
-        jdbcTemplate.update("DELETE FROM member");
-        jdbcTemplate.update("DELETE FROM account");
-
-        jdbcTemplate.update("ALTER TABLE content_pending ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE turip_member ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE member ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE account ALTER COLUMN id RESTART WITH 1");
+        testDataHelper.cleanDatabase();
     }
 
     @Nested
