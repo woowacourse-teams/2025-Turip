@@ -270,6 +270,7 @@ fun TripDetailScreen(
                                 onShareTuripInvitationLink = navigateToShareTuripInvitationLink,
                                 onPlaceTuripChanged = viewModel::updatePlaceTuripSelection,
                                 onDismiss = {
+                                    placeTuripSelectionSnackbarHostState.currentSnackbarData?.dismiss()
                                     bottomSheetScope.launch {
                                         sheetState.hide()
                                         viewModel.clearSelectedPlace()
