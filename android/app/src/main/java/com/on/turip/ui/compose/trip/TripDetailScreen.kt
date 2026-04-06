@@ -289,7 +289,10 @@ fun TripDetailScreen(
                                 isConfirmEnabled = uiState.addTuripNameStatus.isConfirmEnabled && !uiState.isCreatingTurip,
                                 onNameChanged = viewModel::updateAddTuripInputName,
                                 onConfirmClick = viewModel::addTurip,
-                                onDismiss = viewModel::dismissAddTuripBottomSheet,
+                                onDismiss = {
+                                    turipAddSnackbarHostState.currentSnackbarData?.dismiss()
+                                    viewModel.dismissAddTuripBottomSheet()
+                                },
                                 snackbarHostState = turipAddSnackbarHostState,
                             )
                         }
@@ -400,7 +403,10 @@ private fun TripDetailScreenContent(
 ) {
     LazyColumn(
         state = listState,
-        modifier = modifier.fillMaxSize().navigationBarsPadding(),
+        modifier =
+            modifier
+                .fillMaxSize()
+                .navigationBarsPadding(),
     ) {
         item {
             CreatorInformation(
