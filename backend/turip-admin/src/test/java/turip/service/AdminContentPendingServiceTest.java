@@ -32,6 +32,7 @@ import turip.content.repository.ContentRepository;
 import turip.controller.dto.request.AdminContentSaveRequest;
 import turip.controller.dto.request.ContentPendingRejectRequest;
 import turip.controller.dto.response.ContentPendingApprovalResponse;
+import turip.controller.dto.response.ContentPendingResponse;
 import turip.util.fixture.AccountFixture;
 import turip.util.fixture.ContentFixture;
 
@@ -107,13 +108,13 @@ class AdminContentPendingServiceTest {
                     .willReturn(Optional.of(contentPending));
 
             // when
-            ContentPending foundContentPending = adminContentPendingService.getById(contentPending.getId());
+            ContentPendingResponse response = adminContentPendingService.findById(contentPending.getId());
 
             // then
             assertAll(
-                    () -> assertThat(foundContentPending.getCollectorAccount()).isEqualTo(collectorAccount),
-                    () -> assertThat(foundContentPending.getContentData().cityName()).isEqualTo(contentData.cityName()),
-                    () -> assertThat(foundContentPending.getContentData().video().title()).isEqualTo(
+                    () -> assertThat(response.collectorAccount().id()).isEqualTo(collectorAccount.getId()),
+                    () -> assertThat(response.contentData().cityName()).isEqualTo(contentData.cityName()),
+                    () -> assertThat(response.contentData().video().title()).isEqualTo(
                             contentData.video().title())
             );
         }
@@ -126,7 +127,7 @@ class AdminContentPendingServiceTest {
                     .willReturn(Optional.empty());
 
             // when & then
-            assertThatThrownBy(() -> adminContentPendingService.getById(contentPending.getId()))
+            assertThatThrownBy(() -> adminContentPendingService.findById(contentPending.getId()))
                     .isInstanceOf(NotFoundException.class)
                     .hasMessage(ErrorTag.CONTENT_PENDING_NOT_FOUND.getMessage());
         }
