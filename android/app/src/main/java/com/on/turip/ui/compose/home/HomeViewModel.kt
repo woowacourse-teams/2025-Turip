@@ -6,11 +6,11 @@ import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.TuripResult
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
-import com.on.turip.core.session.SessionManager
 import com.on.turip.domain.content.UsersLikeContent
 import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.region.RegionCategory
 import com.on.turip.domain.region.repository.RegionRepository
+import com.on.turip.domain.session.SessionManager
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError

@@ -3,10 +3,10 @@ package com.on.turip.ui.compose.search.regionresult
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.on.turip.core.result.TuripResult
-import com.on.turip.core.session.SessionManager
 import com.on.turip.domain.content.PagedContentsResult
 import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.content.video.VideoInformation
+import com.on.turip.domain.session.SessionManager
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError

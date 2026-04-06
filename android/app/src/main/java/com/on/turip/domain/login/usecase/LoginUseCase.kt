@@ -2,9 +2,9 @@ package com.on.turip.domain.login.usecase
 
 import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.TuripResult
-import com.on.turip.core.session.SessionManager
 import com.on.turip.domain.login.AuthRepository
 import com.on.turip.domain.login.AuthResult
+import com.on.turip.domain.session.SessionManager
 import com.on.turip.domain.session.TokenManager
 import timber.log.Timber
 import javax.inject.Inject

@@ -3,10 +3,10 @@ package com.on.turip.ui.compose.splash
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.on.turip.core.navigation.InitialNavigationTarget
-import com.on.turip.core.session.SessionManager
 import com.on.turip.core.session.SessionState
 import com.on.turip.domain.invitation.repository.DeferredDeepLinkRepository
 import com.on.turip.domain.session.AuthStatus
+import com.on.turip.domain.session.SessionManager
 import com.on.turip.domain.session.usecase.DetermineInitialSessionUseCase
 import com.on.turip.ui.common.extensions.toUrl
 import dagger.hilt.android.lifecycle.HiltViewModel

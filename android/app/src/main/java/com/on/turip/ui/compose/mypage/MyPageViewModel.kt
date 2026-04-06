@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
-import com.on.turip.core.session.SessionManager
 import com.on.turip.core.session.SessionState
 import com.on.turip.domain.account.Account
 import com.on.turip.domain.account.AccountRepository
@@ -14,6 +13,7 @@ import com.on.turip.domain.bookmark.repository.BookmarkRepository
 import com.on.turip.domain.common.paging.Cursor
 import com.on.turip.domain.common.paging.Page
 import com.on.turip.domain.login.MemberRepository
+import com.on.turip.domain.session.SessionManager
 import com.on.turip.domain.setting.PrivacyPolicy
 import com.on.turip.domain.userstorage.repository.UserStorageRepository
 import com.on.turip.ui.common.BookmarkChangeEventBus

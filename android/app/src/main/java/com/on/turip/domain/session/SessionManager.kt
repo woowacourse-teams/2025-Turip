@@ -1,6 +1,6 @@
-package com.on.turip.core.session
+package com.on.turip.domain.session
 
-import com.on.turip.domain.session.TokenManager
+import com.on.turip.core.session.SessionState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,7 +23,7 @@ class SessionManager @Inject constructor(
         _state.value = SessionState.Guest
 
         clearResult.onFailure {
-            Timber.e("게스트 전환 중 로컬 토큰 삭제 실패")
+            Timber.Forest.e("게스트 전환 중 로컬 토큰 삭제 실패")
         }
     }
 

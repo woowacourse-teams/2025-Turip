@@ -5,11 +5,11 @@ import androidx.lifecycle.viewModelScope
 import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
-import com.on.turip.core.session.SessionManager
 import com.on.turip.data.login.datasource.GoogleCredentialManager
 import com.on.turip.domain.login.GuestRepository
 import com.on.turip.domain.login.MemberRepository
 import com.on.turip.domain.login.usecase.LoginUseCase
+import com.on.turip.domain.session.SessionManager
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError

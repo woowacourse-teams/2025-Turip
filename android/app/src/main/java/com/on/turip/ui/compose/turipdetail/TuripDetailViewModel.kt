@@ -5,8 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
-import com.on.turip.core.session.SessionManager
 import com.on.turip.core.session.SessionState
+import com.on.turip.domain.session.SessionManager
 import com.on.turip.domain.turip.DeleteTuripUseCase
 import com.on.turip.domain.turip.ObserveTuripStreamUseCase
 import com.on.turip.domain.turip.Turip
