@@ -13,7 +13,7 @@ import turip.common.exception.custom.ForbiddenException;
 
 @Service
 @RequiredArgsConstructor
-public class AdminAuthService {
+public class AdminAuthService { 
 
     private final AuthService authService;
 
