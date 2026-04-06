@@ -1,5 +1,6 @@
 package turip.account.service;
 
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,7 @@ public class GuestService {
     private final FavoritePlaceService favoritePlaceService;
     private final FavoriteFolderService favoriteFolderService;
     private final GuestNicknameCreator guestNicknameCreator;
+    private final EntityManager entityManager;
 
     @Transactional
     public Guest findOrCreateByDeviceFid(String deviceFid) {
@@ -46,6 +48,7 @@ public class GuestService {
     @Transactional
     public void delete(Guest guest) {
         guestRepository.delete(guest);
+        entityManager.clear();
         accountService.deleteAccountAndFavorites(guest.getAccount());
     }
 }
