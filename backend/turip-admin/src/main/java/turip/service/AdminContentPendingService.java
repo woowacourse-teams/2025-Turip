@@ -18,6 +18,7 @@ import turip.controller.dto.request.AdminContentSaveRequest.VideoRequest;
 import turip.controller.dto.request.ContentPendingRejectRequest;
 import turip.controller.dto.response.ContentPendingApprovalResponse;
 import turip.controller.dto.response.ContentPendingRejectResponse;
+import turip.controller.dto.response.ContentPendingResponse;
 
 @Service
 @RequiredArgsConstructor
@@ -28,9 +29,9 @@ public class AdminContentPendingService {
     private final AdminContentService adminContentService;
 
     @Transactional
-    public ContentPending getById(Long id) {
-        return contentPendingRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(ErrorTag.CONTENT_PENDING_NOT_FOUND));
+    public ContentPendingResponse findById(Long id) {
+        ContentPending contentPending = getById(id);
+        return ContentPendingResponse.from(contentPending);
     }
 
     @Transactional
@@ -58,6 +59,11 @@ public class AdminContentPendingService {
         String rejectReason = request.rejectReason();
         contentPending.reject(validatorAccount, rejectReason);
         return ContentPendingRejectResponse.from(contentPendingId);
+    }
+
+    private ContentPending getById(Long id) {
+        return contentPendingRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(ErrorTag.CONTENT_PENDING_NOT_FOUND));
     }
 
     private AdminContentSaveRequest convertToSaveRequest(ContentPendingData data) {

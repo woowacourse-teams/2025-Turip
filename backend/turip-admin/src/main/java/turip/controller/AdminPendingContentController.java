@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import turip.account.domain.TuripMember;
-import turip.content.domain.ContentPending;
 import turip.controller.dto.request.ContentPendingRejectRequest;
 import turip.controller.dto.response.ContentPendingApprovalResponse;
 import turip.controller.dto.response.ContentPendingRejectResponse;
@@ -32,8 +31,7 @@ public class AdminPendingContentController {
             @AuthAdmin TuripMember admin,
             @PathVariable Long id
     ) {
-        ContentPending contentPending = adminContentPendingService.getById(id);
-        ContentPendingResponse response = ContentPendingResponse.from(contentPending);
+        ContentPendingResponse response = adminContentPendingService.findById(id);
         return ResponseEntity.ok(response);
     }
 
