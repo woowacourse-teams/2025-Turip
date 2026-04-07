@@ -219,6 +219,23 @@ public class FavoriteFolderService {
         return FavoriteFolderExitResponse.of(false);
     }
 
+    @Transactional
+    public void deletePersonalFoldersByAccount(Account account) {
+        List<FavoriteFolder> personalFolders = favoriteFolderRepository.findPersonalFoldersByAccount(account);
+        for (FavoriteFolder personalFolder : personalFolders) {
+            favoriteFolderAccountService.deleteByFavoriteFolderAndAccount(personalFolder, account);
+            favoriteFolderRepository.delete(personalFolder);
+        }
+    }
+
+    @Transactional
+    public void deleteDefaultFolderByAccount(Account account) {
+        FavoriteFolder defaultFolder = favoriteFolderRepository.findDefaultFoldersByAccount(account)
+                .orElseThrow(() -> new NotFoundException(ErrorTag.DEFAULT_FOLDER_NOT_FOUND));
+        favoriteFolderAccountService.deleteByFavoriteFolderAndAccount(defaultFolder, account);
+        favoriteFolderRepository.delete(defaultFolder);
+    }
+
     public void validateFolderExists(Long favoriteFolderId) {
         if (!favoriteFolderRepository.existsById(favoriteFolderId)) {
             throw new NotFoundException(ErrorTag.FAVORITE_FOLDER_NOT_FOUND);

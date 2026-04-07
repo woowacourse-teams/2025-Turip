@@ -16,6 +16,8 @@ import turip.common.exception.custom.NotFoundException;
 import turip.favorite.repository.FavoriteContentRepository;
 import turip.favorite.repository.FavoriteFolderAccountRepository;
 import turip.favorite.repository.FavoriteFolderRepository;
+import turip.favorite.service.FavoriteFolderAccountService;
+import turip.favorite.service.FavoriteFolderService;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +31,8 @@ public class MemberService {
     private final FavoriteFolderAccountRepository favoriteFolderAccountRepository;
     private final FavoriteFolderRepository favoriteFolderRepository;
     private final RandomNicknameCreator randomNicknameCreator;
+    private final FavoriteFolderService favoriteFolderService;
+    private final FavoriteFolderAccountService favoriteFolderAccountService;
 
     @Transactional
     public Member create(String email) {
@@ -72,7 +76,7 @@ public class MemberService {
     }
 
     private void migrateFavoriteFolders(Member member, Guest guest) {
-        favoriteFolderRepository.deleteDefaultFolderByAccount(member.getAccount());
-        favoriteFolderAccountRepository.updateAccount(guest.getAccount(), member.getAccount());
+        favoriteFolderService.deleteDefaultFolderByAccount(member.getAccount());
+        favoriteFolderAccountService.updateAccount(guest.getAccount(), member.getAccount());
     }
 }
