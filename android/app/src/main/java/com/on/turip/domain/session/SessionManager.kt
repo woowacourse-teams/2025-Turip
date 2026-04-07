@@ -1,6 +1,7 @@
 package com.on.turip.domain.session
 
 import com.on.turip.core.session.SessionState
+import com.on.turip.domain.bookmark.repository.BookmarkRepository
 import com.on.turip.domain.turip.repository.TuripRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,6 +14,7 @@ import javax.inject.Singleton
 class SessionManager @Inject constructor(
     private val tokenManager: TokenManager,
     private val turipRepository: TuripRepository,
+    private val bookmarkRepository: BookmarkRepository,
 ) {
     private val _state = MutableStateFlow<SessionState>(SessionState.Uninitialized)
     val state: StateFlow<SessionState> = _state.asStateFlow()
@@ -22,6 +24,7 @@ class SessionManager @Inject constructor(
      */
     suspend fun switchToGuest() {
         turipRepository.clearCache()
+        bookmarkRepository.clearCache()
         val clearResult: Result<Unit> = tokenManager.clearTokens()
         _state.value = SessionState.Guest
 
@@ -35,6 +38,7 @@ class SessionManager @Inject constructor(
      */
     fun switchToMember() {
         turipRepository.clearCache()
+        bookmarkRepository.clearCache()
         _state.value = SessionState.Member
     }
 }
