@@ -23,7 +23,6 @@ import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.InternalServerException;
 import turip.common.exception.custom.NotFoundException;
 import turip.favorite.repository.FavoriteContentRepository;
-import turip.favorite.repository.FavoriteFolderRepository;
 import turip.favorite.service.FavoriteFolderService;
 import turip.util.fixture.AccountFixture;
 
@@ -41,9 +40,6 @@ class AccountServiceTest {
 
     @Mock
     private AccountInsertRepository accountInsertRepository;
-
-    @Mock
-    private FavoriteFolderRepository favoriteFolderRepository;
 
     @Mock
     private FavoriteFolderService favoriteFolderService;
@@ -137,7 +133,7 @@ class AccountServiceTest {
 
             // then
             verify(favoriteContentRepository).deleteByAccount(account);
-            verify(favoriteFolderRepository).deletePersonalFoldersByAccount(account);
+            verify(favoriteFolderService).deletePersonalFoldersByAccount(account);
             verify(accountRepository).delete(account);
         }
     }
