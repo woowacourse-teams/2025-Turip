@@ -36,6 +36,7 @@ import com.on.turip.ui.compose.designsystem.snackbar.LocalSnackbarDelegate
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.home.navigation.HomeNavKey
 import com.on.turip.ui.compose.invitation.navigation.InvitationEntryNavKey
+import com.on.turip.ui.compose.login.navigation.LoginNavKey
 import com.on.turip.ui.compose.main.component.ExitConfirmationHandler
 import com.on.turip.ui.compose.main.component.LocalSystemBarStyleController
 import com.on.turip.ui.compose.main.component.TuripNavigationBar
@@ -70,13 +71,19 @@ fun MainApp(
         }
     }
 
-    // shouldShowBottomBar가 true로 바뀔 때 화면 전환 애니메이션(300ms)이 끝난 뒤
-    // 바텀 바를 표시해 로그인 화면 위에 겹쳐 보이는 현상을 방지한다.
+    // shouldShowBottomBar가 true로 바뀔 때 이전 화면이 인증 화면(Splash/Login)인 경우에만
+    // 화면 전환 애니메이션(300ms)이 끝난 뒤 바텀 바를 표시해 로그인 화면 위에 겹쳐 보이는 현상을 방지한다.
+    // 서브 화면(TuripDetail 등)에서 뒤로 돌아오는 경우에는 즉시 표시한다.
+    var prevKey by remember { mutableStateOf<NavKey?>(null) }
     var bottomBarVisible by remember { mutableStateOf(appState.shouldShowBottomBar) }
     LaunchedEffect(appState.shouldShowBottomBar) {
         if (appState.shouldShowBottomBar) {
-            delay(SCREEN_TRANSITION_DURATION_MS)
+            val isFromAuthScreen = prevKey is SplashNavKey || prevKey is LoginNavKey
+            if (isFromAuthScreen) {
+                delay(SCREEN_TRANSITION_DURATION_MS)
+            }
         }
+        prevKey = appState.currentScreenKey
         bottomBarVisible = appState.shouldShowBottomBar
     }
     val systemBarStyleController = appState.systemBarStyleController
