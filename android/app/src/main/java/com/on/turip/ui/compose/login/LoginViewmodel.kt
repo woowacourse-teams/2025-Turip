@@ -9,7 +9,7 @@ import com.on.turip.data.login.datasource.GoogleCredentialManager
 import com.on.turip.domain.login.GuestRepository
 import com.on.turip.domain.login.MemberRepository
 import com.on.turip.domain.login.usecase.LoginUseCase
-import com.on.turip.domain.session.usecase.SwitchToGuestUseCase
+import com.on.turip.domain.session.SessionManager
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
@@ -29,7 +29,7 @@ class LoginViewmodel @Inject constructor(
     private val loginUseCase: LoginUseCase,
     private val memberRepository: MemberRepository,
     private val guestRepository: GuestRepository,
-    private val switchToGuestUseCase: SwitchToGuestUseCase,
+    private val sessionManager: SessionManager,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<LoginUiState> = MutableStateFlow(LoginUiState.IDLE)
     val uiState: StateFlow<LoginUiState> = _uiState
@@ -76,6 +76,9 @@ class LoginViewmodel @Inject constructor(
                                 handleError(errorType)
                             }
                     }.onFailure { errorType: ErrorType ->
+                        // 로그인 도중 사용자가 포기한 경우는 예외로 판단하지 않고 무시
+                        if (errorType == ErrorType.Unknown) return@onFailure
+
                         handleError(errorType)
                         Timber.e("googleCredentialManager 에서 IdToken 불러오기 실패")
                     }
@@ -112,7 +115,7 @@ class LoginViewmodel @Inject constructor(
 
     fun continueAsGuest() {
         viewModelScope.launch {
-            switchToGuestUseCase()
+            sessionManager.switchToGuest()
             _uiEffect.send(LoginUiEffect.NavigateToMain())
         }
     }

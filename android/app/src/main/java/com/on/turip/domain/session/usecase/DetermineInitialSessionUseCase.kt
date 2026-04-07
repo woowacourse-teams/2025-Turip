@@ -3,9 +3,7 @@ package com.on.turip.domain.session.usecase
 import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.fold
 import com.on.turip.domain.login.AuthRepository
-import com.on.turip.domain.login.AuthTokens
-import com.on.turip.domain.session.SessionState
-import com.on.turip.domain.session.SessionStore
+import com.on.turip.domain.session.AuthStatus
 import com.on.turip.domain.session.TokenManager
 import javax.inject.Inject
 
@@ -14,36 +12,28 @@ import javax.inject.Inject
  */
 class DetermineInitialSessionUseCase @Inject constructor(
     private val tokenManager: TokenManager,
-    private val sessionStore: SessionStore,
     private val authRepository: AuthRepository,
-    private val switchToGuestUseCase: SwitchToGuestUseCase,
 ) {
-    suspend operator fun invoke(): SessionState {
+    suspend operator fun invoke(): AuthStatus {
         tokenManager.initialize()
 
-        val tokens: AuthTokens? = tokenManager.currentTokens
-        if (tokens == null) {
-            sessionStore.setGuest()
-            return SessionState.Guest
-        }
+        // 게스트 모드 상태인 경우
+        if (tokenManager.currentTokens == null) return AuthStatus.UnAuthenticated
 
         // 토큰이 유효한지 검증
-        authRepository.getTokenVerification(tokens.accessToken).fold(
+        authRepository.verifyToken().fold(
             onSuccess = {
-                sessionStore.setMember()
-                return SessionState.Member
+                return AuthStatus.Authenticated
             },
             onFailure = { errorType ->
-                when (errorType) {
+                return when (errorType) {
                     is ErrorType.Auth -> {
-                        switchToGuestUseCase()
-                        return SessionState.Guest
+                        AuthStatus.UnAuthenticated
                     }
 
                     else -> {
-                        // Auth 관련 오류가 아닌 경우는 토큰 초기화하지 않고 멤버로 내려주기
-                        sessionStore.setMember()
-                        return SessionState.Member
+                        // Auth 관련 오류가 아닌 경우는 멤버로 내려주기
+                        AuthStatus.Authenticated
                     }
                 }
             },

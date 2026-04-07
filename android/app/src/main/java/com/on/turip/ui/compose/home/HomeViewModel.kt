@@ -10,6 +10,7 @@ import com.on.turip.domain.content.UsersLikeContent
 import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.region.RegionCategory
 import com.on.turip.domain.region.repository.RegionRepository
+import com.on.turip.domain.session.SessionManager
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
@@ -31,6 +32,7 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val regionRepository: RegionRepository,
     private val contentRepository: ContentRepository,
+    private val sessionManager: SessionManager,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<HomeUiState> = MutableStateFlow(HomeUiState.Idle)
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
@@ -123,6 +125,7 @@ class HomeViewModel @Inject constructor(
                 }
 
                 UiError.Global.TokenExpired -> {
+                    sessionManager.switchToGuest()
                     _uiState.update { it.copy(isLoading = false) }
                     _uiEffect.send(HomeUiEffect.NavigateToLogin)
                 }

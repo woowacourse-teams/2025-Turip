@@ -9,6 +9,7 @@ import com.on.turip.core.result.onSuccess
 import com.on.turip.domain.bookmark.usecase.UpdateBookmarkUseCase
 import com.on.turip.domain.content.Content
 import com.on.turip.domain.content.repository.ContentRepository
+import com.on.turip.domain.session.SessionManager
 import com.on.turip.domain.trip.ContentPlace
 import com.on.turip.domain.trip.Trip
 import com.on.turip.ui.common.error.ErrorUiState
@@ -36,6 +37,7 @@ import javax.inject.Inject
 class TripDetailViewModel @Inject constructor(
     private val contentRepository: ContentRepository,
     private val updateBookmarkUseCase: UpdateBookmarkUseCase,
+    private val sessionManager: SessionManager,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<TripDetailUiState> =
         MutableStateFlow(TripDetailUiState.IDLE)
@@ -140,6 +142,7 @@ class TripDetailViewModel @Inject constructor(
                             }
 
                             UiError.Global.TokenExpired -> {
+                                sessionManager.switchToGuest()
                                 _uiEffect.send(TripDetailUiEffect.NavigateToLogin)
                             }
                         }
@@ -207,6 +210,7 @@ class TripDetailViewModel @Inject constructor(
 
                 UiError.Global.TokenExpired -> {
                     _uiState.update { it.copy(isLoading = false) }
+                    sessionManager.switchToGuest()
                     _uiEffect.send(TripDetailUiEffect.NavigateToLogin)
                 }
             }

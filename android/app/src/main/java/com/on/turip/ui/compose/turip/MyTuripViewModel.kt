@@ -5,8 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
-import com.on.turip.domain.session.SessionState
-import com.on.turip.domain.session.SessionStore
+import com.on.turip.core.session.SessionState
+import com.on.turip.domain.session.SessionManager
 import com.on.turip.domain.turip.DeleteTuripUseCase
 import com.on.turip.domain.turip.Turip
 import com.on.turip.domain.turip.repository.TuripRepository
@@ -38,7 +38,7 @@ import javax.inject.Inject
 class MyTuripViewModel @Inject constructor(
     private val turipRepository: TuripRepository,
     private val deleteTuripUseCase: DeleteTuripUseCase,
-    sessionStore: SessionStore,
+    private val sessionManager: SessionManager,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<MyTuripUiState> =
         MutableStateFlow(MyTuripUiState.Idle)
@@ -48,7 +48,7 @@ class MyTuripViewModel @Inject constructor(
     val uiEffect: Flow<MyTuripUiEffect> = _uiEffect.receiveAsFlow()
 
     init {
-        observeSessionChange(sessionStore.state)
+        observeSessionChange(sessionManager.state)
     }
 
     fun loadTurips() {
@@ -214,6 +214,7 @@ class MyTuripViewModel @Inject constructor(
                 }
 
                 UiError.Global.TokenExpired -> {
+                    sessionManager.switchToGuest()
                     _uiEffect.send(MyTuripUiEffect.NavigateToLogin)
                 }
             }

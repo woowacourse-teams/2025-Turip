@@ -1,4 +1,4 @@
-package com.on.turip.domain.session
+package com.on.turip.core.session
 
 /**
  * 앱의 현재 인증 세션 상태를 나타내는 모델

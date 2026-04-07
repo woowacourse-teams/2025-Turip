@@ -3,8 +3,10 @@ package com.on.turip.ui.compose.splash
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.on.turip.core.navigation.InitialNavigationTarget
+import com.on.turip.core.session.SessionState
 import com.on.turip.domain.invitation.repository.DeferredDeepLinkRepository
-import com.on.turip.domain.session.SessionState
+import com.on.turip.domain.session.AuthStatus
+import com.on.turip.domain.session.SessionManager
 import com.on.turip.domain.session.usecase.DetermineInitialSessionUseCase
 import com.on.turip.ui.common.extensions.toUrl
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,6 +23,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SplashViewModel @Inject constructor(
     private val determineInitialSessionUseCase: DetermineInitialSessionUseCase,
+    private val sessionManager: SessionManager,
     private val deferredDeepLinkRepository: DeferredDeepLinkRepository,
 ) : ViewModel() {
     private val _uiEffect: Channel<SplashUiEffect> = Channel(Channel.BUFFERED)
@@ -43,21 +46,19 @@ class SplashViewModel @Inject constructor(
             try {
                 val trimmedDeepLinkUrl: String? = deepLinkUrl?.trim()?.takeIf(String::isNotEmpty)
                 if (trimmedDeepLinkUrl != null) {
-                    determineInitialSessionUseCase()
+                    switchSession(authStatus = determineInitialSessionUseCase())
+
                     _uiEffect.send(
                         SplashUiEffect.NavigateToMain(
-                            InitialNavigationTarget.InvitationEntry(
-                                deepLinkUrl = trimmedDeepLinkUrl,
-                            ),
+                            InitialNavigationTarget.InvitationEntry(deepLinkUrl = trimmedDeepLinkUrl),
                         ),
                     )
                     return@launch
                 }
 
-                val sessionState: SessionState
                 val deferredDeepLinkUrl: String?
                 coroutineScope {
-                    val sessionStateDeferred = async { determineInitialSessionUseCase() }
+                    val authStatusDeferred = async { determineInitialSessionUseCase() }
                     val deferredDeepLinkUrlDeferred =
                         async {
                             deferredDeepLinkRepository
@@ -65,14 +66,15 @@ class SplashViewModel @Inject constructor(
                                 .getOrNull()
                                 ?.toUrl()
                         }
-                    sessionState = sessionStateDeferred.await()
+
+                    switchSession(authStatus = authStatusDeferred.await())
                     deferredDeepLinkUrl = deferredDeepLinkUrlDeferred.await()
                 }
 
                 val initialNavigationTarget: InitialNavigationTarget =
                     deferredDeepLinkUrl?.let { url: String ->
                         InitialNavigationTarget.InvitationEntry(deepLinkUrl = url)
-                    } ?: when (sessionState) {
+                    } ?: when (sessionManager.state.value) {
                         SessionState.Member -> InitialNavigationTarget.Home
                         SessionState.Guest, SessionState.Uninitialized -> InitialNavigationTarget.Login
                     }
@@ -82,6 +84,13 @@ class SplashViewModel @Inject constructor(
                 Timber.e(exception, "초기 진입 목적지 결정 실패")
                 hasDeterminedStartDestination.set(false)
             }
+        }
+    }
+
+    private suspend fun switchSession(authStatus: AuthStatus) {
+        when (authStatus) {
+            AuthStatus.Authenticated -> sessionManager.switchToMember()
+            AuthStatus.UnAuthenticated -> sessionManager.switchToGuest()
         }
     }
 }
