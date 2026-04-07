@@ -11,12 +11,10 @@ import com.on.turip.domain.account.AccountRepository
 import com.on.turip.domain.bookmark.BookmarkContent
 import com.on.turip.domain.bookmark.repository.BookmarkRepository
 import com.on.turip.domain.common.paging.Cursor
-import com.on.turip.domain.common.paging.Page
 import com.on.turip.domain.login.MemberRepository
 import com.on.turip.domain.session.SessionManager
 import com.on.turip.domain.setting.PrivacyPolicy
 import com.on.turip.domain.userstorage.repository.UserStorageRepository
-import com.on.turip.ui.common.BookmarkChangeEventBus
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
@@ -45,7 +43,6 @@ class MyPageViewModel @Inject constructor(
     private val userStorageRepository: UserStorageRepository,
     private val memberRepository: MemberRepository,
     private val accountRepository: AccountRepository,
-    private val bookmarkChangeEventBus: BookmarkChangeEventBus,
     private val sessionManager: SessionManager,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<MyPageUiState> = MutableStateFlow(MyPageUiState.Idle)
@@ -58,14 +55,34 @@ class MyPageViewModel @Inject constructor(
 
     init {
         loadProfile(isRetry = false)
+        observeBookmarkContents()
         loadBookmarkContents(isRetry = false)
-        observeBookmarkChanges()
     }
 
-    private fun observeBookmarkChanges() {
+    private fun observeBookmarkContents() {
         viewModelScope.launch {
-            bookmarkChangeEventBus.changes.collect {
-                loadBookmarkContents(isRetry = false)
+            bookmarkRepository.bookmarkContents.collect { contents ->
+                _uiState.update { state ->
+                    val shouldUpdate =
+                        when {
+                            state.bookmarkContentState is MyPageSectionState.Error -> false
+                            contents.isEmpty() && state.bookmarkContentState !is MyPageSectionState.Success -> false
+                            else -> true
+                        }
+                    if (shouldUpdate) {
+                        state.copy(
+                            bookmarkContentState =
+                                MyPageSectionState.Success(
+                                    contents
+                                        .take(
+                                            MAX_BOOKMARK_DISPLAY_COUNT,
+                                        ).toImmutableList(),
+                                ),
+                        )
+                    } else {
+                        state
+                    }
+                }
             }
         }
     }
@@ -94,11 +111,23 @@ class MyPageViewModel @Inject constructor(
             val cursor = Cursor(size = 10, lastId = null)
             bookmarkRepository
                 .loadBookmarks(cursor)
-                .onSuccess { result: Page<BookmarkContent> ->
-                    Timber.d("마이페이지 북마크 목록 조회 성공")
-                    _uiState.update {
-                        it.copy(bookmarkContentState = MyPageSectionState.Success(result.items.toImmutableList()))
+                .onSuccess { page ->
+                    _uiState.update { state ->
+                        if (state.bookmarkContentState is MyPageSectionState.Loading) {
+                            state.copy(
+                                bookmarkContentState =
+                                    MyPageSectionState.Success(
+                                        page.items
+                                            .take(
+                                                MAX_BOOKMARK_DISPLAY_COUNT,
+                                            ).toImmutableList(),
+                                    ),
+                            )
+                        } else {
+                            state
+                        }
                     }
+                    Timber.d("마이페이지 북마크 목록 조회 성공")
                 }.onFailure { errorType ->
                     Timber.e("마이페이지 북마크 목록 조회 에러 발생")
 
@@ -289,6 +318,7 @@ class MyPageViewModel @Inject constructor(
 
     companion object {
         private const val INVALID_FID = "FID_LOAD_FAIL"
+        private const val MAX_BOOKMARK_DISPLAY_COUNT = 10
     }
 }
 

@@ -12,7 +12,7 @@ fun LoginJwtTokenResponse.toDomain(): AuthResult =
                 accessToken = accessToken,
                 refreshToken = refreshToken,
             ),
-        isNewMember = isNewMember,
+        isMigrationDecided = isMigrationDecided,
     )
 
 fun ReissueTokenResponse.toDomain(): AuthTokens =

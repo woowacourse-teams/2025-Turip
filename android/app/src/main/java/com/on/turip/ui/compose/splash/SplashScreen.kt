@@ -40,7 +40,6 @@ import com.google.android.play.core.appupdate.AppUpdateOptions
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.UpdateAvailability
 import com.on.turip.R
-import com.on.turip.core.navigation.InitialNavigationTarget
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
@@ -50,7 +49,9 @@ private const val UPDATE_TYPE = AppUpdateType.IMMEDIATE
 @Composable
 fun SplashScreen(
     deepLinkUrl: String?,
-    onNavigateToMain: (target: InitialNavigationTarget) -> Unit,
+    onNavigateToMain: () -> Unit,
+    onNavigateToLogin: () -> Unit,
+    onNavigateToInvitationEntry: (deepLinkUrl: String) -> Unit,
     onFinish: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SplashViewModel = hiltViewModel(),
@@ -82,8 +83,16 @@ fun SplashScreen(
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collectLatest { uiEffect ->
             when (uiEffect) {
-                is SplashUiEffect.NavigateToMain -> {
-                    onNavigateToMain(uiEffect.initialNavigationTarget)
+                SplashUiEffect.NavigateToMain -> {
+                    onNavigateToMain()
+                }
+
+                SplashUiEffect.NavigateToLogin -> {
+                    onNavigateToLogin()
+                }
+
+                is SplashUiEffect.NavigateToInvitationEntry -> {
+                    onNavigateToInvitationEntry(uiEffect.deepLinkUrl)
                 }
             }
         }

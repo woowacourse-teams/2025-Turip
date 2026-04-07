@@ -10,7 +10,7 @@ import de.jensklingenberg.ktorfit.http.GET
 import de.jensklingenberg.ktorfit.http.POST
 
 interface AuthService {
-    @POST(ApiPath.V1 + "auth/login/google")
+    @POST(ApiPath.V2 + "auth/login/google")
     suspend fun postIdToken(
         @Body loginIdTokenPostRequest: LoginIdTokenPostRequest,
     ): LoginJwtTokenResponse

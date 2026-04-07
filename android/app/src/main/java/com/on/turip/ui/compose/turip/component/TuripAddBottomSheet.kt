@@ -31,8 +31,8 @@ fun TuripAddBottomSheet(
     isConfirmEnabled: Boolean,
     onNameChanged: (name: String) -> Unit,
     onConfirmClick: () -> Unit,
-    snackbarHostState: SnackbarHostState,
     onDismiss: () -> Unit,
+    snackbarHostState: SnackbarHostState? = null,
 ) {
     val focusRequester = remember { FocusRequester() }
 
@@ -41,7 +41,23 @@ fun TuripAddBottomSheet(
         sheetState = sheetState,
         containerColor = TuripTheme.colors.white,
     ) {
-        Box(modifier = Modifier.imePadding()) {
+        if (snackbarHostState != null) {
+            Box(modifier = Modifier.imePadding()) {
+                NameEditorSheetContent(
+                    title = title,
+                    turipName = turipName,
+                    turipNameStatus = turipNameStatus,
+                    isConfirmEnabled = isConfirmEnabled,
+                    onNameChanged = onNameChanged,
+                    onConfirmClick = onConfirmClick,
+                    focusRequester = focusRequester,
+                )
+                TuripSnackbar(
+                    snackbarHostState = snackbarHostState,
+                    modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth(),
+                )
+            }
+        } else {
             NameEditorSheetContent(
                 title = title,
                 turipName = turipName,
@@ -50,13 +66,7 @@ fun TuripAddBottomSheet(
                 onNameChanged = onNameChanged,
                 onConfirmClick = onConfirmClick,
                 focusRequester = focusRequester,
-            )
-            TuripSnackbar(
-                snackbarHostState = snackbarHostState,
-                modifier =
-                    Modifier
-                        .align(Alignment.BottomCenter)
-                        .fillMaxWidth(),
+                modifier = Modifier.imePadding(),
             )
         }
     }
@@ -96,8 +106,8 @@ fun TuripAddBottomSheetStatusPreview(
             isConfirmEnabled = true,
             onNameChanged = {},
             onConfirmClick = {},
-            snackbarHostState = snackbarHostState,
             onDismiss = {},
+            snackbarHostState = snackbarHostState,
         )
     }
 }

@@ -66,8 +66,8 @@ class LoginViewmodel @Inject constructor(
                     .getIdToken()
                     .onSuccess { idToken: String ->
                         loginUseCase(idToken)
-                            .onSuccess { isNewMember: Boolean ->
-                                if (isNewMember) {
+                            .onSuccess { isMigrationDecided: Boolean ->
+                                if (!isMigrationDecided) {
                                     _uiState.update { it.copy(showMigrationDialog = true) }
                                 } else {
                                     _uiEffect.send(LoginUiEffect.NavigateToMain(_uiState.value.deepLinkUrl))
@@ -95,22 +95,37 @@ class LoginViewmodel @Inject constructor(
                 .onSuccess {
                     _uiState.update { it.copy(showMigrationDialog = false) }
                     _uiEffect.send(LoginUiEffect.NavigateToMain(_uiState.value.deepLinkUrl))
-                }.onFailure {
+                }.onFailure { errorType ->
                     Timber.e("마이그레이션 실패")
+                    _uiState.update { it.copy(showMigrationDialog = false) }
+                    handleError(errorType)
                 }
         }
     }
 
-    fun clearGuestData() {
+    fun rejectMigration() {
         viewModelScope.launch {
-            guestRepository
-                .deleteGuest()
+            memberRepository
+                .rejectMigration()
                 .onSuccess {
-                    _uiEffect.send(LoginUiEffect.NavigateToMain(_uiState.value.deepLinkUrl))
-                }.onFailure {
-                    Timber.e("게스트 데이터 삭제 실패")
+                    _uiState.update { it.copy(showMigrationDialog = false) }
+                    clearGuestData()
+                }.onFailure { errorType ->
+                    Timber.e("마이그레이션 거절 실패")
+                    _uiState.update { it.copy(showMigrationDialog = false) }
+                    handleError(errorType)
                 }
         }
+    }
+
+    private suspend fun clearGuestData() {
+        guestRepository
+            .deleteGuest()
+            .onSuccess {
+                _uiEffect.send(LoginUiEffect.NavigateToMain(_uiState.value.deepLinkUrl))
+            }.onFailure {
+                Timber.e("게스트 데이터 삭제 실패")
+            }
     }
 
     fun continueAsGuest() {
@@ -130,6 +145,8 @@ class LoginViewmodel @Inject constructor(
             UiError.Global.Server -> {
                 _uiEffect.send(LoginUiEffect.ShowError(ErrorUiState.Server))
             }
+
+            UiError.Feature.Cancelled -> {}
 
             else -> {
                 _uiEffect.send(LoginUiEffect.ShowError(ErrorUiState.Unexpected))
