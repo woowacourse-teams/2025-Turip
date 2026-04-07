@@ -66,8 +66,8 @@ class LoginViewmodel @Inject constructor(
                     .getIdToken()
                     .onSuccess { idToken: String ->
                         loginUseCase(idToken)
-                            .onSuccess { shouldShowMigration: Boolean ->
-                                if (shouldShowMigration) {
+                            .onSuccess { isMigrationDecided: Boolean ->
+                                if (!isMigrationDecided) {
                                     _uiState.update { it.copy(showMigrationDialog = true) }
                                 } else {
                                     _uiEffect.send(LoginUiEffect.NavigateToMain(_uiState.value.deepLinkUrl))
