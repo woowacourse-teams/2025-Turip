@@ -7,5 +7,5 @@ interface AuthRepository {
 
     suspend fun requestTokens(refreshToken: String): TuripResult<AuthTokens>
 
-    suspend fun getTokenVerification(accessToken: String): TuripResult<Unit>
+    suspend fun verifyToken(): TuripResult<Unit>
 }

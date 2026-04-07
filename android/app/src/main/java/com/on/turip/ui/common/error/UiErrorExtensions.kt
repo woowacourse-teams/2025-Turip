@@ -10,7 +10,7 @@ import com.on.turip.core.result.ErrorType.TuripPlace
 
 fun ErrorType.toUiError(): UiError =
     when (this) {
-        Auth.TokenExpired -> UiError.Global.TokenExpired
+        Auth.TokenExpired, Auth.UnAuthorized -> UiError.Global.TokenExpired
 
         Auth.Forbidden -> UiError.Feature.PermissionDenied
 

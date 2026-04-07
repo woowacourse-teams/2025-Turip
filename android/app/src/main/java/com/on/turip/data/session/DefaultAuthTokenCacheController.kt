@@ -1,5 +1,6 @@
 package com.on.turip.data.session
 
+import com.on.turip.di.qualifier.DefaultHttpClient
 import com.on.turip.domain.session.AuthTokenCacheController
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.auth.authProvider
@@ -13,7 +14,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class DefaultAuthTokenCacheController @Inject constructor(
-    private val httpClient: Provider<HttpClient>,
+    @DefaultHttpClient private val httpClient: Provider<HttpClient>,
 ) : AuthTokenCacheController {
     override fun clear() {
         httpClient.get().authProvider<BearerAuthProvider>()?.clearToken()

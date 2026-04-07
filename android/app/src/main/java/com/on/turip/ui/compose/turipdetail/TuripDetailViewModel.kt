@@ -5,8 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
-import com.on.turip.domain.session.SessionState
-import com.on.turip.domain.session.SessionStore
+import com.on.turip.core.session.SessionState
+import com.on.turip.domain.session.SessionManager
 import com.on.turip.domain.turip.DeleteTuripUseCase
 import com.on.turip.domain.turip.ObserveTuripStreamUseCase
 import com.on.turip.domain.turip.Turip
@@ -57,7 +57,7 @@ class TuripDetailViewModel @Inject constructor(
     private val turipRepository: TuripRepository,
     private val deleteTuripUseCase: DeleteTuripUseCase,
     private val observeTuripStreamUseCase: ObserveTuripStreamUseCase,
-    sessionStore: SessionStore,
+    private val sessionManager: SessionManager,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<TuripDetailUiState> =
         MutableStateFlow(TuripDetailUiState.Idle)
@@ -66,7 +66,7 @@ class TuripDetailViewModel @Inject constructor(
     private val _uiEffect: Channel<TuripDetailUiEffect> = Channel(Channel.BUFFERED)
     val uiEffect: Flow<TuripDetailUiEffect> = _uiEffect.receiveAsFlow()
 
-    private val sessionState: StateFlow<SessionState> = sessionStore.state
+    private val sessionState: StateFlow<SessionState> = sessionManager.state
     private var reorderPlacesSnapshot: ImmutableList<TuripPlaceModel>? = null
     private var selectedTuripId: Long = INVALID_ID
     private var isNetworkUnstable: Boolean = false
@@ -189,6 +189,7 @@ class TuripDetailViewModel @Inject constructor(
                         }
 
                         TuripStreamResult.Fatal.TokenExpired -> {
+                            sessionManager.switchToGuest()
                             _uiEffect.send(TuripDetailUiEffect.NavigateToLogin)
                         }
 
@@ -351,7 +352,13 @@ class TuripDetailViewModel @Inject constructor(
                         if (deletePlaceQueue.isEmpty()) {
                             clearDeleteSession()
                         }
-                    }.onFailure {
+                    }.onFailure { errorType ->
+                        if (errorType is ErrorType.Auth) {
+                            sessionManager.switchToGuest()
+                            _uiEffect.send(TuripDetailUiEffect.NavigateToLogin)
+                            return@onFailure
+                        }
+
                         _uiEffect.send(
                             TuripDetailUiEffect.ShowTuripDetailRemoveFailed(deletePlace.name),
                         )
@@ -450,11 +457,7 @@ class TuripDetailViewModel @Inject constructor(
                     _uiEffect.send(TuripDetailUiEffect.TuripUpdated)
                 }.onFailure { errorType: ErrorType ->
                     if (errorType == ErrorType.Turip.DuplicatedName) {
-                        _uiState.update {
-                            it.copy(
-                                turipNameStatus = TuripNameStatusModel.DUPLICATE_NAME,
-                            )
-                        }
+                        _uiState.update { it.copy(turipNameStatus = TuripNameStatusModel.DUPLICATE_NAME) }
                     } else {
                         sendErrorEffect(errorType, TuripPlaceRetryAction.TuripNameUpdate)
                     }
@@ -533,14 +536,18 @@ class TuripDetailViewModel @Inject constructor(
                     _uiState.update { it.copy(places = reorderedTuripPlaces) }
                     clearReorderSnapshot()
                     Timber.d("장소 순서 변경 API 성공")
-                }.onFailure {
+                }.onFailure { errorType ->
+                    if (errorType is ErrorType.Auth) {
+                        sessionManager.switchToGuest()
+                        _uiEffect.send(TuripDetailUiEffect.NavigateToLogin)
+                        return@onFailure
+                    }
+
                     rollbackReorderedPlaces()
                     _uiEffect.send(
                         TuripDetailUiEffect.ShowReorderDetailFailed(
                             retryAction =
-                                TuripPlaceRetryAction.UpdateReorderedPlaces(
-                                    reorderedTuripPlaces,
-                                ),
+                                TuripPlaceRetryAction.UpdateReorderedPlaces(reorderedTuripPlaces),
                         ),
                     )
                     Timber.e("장소 순서 변경 API 실패")
@@ -705,6 +712,7 @@ class TuripDetailViewModel @Inject constructor(
                 }
 
                 UiError.Global.TokenExpired -> {
+                    sessionManager.switchToGuest()
                     _uiEffect.send(TuripDetailUiEffect.NavigateToLogin)
                 }
             }

@@ -12,11 +12,16 @@ import java.io.IOException
 suspend fun <T> safeApiCall(apiCall: suspend () -> T): TuripResult<T> =
     try {
         TuripResult.Success(value = apiCall())
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: ApiException) {
+        when (e) {
+            ApiException.Network -> TuripResult.Failure(ErrorType.Network, e)
+            ApiException.Auth -> TuripResult.Failure(ErrorType.Auth.UnAuthorized, e)
+            is ApiException.Error -> TuripResult.Failure(e.errorType, e)
+        }
     } catch (e: Exception) {
-        if (e is CancellationException) throw e
-
-        val errorType: ErrorType = e.toErrorType()
-        TuripResult.Failure(errorType, cause = e)
+        TuripResult.Failure(e.toErrorType(), e)
     }
 
 suspend fun Throwable.toErrorType(): ErrorType =

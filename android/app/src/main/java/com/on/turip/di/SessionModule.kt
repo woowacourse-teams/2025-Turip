@@ -1,10 +1,8 @@
 package com.on.turip.di
 
 import com.on.turip.data.session.DefaultAuthTokenCacheController
-import com.on.turip.data.session.DefaultSessionStore
 import com.on.turip.data.session.DefaultTokenManager
 import com.on.turip.domain.session.AuthTokenCacheController
-import com.on.turip.domain.session.SessionStore
 import com.on.turip.domain.session.TokenManager
 import dagger.Binds
 import dagger.Module
@@ -22,8 +20,4 @@ abstract class SessionModule {
     @Binds
     @Singleton
     abstract fun bindAuthTokenCacheController(defaultAuthTokenCacheController: DefaultAuthTokenCacheController): AuthTokenCacheController
-
-    @Binds
-    @Singleton
-    abstract fun bindSessionStore(defaultSessionStore: DefaultSessionStore): SessionStore
 }

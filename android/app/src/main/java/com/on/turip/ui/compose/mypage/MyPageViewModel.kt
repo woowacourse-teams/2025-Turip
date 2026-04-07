@@ -5,15 +5,14 @@ import androidx.lifecycle.viewModelScope
 import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
+import com.on.turip.core.session.SessionState
 import com.on.turip.domain.account.Account
 import com.on.turip.domain.account.AccountRepository
 import com.on.turip.domain.bookmark.BookmarkContent
 import com.on.turip.domain.bookmark.repository.BookmarkRepository
 import com.on.turip.domain.common.paging.Cursor
 import com.on.turip.domain.login.MemberRepository
-import com.on.turip.domain.session.SessionState
-import com.on.turip.domain.session.SessionStore
-import com.on.turip.domain.session.usecase.SwitchToGuestUseCase
+import com.on.turip.domain.session.SessionManager
 import com.on.turip.domain.setting.PrivacyPolicy
 import com.on.turip.domain.userstorage.repository.UserStorageRepository
 import com.on.turip.ui.common.error.ErrorUiState
@@ -44,8 +43,7 @@ class MyPageViewModel @Inject constructor(
     private val userStorageRepository: UserStorageRepository,
     private val memberRepository: MemberRepository,
     private val accountRepository: AccountRepository,
-    private val switchToGuestUseCase: SwitchToGuestUseCase,
-    sessionStore: SessionStore,
+    private val sessionManager: SessionManager,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<MyPageUiState> = MutableStateFlow(MyPageUiState.Idle)
     val uiState: StateFlow<MyPageUiState> = _uiState.asStateFlow()
@@ -53,7 +51,7 @@ class MyPageViewModel @Inject constructor(
     private val _uiEffect: Channel<MyPageUiEffect> = Channel(Channel.BUFFERED)
     val uiEffect: Flow<MyPageUiEffect> = _uiEffect.receiveAsFlow()
 
-    val sessionState: StateFlow<SessionState> = sessionStore.state
+    val sessionState: StateFlow<SessionState> = sessionManager.state
 
     init {
         loadProfile(isRetry = false)
@@ -130,8 +128,15 @@ class MyPageViewModel @Inject constructor(
                         }
                     }
                     Timber.d("마이페이지 북마크 목록 조회 성공")
-                }.onFailure {
+                }.onFailure { errorType ->
                     Timber.e("마이페이지 북마크 목록 조회 에러 발생")
+
+                    if (errorType is ErrorType.Auth) {
+                        sessionManager.switchToGuest()
+                        _uiEffect.send(MyPageUiEffect.NavigateToLogin)
+                        return@onFailure
+                    }
+
                     _uiState.update { it.copy(bookmarkContentState = MyPageSectionState.Error) }
                     if (isRetry) _uiEffect.send(MyPageUiEffect.ShowBookmarksLoadFailed)
                 }
@@ -156,18 +161,15 @@ class MyPageViewModel @Inject constructor(
                 val removed =
                     removeBookmarkMutex.withLock {
                         val current = _uiState.value.bookmarkContentState
-                        val contents =
-                            (current as? MyPageSectionState.Success)?.data ?: return@withLock false
+                        val contents = (current as? MyPageSectionState.Success)?.data ?: return@withLock false
 
-                        val removeContentIndex: Int =
-                            contents.indexOfFirst { it.content.id == contentId }
+                        val removeContentIndex: Int = contents.indexOfFirst { it.content.id == contentId }
                         if (removeContentIndex == -1) return@withLock false
 
                         val removeContent = contents[removeContentIndex]
                         removingSnapshots[contentId] = BookmarkRemoveSnapshot(removeContent)
 
-                        val updated =
-                            contents.filter { it.content.id != contentId }.toImmutableList()
+                        val updated = contents.filter { it.content.id != contentId }.toImmutableList()
                         _uiState.update {
                             it.copy(bookmarkContentState = MyPageSectionState.Success(updated))
                         }
@@ -257,7 +259,7 @@ class MyPageViewModel @Inject constructor(
             memberRepository
                 .logout()
                 .onSuccess {
-                    switchToGuestUseCase()
+                    sessionManager.switchToGuest()
                     _uiEffect.send(MyPageUiEffect.NavigateToLogin)
                     Timber.d("로그아웃 성공")
                 }.onFailure { errorType: ErrorType ->
@@ -274,7 +276,7 @@ class MyPageViewModel @Inject constructor(
             memberRepository
                 .deleteMember()
                 .onSuccess {
-                    switchToGuestUseCase()
+                    sessionManager.switchToGuest()
                     _uiEffect.send(MyPageUiEffect.NavigateToLogin)
                     Timber.d("회원탈퇴 성공")
                 }.onFailure { errorType: ErrorType ->
@@ -300,6 +302,7 @@ class MyPageViewModel @Inject constructor(
                 }
 
                 UiError.Global.TokenExpired -> {
+                    sessionManager.switchToGuest()
                     _uiEffect.send(MyPageUiEffect.NavigateToLogin)
                 }
             }
