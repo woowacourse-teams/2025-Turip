@@ -850,6 +850,8 @@ class FavoriteFolderServiceTest {
 
             // then
             assertAll(
+                    () -> verify(favoritePlaceRepository).deleteAllByFavoriteFolder(personalFolder1),
+                    () -> verify(favoritePlaceRepository).deleteAllByFavoriteFolder(personalFolder2),
                     () -> verify(favoriteFolderAccountService).deleteByFavoriteFolderAndAccount(personalFolder1,
                             account),
                     () -> verify(favoriteFolderAccountService).deleteByFavoriteFolderAndAccount(personalFolder2,
@@ -882,6 +884,7 @@ class FavoriteFolderServiceTest {
 
             // then
             assertAll(
+                    () -> verify(favoritePlaceRepository).deleteAllByFavoriteFolder(defaultFolder),
                     () -> verify(favoriteFolderAccountService).deleteByFavoriteFolderAndAccount(defaultFolder,
                             account),
                     () -> verify(favoriteFolderRepository).delete(defaultFolder)
