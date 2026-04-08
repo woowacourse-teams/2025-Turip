@@ -422,11 +422,17 @@ class TuripDetailViewModel @Inject constructor(
     }
 
     fun updateScreenMode(turipPlaceScreenMode: TuripPlaceScreenMode) {
-        if (turipPlaceScreenMode == TuripPlaceScreenMode.MoreOption) {
-            _uiState.update { it.copy(inputTuripName = "") }
+        _uiState.update {
+            if (turipPlaceScreenMode == TuripPlaceScreenMode.Edit) {
+                it.copy(
+                    screenMode = turipPlaceScreenMode,
+                    inputTuripName = "",
+                    turipNameStatus = TuripNameStatusModel.EMPTY,
+                )
+            } else {
+                it.copy(screenMode = turipPlaceScreenMode)
+            }
         }
-
-        _uiState.update { it.copy(screenMode = turipPlaceScreenMode) }
     }
 
     fun updateInputName(name: String) {
@@ -475,12 +481,12 @@ class TuripDetailViewModel @Inject constructor(
         }
     }
 
-    fun showBottomSheet() = _uiState.update { it.copy(showBottomSheet = true) }
+    fun showMoreOptionBottomSheet() = _uiState.update { it.copy(showMoreOptionBottomSheet = true) }
 
-    fun dismissBottomSheet() =
+    fun dismissMoreOptionBottomSheet() =
         _uiState.update {
             it.copy(
-                showBottomSheet = false,
+                showMoreOptionBottomSheet = false,
                 screenMode = TuripPlaceScreenMode.MoreOption,
             )
         }

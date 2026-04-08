@@ -79,8 +79,8 @@ fun TuripDetailScreen(
     val scope = rememberCoroutineScope()
 
     BackHandler {
-        if (uiState.showBottomSheet) {
-            viewModel.dismissBottomSheet()
+        if (uiState.showMoreOptionBottomSheet) {
+            viewModel.dismissMoreOptionBottomSheet()
         } else {
             scope.launch {
                 viewModel.flushDeleteQueueAndAwait()
@@ -101,12 +101,12 @@ fun TuripDetailScreen(
                 }
 
                 is TuripDetailUiEffect.ShareTuripByText -> {
-                    viewModel.dismissBottomSheet()
+                    viewModel.dismissMoreOptionBottomSheet()
                     onShareTuripByText(uiEffect.turipShareModel)
                 }
 
                 is TuripDetailUiEffect.ShareTuripInvitationLink -> {
-                    viewModel.dismissBottomSheet()
+                    viewModel.dismissMoreOptionBottomSheet()
                     onShareTuripInvitationLink(uiEffect.invitationLink)
                 }
 
@@ -130,7 +130,7 @@ fun TuripDetailScreen(
                 }
 
                 TuripDetailUiEffect.TuripUpdated -> {
-                    viewModel.dismissBottomSheet()
+                    viewModel.dismissMoreOptionBottomSheet()
                 }
 
                 is TuripDetailUiEffect.ShowTuripDetailRemoveFailed -> {
@@ -207,12 +207,12 @@ fun TuripDetailScreen(
         )
     }
 
-    if (uiState.showBottomSheet) {
+    if (uiState.showMoreOptionBottomSheet) {
         MoreOptionBottomSheet(
             sheetState = modalBottomSheetState,
             isDefault = uiState.selectedTurip.isDefault,
             isTogetherTurip = uiState.selectedTurip.type == TuripType.TOGETHER,
-            onDismiss = viewModel::dismissBottomSheet,
+            onDismiss = viewModel::dismissMoreOptionBottomSheet,
             onShareTuripByTextClick = viewModel::shareTuripByText,
             onShareTuripInvitationLinkClick = viewModel::shareTuripInvitationLink,
             onDeleteClick = viewModel::showTuripRemoveDialog,
@@ -248,7 +248,7 @@ fun TuripDetailScreen(
             dismissButtonColor = TuripTheme.colors.gray02,
             onConfirmation = {
                 viewModel.deleteTurip()
-                viewModel.dismissBottomSheet()
+                viewModel.dismissMoreOptionBottomSheet()
             },
             onDismissRequest = viewModel::dismissTuripRemoveDialog,
             modifier = Modifier.fillMaxSize(),
@@ -296,7 +296,7 @@ fun TuripDetailScreen(
                             viewModel.applyTuripPlaceDelete(placeId = placeId)
                         },
                         currentPlaceLatLng = uiState.placesLatLng,
-                        onMoreOption = viewModel::showBottomSheet,
+                        onMoreOption = viewModel::showMoreOptionBottomSheet,
                         onBack = {
                             scope.launch {
                                 viewModel.flushDeleteQueueAndAwait()
