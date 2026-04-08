@@ -112,7 +112,10 @@ fun TripDetailScreen(
         )
 
     val isInitialLoading by remember {
-        derivedStateOf { uiState.isLoading || webViewController.isLoading }
+        derivedStateOf {
+            uiState.isLoading ||
+                (webViewController.isLoading && uiState.tripDetailInfo == TripDetailInfoModel.Idle)
+        }
     }
     val isAtBottom by remember(
         listState,
