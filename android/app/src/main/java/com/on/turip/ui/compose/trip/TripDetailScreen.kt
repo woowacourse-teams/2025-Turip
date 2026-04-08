@@ -49,6 +49,9 @@ import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.on.turip.R
 import com.on.turip.ui.common.error.ErrorUiModel
@@ -98,6 +101,7 @@ fun TripDetailScreen(
     val systemBarStyleController = LocalSystemBarStyleController.current
     val context = LocalContext.current
     val resources = LocalResources.current
+    val lifecycleOwner = LocalLifecycleOwner.current
 
     val listState = rememberLazyListState()
 
@@ -108,7 +112,10 @@ fun TripDetailScreen(
         )
 
     val isInitialLoading by remember {
-        derivedStateOf { uiState.isLoading || webViewController.isLoading }
+        derivedStateOf {
+            uiState.isLoading ||
+                (webViewController.isLoading && uiState.tripDetailInfo == TripDetailInfoModel.Idle)
+        }
     }
     val isAtBottom by remember(
         listState,
@@ -156,7 +163,27 @@ fun TripDetailScreen(
     HandleFullScreenWindowLaunchedEffect(isFullScreen = webViewController.isFullScreen)
 
     LaunchedEffect(uiState.tripDetailInfo.videoLink) {
-        webViewController.loadVideo(uiState.tripDetailInfo.videoLink)
+        webViewController.loadVideo(
+            url = uiState.tripDetailInfo.videoLink,
+            initialSecond = viewModel.getCurrentVideoPlaybackSecond(),
+            onTimeUpdate = viewModel::updateVideoPlaybackSecond,
+        )
+    }
+
+    DisposableEffect(lifecycleOwner, uiState.tripDetailInfo.videoLink) {
+        val observer =
+            LifecycleEventObserver { _, event ->
+                if (event == Lifecycle.Event.ON_RESUME) {
+                    val second = viewModel.getCurrentVideoPlaybackSecond()
+                    if (uiState.tripDetailInfo.videoLink.isNotEmpty() && second > 0) {
+                        webViewController.restoreTo(second)
+                    }
+                }
+            }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
     }
 
     LaunchedEffect(Unit) {

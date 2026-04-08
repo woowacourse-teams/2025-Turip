@@ -54,6 +54,7 @@ class TripDetailViewModel @Inject constructor(
     val uiEffect: Flow<TripDetailUiEffect> = _uiEffect.receiveAsFlow()
 
     private var contentId: Long = INVALID_ID
+    private var videoPlaybackSecond: Int = 0
     private var confirmedBookmarked: Boolean = false
     private val bookmarkClickFlow = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
@@ -83,9 +84,17 @@ class TripDetailViewModel @Inject constructor(
     }
 
     fun initContentId(contentId: Long) {
+        if (this.contentId == contentId) return
         this.contentId = contentId
+        videoPlaybackSecond = 0
         loadTripDetails()
     }
+
+    fun updateVideoPlaybackSecond(second: Int) {
+        videoPlaybackSecond = second.coerceAtLeast(0)
+    }
+
+    fun getCurrentVideoPlaybackSecond(): Int = videoPlaybackSecond
 
     fun loadTripDetails() {
         if (contentId == INVALID_ID) return

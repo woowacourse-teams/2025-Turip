@@ -39,6 +39,8 @@ class TripDetailWebViewController(
         private set
     var isError by mutableStateOf(false)
         private set
+    var isPlaybackRestoring by mutableStateOf(false)
+        private set
 
     private var fullscreenContainer: FrameLayout? = null
 
@@ -94,14 +96,38 @@ class TripDetailWebViewController(
         webView.webChromeClient = webChromeClient
     }
 
-    fun loadVideo(url: String) {
+    fun loadVideo(
+        url: String,
+        initialSecond: Int,
+        onTimeUpdate: (time: Int) -> Unit,
+    ) {
         if (url.isNotEmpty() && url != webView.url) {
             if (isError) isError = false
-            videoManager.loadVideo(url) { isError = true }
+            if (initialSecond > 0) isPlaybackRestoring = true
+            videoManager.loadVideo(
+                url = url,
+                initialSecond = initialSecond,
+                onTimeUpdate = { second ->
+                    onTimeUpdate(second)
+                    if (isPlaybackRestoring && second > 0) {
+                        isPlaybackRestoring = false
+                    }
+                },
+                onError = {
+                    isError = true
+                    isPlaybackRestoring = false
+                },
+            )
         }
     }
 
     fun seekTo(seconds: Int) {
+        webView.navigateToTimeLine(seconds)
+    }
+
+    fun restoreTo(seconds: Int) {
+        if (seconds <= 0) return
+        isPlaybackRestoring = true
         webView.navigateToTimeLine(seconds)
     }
 
@@ -120,6 +146,7 @@ class TripDetailWebViewController(
             (activity.window.decorView as ViewGroup).removeView(container)
         }
         fullscreenContainer = null
+        isPlaybackRestoring = false
         videoManager.clear()
         webView.destroy()
     }

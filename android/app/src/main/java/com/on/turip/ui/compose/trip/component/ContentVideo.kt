@@ -36,7 +36,7 @@ fun ContentVideo(
     modifier: Modifier = Modifier,
 ) {
     ContentVideoContent(
-        isLoading = webViewController.isLoading,
+        isLoading = webViewController.isLoading || webViewController.isPlaybackRestoring,
         isError = webViewController.isError,
         onErrorClick = onErrorClick,
         videoContent = { Video(webViewController) },
