@@ -1,6 +1,5 @@
 package com.on.turip.ui.compose.designsystem.component
 
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -8,6 +7,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.BookmarkBorder
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarData
 import androidx.compose.material3.SnackbarDuration
@@ -29,6 +32,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import com.on.turip.R
+import com.on.turip.ui.compose.designsystem.model.SnackbarIconModel
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 
 @Composable
@@ -72,12 +76,26 @@ fun TuripSnackbar(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(TuripTheme.spacing.small),
                     ) {
-                        if (visuals is TuripSnackbarVisuals && visuals.iconRes != null) {
-                            Image(
-                                painter = painterResource(visuals.iconRes),
-                                contentDescription = null,
-                                modifier = Modifier.size(16.dp),
-                            )
+                        if (visuals is TuripSnackbarVisuals) {
+                            when (val icon = visuals.icon) {
+                                is SnackbarIconModel.Vector -> {
+                                    Icon(
+                                        imageVector = icon.imageVector,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(16.dp),
+                                    )
+                                }
+
+                                is SnackbarIconModel.Painter -> {
+                                    Image(
+                                        painter = painterResource(icon.drawableRes),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(16.dp),
+                                    )
+                                }
+
+                                null -> {}
+                            }
                         }
 
                         Text(
@@ -98,7 +116,7 @@ class TuripSnackbarVisuals(
     override val duration: SnackbarDuration = SnackbarDuration.Short,
     override val actionLabel: String? = null,
     override val withDismissAction: Boolean = false,
-    @DrawableRes val iconRes: Int? = null,
+    val icon: SnackbarIconModel? = null,
 ) : SnackbarVisuals
 
 private class DefaultSnackbarPreviewModel(
@@ -110,7 +128,7 @@ private class TuripVisualsSnackbarPreviewModel(
     val message: String,
     val actionLabel: String? = null,
     val withDismissAction: Boolean = false,
-    @DrawableRes val iconRes: Int? = null,
+    val icon: SnackbarIconModel? = null,
 )
 
 private class DefaultSnackbarPreviewProvider : PreviewParameterProvider<DefaultSnackbarPreviewModel> {
@@ -127,26 +145,23 @@ private class TuripVisualsSnackbarPreviewProvider : PreviewParameterProvider<Tur
         sequenceOf(
             TuripVisualsSnackbarPreviewModel(
                 message = "저장되었습니다",
-                iconRes = null,
             ),
             TuripVisualsSnackbarPreviewModel(
                 message = "북마크 목록에 추가되었습니다",
-                iconRes = R.drawable.btn_bookmark_selected,
+                icon = SnackbarIconModel.Vector(Icons.Default.Bookmark),
                 actionLabel = "닫기",
             ),
             TuripVisualsSnackbarPreviewModel(
                 message = "북마크 목록에서 해제되었습니다",
-                iconRes = R.drawable.btn_bookmark_normal,
+                icon = SnackbarIconModel.Vector(Icons.Default.BookmarkBorder),
                 actionLabel = "재시도",
             ),
             TuripVisualsSnackbarPreviewModel(
                 message = "네트워크 연결 실패",
-                iconRes = null,
                 actionLabel = "닫기",
             ),
             TuripVisualsSnackbarPreviewModel(
                 message = "연결 실패, withDismissAction = true",
-                iconRes = null,
                 withDismissAction = true,
             ),
         )
@@ -192,7 +207,7 @@ private fun TuripVisualsSnackbarPreview(
                         actionLabel = preview.actionLabel,
                         duration = SnackbarDuration.Short,
                         withDismissAction = preview.withDismissAction,
-                        iconRes = preview.iconRes,
+                        icon = preview.icon,
                     ),
             )
         }

@@ -21,6 +21,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SheetState
@@ -54,6 +57,7 @@ import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.common.model.trip.TripDurationModel
 import com.on.turip.ui.compose.designsystem.component.ErrorScreen
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbarVisuals
+import com.on.turip.ui.compose.designsystem.model.SnackbarIconModel
 import com.on.turip.ui.compose.designsystem.snackbar.LocalSnackbarDelegate
 import com.on.turip.ui.compose.designsystem.snackbar.SnackbarDelegate
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
@@ -319,12 +323,16 @@ private suspend fun handleUiEffect(
         is TripDetailUiEffect.ShowBookmarkStatus -> {
             val messageResource: Int =
                 if (uiEffect.isBookmarked) R.string.trip_detail_snackbar_bookmark_save else R.string.trip_detail_snackbar_bookmark_remove
-            val iconResource: Int =
-                if (uiEffect.isBookmarked) R.drawable.btn_bookmark_selected else R.drawable.btn_bookmark_normal
+            val icon: SnackbarIconModel.Vector =
+                if (uiEffect.isBookmarked) {
+                    SnackbarIconModel.Vector(Icons.Default.Bookmark)
+                } else {
+                    SnackbarIconModel.Vector(Icons.Default.BookmarkBorder)
+                }
             snackbarDelegate.showSnackbar(
                 message = resources.getString(messageResource),
                 actionLabel = resources.getString(R.string.all_close_description),
-                iconRes = iconResource,
+                icon = icon,
             )
         }
 
@@ -333,12 +341,14 @@ private suspend fun handleUiEffect(
         }
 
         is TripDetailUiEffect.ShowUpdatedTuripSelectionByPlace -> {
-            val messageResource: Int = R.string.trip_detail_turip_selection_updated
-            val iconResource: Int = R.drawable.btn_turip_selected
             snackbarDelegate.showSnackbar(
-                message = resources.getString(messageResource, uiEffect.placeName),
+                message =
+                    resources.getString(
+                        R.string.trip_detail_turip_selection_updated,
+                        uiEffect.placeName,
+                    ),
                 actionLabel = resources.getString(R.string.all_close_description),
-                iconRes = iconResource,
+                icon = SnackbarIconModel.Painter(R.drawable.btn_turip_selected),
             )
         }
 
@@ -381,7 +391,7 @@ private suspend fun handleUiEffect(
                                 R.string.turip_added_snackbar_message,
                                 uiEffect.turipName,
                             ),
-                        iconRes = R.drawable.btn_turip_selected,
+                        icon = SnackbarIconModel.Painter(R.drawable.btn_turip_selected),
                         actionLabel = resources.getString(R.string.all_close_description),
                     ),
             )

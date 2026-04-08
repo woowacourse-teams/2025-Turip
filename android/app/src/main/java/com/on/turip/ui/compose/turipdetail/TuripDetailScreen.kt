@@ -44,6 +44,7 @@ import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.compose.designsystem.component.ErrorScreen
 import com.on.turip.ui.compose.designsystem.component.TuripAppBar
 import com.on.turip.ui.compose.designsystem.component.TuripDialog
+import com.on.turip.ui.compose.designsystem.model.SnackbarIconModel
 import com.on.turip.ui.compose.designsystem.snackbar.LocalSnackbarDelegate
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.trip.model.MapModel
@@ -184,7 +185,7 @@ fun TuripDetailScreen(
                     snackbarDelegate.showSnackbar(
                         message = resources.getString(R.string.turip_detail_sse_reconnected),
                         duration = SnackbarDuration.Short,
-                        iconRes = R.drawable.btn_turip_selected,
+                        icon = SnackbarIconModel.Painter(R.drawable.btn_turip_selected),
                         actionLabel = resources.getString(R.string.all_close_description),
                     )
                 }

@@ -41,6 +41,7 @@ import com.on.turip.R
 import com.on.turip.domain.turip.TuripType
 import com.on.turip.ui.compose.designsystem.component.TuripDialog
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbarVisuals
+import com.on.turip.ui.compose.designsystem.model.SnackbarIconModel
 import com.on.turip.ui.compose.designsystem.snackbar.LocalSnackbarDelegate
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.turip.component.MyTuripCard
@@ -90,7 +91,7 @@ fun MyTuripScreen(
                                 R.string.turip_add_turip,
                                 uiEffect.turipName,
                             ),
-                        iconRes = R.drawable.btn_turip_selected,
+                        icon = SnackbarIconModel.Painter(R.drawable.btn_turip_selected),
                         actionLabel = resources.getString(R.string.all_close_description),
                     )
                 }
