@@ -21,6 +21,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SheetState
@@ -46,14 +49,19 @@ import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.on.turip.R
 import com.on.turip.ui.common.error.ErrorUiModel
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.common.model.trip.TripDurationModel
+import com.on.turip.ui.common.model.turip.TuripShareModel
 import com.on.turip.ui.compose.designsystem.component.ErrorScreen
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbarVisuals
+import com.on.turip.ui.compose.designsystem.model.SnackbarIconModel
 import com.on.turip.ui.compose.designsystem.snackbar.LocalSnackbarDelegate
 import com.on.turip.ui.compose.designsystem.snackbar.SnackbarDelegate
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
@@ -72,7 +80,6 @@ import com.on.turip.ui.compose.trip.model.TripDetailInfoModel
 import com.on.turip.ui.compose.trip.turipselection.PlaceTuripSelectionBottomSheet
 import com.on.turip.ui.compose.trip.webview.VideoManager
 import com.on.turip.ui.compose.turip.component.TuripAddBottomSheet
-import com.on.turip.ui.compose.turipdetail.model.turip.TuripShareModel
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
 
@@ -94,6 +101,7 @@ fun TripDetailScreen(
     val systemBarStyleController = LocalSystemBarStyleController.current
     val context = LocalContext.current
     val resources = LocalResources.current
+    val lifecycleOwner = LocalLifecycleOwner.current
 
     val listState = rememberLazyListState()
 
@@ -104,7 +112,10 @@ fun TripDetailScreen(
         )
 
     val isInitialLoading by remember {
-        derivedStateOf { uiState.isLoading || webViewController.isLoading }
+        derivedStateOf {
+            uiState.isLoading ||
+                (webViewController.isLoading && uiState.tripDetailInfo == TripDetailInfoModel.Idle)
+        }
     }
     val isAtBottom by remember(
         listState,
@@ -152,7 +163,27 @@ fun TripDetailScreen(
     HandleFullScreenWindowLaunchedEffect(isFullScreen = webViewController.isFullScreen)
 
     LaunchedEffect(uiState.tripDetailInfo.videoLink) {
-        webViewController.loadVideo(uiState.tripDetailInfo.videoLink)
+        webViewController.loadVideo(
+            url = uiState.tripDetailInfo.videoLink,
+            initialSecond = viewModel.getCurrentVideoPlaybackSecond(),
+            onTimeUpdate = viewModel::updateVideoPlaybackSecond,
+        )
+    }
+
+    DisposableEffect(lifecycleOwner, uiState.tripDetailInfo.videoLink) {
+        val observer =
+            LifecycleEventObserver { _, event ->
+                if (event == Lifecycle.Event.ON_RESUME) {
+                    val second = viewModel.getCurrentVideoPlaybackSecond()
+                    if (uiState.tripDetailInfo.videoLink.isNotEmpty() && second > 0) {
+                        webViewController.restoreTo(second)
+                    }
+                }
+            }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
     }
 
     LaunchedEffect(Unit) {
@@ -319,12 +350,16 @@ private suspend fun handleUiEffect(
         is TripDetailUiEffect.ShowBookmarkStatus -> {
             val messageResource: Int =
                 if (uiEffect.isBookmarked) R.string.trip_detail_snackbar_bookmark_save else R.string.trip_detail_snackbar_bookmark_remove
-            val iconResource: Int =
-                if (uiEffect.isBookmarked) R.drawable.btn_bookmark_selected else R.drawable.btn_bookmark_normal
+            val icon: SnackbarIconModel.Vector =
+                if (uiEffect.isBookmarked) {
+                    SnackbarIconModel.Vector(Icons.Default.Bookmark)
+                } else {
+                    SnackbarIconModel.Vector(Icons.Default.BookmarkBorder)
+                }
             snackbarDelegate.showSnackbar(
                 message = resources.getString(messageResource),
                 actionLabel = resources.getString(R.string.all_close_description),
-                iconRes = iconResource,
+                icon = icon,
             )
         }
 
@@ -333,12 +368,14 @@ private suspend fun handleUiEffect(
         }
 
         is TripDetailUiEffect.ShowUpdatedTuripSelectionByPlace -> {
-            val messageResource: Int = R.string.trip_detail_turip_selection_updated
-            val iconResource: Int = R.drawable.btn_turip_selected
             snackbarDelegate.showSnackbar(
-                message = resources.getString(messageResource, uiEffect.placeName),
+                message =
+                    resources.getString(
+                        R.string.trip_detail_turip_selection_updated,
+                        uiEffect.placeName,
+                    ),
                 actionLabel = resources.getString(R.string.all_close_description),
-                iconRes = iconResource,
+                icon = SnackbarIconModel.Painter(R.drawable.btn_turip_selected),
             )
         }
 
@@ -381,7 +418,7 @@ private suspend fun handleUiEffect(
                                 R.string.turip_added_snackbar_message,
                                 uiEffect.turipName,
                             ),
-                        iconRes = R.drawable.btn_turip_selected,
+                        icon = SnackbarIconModel.Painter(R.drawable.btn_turip_selected),
                         actionLabel = resources.getString(R.string.all_close_description),
                     ),
             )

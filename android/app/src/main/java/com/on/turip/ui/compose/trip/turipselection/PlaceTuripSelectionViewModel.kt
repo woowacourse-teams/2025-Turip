@@ -14,11 +14,11 @@ import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.common.extensions.toUrl
+import com.on.turip.ui.common.mapper.toUiModel
+import com.on.turip.ui.common.model.turip.TuripModel
+import com.on.turip.ui.common.model.turip.TuripShareModel
 import com.on.turip.ui.compose.trip.turipselection.model.DeletePlaceSnapshot
 import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
-import com.on.turip.ui.compose.turipdetail.model.turip.TuripShareModel
-import com.on.turip.ui.main.favorite.model.TuripModel
-import com.on.turip.ui.main.favorite.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf

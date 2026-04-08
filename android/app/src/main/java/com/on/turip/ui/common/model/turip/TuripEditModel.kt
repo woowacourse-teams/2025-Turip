@@ -1,4 +1,4 @@
-package com.on.turip.ui.folder.model
+package com.on.turip.ui.common.model.turip
 
 data class TuripEditModel(
     val id: Long,

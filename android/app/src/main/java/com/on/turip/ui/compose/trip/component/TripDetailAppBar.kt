@@ -1,13 +1,16 @@
 package com.on.turip.ui.compose.trip.component
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -24,8 +27,7 @@ fun TripDetailAppBar(
     onBookmarkClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val bookmarkIconRes =
-        if (isBookmarked) R.drawable.btn_bookmark_selected else R.drawable.btn_bookmark_normal
+    val bookmarkIcon = if (isBookmarked) Icons.Default.Bookmark else Icons.Default.BookmarkBorder
 
     TuripAppBar(
         contentColor = TuripTheme.colors.white,
@@ -39,14 +41,19 @@ fun TripDetailAppBar(
         },
         end = {
             if (!isError && !isLoading) {
-                Icon(
-                    painter = painterResource(bookmarkIconRes),
-                    contentDescription = stringResource(R.string.trip_detail_bookmark_description),
+                IconButton(
+                    onClick = onBookmarkClick,
                     modifier =
                         Modifier
-                            .clickable(onClick = onBookmarkClick)
-                            .size(20.dp),
-                )
+                            .size(48.dp)
+                            .offset(x = 10.dp),
+                ) {
+                    Icon(
+                        imageVector = bookmarkIcon,
+                        contentDescription = stringResource(R.string.trip_detail_bookmark_description),
+                        modifier = Modifier.size(28.dp),
+                    )
+                }
             }
         },
         modifier = modifier,

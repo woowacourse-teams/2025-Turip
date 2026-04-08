@@ -63,5 +63,15 @@ interface TuripRepository {
 
     fun streamTuripEvents(turipId: Long): Flow<TuripStreamResult>
 
+    fun updateCachedTuripMemberCount(
+        turipId: Long,
+        memberCount: Int,
+    )
+
+    fun updateCachedTuripSharedStatus(
+        turipId: Long,
+        isShared: Boolean,
+    )
+
     fun clearCache()
 }
