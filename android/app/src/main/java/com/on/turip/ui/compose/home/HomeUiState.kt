@@ -3,7 +3,7 @@ package com.on.turip.ui.compose.home
 import androidx.compose.runtime.Stable
 import com.on.turip.domain.region.RegionCategory
 import com.on.turip.ui.common.error.ErrorUiState
-import com.on.turip.ui.main.home.model.UsersLikeContentModel
+import com.on.turip.ui.compose.home.model.UsersLikeContentModel
 
 @Stable
 data class HomeUiState(

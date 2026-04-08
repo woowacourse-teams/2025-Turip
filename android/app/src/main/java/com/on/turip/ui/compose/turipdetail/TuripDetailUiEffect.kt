@@ -1,8 +1,8 @@
 package com.on.turip.ui.compose.turipdetail
 
 import com.on.turip.ui.common.error.ErrorUiState
+import com.on.turip.ui.common.model.turip.TuripShareModel
 import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
-import com.on.turip.ui.compose.turipdetail.model.turip.TuripShareModel
 import kotlinx.collections.immutable.ImmutableList
 
 sealed interface TuripDetailUiEffect {

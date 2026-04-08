@@ -41,6 +41,7 @@ import com.on.turip.R
 import com.on.turip.domain.turip.TuripType
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.toUiModel
+import com.on.turip.ui.common.model.turip.TuripShareModel
 import com.on.turip.ui.compose.designsystem.component.ErrorScreen
 import com.on.turip.ui.compose.designsystem.component.TuripAppBar
 import com.on.turip.ui.compose.designsystem.component.TuripDialog
@@ -55,7 +56,6 @@ import com.on.turip.ui.compose.turipdetail.component.TuripInfoRow
 import com.on.turip.ui.compose.turipdetail.component.TuripMapContent
 import com.on.turip.ui.compose.turipdetail.component.TuripPlaces
 import com.on.turip.ui.compose.turipdetail.model.turip.PlaceLatLngUiModel
-import com.on.turip.ui.compose.turipdetail.model.turip.TuripShareModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch

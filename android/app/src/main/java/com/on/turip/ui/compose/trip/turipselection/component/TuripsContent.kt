@@ -23,8 +23,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.on.turip.R
+import com.on.turip.ui.common.model.turip.TuripModel
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
-import com.on.turip.ui.main.favorite.model.TuripModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 

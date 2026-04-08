@@ -3,10 +3,10 @@ package com.on.turip.ui.compose.turipdetail
 import androidx.compose.runtime.Immutable
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.model.namestatus.TuripNameStatusModel
+import com.on.turip.ui.common.model.turip.TuripEditModel
 import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
 import com.on.turip.ui.compose.turip.model.MyTuripModel
 import com.on.turip.ui.compose.turipdetail.model.turip.PlaceLatLngUiModel
-import com.on.turip.ui.folder.model.TuripEditModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 

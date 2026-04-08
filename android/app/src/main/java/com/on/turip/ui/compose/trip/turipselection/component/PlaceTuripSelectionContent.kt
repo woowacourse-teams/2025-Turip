@@ -24,12 +24,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.on.turip.R
+import com.on.turip.ui.common.model.turip.TuripModel
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.trip.model.MapModel
 import com.on.turip.ui.compose.trip.turipselection.PlaceTuripSelectionScreenMode
 import com.on.turip.ui.compose.trip.turipselection.PlaceTuripSelectionUiState
 import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
-import com.on.turip.ui.main.favorite.model.TuripModel
 import kotlinx.collections.immutable.persistentListOf
 
 @Composable

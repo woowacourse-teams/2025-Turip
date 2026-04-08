@@ -20,14 +20,14 @@ import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.common.extensions.toUrl
+import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.common.model.namestatus.TuripNameStatusModel
+import com.on.turip.ui.common.model.turip.TuripEditModel
+import com.on.turip.ui.common.model.turip.TuripShareModel
 import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
 import com.on.turip.ui.compose.turip.mapper.toUiMyTuripModel
 import com.on.turip.ui.compose.turipdetail.model.RefreshScope
 import com.on.turip.ui.compose.turipdetail.model.turip.PlaceLatLngUiModel
-import com.on.turip.ui.compose.turipdetail.model.turip.TuripShareModel
-import com.on.turip.ui.folder.model.TuripEditModel
-import com.on.turip.ui.main.favorite.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList

@@ -15,11 +15,11 @@ import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.common.model.namestatus.TuripNameStatusModel
+import com.on.turip.ui.common.model.turip.TuripEditModel
 import com.on.turip.ui.compose.turip.mapper.toEditModel
 import com.on.turip.ui.compose.turip.mapper.toUiMyTuripModel
 import com.on.turip.ui.compose.turip.model.ErrorPresentation
 import com.on.turip.ui.compose.turip.model.MyTuripModel
-import com.on.turip.ui.folder.model.TuripEditModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.channels.Channel

@@ -1,4 +1,4 @@
-package com.on.turip.ui.main
+package com.on.turip.ui
 
 import android.content.Intent
 import android.content.pm.ActivityInfo

@@ -55,6 +55,7 @@ import com.on.turip.ui.common.error.ErrorUiModel
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.common.model.trip.TripDurationModel
+import com.on.turip.ui.common.model.turip.TuripShareModel
 import com.on.turip.ui.compose.designsystem.component.ErrorScreen
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbarVisuals
 import com.on.turip.ui.compose.designsystem.model.SnackbarIconModel
@@ -76,7 +77,6 @@ import com.on.turip.ui.compose.trip.model.TripDetailInfoModel
 import com.on.turip.ui.compose.trip.turipselection.PlaceTuripSelectionBottomSheet
 import com.on.turip.ui.compose.trip.webview.VideoManager
 import com.on.turip.ui.compose.turip.component.TuripAddBottomSheet
-import com.on.turip.ui.compose.turipdetail.model.turip.TuripShareModel
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
 

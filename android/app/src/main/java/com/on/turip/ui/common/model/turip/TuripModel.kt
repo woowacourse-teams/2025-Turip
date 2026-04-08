@@ -1,4 +1,4 @@
-package com.on.turip.ui.main.favorite.model
+package com.on.turip.ui.common.model.turip
 
 import androidx.compose.runtime.Immutable
 

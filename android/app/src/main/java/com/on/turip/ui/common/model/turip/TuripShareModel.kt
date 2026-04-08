@@ -1,6 +1,4 @@
-package com.on.turip.ui.compose.turipdetail.model.turip
-
-import com.on.turip.ui.main.favorite.model.TuripPlaceShareModel
+package com.on.turip.ui.common.model.turip
 
 data class TuripShareModel(
     val name: String,
