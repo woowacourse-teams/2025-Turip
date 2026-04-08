@@ -1,18 +1,17 @@
 package com.on.turip.ui.compose.search.regionresult
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.on.turip.core.result.TuripResult
 import com.on.turip.domain.content.PagedContentsResult
 import com.on.turip.domain.content.repository.ContentRepository
 import com.on.turip.domain.content.video.VideoInformation
+import com.on.turip.domain.session.SessionManager
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.common.mapper.toUiModel
 import com.on.turip.ui.compose.search.model.VideoInformationModel
-import com.on.turip.ui.search.regionresult.RegionResultActivity.Companion.REGION_RESULT_REGION_CATEGORY_NAME_KEY
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Deferred
@@ -30,15 +29,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RegionResultViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
     private val contentRepository: ContentRepository,
+    private val sessionManager: SessionManager,
 ) : ViewModel() {
-    val regionCategoryName: String by lazy {
-        checkNotNull(savedStateHandle[REGION_RESULT_REGION_CATEGORY_NAME_KEY]) {
-            Timber.e("지역 검색 화면 지역 이름이 존재하지 않습니다.")
-        }
-    }
-
     private val _uiState: MutableStateFlow<RegionResultUiState> =
         MutableStateFlow(RegionResultUiState.Loading)
     val uiState: StateFlow<RegionResultUiState> = _uiState.asStateFlow()
@@ -46,11 +39,11 @@ class RegionResultViewModel @Inject constructor(
     private val _uiEffect: Channel<RegionResultUiEffect> = Channel(Channel.BUFFERED)
     val uiEffect: Flow<RegionResultUiEffect> = _uiEffect.receiveAsFlow()
 
-    init {
-        loadContentsFromRegion()
+    fun initRegionCategoryName(regionCategoryName: String) {
+        loadContentsFromRegion(regionCategoryName)
     }
 
-    fun loadContentsFromRegion() {
+    fun loadContentsFromRegion(regionCategoryName: String) {
         viewModelScope.launch {
             _uiState.update { RegionResultUiState.Loading }
 
@@ -105,9 +98,18 @@ class RegionResultViewModel @Inject constructor(
         val uiError: UiError = failure.errorType.toUiError()
         if (uiError is UiError.Global) {
             when (uiError) {
-                UiError.Global.Network -> _uiState.update { RegionResultUiState.Error(ErrorUiState.Network) }
-                UiError.Global.Server -> _uiState.update { RegionResultUiState.Error(ErrorUiState.Server) }
-                UiError.Global.TokenExpired -> _uiEffect.send(RegionResultUiEffect.NavigateToLogin)
+                UiError.Global.Network -> {
+                    _uiState.update { RegionResultUiState.Error(ErrorUiState.Network) }
+                }
+
+                UiError.Global.Server -> {
+                    _uiState.update { RegionResultUiState.Error(ErrorUiState.Server) }
+                }
+
+                UiError.Global.TokenExpired -> {
+                    sessionManager.switchToGuest()
+                    _uiEffect.send(RegionResultUiEffect.NavigateToLogin)
+                }
             }
         }
     }

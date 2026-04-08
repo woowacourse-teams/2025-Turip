@@ -3,7 +3,6 @@ package turip.content.api;
 import static org.hamcrest.Matchers.is;
 
 import io.restassured.RestAssured;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -12,33 +11,22 @@ import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import turip.container.TestContainerConfig;
 
-@ActiveProfiles("test")
-@Import(TestContainerConfig.class)
+@ActiveProfiles("test-mysql")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Transactional(propagation = org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED)
-public class ContentKeywordApiTest {
+public class ContentKeywordApiTest extends TestContainerConfig {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
     @LocalServerPort
     protected int port;
-
-    @BeforeAll
-    void setUp() {
-        // Fulltext index 생성
-        jdbcTemplate.execute("ALTER TABLE content ADD FULLTEXT INDEX idx_title (title) WITH PARSER ngram");
-        jdbcTemplate.execute(
-                "ALTER TABLE creator ADD FULLTEXT INDEX idx_channel_name (channel_name) WITH PARSER ngram");
-        jdbcTemplate.execute("ALTER TABLE place ADD FULLTEXT INDEX idx_name (name) WITH PARSER ngram");
-    }
 
     @BeforeEach
     void clear() {
@@ -48,6 +36,7 @@ public class ContentKeywordApiTest {
         jdbcTemplate.execute("TRUNCATE TABLE content_place");
         jdbcTemplate.execute("TRUNCATE TABLE place");
         jdbcTemplate.execute("TRUNCATE TABLE category");
+        jdbcTemplate.execute("TRUNCATE TABLE favorite_folder_account");
         jdbcTemplate.execute("TRUNCATE TABLE favorite_folder");
         jdbcTemplate.execute("TRUNCATE TABLE favorite_content");
         jdbcTemplate.execute("TRUNCATE TABLE guest");

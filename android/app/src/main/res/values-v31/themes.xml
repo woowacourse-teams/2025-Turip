@@ -2,7 +2,7 @@
 <resources>
 
     <style name="Base.Theme.Turip" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="android:windowSplashScreenBackground">#232323</item>
+        <item name="android:windowSplashScreenBackground">@color/splash_background</item>
         <item name="android:windowSplashScreenAnimatedIcon">@null</item>
     </style>
 </resources>

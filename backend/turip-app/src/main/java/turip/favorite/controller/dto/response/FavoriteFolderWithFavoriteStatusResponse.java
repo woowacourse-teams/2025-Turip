@@ -2,6 +2,7 @@ package turip.favorite.controller.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
+import turip.account.domain.Account;
 import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.domain.FavoritePlace;
 import turip.place.controller.dto.response.PlaceResponse;
@@ -15,10 +16,11 @@ public record FavoriteFolderWithFavoriteStatusResponse(
         boolean isFavoritePlace
 ) {
 
-    public static FavoriteFolderWithFavoriteStatusResponse of(FavoriteFolder favoriteFolder, boolean isFavoritePlace) {
+    public static FavoriteFolderWithFavoriteStatusResponse of(FavoriteFolder favoriteFolder, Account account,
+                                                              boolean isFavoritePlace) {
         return new FavoriteFolderWithFavoriteStatusResponse(
                 favoriteFolder.getId(),
-                favoriteFolder.getAccount().getId(),
+                account.getId(),
                 favoriteFolder.getName(),
                 favoriteFolder.isDefault(),
                 isFavoritePlace

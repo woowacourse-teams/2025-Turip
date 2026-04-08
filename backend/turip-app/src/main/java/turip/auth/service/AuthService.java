@@ -15,9 +15,10 @@ import turip.auth.controller.dto.request.GoogleLoginRequest;
 import turip.auth.controller.dto.request.RefreshTokenRequest;
 import turip.auth.controller.dto.request.TuripLoginRequest;
 import turip.auth.controller.dto.response.RefreshTokenResponse;
-import turip.auth.controller.dto.response.SocialLoginResponse;
-import turip.auth.controller.dto.response.TokenResult;
 import turip.auth.domain.RefreshToken;
+import turip.auth.service.dto.SocialLoginResult;
+import turip.auth.service.dto.TokenResult;
+import turip.auth.service.dto.TuripLoginResult;
 import turip.auth.token.GoogleTokenParser;
 import turip.auth.token.JwtProvider;
 import turip.common.exception.ErrorTag;
@@ -37,9 +38,10 @@ public class AuthService {
     private final TuripMemberService turipMemberService;
 
     @Transactional
-    public TokenResult loginWithTurip(TuripLoginRequest request, String deviceFid) {
+    public TuripLoginResult loginWithTurip(TuripLoginRequest request, String deviceFid) {
         Member member = loginAndGetMember(request);
-        return processTuripLogin(deviceFid, member);
+        TokenResult tokenResult = processTuripLogin(deviceFid, member);
+        return TuripLoginResult.of(tokenResult, member);
     }
 
     @Transactional
@@ -56,7 +58,7 @@ public class AuthService {
     }
 
     @Transactional
-    public SocialLoginResponse loginWithSocial(GoogleLoginRequest request, Provider provider, String deviceFid) {
+    public SocialLoginResult loginWithSocial(GoogleLoginRequest request, Provider provider, String deviceFid) {
         if (provider == Provider.GOOGLE) {
             return loginWithGoogle(request, deviceFid);
         }
@@ -80,14 +82,14 @@ public class AuthService {
 
             saveRefreshToken(member, newRefreshToken, deviceFid);
 
-            return new RefreshTokenResponse(newAccessToken, newRefreshToken);
+            return RefreshTokenResponse.of(newAccessToken, newRefreshToken);
 
         } catch (UnauthorizedException e) {
             throw e;
         } catch (IllegalArgumentException e) {
-            throw new UnauthorizedException(e.getErrorTag());
+            throw new UnauthorizedException(e.getErrorTag(), e);
         } catch (Exception e) {
-            throw new UnauthorizedException(ErrorTag.UNAUTHORIZED);
+            throw new UnauthorizedException(ErrorTag.UNAUTHORIZED, e);
         }
     }
 
@@ -108,7 +110,7 @@ public class AuthService {
         return TokenResult.of(accessToken, refreshToken);
     }
 
-    private SocialLoginResponse loginWithGoogle(GoogleLoginRequest request, String deviceFid) {
+    private SocialLoginResult loginWithGoogle(GoogleLoginRequest request, String deviceFid) {
         String idToken = request.idToken();
         validateIdToken(idToken);
 
@@ -125,7 +127,7 @@ public class AuthService {
         }
         TokenResult tokenResult = issueToken(deviceFid, member);
 
-        return SocialLoginResponse.of(tokenResult, isNewMember);
+        return SocialLoginResult.of(tokenResult, isNewMember, member);
     }
 
     private Member findOrCreateSocialMember(Provider provider, String providerId, String email) {
@@ -136,7 +138,7 @@ public class AuthService {
         try {
             return memberService.getByAccountId(accountId);
         } catch (Exception e) {
-            throw new UnauthorizedException(ErrorTag.UNAUTHORIZED);
+            throw new UnauthorizedException(ErrorTag.UNAUTHORIZED, e);
         }
     }
 
@@ -146,9 +148,9 @@ public class AuthService {
             LocalDateTime expiration = jwtProvider.getExpiration(refreshToken);
             refreshTokenService.save(member, deviceFid, jwtProvider.hashToken(refreshToken), issuedAt, expiration);
         } catch (IllegalArgumentException e) {
-            throw new UnauthorizedException(e.getErrorTag());
+            throw new UnauthorizedException(e.getErrorTag(), e);
         } catch (Exception e) {
-            throw new UnauthorizedException(ErrorTag.UNAUTHORIZED);
+            throw new UnauthorizedException(ErrorTag.UNAUTHORIZED, e);
         }
     }
 

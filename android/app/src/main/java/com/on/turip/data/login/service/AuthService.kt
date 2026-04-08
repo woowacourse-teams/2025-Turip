@@ -1,27 +1,25 @@
 package com.on.turip.data.login.service
 
+import com.on.turip.core.network.ApiPath
 import com.on.turip.data.login.dto.LoginIdTokenPostRequest
 import com.on.turip.data.login.dto.LoginJwtTokenResponse
 import com.on.turip.data.login.dto.ReissueTokenRequest
 import com.on.turip.data.login.dto.ReissueTokenResponse
 import de.jensklingenberg.ktorfit.http.Body
 import de.jensklingenberg.ktorfit.http.GET
-import de.jensklingenberg.ktorfit.http.Header
 import de.jensklingenberg.ktorfit.http.POST
 
 interface AuthService {
-    @POST("auth/login/google")
+    @POST(ApiPath.V2 + "auth/login/google")
     suspend fun postIdToken(
         @Body loginIdTokenPostRequest: LoginIdTokenPostRequest,
     ): LoginJwtTokenResponse
 
-    @POST("auth/tokens")
+    @POST(ApiPath.V1 + "auth/tokens")
     suspend fun postReissueToken(
         @Body reissueTokenRequest: ReissueTokenRequest,
     ): ReissueTokenResponse
 
-    @GET("auth/tokens/verification")
-    suspend fun getTokenVerification(
-        @Header("Authorization") token: String,
-    )
+    @GET(ApiPath.V1 + "auth/tokens/verification")
+    suspend fun verifyToken()
 }

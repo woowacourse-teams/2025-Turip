@@ -344,4 +344,42 @@ class FavoriteContentApiTest {
                     .body("loadable", is(false));
         }
     }
+
+    @DisplayName("/api/v1/bookmarks/count GET 콘텐츠 찜 수 조회 테스트")
+    @Nested
+    class ReadBookmarkCount {
+
+        @DisplayName("성공 시 200 OK 코드와 북마크 수를 반환한다")
+        @Test
+        void readBookmarkCount1() {
+            // given
+            jdbcTemplate.update(
+                    "INSERT INTO creator (profile_image, channel_name) VALUES ('https://image.example.com/creator.jpg', 'Travel')");
+            jdbcTemplate.update(
+                    "INSERT INTO country (name, image_url) VALUES ('대한민국', 'https://image.example.com/korea.jpg')");
+            jdbcTemplate.update(
+                    "INSERT INTO city (name, country_id, province_id, image_url) VALUES ('서울', 1, null,'https://image.example.com/seoul.jpg')");
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
+
+            // 3개의 콘텐츠와 북마크 생성
+            for (int i = 1; i <= 3; i++) {
+                jdbcTemplate.update(
+                        "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 1, 'https://youtube.com/watch?v=test"
+                                + i + "', '테스트 영상" + i + "', '2025-08-0" + i + "')");
+                jdbcTemplate.update(
+                        "INSERT INTO favorite_content (account_id, content_id, created_at) VALUES (?, " + i
+                                + ", CURRENT_TIMESTAMP)",
+                        accountId);
+            }
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .when().get("/api/v1/bookmarks/count")
+                    .then()
+                    .statusCode(200)
+                    .body("count", is(3));
+        }
+    }
 }

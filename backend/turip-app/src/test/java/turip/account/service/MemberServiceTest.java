@@ -2,7 +2,6 @@ package turip.account.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -25,8 +24,8 @@ import turip.auth.service.RefreshTokenService;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.BadRequestException;
 import turip.favorite.domain.FavoriteContent;
-import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.repository.FavoriteContentRepository;
+import turip.favorite.repository.FavoriteFolderAccountRepository;
 import turip.favorite.repository.FavoriteFolderRepository;
 import turip.util.fixture.AccountFixture;
 import turip.util.fixture.GuestFixture;
@@ -43,6 +42,9 @@ class MemberServiceTest {
 
     @Mock
     private FavoriteContentRepository favoriteContentRepository;
+
+    @Mock
+    private FavoriteFolderAccountRepository favoriteFolderAccountRepository;
 
     @Mock
     private FavoriteFolderRepository favoriteFolderRepository;
@@ -65,13 +67,14 @@ class MemberServiceTest {
         void create1() {
             // given
             String invalidEmail = "invalid-email";
-            given(accountService.create()).willReturn(AccountFixture.createUser());
+            Account account = AccountFixture.createUser();
+            given(accountService.create(any()))
+                    .willReturn(account);
 
             // when & then
             assertThatThrownBy(() -> memberService.create(invalidEmail))
                     .isInstanceOf(BadRequestException.class)
                     .hasMessage(ErrorTag.EMAIL_INVALID.getMessage());
-
         }
     }
 
@@ -92,8 +95,6 @@ class MemberServiceTest {
 
             given(favoriteContentRepository.findAllByAccount(guestAccount))
                     .willReturn(List.of(guestFavoriteContent));
-            given(favoriteFolderRepository.findAllByAccount(guestAccount))
-                    .willReturn(List.of());
 
             // when
             memberService.migrate(member, guest);
@@ -112,22 +113,15 @@ class MemberServiceTest {
             Member member = MemberFixture.createCustomMember(memberAccount, "email@test.com", true);
             Guest guest = GuestFixture.createCustomGuest(guestAccount, "device-fid-123");
 
-            FavoriteFolder guestFolder1 = new FavoriteFolder(1L, guestAccount, "기본 폴더", true);
-            FavoriteFolder guestFolder2 = new FavoriteFolder(2L, guestAccount, "게스트 커스텀 폴더였던 것", false);
-
             given(favoriteContentRepository.findAllByAccount(any()))
                     .willReturn(List.of());
-            given(favoriteFolderRepository.findAllByAccount(guestAccount))
-                    .willReturn(List.of(guestFolder1, guestFolder2));
 
             // when
             memberService.migrate(member, guest);
 
             // then
-            assertAll(
-                    () -> assertThat(guestFolder1.getAccount()).isEqualTo(memberAccount),
-                    () -> assertThat(guestFolder2.getAccount()).isEqualTo(memberAccount)
-            );
+            verify(favoriteFolderRepository).deleteDefaultFolderByAccount(memberAccount);
+            verify(favoriteFolderAccountRepository).updateAccount(guestAccount, memberAccount);
         }
 
         @DisplayName("마이그레이션이 완료되면 Guest를 삭제한다")
@@ -141,14 +135,52 @@ class MemberServiceTest {
 
             given(favoriteContentRepository.findAllByAccount(any()))
                     .willReturn(List.of());
-            given(favoriteFolderRepository.findAllByAccount(any()))
-                    .willReturn(List.of());
 
             // when
             memberService.migrate(member, guest);
 
             // then
             verify(guestService).delete(guest);
+        }
+
+        @DisplayName("마이그레이션이 완료되면 회원의 isMigrationDecided가 true로 변경된다.")
+        @Test
+        void isMigrationDecidedIsTrue() {
+            // given
+            Account memberAccount = AccountFixture.createCustomAccount(1L, Role.USER);
+            Account guestAccount = AccountFixture.createCustomAccount(2L, Role.USER);
+            Member member = MemberFixture.createCustomMember(memberAccount, "email@test.com", true);
+            Guest guest = GuestFixture.createCustomGuest(guestAccount, "device-fid-123");
+
+            given(favoriteContentRepository.findAllByAccount(any()))
+                    .willReturn(List.of());
+
+            // when
+            assertThat(member.isMigrationDecided()).isFalse();
+            memberService.migrate(member, guest);
+
+            // then
+            assertThat(member.isMigrationDecided()).isTrue();
+        }
+    }
+
+    @DisplayName("마이그레이션 여부 결정 테스트")
+    @Nested
+    class DecideMigration {
+
+        @DisplayName("마이그레이션 여부를 결정하면 isMigrationDecided가 true로 변경된다")
+        @Test
+        void decideMigration1() {
+            // given
+            Account memberAccount = AccountFixture.createCustomAccount(1L, Role.USER);
+            Member member = MemberFixture.createCustomMember(memberAccount, "email@test.com", true);
+
+            // when
+            assertThat(member.isMigrationDecided()).isFalse();
+            memberService.decideMigration(member);
+
+            // then
+            assertThat(member.isMigrationDecided()).isTrue();
         }
     }
 

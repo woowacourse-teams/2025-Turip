@@ -16,6 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import turip.account.domain.Account;
 import turip.common.exception.custom.NotFoundException;
 import turip.content.controller.dto.response.place.ContentPlaceDetailResponse;
 import turip.content.domain.Content;
@@ -24,12 +25,12 @@ import turip.content.repository.ContentPlaceRepository;
 import turip.content.repository.ContentRepository;
 import turip.creator.domain.Creator;
 import turip.favorite.repository.FavoritePlaceRepository;
-import turip.account.domain.Account;
 import turip.place.domain.Category;
 import turip.place.domain.Place;
 import turip.region.domain.City;
 import turip.region.domain.Country;
 import turip.region.domain.Province;
+import turip.util.fixture.AccountFixture;
 
 @ExtendWith(MockitoExtension.class)
 class ContentPlaceServiceTest {
@@ -87,13 +88,13 @@ class ContentPlaceServiceTest {
         ContentPlace firstContentPlace = new ContentPlace(firstVisitDay, visitOrder, firstDayTimeLine, place1, content);
         ContentPlace secondContentPlace = new ContentPlace(secondVisitDay, visitOrder, secondDayTimeLine, place2,
                 content);
-        Account account = new Account();
+        Account account = AccountFixture.createUser();
 
         given(contentRepository.existsById(contentId))
                 .willReturn(true);
         given(contentPlaceRepository.findAllByContentId(contentId))
                 .willReturn(List.of(firstContentPlace, secondContentPlace));
-        given(favoritePlaceRepository.findFavoritedPlaceIdsByFavoriteFolderAccountAndPlaceIn(account,
+        given(favoritePlaceRepository.findFavoritedPlaceIdsByAccountAndPlaceIn(account,
                 List.of(place1, place2)))
                 .willReturn(Set.of());
         ContentPlaceDetailResponse response = contentPlaceService.findContentPlaceDetails(account, contentId);
@@ -143,13 +144,13 @@ class ContentPlaceServiceTest {
         ContentPlace firstContentPlace = new ContentPlace(firstVisitDay, visitOrder, firstDayTimeLine, place1, content);
         ContentPlace secondContentPlace = new ContentPlace(secondVisitDay, visitOrder, secondDayTimeLine, place2,
                 content);
-        Account account = new Account();
+        Account account = AccountFixture.createUser();
 
         given(contentRepository.existsById(contentId))
                 .willReturn(true);
         given(contentPlaceRepository.findAllByContentId(contentId))
                 .willReturn(List.of(firstContentPlace, secondContentPlace));
-        given(favoritePlaceRepository.findFavoritedPlaceIdsByFavoriteFolderAccountAndPlaceIn(account,
+        given(favoritePlaceRepository.findFavoritedPlaceIdsByAccountAndPlaceIn(account,
                 List.of(place1, place2)))
                 .willReturn(Set.of());
         ContentPlaceDetailResponse response = contentPlaceService.findContentPlaceDetails(account, contentId);
@@ -166,7 +167,7 @@ class ContentPlaceServiceTest {
         Long contentId = 1L;
         given(contentRepository.existsById(contentId))
                 .willReturn(false);
-        Account account = new Account();
+        Account account = AccountFixture.createUser();
 
         // when & then
         assertThatThrownBy(() -> contentPlaceService.findContentPlaceDetails(account, contentId))

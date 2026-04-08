@@ -1,14 +1,19 @@
 package com.on.turip.di
 
 import com.on.turip.BuildConfig
-import com.on.turip.common.AuthState
 import com.on.turip.common.FidProvider
-import com.on.turip.common.UserType
+import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.fold
+import com.on.turip.data.result.ApiException
 import com.on.turip.di.NetworkModule.LOG_PREFIX
+import com.on.turip.di.qualifier.DefaultHttpClient
+import com.on.turip.di.qualifier.DefaultKtorfit
+import com.on.turip.di.qualifier.NoAuthHttpClient
+import com.on.turip.di.qualifier.NoAuthKtorfit
+import com.on.turip.di.qualifier.SseHttpClient
 import com.on.turip.domain.login.AuthRepository
 import com.on.turip.domain.login.AuthTokens
-import com.on.turip.domain.userstorage.repository.UserStorageRepository
+import com.on.turip.domain.session.TokenManager
 import dagger.Lazy
 import dagger.Module
 import dagger.Provides
@@ -19,6 +24,8 @@ import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.engine.okhttp.OkHttpConfig
+import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.plugins.HttpTimeoutConfig.Companion.INFINITE_TIMEOUT_MS
 import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.auth.providers.BearerTokens
 import io.ktor.client.plugins.auth.providers.bearer
@@ -27,6 +34,7 @@ import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.plugins.sse.SSE
 import io.ktor.client.request.header
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
@@ -36,18 +44,33 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import timber.log.Timber
 import javax.inject.Singleton
+import kotlin.time.Duration.Companion.milliseconds
 
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
     const val LOG_PREFIX = "moongjenut"
+    private const val CONNECT_TIMEOUT_MILLIS = 10_000L
+    private const val SOCKET_TIMEOUT_MILLIS = 20_000L
+    private const val REQUEST_TIMEOUT_MILLIS = 20_000L
 
     @Provides
     @Singleton
-    fun provideHttpClient(
-        userStorageRepository: UserStorageRepository,
+    fun provideJson(): Json =
+        Json {
+            ignoreUnknownKeys = true
+            isLenient = true
+            encodeDefaults = true
+        }
+
+    @Provides
+    @Singleton
+    @DefaultHttpClient
+    fun provideDefaultHttpClient(
+        tokenManager: TokenManager,
         authRepository: Lazy<AuthRepository>,
         fidProvider: FidProvider,
+        json: Json,
     ): HttpClient =
         HttpClient(OkHttp) {
             /**
@@ -64,78 +87,62 @@ object NetworkModule {
              */
             expectSuccess = true
 
+            timeoutInterceptor()
             loggingInterceptor()
-
-            install(plugin = ContentNegotiation) {
-                json(
-                    Json {
-                        ignoreUnknownKeys = true
-                        isLenient = true
-                        encodeDefaults = true
-                    },
-                )
-            }
-
-            headerInterceptor(userStorageRepository, authRepository, fidProvider)
+            contentNegotiationInterceptor(json)
+            defaultRequestInterceptor(fidProvider)
+            headerInterceptor(tokenManager, authRepository)
         }
 
-    private fun HttpClientConfig<OkHttpConfig>.headerInterceptor(
-        userStorageRepository: UserStorageRepository,
+    @Provides
+    @Singleton
+    @NoAuthHttpClient
+    fun provideNoAuthHttpClient(
+        fidProvider: FidProvider,
+        json: Json,
+    ): HttpClient =
+        HttpClient(OkHttp) {
+            expectSuccess = true
+
+            timeoutInterceptor()
+            loggingInterceptor()
+            contentNegotiationInterceptor(json)
+            defaultRequestInterceptor(fidProvider)
+        }
+
+    @Provides
+    @Singleton
+    @SseHttpClient
+    fun provideSseHttpClient(
+        tokenManager: TokenManager,
         authRepository: Lazy<AuthRepository>,
         fidProvider: FidProvider,
-    ) {
-        install(plugin = Auth) {
-            bearer {
-                loadTokens {
-                    when (AuthState.type) {
-                        UserType.MEMBER -> {
-                            val accessToken: String? =
-                                userStorageRepository.loadAccessToken().getOrNull()
-                            val refreshToken: String? =
-                                userStorageRepository.loadRefreshToken().getOrNull()
-                            if (accessToken != null && refreshToken != null) {
-                                BearerTokens(
-                                    accessToken = accessToken,
-                                    refreshToken = refreshToken,
-                                )
-                            } else {
-                                null
-                            }
-                        }
-
-                        UserType.GUEST, UserType.NONE -> {
-                            null
-                        }
-                    }
-                }
-
-                refreshTokens {
-                    val storedRefreshToken: String =
-                        userStorageRepository.loadRefreshToken().getOrNull()
-                            ?: return@refreshTokens null
-
-                    return@refreshTokens authRepository
-                        .get()
-                        .requestTokens(storedRefreshToken)
-                        .fold(
-                            onSuccess = { newTokens: AuthTokens ->
-                                userStorageRepository.createTokens(newTokens)
-                                BearerTokens(
-                                    accessToken = newTokens.accessToken,
-                                    refreshToken = newTokens.refreshToken,
-                                )
-                            },
-                            onFailure = {
-                                null
-                            },
-                        )
-                }
+        json: Json,
+    ): HttpClient =
+        HttpClient(OkHttp) {
+            expectSuccess = true
+            install(SSE) {
+                reconnectionTime = 3000.milliseconds
             }
+            install(HttpTimeout) {
+                connectTimeoutMillis = CONNECT_TIMEOUT_MILLIS
+                socketTimeoutMillis = INFINITE_TIMEOUT_MS
+                requestTimeoutMillis = INFINITE_TIMEOUT_MS
+            }
+            loggingInterceptor()
+            contentNegotiationInterceptor(json)
+            defaultRequestInterceptor(fidProvider)
+            headerInterceptor(tokenManager, authRepository)
         }
 
-        defaultRequest {
-            header("device-fid", fidProvider.cachedFid)
-            contentType(type = ContentType.Application.Json)
+    private fun HttpClientConfig<OkHttpConfig>.timeoutInterceptor() {
+        install(HttpTimeout) {
+            // 서버와 TCP 연결을 맺는 시간 제한
+            connectTimeoutMillis = CONNECT_TIMEOUT_MILLIS
+            // 서버와 연결된 후 데이터를 읽는 동안 아무 데이터도 안 오면 기다리는 최대 시간
+            socketTimeoutMillis = SOCKET_TIMEOUT_MILLIS
+            // 전체 HTTP 요청이 완료될 때까지 기다리는 최대 시간
+            requestTimeoutMillis = REQUEST_TIMEOUT_MILLIS
         }
     }
 
@@ -146,9 +153,93 @@ object NetworkModule {
         }
     }
 
+    private fun HttpClientConfig<OkHttpConfig>.contentNegotiationInterceptor(json: Json) {
+        install(plugin = ContentNegotiation) {
+            json(json)
+        }
+    }
+
+    private fun HttpClientConfig<OkHttpConfig>.defaultRequestInterceptor(fidProvider: FidProvider) {
+        defaultRequest {
+            header("device-fid", fidProvider.cachedFid)
+            contentType(type = ContentType.Application.Json)
+        }
+    }
+
+    private fun HttpClientConfig<OkHttpConfig>.headerInterceptor(
+        tokenManager: TokenManager,
+        authRepository: Lazy<AuthRepository>,
+    ) {
+        install(plugin = Auth) {
+            bearer {
+                loadTokens {
+                    tokenManager.currentTokens?.let { tokens: AuthTokens ->
+                        BearerTokens(
+                            accessToken = tokens.accessToken,
+                            refreshToken = tokens.refreshToken,
+                        )
+                    }
+                }
+
+                refreshTokens {
+                    val storedRefreshToken: String =
+                        tokenManager.currentTokens?.refreshToken ?: throw ApiException.Auth
+
+                    // 리프레시 토큰으로 토큰 갱신 요청 API는 header 없도록 구성되어 있음(header 있을 경우 이미 만료된 엑세스 토큰이어서 401 발생)
+                    authRepository.get().requestTokens(storedRefreshToken).fold(
+                        onSuccess = { newTokens: AuthTokens ->
+                            Timber.d("refreshToken으로 토큰 재발급 성공")
+                            val currentRefreshToken = tokenManager.currentTokens?.refreshToken
+
+                            // 중단함수 처리 중 이미 토큰 재발급이 되었거나 제거가 발생했을 경우
+                            if (currentRefreshToken != storedRefreshToken) throw ApiException.Auth
+
+                            tokenManager.setTokens(newTokens).fold(
+                                onSuccess = {
+                                    Timber.d("refreshToken으로 재발급 받은 토큰 저장 성공")
+                                    BearerTokens(
+                                        accessToken = newTokens.accessToken,
+                                        refreshToken = newTokens.refreshToken,
+                                    )
+                                },
+                                onFailure = {
+                                    Timber.e("refreshToken으로 재발급 받은 토큰 저장 실패")
+                                    throw ApiException.Auth
+                                },
+                            )
+                        },
+                        onFailure = { errorType ->
+                            Timber.e("refreshToken으로 토큰 재발급 실패 errorType = $errorType")
+                            when (errorType) {
+                                ErrorType.Network -> throw ApiException.Network
+                                is ErrorType.Auth -> throw ApiException.Auth
+                                else -> throw ApiException.Error(errorType)
+                            }
+                        },
+                    )
+                }
+            }
+        }
+    }
+
     @Provides
     @Singleton
-    fun provideKtorfit(httpClient: HttpClient): Ktorfit =
+    @DefaultKtorfit
+    fun provideDefaultKtorfit(
+        @DefaultHttpClient httpClient: HttpClient,
+    ): Ktorfit =
+        Ktorfit
+            .Builder()
+            .baseUrl(BuildConfig.BASE_URL)
+            .httpClient(httpClient)
+            .build()
+
+    @Provides
+    @Singleton
+    @NoAuthKtorfit
+    fun provideNoAuthKtorfit(
+        @NoAuthHttpClient httpClient: HttpClient,
+    ): Ktorfit =
         Ktorfit
             .Builder()
             .baseUrl(BuildConfig.BASE_URL)

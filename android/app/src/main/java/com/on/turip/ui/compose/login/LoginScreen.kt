@@ -9,20 +9,19 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Scaffold
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -34,34 +33,44 @@ import com.on.turip.R
 import com.on.turip.data.login.datasource.GoogleCredentialManager
 import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.compose.designsystem.component.TuripDialog
-import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
+import com.on.turip.ui.compose.designsystem.snackbar.LocalSnackbarDelegate
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.login.component.GoogleLoginButton
-import com.on.turip.ui.compose.login.component.HelpText
+import com.on.turip.ui.compose.login.component.GuestModeSection
 import com.on.turip.ui.compose.login.util.noRippleClickable
 
 @Composable
 fun LoginScreen(
-    navigateToMain: () -> Unit,
+    deepLinkUrl: String?,
+    onNavigateToMain: (deepLinkUrl: String?) -> Unit,
     googleCredentialManager: GoogleCredentialManager,
     viewmodel: LoginViewmodel = hiltViewModel(),
 ) {
     val uiState: LoginUiState by viewmodel.uiState.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val context = LocalContext.current
+    val resources = LocalResources.current
+    val snackbarDelegate = LocalSnackbarDelegate.current
+
+    LaunchedEffect(deepLinkUrl) {
+        viewmodel.initDeepLinkUrl(deepLinkUrl)
+    }
 
     LaunchedEffect(Unit) {
         viewmodel.uiEffect.collect { effect: LoginUiEffect ->
             when (effect) {
-                LoginUiEffect.NavigateToMain -> {
-                    navigateToMain()
+                LoginUiEffect.RequestAutoLogin -> {
+                    viewmodel.loginWithGoogle(googleCredentialManager)
+                }
+
+                is LoginUiEffect.NavigateToMain -> {
+                    onNavigateToMain(effect.deepLinkUrl)
                 }
 
                 is LoginUiEffect.ShowError -> {
                     val errorUiModel = effect.errorUiState.toUiModel() ?: return@collect
-                    snackbarHostState.showSnackbar(
-                        message = context.getString(errorUiModel.titleRes),
-                        duration = SnackbarDuration.Long,
+                    snackbarDelegate.showSnackbar(
+                        message = resources.getString(errorUiModel.titleRes),
+                        actionLabel = resources.getString(R.string.all_close_description),
+                        duration = SnackbarDuration.Short,
                     )
                 }
             }
@@ -73,33 +82,30 @@ fun LoginScreen(
             title = stringResource(R.string.login_dialog_migration_title),
             message = stringResource(R.string.login_dialog_migration_message),
             confirmText = stringResource(R.string.login_dialog_confirm_text),
-            dismissText = stringResource(R.string.setting_logout_dialog_dismiss),
-            onConfirmation = viewmodel::migration,
-            onDismissRequest = viewmodel::clearGuestData,
+            dismissText = stringResource(R.string.my_page_logout_dialog_dismiss),
+            onConfirmation = viewmodel::confirmMigration,
+            onDismissRequest = viewmodel::rejectMigration,
         )
     }
 
-    Scaffold(
+    LoginScreenContent(
+        isHelpTextVisible = uiState.showHelpText,
         modifier =
-            Modifier.noRippleClickable { viewmodel.updateHelpTextVisible(false) },
-        snackbarHost = { TuripSnackbar(snackbarHostState = snackbarHostState) },
-    ) { innerPadding ->
-        LoginScreenContent(
-            isHelpTextVisible = uiState.showHelpText,
-            modifier = Modifier.padding(innerPadding),
-            onClickHelpText = { viewmodel.updateHelpTextVisible(!uiState.showHelpText) },
-            onClickGoogleLogin = { viewmodel.onGoogleLogin(googleCredentialManager) },
-            onClickGuestLogin = viewmodel::onGuestLogin,
-        )
-    }
+            Modifier
+                .fillMaxSize()
+                .noRippleClickable { viewmodel.updateHelpTextVisible(false) },
+        onHelpClick = { viewmodel.updateHelpTextVisible(!uiState.showHelpText) },
+        onGoogleLoginClick = { viewmodel.loginWithGoogle(googleCredentialManager) },
+        onGuestLoginClick = viewmodel::continueAsGuest,
+    )
 }
 
 @Composable
 private fun LoginScreenContent(
     isHelpTextVisible: Boolean,
-    onClickHelpText: () -> Unit,
-    onClickGoogleLogin: () -> Unit,
-    onClickGuestLogin: () -> Unit,
+    onHelpClick: () -> Unit,
+    onGoogleLoginClick: () -> Unit,
+    onGuestLoginClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Image(
@@ -116,7 +122,8 @@ private fun LoginScreenContent(
                 .padding(
                     vertical = TuripTheme.spacing.extraHuge,
                     horizontal = TuripTheme.spacing.extraLarge,
-                ),
+                ).statusBarsPadding()
+                .navigationBarsPadding(),
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
@@ -163,14 +170,15 @@ private fun LoginScreenContent(
                 )
             }
 
-            GoogleLoginButton(onClickLoginButton = onClickGoogleLogin)
+            GoogleLoginButton(
+                onLoginClick = onGoogleLoginClick,
+            )
 
-            HelpText(
+            GuestModeSection(
                 text = stringResource(R.string.login_start_to_guest),
-                style = TuripTheme.typography.body1,
                 color = TuripTheme.colors.white,
-                onClickIcon = onClickHelpText,
-                onClickText = onClickGuestLogin,
+                onHelpClick = onHelpClick,
+                onTextClick = onGuestLoginClick,
             )
         }
     }
@@ -182,9 +190,9 @@ private fun HelpVisibleLoginScreenPreview() {
     TuripTheme {
         LoginScreenContent(
             isHelpTextVisible = true,
-            onClickHelpText = { },
-            onClickGoogleLogin = { },
-            onClickGuestLogin = { },
+            onHelpClick = { },
+            onGoogleLoginClick = { },
+            onGuestLoginClick = { },
         )
     }
 }
@@ -195,9 +203,9 @@ private fun HelpInvisibleLoginScreenPreview() {
     TuripTheme {
         LoginScreenContent(
             isHelpTextVisible = false,
-            onClickHelpText = { },
-            onClickGoogleLogin = { },
-            onClickGuestLogin = { },
+            onHelpClick = { },
+            onGoogleLoginClick = { },
+            onGuestLoginClick = { },
         )
     }
 }

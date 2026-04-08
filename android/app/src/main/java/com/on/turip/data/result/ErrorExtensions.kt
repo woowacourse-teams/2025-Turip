@@ -21,6 +21,7 @@ private fun String.toErrorType(): ErrorType =
         "ACCESS_TOKEN_SIGNATURE_INVALID" -> ErrorType.Auth.InvalidTokenSignature
         "UNAUTHORIZED" -> ErrorType.Auth.UnAuthorized
         "FORBIDDEN" -> ErrorType.Auth.Forbidden
+        "FOLDER_STREAM_FORBIDDEN" -> ErrorType.Auth.Forbidden
         "DEVICE_FID_REQUIRED" -> ErrorType.Device.FidRequired
         "CREATOR_NOT_FOUND" -> ErrorType.Creator.NotFound
         "CONTENT_NOT_FOUND" -> ErrorType.Content.NotFound

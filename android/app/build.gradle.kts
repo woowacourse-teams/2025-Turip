@@ -1,4 +1,6 @@
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
@@ -16,14 +18,25 @@ plugins {
 
 android {
     namespace = "com.on.turip"
-    compileSdk = 35
+    compileSdk = 36
+
+    val localProperties: Properties = gradleLocalProperties(rootDir, providers)
+    val keystorePropertiesFile: File = rootProject.file("keystore.properties")
+    val keystoreProperties: Properties =
+        Properties().apply {
+            if (!keystorePropertiesFile.exists()) error("keystore.properties 파일이 없습니다. android/keystore.properties를 생성해주세요.")
+            keystorePropertiesFile.reader(Charsets.UTF_8).use { reader -> load(reader) }
+        }
+
+    fun requireLocalProperty(key: String): String = localProperties.getProperty(key) ?: error("local.properties에 $key 를 설정해주세요.")
+
+    fun requireKeystoreProperty(key: String): String = keystoreProperties.getProperty(key) ?: error("keystore.properties에 $key 를 설정해주세요.")
 
     defaultConfig {
         applicationId = "com.on.turip"
         minSdk = 24
         //noinspection OldTargetApi
         targetSdk = 35
-        versionCode = 1
         versionName = libs.versions.versionName.get()
         versionCode =
             libs.versions.versionCode
@@ -31,46 +44,55 @@ android {
                 .toInt()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField(
+            "String",
+            "APP_LINK_TURIP_INVITATION_HOST",
+            "\"${requireLocalProperty("app_link_turip_invitation_host")}\"",
+        )
+        manifestPlaceholders["appLinkTuripInvitationHost"] = requireLocalProperty("app_link_turip_invitation_host")
+    }
+
+    signingConfigs {
+        create("debugTurip") {
+            storeFile = file(requireKeystoreProperty("debug_store_file"))
+            storePassword = requireKeystoreProperty("debug_store_password")
+            keyAlias = requireKeystoreProperty("debug_key_alias")
+            keyPassword = requireKeystoreProperty("debug_key_password")
+        }
+
+        create("releaseTurip") {
+            storeFile = file(requireKeystoreProperty("release_store_file"))
+            storePassword = requireKeystoreProperty("release_store_password")
+            keyAlias = requireKeystoreProperty("release_key_alias")
+            keyPassword = requireKeystoreProperty("release_key_password")
+        }
     }
 
     buildTypes {
         debug {
+            signingConfig = signingConfigs.getByName("debugTurip")
+
             isMinifyEnabled = false
             isDebuggable = true
             applicationIdSuffix = ".debug"
             versionNameSuffix = ".debug"
             manifestPlaceholders["appName"] = "튜립.debug"
-            buildConfigField(
-                "String",
-                "BASE_URL",
-                "\"${gradleLocalProperties(rootDir, providers).getProperty("debug_base_url")}\"",
-            )
-            buildConfigField(
-                "String",
-                "CLIENT_ID",
-                "\"${gradleLocalProperties(rootDir, providers).getProperty("client_id")}\"",
-            )
+
+            buildConfigField("String", "BASE_URL", "\"${requireLocalProperty("debug_base_url")}\"")
+            buildConfigField("String", "CLIENT_ID", "\"${requireLocalProperty("client_id")}\"")
         }
 
         release {
+            signingConfig = signingConfigs.getByName("releaseTurip")
+
             isMinifyEnabled = true
             isShrinkResources = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro",
-            )
-            signingConfig = signingConfigs.getByName("debug")
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             manifestPlaceholders["appName"] = "튜립"
-            buildConfigField(
-                "String",
-                "BASE_URL",
-                "\"${gradleLocalProperties(rootDir, providers).getProperty("release_base_url")}\"",
-            )
-            buildConfigField(
-                "String",
-                "CLIENT_ID",
-                "\"${gradleLocalProperties(rootDir, providers).getProperty("client_id")}\"",
-            )
+
+            buildConfigField("String", "BASE_URL", "\"${requireLocalProperty("release_base_url")}\"")
+            buildConfigField("String", "CLIENT_ID", "\"${requireLocalProperty("client_id")}\"")
         }
     }
 
@@ -78,16 +100,21 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
-    }
     buildFeatures {
+        buildConfig = true
         viewBinding = true
         compose = true
     }
 }
 
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_17)
+    }
+}
+
 dependencies {
+    lintChecks(project(":lint-rules"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -136,12 +163,18 @@ dependencies {
     implementation(libs.androidx.viewpager2)
     // livedata
     implementation(libs.androidx.lifecycle.livedata.ktx)
+    // navigation3
+    implementation(libs.androidx.navigation3.runtime)
+    implementation(libs.androidx.navigation3.ui)
+    // ViewModel integration with Navigation3
+    implementation(libs.androidx.lifecycle.viewmodel.navigation3)
 
     // compose
     implementation(platform(libs.compose.bom))
     androidTestImplementation(platform(libs.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.material.icons.core)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.ui.tooling.preview)
@@ -149,13 +182,15 @@ dependencies {
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
+    implementation(libs.material.icons.extended)
 
     // maps
-    implementation(libs.play.services.maps)
+    implementation(libs.google.map)
 
     // app update
     implementation(libs.app.update)
     implementation(libs.app.update.ktx)
+    implementation(libs.install.referrer)
 
     // hilt
     implementation(libs.hilt.android)

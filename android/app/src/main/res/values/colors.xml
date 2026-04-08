@@ -3,7 +3,6 @@
     <color name="pure_black_151515">#FF151515</color>
     <color name="pure_white_ffffff">#FFFFFFFF</color>
 
-    <color name="gray_500_1e1e1e">#FF1E1E1E</color>
     <color name="gray_400_2b2b2b">#FF2B2B2B</color>
     <color name="gray_300_5b5b5b">#FF5B5B5B</color>
     <color name="gray_200_c1c1c1">#FFC1C1C1</color>
@@ -16,4 +15,5 @@
     <color name="turip_light_gray_f2f2f2_50">#80F2F2F2</color>
     <color name="turip_black_000000_06">#0F000000</color>
 
+    <color name="splash_background">#FF232323</color>
 </resources>

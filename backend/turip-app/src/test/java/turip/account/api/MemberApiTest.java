@@ -1,17 +1,13 @@
 package turip.account.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.mockito.Mockito.when;
 
 import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
-import java.util.HashMap;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -19,12 +15,16 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import turip.account.domain.Provider;
+import turip.account.domain.Role;
 import turip.auth.token.GoogleTokenParser;
+import turip.container.TestContainerConfig;
+import turip.favorite.domain.AccountRole;
 import turip.util.helper.TestDataHelper;
 
-@ActiveProfiles("test")
+@ActiveProfiles("test-mysql")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class MemberApiTest {
+class MemberApiTest extends TestContainerConfig {
 
     @LocalServerPort
     private int port;
@@ -42,31 +42,23 @@ class MemberApiTest {
     void setUp() {
         RestAssured.port = port;
 
-        jdbcTemplate.update("DELETE FROM refresh_token");
-        jdbcTemplate.update("DELETE FROM favorite_content");
-        jdbcTemplate.update("DELETE FROM favorite_place");
-        jdbcTemplate.update("DELETE FROM favorite_folder");
-        jdbcTemplate.update("DELETE FROM social_member");
-        jdbcTemplate.update("DELETE FROM member");
-        jdbcTemplate.update("DELETE FROM guest");
-        jdbcTemplate.update("DELETE FROM account");
-        jdbcTemplate.update("DELETE FROM content");
-        jdbcTemplate.update("DELETE FROM creator");
-        jdbcTemplate.update("DELETE FROM city");
-        jdbcTemplate.update("DELETE FROM country");
+        jdbcTemplate.execute("SET FOREIGN_KEY_CHECKS = 0");
 
-        jdbcTemplate.update("ALTER TABLE refresh_token ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE favorite_content ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE favorite_place ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE favorite_folder ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE social_member ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE member ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE guest ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE account ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE content ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE creator ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE city ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE country ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("TRUNCATE TABLE refresh_token");
+        jdbcTemplate.update("TRUNCATE TABLE favorite_content");
+        jdbcTemplate.update("TRUNCATE TABLE favorite_place");
+        jdbcTemplate.update("TRUNCATE TABLE favorite_folder_account");
+        jdbcTemplate.update("TRUNCATE TABLE favorite_folder");
+        jdbcTemplate.update("TRUNCATE TABLE social_member");
+        jdbcTemplate.update("TRUNCATE TABLE member");
+        jdbcTemplate.update("TRUNCATE TABLE guest");
+        jdbcTemplate.update("TRUNCATE TABLE account");
+        jdbcTemplate.update("TRUNCATE TABLE content");
+        jdbcTemplate.update("TRUNCATE TABLE creator");
+        jdbcTemplate.update("TRUNCATE TABLE city");
+        jdbcTemplate.update("TRUNCATE TABLE country");
+
+        jdbcTemplate.execute("SET FOREIGN_KEY_CHECKS = 1");
     }
 
     @Nested
@@ -78,8 +70,7 @@ class MemberApiTest {
         void migrationSuccess() {
             // given
             // 1. Guest account와 Member account 생성
-            Long guestAccountId =
-                    testDataHelper.insertAccount();// Guest account
+            Long guestAccountId = testDataHelper.insertAccount();// Guest account
             Long memberAccountId = testDataHelper.insertAccount(); // Member account
 
             // 2. Guest와 Member 생성
@@ -95,20 +86,12 @@ class MemberApiTest {
             testDataHelper.insertSocialMember(memberId, provider, providerId);
 
             // 3. Guest의 FavoriteFolder와 FavoriteContent 생성
-            jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (id, account_id, name, is_default) VALUES (1, ?, '기본 폴더', true)",
-                    guestAccountId
-            );
-            jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (id, account_id, name, is_default) VALUES (2, ?, '커스텀 폴더', false)",
-                    guestAccountId
-            );
-
-            // Member의 기본 폴더 생성 (마이그레이션 시 삭제될 폴더)
-            jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (id, account_id, name, is_default) VALUES (3, ?, '기본 폴더', true)",
-                    memberAccountId
-            );
+            Long folderId0 = testDataHelper.insertFavoriteFolder("기본 폴더", true, false);
+            Long folderId1 = testDataHelper.insertFavoriteFolder("기본 폴더", true, false);
+            Long folderId2 = testDataHelper.insertFavoriteFolder("커스텀 폴더");
+            testDataHelper.insertFavoriteFolderAccount(memberAccountId, folderId0, AccountRole.OWNER);
+            testDataHelper.insertFavoriteFolderAccount(guestAccountId, folderId1, AccountRole.OWNER);
+            testDataHelper.insertFavoriteFolderAccount(guestAccountId, folderId2, AccountRole.OWNER);
 
             // FavoriteContent를 위한 Content 생성
             jdbcTemplate.update(
@@ -129,26 +112,7 @@ class MemberApiTest {
                     , guestAccountId
             );
 
-            // 4. Member 로그인해서 access token 받기
-            String idToken = "valid-google-id-token";
-
-            when(googleTokenParser.getProvider()).thenReturn(provider);
-            when(googleTokenParser.getProviderId(idToken)).thenReturn(providerId);
-            when(googleTokenParser.getEmail(idToken)).thenReturn("migration@gmail.com");
-
-            Map<String, String> loginRequest = new HashMap<>();
-            loginRequest.put("idToken", idToken);
-
-            String accessToken = RestAssured
-                    .given().log().all()
-                    .contentType(ContentType.JSON)
-                    .header("device-fid", guestDeviceFid)
-                    .body(loginRequest)
-                    .when().post("/api/v1/auth/login/google")
-                    .then().log().all()
-                    .statusCode(200)
-                    .body("accessToken", notNullValue())
-                    .extract().path("accessToken");
+            String accessToken = testDataHelper.createAccessToken(memberAccountId);
 
             // when & then
             RestAssured
@@ -166,11 +130,20 @@ class MemberApiTest {
             );
             assertThat(favoriteContentCount).isEqualTo(1);
 
-            Integer favoriteFolderCount = jdbcTemplate.queryForObject(
-                    "SELECT COUNT(*) FROM favorite_folder WHERE account_id = 2",
-                    Integer.class
+            // 검증: 게스트에 존재하던 폴더가 모두 제거됐는지 확인
+            Integer favoriteFolderAccountCount = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM favorite_folder_account WHERE account_id = ?",
+                    Integer.class,
+                    guestAccountId
             );
-            assertThat(favoriteFolderCount).isEqualTo(2); // Guest의 2개 폴더
+            assertThat(favoriteFolderAccountCount).isEqualTo(0);
+
+            // 검증: 기존에 member에 존재하던 폴더는 제거되고, 마이그레이션 된 폴더만 존재하는지 확인
+            Integer migratedFolderCount = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM favorite_folder_account WHERE account_id = ?",
+                    Integer.class,
+                    memberAccountId);
+            assertThat(migratedFolderCount).isEqualTo(2);
 
             // 검증: Guest가 삭제되었는지 확인
             Integer guestCount = jdbcTemplate.queryForObject(
@@ -204,26 +177,12 @@ class MemberApiTest {
             Provider provider = Provider.GOOGLE;
             String providerId = "google-user-no-device";
 
-            testDataHelper.insertSocialMember(email, true, provider, providerId);
+            Long socialMemberId = testDataHelper.insertSocialMember(email, true, provider, providerId);
+            Long accountId = jdbcTemplate.queryForObject(
+                    "SELECT account_id FROM member WHERE id = (SELECT member_id FROM social_member WHERE id = ?)",
+                    Long.class, socialMemberId);
 
-            String idToken = "valid-google-id-token";
-
-            when(googleTokenParser.getProvider()).thenReturn(provider);
-            when(googleTokenParser.getProviderId(idToken)).thenReturn(providerId);
-            when(googleTokenParser.getEmail(idToken)).thenReturn(email);
-
-            Map<String, String> loginRequest = new HashMap<>();
-            loginRequest.put("idToken", idToken);
-
-            String accessToken = RestAssured
-                    .given().log().all()
-                    .contentType(ContentType.JSON)
-                    .header("device-fid", "temp-device")
-                    .body(loginRequest)
-                    .when().post("/api/v1/auth/login/google")
-                    .then().log().all()
-                    .statusCode(200)
-                    .extract().path("accessToken");
+            String accessToken = testDataHelper.createAccessToken(accountId);
 
             // when & then
             RestAssured
@@ -236,6 +195,46 @@ class MemberApiTest {
     }
 
     @Nested
+    @DisplayName("/api/v1/members/migration/reject POST 마이그레이션 거절 테스트")
+    class RejectMigrateTest {
+
+        @Test
+        @DisplayName("마이그레이션을 거절한 뒤 204 No Content를 응답한다")
+        void reject1() {
+            // given
+            Long memberAccountId = testDataHelper.insertAccount(); // Member account
+            Long memberId = testDataHelper.insertMember(memberAccountId, "migration@gmail.com", true);
+            Provider provider = Provider.GOOGLE;
+            String providerId = "google-user-migration";
+            testDataHelper.insertSocialMember(memberId, provider, providerId);
+            String accessToken = testDataHelper.createAccessToken(memberAccountId);
+
+            // when & then
+            RestAssured
+                    .given().log().all()
+                    .header("Authorization", "Bearer " + accessToken)
+                    .when().post("/api/v1/members/migration/reject")
+                    .then().log().all()
+                    .statusCode(204);
+        }
+
+        @Test
+        @DisplayName("Authorization 헤더 없이 요청 시 401 Unauthorized를 응답한다")
+        void reject2() {
+            // given
+            String deviceFid = "device-123";
+
+            // when & then
+            RestAssured
+                    .given().log().all()
+                    .header("device-fid", deviceFid)
+                    .when().post("/api/v1/members/migration/reject")
+                    .then().log().all()
+                    .statusCode(401);
+        }
+    }
+
+    @Nested
     @DisplayName("/api/v1/members/me DELETE 회원 탈퇴 테스트")
     class DeleteMemberTest {
 
@@ -244,19 +243,20 @@ class MemberApiTest {
         void deleteMemberSuccess() {
             // given
             // 1. Account와 Member 생성
+            Long accountId = testDataHelper.insertAccount(Role.USER);
+
             String email = "delete@gmail.com";
             Provider provider = Provider.GOOGLE;
             String providerId = "google-user-delete";
 
-            testDataHelper.insertSocialMember(email, true, provider, providerId);
+            Long memberId = testDataHelper.insertMember(accountId, email, true);
+            testDataHelper.insertSocialMember(memberId, provider, providerId);
 
             // 2. Member의 FavoriteFolder 생성
-            jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (id, account_id, name, is_default) VALUES (1, 1, '기본 폴더', true)"
-            );
-            jdbcTemplate.update(
-                    "INSERT INTO favorite_folder (id, account_id, name, is_default) VALUES (2, 1, '커스텀 폴더', false)"
-            );
+            Long folderId1 = testDataHelper.insertFavoriteFolder("기본 폴더", true, false);
+            Long folderId2 = testDataHelper.insertFavoriteFolder("커스텀 폴더");
+            testDataHelper.insertFavoriteFolderAccount(accountId, folderId1, AccountRole.OWNER);
+            testDataHelper.insertFavoriteFolderAccount(accountId, folderId2, AccountRole.OWNER);
 
             // 3. FavoriteContent를 위한 Content 생성
             jdbcTemplate.update(
@@ -277,26 +277,7 @@ class MemberApiTest {
                     "INSERT INTO favorite_content (id, account_id, content_id, created_at) VALUES (1, 1, 1, '2024-01-01')"
             );
 
-            // 5. Member 로그인해서 access token 받기
-            String idToken = "valid-google-id-token";
-
-            when(googleTokenParser.getProvider()).thenReturn(provider);
-            when(googleTokenParser.getProviderId(idToken)).thenReturn(providerId);
-            when(googleTokenParser.getEmail(idToken)).thenReturn(email);
-
-            Map<String, String> loginRequest = new HashMap<>();
-            loginRequest.put("idToken", idToken);
-
-            String accessToken = RestAssured
-                    .given().log().all()
-                    .contentType(ContentType.JSON)
-                    .header("device-fid", "device-123")
-                    .body(loginRequest)
-                    .when().post("/api/v1/auth/login/google")
-                    .then().log().all()
-                    .statusCode(200)
-                    .body("accessToken", notNullValue())
-                    .extract().path("accessToken");
+            String accessToken = testDataHelper.createAccessToken(accountId);
 
             // when & then
             RestAssured
@@ -321,10 +302,10 @@ class MemberApiTest {
                     "SELECT COUNT(*) FROM favorite_content WHERE account_id = 1", Integer.class);
             assertThat(favoriteContentCount).isEqualTo(0);
 
-            // 검증: FavoriteFolder가 삭제되었는지 확인
-            Integer favoriteFolderCount = jdbcTemplate.queryForObject(
-                    "SELECT COUNT(*) FROM favorite_folder WHERE account_id = 1", Integer.class);
-            assertThat(favoriteFolderCount).isEqualTo(0);
+            // 검증: FavoriteFolderAccount가 삭제되었는지 확인
+            Integer favoriteFolderAccountCount = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM favorite_folder_account WHERE account_id = 1", Integer.class);
+            assertThat(favoriteFolderAccountCount).isEqualTo(0);
         }
 
         @Test

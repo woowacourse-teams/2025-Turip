@@ -1,13 +1,9 @@
 package com.on.turip.ui.compose.trip
 
-import android.content.Context
-import android.view.View
-import android.view.ViewGroup
-import android.view.ViewGroup.LayoutParams.MATCH_PARENT
+import android.content.res.Resources
 import android.webkit.WebView
-import android.widget.FrameLayout
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.core.animateDpAsState
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +12,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
@@ -24,77 +21,89 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SheetState
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
+import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.on.turip.R
 import com.on.turip.ui.common.error.ErrorUiModel
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.toUiModel
-import com.on.turip.ui.common.extensions.dismissAndExecute
-import com.on.turip.ui.common.extensions.showSnackbarWithAction
 import com.on.turip.ui.common.model.trip.TripDurationModel
+import com.on.turip.ui.common.model.turip.TuripShareModel
 import com.on.turip.ui.compose.designsystem.component.ErrorScreen
-import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbarVisuals
+import com.on.turip.ui.compose.designsystem.model.SnackbarIconModel
+import com.on.turip.ui.compose.designsystem.snackbar.LocalSnackbarDelegate
+import com.on.turip.ui.compose.designsystem.snackbar.SnackbarDelegate
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
+import com.on.turip.ui.compose.main.component.LocalSystemBarStyleController
+import com.on.turip.ui.compose.main.component.SystemBarStyle
 import com.on.turip.ui.compose.trip.component.ContentBookmarkButton
 import com.on.turip.ui.compose.trip.component.ContentInformation
 import com.on.turip.ui.compose.trip.component.ContentVideo
 import com.on.turip.ui.compose.trip.component.CreatorInformation
-import com.on.turip.ui.compose.trip.component.Days
 import com.on.turip.ui.compose.trip.component.PlaceItem
 import com.on.turip.ui.compose.trip.component.TripDetailAppBar
-import com.on.turip.ui.compose.trip.model.DayModel
 import com.on.turip.ui.compose.trip.model.MapModel
 import com.on.turip.ui.compose.trip.model.PlaceModel
+import com.on.turip.ui.compose.trip.model.SelectedPlaceModel
 import com.on.turip.ui.compose.trip.model.TripDetailInfoModel
+import com.on.turip.ui.compose.trip.turipselection.PlaceTuripSelectionBottomSheet
 import com.on.turip.ui.compose.trip.webview.VideoManager
+import com.on.turip.ui.compose.turip.component.TuripAddBottomSheet
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TripDetailScreen(
+    contentId: Long,
     navigateToBack: () -> Unit,
     navigateToLogin: () -> Unit,
+    navigateToTuripDetail: (turipId: Long) -> Unit,
     navigateToMap: (mapModel: MapModel) -> Unit,
     navigateToWebViewUrl: (url: String) -> Unit,
-    onTuripPlaceClick: (id: Long, placeName: String) -> Unit,
+    navigateToShareTuripByText: (turipShareModel: TuripShareModel) -> Unit,
+    navigateToShareTuripInvitationLink: (invitationLink: String) -> Unit,
     viewModel: TripDetailViewModel = hiltViewModel(),
 ) {
-    val uiState: TripDetailUiState by viewModel.uiState.collectAsState()
-    val snackbarHostState = remember { SnackbarHostState() }
+    val uiState: TripDetailUiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val snackbarDelegate = LocalSnackbarDelegate.current
+    val systemBarStyleController = LocalSystemBarStyleController.current
     val context = LocalContext.current
+    val resources = LocalResources.current
+    val lifecycleOwner = LocalLifecycleOwner.current
 
     val listState = rememberLazyListState()
-    val isAtBottom by remember {
-        derivedStateOf {
-            val lastVisibleItemIndex =
-                listState.layoutInfo.visibleItemsInfo
-                    .lastOrNull()
-                    ?.index
-            val totalItemsCount = listState.layoutInfo.totalItemsCount
-
-            lastVisibleItemIndex == totalItemsCount - 1
-        }
-    }
 
     val webViewController =
         rememberTripDetailWebViewController(
@@ -103,25 +112,110 @@ fun TripDetailScreen(
         )
 
     val isInitialLoading by remember {
-        derivedStateOf { uiState.isLoading || webViewController.isLoading }
+        derivedStateOf {
+            uiState.isLoading ||
+                (webViewController.isLoading && uiState.tripDetailInfo == TripDetailInfoModel.Idle)
+        }
+    }
+    val isAtBottom by remember(
+        listState,
+        isInitialLoading,
+        uiState.errorUiState,
+        webViewController.isFullScreen,
+    ) {
+        derivedStateOf {
+            !isInitialLoading &&
+                uiState.errorUiState == ErrorUiState.None &&
+                !webViewController.isFullScreen &&
+                !listState.canScrollForward
+        }
     }
 
-    HandleFullScreenWindowLaunchedEffect(webViewController.isFullScreen)
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var selectedPlace by remember { mutableStateOf<SelectedPlaceModel?>(null) }
+    val bottomSheetScope = rememberCoroutineScope()
+
+    val addTuripSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    // PlaceTuripSelectionBottomSheet 용 (바깥 시트)
+    val placeTuripSelectionSnackbarHostState = remember { SnackbarHostState() }
+    // TuripAddBottomSheet 용 (안쪽 시트)
+    val turipAddSnackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(Unit) {
+        viewModel.initContentId(contentId)
+    }
+
+    // bottomSheet visibility logic
+    LaunchedEffect(uiState.selectedPlaceModel) {
+        val currentSelectedPlace: SelectedPlaceModel? = uiState.selectedPlaceModel
+        if (currentSelectedPlace != null) {
+            selectedPlace = currentSelectedPlace
+            sheetState.show()
+        } else {
+            // 바텀시트 데이터가 초기화되었는데 캐싱 데이터가 존재한다면
+            if (selectedPlace != null) {
+                if (sheetState.currentValue != SheetValue.Hidden) sheetState.hide()
+                selectedPlace = null
+            }
+        }
+    }
+
+    HandleFullScreenWindowLaunchedEffect(isFullScreen = webViewController.isFullScreen)
 
     LaunchedEffect(uiState.tripDetailInfo.videoLink) {
-        webViewController.loadVideo(uiState.tripDetailInfo.videoLink)
+        webViewController.loadVideo(
+            url = uiState.tripDetailInfo.videoLink,
+            initialSecond = viewModel.getCurrentVideoPlaybackSecond(),
+            onTimeUpdate = viewModel::updateVideoPlaybackSecond,
+        )
+    }
+
+    DisposableEffect(lifecycleOwner, uiState.tripDetailInfo.videoLink) {
+        val observer =
+            LifecycleEventObserver { _, event ->
+                if (event == Lifecycle.Event.ON_RESUME) {
+                    val second = viewModel.getCurrentVideoPlaybackSecond()
+                    if (uiState.tripDetailInfo.videoLink.isNotEmpty() && second > 0) {
+                        webViewController.restoreTo(second)
+                    }
+                }
+            }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
     }
 
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { uiEffect: TripDetailUiEffect ->
             handleUiEffect(
                 uiEffect = uiEffect,
-                snackbarHostState = snackbarHostState,
-                context = context,
+                snackbarDelegate = snackbarDelegate,
+                resources = resources,
                 navigateToLogin = navigateToLogin,
                 handleErrorRetryRequest = viewModel::handleErrorRetryRequest,
+                addTuripSheetState = addTuripSheetState,
+                dismissAddTuripBottomSheet = viewModel::dismissAddTuripBottomSheet,
+                placeTuripSelectionSnackbarHostState = placeTuripSelectionSnackbarHostState,
+                turipAddSnackbarHostState = turipAddSnackbarHostState,
             )
         }
+    }
+    LaunchedEffect(isAtBottom) {
+        snackbarDelegate.updateBottomPadding(if (isAtBottom) 50.dp else 0.dp)
+    }
+
+    SideEffect {
+        systemBarStyleController.update(
+            if (webViewController.isFullScreen) {
+                SystemBarStyle()
+            } else {
+                SystemBarStyle(
+                    isLightStatusBarIcons = false,
+                    isLightNavigationBarIcons = false,
+                )
+            },
+        )
     }
 
     BackHandler {
@@ -132,49 +226,34 @@ fun TripDetailScreen(
     }
 
     DisposableEffect(Unit) {
-        onDispose { webViewController.clear() }
+        onDispose {
+            systemBarStyleController.reset()
+            snackbarDelegate.updateBottomPadding(0.dp)
+            webViewController.clear()
+        }
     }
 
-    Scaffold(
-        topBar = {
-            if (!webViewController.isFullScreen) {
-                Column {
-                    Spacer(
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .windowInsetsTopHeight(WindowInsets.systemBars)
-                                .background(TuripTheme.colors.primary),
-                    )
-                    TripDetailAppBar(
-                        isError = uiState.errorUiState != ErrorUiState.None,
-                        isBookmarked = uiState.isBookmarked,
-                        onBackClick = navigateToBack,
-                        onBookmarkClick = {
-                            snackbarHostState.dismissAndExecute { viewModel.updateBookmark() }
-                        },
-                    )
-                }
-            }
-        },
-        snackbarHost = {
-            val bottomPadding by animateDpAsState(
-                targetValue = if (isAtBottom) 50.dp else 0.dp,
-                label = "snackbarPadding",
+    Column(modifier = Modifier.fillMaxSize()) {
+        if (!webViewController.isFullScreen) {
+            Spacer(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .windowInsetsTopHeight(WindowInsets.systemBars)
+                        .background(TuripTheme.colors.primary),
             )
-            TuripSnackbar(
-                snackbarHostState = snackbarHostState,
-                modifier = Modifier.padding(bottom = bottomPadding),
+            TripDetailAppBar(
+                isError = uiState.errorUiState != ErrorUiState.None,
+                isLoading = isInitialLoading,
+                isBookmarked = uiState.isBookmarked,
+                onBackClick = navigateToBack,
+                onBookmarkClick = {
+                    viewModel.updateBookmark()
+                },
             )
-        },
-        modifier = Modifier.fillMaxSize(),
-    ) { innerPadding ->
-        Box(
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding),
-        ) {
+        }
+
+        Box(modifier = Modifier.fillMaxSize()) {
             when {
                 uiState.errorUiState != ErrorUiState.None -> {
                     ErrorScreen(
@@ -195,22 +274,59 @@ fun TripDetailScreen(
                 }
 
                 else -> {
+                    TripDetailScreenContent(
+                        uiState = uiState,
+                        listState = listState,
+                        webViewController = webViewController,
+                        onTimeLineClick = webViewController::seekTo,
+                        onMapClick = navigateToMap,
+                        onTuripPlaceClick = viewModel::selectPlace,
+                        onBookmarkClick = {
+                            viewModel.updateBookmark()
+                        },
+                        onErrorVideoClick = { navigateToWebViewUrl(uiState.tripDetailInfo.videoLink) },
+                    )
+
                     if (!webViewController.isFullScreen) {
-                        TripDetailScreenContent(
-                            uiState = uiState,
-                            listState = listState,
-                            webViewController = webViewController,
-                            onDayClick = viewModel::updateDay,
-                            onTimeLineClick = webViewController::seekTo,
-                            onMapClick = navigateToMap,
-                            onTuripPlaceClick = onTuripPlaceClick,
-                            onBookmarkClick = {
-                                snackbarHostState.dismissAndExecute { viewModel.updateBookmark() }
-                            },
-                            onErrorVideoClick = { navigateToWebViewUrl(uiState.tripDetailInfo.videoLink) },
-                        )
-                    } else {
-                        FullScreenVideo(webViewController.fullScreenVideo)
+                        selectedPlace?.let { place ->
+                            PlaceTuripSelectionBottomSheet(
+                                sheetState = sheetState,
+                                selectedPlaceModel = place,
+                                snackbarHostState = placeTuripSelectionSnackbarHostState,
+                                onNavigateToLogin = navigateToLogin,
+                                onNavigateToAddTurip = { viewModel.showAddTuripBottomSheet() },
+                                onNavigateToTuripDetail = navigateToTuripDetail,
+                                onNavigateToMap = navigateToMap,
+                                onShareTuripByText = navigateToShareTuripByText,
+                                onShareTuripInvitationLink = navigateToShareTuripInvitationLink,
+                                onPlaceTuripChanged = viewModel::updatePlaceTuripSelection,
+                                onDismiss = {
+                                    placeTuripSelectionSnackbarHostState.currentSnackbarData?.dismiss()
+                                    bottomSheetScope.launch {
+                                        sheetState.hide()
+                                        viewModel.clearSelectedPlace()
+                                        selectedPlace = null
+                                    }
+                                },
+                            )
+                        }
+
+                        if (uiState.showAddTuripBottomSheet) {
+                            TuripAddBottomSheet(
+                                title = resources.getString(R.string.bottom_sheet_turip_add_title),
+                                turipName = uiState.addTuripInputName,
+                                sheetState = addTuripSheetState,
+                                turipNameStatus = uiState.addTuripNameStatus,
+                                isConfirmEnabled = uiState.addTuripNameStatus.isConfirmEnabled && !uiState.isCreatingTurip,
+                                onNameChanged = viewModel::updateAddTuripInputName,
+                                onConfirmClick = viewModel::addTurip,
+                                onDismiss = {
+                                    turipAddSnackbarHostState.currentSnackbarData?.dismiss()
+                                    viewModel.dismissAddTuripBottomSheet()
+                                },
+                                snackbarHostState = turipAddSnackbarHostState,
+                            )
+                        }
                     }
                 }
             }
@@ -218,26 +334,32 @@ fun TripDetailScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 private suspend fun handleUiEffect(
     uiEffect: TripDetailUiEffect,
-    snackbarHostState: SnackbarHostState,
-    context: Context,
+    snackbarDelegate: SnackbarDelegate,
+    placeTuripSelectionSnackbarHostState: SnackbarHostState,
+    turipAddSnackbarHostState: SnackbarHostState,
+    resources: Resources,
     navigateToLogin: () -> Unit,
     handleErrorRetryRequest: (action: TripDetailRetryAction) -> Unit,
+    addTuripSheetState: SheetState,
+    dismissAddTuripBottomSheet: () -> Unit,
 ) {
     when (uiEffect) {
         is TripDetailUiEffect.ShowBookmarkStatus -> {
             val messageResource: Int =
                 if (uiEffect.isBookmarked) R.string.trip_detail_snackbar_bookmark_save else R.string.trip_detail_snackbar_bookmark_remove
-            val iconResource: Int =
-                if (uiEffect.isBookmarked) R.drawable.btn_bookmark_selected else R.drawable.btn_bookmark_normal
-            snackbarHostState.showSnackbar(
-                visuals =
-                    TuripSnackbarVisuals(
-                        message = context.getString(messageResource),
-                        actionLabel = context.getString(R.string.all_close_description),
-                        iconRes = iconResource,
-                    ),
+            val icon: SnackbarIconModel.Vector =
+                if (uiEffect.isBookmarked) {
+                    SnackbarIconModel.Vector(Icons.Default.Bookmark)
+                } else {
+                    SnackbarIconModel.Vector(Icons.Default.BookmarkBorder)
+                }
+            snackbarDelegate.showSnackbar(
+                message = resources.getString(messageResource),
+                actionLabel = resources.getString(R.string.all_close_description),
+                icon = icon,
             )
         }
 
@@ -246,26 +368,59 @@ private suspend fun handleUiEffect(
         }
 
         is TripDetailUiEffect.ShowUpdatedTuripSelectionByPlace -> {
-            val messageResource: Int = R.string.trip_detail_turip_selection_updated
-            val iconResource: Int = R.drawable.btn_turip_selected
-            snackbarHostState.showSnackbar(
-                visuals =
-                    TuripSnackbarVisuals(
-                        message = context.getString(messageResource, uiEffect.placeName),
-                        actionLabel = context.getString(R.string.all_close_description),
-                        iconRes = iconResource,
+            snackbarDelegate.showSnackbar(
+                message =
+                    resources.getString(
+                        R.string.trip_detail_turip_selection_updated,
+                        uiEffect.placeName,
                     ),
+                actionLabel = resources.getString(R.string.all_close_description),
+                icon = SnackbarIconModel.Painter(R.drawable.btn_turip_selected),
             )
         }
 
         is TripDetailUiEffect.ShowError -> {
             val uiModel: ErrorUiModel =
                 uiEffect.errorUiState.toUiModel() ?: return
-            snackbarHostState.showSnackbarWithAction(
-                message = context.getString(uiModel.titleRes),
-                actionLabel = context.getString(uiModel.retryTextRes),
+            snackbarDelegate.showSnackbar(
+                message = resources.getString(uiModel.titleRes),
+                actionLabel = resources.getString(uiModel.retryTextRes),
                 duration = SnackbarDuration.Long,
                 onAction = { handleErrorRetryRequest(uiEffect.retryAction) },
+            )
+        }
+
+        is TripDetailUiEffect.ShowAddedError -> {
+            val uiModel: ErrorUiModel =
+                uiEffect.errorUiState.toUiModel() ?: return
+            val result =
+                turipAddSnackbarHostState.showSnackbar(
+                    visuals =
+                        TuripSnackbarVisuals(
+                            message = resources.getString(uiModel.titleRes),
+                            actionLabel = resources.getString(uiModel.retryTextRes),
+                            duration = SnackbarDuration.Long,
+                        ),
+                )
+            if (result == SnackbarResult.ActionPerformed) {
+                handleErrorRetryRequest(uiEffect.retryAction)
+            }
+        }
+
+        is TripDetailUiEffect.TuripAdded -> {
+            addTuripSheetState.hide()
+            dismissAddTuripBottomSheet()
+            placeTuripSelectionSnackbarHostState.showSnackbar(
+                visuals =
+                    TuripSnackbarVisuals(
+                        message =
+                            resources.getString(
+                                R.string.turip_added_snackbar_message,
+                                uiEffect.turipName,
+                            ),
+                        icon = SnackbarIconModel.Painter(R.drawable.btn_turip_selected),
+                        actionLabel = resources.getString(R.string.all_close_description),
+                    ),
             )
         }
     }
@@ -276,7 +431,6 @@ private fun TripDetailScreenContent(
     uiState: TripDetailUiState,
     listState: LazyListState,
     webViewController: TripDetailWebViewController,
-    onDayClick: (day: Int) -> Unit,
     onTimeLineClick: (timeLine: Int) -> Unit,
     onMapClick: (mapModel: MapModel) -> Unit,
     onTuripPlaceClick: (id: Long, placeName: String) -> Unit,
@@ -286,7 +440,10 @@ private fun TripDetailScreenContent(
 ) {
     LazyColumn(
         state = listState,
-        modifier = modifier.fillMaxSize(),
+        modifier =
+            modifier
+                .fillMaxSize()
+                .navigationBarsPadding(),
     ) {
         item {
             CreatorInformation(
@@ -308,32 +465,10 @@ private fun TripDetailScreenContent(
             Spacer(modifier = Modifier.height(TuripTheme.spacing.large))
         }
 
-        item {
-            Days(
-                days = uiState.days,
-                onDayClick = onDayClick,
-                modifier = Modifier.padding(horizontal = TuripTheme.spacing.extraLarge),
-            )
-        }
-
-        item {
-            Text(
-                text = stringResource(R.string.trip_detail_day_place_count, uiState.places.size),
-                style = TuripTheme.typography.info1,
-                color = TuripTheme.colors.gray05,
-                textAlign = TextAlign.End,
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = TuripTheme.spacing.extraLarge)
-                        .padding(
-                            top = TuripTheme.spacing.extraSmall,
-                            bottom = TuripTheme.spacing.medium,
-                        ),
-            )
-        }
-
-        items(items = uiState.places, key = { it.timeLine }) { place ->
+        items(
+            items = uiState.places,
+            key = { "${it.id}_${it.timeLine}" },
+        ) { place ->
             PlaceItem(
                 placeModel = place,
                 onTimeLineClick = onTimeLineClick,
@@ -364,26 +499,6 @@ private fun TripDetailScreenContent(
     }
 }
 
-@Composable
-private fun FullScreenVideo(fullScreenVideo: View?) {
-    if (fullScreenVideo == null) return
-    AndroidView(
-        factory = { context ->
-            FrameLayout(context).apply {
-                layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT)
-            }
-        },
-        update = { view: FrameLayout ->
-            if (view.getChildAt(0) == fullScreenVideo) return@AndroidView
-            (fullScreenVideo.parent as? ViewGroup)?.removeView(fullScreenVideo)
-            view.removeAllViews()
-            view.addView(fullScreenVideo)
-        },
-        modifier = Modifier.fillMaxSize(),
-        onRelease = { (fullScreenVideo.parent as? ViewGroup)?.removeView(fullScreenVideo) },
-    )
-}
-
 @Preview(showBackground = true)
 @Composable
 private fun TripContentScreenPreview() {
@@ -400,49 +515,48 @@ private fun TripContentScreenPreview() {
         )
     val webView = WebView(LocalContext.current)
     TuripTheme {
-        TuripTheme {
-            TripDetailScreenContent(
-                uiState =
-                    TripDetailUiState(
-                        isLoading = false,
-                        errorUiState = ErrorUiState.None,
-                        tripDetailInfo = tripDetailInfo,
-                        days = persistentListOf(DayModel(1), DayModel(2)),
-                        places =
-                            persistentListOf(
-                                PlaceModel(
-                                    id = 1L,
-                                    name = "우아한테크코스",
-                                    isTuripPlace = true,
-                                    category = "💻 코딩맛집",
-                                    mapLink = "kakao.com/123123",
-                                    timeLine = "01:03",
-                                ),
-                                PlaceModel(
-                                    id = 2L,
-                                    name = "우아한테크코스",
-                                    isTuripPlace = false,
-                                    category = "💻 코딩맛집",
-                                    mapLink = "google.com/123123",
-                                    timeLine = "03:03",
-                                ),
+        TripDetailScreenContent(
+            uiState =
+                TripDetailUiState(
+                    isLoading = false,
+                    errorUiState = ErrorUiState.None,
+                    tripDetailInfo = tripDetailInfo,
+                    places =
+                        persistentListOf(
+                            PlaceModel(
+                                id = 1L,
+                                name = "우아한테크코스",
+                                isTuripPlace = true,
+                                category = "💻 코딩맛집",
+                                mapLink = "kakao.com/123123",
+                                timeLine = "01:03",
                             ),
-                        isBookmarked = true,
-                    ),
-                listState = rememberLazyListState(),
-                webViewController =
-                    TripDetailWebViewController(
-                        webView = webView,
-                        videoManager = VideoManager(webView),
-                        navigateToWebViewUrl = {},
-                    ),
-                onDayClick = {},
-                onTimeLineClick = {},
-                onMapClick = {},
-                onTuripPlaceClick = { _, _ -> },
-                onBookmarkClick = {},
-                onErrorVideoClick = {},
-            )
-        }
+                            PlaceModel(
+                                id = 2L,
+                                name = "우아한테크코스",
+                                isTuripPlace = false,
+                                category = "💻 코딩맛집",
+                                mapLink = "google.com/123123",
+                                timeLine = "03:03",
+                            ),
+                        ),
+                    isBookmarked = true,
+                    selectedPlaceModel = null,
+                ),
+            listState = rememberLazyListState(),
+            webViewController =
+                TripDetailWebViewController(
+                    webView = webView,
+                    videoManager = VideoManager(webView),
+                    navigateToWebViewUrl = {},
+                    activity = LocalActivity.current ?: return@TuripTheme,
+                ),
+            onTimeLineClick = {},
+            onMapClick = {},
+            onTuripPlaceClick = { _, _ -> },
+            onBookmarkClick = {},
+            onErrorVideoClick = {},
+            modifier = Modifier.background(color = TuripTheme.colors.white),
+        )
     }
 }

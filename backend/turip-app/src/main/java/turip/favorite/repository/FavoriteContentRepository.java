@@ -18,7 +18,6 @@ public interface FavoriteContentRepository extends JpaRepository<FavoriteContent
 
     Optional<FavoriteContent> findByAccountIdAndContentId(Long accountId, Long contentId);
 
-
     @Query(value = """
             SELECT c.*
             FROM favorite_content f
@@ -37,24 +36,27 @@ public interface FavoriteContentRepository extends JpaRepository<FavoriteContent
     List<FavoriteContent> findByAccountIdAndContentIdIn(Long accountId, List<Long> contentIds);
 
     @Query("""
-                SELECT f.content
+                SELECT f
                 FROM FavoriteContent f
                 JOIN f.account a
-                JOIN FETCH f.content.creator
-                JOIN FETCH f.content.city
+                JOIN FETCH f.content c
+                JOIN FETCH c.creator
+                JOIN FETCH c.city
                 WHERE a.id = :accountId
-                  AND f.content.id < :lastContentId
-                ORDER BY f.createdAt DESC
+                  AND f.id < :lastId
+                ORDER BY f.id DESC
             """)
-    Slice<Content> findMyFavoriteContentsByAccountId(
+    Slice<FavoriteContent> findMyFavoriteContentsByAccountId(
             @Param("accountId") Long accountId,
-            @Param("lastContentId") Long lastContentId,
+            @Param("lastId") Long lastFavoriteContentId,
             Pageable pageable
     );
 
     List<FavoriteContent> findAllByAccount(Account account);
 
     boolean existsByAccount(Account account);
+
+    int countByAccount(Account account);
 
     void deleteByAccount(Account account);
 }

@@ -22,12 +22,12 @@ import com.on.turip.domain.region.City
 import com.on.turip.ui.common.TuripUrlConverter
 import com.on.turip.ui.common.model.trip.TripDurationModel
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
-import com.on.turip.ui.main.home.model.UsersLikeContentModel
+import com.on.turip.ui.compose.home.model.UsersLikeContentModel
 
 @Composable
 fun UsersLikeList(
     usersLikeContents: List<UsersLikeContentModel>,
-    onContentClick: (UsersLikeContentModel) -> Unit,
+    onContentClick: (usersLikeContent: UsersLikeContentModel) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyRow(

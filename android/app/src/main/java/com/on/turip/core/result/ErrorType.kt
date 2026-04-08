@@ -93,6 +93,11 @@ sealed interface ErrorType {
     data object Network : ErrorType
 
     /**
+     * 사용자가 직접 작업을 취소한 에러 타입
+     */
+    data object Cancelled : ErrorType
+
+    /**
      * 커스텀 예외 밖 모든 에러 타입
      */
     data object Unknown : ErrorType

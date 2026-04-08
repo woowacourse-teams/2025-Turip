@@ -2,15 +2,16 @@ package turip.favorite.service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import turip.account.domain.Account;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.BadRequestException;
 import turip.common.exception.custom.ConflictException;
-import turip.common.exception.custom.ForbiddenException;
 import turip.common.exception.custom.NotFoundException;
 import turip.favorite.controller.dto.request.FavoritePlaceOrderRequest;
 import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlaceResponse;
@@ -19,6 +20,8 @@ import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusRe
 import turip.favorite.controller.dto.response.FavoritePlaceCountResponse;
 import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.domain.FavoritePlace;
+import turip.favorite.domain.event.ActionType;
+import turip.favorite.domain.event.FavoriteFolderUpdateEvent;
 import turip.favorite.repository.FavoriteFolderRepository;
 import turip.favorite.repository.FavoritePlaceRepository;
 import turip.place.domain.Place;
@@ -31,13 +34,15 @@ public class FavoritePlaceService {
     private final FavoritePlaceRepository favoritePlaceRepository;
     private final FavoriteFolderRepository favoriteFolderRepository;
     private final PlaceRepository placeRepository;
+    private final FavoriteFolderAccountService favoriteFolderAccountService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public FavoritePlaceResponse create(Account account, Long favoriteFolderId, Long placeId) {
         FavoriteFolder favoriteFolder = getFavoriteFolderById(favoriteFolderId);
         Place place = getPlaceById(placeId);
 
-        validateOwnership(account, favoriteFolder);
+        favoriteFolderAccountService.validateMembership(account, favoriteFolder);
         validateDuplicated(favoriteFolder, place);
 
         Integer maxOrder = favoritePlaceRepository.findMaxFavoriteOrderByFavoriteFolder(favoriteFolder)
@@ -46,26 +51,30 @@ public class FavoritePlaceService {
         FavoritePlace favoritePlace = new FavoritePlace(favoriteFolder, place, maxOrder + 1);
         FavoritePlace savedFavoritePlace = favoritePlaceRepository.save(favoritePlace);
 
+        eventPublisher.publishEvent(FavoriteFolderUpdateEvent.of(favoriteFolderId, ActionType.PLACE_ADDED));
+
         return FavoritePlaceResponse.from(savedFavoritePlace);
     }
 
     @Transactional
     public List<FavoritePlaceResponse> updateFavoriteFolders(Account account,
                                                              List<Long> favoriteFolderIds,
-                                                             Long placeId
-    ) {
-        List<Long> requestFavoriteFolderIds = favoriteFolderIds.stream().distinct().toList();
-        List<FavoriteFolder> favoriteFolders = favoriteFolderRepository.findAllById(requestFavoriteFolderIds);
-        validateMultiFolder(account, favoriteFolders, requestFavoriteFolderIds);
+                                                             Long placeId) {
+        List<Long> requestIds = favoriteFolderIds.stream().distinct().toList();
+        List<FavoriteFolder> requestFolders = favoriteFolderRepository.findAllById(requestIds);
+        validateMultiFolder(account, requestFolders, requestIds);
 
         Place place = getPlaceById(placeId);
-        List<FavoritePlace> existingFavoritePlaces = favoritePlaceRepository.findAllByPlaceAndAccount(place, account);
+        List<FavoritePlace> existingPlaces = favoritePlaceRepository.findAllByPlaceAndAccount(place, account);
 
-        deleteRemovedFavoritePlaces(existingFavoritePlaces, requestFavoriteFolderIds);
-        List<FavoritePlace> createdFavoritePlaces = createFavoritePlaces(place, existingFavoritePlaces, favoriteFolders,
-                requestFavoriteFolderIds);
+        Set<Long> affectedFolderIds = calculateAffectedFolderIds(existingPlaces, requestIds);
 
-        return convertToResultResponse(existingFavoritePlaces, createdFavoritePlaces, requestFavoriteFolderIds);
+        deleteRemovedFavoritePlaces(existingPlaces, requestIds);
+        List<FavoritePlace> createdPlaces = createFavoritePlaces(place, existingPlaces, requestFolders, requestIds);
+
+        publishFolderUpdateEvents(affectedFolderIds);
+
+        return convertToResultResponse(existingPlaces, createdPlaces, requestIds);
     }
 
     public FavoritePlacesWithPlaceDetailResponse findAllByFolder(Long favoriteFolderId) {
@@ -80,19 +89,19 @@ public class FavoritePlaceService {
     }
 
     public FavoritePlaceCountResponse countByAccount(Account account) {
-        int count = favoritePlaceRepository.countByFavoriteFolderAccount(account);
+        int count = favoritePlaceRepository.countByAccount(account);
         return FavoritePlaceCountResponse.from(count);
     }
 
     public boolean existsByAccount(Account account) {
-        return favoritePlaceRepository.existsByFavoriteFolderAccount(account);
+        return favoritePlaceRepository.existsByAccount(account);
     }
 
     @Transactional
     public void updatePlaceOrder(Account account, Long favoriteFolderId,
                                  FavoritePlaceOrderRequest request) {
         FavoriteFolder favoriteFolder = getFavoriteFolderById(favoriteFolderId);
-        validateOwnership(account, favoriteFolder);
+        favoriteFolderAccountService.validateMembership(account, favoriteFolder);
 
         List<Long> favoritePlaceIdsOrder = request.favoritePlaceIdsOrder();
 
@@ -102,6 +111,8 @@ public class FavoritePlaceService {
             validateFavoritePlaceBelongsToFolder(favoritePlace, favoriteFolder);
             favoritePlace.updateFavoriteOrder(index + 1);
         }
+
+        eventPublisher.publishEvent(FavoriteFolderUpdateEvent.of(favoriteFolderId, ActionType.PLACE_REORDERED));
     }
 
     @Transactional
@@ -109,10 +120,12 @@ public class FavoritePlaceService {
         FavoriteFolder favoriteFolder = getFavoriteFolderById(favoriteFolderId);
         Place place = getPlaceById(placeId);
 
-        validateOwnership(account, favoriteFolder);
+        favoriteFolderAccountService.validateMembership(account, favoriteFolder);
         FavoritePlace favoritePlace = getByFavoriteFolderAndPlace(favoriteFolder, place);
 
         favoritePlaceRepository.delete(favoritePlace);
+
+        eventPublisher.publishEvent(FavoriteFolderUpdateEvent.of(favoriteFolderId, ActionType.PLACE_DELETED));
     }
 
     private FavoriteFolder getFavoriteFolderById(Long favoriteFolderId) {
@@ -128,6 +141,20 @@ public class FavoritePlaceService {
     private FavoritePlace getFavoritePlaceById(Long favoritePlaceId) {
         return favoritePlaceRepository.findById(favoritePlaceId)
                 .orElseThrow(() -> new NotFoundException(ErrorTag.FAVORITE_PLACE_NOT_FOUND));
+    }
+
+    private Set<Long> calculateAffectedFolderIds(List<FavoritePlace> existingPlaces, List<Long> requestIds) {
+        Set<Long> ids = existingPlaces.stream()
+                .map(fp -> fp.getFavoriteFolder().getId())
+                .collect(Collectors.toSet());
+        ids.addAll(requestIds);
+        return ids;
+    }
+
+    private void publishFolderUpdateEvents(Set<Long> folderIds) {
+        folderIds.forEach(folderId ->
+                eventPublisher.publishEvent(new FavoriteFolderUpdateEvent(folderId, ActionType.FOLDER_PLACE_CHANGED))
+        );
     }
 
     private void deleteRemovedFavoritePlaces(List<FavoritePlace> existingFavoritePlaces,
@@ -185,13 +212,7 @@ public class FavoritePlaceService {
         if (requestedFavoriteFolders.size() != requestedFavoriteFolderIds.size()) {
             throw new NotFoundException(ErrorTag.FAVORITE_FOLDER_NOT_FOUND);
         }
-        requestedFavoriteFolders.forEach(folder -> validateOwnership(account, folder));
-    }
-
-    private void validateOwnership(Account requestAccount, FavoriteFolder favoriteFolder) {
-        if (!favoriteFolder.isOwner(requestAccount)) {
-            throw new ForbiddenException(ErrorTag.FORBIDDEN);
-        }
+        requestedFavoriteFolders.forEach(folder -> favoriteFolderAccountService.validateMembership(account, folder));
     }
 
     private void validateDuplicated(FavoriteFolder favoriteFolder, Place place) {

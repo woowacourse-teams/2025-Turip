@@ -1,5 +1,6 @@
 package com.on.turip.data.content.service
 
+import com.on.turip.core.network.ApiPath
 import com.on.turip.data.content.dto.ContentDetailResponse
 import com.on.turip.data.content.dto.ContentInformationCountResponse
 import com.on.turip.data.content.dto.ContentPlacesResponse
@@ -10,41 +11,41 @@ import de.jensklingenberg.ktorfit.http.Path
 import de.jensklingenberg.ktorfit.http.Query
 
 interface ContentService {
-    @GET("contents/count")
+    @GET(ApiPath.V1 + "contents/count")
     suspend fun getContentsCountByRegion(
         @Query("regionCategory") regionCategoryName: String,
     ): ContentInformationCountResponse
 
-    @GET("contents/keyword/count")
+    @GET(ApiPath.V1 + "contents/keyword/count")
     suspend fun getContentsCountByKeyword(
         @Query("keyword") keyword: String,
     ): ContentInformationCountResponse
 
-    @GET("contents")
+    @GET(ApiPath.V1 + "contents")
     suspend fun getContentsByRegion(
         @Query("regionCategory") regionCategoryName: String,
         @Query("size") size: Int,
         @Query("lastId") lastId: Long,
     ): ContentsInformationResponse
 
-    @GET("contents/keyword")
+    @GET(ApiPath.V1 + "contents/keyword")
     suspend fun getContentsByKeyword(
         @Query("keyword") keyword: String,
         @Query("size") size: Int,
         @Query("lastId") lastId: Long,
     ): ContentsInformationResponse
 
-    @GET("contents/{contentId}")
+    @GET(ApiPath.V1 + "contents/{contentId}")
     suspend fun getContentDetail(
         @Path("contentId") contentId: Long,
     ): ContentDetailResponse
 
-    @GET("contents/popular")
+    @GET(ApiPath.V1 + "contents/popular")
     suspend fun getUsersLikeContents(
         @Query("size") size: Int,
     ): UsersLikeContentsResponse
 
-    @GET("contents/{contentId}/places")
+    @GET(ApiPath.V1 + "contents/{contentId}/places")
     suspend fun getTrip(
         @Path("contentId") contentId: Long,
     ): ContentPlacesResponse

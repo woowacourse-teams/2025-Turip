@@ -21,10 +21,11 @@ private const val MAX_REGION_COUNT_IN_EACH_ROW = 4
 @Composable
 fun RegionList(
     regions: List<RegionCategory>,
-    onRegionClick: (String) -> Unit,
+    onRegionClick: (regionName: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val rowCount = (regions.lastIndex / MAX_REGION_COUNT_IN_EACH_ROW) + 1
+    val distinctRegions = regions.distinctBy { it.name }
+    val rowCount = (distinctRegions.lastIndex / MAX_REGION_COUNT_IN_EACH_ROW) + 1
     val height = rowCount.times(128.dp)
     LazyVerticalGrid(
         columns = GridCells.Fixed(count = MAX_REGION_COUNT_IN_EACH_ROW),
@@ -34,7 +35,7 @@ fun RegionList(
                 .height(height)
                 .fillMaxWidth(),
     ) {
-        items(regions, key = { it.name }) { regionCategory: RegionCategory ->
+        items(distinctRegions, key = { it.name }) { regionCategory: RegionCategory ->
             RegionItem(
                 region = regionCategory,
                 modifier =

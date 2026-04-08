@@ -1,7 +1,9 @@
 package com.on.turip.di
 
-import com.on.turip.data.bookmarks.service.BookmarkService
-import com.on.turip.data.bookmarks.service.createBookmarkService
+import com.on.turip.data.account.service.AccountService
+import com.on.turip.data.account.service.createAccountService
+import com.on.turip.data.bookmark.service.BookmarkService
+import com.on.turip.data.bookmark.service.createBookmarkService
 import com.on.turip.data.content.service.ContentService
 import com.on.turip.data.content.service.createContentService
 import com.on.turip.data.login.service.AuthService
@@ -14,6 +16,10 @@ import com.on.turip.data.region.service.RegionService
 import com.on.turip.data.region.service.createRegionService
 import com.on.turip.data.turip.service.TuripService
 import com.on.turip.data.turip.service.createTuripService
+import com.on.turip.di.qualifier.DefaultAuthService
+import com.on.turip.di.qualifier.DefaultKtorfit
+import com.on.turip.di.qualifier.NoAuthAuthService
+import com.on.turip.di.qualifier.NoAuthKtorfit
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -26,29 +32,57 @@ import javax.inject.Singleton
 object ServiceModule {
     @Provides
     @Singleton
-    fun provideContentService(ktorfit: Ktorfit): ContentService = ktorfit.createContentService()
+    fun provideContentService(
+        @DefaultKtorfit ktorfit: Ktorfit,
+    ): ContentService = ktorfit.createContentService()
 
     @Provides
     @Singleton
-    fun provideBookmarkService(ktorfit: Ktorfit): BookmarkService = ktorfit.createBookmarkService()
+    fun provideBookmarkService(
+        @DefaultKtorfit ktorfit: Ktorfit,
+    ): BookmarkService = ktorfit.createBookmarkService()
 
     @Provides
     @Singleton
-    fun provideTuripService(ktorfit: Ktorfit): TuripService = ktorfit.createTuripService()
+    fun provideTuripService(
+        @DefaultKtorfit ktorfit: Ktorfit,
+    ): TuripService = ktorfit.createTuripService()
 
     @Provides
     @Singleton
-    fun provideRegionService(ktorfit: Ktorfit): RegionService = ktorfit.createRegionService()
+    fun provideRegionService(
+        @DefaultKtorfit ktorfit: Ktorfit,
+    ): RegionService = ktorfit.createRegionService()
 
     @Provides
     @Singleton
-    fun provideAuthService(ktorfit: Ktorfit): AuthService = ktorfit.createAuthService()
+    @DefaultAuthService
+    fun provideDefaultAuthService(
+        @DefaultKtorfit ktorfit: Ktorfit,
+    ): AuthService = ktorfit.createAuthService()
 
     @Provides
     @Singleton
-    fun provideMemberService(ktorfit: Ktorfit): MemberService = ktorfit.createMemberService()
+    @NoAuthAuthService
+    fun provideNoAuthAuthService(
+        @NoAuthKtorfit ktorfit: Ktorfit,
+    ): AuthService = ktorfit.createAuthService()
 
     @Provides
     @Singleton
-    fun provideGuestService(ktorfit: Ktorfit): GuestService = ktorfit.createGuestService()
+    fun provideMemberService(
+        @DefaultKtorfit ktorfit: Ktorfit,
+    ): MemberService = ktorfit.createMemberService()
+
+    @Provides
+    @Singleton
+    fun provideGuestService(
+        @DefaultKtorfit ktorfit: Ktorfit,
+    ): GuestService = ktorfit.createGuestService()
+
+    @Provides
+    @Singleton
+    fun provideAccountService(
+        @DefaultKtorfit ktorfit: Ktorfit,
+    ): AccountService = ktorfit.createAccountService()
 }

@@ -2,30 +2,20 @@ package turip.favorite.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.IllegalArgumentException;
-import turip.account.domain.Account;
 
 @Getter
 @Entity
-@Table(name = "favorite_folder", uniqueConstraints = {
-        @UniqueConstraint(name = "uq_favorite_folder__account_id_name", columnNames = {"account_id", "name"})
-})
-@AllArgsConstructor
+@Table(name = "favorite_folder")
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class FavoriteFolder {
@@ -35,30 +25,29 @@ public class FavoriteFolder {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "account_id", nullable = false, foreignKey = @ForeignKey(name = "fk_favorite_folder__account"))
-    private Account account;
-
     @Column(name = "name", nullable = false)
     private String name;
 
     @Column(name = "is_default", nullable = false)
     private boolean isDefault;
 
-    private FavoriteFolder(Account account, String name, boolean isDefault) {
-        this.account = account;
+    @Column(name = "is_shared", nullable = false)
+    private boolean isShared;
+
+    private FavoriteFolder(String name, boolean isDefault) {
         this.name = name;
         this.isDefault = isDefault;
+        this.isShared = false;
     }
 
-    public static FavoriteFolder defaultFolderOf(Account account) {
-        return new FavoriteFolder(account, "기본 폴더", true);
+    public static FavoriteFolder defaultFolderOf() {
+        return new FavoriteFolder("기본 폴더", true);
     }
 
-    public static FavoriteFolder customFolderOf(Account account, String name) {
+    public static FavoriteFolder customFolderOf(String name) {
         String formattedName = formatName(name);
         validateName(formattedName);
-        return new FavoriteFolder(account, formattedName, false);
+        return new FavoriteFolder(formattedName, false);
     }
 
     public static String formatName(String unformattedName) {
@@ -74,16 +63,16 @@ public class FavoriteFolder {
         }
     }
 
-    public boolean isOwner(Account account) {
-        return this.account.equals(account);
-    }
-
     public void rename(String newName) {
         validateName(newName);
         this.name = newName;
     }
 
-    public void updateAccount(Account account) {
-        this.account = account;
+    public void convertToSharedFolder() {
+        this.isShared = true;
+    }
+
+    public boolean isSameFolderName(String folderName) {
+        return this.name.equals(folderName);
     }
 }
