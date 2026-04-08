@@ -421,6 +421,24 @@ class TuripDetailViewModel @Inject constructor(
         }
     }
 
+    fun syncMemberCountToCachedTurips() {
+        val turipId = uiState.value.selectedTurip.id
+        if (turipId == INVALID_ID) return
+
+        val currentMembers = uiState.value.members
+        val memberCount =
+            if (currentMembers.isNotEmpty()) {
+                currentMembers.size
+            } else {
+                uiState.value.selectedTurip.memberCount
+            }
+
+        turipRepository.updateCachedTuripMemberCount(
+            turipId = turipId,
+            memberCount = memberCount,
+        )
+    }
+
     fun updateScreenMode(turipPlaceScreenMode: TuripPlaceScreenMode) {
         _uiState.update {
             if (turipPlaceScreenMode == TuripPlaceScreenMode.Edit) {
@@ -568,6 +586,15 @@ class TuripDetailViewModel @Inject constructor(
                     turipRepository
                         .createInvitationToken(selectedTuripId)
                         .onSuccess { token: TuripInvitationToken ->
+                            turipRepository.updateCachedTuripSharedStatus(
+                                turipId = selectedTuripId,
+                                isShared = true,
+                            )
+                            _uiState.update { state ->
+                                state.copy(
+                                    selectedTurip = state.selectedTurip.copy(type = TuripType.TOGETHER),
+                                )
+                            }
                             _uiEffect.send(
                                 TuripDetailUiEffect.ShareTuripInvitationLink(
                                     invitationLink = token.toUrl(),

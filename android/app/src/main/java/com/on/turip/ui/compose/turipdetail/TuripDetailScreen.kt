@@ -84,6 +84,7 @@ fun TuripDetailScreen(
         } else {
             scope.launch {
                 viewModel.flushDeleteQueueAndAwait()
+                viewModel.syncMemberCountToCachedTurips()
                 onBack()
             }
         }
@@ -300,6 +301,7 @@ fun TuripDetailScreen(
                         onBack = {
                             scope.launch {
                                 viewModel.flushDeleteQueueAndAwait()
+                                viewModel.syncMemberCountToCachedTurips()
                                 onBack()
                             }
                         },

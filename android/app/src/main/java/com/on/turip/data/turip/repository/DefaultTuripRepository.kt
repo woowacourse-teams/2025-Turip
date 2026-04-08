@@ -191,4 +191,34 @@ class DefaultTuripRepository @Inject constructor(
 
                 emit(fatalResult)
             }
+
+    override fun updateCachedTuripMemberCount(
+        turipId: Long,
+        memberCount: Int,
+    ) {
+        _turips.update { current ->
+            current.map { turip ->
+                if (turip.id == turipId) {
+                    turip.copy(memberCount = memberCount.coerceAtLeast(0))
+                } else {
+                    turip
+                }
+            }
+        }
+    }
+
+    override fun updateCachedTuripSharedStatus(
+        turipId: Long,
+        isShared: Boolean,
+    ) {
+        _turips.update { current ->
+            current.map { turip ->
+                if (turip.id == turipId) {
+                    turip.copy(isShared = isShared)
+                } else {
+                    turip
+                }
+            }
+        }
+    }
 }
