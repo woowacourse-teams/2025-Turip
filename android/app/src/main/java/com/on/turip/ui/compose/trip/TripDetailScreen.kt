@@ -176,7 +176,7 @@ fun TripDetailScreen(
                 if (event == Lifecycle.Event.ON_RESUME) {
                     val second = viewModel.getCurrentVideoPlaybackSecond()
                     if (uiState.tripDetailInfo.videoLink.isNotEmpty() && second > 0) {
-                        webViewController.seekTo(second)
+                        webViewController.restoreTo(second)
                     }
                 }
             }
