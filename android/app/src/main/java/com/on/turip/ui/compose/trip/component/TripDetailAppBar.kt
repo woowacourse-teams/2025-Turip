@@ -1,6 +1,7 @@
 package com.on.turip.ui.compose.trip.component
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -42,7 +43,10 @@ fun TripDetailAppBar(
             if (!isError && !isLoading) {
                 IconButton(
                     onClick = onBookmarkClick,
-                    modifier = Modifier.size(48.dp),
+                    modifier =
+                        Modifier
+                            .size(48.dp)
+                            .offset(x = 10.dp),
                 ) {
                     Icon(
                         imageVector = bookmarkIcon,
