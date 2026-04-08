@@ -79,6 +79,10 @@
     <string name="turip_place_empty_suggest_title">튜립에 장소를 추가 해보세요!</string>
     <string name="turip_place_empty_suggest_description">장소에 \'내 튜립\' 버튼을 눌러\n마음에 드는 튜립을 만들어 보세요.</string>
 
+    <!-- 튜립 목록 화면 -->
+    <string name="my_turip_together_turip_empty_title">친구와 함께 하는 튜립이 없어요</string>
+    <string name="my_turip_together_turip_empty_description">나홀로 튜립을 링크로 초대해서\n친구와 함께 여행을 떠나보세요.</string>
+
     <!-- 여행 상세 페이지 -->
     <string name="trip_detail_video_error">해당 영상은 제작자의 요청으로 유튜브로만 시청할 수 있습니다.\n클릭 시 유튜브로 이동합니다.</string>
     <string name="trip_detail_day_place_count">일정 %d개</string>
