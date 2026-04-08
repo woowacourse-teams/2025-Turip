@@ -7,6 +7,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -39,14 +40,16 @@ fun TripDetailAppBar(
         },
         end = {
             if (!isError && !isLoading) {
-                Icon(
-                    imageVector = bookmarkIcon,
-                    contentDescription = stringResource(R.string.trip_detail_bookmark_description),
-                    modifier =
-                        Modifier
-                            .clickable(onClick = onBookmarkClick)
-                            .size(28.dp),
-                )
+                IconButton(
+                    onClick = onBookmarkClick,
+                    modifier = Modifier.size(48.dp),
+                ) {
+                    Icon(
+                        imageVector = bookmarkIcon,
+                        contentDescription = stringResource(R.string.trip_detail_bookmark_description),
+                        modifier = Modifier.size(28.dp),
+                    )
+                }
             }
         },
         modifier = modifier,
