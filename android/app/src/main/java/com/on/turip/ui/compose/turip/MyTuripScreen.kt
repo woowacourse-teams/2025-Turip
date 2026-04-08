@@ -1,5 +1,6 @@
 package com.on.turip.ui.compose.turip
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -198,6 +199,10 @@ private fun MyTuripScreenContent(
 ) {
     var selectedTab: MyTuripTab by rememberSaveable { mutableStateOf(MyTuripTab.ALL) }
     var isDeleteMode: Boolean by rememberSaveable { mutableStateOf(false) }
+
+    BackHandler(enabled = isDeleteMode) {
+        isDeleteMode = false
+    }
 
     val filteredTurips by remember(turips, selectedTab) {
         derivedStateOf {
