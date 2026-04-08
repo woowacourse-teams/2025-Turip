@@ -8,15 +8,43 @@ class VideoManager(
     private val webView: WebView,
 ) {
     private var isInitialized = false
+    private var initialSecond: Int = 0
+    private var onTimeUpdateCallback: (Int) -> Unit = {}
+    private var onErrorCallback: () -> Unit = {}
 
     fun loadVideo(
         url: String,
+        initialSecond: Int,
+        onTimeUpdate: (time: Int) -> Unit,
         onError: () -> Unit,
     ) {
+        this.initialSecond = initialSecond.coerceAtLeast(0)
+        this.onTimeUpdateCallback = onTimeUpdate
+        this.onErrorCallback = onError
+
         webView.apply {
             if (!isInitialized) {
                 addJavascriptInterface(
-                    WebViewVideoBridge(TuripUrlConverter.extractVideoId(url)) { onError() },
+                    WebViewVideoBridge(
+                        videoId = TuripUrlConverter.extractVideoId(url),
+                        onPlayerReadyCallback = {
+                            if (this@VideoManager.initialSecond > 0) {
+                                webView.post {
+                                    webView.navigateToTimeLine(this@VideoManager.initialSecond)
+                                }
+                            }
+                        },
+                        onTimeUpdateCallback = { second ->
+                            webView.post {
+                                this@VideoManager.onTimeUpdateCallback(second)
+                            }
+                        },
+                        onErrorCallback = {
+                            webView.post {
+                                this@VideoManager.onErrorCallback()
+                            }
+                        },
+                    ),
                     BRIDGE_NAME_IN_JS_FILE,
                 )
                 isInitialized = true

@@ -94,10 +94,19 @@ class TripDetailWebViewController(
         webView.webChromeClient = webChromeClient
     }
 
-    fun loadVideo(url: String) {
+    fun loadVideo(
+        url: String,
+        initialSecond: Int,
+        onTimeUpdate: (time: Int) -> Unit,
+    ) {
         if (url.isNotEmpty() && url != webView.url) {
             if (isError) isError = false
-            videoManager.loadVideo(url) { isError = true }
+            videoManager.loadVideo(
+                url = url,
+                initialSecond = initialSecond,
+                onTimeUpdate = onTimeUpdate,
+                onError = { isError = true },
+            )
         }
     }
 
