@@ -5,7 +5,6 @@ import com.on.turip.domain.bookmark.TuripPlace
 import com.on.turip.domain.turip.Turip
 import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
 import com.on.turip.ui.compose.turipdetail.model.turip.PlaceLatLngUiModel
-import com.on.turip.ui.compose.turipdetail.model.turip.TuripPlaceUiModel
 import com.on.turip.ui.main.favorite.model.TuripModel
 import com.on.turip.ui.main.favorite.model.TuripPlaceShareModel
 
@@ -35,12 +34,6 @@ fun Turip.toUiModel(): TuripModel =
         placeCount = placeCount,
         isSelected = hasIncludePlace,
         isDefault = isDefault,
-    )
-
-fun TuripPlaceUiModel.toUiModel(): TuripPlaceShareModel =
-    TuripPlaceShareModel(
-        name = name,
-        uri = uri,
     )
 
 fun TuripPlaceModel.toUiModel(): TuripPlaceShareModel =
