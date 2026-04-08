@@ -229,33 +229,20 @@ fun TuripDetailScreen(
 
     if (uiState.showTuripRemoveDialog) {
         val isTogetherTurip = uiState.selectedTurip.type == TuripType.TOGETHER
+        val title =
+            stringResource(if (isTogetherTurip) R.string.bottom_sheet_turip_leave else R.string.bottom_sheet_turip_delete)
+        val message =
+            stringResource(
+                if (isTogetherTurip) R.string.bottom_sheet_turip_leave_title else R.string.bottom_sheet_turip_remove_title,
+                uiState.selectedTurip.name,
+            )
+        val confirmText =
+            stringResource(if (isTogetherTurip) R.string.bottom_sheet_turip_leave_approve else R.string.bottom_sheet_turip_remove_approve)
 
         TuripDialog(
-            title =
-                stringResource(
-                    if (isTogetherTurip) {
-                        R.string.bottom_sheet_turip_leave
-                    } else {
-                        R.string.bottom_sheet_turip_delete
-                    },
-                ),
-            message =
-                stringResource(
-                    if (isTogetherTurip) {
-                        R.string.bottom_sheet_turip_leave_title
-                    } else {
-                        R.string.bottom_sheet_turip_remove_title
-                    },
-                    uiState.selectedTurip.name,
-                ),
-            confirmText =
-                stringResource(
-                    if (isTogetherTurip) {
-                        R.string.bottom_sheet_turip_leave_approve
-                    } else {
-                        R.string.bottom_sheet_turip_remove_approve
-                    },
-                ),
+            title = title,
+            message = message,
+            confirmText = confirmText,
             dismissText = stringResource(R.string.bottom_sheet_turip_remove_cancel),
             confirmButtonColor = TuripTheme.colors.error,
             dismissButtonColor = TuripTheme.colors.gray02,
