@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -89,9 +91,9 @@ private fun SearchHistoryItem(
             modifier = Modifier.size(TuripTheme.spacing.extraExtraLarge),
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_search_cancel),
+                imageVector = Icons.Default.Cancel,
                 contentDescription = "삭제",
-                tint = Color.Unspecified,
+                tint = TuripTheme.colors.gray02,
             )
         }
     }
