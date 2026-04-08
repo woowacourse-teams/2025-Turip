@@ -89,6 +89,7 @@ class Navigator(
                 val parentSubStack: NavBackStack<NavKey> =
                     state.subStacks[topLevelKey]
                         ?: error("Sub stack for $topLevelKey does not exist")
+                parentSubStack.add(topLevelKey)
                 parentSubStack.add(key)
             }
         }
