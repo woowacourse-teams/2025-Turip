@@ -15,6 +15,8 @@ import turip.favorite.repository.dto.FavoriteFolderItemCountResult;
 
 public interface FavoriteFolderAccountRepository extends JpaRepository<FavoriteFolderAccount, Long> {
 
+    List<FavoriteFolderAccount> findByAccount(Account account);
+
     int countByFavoriteFolder(FavoriteFolder favoriteFolder);
 
     @Query("""
