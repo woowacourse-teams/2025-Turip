@@ -77,6 +77,12 @@ public class FavoriteFolderAccountService {
     }
 
     @Transactional
+    public void updateAccount(Account oldAccount, Account newAccount) {
+        List<FavoriteFolderAccount> folders = favoriteFolderAccountRepository.findByAccount(oldAccount);
+        folders.forEach(folder -> folder.updateAccount(newAccount));
+    }
+
+    @Transactional
     public void deleteByFavoriteFolderAndAccount(FavoriteFolder favoriteFolder, Account account) {
         FavoriteFolderAccount favoriteFolderAccount = favoriteFolderAccountRepository.findByFavoriteFolderAndAccount(
                         favoriteFolder, account)

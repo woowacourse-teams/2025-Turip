@@ -38,6 +38,17 @@
         const iframe = event.target.getIframe();
         iframe.setAttribute("referrerpolicy", "strict-origin-when-cross-origin");
         event.target.playVideo();
+        if (window.videoBridge) {
+            window.videoBridge.onPlayerReady();
+        }
+        setInterval(function() {
+            if (player && window.videoBridge && typeof player.getCurrentTime === 'function') {
+                var state = player.getPlayerState();
+                if (state >= 0) {
+                    window.videoBridge.onTimeUpdate(Math.floor(player.getCurrentTime()));
+                }
+            }
+        }, 1000);
     }
 
     function onPlayerError(event) {

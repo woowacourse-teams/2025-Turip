@@ -41,9 +41,11 @@ import com.on.turip.R
 import com.on.turip.domain.turip.TuripType
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.toUiModel
+import com.on.turip.ui.common.model.turip.TuripShareModel
 import com.on.turip.ui.compose.designsystem.component.ErrorScreen
 import com.on.turip.ui.compose.designsystem.component.TuripAppBar
 import com.on.turip.ui.compose.designsystem.component.TuripDialog
+import com.on.turip.ui.compose.designsystem.model.SnackbarIconModel
 import com.on.turip.ui.compose.designsystem.snackbar.LocalSnackbarDelegate
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.trip.model.MapModel
@@ -54,7 +56,6 @@ import com.on.turip.ui.compose.turipdetail.component.TuripInfoRow
 import com.on.turip.ui.compose.turipdetail.component.TuripMapContent
 import com.on.turip.ui.compose.turipdetail.component.TuripPlaces
 import com.on.turip.ui.compose.turipdetail.model.turip.PlaceLatLngUiModel
-import com.on.turip.ui.compose.turipdetail.model.turip.TuripShareModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
@@ -78,11 +79,12 @@ fun TuripDetailScreen(
     val scope = rememberCoroutineScope()
 
     BackHandler {
-        if (uiState.showBottomSheet) {
-            viewModel.dismissBottomSheet()
+        if (uiState.showMoreOptionBottomSheet) {
+            viewModel.dismissMoreOptionBottomSheet()
         } else {
             scope.launch {
                 viewModel.flushDeleteQueueAndAwait()
+                viewModel.syncMemberCountToCachedTurips()
                 onBack()
             }
         }
@@ -100,12 +102,12 @@ fun TuripDetailScreen(
                 }
 
                 is TuripDetailUiEffect.ShareTuripByText -> {
-                    viewModel.dismissBottomSheet()
+                    viewModel.dismissMoreOptionBottomSheet()
                     onShareTuripByText(uiEffect.turipShareModel)
                 }
 
                 is TuripDetailUiEffect.ShareTuripInvitationLink -> {
-                    viewModel.dismissBottomSheet()
+                    viewModel.dismissMoreOptionBottomSheet()
                     onShareTuripInvitationLink(uiEffect.invitationLink)
                 }
 
@@ -129,7 +131,7 @@ fun TuripDetailScreen(
                 }
 
                 TuripDetailUiEffect.TuripUpdated -> {
-                    viewModel.dismissBottomSheet()
+                    viewModel.dismissMoreOptionBottomSheet()
                 }
 
                 is TuripDetailUiEffect.ShowTuripDetailRemoveFailed -> {
@@ -184,7 +186,7 @@ fun TuripDetailScreen(
                     snackbarDelegate.showSnackbar(
                         message = resources.getString(R.string.turip_detail_sse_reconnected),
                         duration = SnackbarDuration.Short,
-                        iconRes = R.drawable.btn_turip_selected,
+                        icon = SnackbarIconModel.Painter(R.drawable.btn_turip_selected),
                         actionLabel = resources.getString(R.string.all_close_description),
                     )
                 }
@@ -206,12 +208,12 @@ fun TuripDetailScreen(
         )
     }
 
-    if (uiState.showBottomSheet) {
+    if (uiState.showMoreOptionBottomSheet) {
         MoreOptionBottomSheet(
             sheetState = modalBottomSheetState,
             isDefault = uiState.selectedTurip.isDefault,
             isTogetherTurip = uiState.selectedTurip.type == TuripType.TOGETHER,
-            onDismiss = viewModel::dismissBottomSheet,
+            onDismiss = viewModel::dismissMoreOptionBottomSheet,
             onShareTuripByTextClick = viewModel::shareTuripByText,
             onShareTuripInvitationLinkClick = viewModel::shareTuripInvitationLink,
             onDeleteClick = viewModel::showTuripRemoveDialog,
@@ -228,39 +230,26 @@ fun TuripDetailScreen(
 
     if (uiState.showTuripRemoveDialog) {
         val isTogetherTurip = uiState.selectedTurip.type == TuripType.TOGETHER
+        val title =
+            stringResource(if (isTogetherTurip) R.string.bottom_sheet_turip_leave else R.string.bottom_sheet_turip_delete)
+        val message =
+            stringResource(
+                if (isTogetherTurip) R.string.bottom_sheet_turip_leave_title else R.string.bottom_sheet_turip_remove_title,
+                uiState.selectedTurip.name,
+            )
+        val confirmText =
+            stringResource(if (isTogetherTurip) R.string.bottom_sheet_turip_leave_approve else R.string.bottom_sheet_turip_remove_approve)
 
         TuripDialog(
-            title =
-                stringResource(
-                    if (isTogetherTurip) {
-                        R.string.bottom_sheet_turip_leave
-                    } else {
-                        R.string.bottom_sheet_turip_delete
-                    },
-                ),
-            message =
-                stringResource(
-                    if (isTogetherTurip) {
-                        R.string.bottom_sheet_turip_leave_title
-                    } else {
-                        R.string.bottom_sheet_turip_remove_title
-                    },
-                    uiState.selectedTurip.name,
-                ),
-            confirmText =
-                stringResource(
-                    if (isTogetherTurip) {
-                        R.string.bottom_sheet_turip_leave_approve
-                    } else {
-                        R.string.bottom_sheet_turip_remove_approve
-                    },
-                ),
+            title = title,
+            message = message,
+            confirmText = confirmText,
             dismissText = stringResource(R.string.bottom_sheet_turip_remove_cancel),
             confirmButtonColor = TuripTheme.colors.error,
             dismissButtonColor = TuripTheme.colors.gray02,
             onConfirmation = {
                 viewModel.deleteTurip()
-                viewModel.dismissBottomSheet()
+                viewModel.dismissMoreOptionBottomSheet()
             },
             onDismissRequest = viewModel::dismissTuripRemoveDialog,
             modifier = Modifier.fillMaxSize(),
@@ -308,10 +297,11 @@ fun TuripDetailScreen(
                             viewModel.applyTuripPlaceDelete(placeId = placeId)
                         },
                         currentPlaceLatLng = uiState.placesLatLng,
-                        onMoreOption = viewModel::showBottomSheet,
+                        onMoreOption = viewModel::showMoreOptionBottomSheet,
                         onBack = {
                             scope.launch {
                                 viewModel.flushDeleteQueueAndAwait()
+                                viewModel.syncMemberCountToCachedTurips()
                                 onBack()
                             }
                         },

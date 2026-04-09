@@ -17,6 +17,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Group
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -77,13 +79,13 @@ fun MoreOptionBottomSheet(
             ),
             MoreOptionItem(
                 title = stringResource(R.string.all_turip_share_by_text),
-                icon = MoreOptionIcon.Resource(R.drawable.ic_text_area),
+                icon = MoreOptionIcon.Vector(Icons.Default.Share),
                 color = TuripTheme.colors.black,
                 onClick = onShareTuripByTextClick,
             ),
             MoreOptionItem(
                 title = stringResource(R.string.all_turip_invite_by_link),
-                icon = MoreOptionIcon.Resource(R.drawable.ic_people_fill),
+                icon = MoreOptionIcon.Vector(Icons.Default.Group),
                 color = TuripTheme.colors.black,
                 onClick = onShareTuripInvitationLinkClick,
                 enabled = !isDefault,

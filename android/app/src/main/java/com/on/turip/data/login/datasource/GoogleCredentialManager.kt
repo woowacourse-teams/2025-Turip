@@ -6,6 +6,7 @@ import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetCredentialResponse
+import androidx.credentials.exceptions.GetCredentialCancellationException
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
 import com.on.turip.core.result.ErrorType
@@ -28,8 +29,9 @@ class GoogleCredentialManager @Inject constructor(
             TuripResult.Success(handleSignIn(googleIdTokenCredential))
         } catch (e: Throwable) {
             if (e is CancellationException) throw e
-            when {
-                e is IOException -> TuripResult.Failure(ErrorType.Network, e)
+            when (e) {
+                is GetCredentialCancellationException -> TuripResult.Failure(ErrorType.Cancelled, e)
+                is IOException -> TuripResult.Failure(ErrorType.Network, e)
                 else -> TuripResult.Failure(ErrorType.Unknown, e)
             }
         }

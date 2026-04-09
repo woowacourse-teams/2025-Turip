@@ -1,7 +1,7 @@
 [versions]
 # App Version
-versionName = "1.3.5"
-versionCode = "137"
+versionName = "1.3.6"
+versionCode = "138"
 
 # Gradle Plugin
 agp = "8.9.1"

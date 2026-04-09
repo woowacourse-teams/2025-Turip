@@ -7,11 +7,10 @@ import com.on.turip.data.login.dto.ReissueTokenRequest
 import com.on.turip.data.login.dto.ReissueTokenResponse
 import de.jensklingenberg.ktorfit.http.Body
 import de.jensklingenberg.ktorfit.http.GET
-import de.jensklingenberg.ktorfit.http.Header
 import de.jensklingenberg.ktorfit.http.POST
 
 interface AuthService {
-    @POST(ApiPath.V1 + "auth/login/google")
+    @POST(ApiPath.V2 + "auth/login/google")
     suspend fun postIdToken(
         @Body loginIdTokenPostRequest: LoginIdTokenPostRequest,
     ): LoginJwtTokenResponse
@@ -22,7 +21,5 @@ interface AuthService {
     ): ReissueTokenResponse
 
     @GET(ApiPath.V1 + "auth/tokens/verification")
-    suspend fun getTokenVerification(
-        @Header("Authorization") token: String,
-    )
+    suspend fun verifyToken()
 }

@@ -1,6 +1,5 @@
 package com.on.turip.ui.compose.designsystem.snackbar
 
-import androidx.annotation.DrawableRes
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
@@ -12,6 +11,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.on.turip.ui.compose.designsystem.component.TuripSnackbarVisuals
+import com.on.turip.ui.compose.designsystem.model.SnackbarIconModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -42,7 +42,7 @@ class SnackbarDelegate(
         duration: SnackbarDuration = SnackbarDuration.Short,
         onDismiss: () -> Unit = {},
         onAction: () -> Unit = {},
-        @DrawableRes iconRes: Int? = null,
+        icon: SnackbarIconModel? = null,
     ) {
         snackbarJob?.cancel()
         val currentJob: Job =
@@ -53,7 +53,7 @@ class SnackbarDelegate(
                         actionLabel = actionLabel,
                         withDismissAction = withDismissAction,
                         duration = duration,
-                        iconRes = iconRes,
+                        icon = icon,
                     )
                 try {
                     snackbarHostState.currentSnackbarData?.dismiss()

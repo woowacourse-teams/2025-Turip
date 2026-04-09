@@ -2,8 +2,8 @@ package com.on.turip.ui.compose.turip.mapper
 
 import com.on.turip.domain.turip.Turip
 import com.on.turip.domain.turip.TuripType
+import com.on.turip.ui.common.model.turip.TuripEditModel
 import com.on.turip.ui.compose.turip.model.MyTuripModel
-import com.on.turip.ui.folder.model.TuripEditModel
 
 fun Turip.toUiMyTuripModel(): MyTuripModel =
     MyTuripModel(

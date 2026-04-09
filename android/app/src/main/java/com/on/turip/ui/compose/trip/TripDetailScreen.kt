@@ -1,12 +1,9 @@
 package com.on.turip.ui.compose.trip
 
 import android.content.res.Resources
-import android.view.View
-import android.view.ViewGroup
-import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.webkit.WebView
-import android.widget.FrameLayout
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,10 +21,16 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -45,15 +48,20 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.on.turip.R
 import com.on.turip.ui.common.error.ErrorUiModel
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.toUiModel
 import com.on.turip.ui.common.model.trip.TripDurationModel
+import com.on.turip.ui.common.model.turip.TuripShareModel
 import com.on.turip.ui.compose.designsystem.component.ErrorScreen
+import com.on.turip.ui.compose.designsystem.component.TuripSnackbarVisuals
+import com.on.turip.ui.compose.designsystem.model.SnackbarIconModel
 import com.on.turip.ui.compose.designsystem.snackbar.LocalSnackbarDelegate
 import com.on.turip.ui.compose.designsystem.snackbar.SnackbarDelegate
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
@@ -71,7 +79,7 @@ import com.on.turip.ui.compose.trip.model.SelectedPlaceModel
 import com.on.turip.ui.compose.trip.model.TripDetailInfoModel
 import com.on.turip.ui.compose.trip.turipselection.PlaceTuripSelectionBottomSheet
 import com.on.turip.ui.compose.trip.webview.VideoManager
-import com.on.turip.ui.compose.turipdetail.model.turip.TuripShareModel
+import com.on.turip.ui.compose.turip.component.TuripAddBottomSheet
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
 
@@ -81,9 +89,9 @@ fun TripDetailScreen(
     contentId: Long,
     navigateToBack: () -> Unit,
     navigateToLogin: () -> Unit,
+    navigateToTuripDetail: (turipId: Long) -> Unit,
     navigateToMap: (mapModel: MapModel) -> Unit,
     navigateToWebViewUrl: (url: String) -> Unit,
-    navigateToAddTurip: () -> Unit,
     navigateToShareTuripByText: (turipShareModel: TuripShareModel) -> Unit,
     navigateToShareTuripInvitationLink: (invitationLink: String) -> Unit,
     viewModel: TripDetailViewModel = hiltViewModel(),
@@ -93,6 +101,7 @@ fun TripDetailScreen(
     val systemBarStyleController = LocalSystemBarStyleController.current
     val context = LocalContext.current
     val resources = LocalResources.current
+    val lifecycleOwner = LocalLifecycleOwner.current
 
     val listState = rememberLazyListState()
 
@@ -103,7 +112,10 @@ fun TripDetailScreen(
         )
 
     val isInitialLoading by remember {
-        derivedStateOf { uiState.isLoading || webViewController.isLoading }
+        derivedStateOf {
+            uiState.isLoading ||
+                (webViewController.isLoading && uiState.tripDetailInfo == TripDetailInfoModel.Idle)
+        }
     }
     val isAtBottom by remember(
         listState,
@@ -122,6 +134,12 @@ fun TripDetailScreen(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var selectedPlace by remember { mutableStateOf<SelectedPlaceModel?>(null) }
     val bottomSheetScope = rememberCoroutineScope()
+
+    val addTuripSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    // PlaceTuripSelectionBottomSheet 용 (바깥 시트)
+    val placeTuripSelectionSnackbarHostState = remember { SnackbarHostState() }
+    // TuripAddBottomSheet 용 (안쪽 시트)
+    val turipAddSnackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
         viewModel.initContentId(contentId)
@@ -145,7 +163,27 @@ fun TripDetailScreen(
     HandleFullScreenWindowLaunchedEffect(isFullScreen = webViewController.isFullScreen)
 
     LaunchedEffect(uiState.tripDetailInfo.videoLink) {
-        webViewController.loadVideo(uiState.tripDetailInfo.videoLink)
+        webViewController.loadVideo(
+            url = uiState.tripDetailInfo.videoLink,
+            initialSecond = viewModel.getCurrentVideoPlaybackSecond(),
+            onTimeUpdate = viewModel::updateVideoPlaybackSecond,
+        )
+    }
+
+    DisposableEffect(lifecycleOwner, uiState.tripDetailInfo.videoLink) {
+        val observer =
+            LifecycleEventObserver { _, event ->
+                if (event == Lifecycle.Event.ON_RESUME) {
+                    val second = viewModel.getCurrentVideoPlaybackSecond()
+                    if (uiState.tripDetailInfo.videoLink.isNotEmpty() && second > 0) {
+                        webViewController.restoreTo(second)
+                    }
+                }
+            }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
     }
 
     LaunchedEffect(Unit) {
@@ -156,6 +194,10 @@ fun TripDetailScreen(
                 resources = resources,
                 navigateToLogin = navigateToLogin,
                 handleErrorRetryRequest = viewModel::handleErrorRetryRequest,
+                addTuripSheetState = addTuripSheetState,
+                dismissAddTuripBottomSheet = viewModel::dismissAddTuripBottomSheet,
+                placeTuripSelectionSnackbarHostState = placeTuripSelectionSnackbarHostState,
+                turipAddSnackbarHostState = turipAddSnackbarHostState,
             )
         }
     }
@@ -202,6 +244,7 @@ fun TripDetailScreen(
             )
             TripDetailAppBar(
                 isError = uiState.errorUiState != ErrorUiState.None,
+                isLoading = isInitialLoading,
                 isBookmarked = uiState.isBookmarked,
                 onBackClick = navigateToBack,
                 onBookmarkClick = {
@@ -231,31 +274,34 @@ fun TripDetailScreen(
                 }
 
                 else -> {
-                    if (!webViewController.isFullScreen) {
-                        TripDetailScreenContent(
-                            uiState = uiState,
-                            listState = listState,
-                            webViewController = webViewController,
-                            onTimeLineClick = webViewController::seekTo,
-                            onMapClick = navigateToMap,
-                            onTuripPlaceClick = viewModel::selectPlace,
-                            onBookmarkClick = {
-                                viewModel.updateBookmark()
-                            },
-                            onErrorVideoClick = { navigateToWebViewUrl(uiState.tripDetailInfo.videoLink) },
-                        )
+                    TripDetailScreenContent(
+                        uiState = uiState,
+                        listState = listState,
+                        webViewController = webViewController,
+                        onTimeLineClick = webViewController::seekTo,
+                        onMapClick = navigateToMap,
+                        onTuripPlaceClick = viewModel::selectPlace,
+                        onBookmarkClick = {
+                            viewModel.updateBookmark()
+                        },
+                        onErrorVideoClick = { navigateToWebViewUrl(uiState.tripDetailInfo.videoLink) },
+                    )
 
+                    if (!webViewController.isFullScreen) {
                         selectedPlace?.let { place ->
                             PlaceTuripSelectionBottomSheet(
                                 sheetState = sheetState,
                                 selectedPlaceModel = place,
+                                snackbarHostState = placeTuripSelectionSnackbarHostState,
                                 onNavigateToLogin = navigateToLogin,
-                                onNavigateToAddTurip = navigateToAddTurip,
+                                onNavigateToAddTurip = { viewModel.showAddTuripBottomSheet() },
+                                onNavigateToTuripDetail = navigateToTuripDetail,
                                 onNavigateToMap = navigateToMap,
                                 onShareTuripByText = navigateToShareTuripByText,
                                 onShareTuripInvitationLink = navigateToShareTuripInvitationLink,
                                 onPlaceTuripChanged = viewModel::updatePlaceTuripSelection,
                                 onDismiss = {
+                                    placeTuripSelectionSnackbarHostState.currentSnackbarData?.dismiss()
                                     bottomSheetScope.launch {
                                         sheetState.hide()
                                         viewModel.clearSelectedPlace()
@@ -264,8 +310,23 @@ fun TripDetailScreen(
                                 },
                             )
                         }
-                    } else {
-                        FullScreenVideo(webViewController.fullScreenVideo)
+
+                        if (uiState.showAddTuripBottomSheet) {
+                            TuripAddBottomSheet(
+                                title = resources.getString(R.string.bottom_sheet_turip_add_title),
+                                turipName = uiState.addTuripInputName,
+                                sheetState = addTuripSheetState,
+                                turipNameStatus = uiState.addTuripNameStatus,
+                                isConfirmEnabled = uiState.addTuripNameStatus.isConfirmEnabled && !uiState.isCreatingTurip,
+                                onNameChanged = viewModel::updateAddTuripInputName,
+                                onConfirmClick = viewModel::addTurip,
+                                onDismiss = {
+                                    turipAddSnackbarHostState.currentSnackbarData?.dismiss()
+                                    viewModel.dismissAddTuripBottomSheet()
+                                },
+                                snackbarHostState = turipAddSnackbarHostState,
+                            )
+                        }
                     }
                 }
             }
@@ -273,23 +334,32 @@ fun TripDetailScreen(
     }
 }
 
-private fun handleUiEffect(
+@OptIn(ExperimentalMaterial3Api::class)
+private suspend fun handleUiEffect(
     uiEffect: TripDetailUiEffect,
     snackbarDelegate: SnackbarDelegate,
+    placeTuripSelectionSnackbarHostState: SnackbarHostState,
+    turipAddSnackbarHostState: SnackbarHostState,
     resources: Resources,
     navigateToLogin: () -> Unit,
     handleErrorRetryRequest: (action: TripDetailRetryAction) -> Unit,
+    addTuripSheetState: SheetState,
+    dismissAddTuripBottomSheet: () -> Unit,
 ) {
     when (uiEffect) {
         is TripDetailUiEffect.ShowBookmarkStatus -> {
             val messageResource: Int =
                 if (uiEffect.isBookmarked) R.string.trip_detail_snackbar_bookmark_save else R.string.trip_detail_snackbar_bookmark_remove
-            val iconResource: Int =
-                if (uiEffect.isBookmarked) R.drawable.btn_bookmark_selected else R.drawable.btn_bookmark_normal
+            val icon: SnackbarIconModel.Vector =
+                if (uiEffect.isBookmarked) {
+                    SnackbarIconModel.Vector(Icons.Default.Bookmark)
+                } else {
+                    SnackbarIconModel.Vector(Icons.Default.BookmarkBorder)
+                }
             snackbarDelegate.showSnackbar(
                 message = resources.getString(messageResource),
                 actionLabel = resources.getString(R.string.all_close_description),
-                iconRes = iconResource,
+                icon = icon,
             )
         }
 
@@ -298,12 +368,14 @@ private fun handleUiEffect(
         }
 
         is TripDetailUiEffect.ShowUpdatedTuripSelectionByPlace -> {
-            val messageResource: Int = R.string.trip_detail_turip_selection_updated
-            val iconResource: Int = R.drawable.btn_turip_selected
             snackbarDelegate.showSnackbar(
-                message = resources.getString(messageResource, uiEffect.placeName),
+                message =
+                    resources.getString(
+                        R.string.trip_detail_turip_selection_updated,
+                        uiEffect.placeName,
+                    ),
                 actionLabel = resources.getString(R.string.all_close_description),
-                iconRes = iconResource,
+                icon = SnackbarIconModel.Painter(R.drawable.btn_turip_selected),
             )
         }
 
@@ -315,6 +387,40 @@ private fun handleUiEffect(
                 actionLabel = resources.getString(uiModel.retryTextRes),
                 duration = SnackbarDuration.Long,
                 onAction = { handleErrorRetryRequest(uiEffect.retryAction) },
+            )
+        }
+
+        is TripDetailUiEffect.ShowAddedError -> {
+            val uiModel: ErrorUiModel =
+                uiEffect.errorUiState.toUiModel() ?: return
+            val result =
+                turipAddSnackbarHostState.showSnackbar(
+                    visuals =
+                        TuripSnackbarVisuals(
+                            message = resources.getString(uiModel.titleRes),
+                            actionLabel = resources.getString(uiModel.retryTextRes),
+                            duration = SnackbarDuration.Long,
+                        ),
+                )
+            if (result == SnackbarResult.ActionPerformed) {
+                handleErrorRetryRequest(uiEffect.retryAction)
+            }
+        }
+
+        is TripDetailUiEffect.TuripAdded -> {
+            addTuripSheetState.hide()
+            dismissAddTuripBottomSheet()
+            placeTuripSelectionSnackbarHostState.showSnackbar(
+                visuals =
+                    TuripSnackbarVisuals(
+                        message =
+                            resources.getString(
+                                R.string.turip_added_snackbar_message,
+                                uiEffect.turipName,
+                            ),
+                        icon = SnackbarIconModel.Painter(R.drawable.btn_turip_selected),
+                        actionLabel = resources.getString(R.string.all_close_description),
+                    ),
             )
         }
     }
@@ -334,7 +440,10 @@ private fun TripDetailScreenContent(
 ) {
     LazyColumn(
         state = listState,
-        modifier = modifier.fillMaxSize().navigationBarsPadding(),
+        modifier =
+            modifier
+                .fillMaxSize()
+                .navigationBarsPadding(),
     ) {
         item {
             CreatorInformation(
@@ -390,26 +499,6 @@ private fun TripDetailScreenContent(
     }
 }
 
-@Composable
-private fun FullScreenVideo(fullScreenVideo: View?) {
-    if (fullScreenVideo == null) return
-    AndroidView(
-        factory = { context ->
-            FrameLayout(context).apply {
-                layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT)
-            }
-        },
-        update = { view: FrameLayout ->
-            if (view.getChildAt(0) == fullScreenVideo) return@AndroidView
-            (fullScreenVideo.parent as? ViewGroup)?.removeView(fullScreenVideo)
-            view.removeAllViews()
-            view.addView(fullScreenVideo)
-        },
-        modifier = Modifier.fillMaxSize(),
-        onRelease = { (fullScreenVideo.parent as? ViewGroup)?.removeView(fullScreenVideo) },
-    )
-}
-
 @Preview(showBackground = true)
 @Composable
 private fun TripContentScreenPreview() {
@@ -460,6 +549,7 @@ private fun TripContentScreenPreview() {
                     webView = webView,
                     videoManager = VideoManager(webView),
                     navigateToWebViewUrl = {},
+                    activity = LocalActivity.current ?: return@TuripTheme,
                 ),
             onTimeLineClick = {},
             onMapClick = {},

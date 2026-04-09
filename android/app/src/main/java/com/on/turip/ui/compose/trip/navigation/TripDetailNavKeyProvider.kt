@@ -9,9 +9,8 @@ import com.on.turip.R
 import com.on.turip.navigation.NavKeyProvider
 import com.on.turip.navigation.Navigator
 import com.on.turip.ui.common.extensions.safeStartActivityWithToast
+import com.on.turip.ui.common.model.turip.TuripShareModel
 import com.on.turip.ui.compose.trip.model.MapModel
-import com.on.turip.ui.compose.turipdetail.model.turip.TuripShareModel
-import com.on.turip.ui.folder.TuripActivity
 import dagger.hilt.android.qualifiers.ActivityContext
 import kotlinx.serialization.modules.PolymorphicModuleBuilder
 import javax.inject.Inject
@@ -28,7 +27,6 @@ class TripDetailNavKeyProvider @Inject constructor(
             navigator = navigator,
             navigateToMap = ::navigateToMap,
             navigateToWebViewUrl = ::navigateToWebViewUrl,
-            navigateToAddTurip = ::navigateToAddTurip,
             navigateToShareTuripByText = ::shareTuripByText,
             navigateToShareTuripInvitationLink = ::shareTuripInvitationLink,
         )
@@ -47,14 +45,6 @@ class TripDetailNavKeyProvider @Inject constructor(
         context.safeStartActivityWithToast(
             intent = intent,
             errorToastMessage = context.getString(R.string.all_snackbar_not_found_video_url),
-        )
-    }
-
-    private fun navigateToAddTurip() {
-        val intent: Intent = TuripActivity.newIntent(context)
-        context.safeStartActivityWithToast(
-            intent = intent,
-            errorToastMessage = context.getString(R.string.all_snackbar_not_found_trip_add),
         )
     }
 

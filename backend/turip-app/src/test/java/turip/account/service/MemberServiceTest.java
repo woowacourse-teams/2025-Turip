@@ -25,8 +25,8 @@ import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.BadRequestException;
 import turip.favorite.domain.FavoriteContent;
 import turip.favorite.repository.FavoriteContentRepository;
-import turip.favorite.repository.FavoriteFolderAccountRepository;
-import turip.favorite.repository.FavoriteFolderRepository;
+import turip.favorite.service.FavoriteFolderAccountService;
+import turip.favorite.service.FavoriteFolderService;
 import turip.util.fixture.AccountFixture;
 import turip.util.fixture.GuestFixture;
 import turip.util.fixture.MemberFixture;
@@ -44,10 +44,10 @@ class MemberServiceTest {
     private FavoriteContentRepository favoriteContentRepository;
 
     @Mock
-    private FavoriteFolderAccountRepository favoriteFolderAccountRepository;
+    private FavoriteFolderService favoriteFolderService;
 
     @Mock
-    private FavoriteFolderRepository favoriteFolderRepository;
+    private FavoriteFolderAccountService favoriteFolderAccountService;
 
     @Mock
     private GuestService guestService;
@@ -120,8 +120,8 @@ class MemberServiceTest {
             memberService.migrate(member, guest);
 
             // then
-            verify(favoriteFolderRepository).deleteDefaultFolderByAccount(memberAccount);
-            verify(favoriteFolderAccountRepository).updateAccount(guestAccount, memberAccount);
+            verify(favoriteFolderService).deleteDefaultFolderByAccount(memberAccount);
+            verify(favoriteFolderAccountService).updateAccount(guestAccount, memberAccount);
         }
 
         @DisplayName("마이그레이션이 완료되면 Guest를 삭제한다")

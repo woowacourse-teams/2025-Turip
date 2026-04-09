@@ -1,7 +1,6 @@
 package com.on.turip.ui.compose.trip.turipselection.component
 
 import androidx.activity.compose.BackHandler
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,6 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Group
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -23,7 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -63,7 +64,7 @@ fun ShareOptionBottomSheet(
             )
 
             ShareOptionRow(
-                iconRes = R.drawable.ic_text_area,
+                icon = Icons.Default.Share,
                 title = stringResource(R.string.all_turip_share_by_text),
                 onClick = onShareByTextClick,
             )
@@ -74,7 +75,7 @@ fun ShareOptionBottomSheet(
             )
 
             ShareOptionRow(
-                iconRes = R.drawable.ic_people_fill,
+                icon = Icons.Default.Group,
                 title = stringResource(R.string.all_turip_invite_by_link),
                 onClick = onInviteLinkClick,
                 enabled = isInviteLinkEnabled,
@@ -108,7 +109,7 @@ private fun ShareOptionCloseButton(
 
 @Composable
 private fun ShareOptionRow(
-    @DrawableRes iconRes: Int,
+    icon: ImageVector,
     title: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -127,7 +128,7 @@ private fun ShareOptionRow(
                 ),
     ) {
         Icon(
-            painter = painterResource(iconRes),
+            imageVector = icon,
             contentDescription = null,
             tint = TuripTheme.colors.black,
             modifier = Modifier.size(18.dp),

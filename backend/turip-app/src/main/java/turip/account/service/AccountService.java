@@ -13,16 +13,14 @@ import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.InternalServerException;
 import turip.common.exception.custom.NotFoundException;
 import turip.favorite.repository.FavoriteContentRepository;
-import turip.favorite.repository.FavoriteFolderRepository;
 import turip.favorite.service.FavoriteFolderService;
 
 @Service
 @RequiredArgsConstructor
-public class AccountService { 
+public class AccountService {
 
     private final AccountRepository accountRepository;
     private final FavoriteContentRepository favoriteContentRepository;
-    private final FavoriteFolderRepository favoriteFolderRepository;
     private final FavoriteFolderService favoriteFolderService;
     private final AccountInsertRepository accountInsertRepository;
 
@@ -51,7 +49,7 @@ public class AccountService {
     @Transactional
     public void deleteAccountAndFavorites(Account account) {
         favoriteContentRepository.deleteByAccount(account);
-        favoriteFolderRepository.deletePersonalFoldersByAccount(account);
+        favoriteFolderService.deletePersonalFoldersByAccount(account);
         accountRepository.delete(account);
     }
 }

@@ -42,7 +42,7 @@ import com.on.turip.ui.compose.home.component.RegionList
 import com.on.turip.ui.compose.home.component.RegionTypeButtons
 import com.on.turip.ui.compose.home.component.SearchTextField
 import com.on.turip.ui.compose.home.component.UsersLikeList
-import com.on.turip.ui.main.home.model.UsersLikeContentModel
+import com.on.turip.ui.compose.home.model.UsersLikeContentModel
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -174,6 +174,7 @@ private fun HomeScreenContent(
                 RegionList(
                     regions = uiState.regionCategories,
                     onRegionClick = onRegionClick,
+                    modifier = Modifier.padding(bottom = TuripTheme.spacing.large),
                 )
             }
         }

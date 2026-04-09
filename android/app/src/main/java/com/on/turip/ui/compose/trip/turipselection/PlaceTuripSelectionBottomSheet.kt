@@ -1,11 +1,13 @@
 package com.on.turip.ui.compose.trip.turipselection
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -13,6 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalResources
@@ -27,7 +30,9 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.on.turip.R
 import com.on.turip.ui.common.error.ErrorUiModel
 import com.on.turip.ui.common.error.toUiModel
+import com.on.turip.ui.common.model.turip.TuripShareModel
 import com.on.turip.ui.compose.designsystem.component.TuripDialog
+import com.on.turip.ui.compose.designsystem.component.TuripSnackbar
 import com.on.turip.ui.compose.designsystem.snackbar.LocalSnackbarDelegate
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.trip.model.MapModel
@@ -35,7 +40,6 @@ import com.on.turip.ui.compose.trip.model.SelectedPlaceModel
 import com.on.turip.ui.compose.trip.turipselection.component.PlaceTuripSelectionContent
 import com.on.turip.ui.compose.trip.turipselection.component.ShareOptionBottomSheet
 import com.on.turip.ui.compose.trip.turipselection.component.TuripsContent
-import com.on.turip.ui.compose.turipdetail.model.turip.TuripShareModel
 import kotlinx.collections.immutable.persistentListOf
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -43,8 +47,10 @@ import kotlinx.collections.immutable.persistentListOf
 fun PlaceTuripSelectionBottomSheet(
     sheetState: SheetState,
     selectedPlaceModel: SelectedPlaceModel,
+    snackbarHostState: SnackbarHostState,
     onNavigateToLogin: () -> Unit,
     onNavigateToAddTurip: () -> Unit,
+    onNavigateToTuripDetail: (turipId: Long) -> Unit,
     onNavigateToMap: (mapModel: MapModel) -> Unit,
     onShareTuripByText: (shareModel: TuripShareModel) -> Unit,
     onShareTuripInvitationLink: (invitationLink: String) -> Unit,
@@ -65,6 +71,7 @@ fun PlaceTuripSelectionBottomSheet(
     val placeId = selectedPlaceModel.placeId
     val placeName = selectedPlaceModel.placeName
     val isTuripsMode = uiState.screenMode is PlaceTuripSelectionScreenMode.Turips
+
     LaunchedEffect(lifecycleOwner, placeId, isTuripsMode) {
         if (!isTuripsMode) return@LaunchedEffect
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
@@ -178,25 +185,28 @@ fun PlaceTuripSelectionBottomSheet(
         val density = LocalDensity.current
         val bottomSheetHeight = with(density) { windowInfo.containerSize.height.toDp() * 0.8f }
 
-        PlaceTuripSelectionContent(
-            uiState = uiState,
-            onBackFromTuripDetail = viewModel::onTuripDetailBack,
-            onDismissRequest = viewModel::requestDismiss,
-            onAddTuripClick = onNavigateToAddTurip,
-            onTuripPlaceClickAtTurips = viewModel::updateTurip,
-            onNavigateToTurip = viewModel::loadPlacesInSelectTurip,
-            onConfirmClick = viewModel::updateTuripsByPlace,
-            onMapClick = onNavigateToMap,
-            onTuripPlaceClickAtTuripDetail = viewModel::applyTuripPlaceDelete,
-            onShareClick = { showShareOptionSheet = true },
-            onDragStart = viewModel::onDragStart,
-            onDragPlace = viewModel::onDragMove,
-            onDragEnd = viewModel::onDragEnd,
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .height(bottomSheetHeight),
-        )
+        Box(modifier = Modifier.fillMaxWidth().height(bottomSheetHeight)) {
+            PlaceTuripSelectionContent(
+                uiState = uiState,
+                onBackFromTuripDetail = viewModel::onTuripDetailBack,
+                onDismissRequest = viewModel::requestDismiss,
+                onAddTuripClick = onNavigateToAddTurip,
+                onTuripPlaceClickAtTurips = viewModel::updateTurip,
+                onNavigateToTurip = onNavigateToTuripDetail,
+                onConfirmClick = viewModel::updateTuripsByPlace,
+                onMapClick = onNavigateToMap,
+                onTuripPlaceClickAtTuripDetail = viewModel::applyTuripPlaceDelete,
+                onShareClick = { showShareOptionSheet = true },
+                onDragStart = viewModel::onDragStart,
+                onDragPlace = viewModel::onDragMove,
+                onDragEnd = viewModel::onDragEnd,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            TuripSnackbar(
+                snackbarHostState = snackbarHostState,
+                modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth(),
+            )
+        }
     }
 
     if (showShareOptionSheet) {

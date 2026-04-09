@@ -40,6 +40,7 @@ public enum ErrorTag {
     ACCOUNT_NOT_FOUND("계정을 찾을 수 없습니다."),
     CONTENT_NOT_FOUND("컨텐츠를 찾을 수 없습니다."),
     FAVORITE_FOLDER_NOT_FOUND("찜폴더를 찾을 수 없습니다."),
+    DEFAULT_FOLDER_NOT_FOUND("기본 찜폴더를 찾을 수 없습니다."),
     PLACE_NOT_FOUND("장소를 찾을 수 없습니다."),
     FAVORITE_PLACE_NOT_FOUND("찜한 장소를 찾을 수 없습니다."),
     CREATOR_NOT_FOUND("크리에이터를 찾을 수 없습니다."),

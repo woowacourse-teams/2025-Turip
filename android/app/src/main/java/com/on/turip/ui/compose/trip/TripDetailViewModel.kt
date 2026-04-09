@@ -9,23 +9,30 @@ import com.on.turip.core.result.onSuccess
 import com.on.turip.domain.bookmark.usecase.UpdateBookmarkUseCase
 import com.on.turip.domain.content.Content
 import com.on.turip.domain.content.repository.ContentRepository
+import com.on.turip.domain.session.SessionManager
 import com.on.turip.domain.trip.ContentPlace
 import com.on.turip.domain.trip.Trip
+import com.on.turip.domain.turip.repository.TuripRepository
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.common.mapper.toUiModel
+import com.on.turip.ui.common.model.namestatus.TuripNameStatusModel
 import com.on.turip.ui.compose.trip.model.PlaceModel
 import com.on.turip.ui.compose.trip.model.SelectedPlaceModel
 import com.on.turip.ui.compose.trip.model.TripDetailInfoModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -36,6 +43,8 @@ import javax.inject.Inject
 class TripDetailViewModel @Inject constructor(
     private val contentRepository: ContentRepository,
     private val updateBookmarkUseCase: UpdateBookmarkUseCase,
+    private val turipRepository: TuripRepository,
+    private val sessionManager: SessionManager,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<TripDetailUiState> =
         MutableStateFlow(TripDetailUiState.IDLE)
@@ -45,11 +54,47 @@ class TripDetailViewModel @Inject constructor(
     val uiEffect: Flow<TripDetailUiEffect> = _uiEffect.receiveAsFlow()
 
     private var contentId: Long = INVALID_ID
+    private var videoPlaybackSecond: Int = 0
+    private var confirmedBookmarked: Boolean = false
+    private val bookmarkClickFlow = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+
+    init {
+        handleBookmarkActions()
+    }
+
+    @OptIn(FlowPreview::class)
+    private fun handleBookmarkActions() {
+        viewModelScope.launch {
+            bookmarkClickFlow
+                .debounce(BOOKMARK_DEBOUNCE_MS)
+                .collect {
+                    val targetBookmarked = uiState.value.isBookmarked
+                    updateBookmarkUseCase(targetBookmarked, contentId)
+                        .onSuccess {
+                            Timber.d("북마크 업데이트 API 성공")
+                            confirmedBookmarked = targetBookmarked
+                            _uiEffect.send(TripDetailUiEffect.ShowBookmarkStatus(targetBookmarked))
+                        }.onFailure { errorType: ErrorType ->
+                            _uiState.update { it.copy(isBookmarked = confirmedBookmarked) }
+                            sendErrorEffect(errorType, TripDetailRetryAction.UpdateBookmark)
+                            Timber.e("북마크 업데이트 API 실패")
+                        }
+                }
+        }
+    }
 
     fun initContentId(contentId: Long) {
+        if (this.contentId == contentId) return
         this.contentId = contentId
+        videoPlaybackSecond = 0
         loadTripDetails()
     }
+
+    fun updateVideoPlaybackSecond(second: Int) {
+        videoPlaybackSecond = second.coerceAtLeast(0)
+    }
+
+    fun getCurrentVideoPlaybackSecond(): Int = videoPlaybackSecond
 
     fun loadTripDetails() {
         if (contentId == INVALID_ID) return
@@ -99,7 +144,7 @@ class TripDetailViewModel @Inject constructor(
                             placeTotalCount = trip.tripPlaceCount,
                             duration = trip.tripDuration.toUiModel(),
                         ),
-                    isBookmarked = content.isBookmarked,
+                    isBookmarked = content.isBookmarked.also { confirmedBookmarked = it },
                     selectedPlaceModel = null,
                 )
             }
@@ -109,44 +154,8 @@ class TripDetailViewModel @Inject constructor(
     }
 
     fun updateBookmark() {
-        val updateBookmark = !uiState.value.isBookmarked
-        viewModelScope.launch {
-            updateBookmarkUseCase(updateBookmark, contentId)
-                .onSuccess {
-                    Timber.d("북마크 업데이트 API 성공")
-                    _uiState.update { it.copy(isBookmarked = updateBookmark) }
-                    _uiEffect.send(TripDetailUiEffect.ShowBookmarkStatus(updateBookmark))
-                }.onFailure { errorType: ErrorType ->
-                    _uiState.update { it.copy(isLoading = false) }
-                    val uiError: UiError = errorType.toUiError()
-                    if (uiError is UiError.Global) {
-                        when (uiError) {
-                            UiError.Global.Network -> {
-                                _uiEffect.send(
-                                    TripDetailUiEffect.ShowError(
-                                        ErrorUiState.Network,
-                                        TripDetailRetryAction.UpdateBookmark,
-                                    ),
-                                )
-                            }
-
-                            UiError.Global.Server -> {
-                                _uiEffect.send(
-                                    TripDetailUiEffect.ShowError(
-                                        ErrorUiState.Server,
-                                        TripDetailRetryAction.UpdateBookmark,
-                                    ),
-                                )
-                            }
-
-                            UiError.Global.TokenExpired -> {
-                                _uiEffect.send(TripDetailUiEffect.NavigateToLogin)
-                            }
-                        }
-                    }
-                    Timber.d("북마크 업데이트 API 실패")
-                }
-        }
+        _uiState.update { it.copy(isBookmarked = !it.isBookmarked) }
+        bookmarkClickFlow.tryEmit(Unit)
     }
 
     fun updatePlaceTuripSelection(
@@ -207,19 +216,127 @@ class TripDetailViewModel @Inject constructor(
 
                 UiError.Global.TokenExpired -> {
                     _uiState.update { it.copy(isLoading = false) }
+                    sessionManager.switchToGuest()
                     _uiEffect.send(TripDetailUiEffect.NavigateToLogin)
                 }
             }
         }
     }
 
+    fun showAddTuripBottomSheet() = _uiState.update { it.copy(showAddTuripBottomSheet = true) }
+
+    fun dismissAddTuripBottomSheet() =
+        _uiState.update {
+            if (it.isCreatingTurip) {
+                it.copy(showAddTuripBottomSheet = false)
+            } else {
+                it.copy(
+                    showAddTuripBottomSheet = false,
+                    addTuripInputName = "",
+                    addTuripNameStatus = TuripNameStatusModel.EMPTY,
+                )
+            }
+        }
+
+    fun updateAddTuripInputName(name: String) {
+        if (name.length > MAX_NAME_LENGTH) return
+        val status = TuripNameStatusModel.of(name, persistentListOf())
+        _uiState.update {
+            it.copy(
+                addTuripInputName = name,
+                addTuripNameStatus = status,
+            )
+        }
+    }
+
+    fun addTurip() {
+        val currentState = _uiState.value
+        if (currentState.isCreatingTurip || !currentState.addTuripNameStatus.isConfirmEnabled) return
+        _uiState.update { it.copy(isCreatingTurip = true) }
+        val name = currentState.addTuripInputName
+        viewModelScope.launch {
+            turipRepository
+                .createTurip(name)
+                .onSuccess {
+                    _uiState.update { it.copy(isCreatingTurip = false) }
+                    _uiEffect.send(TripDetailUiEffect.TuripAdded(name))
+                }.onFailure { errorType: ErrorType ->
+                    if (errorType == ErrorType.Turip.DuplicatedName) {
+                        _uiState.update {
+                            it.copy(
+                                isCreatingTurip = false,
+                                addTuripNameStatus = TuripNameStatusModel.DUPLICATE_NAME,
+                            )
+                        }
+                    } else {
+                        _uiState.update { it.copy(isCreatingTurip = false) }
+                        sendErrorEffect(errorType, TripDetailRetryAction.AddTurip)
+                    }
+                }
+        }
+    }
+
     fun handleErrorRetryRequest(action: TripDetailRetryAction) {
         when (action) {
             TripDetailRetryAction.UpdateBookmark -> updateBookmark()
+            TripDetailRetryAction.AddTurip -> addTurip()
+        }
+    }
+
+    private suspend fun sendErrorEffect(
+        errorType: ErrorType,
+        retryAction: TripDetailRetryAction,
+    ) {
+        val uiError: UiError = errorType.toUiError()
+        if (uiError is UiError.Global) {
+            when (uiError) {
+                UiError.Global.Network -> {
+                    if (retryAction is TripDetailRetryAction.AddTurip) {
+                        _uiEffect.send(
+                            TripDetailUiEffect.ShowAddedError(
+                                ErrorUiState.Network,
+                                retryAction,
+                            ),
+                        )
+                    } else {
+                        _uiEffect.send(
+                            TripDetailUiEffect.ShowError(
+                                ErrorUiState.Network,
+                                retryAction,
+                            ),
+                        )
+                    }
+                }
+
+                UiError.Global.Server -> {
+                    if (retryAction is TripDetailRetryAction.AddTurip) {
+                        _uiEffect.send(
+                            TripDetailUiEffect.ShowAddedError(
+                                ErrorUiState.Server,
+                                retryAction,
+                            ),
+                        )
+                    } else {
+                        _uiEffect.send(
+                            TripDetailUiEffect.ShowError(
+                                ErrorUiState.Server,
+                                retryAction,
+                            ),
+                        )
+                    }
+                }
+
+                UiError.Global.TokenExpired -> {
+                    _uiEffect.send(TripDetailUiEffect.NavigateToLogin)
+                }
+            }
         }
     }
 
     private companion object {
+        private const val MAX_NAME_LENGTH = 20
+
         private const val INVALID_ID = -1L
+        private const val BOOKMARK_DEBOUNCE_MS = 500L
     }
 }

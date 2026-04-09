@@ -20,6 +20,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -112,7 +114,7 @@ private fun Header(
                 modifier = Modifier.size(40.dp),
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.btn_chevron_left),
+                    imageVector = Icons.Default.ChevronLeft,
                     contentDescription = stringResource(R.string.all_back_description),
                     tint = TuripTheme.colors.gray03,
                 )
