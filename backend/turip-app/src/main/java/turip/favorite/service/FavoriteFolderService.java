@@ -220,9 +220,9 @@ public class FavoriteFolderService {
     }
 
     @Transactional
-    public void deletePersonalFoldersByAccount(Account account) {
-        List<FavoriteFolder> personalFolders = favoriteFolderRepository.findPersonalFoldersByAccount(account);
-        for (FavoriteFolder personalFolder : personalFolders) {
+    public void deleteAloneFoldersByAccount(Account account) {
+        List<FavoriteFolder> aloneFolders = favoriteFolderRepository.findAloneFoldersByAccount(account);
+        for (FavoriteFolder personalFolder : aloneFolders) {
             deleteFavoriteFolderWithAssociations(account, personalFolder);
         }
     }

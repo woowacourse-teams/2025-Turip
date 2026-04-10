@@ -34,8 +34,9 @@ public interface FavoriteFolderRepository extends JpaRepository<FavoriteFolder, 
 
     @Query("SELECT ff FROM FavoriteFolder ff " +
             "JOIN FavoriteFolderAccount ffa ON ffa.favoriteFolder = ff " +
-            "WHERE ffa.account = :account AND ff.isShared = false")
-    List<FavoriteFolder> findPersonalFoldersByAccount(@Param("account") Account account);
+            "WHERE ffa.account = :account " +
+            "AND (SELECT COUNT(ffa2) FROM FavoriteFolderAccount ffa2 WHERE ffa2.favoriteFolder = ff) = 1")
+    List<FavoriteFolder> findAloneFoldersByAccount(@Param("account") Account account);
 
     @Query("SELECT ff FROM FavoriteFolder ff " +
             "JOIN FavoriteFolderAccount ffa ON ffa.favoriteFolder = ff " +
