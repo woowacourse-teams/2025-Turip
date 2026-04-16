@@ -12,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
+import turip.util.helper.TestDataHelper;
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -23,29 +24,14 @@ class DomesticRegionCategoryPagingApiTest {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    @Autowired
+    private TestDataHelper testDataHelper;
+
     @BeforeEach
     void setUp() {
-        jdbcTemplate.update("DELETE FROM content_place");
-        jdbcTemplate.update("DELETE FROM place_category");
-        jdbcTemplate.update("DELETE FROM place");
-        jdbcTemplate.update("DELETE FROM favorite_content");
-        jdbcTemplate.update("DELETE FROM content");
-        jdbcTemplate.update("DELETE FROM creator");
-        jdbcTemplate.update("DELETE FROM city");
-        jdbcTemplate.update("DELETE FROM country");
-        jdbcTemplate.update("DELETE FROM province");
+        testDataHelper.cleanDatabase();
 
-        jdbcTemplate.update("ALTER TABLE place_category ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE content_place ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE place ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE favorite_content ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE content ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE creator ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE city ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE country ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE province ALTER COLUMN id RESTART WITH 1");
-
-        // 크리에이터, 도시 데이터 설정 
+        // 크리에이터, 도시 데이터 설정
         jdbcTemplate.update(
                 "INSERT INTO creator (profile_image, channel_name) VALUES ('https://image.example.com/creator1.jpg', 'TravelMate')");
         jdbcTemplate.update(

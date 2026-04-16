@@ -22,6 +22,7 @@ import org.hibernate.type.SqlTypes;
 import turip.account.domain.Account;
 import turip.common.domain.BaseTimeEntity;
 import turip.common.exception.ErrorTag;
+import turip.common.exception.custom.IllegalArgumentException;
 import turip.common.exception.custom.IllegalStateException;
 
 @Getter
@@ -89,6 +90,7 @@ public class ContentPending extends BaseTimeEntity {
 
     public void reject(Account validatorAccount, String rejectReason) {
         validateStatusNotApproved();
+        validateRejectReason(rejectReason);
 
         this.status = ContentPendingStatus.REJECTED;
         this.validatorAccount = validatorAccount;
@@ -98,6 +100,12 @@ public class ContentPending extends BaseTimeEntity {
     private void validateStatusNotApproved() {
         if (this.status == ContentPendingStatus.APPROVED) {
             throw new IllegalStateException(ErrorTag.IS_ALREADY_APPROVED);
+        }
+    }
+
+    private void validateRejectReason(String rejectReason) {
+        if (rejectReason == null || rejectReason.isBlank()) {
+            throw new IllegalArgumentException(ErrorTag.REJECT_REASON_REQUIRED);
         }
     }
 }
