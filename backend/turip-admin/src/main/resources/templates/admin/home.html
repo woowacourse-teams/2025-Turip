@@ -1,131 +1,324 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>관리자 메인 - Turip</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: #f5f5f5;
+            font-family: 'Pretendard', -apple-system, sans-serif;
+            background: linear-gradient(135deg, #becdfd, #ffffff);
             min-height: 100vh;
         }
 
         .header {
             background: white;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            padding: 20px 40px;
+            padding: 15px 40px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
         }
 
         .header h1 {
             color: #667eea;
-            font-size: 24px;
+            font-size: 22px;
+            font-weight: 800;
+            margin: 0;
         }
 
-        .logout-btn {
-            padding: 10px 20px;
-            background: #667eea;
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .notification-container { position: relative; }
+
+        .notification-bell {
+            position: relative;
+            font-size: 22px;
+            color: #667eea;
+            cursor: pointer;
+            transition: transform 0.2s;
+            padding: 5px;
+        }
+
+        .notification-bell:hover { transform: scale(1.1); }
+
+        .badge {
+            position: absolute;
+            top: 0;
+            right: -2px;
+            background: #ff4d4f;
             color: white;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 10px;
+            border: 2px solid white;
+            display: none;
+        }
+
+        .notification-dropdown {
+            position: absolute;
+            top: calc(100% + 12px);
+            right: 0;
+            width: 300px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            display: none;
+            z-index: 1100;
+            overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .notification-dropdown.active {
+            display: block;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .dropdown-header {
+            padding: 12px 18px;
+            font-weight: 700;
+            border-bottom: 1px solid #eee;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .dropdown-body { max-height: 300px; overflow-y: auto; }
+
+        .notif-item {
+            padding: 12px 18px;
+            display: flex;
+            flex-direction: column;
+            text-decoration: none;
+            color: #444;
+            border-bottom: 1px solid #f8f8f8;
+        }
+
+        .notif-item:hover { background: #f1f4ff; }
+
+        .notif-title {
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .notif-user { font-size: 11px; color: #999; }
+
+        .dropdown-footer { padding: 10px; text-align: center; background: #fafafa; }
+
+        .btn-all {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .empty-state { padding: 30px; text-align: center; color: #ccc; font-size: 13px; }
+
+        .mypage-btn {
+            font-size: 22px;
+            color: #667eea;
+            text-decoration: none;
+            transition: transform 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        .mypage-btn:hover { transform: scale(1.1); }
+
+        .logout-btn {
+            padding: 8px 18px;
+            background: #f1f3f9;
+            color: #555;
             border: none;
             border-radius: 6px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: all 0.3s;
         }
 
-        .logout-btn:hover {
-            background: #5568d3;
-        }
+        .logout-btn:hover { background: #e2e8f0; color: #333; }
 
         .main-content {
-            max-width: 1200px;
-            margin: 40px auto;
+            max-width: 900px;
+            margin: 100px auto 40px;
             padding: 0 20px;
         }
 
         .welcome-card {
             background: white;
-            border-radius: 12px;
-            padding: 40px;
+            border-radius: 20px;
+            padding: 50px;
             text-align: center;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         }
 
-        .welcome-card h2 {
-            color: #333;
-            font-size: 28px;
-            margin-bottom: 16px;
-        }
+        .welcome-card h2 { color: #333; font-size: 28px; margin-bottom: 10px; }
+        .welcome-card p { color: #888; margin-bottom: 35px; }
 
-        .welcome-card p {
-            color: #666;
-            font-size: 16px;
-            margin-bottom: 30px;
-        }
+        .btn-group { display: flex; gap: 15px; justify-content: center; }
 
         .action-btn {
-            padding: 14px 30px;
-            background: #667eea;
-            color: white;
+            padding: 16px 32px;
             border: none;
-            border-radius: 6px;
+            border-radius: 12px;
             font-size: 16px;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
         }
 
-        .action-btn:hover {
+        .btn-collect { background: #667eea; color: white; }
+
+        .btn-collect:hover {
             background: #5568d3;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
         }
+
+        .btn-pending { background: #fff; color: #667eea; border: 2px solid #667eea; }
+
+        .btn-pending:hover { background: #f8faff; transform: translateY(-3px); }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>Turip 관리자</h1>
+
+<div class="header">
+    <h1>Turip Admin</h1>
+    <div class="header-right">
+        <div class="notification-container">
+            <div class="notification-bell" id="bellIcon">
+                <i class="fa-solid fa-bell"></i>
+                <span class="badge" id="pendingBadge">0</span>
+            </div>
+            <div class="notification-dropdown" id="notifDropdown">
+                <div class="dropdown-header">최신 검수 요청</div>
+                <div class="dropdown-body" id="notifList">
+                    <div class="empty-state">내역이 없습니다.</div>
+                </div>
+                <div class="dropdown-footer">
+                    <a class="btn-all" href="/admin/contents/pending">전체 보기</a>
+                </div>
+            </div>
+        </div>
+
+        <a class="mypage-btn" href="/admin/my" title="마이페이지">
+            <i class="fa-solid fa-circle-user"></i>
+        </a>
+
         <button class="logout-btn" onclick="logout()">로그아웃</button>
     </div>
+</div>
 
-    <div class="main-content">
-        <div class="welcome-card">
-            <h2>환영합니다!</h2>
-            <p>Turip 관리자 페이지입니다.</p>
-            <button class="action-btn" onclick="location.href='/admin/contents'">콘텐츠 수집</button>
+<div class="main-content">
+    <div class="welcome-card">
+        <h2>반갑습니다, <span style="color:#667eea;" th:text="${admin.member.account.nickname}">관리자</span>님! 👋</h2>
+        <p>오늘도 새로운 여행 콘텐츠를 수집해볼까요?</p>
+        <div class="btn-group">
+            <a class="action-btn btn-collect" href="/admin/contents">
+                <i class="fa-solid fa-plus"></i> 콘텐츠 수집하기
+            </a>
+            <a class="action-btn btn-pending" href="/admin/contents/pending">
+                <i class="fa-solid fa-list-check"></i> 검수 대기 목록
+            </a>
         </div>
     </div>
+</div>
 
 <script>
-    async function logout() {
-        try {
-            // 서버에 로그아웃 요청 (RefreshToken 삭제 + 쿠키 무효화)
-            const response = await fetch('/api/v1/auth/logout', {
-                method: 'POST',
-                headers: {
-                    'device-fid': 'admin-web'
-                },
-                credentials: 'include'  // 쿠키 자동 전송
-            });
+    const bellIcon = document.getElementById('bellIcon');
+    const notifDropdown = document.getElementById('notifDropdown');
 
-                // 성공 여부와 관계없이 로그인 페이지로 리다이렉트
-                window.location.href = '/admin/login';
-            } catch (error) {
-                console.error('로그아웃 중 오류:', error);
-                // 오류가 발생해도 로그인 페이지로 이동
-                window.location.href = '/admin/login';
-            }
+    bellIcon.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isActive = notifDropdown.classList.toggle('active');
+        if (isActive) fetchRecentPending();
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!notifDropdown.contains(e.target) && e.target !== bellIcon) {
+            notifDropdown.classList.remove('active');
         }
-    </script>
+    });
+
+    async function fetchRecentPending() {
+        try {
+            const res = await fetch('/api/v1/admin/content-pendings/list');
+            const list = await res.json();
+            const container = document.getElementById('notifList');
+
+            if (!list || list.length === 0) {
+                container.innerHTML = '<div class="empty-state">새로운 요청이 없습니다.</div>';
+                return;
+            }
+
+            container.innerHTML = list.slice(0, 5).map(item => `
+                <a href="/admin/contents/pending/${item.id}" class="notif-item">
+                    <span class="notif-title">${item.videoTitle}</span>
+                    <span class="notif-user">${item.collectorNickname}님의 요청</span>
+                </a>
+            `).join('');
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    async function updatePendingCount() {
+        try {
+            const res = await fetch('/api/v1/admin/content-pendings/list');
+            const list = await res.json();
+            const badge = document.getElementById('pendingBadge');
+            if (list.length > 0) {
+                badge.innerText = list.length > 99 ? '99+' : list.length;
+                badge.style.display = 'block';
+            } else {
+                badge.style.display = 'none';
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        updatePendingCount();
+        setInterval(updatePendingCount, 60000);
+    });
+
+    async function logout() {
+        if (!confirm('로그아웃 하시겠습니까?')) return;
+        try {
+            await fetch('/api/v1/auth/logout', {
+                method: 'POST',
+                headers: {'device-fid': 'admin-web'},
+                credentials: 'include'
+            });
+        } catch (e) {}
+        window.location.href = '/admin/login';
+    }
+</script>
 </body>
 </html>

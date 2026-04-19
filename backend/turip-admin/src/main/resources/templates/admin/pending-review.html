@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Turip Admin - 상세 검수</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+        body {
+            background: linear-gradient(135deg, #becdfd, #ffffff);
+            min-height: 100vh;
+            padding-bottom: 60px;
+            font-family: 'Pretendard', sans-serif;
+        }
+
+        .header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        /* 카드 UI (수집 페이지와 동일한 둥근 모서리 및 그림자) */
+        .admin-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-bottom: 25px;
+            border: none;
+        }
+
+        .section-title {
+            font-weight: 800;
+            color: #333;
+            margin-bottom: 25px;
+            border-left: 5px solid #6e8efb;
+            padding-left: 15px;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+        }
+
+        /* 장소 리스트 스타일 */
+        .place-item {
+            background: #f8faff;
+            border: 1px solid #edf2f7;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: 0.2s;
+        }
+        .place-item:hover { border-color: #6e8efb; transform: translateX(5px); }
+
+        .day-badge {
+            background: #6e8efb;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            display: inline-block;
+        }
+
+        /* 우측 정보 테이블 스타일 */
+        .info-table { width: 100%; border-top: 1px solid #f0f0f0; }
+        .info-table td { padding: 12px 0; border-bottom: 1px solid #f0f0f0; font-size: 14px; }
+        .info-label { color: #888; width: 80px; }
+        .info-value { text-align: right; font-weight: 700; color: #333; }
+
+        /* 버튼 스타일 (스크린샷 반영) */
+        .btn-approve { background-color: #1a9a5a; border: none; font-weight: 700; font-size: 16px; padding: 12px; }
+        .btn-reject-trigger {
+            background: white;
+            color: #dc3545;
+            border: 1px solid #dc3545;
+            font-weight: 600;
+            padding: 10px;
+            margin-top: 8px;
+        }
+        .btn-reject-trigger:hover { background: #fff5f5; color: #dc3545; }
+
+        .reject-box { background: #fff8f8; border: 1px solid #ffe3e3; border-radius: 15px; padding: 20px; display: none; margin-top: 15px; }
+
+        #video_preview { border-radius: 15px; overflow: hidden; background: #000; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1 style="color: #667eea; font-size: 22px; font-weight: 800; margin:0;">Turip Admin</h1>
+    <a class="btn btn-sm btn-outline-primary fw-bold" href="/admin/contents/pending">목록으로</a>
+</div>
+
+<div class="container" style="margin-top: 80px;">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="admin-card">
+                <h3 class="section-title">1. 영상 및 기본 정보</h3>
+                <div class="mb-4">
+                    <h4 id="display_title" class="fw-bold mb-1" style="letter-spacing: -0.5px;">-</h4>
+                    <p id="display_channel" class="text-primary fw-bold small mb-3"></p>
+                </div>
+                <div id="video_preview" class="ratio ratio-16x9">
+                    <iframe id="video_iframe" src="" title="YouTube" allowfullscreen style="border: none;"></iframe>
+                </div>
+            </div>
+
+            <div class="admin-card">
+                <h3 class="section-title">2. 수집된 장소 (경로)</h3>
+                <div id="placeListContainer">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="admin-card">
+                <h3 class="section-title">검수 처리</h3>
+                <div class="d-grid gap-2">
+                    <button class="btn btn-approve btn-lg text-white shadow-sm" onclick="approve()">
+                        <i class="fa-solid fa-check-double me-2"></i>최종 승인
+                    </button>
+                    <button class="btn btn-reject-trigger btn-sm" onclick="toggleReject()">
+                        <i class="fa-solid fa-rotate-left me-2"></i>반려(Reject)
+                    </button>
+                </div>
+
+                <div id="rejectArea" class="reject-box">
+                    <label class="form-label fw-bold text-danger small">반려 사유</label>
+                    <textarea id="rejectReason" class="form-control mb-3 form-control-sm" rows="4" placeholder="수집자가 확인할 피드백을 입력하세요."></textarea>
+                    <button class="btn btn-danger btn-sm w-100 fw-bold" onclick="reject()">반려 전송</button>
+                </div>
+            </div>
+
+            <div class="admin-card">
+                <h3 class="section-title" style="border-left-color: #ced4da; font-size: 15px;">수집 정보 요약</h3>
+                <table class="info-table">
+                    <tr>
+                        <td class="info-label">도시</td>
+                        <td class="info-value text-primary" id="display_city">-</td>
+                    </tr>
+                    <tr>
+                        <td class="info-label">수집자</td>
+                        <td class="info-value" id="display_collector">-</td>
+                    </tr>
+                    <tr>
+                        <td class="info-label">요청일</td>
+                        <td class="info-value" id="display_date">-</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    const pendingId = [[${pendingId}]];
+
+    async function loadDetail() {
+        try {
+            const res = await fetch(`/api/v1/admin/content-pendings/${pendingId}`);
+            const data = await res.json();
+
+            // 상단 정보 바인딩
+            document.getElementById('display_title').innerText = data.contentData.video.title;
+            document.getElementById('display_channel').innerText = data.contentData.video.channelName;
+            document.getElementById('display_city').innerText = data.contentData.cityName;
+            document.getElementById('display_collector').innerText = data.collectorAccount.nickname;
+            document.getElementById('display_date').innerText = new Date(data.createdAt).toLocaleDateString();
+
+            // 유튜브 임베드
+            const vId = data.contentData.video.videoId;
+            document.getElementById('video_iframe').src = `https://www.youtube.com/embed/${vId}`;
+
+            // 장소 리스트 렌더링
+            const container = document.getElementById('placeListContainer');
+            container.innerHTML = data.contentData.contentPlaces.map(p => `
+                <div class="place-item">
+                    <div>
+                        <span class="day-badge">${p.visitDay}일차 - ${p.visitOrder}번</span>
+                        <h6 class="fw-bold mb-1" style="font-size: 16px;">${p.place.name}</h6>
+                        <div class="text-muted small"><i class="fa-solid fa-location-dot me-1"></i> ${p.place.address}</div>
+                    </div>
+                    <div class="text-end">
+                        <span class="badge bg-light text-dark border fw-bold" style="font-size: 13px;">🕒 ${p.timeLine}</span>
+                    </div>
+                </div>
+            `).join('');
+        } catch (e) {
+            console.error(e);
+            alert("데이터 로드 중 에러가 발생했습니다.");
+        }
+    }
+
+    async function approve() {
+        if(!confirm("이 콘텐츠를 최종 승인하시겠습니까?")) return;
+        const res = await fetch(`/api/v1/admin/content-pendings/${pendingId}/approve`, { method: 'POST' });
+        if(res.ok) {
+            alert("승인이 완료되었습니다!");
+            location.href = "/admin/contents/pending";
+        }
+    }
+
+    function toggleReject() {
+        const area = document.getElementById('rejectArea');
+        area.style.display = area.style.display === 'none' ? 'block' : 'none';
+    }
+
+    async function reject() {
+        const rejectReason = document.getElementById('rejectReason').value;
+        if(!rejectReason) return alert("반려 사유를 입력해주세요.");
+
+        const res = await fetch(`/api/v1/admin/content-pendings/${pendingId}/reject`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ rejectReason })
+        });
+
+        if(res.ok) {
+            alert("반려 처리가 완료되었습니다.");
+            location.href = "/admin/contents/pending";
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadDetail);
+</script>
+</body>
+</html>
