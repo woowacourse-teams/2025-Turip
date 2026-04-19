@@ -92,6 +92,9 @@ internal class KmpApplicationConventionPlugin : Plugin<Project> {
                 sourceSets.named("commonMain") {
                     dependencies {
                         implementation(libs.library("koin-core"))
+                        implementation(libs.library("koin-compose"))
+                        implementation(libs.library("koin-compose-viewmodel"))
+                        implementation(libs.library("koin-compose-viewmodel-navigation"))
                         implementation(libs.library("napier"))
                     }
                 }
@@ -99,9 +102,6 @@ internal class KmpApplicationConventionPlugin : Plugin<Project> {
                 sourceSets.named("androidMain") {
                     dependencies {
                         implementation(libs.library("koin-android"))
-                        implementation(libs.library("koin-compose"))
-                        implementation(libs.library("koin-compose-viewmodel"))
-                        implementation(libs.library("koin-compose-viewmodel-navigation"))
                     }
                 }
             }
