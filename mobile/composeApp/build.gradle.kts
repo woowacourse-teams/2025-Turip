@@ -26,7 +26,7 @@ buildkonfig {
         buildConfigField(
             STRING,
             "SENTRY_DSN",
-            "${gradleLocalProperties(rootDir, providers).getProperty("sentry_dsn")}"
+            "${gradleLocalProperties(rootDir, providers).getProperty("sentry_dsn")}",
         )
     }
 }
@@ -36,7 +36,10 @@ android {
 
     defaultConfig {
         applicationId = "com.on.turip"
-        versionCode = libs.versions.versionCode.get().toInt()
+        versionCode =
+            libs.versions.versionCode
+                .get()
+                .toInt()
         versionName = libs.versions.versionName.get()
     }
     packaging {
@@ -49,18 +52,20 @@ android {
             isDebuggable = true
             applicationIdSuffix = ".dev"
             versionNameSuffix = ".dev"
-            manifestPlaceholders += mapOf(
-                "appName" to "@string/app_name_dev",
-            )
+            manifestPlaceholders +=
+                mapOf(
+                    "appName" to "@string/app_name_dev",
+                )
         }
 
         getByName("release") {
             isDebuggable = false
             isMinifyEnabled = true
             isShrinkResources = true
-            manifestPlaceholders += mapOf(
-                "appName" to "@string/app_name",
-            )
+            manifestPlaceholders +=
+                mapOf(
+                    "appName" to "@string/app_name",
+                )
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",

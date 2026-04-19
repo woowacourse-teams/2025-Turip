@@ -59,17 +59,18 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
  * ```
  */
 internal class KmpFeatureApiConventionPlugin : Plugin<Project> {
-    override fun apply(target: Project): Unit = with(target) {
-        plugins.apply(PluginIds.KMP_LIBRARY_CONVENTION)
-        plugins.apply(PluginIds.KOTLINX_SERIALIZATION)
+    override fun apply(target: Project): Unit =
+        with(target) {
+            plugins.apply(PluginIds.KMP_LIBRARY_CONVENTION)
+            plugins.apply(PluginIds.KOTLINX_SERIALIZATION)
 
-        extensions.configure<KotlinMultiplatformExtension> {
-            sourceSets.named("commonMain") {
-                dependencies {
-                    implementation(libs.library("kotlinx-serialization-json"))
-                    implementation(libs.library("jetbrains-navigation3-ui"))
+            extensions.configure<KotlinMultiplatformExtension> {
+                sourceSets.named("commonMain") {
+                    dependencies {
+                        implementation(libs.library("kotlinx-serialization-json"))
+                        implementation(libs.library("jetbrains-navigation3-ui"))
+                    }
                 }
             }
         }
-    }
 }

@@ -98,30 +98,31 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
  */
 
 internal class KmpFeatureImplConventionPlugin : Plugin<Project> {
-    override fun apply(target: Project): Unit = with(target) {
-        plugins.apply(PluginIds.KMP_LIBRARY_CONVENTION)
-        plugins.apply(PluginIds.KMP_COMPOSE_CONVENTION)
-        plugins.apply(PluginIds.KOTLINX_SERIALIZATION)
+    override fun apply(target: Project): Unit =
+        with(target) {
+            plugins.apply(PluginIds.KMP_LIBRARY_CONVENTION)
+            plugins.apply(PluginIds.KMP_COMPOSE_CONVENTION)
+            plugins.apply(PluginIds.KOTLINX_SERIALIZATION)
 
-        extensions.configure<KotlinMultiplatformExtension> {
-            sourceSets.named("commonMain") {
-                dependencies {
-                    // core 공통
-                    implementation(project(":core:ui"))
-                    implementation(project(":core:domain"))
-                    implementation(project(":core:model"))
-                    implementation(project(":core:navigation"))
-                    implementation(project(":core:designsystem"))
-                    implementation(project(":core:common"))
+            extensions.configure<KotlinMultiplatformExtension> {
+                sourceSets.named("commonMain") {
+                    dependencies {
+                        // core 공통
+                        implementation(project(":core:ui"))
+                        implementation(project(":core:domain"))
+                        implementation(project(":core:model"))
+                        implementation(project(":core:navigation"))
+                        implementation(project(":core:designsystem"))
+                        implementation(project(":core:common"))
 
-                    // Feature 공통
-                    implementation(libs.library("koin-compose-viewmodel"))
-                    implementation(libs.library("kotlinx-collections-immutable"))
-                    implementation(libs.library("jetbrains-navigation3-ui"))
-                    implementation(libs.library("napier"))
-                    implementation(libs.library("kotlinx-datetime"))
+                        // Feature 공통
+                        implementation(libs.library("koin-compose-viewmodel"))
+                        implementation(libs.library("kotlinx-collections-immutable"))
+                        implementation(libs.library("jetbrains-navigation3-ui"))
+                        implementation(libs.library("napier"))
+                        implementation(libs.library("kotlinx-datetime"))
+                    }
                 }
             }
         }
-    }
 }

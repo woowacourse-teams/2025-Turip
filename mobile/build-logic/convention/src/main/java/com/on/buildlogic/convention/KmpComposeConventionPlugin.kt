@@ -45,26 +45,27 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
  * ```
  */
 internal class KmpComposeConventionPlugin : Plugin<Project> {
-    override fun apply(target: Project): Unit = with(target) {
-        plugins.apply(PluginIds.COMPOSE_MULTIPLATFORM)
-        plugins.apply(PluginIds.KOTLIN_COMPOSE)
+    override fun apply(target: Project): Unit =
+        with(target) {
+            plugins.apply(PluginIds.COMPOSE_MULTIPLATFORM)
+            plugins.apply(PluginIds.KOTLIN_COMPOSE)
 
-        extensions.configure<KotlinMultiplatformExtension> {
-            sourceSets.named("commonMain") {
-                dependencies {
-                    implementation(libs.library("compose-runtime"))
-                    implementation(libs.library("compose-foundation"))
-                    implementation(libs.library("compose-ui"))
-                    implementation(libs.library("compose-ui-tooling-preview"))
-                    implementation(libs.library("compose-components-resources"))
-                    implementation(libs.library("compose-material3"))
-                    implementation(libs.library("koin-compose"))
+            extensions.configure<KotlinMultiplatformExtension> {
+                sourceSets.named("commonMain") {
+                    dependencies {
+                        implementation(libs.library("compose-runtime"))
+                        implementation(libs.library("compose-foundation"))
+                        implementation(libs.library("compose-ui"))
+                        implementation(libs.library("compose-ui-tooling-preview"))
+                        implementation(libs.library("compose-components-resources"))
+                        implementation(libs.library("compose-material3"))
+                        implementation(libs.library("koin-compose"))
+                    }
                 }
             }
-        }
 
-        dependencies {
-            add("debugImplementation", "org.jetbrains.compose.ui:ui-tooling:1.10.0")
+            dependencies {
+                add("debugImplementation", "org.jetbrains.compose.ui:ui-tooling:1.10.0")
+            }
         }
-    }
 }

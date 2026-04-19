@@ -10,7 +10,5 @@ class KtorMuseumApi : MuseumApi {
             "https://raw.githubusercontent.com/Kotlin/KMP-App-Template/main/list.json"
     }
 
-    override suspend fun getData(): List<MuseumObject> {
-        return emptyList()
-    }
+    override suspend fun getData(): List<MuseumObject> = emptyList()
 }

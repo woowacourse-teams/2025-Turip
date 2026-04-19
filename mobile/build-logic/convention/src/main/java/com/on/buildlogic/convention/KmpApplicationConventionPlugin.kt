@@ -65,61 +65,62 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
  * > `KmpLibraryConventionPlugin`과 명확히 역할이 분리된다.
  */
 internal class KmpApplicationConventionPlugin : Plugin<Project> {
-    override fun apply(target: Project) = with(target) {
-        pluginManager.apply {
-            apply(PluginIds.KOTLIN_MULTIPLATFORM)
-            apply(PluginIds.ANDROID_APPLICATION)
-            apply("dialog.convention.kmp.compose")
-            apply(PluginIds.KOTLINX_SERIALIZATION)
-            apply(PluginIds.BUILD_KONFIG)
-            apply(PluginIds.SENTRY_KMP)
-        }
+    override fun apply(target: Project) =
+        with(target) {
+            pluginManager.apply {
+                apply(PluginIds.KOTLIN_MULTIPLATFORM)
+                apply(PluginIds.ANDROID_APPLICATION)
+                apply("dialog.convention.kmp.compose")
+                apply(PluginIds.KOTLINX_SERIALIZATION)
+                apply(PluginIds.BUILD_KONFIG)
+                apply(PluginIds.SENTRY_KMP)
+            }
 
-        extensions.configure<KotlinMultiplatformExtension> {
-            configureDialogTargets()
+            extensions.configure<KotlinMultiplatformExtension> {
+                configureDialogTargets()
 
-            targets.filterIsInstance<KotlinNativeTarget>().forEach { target ->
-                target.binaries.framework {
-                    baseName = "ComposeApp"
-                    isStatic = true
-                    binaryOption("bundleId", "com.on.dialog")
-                    binaryOption("bundleVersion", libs.version("versionName"))
-                    binaryOption("bundleShortVersionString", libs.version("versionName"))
+                targets.filterIsInstance<KotlinNativeTarget>().forEach { target ->
+                    target.binaries.framework {
+                        baseName = "ComposeApp"
+                        isStatic = true
+                        binaryOption("bundleId", "com.on.dialog")
+                        binaryOption("bundleVersion", libs.version("versionName"))
+                        binaryOption("bundleShortVersionString", libs.version("versionName"))
+                    }
+                }
+
+                sourceSets.named("commonMain") {
+                    dependencies {
+                        implementation(libs.library("koin-core"))
+                        implementation(libs.library("napier"))
+                    }
+                }
+
+                sourceSets.named("androidMain") {
+                    dependencies {
+                        implementation(libs.library("koin-android"))
+                        implementation(libs.library("koin-compose"))
+                        implementation(libs.library("koin-compose-viewmodel"))
+                        implementation(libs.library("koin-compose-viewmodel-navigation"))
+                    }
                 }
             }
 
-            sourceSets.named("commonMain") {
-                dependencies {
-                    implementation(libs.library("koin-core"))
-                    implementation(libs.library("napier"))
+            extensions.configure<ApplicationExtension> {
+                compileSdk = libs.versionInt("compileSdk")
+                defaultConfig {
+                    minSdk = libs.versionInt("minSdk")
+                    targetSdk = libs.versionInt("targetSdk")
                 }
-            }
+                buildFeatures {
+                    compose = true
+                    buildConfig = true
+                }
 
-            sourceSets.named("androidMain") {
-                dependencies {
-                    implementation(libs.library("koin-android"))
-                    implementation(libs.library("koin-compose"))
-                    implementation(libs.library("koin-compose-viewmodel"))
-                    implementation(libs.library("koin-compose-viewmodel-navigation"))
+                compileOptions {
+                    sourceCompatibility = JavaVersion.VERSION_21
+                    targetCompatibility = JavaVersion.VERSION_21
                 }
             }
         }
-
-        extensions.configure<ApplicationExtension> {
-            compileSdk = libs.versionInt("compileSdk")
-            defaultConfig {
-                minSdk = libs.versionInt("minSdk")
-                targetSdk = libs.versionInt("targetSdk")
-            }
-            buildFeatures {
-                compose = true
-                buildConfig = true
-            }
-
-            compileOptions {
-                sourceCompatibility = JavaVersion.VERSION_21
-                targetCompatibility = JavaVersion.VERSION_21
-            }
-        }
-    }
 }

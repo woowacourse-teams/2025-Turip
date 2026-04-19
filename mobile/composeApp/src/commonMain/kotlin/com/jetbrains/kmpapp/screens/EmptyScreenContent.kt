@@ -12,9 +12,7 @@ import turip.composeapp.generated.resources.no_data_available
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-fun EmptyScreenContent(
-    modifier: Modifier = Modifier,
-) {
+fun EmptyScreenContent(modifier: Modifier = Modifier) {
     Box(
         modifier = modifier,
         contentAlignment = Alignment.Center,

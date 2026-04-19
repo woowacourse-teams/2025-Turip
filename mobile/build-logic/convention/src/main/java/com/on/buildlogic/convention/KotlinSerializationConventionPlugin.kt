@@ -38,15 +38,16 @@ import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
  * > 순수하게 **직렬화 플러그인 + 공통 의존성**만을 책임진다.
  */
 internal class KotlinSerializationConventionPlugin : Plugin<Project> {
-    override fun apply(target: Project): Unit = with(target) {
-        plugins.apply(PluginIds.KOTLINX_SERIALIZATION)
+    override fun apply(target: Project): Unit =
+        with(target) {
+            plugins.apply(PluginIds.KOTLINX_SERIALIZATION)
 
-        kotlinExtension.sourceSets.apply {
-            named("commonMain") {
-                dependencies {
-                    implementation(libs.library("kotlinx.serialization.json"))
+            kotlinExtension.sourceSets.apply {
+                named("commonMain") {
+                    dependencies {
+                        implementation(libs.library("kotlinx.serialization.json"))
+                    }
                 }
             }
         }
-    }
 }

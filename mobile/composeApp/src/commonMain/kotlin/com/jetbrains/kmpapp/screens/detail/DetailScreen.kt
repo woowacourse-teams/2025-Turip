@@ -76,7 +76,7 @@ private fun ObjectDetails(
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                     }
-                }
+                },
             )
         },
         modifier = modifier.windowInsetsPadding(WindowInsets.systemBars),
@@ -84,9 +84,8 @@ private fun ObjectDetails(
         Column(
             Modifier
                 .verticalScroll(rememberScrollState())
-                .padding(paddingValues)
+                .padding(paddingValues),
         ) {
-
             SelectionContainer {
                 Column(Modifier.padding(12.dp)) {
                     Text(obj.title, style = MaterialTheme.typography.headlineMedium)
@@ -119,7 +118,7 @@ private fun LabeledInfo(
                     append("$label: ")
                 }
                 append(data)
-            }
+            },
         )
     }
 }

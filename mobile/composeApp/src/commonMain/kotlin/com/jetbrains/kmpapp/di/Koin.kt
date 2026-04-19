@@ -11,20 +11,22 @@ import org.koin.core.context.startKoin
 import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.module
 
-val dataModule = module {
-    single<MuseumApi> { KtorMuseumApi() }
-    single<MuseumStorage> { InMemoryMuseumStorage() }
-    single {
-        MuseumRepository(get(), get()).apply {
-            initialize()
+val dataModule =
+    module {
+        single<MuseumApi> { KtorMuseumApi() }
+        single<MuseumStorage> { InMemoryMuseumStorage() }
+        single {
+            MuseumRepository(get(), get()).apply {
+                initialize()
+            }
         }
     }
-}
 
-val viewModelModule = module {
-    factoryOf(::ListViewModel)
-    factoryOf(::DetailViewModel)
-}
+val viewModelModule =
+    module {
+        factoryOf(::ListViewModel)
+        factoryOf(::DetailViewModel)
+    }
 
 fun initKoin() {
     startKoin {
