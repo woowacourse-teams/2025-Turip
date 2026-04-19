@@ -1,4 +1,4 @@
-package com.jetbrains.kmpapp
+package com.on.turip
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
