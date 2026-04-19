@@ -74,6 +74,11 @@ public enum ErrorTag {
     // 404 Not Found
     YOUTUBE_VIDEO_NOT_FOUND("유튜브 영상을 찾을 수 없습니다."),
     CITY_NOT_FOUND("도시를 찾을 수 없습니다."),
+    ADMIN_NOT_FOUND("관리자 계정을 찾을 수 없습니다."),
+    NO_AVAILABLE_VALIDATOR("검수를 담당할 수 있는 다른 관리자가 없습니다. 관리자를 추가한 후 다시 시도해주세요."),
+
+    // 409 Conflict
+    DUPLICATE_PENDING_CONTENT("이미 검수 대기 중인 콘텐츠입니다."),
 
     // 500 Internal Server Error
     YOUTUBE_API_SERVER_ERROR("유튜브 API 서버에 에러가 발생했습니다.");
