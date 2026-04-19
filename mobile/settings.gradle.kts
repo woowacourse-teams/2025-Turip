@@ -1,7 +1,8 @@
-rootProject.name = "KMP-App-Template"
+rootProject.name = "Turip"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
+    includeBuild("build-logic")
     repositories {
         google {
             mavenContent {

@@ -14,10 +14,7 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -34,21 +31,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil3.compose.AsyncImage
 import com.jetbrains.kmpapp.data.MuseumObject
 import com.jetbrains.kmpapp.screens.EmptyScreenContent
-import kmp_app_template.composeapp.generated.resources.Res
-import kmp_app_template.composeapp.generated.resources.back
-import kmp_app_template.composeapp.generated.resources.label_artist
-import kmp_app_template.composeapp.generated.resources.label_credits
-import kmp_app_template.composeapp.generated.resources.label_date
-import kmp_app_template.composeapp.generated.resources.label_department
-import kmp_app_template.composeapp.generated.resources.label_dimensions
-import kmp_app_template.composeapp.generated.resources.label_medium
-import kmp_app_template.composeapp.generated.resources.label_repository
-import kmp_app_template.composeapp.generated.resources.label_title
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+import turip.composeapp.generated.resources.Res
+import turip.composeapp.generated.resources.label_artist
+import turip.composeapp.generated.resources.label_credits
+import turip.composeapp.generated.resources.label_date
+import turip.composeapp.generated.resources.label_department
+import turip.composeapp.generated.resources.label_dimensions
+import turip.composeapp.generated.resources.label_medium
+import turip.composeapp.generated.resources.label_repository
+import turip.composeapp.generated.resources.label_title
 
 @Composable
 fun DetailScreen(
@@ -80,7 +75,6 @@ private fun ObjectDetails(
                 title = {},
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(Res.string.back))
                     }
                 }
             )
@@ -92,14 +86,6 @@ private fun ObjectDetails(
                 .verticalScroll(rememberScrollState())
                 .padding(paddingValues)
         ) {
-            AsyncImage(
-                model = obj.primaryImageSmall,
-                contentDescription = obj.title,
-                contentScale = ContentScale.FillWidth,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.LightGray)
-            )
 
             SelectionContainer {
                 Column(Modifier.padding(12.dp)) {

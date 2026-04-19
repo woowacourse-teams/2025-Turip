@@ -25,7 +25,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil3.compose.AsyncImage
 import com.jetbrains.kmpapp.data.MuseumObject
 import com.jetbrains.kmpapp.screens.EmptyScreenContent
 import org.koin.compose.viewmodel.koinViewModel
@@ -80,15 +79,6 @@ private fun ObjectFrame(
             .padding(8.dp)
             .clickable { onClick() }
     ) {
-        AsyncImage(
-            model = obj.primaryImageSmall,
-            contentDescription = obj.title,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(1f)
-                .background(Color.LightGray),
-        )
 
         Spacer(Modifier.height(2.dp))
 
