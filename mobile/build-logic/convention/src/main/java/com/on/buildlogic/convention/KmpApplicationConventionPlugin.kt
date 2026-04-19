@@ -70,6 +70,7 @@ internal class KmpApplicationConventionPlugin : Plugin<Project> {
             apply(PluginIds.KOTLIN_MULTIPLATFORM)
             apply(PluginIds.ANDROID_APPLICATION)
             apply("dialog.convention.kmp.compose")
+            apply(PluginIds.KOTLINX_SERIALIZATION)
             apply(PluginIds.BUILD_KONFIG)
             apply(PluginIds.SENTRY_KMP)
         }

@@ -12,17 +12,7 @@ import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.module
 
 val dataModule = module {
-    single {
-//        val json = Json { ignoreUnknownKeys = true }
-//        HttpClient {
-//            install(ContentNegotiation) {
-//                // TODO Fix API so it serves application/json
-//                json(json, contentType = ContentType.Any)
-//            }
-//        }
-    }
-
-    single<MuseumApi> { KtorMuseumApi(get()) }
+    single<MuseumApi> { KtorMuseumApi() }
     single<MuseumStorage> { InMemoryMuseumStorage() }
     single {
         MuseumRepository(get(), get()).apply {
