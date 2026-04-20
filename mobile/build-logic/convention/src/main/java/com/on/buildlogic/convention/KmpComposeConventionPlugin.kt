@@ -40,7 +40,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
  * ## 사용 예시
  * ```kotlin
  * plugins {
- *     id("dialog.convention.kmp.compose")
+ *     id("turip.convention.kmp.compose")
  * }
  * ```
  */

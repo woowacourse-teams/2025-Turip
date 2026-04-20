@@ -19,33 +19,33 @@ dependencies {
 
 gradlePlugin {
     plugins {
-        register("dialog.convention.kmp.library") {
-            id = "dialog.convention.kmp.library"
+        register("turip.convention.kmp.library") {
+            id = "turip.convention.kmp.library"
             implementationClass = "com.on.buildlogic.convention.KmpLibraryConventionPlugin"
         }
 
-        register("dialog.convention.kmp.compose") {
-            id = "dialog.convention.kmp.compose"
+        register("turip.convention.kmp.compose") {
+            id = "turip.convention.kmp.compose"
             implementationClass = "com.on.buildlogic.convention.KmpComposeConventionPlugin"
         }
 
-        register("dialog.convention.kmp.application") {
-            id = "dialog.convention.kmp.application"
+        register("turip.convention.kmp.application") {
+            id = "turip.convention.kmp.application"
             implementationClass = "com.on.buildlogic.convention.KmpApplicationConventionPlugin"
         }
 
-        register("dialog.convention.kotlin.serialization") {
-            id = "dialog.convention.kotlin.serialization"
+        register("turip.convention.kotlin.serialization") {
+            id = "turip.convention.kotlin.serialization"
             implementationClass = "com.on.buildlogic.convention.KotlinSerializationConventionPlugin"
         }
 
-        register("dialog.convention.kotlin.feature.api") {
-            id = "dialog.convention.kotlin.feature.api"
+        register("turip.convention.kotlin.feature.api") {
+            id = "turip.convention.kotlin.feature.api"
             implementationClass = "com.on.buildlogic.convention.KmpFeatureApiConventionPlugin"
         }
 
-        register("dialog.convention.kotlin.feature.impl") {
-            id = "dialog.convention.kotlin.feature.impl"
+        register("turip.convention.kotlin.feature.impl") {
+            id = "turip.convention.kotlin.feature.impl"
             implementationClass = "com.on.buildlogic.convention.KmpFeatureImplConventionPlugin"
         }
     }

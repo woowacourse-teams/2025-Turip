@@ -2,7 +2,7 @@ package com.on.buildlogic.convention
 
 import com.android.build.api.dsl.LibraryExtension
 import com.on.buildlogic.convention.extension.PluginIds
-import com.on.buildlogic.convention.extension.configureDialogTargets
+import com.on.buildlogic.convention.extension.configureTuripTargets
 import com.on.buildlogic.convention.extension.library
 import com.on.buildlogic.convention.extension.libs
 import com.on.buildlogic.convention.extension.versionInt
@@ -23,10 +23,10 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
  * ## 적용되는 플러그인
  * - `org.jetbrains.kotlin.multiplatform`
  * - `com.android.library`
- * - `dialog.convention.kotlin.serialization`
+ * - `turip.convention.kotlin.serialization`
  *
  * ## Kotlin Multiplatform 설정
- * - `configureDialogTargets()`로 Android / iOS 타겟을 구성한다.
+ * - `configureTuripTargets()`로 Android / iOS 타겟을 구성한다.
  *
  * ### SourceSet 구성
  * - `commonMain`
@@ -45,7 +45,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
  * ## 사용 예시
  * ```kotlin
  * plugins {
- *     id("dialog.convention.kmp.library")
+ *     id("turip.convention.kmp.library")
  * }
  * ```
  *
@@ -59,7 +59,7 @@ internal class KmpLibraryConventionPlugin : Plugin<Project> {
             plugins.apply(PluginIds.ANDROID_LIBRARY)
 
             extensions.configure<KotlinMultiplatformExtension> {
-                configureDialogTargets()
+                configureTuripTargets()
 
                 sourceSets.named("commonMain") {
                     dependencies {

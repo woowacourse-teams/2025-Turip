@@ -30,7 +30,7 @@ import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
  * ## 사용 예시
  * ```kotlin
  * plugins {
- *     id("dialog.convention.kotlin.serialization")
+ *     id("turip.convention.kotlin.serialization")
  * }
  * ```
  *

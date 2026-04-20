@@ -30,7 +30,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
  *   - Kotlinx Serialization 사용을 위한 플러그인
  *
  * ## Kotlin Multiplatform 설정
- * - `configureDialogTargets()`
+ * - `configureTuripTargets()`
  *   - Android / iOS 등 KMP 타겟을 프로젝트 공통 규칙에 따라 설정
  * - `configureIosFrameworkForLibrary(project)`
  *   - iOS에서 Feature Impl 모듈을 Framework 형태로 제공
@@ -92,7 +92,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
  * ## 사용 예시
  * ```kotlin
  * plugins {
- *     id("dialog.convention.kmp.feature.impl")
+ *     id("turip.convention.kmp.feature.impl")
  * }
  * ```
  */

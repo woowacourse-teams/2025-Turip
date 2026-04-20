@@ -2,7 +2,7 @@ package com.on.buildlogic.convention
 
 import com.android.build.api.dsl.ApplicationExtension
 import com.on.buildlogic.convention.extension.PluginIds
-import com.on.buildlogic.convention.extension.configureDialogTargets
+import com.on.buildlogic.convention.extension.configureTuripTargets
 import com.on.buildlogic.convention.extension.library
 import com.on.buildlogic.convention.extension.libs
 import com.on.buildlogic.convention.extension.version
@@ -25,12 +25,12 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
  * ## 적용되는 플러그인
  * - `org.jetbrains.kotlin.multiplatform`
  * - `com.android.application`
- * - `dialog.convention.kmp.compose`
+ * - `turip.convention.kmp.compose`
  * - `io.sentry.kotlin.multiplatform.gradle` — Sentry KMP SDK 및 iOS Cocoa 의존성 자동 설치
  * - `com.codingfeline.buildkonfig` — 빌드 타입별 상수(DSN, IS_DEBUG 등) 주입
  *
  * ## Kotlin Multiplatform 설정
- * - `configureDialogTargets()`를 통해 Android / iOS 타겟을 구성한다.
+ * - `configureTuripTargets()`를 통해 Android / iOS 타겟을 구성한다.
  *
  * ### SourceSet 구성
  * - `commonMain`
@@ -57,7 +57,7 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
  * ## 사용 예시
  * ```kotlin
  * plugins {
- *     id("dialog.convention.kmp.application")
+ *     id("turip.convention.kmp.application")
  * }
  * ```
  *
@@ -70,20 +70,20 @@ internal class KmpApplicationConventionPlugin : Plugin<Project> {
             pluginManager.apply {
                 apply(PluginIds.KOTLIN_MULTIPLATFORM)
                 apply(PluginIds.ANDROID_APPLICATION)
-                apply("dialog.convention.kmp.compose")
+                apply("turip.convention.kmp.compose")
                 apply(PluginIds.KOTLINX_SERIALIZATION)
                 apply(PluginIds.BUILD_KONFIG)
                 apply(PluginIds.SENTRY_KMP)
             }
 
             extensions.configure<KotlinMultiplatformExtension> {
-                configureDialogTargets()
+                configureTuripTargets()
 
                 targets.filterIsInstance<KotlinNativeTarget>().forEach { target ->
                     target.binaries.framework {
                         baseName = "ComposeApp"
                         isStatic = true
-                        binaryOption("bundleId", "com.on.dialog")
+                        binaryOption("bundleId", "com.on.turip")
                         binaryOption("bundleVersion", libs.version("versionName"))
                         binaryOption("bundleShortVersionString", libs.version("versionName"))
                     }

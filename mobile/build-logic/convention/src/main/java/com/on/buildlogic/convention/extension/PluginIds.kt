@@ -10,9 +10,9 @@ internal object PluginIds {
 
     const val KOTLINX_SERIALIZATION = "org.jetbrains.kotlin.plugin.serialization"
 
-    const val KMP_COMPOSE_CONVENTION = "dialog.convention.kmp.compose"
+    const val KMP_COMPOSE_CONVENTION = "turip.convention.kmp.compose"
 
-    const val KMP_LIBRARY_CONVENTION = "dialog.convention.kmp.library"
+    const val KMP_LIBRARY_CONVENTION = "turip.convention.kmp.library"
 
     const val SENTRY_KMP = "io.sentry.kotlin.multiplatform.gradle"
 

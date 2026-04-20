@@ -3,7 +3,7 @@ import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.BOOLEAN
 import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
 
 plugins {
-    id("dialog.convention.kmp.application")
+    id("turip.convention.kmp.application")
 }
 
 kotlin {
