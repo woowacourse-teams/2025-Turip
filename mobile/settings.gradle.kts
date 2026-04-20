@@ -1,6 +1,3 @@
-rootProject.name = "Turip"
-enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
-
 pluginManagement {
     includeBuild("build-logic")
     repositories {
@@ -15,6 +12,8 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+rootProject.name = "Turip"
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 dependencyResolutionManagement {
     repositories {
