@@ -198,7 +198,7 @@ buildkonfig = { id = "com.codingfeline.buildkonfig", version.ref = "build-konfig
 android-test = { id = "com.android.test", version.ref = "android-gradle-plugin" }
 
 # Network
-ktrofit = { id = "de.jensklingenberg.ktorfit", version.ref = "ktorfit" }
+ktorfit = { id = "de.jensklingenberg.ktorfit", version.ref = "ktorfit" }
 
 [bundles]
 plugins = [
