@@ -70,6 +70,7 @@ public enum ErrorTag {
     IS_ALREADY_APPROVED("이미 승인된 콘텐츠입니다."),
     CONTENT_PENDING_NOT_FOUND("펜딩 콘텐츠를 찾을 수 없습니다."),
     REJECT_REASON_REQUIRED("거절 사유를 입력해주세요."),
+    VALIDATOR_NOT_VALID("해당 콘텐츠를 검증할 권한이 없습니다."),
 
     // 404 Not Found
     YOUTUBE_VIDEO_NOT_FOUND("유튜브 영상을 찾을 수 없습니다."),

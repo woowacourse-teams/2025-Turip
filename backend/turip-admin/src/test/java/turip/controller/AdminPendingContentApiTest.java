@@ -173,6 +173,30 @@ class AdminPendingContentApiTest {
                     .then()
                     .statusCode(404);
         }
+
+        @Test
+        @DisplayName("자신이 수집한 콘텐츠를 승인하려 할 때 400 Bad Request를 응답한다")
+        void approveContentPending_ValidatorNotValid() {
+            // given
+            Account collectorAccount = AccountFixture.createCustomAccount(1L, Role.ADMIN);
+            Long collectorAccountId = testDataHelper.insertAccount(collectorAccount);
+            ReflectionTestUtils.setField(collectorAccount, "id", collectorAccountId);
+
+            testDataHelper.insertTuripMember(collectorAccountId, "admin@turip.com", false, "admin", "password123!");
+            String collectorAccessToken = testDataHelper.createAccessToken(collectorAccountId, Role.ADMIN);
+
+            testDataHelper.insertCity("서울");
+            ContentPendingData contentData = ContentPendingFixture.createTestContentData("서울");
+            ContentPending contentPending = new ContentPending(contentData, collectorAccount, null, null, null);
+            contentPendingRepository.save(contentPending);
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + collectorAccessToken)
+                    .when().post("/api/v1/admin/content-pendings/{id}/approve", 1)
+                    .then()
+                    .statusCode(400);
+        }
     }
 
     @DisplayName("/api/v1/admin/content-pendings/{id}/reject POST 펜딩 콘텐츠 거절 테스트")
