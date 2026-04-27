@@ -1,6 +1,7 @@
 package turip.controller.dto.response;
 
 import java.time.LocalDateTime;
+import turip.content.domain.ContentPending;
 
 public record PendingListResponse(
         Long id,
@@ -9,4 +10,14 @@ public record PendingListResponse(
         String collectorNickname,
         LocalDateTime createdAt
 ) {
+
+    public static PendingListResponse from(ContentPending p) {
+        return new PendingListResponse(
+                p.getId(),
+                p.getContentData().video().title(),
+                p.getContentData().video().channelName(),
+                p.getCollectorAccount().getNickname(),
+                p.getCreatedAt()
+        );
+    }
 }

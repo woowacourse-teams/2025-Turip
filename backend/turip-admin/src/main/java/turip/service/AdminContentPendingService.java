@@ -45,27 +45,14 @@ public class AdminContentPendingService {
     public List<PendingListResponse> findAll() {
         return contentPendingRepository.findAllByStatusOrderByIdDesc(ContentPendingStatus.PENDING)
                 .stream()
-                .map(p -> new PendingListResponse(
-                        p.getId(),
-                        p.getContentData().video().title(),
-                        p.getContentData().video().channelName(),
-                        p.getCollectorAccount().getNickname(),
-                        p.getCreatedAt()
-                ))
+                .map(PendingListResponse::from)
                 .toList();
     }
 
     public List<MyCollectContentResponse> getMyHistory(Account account) {
         return contentPendingRepository.findAllByCollectorAccountOrderByIdDesc(account)
                 .stream()
-                .map(p -> new MyCollectContentResponse(
-                        p.getId(),
-                        p.getContentData().video().title(),
-                        p.getContentData().cityName(),
-                        p.getStatus().name(),
-                        p.getRejectReason(),
-                        p.getCreatedAt()
-                ))
+                .map(MyCollectContentResponse::from)
                 .toList();
     }
 
@@ -89,7 +76,7 @@ public class AdminContentPendingService {
                 .orElseThrow(() -> new NotFoundException(ErrorTag.CONTENT_NOT_FOUND));
         contentPending.approve(validatorAccount, content);
 
-        return new ContentPendingApprovalResponse(content.getId(), contentPending.getId());
+        return ContentPendingApprovalResponse.of(content, contentPending);
     }
 
     @Transactional
