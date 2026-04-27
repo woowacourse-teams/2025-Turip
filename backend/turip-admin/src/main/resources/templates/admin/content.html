@@ -616,10 +616,11 @@
                 alert("📨 재검수 요청이 완료되었습니다!");
                 location.href = '/admin/my';
             } else {
-                saveButton.innerHTML = '💾 저장 중...';
-                await authFetch('/api/v1/admin/contents', {method: 'POST', body: JSON.stringify(payload)});
-                alert("🎉 콘텐츠 저장 완료!");
-                location.reload();
+                saveButton.innerHTML = '📨 검수 요청 중...';
+                const { tripDuration, ...pendingPayload } = payload;
+                await authFetch('/api/v1/admin/content-pendings', {method: 'POST', body: JSON.stringify(pendingPayload)});
+                alert("📨 검수 요청이 완료되었습니다!");
+                location.href = '/admin/my';
             }
         } catch (e) {
             showErrorToast(e.message);
