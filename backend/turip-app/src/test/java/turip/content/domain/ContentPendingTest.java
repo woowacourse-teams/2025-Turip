@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import turip.account.domain.Account;
+import turip.account.domain.Role;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.IllegalArgumentException;
 import turip.common.exception.custom.IllegalStateException;
@@ -29,8 +30,8 @@ class ContentPendingTest {
             @Test
             void approve1() {
                 // given
-                Account collector = AccountFixture.createAdmin();
-                Account validator = AccountFixture.createAdmin();
+                Account collector = AccountFixture.createCustomAccount(1L, Role.ADMIN);
+                Account validator = AccountFixture.createCustomAccount(2L, Role.ADMIN);
                 ContentPending pendingContent = ContentPendingFixture.createPending(collector);
                 Content content = null;
 
