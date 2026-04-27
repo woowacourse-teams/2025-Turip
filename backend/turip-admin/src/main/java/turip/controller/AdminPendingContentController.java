@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import turip.account.domain.Member;
 import turip.account.domain.TuripMember;
 import turip.content.domain.ContentPendingData;
 import turip.controller.dto.request.ContentPendingRejectRequest;
@@ -47,10 +46,10 @@ public class AdminPendingContentController {
 
     @PostMapping
     public ResponseEntity<Long> pending(
-            @AuthAdmin Member member,
+            @AuthAdmin TuripMember admin,
             @RequestBody ContentPendingData contentData
     ) {
-        Long pendingId = adminContentPendingService.pending(member.getAccount(), contentData);
+        Long pendingId = adminContentPendingService.pending(admin.getMember().getAccount(), contentData);
         return ResponseEntity.status(HttpStatus.CREATED).body(pendingId);
     }
 

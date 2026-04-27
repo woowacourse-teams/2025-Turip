@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import turip.account.domain.Member;
+import turip.account.domain.TuripMember;
 import turip.controller.dto.request.AdminContentSaveRequest;
 import turip.controller.dto.response.MyCollectContentResponse;
 import turip.resolver.AuthAdmin;
@@ -27,15 +27,15 @@ public class AdminContentController {
     private final AdminContentPendingService adminContentPendingService;
 
     @PostMapping
-    public ResponseEntity<Long> save(@AuthAdmin Member member, @RequestBody AdminContentSaveRequest request) {
+    public ResponseEntity<Long> save(@AuthAdmin TuripMember admin, @RequestBody AdminContentSaveRequest request) {
         Long contentId = adminContentService.save(request);
-        log.info("[콘텐츠 수집] nickname: {}", member.getAccount().getNickname());
+        log.info("[콘텐츠 수집] nickname: {}", admin.getMember().getAccount().getNickname());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(contentId);
     }
 
     @GetMapping("/my")
-    public ResponseEntity<List<MyCollectContentResponse>> getMyHistory(@AuthAdmin Member member) {
-        return ResponseEntity.ok(adminContentPendingService.getMyHistory(member.getAccount()));
+    public ResponseEntity<List<MyCollectContentResponse>> getMyHistory(@AuthAdmin TuripMember admin) {
+        return ResponseEntity.ok(adminContentPendingService.getMyHistory(admin.getMember().getAccount()));
     }
 }
