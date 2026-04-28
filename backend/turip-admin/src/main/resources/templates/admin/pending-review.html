@@ -232,10 +232,18 @@
 
     async function approve() {
         if(!confirm("이 콘텐츠를 최종 승인하시겠습니까?")) return;
-        const res = await fetch(`/api/v1/admin/content-pendings/${pendingId}/approve`, { method: 'POST' });
-        if(res.ok) {
-            alert("승인이 완료되었습니다!");
-            location.href = "/admin/contents/pending";
+        try {
+            const res = await fetch(`/api/v1/admin/content-pendings/${pendingId}/approve`, { method: 'POST' });
+            if(res.ok) {
+                alert("승인이 완료되었습니다!");
+                location.href = "/admin/contents/pending";
+            } else {
+                const errorData = await res.json().catch(() => null);
+                const errorMessage = errorData?.message || `승인 실패 (${res.status})`;
+                alert("⚠️ " + errorMessage);
+            }
+        } catch (e) {
+            alert("⚠️ 승인 처리 중 오류가 발생했습니다: " + e.message);
         }
     }
 
@@ -248,15 +256,23 @@
         const rejectReason = document.getElementById('rejectReason').value;
         if(!rejectReason) return alert("반려 사유를 입력해주세요.");
 
-        const res = await fetch(`/api/v1/admin/content-pendings/${pendingId}/reject`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ rejectReason })
-        });
+        try {
+            const res = await fetch(`/api/v1/admin/content-pendings/${pendingId}/reject`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ rejectReason })
+            });
 
-        if(res.ok) {
-            alert("반려 처리가 완료되었습니다.");
-            location.href = "/admin/contents/pending";
+            if(res.ok) {
+                alert("반려 처리가 완료되었습니다.");
+                location.href = "/admin/contents/pending";
+            } else {
+                const errorData = await res.json().catch(() => null);
+                const errorMessage = errorData?.message || `반려 실패 (${res.status})`;
+                alert("⚠️ " + errorMessage);
+            }
+        } catch (e) {
+            alert("⚠️ 반려 처리 중 오류가 발생했습니다: " + e.message);
         }
     }
 
