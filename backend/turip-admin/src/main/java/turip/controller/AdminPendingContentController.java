@@ -1,7 +1,9 @@
 package turip.controller;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,10 +12,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import turip.account.domain.TuripMember;
+import turip.content.domain.ContentPendingData;
 import turip.controller.dto.request.ContentPendingRejectRequest;
 import turip.controller.dto.response.ContentPendingApprovalResponse;
 import turip.controller.dto.response.ContentPendingRejectResponse;
 import turip.controller.dto.response.ContentPendingResponse;
+import turip.controller.dto.response.PendingListResponse;
 import turip.resolver.AuthAdmin;
 import turip.service.AdminContentPendingService;
 
@@ -26,6 +30,11 @@ public class AdminPendingContentController {
 
     private final AdminContentPendingService adminContentPendingService;
 
+    @GetMapping("/list")
+    public ResponseEntity<List<PendingListResponse>> findAll(@AuthAdmin TuripMember admin) {
+        return ResponseEntity.ok(adminContentPendingService.findAll());
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ContentPendingResponse> findById(
             @AuthAdmin TuripMember admin,
@@ -33,6 +42,15 @@ public class AdminPendingContentController {
     ) {
         ContentPendingResponse response = adminContentPendingService.findById(id);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping
+    public ResponseEntity<Long> pending(
+            @AuthAdmin TuripMember admin,
+            @RequestBody ContentPendingData contentData
+    ) {
+        Long pendingId = adminContentPendingService.pending(admin.getMember().getAccount(), contentData);
+        return ResponseEntity.status(HttpStatus.CREATED).body(pendingId);
     }
 
     @PostMapping("/{id}/approve")
@@ -44,7 +62,6 @@ public class AdminPendingContentController {
                 admin.getMember().getAccount());
         return ResponseEntity.ok(response);
     }
-
 
     @PostMapping("/{id}/reject")
     public ResponseEntity<ContentPendingRejectResponse> reject(

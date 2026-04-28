@@ -81,6 +81,9 @@ public class ContentPending extends BaseTimeEntity {
 
     public void approve(Account validatorAccount, Content content) {
         validateStatusNotApproved();
+        if (validatorAccount.equals(collectorAccount)) {
+            throw new IllegalArgumentException(ErrorTag.VALIDATOR_NOT_VALID);
+        }
 
         this.status = ContentPendingStatus.APPROVED;
         this.validatorAccount = validatorAccount;

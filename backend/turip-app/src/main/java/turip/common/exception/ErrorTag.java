@@ -70,10 +70,16 @@ public enum ErrorTag {
     IS_ALREADY_APPROVED("이미 승인된 콘텐츠입니다."),
     CONTENT_PENDING_NOT_FOUND("펜딩 콘텐츠를 찾을 수 없습니다."),
     REJECT_REASON_REQUIRED("거절 사유를 입력해주세요."),
+    VALIDATOR_NOT_VALID("해당 콘텐츠를 검증할 권한이 없습니다."),
 
     // 404 Not Found
     YOUTUBE_VIDEO_NOT_FOUND("유튜브 영상을 찾을 수 없습니다."),
     CITY_NOT_FOUND("도시를 찾을 수 없습니다."),
+    ADMIN_NOT_FOUND("관리자 계정을 찾을 수 없습니다."),
+    NO_AVAILABLE_VALIDATOR("검수를 담당할 수 있는 다른 관리자가 없습니다. 관리자를 추가한 후 다시 시도해주세요."),
+
+    // 409 Conflict
+    DUPLICATE_PENDING_CONTENT("이미 검수 대기 중인 콘텐츠입니다."),
 
     // 500 Internal Server Error
     YOUTUBE_API_SERVER_ERROR("유튜브 API 서버에 에러가 발생했습니다.");

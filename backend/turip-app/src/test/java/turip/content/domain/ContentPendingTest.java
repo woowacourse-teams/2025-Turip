@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import turip.account.domain.Account;
+import turip.account.domain.Role;
+import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.IllegalArgumentException;
 import turip.common.exception.custom.IllegalStateException;
 import turip.util.fixture.AccountFixture;
@@ -28,8 +30,8 @@ class ContentPendingTest {
             @Test
             void approve1() {
                 // given
-                Account collector = AccountFixture.createAdmin();
-                Account validator = AccountFixture.createAdmin();
+                Account collector = AccountFixture.createCustomAccount(1L, Role.ADMIN);
+                Account validator = AccountFixture.createCustomAccount(2L, Role.ADMIN);
                 ContentPending pendingContent = ContentPendingFixture.createPending(collector);
                 Content content = null;
 
@@ -54,6 +56,20 @@ class ContentPendingTest {
                 // when & then
                 assertThatThrownBy(() -> pendingContent.approve(validator, content))
                         .isInstanceOf(IllegalStateException.class);
+            }
+
+            @DisplayName("자신이 수집한 콘텐츠는 승인할 수 없다.")
+            @Test
+            void approve3() {
+                // given
+                Account collector = AccountFixture.createAdmin();
+                ContentPending pendingContent = ContentPendingFixture.createPending(collector);
+                Content content = null;
+
+                // when & then
+                assertThatThrownBy(() -> pendingContent.approve(collector, content))
+                        .isInstanceOf(IllegalArgumentException.class)
+                        .hasMessage(ErrorTag.VALIDATOR_NOT_VALID.getMessage());
             }
         }
 

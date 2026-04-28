@@ -13,7 +13,7 @@
         body {
             background: linear-gradient(135deg, #becdfd, #ffffff);
             min-height: 100vh;
-            padding: 40px 0;
+            padding-bottom: 40px;
             font-family: 'Pretendard', sans-serif;
         }
 
@@ -144,43 +144,31 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .header h1 {
-            color: #667eea;
-            font-size: 24px;
-            margin: 0;
-        }
-
-        .home-btn {
-            padding: 10px 20px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.3s;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .home-btn:hover {
-            background: #5568d3;
-            color: white;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
         }
     </style>
 </head>
 <body>
 
-<div class="header">
-    <h1>Turip 관리자 - 콘텐츠 수집</h1>
-    <a href="/admin/home" class="home-btn">홈으로 돌아가기</a>
+<!-- Toast 알림 -->
+<div aria-atomic="true" aria-live="polite" class="position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+    <div class="toast align-items-center border-0" id="errorToast" role="alert">
+        <div class="d-flex">
+            <div class="toast-body fw-bold" id="toastMessage"></div>
+            <button aria-label="Close" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" type="button"></button>
+        </div>
+    </div>
 </div>
 
-<div class="container">
+<div class="header">
+    <h1 style="color: #667eea; font-size: 22px; font-weight: 800; margin:0;">Turip Admin</h1>
+    <a class="btn btn-sm btn-outline-primary fw-bold" href="/admin/home">홈으로 돌아가기</a>
+</div>
+
+<div class="container" style="margin-top: 80px;">
     <div class="row justify-content-center">
         <div class="col-lg-12">
             <div class="admin-card">
@@ -456,7 +444,16 @@
             data.items.forEach(item => {
                 const div = document.createElement('div');
                 div.className = 'search-result-item';
-                div.innerHTML = `<strong>${item.name}</strong><br><small>${item.address}</small>`;
+
+                const strong = document.createElement('strong');
+                strong.textContent = item.name;
+                div.appendChild(strong);
+                div.appendChild(document.createElement('br'));
+
+                const small = document.createElement('small');
+                small.textContent = item.address;
+                div.appendChild(small);
+
                 div.onclick = () => {
                     selectedPlaceData = item;
                     document.getElementById('placeQuery').value = item.name;
@@ -533,7 +530,33 @@
             container.appendChild(dayBox);
             const listDiv = document.getElementById(`day-list-${day}`);
             grouped[day].forEach(item => {
-                listDiv.insertAdjacentHTML('beforeend', `<div class="place-item" data-id="${item.id}" onclick="focusOnPlace(${item.id})" style="cursor: pointer;"><div><b>${item.place.name}</b> <small>🕒 ${item.timeLine}</small></div><button class="btn btn-sm text-danger" onclick="event.stopPropagation(); removePlace(${item.id})">✕</button></div>`);
+                const placeDiv = document.createElement('div');
+                placeDiv.className = 'place-item';
+                placeDiv.setAttribute('data-id', item.id);
+                placeDiv.style.cursor = 'pointer';
+                placeDiv.onclick = () => focusOnPlace(item.id);
+
+                const infoDiv = document.createElement('div');
+                const placeName = document.createElement('b');
+                placeName.textContent = item.place.name;
+                infoDiv.appendChild(placeName);
+                infoDiv.appendChild(document.createTextNode(' '));
+
+                const timeSmall = document.createElement('small');
+                timeSmall.textContent = `🕒 ${item.timeLine}`;
+                infoDiv.appendChild(timeSmall);
+
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'btn btn-sm text-danger';
+                removeBtn.textContent = '✕';
+                removeBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    removePlace(item.id);
+                };
+
+                placeDiv.appendChild(infoDiv);
+                placeDiv.appendChild(removeBtn);
+                listDiv.appendChild(placeDiv);
             });
             Sortable.create(listDiv, {
                 group: 'places', animation: 150,
@@ -603,14 +626,41 @@
 
         try {
             saveButton.disabled = true;
-            saveButton.innerHTML = '💾 저장 중...';
-            await authFetch('/api/v1/admin/contents', {method: 'POST', body: JSON.stringify(payload)});
-            alert("🎉 콘텐츠 저장 완료!");
-            location.reload();
+
+            if (editPendingId) {
+                // 반려 후 재검수 요청: ContentPendingData 형식으로 POST
+                saveButton.innerHTML = '📨 요청 중...';
+                const pendingPayload = {
+                    cityName: cityName,
+                    video: {
+                        videoId: vId,
+                        url: document.getElementById('v_url').value,
+                        title: document.getElementById('v_video_title').innerText,
+                        channelName: document.getElementById('v_channel_name').innerText,
+                        channelImage: document.getElementById('v_channel_img').src,
+                        uploadedDate: document.getElementById('v_date_val').value || null
+                    },
+                    contentPlaces: collectedPlaces.map(p => ({
+                        visitDay: p.visitDay,
+                        visitOrder: p.visitOrder,
+                        timeLine: p.timeLine,
+                        place: p.place
+                    }))
+                };
+                await authFetch('/api/v1/admin/content-pendings', {method: 'POST', body: JSON.stringify(pendingPayload)});
+                alert("📨 재검수 요청이 완료되었습니다!");
+                location.href = '/admin/my';
+            } else {
+                saveButton.innerHTML = '📨 검수 요청 중...';
+                const { tripDuration, ...pendingPayload } = payload;
+                await authFetch('/api/v1/admin/content-pendings', {method: 'POST', body: JSON.stringify(pendingPayload)});
+                alert("📨 검수 요청이 완료되었습니다!");
+                location.href = '/admin/my';
+            }
         } catch (e) {
-            alert("⚠️ 저장 실패\n" + e.message);
+            showErrorToast(e.message);
             saveButton.disabled = false;
-            saveButton.innerHTML = '💾 서버에 콘텐츠 저장';
+            saveButton.innerHTML = editPendingId ? '📨 재검수 요청' : '💾 서버에 콘텐츠 저장';
         }
     }
 
@@ -655,11 +705,87 @@
             });
         } catch (error) {
             console.error('도시 목록 로드 실패:', error);
+            showErrorToast('도시 목록을 불러오는데 실패했습니다: ' + error.message);
         }
     }
 
-    // 페이지 로드 시 도시 목록 불러오기
-    document.addEventListener('DOMContentLoaded', loadCities);
+    function showErrorToast(message) {
+        const toastEl = document.getElementById('errorToast');
+        document.getElementById('toastMessage').textContent = '⚠️ ' + message;
+        toastEl.classList.remove('text-bg-success', 'text-bg-danger');
+        toastEl.classList.add('text-bg-danger');
+        bootstrap.Toast.getOrCreateInstance(toastEl, {delay: 5000}).show();
+    }
+
+    let editPendingId = null;
+
+    async function loadEditData(pendingId) {
+        try {
+            const res = await authFetch(`/api/v1/admin/content-pendings/${pendingId}`);
+            const data = await res.json();
+            const cd = data.contentData;
+
+            // 편집 모드 배너 표시
+            const banner = document.createElement('div');
+            banner.className = 'alert alert-warning';
+            banner.style.cssText = 'margin: 0 0 16px 0; border-radius: 12px;';
+            banner.textContent = '✏️ ';
+            const strong = document.createElement('strong');
+            strong.textContent = '반려된 콘텐츠 수정 중';
+            banner.appendChild(strong);
+            banner.appendChild(document.createTextNode(' — 반려 사유: ' + (data.rejectReason || '(사유 없음)')));
+            document.querySelector('.container').prepend(banner);
+
+            // 저장 버튼 텍스트 변경
+            document.getElementById('saveContentBtn').innerHTML = '📨 재검수 요청';
+
+            // 영상 정보 채우기
+            document.getElementById('videoUrlInput').value = cd.video.url;
+            document.getElementById('v_id').value = cd.video.videoId;
+            document.getElementById('v_url').value = cd.video.url;
+            document.getElementById('v_channel_name').innerText = cd.video.channelName;
+            document.getElementById('v_video_title').innerText = cd.video.title;
+            document.getElementById('v_channel_img').src = cd.video.channelImage || 'https://via.placeholder.com/90?text=No+Image';
+            document.getElementById('v_date_val').value = cd.video.uploadedDate || '';
+            document.getElementById('videoInfoArea').classList.remove('d-none');
+            createPlayer(cd.video.videoId);
+
+            // 도시 이름
+            document.getElementById('cityName').value = cd.cityName;
+
+            // 장소 목록 복원
+            collectedPlaces = cd.contentPlaces.map((cp, i) => ({
+                id: Date.now() + i,
+                visitDay: cp.visitDay,
+                visitOrder: cp.visitOrder,
+                timeLine: cp.timeLine,
+                place: {
+                    name: cp.place.name,
+                    url: cp.place.url,
+                    address: cp.place.address,
+                    latitude: cp.place.latitude,
+                    longitude: cp.place.longitude,
+                    categoryName: cp.place.categoryName
+                }
+            }));
+            renderPlaceList();
+            calculateDuration();
+            updateMapMarkers();
+        } catch (e) {
+            alert('기존 데이터를 불러오는 데 실패했습니다.\n' + e.message);
+        }
+    }
+
+    // 페이지 로드 시 도시 목록 불러오기 + editId 처리
+    document.addEventListener('DOMContentLoaded', async () => {
+        await loadCities();
+        const params = new URLSearchParams(location.search);
+        const editId = params.get('editId');
+        if (editId) {
+            editPendingId = editId;
+            await loadEditData(editId);
+        }
+    });
 
     /*]]>*/
 </script>
