@@ -151,10 +151,17 @@
 
 <script>
     async function loadPendingList() {
+        const tbody = document.getElementById('pendingTableBody');
         try {
             const res = await fetch('/api/v1/admin/content-pendings/list');
+
+            if (!res.ok) {
+                const errorData = await res.json().catch(() => null);
+                const errorMessage = errorData?.message || `서버 오류 (${res.status})`;
+                throw new Error(errorMessage);
+            }
+
             const list = await res.json();
-            const tbody = document.getElementById('pendingTableBody');
 
             if (list.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="5" class="text-center py-5 text-muted">검수 대기 중인 콘텐츠가 없습니다.</td></tr>';
@@ -206,6 +213,7 @@
             });
         } catch (e) {
             console.error("데이터 로드 실패:", e);
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-5 text-danger">⚠️ 데이터를 불러오는데 실패했습니다: ' + e.message + '</td></tr>';
         }
     }
 

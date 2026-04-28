@@ -164,10 +164,17 @@
 
 <script th:inline="javascript">
     async function loadMyHistory() {
+        const tbody = document.getElementById('myCollectList');
         try {
             const response = await fetch('/api/v1/admin/contents/my');
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => null);
+                const errorMessage = errorData?.message || `서버 오류 (${response.status})`;
+                throw new Error(errorMessage);
+            }
+
             const list = await response.json();
-            const tbody = document.getElementById('myCollectList');
 
             if (list.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="3" class="text-center py-5 text-muted small">수집한 내역이 없습니다.</td></tr>';
@@ -229,6 +236,7 @@
             });
         } catch (error) {
             console.error("내역 로드 실패:", error);
+            tbody.innerHTML = '<tr><td colspan="3" class="text-center py-5 text-danger">⚠️ 데이터를 불러오는데 실패했습니다: ' + error.message + '</td></tr>';
         }
     }
 

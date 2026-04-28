@@ -705,6 +705,7 @@
             });
         } catch (error) {
             console.error('도시 목록 로드 실패:', error);
+            showErrorToast('도시 목록을 불러오는데 실패했습니다: ' + error.message);
         }
     }
 
