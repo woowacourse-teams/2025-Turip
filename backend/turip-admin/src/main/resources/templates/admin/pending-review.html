@@ -186,18 +186,44 @@
 
             // 장소 리스트 렌더링
             const container = document.getElementById('placeListContainer');
-            container.innerHTML = data.contentData.contentPlaces.map(p => `
-                <div class="place-item">
-                    <div>
-                        <span class="day-badge">${p.visitDay}일차 - ${p.visitOrder}번</span>
-                        <h6 class="fw-bold mb-1" style="font-size: 16px;">${p.place.name}</h6>
-                        <div class="text-muted small"><i class="fa-solid fa-location-dot me-1"></i> ${p.place.address}</div>
-                    </div>
-                    <div class="text-end">
-                        <span class="badge bg-light text-dark border fw-bold" style="font-size: 13px;">🕒 ${p.timeLine}</span>
-                    </div>
-                </div>
-            `).join('');
+            container.innerHTML = '';
+            data.contentData.contentPlaces.forEach(p => {
+                const placeItem = document.createElement('div');
+                placeItem.className = 'place-item';
+
+                const leftDiv = document.createElement('div');
+                const dayBadge = document.createElement('span');
+                dayBadge.className = 'day-badge';
+                dayBadge.textContent = `${p.visitDay}일차 - ${p.visitOrder}번`;
+                leftDiv.appendChild(dayBadge);
+
+                const placeName = document.createElement('h6');
+                placeName.className = 'fw-bold mb-1';
+                placeName.style.fontSize = '16px';
+                placeName.textContent = p.place.name;
+                leftDiv.appendChild(placeName);
+
+                const addressDiv = document.createElement('div');
+                addressDiv.className = 'text-muted small';
+                const icon = document.createElement('i');
+                icon.className = 'fa-solid fa-location-dot me-1';
+                addressDiv.appendChild(icon);
+                addressDiv.appendChild(document.createTextNode(' ' + p.place.address));
+                leftDiv.appendChild(addressDiv);
+
+                placeItem.appendChild(leftDiv);
+
+                const rightDiv = document.createElement('div');
+                rightDiv.className = 'text-end';
+                const timeBadge = document.createElement('span');
+                timeBadge.className = 'badge bg-light text-dark border fw-bold';
+                timeBadge.style.fontSize = '13px';
+                timeBadge.textContent = `🕒 ${p.timeLine}`;
+                rightDiv.appendChild(timeBadge);
+                placeItem.appendChild(rightDiv);
+
+                container.appendChild(placeItem);
+            });
         } catch (e) {
             console.error(e);
             alert("데이터 로드 중 에러가 발생했습니다.");

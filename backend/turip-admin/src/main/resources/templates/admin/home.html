@@ -276,12 +276,24 @@
                 return;
             }
 
-            container.innerHTML = list.slice(0, 5).map(item => `
-                <a href="/admin/contents/pending/${item.id}" class="notif-item">
-                    <span class="notif-title">${item.videoTitle}</span>
-                    <span class="notif-user">${item.collectorNickname}님의 요청</span>
-                </a>
-            `).join('');
+            container.innerHTML = '';
+            list.slice(0, 5).forEach(item => {
+                const link = document.createElement('a');
+                link.href = `/admin/contents/pending/${item.id}`;
+                link.className = 'notif-item';
+
+                const titleSpan = document.createElement('span');
+                titleSpan.className = 'notif-title';
+                titleSpan.textContent = item.videoTitle;
+                link.appendChild(titleSpan);
+
+                const userSpan = document.createElement('span');
+                userSpan.className = 'notif-user';
+                userSpan.textContent = `${item.collectorNickname}님의 요청`;
+                link.appendChild(userSpan);
+
+                container.appendChild(link);
+            });
         } catch (e) {
             console.error(e);
         }

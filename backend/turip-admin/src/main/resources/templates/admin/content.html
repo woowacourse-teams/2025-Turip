@@ -444,7 +444,16 @@
             data.items.forEach(item => {
                 const div = document.createElement('div');
                 div.className = 'search-result-item';
-                div.innerHTML = `<strong>${item.name}</strong><br><small>${item.address}</small>`;
+
+                const strong = document.createElement('strong');
+                strong.textContent = item.name;
+                div.appendChild(strong);
+                div.appendChild(document.createElement('br'));
+
+                const small = document.createElement('small');
+                small.textContent = item.address;
+                div.appendChild(small);
+
                 div.onclick = () => {
                     selectedPlaceData = item;
                     document.getElementById('placeQuery').value = item.name;
@@ -521,7 +530,33 @@
             container.appendChild(dayBox);
             const listDiv = document.getElementById(`day-list-${day}`);
             grouped[day].forEach(item => {
-                listDiv.insertAdjacentHTML('beforeend', `<div class="place-item" data-id="${item.id}" onclick="focusOnPlace(${item.id})" style="cursor: pointer;"><div><b>${item.place.name}</b> <small>🕒 ${item.timeLine}</small></div><button class="btn btn-sm text-danger" onclick="event.stopPropagation(); removePlace(${item.id})">✕</button></div>`);
+                const placeDiv = document.createElement('div');
+                placeDiv.className = 'place-item';
+                placeDiv.setAttribute('data-id', item.id);
+                placeDiv.style.cursor = 'pointer';
+                placeDiv.onclick = () => focusOnPlace(item.id);
+
+                const infoDiv = document.createElement('div');
+                const placeName = document.createElement('b');
+                placeName.textContent = item.place.name;
+                infoDiv.appendChild(placeName);
+                infoDiv.appendChild(document.createTextNode(' '));
+
+                const timeSmall = document.createElement('small');
+                timeSmall.textContent = `🕒 ${item.timeLine}`;
+                infoDiv.appendChild(timeSmall);
+
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'btn btn-sm text-danger';
+                removeBtn.textContent = '✕';
+                removeBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    removePlace(item.id);
+                };
+
+                placeDiv.appendChild(infoDiv);
+                placeDiv.appendChild(removeBtn);
+                listDiv.appendChild(placeDiv);
             });
             Sortable.create(listDiv, {
                 group: 'places', animation: 150,
@@ -693,7 +728,11 @@
             const banner = document.createElement('div');
             banner.className = 'alert alert-warning';
             banner.style.cssText = 'margin: 0 0 16px 0; border-radius: 12px;';
-            banner.innerHTML = `✏️ <strong>반려된 콘텐츠 수정 중</strong> — 반려 사유: ${data.rejectReason || '(사유 없음)'}`;
+            banner.textContent = '✏️ ';
+            const strong = document.createElement('strong');
+            strong.textContent = '반려된 콘텐츠 수정 중';
+            banner.appendChild(strong);
+            banner.appendChild(document.createTextNode(' — 반려 사유: ' + (data.rejectReason || '(사유 없음)')));
             document.querySelector('.container').prepend(banner);
 
             // 저장 버튼 텍스트 변경

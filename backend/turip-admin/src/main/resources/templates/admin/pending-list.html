@@ -161,18 +161,49 @@
                 return;
             }
 
-            tbody.innerHTML = list.map(item => `
-                <tr>
-                    <td>${item.id}</td>
-                    <td>
-                        <span class="video-title">${item.videoTitle}</span>
-                        <span class="channel-name">${item.channelName}</span>
-                    </td>
-                    <td class="collector-name">${item.collectorNickname}</td>
-                    <td class="text-center"><span class="status-badge">대기 중</span></td>
-                    <td class="text-end"><a href="/admin/contents/pending/${item.id}" class="btn-review">상세 검수</a></td>
-                </tr>
-            `).join('');
+            tbody.innerHTML = '';
+            list.forEach(item => {
+                const tr = document.createElement('tr');
+
+                const tdId = document.createElement('td');
+                tdId.textContent = item.id;
+                tr.appendChild(tdId);
+
+                const tdVideo = document.createElement('td');
+                const videoTitle = document.createElement('span');
+                videoTitle.className = 'video-title';
+                videoTitle.textContent = item.videoTitle;
+                const channelName = document.createElement('span');
+                channelName.className = 'channel-name';
+                channelName.textContent = item.channelName;
+                tdVideo.appendChild(videoTitle);
+                tdVideo.appendChild(channelName);
+                tr.appendChild(tdVideo);
+
+                const tdCollector = document.createElement('td');
+                tdCollector.className = 'collector-name';
+                tdCollector.textContent = item.collectorNickname;
+                tr.appendChild(tdCollector);
+
+                const tdStatus = document.createElement('td');
+                tdStatus.className = 'text-center';
+                const statusBadge = document.createElement('span');
+                statusBadge.className = 'status-badge';
+                statusBadge.textContent = '대기 중';
+                tdStatus.appendChild(statusBadge);
+                tr.appendChild(tdStatus);
+
+                const tdAction = document.createElement('td');
+                tdAction.className = 'text-end';
+                const link = document.createElement('a');
+                link.href = `/admin/contents/pending/${item.id}`;
+                link.className = 'btn-review';
+                link.textContent = '상세 검수';
+                tdAction.appendChild(link);
+                tr.appendChild(tdAction);
+
+                tbody.appendChild(tr);
+            });
         } catch (e) {
             console.error("데이터 로드 실패:", e);
         }
