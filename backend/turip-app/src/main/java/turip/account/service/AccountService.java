@@ -49,7 +49,7 @@ public class AccountService {
     @Transactional
     public void deleteAccountAndFavorites(Account account) {
         favoriteContentRepository.deleteByAccount(account);
-        favoriteFolderService.deletePersonalFoldersByAccount(account);
+        favoriteFolderService.deleteAloneFoldersByAccount(account);
         accountRepository.delete(account);
     }
 }

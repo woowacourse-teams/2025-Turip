@@ -117,10 +117,11 @@ class FavoriteFolderRepositoryTest {
     }
 
     @Test
-    @DisplayName("계정에 대한 개인 폴더들을 조회한다")
-    void findPersonalFoldersByAccount() {
+    @DisplayName("계정에 대해 혼자 참여중인 폴더들을 조회한다")
+    void findAloneFoldersByAccount() {
         // given
         Account account1 = accountRepository.save(AccountFixture.createEntity());
+        Account account2 = accountRepository.save(AccountFixture.createEntity());
 
         FavoriteFolder folder1 = favoriteFolderRepository.save(FavoriteFolderFixture.createDefaultFolder());
         FavoriteFolder folder2 = favoriteFolderRepository.save(FavoriteFolderFixture.createSharedFolder("공유 폴더"));
@@ -131,10 +132,12 @@ class FavoriteFolderRepositoryTest {
         favoriteFolderAccountRepository.save(
                 FavoriteFolderAccountFixture.createFavoriteFolderAccount(folder2, account1, AccountRole.OWNER));
         favoriteFolderAccountRepository.save(
+                FavoriteFolderAccountFixture.createFavoriteFolderAccount(folder2, account2, AccountRole.MEMBER));
+        favoriteFolderAccountRepository.save(
                 FavoriteFolderAccountFixture.createFavoriteFolderAccount(folder3, account1, AccountRole.OWNER));
 
         // when
-        List<FavoriteFolder> personalFolders = favoriteFolderRepository.findPersonalFoldersByAccount(account1);
+        List<FavoriteFolder> personalFolders = favoriteFolderRepository.findAloneFoldersByAccount(account1);
 
         // then
         assertThat(personalFolders).hasSize(2);
