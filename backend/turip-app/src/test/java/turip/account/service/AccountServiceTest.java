@@ -133,7 +133,7 @@ class AccountServiceTest {
 
             // then
             verify(favoriteContentRepository).deleteByAccount(account);
-            verify(favoriteFolderService).deletePersonalFoldersByAccount(account);
+            verify(favoriteFolderService).deleteAloneFoldersByAccount(account);
             verify(accountRepository).delete(account);
         }
     }

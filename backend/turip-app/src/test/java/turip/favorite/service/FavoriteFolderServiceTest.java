@@ -842,11 +842,11 @@ class FavoriteFolderServiceTest {
             FavoriteFolder personalFolder1 = FavoriteFolderFixture.createCustomFolderWithId(folderId1, "개인 폴더 1");
             FavoriteFolder personalFolder2 = FavoriteFolderFixture.createCustomFolderWithId(folderId2, "개인 폴더 2");
 
-            given(favoriteFolderRepository.findPersonalFoldersByAccount(account))
+            given(favoriteFolderRepository.findAloneFoldersByAccount(account))
                     .willReturn(List.of(personalFolder1, personalFolder2));
 
             // when
-            favoriteFolderService.deletePersonalFoldersByAccount(account);
+            favoriteFolderService.deleteAloneFoldersByAccount(account);
 
             // then
             assertAll(
