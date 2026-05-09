@@ -19,8 +19,8 @@ import turip.auth.domain.RefreshToken;
 import turip.auth.service.dto.SocialLoginResult;
 import turip.auth.service.dto.TokenResult;
 import turip.auth.service.dto.TuripLoginResult;
-import turip.auth.token.AppleTokenParser;
-import turip.auth.token.GoogleTokenParser;
+import turip.auth.token.IdTokenParser;
+import turip.auth.token.IdTokenParserResolver;
 import turip.auth.token.JwtProvider;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.BadRequestException;
@@ -32,8 +32,7 @@ import turip.common.exception.custom.UnauthorizedException;
 public class AuthService {
 
     private final JwtProvider jwtProvider;
-    private final GoogleTokenParser googleTokenParser;
-    private final AppleTokenParser appleTokenParser;
+    private final IdTokenParserResolver idTokenParserResolver;
     private final RefreshTokenService refreshTokenService;
     private final MemberService memberService;
     private final SocialMemberService socialMemberService;
@@ -61,13 +60,23 @@ public class AuthService {
 
     @Transactional
     public SocialLoginResult loginWithSocial(SocialLoginRequest request, Provider provider, String deviceFid) {
-        if (provider == Provider.GOOGLE) {
-            return loginWithGoogle(request, deviceFid);
+        String idToken = request.idToken();
+        validateIdToken(idToken);
+
+        IdTokenParser parser = idTokenParserResolver.resolve(provider);
+        String providerId = parser.getProviderId(idToken);
+        String email = parser.getEmail(idToken);
+
+        Member member = findOrCreateSocialMember(provider, providerId, email);
+
+        boolean isNewMember = false;
+        if (member.isFirstLogin()) {
+            member.completeFirstLogin();
+            isNewMember = true;
         }
-        if (provider == Provider.APPLE) {
-            return loginWithApple(request, deviceFid);
-        }
-        throw new UnauthorizedException(ErrorTag.UNAUTHORIZED);
+        TokenResult tokenResult = issueToken(deviceFid, member);
+
+        return SocialLoginResult.of(tokenResult, isNewMember, member);
     }
 
     @Transactional
@@ -115,26 +124,6 @@ public class AuthService {
         return TokenResult.of(accessToken, refreshToken);
     }
 
-    private SocialLoginResult loginWithGoogle(SocialLoginRequest request, String deviceFid) {
-        String idToken = request.idToken();
-        validateIdToken(idToken);
-
-        Provider provider = googleTokenParser.getProvider();
-        String providerId = googleTokenParser.getProviderId(idToken);
-        String email = googleTokenParser.getEmail(idToken);
-
-        Member member = findOrCreateSocialMember(provider, providerId, email);
-
-        boolean isNewMember = false;
-        if (member.isFirstLogin()) {
-            member.completeFirstLogin();
-            isNewMember = true;
-        }
-        TokenResult tokenResult = issueToken(deviceFid, member);
-
-        return SocialLoginResult.of(tokenResult, isNewMember, member);
-    }
-
     private Member findOrCreateSocialMember(Provider provider, String providerId, String email) {
         return socialMemberService.findOrCreate(provider, providerId, email).getMember();
     }
@@ -176,25 +165,5 @@ public class AuthService {
         if (idToken == null || idToken.isBlank()) {
             throw new BadRequestException(ErrorTag.ID_TOKEN_NOT_VALID);
         }
-    }
-
-    private SocialLoginResult loginWithApple(SocialLoginRequest request, String deviceFid) {
-        String idToken = request.idToken();
-        validateIdToken(idToken);
-
-        Provider provider = appleTokenParser.getProvider();
-        String providerId = appleTokenParser.getProviderId(idToken);
-        String email = appleTokenParser.getEmail(idToken);
-
-        Member member = findOrCreateSocialMember(provider, providerId, email);
-
-        boolean isNewMember = false;
-        if (member.isFirstLogin()) {
-            member.completeFirstLogin();
-            isNewMember = true;
-        }
-        TokenResult tokenResult = issueToken(deviceFid, member);
-
-        return SocialLoginResult.of(tokenResult, isNewMember, member);
     }
 }
