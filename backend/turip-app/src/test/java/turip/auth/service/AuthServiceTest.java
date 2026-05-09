@@ -30,14 +30,15 @@ import turip.account.domain.TuripMember;
 import turip.account.service.MemberService;
 import turip.account.service.SocialMemberService;
 import turip.account.service.TuripMemberService;
-import turip.auth.controller.dto.request.GoogleLoginRequest;
 import turip.auth.controller.dto.request.RefreshTokenRequest;
+import turip.auth.controller.dto.request.SocialLoginRequest;
 import turip.auth.controller.dto.request.TuripLoginRequest;
 import turip.auth.controller.dto.response.RefreshTokenResponse;
 import turip.auth.domain.RefreshToken;
 import turip.auth.service.dto.SocialLoginResult;
 import turip.auth.service.dto.TuripLoginResult;
-import turip.auth.token.GoogleTokenParser;
+import turip.auth.token.IdTokenParser;
+import turip.auth.token.IdTokenParserResolver;
 import turip.auth.token.JwtProvider;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.NotFoundException;
@@ -54,7 +55,10 @@ class AuthServiceTest {
     private JwtProvider jwtProvider;
 
     @Mock
-    private GoogleTokenParser googleTokenParser;
+    private IdTokenParserResolver idTokenParserResolver;
+
+    @Mock
+    private IdTokenParser idTokenParser;
 
     @Mock
     private MemberService memberService;
@@ -142,11 +146,11 @@ class AuthServiceTest {
             String accessToken = "access-token";
             String refreshToken = "refresh-token";
 
-            GoogleLoginRequest request = new GoogleLoginRequest(idToken);
+            SocialLoginRequest request = new SocialLoginRequest(idToken);
 
-            when(googleTokenParser.getProvider()).thenReturn(provider);
-            when(googleTokenParser.getProviderId(idToken)).thenReturn(providerId);
-            when(googleTokenParser.getEmail(idToken)).thenReturn(email);
+            when(idTokenParserResolver.resolve(provider)).thenReturn(idTokenParser);
+            when(idTokenParser.getProviderId(idToken)).thenReturn(providerId);
+            when(idTokenParser.getEmail(idToken)).thenReturn(email);
             when(socialMemberService.findOrCreate(provider, providerId, email)).thenReturn(socialMember);
             when(jwtProvider.generateAccessToken(1L, account.getRole())).thenReturn(accessToken);
             when(jwtProvider.generateRefreshToken(1L, account.getRole())).thenReturn(refreshToken);
@@ -185,11 +189,11 @@ class AuthServiceTest {
             Member member = MemberFixture.createCustomMember(account, email, true);
             SocialMember socialMember = SocialMemberFixture.createCustomSocialMember(member, provider, providerId);
 
-            GoogleLoginRequest request = new GoogleLoginRequest(idToken);
+            SocialLoginRequest request = new SocialLoginRequest(idToken);
 
-            when(googleTokenParser.getProvider()).thenReturn(provider);
-            when(googleTokenParser.getProviderId(idToken)).thenReturn(providerId);
-            when(googleTokenParser.getEmail(idToken)).thenReturn(email);
+            when(idTokenParserResolver.resolve(provider)).thenReturn(idTokenParser);
+            when(idTokenParser.getProviderId(idToken)).thenReturn(providerId);
+            when(idTokenParser.getEmail(idToken)).thenReturn(email);
             when(socialMemberService.findOrCreate(provider, providerId, email)).thenReturn(socialMember);
             when(jwtProvider.generateAccessToken(1L, account.getRole())).thenReturn("access-token");
             when(jwtProvider.generateRefreshToken(1L, account.getRole())).thenReturn("refresh-token");
@@ -217,10 +221,10 @@ class AuthServiceTest {
             // given
             String invalidIdToken = "invalid-token";
             String deviceFid = "device-123";
-            GoogleLoginRequest request = new GoogleLoginRequest(invalidIdToken);
+            SocialLoginRequest request = new SocialLoginRequest(invalidIdToken);
 
-            when(googleTokenParser.getProvider()).thenReturn(Provider.GOOGLE);
-            when(googleTokenParser.getProviderId(invalidIdToken))
+            when(idTokenParserResolver.resolve(Provider.GOOGLE)).thenReturn(idTokenParser);
+            when(idTokenParser.getProviderId(invalidIdToken))
                     .thenThrow(new UnauthorizedException(ErrorTag.ID_TOKEN_NOT_VALID));
 
             // when & then
