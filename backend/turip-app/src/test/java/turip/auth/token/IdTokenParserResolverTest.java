@@ -1,7 +1,6 @@
 package turip.auth.token;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -12,8 +11,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import turip.account.domain.Provider;
-import turip.common.exception.ErrorTag;
-import turip.common.exception.custom.UnauthorizedException;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("IdTokenParserResolver 테스트")
