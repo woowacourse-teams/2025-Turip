@@ -11,14 +11,15 @@ import turip.account.domain.Role;
 import turip.account.service.MemberService;
 import turip.account.service.SocialMemberService;
 import turip.account.service.TuripMemberService;
-import turip.auth.controller.dto.request.GoogleLoginRequest;
 import turip.auth.controller.dto.request.RefreshTokenRequest;
+import turip.auth.controller.dto.request.SocialLoginRequest;
 import turip.auth.controller.dto.request.TuripLoginRequest;
 import turip.auth.controller.dto.response.RefreshTokenResponse;
 import turip.auth.domain.RefreshToken;
 import turip.auth.service.dto.SocialLoginResult;
 import turip.auth.service.dto.TokenResult;
 import turip.auth.service.dto.TuripLoginResult;
+import turip.auth.token.AppleTokenParser;
 import turip.auth.token.GoogleTokenParser;
 import turip.auth.token.JwtProvider;
 import turip.common.exception.ErrorTag;
@@ -32,6 +33,7 @@ public class AuthService {
 
     private final JwtProvider jwtProvider;
     private final GoogleTokenParser googleTokenParser;
+    private final AppleTokenParser appleTokenParser;
     private final RefreshTokenService refreshTokenService;
     private final MemberService memberService;
     private final SocialMemberService socialMemberService;
@@ -58,9 +60,12 @@ public class AuthService {
     }
 
     @Transactional
-    public SocialLoginResult loginWithSocial(GoogleLoginRequest request, Provider provider, String deviceFid) {
+    public SocialLoginResult loginWithSocial(SocialLoginRequest request, Provider provider, String deviceFid) {
         if (provider == Provider.GOOGLE) {
             return loginWithGoogle(request, deviceFid);
+        }
+        if (provider == Provider.APPLE) {
+            return loginWithApple(request, deviceFid);
         }
         throw new UnauthorizedException(ErrorTag.UNAUTHORIZED);
     }
@@ -110,7 +115,7 @@ public class AuthService {
         return TokenResult.of(accessToken, refreshToken);
     }
 
-    private SocialLoginResult loginWithGoogle(GoogleLoginRequest request, String deviceFid) {
+    private SocialLoginResult loginWithGoogle(SocialLoginRequest request, String deviceFid) {
         String idToken = request.idToken();
         validateIdToken(idToken);
 
@@ -171,5 +176,25 @@ public class AuthService {
         if (idToken == null || idToken.isBlank()) {
             throw new BadRequestException(ErrorTag.ID_TOKEN_NOT_VALID);
         }
+    }
+
+    private SocialLoginResult loginWithApple(SocialLoginRequest request, String deviceFid) {
+        String idToken = request.idToken();
+        validateIdToken(idToken);
+
+        Provider provider = appleTokenParser.getProvider();
+        String providerId = appleTokenParser.getProviderId(idToken);
+        String email = appleTokenParser.getEmail(idToken);
+
+        Member member = findOrCreateSocialMember(provider, providerId, email);
+
+        boolean isNewMember = false;
+        if (member.isFirstLogin()) {
+            member.completeFirstLogin();
+            isNewMember = true;
+        }
+        TokenResult tokenResult = issueToken(deviceFid, member);
+
+        return SocialLoginResult.of(tokenResult, isNewMember, member);
     }
 }
