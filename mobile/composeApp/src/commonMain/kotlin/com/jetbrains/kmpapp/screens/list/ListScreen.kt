@@ -1,15 +1,12 @@
-package com.jetbrains.kmpapp.screens.list
+package com.on.turip.screens.list
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
@@ -21,19 +18,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil3.compose.AsyncImage
-import com.jetbrains.kmpapp.data.MuseumObject
-import com.jetbrains.kmpapp.screens.EmptyScreenContent
+import com.on.turip.data.MuseumObject
+import com.on.turip.screens.EmptyScreenContent
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun ListScreen(
-    navigateToDetails: (objectId: Int) -> Unit
-) {
+fun ListScreen(navigateToDetails: (objectId: Int) -> Unit) {
     val viewModel = koinViewModel<ListViewModel>()
     val objects by viewModel.objects.collectAsStateWithLifecycle()
 
@@ -78,18 +70,8 @@ private fun ObjectFrame(
     Column(
         modifier
             .padding(8.dp)
-            .clickable { onClick() }
+            .clickable { onClick() },
     ) {
-        AsyncImage(
-            model = obj.primaryImageSmall,
-            contentDescription = obj.title,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(1f)
-                .background(Color.LightGray),
-        )
-
         Spacer(Modifier.height(2.dp))
 
         Text(obj.title, style = MaterialTheme.typography.titleMedium)
