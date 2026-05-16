@@ -92,7 +92,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
  * ## 사용 예시
  * ```kotlin
  * plugins {
- *     id("turip.convention.kmp.feature.impl")
+ *     id("turip.convention.kotlin.feature.impl")
  * }
  * ```
  */

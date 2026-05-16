@@ -34,7 +34,7 @@ composeNavigationEvent = "1.0.0"
 
 
 # Navigation
-multiplatform-nav3-ui = "1.0.0-alpha05"
+multiplatform-nav3 = "1.0.0-alpha05"
 compose-multiplatform-lifecycle = "2.10.0-alpha05"
 
 # Room Database
@@ -110,7 +110,8 @@ compose-navigationevent = { module = "org.jetbrains.androidx.navigationevent:nav
 material-icons-extended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
 
 # Navigation
-jetbrains-navigation3-ui = { module = "org.jetbrains.androidx.navigation3:navigation3-ui", version.ref = "multiplatform-nav3-ui" }
+jetbrains-navigation3-runtime = { module = "org.jetbrains.androidx.navigation3:navigation3-runtime", version.ref = "multiplatform-nav3" }
+jetbrains-navigation3-ui = { module = "org.jetbrains.androidx.navigation3:navigation3-ui", version.ref = "multiplatform-nav3" }
 jetbrains-lifecycle-viewmodelNavigation3 = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "compose-multiplatform-lifecycle" }
 
 # Ktor

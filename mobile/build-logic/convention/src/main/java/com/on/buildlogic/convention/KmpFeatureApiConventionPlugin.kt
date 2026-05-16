@@ -35,7 +35,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
  *
  * - `kotlinx-serialization-json`
  *   - 공통 계층에서 JSON 직렬화/역직렬화 처리
- * - `androidx-nav3-runtime`
+ * - `jetbrains-navigation3-runtime`
  *   - Navigation 로직을 공통 계층(API 레벨)에서 참조하기 위한 런타임 의존성
  *
  * ## Android Library 설정
@@ -68,7 +68,7 @@ internal class KmpFeatureApiConventionPlugin : Plugin<Project> {
                 sourceSets.named("commonMain") {
                     dependencies {
                         implementation(libs.library("kotlinx-serialization-json"))
-                        implementation(libs.library("jetbrains-navigation3-ui"))
+                        implementation(libs.library("jetbrains-navigation3-runtime"))
                     }
                 }
             }

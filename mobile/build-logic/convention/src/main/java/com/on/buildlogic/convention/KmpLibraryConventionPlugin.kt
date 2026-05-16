@@ -17,13 +17,12 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
  *
  * ## 역할
  * - Kotlin Multiplatform + Android Library 환경을 표준화한다.
- * - Android / iOS 타겟 구성을 통일하고, iOS에서 사용할 Framework 바이너리 설정을 적용한다.
- * - 공통 소스(`commonMain`)에서 사용할 기본 의존성과 직렬화 플러그인 적용을 일괄 처리한다.
+ * - Android / iOS 타겟 구성을 통일한다.
+ * - 공통 소스(`commonMain`)에서 사용할 기본 의존성을 일괄 처리한다.
  *
  * ## 적용되는 플러그인
  * - `org.jetbrains.kotlin.multiplatform`
  * - `com.android.library`
- * - `turip.convention.kotlin.serialization`
  *
  * ## Kotlin Multiplatform 설정
  * - `configureTuripTargets()`로 Android / iOS 타겟을 구성한다.
