@@ -1,8 +1,8 @@
 package com.on.turip.core.local.di
 
-import com.on.turip.core.domain.searchhistory.SearchHistoryRepository
+import com.on.turip.core.domain.repository.SearchHistoryRepository
 import com.on.turip.core.domain.session.TokenManager
-import com.on.turip.core.domain.userstorage.UserStorageRepository
+import com.on.turip.core.domain.repository.UserStorageRepository
 import com.on.turip.core.local.searchhistory.DefaultSearchHistoryRepository
 import com.on.turip.core.local.userstorage.DefaultTokenManager
 import com.on.turip.core.local.userstorage.DefaultUserStorageRepository

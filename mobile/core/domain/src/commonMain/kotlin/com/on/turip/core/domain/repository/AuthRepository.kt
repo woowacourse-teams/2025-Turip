@@ -1,4 +1,4 @@
-package com.on.turip.core.domain.auth
+package com.on.turip.core.domain.repository
 
 import com.on.turip.core.model.AuthTokens
 

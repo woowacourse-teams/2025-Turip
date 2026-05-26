@@ -1,6 +1,6 @@
 package com.on.turip.core.local.searchhistory
 
-import com.on.turip.core.domain.searchhistory.SearchHistoryRepository
+import com.on.turip.core.domain.repository.SearchHistoryRepository
 import com.on.turip.core.local.database.SearchHistoryDao
 import com.on.turip.core.local.database.SearchHistoryEntity
 import com.on.turip.core.model.SearchHistory

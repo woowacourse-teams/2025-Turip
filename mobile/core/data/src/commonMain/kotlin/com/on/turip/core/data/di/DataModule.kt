@@ -9,15 +9,15 @@ import com.on.turip.core.data.repository.DefaultInvitationRepository
 import com.on.turip.core.data.repository.DefaultRegionRepository
 import com.on.turip.core.data.session.DefaultSessionManager
 import com.on.turip.core.data.repository.DefaultTuripRepository
-import com.on.turip.core.domain.account.AccountRepository
-import com.on.turip.core.domain.auth.AuthRepository
-import com.on.turip.core.domain.bookmark.BookmarkRepository
-import com.on.turip.core.domain.content.ContentRepository
-import com.on.turip.core.domain.invitation.DeferredDeepLinkRepository
-import com.on.turip.core.domain.invitation.InvitationRepository
-import com.on.turip.core.domain.region.RegionRepository
+import com.on.turip.core.domain.repository.AccountRepository
+import com.on.turip.core.domain.repository.AuthRepository
+import com.on.turip.core.domain.repository.BookmarkRepository
+import com.on.turip.core.domain.repository.ContentRepository
+import com.on.turip.core.domain.repository.DeferredDeepLinkRepository
+import com.on.turip.core.domain.repository.InvitationRepository
+import com.on.turip.core.domain.repository.RegionRepository
 import com.on.turip.core.domain.session.SessionManager
-import com.on.turip.core.domain.turip.TuripRepository
+import com.on.turip.core.domain.repository.TuripRepository
 import org.koin.dsl.module
 
 val dataModule = module {

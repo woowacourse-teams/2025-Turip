@@ -1,4 +1,4 @@
-package com.on.turip.core.domain.turip
+package com.on.turip.core.domain.repository
 
 import com.on.turip.core.model.Member
 import com.on.turip.core.model.Turip

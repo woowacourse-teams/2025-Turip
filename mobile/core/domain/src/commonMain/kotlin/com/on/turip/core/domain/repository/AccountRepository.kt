@@ -1,4 +1,4 @@
-package com.on.turip.core.domain.account
+package com.on.turip.core.domain.repository
 
 import com.on.turip.core.model.Member
 

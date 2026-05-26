@@ -1,7 +1,7 @@
 package com.on.turip.feature.splash.impl.viewmodel
 
 import androidx.lifecycle.viewModelScope
-import com.on.turip.core.domain.invitation.DeferredDeepLinkRepository
+import com.on.turip.core.domain.repository.DeferredDeepLinkRepository
 import com.on.turip.core.domain.session.AuthStatus
 import com.on.turip.core.domain.session.SessionManager
 import com.on.turip.core.domain.session.usecase.DetermineInitialSessionUseCase

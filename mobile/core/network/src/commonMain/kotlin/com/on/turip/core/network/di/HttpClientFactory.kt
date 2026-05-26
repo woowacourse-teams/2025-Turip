@@ -1,7 +1,7 @@
 package com.on.turip.core.network.di
 
 import com.on.turip.core.common.ApiException
-import com.on.turip.core.domain.auth.AuthRepository
+import com.on.turip.core.domain.repository.AuthRepository
 import com.on.turip.core.domain.session.TokenManager
 import com.on.turip.core.network.error.ErrorResponse
 import com.on.turip.core.network.error.toNetworkError

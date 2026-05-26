@@ -1,7 +1,7 @@
 package com.on.turip.core.data.repository
 
 import com.on.turip.core.common.safeApiCall
-import com.on.turip.core.domain.account.AccountRepository
+import com.on.turip.core.domain.repository.AccountRepository
 import com.on.turip.core.model.Member
 import com.on.turip.core.network.datasource.AccountDatasource
 

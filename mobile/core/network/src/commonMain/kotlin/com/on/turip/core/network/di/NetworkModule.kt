@@ -1,6 +1,6 @@
 package com.on.turip.core.network.di
 
-import com.on.turip.core.domain.auth.AuthRepository
+import com.on.turip.core.domain.repository.AuthRepository
 import com.on.turip.core.domain.session.AuthTokenCacheController
 import com.on.turip.core.domain.session.TokenManager
 import com.on.turip.core.domain.turip.TuripStreamService

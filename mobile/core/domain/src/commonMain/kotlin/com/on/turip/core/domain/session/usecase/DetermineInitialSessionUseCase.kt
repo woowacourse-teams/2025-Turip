@@ -2,7 +2,7 @@ package com.on.turip.core.domain.session.usecase
 
 import com.on.turip.core.common.NetworkError
 import com.on.turip.core.common.NetworkException
-import com.on.turip.core.domain.auth.AuthRepository
+import com.on.turip.core.domain.repository.AuthRepository
 import com.on.turip.core.domain.session.AuthStatus
 import com.on.turip.core.domain.session.TokenManager
 
