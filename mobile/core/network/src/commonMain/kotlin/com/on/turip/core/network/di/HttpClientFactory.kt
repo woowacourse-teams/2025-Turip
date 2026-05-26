@@ -36,11 +36,16 @@ private val jsonConfig = Json {
 private class TokenCache {
     @kotlin.concurrent.Volatile
     var value: BearerTokens? = null
-    fun clear() { value = null }
+
+    fun clear() {
+        value = null
+    }
 }
 
 expect fun createDefaultEngine(config: HttpClientConfig<*>.() -> Unit): HttpClient
+
 expect fun createNoAuthEngine(config: HttpClientConfig<*>.() -> Unit): HttpClient
+
 expect fun createSseEngine(config: HttpClientConfig<*>.() -> Unit): HttpClient
 
 fun buildDefaultHttpClient(

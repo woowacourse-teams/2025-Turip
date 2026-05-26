@@ -25,6 +25,8 @@ class DefaultAuthRepository(
             authDatasource.postReissueToken(ReissueTokenRequest(refreshToken)).toDomain()
         }
 
+    override suspend fun verifyToken(): Result<Unit> = safeApiCall { authDatasource.verifyToken() }
+
     private fun com.on.turip.core.network.dto.auth.LoginJwtTokenResponse.toDomain() =
         AuthTokens(accessToken = accessToken, refreshToken = refreshToken)
 

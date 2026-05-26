@@ -46,13 +46,17 @@ class DefaultTuripStreamService(
         )
         "FOLDER_UPDATE" -> TuripStreamEvent.FolderUpdate(
             turipId = turipId,
-            action = element["action"]?.jsonPrimitive?.content
+            action = element["action"]
+                ?.jsonPrimitive
+                ?.content
                 ?.let { parseFolderAction(it) } ?: FolderUpdateAction.UNKNOWN,
             timestamp = element["timestamp"]?.jsonPrimitive?.long ?: 0L,
         )
         "MEMBER_UPDATE" -> TuripStreamEvent.MemberUpdate(
             turipId = turipId,
-            action = element["action"]?.jsonPrimitive?.content
+            action = element["action"]
+                ?.jsonPrimitive
+                ?.content
                 ?.let { parseMemberAction(it) } ?: MemberUpdateAction.UNKNOWN,
             memberCount = element["memberCount"]?.jsonPrimitive?.int ?: 0,
             members = emptyList(),

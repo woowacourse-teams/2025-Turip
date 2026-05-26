@@ -7,5 +7,7 @@ import de.jensklingenberg.ktorfit.http.Query
 
 interface RegionService {
     @GET(ApiPath.V1 + "region-categories")
-    suspend fun getRegionCategories(@Query("isKorea") isDomestic: Boolean): List<RegionCategoryResponse>
+    suspend fun getRegionCategories(
+        @Query("isKorea") isDomestic: Boolean,
+    ): List<RegionCategoryResponse>
 }

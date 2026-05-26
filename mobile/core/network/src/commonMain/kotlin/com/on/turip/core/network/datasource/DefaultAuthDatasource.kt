@@ -17,4 +17,6 @@ class DefaultAuthDatasource(
 
     override suspend fun postReissueToken(body: ReissueTokenRequest): ReissueTokenResponse =
         authService.postReissueToken(body)
+
+    override suspend fun verifyToken() = authService.verifyToken()
 }

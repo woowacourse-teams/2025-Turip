@@ -9,10 +9,14 @@ import de.jensklingenberg.ktorfit.http.Query
 
 interface ContentService {
     @GET(ApiPath.V1 + "contents/{contentId}")
-    suspend fun getContent(@Path("contentId") contentId: Long): ContentResponse
+    suspend fun getContent(
+        @Path("contentId") contentId: Long,
+    ): ContentResponse
 
     @GET(ApiPath.V1 + "contents/popular")
-    suspend fun getPopularContents(@Query("size") size: Int): List<UsersLikeContentResponse>
+    suspend fun getPopularContents(
+        @Query("size") size: Int,
+    ): List<UsersLikeContentResponse>
 
     @GET(ApiPath.V1 + "contents/keyword")
     suspend fun getContentsByKeyword(
@@ -22,7 +26,9 @@ interface ContentService {
     ): List<ContentResponse>
 
     @GET(ApiPath.V1 + "contents/keyword/count")
-    suspend fun getContentsSizeByKeyword(@Query("keyword") keyword: String): Int
+    suspend fun getContentsSizeByKeyword(
+        @Query("keyword") keyword: String,
+    ): Int
 
     @GET(ApiPath.V1 + "contents")
     suspend fun getContentsByRegion(
@@ -32,5 +38,7 @@ interface ContentService {
     ): List<ContentResponse>
 
     @GET(ApiPath.V1 + "contents/count")
-    suspend fun getContentsSizeByRegion(@Query("regionCategory") regionCategory: String): Int
+    suspend fun getContentsSizeByRegion(
+        @Query("regionCategory") regionCategory: String,
+    ): Int
 }

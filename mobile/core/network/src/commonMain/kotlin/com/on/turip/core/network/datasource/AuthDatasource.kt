@@ -7,6 +7,10 @@ import com.on.turip.core.network.dto.auth.ReissueTokenResponse
 
 interface AuthDatasource {
     suspend fun postLogin(body: LoginIdTokenPostRequest): LoginJwtTokenResponse
+
     suspend fun postGuestLogin(): LoginJwtTokenResponse
+
     suspend fun postReissueToken(body: ReissueTokenRequest): ReissueTokenResponse
+
+    suspend fun verifyToken()
 }

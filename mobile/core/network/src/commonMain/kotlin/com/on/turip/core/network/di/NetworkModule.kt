@@ -71,14 +71,16 @@ fun networkModule(baseUrl: String, deviceFidProvider: () -> String?) = module {
     }
 
     single<Ktorfit>(named(DEFAULT_KTORFIT)) {
-        Ktorfit.Builder()
+        Ktorfit
+            .Builder()
             .baseUrl(baseUrl)
             .httpClient(get<HttpClient>(named(DEFAULT_HTTP_CLIENT)))
             .build()
     }
 
     single<Ktorfit>(named(NO_AUTH_KTORFIT)) {
-        Ktorfit.Builder()
+        Ktorfit
+            .Builder()
             .baseUrl(baseUrl)
             .httpClient(get<HttpClient>(named(NO_AUTH_HTTP_CLIENT)))
             .build()

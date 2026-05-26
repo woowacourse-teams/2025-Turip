@@ -18,8 +18,12 @@ interface BookmarkService {
     ): List<ContentResponse>
 
     @POST(ApiPath.V1 + "bookmarks")
-    suspend fun postBookmark(@Body body: PostBookmarkRequest)
+    suspend fun postBookmark(
+        @Body body: PostBookmarkRequest,
+    )
 
     @DELETE(ApiPath.V1 + "bookmarks/{contentId}")
-    suspend fun deleteBookmark(@Path("contentId") contentId: Long)
+    suspend fun deleteBookmark(
+        @Path("contentId") contentId: Long,
+    )
 }

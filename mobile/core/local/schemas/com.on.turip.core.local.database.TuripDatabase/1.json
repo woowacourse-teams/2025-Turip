@@ -1,0 +1,37 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "3e55374b1fcd8a4f08e220af6712449a",
+    "entities": [
+      {
+        "tableName": "search_history",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`keyword` TEXT NOT NULL, `history` INTEGER NOT NULL, PRIMARY KEY(`keyword`))",
+        "fields": [
+          {
+            "fieldPath": "keyword",
+            "columnName": "keyword",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "history",
+            "columnName": "history",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "keyword"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '3e55374b1fcd8a4f08e220af6712449a')"
+    ]
+  }
+}
