@@ -1,4 +1,4 @@
-package com.on.turip.core.data.invitation
+package com.on.turip.core.data.repository
 
 import com.on.turip.core.domain.invitation.DeferredDeepLinkRepository
 

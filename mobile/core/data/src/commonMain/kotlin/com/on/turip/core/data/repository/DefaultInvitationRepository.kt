@@ -1,7 +1,7 @@
-package com.on.turip.core.data.invitation
+package com.on.turip.core.data.repository
 
 import com.on.turip.core.common.safeApiCall
-import com.on.turip.core.data.turip.toDomain
+import com.on.turip.core.data.mapper.toDomain
 import com.on.turip.core.domain.invitation.InvitationRepository
 import com.on.turip.core.model.TuripInvitationInformation
 import com.on.turip.core.network.datasource.TuripDatasource

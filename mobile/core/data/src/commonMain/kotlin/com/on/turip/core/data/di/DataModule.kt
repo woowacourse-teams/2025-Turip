@@ -1,14 +1,14 @@
 package com.on.turip.core.data.di
 
-import com.on.turip.core.data.account.DefaultAccountRepository
-import com.on.turip.core.data.auth.DefaultAuthRepository
-import com.on.turip.core.data.bookmark.DefaultBookmarkRepository
-import com.on.turip.core.data.content.DefaultContentRepository
-import com.on.turip.core.data.invitation.DefaultDeferredDeepLinkRepository
-import com.on.turip.core.data.invitation.DefaultInvitationRepository
-import com.on.turip.core.data.region.DefaultRegionRepository
+import com.on.turip.core.data.repository.DefaultAccountRepository
+import com.on.turip.core.data.repository.DefaultAuthRepository
+import com.on.turip.core.data.repository.DefaultBookmarkRepository
+import com.on.turip.core.data.repository.DefaultContentRepository
+import com.on.turip.core.data.repository.DefaultDeferredDeepLinkRepository
+import com.on.turip.core.data.repository.DefaultInvitationRepository
+import com.on.turip.core.data.repository.DefaultRegionRepository
 import com.on.turip.core.data.session.DefaultSessionManager
-import com.on.turip.core.data.turip.DefaultTuripRepository
+import com.on.turip.core.data.repository.DefaultTuripRepository
 import com.on.turip.core.domain.account.AccountRepository
 import com.on.turip.core.domain.auth.AuthRepository
 import com.on.turip.core.domain.bookmark.BookmarkRepository

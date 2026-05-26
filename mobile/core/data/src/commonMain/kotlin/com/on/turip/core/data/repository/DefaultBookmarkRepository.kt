@@ -1,7 +1,7 @@
-package com.on.turip.core.data.bookmark
+package com.on.turip.core.data.repository
 
 import com.on.turip.core.common.safeApiCall
-import com.on.turip.core.data.content.toDomain
+import com.on.turip.core.data.mapper.toDomain
 import com.on.turip.core.domain.bookmark.BookmarkRepository
 import com.on.turip.core.model.Content
 import com.on.turip.core.network.datasource.BookmarkDatasource

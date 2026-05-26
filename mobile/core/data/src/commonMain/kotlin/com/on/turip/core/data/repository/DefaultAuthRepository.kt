@@ -1,4 +1,4 @@
-package com.on.turip.core.data.auth
+package com.on.turip.core.data.repository
 
 import com.on.turip.core.common.safeApiCall
 import com.on.turip.core.domain.auth.AuthRepository

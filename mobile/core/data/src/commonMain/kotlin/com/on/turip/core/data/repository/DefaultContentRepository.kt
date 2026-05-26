@@ -1,6 +1,7 @@
-package com.on.turip.core.data.content
+package com.on.turip.core.data.repository
 
 import com.on.turip.core.common.safeApiCall
+import com.on.turip.core.data.mapper.toDomain
 import com.on.turip.core.domain.content.ContentRepository
 import com.on.turip.core.model.Content
 import com.on.turip.core.model.UsersLikeContent
