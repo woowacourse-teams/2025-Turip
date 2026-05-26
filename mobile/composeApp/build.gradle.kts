@@ -9,6 +9,12 @@ plugins {
 kotlin {
     sourceSets {
         commonMain.dependencies {
+            implementation(project(":core:model"))
+            implementation(project(":core:common"))
+            implementation(project(":core:domain"))
+            implementation(project(":core:network"))
+            implementation(project(":core:data"))
+            implementation(project(":core:local"))
         }
     }
 }
@@ -19,6 +25,16 @@ buildkonfig {
     defaultConfigs {
         buildConfigField(BOOLEAN, "IS_DEBUG", "true")
         buildConfigField(STRING, "SENTRY_DSN", "")
+        buildConfigField(
+            STRING,
+            "BASE_URL",
+            "${gradleLocalProperties(rootDir, providers).getProperty("debug_base_url")}",
+        )
+        buildConfigField(
+            STRING,
+            "CLIENT_ID",
+            "${gradleLocalProperties(rootDir, providers).getProperty("client_id")}",
+        )
     }
 
     defaultConfigs("release") {
@@ -27,6 +43,16 @@ buildkonfig {
             STRING,
             "SENTRY_DSN",
             "${gradleLocalProperties(rootDir, providers).getProperty("sentry_dsn")}",
+        )
+        buildConfigField(
+            STRING,
+            "BASE_URL",
+            "${gradleLocalProperties(rootDir, providers).getProperty("release_base_url")}",
+        )
+        buildConfigField(
+            STRING,
+            "CLIENT_ID",
+            "${gradleLocalProperties(rootDir, providers).getProperty("client_id")}",
         )
     }
 }

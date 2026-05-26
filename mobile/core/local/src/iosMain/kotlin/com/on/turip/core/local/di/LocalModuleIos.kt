@@ -1,0 +1,31 @@
+package com.on.turip.core.local.di
+
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.core.Preferences
+import androidx.room.Room
+import androidx.sqlite.driver.bundled.BundledSQLiteDriver
+import com.on.turip.core.local.database.TuripDatabase
+import okio.Path.Companion.toPath
+import org.koin.dsl.module
+import platform.Foundation.NSHomeDirectory
+
+val localModuleIos = module {
+    single<TuripDatabase> {
+        Room.databaseBuilder<TuripDatabase>(
+            name = NSHomeDirectory() + "/turip.db",
+        )
+            .setDriver(BundledSQLiteDriver())
+            .build()
+    }
+
+    single { get<TuripDatabase>().searchHistoryDao() }
+
+    single<DataStore<Preferences>> {
+        PreferenceDataStoreFactory.createWithPath(
+            produceFile = {
+                (NSHomeDirectory() + "/datastore/turip_prefs.preferences_pb").toPath()
+            }
+        )
+    }
+}

@@ -1,0 +1,17 @@
+package com.on.turip.core.data.region
+
+import com.on.turip.core.common.safeApiCall
+import com.on.turip.core.domain.region.RegionRepository
+import com.on.turip.core.model.RegionCategory
+import com.on.turip.core.network.datasource.RegionDatasource
+
+class DefaultRegionRepository(
+    private val regionDatasource: RegionDatasource,
+) : RegionRepository {
+    override suspend fun loadRegionCategories(isDomestic: Boolean): Result<List<RegionCategory>> =
+        safeApiCall {
+            regionDatasource.getRegionCategories(isDomestic).map {
+                RegionCategory(name = it.name, imageUrl = it.imageUrl)
+            }
+        }
+}
