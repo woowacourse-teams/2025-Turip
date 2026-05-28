@@ -6,6 +6,8 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(project(":feature:turip:api"))
+            implementation(project(":feature:turipdetail:api"))
+            implementation(project(":feature:login:api"))
         }
     }
 }

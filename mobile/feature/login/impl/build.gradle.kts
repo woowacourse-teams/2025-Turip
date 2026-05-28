@@ -6,6 +6,8 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(project(":feature:login:api"))
+            implementation(project(":feature:invitation:api"))
+            implementation(project(":feature:home:api"))
         }
     }
 }

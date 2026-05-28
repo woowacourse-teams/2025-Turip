@@ -17,6 +17,16 @@ kotlin {
             implementation(project(":core:local"))
             implementation(project(":core:navigation"))
             implementation(project(":feature:main"))
+            implementation(project(":feature:splash:impl"))
+            implementation(project(":feature:login:impl"))
+            implementation(project(":feature:invitation:impl"))
+            implementation(project(":feature:home:impl"))
+            implementation(project(":feature:bookmark:impl"))
+            implementation(project(":feature:mypage:impl"))
+            implementation(project(":feature:search:impl"))
+            implementation(project(":feature:turip:impl"))
+            implementation(project(":feature:turipdetail:impl"))
+            implementation(project(":feature:trip:impl"))
         }
     }
 }
