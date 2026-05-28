@@ -10,6 +10,6 @@ import org.koin.dsl.module
 
 val splashModule = module {
     single { DetermineInitialSessionUseCase(get(), get()) }
-    viewModel { SplashViewModel(get(), get(), get()) }
+    viewModel { SplashViewModel(get(), get(), get(), get()) }
     single { SplashNavKeyProvider() } bind NavKeyProvider::class
 }

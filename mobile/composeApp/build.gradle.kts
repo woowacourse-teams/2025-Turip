@@ -4,6 +4,7 @@ import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
 
 plugins {
     id("turip.convention.kmp.application")
+    alias(libs.plugins.google.services)
 }
 
 kotlin {

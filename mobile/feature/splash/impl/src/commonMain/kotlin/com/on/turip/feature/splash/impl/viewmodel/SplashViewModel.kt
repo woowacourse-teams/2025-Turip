@@ -1,6 +1,7 @@
 package com.on.turip.feature.splash.impl.viewmodel
 
 import androidx.lifecycle.viewModelScope
+import com.on.turip.core.domain.fid.DeviceFidManager
 import com.on.turip.core.domain.repository.DeferredDeepLinkRepository
 import com.on.turip.core.domain.session.AuthStatus
 import com.on.turip.core.domain.session.SessionManager
@@ -15,6 +16,7 @@ class SplashViewModel(
     private val determineInitialSessionUseCase: DetermineInitialSessionUseCase,
     private val sessionManager: SessionManager,
     private val deferredDeepLinkRepository: DeferredDeepLinkRepository,
+    private val deviceFidManager: DeviceFidManager,
 ) : BaseViewModel<SplashIntent, SplashState, SplashEffect>(SplashState()) {
     @kotlin.concurrent.Volatile
     private var hasDetermined = false
@@ -27,6 +29,7 @@ class SplashViewModel(
 
         viewModelScope.launch {
             try {
+                deviceFidManager.ensureInitialized()
                 val trimmedDeepLinkUrl = deepLinkUrl?.trim()?.takeIf(String::isNotEmpty)
                 if (trimmedDeepLinkUrl != null) {
                     switchSession(determineInitialSessionUseCase())

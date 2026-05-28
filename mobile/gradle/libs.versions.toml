@@ -59,6 +59,10 @@ imagepicker = "1.0.30"
 # Markdown
 multiplatformMarkdownRenderer = "0.37.0"
 
+# Firebase
+firebase-installations = "18.0.0"
+google-services = "4.4.2"
+
 # Util
 sentry-kmp = "0.25.0"
 napier = "2.7.1"
@@ -152,6 +156,10 @@ imagepicker = { module = "io.github.ismoy:imagepickerkmp", version.ref = "imagep
 multiplatform-markdown-renderer = { module = "com.mikepenz:multiplatform-markdown-renderer", version.ref = "multiplatformMarkdownRenderer" }
 multiplatform-markdown-renderer-m3 = { module = "com.mikepenz:multiplatform-markdown-renderer-m3", version.ref = "multiplatformMarkdownRenderer" }
 
+# Firebase
+firebase-installations = { group = "com.google.firebase", name = "firebase-installations-ktx", version.ref = "firebase-installations" }
+kotlinx-coroutines-play-services = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-play-services", version.ref = "kotlinx-coroutines" }
+
 # Util
 napier = { group = "io.github.aakira", name = "napier", version.ref = "napier" }
 
@@ -198,6 +206,9 @@ ksp-gradle-plugin = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 
 # Buildkonfig
 buildkonfig = { id = "com.codingfeline.buildkonfig", version.ref = "build-konfig" }
+
+# Firebase
+google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
 
 # Test
 android-test = { id = "com.android.test", version.ref = "android-gradle-plugin" }

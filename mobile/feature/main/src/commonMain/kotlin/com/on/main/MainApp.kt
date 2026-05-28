@@ -35,19 +35,15 @@ import com.on.turip.feature.main.component.ExitConfirmationHandler
 import com.on.turip.feature.main.component.LocalSystemBarStyleController
 import com.on.turip.feature.main.component.SystemBarStyleEffect
 import com.on.turip.feature.main.component.TuripNavigationBar
+import com.on.turip.feature.invitation.api.InvitationEntryNavKey
+import com.on.turip.feature.login.api.LoginNavKey
 import com.on.turip.feature.main.navigation.SavedStateConfigurationProvider
 import com.on.turip.feature.main.navigation.TopLevel
 import com.on.turip.feature.main.navigation.appScreens
 import com.on.turip.feature.main.navigation.rememberTuripAppState
+import com.on.turip.feature.splash.api.SplashNavKey
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.serialization.Serializable
-
-// TODO: Remove stubs below and import actual NavKeys from feature api modules
-@Serializable private data object SplashNavKey : NavKey // TODO: import from :feature:splash:api
-@Serializable private data object HomeNavKey : NavKey // TODO: import from :feature:home:api
-@Serializable private data class InvitationEntryNavKey(val deepLinkUrl: String) : NavKey // TODO: import from :feature:invitation:api
-@Serializable private data class LoginNavKey(val deepLinkUrl: String?) : NavKey // TODO: import from :feature:login:api
 
 @Composable
 fun MainApp(
@@ -78,7 +74,7 @@ fun MainApp(
     var bottomBarVisible by remember { mutableStateOf(appState.shouldShowBottomBar) }
     LaunchedEffect(appState.shouldShowBottomBar) {
         if (appState.shouldShowBottomBar) {
-            val isFromAuthScreen = prevKey is SplashNavKey || prevKey is LoginNavKey // TODO: check against real NavKeys
+            val isFromAuthScreen = prevKey is SplashNavKey || prevKey is LoginNavKey
             if (isFromAuthScreen) {
                 delay(SCREEN_TRANSITION_DURATION_MS)
             }

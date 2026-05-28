@@ -15,9 +15,9 @@ fun EntryProviderScope<NavKey>.loginScreen(
     entry<LoginNavKey> { key ->
         LoginScreen(
             deepLinkUrl = key.deepLinkUrl,
-            onNavigateToHome = { navigator.replace(HomeNavKey) },
+            onNavigateToHome = { navigator.goWithAllClear(HomeNavKey) },
             onNavigateToInvitationEntry = { url ->
-                navigator.replace(InvitationEntryNavKey(url))
+                navigator.goWithAllClear(InvitationEntryNavKey(url))
             },
         )
     }

@@ -39,15 +39,8 @@ class LoginViewModel(
     private fun handleGuestLogin() {
         if (currentState.isLoading) return
         viewModelScope.launch {
-            updateState { copy(isLoading = true) }
-            authRepository.loginAsGuest()
-                .onSuccess {
-                    sessionManager.switchToGuest()
-                    navigateAfterLogin()
-                }.onFailure {
-                    updateState { copy(isLoading = false) }
-                    emitEffect(LoginEffect.ShowSnackbar("게스트 로그인에 실패했습니다. 다시 시도해 주세요."))
-                }
+            sessionManager.switchToGuest()
+            navigateAfterLogin()
         }
     }
 

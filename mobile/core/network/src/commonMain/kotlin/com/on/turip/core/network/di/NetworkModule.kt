@@ -1,5 +1,6 @@
 package com.on.turip.core.network.di
 
+import com.on.turip.core.domain.fid.DeviceFidManager
 import com.on.turip.core.domain.repository.AuthRepository
 import com.on.turip.core.domain.session.AuthTokenCacheController
 import com.on.turip.core.domain.session.TokenManager
@@ -15,32 +16,35 @@ const val SSE_HTTP_CLIENT = "SseHttpClient"
 const val DEFAULT_KTORFIT = "DefaultKtorfit"
 const val NO_AUTH_KTORFIT = "NoAuthKtorfit"
 
-fun networkModule(baseUrl: String, deviceFidProvider: () -> String?) = module {
+fun networkModule(baseUrl: String) = module {
     single { DefaultAuthTokenCacheController() }
     single<AuthTokenCacheController> { get<DefaultAuthTokenCacheController>() }
 
     single<HttpClient>(named(DEFAULT_HTTP_CLIENT)) {
+        val fidManager = get<DeviceFidManager>()
         buildDefaultHttpClient(
             baseUrl = baseUrl,
             tokenManager = get<TokenManager>(),
             authRepositoryProvider = { get<AuthRepository>() },
-            deviceFidProvider = deviceFidProvider,
+            deviceFidProvider = { fidManager.getFid() },
             authTokenCacheController = get<DefaultAuthTokenCacheController>(),
         )
     }
 
     single<HttpClient>(named(NO_AUTH_HTTP_CLIENT)) {
+        val fidManager = get<DeviceFidManager>()
         buildNoAuthHttpClient(
             baseUrl = baseUrl,
-            deviceFidProvider = deviceFidProvider,
+            deviceFidProvider = { fidManager.getFid() },
         )
     }
 
     single<HttpClient>(named(SSE_HTTP_CLIENT)) {
+        val fidManager = get<DeviceFidManager>()
         buildSseHttpClient(
             baseUrl = baseUrl,
             tokenManager = get<TokenManager>(),
-            deviceFidProvider = deviceFidProvider,
+            deviceFidProvider = { fidManager.getFid() },
         )
     }
 

@@ -102,7 +102,7 @@ private fun HttpClientConfig<*>.configureLogging() {
         logger = object : Logger {
             override fun log(message: String) = Napier.d(message, tag = "Ktor")
         }
-        level = LogLevel.BODY
+        level = LogLevel.ALL
     }
 }
 

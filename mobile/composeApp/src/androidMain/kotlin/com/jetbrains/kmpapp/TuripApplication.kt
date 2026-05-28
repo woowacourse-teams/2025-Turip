@@ -3,6 +3,7 @@ package com.on.turip
 import android.app.Application
 import com.jetbrains.kmpapp.di.initLogger
 import com.jetbrains.kmpapp.di.initializeSentry
+import com.on.turip.core.local.di.localModuleAndroid
 import com.on.turip.di.initKoin
 import org.koin.android.ext.koin.androidContext
 
@@ -14,6 +15,7 @@ class TuripApplication : Application() {
         initLogger()
         initKoin {
             androidContext(this@TuripApplication)
+            modules(localModuleAndroid)
         }
     }
 }

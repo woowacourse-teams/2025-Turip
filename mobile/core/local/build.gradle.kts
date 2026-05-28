@@ -6,10 +6,16 @@ plugins {
 
 kotlin {
     sourceSets {
+        androidMain.dependencies {
+            implementation(libs.koin.android)
+            implementation(libs.firebase.installations)
+            implementation(libs.kotlinx.coroutines.play.services)
+        }
         commonMain.dependencies {
             implementation(project(":core:model"))
             implementation(project(":core:common"))
             implementation(project(":core:domain"))
+            implementation(libs.napier)
 
             implementation(libs.androidx.room.runtime)
             implementation(libs.androidx.sqlite.bundled)

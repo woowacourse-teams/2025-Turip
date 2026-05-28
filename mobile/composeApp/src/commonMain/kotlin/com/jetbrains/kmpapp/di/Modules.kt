@@ -1,7 +1,10 @@
 package com.jetbrains.kmpapp.di
 
+import com.on.turip.BuildKonfig
 import com.on.turip.core.data.di.dataModule
+import com.on.turip.core.local.di.localModule
 import com.on.turip.core.network.di.datasourceModule
+import com.on.turip.core.network.di.networkModule
 import com.on.turip.core.network.di.serviceModule
 import com.on.turip.feature.bookmark.impl.di.bookmarkModule
 import com.on.turip.feature.home.impl.di.homeModule
@@ -18,7 +21,7 @@ import org.koin.dsl.module
 
 val coreModule =
     module {
-        includes(dataModule, serviceModule, datasourceModule)
+        includes(dataModule, localModule, networkModule(BuildKonfig.BASE_URL), serviceModule, datasourceModule)
     }
 
 val featureModule =

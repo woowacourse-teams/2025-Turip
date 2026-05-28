@@ -5,6 +5,8 @@
 xcuserdata
 !src/**/build/
 local.properties
+google-services.json
+GoogleService-Info.plist
 .idea
 .DS_Store
 captures
