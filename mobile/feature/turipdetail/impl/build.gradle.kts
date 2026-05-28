@@ -7,7 +7,7 @@ kotlin {
         commonMain.dependencies {
             implementation(project(":feature:turipdetail:api"))
             implementation(project(":feature:login:api"))
-}
+        }
     }
 }
 

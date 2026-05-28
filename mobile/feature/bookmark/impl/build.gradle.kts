@@ -8,7 +8,7 @@ kotlin {
             implementation(project(":feature:bookmark:api"))
             implementation(project(":feature:login:api"))
             implementation(project(":feature:trip:api"))
-}
+        }
     }
 }
 

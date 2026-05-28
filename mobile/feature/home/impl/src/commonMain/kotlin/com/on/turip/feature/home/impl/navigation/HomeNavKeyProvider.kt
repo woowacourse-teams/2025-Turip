@@ -12,7 +12,5 @@ class HomeNavKeyProvider : NavKeyProvider {
         subclass(HomeNavKey::class, HomeNavKey.serializer())
     }
 
-    override fun EntryProviderScope<NavKey>.registerScreens(navigator: Navigator) {
-        homeScreen(navigator)
-    }
+    override fun EntryProviderScope<NavKey>.registerScreens(navigator: Navigator) {}
 }

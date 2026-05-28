@@ -12,7 +12,5 @@ class TuripDetailNavKeyProvider : NavKeyProvider {
         subclass(TuripDetailNavKey::class, TuripDetailNavKey.serializer())
     }
 
-    override fun EntryProviderScope<NavKey>.registerScreens(navigator: Navigator) {
-        turipDetailScreen(navigator)
-    }
+    override fun EntryProviderScope<NavKey>.registerScreens(navigator: Navigator) {}
 }

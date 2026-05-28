@@ -12,7 +12,5 @@ class MyPageNavKeyProvider : NavKeyProvider {
         subclass(MyPageNavKey::class, MyPageNavKey.serializer())
     }
 
-    override fun EntryProviderScope<NavKey>.registerScreens(navigator: Navigator) {
-        myPageScreen(navigator)
-    }
+    override fun EntryProviderScope<NavKey>.registerScreens(navigator: Navigator) {}
 }

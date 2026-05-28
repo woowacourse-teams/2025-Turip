@@ -12,7 +12,5 @@ class BookmarkNavKeyProvider : NavKeyProvider {
         subclass(BookmarkNavKey::class, BookmarkNavKey.serializer())
     }
 
-    override fun EntryProviderScope<NavKey>.registerScreens(navigator: Navigator) {
-        bookmarkScreen(navigator)
-    }
+    override fun EntryProviderScope<NavKey>.registerScreens(navigator: Navigator) {}
 }

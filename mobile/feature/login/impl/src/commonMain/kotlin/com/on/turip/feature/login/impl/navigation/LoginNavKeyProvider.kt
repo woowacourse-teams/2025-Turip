@@ -12,7 +12,5 @@ class LoginNavKeyProvider : NavKeyProvider {
         subclass(LoginNavKey::class, LoginNavKey.serializer())
     }
 
-    override fun EntryProviderScope<NavKey>.registerScreens(navigator: Navigator) {
-        loginScreen(navigator, null)
-    }
+    override fun EntryProviderScope<NavKey>.registerScreens(navigator: Navigator) {}
 }
