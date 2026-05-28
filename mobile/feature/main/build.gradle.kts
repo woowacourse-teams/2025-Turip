@@ -1,5 +1,17 @@
 plugins {
-    id("turip.convention.kotlin.feature.api")
+    id("turip.convention.kotlin.feature.impl")
+}
+
+kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            implementation(libs.material.icons.extended)
+        }
+        androidMain.dependencies {
+            implementation(libs.androidx.activity.compose)
+            implementation(libs.androidx.core)
+        }
+    }
 }
 
 android {

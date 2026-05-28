@@ -23,12 +23,21 @@ fun rememberNavigationState(
     configuration: SavedStateConfiguration,
 ): NavigationState {
     val topLevelStack = rememberNavBackStack(configuration = configuration, startKey)
-    val subStacks = topLevelKeys.associateWith { key ->
+    // startKey가 topLevelKeys에 없을 경우(Splash, Login 등 인증 전 화면)를 위해
+    // 항상 startKey sub-stack을 생성하고, topLevelKeys에 포함된 경우엔 버린다.
+    val startKeyStack = rememberNavBackStack(configuration = configuration, startKey)
+    val topLevelSubStacks = topLevelKeys.associateWith { key ->
         rememberNavBackStack(
             configuration = configuration,
             key,
         )
     }
+    val subStacks =
+        if (startKey in topLevelKeys) {
+            topLevelSubStacks
+        } else {
+            topLevelSubStacks + (startKey to startKeyStack)
+        }
 
     return remember(startKey, topLevelKeys) {
         NavigationState(

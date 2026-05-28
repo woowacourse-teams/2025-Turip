@@ -15,6 +15,8 @@ kotlin {
             implementation(project(":core:network"))
             implementation(project(":core:data"))
             implementation(project(":core:local"))
+            implementation(project(":core:navigation"))
+            implementation(project(":feature:main"))
         }
     }
 }
