@@ -1,7 +1,7 @@
 package com.on.turip.core.network.service
 
 import com.on.turip.core.network.ApiPath
-import com.on.turip.core.network.dto.bookmark.PostBookmarkRequest
+import com.on.turip.core.network.dto.bookmark.BookmarkAddRequest
 import com.on.turip.core.network.dto.content.ContentResponse
 import de.jensklingenberg.ktorfit.http.Body
 import de.jensklingenberg.ktorfit.http.DELETE
@@ -19,7 +19,7 @@ interface BookmarkService {
 
     @POST(ApiPath.V1 + "bookmarks")
     suspend fun postBookmark(
-        @Body body: PostBookmarkRequest,
+        @Body body: BookmarkAddRequest,
     )
 
     @DELETE(ApiPath.V1 + "bookmarks/{contentId}")

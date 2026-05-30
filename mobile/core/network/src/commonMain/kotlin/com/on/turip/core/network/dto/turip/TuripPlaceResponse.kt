@@ -1,14 +1,14 @@
 package com.on.turip.core.network.dto.turip
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class TuripPlaceResponse(
-    val turipId: Long,
-    val placeId: Long,
-    val name: String,
-    val category: String,
-    val latitude: Double,
-    val longitude: Double,
-    val order: Int,
+    @SerialName("id")
+    val id: Long,
+    @SerialName("place")
+    val placeResponse: PlaceResponse,
+    @SerialName("turipPlaceOrder")
+    val order: Long,
 )

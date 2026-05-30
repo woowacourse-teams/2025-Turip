@@ -1,17 +1,20 @@
 package com.on.turip.core.network.service
 
 import com.on.turip.core.network.ApiPath
-import com.on.turip.core.network.dto.turip.AddTuripPlaceRequest
-import com.on.turip.core.network.dto.turip.CreateTuripRequest
-import com.on.turip.core.network.dto.turip.InvitationInformationResponse
-import com.on.turip.core.network.dto.turip.InvitationTokenResponse
-import com.on.turip.core.network.dto.turip.MemberResponse
-import com.on.turip.core.network.dto.turip.RenameTuripRequest
-import com.on.turip.core.network.dto.turip.ReorderTuripPlacesRequest
+import com.on.turip.core.network.dto.turip.PlaceTuripsRequest
+import com.on.turip.core.network.dto.turip.TuripCreationResponse
+import com.on.turip.core.network.dto.turip.TuripInvitationInformationResponse
+import com.on.turip.core.network.dto.turip.TuripInvitationTokenResponse
+import com.on.turip.core.network.dto.turip.TuripJoinResponse
+import com.on.turip.core.network.dto.turip.TuripMembersResponse
+import com.on.turip.core.network.dto.turip.TuripPatchRequest
+import com.on.turip.core.network.dto.turip.TuripPlaceOrderRequest
 import com.on.turip.core.network.dto.turip.TuripPlaceResponse
+import com.on.turip.core.network.dto.turip.TuripPlacesResponse
+import com.on.turip.core.network.dto.turip.TuripPostRequest
 import com.on.turip.core.network.dto.turip.TuripResponse
-import com.on.turip.core.network.dto.turip.TuripStatusResponse
-import com.on.turip.core.network.dto.turip.UpdatePlaceTuripsRequest
+import com.on.turip.core.network.dto.turip.TuripsByPlaceResponse
+import com.on.turip.core.network.dto.turip.TuripsResponse
 import de.jensklingenberg.ktorfit.http.Body
 import de.jensklingenberg.ktorfit.http.DELETE
 import de.jensklingenberg.ktorfit.http.GET
@@ -28,22 +31,22 @@ interface TuripService {
     ): TuripResponse
 
     @GET(ApiPath.V1 + "turips")
-    suspend fun getTurips(): List<TuripResponse>
+    suspend fun getTurips(): TuripsResponse
 
     @GET(ApiPath.V1 + "turips/{turipId}/members")
     suspend fun getTuripMembers(
         @Path("turipId") turipId: Long,
-    ): List<MemberResponse>
+    ): TuripMembersResponse
 
     @POST(ApiPath.V1 + "turips")
     suspend fun postTurip(
-        @Body body: CreateTuripRequest,
-    ): TuripResponse
+        @Body body: TuripPostRequest,
+    ): TuripCreationResponse
 
     @PATCH(ApiPath.V1 + "turips/{turipId}")
     suspend fun patchTurip(
         @Path("turipId") turipId: Long,
-        @Body body: RenameTuripRequest,
+        @Body body: TuripPatchRequest,
     )
 
     @DELETE(ApiPath.V1 + "turips/{turipId}")
@@ -59,16 +62,17 @@ interface TuripService {
     @GET(ApiPath.V1 + "turips/turip-status")
     suspend fun getTuripsByPlaceId(
         @Query("placeId") placeId: Long,
-    ): List<TuripStatusResponse>
+    ): TuripsByPlaceResponse
 
     @GET(ApiPath.V1 + "turips/places")
     suspend fun getTuripPlaces(
         @Query("turipId") turipId: Long,
-    ): List<TuripPlaceResponse>
+    ): TuripPlacesResponse
 
     @POST(ApiPath.V1 + "turips/places")
     suspend fun postTuripPlace(
-        @Body body: AddTuripPlaceRequest,
+        @Query("turipId") turipId: Long,
+        @Query("placeId") placeId: Long,
     )
 
     @DELETE(ApiPath.V1 + "turips/places")
@@ -79,27 +83,28 @@ interface TuripService {
 
     @PATCH(ApiPath.V1 + "turips/places/turip-order")
     suspend fun patchTuripPlaceOrder(
-        @Body body: ReorderTuripPlacesRequest,
+        @Query("turipId") turipId: Long,
+        @Body body: TuripPlaceOrderRequest,
     )
 
     @PUT(ApiPath.V1 + "turips/places/{placeId}")
     suspend fun putPlaceTurips(
         @Path("placeId") placeId: Long,
-        @Body body: UpdatePlaceTuripsRequest,
+        @Body body: PlaceTuripsRequest,
     )
 
     @POST(ApiPath.V1 + "turips/{turipId}/invitation-tokens")
     suspend fun postInvitationToken(
         @Path("turipId") turipId: Long,
-    ): InvitationTokenResponse
+    ): TuripInvitationTokenResponse
 
     @POST(ApiPath.V1 + "turips/{turipId}/join")
     suspend fun postJoinTurip(
         @Path("turipId") turipId: Long,
-    )
+    ): TuripJoinResponse
 
     @GET(ApiPath.V1 + "turips/invitation-tokens")
     suspend fun getInvitationInformation(
         @Query("token") token: String,
-    ): InvitationInformationResponse
+    ): TuripInvitationInformationResponse
 }

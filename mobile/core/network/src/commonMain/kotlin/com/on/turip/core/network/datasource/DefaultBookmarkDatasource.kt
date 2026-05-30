@@ -1,6 +1,6 @@
 package com.on.turip.core.network.datasource
 
-import com.on.turip.core.network.dto.bookmark.PostBookmarkRequest
+import com.on.turip.core.network.dto.bookmark.BookmarkAddRequest
 import com.on.turip.core.network.dto.content.ContentResponse
 import com.on.turip.core.network.service.BookmarkService
 
@@ -11,7 +11,7 @@ class DefaultBookmarkDatasource(
         bookmarkService.getBookmarks(size, lastId)
 
     override suspend fun addBookmark(contentId: Long) =
-        bookmarkService.postBookmark(PostBookmarkRequest(contentId))
+        bookmarkService.postBookmark(BookmarkAddRequest(contentId))
 
     override suspend fun removeBookmark(contentId: Long) =
         bookmarkService.deleteBookmark(contentId)

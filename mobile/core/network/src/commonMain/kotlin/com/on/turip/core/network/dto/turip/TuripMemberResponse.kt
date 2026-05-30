@@ -1,10 +1,10 @@
 package com.on.turip.core.network.dto.turip
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class MemberResponse(
-    val id: Long,
+data class TuripMemberResponse(
+    @SerialName("nickname")
     val nickname: String,
-    val profileImageUrl: String? = null,
 )

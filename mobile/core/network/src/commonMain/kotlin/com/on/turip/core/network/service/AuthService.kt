@@ -1,10 +1,10 @@
 package com.on.turip.core.network.service
 
 import com.on.turip.core.network.ApiPath
-import com.on.turip.core.network.dto.auth.LoginIdTokenPostRequest
-import com.on.turip.core.network.dto.auth.LoginJwtTokenResponse
-import com.on.turip.core.network.dto.auth.ReissueTokenRequest
-import com.on.turip.core.network.dto.auth.ReissueTokenResponse
+import com.on.turip.core.network.dto.login.LoginIdTokenPostRequest
+import com.on.turip.core.network.dto.login.LoginJwtTokenResponse
+import com.on.turip.core.network.dto.login.ReissueTokenRequest
+import com.on.turip.core.network.dto.login.ReissueTokenResponse
 import de.jensklingenberg.ktorfit.http.Body
 import de.jensklingenberg.ktorfit.http.GET
 import de.jensklingenberg.ktorfit.http.POST

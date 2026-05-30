@@ -1,4 +1,4 @@
-package com.on.turip.core.network.dto.content
+package com.on.turip.core.network.dto.turip
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

@@ -1,9 +1,14 @@
 package com.on.turip.core.network.dto.region
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class RegionCategoryResponse(
-    val name: String,
-    val imageUrl: String,
+    @SerialName("country")
+    val country: CountryResponse?,
+    @SerialName("regionCategoryImageUrl")
+    val regionCategoryImageUrl: String,
+    @SerialName("regionCategoryName")
+    val regionCategoryName: String,
 )

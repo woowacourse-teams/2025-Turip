@@ -4,19 +4,15 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class TuripResponse(
+data class TuripByPlaceResponse(
     @SerialName("id")
     val id: Long,
+    @SerialName("isDefault")
+    val isDefault: Boolean,
+    @SerialName("isTuripPlace")
+    val isTuripPlace: Boolean,
     @SerialName("accountId")
     val accountId: Long,
     @SerialName("name")
     val name: String,
-    @SerialName("isDefault")
-    val isDefault: Boolean,
-    @SerialName("placeCount")
-    val placeCount: Int,
-    @SerialName("memberCount")
-    val memberCount: Int,
-    @SerialName("isShared")
-    val isShared: Boolean,
 )

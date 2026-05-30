@@ -1,7 +1,7 @@
 package com.on.turip.core.network.service
 
 import com.on.turip.core.network.ApiPath
-import com.on.turip.core.network.dto.auth.LoginJwtTokenResponse
+import com.on.turip.core.network.dto.login.LoginJwtTokenResponse
 import de.jensklingenberg.ktorfit.http.POST
 
 interface GuestService {

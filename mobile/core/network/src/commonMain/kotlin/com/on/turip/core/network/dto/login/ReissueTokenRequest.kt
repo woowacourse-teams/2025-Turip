@@ -1,8 +1,10 @@
-package com.on.turip.core.network.dto.auth
+package com.on.turip.core.network.dto.login
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class ReissueTokenRequest(
+    @SerialName("refreshToken")
     val refreshToken: String,
 )
