@@ -1,7 +1,5 @@
 package com.on.turip.core.domain.repository
 
-import com.on.turip.core.model.AuthTokens
-
 interface UserStorageRepository {
     suspend fun loadAccessToken(): Result<String?>
 

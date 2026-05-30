@@ -1,8 +1,5 @@
 package com.on.turip.core.domain.repository
 
-import com.on.turip.core.model.Content
-import com.on.turip.core.model.UsersLikeContent
-
 interface ContentRepository {
     suspend fun getContent(contentId: Long): Result<Content>
 

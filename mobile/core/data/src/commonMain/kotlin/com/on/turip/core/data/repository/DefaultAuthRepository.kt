@@ -2,7 +2,6 @@ package com.on.turip.core.data.repository
 
 import com.on.turip.core.common.safeApiCall
 import com.on.turip.core.domain.repository.AuthRepository
-import com.on.turip.core.model.AuthTokens
 import com.on.turip.core.network.datasource.AuthDatasource
 import com.on.turip.core.network.dto.auth.LoginIdTokenPostRequest
 import com.on.turip.core.network.dto.auth.ReissueTokenRequest

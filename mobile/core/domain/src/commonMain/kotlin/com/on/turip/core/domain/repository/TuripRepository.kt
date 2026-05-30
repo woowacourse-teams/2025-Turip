@@ -1,11 +1,5 @@
 package com.on.turip.core.domain.repository
 
-import com.on.turip.core.model.Member
-import com.on.turip.core.model.Turip
-import com.on.turip.core.model.TuripInvitationInformation
-import com.on.turip.core.model.TuripPlace
-import com.on.turip.core.model.TuripStatus
-
 interface TuripRepository {
     suspend fun getTurips(): Result<List<Turip>>
 

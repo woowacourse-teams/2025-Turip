@@ -1,4 +1,4 @@
-package com.on.turip.core.model
+package com.on.turip.core.model.turip
 
 data class Turip(
     val id: Long,
@@ -7,5 +7,5 @@ data class Turip(
     val placeCount: Int,
     val memberCount: Int,
     val isShared: Boolean,
-    val hasIncludePlace: Boolean,
+    val hasIncludePlace: Boolean = false,
 )

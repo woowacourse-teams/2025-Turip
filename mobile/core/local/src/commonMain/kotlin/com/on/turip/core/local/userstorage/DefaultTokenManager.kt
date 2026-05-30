@@ -3,7 +3,6 @@ package com.on.turip.core.local.userstorage
 import com.on.turip.core.domain.session.AuthTokenCacheController
 import com.on.turip.core.domain.session.TokenManager
 import com.on.turip.core.domain.repository.UserStorageRepository
-import com.on.turip.core.model.AuthTokens
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 

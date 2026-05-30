@@ -1,6 +1,5 @@
 package com.on.turip.core.domain.session
 
-import com.on.turip.core.model.SessionState
 import kotlinx.coroutines.flow.StateFlow
 
 interface SessionManager {
