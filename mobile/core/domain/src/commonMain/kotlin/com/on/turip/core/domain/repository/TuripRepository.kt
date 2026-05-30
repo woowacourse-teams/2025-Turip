@@ -1,35 +1,77 @@
 package com.on.turip.core.domain.repository
 
+import com.on.turip.core.model.result.TuripResult
+import com.on.turip.core.model.bookmark.TuripPlace
+import com.on.turip.core.model.turip.Turip
+import com.on.turip.core.model.turip.TuripInvitationInformation
+import com.on.turip.core.model.turip.TuripInvitationToken
+import com.on.turip.core.model.turip.TuripMember
+import com.on.turip.core.model.turip.result.TuripStreamResult
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
+
 interface TuripRepository {
-    suspend fun getTurips(): Result<List<Turip>>
+    val turips: StateFlow<List<Turip>>
 
-    suspend fun getTurip(turipId: Long): Result<Turip>
+    suspend fun loadTurip(turipId: Long): TuripResult<Turip>
 
-    suspend fun getTuripMembers(turipId: Long): Result<List<Member>>
+    suspend fun loadTurips(): TuripResult<List<Turip>>
 
-    suspend fun createTurip(name: String): Result<Turip>
+    suspend fun loadTuripMembers(turipId: Long): TuripResult<List<TuripMember>>
 
-    suspend fun renameTurip(turipId: Long, name: String): Result<Unit>
+    suspend fun createTurip(name: String): TuripResult<Turip>
 
-    suspend fun deleteTurip(turipId: Long): Result<Unit>
+    suspend fun updateTurip(
+        turipId: Long,
+        updateName: String,
+    ): TuripResult<Unit>
 
-    suspend fun exitTurip(turipId: Long): Result<Unit>
+    suspend fun deleteTurip(turipId: Long): TuripResult<Unit>
 
-    suspend fun getTuripsByPlaceId(placeId: Long): Result<List<TuripStatus>>
+    suspend fun exitTurip(turipId: Long): TuripResult<Unit>
 
-    suspend fun getTuripPlaces(turipId: Long): Result<List<TuripPlace>>
+    suspend fun loadTuripsByPlaceId(placeId: Long): TuripResult<List<Turip>>
 
-    suspend fun addTuripPlace(turipId: Long, placeId: Long): Result<Unit>
+    suspend fun loadTuripPlaces(turipId: Long): TuripResult<List<TuripPlace>>
 
-    suspend fun removeTuripPlace(turipId: Long, placeId: Long): Result<Unit>
+    suspend fun createTuripPlace(
+        turipId: Long,
+        placeId: Long,
+    ): TuripResult<Unit>
 
-    suspend fun reorderTuripPlaces(turipId: Long, placeIds: List<Long>): Result<Unit>
+    suspend fun deleteTuripPlace(
+        turipId: Long,
+        placeId: Long,
+    ): TuripResult<Unit>
 
-    suspend fun updatePlaceTurips(placeId: Long, turipIds: List<Long>): Result<Unit>
+    suspend fun updateTuripPlacesOrder(
+        turipId: Long,
+        updatedOrder: List<Long>,
+    ): TuripResult<Unit>
 
-    suspend fun generateInvitationToken(turipId: Long): Result<String>
+    suspend fun updatePlaceTurips(
+        placeId: Long,
+        turipIds: List<Long>,
+        previouslySelectedIds: Set<Long>,
+    ): TuripResult<Unit>
 
-    suspend fun getInvitationInformation(token: String): Result<TuripInvitationInformation>
+    suspend fun createInvitationToken(turipId: Long): TuripResult<TuripInvitationToken>
 
-    suspend fun joinTurip(turipId: Long): Result<Unit>
+    suspend fun joinTurip(turipId: Long): TuripResult<Unit>
+
+    suspend fun verifyInvitationToken(token: String): TuripResult<TuripInvitationInformation>
+
+    fun streamTuripEvents(turipId: Long): Flow<TuripStreamResult>
+
+    fun updateCachedTuripMemberCount(
+        turipId: Long,
+        memberCount: Int,
+    )
+
+    fun updateCachedTuripSharedStatus(
+        turipId: Long,
+        isShared: Boolean,
+    )
+
+    fun clearCache()
 }

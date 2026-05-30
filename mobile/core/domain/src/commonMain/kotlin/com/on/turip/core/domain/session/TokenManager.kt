@@ -1,5 +1,7 @@
 package com.on.turip.core.domain.session
 
+import com.on.turip.core.model.login.AuthTokens
+
 interface TokenManager {
     val currentTokens: AuthTokens?
 

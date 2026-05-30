@@ -1,15 +1,31 @@
 package com.on.turip.core.domain.repository
 
+import com.on.turip.core.model.content.Content
+import com.on.turip.core.model.content.PagedContentsResult
+import com.on.turip.core.model.content.UsersLikeContent
+import com.on.turip.core.model.result.TuripResult
+import com.on.turip.core.model.trip.Trip
+
 interface ContentRepository {
-    suspend fun getContent(contentId: Long): Result<Content>
+    suspend fun loadContentsSizeByRegion(regionCategoryName: String): TuripResult<Int>
 
-    suspend fun loadPopularFavoriteContents(size: Int): Result<List<UsersLikeContent>>
+    suspend fun loadContentsSizeByKeyword(keyword: String): TuripResult<Int>
 
-    suspend fun loadContentsByKeyword(keyword: String, size: Int, lastId: Long): Result<List<Content>>
+    suspend fun loadContentsByRegion(
+        regionCategoryName: String,
+        size: Int,
+        lastId: Long,
+    ): TuripResult<PagedContentsResult>
 
-    suspend fun loadContentsSizeByKeyword(keyword: String): Result<Int>
+    suspend fun loadContentsByKeyword(
+        keyword: String,
+        size: Int,
+        lastId: Long,
+    ): TuripResult<PagedContentsResult>
 
-    suspend fun loadContentsByRegion(regionCategory: String, size: Int, lastId: Long): Result<List<Content>>
+    suspend fun loadContent(contentId: Long): TuripResult<Content>
 
-    suspend fun loadContentsSizeByRegion(regionCategory: String): Result<Int>
+    suspend fun loadPopularFavoriteContents(size: Int = 5): TuripResult<List<UsersLikeContent>>
+
+    suspend fun loadTripInfo(contentId: Long): TuripResult<Trip>
 }

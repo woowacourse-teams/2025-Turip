@@ -1,5 +1,7 @@
 package com.on.turip.core.domain.repository
 
+import com.on.turip.core.model.searchhistory.SearchHistory
+
 interface SearchHistoryRepository {
     suspend fun createSearchHistory(keyword: String): Result<Unit>
 

@@ -1,13 +1,14 @@
 package com.on.turip.core.domain.repository
 
-import com.on.turip.core.model.AuthTokens
+import com.on.turip.core.model.login.AuthResult
+import com.on.turip.core.model.login.AuthTokens
+import com.on.turip.core.model.result.TuripResult
+
 
 interface AuthRepository {
-    suspend fun loginWithGoogleIdToken(idToken: String, clientId: String): Result<AuthTokens>
+    suspend fun login(idToken: String): TuripResult<AuthResult>
 
-    suspend fun loginAsGuest(): Result<AuthTokens>
+    suspend fun requestTokens(refreshToken: String): TuripResult<AuthTokens>
 
-    suspend fun requestTokens(refreshToken: String): Result<AuthTokens>
-
-    suspend fun verifyToken(): Result<Unit>
+    suspend fun verifyToken(): TuripResult<Unit>
 }
