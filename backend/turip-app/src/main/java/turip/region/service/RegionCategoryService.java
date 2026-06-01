@@ -7,12 +7,14 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import turip.region.domain.City;
 import turip.content.repository.ContentRepository;
-import turip.region.domain.Country;
+import turip.infrastructure.client.KoreaTourismApiClient;
 import turip.region.controller.dto.response.RegionCategoriesResponse;
 import turip.region.controller.dto.response.RegionCategoryResponse;
+import turip.region.domain.City;
+import turip.region.domain.Country;
 import turip.region.domain.DomesticRegionCategory;
+import turip.region.domain.LegalDistrictCode;
 import turip.region.domain.OverseasRegionCategory;
 
 @Service
@@ -22,9 +24,12 @@ public class RegionCategoryService {
     private static final String KOREA_COUNTRY_NAME = "대한민국";
     private static final String DOMESTIC_ETC_NAME = "국내 기타";
     private static final String OVERSEAS_ETC_NAME = "해외 기타";
+
     private final CityService cityService;
     private final CountryService countryService;
     private final ContentRepository contentRepository;
+    private final KoreaTourismApiClient koreaTourismApiClient;
+
     @Value("${region.category.domestic.etc.image-url}")
     private String domesticEtcImageUrl;
     @Value("${region.category.overseas.etc.image-url}")
@@ -53,8 +58,17 @@ public class RegionCategoryService {
                 .map(this::createCityWithContentCount)
                 .filter(cityWithCount -> cityWithCount.contentCount() > 0)
                 .sorted(Comparator.comparing(CityWithContentCount::contentCount).reversed())
-                .map(cityWithCount -> RegionCategoryResponse.from(cityWithCount.city()))
+                .map(cityWithCount -> createRegionCategoryResponseWithImage(cityWithCount.city()))
                 .collect(Collectors.toList());
+    }
+
+    private RegionCategoryResponse createRegionCategoryResponseWithImage(City city) {
+        if (LegalDistrictCode.isSupportedCity(city.getName())) {
+            String imageUrl = koreaTourismApiClient.searchRegionImage(city.getName())
+                    .orElse(city.getImageUrl());
+            return RegionCategoryResponse.of(city, imageUrl);
+        }
+        return RegionCategoryResponse.from(city);
     }
 
     private boolean isSupportedDomesticCity(City city) {

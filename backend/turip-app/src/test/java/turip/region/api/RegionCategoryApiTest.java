@@ -1,8 +1,11 @@
 package turip.region.api;
 
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
 import io.restassured.RestAssured;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -12,6 +15,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import turip.infrastructure.client.KoreaTourismApiClient;
 import turip.util.helper.TestDataHelper;
 
 @ActiveProfiles("test")
@@ -27,9 +32,16 @@ class RegionCategoryApiTest {
     @Autowired
     private TestDataHelper testDataHelper;
 
+    @MockitoBean
+    private KoreaTourismApiClient koreaTourismApiClient;
+
     @BeforeEach
     void setUp() {
         testDataHelper.cleanDatabase();
+
+        // KoreaTourismApiClient mock 설정 - 실제 API 호출하지 않도록
+        when(koreaTourismApiClient.searchRegionImage(anyString()))
+                .thenReturn(Optional.empty());
     }
 
     @DisplayName("/api/v1/region-categories GET 지역 카테고리 조회 테스트")

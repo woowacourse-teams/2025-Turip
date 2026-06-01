@@ -6,6 +6,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,6 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import turip.content.repository.ContentRepository;
+import turip.infrastructure.client.KoreaTourismApiClient;
 import turip.region.controller.dto.response.RegionCategoriesResponse;
 import turip.region.domain.City;
 import turip.region.domain.Country;
@@ -31,6 +33,9 @@ class RegionCategoryServiceTest {
 
     @Mock
     private ContentRepository contentRepository;
+
+    @Mock
+    private KoreaTourismApiClient koreaTourismApiClient;
 
     @DisplayName("국내 지역 카테고리 조회 시 국내 도시 목록과 기타 카테고리를 반환한다")
     @Test
@@ -57,6 +62,11 @@ class RegionCategoryServiceTest {
         given(contentRepository.countByCityName("서울")).willReturn(3);
         given(contentRepository.countByCityName("부산")).willReturn(1);
         given(contentRepository.countDomesticEtcContents(List.of("서울", "부산"))).willReturn(0);
+
+        given(koreaTourismApiClient.searchRegionImage("서울"))
+                .willReturn(Optional.of("https://api.example.com/seoul.jpg"));
+        given(koreaTourismApiClient.searchRegionImage("부산"))
+                .willReturn(Optional.of("https://api.example.com/busan.jpg"));
 
         // when
         RegionCategoriesResponse response = regionCategoryService.findRegionCategoriesByCountryType(true);

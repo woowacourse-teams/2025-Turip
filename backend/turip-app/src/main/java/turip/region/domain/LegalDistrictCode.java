@@ -3,11 +3,11 @@ package turip.region.domain;
 import java.util.Arrays;
 
 public enum LegalDistrictCode {
-    SEOUL("서울", "1100000000"),
-    BUSAN("부산", "2600000000"),
-    INCHEON("인천", "2800000000"),
-    DAEJEON("대전", "3000000000"),
-    JEJU("제주", "5000000000");
+    SEOUL("서울", "11"),
+    BUSAN("부산", "26"),
+    INCHEON("인천", "28"),
+    DAEJEON("대전", "30"),
+    JEJU("제주", "50");
 
     private final String cityName;
     private final String code;
@@ -23,6 +23,14 @@ public enum LegalDistrictCode {
                 .findFirst()
                 .map(district -> district.code)
                 .orElse(null);
+    }
+
+    public static boolean isSupportedCity(String cityName) {
+        if (cityName == null || cityName.isBlank()) {
+            return false;
+        }
+        return Arrays.stream(values())
+                .anyMatch(district -> cityName.equals(district.cityName));
     }
 
     public String getCode() {

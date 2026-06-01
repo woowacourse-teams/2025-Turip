@@ -1,5 +1,8 @@
 package turip.infrastructure.client;
 
+import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -15,7 +18,7 @@ public class KoreaTourismApiClient {
 
     public KoreaTourismApiClient(RestClient baseRestClient,
                                  @Value("${korea-tourism.image.api.key}") String koreaTourismApiKey,
-                                 @Value("${korea-tourism.api.url}") String koreaTourismApiUrl) {
+                                 @Value("${korea-tourism.image.api.url}") String koreaTourismApiUrl) {
         this.restClient = baseRestClient.mutate()
                 .baseUrl(koreaTourismApiUrl)
                 .build();
@@ -28,16 +31,16 @@ public class KoreaTourismApiClient {
             return Optional.empty();
         }
 
+        String encodedServiceKey = URLEncoder.encode(koreaTourismApiKey, StandardCharsets.UTF_8);
+
+        String uriString = String.format(
+                "https://apis.data.go.kr/B551011/PhokoAwrdService/phokoAwrdList?serviceKey=%s&MobileOS=AND&MobileApp=Turip&lDongRegnCd=%s&_type=json&numOfRows=1",
+                encodedServiceKey,
+                legalDistrictCode
+        );
+
         KoreaTourismResponse response = restClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/phokoAwrdList")
-                        .queryParam("serviceKey", koreaTourismApiKey)
-                        .queryParam("MobileOS", "ETC")
-                        .queryParam("MobileApp", "Turip")
-                        .queryParam("lDongRegnCd", legalDistrictCode)
-                        .queryParam("_type", "json")
-                        .queryParam("numOfRows", "1")
-                        .build())
+                .uri(URI.create(uriString))
                 .retrieve()
                 .body(KoreaTourismResponse.class);
 

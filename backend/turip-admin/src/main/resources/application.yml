@@ -52,6 +52,12 @@ youtube:
     key: ${YOUTUBE_API_KEY}
     url: https://www.googleapis.com/youtube/v3/videos
 
+korea-tourism:
+  image:
+    api:
+      key: ${KOREA_TOURISM_IMAGE_API_KEY}
+      url: https://apis.data.go.kr
+
 invitation:
   jwt:
     secret-key: ${INVITATION_JWT_SECRET_KEY}

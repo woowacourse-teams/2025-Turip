@@ -47,6 +47,12 @@ youtube:
     key: test-youtube-api-key
     url: https://test.youtube.com
 
+korea-tourism:
+  image:
+    api:
+      key: test-tourism-api-key
+      url: https://test.data.go.kr
+
 # CSV Import 설정
 csv:
   import:

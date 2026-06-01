@@ -62,7 +62,7 @@ korea-tourism:
   image:
     api:
       key: ${KOREA_TOURISM_IMAGE_API_KEY}
-      url: https://apis.data.go.kr/B551011/PhotoGalleryService1
+      url: https://apis.data.go.kr
 
 invitation:
   jwt:
