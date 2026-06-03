@@ -5,8 +5,10 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import turip.common.configuration.CacheConfiguration;
 import turip.infrastructure.client.dto.KoreaTourismResponse;
 import turip.region.domain.LegalDistrictCode;
 
@@ -25,6 +27,7 @@ public class KoreaTourismApiClient {
         this.koreaTourismApiKey = koreaTourismApiKey;
     }
 
+    @Cacheable(value = CacheConfiguration.KOREA_TOURISM_IMAGE_CACHE, key = "#cityName", unless = "#result == null || #result.isEmpty()")
     public Optional<String> searchRegionImage(String cityName) {
         String legalDistrictCode = LegalDistrictCode.getCodeByCityName(cityName);
         if (legalDistrictCode == null) {
