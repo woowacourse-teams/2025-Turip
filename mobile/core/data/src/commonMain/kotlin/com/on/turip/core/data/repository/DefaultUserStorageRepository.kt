@@ -20,17 +20,10 @@ class DefaultUserStorageRepository(
     override suspend fun loadId(): Result<TuripDeviceIdentifier> =
         userStorageLocalDataSource
             .getId()
-            .mapCatching { fid: String? -> fid ?: recreateId() }
-            .mapCatching { fid: String -> fid.toDomain() }
+            .mapCatching { fid: String? -> fid?.toDomain() ?: TuripDeviceIdentifier.EMPTY }
             .onFailure {
                 Napier.e("${it.message}")
             }
-
-    private suspend fun recreateId(): String {
-        val newFid: String = FirebaseInstallations.getInstance().id.await()
-        userStorageLocalDataSource.createId(newFid)
-        return newFid
-    }
 
     override suspend fun loadAccessToken(): Result<String?> = userStorageLocalDataSource.getAccessToken()
 
