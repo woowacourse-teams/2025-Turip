@@ -1,6 +1,6 @@
 package com.on.turip.core.data.di
 
-import com.on.turip.core.data.searchhistory.DefaultSearchHistoryRepository
+import com.on.turip.core.data.repository.DefaultSearchHistoryRepository
 import com.on.turip.core.data.session.SessionManager
 import com.on.turip.core.data.userstorage.DefaultTokenManager
 import com.on.turip.core.data.userstorage.DefaultUserStorageRepository

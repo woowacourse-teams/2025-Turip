@@ -1,4 +1,4 @@
-package com.on.turip.core.data.searchhistory
+package com.on.turip.core.data.repository
 
 import com.on.turip.core.data.datasource.SearchHistoryDataSource
 import com.on.turip.core.domain.repository.SearchHistoryRepository
