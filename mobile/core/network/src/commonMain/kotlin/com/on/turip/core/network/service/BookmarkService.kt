@@ -1,11 +1,11 @@
 package com.on.turip.core.network.service
 
 import com.on.turip.core.network.ApiPath
-import com.on.turip.core.network.dto.bookmark.BookmarkAddRequest
-import com.on.turip.core.network.dto.bookmark.BookmarkContentsResponse
-import com.on.turip.core.network.dto.bookmark.BookmarkCountResponse
-import com.on.turip.core.network.dto.bookmark.BookmarkCreationResponse
-import com.on.turip.core.network.dto.content.ContentResponse
+import com.on.turip.core.data.dto.bookmark.BookmarkAddRequest
+import com.on.turip.core.data.dto.bookmark.BookmarkContentsResponse
+import com.on.turip.core.data.dto.bookmark.BookmarkCountResponse
+import com.on.turip.core.data.dto.bookmark.BookmarkCreationResponse
+import com.on.turip.core.data.dto.content.ContentResponse
 import de.jensklingenberg.ktorfit.http.Body
 import de.jensklingenberg.ktorfit.http.DELETE
 import de.jensklingenberg.ktorfit.http.GET

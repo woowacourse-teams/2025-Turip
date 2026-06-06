@@ -15,6 +15,7 @@ kotlin {
             implementation(project(":core:model"))
             implementation(project(":core:common"))
             implementation(project(":core:domain"))
+            implementation(project(":core:data"))
             implementation(libs.napier)
 
             implementation(libs.androidx.room.runtime)

@@ -1,6 +1,6 @@
 package com.on.turip.core.domain.turip
 
-import com.on.turip.core.model.TuripStreamEvent
+import com.on.turip.core.model.turip.TuripStreamEvent
 import kotlinx.coroutines.flow.Flow
 
 interface TuripStreamService {

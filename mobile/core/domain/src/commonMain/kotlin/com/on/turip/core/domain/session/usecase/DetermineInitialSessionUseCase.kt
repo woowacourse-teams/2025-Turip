@@ -1,9 +1,10 @@
 package com.on.turip.core.domain.session.usecase
 
-import com.on.turip.core.common.NetworkError
-import com.on.turip.core.common.NetworkException
+import com.on.turip.core.domain.repository.AuthRepository
 import com.on.turip.core.domain.session.AuthStatus
 import com.on.turip.core.domain.session.TokenManager
+import com.on.turip.core.model.result.ErrorType
+import com.on.turip.core.model.result.fold
 
 class DetermineInitialSessionUseCase(
     private val tokenManager: TokenManager,
@@ -15,8 +16,8 @@ class DetermineInitialSessionUseCase(
 
         return authRepository.verifyToken().fold(
             onSuccess = { AuthStatus.Authenticated },
-            onFailure = { throwable ->
-                if (throwable is NetworkException && throwable.networkError is NetworkError.Auth) {
+            onFailure = { errorType ->
+                if (errorType is ErrorType.Auth) {
                     AuthStatus.UnAuthenticated
                 } else {
                     AuthStatus.Authenticated

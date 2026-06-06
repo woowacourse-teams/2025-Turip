@@ -3,11 +3,11 @@ package com.on.turip.core.network.datasourceimpl
 import com.on.turip.core.common.safeApiCall
 import com.on.turip.core.model.paging.Cursor
 import com.on.turip.core.model.result.TuripResult
-import com.on.turip.core.network.datasource.BookmarkRemoteDataSource
-import com.on.turip.core.network.dto.bookmark.BookmarkAddRequest
-import com.on.turip.core.network.dto.bookmark.BookmarkContentsResponse
-import com.on.turip.core.network.dto.bookmark.BookmarkCountResponse
-import com.on.turip.core.network.dto.bookmark.BookmarkCreationResponse
+import com.on.turip.core.data.datasource.BookmarkRemoteDataSource
+import com.on.turip.core.data.dto.bookmark.BookmarkAddRequest
+import com.on.turip.core.data.dto.bookmark.BookmarkContentsResponse
+import com.on.turip.core.data.dto.bookmark.BookmarkCountResponse
+import com.on.turip.core.data.dto.bookmark.BookmarkCreationResponse
 import com.on.turip.core.network.service.BookmarkService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO

@@ -4,7 +4,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
-import com.on.turip.core.local.datasource.DeferredDeepLinkLocalDataSource
+import com.on.turip.core.data.datasource.DeferredDeepLinkLocalDataSource
 import kotlinx.coroutines.flow.first
 
 class DefaultDeferredDeepLinkLocalDataSource(

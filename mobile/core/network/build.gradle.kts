@@ -10,6 +10,7 @@ kotlin {
             implementation(project(":core:model"))
             implementation(project(":core:common"))
             implementation(project(":core:domain"))
+            implementation(project(":core:data"))
 
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.content.negotiation)

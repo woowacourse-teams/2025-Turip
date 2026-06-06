@@ -1,6 +1,7 @@
 package com.on.turip.core.local.fid
 
 import com.on.turip.core.domain.fid.DeviceFidManager
+import com.on.turip.core.domain.repository.UserStorageRepository
 import io.github.aakira.napier.Napier
 import kotlin.concurrent.Volatile
 import kotlin.uuid.ExperimentalUuidApi

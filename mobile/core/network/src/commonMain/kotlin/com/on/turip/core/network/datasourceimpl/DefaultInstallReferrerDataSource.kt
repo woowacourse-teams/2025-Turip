@@ -1,6 +1,6 @@
 package com.on.turip.core.network.datasourceimpl
 
-import com.on.turip.core.network.datasource.InstallReferrerDataSource
+import com.on.turip.core.data.datasource.InstallReferrerDataSource
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeout
 

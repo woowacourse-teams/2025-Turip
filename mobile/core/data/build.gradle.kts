@@ -1,5 +1,6 @@
 plugins {
     id("turip.convention.kmp.library")
+    id("turip.convention.kotlin.serialization")
 }
 
 kotlin {
@@ -8,7 +9,7 @@ kotlin {
             implementation(project(":core:model"))
             implementation(project(":core:common"))
             implementation(project(":core:domain"))
-            implementation(project(":core:network"))
+            implementation(libs.kotlinx.serialization.json)
             implementation(libs.kotlinx.coroutines.core)
         }
     }

@@ -2,8 +2,8 @@ package com.on.turip.core.network.datasourceimpl
 
 import com.on.turip.core.common.safeApiCall
 import com.on.turip.core.model.result.TuripResult
-import com.on.turip.core.network.datasource.AccountRemoteDataSource
-import com.on.turip.core.network.dto.account.MyProfileResponse
+import com.on.turip.core.data.datasource.AccountRemoteDataSource
+import com.on.turip.core.data.dto.account.MyProfileResponse
 import com.on.turip.core.network.service.AccountService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO

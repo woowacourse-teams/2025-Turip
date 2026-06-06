@@ -1,13 +1,13 @@
 package com.on.turip.core.network.service
 
 import com.on.turip.core.network.ApiPath
-import com.on.turip.core.network.dto.content.ContentDetailResponse
-import com.on.turip.core.network.dto.content.ContentInformationCountResponse
-import com.on.turip.core.network.dto.content.ContentPlacesResponse
-import com.on.turip.core.network.dto.content.ContentResponse
-import com.on.turip.core.network.dto.content.ContentsInformationResponse
-import com.on.turip.core.network.dto.content.UsersLikeContentResponse
-import com.on.turip.core.network.dto.content.UsersLikeContentsResponse
+import com.on.turip.core.data.dto.content.ContentDetailResponse
+import com.on.turip.core.data.dto.content.ContentInformationCountResponse
+import com.on.turip.core.data.dto.content.ContentPlacesResponse
+import com.on.turip.core.data.dto.content.ContentResponse
+import com.on.turip.core.data.dto.content.ContentsInformationResponse
+import com.on.turip.core.data.dto.content.UsersLikeContentResponse
+import com.on.turip.core.data.dto.content.UsersLikeContentsResponse
 import de.jensklingenberg.ktorfit.http.GET
 import de.jensklingenberg.ktorfit.http.Path
 import de.jensklingenberg.ktorfit.http.Query

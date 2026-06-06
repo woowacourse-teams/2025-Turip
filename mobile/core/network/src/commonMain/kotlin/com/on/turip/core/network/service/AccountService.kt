@@ -1,7 +1,7 @@
 package com.on.turip.core.network.service
 
 import com.on.turip.core.network.ApiPath
-import com.on.turip.core.network.dto.account.MyProfileResponse
+import com.on.turip.core.data.dto.account.MyProfileResponse
 import de.jensklingenberg.ktorfit.http.GET
 
 interface AccountService {
