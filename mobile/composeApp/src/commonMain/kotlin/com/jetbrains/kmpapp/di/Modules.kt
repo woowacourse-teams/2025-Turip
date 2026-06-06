@@ -21,7 +21,13 @@ import org.koin.dsl.module
 
 val coreModule =
     module {
-        includes(dataModule, localModule, networkModule(BuildKonfig.BASE_URL), serviceModule, datasourceModule)
+        includes(
+            dataModule,
+            localModule,
+            networkModule(BuildKonfig.BASE_URL),
+            serviceModule,
+            datasourceModule(BuildKonfig.BASE_URL),
+        )
     }
 
 val featureModule =

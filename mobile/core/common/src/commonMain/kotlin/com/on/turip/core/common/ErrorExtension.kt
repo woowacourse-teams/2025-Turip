@@ -1,7 +1,6 @@
 package com.on.turip.core.common
 
 import com.on.turip.core.model.result.ErrorType
-import com.on.turip.core.network.dto.common.ErrorResponse
 
 fun ErrorResponse?.toErrorType(): ErrorType {
     if (this == null) return ErrorType.Unknown

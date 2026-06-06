@@ -13,12 +13,13 @@ import kotlin.coroutines.CoroutineContext
 
 class DefaultTuripStreamService(
     private val httpClient: HttpClient,
+    private val baseUrl: String,
     private val coroutineContext: CoroutineContext = Dispatchers.IO,
 ) : TuripStreamService {
     override fun streamTuripEvents(turipId: Long): Flow<ServerSentEvent> =
         flow {
             httpClient.sse(
-                urlString = "${BuildKonfig.BASE_URL}${ApiPath.V1}turips/$turipId/stream",
+                urlString = "$baseUrl${ApiPath.V1}turips/$turipId/stream",
             ) {
                 incoming.collect { event: ServerSentEvent ->
                     emit(event)

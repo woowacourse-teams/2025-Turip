@@ -2,7 +2,6 @@ package com.on.turip.core.common
 
 import com.on.turip.core.model.result.ErrorType
 import com.on.turip.core.model.result.TuripResult
-import com.on.turip.core.network.dto.common.ErrorResponse
 import io.ktor.client.call.body
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.ServerResponseException
