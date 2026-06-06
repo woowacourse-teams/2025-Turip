@@ -1,7 +1,13 @@
 package com.on.turip.core.common
 
-sealed class ApiException(cause: Throwable? = null) : Exception(cause) {
+import com.on.turip.core.model.result.ErrorType
+
+sealed class ApiException : Exception() {
+    data class Error(
+        val errorType: ErrorType,
+    ) : ApiException()
+
     data object Auth : ApiException()
+
     data object Network : ApiException()
-    data class Error(val networkError: NetworkError) : ApiException()
 }
