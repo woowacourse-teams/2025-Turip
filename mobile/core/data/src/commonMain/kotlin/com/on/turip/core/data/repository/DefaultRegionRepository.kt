@@ -1,6 +1,7 @@
 package com.on.turip.core.data.repository
 
 import com.on.turip.core.data.datasource.RegionRemoteDataSource
+import com.on.turip.core.data.mapper.toDomain
 import com.on.turip.core.domain.repository.RegionRepository
 import com.on.turip.core.model.region.RegionCategory
 import com.on.turip.core.model.result.TuripResult

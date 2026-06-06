@@ -1,6 +1,7 @@
 package com.on.turip.core.data.repository
 
 import com.on.turip.core.data.datasource.ContentRemoteDataSource
+import com.on.turip.core.data.mapper.toDomain
 import com.on.turip.core.domain.repository.ContentRepository
 import com.on.turip.core.model.content.Content
 import com.on.turip.core.model.content.PagedContentsResult

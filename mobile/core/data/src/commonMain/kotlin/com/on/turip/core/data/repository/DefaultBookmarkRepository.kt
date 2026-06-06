@@ -1,6 +1,8 @@
 package com.on.turip.core.data.repository
 
 import com.on.turip.core.data.datasource.BookmarkRemoteDataSource
+import com.on.turip.core.data.mapper.toDomain
+import com.on.turip.core.data.mapper.toRequestDto
 import com.on.turip.core.domain.repository.BookmarkRepository
 import com.on.turip.core.domain.repository.ContentRepository
 import com.on.turip.core.model.bookmark.BookmarkContent

@@ -1,4 +1,4 @@
-package com.on.turip.core.data.repository
+package com.on.turip.core.data.mapper
 
 import com.on.turip.core.data.dto.login.LoginJwtTokenResponse
 import com.on.turip.core.data.dto.login.ReissueTokenResponse

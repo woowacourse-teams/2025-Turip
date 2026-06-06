@@ -5,6 +5,9 @@ import com.on.turip.core.data.datasource.TuripRemoteDataSource
 import com.on.turip.core.data.datasource.TuripSseStreamDataSource
 import com.on.turip.core.data.dto.turip.PlaceTuripsRequest
 import com.on.turip.core.data.dto.turip.TuripPlaceOrderRequest
+import com.on.turip.core.data.mapper.toDomain
+import com.on.turip.core.data.mapper.toPatchRequestDto
+import com.on.turip.core.data.mapper.toPostRequestDto
 import com.on.turip.core.domain.repository.TuripRepository
 import com.on.turip.core.model.bookmark.TuripPlace
 import com.on.turip.core.model.result.ErrorType

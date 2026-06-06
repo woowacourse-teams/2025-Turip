@@ -1,4 +1,4 @@
-package com.on.turip.core.data.repository
+package com.on.turip.core.data.mapper
 
 import com.on.turip.core.data.dto.bookmark.BookmarkAddRequest
 import com.on.turip.core.data.dto.bookmark.BookmarkContentResponse
