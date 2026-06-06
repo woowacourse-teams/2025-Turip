@@ -40,13 +40,13 @@ interface TuripService {
 
     @POST(ApiPath.V1 + "turips")
     suspend fun postTurip(
-        @Body body: TuripPostRequest,
+        @Body turipPostRequest: TuripPostRequest,
     ): TuripCreationResponse
 
     @PATCH(ApiPath.V1 + "turips/{turipId}")
     suspend fun patchTurip(
         @Path("turipId") turipId: Long,
-        @Body body: TuripPatchRequest,
+        @Body turipPatchRequest: TuripPatchRequest,
     )
 
     @DELETE(ApiPath.V1 + "turips/{turipId}")
@@ -84,13 +84,13 @@ interface TuripService {
     @PATCH(ApiPath.V1 + "turips/places/turip-order")
     suspend fun patchTuripPlaceOrder(
         @Query("turipId") turipId: Long,
-        @Body body: TuripPlaceOrderRequest,
+        @Body turipPlaceOrderRequest: TuripPlaceOrderRequest,
     )
 
     @PUT(ApiPath.V1 + "turips/places/{placeId}")
     suspend fun putPlaceTurips(
         @Path("placeId") placeId: Long,
-        @Body body: PlaceTuripsRequest,
+        @Body placeTuripsRequest: PlaceTuripsRequest,
     )
 
     @POST(ApiPath.V1 + "turips/{turipId}/invitation-tokens")

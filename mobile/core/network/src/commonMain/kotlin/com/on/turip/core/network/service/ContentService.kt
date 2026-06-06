@@ -1,44 +1,54 @@
 package com.on.turip.core.network.service
 
 import com.on.turip.core.network.ApiPath
+import com.on.turip.core.network.dto.content.ContentDetailResponse
+import com.on.turip.core.network.dto.content.ContentInformationCountResponse
+import com.on.turip.core.network.dto.content.ContentPlacesResponse
 import com.on.turip.core.network.dto.content.ContentResponse
+import com.on.turip.core.network.dto.content.ContentsInformationResponse
 import com.on.turip.core.network.dto.content.UsersLikeContentResponse
+import com.on.turip.core.network.dto.content.UsersLikeContentsResponse
 import de.jensklingenberg.ktorfit.http.GET
 import de.jensklingenberg.ktorfit.http.Path
 import de.jensklingenberg.ktorfit.http.Query
 
 interface ContentService {
-    @GET(ApiPath.V1 + "contents/{contentId}")
-    suspend fun getContent(
-        @Path("contentId") contentId: Long,
-    ): ContentResponse
+    @GET(ApiPath.V1 + "contents/count")
+    suspend fun getContentsCountByRegion(
+        @Query("regionCategory") regionCategoryName: String,
+    ): ContentInformationCountResponse
 
-    @GET(ApiPath.V1 + "contents/popular")
-    suspend fun getPopularContents(
+    @GET(ApiPath.V1 + "contents/keyword/count")
+    suspend fun getContentsCountByKeyword(
+        @Query("keyword") keyword: String,
+    ): ContentInformationCountResponse
+
+    @GET(ApiPath.V1 + "contents")
+    suspend fun getContentsByRegion(
+        @Query("regionCategory") regionCategoryName: String,
         @Query("size") size: Int,
-    ): List<UsersLikeContentResponse>
+        @Query("lastId") lastId: Long,
+    ): ContentsInformationResponse
 
     @GET(ApiPath.V1 + "contents/keyword")
     suspend fun getContentsByKeyword(
         @Query("keyword") keyword: String,
         @Query("size") size: Int,
         @Query("lastId") lastId: Long,
-    ): List<ContentResponse>
+    ): ContentsInformationResponse
 
-    @GET(ApiPath.V1 + "contents/keyword/count")
-    suspend fun getContentsSizeByKeyword(
-        @Query("keyword") keyword: String,
-    ): Int
+    @GET(ApiPath.V1 + "contents/{contentId}")
+    suspend fun getContentDetail(
+        @Path("contentId") contentId: Long,
+    ): ContentDetailResponse
 
-    @GET(ApiPath.V1 + "contents")
-    suspend fun getContentsByRegion(
-        @Query("regionCategory") regionCategory: String,
+    @GET(ApiPath.V1 + "contents/popular")
+    suspend fun getUsersLikeContents(
         @Query("size") size: Int,
-        @Query("lastId") lastId: Long,
-    ): List<ContentResponse>
+    ): UsersLikeContentsResponse
 
-    @GET(ApiPath.V1 + "contents/count")
-    suspend fun getContentsSizeByRegion(
-        @Query("regionCategory") regionCategory: String,
-    ): Int
+    @GET(ApiPath.V1 + "contents/{contentId}/places")
+    suspend fun getTrip(
+        @Path("contentId") contentId: Long,
+    ): ContentPlacesResponse
 }

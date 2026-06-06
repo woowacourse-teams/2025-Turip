@@ -10,17 +10,14 @@ import de.jensklingenberg.ktorfit.http.GET
 import de.jensklingenberg.ktorfit.http.POST
 
 interface AuthService {
-    @POST(ApiPath.V1 + "auth/login")
-    suspend fun postLogin(
-        @Body body: LoginIdTokenPostRequest,
+    @POST(ApiPath.V2 + "auth/login/google")
+    suspend fun postIdToken(
+        @Body loginIdTokenPostRequest: LoginIdTokenPostRequest,
     ): LoginJwtTokenResponse
 
-    @POST(ApiPath.V1 + "auth/guest")
-    suspend fun postGuestLogin(): LoginJwtTokenResponse
-
-    @POST(ApiPath.V2 + "auth/reissue")
+    @POST(ApiPath.V1 + "auth/tokens")
     suspend fun postReissueToken(
-        @Body body: ReissueTokenRequest,
+        @Body reissueTokenRequest: ReissueTokenRequest,
     ): ReissueTokenResponse
 
     @GET(ApiPath.V1 + "auth/tokens/verification")
