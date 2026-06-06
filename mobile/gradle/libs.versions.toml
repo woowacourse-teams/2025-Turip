@@ -61,6 +61,7 @@ multiplatformMarkdownRenderer = "0.37.0"
 
 # Firebase
 firebase-installations = "18.0.0"
+install-referrer = "2.2"
 google-services = "4.4.2"
 
 # Util
@@ -158,6 +159,7 @@ multiplatform-markdown-renderer-m3 = { module = "com.mikepenz:multiplatform-mark
 
 # Firebase
 firebase-installations = { group = "com.google.firebase", name = "firebase-installations-ktx", version.ref = "firebase-installations" }
+install-referrer = { group = "com.android.installreferrer", name = "installreferrer", version.ref = "install-referrer" }
 kotlinx-coroutines-play-services = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-play-services", version.ref = "kotlinx-coroutines" }
 
 # Util

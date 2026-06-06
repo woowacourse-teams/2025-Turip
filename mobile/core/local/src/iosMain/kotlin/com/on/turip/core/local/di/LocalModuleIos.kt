@@ -5,7 +5,9 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.room.Room
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
+import com.on.turip.core.data.datasource.InstallReferrerDataSource
 import com.on.turip.core.local.database.TuripDatabase
+import com.on.turip.core.local.datasourceimpl.DefaultInstallReferrerDataSource
 import okio.Path.Companion.toPath
 import org.koin.dsl.module
 import platform.Foundation.NSHomeDirectory
@@ -27,5 +29,9 @@ val localModuleIos = module {
                 (NSHomeDirectory() + "/datastore/turip_prefs.preferences_pb").toPath()
             }
         )
+    }
+
+    single<InstallReferrerDataSource> {
+        DefaultInstallReferrerDataSource()
     }
 }

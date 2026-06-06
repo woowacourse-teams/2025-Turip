@@ -2,6 +2,7 @@ package com.on.turip.core.local.fid
 
 import com.on.turip.core.domain.fid.DeviceFidManager
 import com.on.turip.core.domain.repository.UserStorageRepository
+import com.on.turip.core.model.userstorage.TuripDeviceIdentifier
 import io.github.aakira.napier.Napier
 import kotlin.concurrent.Volatile
 import kotlin.uuid.ExperimentalUuidApi
@@ -21,7 +22,7 @@ class DefaultDeviceFidManager(
             Napier.d("FID already cached: $cachedFid", tag = "DeviceFid")
             return
         }
-        val stored = userStorageRepository.loadDeviceFid().getOrNull()
+        val stored = userStorageRepository.loadId().getOrNull()?.fid?.takeIf { it.isNotBlank() }
         if (stored != null) {
             cachedFid = stored
             Napier.d("FID loaded from storage: $stored", tag = "DeviceFid")
@@ -30,7 +31,7 @@ class DefaultDeviceFidManager(
         val platformFid = fetchPlatformFid()
         Napier.d("Firebase FID: $platformFid", tag = "DeviceFid")
         val newFid = platformFid ?: Uuid.random().toString()
-        userStorageRepository.saveDeviceFid(newFid)
+        userStorageRepository.createId(TuripDeviceIdentifier(newFid))
         cachedFid = newFid
         Napier.d("FID saved: $newFid", tag = "DeviceFid")
     }

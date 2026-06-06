@@ -1,8 +1,14 @@
-package com.on.turip.core.network.datasourceimpl
+package com.on.turip.core.local.datasourceimpl
 
+import android.content.Context
+import com.android.installreferrer.api.InstallReferrerClient
+import com.android.installreferrer.api.InstallReferrerStateListener
 import com.on.turip.core.data.datasource.InstallReferrerDataSource
+import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeout
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 class DefaultInstallReferrerDataSource(
     private val context: Context,
@@ -14,7 +20,7 @@ class DefaultInstallReferrerDataSource(
     override suspend fun getInstallReferrer(): Result<String?> =
         runCatching {
             withTimeout(INSTALL_REFERRER_TIMEOUT_MILLIS) {
-                suspendCancellableCoroutine<String?> { continuation ->
+                suspendCancellableCoroutine { continuation ->
                     val client = InstallReferrerClient.newBuilder(context).build()
 
                     continuation.invokeOnCancellation {
@@ -29,7 +35,7 @@ class DefaultInstallReferrerDataSource(
 
                     runCatching {
                         client.startConnection(listener)
-                    }.onFailure { exception: Throwable ->
+                    }.onFailure { exception ->
                         client.endConnectionSafely()
                         continuation.resumeWithExceptionSafely(exception)
                     }
@@ -47,14 +53,13 @@ class DefaultInstallReferrerDataSource(
                     InstallReferrerClient.InstallReferrerResponse.OK -> {
                         runCatching {
                             client.installReferrer.installReferrer
-                        }.onSuccess { installReferrer: String? ->
+                        }.onSuccess { installReferrer ->
                             continuation.resumeSafely(installReferrer)
-                        }.onFailure { exception: Throwable ->
+                        }.onFailure { exception ->
                             continuation.resumeWithExceptionSafely(exception)
                         }
                     }
 
-                    // 재시도를 하더라도 처리 할 수 없는 에러
                     InstallReferrerClient.InstallReferrerResponse.FEATURE_NOT_SUPPORTED,
                     InstallReferrerClient.InstallReferrerResponse.DEVELOPER_ERROR,
                     InstallReferrerClient.InstallReferrerResponse.PERMISSION_ERROR,
@@ -64,22 +69,21 @@ class DefaultInstallReferrerDataSource(
 
                     InstallReferrerClient.InstallReferrerResponse.SERVICE_UNAVAILABLE -> {
                         continuation.resumeWithExceptionSafely(
-                            IllegalStateException("InstallReferrer SERVICE_UNAVAILABLE 에러 발생"),
+                            IllegalStateException("InstallReferrer SERVICE_UNAVAILABLE error"),
                         )
                     }
 
                     else -> {
                         continuation.resumeWithExceptionSafely(
-                            IllegalStateException("InstallReferrer 에러 코드 responseCode:$responseCode"),
+                            IllegalStateException("InstallReferrer error responseCode=$responseCode"),
                         )
                     }
                 }
                 client.endConnectionSafely()
             }
 
-            // Google Play 연결이 중단된 경우 처리
             override fun onInstallReferrerServiceDisconnected() {
-                continuation.resumeWithExceptionSafely(IllegalStateException("InstallReferrer 연결 중단"))
+                continuation.resumeWithExceptionSafely(IllegalStateException("InstallReferrer disconnected"))
                 client.endConnectionSafely()
             }
         }

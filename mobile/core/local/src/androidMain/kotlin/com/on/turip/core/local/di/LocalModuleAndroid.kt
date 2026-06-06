@@ -6,7 +6,9 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.room.Room
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
+import com.on.turip.core.data.datasource.InstallReferrerDataSource
 import com.on.turip.core.local.database.TuripDatabase
+import com.on.turip.core.local.datasourceimpl.DefaultInstallReferrerDataSource
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
@@ -30,5 +32,9 @@ val localModuleAndroid = module {
                 context.preferencesDataStoreFile("turip_prefs")
             },
         )
+    }
+
+    single<InstallReferrerDataSource> {
+        DefaultInstallReferrerDataSource(androidContext())
     }
 }
