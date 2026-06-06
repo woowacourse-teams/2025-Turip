@@ -1,8 +1,13 @@
-package com.on.turip.core.network.datasourceimpl
+package com.on.turip.core.local.datasourceimpl
 
-import com.on.turip.core.network.datasource.UserStorageLocalDataSource
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
+import com.on.turip.core.local.datasource.UserStorageLocalDataSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.CoroutineContext
 
@@ -19,6 +24,7 @@ class DefaultUserStorageLocalDataSource(
             withContext(coroutineContext) {
                 userStorage.edit { prefs -> prefs[deviceFIDKey] = fid }
             }
+            Unit
         }
 
     override suspend fun getId(): Result<String?> =
@@ -33,6 +39,7 @@ class DefaultUserStorageLocalDataSource(
             withContext(coroutineContext) {
                 userStorage.edit { prefs -> prefs[accessTokenKey] = accessToken }
             }
+            Unit
         }
 
     override suspend fun getAccessToken(): Result<String?> =
@@ -47,6 +54,7 @@ class DefaultUserStorageLocalDataSource(
             withContext(coroutineContext) {
                 userStorage.edit { prefs -> prefs[refreshTokenKey] = refreshToken }
             }
+            Unit
         }
 
     override suspend fun getRefreshToken(): Result<String> =
@@ -65,5 +73,6 @@ class DefaultUserStorageLocalDataSource(
                     prefs.remove(refreshTokenKey)
                 }
             }
+            Unit
         }
 }

@@ -1,4 +1,4 @@
-package com.on.turip.core.network.datasource
+package com.on.turip.core.local.datasource
 
 interface UserStorageLocalDataSource {
     suspend fun createId(fid: String): Result<Unit>

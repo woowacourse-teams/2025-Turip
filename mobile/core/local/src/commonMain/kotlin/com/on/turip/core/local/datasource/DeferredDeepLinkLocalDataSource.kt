@@ -1,4 +1,4 @@
-package com.on.turip.core.network.datasource
+package com.on.turip.core.local.datasource
 
 /**
  * deferred deep link 처리 상태를 로컬에 저장하고 관리한다.
