@@ -1,14 +1,6 @@
 package com.on.turip.core.data.di
 
-import com.on.turip.core.data.repository.DefaultAccountRepository
-import com.on.turip.core.data.repository.DefaultAuthRepository
-import com.on.turip.core.data.repository.DefaultBookmarkRepository
-import com.on.turip.core.data.repository.DefaultContentRepository
-import com.on.turip.core.data.repository.DefaultDeferredDeepLinkRepository
-import com.on.turip.core.data.repository.DefaultInvitationRepository
-import com.on.turip.core.data.repository.DefaultRegionRepository
 import com.on.turip.core.data.session.DefaultSessionManager
-import com.on.turip.core.data.repository.DefaultTuripRepository
 import com.on.turip.core.domain.session.SessionManager
 import org.koin.dsl.module
 
