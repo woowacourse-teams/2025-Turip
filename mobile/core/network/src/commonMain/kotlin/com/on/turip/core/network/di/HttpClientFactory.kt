@@ -1,11 +1,11 @@
 package com.on.turip.core.network.di
 
 import com.on.turip.core.common.ApiException
+import com.on.turip.core.common.ErrorResponse
+import com.on.turip.core.common.toErrorType
 import com.on.turip.core.domain.repository.AuthRepository
 import com.on.turip.core.domain.session.TokenManager
 import com.on.turip.core.model.result.getOrElse
-import com.on.turip.core.network.error.ErrorResponse
-import com.on.turip.core.network.error.toNetworkError
 import io.github.aakira.napier.Napier
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
@@ -174,7 +174,7 @@ private fun HttpClientConfig<*>.handleErrors() {
                 val error = runCatching { response.body<ErrorResponse>() }.getOrNull()
                 if (error != null) {
                     if (response.status.value == 401) throw ApiException.Auth
-                    throw ApiException.Error(error.tag.toNetworkError())
+                    throw ApiException.Error(error.toErrorType())
                 } else if (response.status.value in 500..599) {
                     throw ApiException.Network
                 }

@@ -1,10 +1,9 @@
 package com.on.turip.feature.main.navigation.model
 
-import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
 
 @Immutable
 data class NavigationItem(
-    @StringRes val labelRes: Int,
+    val label: String,
     val icon: NavigationIconModel,
 )

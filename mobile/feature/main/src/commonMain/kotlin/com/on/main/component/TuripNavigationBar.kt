@@ -30,7 +30,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavKey
@@ -100,7 +99,7 @@ fun TuripNavigationBar(
                                     is NavigationIconModel.Vector -> {
                                         Icon(
                                             imageVector = item.icon.imageVector,
-                                            contentDescription = item.labelRes.toString(), // TODO: stringResource(item.labelRes)
+                                            contentDescription = item.label,
                                             modifier =
                                                 Modifier
                                                     .size(32.dp)
@@ -114,7 +113,7 @@ fun TuripNavigationBar(
                                     is NavigationIconModel.PainterIcon -> {
                                         Icon(
                                             painter = painterResource(item.icon.drawRes),
-                                            contentDescription = item.labelRes.toString(), // TODO: stringResource(item.labelRes)
+                                            contentDescription = item.label,
                                             modifier =
                                                 Modifier
                                                     .size(32.dp)
@@ -126,7 +125,7 @@ fun TuripNavigationBar(
                                     }
                                 }
                                 Text(
-                                    text = item.labelRes.toString(), // TODO: stringResource(item.labelRes)
+                                    text = item.label,
                                     style = TuripTheme.typography.info1,
                                 )
                             }
@@ -165,17 +164,17 @@ private fun TuripNavigationBarPreview() {
                     Example1 to
                         NavigationItem(
                             icon = NavigationIconModel.Vector(Icons.Default.Home),
-                            labelRes = 0, // TODO: R.string.bottom_navigation_home
+                            label = "홈",
                         ),
                     Example2 to
                         NavigationItem(
                             icon = NavigationIconModel.Vector(Icons.Default.Folder),
-                            labelRes = 0, // TODO: R.string.bottom_navigation_my_turip
+                            label = "튜립",
                         ),
                     Example3 to
                         NavigationItem(
                             icon = NavigationIconModel.Vector(Icons.Default.Person),
-                            labelRes = 0, // TODO: R.string.bottom_navigation_my_page
+                            label = "마이",
                         ),
                 ),
             selectedKey = selectedIndex,

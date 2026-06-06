@@ -17,17 +17,17 @@ object TopLevel {
             HomeNavKey to
                 NavigationItem(
                     icon = NavigationIconModel.Vector(Icons.Default.Home),
-                    labelRes = 0,
+                    label = "홈",
                 ),
             MyTuripNavKey to
                 NavigationItem(
                     icon = NavigationIconModel.Vector(Icons.Default.Folder),
-                    labelRes = 0,
+                    label = "튜립",
                 ),
             MyPageNavKey to
                 NavigationItem(
                     icon = NavigationIconModel.Vector(Icons.Default.Person),
-                    labelRes = 0,
+                    label = "마이",
                 ),
         )
 }

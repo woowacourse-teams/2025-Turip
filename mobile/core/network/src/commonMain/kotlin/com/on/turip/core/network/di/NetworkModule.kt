@@ -1,6 +1,7 @@
 package com.on.turip.core.network.di
 
 import com.on.turip.core.domain.fid.DeviceFidManager
+import com.on.turip.core.domain.repository.AuthRepository
 import com.on.turip.core.domain.session.AuthTokenCacheController
 import com.on.turip.core.domain.session.TokenManager
 import de.jensklingenberg.ktorfit.Ktorfit

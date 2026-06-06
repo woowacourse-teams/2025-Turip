@@ -1,8 +1,8 @@
 package com.on.turip.feature.main.navigation.model
 
-import androidx.annotation.DrawableRes
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.vector.ImageVector
+import org.jetbrains.compose.resources.DrawableResource
 
 @Immutable
 sealed interface NavigationIconModel {
@@ -11,6 +11,6 @@ sealed interface NavigationIconModel {
     ) : NavigationIconModel
 
     data class PainterIcon(
-        @DrawableRes val drawRes: Int,
+        val drawRes: DrawableResource,
     ) : NavigationIconModel
 }
