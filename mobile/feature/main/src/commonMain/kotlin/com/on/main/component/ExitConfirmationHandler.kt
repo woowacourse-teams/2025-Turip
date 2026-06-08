@@ -5,20 +5,23 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.navigationevent.NavigationEventInfo
 import androidx.navigationevent.compose.NavigationBackHandler
 import androidx.navigationevent.compose.rememberNavigationEventState
 import com.on.turip.core.common.Platform
 import com.on.turip.core.common.currentPlatform
+import com.on.turip.core.designsystem.generated.resources.Res
 import com.on.turip.feature.main.navigation.TuripAppState
+import org.jetbrains.compose.resources.getString
 
 @Composable
-fun ExitConfirmationHandler(appState: TuripAppState) {
-    var canExit: Boolean by remember { mutableStateOf(false) }
+internal fun ExitConfirmationHandler(
+    appState: TuripAppState,
+) {
+    var canExit: Boolean by rememberSaveable { mutableStateOf(false) }
     val isTopLevelRoot: Boolean = appState.navigationState.isTopLevelKey
-
-    val exit = "TODO: R.string.main_double_back_pressed_to_exit"
 
     LaunchedEffect(canExit, isTopLevelRoot) {
         if (!canExit) return@LaunchedEffect
@@ -30,12 +33,12 @@ fun ExitConfirmationHandler(appState: TuripAppState) {
         }
 
         appState.snackbarDelegate.showSnackbar(
-            message = exit,
+            message = "닫기",
             onDismiss = { canExit = false },
         )
     }
 
-    LaunchedEffect(appState.navigationState.currentKey) {
+    LaunchedEffect(appState.navigationState.currentTopLevelKey) {
         appState.snackbarDelegate.dismissCurrentSnackbar()
     }
 

@@ -31,6 +31,7 @@ import com.on.turip.core.designsystem.theme.TuripTheme
 import com.on.turip.core.navigation.Navigator
 import com.on.turip.core.navigation.rememberNavigationState
 import com.on.turip.core.navigation.toEntries
+import com.on.turip.feature.home.api.HomeNavKey
 import com.on.turip.feature.main.component.ExitConfirmationHandler
 import com.on.turip.feature.main.component.LocalSystemBarStyleController
 import com.on.turip.feature.main.component.SystemBarStyleEffect
@@ -53,8 +54,9 @@ fun MainApp(
     val initialEntryKey: NavKey = SplashNavKey
     val navigationState =
         rememberNavigationState(
-            startKey = initialEntryKey,
+            startKey = HomeNavKey,
             topLevelKeys = TopLevel.routes.keys,
+            initialEntryKey = initialEntryKey,
             configuration = savedStateConfigurationProvider.savedStateConfiguration,
         )
 
@@ -63,7 +65,7 @@ fun MainApp(
 
     LaunchedEffect(Unit) {
         newDeepLinkFlow.collect { deepLinkUrl ->
-            navigator.navigate(InvitationEntryNavKey(deepLinkUrl)) // TODO: goWithAllClear (clear back stack before navigating)
+            navigator.goWithAllClear(InvitationEntryNavKey(deepLinkUrl))
         }
     }
 

@@ -20,31 +20,54 @@ import androidx.savedstate.serialization.SavedStateConfiguration
 fun rememberNavigationState(
     startKey: NavKey,
     topLevelKeys: Set<NavKey>,
+    initialEntryKey: NavKey?,
     configuration: SavedStateConfiguration,
 ): NavigationState {
     val topLevelStack = rememberNavBackStack(configuration = configuration, startKey)
-    // startKey가 topLevelKeys에 없을 경우(Splash, Login 등 인증 전 화면)를 위해
-    // 항상 startKey sub-stack을 생성하고, topLevelKeys에 포함된 경우엔 버린다.
-    val startKeyStack = rememberNavBackStack(configuration = configuration, startKey)
-    val topLevelSubStacks = topLevelKeys.associateWith { key ->
-        rememberNavBackStack(
-            configuration = configuration,
-            key,
-        )
-    }
     val subStacks =
-        if (startKey in topLevelKeys) {
-            topLevelSubStacks
-        } else {
-            topLevelSubStacks + (startKey to startKeyStack)
+        topLevelKeys.associateWith { key ->
+            rememberNavBackStack(configuration = configuration, key)
         }
 
-    return remember(startKey, topLevelKeys) {
+    return remember(startKey, topLevelKeys, initialEntryKey) {
+        if (initialEntryKey != null) {
+            clearAllStacks(topLevelStack = topLevelStack, subStacks = subStacks)
+            when (initialEntryKey) {
+                in subStacks.keys -> {
+                    topLevelStack.add(initialEntryKey)
+                }
+
+                else -> {
+                    topLevelStack.add(startKey)
+                    val startSubStack: NavBackStack<NavKey> =
+                        subStacks[startKey] ?: error("Sub stack for $startKey does not exist")
+                    startSubStack.add(initialEntryKey)
+                }
+            }
+        }
+
         NavigationState(
             startKey = startKey,
             topLevelStack = topLevelStack,
             subStacks = subStacks,
         )
+    }
+}
+
+/**
+ * 모든 네비게이션 스택을 초기 상태로 되돌린다.
+ *
+ * - `topLevelStack`은 완전히 비운다.
+ * - 각 서브 스택은 비운 뒤, 자신의 top-level 키 1개만 다시 넣어 기본 상태를 만든다.
+ */
+private fun clearAllStacks(
+    topLevelStack: NavBackStack<NavKey>,
+    subStacks: Map<NavKey, NavBackStack<NavKey>>,
+) {
+    topLevelStack.clear()
+    subStacks.forEach { (topLevelKey: NavKey, stack: NavBackStack<NavKey>) ->
+        stack.clear()
+        stack.add(topLevelKey)
     }
 }
 
@@ -63,8 +86,15 @@ class NavigationState(
     val topLevelStack: NavBackStack<NavKey>,
     val subStacks: Map<NavKey, NavBackStack<NavKey>>,
 ) {
-    val currentTopLevelKey: NavKey by derivedStateOf { topLevelStack.last() }
-    val currentKey: NavKey by derivedStateOf { currentSubStack.last() }
+    val isTopLevelKey
+        get() = topLevelKeys.contains(currentKey)
+    val currentTopLevelKey: NavKey by derivedStateOf {
+        topLevelStack.lastOrNull() ?: error("등록된 Top키가 존재하지 않습니다.")
+    }
+    val currentKey: NavKey by derivedStateOf {
+        currentSubStack.lastOrNull() ?: error("등록된 키가 존재하지 않습니다.")
+    }
+
     val topLevelKeys
         get() = subStacks.keys
 
@@ -72,19 +102,16 @@ class NavigationState(
         get() =
             subStacks[currentTopLevelKey]
                 ?: error("Sub stack for $currentTopLevelKey does not exist")
-
-    val isTopLevelKey
-        get() = topLevelKeys.contains(currentKey)
 }
 
 @Composable
-fun NavigationState.toEntries(entryProvider: (NavKey) -> NavEntry<NavKey>): SnapshotStateList<NavEntry<NavKey>> {
+fun NavigationState.toEntries(entryProvider: (navKey: NavKey) -> NavEntry<NavKey>): List<NavEntry<NavKey>> {
     val decoratedEntries =
         subStacks.mapValues { (_, stack) ->
             val decorators =
                 listOf(
                     rememberSaveableStateHolderNavEntryDecorator<NavKey>(),
-                    rememberViewModelStoreNavEntryDecorator(),
+                    rememberViewModelStoreNavEntryDecorator<NavKey>(),
                 )
 
             rememberDecoratedNavEntries(
@@ -94,7 +121,5 @@ fun NavigationState.toEntries(entryProvider: (NavKey) -> NavEntry<NavKey>): Snap
             )
         }
 
-    return topLevelStack
-        .flatMap { decoratedEntries[it] ?: emptyList() }
-        .toMutableStateList()
+    return topLevelStack.flatMap { decoratedEntries[it] ?: emptyList() }
 }
