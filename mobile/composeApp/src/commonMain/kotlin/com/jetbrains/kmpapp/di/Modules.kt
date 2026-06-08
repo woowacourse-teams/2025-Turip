@@ -1,5 +1,6 @@
 package com.jetbrains.kmpapp.di
 
+import com.on.main.di.mainModule
 import com.on.turip.BuildKonfig
 import com.on.turip.core.data.di.dataModule
 import com.on.turip.core.local.di.localModule
@@ -27,6 +28,7 @@ val coreModule =
             networkModule(BuildKonfig.BASE_URL),
             serviceModule,
             datasourceModule(BuildKonfig.BASE_URL),
+            mainModule,
         )
     }
 
