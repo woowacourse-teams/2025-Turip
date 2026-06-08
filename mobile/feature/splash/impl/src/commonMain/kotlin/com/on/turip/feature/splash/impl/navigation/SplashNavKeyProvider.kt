@@ -12,5 +12,7 @@ class SplashNavKeyProvider : NavKeyProvider {
         subclass(SplashNavKey::class, SplashNavKey.serializer())
     }
 
-    override fun EntryProviderScope<NavKey>.registerScreens(navigator: Navigator) {}
+    override fun EntryProviderScope<NavKey>.registerScreens(navigator: Navigator) {
+        splashScreen(navigator, deepLinkUrl = null)
+    }
 }
