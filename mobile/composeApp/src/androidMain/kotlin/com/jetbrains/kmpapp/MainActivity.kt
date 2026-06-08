@@ -7,8 +7,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalConfiguration
+import com.on.turip.core.domain.fid.DeviceFidManager
 import com.on.turip.feature.main.MainApp
 import com.on.turip.feature.main.navigation.SavedStateConfigurationProvider
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -26,6 +28,10 @@ class MainActivity : ComponentActivity() {
             requestedOrientation =
                 if (isPhone) ActivityInfo.SCREEN_ORIENTATION_PORTRAIT else ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
             val savedStateConfigurationProvider: SavedStateConfigurationProvider = koinInject()
+            val deviceFidManager: DeviceFidManager = koinInject()
+            LaunchedEffect(Unit) {
+                deviceFidManager.ensureInitialized()
+            }
             MainApp(
                 savedStateConfigurationProvider = savedStateConfigurationProvider,
                 newDeepLinkFlow = newDeepLinkFlow,
