@@ -13,6 +13,7 @@
 		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
 		F1A000000000000000000001 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = F1A000000000000000000005 /* FirebaseCore */; };
 		F1A000000000000000000002 /* FirebaseInstallations in Frameworks */ = {isa = PBXBuildFile; productRef = F1A000000000000000000006 /* FirebaseInstallations */; };
+		F1A000000000000000000007 /* Sentry in Frameworks */ = {isa = PBXBuildFile; productRef = F1A000000000000000000009 /* Sentry */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -33,6 +34,7 @@
 			files = (
 				F1A000000000000000000001 /* FirebaseCore in Frameworks */,
 				F1A000000000000000000002 /* FirebaseInstallations in Frameworks */,
+				F1A000000000000000000007 /* Sentry in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -113,6 +115,7 @@
 			packageProductDependencies = (
 				F1A000000000000000000005 /* FirebaseCore */,
 				F1A000000000000000000006 /* FirebaseInstallations */,
+				F1A000000000000000000009 /* Sentry */,
 			);
 			productName = iosApp;
 			productReference = 7555FF7B242A565900829871 /* KMP App.app */;
@@ -145,6 +148,7 @@
 			mainGroup = 7555FF72242A565900829871;
 			packageReferences = (
 				F1A000000000000000000004 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				F1A000000000000000000008 /* XCRemoteSwiftPackageReference "sentry-cocoa" */,
 			);
 			productRefGroup = 7555FF7C242A565900829871 /* Products */;
 			projectDirPath = "";
@@ -409,6 +413,14 @@
 				minimumVersion = 11.0.0;
 			};
 		};
+		F1A000000000000000000008 /* XCRemoteSwiftPackageReference "sentry-cocoa" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/getsentry/sentry-cocoa.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -421,6 +433,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = F1A000000000000000000004 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseInstallations;
+		};
+		F1A000000000000000000009 /* Sentry */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F1A000000000000000000008 /* XCRemoteSwiftPackageReference "sentry-cocoa" */;
+			productName = Sentry;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
