@@ -13,44 +13,92 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.on.turip.core.designsystem.component.TuripDialog
 import com.on.turip.core.designsystem.generated.resources.Res
+import com.on.turip.core.designsystem.generated.resources.all_close_description
 import com.on.turip.core.designsystem.generated.resources.bg_login
 import com.on.turip.core.designsystem.generated.resources.ic_logo
+import com.on.turip.core.designsystem.snackbar.LocalSnackbarDelegate
 import com.on.turip.core.designsystem.theme.TuripTheme
+import com.on.turip.core.ui.error.toUiModel
 import com.on.turip.feature.login.impl.component.GoogleLoginButton
 import com.on.turip.feature.login.impl.component.GuestModeSection
 import com.on.turip.feature.login.impl.util.noRippleClickable
+import kotlinx.coroutines.flow.collectLatest
+import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.painterResource
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun LoginScreen(
     deepLinkUrl: String?,
     onNavigateToMain: (deepLinkUrl: String?) -> Unit,
     modifier: Modifier = Modifier,
+    viewModel: LoginViewModel = koinViewModel(),
 ) {
-    var isHelpTextVisible: Boolean by rememberSaveable { mutableStateOf(false) }
+    val uiState: LoginUiState by viewModel.uiState.collectAsState()
+    val googleCredentialManager = rememberGoogleCredentialManager()
+    val snackbarDelegate = LocalSnackbarDelegate.current
+
+    LaunchedEffect(deepLinkUrl) {
+        viewModel.initDeepLinkUrl(deepLinkUrl)
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.uiEffect.collectLatest { effect: LoginUiEffect ->
+            when (effect) {
+                LoginUiEffect.RequestAutoLogin -> {
+                    viewModel.loginWithGoogle(googleCredentialManager)
+                }
+
+                is LoginUiEffect.NavigateToMain -> {
+                    onNavigateToMain(effect.deepLinkUrl)
+                }
+
+                is LoginUiEffect.ShowError -> {
+                    val errorUiModel = effect.errorUiState.toUiModel() ?: return@collectLatest
+                    snackbarDelegate.showSnackbar(
+                        message = getString(errorUiModel.titleRes),
+                        actionLabel = getString(Res.string.all_close_description),
+                        duration = SnackbarDuration.Short,
+                    )
+                }
+            }
+        }
+    }
+
+    if (uiState.showMigrationDialog) {
+        TuripDialog(
+            title = "게스트 모드 데이터가 있어요",
+            message = "기존 게스트 모드 데이터를 계정으로 옮길까요?",
+            confirmText = "옮기기",
+            dismissText = "괜찮아요",
+            onConfirmation = viewModel::confirmMigration,
+            onDismissRequest = viewModel::rejectMigration,
+        )
+    }
 
     LoginScreenContent(
-        isHelpTextVisible = isHelpTextVisible,
+        isHelpTextVisible = uiState.showHelpText,
         modifier =
             modifier
                 .fillMaxSize()
-                .noRippleClickable { isHelpTextVisible = false },
-        onHelpClick = { isHelpTextVisible = !isHelpTextVisible },
-        onGoogleLoginClick = { onNavigateToMain(deepLinkUrl) },
-        onGuestLoginClick = { onNavigateToMain(deepLinkUrl) },
+                .noRippleClickable { viewModel.updateHelpTextVisible(false) },
+        onHelpClick = { viewModel.updateHelpTextVisible(!uiState.showHelpText) },
+        onGoogleLoginClick = { viewModel.loginWithGoogle(googleCredentialManager) },
+        onGuestLoginClick = viewModel::continueAsGuest,
     )
 }
 

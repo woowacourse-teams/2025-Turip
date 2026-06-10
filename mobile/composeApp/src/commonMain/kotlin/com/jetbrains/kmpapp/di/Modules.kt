@@ -25,7 +25,10 @@ val coreModule =
         includes(
             dataModule,
             localModule,
-            networkModule(BuildKonfig.BASE_URL),
+            networkModule(
+                baseUrl = BuildKonfig.BASE_URL,
+                isDebug = BuildKonfig.IS_DEBUG,
+            ),
             serviceModule,
             datasourceModule(BuildKonfig.BASE_URL),
             mainModule,

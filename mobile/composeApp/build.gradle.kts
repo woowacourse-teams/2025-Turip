@@ -1,6 +1,7 @@
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.BOOLEAN
 import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
+import java.util.Properties
 
 plugins {
     id("turip.convention.kmp.application")
@@ -73,6 +74,14 @@ buildkonfig {
 android {
     namespace = "com.on.turip"
 
+    val androidKeystoreProperties =
+        Properties().apply {
+            val keystorePropertiesFile = rootDir.resolve("../android/keystore.properties").normalize()
+            if (keystorePropertiesFile.isFile) {
+                keystorePropertiesFile.inputStream().use(::load)
+            }
+        }
+
     defaultConfig {
         applicationId = "com.on.turip"
         versionCode =
@@ -86,11 +95,22 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    signingConfigs {
+        if (androidKeystoreProperties.isNotEmpty()) {
+            getByName("debug") {
+                storeFile = file(androidKeystoreProperties.getProperty("debug_store_file"))
+                storePassword = androidKeystoreProperties.getProperty("debug_store_password")
+                keyAlias = androidKeystoreProperties.getProperty("debug_key_alias")
+                keyPassword = androidKeystoreProperties.getProperty("debug_key_password")
+            }
+        }
+    }
+
     buildTypes {
         getByName("debug") {
             isDebuggable = true
-            applicationIdSuffix = ".dev"
-            versionNameSuffix = ".dev"
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = ".debug"
             manifestPlaceholders +=
                 mapOf(
                     "appName" to "@string/app_name_dev",

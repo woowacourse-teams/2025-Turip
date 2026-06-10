@@ -16,7 +16,10 @@ const val SSE_HTTP_CLIENT = "SseHttpClient"
 const val DEFAULT_KTORFIT = "DefaultKtorfit"
 const val NO_AUTH_KTORFIT = "NoAuthKtorfit"
 
-fun networkModule(baseUrl: String) = module {
+fun networkModule(
+    baseUrl: String,
+    isDebug: Boolean,
+) = module {
     single { DefaultAuthTokenCacheController() }
     single<AuthTokenCacheController> { get<DefaultAuthTokenCacheController>() }
 
@@ -24,10 +27,10 @@ fun networkModule(baseUrl: String) = module {
         val fidManager = get<DeviceFidManager>()
         buildDefaultHttpClient(
             baseUrl = baseUrl,
+            isDebug = isDebug,
             tokenManager = get<TokenManager>(),
             authRepositoryProvider = { get<AuthRepository>() },
             deviceFidProvider = { fidManager.getFid() },
-            authTokenCacheController = get<DefaultAuthTokenCacheController>(),
         )
     }
 
@@ -35,6 +38,7 @@ fun networkModule(baseUrl: String) = module {
         val fidManager = get<DeviceFidManager>()
         buildNoAuthHttpClient(
             baseUrl = baseUrl,
+            isDebug = isDebug,
             deviceFidProvider = { fidManager.getFid() },
         )
     }
@@ -43,7 +47,9 @@ fun networkModule(baseUrl: String) = module {
         val fidManager = get<DeviceFidManager>()
         buildSseHttpClient(
             baseUrl = baseUrl,
+            isDebug = isDebug,
             tokenManager = get<TokenManager>(),
+            authRepositoryProvider = { get<AuthRepository>() },
             deviceFidProvider = { fidManager.getFid() },
         )
     }
