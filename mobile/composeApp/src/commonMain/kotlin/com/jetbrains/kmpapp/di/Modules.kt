@@ -47,7 +47,7 @@ val featureModule =
             searchModule,
             myTuripModule,
             turipDetailModule,
-            tripModule,
+            tripModule(BuildKonfig.BASE_URL),
         )
     }
 

@@ -23,19 +23,26 @@ import com.on.turip.core.designsystem.generated.resources.Res
 import com.on.turip.core.designsystem.generated.resources.ic_play_button
 import com.on.turip.core.designsystem.generated.resources.trip_detail_video_error
 import com.on.turip.core.designsystem.theme.TuripTheme
+import com.on.turip.feature.trip.impl.TripDetailWebViewController
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun ContentVideo(
     onErrorClick: () -> Unit,
+    webViewController: TripDetailWebViewController,
     modifier: Modifier = Modifier,
 ) {
     ContentVideoContent(
-        isLoading = false,
-        isError = false,
+        isLoading = webViewController.isLoading || webViewController.isPlaybackRestoring,
+        isError = webViewController.isError,
         onErrorClick = onErrorClick,
-        videoContent = { Video() },
+        videoContent = {
+            PlatformVideo(
+                webViewController = webViewController,
+                modifier = Modifier.fillMaxSize(),
+            )
+        },
         modifier = modifier,
     )
 }
@@ -80,16 +87,6 @@ private fun ContentVideoContent(
 }
 
 @Composable
-private fun Video() {
-    Box(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .background(TuripTheme.colors.black),
-    )
-}
-
-@Composable
 private fun VideoError(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -125,7 +122,14 @@ private fun ContentVideoPlayingPreview() {
             isLoading = false,
             isError = false,
             onErrorClick = {},
-            videoContent = { Video() },
+            videoContent = {
+                Box(
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .background(TuripTheme.colors.black),
+                )
+            },
         )
     }
 }
@@ -138,7 +142,14 @@ private fun ContentVideoLoadingPreview() {
             isLoading = true,
             isError = false,
             onErrorClick = {},
-            videoContent = { Video() },
+            videoContent = {
+                Box(
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .background(TuripTheme.colors.black),
+                )
+            },
         )
     }
 }

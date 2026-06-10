@@ -18,11 +18,20 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -47,12 +56,16 @@ import com.on.turip.feature.trip.impl.component.PlaceItem
 import com.on.turip.feature.trip.impl.component.TripDetailAppBar
 import com.on.turip.feature.trip.impl.model.MapModel
 import com.on.turip.feature.trip.impl.model.PlaceModel
+import com.on.turip.feature.trip.impl.model.SelectedPlaceModel
 import com.on.turip.feature.trip.impl.model.TripDetailInfoModel
 import com.on.turip.feature.trip.impl.model.TripDurationModel
+import com.on.turip.feature.trip.impl.turipselection.PlaceTuripSelectionBottomSheet
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.getString
 import org.koin.compose.viewmodel.koinViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TripDetailScreen(
     contentId: Long,
@@ -63,15 +76,58 @@ fun TripDetailScreen(
     navigateToWebViewUrl: (url: String) -> Unit,
     navigateToShareTuripByText: (turipShareModel: TuripShareModel) -> Unit,
     navigateToShareTuripInvitationLink: (invitationLink: String) -> Unit,
+    webViewBaseUrl: String,
     modifier: Modifier = Modifier,
     viewModel: TripDetailViewModel = koinViewModel(),
 ) {
     val uiState: TripDetailUiState by viewModel.uiState.collectAsState()
     val snackbarDelegate = LocalSnackbarDelegate.current
     val listState = rememberLazyListState()
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var selectedPlace by remember { mutableStateOf<SelectedPlaceModel?>(null) }
+    val bottomSheetScope = rememberCoroutineScope()
+    val placeTuripSelectionSnackbarHostState = remember { SnackbarHostState() }
+    val webViewController =
+        rememberTripDetailWebViewController(
+            baseUrl = webViewBaseUrl,
+            navigateToWebViewUrl = navigateToWebViewUrl,
+        )
+    val isInitialLoading by remember {
+        derivedStateOf {
+            uiState.isLoading ||
+                (webViewController.isLoading && uiState.tripDetailInfo == TripDetailInfoModel.Idle)
+        }
+    }
 
     LaunchedEffect(contentId) {
         viewModel.initContentId(contentId)
+    }
+
+    HandleFullScreenWindowLaunchedEffect(isFullScreen = webViewController.isFullScreen)
+
+    LaunchedEffect(uiState.tripDetailInfo.videoLink) {
+        webViewController.loadVideo(
+            url = uiState.tripDetailInfo.videoLink,
+            initialSecond = viewModel.getCurrentVideoPlaybackSecond(),
+            onTimeUpdate = viewModel::updateVideoPlaybackSecond,
+        )
+    }
+
+    LaunchedEffect(uiState.selectedPlaceModel) {
+        val currentSelectedPlace = uiState.selectedPlaceModel
+        if (currentSelectedPlace != null) {
+            selectedPlace = currentSelectedPlace
+            sheetState.show()
+        } else if (selectedPlace != null) {
+            sheetState.hide()
+            selectedPlace = null
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            webViewController.clear()
+        }
     }
 
     LaunchedEffect(Unit) {
@@ -131,20 +187,28 @@ fun TripDetailScreen(
     }
 
     Column(modifier = modifier.fillMaxSize()) {
-        Spacer(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .windowInsetsTopHeight(WindowInsets.systemBars)
-                    .background(TuripTheme.colors.primary),
-        )
-        TripDetailAppBar(
-            isError = uiState.errorUiState != ErrorUiState.None,
-            isLoading = uiState.isLoading,
-            isBookmarked = uiState.isBookmarked,
-            onBackClick = navigateToBack,
-            onBookmarkClick = viewModel::updateBookmark,
-        )
+        if (!webViewController.isFullScreen) {
+            Spacer(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .windowInsetsTopHeight(WindowInsets.systemBars)
+                        .background(TuripTheme.colors.primary),
+            )
+            TripDetailAppBar(
+                isError = uiState.errorUiState != ErrorUiState.None,
+                isLoading = isInitialLoading,
+                isBookmarked = uiState.isBookmarked,
+                onBackClick = {
+                    if (webViewController.canHandleBack()) {
+                        webViewController.handleBack()
+                    } else {
+                        navigateToBack()
+                    }
+                },
+                onBookmarkClick = viewModel::updateBookmark,
+            )
+        }
 
         Box(modifier = Modifier.fillMaxSize()) {
             when {
@@ -156,7 +220,7 @@ fun TripDetailScreen(
                     )
                 }
 
-                uiState.isLoading -> {
+                isInitialLoading -> {
                     CircularProgressIndicator(
                         modifier =
                             Modifier
@@ -170,7 +234,8 @@ fun TripDetailScreen(
                     TripDetailScreenContent(
                         uiState = uiState,
                         listState = listState,
-                        onTimeLineClick = viewModel::updateVideoPlaybackSecond,
+                        webViewController = webViewController,
+                        onTimeLineClick = webViewController::seekTo,
                         onMapClick = navigateToMap,
                         onTuripPlaceClick = viewModel::selectPlace,
                         onBookmarkClick = viewModel::updateBookmark,
@@ -179,6 +244,26 @@ fun TripDetailScreen(
                     )
                 }
             }
+        }
+    }
+
+    if (!webViewController.isFullScreen) {
+        selectedPlace?.let { place ->
+            PlaceTuripSelectionBottomSheet(
+                sheetState = sheetState,
+                selectedPlaceModel = place,
+                snackbarHostState = placeTuripSelectionSnackbarHostState,
+                onNavigateToLogin = navigateToLogin,
+                onNavigateToAddTurip = {},
+                onPlaceTuripChanged = viewModel::updatePlaceTuripSelection,
+                onDismiss = {
+                    bottomSheetScope.launch {
+                        sheetState.hide()
+                        viewModel.clearSelectedPlace()
+                        selectedPlace = null
+                    }
+                },
+            )
         }
     }
 
@@ -191,6 +276,7 @@ fun TripDetailScreen(
 private fun TripDetailScreenContent(
     uiState: TripDetailUiState,
     listState: LazyListState,
+    webViewController: TripDetailWebViewController,
     onTimeLineClick: (timeLine: Int) -> Unit,
     onMapClick: (mapModel: MapModel) -> Unit,
     onTuripPlaceClick: (id: Long, placeName: String) -> Unit,
@@ -214,7 +300,10 @@ private fun TripDetailScreenContent(
         }
 
         stickyHeader {
-            ContentVideo(onErrorClick = onErrorVideoClick)
+            ContentVideo(
+                onErrorClick = onErrorVideoClick,
+                webViewController = webViewController,
+            )
         }
 
         item {
@@ -304,6 +393,7 @@ private fun TripContentScreenPreview() {
                     selectedPlaceModel = null,
                 ),
             listState = rememberLazyListState(),
+            webViewController = rememberTripDetailWebViewController(baseUrl = "", navigateToWebViewUrl = {}),
             onTimeLineClick = {},
             onMapClick = {},
             onTuripPlaceClick = { _, _ -> },

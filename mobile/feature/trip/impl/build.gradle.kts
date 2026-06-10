@@ -10,6 +10,7 @@ kotlin {
             implementation(project(":feature:turipdetail:api"))
             implementation(project(":core:data"))
         }
+
     }
 }
 
