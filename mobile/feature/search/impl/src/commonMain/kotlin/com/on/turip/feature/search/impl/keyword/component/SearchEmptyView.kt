@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import com.on.turip.core.designsystem.generated.resources.Res
 import com.on.turip.core.designsystem.generated.resources.*
 import com.on.turip.core.designsystem.theme.TuripTheme
+import com.on.turip.core.ui.util.formatResource
 
 @Composable
 fun SearchEmptyView(
@@ -34,7 +35,7 @@ fun SearchEmptyView(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
-            text = stringResource(Res.string.search_result_no_result, searchKeyword),
+            text = stringResource(Res.string.search_result_no_result).formatResource(searchKeyword),
             style = TuripTheme.typography.display,
             color = TuripTheme.colors.black,
             textAlign = TextAlign.Center,

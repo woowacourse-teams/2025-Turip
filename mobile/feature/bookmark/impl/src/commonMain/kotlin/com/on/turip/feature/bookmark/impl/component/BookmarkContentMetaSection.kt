@@ -30,6 +30,7 @@ import com.on.turip.core.model.content.video.VideoData
 import com.on.turip.core.model.creator.Creator
 import com.on.turip.core.model.region.City
 import com.on.turip.core.model.trip.TripDuration
+import com.on.turip.core.ui.util.formatResource
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -50,11 +51,8 @@ fun BookmarkContentMetaSection(
         ) {
             Text(
                 text =
-                    stringResource(
-                        Res.string.region_result_video_description,
-                        item.content.creator.channelName,
-                        item.content.videoData.uploadedDate,
-                    ),
+                    stringResource(Res.string.region_result_video_description)
+                        .formatResource(item.content.creator.channelName, item.content.videoData.uploadedDate),
                 style = TuripTheme.typography.info2,
                 color = TuripTheme.colors.gray03,
                 maxLines = 1,
@@ -69,7 +67,7 @@ fun BookmarkContentMetaSection(
                     iconPainterRes = Res.drawable.ic_calendar,
                 )
                 ContentInfoItem(
-                    text = stringResource(Res.string.all_total_place_count, item.tripPlaceCount),
+                    text = stringResource(Res.string.all_total_place_count).formatResource(item.tripPlaceCount),
                     iconPainterRes = Res.drawable.ic_place,
                 )
             }

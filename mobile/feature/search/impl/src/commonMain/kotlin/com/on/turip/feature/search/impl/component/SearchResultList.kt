@@ -33,6 +33,7 @@ import coil3.compose.AsyncImage
 import com.on.turip.core.designsystem.generated.resources.Res
 import com.on.turip.core.designsystem.generated.resources.*
 import com.on.turip.core.designsystem.theme.TuripTheme
+import com.on.turip.core.ui.util.formatResource
 import com.on.turip.feature.search.impl.model.VideoInformationModel
 import kotlinx.collections.immutable.ImmutableList
 import org.jetbrains.compose.resources.DrawableResource
@@ -51,7 +52,7 @@ fun SearchResultList(
                 .background(TuripTheme.colors.white),
     ) {
         Text(
-            text = stringResource(Res.string.search_result_exist_result, totalCount),
+            text = stringResource(Res.string.search_result_exist_result).formatResource(totalCount),
             style = TuripTheme.typography.body2,
             color = TuripTheme.colors.gray03,
             modifier =
@@ -197,10 +198,8 @@ private fun SearchResultItem(
                 InfoIconText(
                     iconRes = Res.drawable.ic_location,
                     text =
-                        stringResource(
-                            Res.string.all_total_place_count,
-                            videoInfo.tripModel.tripPlaceCount,
-                        ),
+                        stringResource(Res.string.all_total_place_count)
+                            .formatResource(videoInfo.tripModel.tripPlaceCount),
                 )
             }
         }

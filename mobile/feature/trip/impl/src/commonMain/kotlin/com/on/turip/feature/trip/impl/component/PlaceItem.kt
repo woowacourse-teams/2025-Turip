@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import com.on.turip.core.designsystem.generated.resources.Res
 import com.on.turip.core.designsystem.generated.resources.*
 import com.on.turip.core.designsystem.theme.TuripTheme
+import com.on.turip.core.ui.util.formatResource
 import com.on.turip.feature.trip.impl.model.MapModel
 import com.on.turip.feature.trip.impl.model.PlaceModel
 import org.jetbrains.compose.resources.DrawableResource
@@ -88,7 +89,7 @@ fun PlaceItem(
             modifier = Modifier.fillMaxWidth(),
         ) {
             PlaceActionItem(
-                text = stringResource(Res.string.trip_place_time_line, placeModel.timeLine),
+                text = stringResource(Res.string.trip_place_time_line).formatResource(placeModel.timeLine),
                 drawableRes = Res.drawable.ic_play_button,
                 useTint = true,
                 onClick = { onTimeLineClick(placeModel.seekTimeSeconds) },

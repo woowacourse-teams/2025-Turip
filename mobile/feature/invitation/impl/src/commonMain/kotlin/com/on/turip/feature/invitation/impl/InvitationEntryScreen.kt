@@ -17,6 +17,7 @@ import com.on.turip.core.designsystem.component.TuripDialog
 import com.on.turip.core.designsystem.generated.resources.Res
 import com.on.turip.core.designsystem.generated.resources.*
 import com.on.turip.core.designsystem.theme.TuripTheme
+import com.on.turip.core.ui.util.formatResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -64,11 +65,11 @@ private fun InvitationEntryScreenContent(
     uiState.invitationTuripId?.let {
         val title =
             invitationTuripName?.let { turipName ->
-                stringResource(Res.string.invitation_confirm_dialog_title_with_name, turipName)
+                stringResource(Res.string.invitation_confirm_dialog_title_with_name).formatResource(turipName)
             } ?: stringResource(Res.string.invitation_confirm_dialog_title)
         val message =
             invitationTuripName?.let { turipName ->
-                stringResource(Res.string.invitation_confirm_dialog_message_with_name, turipName)
+                stringResource(Res.string.invitation_confirm_dialog_message_with_name).formatResource(turipName)
             } ?: stringResource(Res.string.invitation_confirm_dialog_message)
 
         TuripDialog(
@@ -109,7 +110,7 @@ private fun InvitationEntryLoading(
 ) {
     val loadingInvitationTitle =
         turipName?.let { name ->
-            stringResource(Res.string.invitation_loading_title_with_name, name)
+            stringResource(Res.string.invitation_loading_title_with_name).formatResource(name)
         } ?: stringResource(Res.string.invitation_loading_title)
 
     Box(

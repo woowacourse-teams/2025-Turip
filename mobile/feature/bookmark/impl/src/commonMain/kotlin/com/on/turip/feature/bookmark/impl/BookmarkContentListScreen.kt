@@ -32,6 +32,7 @@ import com.on.turip.core.model.content.video.VideoData
 import com.on.turip.core.model.creator.Creator
 import com.on.turip.core.model.region.City
 import com.on.turip.core.model.trip.TripDuration
+import com.on.turip.core.ui.util.formatResource
 import com.on.turip.feature.bookmark.impl.component.BookmarkContentListAppBar
 import com.on.turip.feature.bookmark.impl.component.BookmarkContentListItem
 import kotlinx.collections.immutable.ImmutableList
@@ -79,7 +80,7 @@ private fun BookmarkContentListContent(
 
     val totalBookmarkCountText =
         if (totalBookmarkCount != null) {
-            stringResource(Res.string.bookmark_content_count, totalBookmarkCount)
+            stringResource(Res.string.bookmark_content_count).formatResource(totalBookmarkCount)
         } else {
             stringResource(Res.string.bookmark_content_count_fail)
         }

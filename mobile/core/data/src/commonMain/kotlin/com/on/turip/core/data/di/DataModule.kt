@@ -23,6 +23,7 @@ import com.on.turip.core.domain.repository.SearchHistoryRepository
 import com.on.turip.core.domain.repository.TuripRepository
 import com.on.turip.core.domain.repository.UserStorageRepository
 import com.on.turip.core.domain.session.TokenManager
+import com.on.turip.core.domain.usecase.DeleteTuripUseCase
 import com.on.turip.core.domain.usecase.DetermineInitialSessionUseCase
 import com.on.turip.domain.login.GuestRepository
 import com.on.turip.domain.login.MemberRepository
@@ -42,5 +43,6 @@ val dataModule = module {
     single<SearchHistoryRepository> { DefaultSearchHistoryRepository(get()) }
     single<TokenManager> { DefaultTokenManager(get(), get()) }
     single<SessionManager> { SessionManager(get(), get(), get()) }
+    single<DeleteTuripUseCase> { DeleteTuripUseCase(get()) }
     single<DetermineInitialSessionUseCase> { DetermineInitialSessionUseCase(get(), get()) }
 }
