@@ -11,9 +11,11 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,15 +29,18 @@ import com.on.turip.core.designsystem.generated.resources.Res
 import com.on.turip.core.designsystem.generated.resources.*
 import com.on.turip.core.designsystem.theme.TuripTheme
 import com.on.turip.feature.turipdetail.impl.model.MapModel
+import com.on.turip.feature.turipdetail.impl.component.MoreOptionBottomSheet
 import com.on.turip.feature.turipdetail.impl.component.TuripInfoRow
 import com.on.turip.feature.turipdetail.impl.component.TuripMapContent
 import com.on.turip.feature.turipdetail.impl.component.TuripPlaces
+import com.on.turip.feature.turipdetail.impl.model.TuripNameStatusModel
 import com.on.turip.feature.turipdetail.impl.model.TuripPlaceModel
 import com.on.turip.feature.turipdetail.impl.model.turip.PlaceLatLngUiModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import org.jetbrains.compose.resources.stringResource
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TuripDetailScreen(
     selectedTuripId: Long,
@@ -44,18 +49,51 @@ fun TuripDetailScreen(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val modalBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var showMoreOptionBottomSheet by remember { mutableStateOf(false) }
+    var screenMode by remember { mutableStateOf(TuripPlaceScreenMode.MoreOption) }
+    var selectedTuripName by remember { mutableStateOf("서울 여행") }
+    var turipNameStatus by remember { mutableStateOf(TuripNameStatusModel.OK) }
+
+    if (showMoreOptionBottomSheet) {
+        MoreOptionBottomSheet(
+            sheetState = modalBottomSheetState,
+            isDefault = false,
+            isTogetherTurip = true,
+            onDismiss = {
+                showMoreOptionBottomSheet = false
+                screenMode = TuripPlaceScreenMode.MoreOption
+            },
+            onShareTuripByTextClick = {},
+            onShareTuripInvitationLinkClick = {},
+            onDeleteClick = {},
+            screenMode = screenMode,
+            onScreenModeChange = { screenMode = it },
+            turipNameStatus = turipNameStatus,
+            turipName = selectedTuripName,
+            onNameChanged = { input ->
+                selectedTuripName = input
+                turipNameStatus = if (input.isBlank()) TuripNameStatusModel.EMPTY else TuripNameStatusModel.OK
+            },
+            onConfirmClick = {
+                showMoreOptionBottomSheet = false
+                screenMode = TuripPlaceScreenMode.MoreOption
+            },
+        )
+    }
+
     TuripPlaceContent(
         nicknames = persistentListOf("여행자", "튜립"),
         isTogetherTurip = true,
         selectedTuripId = selectedTuripId,
-        selectedTuripName = "서울 여행",
+        selectedTuripName = selectedTuripName,
         selectedPlace = samplePlaceLatLng.first(),
         currentPlaceLatLng = samplePlaceLatLng,
         turipPlaceModel = sampleTuripPlaces,
         navigateToMap = onNavigateToMap,
         onClickTuripPlace = {},
         onClickMembers = {},
-        onMoreOption = {},
+        onMoreOption = { showMoreOptionBottomSheet = true },
         onItemClick = {},
         onDragStart = {},
         onDragPlace = { _, _ -> },
