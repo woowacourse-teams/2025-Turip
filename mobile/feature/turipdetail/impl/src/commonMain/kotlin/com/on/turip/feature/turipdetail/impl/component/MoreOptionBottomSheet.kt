@@ -1,5 +1,11 @@
 package com.on.turip.feature.turipdetail.impl.component
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,10 +25,11 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -54,7 +61,9 @@ fun MoreOptionBottomSheet(
     onConfirmClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val items =
+    val focusRequester = remember { FocusRequester() }
+
+    val items: List<MoreOptionItem> =
         listOf(
             MoreOptionItem(
                 title = stringResource(Res.string.turip_more_option_bottom_sheet_change_name),
@@ -105,31 +114,46 @@ fun MoreOptionBottomSheet(
         containerColor = TuripTheme.colors.white,
         modifier = modifier,
     ) {
-        when (screenMode) {
-            TuripPlaceScreenMode.MoreOption -> {
-                Column {
-                    items.forEachIndexed { index, item ->
-                        MoreOptionRow(item = item)
-                        if (index != items.lastIndex) {
-                            HorizontalDivider(
-                                modifier = Modifier.padding(horizontal = TuripTheme.spacing.extraLarge),
-                            )
+        AnimatedContent(
+            targetState = screenMode,
+            transitionSpec = {
+                when (targetState) {
+                    TuripPlaceScreenMode.Edit -> {
+                        slideInHorizontally { it } + fadeIn() togetherWith
+                            slideOutHorizontally { -it } + fadeOut()
+                    }
+
+                    TuripPlaceScreenMode.MoreOption -> {
+                        slideInHorizontally { -it } + fadeIn() togetherWith
+                            slideOutHorizontally { it } + fadeOut()
+                    }
+                }
+            },
+        ) { mode: TuripPlaceScreenMode ->
+            when (mode) {
+                TuripPlaceScreenMode.MoreOption -> {
+                    Column {
+                        items.forEachIndexed { index, item ->
+                            MoreOptionRow(item = item)
+                            if (index != items.lastIndex) {
+                                HorizontalDivider(
+                                    modifier = Modifier.padding(horizontal = TuripTheme.spacing.extraLarge),
+                                )
+                            }
                         }
                     }
                 }
-            }
 
-            TuripPlaceScreenMode.Edit -> {
-                Column(modifier = Modifier.padding(TuripTheme.spacing.extraLarge)) {
-                    Text(
-                        text = stringResource(Res.string.bottom_sheet_turip_modify_title),
-                        style = TuripTheme.typography.title1,
-                    )
-                    Text(
-                        text = turipName,
-                        style = TuripTheme.typography.body2,
-                        color = if (turipNameStatus.isConfirmEnabled) TuripTheme.colors.black else TuripTheme.colors.error,
-                        modifier = Modifier.padding(top = TuripTheme.spacing.medium),
+                TuripPlaceScreenMode.Edit -> {
+                    NameEditorSheetContent(
+                        title = stringResource(Res.string.bottom_sheet_turip_modify_title),
+                        turipName = turipName,
+                        onBack = { onScreenModeChange(TuripPlaceScreenMode.MoreOption) },
+                        turipNameStatus = turipNameStatus,
+                        isConfirmEnabled = turipNameStatus.isConfirmEnabled,
+                        onNameChanged = onNameChanged,
+                        onConfirmClick = onConfirmClick,
+                        focusRequester = focusRequester,
                     )
                 }
             }

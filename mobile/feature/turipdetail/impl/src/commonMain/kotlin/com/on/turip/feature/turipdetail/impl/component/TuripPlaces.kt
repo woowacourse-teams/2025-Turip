@@ -1,38 +1,39 @@
 package com.on.turip.feature.turipdetail.impl.component
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Map
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.on.turip.core.designsystem.generated.resources.Res
 import com.on.turip.core.designsystem.generated.resources.*
 import com.on.turip.core.designsystem.theme.TuripTheme
 import com.on.turip.feature.turipdetail.impl.model.MapModel
 import com.on.turip.feature.turipdetail.impl.model.TuripPlaceModel
+import com.on.turip.feature.turipdetail.impl.util.reorderable.ReorderableItem
+import com.on.turip.feature.turipdetail.impl.util.reorderable.rememberReorderableLazyColumnState
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import org.jetbrains.compose.resources.painterResource
@@ -49,85 +50,90 @@ fun TuripPlaces(
     onDragEnd: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val hasPlaces = places.isNotEmpty()
+    val listState = rememberLazyListState()
+
     Column(
         modifier =
             modifier
                 .fillMaxWidth()
                 .background(color = TuripTheme.colors.white),
     ) {
-        if (places.isEmpty()) {
+        if (hasPlaces) {
+            TuripPlaces(
+                listState = listState,
+                places = places,
+                onMapClick = onMapClick,
+                onTuripPlaceClick = onTuripPlaceClick,
+                onDragStart = onDragStart,
+                onDragPlace = onDragPlace,
+                onItemClick = onItemClick,
+                onDragEnd = onDragEnd,
+                modifier = Modifier.padding(horizontal = TuripTheme.spacing.large),
+            )
+        } else {
             EmptyTuripPlaces(
                 modifier =
                     Modifier
                         .fillMaxSize()
                         .weight(1f),
             )
-        } else {
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(TuripTheme.spacing.small),
-                contentPadding = PaddingValues(TuripTheme.spacing.large),
-                modifier = Modifier.fillMaxSize(),
-            ) {
-                items(items = places, key = { it.turipPlaceId }) { place ->
-                    TuripPlaceRow(
-                        place = place,
-                        onItemClick = { onItemClick(place.placeId) },
-                        onMapClick = { onMapClick(place.mapModel) },
-                        onTuripPlaceClick = { onTuripPlaceClick(place.placeId) },
-                    )
-                }
-            }
         }
     }
 }
 
 @Composable
-private fun TuripPlaceRow(
-    place: TuripPlaceModel,
-    onItemClick: () -> Unit,
-    onMapClick: () -> Unit,
-    onTuripPlaceClick: () -> Unit,
+private fun TuripPlaces(
+    listState: LazyListState,
+    places: ImmutableList<TuripPlaceModel>,
+    onItemClick: (placeId: Long) -> Unit,
+    onMapClick: (map: MapModel) -> Unit,
+    onTuripPlaceClick: (placeId: Long) -> Unit,
+    onDragStart: () -> Unit,
+    onDragPlace: (from: Int, to: Int) -> Unit,
+    onDragEnd: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    Row(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .background(TuripTheme.colors.container, TuripTheme.shape.container)
-                .clickable(onClick = onItemClick)
-                .padding(TuripTheme.spacing.large),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(TuripTheme.spacing.medium),
+    val reorderableItemShape = TuripTheme.shape.container
+    val reorderableLazyColumnState =
+        rememberReorderableLazyColumnState(
+            lazyListState = listState,
+            onDragStart = onDragStart,
+            onDragEnd = onDragEnd,
+            onMove = { from, to ->
+                onDragPlace(from.index, to.index)
+            },
+        )
+
+    LazyColumn(
+        state = listState,
+        verticalArrangement = Arrangement.spacedBy(TuripTheme.spacing.small),
+        contentPadding = PaddingValues(vertical = TuripTheme.spacing.medium),
+        modifier = modifier.fillMaxHeight(),
     ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = place.category,
-                style = TuripTheme.typography.info1,
-                color = TuripTheme.colors.gray05,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Spacer(modifier = Modifier.height(TuripTheme.spacing.extraSmall))
-            Text(
-                text = place.name,
-                style = TuripTheme.typography.title2,
-                color = TuripTheme.colors.gray04,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-        }
-        IconButton(onClick = onMapClick) {
-            Icon(
-                imageVector = Icons.Default.Map,
-                contentDescription = null,
-                tint = TuripTheme.colors.gray04,
-            )
-        }
-        IconButton(onClick = onTuripPlaceClick) {
-            Icon(
-                imageVector = Icons.Default.Delete,
-                contentDescription = null,
-                tint = TuripTheme.colors.error,
-            )
+        items(items = places, key = { it.turipPlaceId }) { place ->
+            ReorderableItem(
+                state = reorderableLazyColumnState,
+                key = place.turipPlaceId,
+            ) { isDragging: Boolean ->
+                val interactionSource = remember { MutableInteractionSource() }
+                val elevation by animateFloatAsState(if (isDragging) 8.0f else 0.0f)
+                TuripPlaceItem(
+                    place = place,
+                    onMapClick = { onMapClick(place.mapModel) },
+                    onTuripPlaceClick = { onTuripPlaceClick(place.placeId) },
+                    onItemClick = { onItemClick(place.placeId) },
+                    modifier =
+                        Modifier
+                            .graphicsLayer {
+                                shadowElevation = elevation
+                                shape = reorderableItemShape
+                                clip = true
+                            }.draggableAfterLongPress(
+                                interactionSource = interactionSource,
+                            ),
+                )
+            }
         }
     }
 }

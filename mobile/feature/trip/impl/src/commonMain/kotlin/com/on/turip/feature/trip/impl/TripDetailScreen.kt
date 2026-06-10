@@ -1,32 +1,32 @@
 package com.on.turip.feature.trip.impl
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.on.turip.core.designsystem.theme.TuripTheme
 import com.on.turip.feature.trip.impl.component.ContentBookmarkButton
 import com.on.turip.feature.trip.impl.component.ContentInformation
+import com.on.turip.feature.trip.impl.component.ContentVideo
 import com.on.turip.feature.trip.impl.component.CreatorInformation
 import com.on.turip.feature.trip.impl.component.PlaceItem
 import com.on.turip.feature.trip.impl.component.TripDetailAppBar
@@ -63,9 +63,13 @@ fun TripDetailScreen(
         )
 
         TripDetailScreenContent(
-            information = sampleTripDetailInfo,
-            places = samplePlaces,
-            isBookmarked = true,
+            uiState =
+                TripDetailUiState(
+                    tripDetailInfo = sampleTripDetailInfo,
+                    places = samplePlaces,
+                    isBookmarked = true,
+                ),
+            listState = rememberLazyListState(),
             onTimeLineClick = {},
             onMapClick = navigateToMap,
             onTuripPlaceClick = { _, _ -> },
@@ -78,9 +82,8 @@ fun TripDetailScreen(
 
 @Composable
 private fun TripDetailScreenContent(
-    information: TripDetailInfoModel,
-    places: List<PlaceModel>,
-    isBookmarked: Boolean,
+    uiState: TripDetailUiState,
+    listState: LazyListState,
     onTimeLineClick: (timeLine: Int) -> Unit,
     onMapClick: (mapModel: MapModel) -> Unit,
     onTuripPlaceClick: (id: Long, placeName: String) -> Unit,
@@ -88,37 +91,35 @@ private fun TripDetailScreenContent(
     onErrorVideoClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    LazyColumn(modifier = modifier.background(TuripTheme.colors.white)) {
-        item {
-            VideoPlaceholder(onClick = onErrorVideoClick)
-        }
-
+    LazyColumn(
+        state = listState,
+        modifier =
+            modifier
+                .fillMaxSize()
+                .navigationBarsPadding()
+                .background(TuripTheme.colors.white),
+    ) {
         item {
             CreatorInformation(
-                thumbnailUrl = information.creatorThumbnail,
-                name = information.creatorName,
+                thumbnailUrl = uiState.tripDetailInfo.creatorThumbnail,
+                name = uiState.tripDetailInfo.creatorName,
             )
+        }
+
+        stickyHeader {
+            ContentVideo(onErrorClick = onErrorVideoClick)
         }
 
         item {
-            ContentInformation(
-                information = information,
-                modifier = Modifier.padding(top = TuripTheme.spacing.large),
-            )
+            Spacer(modifier = Modifier.height(TuripTheme.spacing.extraLarge))
+            ContentInformation(information = uiState.tripDetailInfo)
+            Spacer(modifier = Modifier.height(TuripTheme.spacing.large))
         }
 
-        item {
-            ContentBookmarkButton(
-                isBookmarked = isBookmarked,
-                onClick = onBookmarkClick,
-                modifier =
-                    Modifier
-                        .padding(horizontal = TuripTheme.spacing.extraLarge)
-                        .padding(top = TuripTheme.spacing.extraLarge),
-            )
-        }
-
-        items(places, key = { it.id }) { place ->
+        items(
+            items = uiState.places,
+            key = { "${it.id}_${it.timeLine}" },
+        ) { place ->
             PlaceItem(
                 placeModel = place,
                 onTimeLineClick = onTimeLineClick,
@@ -126,38 +127,34 @@ private fun TripDetailScreenContent(
                 onTuripPlaceClick = onTuripPlaceClick,
                 modifier =
                     Modifier
-                        .padding(horizontal = TuripTheme.spacing.extraLarge)
-                        .padding(top = TuripTheme.spacing.medium),
+                        .padding(
+                            start = TuripTheme.spacing.extraLarge,
+                            end = TuripTheme.spacing.extraLarge,
+                            bottom = TuripTheme.spacing.small,
+                        ).fillMaxWidth(),
             )
         }
 
         item {
-            Spacer(modifier = Modifier.height(TuripTheme.spacing.extraHuge))
+            ContentBookmarkButton(
+                isBookmarked = uiState.isBookmarked,
+                onClick = onBookmarkClick,
+                modifier =
+                    Modifier
+                        .padding(
+                            horizontal = TuripTheme.spacing.extraLarge,
+                            vertical = TuripTheme.spacing.medium,
+                        ).fillMaxWidth(),
+            )
         }
     }
 }
 
-@Composable
-private fun VideoPlaceholder(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Box(
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .aspectRatio(16 / 9f)
-                .background(TuripTheme.colors.black),
-        contentAlignment = Alignment.Center,
-    ) {
-        Text(
-            text = "YouTube",
-            style = TuripTheme.typography.display,
-            color = TuripTheme.colors.white,
-            textAlign = TextAlign.Center,
-        )
-    }
-}
+private data class TripDetailUiState(
+    val tripDetailInfo: TripDetailInfoModel,
+    val places: List<PlaceModel>,
+    val isBookmarked: Boolean,
+)
 
 private val sampleTripDetailInfo =
     TripDetailInfoModel(

@@ -8,6 +8,9 @@ data class TuripPlaceModel(
     val mapModel: MapModel,
     val isTuripPlace: Boolean,
 ) {
+    val turipCategory: String
+        get() = category
+
     companion object {
         val Idle =
             TuripPlaceModel(
