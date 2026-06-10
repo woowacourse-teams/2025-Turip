@@ -94,6 +94,8 @@ android {
             manifestPlaceholders +=
                 mapOf(
                     "appName" to "@string/app_name_dev",
+                    "google_maps_api_key" to
+                        (gradleLocalProperties(rootDir, providers).getProperty("google_maps_api_key") ?: ""),
                 )
         }
 
@@ -104,6 +106,8 @@ android {
             manifestPlaceholders +=
                 mapOf(
                     "appName" to "@string/app_name",
+                    "google_maps_api_key" to
+                        (gradleLocalProperties(rootDir, providers).getProperty("google_maps_api_key") ?: ""),
                 )
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),

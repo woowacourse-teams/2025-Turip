@@ -8,6 +8,11 @@ kotlin {
             implementation(project(":feature:turipdetail:api"))
             implementation(project(":feature:login:api"))
         }
+
+        androidMain.dependencies {
+            implementation(libs.google.map)
+            implementation(libs.play.services.maps)
+        }
     }
 }
 

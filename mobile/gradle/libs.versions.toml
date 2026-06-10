@@ -63,6 +63,8 @@ multiplatformMarkdownRenderer = "0.37.0"
 firebase-installations = "18.0.0"
 install-referrer = "2.2"
 google-services = "4.4.2"
+googleMap = "8.1.0"
+playServicesMaps = "19.2.0"
 
 # Util
 sentry-kmp = "0.25.0"
@@ -161,6 +163,8 @@ multiplatform-markdown-renderer-m3 = { module = "com.mikepenz:multiplatform-mark
 firebase-installations = { group = "com.google.firebase", name = "firebase-installations-ktx", version.ref = "firebase-installations" }
 install-referrer = { group = "com.android.installreferrer", name = "installreferrer", version.ref = "install-referrer" }
 kotlinx-coroutines-play-services = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-play-services", version.ref = "kotlinx-coroutines" }
+google-map = { module = "com.google.maps.android:maps-compose", version.ref = "googleMap" }
+play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "playServicesMaps" }
 
 # Util
 napier = { group = "io.github.aakira", name = "napier", version.ref = "napier" }
