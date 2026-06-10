@@ -5,6 +5,9 @@ import androidx.navigation3.runtime.NavKey
 import com.on.turip.core.navigation.NavKeyProvider
 import com.on.turip.core.navigation.Navigator
 import com.on.turip.feature.trip.api.TripDetailNavKey
+import com.on.turip.feature.login.api.LoginNavKey
+import com.on.turip.feature.trip.impl.TripDetailScreen
+import com.on.turip.feature.turipdetail.api.TuripDetailNavKey
 import kotlinx.serialization.modules.PolymorphicModuleBuilder
 
 class TripNavKeyProvider : NavKeyProvider {
@@ -12,5 +15,16 @@ class TripNavKeyProvider : NavKeyProvider {
         subclass(TripDetailNavKey::class, TripDetailNavKey.serializer())
     }
 
-    override fun EntryProviderScope<NavKey>.registerScreens(navigator: Navigator) {}
+    override fun EntryProviderScope<NavKey>.registerScreens(navigator: Navigator) {
+        entry<TripDetailNavKey> { key ->
+            TripDetailScreen(
+                contentId = key.contentId,
+                navigateToBack = navigator::goBack,
+                navigateToLogin = { navigator.goWithAllClear(LoginNavKey()) },
+                navigateToTuripDetail = { turipId -> navigator.navigate(TuripDetailNavKey(turipId)) },
+                navigateToMap = {},
+                navigateToWebViewUrl = {},
+            )
+        }
+    }
 }

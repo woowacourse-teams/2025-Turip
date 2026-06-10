@@ -6,7 +6,7 @@ import com.on.turip.core.data.session.SessionManager
 import com.on.turip.core.domain.repository.DeferredDeepLinkRepository
 import com.on.turip.core.domain.session.AuthStatus
 import com.on.turip.core.domain.session.SessionState
-import com.on.turip.core.domain.session.usecase.DetermineInitialSessionUseCase
+import com.on.turip.core.domain.usecase.DetermineInitialSessionUseCase
 import com.on.turip.core.model.turip.TuripInvitationToken
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.async

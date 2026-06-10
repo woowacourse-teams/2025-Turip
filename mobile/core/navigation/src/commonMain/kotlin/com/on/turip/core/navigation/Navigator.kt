@@ -67,6 +67,9 @@ class Navigator(
             clear()
             add(key)
         }
+        state.subStacks[key]?.apply {
+            if (isEmpty()) add(key)
+        }
     }
 
     private fun clearSubStack() {

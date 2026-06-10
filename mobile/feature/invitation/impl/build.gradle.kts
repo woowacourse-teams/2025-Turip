@@ -7,6 +7,8 @@ kotlin {
         commonMain.dependencies {
             implementation(project(":feature:invitation:api"))
             implementation(project(":feature:home:api"))
+            implementation(project(":feature:login:api"))
+            implementation(project(":feature:turipdetail:api"))
         }
     }
 }
