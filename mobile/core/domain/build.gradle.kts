@@ -9,6 +9,7 @@ kotlin {
             implementation(project(":core:common"))
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.collections.immutable)
+            implementation(libs.napier)
         }
     }
 }

@@ -25,6 +25,8 @@ import com.on.turip.core.domain.repository.UserStorageRepository
 import com.on.turip.core.domain.session.TokenManager
 import com.on.turip.core.domain.usecase.DeleteTuripUseCase
 import com.on.turip.core.domain.usecase.DetermineInitialSessionUseCase
+import com.on.turip.core.domain.usecase.ObserveTuripStreamUseCase
+import com.on.turip.core.domain.usecase.TuripStreamHeartbeatManager
 import com.on.turip.domain.login.GuestRepository
 import com.on.turip.domain.login.MemberRepository
 import org.koin.dsl.module
@@ -45,4 +47,6 @@ val dataModule = module {
     single<SessionManager> { SessionManager(get(), get(), get()) }
     single<DeleteTuripUseCase> { DeleteTuripUseCase(get()) }
     single<DetermineInitialSessionUseCase> { DetermineInitialSessionUseCase(get(), get()) }
+    single<TuripStreamHeartbeatManager> { TuripStreamHeartbeatManager() }
+    single<ObserveTuripStreamUseCase> { ObserveTuripStreamUseCase(get(), get()) }
 }

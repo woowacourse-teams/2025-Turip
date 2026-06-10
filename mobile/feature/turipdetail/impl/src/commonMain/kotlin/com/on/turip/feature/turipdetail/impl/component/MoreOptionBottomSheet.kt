@@ -36,8 +36,9 @@ import androidx.compose.ui.unit.dp
 import com.on.turip.core.designsystem.generated.resources.Res
 import com.on.turip.core.designsystem.generated.resources.*
 import com.on.turip.core.designsystem.theme.TuripTheme
+import com.on.turip.core.ui.component.NameEditorSheetContent
+import com.on.turip.core.ui.model.namestatus.TuripNameStatusModel
 import com.on.turip.feature.turipdetail.impl.TuripPlaceScreenMode
-import com.on.turip.feature.turipdetail.impl.model.TuripNameStatusModel
 import com.on.turip.feature.turipdetail.impl.model.moreoption.MoreOptionIcon
 import com.on.turip.feature.turipdetail.impl.model.moreoption.MoreOptionItem
 import org.jetbrains.compose.resources.painterResource

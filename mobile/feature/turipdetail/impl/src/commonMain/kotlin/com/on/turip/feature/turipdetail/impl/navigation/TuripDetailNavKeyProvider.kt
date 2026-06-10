@@ -19,6 +19,8 @@ class TuripDetailNavKeyProvider : NavKeyProvider {
             TuripDetailScreen(
                 selectedTuripId = key.turipId,
                 onNavigateToLogin = { navigator.goWithAllClear(LoginNavKey()) },
+                onShareTuripByText = {},
+                onShareTuripInvitationLink = {},
                 onNavigateToMap = {},
                 onBack = navigator::goBack,
             )
