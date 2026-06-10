@@ -24,6 +24,8 @@ class TripNavKeyProvider : NavKeyProvider {
                 navigateToTuripDetail = { turipId -> navigator.navigate(TuripDetailNavKey(turipId)) },
                 navigateToMap = {},
                 navigateToWebViewUrl = {},
+                navigateToShareTuripByText = {},
+                navigateToShareTuripInvitationLink = {},
             )
         }
     }

@@ -18,12 +18,27 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.on.turip.core.designsystem.generated.resources.Res
+import com.on.turip.core.designsystem.generated.resources.all_close_description
+import com.on.turip.core.designsystem.generated.resources.trip_detail_snackbar_bookmark_remove
+import com.on.turip.core.designsystem.generated.resources.trip_detail_snackbar_bookmark_save
+import com.on.turip.core.designsystem.generated.resources.trip_detail_turip_selection_updated
+import com.on.turip.core.designsystem.snackbar.LocalSnackbarDelegate
 import com.on.turip.core.designsystem.theme.TuripTheme
+import com.on.turip.core.ui.component.ErrorScreen
+import com.on.turip.core.ui.error.ErrorUiState
+import com.on.turip.core.ui.error.toUiModel
+import com.on.turip.core.ui.model.turip.TuripShareModel
+import com.on.turip.core.ui.util.formatResource
 import com.on.turip.feature.trip.impl.component.ContentBookmarkButton
 import com.on.turip.feature.trip.impl.component.ContentInformation
 import com.on.turip.feature.trip.impl.component.ContentVideo
@@ -35,6 +50,8 @@ import com.on.turip.feature.trip.impl.model.PlaceModel
 import com.on.turip.feature.trip.impl.model.TripDetailInfoModel
 import com.on.turip.feature.trip.impl.model.TripDurationModel
 import kotlinx.collections.immutable.persistentListOf
+import org.jetbrains.compose.resources.getString
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun TripDetailScreen(
@@ -44,8 +61,75 @@ fun TripDetailScreen(
     navigateToTuripDetail: (turipId: Long) -> Unit,
     navigateToMap: (mapModel: MapModel) -> Unit,
     navigateToWebViewUrl: (url: String) -> Unit,
+    navigateToShareTuripByText: (turipShareModel: TuripShareModel) -> Unit,
+    navigateToShareTuripInvitationLink: (invitationLink: String) -> Unit,
     modifier: Modifier = Modifier,
+    viewModel: TripDetailViewModel = koinViewModel(),
 ) {
+    val uiState: TripDetailUiState by viewModel.uiState.collectAsState()
+    val snackbarDelegate = LocalSnackbarDelegate.current
+    val listState = rememberLazyListState()
+
+    LaunchedEffect(contentId) {
+        viewModel.initContentId(contentId)
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.uiEffect.collect { uiEffect: TripDetailUiEffect ->
+            when (uiEffect) {
+                is TripDetailUiEffect.ShowBookmarkStatus -> {
+                    val messageResource =
+                        if (uiEffect.isBookmarked) {
+                            Res.string.trip_detail_snackbar_bookmark_save
+                        } else {
+                            Res.string.trip_detail_snackbar_bookmark_remove
+                        }
+                    snackbarDelegate.showSnackbar(
+                        message = getString(messageResource),
+                        actionLabel = getString(Res.string.all_close_description),
+                    )
+                }
+
+                TripDetailUiEffect.NavigateToLogin -> {
+                    navigateToLogin()
+                }
+
+                is TripDetailUiEffect.ShowUpdatedTuripSelectionByPlace -> {
+                    snackbarDelegate.showSnackbar(
+                        message =
+                            getString(Res.string.trip_detail_turip_selection_updated)
+                                .formatResource(uiEffect.placeName),
+                        actionLabel = getString(Res.string.all_close_description),
+                    )
+                }
+
+                is TripDetailUiEffect.ShowError -> {
+                    val uiModel = uiEffect.errorUiState.toUiModel() ?: return@collect
+                    snackbarDelegate.showSnackbar(
+                        message = getString(uiModel.titleRes),
+                        actionLabel = getString(uiModel.retryTextRes),
+                        duration = SnackbarDuration.Long,
+                        onAction = { viewModel.handleErrorRetryRequest(uiEffect.retryAction) },
+                    )
+                }
+
+                is TripDetailUiEffect.ShowAddedError -> {
+                    val uiModel = uiEffect.errorUiState.toUiModel() ?: return@collect
+                    snackbarDelegate.showSnackbar(
+                        message = getString(uiModel.titleRes),
+                        actionLabel = getString(uiModel.retryTextRes),
+                        duration = SnackbarDuration.Long,
+                        onAction = { viewModel.handleErrorRetryRequest(uiEffect.retryAction) },
+                    )
+                }
+
+                is TripDetailUiEffect.TuripAdded -> {
+                    viewModel.dismissAddTuripBottomSheet()
+                }
+            }
+        }
+    }
+
     Column(modifier = modifier.fillMaxSize()) {
         Spacer(
             modifier =
@@ -55,29 +139,52 @@ fun TripDetailScreen(
                     .background(TuripTheme.colors.primary),
         )
         TripDetailAppBar(
-            isError = false,
-            isLoading = false,
-            isBookmarked = true,
+            isError = uiState.errorUiState != ErrorUiState.None,
+            isLoading = uiState.isLoading,
+            isBookmarked = uiState.isBookmarked,
             onBackClick = navigateToBack,
-            onBookmarkClick = {},
+            onBookmarkClick = viewModel::updateBookmark,
         )
 
-        TripDetailScreenContent(
-            uiState =
-                TripDetailUiState(
-                    tripDetailInfo = sampleTripDetailInfo,
-                    places = samplePlaces,
-                    isBookmarked = true,
-                ),
-            listState = rememberLazyListState(),
-            onTimeLineClick = {},
-            onMapClick = navigateToMap,
-            onTuripPlaceClick = { _, _ -> },
-            onBookmarkClick = {},
-            onErrorVideoClick = { navigateToWebViewUrl(sampleTripDetailInfo.videoLink) },
-            modifier = Modifier.fillMaxSize(),
-        )
+        Box(modifier = Modifier.fillMaxSize()) {
+            when {
+                uiState.errorUiState != ErrorUiState.None -> {
+                    ErrorScreen(
+                        errorUiState = uiState.errorUiState,
+                        onRetryClick = viewModel::loadTripDetails,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                }
+
+                uiState.isLoading -> {
+                    CircularProgressIndicator(
+                        modifier =
+                            Modifier
+                                .size(60.dp)
+                                .align(Alignment.Center),
+                        color = TuripTheme.colors.primary,
+                    )
+                }
+
+                else -> {
+                    TripDetailScreenContent(
+                        uiState = uiState,
+                        listState = listState,
+                        onTimeLineClick = viewModel::updateVideoPlaybackSecond,
+                        onMapClick = navigateToMap,
+                        onTuripPlaceClick = viewModel::selectPlace,
+                        onBookmarkClick = viewModel::updateBookmark,
+                        onErrorVideoClick = { navigateToWebViewUrl(uiState.tripDetailInfo.videoLink) },
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                }
+            }
+        }
     }
+
+    navigateToTuripDetail
+    navigateToShareTuripByText
+    navigateToShareTuripInvitationLink
 }
 
 @Composable
@@ -150,12 +257,6 @@ private fun TripDetailScreenContent(
     }
 }
 
-private data class TripDetailUiState(
-    val tripDetailInfo: TripDetailInfoModel,
-    val places: List<PlaceModel>,
-    val isBookmarked: Boolean,
-)
-
 private val sampleTripDetailInfo =
     TripDetailInfoModel(
         creatorName = "여행하는 튜립팀",
@@ -190,15 +291,25 @@ private val samplePlaces =
 
 @Preview(showBackground = true)
 @Composable
-private fun TripDetailScreenPreview() {
+private fun TripContentScreenPreview() {
     TuripTheme {
-        TripDetailScreen(
-            contentId = 1L,
-            navigateToBack = {},
-            navigateToLogin = {},
-            navigateToTuripDetail = {},
-            navigateToMap = {},
-            navigateToWebViewUrl = {},
+        TripDetailScreenContent(
+            uiState =
+                TripDetailUiState(
+                    isLoading = false,
+                    errorUiState = ErrorUiState.None,
+                    tripDetailInfo = sampleTripDetailInfo,
+                    places = samplePlaces,
+                    isBookmarked = true,
+                    selectedPlaceModel = null,
+                ),
+            listState = rememberLazyListState(),
+            onTimeLineClick = {},
+            onMapClick = {},
+            onTuripPlaceClick = { _, _ -> },
+            onBookmarkClick = {},
+            onErrorVideoClick = {},
+            modifier = Modifier.background(color = TuripTheme.colors.white),
         )
     }
 }
