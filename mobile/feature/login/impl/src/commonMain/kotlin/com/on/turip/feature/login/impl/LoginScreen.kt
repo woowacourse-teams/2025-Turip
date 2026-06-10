@@ -28,8 +28,15 @@ import androidx.compose.ui.unit.dp
 import com.on.turip.core.designsystem.component.TuripDialog
 import com.on.turip.core.designsystem.generated.resources.Res
 import com.on.turip.core.designsystem.generated.resources.all_close_description
+import com.on.turip.core.designsystem.generated.resources.all_turip_description
 import com.on.turip.core.designsystem.generated.resources.bg_login
 import com.on.turip.core.designsystem.generated.resources.ic_logo
+import com.on.turip.core.designsystem.generated.resources.login_dialog_confirm_text
+import com.on.turip.core.designsystem.generated.resources.login_dialog_migration_message
+import com.on.turip.core.designsystem.generated.resources.login_dialog_migration_title
+import com.on.turip.core.designsystem.generated.resources.login_help_description
+import com.on.turip.core.designsystem.generated.resources.login_start_to_guest
+import com.on.turip.core.designsystem.generated.resources.my_page_logout_dialog_dismiss
 import com.on.turip.core.designsystem.snackbar.LocalSnackbarDelegate
 import com.on.turip.core.designsystem.theme.TuripTheme
 import com.on.turip.core.ui.error.toUiModel
@@ -39,6 +46,7 @@ import com.on.turip.feature.login.impl.util.noRippleClickable
 import kotlinx.coroutines.flow.collectLatest
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -81,10 +89,10 @@ fun LoginScreen(
 
     if (uiState.showMigrationDialog) {
         TuripDialog(
-            title = "게스트 모드 데이터가 있어요",
-            message = "기존 게스트 모드 데이터를 계정으로 옮길까요?",
-            confirmText = "옮기기",
-            dismissText = "괜찮아요",
+            title = stringResource(Res.string.login_dialog_migration_title),
+            message = stringResource(Res.string.login_dialog_migration_message),
+            confirmText = stringResource(Res.string.login_dialog_confirm_text),
+            dismissText = stringResource(Res.string.my_page_logout_dialog_dismiss),
             onConfirmation = viewModel::confirmMigration,
             onDismissRequest = viewModel::rejectMigration,
         )
@@ -138,7 +146,7 @@ private fun LoginScreenContent(
             )
 
             Text(
-                text = "직진만 남은 여행",
+                text = stringResource(Res.string.all_turip_description),
                 style = TuripTheme.typography.title3,
                 modifier = Modifier.padding(top = TuripTheme.spacing.extraSmall),
             )
@@ -154,7 +162,7 @@ private fun LoginScreenContent(
         ) {
             if (isHelpTextVisible) {
                 Text(
-                    text = "게스트 모드를 이용할 경우,\n사용할 수 있는 기능이 제한돼요",
+                    text = stringResource(Res.string.login_help_description),
                     color = TuripTheme.colors.white,
                     style = TuripTheme.typography.body1,
                     modifier =
@@ -176,7 +184,7 @@ private fun LoginScreenContent(
             )
 
             GuestModeSection(
-                text = "게스트 모드로 시작하기",
+                text = stringResource(Res.string.login_start_to_guest),
                 color = TuripTheme.colors.white,
                 onHelpClick = onHelpClick,
                 onTextClick = onGuestLoginClick,
@@ -191,6 +199,19 @@ private fun HelpVisibleLoginScreenPreview() {
     TuripTheme {
         LoginScreenContent(
             isHelpTextVisible = true,
+            onHelpClick = {},
+            onGoogleLoginClick = {},
+            onGuestLoginClick = {},
+        )
+    }
+}
+
+@Composable
+@Preview(showBackground = true, name = "HelpInvisible")
+private fun HelpInvisibleLoginScreenPreview() {
+    TuripTheme {
+        LoginScreenContent(
+            isHelpTextVisible = false,
             onHelpClick = {},
             onGoogleLoginClick = {},
             onGuestLoginClick = {},
