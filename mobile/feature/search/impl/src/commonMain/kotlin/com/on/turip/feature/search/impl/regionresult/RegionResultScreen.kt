@@ -1,23 +1,22 @@
 package com.on.turip.feature.search.impl.regionresult
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import com.on.turip.core.designsystem.theme.TuripTheme
-import com.on.turip.core.model.content.Content
-import com.on.turip.core.model.content.video.VideoData
-import com.on.turip.core.model.creator.Creator
-import com.on.turip.core.model.region.City
+import com.on.turip.core.ui.component.ErrorScreen
 import com.on.turip.feature.search.impl.component.SearchResultList
-import com.on.turip.feature.search.impl.model.TripDurationModel
-import com.on.turip.feature.search.impl.model.TripModel
-import com.on.turip.feature.search.impl.model.VideoInformationModel
 import com.on.turip.feature.search.impl.regionresult.component.RegionResultAppBar
-import kotlinx.collections.immutable.persistentListOf
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun RegionResultScreen(
@@ -26,7 +25,22 @@ fun RegionResultScreen(
     onNavigateToTripDetail: (id: Long) -> Unit,
     onNavigateToLogin: () -> Unit,
     modifier: Modifier = Modifier,
+    viewModel: RegionResultViewModel = koinViewModel(),
 ) {
+    val uiState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.uiEffect.collect { effect ->
+            when (effect) {
+                RegionResultUiEffect.NavigateToLogin -> onNavigateToLogin()
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.initRegionCategoryName(regionCategoryName)
+    }
+
     Column(modifier = modifier.fillMaxSize()) {
         Surface(
             color = TuripTheme.colors.white,
@@ -38,38 +52,31 @@ fun RegionResultScreen(
             )
         }
 
-        SearchResultList(
-            totalCount = sampleRegionVideos.size,
-            videos = sampleRegionVideos,
-            onItemClick = onNavigateToTripDetail,
-        )
-    }
-}
+        Box(modifier = Modifier.fillMaxSize()) {
+            when (val state = uiState) {
+                RegionResultUiState.Loading -> {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                }
 
-private val sampleRegionVideos =
-    persistentListOf(
-        VideoInformationModel(
-            content =
-                Content(
-                    id = 10L,
-                    creator = Creator(1L, "Turip", ""),
-                    videoData = VideoData("지역별 추천 여행", "thumbnail", "2026-02-23"),
-                    city = City("대구"),
-                    isBookmarked = false,
-                ),
-            tripModel = TripModel(TripDurationModel(0, 1), 4),
-        ),
-    )
+                RegionResultUiState.Empty -> {
+                    // Original Android currently has no visible empty-region UI.
+                }
 
-@Preview(showBackground = true)
-@Composable
-private fun RegionResultScreenPreview() {
-    TuripTheme {
-        RegionResultScreen(
-            regionCategoryName = "대구",
-            onBackClick = {},
-            onNavigateToTripDetail = {},
-            onNavigateToLogin = {},
-        )
+                is RegionResultUiState.Success -> {
+                    SearchResultList(
+                        totalCount = state.totalCount,
+                        videos = state.videos,
+                        onItemClick = onNavigateToTripDetail,
+                    )
+                }
+
+                is RegionResultUiState.Error -> {
+                    ErrorScreen(
+                        errorUiState = state.errorUiState,
+                        onRetryClick = { viewModel.loadContentsFromRegion(regionCategoryName) },
+                    )
+                }
+            }
+        }
     }
 }

@@ -6,31 +6,27 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.tooling.preview.Preview
 import com.on.turip.core.designsystem.theme.TuripTheme
-import com.on.turip.core.model.content.Content
-import com.on.turip.core.model.content.video.VideoData
-import com.on.turip.core.model.creator.Creator
-import com.on.turip.core.model.region.City
-import com.on.turip.core.model.searchhistory.SearchHistory
+import com.on.turip.core.ui.component.ErrorScreen
 import com.on.turip.feature.search.impl.component.SearchResultList
 import com.on.turip.feature.search.impl.keyword.component.SearchAppBar
 import com.on.turip.feature.search.impl.keyword.component.SearchEmptyView
 import com.on.turip.feature.search.impl.keyword.component.SearchHistoryList
-import com.on.turip.feature.search.impl.model.TripDurationModel
-import com.on.turip.feature.search.impl.model.TripModel
-import com.on.turip.feature.search.impl.model.VideoInformationModel
-import kotlinx.collections.immutable.persistentListOf
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun SearchScreen(
@@ -39,11 +35,35 @@ fun SearchScreen(
     onNavigateToDetail: (id: Long) -> Unit,
     onNavigateToLogin: () -> Unit,
     modifier: Modifier = Modifier,
+    viewModel: SearchViewModel = koinViewModel(),
 ) {
+    val uiState by viewModel.uiState.collectAsState()
+    val searchingWord by viewModel.searchingWord.collectAsState()
+    val searchHistory by viewModel.searchHistory.collectAsState()
+
     val focusManager = LocalFocusManager.current
-    var searchText by remember(keyword) { mutableStateOf(keyword) }
     var isHistoryVisible by remember { mutableStateOf(false) }
-    val videos = sampleVideos(searchText.ifBlank { "여행" })
+
+    val onSearchAction = {
+        if (searchingWord.isNotBlank()) {
+            viewModel.loadByKeyword()
+            viewModel.createSearchHistory()
+            isHistoryVisible = false
+            focusManager.clearFocus()
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.initKeyword(keyword)
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.uiEffect.collect { effect ->
+            when (effect) {
+                SearchUiEffect.NavigateToLogin -> onNavigateToLogin()
+            }
+        }
+    }
 
     Column(
         modifier =
@@ -56,15 +76,16 @@ fun SearchScreen(
             modifier = Modifier.statusBarsPadding(),
         ) {
             SearchAppBar(
-                searchText = searchText,
-                onSearchTextChanged = { searchText = it },
-                onSearchAction = {
-                    isHistoryVisible = false
-                    focusManager.clearFocus()
-                },
-                onClearClick = { searchText = "" },
+                searchText = searchingWord,
+                onSearchTextChanged = { viewModel.updateSearchingWord(it) },
+                onSearchAction = onSearchAction,
+                onClearClick = { viewModel.updateSearchingWord("") },
                 onBackClick = onNavigateBack,
-                onFocusChanged = { hasFocus -> isHistoryVisible = hasFocus },
+                onFocusChanged = { hasFocus ->
+                    if (hasFocus && uiState !is SearchUiState.Error) {
+                        isHistoryVisible = true
+                    }
+                },
             )
         }
 
@@ -74,29 +95,42 @@ fun SearchScreen(
                     .fillMaxSize()
                     .addFocusCleaner(focusManager),
         ) {
-            if (searchText.isBlank()) {
-                SearchEmptyView(searchText)
-            } else {
-                SearchResultList(
-                    totalCount = videos.size,
-                    videos = videos,
-                    onItemClick = onNavigateToDetail,
-                )
+            when (val state = uiState) {
+                SearchUiState.Loading -> {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                }
+
+                is SearchUiState.Empty -> {
+                    SearchEmptyView(state.keyword)
+                }
+
+                is SearchUiState.Success -> {
+                    SearchResultList(
+                        totalCount = state.totalCount,
+                        videos = state.videos,
+                        onItemClick = onNavigateToDetail,
+                    )
+                }
+
+                is SearchUiState.Error -> {
+                    ErrorScreen(
+                        errorUiState = state.errorUiState,
+                        onRetryClick = { viewModel.loadByKeyword() },
+                    )
+                }
             }
 
             if (isHistoryVisible) {
                 SearchHistoryList(
-                    histories =
-                        persistentListOf(
-                            SearchHistory("제주도 맛집", 0L),
-                            SearchHistory("서울 가볼만한 곳", 0L),
-                        ),
-                    onHistoryClick = {
-                        searchText = it
+                    histories = searchHistory,
+                    onHistoryClick = { keyword ->
+                        viewModel.updateSearchingWord(keyword)
+                        viewModel.loadByKeyword()
+                        viewModel.createSearchHistory()
                         isHistoryVisible = false
                         focusManager.clearFocus()
                     },
-                    onDeleteClick = {},
+                    onDeleteClick = { viewModel.deleteSearchHistory(it) },
                 )
             }
         }
@@ -109,31 +143,3 @@ private fun Modifier.addFocusCleaner(focusManager: FocusManager): Modifier =
             focusManager.clearFocus()
         })
     }
-
-private fun sampleVideos(keyword: String) =
-    persistentListOf(
-        VideoInformationModel(
-            content =
-                Content(
-                    id = 1L,
-                    creator = Creator(1L, "여행 크리에이터", ""),
-                    videoData = VideoData("$keyword 콘텐츠 제목", "thumbnail", "2026-02-23"),
-                    city = City("제주"),
-                    isBookmarked = false,
-                ),
-            tripModel = TripModel(TripDurationModel(1, 2), 3),
-        ),
-    )
-
-@Preview(showBackground = true)
-@Composable
-private fun SearchScreenPreview() {
-    TuripTheme {
-        SearchScreen(
-            keyword = "제주",
-            onNavigateBack = {},
-            onNavigateToDetail = {},
-            onNavigateToLogin = {},
-        )
-    }
-}
