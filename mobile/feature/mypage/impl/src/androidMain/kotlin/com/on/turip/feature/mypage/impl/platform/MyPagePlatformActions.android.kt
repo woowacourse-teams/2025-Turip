@@ -15,12 +15,15 @@ internal actual fun rememberMyPagePlatformActions(): MyPagePlatformActions {
     return remember(context) {
         MyPagePlatformActions(
             openInquiryMail = { mail: InquiryMail ->
+                val uri =
+                    Uri.parse(
+                        "mailto:${InquiryMail.RECIPIENT}" +
+                            "?subject=${Uri.encode(InquiryMail.TITLE)}" +
+                            "&body=${Uri.encode(mail.content)}",
+                    )
                 val intent =
                     Intent(Intent.ACTION_SENDTO).apply {
-                        data = Uri.parse("mailto:${InquiryMail.RECIPIENT}")
-                        putExtra(Intent.EXTRA_EMAIL, arrayOf(InquiryMail.RECIPIENT))
-                        putExtra(Intent.EXTRA_SUBJECT, InquiryMail.TITLE)
-                        putExtra(Intent.EXTRA_TEXT, mail.content)
+                        data = uri
                     }
                 context.safeStartActivityWithToast(
                     intent = intent,
