@@ -73,6 +73,9 @@ buildkonfig {
 
 android {
     namespace = "com.on.turip"
+    val appLinkTuripInvitationHost =
+        gradleLocalProperties(rootDir, providers).getProperty("app_link_turip_invitation_host")
+            ?: "invite.turip.kro.kr"
 
     val androidKeystoreProperties =
         Properties().apply {
@@ -114,6 +117,7 @@ android {
             manifestPlaceholders +=
                 mapOf(
                     "appName" to "@string/app_name_dev",
+                    "appLinkTuripInvitationHost" to appLinkTuripInvitationHost,
                     "google_maps_api_key" to
                         (gradleLocalProperties(rootDir, providers).getProperty("google_maps_api_key") ?: ""),
                 )
@@ -126,6 +130,7 @@ android {
             manifestPlaceholders +=
                 mapOf(
                     "appName" to "@string/app_name",
+                    "appLinkTuripInvitationHost" to appLinkTuripInvitationHost,
                     "google_maps_api_key" to
                         (gradleLocalProperties(rootDir, providers).getProperty("google_maps_api_key") ?: ""),
                 )

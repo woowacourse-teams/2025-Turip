@@ -9,7 +9,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -18,7 +20,9 @@ import com.on.turip.core.designsystem.generated.resources.Res
 import com.on.turip.core.designsystem.generated.resources.*
 import com.on.turip.core.designsystem.theme.TuripTheme
 import com.on.turip.core.ui.util.formatResource
+import kotlinx.coroutines.flow.collectLatest
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun InvitationEntryScreen(
@@ -27,20 +31,40 @@ fun InvitationEntryScreen(
     onNavigateToTuripDetail: (turipId: Long) -> Unit,
     onNavigateToLogin: () -> Unit,
     modifier: Modifier = Modifier,
+    viewModel: InvitationEntryViewModel = koinViewModel(),
 ) {
+    val uiState: InvitationEntryUiState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(deepLinkUrl) {
+        viewModel.initDeepLinkUrl(deepLinkUrl)
+        viewModel.resolveInvitationEntry()
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.uiEffect.collectLatest { uiEffect ->
+            when (uiEffect) {
+                InvitationEntryUiEffect.NavigateToHome -> {
+                    onNavigateToHome()
+                }
+
+                is InvitationEntryUiEffect.NavigateToTuripDetail -> {
+                    onNavigateToTuripDetail(uiEffect.turipId)
+                }
+
+                InvitationEntryUiEffect.NavigateToLogin -> {
+                    onNavigateToLogin()
+                }
+            }
+        }
+    }
+
     InvitationEntryScreenContent(
-        uiState =
-            InvitationEntryUiState(
-                deepLinkUrl = deepLinkUrl,
-                invitationTuripId = 1L,
-                invitationTuripName = "초대받은 튜립",
-                dialogState = null,
-            ),
-        onConfirmEnterInvitedTurip = { onNavigateToTuripDetail(1L) },
-        onCancelEnterInvitedTurip = onNavigateToHome,
-        onRetryResolveEntry = {},
-        onConfirmFailureDialog = onNavigateToHome,
-        onResolveInvalidInvitationDialog = onNavigateToHome,
+        uiState = uiState,
+        onConfirmEnterInvitedTurip = viewModel::confirmEnterInvitedTurip,
+        onCancelEnterInvitedTurip = viewModel::cancelEnterInvitedTurip,
+        onRetryResolveEntry = viewModel::retryResolveInvitationEntry,
+        onConfirmFailureDialog = viewModel::resolveFailureDialog,
+        onResolveInvalidInvitationDialog = viewModel::resolveInvalidDialog,
         modifier = modifier,
     )
 }
@@ -202,33 +226,6 @@ private fun InvitationEntryInvalidDialog(
         onConfirmation = onConfirm,
         onDismissRequest = onDismiss,
     )
-}
-
-@Immutable
-private data class InvitationEntryUiState(
-    val deepLinkUrl: String?,
-    val invitationTuripId: Long?,
-    val invitationTuripName: String?,
-    val dialogState: InvitationEntryDialogState?,
-)
-
-@Immutable
-private sealed interface InvitationEntryDialogState {
-    @Immutable
-    data class Invalid(
-        val target: InvalidInvitationTarget,
-    ) : InvitationEntryDialogState
-
-    @Immutable
-    data class Failure(
-        val target: InvalidInvitationTarget,
-        val retryable: Boolean,
-    ) : InvitationEntryDialogState
-}
-
-private enum class InvalidInvitationTarget {
-    Home,
-    Login,
 }
 
 @Composable

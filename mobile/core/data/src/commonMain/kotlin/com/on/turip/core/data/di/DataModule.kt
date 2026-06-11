@@ -24,6 +24,7 @@ import com.on.turip.core.domain.repository.TuripRepository
 import com.on.turip.core.domain.repository.UserStorageRepository
 import com.on.turip.core.domain.session.TokenManager
 import com.on.turip.core.domain.usecase.DeleteTuripUseCase
+import com.on.turip.core.domain.usecase.DetermineInvitationEntryRouteUseCase
 import com.on.turip.core.domain.usecase.DetermineInitialSessionUseCase
 import com.on.turip.core.domain.usecase.ObserveTuripStreamUseCase
 import com.on.turip.core.domain.usecase.TuripStreamHeartbeatManager
@@ -47,6 +48,7 @@ val dataModule = module {
     single<TokenManager> { DefaultTokenManager(get(), get()) }
     single<SessionManager> { SessionManager(get(), get(), get()) }
     single<DeleteTuripUseCase> { DeleteTuripUseCase(get()) }
+    single<DetermineInvitationEntryRouteUseCase> { DetermineInvitationEntryRouteUseCase(get()) }
     single<DetermineInitialSessionUseCase> { DetermineInitialSessionUseCase(get(), get()) }
     single<UpdateBookmarkUseCase> { UpdateBookmarkUseCase(get()) }
     single<TuripStreamHeartbeatManager> { TuripStreamHeartbeatManager() }
