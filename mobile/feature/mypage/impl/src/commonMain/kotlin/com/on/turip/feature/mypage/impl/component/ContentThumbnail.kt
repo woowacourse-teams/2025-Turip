@@ -16,6 +16,7 @@ import coil3.compose.AsyncImage
 import com.on.turip.core.designsystem.generated.resources.Res
 import com.on.turip.core.designsystem.generated.resources.bg_image_placeholder
 import com.on.turip.core.designsystem.theme.TuripTheme
+import com.on.turip.core.ui.util.TuripUrlConverter.convertVideoThumbnailUrl
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -48,12 +49,6 @@ fun ContentThumbnail(
         )
     }
 }
-
-private fun convertVideoThumbnailUrl(url: String): String =
-    when {
-        url.contains("img.youtube.com") -> url.replace("default.jpg", "hqdefault.jpg")
-        else -> url
-    }
 
 @Preview(showBackground = true)
 @Composable
