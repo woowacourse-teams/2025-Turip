@@ -85,7 +85,7 @@
 
     <!-- 여행 상세 페이지 -->
     <string name="trip_detail_video_error">해당 영상은 제작자의 요청으로 유튜브로만 시청할 수 있습니다.\n클릭 시 유튜브로 이동합니다.</string>
-    <string name="trip_detail_day_place_count">일정 %d개</string>
+    <string name="trip_detail_day_place_count">일정 %1$d개</string>
     <string name="trip_detail_snackbar_bookmark_save">북마크에 저장했어요</string>
     <string name="trip_detail_snackbar_bookmark_remove">북마크를 해제했어요</string>
     <string name="trip_detail_saved_places_label">저장된 장소</string>
