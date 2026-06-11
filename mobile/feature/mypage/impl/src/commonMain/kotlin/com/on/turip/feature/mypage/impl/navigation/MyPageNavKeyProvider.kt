@@ -8,6 +8,7 @@ import com.on.turip.feature.bookmark.api.BookmarkNavKey
 import com.on.turip.feature.login.api.LoginNavKey
 import com.on.turip.feature.mypage.api.MyPageNavKey
 import com.on.turip.feature.mypage.impl.MyPageScreen
+import com.on.turip.feature.mypage.impl.platform.rememberMyPagePlatformActions
 import com.on.turip.feature.trip.api.TripDetailNavKey
 import kotlinx.serialization.modules.PolymorphicModuleBuilder
 
@@ -18,11 +19,12 @@ class MyPageNavKeyProvider : NavKeyProvider {
 
     override fun EntryProviderScope<NavKey>.registerScreens(navigator: Navigator) {
         entry<MyPageNavKey> {
+            val platformActions = rememberMyPagePlatformActions()
             MyPageScreen(
                 onNavigateToAllBookmarkContents = { navigator.navigate(BookmarkNavKey) },
                 onNavigateToContent = { contentId -> navigator.navigate(TripDetailNavKey(contentId)) },
-                onNavigateToInquiry = { },
-                onNavigateToPrivacyPolicy = { },
+                onNavigateToInquiry = platformActions.openInquiryMail,
+                onNavigateToPrivacyPolicy = platformActions.openPrivacyPolicyUrl,
                 onNavigateToLogin = { navigator.goWithAllClear(LoginNavKey()) },
             )
         }
