@@ -22,7 +22,12 @@ import org.koin.dsl.module
 
 val serviceModule = module {
     single<AccountService> { get<Ktorfit>(named(DEFAULT_KTORFIT)).createAccountService() }
-    single<AuthService> { get<Ktorfit>(named(NO_AUTH_KTORFIT)).createAuthService() }
+    single<AuthService>(named(DEFAULT_AUTH_SERVICE)) {
+        get<Ktorfit>(named(DEFAULT_KTORFIT)).createAuthService()
+    }
+    single<AuthService>(named(NO_AUTH_AUTH_SERVICE)) {
+        get<Ktorfit>(named(NO_AUTH_KTORFIT)).createAuthService()
+    }
     single<GuestService> { get<Ktorfit>(named(DEFAULT_KTORFIT)).createGuestService() }
     single<MemberService> { get<Ktorfit>(named(DEFAULT_KTORFIT)).createMemberService() }
     single<TuripService> { get<Ktorfit>(named(DEFAULT_KTORFIT)).createTuripService() }

@@ -16,6 +16,9 @@ const val SSE_HTTP_CLIENT = "SseHttpClient"
 const val DEFAULT_KTORFIT = "DefaultKtorfit"
 const val NO_AUTH_KTORFIT = "NoAuthKtorfit"
 
+const val DEFAULT_AUTH_SERVICE = "DefaultAuthService"
+const val NO_AUTH_AUTH_SERVICE = "NoAuthAuthService"
+
 fun networkModule(
     baseUrl: String,
     isDebug: Boolean,
