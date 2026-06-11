@@ -1,33 +1,37 @@
 package com.on.turip.feature.trip.impl.turipselection
 
 import androidx.compose.runtime.Immutable
-import com.on.turip.core.ui.error.ErrorUiState
-import com.on.turip.core.ui.model.namestatus.TuripNameStatusModel
+import com.on.turip.feature.trip.impl.turipselection.model.TuripPlaceModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
 @Immutable
 data class PlaceTuripSelectionUiState(
-    val isLoading: Boolean,
-    val errorUiState: ErrorUiState,
-    val placeId: Long,
+    val selectionPlaceId: Long,
+    val screenMode: PlaceTuripSelectionScreenMode,
     val placeName: String,
     val turips: ImmutableList<TuripSelectionModel>,
+    val selectedTuripPlaces: ImmutableList<TuripPlaceModel>,
     val isChanged: Boolean,
-    val showAddTuripBottomSheet: Boolean = false,
-    val isCreatingTurip: Boolean = false,
-    val addTuripInputName: String = "",
-    val addTuripNameStatus: TuripNameStatusModel = TuripNameStatusModel.EMPTY,
 ) {
     companion object {
         val Idle =
             PlaceTuripSelectionUiState(
-                isLoading = false,
-                errorUiState = ErrorUiState.None,
-                placeId = 0L,
+                selectionPlaceId = 0L,
+                screenMode = PlaceTuripSelectionScreenMode.Turips,
                 placeName = "",
                 turips = persistentListOf(),
+                selectedTuripPlaces = persistentListOf(),
                 isChanged = false,
             )
     }
+}
+
+@Immutable
+sealed interface PlaceTuripSelectionScreenMode {
+    data object Turips : PlaceTuripSelectionScreenMode
+
+    data class TuripDetail(
+        val turipModel: TuripSelectionModel,
+    ) : PlaceTuripSelectionScreenMode
 }

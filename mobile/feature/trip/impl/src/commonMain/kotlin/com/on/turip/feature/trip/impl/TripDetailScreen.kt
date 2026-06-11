@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -19,6 +20,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -34,15 +36,20 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.on.turip.core.designsystem.component.TuripSnackbarVisuals
 import com.on.turip.core.designsystem.generated.resources.Res
 import com.on.turip.core.designsystem.generated.resources.all_close_description
+import com.on.turip.core.designsystem.generated.resources.bottom_sheet_turip_add_title
 import com.on.turip.core.designsystem.generated.resources.trip_detail_snackbar_bookmark_remove
 import com.on.turip.core.designsystem.generated.resources.trip_detail_snackbar_bookmark_save
 import com.on.turip.core.designsystem.generated.resources.trip_detail_turip_selection_updated
+import com.on.turip.core.designsystem.generated.resources.turip_added_snackbar_message
 import com.on.turip.core.designsystem.snackbar.LocalSnackbarDelegate
 import com.on.turip.core.designsystem.theme.TuripTheme
+import com.on.turip.core.ui.component.NameEditorSheetContent
 import com.on.turip.core.ui.component.ErrorScreen
 import com.on.turip.core.ui.error.ErrorUiState
 import com.on.turip.core.ui.error.toUiModel
@@ -63,6 +70,7 @@ import com.on.turip.feature.trip.impl.turipselection.PlaceTuripSelectionBottomSh
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.getString
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -84,6 +92,7 @@ fun TripDetailScreen(
     val snackbarDelegate = LocalSnackbarDelegate.current
     val listState = rememberLazyListState()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val addTuripSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var selectedPlace by remember { mutableStateOf<SelectedPlaceModel?>(null) }
     val bottomSheetScope = rememberCoroutineScope()
     val placeTuripSelectionSnackbarHostState = remember { SnackbarHostState() }
@@ -181,6 +190,14 @@ fun TripDetailScreen(
 
                 is TripDetailUiEffect.TuripAdded -> {
                     viewModel.dismissAddTuripBottomSheet()
+                    placeTuripSelectionSnackbarHostState.showSnackbar(
+                        visuals =
+                            TuripSnackbarVisuals(
+                                message =
+                                    getString(Res.string.turip_added_snackbar_message)
+                                        .formatResource(uiEffect.turipName),
+                            ),
+                    )
                 }
             }
         }
@@ -254,9 +271,14 @@ fun TripDetailScreen(
                 selectedPlaceModel = place,
                 snackbarHostState = placeTuripSelectionSnackbarHostState,
                 onNavigateToLogin = navigateToLogin,
-                onNavigateToAddTurip = {},
+                onNavigateToAddTurip = viewModel::showAddTuripBottomSheet,
+                onNavigateToTuripDetail = navigateToTuripDetail,
+                onNavigateToMap = navigateToMap,
+                onShareTuripByText = navigateToShareTuripByText,
+                onShareTuripInvitationLink = navigateToShareTuripInvitationLink,
                 onPlaceTuripChanged = viewModel::updatePlaceTuripSelection,
                 onDismiss = {
+                    placeTuripSelectionSnackbarHostState.currentSnackbarData?.dismiss()
                     bottomSheetScope.launch {
                         sheetState.hide()
                         viewModel.clearSelectedPlace()
@@ -267,9 +289,25 @@ fun TripDetailScreen(
         }
     }
 
-    navigateToTuripDetail
-    navigateToShareTuripByText
-    navigateToShareTuripInvitationLink
+    if (uiState.showAddTuripBottomSheet) {
+        ModalBottomSheet(
+            onDismissRequest = viewModel::dismissAddTuripBottomSheet,
+            sheetState = addTuripSheetState,
+            containerColor = TuripTheme.colors.white,
+        ) {
+            val focusRequester = remember { FocusRequester() }
+            NameEditorSheetContent(
+                title = stringResource(Res.string.bottom_sheet_turip_add_title),
+                turipName = uiState.addTuripInputName,
+                turipNameStatus = uiState.addTuripNameStatus,
+                isConfirmEnabled = uiState.addTuripNameStatus.isConfirmEnabled && !uiState.isCreatingTurip,
+                onNameChanged = viewModel::updateAddTuripInputName,
+                onConfirmClick = viewModel::addTurip,
+                focusRequester = focusRequester,
+                modifier = Modifier.imePadding(),
+            )
+        }
+    }
 }
 
 @Composable

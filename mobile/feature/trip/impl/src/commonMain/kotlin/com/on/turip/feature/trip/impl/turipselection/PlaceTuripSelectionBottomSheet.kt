@@ -1,54 +1,46 @@
 package com.on.turip.feature.trip.impl.turipselection
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
-import com.on.turip.core.designsystem.component.TuripSnackbarVisuals
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
+import com.on.turip.core.designsystem.component.TuripDialog
+import com.on.turip.core.designsystem.component.TuripSnackbar
 import com.on.turip.core.designsystem.generated.resources.Res
-import com.on.turip.core.designsystem.generated.resources.all_total_place_count
-import com.on.turip.core.designsystem.generated.resources.bottom_sheet_turip_add_title
-import com.on.turip.core.designsystem.generated.resources.trip_detail_bottom_sheet_add_turip_description
-import com.on.turip.core.designsystem.generated.resources.trip_detail_bottom_sheet_turip_selection_confirm
-import com.on.turip.core.designsystem.generated.resources.trip_detail_bottom_sheet_turip_selection_title
-import com.on.turip.core.designsystem.generated.resources.trip_detail_bottom_sheet_turip_place_select_description
-import com.on.turip.core.designsystem.generated.resources.trip_detail_bottom_sheet_turip_place_unselect_description
-import com.on.turip.core.designsystem.generated.resources.turip_added_snackbar_message
+import com.on.turip.core.designsystem.generated.resources.trip_detail_bottom_sheet_snackbar_place_remove_failed
+import com.on.turip.core.designsystem.generated.resources.trip_detail_bottom_sheet_snackbar_place_remove_undo
+import com.on.turip.core.designsystem.generated.resources.trip_detail_bottom_sheet_snackbar_place_removed
+import com.on.turip.core.designsystem.generated.resources.trip_detail_bottom_sheet_snackbar_place_reorder_failed
+import com.on.turip.core.designsystem.generated.resources.trip_detail_bottom_sheet_snackbar_place_reorder_retry
+import com.on.turip.core.designsystem.generated.resources.turip_dialog_login_suggest_confirm
+import com.on.turip.core.designsystem.generated.resources.turip_dialog_login_suggest_description
+import com.on.turip.core.designsystem.generated.resources.turip_dialog_login_suggest_dismiss
+import com.on.turip.core.designsystem.generated.resources.turip_dialog_login_suggest_title
 import com.on.turip.core.designsystem.snackbar.LocalSnackbarDelegate
 import com.on.turip.core.designsystem.theme.TuripTheme
-import com.on.turip.core.ui.component.NameEditorSheetContent
 import com.on.turip.core.ui.error.toUiModel
+import com.on.turip.core.ui.model.turip.TuripShareModel
 import com.on.turip.core.ui.util.formatResource
+import com.on.turip.feature.trip.impl.model.MapModel
 import com.on.turip.feature.trip.impl.model.SelectedPlaceModel
-import kotlinx.collections.immutable.ImmutableList
+import com.on.turip.feature.trip.impl.turipselection.component.PlaceTuripSelectionContent
+import com.on.turip.feature.trip.impl.turipselection.component.ShareOptionBottomSheet
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -61,6 +53,10 @@ fun PlaceTuripSelectionBottomSheet(
     snackbarHostState: SnackbarHostState,
     onNavigateToLogin: () -> Unit,
     onNavigateToAddTurip: () -> Unit,
+    onNavigateToTuripDetail: (turipId: Long) -> Unit,
+    onNavigateToMap: (mapModel: MapModel) -> Unit,
+    onShareTuripByText: (shareModel: TuripShareModel) -> Unit,
+    onShareTuripInvitationLink: (invitationLink: String) -> Unit,
     onPlaceTuripChanged: (placeId: Long, hasTurip: Boolean) -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
@@ -68,19 +64,58 @@ fun PlaceTuripSelectionBottomSheet(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val snackbarDelegate = LocalSnackbarDelegate.current
-    val addTuripSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    LaunchedEffect(selectedPlaceModel.placeId, selectedPlaceModel.placeName) {
-        viewModel.loadTuripsByPlace(selectedPlaceModel.placeId, selectedPlaceModel.placeName)
+    var showLoginSuggestDialog by remember { mutableStateOf(false) }
+    var showShareOptionSheet by remember { mutableStateOf(false) }
+    val shareOptionSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    val placeId = selectedPlaceModel.placeId
+    val placeName = selectedPlaceModel.placeName
+    val isTuripsMode = uiState.screenMode is PlaceTuripSelectionScreenMode.Turips
+
+    LaunchedEffect(placeId, placeName, isTuripsMode) {
+        if (isTuripsMode) {
+            viewModel.loadTuripsByPlace(placeId, placeName)
+        }
     }
 
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { uiEffect ->
             when (uiEffect) {
-                PlaceTuripSelectionUiEffect.NavigateToLogin -> onNavigateToLogin()
-                PlaceTuripSelectionUiEffect.Dismiss -> onDismiss()
-                is PlaceTuripSelectionUiEffect.UpdateTuripsByPlace -> {
-                    onPlaceTuripChanged(uiEffect.placeId, uiEffect.hasTurip)
+                PlaceTuripSelectionUiEffect.NavigateToLogin -> {
+                    onNavigateToLogin()
+                }
+
+                is PlaceTuripSelectionUiEffect.ShowTuripPlaceRemoveFailed -> {
+                    snackbarDelegate.showSnackbar(
+                        message =
+                            getString(Res.string.trip_detail_bottom_sheet_snackbar_place_remove_failed)
+                                .formatResource(uiEffect.placeName),
+                        duration = SnackbarDuration.Short,
+                    )
+                }
+
+                PlaceTuripSelectionUiEffect.TuripShareNotAllowed -> {
+                    showLoginSuggestDialog = true
+                }
+
+                is PlaceTuripSelectionUiEffect.ShareTuripByText -> {
+                    onShareTuripByText(uiEffect.turipShareModel)
+                }
+
+                is PlaceTuripSelectionUiEffect.ShareTuripInvitationLink -> {
+                    onShareTuripInvitationLink(uiEffect.invitationLink)
+                }
+
+                is PlaceTuripSelectionUiEffect.ShowTuripPlaceRemoved -> {
+                    snackbarDelegate.showSnackbar(
+                        message =
+                            getString(Res.string.trip_detail_bottom_sheet_snackbar_place_removed)
+                                .formatResource(uiEffect.placeName),
+                        actionLabel = getString(Res.string.trip_detail_bottom_sheet_snackbar_place_remove_undo),
+                        onAction = viewModel::rollbackTuripPlaceDelete,
+                        onDismiss = viewModel::commitTuripPlaceDelete,
+                    )
                 }
 
                 is PlaceTuripSelectionUiEffect.ShowError -> {
@@ -93,181 +128,95 @@ fun PlaceTuripSelectionBottomSheet(
                     )
                 }
 
-                is PlaceTuripSelectionUiEffect.TuripAdded -> {
-                    viewModel.dismissAddTuripBottomSheet()
-                    snackbarHostState.showSnackbar(
-                        visuals =
-                            TuripSnackbarVisuals(
-                                message =
-                                    getString(Res.string.turip_added_snackbar_message)
-                                        .formatResource(uiEffect.turipName),
-                            ),
+                is PlaceTuripSelectionUiEffect.ShowReorderPlaceFailed -> {
+                    snackbarDelegate.showSnackbar(
+                        message = getString(Res.string.trip_detail_bottom_sheet_snackbar_place_reorder_failed),
+                        actionLabel = getString(Res.string.trip_detail_bottom_sheet_snackbar_place_reorder_retry),
+                        onAction = { viewModel.handleErrorRetryRequest(uiEffect.retryAction) },
                     )
+                }
+
+                is PlaceTuripSelectionUiEffect.UpdateTuripsByPlace -> {
+                    onPlaceTuripChanged(uiEffect.placeId, uiEffect.hasTurip)
+                }
+
+                is PlaceTuripSelectionUiEffect.HasNoTuripsByPlace -> {
+                    onPlaceTuripChanged(uiEffect.placeId, false)
+                }
+
+                PlaceTuripSelectionUiEffect.Dismiss -> {
+                    onDismiss()
                 }
             }
         }
+    }
+
+    if (showLoginSuggestDialog) {
+        TuripDialog(
+            title = stringResource(Res.string.turip_dialog_login_suggest_title),
+            message = stringResource(Res.string.turip_dialog_login_suggest_description),
+            confirmText = stringResource(Res.string.turip_dialog_login_suggest_confirm),
+            dismissText = stringResource(Res.string.turip_dialog_login_suggest_dismiss),
+            onConfirmation = {
+                onNavigateToLogin()
+                showLoginSuggestDialog = false
+            },
+            onDismissRequest = { showLoginSuggestDialog = false },
+        )
     }
 
     ModalBottomSheet(
         sheetState = sheetState,
-        onDismissRequest = onDismiss,
+        onDismissRequest = { viewModel.requestDismiss() },
+        sheetGesturesEnabled = false,
+        dragHandle = null,
         containerColor = TuripTheme.colors.white,
         modifier = modifier,
     ) {
-        PlaceTuripSelectionContent(
-            placeName = selectedPlaceModel.placeName,
-            isLoading = uiState.isLoading,
-            turips = uiState.turips,
-            enableConfirm = uiState.isChanged,
-            onAddTuripClick = {
-                onNavigateToAddTurip()
-                viewModel.showAddTuripBottomSheet()
+        val windowInfo = LocalWindowInfo.current
+        val density = LocalDensity.current
+        val bottomSheetHeight = with(density) { windowInfo.containerSize.height.toDp() * 0.8f }
+
+        Box(modifier = Modifier.fillMaxWidth().height(bottomSheetHeight)) {
+            PlaceTuripSelectionContent(
+                uiState = uiState,
+                onBackFromTuripDetail = viewModel::onTuripDetailBack,
+                onDismissRequest = viewModel::requestDismiss,
+                onAddTuripClick = onNavigateToAddTurip,
+                onTuripPlaceClickAtTurips = viewModel::updateTurip,
+                onNavigateToTurip = onNavigateToTuripDetail,
+                onConfirmClick = viewModel::updateTuripsByPlace,
+                onMapClick = onNavigateToMap,
+                onTuripPlaceClickAtTuripDetail = viewModel::applyTuripPlaceDelete,
+                onShareClick = { showShareOptionSheet = true },
+                onDragStart = viewModel::onDragStart,
+                onDragPlace = viewModel::onDragMove,
+                onDragEnd = viewModel::onDragEnd,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            TuripSnackbar(
+                snackbarHostState = snackbarHostState,
+                modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth(),
+            )
+        }
+    }
+
+    if (showShareOptionSheet) {
+        val isInviteLinkEnabled =
+            (uiState.screenMode as? PlaceTuripSelectionScreenMode.TuripDetail)?.turipModel?.isDefault == false
+
+        ShareOptionBottomSheet(
+            sheetState = shareOptionSheetState,
+            onDismiss = { showShareOptionSheet = false },
+            onShareByTextClick = {
+                showShareOptionSheet = false
+                viewModel.shareTuripByText()
             },
-            onTuripClick = viewModel::updateTurip,
-            onConfirmClick = viewModel::updateTuripsByPlace,
-            modifier = Modifier.fillMaxWidth(),
-        )
-    }
-
-    if (uiState.showAddTuripBottomSheet) {
-        ModalBottomSheet(
-            onDismissRequest = viewModel::dismissAddTuripBottomSheet,
-            sheetState = addTuripSheetState,
-            containerColor = TuripTheme.colors.white,
-        ) {
-            val focusRequester = remember { FocusRequester() }
-            NameEditorSheetContent(
-                title = stringResource(Res.string.bottom_sheet_turip_add_title),
-                turipName = uiState.addTuripInputName,
-                turipNameStatus = uiState.addTuripNameStatus,
-                isConfirmEnabled = uiState.addTuripNameStatus.isConfirmEnabled && !uiState.isCreatingTurip,
-                onNameChanged = viewModel::updateAddTuripInputName,
-                onConfirmClick = viewModel::addTurip,
-                focusRequester = focusRequester,
-                modifier = Modifier.imePadding(),
-            )
-        }
-    }
-}
-
-@Composable
-private fun PlaceTuripSelectionContent(
-    placeName: String,
-    isLoading: Boolean,
-    turips: ImmutableList<TuripSelectionModel>,
-    enableConfirm: Boolean,
-    onAddTuripClick: () -> Unit,
-    onTuripClick: (TuripSelectionModel) -> Unit,
-    onConfirmClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        modifier =
-            modifier.padding(
-                start = TuripTheme.spacing.extraLarge,
-                end = TuripTheme.spacing.extraLarge,
-                bottom = TuripTheme.spacing.extraLarge,
-            ),
-    ) {
-        Text(
-            text = stringResource(Res.string.trip_detail_bottom_sheet_turip_selection_title),
-            style = TuripTheme.typography.title1,
-            color = TuripTheme.colors.gray05,
-        )
-        Spacer(modifier = Modifier.height(TuripTheme.spacing.small))
-        Text(
-            text = placeName,
-            style = TuripTheme.typography.body2,
-            color = TuripTheme.colors.gray04,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
-        Spacer(modifier = Modifier.height(TuripTheme.spacing.large))
-
-        if (isLoading) {
-            Box(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .height(180.dp),
-                contentAlignment = Alignment.Center,
-            ) {
-                CircularProgressIndicator(color = TuripTheme.colors.primary)
-            }
-        } else {
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(TuripTheme.spacing.small),
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .height(260.dp),
-            ) {
-                items(turips, key = { it.id }) { turip ->
-                    TuripSelectionItem(
-                        turip = turip,
-                        onClick = { onTuripClick(turip) },
-                    )
-                }
-            }
-        }
-
-        TextButton(
-            onClick = onAddTuripClick,
-            modifier = Modifier.align(Alignment.Start),
-        ) {
-            Text(text = stringResource(Res.string.trip_detail_bottom_sheet_add_turip_description))
-        }
-
-        Button(
-            onClick = onConfirmClick,
-            enabled = enableConfirm,
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Text(text = stringResource(Res.string.trip_detail_bottom_sheet_turip_selection_confirm))
-        }
-    }
-}
-
-@Composable
-private fun TuripSelectionItem(
-    turip: TuripSelectionModel,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .clickable(onClick = onClick)
-                .padding(vertical = TuripTheme.spacing.medium),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
-    ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = turip.name,
-                style = TuripTheme.typography.body1,
-                color = TuripTheme.colors.gray05,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Text(
-                text = stringResource(Res.string.all_total_place_count).formatResource(turip.placeCount),
-                style = TuripTheme.typography.info1,
-                color = TuripTheme.colors.gray03,
-            )
-        }
-        Text(
-            text =
-                stringResource(
-                    if (turip.isSelected) {
-                        Res.string.trip_detail_bottom_sheet_turip_place_unselect_description
-                    } else {
-                        Res.string.trip_detail_bottom_sheet_turip_place_select_description
-                    },
-                ),
-            style = TuripTheme.typography.body2,
-            color = if (turip.isSelected) TuripTheme.colors.primary else TuripTheme.colors.gray03,
+            onInviteLinkClick = {
+                showShareOptionSheet = false
+                viewModel.shareTuripInvitationLink()
+            },
+            isInviteLinkEnabled = isInviteLinkEnabled,
         )
     }
 }

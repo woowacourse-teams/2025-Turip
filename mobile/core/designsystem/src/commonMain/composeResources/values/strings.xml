@@ -159,7 +159,7 @@
     <string name="turip_more_option_bottom_sheet_change_name">이름 변경</string>
     <string name="turip_more_option_bottom_sheet_delete">삭제</string>
     <string name="turip_more_option_bottom_sheet_leave">나가기</string>
-    <string name="turip_added_snackbar_message">\'%s\' 튜립이 추가됐어요</string>
+    <string name="turip_added_snackbar_message">'%s' 튜립이 추가됐어요</string>
 
     <!-- 튜립 화면 -->
     <string name="turip_card_together_turip">함께 튜립</string>
