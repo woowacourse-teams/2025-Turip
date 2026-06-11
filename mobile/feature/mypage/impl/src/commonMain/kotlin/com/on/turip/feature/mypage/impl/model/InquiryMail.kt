@@ -25,7 +25,7 @@ data class InquiryMail(
             --------------------------------------------------------
             
             사용자의 튜립 앱 버전: ${appEnvironmentInfo.appVersionName} (${appEnvironmentInfo.appVersionCode})
-            사용자의 OS: Android ${appEnvironmentInfo.deviceReleaseVersion} (SDK ${appEnvironmentInfo.deviceSdkVersion})
+            사용자의 OS: ${appEnvironmentInfo.osName} ${appEnvironmentInfo.deviceReleaseVersion}${appEnvironmentInfo.sdkDescription}
             사용자 기기: ${appEnvironmentInfo.deviceManufacturer} ${appEnvironmentInfo.deviceModel}
             사용자 ID: $fid
             """.trimIndent()
@@ -35,3 +35,11 @@ data class InquiryMail(
         const val TITLE: String = "튜립 사용 문의 및 불편 사항 건의"
     }
 }
+
+private val AppEnvironmentInfoModel.sdkDescription: String
+    get() =
+        if (deviceSdkVersion > 0) {
+            " (SDK $deviceSdkVersion)"
+        } else {
+            ""
+        }

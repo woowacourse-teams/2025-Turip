@@ -9,6 +9,7 @@ actual object AppEnvironmentInfoProvider {
         AppEnvironmentInfoModel(
             appVersionName = BuildConfig.VERSION_NAME,
             appVersionCode = BuildConfig.VERSION_CODE,
+            osName = "Android",
             deviceReleaseVersion = Build.VERSION.RELEASE,
             deviceSdkVersion = Build.VERSION.SDK_INT,
             deviceManufacturer = Build.MANUFACTURER,

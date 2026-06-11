@@ -8,6 +8,7 @@ actual object AppEnvironmentInfoProvider {
         AppEnvironmentInfoModel(
             appVersionName = "unknown",
             appVersionCode = 0,
+            osName = UIDevice.currentDevice.systemName,
             deviceReleaseVersion = UIDevice.currentDevice.systemVersion,
             deviceSdkVersion = 0,
             deviceManufacturer = "Apple",
