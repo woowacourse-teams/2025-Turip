@@ -235,7 +235,7 @@ private fun InvitationEntryScreenPreview() {
         InvitationEntryScreenContent(
             uiState =
                 InvitationEntryUiState(
-                    deepLinkUrl = "https://invite.turip.kro.kr?token=preview",
+                    deepLinkUrl = "https://invite.turip.kro.kr/invitations/?token=preview",
                     invitationTuripId = 1L,
                     invitationTuripName = "도쿄 여행",
                     dialogState = null,

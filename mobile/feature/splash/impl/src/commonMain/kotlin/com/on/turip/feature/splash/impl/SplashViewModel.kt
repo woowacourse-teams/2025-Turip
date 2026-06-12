@@ -96,4 +96,4 @@ class SplashViewModel(
 }
 
 private fun TuripInvitationToken.toInvitationUrl(): String =
-    "https://invite.turip.kro.kr/invitations?token=$value"
+    "https://invite.turip.kro.kr/invitations/?token=$value"

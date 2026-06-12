@@ -460,7 +460,7 @@ class PlaceTuripSelectionViewModel(
         )
 
     private fun TuripInvitationToken.toUrl(): String =
-        "https://$APP_LINK_TURIP_INVITATION_HOST/invitations?token=${value.encodeUrlParameter()}"
+        "https://$APP_LINK_TURIP_INVITATION_HOST/invitations/?token=${value.encodeUrlParameter()}"
 
     private fun String.encodeUrlParameter(): String =
         encodeToByteArray().joinToString(separator = "") { byte ->
