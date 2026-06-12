@@ -8,9 +8,13 @@ import com.nimbusds.jose.proc.JWSVerificationKeySelector;
 import com.nimbusds.jose.proc.SecurityContext;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.proc.ConfigurableJWTProcessor;
+import com.nimbusds.jwt.proc.DefaultJWTClaimsVerifier;
 import com.nimbusds.jwt.proc.DefaultJWTProcessor;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.HashSet;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import turip.account.domain.Provider;
 import turip.common.exception.ErrorTag;
@@ -21,21 +25,39 @@ import turip.common.exception.custom.UnauthorizedException;
 public class AppleTokenParser implements IdTokenParser {
 
     private static final String APPLE_JWKS_URL = "https://appleid.apple.com/auth/keys";
+    private static final String APPLE_ISS = "https://appleid.apple.com";
     private final ConfigurableJWTProcessor<SecurityContext> jwtProcessor;
+    private final String clientId;
 
-    public AppleTokenParser() {
+    public AppleTokenParser(@Value("${apple.client-id}") String clientId) {
+        this.clientId = clientId;
         try {
             this.jwtProcessor = createJwtProcessor();
         } catch (Exception e) {
-            throw new IllegalStateException("AppleTokenParser 초기화 실패");
+            throw new IllegalStateException("AppleTokenParser 초기화 실패", e);
         }
     }
 
     private ConfigurableJWTProcessor<SecurityContext> createJwtProcessor() throws Exception {
         ConfigurableJWTProcessor<SecurityContext> processor = new DefaultJWTProcessor<>();
+
+        // JWS signature 검증 설정 (RS256 알고리즘 사용)
         JWKSource<SecurityContext> keySource = new RemoteJWKSet<>(new URL(APPLE_JWKS_URL));
         JWSKeySelector<SecurityContext> keySelector = new JWSVerificationKeySelector<>(JWSAlgorithm.RS256, keySource);
         processor.setJWSKeySelector(keySelector);
+
+        // Claims 검증 설정 (iss, aud, exp 검증)
+        JWTClaimsSet exactMatchClaims = new JWTClaimsSet.Builder()
+                .issuer(APPLE_ISS)
+                .audience(clientId)
+                .build();
+
+        DefaultJWTClaimsVerifier<SecurityContext> claimsVerifier = new DefaultJWTClaimsVerifier<>(
+                exactMatchClaims,
+                new HashSet<>(Arrays.asList("sub", "email", "exp"))
+        );
+        processor.setJWTClaimsSetVerifier(claimsVerifier);
+
         return processor;
     }
 
