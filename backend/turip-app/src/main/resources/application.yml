@@ -59,6 +59,9 @@ youtube:
     key: ${YOUTUBE_API_KEY}
     url: https://www.googleapis.com/youtube/v3/videos
 
+apple:
+  client-id: ${APPLE_CLIENT_ID}
+
 invitation:
   jwt:
     secret-key: ${INVITATION_JWT_SECRET_KEY}
