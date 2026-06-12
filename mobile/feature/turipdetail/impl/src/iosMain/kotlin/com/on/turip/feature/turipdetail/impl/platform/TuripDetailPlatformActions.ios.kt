@@ -21,7 +21,7 @@ internal actual fun rememberTuripDetailPlatformActions(): TuripDetailPlatformAct
                 shareText(turipShareModel.toShareFormat())
             },
             shareTuripInvitationLink = { invitationLink: String ->
-                shareText(invitationLink)
+                shareText(invitationLink.toInvitationShareText())
             },
         )
     }
@@ -38,7 +38,7 @@ private fun shareText(text: String) {
     }
     val activityViewController =
         UIActivityViewController(
-            activityItems = listOf(text),
+            activityItems = listOf(text as NSStringBackedString),
             applicationActivities = null,
         )
     rootViewController.presentViewController(activityViewController, animated = true, completion = null)
@@ -56,3 +56,8 @@ private fun topViewController(): UIViewController? {
     }
     return current
 }
+
+private fun String.toInvitationShareText(): String =
+    "튜립 초대 링크\n$this"
+
+private typealias NSStringBackedString = platform.Foundation.NSString
