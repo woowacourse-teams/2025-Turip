@@ -55,6 +55,7 @@ build-konfig = "0.17.1"
 # Image
 coil = "3.3.0"
 imagepicker = "1.0.30"
+kmp-sharing = "0.2.0"
 
 # Markdown
 multiplatformMarkdownRenderer = "0.37.0"
@@ -156,6 +157,7 @@ ktor-client-darwin = { group = "io.ktor", name = "ktor-client-darwin", version.r
 coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
 coil-network-ktor = { group = "io.coil-kt.coil3", name = "coil-network-ktor3", version.ref = "coil" }
 imagepicker = { module = "io.github.ismoy:imagepickerkmp", version.ref = "imagepicker" }
+kmp-sharing = { module = "com.swmansion.kmpsharing:kmp-sharing", version.ref = "kmp-sharing" }
 
 # Markdown
 multiplatform-markdown-renderer = { module = "com.mikepenz:multiplatform-markdown-renderer", version.ref = "multiplatformMarkdownRenderer" }

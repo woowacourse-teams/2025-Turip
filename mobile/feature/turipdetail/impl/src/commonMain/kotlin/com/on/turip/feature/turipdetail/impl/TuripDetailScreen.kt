@@ -75,6 +75,7 @@ import com.on.turip.feature.turipdetail.impl.model.TuripPlaceModel
 import com.on.turip.feature.turipdetail.impl.model.turip.PlaceLatLngUiModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.painterResource
@@ -104,6 +105,14 @@ fun TuripDetailScreen(
         viewModel.initIfNeeded(selectedTuripId)
     }
 
+    suspend fun dismissMoreOptionBottomSheet() {
+        if (modalBottomSheetState.isVisible) {
+            modalBottomSheetState.hide()
+        }
+        viewModel.dismissMoreOptionBottomSheet()
+        delay(250L)
+    }
+
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { uiEffect: TuripDetailUiEffect ->
             when (uiEffect) {
@@ -112,12 +121,12 @@ fun TuripDetailScreen(
                 }
 
                 is TuripDetailUiEffect.ShareTuripByText -> {
-                    viewModel.dismissMoreOptionBottomSheet()
+                    dismissMoreOptionBottomSheet()
                     onShareTuripByText(uiEffect.turipShareModel)
                 }
 
                 is TuripDetailUiEffect.ShareTuripInvitationLink -> {
-                    viewModel.dismissMoreOptionBottomSheet()
+                    dismissMoreOptionBottomSheet()
                     onShareTuripInvitationLink(uiEffect.invitationLink)
                 }
 

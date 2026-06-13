@@ -9,6 +9,7 @@ kotlin {
             implementation(project(":feature:login:api"))
             implementation(project(":feature:turipdetail:api"))
             implementation(project(":core:data"))
+            implementation(libs.kmp.sharing)
         }
 
     }

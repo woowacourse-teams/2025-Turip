@@ -8,6 +8,7 @@ kotlin {
             implementation(project(":core:data"))
             implementation(project(":feature:turipdetail:api"))
             implementation(project(":feature:login:api"))
+            implementation(libs.kmp.sharing)
         }
 
         androidMain.dependencies {

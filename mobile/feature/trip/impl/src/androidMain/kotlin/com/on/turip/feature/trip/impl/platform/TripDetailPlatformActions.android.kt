@@ -9,11 +9,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
 import com.on.turip.core.ui.model.turip.TuripShareModel
 import com.on.turip.feature.trip.impl.model.MapModel
+import com.swmansion.kmpsharing.SharingOptions
+import com.swmansion.kmpsharing.rememberShare
 
 @Composable
 internal actual fun rememberTripDetailPlatformActions(): TripDetailPlatformActions {
     val context = LocalContext.current
-    return remember(context) {
+    val share = rememberShare()
+    return remember(context, share) {
         TripDetailPlatformActions(
             navigateToMap = { mapModel: MapModel ->
                 context.safeStartActivityWithToast(
@@ -28,26 +31,23 @@ internal actual fun rememberTripDetailPlatformActions(): TripDetailPlatformActio
                 )
             },
             shareTuripByText = { turipShareModel: TuripShareModel ->
-                val chooserIntent =
-                    createShareChooserIntent(
-                        text = turipShareModel.toShareFormat(),
-                        title = turipShareModel.name,
-                        baseIntentTitle = turipShareModel.name,
-                    )
-                context.safeStartActivityWithToast(
-                    intent = chooserIntent,
-                    errorToastMessage = "공유할 수 있는 앱을 찾을 수 없어요",
+                share(
+                    data = turipShareModel.toShareFormat(),
+                    options =
+                        SharingOptions(
+                            androidDialogTitle = turipShareModel.name,
+                            androidMimeType = TEXT_PLAIN_MIME_TYPE,
+                        ),
                 )
             },
             shareTuripInvitationLink = { invitationLink: String ->
-                val chooserIntent =
-                    createShareChooserIntent(
-                        text = invitationLink,
-                        title = "초대 링크 공유",
-                    )
-                context.safeStartActivityWithToast(
-                    intent = chooserIntent,
-                    errorToastMessage = "공유할 수 있는 앱을 찾을 수 없어요",
+                share(
+                    data = invitationLink,
+                    options =
+                        SharingOptions(
+                            androidDialogTitle = "초대 링크 공유",
+                            androidMimeType = TEXT_PLAIN_MIME_TYPE,
+                        ),
                 )
             },
         )
@@ -68,39 +68,4 @@ private fun android.content.Context.safeStartActivityWithToast(
         }
 }
 
-private fun createShareChooserIntent(
-    text: String,
-    title: String,
-    baseIntentTitle: String? = null,
-): Intent {
-    val intent =
-        createShareIntent(text = text).apply {
-            baseIntentTitle?.let { putExtra(Intent.EXTRA_TITLE, it) }
-        }
-
-    val initialIntents =
-        arrayOf(
-            createShareIntent(text = text, packageName = KAKAO_PACKAGE),
-            createShareIntent(text = text, packageName = INSTAGRAM_PACKAGE),
-        )
-
-    return Intent
-        .createChooser(intent, title)
-        .apply { putExtra(Intent.EXTRA_INITIAL_INTENTS, initialIntents) }
-}
-
-private fun createShareIntent(
-    text: String,
-    packageName: String? = null,
-): Intent =
-    Intent(Intent.ACTION_SEND).apply {
-        type = "text/plain"
-        putExtra(Intent.EXTRA_TEXT, text)
-
-        packageName?.let { packageName ->
-            `package` = packageName
-        }
-    }
-
-private const val KAKAO_PACKAGE = "com.kakao.talk"
-private const val INSTAGRAM_PACKAGE = "com.instagram.android"
+private const val TEXT_PLAIN_MIME_TYPE = "text/plain"
