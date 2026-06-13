@@ -175,6 +175,49 @@ Last updated: 2026-06-11
 - Dispose/exit requests `UIInterfaceOrientationMaskPortrait`.
 - `:feature:trip:impl:compileKotlinIosSimulatorArm64` passed after the fix.
 
+## iOS Share Sheet Did Not Appear
+
+### Symptom
+
+- TuripDetail/TripDetail invite link API succeeded, but the iOS share sheet did not appear.
+- Logs confirmed the API response was successful.
+- After switching to `kmp-sharing`, app logs showed:
+  - `iOS kmp-sharing requested. textLength=...`
+- That meant the UI effect and platform action reached the share call, but presentation still failed or was hidden.
+- Simulator/system noise logs also appeared, such as:
+  - `RTIInputSystemClient ... valid sessionID`
+  - `CHHapticPattern ... hapticpatternlibrary.plist couldn't be opened`
+
+### Cause
+
+- The original direct iOS implementation used `UIActivityViewController` and `UIApplication.sharedApplication.keyWindow?.rootViewController`.
+- `kmp-sharing` internally also presents from `UIApplication.sharedApplication.keyWindow?.rootViewController`.
+- In Compose Multiplatform iOS, presenting a native share sheet immediately while a Compose modal bottom sheet is still being dismissed can silently fail or appear to do nothing.
+- The system haptic/keyboard logs were simulator noise, not the root cause.
+
+### Resolution
+
+- Replaced direct share implementations with `kmp-sharing`.
+- Added `com.swmansion.kmpsharing:kmp-sharing:0.2.0`.
+- Used `rememberShare()` for TuripDetail/TripDetail share actions.
+- On iOS, wrapped invitation links as text:
+  - `튜립 초대 링크\n$link`
+- Passed `iosUTI = "public.plain-text"` for text sharing.
+- Removed custom iOS anchor and let `kmp-sharing` use its default centered anchor.
+- In `TuripDetailScreen`, hid the more-option bottom sheet first and delayed share by `250ms`.
+- `:feature:turipdetail:impl:compileKotlinIosSimulatorArm64 :feature:trip:impl:compileKotlinIosSimulatorArm64` passed after the fix.
+
+### Notes
+
+- The share call should log:
+
+```text
+iOS kmp-sharing requested. textLength=...
+```
+
+- If this log appears but the sheet does not, re-check native presentation timing or root presenter selection.
+- If this log does not appear, debug the UI effect/platform action path first.
+
 ## Gradle Project Sync Broken Pipe
 
 ### Symptom
