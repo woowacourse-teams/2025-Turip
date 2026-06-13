@@ -13,6 +13,6 @@ class SplashNavKeyProvider : NavKeyProvider {
     }
 
     override fun EntryProviderScope<NavKey>.registerScreens(navigator: Navigator) {
-        splashScreen(navigator, deepLinkUrl = null)
+        splashScreen(navigator)
     }
 }

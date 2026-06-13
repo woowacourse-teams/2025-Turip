@@ -1,6 +1,6 @@
 # Troubleshooting Notes
 
-Last updated: 2026-06-11
+Last updated: 2026-06-13
 
 ## Android Google Login Did Not Navigate
 
@@ -72,6 +72,46 @@ Last updated: 2026-06-11
 ### Resolution
 
 - Adjusted image loading usage so remote images render correctly in migrated screens.
+
+## Android Emulator Local HTTP Server Blocked
+
+### Symptom
+
+- iOS Simulator could connect to the local server with:
+  - `http://localhost:8080/api/`
+- Android Emulator used the correct host-machine alias:
+  - `http://10.0.2.2:8080/api/`
+- Android requests still failed with:
+
+```text
+java.net.UnknownServiceException: CLEARTEXT communication to 10.0.2.2 not permitted by network security policy
+```
+
+### Cause
+
+- `10.0.2.2` is the correct Android Emulator address for the host machine.
+- The failure was not an emulator routing issue.
+- Android blocked plain `http://` traffic because cleartext traffic was not allowed by the app manifest/network security policy.
+
+### Resolution
+
+- Added a manifest placeholder for cleartext traffic:
+  - debug: `usesCleartextTraffic = true`
+  - release: `usesCleartextTraffic = false`
+- Wired the placeholder into `AndroidManifest.xml`:
+
+```xml
+android:usesCleartextTraffic="${usesCleartextTraffic}"
+```
+
+- `:composeApp:compileDebugKotlinAndroid` passed after the fix.
+
+### Notes
+
+- Use `http://10.0.2.2:8080/api/` for Android Emulator.
+- Use `http://localhost:8080/api/` for iOS Simulator.
+- Use the host machine LAN IP, not `10.0.2.2`, for Android physical devices.
+- Reinstall/re-run the Android app after manifest changes so the new network policy is applied.
 
 ## YouTube Error 152-4 On Android WebView
 

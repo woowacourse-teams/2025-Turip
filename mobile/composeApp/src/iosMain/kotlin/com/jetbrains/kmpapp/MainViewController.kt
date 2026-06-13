@@ -21,5 +21,6 @@ fun MainViewController() = ComposeUIViewController(
     MainApp(
         savedStateConfigurationProvider = savedStateConfigurationProvider,
         newDeepLinkFlow = iosDeepLinkFlow(),
+        initialDeepLinkUrl = null,
     )
 }

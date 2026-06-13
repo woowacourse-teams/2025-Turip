@@ -11,13 +11,12 @@ import com.on.turip.feature.splash.impl.SplashScreen
 
 fun EntryProviderScope<NavKey>.splashScreen(
     navigator: Navigator,
-    deepLinkUrl: String?,
 ) {
-    entry<SplashNavKey> {
+    entry<SplashNavKey> { key ->
         SplashScreen(
-            deepLinkUrl = deepLinkUrl,
+            deepLinkUrl = key.deepLinkUrl,
             onNavigateToMain = { navigator.goWithAllClear(HomeNavKey) },
-            onNavigateToLogin = { navigator.goWithAllClear(LoginNavKey(deepLinkUrl)) },
+            onNavigateToLogin = { navigator.goWithAllClear(LoginNavKey(key.deepLinkUrl)) },
             onNavigateToInvitationEntry = { navigator.goWithAllClear(InvitationEntryNavKey(it)) },
             onFinish = { navigator.goBack() },
         )

@@ -50,8 +50,9 @@ import kotlinx.coroutines.flow.Flow
 fun MainApp(
     savedStateConfigurationProvider: SavedStateConfigurationProvider,
     newDeepLinkFlow: Flow<String>,
+    initialDeepLinkUrl: String? = null,
 ) {
-    val initialEntryKey: NavKey = SplashNavKey
+    val initialEntryKey: NavKey = SplashNavKey(deepLinkUrl = initialDeepLinkUrl)
     val navigationState =
         rememberNavigationState(
             startKey = HomeNavKey,

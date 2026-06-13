@@ -23,7 +23,7 @@ class MainActivity : ComponentActivity() {
         requestedOrientation =
             if (shouldLockPortrait) ActivityInfo.SCREEN_ORIENTATION_PORTRAIT else ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
 
-        handleDeepLink(intent)
+        val initialDeepLinkUrl = intent.deepLinkUrl()
         setContent {
             val savedStateConfigurationProvider: SavedStateConfigurationProvider = koinInject()
             val deviceFidManager: DeviceFidManager = koinInject()
@@ -33,16 +33,20 @@ class MainActivity : ComponentActivity() {
             MainApp(
                 savedStateConfigurationProvider = savedStateConfigurationProvider,
                 newDeepLinkFlow = newDeepLinkFlow,
+                initialDeepLinkUrl = initialDeepLinkUrl,
             )
         }
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        setIntent(intent)
         handleDeepLink(intent)
     }
 
     private fun handleDeepLink(intent: Intent?) {
-        intent?.data?.toString()?.let { newDeepLinkFlow.tryEmit(it) }
+        intent.deepLinkUrl()?.let { newDeepLinkFlow.tryEmit(it) }
     }
+
+    private fun Intent?.deepLinkUrl(): String? = this?.data?.toString()
 }
