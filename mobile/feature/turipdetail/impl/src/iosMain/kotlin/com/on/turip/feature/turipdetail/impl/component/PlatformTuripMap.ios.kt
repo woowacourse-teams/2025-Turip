@@ -1,17 +1,22 @@
 package com.on.turip.feature.turipdetail.impl.component
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.UIKitView
+import com.on.turip.core.ui.platform.IosGoogleMapBridge
 import com.on.turip.feature.turipdetail.impl.model.turip.PlaceLatLngUiModel
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.cinterop.CValue
 import kotlinx.cinterop.ExperimentalForeignApi
-import platform.CoreLocation.CLLocationCoordinate2DMake
-import platform.MapKit.MKCoordinateRegionMake
-import platform.MapKit.MKCoordinateSpanMake
-import platform.MapKit.MKMapTypeStandard
+import kotlinx.cinterop.cValue
+import kotlinx.cinterop.readValue
+import platform.CoreGraphics.CGRectZero
+import platform.CoreLocation.CLLocationCoordinate2D
+import platform.MapKit.MKCoordinateRegionMakeWithDistance
 import platform.MapKit.MKMapView
 import platform.MapKit.MKPointAnnotation
+import platform.UIKit.UIView
 
 @OptIn(ExperimentalForeignApi::class)
 @Composable
@@ -21,83 +26,96 @@ internal actual fun PlatformTuripMap(
     places: ImmutableList<PlaceLatLngUiModel>,
     modifier: Modifier,
 ) {
+    val fallbackMapView = remember(selectedTuripId) { FallbackMapViewState() }
+
     UIKitView(
         factory = {
-            MKMapView().apply {
-                mapType = MKMapTypeStandard
-                zoomEnabled = true
-                scrollEnabled = true
-                rotateEnabled = false
-                pitchEnabled = false
-                showsCompass = true
-            }
+            IosGoogleMapBridge.createView()
+                ?: fallbackMapView.createView()
         },
         modifier = modifier,
         update = { mapView ->
-            mapView.renderPlaces(
-                selectedPlace = selectedPlace,
-                places = places,
+            val targetPlace = selectedPlace.validOrNull() ?: places.firstValidOrNull() ?: return@UIKitView
+            IosGoogleMapBridge.updateView(
+                view = mapView,
+                selectedLatitude = targetPlace.latitude,
+                selectedLongitude = targetPlace.longitude,
+                selectedName = targetPlace.name,
+                placesPayload = places.toPayload(),
             )
-        },
-    )
-}
 
-@OptIn(ExperimentalForeignApi::class)
-private fun MKMapView.renderPlaces(
-    selectedPlace: PlaceLatLngUiModel,
-    places: ImmutableList<PlaceLatLngUiModel>,
-) {
-    removeAnnotations(annotations)
-
-    val visiblePlaces = places.filterNot { it.isEmptyCoordinate() }
-    if (visiblePlaces.isEmpty()) return
-
-    addAnnotations(
-        visiblePlaces.map { place ->
-            MKPointAnnotation().apply {
-                setCoordinate(CLLocationCoordinate2DMake(place.latitude, place.longitude))
-                setTitle(place.name)
+            if (mapView is MKMapView) {
+                fallbackMapView.updateView(mapView, targetPlace, places)
             }
         },
     )
+}
 
-    val targetPlace =
-        selectedPlace
-            .takeUnless { it.isEmptyCoordinate() }
-            ?: visiblePlaces.first()
+private fun PlaceLatLngUiModel.validOrNull(): PlaceLatLngUiModel? =
+    takeUnless { latitude == 0.0 && longitude == 0.0 }
 
-    setRegion(
-        targetPlace.regionFor(visiblePlaces),
-        animated = true,
-    )
+private fun List<PlaceLatLngUiModel>.firstValidOrNull(): PlaceLatLngUiModel? =
+    firstOrNull { it.latitude != 0.0 || it.longitude != 0.0 }
+
+private fun List<PlaceLatLngUiModel>.toPayload(): String =
+    filter { it.latitude != 0.0 || it.longitude != 0.0 }
+        .joinToString(separator = "\n") { place ->
+            listOf(
+                place.placeId.toString(),
+                place.latitude.toString(),
+                place.longitude.toString(),
+                place.name.sanitizePayloadField(),
+            ).joinToString(separator = "\t")
+        }
+
+private fun String.sanitizePayloadField(): String =
+    replace("\t", " ")
+        .replace("\n", " ")
+
+@OptIn(ExperimentalForeignApi::class)
+private class FallbackMapViewState {
+    fun createView(): UIView =
+        MKMapView(frame = CGRectZero.readValue()).apply {
+            scrollEnabled = true
+            zoomEnabled = true
+            rotateEnabled = false
+        }
+
+    fun updateView(
+        mapView: MKMapView,
+        selectedPlace: PlaceLatLngUiModel,
+        places: List<PlaceLatLngUiModel>,
+    ) {
+        mapView.removeAnnotations(mapView.annotations)
+
+        places
+            .filter { it.latitude != 0.0 || it.longitude != 0.0 }
+            .forEach { place ->
+                val annotation =
+                    MKPointAnnotation().apply {
+                        setCoordinate(coordinate(place.latitude, place.longitude))
+                        setTitle(place.name)
+                    }
+                mapView.addAnnotation(annotation)
+            }
+
+        mapView.setRegion(
+            MKCoordinateRegionMakeWithDistance(
+                coordinate(selectedPlace.latitude, selectedPlace.longitude),
+                1_000.0,
+                1_000.0,
+            ),
+            animated = true,
+        )
+    }
 }
 
 @OptIn(ExperimentalForeignApi::class)
-private fun PlaceLatLngUiModel.regionFor(places: List<PlaceLatLngUiModel>) =
-    if (places.size == 1) {
-        MKCoordinateRegionMake(
-            centerCoordinate = CLLocationCoordinate2DMake(latitude, longitude),
-            span = MKCoordinateSpanMake(DEFAULT_LATITUDE_DELTA, DEFAULT_LONGITUDE_DELTA),
-        )
-    } else {
-        val minLatitude = places.minOf { it.latitude }
-        val maxLatitude = places.maxOf { it.latitude }
-        val minLongitude = places.minOf { it.longitude }
-        val maxLongitude = places.maxOf { it.longitude }
-        val latitudeDelta = ((maxLatitude - minLatitude) * MAP_PADDING_RATIO).coerceAtLeast(DEFAULT_LATITUDE_DELTA)
-        val longitudeDelta = ((maxLongitude - minLongitude) * MAP_PADDING_RATIO).coerceAtLeast(DEFAULT_LONGITUDE_DELTA)
-
-        MKCoordinateRegionMake(
-            centerCoordinate = CLLocationCoordinate2DMake(
-                latitude = (minLatitude + maxLatitude) / 2.0,
-                longitude = (minLongitude + maxLongitude) / 2.0,
-            ),
-            span = MKCoordinateSpanMake(latitudeDelta, longitudeDelta),
-        )
+private fun coordinate(
+    latitude: Double,
+    longitude: Double,
+): CValue<CLLocationCoordinate2D> =
+    cValue {
+        this.latitude = latitude
+        this.longitude = longitude
     }
-
-private fun PlaceLatLngUiModel.isEmptyCoordinate(): Boolean = latitude == 0.0 && longitude == 0.0
-
-private const val DEFAULT_LATITUDE_DELTA = 0.01
-private const val DEFAULT_LONGITUDE_DELTA = 0.01
-private const val MAP_PADDING_RATIO = 1.4

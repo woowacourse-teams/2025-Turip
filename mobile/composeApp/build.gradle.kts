@@ -49,6 +49,11 @@ buildkonfig {
             "CLIENT_ID",
             "${gradleLocalProperties(rootDir, providers).getProperty("client_id")}",
         )
+        buildConfigField(
+            STRING,
+            "GOOGLE_MAPS_API_KEY",
+            "${gradleLocalProperties(rootDir, providers).getProperty("google_maps_api_key") ?: ""}",
+        )
     }
 
     defaultConfigs("release") {
@@ -67,6 +72,11 @@ buildkonfig {
             STRING,
             "CLIENT_ID",
             "${gradleLocalProperties(rootDir, providers).getProperty("client_id")}",
+        )
+        buildConfigField(
+            STRING,
+            "GOOGLE_MAPS_API_KEY",
+            gradleLocalProperties(rootDir, providers).getProperty("google_maps_api_key") ?: "",
         )
     }
 }
