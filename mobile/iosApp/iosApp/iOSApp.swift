@@ -3,6 +3,7 @@ import ComposeApp
 import FirebaseCore
 import FirebaseInstallations
 import GoogleMaps
+import QuartzCore
 
 @main
 struct iOSApp: App {
@@ -68,6 +69,7 @@ struct iOSApp: App {
 
 private final class TuripGoogleMapView: GMSMapView {
     private let defaultZoom: Float = 15
+    private let selectedPlaceAnimationDuration: CFTimeInterval = 1
     private let boundsPadding: CGFloat = 100
     private var currentSelectedTuripId: Int64?
     private var isInitialized = false
@@ -154,10 +156,23 @@ private final class TuripGoogleMapView: GMSMapView {
         guard let selectedCoordinate else { return }
         guard previousSelectedCoordinate?.isSameCoordinate(as: selectedCoordinate) != true else { return }
 
-        animate(to: GMSCameraPosition.camera(
-            withTarget: selectedCoordinate,
-            zoom: defaultZoom
-        ))
+        animateCamera(
+            to: GMSCameraPosition.camera(
+                withTarget: selectedCoordinate,
+                zoom: defaultZoom
+            ),
+            duration: selectedPlaceAnimationDuration
+        )
+    }
+
+    private func animateCamera(
+        to cameraPosition: GMSCameraPosition,
+        duration: CFTimeInterval
+    ) {
+        CATransaction.begin()
+        CATransaction.setAnimationDuration(duration)
+        animate(to: cameraPosition)
+        CATransaction.commit()
     }
 
     private func cameraUpdateForPlaces(
