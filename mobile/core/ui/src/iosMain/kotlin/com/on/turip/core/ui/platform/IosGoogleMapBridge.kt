@@ -5,6 +5,7 @@ import platform.UIKit.UIView
 typealias IosGoogleMapViewFactory = () -> UIView
 typealias IosGoogleMapViewUpdater = (
     view: UIView,
+    selectedTuripId: Long,
     selectedLatitude: Double,
     selectedLongitude: Double,
     selectedName: String,
@@ -27,11 +28,12 @@ object IosGoogleMapBridge {
 
     fun updateView(
         view: UIView,
+        selectedTuripId: Long,
         selectedLatitude: Double,
         selectedLongitude: Double,
         selectedName: String,
         placesPayload: String,
     ) {
-        updater?.invoke(view, selectedLatitude, selectedLongitude, selectedName, placesPayload)
+        updater?.invoke(view, selectedTuripId, selectedLatitude, selectedLongitude, selectedName, placesPayload)
     }
 }

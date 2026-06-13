@@ -1,6 +1,6 @@
 # Troubleshooting Notes
 
-Last updated: 2026-06-13
+Last updated: 2026-06-14
 
 ## Android Google Login Did Not Navigate
 
@@ -288,3 +288,43 @@ kotlin.daemon.jvmargs=-Xmx2048M -Djava.net.preferIPv6Addresses=true
 ```
 
 3. Only move this setting into project `gradle.properties` if it is confirmed to be needed for the team.
+
+## iOS TuripDetail Map Uses Google Maps SDK
+
+### Context
+
+- Android TuripDetail already used Google Maps through `com.google.maps.android:maps-compose`.
+- iOS TuripDetail originally used MapKit through `MKMapView`.
+- Product decision: use Google Maps on iOS as well, not WebView and not MapKit.
+
+### Checked Alternative
+
+- Checked `eu.buney.maps:kmp-maps-compose` from `yankeppey/kmp-maps-compose`.
+- The library artifact is built with Kotlin `2.3.x` KLIB ABI.
+- Current project Kotlin is `2.2.21`, so iOS compilation cannot consume that KLIB.
+- Using this library would require upgrading the project Kotlin/KSP stack, not just changing the map module.
+
+### Resolution
+
+- Added Google Maps iOS SDK through Swift Package Manager in the Xcode project.
+- Added a small KMP bridge so common/iOS Kotlin can provide the map data and Swift can render the native `GMSMapView`.
+- `iosApp/iosApp/iOSApp.swift` now:
+  - calls `GMSServices.provideAPIKey(...)`
+  - registers a native `TuripGoogleMapView` factory/updater
+  - renders markers and selected place with Google Maps SDK
+- TuripDetail iOS map now uses native Google Maps SDK instead of MapKit.
+
+### API Key Notes
+
+- Google Maps API key is read from `local.properties` as `google_maps_api_key`.
+- `local.properties` is ignored by Git, so the raw key is not committed to the repository.
+- The key is passed into BuildKonfig and used by iOS at runtime.
+- This means the key is not exposed in GitHub, but it is still included in the mobile app binary.
+- Protect the key in Google Cloud Console with platform restrictions:
+  - iOS: bundle identifier restriction
+  - Android: package name and SHA-1 restriction
+
+### Notes
+
+- `iosApp/Configuration/Config.xcconfig` is tracked, but it currently contains Google Sign-In configuration such as `GOOGLE_REVERSED_CLIENT_ID`, not the Google Maps API key.
+- A future switch to `kmp-maps-compose` should be handled as a separate Kotlin `2.3.x` upgrade task.

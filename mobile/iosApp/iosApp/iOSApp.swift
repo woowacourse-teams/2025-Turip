@@ -37,9 +37,10 @@ struct iOSApp: App {
                 mapView.configure()
                 return mapView
             },
-            updater: { view, selectedLatitude, selectedLongitude, selectedName, placesPayload in
+            updater: { view, selectedTuripId, selectedLatitude, selectedLongitude, selectedName, placesPayload in
                 guard let mapView = view as? TuripGoogleMapView else { return }
                 mapView.update(
+                    selectedTuripId: selectedTuripId.int64Value,
                     selectedLatitude: selectedLatitude.doubleValue,
                     selectedLongitude: selectedLongitude.doubleValue,
                     selectedName: selectedName,
@@ -67,6 +68,11 @@ struct iOSApp: App {
 
 private final class TuripGoogleMapView: GMSMapView {
     private let defaultZoom: Float = 15
+    private let boundsPadding: CGFloat = 100
+    private var currentSelectedTuripId: Int64?
+    private var isInitialized = false
+    private var previousSelectedCoordinate: CLLocationCoordinate2D?
+    private var previousPlacesPayload = ""
 
     func configure() {
         settings.zoomGestures = true
@@ -76,6 +82,7 @@ private final class TuripGoogleMapView: GMSMapView {
     }
 
     func update(
+        selectedTuripId: Int64,
         selectedLatitude: Double,
         selectedLongitude: Double,
         selectedName: String,
@@ -85,11 +92,19 @@ private final class TuripGoogleMapView: GMSMapView {
             latitude: selectedLatitude,
             longitude: selectedLongitude
         )
+        let places = parsePlaces(placesPayload)
+
+        if currentSelectedTuripId != selectedTuripId {
+            currentSelectedTuripId = selectedTuripId
+            isInitialized = false
+            previousSelectedCoordinate = nil
+            previousPlacesPayload = ""
+        }
 
         clear()
 
         var selectedMarker: GMSMarker?
-        parsePlaces(placesPayload).forEach { place in
+        places.forEach { place in
             let marker = GMSMarker()
             marker.position = CLLocationCoordinate2D(latitude: place.latitude, longitude: place.longitude)
             marker.title = place.name
@@ -101,11 +116,6 @@ private final class TuripGoogleMapView: GMSMapView {
             }
         }
 
-        animate(to: GMSCameraPosition.camera(
-            withTarget: selectedCoordinate,
-            zoom: defaultZoom
-        ))
-
         if let selectedMarker {
             self.selectedMarker = selectedMarker
         } else if !selectedName.isEmpty {
@@ -114,6 +124,62 @@ private final class TuripGoogleMapView: GMSMapView {
             marker.map = self
             self.selectedMarker = marker
         }
+
+        updateCamera(
+            selectedCoordinate: selectedCoordinate,
+            places: places,
+            placesPayload: placesPayload
+        )
+        previousSelectedCoordinate = selectedCoordinate
+        previousPlacesPayload = placesPayload
+    }
+
+    private func updateCamera(
+        selectedCoordinate: CLLocationCoordinate2D,
+        places: [TuripMapPlace],
+        placesPayload: String
+    ) {
+        if !isInitialized {
+            moveCamera(cameraUpdateForPlaces(places, fallbackCoordinate: selectedCoordinate))
+            isInitialized = true
+            return
+        }
+
+        if previousPlacesPayload != placesPayload {
+            animate(with: cameraUpdateForPlaces(places, fallbackCoordinate: selectedCoordinate))
+            return
+        }
+
+        guard previousSelectedCoordinate?.isSameCoordinate(as: selectedCoordinate) != true else { return }
+
+        animate(to: GMSCameraPosition.camera(
+            withTarget: selectedCoordinate,
+            zoom: defaultZoom
+        ))
+    }
+
+    private func cameraUpdateForPlaces(
+        _ places: [TuripMapPlace],
+        fallbackCoordinate: CLLocationCoordinate2D
+    ) -> GMSCameraUpdate {
+        guard !places.isEmpty else {
+            return GMSCameraUpdate.setTarget(fallbackCoordinate, zoom: defaultZoom)
+        }
+
+        if places.count == 1 {
+            return GMSCameraUpdate.setTarget(
+                CLLocationCoordinate2D(latitude: places[0].latitude, longitude: places[0].longitude),
+                zoom: defaultZoom
+            )
+        }
+
+        var bounds = GMSCoordinateBounds()
+        places.forEach { place in
+            bounds = bounds.includingCoordinate(
+                CLLocationCoordinate2D(latitude: place.latitude, longitude: place.longitude)
+            )
+        }
+        return GMSCameraUpdate.fit(bounds, withPadding: boundsPadding)
     }
 
     private func parsePlaces(_ payload: String) -> [TuripMapPlace] {
@@ -138,4 +204,11 @@ private struct TuripMapPlace {
     let latitude: Double
     let longitude: Double
     let name: String
+}
+
+private extension CLLocationCoordinate2D {
+    func isSameCoordinate(as other: CLLocationCoordinate2D) -> Bool {
+        abs(latitude - other.latitude) < 0.000001 &&
+            abs(longitude - other.longitude) < 0.000001
+    }
 }

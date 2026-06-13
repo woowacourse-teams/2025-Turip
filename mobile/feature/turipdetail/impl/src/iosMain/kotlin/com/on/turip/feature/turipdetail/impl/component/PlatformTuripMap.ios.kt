@@ -38,6 +38,7 @@ internal actual fun PlatformTuripMap(
             val targetPlace = selectedPlace.validOrNull() ?: places.firstValidOrNull() ?: return@UIKitView
             IosGoogleMapBridge.updateView(
                 view = mapView,
+                selectedTuripId = selectedTuripId,
                 selectedLatitude = targetPlace.latitude,
                 selectedLongitude = targetPlace.longitude,
                 selectedName = targetPlace.name,
