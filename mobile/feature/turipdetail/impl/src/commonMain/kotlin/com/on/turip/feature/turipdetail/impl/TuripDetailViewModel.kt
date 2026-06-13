@@ -145,11 +145,6 @@ class TuripDetailViewModel(
                                 mergedPlaces
                                     .map { it.toPlaceLatLngUiModel() }
                                     .toImmutableList(),
-                            selectedPlace =
-                                mergedPlaces
-                                    .firstOrNull()
-                                    ?.toPlaceLatLngUiModel()
-                                    ?: PlaceLatLngUiModel.Idle,
                         )
                     }
 

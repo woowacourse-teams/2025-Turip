@@ -35,18 +35,19 @@ internal actual fun PlatformTuripMap(
         },
         modifier = modifier,
         update = { mapView ->
-            val targetPlace = selectedPlace.validOrNull() ?: places.firstValidOrNull() ?: return@UIKitView
+            if (places.firstValidOrNull() == null) return@UIKitView
+            val selectedMapPlace = selectedPlace.validOrNull() ?: PlaceLatLngUiModel.Idle
             IosGoogleMapBridge.updateView(
                 view = mapView,
                 selectedTuripId = selectedTuripId,
-                selectedLatitude = targetPlace.latitude,
-                selectedLongitude = targetPlace.longitude,
-                selectedName = targetPlace.name,
+                selectedLatitude = selectedMapPlace.latitude,
+                selectedLongitude = selectedMapPlace.longitude,
+                selectedName = selectedMapPlace.name,
                 placesPayload = places.toPayload(),
             )
 
             if (mapView is MKMapView) {
-                fallbackMapView.updateView(mapView, targetPlace, places)
+                fallbackMapView.updateView(mapView, selectedPlace.validOrNull() ?: places.firstValidOrNull() ?: return@UIKitView, places)
             }
         },
     )

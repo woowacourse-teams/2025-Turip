@@ -92,6 +92,7 @@ private final class TuripGoogleMapView: GMSMapView {
             latitude: selectedLatitude,
             longitude: selectedLongitude
         )
+        let selectedCoordinateOrNil = selectedCoordinate.validOrNil
         let places = parsePlaces(placesPayload)
 
         if currentSelectedTuripId != selectedTuripId {
@@ -110,15 +111,15 @@ private final class TuripGoogleMapView: GMSMapView {
             marker.title = place.name
             marker.map = self
 
-            if abs(place.latitude - selectedLatitude) < 0.000001 &&
-                abs(place.longitude - selectedLongitude) < 0.000001 {
+            if let selectedCoordinateOrNil,
+               marker.position.isSameCoordinate(as: selectedCoordinateOrNil) {
                 selectedMarker = marker
             }
         }
 
         if let selectedMarker {
             self.selectedMarker = selectedMarker
-        } else if !selectedName.isEmpty {
+        } else if let selectedCoordinateOrNil, !selectedName.isEmpty {
             let marker = GMSMarker(position: selectedCoordinate)
             marker.title = selectedName
             marker.map = self
@@ -126,16 +127,16 @@ private final class TuripGoogleMapView: GMSMapView {
         }
 
         updateCamera(
-            selectedCoordinate: selectedCoordinate,
+            selectedCoordinate: selectedCoordinateOrNil,
             places: places,
             placesPayload: placesPayload
         )
-        previousSelectedCoordinate = selectedCoordinate
+        previousSelectedCoordinate = selectedCoordinateOrNil
         previousPlacesPayload = placesPayload
     }
 
     private func updateCamera(
-        selectedCoordinate: CLLocationCoordinate2D,
+        selectedCoordinate: CLLocationCoordinate2D?,
         places: [TuripMapPlace],
         placesPayload: String
     ) {
@@ -150,6 +151,7 @@ private final class TuripGoogleMapView: GMSMapView {
             return
         }
 
+        guard let selectedCoordinate else { return }
         guard previousSelectedCoordinate?.isSameCoordinate(as: selectedCoordinate) != true else { return }
 
         animate(to: GMSCameraPosition.camera(
@@ -160,10 +162,13 @@ private final class TuripGoogleMapView: GMSMapView {
 
     private func cameraUpdateForPlaces(
         _ places: [TuripMapPlace],
-        fallbackCoordinate: CLLocationCoordinate2D
+        fallbackCoordinate: CLLocationCoordinate2D?
     ) -> GMSCameraUpdate {
         guard !places.isEmpty else {
-            return GMSCameraUpdate.setTarget(fallbackCoordinate, zoom: defaultZoom)
+            return GMSCameraUpdate.setTarget(
+                fallbackCoordinate ?? CLLocationCoordinate2D(latitude: 0, longitude: 0),
+                zoom: defaultZoom
+            )
         }
 
         if places.count == 1 {
@@ -207,6 +212,10 @@ private struct TuripMapPlace {
 }
 
 private extension CLLocationCoordinate2D {
+    var validOrNil: CLLocationCoordinate2D? {
+        latitude == 0 && longitude == 0 ? nil : self
+    }
+
     func isSameCoordinate(as other: CLLocationCoordinate2D) -> Bool {
         abs(latitude - other.latitude) < 0.000001 &&
             abs(longitude - other.longitude) < 0.000001
