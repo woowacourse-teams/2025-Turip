@@ -118,6 +118,7 @@ android {
                 mapOf(
                     "appName" to "@string/app_name_dev",
                     "appLinkTuripInvitationHost" to appLinkTuripInvitationHost,
+                    "usesCleartextTraffic" to true,
                     "google_maps_api_key" to
                         (gradleLocalProperties(rootDir, providers).getProperty("google_maps_api_key") ?: ""),
                 )
@@ -131,6 +132,7 @@ android {
                 mapOf(
                     "appName" to "@string/app_name",
                     "appLinkTuripInvitationHost" to appLinkTuripInvitationHost,
+                    "usesCleartextTraffic" to false,
                     "google_maps_api_key" to
                         (gradleLocalProperties(rootDir, providers).getProperty("google_maps_api_key") ?: ""),
                 )
