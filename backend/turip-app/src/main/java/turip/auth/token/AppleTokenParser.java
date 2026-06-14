@@ -54,7 +54,7 @@ public class AppleTokenParser implements IdTokenParser {
 
         DefaultJWTClaimsVerifier<SecurityContext> claimsVerifier = new DefaultJWTClaimsVerifier<>(
                 exactMatchClaims,
-                new HashSet<>(Arrays.asList("sub", "email", "exp"))
+                new HashSet<>(Arrays.asList("sub", "exp"))
         );
         processor.setJWTClaimsSetVerifier(claimsVerifier);
 
