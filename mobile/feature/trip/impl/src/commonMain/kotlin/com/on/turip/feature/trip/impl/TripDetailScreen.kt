@@ -107,6 +107,19 @@ fun TripDetailScreen(
                 (webViewController.isLoading && uiState.tripDetailInfo == TripDetailInfoModel.Idle)
         }
     }
+    val isAtBottom by remember(
+        listState,
+        isInitialLoading,
+        uiState.errorUiState,
+        webViewController.isFullScreen,
+    ) {
+        derivedStateOf {
+            !isInitialLoading &&
+                uiState.errorUiState == ErrorUiState.None &&
+                !webViewController.isFullScreen &&
+                !listState.canScrollForward
+        }
+    }
 
     LaunchedEffect(contentId) {
         viewModel.initContentId(contentId)
@@ -135,6 +148,7 @@ fun TripDetailScreen(
 
     DisposableEffect(Unit) {
         onDispose {
+            snackbarDelegate.updateBottomPadding(0.dp)
             webViewController.clear()
         }
     }
@@ -201,6 +215,10 @@ fun TripDetailScreen(
                 }
             }
         }
+    }
+
+    LaunchedEffect(isAtBottom) {
+        snackbarDelegate.updateBottomPadding(if (isAtBottom) 50.dp else 0.dp)
     }
 
     Column(modifier = modifier.fillMaxSize()) {
