@@ -40,7 +40,7 @@ internal actual fun PlatformTuripMap(
     LaunchedEffect(selectedPlace) {
         cameraPositionState.animate(
             CameraUpdateFactory.newCameraPosition(
-                CameraPosition(selectedPlace.toLatLng(), 15f, 0f, 0f),
+                CameraPosition(selectedPlace.toLatLng(), 18f, 0f, 0f),
             ),
             durationMs = 1000,
         )
@@ -52,7 +52,7 @@ internal actual fun PlatformTuripMap(
 
         val update =
             when (places.size) {
-                1 -> CameraUpdateFactory.newLatLngZoom(places.first().toLatLng(), 15f)
+                1 -> CameraUpdateFactory.newLatLngZoom(places.first().toLatLng(), 18f)
                 else -> {
                     val bounds =
                         LatLngBounds

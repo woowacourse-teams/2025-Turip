@@ -68,7 +68,7 @@ struct iOSApp: App {
 }
 
 private final class TuripGoogleMapView: GMSMapView {
-    private let defaultZoom: Float = 15
+    private let defaultZoom: Float = 18
     private let selectedPlaceAnimationDuration: CFTimeInterval = 1
     private let boundsPadding: CGFloat = 100
     private var currentSelectedTuripId: Int64?
