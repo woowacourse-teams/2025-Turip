@@ -13,6 +13,7 @@ import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.Optional;
 import javax.crypto.SecretKey;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -151,7 +152,7 @@ class AuthServiceTest {
             when(idTokenParserResolver.resolve(provider)).thenReturn(idTokenParser);
             when(idTokenParser.getProviderId(idToken)).thenReturn(providerId);
             when(idTokenParser.getEmail(idToken)).thenReturn(email);
-            when(socialMemberService.findOrCreate(provider, providerId, email)).thenReturn(socialMember);
+            when(socialMemberService.findOrCreate(provider, providerId, Optional.of(email))).thenReturn(socialMember);
             when(jwtProvider.generateAccessToken(1L, account.getRole())).thenReturn(accessToken);
             when(jwtProvider.generateRefreshToken(1L, account.getRole())).thenReturn(refreshToken);
             when(jwtProvider.getIssuedAt(anyString())).thenReturn(LocalDateTime.now());
@@ -194,7 +195,7 @@ class AuthServiceTest {
             when(idTokenParserResolver.resolve(provider)).thenReturn(idTokenParser);
             when(idTokenParser.getProviderId(idToken)).thenReturn(providerId);
             when(idTokenParser.getEmail(idToken)).thenReturn(email);
-            when(socialMemberService.findOrCreate(provider, providerId, email)).thenReturn(socialMember);
+            when(socialMemberService.findOrCreate(provider, providerId, Optional.of(email))).thenReturn(socialMember);
             when(jwtProvider.generateAccessToken(1L, account.getRole())).thenReturn("access-token");
             when(jwtProvider.generateRefreshToken(1L, account.getRole())).thenReturn("refresh-token");
             when(jwtProvider.getIssuedAt(anyString())).thenReturn(LocalDateTime.now());

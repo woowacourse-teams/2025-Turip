@@ -1,6 +1,7 @@
 package turip.auth.service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -67,7 +68,7 @@ public class AuthService {
         String providerId = parser.getProviderId(idToken);
         String email = parser.getEmail(idToken);
 
-        Member member = findOrCreateSocialMember(provider, providerId, email);
+        Member member = findOrCreateSocialMember(provider, providerId, Optional.ofNullable(email));
 
         boolean isNewMember = false;
         if (member.isFirstLogin()) {
@@ -124,7 +125,7 @@ public class AuthService {
         return TokenResult.of(accessToken, refreshToken);
     }
 
-    private Member findOrCreateSocialMember(Provider provider, String providerId, String email) {
+    private Member findOrCreateSocialMember(Provider provider, String providerId, Optional<String> email) {
         return socialMemberService.findOrCreate(provider, providerId, email).getMember();
     }
 

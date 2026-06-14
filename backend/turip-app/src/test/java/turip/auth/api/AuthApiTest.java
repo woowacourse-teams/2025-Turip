@@ -448,6 +448,40 @@ class AuthApiTest {
         }
 
         @Test
+        @DisplayName("애플 재로그인 시 email이 없어도 로그인에 성공한다")
+        void loginExistingMemberWithoutEmail() {
+            // given - 첫 로그인 시 email로 회원가입된 상태
+            String email = "existing@icloud.com";
+            Provider provider = Provider.APPLE;
+            String providerId = "apple-user-relogin";
+            testDataHelper.insertSocialMember(email, false, provider, providerId);
+
+            String idToken = "valid-apple-id-token-relogin";
+            String deviceFid = "device-relogin-456";
+
+            // 애플 재로그인 시에는 email이 null
+            when(appleTokenParserMock.getProviderId(idToken)).thenReturn(providerId);
+            when(appleTokenParserMock.getEmail(idToken)).thenReturn(null);
+
+            Map<String, String> requestBody = new HashMap<>();
+            requestBody.put("idToken", idToken);
+
+            // when & then
+            RestAssured
+                    .given().log().all()
+                    .contentType(ContentType.JSON)
+                    .header("device-fid", deviceFid)
+                    .body(requestBody)
+                    .when().post("/api/v1/auth/login/apple")
+                    .then().log().all()
+                    .statusCode(200)
+                    .body("accessToken", notNullValue())
+                    .body("refreshToken", notNullValue())
+                    .body("nickname", notNullValue())
+                    .body("isMigrationDecided", is(false));
+        }
+
+        @Test
         @DisplayName("유효하지 않은 ID 토큰인 경우 401 Unauthorized를 응답한다")
         void loginWithInvalidIdToken() {
             // given
