@@ -35,8 +35,25 @@ internal actual fun rememberTuripDetailPlatformActions(): TuripDetailPlatformAct
 }
 
 private fun openUrl(url: String) {
-    val nsUrl = NSURL.URLWithString(url) ?: return
-    UIApplication.sharedApplication.openURL(nsUrl)
+    val normalizedUrl = url.normalizedExternalUrl()
+    val nsUrl = NSURL.URLWithString(normalizedUrl) ?: run {
+        Napier.e("iOS failed to create NSURL. url=$url")
+        return
+    }
+    UIApplication.sharedApplication.openURL(
+        url = nsUrl,
+        options = emptyMap<Any?, Any?>(),
+        completionHandler = { success ->
+            if (!success) {
+                Napier.e("iOS failed to open external URL. url=$normalizedUrl")
+            }
+        },
+    )
+}
+
+private fun String.normalizedExternalUrl(): String {
+    val trimmedUrl = trim()
+    return if (trimmedUrl.contains("://")) trimmedUrl else "https://$trimmedUrl"
 }
 
 private fun String.toInvitationShareText(): String =
