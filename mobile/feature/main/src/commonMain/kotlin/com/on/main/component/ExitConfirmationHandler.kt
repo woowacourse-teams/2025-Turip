@@ -13,8 +13,9 @@ import androidx.navigationevent.compose.rememberNavigationEventState
 import com.on.turip.core.common.Platform
 import com.on.turip.core.common.currentPlatform
 import com.on.turip.core.designsystem.generated.resources.Res
+import com.on.turip.core.designsystem.generated.resources.main_double_back_pressed_to_exit
 import com.on.turip.feature.main.navigation.TuripAppState
-import org.jetbrains.compose.resources.getString
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 internal fun ExitConfirmationHandler(
@@ -22,6 +23,7 @@ internal fun ExitConfirmationHandler(
 ) {
     var canExit: Boolean by rememberSaveable { mutableStateOf(false) }
     val isTopLevelRoot: Boolean = appState.navigationState.isTopLevelKey
+    val exitMessage: String = stringResource(Res.string.main_double_back_pressed_to_exit)
 
     LaunchedEffect(canExit, isTopLevelRoot) {
         if (!canExit) return@LaunchedEffect
@@ -33,7 +35,7 @@ internal fun ExitConfirmationHandler(
         }
 
         appState.snackbarDelegate.showSnackbar(
-            message = "닫기",
+            message = exitMessage,
             onDismiss = { canExit = false },
         )
     }
