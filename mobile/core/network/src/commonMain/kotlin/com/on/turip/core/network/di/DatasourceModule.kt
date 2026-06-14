@@ -30,7 +30,10 @@ import org.koin.dsl.module
 fun datasourceModule(baseUrl: String) = module {
     single<AccountRemoteDataSource> { DefaultAccountRemoteDataSource(accountService = get()) }
     single<AuthRemoteDataSource> {
-        DefaultAuthRemoteDataSource(authService = get(named(DEFAULT_AUTH_SERVICE)))
+        DefaultAuthRemoteDataSource(
+            authService = get(named(DEFAULT_AUTH_SERVICE)),
+            noAuthAuthService = get(named(NO_AUTH_AUTH_SERVICE)),
+        )
     }
     single<AuthRefreshRemoteDataSource> {
         DefaultAuthRefreshRemoteDataSource(authService = get(named(NO_AUTH_AUTH_SERVICE)))

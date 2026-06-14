@@ -16,6 +16,9 @@ class DefaultAuthRepository(
     override suspend fun login(idToken: String): TuripResult<AuthResult> =
         authRemoteDataSource.postIdToken(idToken).mapCatching { it.toDomain() }
 
+    override suspend fun loginWithApple(idToken: String): TuripResult<AuthResult> =
+        authRemoteDataSource.postAppleIdToken(idToken).mapCatching { it.toDomain() }
+
     override suspend fun requestTokens(refreshToken: String): TuripResult<AuthTokens> =
         authRefreshRemoteDataSource.postReissueToken(refreshToken).mapCatching { it.toDomain() }
 

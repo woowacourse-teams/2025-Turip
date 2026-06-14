@@ -14,9 +14,18 @@ class LoginUseCase(
     private val authRepository: AuthRepository,
 ) {
     suspend operator fun invoke(idToken: String): TuripResult<Boolean> =
-        when (val loginResult = authRepository.login(idToken)) {
+        handleLoginResult(authRepository.login(idToken))
+
+    suspend fun loginWithApple(idToken: String): TuripResult<Boolean> =
+        handleLoginResult(authRepository.loginWithApple(idToken))
+
+    private suspend fun handleLoginResult(loginResult: TuripResult<AuthResult>): TuripResult<Boolean> =
+        when (loginResult) {
             is TuripResult.Failure -> {
-                Napier.e("로그인 실패")
+                Napier.e(
+                    message = "로그인 실패. errorType=${loginResult.errorType}",
+                    throwable = loginResult.cause,
+                )
                 loginResult
             }
 

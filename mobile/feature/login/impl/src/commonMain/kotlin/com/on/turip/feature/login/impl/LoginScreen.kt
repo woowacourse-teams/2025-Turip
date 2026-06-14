@@ -25,6 +25,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.on.turip.core.common.Platform
+import com.on.turip.core.common.currentPlatform
 import com.on.turip.core.designsystem.component.TuripDialog
 import com.on.turip.core.designsystem.generated.resources.Res
 import com.on.turip.core.designsystem.generated.resources.all_close_description
@@ -42,6 +44,7 @@ import com.on.turip.core.designsystem.theme.TuripTheme
 import com.on.turip.core.ui.error.toUiModel
 import com.on.turip.feature.login.impl.component.GoogleLoginButton
 import com.on.turip.feature.login.impl.component.GuestModeSection
+import com.on.turip.feature.login.impl.component.PlatformLoginButton
 import com.on.turip.feature.login.impl.util.noRippleClickable
 import kotlinx.coroutines.flow.collectLatest
 import org.jetbrains.compose.resources.getString
@@ -58,7 +61,9 @@ fun LoginScreen(
 ) {
     val uiState: LoginUiState by viewModel.uiState.collectAsState()
     val googleCredentialManager = rememberGoogleCredentialManager()
+    val appleCredentialManager = rememberAppleCredentialManager()
     val snackbarDelegate = LocalSnackbarDelegate.current
+    val showAppleLoginButton = currentPlatform == Platform.IOS
 
     LaunchedEffect(deepLinkUrl) {
         viewModel.initDeepLinkUrl(deepLinkUrl)
@@ -104,8 +109,10 @@ fun LoginScreen(
             modifier
                 .fillMaxSize()
                 .noRippleClickable { viewModel.updateHelpTextVisible(false) },
+        showAppleLoginButton = showAppleLoginButton,
         onHelpClick = { viewModel.updateHelpTextVisible(!uiState.showHelpText) },
         onGoogleLoginClick = { viewModel.loginWithGoogle(googleCredentialManager) },
+        onAppleLoginClick = { viewModel.loginWithApple(appleCredentialManager) },
         onGuestLoginClick = viewModel::continueAsGuest,
     )
 }
@@ -113,8 +120,10 @@ fun LoginScreen(
 @Composable
 private fun LoginScreenContent(
     isHelpTextVisible: Boolean,
+    showAppleLoginButton: Boolean,
     onHelpClick: () -> Unit,
     onGoogleLoginClick: () -> Unit,
+    onAppleLoginClick: () -> Unit,
     onGuestLoginClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -181,7 +190,15 @@ private fun LoginScreenContent(
 
             GoogleLoginButton(
                 onLoginClick = onGoogleLoginClick,
+                modifier = Modifier.fillMaxWidth(),
             )
+
+            if (showAppleLoginButton) {
+                PlatformLoginButton(
+                    onLoginClick = onAppleLoginClick,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
 
             GuestModeSection(
                 text = stringResource(Res.string.login_start_to_guest),
@@ -199,8 +216,10 @@ private fun HelpVisibleLoginScreenPreview() {
     TuripTheme {
         LoginScreenContent(
             isHelpTextVisible = true,
+            showAppleLoginButton = false,
             onHelpClick = {},
             onGoogleLoginClick = {},
+            onAppleLoginClick = {},
             onGuestLoginClick = {},
         )
     }
@@ -212,8 +231,10 @@ private fun HelpInvisibleLoginScreenPreview() {
     TuripTheme {
         LoginScreenContent(
             isHelpTextVisible = false,
+            showAppleLoginButton = false,
             onHelpClick = {},
             onGoogleLoginClick = {},
+            onAppleLoginClick = {},
             onGuestLoginClick = {},
         )
     }

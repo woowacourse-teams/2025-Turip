@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.on.turip.core.data.session.SessionManager
 import com.on.turip.core.model.result.ErrorType
 import com.on.turip.core.model.result.onFailure
+import com.on.turip.core.model.result.onFailureWithCause
 import com.on.turip.core.model.result.onSuccess
 import com.on.turip.core.ui.error.ErrorUiState
 import com.on.turip.core.ui.error.UiError
@@ -66,15 +67,65 @@ class LoginViewModel(
                                 } else {
                                     _uiEffect.send(LoginUiEffect.NavigateToMain(_uiState.value.deepLinkUrl))
                                 }
-                            }.onFailure { errorType ->
+                            }.onFailureWithCause { errorType, cause ->
+                                Napier.e(
+                                    message = "Google 로그인 API 실패. errorType=$errorType",
+                                    throwable = cause,
+                                )
                                 handleError(errorType)
                             }
-                    }.onFailure { errorType: ErrorType ->
+                    }.onFailureWithCause { errorType: ErrorType, cause: Throwable ->
                         // 로그인 도중 사용자가 포기한 경우는 예외로 판단하지 않고 무시
-                        if (errorType == ErrorType.Unknown) return@onFailure
+                        if (errorType == ErrorType.Cancelled) {
+                            Napier.d("Google 로그인 취소")
+                            return@onFailureWithCause
+                        }
 
                         handleError(errorType)
-                        Napier.e("googleCredentialManager 에서 IdToken 불러오기 실패")
+                        Napier.e(
+                            message = "googleCredentialManager 에서 IdToken 불러오기 실패. errorType=$errorType",
+                            throwable = cause,
+                        )
+                    }
+            } finally {
+                isLoginInProgress = false
+            }
+        }
+    }
+
+    fun loginWithApple(appleCredentialManager: AppleCredentialManager) {
+        if (isLoginInProgress) return
+        isLoginInProgress = true
+        viewModelScope.launch {
+            try {
+                appleCredentialManager
+                    .getIdToken()
+                    .onSuccess { idToken: String ->
+                        loginUseCase.loginWithApple(idToken)
+                            .onSuccess { isMigrationDecided: Boolean ->
+                                if (!isMigrationDecided) {
+                                    _uiState.update { it.copy(showMigrationDialog = true) }
+                                } else {
+                                    _uiEffect.send(LoginUiEffect.NavigateToMain(_uiState.value.deepLinkUrl))
+                                }
+                            }.onFailureWithCause { errorType, cause ->
+                                Napier.e(
+                                    message = "Apple 로그인 API 실패. errorType=$errorType",
+                                    throwable = cause,
+                                )
+                                handleError(errorType)
+                            }
+                    }.onFailureWithCause { errorType: ErrorType, cause: Throwable ->
+                        if (errorType == ErrorType.Cancelled) {
+                            Napier.d("Apple 로그인 취소")
+                            return@onFailureWithCause
+                        }
+
+                        handleError(errorType)
+                        Napier.e(
+                            message = "appleCredentialManager 에서 IdToken 불러오기 실패. errorType=$errorType",
+                            throwable = cause,
+                        )
                     }
             } finally {
                 isLoginInProgress = false

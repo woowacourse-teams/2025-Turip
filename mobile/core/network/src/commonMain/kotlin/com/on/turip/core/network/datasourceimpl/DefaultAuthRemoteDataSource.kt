@@ -13,12 +13,20 @@ import kotlin.coroutines.CoroutineContext
 
 class DefaultAuthRemoteDataSource(
     private val authService: AuthService,
+    private val noAuthAuthService: AuthService,
     private val coroutineContext: CoroutineContext = Dispatchers.IO,
 ) : AuthRemoteDataSource {
     override suspend fun postIdToken(idToken: String): TuripResult<LoginJwtTokenResponse> =
         withContext(coroutineContext) {
             safeApiCall {
-                authService.postIdToken(LoginIdTokenPostRequest(idToken))
+                noAuthAuthService.postIdToken(LoginIdTokenPostRequest(idToken))
+            }
+        }
+
+    override suspend fun postAppleIdToken(idToken: String): TuripResult<LoginJwtTokenResponse> =
+        withContext(coroutineContext) {
+            safeApiCall {
+                noAuthAuthService.postAppleIdToken(LoginIdTokenPostRequest(idToken))
             }
         }
 

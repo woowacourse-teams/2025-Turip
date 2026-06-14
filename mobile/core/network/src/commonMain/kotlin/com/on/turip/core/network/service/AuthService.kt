@@ -15,6 +15,11 @@ interface AuthService {
         @Body loginIdTokenPostRequest: LoginIdTokenPostRequest,
     ): LoginJwtTokenResponse
 
+    @POST(ApiPath.V1 + "auth/login/apple")
+    suspend fun postAppleIdToken(
+        @Body loginIdTokenPostRequest: LoginIdTokenPostRequest,
+    ): LoginJwtTokenResponse
+
     @POST(ApiPath.V1 + "auth/tokens")
     suspend fun postReissueToken(
         @Body reissueTokenRequest: ReissueTokenRequest,
