@@ -10,7 +10,10 @@ import com.on.turip.core.local.database.TuripDatabase
 import com.on.turip.core.local.datasourceimpl.DefaultInstallReferrerDataSource
 import okio.Path.Companion.toPath
 import org.koin.dsl.module
+import platform.Foundation.NSApplicationSupportDirectory
 import platform.Foundation.NSHomeDirectory
+import platform.Foundation.NSSearchPathForDirectoriesInDomains
+import platform.Foundation.NSUserDomainMask
 
 val localModuleIos = module {
     single<TuripDatabase> {
@@ -26,8 +29,8 @@ val localModuleIos = module {
     single<DataStore<Preferences>> {
         PreferenceDataStoreFactory.createWithPath(
             produceFile = {
-                (NSHomeDirectory() + "/datastore/turip_prefs.preferences_pb").toPath()
-            }
+                "${applicationSupportDirectory()}/datastore/turip_prefs.preferences_pb".toPath()
+            },
         )
     }
 
@@ -35,3 +38,10 @@ val localModuleIos = module {
         DefaultInstallReferrerDataSource()
     }
 }
+
+private fun applicationSupportDirectory(): String =
+    NSSearchPathForDirectoriesInDomains(
+        directory = NSApplicationSupportDirectory,
+        domainMask = NSUserDomainMask,
+        expandTilde = true,
+    ).firstOrNull() as? String ?: NSHomeDirectory()

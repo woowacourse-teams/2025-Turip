@@ -1,6 +1,6 @@
 # Troubleshooting Notes
 
-Last updated: 2026-06-14
+Last updated: 2026-06-16
 
 ## Android Google Login Did Not Navigate
 
@@ -328,3 +328,50 @@ kotlin.daemon.jvmargs=-Xmx2048M -Djava.net.preferIPv6Addresses=true
 
 - `iosApp/Configuration/Config.xcconfig` is tracked, but it currently contains Google Sign-In configuration such as `GOOGLE_REVERSED_CLIENT_ID`, not the Google Maps API key.
 - A future switch to `kmp-maps-compose` should be handled as a separate Kotlin `2.3.x` upgrade task.
+
+## iOS Login Failed Because DataStore Could Not Create Its File
+
+### Symptom
+
+- Google login succeeded and the server login API returned `accessToken` / `refreshToken`.
+- The app then failed while saving tokens, so login was treated as failed.
+- Logs included:
+  - `okio.IOException: Operation not permitted`
+  - `okio.PosixFileSystem#createDirectory`
+
+### Cause
+
+- This was not an auth failure or a server communication failure. It was an iOS local storage path error.
+- The iOS DataStore file path was:
+  - `NSHomeDirectory() + "/datastore/turip_prefs.preferences_pb"`
+- That location is not a standard, reliably writable directory inside the iOS app sandbox.
+- When DataStore tried to create the `/datastore` directory there, iOS denied directory creation.
+- Android had no issue because it used `context.preferencesDataStoreFile("turip_prefs")`, which resolves to the correct internal storage location.
+
+### Resolution
+
+- In `core/local/src/iosMain/.../di/LocalModuleIos.kt`, changed the DataStore path base from `NSHomeDirectory()` to the standard `Library/Application Support` directory.
+- Added a helper that resolves it and falls back to `NSHomeDirectory()` if unavailable:
+
+```kotlin
+single<DataStore<Preferences>> {
+    PreferenceDataStoreFactory.createWithPath(
+        produceFile = {
+            "${applicationSupportDirectory()}/datastore/turip_prefs.preferences_pb".toPath()
+        },
+    )
+}
+
+private fun applicationSupportDirectory(): String =
+    NSSearchPathForDirectoriesInDomains(
+        directory = NSApplicationSupportDirectory,
+        domainMask = NSUserDomainMask,
+        expandTilde = true,
+    ).firstOrNull() as? String ?: NSHomeDirectory()
+```
+
+### Notes
+
+- `Library/Application Support` may not exist on a clean install until the app creates it.
+- DataStore (okio) creates the leaf `/datastore` folder, but if `Application Support` itself is missing, the same `Operation not permitted` error can recur.
+- If this is reproduced on a clean device, create the directory first with `NSFileManager` before initializing DataStore.
