@@ -1,12 +1,10 @@
-package com.jetbrains.kmpapp.screens.detail
+package com.on.turip.screens.detail
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
@@ -14,10 +12,7 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -26,29 +21,25 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil3.compose.AsyncImage
-import com.jetbrains.kmpapp.data.MuseumObject
-import com.jetbrains.kmpapp.screens.EmptyScreenContent
-import kmp_app_template.composeapp.generated.resources.Res
-import kmp_app_template.composeapp.generated.resources.back
-import kmp_app_template.composeapp.generated.resources.label_artist
-import kmp_app_template.composeapp.generated.resources.label_credits
-import kmp_app_template.composeapp.generated.resources.label_date
-import kmp_app_template.composeapp.generated.resources.label_department
-import kmp_app_template.composeapp.generated.resources.label_dimensions
-import kmp_app_template.composeapp.generated.resources.label_medium
-import kmp_app_template.composeapp.generated.resources.label_repository
-import kmp_app_template.composeapp.generated.resources.label_title
+import com.on.turip.data.MuseumObject
+import com.on.turip.screens.EmptyScreenContent
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+import turip.composeapp.generated.resources.Res
+import turip.composeapp.generated.resources.label_artist
+import turip.composeapp.generated.resources.label_credits
+import turip.composeapp.generated.resources.label_date
+import turip.composeapp.generated.resources.label_department
+import turip.composeapp.generated.resources.label_dimensions
+import turip.composeapp.generated.resources.label_medium
+import turip.composeapp.generated.resources.label_repository
+import turip.composeapp.generated.resources.label_title
 
 @Composable
 fun DetailScreen(
@@ -80,9 +71,8 @@ private fun ObjectDetails(
                 title = {},
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(Res.string.back))
                     }
-                }
+                },
             )
         },
         modifier = modifier.windowInsetsPadding(WindowInsets.systemBars),
@@ -90,17 +80,8 @@ private fun ObjectDetails(
         Column(
             Modifier
                 .verticalScroll(rememberScrollState())
-                .padding(paddingValues)
+                .padding(paddingValues),
         ) {
-            AsyncImage(
-                model = obj.primaryImageSmall,
-                contentDescription = obj.title,
-                contentScale = ContentScale.FillWidth,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.LightGray)
-            )
-
             SelectionContainer {
                 Column(Modifier.padding(12.dp)) {
                     Text(obj.title, style = MaterialTheme.typography.headlineMedium)
@@ -133,7 +114,7 @@ private fun LabeledInfo(
                     append("$label: ")
                 }
                 append(data)
-            }
+            },
         )
     }
 }

@@ -1,76 +1,46 @@
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.BOOLEAN
+import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
 
 plugins {
-    alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidApplication)
-    alias(libs.plugins.composeMultiplatform)
-    alias(libs.plugins.composeCompiler)
-    alias(libs.plugins.kotlinxSerialization)
+    id("turip.convention.kmp.application")
 }
 
 kotlin {
-    androidTarget {
-        @OptIn(ExperimentalKotlinGradlePluginApi::class)
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
-        }
-    }
-
-    listOf(
-        iosX64(),
-        iosArm64(),
-        iosSimulatorArm64()
-    ).forEach { iosTarget ->
-        iosTarget.binaries.framework {
-            baseName = "ComposeApp"
-            isStatic = true
-        }
-    }
-
     sourceSets {
-        androidMain.dependencies {
-            implementation(libs.androidx.compose.ui.tooling.preview)
-            implementation(libs.androidx.activity.compose)
-            implementation(libs.ktor.client.okhttp)
-        }
-        iosMain.dependencies {
-            implementation(libs.ktor.client.darwin)
-        }
         commonMain.dependencies {
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.material3)
-            implementation(compose.ui)
-            implementation(compose.components.resources)
-            implementation(compose.components.uiToolingPreview)
-
-            implementation(libs.navigation.compose)
-            implementation(libs.lifecycle.runtime.compose)
-            implementation(libs.material.icons.core)
-
-            implementation(libs.ktor.client.core)
-            implementation(libs.ktor.client.content.negotiation)
-            implementation(libs.ktor.serialization.kotlinx.json)
-
-            implementation(libs.coil.compose)
-            implementation(libs.coil.network.ktor)
-            implementation(libs.koin.core)
-            implementation(libs.koin.compose.viewmodel)
         }
+    }
+}
+
+buildkonfig {
+    packageName = "com.on.turip"
+
+    defaultConfigs {
+        buildConfigField(BOOLEAN, "IS_DEBUG", "true")
+        buildConfigField(STRING, "SENTRY_DSN", "")
+    }
+
+    defaultConfigs("release") {
+        buildConfigField(BOOLEAN, "IS_DEBUG", "false")
+        buildConfigField(
+            STRING,
+            "SENTRY_DSN",
+            "${gradleLocalProperties(rootDir, providers).getProperty("sentry_dsn")}",
+        )
     }
 }
 
 android {
-    namespace = "com.jetbrains.kmpapp"
-    compileSdk = 35
+    namespace = "com.on.turip"
 
     defaultConfig {
-        applicationId = "com.jetbrains.kmpapp"
-        minSdk = 24
-        targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        applicationId = "com.on.turip"
+        versionCode =
+            libs.versions.versionCode
+                .get()
+                .toInt()
+        versionName = libs.versions.versionName.get()
     }
     packaging {
         resources {
@@ -78,16 +48,28 @@ android {
         }
     }
     buildTypes {
+        getByName("debug") {
+            isDebuggable = true
+            applicationIdSuffix = ".dev"
+            versionNameSuffix = ".dev"
+            manifestPlaceholders +=
+                mapOf(
+                    "appName" to "@string/app_name_dev",
+                )
+        }
+
         getByName("release") {
-            isMinifyEnabled = false
+            isDebuggable = false
+            isMinifyEnabled = true
+            isShrinkResources = true
+            manifestPlaceholders +=
+                mapOf(
+                    "appName" to "@string/app_name",
+                )
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
         }
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-}
-
-dependencies {
-    debugImplementation(libs.androidx.compose.ui.tooling)
 }

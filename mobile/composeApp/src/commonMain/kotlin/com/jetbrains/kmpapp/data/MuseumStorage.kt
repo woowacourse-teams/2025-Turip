@@ -1,4 +1,4 @@
-package com.jetbrains.kmpapp.data
+package com.on.turip.data
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,11 +19,10 @@ class InMemoryMuseumStorage : MuseumStorage {
         storedObjects.value = newObjects
     }
 
-    override fun getObjectById(objectId: Int): Flow<MuseumObject?> {
-        return storedObjects.map { objects ->
+    override fun getObjectById(objectId: Int): Flow<MuseumObject?> =
+        storedObjects.map { objects ->
             objects.find { it.objectID == objectId }
         }
-    }
 
     override fun getObjects(): Flow<List<MuseumObject>> = storedObjects
 }

@@ -1,4 +1,4 @@
-package com.jetbrains.kmpapp
+package com.on.turip
 
 import androidx.compose.ui.window.ComposeUIViewController
 

@@ -1,7 +1,5 @@
-rootProject.name = "KMP-App-Template"
-enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
-
 pluginManagement {
+    includeBuild("build-logic")
     repositories {
         google {
             mavenContent {
@@ -14,6 +12,8 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+rootProject.name = "Turip"
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 dependencyResolutionManagement {
     repositories {
