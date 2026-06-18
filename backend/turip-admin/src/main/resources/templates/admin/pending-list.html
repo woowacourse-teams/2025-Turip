@@ -118,6 +118,16 @@
             font-weight: 600;
             color: #444;
         }
+
+        .validator-name {
+            font-weight: 600;
+            color: #6e8efb;
+        }
+
+        .not-assigned {
+            color: #999;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
@@ -137,7 +147,8 @@
                 <tr>
                     <th style="width: 50px;">ID</th>
                     <th>영상 정보</th>
-                    <th style="width: 200px;">수집자</th>
+                    <th style="width: 150px;">수집자</th>
+                    <th style="width: 150px;">담당자</th>
                     <th style="width: 100px; text-align: center;">상태</th>
                     <th style="width: 120px; text-align: right;">관리</th>
                 </tr>
@@ -164,7 +175,7 @@
             const list = await res.json();
 
             if (list.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="text-center py-5 text-muted">검수 대기 중인 콘텐츠가 없습니다.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-5 text-muted">검수 대기 중인 콘텐츠가 없습니다.</td></tr>';
                 return;
             }
 
@@ -192,6 +203,16 @@
                 tdCollector.textContent = item.collectorNickname;
                 tr.appendChild(tdCollector);
 
+                const tdValidator = document.createElement('td');
+                if (item.validatorNickname) {
+                    tdValidator.className = 'validator-name';
+                    tdValidator.textContent = item.validatorNickname;
+                } else {
+                    tdValidator.className = 'not-assigned';
+                    tdValidator.textContent = '미배정';
+                }
+                tr.appendChild(tdValidator);
+
                 const tdStatus = document.createElement('td');
                 tdStatus.className = 'text-center';
                 const statusBadge = document.createElement('span');
@@ -213,7 +234,7 @@
             });
         } catch (e) {
             console.error("데이터 로드 실패:", e);
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-5 text-danger">⚠️ 데이터를 불러오는데 실패했습니다: ' + e.message + '</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center py-5 text-danger">⚠️ 데이터를 불러오는데 실패했습니다: ' + e.message + '</td></tr>';
         }
     }
 
