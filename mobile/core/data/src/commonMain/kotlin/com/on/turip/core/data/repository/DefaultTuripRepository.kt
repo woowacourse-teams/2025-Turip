@@ -36,7 +36,11 @@ class DefaultTuripRepository(
     override val turips: StateFlow<List<Turip>> = _turips.asStateFlow()
 
     override suspend fun loadTurip(turipId: Long): TuripResult<Turip> =
-        turipRestRemoteDataSource.getTurip(turipId).mapCatching { it.toDomain() }
+        turipRestRemoteDataSource.getTurip(turipId).mapCatching { it.toDomain() }.also { result ->
+            result.onSuccess { turip ->
+                _turips.update { current -> current.map { if (it.id == turip.id) turip else it } }
+            }
+        }
 
     override suspend fun loadTurips(): TuripResult<List<Turip>> =
         turipRestRemoteDataSource.getTurips().mapCatching { it.toDomain() }.also { result ->
