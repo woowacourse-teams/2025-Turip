@@ -40,6 +40,11 @@ public class AdminPendingContentController {
         return ResponseEntity.ok(adminContentPendingService.findByValidatorAccount(admin.getMember().getAccount()));
     }
 
+    @GetMapping("/my-count")
+    public ResponseEntity<Long> countMyPending(@AuthAdmin TuripMember admin) {
+        return ResponseEntity.ok(adminContentPendingService.countMyPending(admin.getMember().getAccount()));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ContentPendingResponse> findById(
             @AuthAdmin TuripMember admin,

@@ -59,6 +59,13 @@ public class AdminContentPendingService {
                 .toList();
     }
 
+    public long countMyPending(Account validatorAccount) {
+        return contentPendingRepository.countByStatusAndValidatorAccount(
+                ContentPendingStatus.PENDING,
+                validatorAccount
+        );
+    }
+
     public List<MyCollectContentResponse> getMyHistory(Account account) {
         return contentPendingRepository.findAllByCollectorAccountOrderByIdDesc(account)
                 .stream()
