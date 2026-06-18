@@ -49,6 +49,16 @@ public class AdminContentPendingService {
                 .toList();
     }
 
+    public List<PendingListResponse> findByValidatorAccount(Account validatorAccount) {
+        return contentPendingRepository.findAllByStatusAndValidatorAccountOrderByIdDesc(
+                        ContentPendingStatus.PENDING,
+                        validatorAccount
+                )
+                .stream()
+                .map(PendingListResponse::from)
+                .toList();
+    }
+
     public List<MyCollectContentResponse> getMyHistory(Account account) {
         return contentPendingRepository.findAllByCollectorAccountOrderByIdDesc(account)
                 .stream()

@@ -22,6 +22,11 @@ public interface ContentPendingRepository extends JpaRepository<ContentPending, 
 
     List<ContentPending> findAllByStatusOrderByIdDesc(ContentPendingStatus status);
 
+    List<ContentPending> findAllByStatusAndValidatorAccountOrderByIdDesc(
+            ContentPendingStatus status,
+            Account validatorAccount
+    );
+
     List<ContentPending> findAllByCollectorAccountOrderByIdDesc(Account collectorAccount);
 
     default boolean existsByVideoUrlAndStatus(String url, ContentPendingStatus status) {

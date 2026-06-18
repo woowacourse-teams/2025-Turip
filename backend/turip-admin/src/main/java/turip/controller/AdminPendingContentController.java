@@ -35,6 +35,11 @@ public class AdminPendingContentController {
         return ResponseEntity.ok(adminContentPendingService.findAll());
     }
 
+    @GetMapping("/my-list")
+    public ResponseEntity<List<PendingListResponse>> findMyPending(@AuthAdmin TuripMember admin) {
+        return ResponseEntity.ok(adminContentPendingService.findByValidatorAccount(admin.getMember().getAccount()));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ContentPendingResponse> findById(
             @AuthAdmin TuripMember admin,
