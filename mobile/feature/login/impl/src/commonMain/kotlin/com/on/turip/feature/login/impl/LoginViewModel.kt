@@ -99,9 +99,9 @@ class LoginViewModel(
         viewModelScope.launch {
             try {
                 appleCredentialManager
-                    .getIdToken()
-                    .onSuccess { idToken: String ->
-                        loginUseCase.loginWithApple(idToken)
+                    .getCredential()
+                    .onSuccess { credential: AppleCredential ->
+                        loginUseCase.loginWithApple(idToken = credential.idToken, nonce = credential.rawNonce)
                             .onSuccess { isMigrationDecided: Boolean ->
                                 if (!isMigrationDecided) {
                                     _uiState.update { it.copy(showMigrationDialog = true) }
@@ -123,7 +123,7 @@ class LoginViewModel(
 
                         handleError(errorType)
                         Napier.e(
-                            message = "appleCredentialManager 에서 IdToken 불러오기 실패. errorType=$errorType",
+                            message = "appleCredentialManager 에서 credential 불러오기 실패. errorType=$errorType",
                             throwable = cause,
                         )
                     }

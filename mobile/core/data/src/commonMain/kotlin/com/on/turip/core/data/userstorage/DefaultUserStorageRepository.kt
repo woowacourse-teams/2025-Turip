@@ -15,7 +15,8 @@ class DefaultUserStorageRepository(
     }
 
     override suspend fun loadId(): Result<TuripDeviceIdentifier> =
-        localDataSource.getId()
+        localDataSource
+            .getId()
             .map { fid -> fid?.let(::TuripDeviceIdentifier) ?: TuripDeviceIdentifier.EMPTY }
             .recoverCancellation()
 
@@ -26,10 +27,9 @@ class DefaultUserStorageRepository(
         localDataSource.getRefreshToken().recoverCancellation()
 
     override suspend fun createTokens(tokens: AuthTokens): Result<Unit> =
-        runCatching {
-            localDataSource.createAccessToken(tokens.accessToken).getOrThrow()
-            localDataSource.createRefreshToken(tokens.refreshToken).getOrThrow()
-        }.recoverCancellation()
+        localDataSource
+            .createTokens(tokens.accessToken, tokens.refreshToken)
+            .recoverCancellation()
 
     override suspend fun clearTokens(): Result<Unit> =
         localDataSource.deleteTokens().recoverCancellation()

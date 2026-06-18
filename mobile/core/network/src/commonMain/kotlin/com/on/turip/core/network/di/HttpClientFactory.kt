@@ -155,38 +155,28 @@ private fun HttpClientConfig<*>.headerInterceptor(
                 val storedRefreshToken: String =
                     tokenManager.currentTokens?.refreshToken ?: throw ApiException.Auth
 
+                // HTTP/SSE 두 클라이언트가 동시에 401을 받아도 TokenManager가 갱신을 직렬화한다.
                 // 리프레시 토큰으로 토큰 갱신 요청 API는 header 없도록 구성되어 있음(header 있을 경우 이미 만료된 엑세스 토큰이어서 401 발생)
-                authRepositoryProvider().requestTokens(storedRefreshToken).fold(
-                    onSuccess = { newTokens: AuthTokens ->
-                        Napier.d("refreshToken으로 토큰 재발급 성공")
-                        val currentRefreshToken = tokenManager.currentTokens?.refreshToken
-
-                        // 중단함수 처리 중 이미 토큰 재발급이 되었거나 제거가 발생했을 경우
-                        if (currentRefreshToken != storedRefreshToken) throw ApiException.Auth
-
-                        tokenManager.setTokens(newTokens).fold(
-                            onSuccess = {
-                                Napier.d("refreshToken으로 재발급 받은 토큰 저장 성공")
-                                BearerTokens(
-                                    accessToken = newTokens.accessToken,
-                                    refreshToken = newTokens.refreshToken,
-                                )
-                            },
-                            onFailure = {
-                                Napier.e("refreshToken으로 재발급 받은 토큰 저장 실패")
-                                throw ApiException.Auth
-                            },
-                        )
-                    },
-                    onFailure = { errorType ->
-                        Napier.e("refreshToken으로 토큰 재발급 실패 errorType = $errorType")
-                        when (errorType) {
-                            ErrorType.Network -> throw ApiException.Network
-                            is ErrorType.Auth -> throw ApiException.Auth
-                            else -> throw ApiException.Error(errorType)
-                        }
-                    },
-                )
+                tokenManager
+                    .refreshTokens(storedRefreshToken) { refreshToken ->
+                        authRepositoryProvider().requestTokens(refreshToken)
+                    }.fold(
+                        onSuccess = { newTokens: AuthTokens ->
+                            Napier.d("refreshToken으로 토큰 재발급 성공")
+                            BearerTokens(
+                                accessToken = newTokens.accessToken,
+                                refreshToken = newTokens.refreshToken,
+                            )
+                        },
+                        onFailure = { errorType ->
+                            Napier.e("refreshToken으로 토큰 재발급 실패 errorType = $errorType")
+                            when (errorType) {
+                                ErrorType.Network -> throw ApiException.Network
+                                is ErrorType.Auth -> throw ApiException.Auth
+                                else -> throw ApiException.Error(errorType)
+                            }
+                        },
+                    )
             }
         }
     }

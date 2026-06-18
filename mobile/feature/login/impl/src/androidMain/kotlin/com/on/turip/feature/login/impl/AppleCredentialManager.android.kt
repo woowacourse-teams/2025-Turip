@@ -12,7 +12,7 @@ internal actual fun rememberAppleCredentialManager(): AppleCredentialManager =
     }
 
 private class AndroidAppleCredentialManager : AppleCredentialManager {
-    override suspend fun getIdToken(): TuripResult<String> =
+    override suspend fun getCredential(): TuripResult<AppleCredential> =
         TuripResult.Failure(
             errorType = ErrorType.Cancelled,
             cause = UnsupportedOperationException("Apple login is only available on iOS."),

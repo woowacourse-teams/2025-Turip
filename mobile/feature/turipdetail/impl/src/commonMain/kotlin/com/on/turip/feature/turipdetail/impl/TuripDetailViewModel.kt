@@ -35,6 +35,7 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -80,6 +81,8 @@ class TuripDetailViewModel(
 
     private val commitMutex = Mutex()
 
+    private var sseJob: Job? = null
+
     init {
         registerDragEndEvents()
         registerStreamRefresh()
@@ -111,14 +114,18 @@ class TuripDetailViewModel(
     }
 
     private suspend fun loadSelectedTurip(selectedTuripId: Long) {
-        turipRepository.loadTurip(selectedTuripId).onSuccess { turip: Turip ->
-            _uiState.update { state: TuripDetailUiState ->
-                state.copy(
-                    errorUiState = ErrorUiState.None,
-                    selectedTurip = turip.toUiMyTuripModel(),
-                )
+        turipRepository
+            .loadTurip(selectedTuripId)
+            .onSuccess { turip: Turip ->
+                _uiState.update { state: TuripDetailUiState ->
+                    state.copy(
+                        errorUiState = ErrorUiState.None,
+                        selectedTurip = turip.toUiMyTuripModel(),
+                    )
+                }
+            }.onFailure { errorType ->
+                handleLoadFailure("loadSelectedTurip", errorType)
             }
-        }
     }
 
     fun loadPlaces(selectedTuripId: Long) {
@@ -154,6 +161,8 @@ class TuripDetailViewModel(
                     } else {
                         clearSnapshots()
                     }
+                }.onFailure { errorType ->
+                    handleLoadFailure("loadPlaces", errorType)
                 }
         }
     }
@@ -166,12 +175,39 @@ class TuripDetailViewModel(
                     _uiState.update {
                         it.copy(members = members.map { member -> member.nickName }.toImmutableList())
                     }
+                }.onFailure { errorType ->
+                    handleLoadFailure("loadMembers", errorType)
                 }
         }
     }
 
+    private fun handleLoadFailure(
+        source: String,
+        errorType: ErrorType,
+    ) {
+        Napier.e("$source 실패. turipId=$selectedTuripId, errorType=$errorType")
+        when (errorType.toUiError()) {
+            UiError.Global.TokenExpired -> {
+                viewModelScope.launch {
+                    sessionManager.switchToGuest()
+                    _uiEffect.send(TuripDetailUiEffect.NavigateToLogin)
+                }
+            }
+
+            UiError.Global.Network ->
+                _uiState.update { it.copy(isLoading = false, errorUiState = ErrorUiState.Network) }
+
+            UiError.Global.Server ->
+                _uiState.update { it.copy(isLoading = false, errorUiState = ErrorUiState.Server) }
+
+            else ->
+                _uiState.update { it.copy(isLoading = false, errorUiState = ErrorUiState.Unexpected) }
+        }
+    }
+
     private fun observeTuripStream(turipId: Long) {
-        viewModelScope.launch {
+        sseJob?.cancel()
+        sseJob = viewModelScope.launch {
             observeTuripStreamUseCase(turipId)
                 .collect { result ->
                     when (result) {
@@ -478,13 +514,13 @@ class TuripDetailViewModel(
     }
 
     fun updateSelectedPlace(placeId: Long) {
-        _uiState.update { turipDetailUiState: TuripDetailUiState ->
-            turipDetailUiState.copy(
-                selectedPlace =
-                    _uiState.value.placesLatLng.find { it.placeId == placeId }
-                        ?: throw IllegalStateException("장소를 찾을 수 없습니다."),
-            )
-        }
+        val place =
+            uiState.value.placesLatLng.find { it.placeId == placeId }
+                ?: run {
+                    Napier.e("선택한 장소를 찾을 수 없어요. placeId = $placeId")
+                    return
+                }
+        _uiState.update { it.copy(selectedPlace = place) }
     }
 
     fun showMoreOptionBottomSheet() = _uiState.update { it.copy(showMoreOptionBottomSheet = true) }
@@ -583,6 +619,7 @@ class TuripDetailViewModel(
                                     selectedTurip = state.selectedTurip.copy(type = TuripType.TOGETHER),
                                 )
                             }
+                            observeTuripStream(selectedTuripId)
                             _uiEffect.send(
                                 TuripDetailUiEffect.ShareTuripInvitationLink(
                                     invitationLink = token.toUrl(),
@@ -751,6 +788,11 @@ class TuripDetailViewModel(
             this == '_' ||
             this == '.' ||
             this == '~'
+
+    override fun onCleared() {
+        sseJob?.cancel()
+        super.onCleared()
+    }
 
     companion object {
         private const val INVALID_ID = -1L

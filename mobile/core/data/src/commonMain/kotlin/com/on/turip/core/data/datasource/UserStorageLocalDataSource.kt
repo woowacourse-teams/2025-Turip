@@ -5,11 +5,13 @@ interface UserStorageLocalDataSource {
 
     suspend fun getId(): Result<String?>
 
-    suspend fun createAccessToken(accessToken: String): Result<Unit>
+    /**
+     * access/refresh 토큰을 단일 트랜잭션(하나의 edit 블록)으로 저장하여
+     * 둘 중 하나만 쓰인 불일치 상태가 영속되지 않도록 한다.
+     */
+    suspend fun createTokens(accessToken: String, refreshToken: String): Result<Unit>
 
     suspend fun getAccessToken(): Result<String?>
-
-    suspend fun createRefreshToken(refreshToken: String): Result<Unit>
 
     suspend fun getRefreshToken(): Result<String>
 

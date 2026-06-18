@@ -72,7 +72,7 @@ private class IosGoogleCredentialManager :
                 redirectUri = redirectUri,
                 state = state,
                 nonce = nonce,
-                codeChallenge = codeVerifier,
+                codeChallenge = sha256Base64Url(codeVerifier),
             )
 
         val authorizationCode =
@@ -199,7 +199,7 @@ private fun buildGoogleAuthorizationUrl(
         "&state=${state.urlEncode()}" +
         "&nonce=${nonce.urlEncode()}" +
         "&code_challenge=${codeChallenge.urlEncode()}" +
-        "&code_challenge_method=plain" +
+        "&code_challenge_method=S256" +
         "&prompt=select_account"
 
 private suspend fun exchangeAuthorizationCodeForIdToken(
@@ -325,6 +325,25 @@ private fun String.urlDecode(): String =
 
 private fun createPkceCodeVerifier(): String =
     "${NSUUID().UUIDString()}-${NSUUID().UUIDString()}"
+
+private fun sha256Base64Url(input: String): String = base64UrlEncode(sha256Digest(input))
+
+private fun base64UrlEncode(bytes: ByteArray): String {
+    val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
+    val sb = StringBuilder()
+    var i = 0
+    while (i < bytes.size) {
+        val b0 = bytes[i].toInt() and 0xFF
+        val b1 = if (i + 1 < bytes.size) bytes[i + 1].toInt() and 0xFF else 0
+        val b2 = if (i + 2 < bytes.size) bytes[i + 2].toInt() and 0xFF else 0
+        sb.append(chars[b0 shr 2])
+        sb.append(chars[((b0 and 0x3) shl 4) or (b1 shr 4)])
+        if (i + 1 < bytes.size) sb.append(chars[((b1 and 0xF) shl 2) or (b2 shr 6)])
+        if (i + 2 < bytes.size) sb.append(chars[b2 and 0x3F])
+        i += 3
+    }
+    return sb.toString()
+}
 
 private fun isUrlSchemeRegistered(scheme: String): Boolean {
     val urlTypes = NSBundle.mainBundle.objectForInfoDictionaryKey("CFBundleURLTypes") as? NSArray

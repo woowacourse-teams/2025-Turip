@@ -16,8 +16,8 @@ class LoginUseCase(
     suspend operator fun invoke(idToken: String): TuripResult<Boolean> =
         handleLoginResult(authRepository.login(idToken))
 
-    suspend fun loginWithApple(idToken: String): TuripResult<Boolean> =
-        handleLoginResult(authRepository.loginWithApple(idToken))
+    suspend fun loginWithApple(idToken: String, nonce: String): TuripResult<Boolean> =
+        handleLoginResult(authRepository.loginWithApple(idToken = idToken, nonce = nonce))
 
     private suspend fun handleLoginResult(loginResult: TuripResult<AuthResult>): TuripResult<Boolean> =
         when (loginResult) {

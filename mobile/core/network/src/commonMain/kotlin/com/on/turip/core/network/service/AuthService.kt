@@ -1,6 +1,7 @@
 package com.on.turip.core.network.service
 
 import com.on.turip.core.network.ApiPath
+import com.on.turip.core.data.dto.login.AppleLoginIdTokenPostRequest
 import com.on.turip.core.data.dto.login.LoginIdTokenPostRequest
 import com.on.turip.core.data.dto.login.LoginJwtTokenResponse
 import com.on.turip.core.data.dto.login.ReissueTokenRequest
@@ -17,7 +18,7 @@ interface AuthService {
 
     @POST(ApiPath.V1 + "auth/login/apple")
     suspend fun postAppleIdToken(
-        @Body loginIdTokenPostRequest: LoginIdTokenPostRequest,
+        @Body appleLoginIdTokenPostRequest: AppleLoginIdTokenPostRequest,
     ): LoginJwtTokenResponse
 
     @POST(ApiPath.V1 + "auth/tokens")

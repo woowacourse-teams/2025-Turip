@@ -3,6 +3,7 @@ package com.on.turip.core.network.datasourceimpl
 import com.on.turip.core.common.safeApiCall
 import com.on.turip.core.model.result.TuripResult
 import com.on.turip.core.data.datasource.AuthRemoteDataSource
+import com.on.turip.core.data.dto.login.AppleLoginIdTokenPostRequest
 import com.on.turip.core.data.dto.login.LoginIdTokenPostRequest
 import com.on.turip.core.data.dto.login.LoginJwtTokenResponse
 import com.on.turip.core.network.service.AuthService
@@ -23,10 +24,10 @@ class DefaultAuthRemoteDataSource(
             }
         }
 
-    override suspend fun postAppleIdToken(idToken: String): TuripResult<LoginJwtTokenResponse> =
+    override suspend fun postAppleIdToken(idToken: String, nonce: String): TuripResult<LoginJwtTokenResponse> =
         withContext(coroutineContext) {
             safeApiCall {
-                noAuthAuthService.postAppleIdToken(LoginIdTokenPostRequest(idToken))
+                noAuthAuthService.postAppleIdToken(AppleLoginIdTokenPostRequest(idToken = idToken, nonce = nonce))
             }
         }
 

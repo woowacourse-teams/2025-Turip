@@ -6,7 +6,7 @@ import com.on.turip.core.data.dto.login.LoginJwtTokenResponse
 interface AuthRemoteDataSource {
     suspend fun postIdToken(idToken: String): TuripResult<LoginJwtTokenResponse>
 
-    suspend fun postAppleIdToken(idToken: String): TuripResult<LoginJwtTokenResponse>
+    suspend fun postAppleIdToken(idToken: String, nonce: String): TuripResult<LoginJwtTokenResponse>
 
     suspend fun verifyToken(): TuripResult<Unit>
 }

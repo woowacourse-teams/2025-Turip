@@ -20,6 +20,7 @@ import platform.AuthenticationServices.ASAuthorizationControllerDelegateProtocol
 import platform.AuthenticationServices.ASAuthorizationControllerPresentationContextProvidingProtocol
 import platform.AuthenticationServices.ASAuthorizationScopeEmail
 import platform.Foundation.NSError
+import platform.Foundation.NSUUID
 import platform.Foundation.NSString
 import platform.Foundation.NSUTF8StringEncoding
 import platform.Foundation.create
@@ -38,17 +39,22 @@ private class IosAppleCredentialManager : AppleCredentialManager {
     private var authorizationController: ASAuthorizationController? = null
     private var authorizationDelegate: AppleAuthorizationDelegate? = null
 
-    override suspend fun getIdToken(): TuripResult<String> =
+    override suspend fun getCredential(): TuripResult<AppleCredential> =
         suspendCancellableCoroutine { continuation ->
+            val rawNonce = generateRawNonce()
+            val hashedNonce = sha256(rawNonce)
+
             val request =
                 ASAuthorizationAppleIDProvider()
                     .createRequest()
                     .apply {
                         requestedScopes = listOf(ASAuthorizationScopeEmail)
+                        nonce = hashedNonce
                     }
             val controller = ASAuthorizationController(authorizationRequests = listOf(request))
             val delegate =
                 AppleAuthorizationDelegate(
+                    rawNonce = rawNonce,
                     onCompleted = { result ->
                         authorizationController = null
                         authorizationDelegate = null
@@ -72,8 +78,15 @@ private class IosAppleCredentialManager : AppleCredentialManager {
         }
 }
 
+private fun generateRawNonce(): String =
+    NSUUID().UUIDString().replace("-", "") + NSUUID().UUIDString().replace("-", "")
+
+private fun sha256(input: String): String =
+    sha256Digest(input).joinToString("") { (it.toInt() and 0xff).toString(16).padStart(2, '0') }
+
 private class AppleAuthorizationDelegate(
-    private val onCompleted: (TuripResult<String>) -> Unit,
+    private val rawNonce: String,
+    private val onCompleted: (TuripResult<AppleCredential>) -> Unit,
 ) : NSObject(),
     ASAuthorizationControllerDelegateProtocol,
     ASAuthorizationControllerPresentationContextProvidingProtocol {
@@ -94,7 +107,7 @@ private class AppleAuthorizationDelegate(
                     cause = IllegalStateException("Apple id token is missing."),
                 )
             } else {
-                TuripResult.Success(idToken)
+                TuripResult.Success(AppleCredential(idToken = idToken, rawNonce = rawNonce))
             },
         )
     }
@@ -127,6 +140,7 @@ private class AppleAuthorizationDelegate(
             ),
         )
     }
+
 
     @OptIn(ExperimentalForeignApi::class)
     override fun presentationAnchorForAuthorizationController(

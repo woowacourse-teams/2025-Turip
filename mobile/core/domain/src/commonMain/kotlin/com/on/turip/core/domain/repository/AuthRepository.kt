@@ -8,7 +8,7 @@ import com.on.turip.core.model.result.TuripResult
 interface AuthRepository {
     suspend fun login(idToken: String): TuripResult<AuthResult>
 
-    suspend fun loginWithApple(idToken: String): TuripResult<AuthResult>
+    suspend fun loginWithApple(idToken: String, nonce: String): TuripResult<AuthResult>
 
     suspend fun requestTokens(refreshToken: String): TuripResult<AuthTokens>
 

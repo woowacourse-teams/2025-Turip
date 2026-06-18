@@ -34,10 +34,13 @@ class DefaultUserStorageLocalDataSource(
             }
         }
 
-    override suspend fun createAccessToken(accessToken: String): Result<Unit> =
+    override suspend fun createTokens(accessToken: String, refreshToken: String): Result<Unit> =
         runCatching {
             withContext(coroutineContext) {
-                userStorage.edit { prefs -> prefs[accessTokenKey] = accessToken }
+                userStorage.edit { prefs ->
+                    prefs[accessTokenKey] = accessToken
+                    prefs[refreshTokenKey] = refreshToken
+                }
             }
             Unit
         }
@@ -47,14 +50,6 @@ class DefaultUserStorageLocalDataSource(
             withContext(coroutineContext) {
                 userStorage.data.first()[accessTokenKey]
             }
-        }
-
-    override suspend fun createRefreshToken(refreshToken: String): Result<Unit> =
-        runCatching {
-            withContext(coroutineContext) {
-                userStorage.edit { prefs -> prefs[refreshTokenKey] = refreshToken }
-            }
-            Unit
         }
 
     override suspend fun getRefreshToken(): Result<String> =
