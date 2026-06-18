@@ -16,8 +16,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.on.turip.core.designsystem.component.TuripDialog
-import com.on.turip.core.designsystem.generated.resources.Res
 import com.on.turip.core.designsystem.generated.resources.*
+import com.on.turip.core.designsystem.generated.resources.Res
 import com.on.turip.core.designsystem.theme.TuripTheme
 import com.on.turip.core.ui.util.formatResource
 import kotlinx.coroutines.flow.collectLatest

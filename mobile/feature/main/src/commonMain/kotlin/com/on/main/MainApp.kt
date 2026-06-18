@@ -32,12 +32,12 @@ import com.on.turip.core.navigation.Navigator
 import com.on.turip.core.navigation.rememberNavigationState
 import com.on.turip.core.navigation.toEntries
 import com.on.turip.feature.home.api.HomeNavKey
+import com.on.turip.feature.invitation.api.InvitationEntryNavKey
+import com.on.turip.feature.login.api.LoginNavKey
 import com.on.turip.feature.main.component.ExitConfirmationHandler
 import com.on.turip.feature.main.component.LocalSystemBarStyleController
 import com.on.turip.feature.main.component.SystemBarStyleEffect
 import com.on.turip.feature.main.component.TuripNavigationBar
-import com.on.turip.feature.invitation.api.InvitationEntryNavKey
-import com.on.turip.feature.login.api.LoginNavKey
 import com.on.turip.feature.main.navigation.SavedStateConfigurationProvider
 import com.on.turip.feature.main.navigation.TopLevel
 import com.on.turip.feature.main.navigation.appScreens

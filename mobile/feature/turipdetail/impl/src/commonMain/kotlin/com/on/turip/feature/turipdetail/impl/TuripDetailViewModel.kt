@@ -194,14 +194,17 @@ class TuripDetailViewModel(
                 }
             }
 
-            UiError.Global.Network ->
+            UiError.Global.Network -> {
                 _uiState.update { it.copy(isLoading = false, errorUiState = ErrorUiState.Network) }
+            }
 
-            UiError.Global.Server ->
+            UiError.Global.Server -> {
                 _uiState.update { it.copy(isLoading = false, errorUiState = ErrorUiState.Server) }
+            }
 
-            else ->
+            else -> {
                 _uiState.update { it.copy(isLoading = false, errorUiState = ErrorUiState.Unexpected) }
+            }
         }
     }
 
@@ -282,7 +285,9 @@ class TuripDetailViewModel(
             }
 
             is TuripStreamEvent.MemberUpdate -> {
-                Napier.d("튜립 SSE 멤버 업데이트 수신: turipId=${event.turipId}, action=${event.action}, memberCount=${event.memberCount}, eventId=${event.id}")
+                Napier.d(
+                    "튜립 SSE 멤버 업데이트 수신: turipId=${event.turipId}, action=${event.action}, memberCount=${event.memberCount}, eventId=${event.id}",
+                )
                 requestRefresh(turip = true, places = false)
                 loadMembers()
             }

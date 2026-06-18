@@ -1,10 +1,10 @@
 package com.on.turip.core.network.datasourceimpl
 
 import com.on.turip.core.common.safeApiCall
-import com.on.turip.core.model.result.TuripResult
 import com.on.turip.core.data.datasource.AuthRefreshRemoteDataSource
 import com.on.turip.core.data.dto.login.ReissueTokenRequest
 import com.on.turip.core.data.dto.login.ReissueTokenResponse
+import com.on.turip.core.model.result.TuripResult
 import com.on.turip.core.network.service.AuthService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO

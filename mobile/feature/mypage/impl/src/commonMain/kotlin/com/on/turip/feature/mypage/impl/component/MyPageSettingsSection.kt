@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.on.turip.core.designsystem.generated.resources.Res
 import com.on.turip.core.designsystem.generated.resources.ic_account
@@ -25,6 +24,7 @@ import com.on.turip.core.designsystem.generated.resources.my_page_settings_title
 import com.on.turip.core.designsystem.generated.resources.my_page_withdraw
 import com.on.turip.core.designsystem.theme.TuripTheme
 import com.on.turip.core.domain.session.SessionState
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun MyPageSettingsSection(

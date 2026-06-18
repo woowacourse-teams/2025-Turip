@@ -86,10 +86,12 @@ object InvitationTokenParser {
                             i++
                         }
                     }
+
                     '+' -> {
                         bytes.add(' '.code.toByte())
                         i++
                     }
+
                     else -> {
                         bytes.addAll(c.toString().encodeToByteArray().toList())
                         i++

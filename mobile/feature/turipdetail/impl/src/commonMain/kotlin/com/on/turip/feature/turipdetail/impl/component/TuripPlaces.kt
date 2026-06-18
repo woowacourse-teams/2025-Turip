@@ -27,8 +27,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import com.on.turip.core.designsystem.generated.resources.Res
 import com.on.turip.core.designsystem.generated.resources.*
+import com.on.turip.core.designsystem.generated.resources.Res
 import com.on.turip.core.designsystem.theme.TuripTheme
 import com.on.turip.feature.turipdetail.impl.model.MapModel
 import com.on.turip.feature.turipdetail.impl.model.TuripPlaceModel

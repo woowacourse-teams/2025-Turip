@@ -52,7 +52,10 @@ internal actual fun PlatformTuripMap(
 
         val update =
             when (places.size) {
-                1 -> CameraUpdateFactory.newLatLngZoom(places.first().toLatLng(), 18f)
+                1 -> {
+                    CameraUpdateFactory.newLatLngZoom(places.first().toLatLng(), 18f)
+                }
+
                 else -> {
                     val bounds =
                         LatLngBounds

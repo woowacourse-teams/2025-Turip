@@ -1,9 +1,9 @@
 package com.on.turip.core.local.di
 
-import com.on.turip.core.domain.fid.DeviceFidManager
 import com.on.turip.core.data.datasource.DeferredDeepLinkLocalDataSource
 import com.on.turip.core.data.datasource.SearchHistoryDataSource
 import com.on.turip.core.data.datasource.UserStorageLocalDataSource
+import com.on.turip.core.domain.fid.DeviceFidManager
 import com.on.turip.core.local.datasourceimpl.DefaultDeferredDeepLinkLocalDataSource
 import com.on.turip.core.local.datasourceimpl.DefaultSearchHistoryDataSource
 import com.on.turip.core.local.datasourceimpl.DefaultUserStorageLocalDataSource

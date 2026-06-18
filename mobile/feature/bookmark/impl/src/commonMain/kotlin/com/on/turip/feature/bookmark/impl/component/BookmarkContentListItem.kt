@@ -14,13 +14,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
+import com.on.turip.core.designsystem.theme.TuripTheme
 import com.on.turip.core.model.bookmark.BookmarkContent
 import com.on.turip.core.model.content.Content
 import com.on.turip.core.model.content.video.VideoData
 import com.on.turip.core.model.creator.Creator
 import com.on.turip.core.model.region.City
 import com.on.turip.core.model.trip.TripDuration
-import com.on.turip.core.designsystem.theme.TuripTheme
 
 @Composable
 fun BookmarkContentListItem(

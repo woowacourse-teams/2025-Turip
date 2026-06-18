@@ -23,15 +23,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.on.turip.core.designsystem.generated.resources.Res
-import com.on.turip.core.designsystem.generated.resources.*
 import com.on.turip.core.designsystem.component.TuripAppBar
+import com.on.turip.core.designsystem.generated.resources.*
+import com.on.turip.core.designsystem.generated.resources.Res
 import com.on.turip.core.designsystem.theme.TuripTheme
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun SearchAppBar(

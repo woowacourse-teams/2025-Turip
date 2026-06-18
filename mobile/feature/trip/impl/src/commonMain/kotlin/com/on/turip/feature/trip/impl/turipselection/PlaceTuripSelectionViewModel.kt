@@ -137,7 +137,9 @@ class PlaceTuripSelectionViewModel(
 
     fun updateTuripsByPlace() {
         viewModelScope.launch {
-            val selectedTuripIds = uiState.value.turips.filter { it.isSelected }.map { it.id }
+            val selectedTuripIds = uiState.value.turips
+                .filter { it.isSelected }
+                .map { it.id }
             val placeId = uiState.value.selectionPlaceId
 
             turipRepository

@@ -5,12 +5,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.on.turip.core.designsystem.generated.resources.Res
 import com.on.turip.core.designsystem.generated.resources.region_type_buttons_abroad
 import com.on.turip.core.designsystem.generated.resources.region_type_buttons_domestic
 import com.on.turip.core.designsystem.theme.TuripTheme
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun RegionTypeButtons(

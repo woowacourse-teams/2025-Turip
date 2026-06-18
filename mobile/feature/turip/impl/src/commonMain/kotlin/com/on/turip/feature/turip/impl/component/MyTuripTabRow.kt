@@ -18,12 +18,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.on.turip.core.designsystem.theme.TuripTheme
 import com.on.turip.feature.turip.impl.model.MyTuripTab
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun MyTuripTabRow(

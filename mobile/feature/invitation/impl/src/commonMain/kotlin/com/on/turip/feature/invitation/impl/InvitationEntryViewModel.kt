@@ -176,6 +176,7 @@ class InvitationEntryViewModel(
     private fun invalidInvitationTarget(): InvalidInvitationTarget =
         when (sessionState.value) {
             SessionState.Member -> InvalidInvitationTarget.Home
+
             SessionState.Guest,
             SessionState.Uninitialized,
             -> InvalidInvitationTarget.Login

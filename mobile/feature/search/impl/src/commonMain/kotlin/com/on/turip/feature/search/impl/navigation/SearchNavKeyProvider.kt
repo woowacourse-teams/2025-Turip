@@ -4,11 +4,11 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import com.on.turip.core.navigation.NavKeyProvider
 import com.on.turip.core.navigation.Navigator
+import com.on.turip.feature.login.api.LoginNavKey
 import com.on.turip.feature.search.api.RegionResultNavKey
 import com.on.turip.feature.search.api.SearchNavKey
 import com.on.turip.feature.search.impl.keyword.SearchScreen
 import com.on.turip.feature.search.impl.regionresult.RegionResultScreen
-import com.on.turip.feature.login.api.LoginNavKey
 import com.on.turip.feature.trip.api.TripDetailNavKey
 import kotlinx.serialization.modules.PolymorphicModuleBuilder
 

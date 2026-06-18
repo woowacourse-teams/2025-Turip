@@ -13,13 +13,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.on.turip.core.designsystem.generated.resources.Res
+import com.on.turip.core.designsystem.theme.TuripTheme
 import com.on.turip.core.model.content.Content
 import com.on.turip.core.model.content.video.VideoData
 import com.on.turip.core.model.creator.Creator
 import com.on.turip.core.model.region.City
-import com.on.turip.core.designsystem.theme.TuripTheme
-import com.on.turip.feature.home.impl.model.UsersLikeContentModel
 import com.on.turip.core.model.trip.TripDuration
+import com.on.turip.feature.home.impl.model.UsersLikeContentModel
 
 @Composable
 fun UsersLikeList(

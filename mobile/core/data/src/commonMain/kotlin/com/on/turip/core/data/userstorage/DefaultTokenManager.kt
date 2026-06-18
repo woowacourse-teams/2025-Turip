@@ -74,7 +74,7 @@ class DefaultTokenManager(
             }
 
             when (val result = requestNewTokens(requestRefreshToken)) {
-                is TuripResult.Success ->
+                is TuripResult.Success -> {
                     setTokens(result.value).fold(
                         onSuccess = {
                             Napier.d("refreshToken으로 재발급 받은 토큰 저장 성공")
@@ -85,8 +85,11 @@ class DefaultTokenManager(
                             TuripResult.Failure(ErrorType.Auth.UnAuthorized, throwable)
                         },
                     )
+                }
 
-                is TuripResult.Failure -> result
+                is TuripResult.Failure -> {
+                    result
+                }
             }
         }
 

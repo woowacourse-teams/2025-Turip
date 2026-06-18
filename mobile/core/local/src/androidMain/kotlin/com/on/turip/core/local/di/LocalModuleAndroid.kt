@@ -15,11 +15,11 @@ import org.koin.dsl.module
 val localModuleAndroid = module {
     single<TuripDatabase> {
         val context = androidContext()
-        Room.databaseBuilder<TuripDatabase>(
-            context = context,
-            name = context.getDatabasePath("turip.db").absolutePath,
-        )
-            .setDriver(BundledSQLiteDriver())
+        Room
+            .databaseBuilder<TuripDatabase>(
+                context = context,
+                name = context.getDatabasePath("turip.db").absolutePath,
+            ).setDriver(BundledSQLiteDriver())
             .build()
     }
 

@@ -1,7 +1,7 @@
 package com.on.turip.core.network.sse
 
-import com.on.turip.core.model.turip.TuripStreamEvent
 import com.on.turip.core.data.dto.sse.TuripStreamConnectPayload
+import com.on.turip.core.model.turip.TuripStreamEvent
 import com.on.turip.data.turip.stream.TuripStreamFolderUpdatePayload
 import com.on.turip.data.turip.stream.TuripStreamHeartbeatPayload
 import com.on.turip.data.turip.stream.TuripStreamMemberUpdatePayload

@@ -52,16 +52,14 @@ fun buildDefaultHttpClient(
     tokenManager: TokenManager,
     authRepositoryProvider: () -> AuthRepository,
     deviceFidProvider: () -> String?,
-): HttpClient {
-    return createDefaultEngine {
-        expectSuccess = true
+): HttpClient = createDefaultEngine {
+    expectSuccess = true
 
-        timeoutInterceptor()
-        loggingInterceptor(isDebug)
-        contentNegotiationInterceptor()
-        defaultRequestInterceptor(baseUrl, deviceFidProvider)
-        headerInterceptor(tokenManager, authRepositoryProvider)
-    }
+    timeoutInterceptor()
+    loggingInterceptor(isDebug)
+    contentNegotiationInterceptor()
+    defaultRequestInterceptor(baseUrl, deviceFidProvider)
+    headerInterceptor(tokenManager, authRepositoryProvider)
 }
 
 fun buildNoAuthHttpClient(

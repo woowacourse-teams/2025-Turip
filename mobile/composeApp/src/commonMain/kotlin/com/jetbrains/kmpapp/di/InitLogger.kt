@@ -55,7 +55,9 @@ private class SentryAntilog : Antilog() {
                 Sentry.addBreadcrumb(breadcrumb)
             }
 
-            else -> Unit
+            else -> {
+                Unit
+            }
         }
     }
 }

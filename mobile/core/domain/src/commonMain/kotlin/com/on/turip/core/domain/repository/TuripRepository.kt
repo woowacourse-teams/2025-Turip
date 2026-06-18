@@ -1,7 +1,7 @@
 package com.on.turip.core.domain.repository
 
-import com.on.turip.core.model.result.TuripResult
 import com.on.turip.core.model.bookmark.TuripPlace
+import com.on.turip.core.model.result.TuripResult
 import com.on.turip.core.model.turip.Turip
 import com.on.turip.core.model.turip.TuripInvitationInformation
 import com.on.turip.core.model.turip.TuripInvitationToken

@@ -1,7 +1,7 @@
 package com.on.turip.core.navigation
 
-import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.NavBackStack
+import androidx.navigation3.runtime.NavKey
 import io.github.aakira.napier.Napier
 import kotlin.collections.get
 import kotlin.text.clear
@@ -37,6 +37,7 @@ class Navigator(
             add(key)
         }
     }
+
     fun goWithAllClear(
         key: NavKey,
         parentTopLevelKey: NavKey = state.startKey,

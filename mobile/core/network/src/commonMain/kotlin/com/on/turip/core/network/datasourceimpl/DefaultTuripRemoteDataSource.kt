@@ -1,7 +1,6 @@
 package com.on.turip.core.network.datasourceimpl
 
 import com.on.turip.core.common.safeApiCall
-import com.on.turip.core.model.result.TuripResult
 import com.on.turip.core.data.datasource.TuripRemoteDataSource
 import com.on.turip.core.data.dto.turip.PlaceTuripsRequest
 import com.on.turip.core.data.dto.turip.TuripCreationResponse
@@ -16,6 +15,7 @@ import com.on.turip.core.data.dto.turip.TuripPostRequest
 import com.on.turip.core.data.dto.turip.TuripResponse
 import com.on.turip.core.data.dto.turip.TuripsByPlaceResponse
 import com.on.turip.core.data.dto.turip.TuripsResponse
+import com.on.turip.core.model.result.TuripResult
 import com.on.turip.core.network.service.TuripService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO

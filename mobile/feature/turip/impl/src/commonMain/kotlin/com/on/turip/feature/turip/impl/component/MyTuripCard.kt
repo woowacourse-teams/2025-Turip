@@ -36,8 +36,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalHapticFeedback
-import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -47,14 +45,16 @@ import com.on.turip.core.designsystem.generated.resources.ic_remove
 import com.on.turip.core.designsystem.generated.resources.ic_together_folder
 import com.on.turip.core.designsystem.generated.resources.turip_card_solo_turip
 import com.on.turip.core.designsystem.generated.resources.turip_card_together_turip
-import com.on.turip.core.model.turip.TuripType
 import com.on.turip.core.designsystem.theme.TuripTheme
+import com.on.turip.core.model.turip.TuripType
 import com.on.turip.feature.turip.impl.model.MyTuripModel
 import com.on.turip.feature.turip.impl.model.TuripChipIconModel
 import com.on.turip.feature.turip.impl.model.TuripChipModel
-import kotlin.time.TimeSource
 import kotlinx.coroutines.withTimeoutOrNull
 import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
+import kotlin.time.TimeSource
 
 private const val LONG_PRESS_DELAY_MS = 800L
 

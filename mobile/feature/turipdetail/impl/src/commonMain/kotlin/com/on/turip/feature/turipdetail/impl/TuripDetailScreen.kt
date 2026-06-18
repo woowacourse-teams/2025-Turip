@@ -243,7 +243,9 @@ fun TuripDetailScreen(
                 if (isTogetherTurip) Res.string.bottom_sheet_turip_leave_title else Res.string.bottom_sheet_turip_remove_title,
             ).formatResource(uiState.selectedTurip.name)
         val confirmText =
-            stringResource(if (isTogetherTurip) Res.string.bottom_sheet_turip_leave_approve else Res.string.bottom_sheet_turip_remove_approve)
+            stringResource(
+                if (isTogetherTurip) Res.string.bottom_sheet_turip_leave_approve else Res.string.bottom_sheet_turip_remove_approve,
+            )
 
         TuripDialog(
             title = title,

@@ -1,8 +1,8 @@
 package com.on.turip.feature.trip.impl.model
 
 import androidx.compose.runtime.Stable
-import com.on.turip.core.designsystem.generated.resources.Res
 import com.on.turip.core.designsystem.generated.resources.*
+import com.on.turip.core.designsystem.generated.resources.Res
 import com.on.turip.core.model.trip.MapType
 import org.jetbrains.compose.resources.DrawableResource
 

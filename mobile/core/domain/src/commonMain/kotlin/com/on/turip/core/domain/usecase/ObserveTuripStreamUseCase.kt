@@ -46,7 +46,9 @@ class ObserveTuripStreamUseCase(
                                         streamFailure = eventResult
                                     }
 
-                                    is TuripStreamResult.Reconnecting -> Unit
+                                    is TuripStreamResult.Reconnecting -> {
+                                        Unit
+                                    }
                                 }
                             }
                     }
@@ -135,7 +137,9 @@ class ObserveTuripStreamUseCase(
         when (errorType) {
             ErrorType.Network,
             ErrorType.Unknown,
-            -> true
+            -> {
+                true
+            }
 
             else -> {
                 Napier.e("튜립 SSE 에러로 스트림을 중단합니다. turipId=$turipId, errorType=$errorType")

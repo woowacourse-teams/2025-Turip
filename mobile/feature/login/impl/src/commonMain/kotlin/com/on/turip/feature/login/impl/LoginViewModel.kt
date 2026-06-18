@@ -101,7 +101,8 @@ class LoginViewModel(
                 appleCredentialManager
                     .getCredential()
                     .onSuccess { credential: AppleCredential ->
-                        loginUseCase.loginWithApple(idToken = credential.idToken, nonce = credential.rawNonce)
+                        loginUseCase
+                            .loginWithApple(idToken = credential.idToken, nonce = credential.rawNonce)
                             .onSuccess { isMigrationDecided: Boolean ->
                                 if (!isMigrationDecided) {
                                     _uiState.update { it.copy(showMigrationDialog = true) }

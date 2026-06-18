@@ -22,7 +22,11 @@ class DefaultDeviceFidManager(
             Napier.d("FID already cached: $cachedFid", tag = "DeviceFid")
             return
         }
-        val stored = userStorageRepository.loadId().getOrNull()?.fid?.takeIf { it.isNotBlank() }
+        val stored = userStorageRepository
+            .loadId()
+            .getOrNull()
+            ?.fid
+            ?.takeIf { it.isNotBlank() }
         if (stored != null) {
             cachedFid = stored
             Napier.d("FID loaded from storage: $stored", tag = "DeviceFid")

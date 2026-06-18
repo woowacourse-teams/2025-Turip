@@ -21,9 +21,9 @@ import kotlinx.serialization.json.jsonPrimitive
 import platform.AuthenticationServices.ASPresentationAnchor
 import platform.AuthenticationServices.ASWebAuthenticationPresentationContextProvidingProtocol
 import platform.AuthenticationServices.ASWebAuthenticationSession
-import platform.Foundation.NSCharacterSet
 import platform.Foundation.NSArray
 import platform.Foundation.NSBundle
+import platform.Foundation.NSCharacterSet
 import platform.Foundation.NSDictionary
 import platform.Foundation.NSError
 import platform.Foundation.NSURL
@@ -42,8 +42,7 @@ internal actual fun rememberGoogleCredentialManager(): GoogleCredentialManager =
         IosGoogleCredentialManager()
     }
 
-private class IosGoogleCredentialManager :
-    GoogleCredentialManager {
+private class IosGoogleCredentialManager : GoogleCredentialManager {
     private var authenticationSession: ASWebAuthenticationSession? = null
     private val presentationContextProvider = GooglePresentationContextProvider()
 
@@ -168,7 +167,6 @@ private class IosGoogleCredentialManager :
                 )
             }
         }
-
 }
 
 private class GooglePresentationContextProvider :

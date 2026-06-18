@@ -8,7 +8,6 @@ import io.github.aakira.napier.Napier
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.suspendCancellableCoroutine
-import platform.AuthenticationServices.ASPresentationAnchor
 import platform.AuthenticationServices.ASAuthorization
 import platform.AuthenticationServices.ASAuthorizationAppleIDButton
 import platform.AuthenticationServices.ASAuthorizationAppleIDButtonStyle
@@ -19,10 +18,11 @@ import platform.AuthenticationServices.ASAuthorizationController
 import platform.AuthenticationServices.ASAuthorizationControllerDelegateProtocol
 import platform.AuthenticationServices.ASAuthorizationControllerPresentationContextProvidingProtocol
 import platform.AuthenticationServices.ASAuthorizationScopeEmail
+import platform.AuthenticationServices.ASPresentationAnchor
 import platform.Foundation.NSError
-import platform.Foundation.NSUUID
 import platform.Foundation.NSString
 import platform.Foundation.NSUTF8StringEncoding
+import platform.Foundation.NSUUID
 import platform.Foundation.create
 import platform.UIKit.UIApplication
 import platform.UIKit.UIWindow
@@ -140,7 +140,6 @@ private class AppleAuthorizationDelegate(
             ),
         )
     }
-
 
     @OptIn(ExperimentalForeignApi::class)
     override fun presentationAnchorForAuthorizationController(

@@ -40,7 +40,9 @@ class DetermineInvitationEntryRouteUseCase(
 
                         SessionState.Guest,
                         SessionState.Uninitialized,
-                        -> InvitationEntryResult.RequiresAuth
+                        -> {
+                            InvitationEntryResult.RequiresAuth
+                        }
                     }
                 },
                 onFailure = { errorType ->

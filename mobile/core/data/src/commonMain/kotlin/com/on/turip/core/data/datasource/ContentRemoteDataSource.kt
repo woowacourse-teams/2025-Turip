@@ -1,11 +1,11 @@
 package com.on.turip.core.data.datasource
 
-import com.on.turip.core.model.result.TuripResult
 import com.on.turip.core.data.dto.content.ContentDetailResponse
 import com.on.turip.core.data.dto.content.ContentInformationCountResponse
 import com.on.turip.core.data.dto.content.ContentPlacesResponse
 import com.on.turip.core.data.dto.content.ContentsInformationResponse
 import com.on.turip.core.data.dto.content.UsersLikeContentsResponse
+import com.on.turip.core.model.result.TuripResult
 
 interface ContentRemoteDataSource {
     suspend fun getContentsSizeByRegion(regionCategoryName: String): TuripResult<ContentInformationCountResponse>

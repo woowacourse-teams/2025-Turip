@@ -28,18 +28,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.on.turip.core.designsystem.generated.resources.Res
 import com.on.turip.core.designsystem.generated.resources.*
+import com.on.turip.core.designsystem.generated.resources.Res
 import com.on.turip.core.designsystem.theme.TuripTheme
 import com.on.turip.core.ui.util.formatResource
 import com.on.turip.feature.trip.impl.model.MapModel
 import com.on.turip.feature.trip.impl.model.PlaceModel
 import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun PlaceItem(

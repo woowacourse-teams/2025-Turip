@@ -11,12 +11,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import com.on.turip.core.designsystem.generated.resources.Res
 import com.on.turip.core.designsystem.generated.resources.btn_help
 import com.on.turip.core.designsystem.theme.TuripTheme
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun GuestModeSection(

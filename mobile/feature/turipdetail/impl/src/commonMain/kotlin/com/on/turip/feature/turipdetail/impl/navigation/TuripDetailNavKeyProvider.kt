@@ -5,8 +5,8 @@ import androidx.navigation3.runtime.NavKey
 import com.on.turip.core.navigation.NavKeyProvider
 import com.on.turip.core.navigation.Navigator
 import com.on.turip.feature.login.api.LoginNavKey
-import com.on.turip.feature.turipdetail.impl.TuripDetailScreen
 import com.on.turip.feature.turipdetail.api.TuripDetailNavKey
+import com.on.turip.feature.turipdetail.impl.TuripDetailScreen
 import com.on.turip.feature.turipdetail.impl.platform.rememberTuripDetailPlatformActions
 import kotlinx.serialization.modules.PolymorphicModuleBuilder
 

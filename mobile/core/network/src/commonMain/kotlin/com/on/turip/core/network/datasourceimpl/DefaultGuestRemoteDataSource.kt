@@ -1,8 +1,8 @@
 package com.on.turip.core.network.datasourceimpl
 
 import com.on.turip.core.common.safeApiCall
-import com.on.turip.core.model.result.TuripResult
 import com.on.turip.core.data.datasource.GuestRemoteDataSource
+import com.on.turip.core.model.result.TuripResult
 import com.on.turip.core.network.service.GuestService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO

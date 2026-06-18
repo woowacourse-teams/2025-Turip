@@ -6,11 +6,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.UIKitView
 import com.on.turip.core.ui.platform.IosGoogleMapBridge
 import com.on.turip.feature.turipdetail.impl.model.turip.PlaceLatLngUiModel
-import kotlinx.collections.immutable.ImmutableList
 import kotlinx.cinterop.CValue
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.cValue
 import kotlinx.cinterop.readValue
+import kotlinx.collections.immutable.ImmutableList
 import platform.CoreGraphics.CGRectZero
 import platform.CoreLocation.CLLocationCoordinate2D
 import platform.MapKit.MKCoordinateRegionMakeWithDistance

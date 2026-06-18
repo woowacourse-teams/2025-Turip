@@ -253,8 +253,14 @@ private class TuripWebViewClient(
     ): Boolean {
         val url: String = request?.url.toString()
         return when {
-            url.startsWith(TARGET_URL_PREFIX) -> false
-            !url.startsWith(SECURE_URL) -> true
+            url.startsWith(TARGET_URL_PREFIX) -> {
+                false
+            }
+
+            !url.startsWith(SECURE_URL) -> {
+                true
+            }
+
             else -> {
                 onNavigateExternalUrl(url)
                 true

@@ -20,10 +20,10 @@ import platform.Foundation.NSUserDomainMask
 
 val localModuleIos = module {
     single<TuripDatabase> {
-        Room.databaseBuilder<TuripDatabase>(
-            name = NSHomeDirectory() + "/turip.db",
-        )
-            .setDriver(BundledSQLiteDriver())
+        Room
+            .databaseBuilder<TuripDatabase>(
+                name = NSHomeDirectory() + "/turip.db",
+            ).setDriver(BundledSQLiteDriver())
             .build()
     }
 

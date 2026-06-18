@@ -25,9 +25,9 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -49,8 +49,8 @@ import com.on.turip.core.designsystem.generated.resources.trip_detail_turip_sele
 import com.on.turip.core.designsystem.generated.resources.turip_added_snackbar_message
 import com.on.turip.core.designsystem.snackbar.LocalSnackbarDelegate
 import com.on.turip.core.designsystem.theme.TuripTheme
-import com.on.turip.core.ui.component.NameEditorSheetContent
 import com.on.turip.core.ui.component.ErrorScreen
+import com.on.turip.core.ui.component.NameEditorSheetContent
 import com.on.turip.core.ui.error.ErrorUiState
 import com.on.turip.core.ui.error.toUiModel
 import com.on.turip.core.ui.model.turip.TuripShareModel

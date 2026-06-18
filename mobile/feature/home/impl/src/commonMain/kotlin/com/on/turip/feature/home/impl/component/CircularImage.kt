@@ -6,11 +6,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import org.jetbrains.compose.resources.painterResource
 import coil3.compose.AsyncImage
 import com.on.turip.core.designsystem.generated.resources.Res
 import com.on.turip.core.designsystem.generated.resources.bg_image_placeholder
 import com.on.turip.core.designsystem.generated.resources.ic_sorry
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun CircularImage(

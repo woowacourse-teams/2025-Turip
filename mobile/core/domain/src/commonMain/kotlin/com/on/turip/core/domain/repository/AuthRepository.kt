@@ -4,7 +4,6 @@ import com.on.turip.core.model.login.AuthResult
 import com.on.turip.core.model.login.AuthTokens
 import com.on.turip.core.model.result.TuripResult
 
-
 interface AuthRepository {
     suspend fun login(idToken: String): TuripResult<AuthResult>
 

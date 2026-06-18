@@ -1,6 +1,5 @@
 package com.on.turip.core.data.datasource
 
-import com.on.turip.core.model.result.TuripResult
 import com.on.turip.core.data.dto.turip.PlaceTuripsRequest
 import com.on.turip.core.data.dto.turip.TuripCreationResponse
 import com.on.turip.core.data.dto.turip.TuripInvitationInformationResponse
@@ -14,6 +13,7 @@ import com.on.turip.core.data.dto.turip.TuripPostRequest
 import com.on.turip.core.data.dto.turip.TuripResponse
 import com.on.turip.core.data.dto.turip.TuripsByPlaceResponse
 import com.on.turip.core.data.dto.turip.TuripsResponse
+import com.on.turip.core.model.result.TuripResult
 
 interface TuripRemoteDataSource {
     suspend fun getTurip(turipId: Long): TuripResult<TuripResponse>

@@ -1,13 +1,13 @@
 package com.on.turip.core.network.datasourceimpl
 
 import com.on.turip.core.common.safeApiCall
-import com.on.turip.core.model.result.TuripResult
 import com.on.turip.core.data.datasource.ContentRemoteDataSource
 import com.on.turip.core.data.dto.content.ContentDetailResponse
 import com.on.turip.core.data.dto.content.ContentInformationCountResponse
 import com.on.turip.core.data.dto.content.ContentPlacesResponse
 import com.on.turip.core.data.dto.content.ContentsInformationResponse
 import com.on.turip.core.data.dto.content.UsersLikeContentsResponse
+import com.on.turip.core.model.result.TuripResult
 import com.on.turip.core.network.service.ContentService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO

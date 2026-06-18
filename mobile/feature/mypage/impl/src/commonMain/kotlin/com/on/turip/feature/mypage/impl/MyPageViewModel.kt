@@ -17,10 +17,10 @@ import com.on.turip.core.model.setting.PrivacyPolicy
 import com.on.turip.core.ui.error.ErrorUiState
 import com.on.turip.core.ui.error.UiError
 import com.on.turip.core.ui.error.toUiError
+import com.on.turip.domain.login.MemberRepository
 import com.on.turip.feature.mypage.impl.model.InquiryMail
 import com.on.turip.feature.mypage.impl.util.AppEnvironmentInfoProvider
 import com.on.turip.feature.mypage.impl.util.toUiModel
-import com.on.turip.domain.login.MemberRepository
 import io.github.aakira.napier.Napier
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList

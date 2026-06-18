@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class SessionManager (
+class SessionManager(
     private val tokenManager: TokenManager,
     private val turipRepository: TuripRepository,
     private val bookmarkRepository: BookmarkRepository,

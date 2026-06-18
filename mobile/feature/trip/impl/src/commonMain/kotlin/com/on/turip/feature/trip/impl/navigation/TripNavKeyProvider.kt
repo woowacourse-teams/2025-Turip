@@ -4,11 +4,11 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import com.on.turip.core.navigation.NavKeyProvider
 import com.on.turip.core.navigation.Navigator
-import com.on.turip.feature.trip.api.TripDetailNavKey
 import com.on.turip.feature.login.api.LoginNavKey
+import com.on.turip.feature.trip.api.TripDetailNavKey
 import com.on.turip.feature.trip.impl.TripDetailScreen
-import com.on.turip.feature.turipdetail.api.TuripDetailNavKey
 import com.on.turip.feature.trip.impl.platform.rememberTripDetailPlatformActions
+import com.on.turip.feature.turipdetail.api.TuripDetailNavKey
 import kotlinx.serialization.modules.PolymorphicModuleBuilder
 
 class TripNavKeyProvider(

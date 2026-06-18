@@ -10,9 +10,11 @@ import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 @Entity(tableName = "search_history")
-data class SearchHistoryEntity @OptIn(ExperimentalTime::class) constructor(
-    @PrimaryKey
-    val keyword: String,
-    @ColumnInfo(name = "history")
-    val history: Long = Clock.System.now().toEpochMilliseconds()
-)
+data class SearchHistoryEntity
+    @OptIn(ExperimentalTime::class)
+    constructor(
+        @PrimaryKey
+        val keyword: String,
+        @ColumnInfo(name = "history")
+        val history: Long = Clock.System.now().toEpochMilliseconds(),
+    )

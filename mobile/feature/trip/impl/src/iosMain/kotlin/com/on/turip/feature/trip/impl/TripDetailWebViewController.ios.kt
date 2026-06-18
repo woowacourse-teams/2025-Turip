@@ -195,7 +195,8 @@ private const val FULLSCREEN_MESSAGE_HANDLER_NAME = "turipFullscreen"
 
 private class FullScreenScriptMessageHandler(
     private val onFullScreenChanged: (Boolean) -> Unit,
-) : NSObject(), WKScriptMessageHandlerProtocol {
+) : NSObject(),
+    WKScriptMessageHandlerProtocol {
     override fun userContentController(
         userContentController: WKUserContentController,
         didReceiveScriptMessage: WKScriptMessage,

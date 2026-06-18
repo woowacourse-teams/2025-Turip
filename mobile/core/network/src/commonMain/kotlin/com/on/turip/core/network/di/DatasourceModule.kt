@@ -20,9 +20,9 @@ import com.on.turip.core.network.datasourceimpl.DefaultMemberRemoteDataSource
 import com.on.turip.core.network.datasourceimpl.DefaultRegionRemoteDataSource
 import com.on.turip.core.network.datasourceimpl.DefaultTuripRemoteDataSource
 import com.on.turip.core.network.datasourceimpl.DefaultTuripSseStreamDataSource
-import com.on.turip.core.network.sse.TuripSseParser
 import com.on.turip.core.network.service.DefaultTuripStreamService
 import com.on.turip.core.network.service.TuripStreamService
+import com.on.turip.core.network.sse.TuripSseParser
 import kotlinx.serialization.json.Json
 import org.koin.core.qualifier.named
 import org.koin.dsl.module

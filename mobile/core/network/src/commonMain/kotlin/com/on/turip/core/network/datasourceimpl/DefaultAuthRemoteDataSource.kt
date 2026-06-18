@@ -1,11 +1,11 @@
 package com.on.turip.core.network.datasourceimpl
 
 import com.on.turip.core.common.safeApiCall
-import com.on.turip.core.model.result.TuripResult
 import com.on.turip.core.data.datasource.AuthRemoteDataSource
 import com.on.turip.core.data.dto.login.AppleLoginIdTokenPostRequest
 import com.on.turip.core.data.dto.login.LoginIdTokenPostRequest
 import com.on.turip.core.data.dto.login.LoginJwtTokenResponse
+import com.on.turip.core.model.result.TuripResult
 import com.on.turip.core.network.service.AuthService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO

@@ -1,7 +1,7 @@
 package com.on.turip.core.network.service
 
-import com.on.turip.core.network.ApiPath
 import com.on.turip.core.data.dto.account.MyProfileResponse
+import com.on.turip.core.network.ApiPath
 import de.jensklingenberg.ktorfit.http.DELETE
 import de.jensklingenberg.ktorfit.http.GET
 import de.jensklingenberg.ktorfit.http.POST

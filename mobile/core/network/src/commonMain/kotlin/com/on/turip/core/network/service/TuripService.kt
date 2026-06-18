@@ -1,6 +1,5 @@
 package com.on.turip.core.network.service
 
-import com.on.turip.core.network.ApiPath
 import com.on.turip.core.data.dto.turip.PlaceTuripsRequest
 import com.on.turip.core.data.dto.turip.TuripCreationResponse
 import com.on.turip.core.data.dto.turip.TuripInvitationInformationResponse
@@ -15,6 +14,7 @@ import com.on.turip.core.data.dto.turip.TuripPostRequest
 import com.on.turip.core.data.dto.turip.TuripResponse
 import com.on.turip.core.data.dto.turip.TuripsByPlaceResponse
 import com.on.turip.core.data.dto.turip.TuripsResponse
+import com.on.turip.core.network.ApiPath
 import de.jensklingenberg.ktorfit.http.Body
 import de.jensklingenberg.ktorfit.http.DELETE
 import de.jensklingenberg.ktorfit.http.GET
