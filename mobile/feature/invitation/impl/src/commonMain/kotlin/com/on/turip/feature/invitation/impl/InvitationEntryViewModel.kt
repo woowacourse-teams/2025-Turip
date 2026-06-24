@@ -4,7 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.on.turip.core.data.session.SessionManager
 import com.on.turip.core.domain.repository.TuripRepository
+import com.on.turip.core.domain.session.AuthStatus
 import com.on.turip.core.domain.session.SessionState
+import com.on.turip.core.domain.usecase.DetermineInitialSessionUseCase
 import com.on.turip.core.domain.usecase.DetermineInvitationEntryRouteUseCase
 import com.on.turip.core.model.invitation.InvitationEntryResult
 import com.on.turip.core.model.invitation.InvitationTokenParser
@@ -22,6 +24,7 @@ import kotlinx.coroutines.launch
 
 class InvitationEntryViewModel(
     private val determineInvitationEntryRouteUseCase: DetermineInvitationEntryRouteUseCase,
+    private val determineInitialSessionUseCase: DetermineInitialSessionUseCase,
     private val turipRepository: TuripRepository,
     private val sessionManager: SessionManager,
 ) : ViewModel() {
@@ -40,6 +43,11 @@ class InvitationEntryViewModel(
 
     fun resolveInvitationEntry() {
         viewModelScope.launch {
+            // 딥링크가 Splash를 건너뛰거나(iOS) Splash의 세션 초기화 코루틴이 화면 전환으로 취소되면
+            // 세션이 Uninitialized로 남는다. 이 경우 회원인데도 RequiresAuth로 판정돼 로그인으로 튕긴다.
+            // 따라서 토큰 검증 전에 세션 초기화를 보장한다(이미 초기화됐으면 no-op).
+            ensureSessionInitialized()
+
             val invitationToken: String? =
                 InvitationTokenParser.extractTokenFromUrl(_uiState.value.deepLinkUrl)
             when (
@@ -171,6 +179,14 @@ class InvitationEntryViewModel(
             (_uiState.value.dialogState as? InvitationEntryDialogState.Invalid)?.target ?: return
         _uiState.update { it.copy(dialogState = null) }
         navigateByTarget(target)
+    }
+
+    private suspend fun ensureSessionInitialized() {
+        if (sessionManager.state.value != SessionState.Uninitialized) return
+        when (determineInitialSessionUseCase()) {
+            AuthStatus.Authenticated -> sessionManager.switchToMember()
+            AuthStatus.UnAuthenticated -> sessionManager.switchToGuest()
+        }
     }
 
     private fun invalidInvitationTarget(): InvalidInvitationTarget =

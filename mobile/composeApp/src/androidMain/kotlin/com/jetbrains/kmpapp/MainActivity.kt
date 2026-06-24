@@ -7,6 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.LaunchedEffect
+import com.on.turip.core.common.deeplink.PassthroughDeepLinkEventSource
 import com.on.turip.core.domain.fid.DeviceFidManager
 import com.on.turip.feature.main.MainApp
 import com.on.turip.feature.main.navigation.SavedStateConfigurationProvider
@@ -15,6 +16,9 @@ import org.koin.compose.koinInject
 
 class MainActivity : ComponentActivity() {
     private val newDeepLinkFlow = MutableSharedFlow<String>(extraBufferCapacity = 1)
+
+    // 콜드 스타트는 initialDeepLinkUrl로 동기 주입(기존 동작 유지), warm-start만 passthrough로 전달.
+    private val deepLinkEventSource = PassthroughDeepLinkEventSource(newDeepLinkFlow)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -32,7 +36,7 @@ class MainActivity : ComponentActivity() {
             }
             MainApp(
                 savedStateConfigurationProvider = savedStateConfigurationProvider,
-                newDeepLinkFlow = newDeepLinkFlow,
+                deepLinkEventSource = deepLinkEventSource,
                 initialDeepLinkUrl = initialDeepLinkUrl,
             )
         }

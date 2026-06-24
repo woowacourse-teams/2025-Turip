@@ -9,5 +9,5 @@ import org.koin.dsl.module
 
 val invitationModule = module {
     single { InvitationNavKeyProvider() } bind NavKeyProvider::class
-    viewModel<InvitationEntryViewModel> { InvitationEntryViewModel(get(), get(), get()) }
+    viewModel<InvitationEntryViewModel> { InvitationEntryViewModel(get(), get(), get(), get()) }
 }

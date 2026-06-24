@@ -25,6 +25,9 @@ import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
+import com.on.turip.core.common.deeplink.DeepLinkEventSource
+import com.on.turip.core.common.deeplink.InvitationNavigationCoordinator
+import com.on.turip.core.common.deeplink.StartupNavigationArbiter
 import com.on.turip.core.designsystem.component.TuripSnackbar
 import com.on.turip.core.designsystem.snackbar.LocalSnackbarDelegate
 import com.on.turip.core.designsystem.theme.TuripTheme
@@ -44,12 +47,12 @@ import com.on.turip.feature.main.navigation.appScreens
 import com.on.turip.feature.main.navigation.rememberTuripAppState
 import com.on.turip.feature.splash.api.SplashNavKey
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
+import org.koin.compose.koinInject
 
 @Composable
 fun MainApp(
     savedStateConfigurationProvider: SavedStateConfigurationProvider,
-    newDeepLinkFlow: Flow<String>,
+    deepLinkEventSource: DeepLinkEventSource,
     initialDeepLinkUrl: String? = null,
 ) {
     val initialEntryKey: NavKey = SplashNavKey(deepLinkUrl = initialDeepLinkUrl)
@@ -64,9 +67,28 @@ fun MainApp(
     val appState = rememberTuripAppState(navigationState = navigationState)
     val navigator = remember(appState.navigationState) { Navigator(appState.navigationState) }
 
-    LaunchedEffect(Unit) {
-        newDeepLinkFlow.collect { deepLinkUrl ->
-            navigator.goWithAllClear(InvitationEntryNavKey(deepLinkUrl))
+    // Splash 세션 진입과 동일 인스턴스를 공유하는 startup-수명 가드(프로세스 싱글턴).
+    // Splash가 프로세스당 1회만 실행되므로 owner 잔존이 일반 네비게이션을 막지 않는다.
+    val startupNavigationArbiter: StartupNavigationArbiter = koinInject()
+    val invitationNavigationCoordinator: InvitationNavigationCoordinator = koinInject()
+
+    LaunchedEffect(deepLinkEventSource) {
+        deepLinkEventSource.events.collect { event ->
+            // 원본 URL을 그대로 넘긴다(토큰 재조립 시 이중 디코딩으로 손상되는 문제 방지).
+            // 딥링크가 owner를 선점(AlreadyHandling 포함)해 늦은 Splash 세션 네비게이션이 덮지 못하게 한다.
+            startupNavigationArbiter.navigateByDeepLink {
+                invitationNavigationCoordinator.navigateInvitationIfNeeded(event.dedupeKey) {
+                    navigator.goWithAllClear(InvitationEntryNavKey(event.originalUrl))
+                }
+            }
+            deepLinkEventSource.acknowledge(event)
+        }
+    }
+
+    // 초대 흐름이 top-level 탭으로 빠져나오면 가드를 해제해 동일 링크 재탭을 다시 허용한다.
+    LaunchedEffect(appState.currentScreenKey) {
+        if (appState.currentScreenKey in TopLevel.routes.keys) {
+            invitationNavigationCoordinator.onFlowEnded()
         }
     }
 
