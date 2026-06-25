@@ -1,4 +1,4 @@
-package turip.fcm.domain;
+package turip.account.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,7 +14,6 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import turip.account.domain.Account;
 
 @Entity
 @Getter
