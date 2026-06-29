@@ -32,7 +32,7 @@ public class FcmToken {
     @JoinColumn(name = "account_id", nullable = false)
     private Account account;
 
-    @Column(name = "token", length = 500, nullable = false)
+    @Column(name = "token", length = 500, nullable = false, unique = true)
     private String token;
 
     public FcmToken(Account account, String token) {
