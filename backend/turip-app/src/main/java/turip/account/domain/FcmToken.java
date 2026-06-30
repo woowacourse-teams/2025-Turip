@@ -14,6 +14,7 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import turip.common.domain.BaseTimeEntity;
 
 @Entity
 @Getter
@@ -21,7 +22,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "fcm_token")
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class FcmToken {
+public class FcmToken extends BaseTimeEntity {
 
     @Id
     @EqualsAndHashCode.Include
