@@ -36,8 +36,12 @@ public class FcmToken extends BaseTimeEntity {
     @Column(name = "token", length = 500, nullable = false, unique = true)
     private String token;
 
+    @Column(name = "notification_enabled", nullable = false)
+    private boolean notificationEnabled;
+
     public FcmToken(Account account, String token) {
         this.account = account;
         this.token = token;
+        this.notificationEnabled = true;
     }
 }

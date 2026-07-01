@@ -2,6 +2,7 @@ CREATE TABLE fcm_token (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     account_id BIGINT NOT NULL,
     token VARCHAR(500) NOT NULL,
+    notification_enabled BOOLEAN NOT NULL DEFAULT TRUE,
     created_at DATETIME(6) NOT NULL,
     updated_at DATETIME(6) NOT NULL,
 
