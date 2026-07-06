@@ -32,4 +32,25 @@ public class AsyncConfiguration {
 
         return executor;
     }
+
+    @Bean(name = "fcmEventExecutor")
+    public Executor fcmEventExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(2);
+        executor.setMaxPoolSize(4);
+        executor.setQueueCapacity(100);
+        executor.setThreadNamePrefix("FCM-EVT-");
+
+        executor.setRejectedExecutionHandler((r, executorInstance) -> log.warn(
+                        "[FCM-ThreadPool] 이벤트 전송 거부됨 - Thread pool 포화 상태 (현재 활성 스레드: {}, 잔여 큐 용량: {})",
+                        executorInstance.getActiveCount(),
+                        executorInstance.getQueue().remainingCapacity()
+                )
+        );
+
+        executor.setWaitForTasksToCompleteOnShutdown(true);
+        executor.setAwaitTerminationSeconds(30);
+
+        return executor;
+    }
 }
