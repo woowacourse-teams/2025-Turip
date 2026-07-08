@@ -1,8 +1,8 @@
 package turip.infrastructure.client;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
+import com.google.firebase.messaging.MessagingErrorCode;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,42 +29,8 @@ class FirebaseClientTest {
     private FirebaseClient firebaseClient;
 
     @Test
-    @DisplayName("FCM 토큰으로 알림을 성공적으로 전송한다")
-    void sendNotification1() throws FirebaseMessagingException {
-        // given
-        String fcmToken = "test-fcm-token";
-        String title = "테스트 제목";
-        String body = "테스트 내용";
-
-        when(firebaseMessaging.send(any(Message.class))).thenReturn("message-id");
-
-        // when & then
-        assertDoesNotThrow(() -> firebaseClient.sendNotification(fcmToken, title, body));
-        verify(firebaseMessaging, times(1)).send(any(Message.class));
-    }
-
-    @Test
-    @DisplayName("FCM 전송 실패 시 RuntimeException을 발생시킨다")
-    void sendNotification2() throws FirebaseMessagingException {
-        // given
-        String fcmToken = "invalid-token";
-        String title = "테스트 제목";
-        String body = "테스트 내용";
-
-        when(firebaseMessaging.send(any(Message.class)))
-                .thenThrow(FirebaseMessagingException.class);
-
-        // when & then
-        assertThatThrownBy(() -> firebaseClient.sendNotification(fcmToken, title, body))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessage("[FCM] 알림 전송 실패");
-
-        verify(firebaseMessaging, times(1)).send(any(Message.class));
-    }
-
-    @Test
     @DisplayName("여러 디바이스에 알림을 성공적으로 전송한다")
-    void sendNotificationToMultipleDevices() throws FirebaseMessagingException {
+    void sendNotificationToMultipleDevicesAndReturnInvalidTokens1() throws FirebaseMessagingException {
         // given
         List<String> fcmTokens = List.of("token1", "token2", "token3");
         String title = "테스트 제목";
@@ -71,8 +38,65 @@ class FirebaseClientTest {
 
         when(firebaseMessaging.send(any(Message.class))).thenReturn("message-id");
 
-        // when & then
-        assertDoesNotThrow(() -> firebaseClient.sendNotificationToMultipleDevices(fcmTokens, title, body));
+        // when
+        List<String> invalidTokens = firebaseClient.sendNotificationToMultipleDevicesAndReturnInvalidTokens(
+                fcmTokens, title, body
+        );
+
+        // then
+        assertThat(invalidTokens).isEmpty();
+        verify(firebaseMessaging, times(3)).send(any(Message.class));
+    }
+
+    @Test
+    @DisplayName("UNREGISTERED 에러 발생 시 유효하지 않은 토큰 리스트를 반환한다")
+    void sendNotificationToMultipleDevicesAndReturnInvalidTokens2() throws FirebaseMessagingException {
+        // given
+        List<String> fcmTokens = List.of("token1", "invalid-token", "token3");
+        String title = "테스트 제목";
+        String body = "테스트 내용";
+
+        FirebaseMessagingException unregisteredException = mock(FirebaseMessagingException.class);
+        when(unregisteredException.getMessagingErrorCode()).thenReturn(MessagingErrorCode.UNREGISTERED);
+
+        when(firebaseMessaging.send(any(Message.class)))
+                .thenReturn("message-id")
+                .thenThrow(unregisteredException)
+                .thenReturn("message-id");
+
+        // when
+        List<String> invalidTokens = firebaseClient.sendNotificationToMultipleDevicesAndReturnInvalidTokens(
+                fcmTokens, title, body
+        );
+
+        // then
+        assertThat(invalidTokens).hasSize(1).contains("invalid-token");
+        verify(firebaseMessaging, times(3)).send(any(Message.class));
+    }
+
+    @Test
+    @DisplayName("UNREGISTERED가 아닌 다른 에러는 로그만 남기고 계속 진행한다")
+    void sendNotificationToMultipleDevicesAndReturnInvalidTokens3() throws FirebaseMessagingException {
+        // given
+        List<String> fcmTokens = List.of("token1", "token2", "token3");
+        String title = "테스트 제목";
+        String body = "테스트 내용";
+
+        FirebaseMessagingException otherException = mock(FirebaseMessagingException.class);
+        when(otherException.getMessagingErrorCode()).thenReturn(MessagingErrorCode.INTERNAL);
+
+        when(firebaseMessaging.send(any(Message.class)))
+                .thenReturn("message-id")
+                .thenThrow(otherException)
+                .thenReturn("message-id");
+
+        // when
+        List<String> invalidTokens = firebaseClient.sendNotificationToMultipleDevicesAndReturnInvalidTokens(
+                fcmTokens, title, body
+        );
+
+        // then
+        assertThat(invalidTokens).isEmpty();
         verify(firebaseMessaging, times(3)).send(any(Message.class));
     }
 }

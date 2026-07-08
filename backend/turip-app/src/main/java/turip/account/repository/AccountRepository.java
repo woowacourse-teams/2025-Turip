@@ -2,6 +2,7 @@ package turip.account.repository;
 
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import turip.account.domain.Account;
@@ -16,4 +17,8 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
 
     @Query("SELECT f FROM FcmToken f WHERE f.account.id IN :accountIds AND f.notificationEnabled = true")
     List<FcmToken> findFcmTokensByAccountIds(@Param("accountIds") List<Long> accountIds);
+
+    @Modifying
+    @Query("DELETE FROM FcmToken f WHERE f.token IN :tokens")
+    void deleteFcmTokensByTokenIn(@Param("tokens") List<String> tokens);
 }

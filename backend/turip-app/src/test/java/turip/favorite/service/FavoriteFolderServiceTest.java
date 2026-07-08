@@ -500,7 +500,7 @@ class FavoriteFolderServiceTest {
                     () -> assertThat(response.isShared()).isTrue(),
                     () -> assertThat(response.accountId()).isEqualTo(accountId),
                     () -> verify(eventPublisher).publishEvent(
-                            FavoriteFolderUpdateEvent.of(turipId, ActionType.MEMBER_JOINED))
+                            FavoriteFolderUpdateEvent.of(turipId, ActionType.MEMBER_JOINED, accountId))
             );
         }
 

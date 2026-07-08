@@ -1,5 +1,6 @@
 package turip.account.notification;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -8,6 +9,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -53,17 +55,20 @@ class FcmAlertServiceTest {
 
             when(accountRepository.findFcmTokensByAccountIds(List.of(1L, 2L)))
                     .thenReturn(fcmTokens);
+            when(firebaseClient.sendNotificationToMultipleDevicesAndReturnInvalidTokens(anyList(), anyString(), anyString()))
+                    .thenReturn(Collections.emptyList());
 
             // when
             fcmAlertService.sendToAccounts(accounts, message);
 
             // then
             verify(accountRepository, times(1)).findFcmTokensByAccountIds(List.of(1L, 2L));
-            verify(firebaseClient, times(1)).sendNotificationToMultipleDevices(
+            verify(firebaseClient, times(1)).sendNotificationToMultipleDevicesAndReturnInvalidTokens(
                     eq(List.of("token1", "token2")),
                     eq("테스트 제목"),
                     eq("테스트 내용")
             );
+            verify(accountRepository, never()).deleteFcmTokensByTokenIn(any());
         }
 
         @Test
@@ -83,7 +88,9 @@ class FcmAlertServiceTest {
 
             // then
             verify(accountRepository, times(1)).findFcmTokensByAccountIds(List.of(1L));
-            verify(firebaseClient, never()).sendNotificationToMultipleDevices(anyList(), anyString(), anyString());
+            verify(firebaseClient, never()).sendNotificationToMultipleDevicesAndReturnInvalidTokens(
+                    anyList(), anyString(), anyString()
+            );
         }
 
         @Test
@@ -104,17 +111,54 @@ class FcmAlertServiceTest {
 
             when(accountRepository.findFcmTokensByAccountIds(List.of(1L, 2L, 3L)))
                     .thenReturn(fcmTokens);
+            when(firebaseClient.sendNotificationToMultipleDevicesAndReturnInvalidTokens(
+                    anyList(), anyString(), anyString()
+            )).thenReturn(Collections.emptyList());
 
             // when
             fcmAlertService.sendToAccounts(accounts, message);
 
             // then
             verify(accountRepository, times(1)).findFcmTokensByAccountIds(List.of(1L, 2L, 3L));
-            verify(firebaseClient, times(1)).sendNotificationToMultipleDevices(
+            verify(firebaseClient, times(1)).sendNotificationToMultipleDevicesAndReturnInvalidTokens(
                     eq(List.of("token1", "token2")),
                     eq("테스트 제목"),
                     eq("테스트 내용")
             );
+            verify(accountRepository, never()).deleteFcmTokensByTokenIn(any());
+        }
+
+        @Test
+        @DisplayName("유효하지 않은 토큰이 있으면 삭제한다")
+        void sendToAccounts4() {
+            // given
+            Account account1 = createAccount(1L);
+            Account account2 = createAccount(2L);
+            List<Account> accounts = List.of(account1, account2);
+
+            FcmToken fcmToken1 = new FcmToken(account1, "token1");
+            FcmToken fcmToken2 = new FcmToken(account2, "invalid-token");
+            List<FcmToken> fcmTokens = List.of(fcmToken1, fcmToken2);
+
+            FcmAlertMessage message = FcmAlertMessage.of("테스트 제목", "테스트 내용");
+
+            when(accountRepository.findFcmTokensByAccountIds(List.of(1L, 2L)))
+                    .thenReturn(fcmTokens);
+            when(firebaseClient.sendNotificationToMultipleDevicesAndReturnInvalidTokens(
+                    anyList(), anyString(), anyString()
+            )).thenReturn(List.of("invalid-token"));
+
+            // when
+            fcmAlertService.sendToAccounts(accounts, message);
+
+            // then
+            verify(accountRepository, times(1)).findFcmTokensByAccountIds(List.of(1L, 2L));
+            verify(firebaseClient, times(1)).sendNotificationToMultipleDevicesAndReturnInvalidTokens(
+                    eq(List.of("token1", "invalid-token")),
+                    eq("테스트 제목"),
+                    eq("테스트 내용")
+            );
+            verify(accountRepository, times(1)).deleteFcmTokensByTokenIn(eq(List.of("invalid-token")));
         }
     }
 
