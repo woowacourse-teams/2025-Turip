@@ -11,13 +11,13 @@ import turip.infrastructure.client.FirebaseClient;
 
 @Service
 @RequiredArgsConstructor
-public class FcmAlertService {
+public class FcmNotificationService {
 
     private final FirebaseClient firebaseClient;
     private final AccountRepository accountRepository;
 
     @Transactional
-    public void sendToAccounts(List<Account> accounts, FcmAlertMessage fcmAlertMessage) {
+    public void sendToAccounts(List<Account> accounts, FcmNotificationMessage fcmNotificationMessage) {
         List<Long> accountIds = accounts.stream()
                 .map(Account::getId)
                 .toList();
@@ -31,8 +31,8 @@ public class FcmAlertService {
         if (!tokens.isEmpty()) {
             List<String> invalidTokens = firebaseClient.sendNotificationToMultipleDevicesAndReturnInvalidTokens(
                     tokens,
-                    fcmAlertMessage.title(),
-                    fcmAlertMessage.message()
+                    fcmNotificationMessage.title(),
+                    fcmNotificationMessage.message()
             );
 
             if (!invalidTokens.isEmpty()) {

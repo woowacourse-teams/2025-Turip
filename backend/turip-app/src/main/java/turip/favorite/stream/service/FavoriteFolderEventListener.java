@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 import turip.account.domain.Account;
-import turip.account.notification.FcmAlertService;
+import turip.account.notification.FcmNotificationService;
 import turip.account.notification.NotificationType;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.IllegalArgumentException;
@@ -24,7 +24,7 @@ public class FavoriteFolderEventListener {
     private final FavoriteFolderStreamService favoriteFolderStreamService;
     private final FavoriteFolderAccountService favoriteFolderAccountService;
     private final FavoriteFolderRepository favoriteFolderRepository;
-    private final FcmAlertService fcmAlertService;
+    private final FcmNotificationService fcmNotificationService;
 
     @Async("sseEventExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
@@ -62,7 +62,7 @@ public class FavoriteFolderEventListener {
                 .filter(account -> !account.getId().equals(event.accountId()))
                 .toList();
 
-        fcmAlertService.sendToAccounts(
+        fcmNotificationService.sendToAccounts(
                 recipients,
                 NotificationType.NEW_MEMBER_JOINED.createMessage(favoriteFolder.getName())
         );

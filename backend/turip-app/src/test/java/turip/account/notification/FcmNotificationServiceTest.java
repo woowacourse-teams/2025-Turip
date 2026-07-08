@@ -25,7 +25,7 @@ import turip.account.repository.AccountRepository;
 import turip.infrastructure.client.FirebaseClient;
 
 @ExtendWith(MockitoExtension.class)
-class FcmAlertServiceTest {
+class FcmNotificationServiceTest {
 
     @Mock
     private FirebaseClient firebaseClient;
@@ -34,7 +34,7 @@ class FcmAlertServiceTest {
     private AccountRepository accountRepository;
 
     @InjectMocks
-    private FcmAlertService fcmAlertService;
+    private FcmNotificationService fcmNotificationService;
 
     @Nested
     class SendToAccounts {
@@ -51,7 +51,7 @@ class FcmAlertServiceTest {
             FcmToken fcmToken2 = new FcmToken(account2, "token2");
             List<FcmToken> fcmTokens = List.of(fcmToken1, fcmToken2);
 
-            FcmAlertMessage message = FcmAlertMessage.of("테스트 제목", "테스트 내용");
+            FcmNotificationMessage message = FcmNotificationMessage.of("테스트 제목", "테스트 내용");
 
             when(accountRepository.findFcmTokensByAccountIds(List.of(1L, 2L)))
                     .thenReturn(fcmTokens);
@@ -59,7 +59,7 @@ class FcmAlertServiceTest {
                     .thenReturn(Collections.emptyList());
 
             // when
-            fcmAlertService.sendToAccounts(accounts, message);
+            fcmNotificationService.sendToAccounts(accounts, message);
 
             // then
             verify(accountRepository, times(1)).findFcmTokensByAccountIds(List.of(1L, 2L));
@@ -78,13 +78,13 @@ class FcmAlertServiceTest {
             Account account = createAccount(1L);
             List<Account> accounts = List.of(account);
 
-            FcmAlertMessage message = FcmAlertMessage.of("테스트 제목", "테스트 내용");
+            FcmNotificationMessage message = FcmNotificationMessage.of("테스트 제목", "테스트 내용");
 
             when(accountRepository.findFcmTokensByAccountIds(List.of(1L)))
                     .thenReturn(List.of());
 
             // when
-            fcmAlertService.sendToAccounts(accounts, message);
+            fcmNotificationService.sendToAccounts(accounts, message);
 
             // then
             verify(accountRepository, times(1)).findFcmTokensByAccountIds(List.of(1L));
@@ -107,7 +107,7 @@ class FcmAlertServiceTest {
             FcmToken fcmToken2 = new FcmToken(account2, "token2");
             List<FcmToken> fcmTokens = List.of(fcmToken1, fcmToken2);
 
-            FcmAlertMessage message = FcmAlertMessage.of("테스트 제목", "테스트 내용");
+            FcmNotificationMessage message = FcmNotificationMessage.of("테스트 제목", "테스트 내용");
 
             when(accountRepository.findFcmTokensByAccountIds(List.of(1L, 2L, 3L)))
                     .thenReturn(fcmTokens);
@@ -116,7 +116,7 @@ class FcmAlertServiceTest {
             )).thenReturn(Collections.emptyList());
 
             // when
-            fcmAlertService.sendToAccounts(accounts, message);
+            fcmNotificationService.sendToAccounts(accounts, message);
 
             // then
             verify(accountRepository, times(1)).findFcmTokensByAccountIds(List.of(1L, 2L, 3L));
@@ -140,7 +140,7 @@ class FcmAlertServiceTest {
             FcmToken fcmToken2 = new FcmToken(account2, "invalid-token");
             List<FcmToken> fcmTokens = List.of(fcmToken1, fcmToken2);
 
-            FcmAlertMessage message = FcmAlertMessage.of("테스트 제목", "테스트 내용");
+            FcmNotificationMessage message = FcmNotificationMessage.of("테스트 제목", "테스트 내용");
 
             when(accountRepository.findFcmTokensByAccountIds(List.of(1L, 2L)))
                     .thenReturn(fcmTokens);
@@ -149,7 +149,7 @@ class FcmAlertServiceTest {
             )).thenReturn(List.of("invalid-token"));
 
             // when
-            fcmAlertService.sendToAccounts(accounts, message);
+            fcmNotificationService.sendToAccounts(accounts, message);
 
             // then
             verify(accountRepository, times(1)).findFcmTokensByAccountIds(List.of(1L, 2L));

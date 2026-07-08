@@ -16,8 +16,8 @@ public enum NotificationType {
     private final String title;
     private final String messageTemplate;
 
-    public FcmAlertMessage createMessage(Object... args) {
+    public FcmNotificationMessage createMessage(Object... args) {
         String formattedMessage = String.format(messageTemplate, args);
-        return FcmAlertMessage.of(title, formattedMessage);
+        return FcmNotificationMessage.of(title, formattedMessage);
     }
 }
