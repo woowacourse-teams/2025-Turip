@@ -42,7 +42,7 @@ public class AsyncConfiguration {
         executor.setThreadNamePrefix("FCM-EVT-");
 
         executor.setRejectedExecutionHandler((r, executorInstance) -> log.warn(
-                        "[FCM-ThreadPool] 이벤트 전송 거부됨 - Thread pool 포화 상태 (현재 활성 스레드: {}, 잔여 큐 용량: {})",
+                        "[FCM-ThreadPool] 알림 전송 거부됨 - Thread pool 포화 상태 (현재 활성 스레드: {}, 잔여 큐 용량: {})",
                         executorInstance.getActiveCount(),
                         executorInstance.getQueue().remainingCapacity()
                 )
