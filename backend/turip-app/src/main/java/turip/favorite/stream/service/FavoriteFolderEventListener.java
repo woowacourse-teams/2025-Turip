@@ -7,10 +7,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 import turip.account.domain.Account;
-import turip.event.FcmAlertMessage;
-import turip.event.FcmAlertService;
+import turip.account.notification.FcmAlertService;
+import turip.account.notification.NotificationType;
+import turip.common.exception.ErrorTag;
+import turip.common.exception.custom.IllegalArgumentException;
+import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.domain.event.ActionType;
 import turip.favorite.domain.event.FavoriteFolderUpdateEvent;
+import turip.favorite.repository.FavoriteFolderRepository;
 import turip.favorite.service.FavoriteFolderAccountService;
 
 @Component
@@ -19,6 +23,7 @@ public class FavoriteFolderEventListener {
 
     private final FavoriteFolderStreamService favoriteFolderStreamService;
     private final FavoriteFolderAccountService favoriteFolderAccountService;
+    private final FavoriteFolderRepository favoriteFolderRepository;
     private final FcmAlertService fcmAlertService;
 
     @Async("sseEventExecutor")
@@ -49,10 +54,17 @@ public class FavoriteFolderEventListener {
         }
 
         Long folderId = event.favoriteFolderId();
+        FavoriteFolder favoriteFolder = favoriteFolderRepository.findById(folderId)
+                .orElseThrow(() -> new IllegalArgumentException(ErrorTag.FAVORITE_FOLDER_NOT_FOUND));
+
         List<Account> accounts = favoriteFolderAccountService.findAccountsByFavoriteFolder(folderId);
         List<Account> recipients = accounts.stream()
                 .filter(account -> !account.getId().equals(event.accountId()))
                 .toList();
-        fcmAlertService.sendToAccounts(recipients, FcmAlertMessage.of("새 멤버가 참여했어요", "함께 튜립에 새로운 멤버가 참여했습니다."));
+
+        fcmAlertService.sendToAccounts(
+                recipients,
+                NotificationType.NEW_MEMBER_JOINED.createMessage(favoriteFolder.getName())
+        );
     }
 }

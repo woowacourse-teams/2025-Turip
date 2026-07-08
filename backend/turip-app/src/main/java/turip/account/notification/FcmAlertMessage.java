@@ -1,4 +1,4 @@
-package turip.event;
+package turip.account.notification;
 
 public record FcmAlertMessage(String title, String message) {
 
