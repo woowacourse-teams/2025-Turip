@@ -61,6 +61,9 @@ invitation:
     secret-key: ${INVITATION_JWT_SECRET_KEY}
     token-expiration: 7d # 604800000 # 7일
 
+firebase:
+  service-account-key-path: classpath:firebase-service-account-dev.json
+
 management:
   endpoints:
     web:
