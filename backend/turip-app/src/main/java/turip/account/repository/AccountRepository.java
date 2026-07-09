@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 import turip.account.domain.Account;
 import turip.account.domain.FcmToken;
 import turip.account.domain.Role;
@@ -19,6 +20,7 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     List<FcmToken> findFcmTokensByAccountIds(@Param("accountIds") List<Long> accountIds);
 
     @Modifying
+    @Transactional
     @Query("DELETE FROM FcmToken f WHERE f.token IN :tokens")
     void deleteFcmTokensByTokenIn(@Param("tokens") List<String> tokens);
 }
