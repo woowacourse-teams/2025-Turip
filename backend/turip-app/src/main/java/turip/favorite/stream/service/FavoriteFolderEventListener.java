@@ -66,6 +66,9 @@ public class FavoriteFolderEventListener {
         List<Account> recipients = accounts.stream()
                 .filter(account -> !account.getId().equals(event.accountId()))
                 .toList();
+        if (recipients.isEmpty()) {
+            return;
+        }
 
         fcmNotificationService.sendToAccounts(
                 recipients,
