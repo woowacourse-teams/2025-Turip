@@ -2,6 +2,7 @@ package turip.favorite.stream.service;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
@@ -9,14 +10,13 @@ import org.springframework.transaction.event.TransactionalEventListener;
 import turip.account.domain.Account;
 import turip.account.notification.FcmNotificationService;
 import turip.account.notification.NotificationType;
-import turip.common.exception.ErrorTag;
-import turip.common.exception.custom.IllegalArgumentException;
 import turip.favorite.domain.FavoriteFolder;
 import turip.favorite.domain.event.ActionType;
 import turip.favorite.domain.event.FavoriteFolderUpdateEvent;
 import turip.favorite.repository.FavoriteFolderRepository;
 import turip.favorite.service.FavoriteFolderAccountService;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class FavoriteFolderEventListener {
@@ -55,7 +55,12 @@ public class FavoriteFolderEventListener {
 
         Long folderId = event.favoriteFolderId();
         FavoriteFolder favoriteFolder = favoriteFolderRepository.findById(folderId)
-                .orElseThrow(() -> new IllegalArgumentException(ErrorTag.FAVORITE_FOLDER_NOT_FOUND));
+                .orElse(null);
+
+        if (favoriteFolder == null) {
+            log.warn("폴더를 찾을 수 없어 알림 전송을 건너뜁니다. folderId={}", folderId);
+            return;
+        }
 
         List<Account> accounts = favoriteFolderAccountService.findAccountsByFavoriteFolder(folderId);
         List<Account> recipients = accounts.stream()
