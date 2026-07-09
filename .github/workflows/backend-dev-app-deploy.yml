@@ -56,8 +56,10 @@ jobs:
           cache: 'gradle'
 
       - name: Create Firebase service account file
+        env:
+          FIREBASE_CONFIG: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_DEV }}
         run: |
-          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_DEV }}' > \
+          printf '%s' "$FIREBASE_CONFIG" > \
             turip-app/src/main/resources/firebase-service-account-dev.json
 
       - name: Build Module Jar
