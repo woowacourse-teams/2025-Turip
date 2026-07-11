@@ -48,6 +48,7 @@ public class FcmToken extends BaseTimeEntity {
     private boolean notificationEnabled;
 
     public FcmToken(Account account, String deviceFid, String token) {
+        validateDeviceFid(deviceFid);
         validateToken(token);
         this.account = account;
         this.deviceFid = deviceFid;
@@ -62,6 +63,12 @@ public class FcmToken extends BaseTimeEntity {
 
     public void changeNotificationEnabled(boolean notificationEnabled) {
         this.notificationEnabled = notificationEnabled;
+    }
+
+    private void validateDeviceFid(String deviceFid) {
+        if (StringUtils.isBlank(deviceFid)) {
+            throw new BadRequestException(ErrorTag.DEVICE_FID_REQUIRED);
+        }
     }
 
     private void validateToken(String token) {

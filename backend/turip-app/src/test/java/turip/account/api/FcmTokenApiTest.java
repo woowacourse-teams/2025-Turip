@@ -171,6 +171,27 @@ class FcmTokenApiTest {
                     .statusCode(400)
                     .body("tag", is("FCM_TOKEN_BLANK"));
         }
+
+        @Test
+        @DisplayName("device-fid 헤더가 공백 값이면 400 Bad Request를 응답한다")
+        void register6() {
+            Long accountId = testDataHelper.insertAccount(Role.USER);
+            testDataHelper.insertMember(accountId, "member@turip.com", false);
+            String accessToken = testDataHelper.createAccessToken(accountId);
+
+            Map<String, String> requestBody = new HashMap<>(Map.of("token", "fcm-token-1"));
+
+            RestAssured
+                    .given().log().all()
+                    .contentType(ContentType.JSON)
+                    .header("Authorization", "Bearer " + accessToken)
+                    .header("device-fid", " ")
+                    .body(requestBody)
+                    .when().post("/api/v1/fcm-tokens")
+                    .then().log().all()
+                    .statusCode(400)
+                    .body("tag", is("DEVICE_FID_REQUIRED"));
+        }
     }
 
     @Nested
