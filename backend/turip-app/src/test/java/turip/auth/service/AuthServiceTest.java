@@ -28,6 +28,7 @@ import turip.account.domain.Member;
 import turip.account.domain.Provider;
 import turip.account.domain.SocialMember;
 import turip.account.domain.TuripMember;
+import turip.account.service.FcmTokenService;
 import turip.account.service.MemberService;
 import turip.account.service.SocialMemberService;
 import turip.account.service.TuripMemberService;
@@ -72,6 +73,9 @@ class AuthServiceTest {
 
     @Mock
     private RefreshTokenService refreshTokenService;
+
+    @Mock
+    private FcmTokenService fcmTokenService;
 
     @InjectMocks
     private AuthService authService;

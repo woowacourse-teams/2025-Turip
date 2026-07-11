@@ -9,6 +9,7 @@ import turip.account.domain.Account;
 import turip.account.domain.Member;
 import turip.account.domain.Provider;
 import turip.account.domain.Role;
+import turip.account.service.FcmTokenService;
 import turip.account.service.MemberService;
 import turip.account.service.SocialMemberService;
 import turip.account.service.TuripMemberService;
@@ -38,6 +39,7 @@ public class AuthService {
     private final MemberService memberService;
     private final SocialMemberService socialMemberService;
     private final TuripMemberService turipMemberService;
+    private final FcmTokenService fcmTokenService;
 
     @Transactional
     public TuripLoginResult loginWithTurip(TuripLoginRequest request, String deviceFid) {
@@ -112,6 +114,7 @@ public class AuthService {
     public void logout(Account account, String deviceFid) {
         Member member = getMemberByAccountId(account.getId());
         refreshTokenService.deleteByMemberAndDeviceFid(member, deviceFid);
+        fcmTokenService.deleteByAccountAndDeviceFid(account, deviceFid);
     }
 
     private TokenResult issueToken(String deviceFid, Member member) {
