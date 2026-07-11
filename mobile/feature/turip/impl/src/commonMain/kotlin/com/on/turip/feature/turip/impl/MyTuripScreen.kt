@@ -40,6 +40,9 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigationevent.NavigationEventInfo
+import androidx.navigationevent.compose.NavigationBackHandler
+import androidx.navigationevent.compose.rememberNavigationEventState
 import com.on.turip.core.designsystem.component.TuripDialog
 import com.on.turip.core.designsystem.component.TuripSnackbarVisuals
 import com.on.turip.core.designsystem.generated.resources.Res
@@ -222,6 +225,12 @@ private fun MyTuripScreenContent(
             isDeleteMode = false
         }
     }
+
+    NavigationBackHandler(
+        state = rememberNavigationEventState(currentInfo = NavigationEventInfo.None),
+        isBackEnabled = isDeleteMode,
+        onBackCompleted = { isDeleteMode = false },
+    )
 
     Box(modifier = modifier.fillMaxSize()) {
         Column(
