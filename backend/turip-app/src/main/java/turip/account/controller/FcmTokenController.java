@@ -41,6 +41,36 @@ public class FcmTokenController {
                     description = "등록/갱신 성공"
             ),
             @ApiResponse(
+                    responseCode = "400",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "fcm token blank",
+                                            summary = "FCM 토큰이 빈 값인 경우",
+                                            value = """
+                                                    {
+                                                        "tag": "FCM_TOKEN_BLANK",
+                                                        "message": "FCM 토큰은 비워둘 수 없습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "device fid required",
+                                            summary = "device-fid 헤더가 빈 값인 경우",
+                                            value = """
+                                                    {
+                                                        "tag": "DEVICE_FID_REQUIRED",
+                                                        "message": "요청 헤더에 device_fid가 존재하지 않습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
                     responseCode = "401",
                     description = "실패 예시",
                     content = @Content(
@@ -98,6 +128,24 @@ public class FcmTokenController {
             @ApiResponse(
                     responseCode = "204",
                     description = "변경 성공"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "notification enabled required",
+                                    summary = "알림 수신 여부 값이 누락된 경우",
+                                    value = """
+                                            {
+                                                "tag": "NOTIFICATION_ENABLED_REQUIRED",
+                                                "message": "알림 수신 여부는 필수 값입니다."
+                                            }
+                                            """
+                            )
+                    )
             ),
             @ApiResponse(
                     responseCode = "401",
