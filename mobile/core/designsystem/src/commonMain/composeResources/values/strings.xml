@@ -145,6 +145,7 @@
     <string name="login_start_to_guest">게스트 모드로 시작하기</string>
     <string name="login_help_description">게스트 모드를 이용할 경우,\n사용할 수 있는 기능이 제한돼요</string>
     <string name="login_google_description">구글 로그인</string>
+    <string name="login_apple_description">Apple로 로그인</string>
     <string name="login_dialog_migration_message">기존의 데이터와 동기화 하시겠습니까?</string>
     <string name="login_dialog_migration_title">동기화</string>
     <string name="login_dialog_confirm_text">데이터 동기화</string>

@@ -9,9 +9,6 @@ import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 import platform.AuthenticationServices.ASAuthorization
-import platform.AuthenticationServices.ASAuthorizationAppleIDButton
-import platform.AuthenticationServices.ASAuthorizationAppleIDButtonStyle
-import platform.AuthenticationServices.ASAuthorizationAppleIDButtonTypeSignIn
 import platform.AuthenticationServices.ASAuthorizationAppleIDCredential
 import platform.AuthenticationServices.ASAuthorizationAppleIDProvider
 import platform.AuthenticationServices.ASAuthorizationController
@@ -149,11 +146,5 @@ private class AppleAuthorizationDelegate(
         return window ?: UIWindow()
     }
 }
-
-internal fun createAppleSignInButton(): ASAuthorizationAppleIDButton =
-    ASAuthorizationAppleIDButton(
-        authorizationButtonType = ASAuthorizationAppleIDButtonTypeSignIn,
-        authorizationButtonStyle = ASAuthorizationAppleIDButtonStyle.ASAuthorizationAppleIDButtonStyleBlack,
-    )
 
 private const val APPLE_AUTHORIZATION_ERROR_CANCELED_CODE = 1001L

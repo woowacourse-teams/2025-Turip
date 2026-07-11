@@ -43,9 +43,9 @@ import com.on.turip.core.designsystem.generated.resources.my_page_logout_dialog_
 import com.on.turip.core.designsystem.snackbar.LocalSnackbarDelegate
 import com.on.turip.core.designsystem.theme.TuripTheme
 import com.on.turip.core.ui.error.toUiModel
+import com.on.turip.feature.login.impl.component.AppleLoginButton
 import com.on.turip.feature.login.impl.component.GoogleLoginButton
 import com.on.turip.feature.login.impl.component.GuestModeSection
-import com.on.turip.feature.login.impl.component.PlatformLoginButton
 import com.on.turip.feature.login.impl.util.noRippleClickable
 import kotlinx.coroutines.flow.collectLatest
 import org.jetbrains.compose.resources.getString
@@ -197,7 +197,7 @@ private fun LoginScreenContent(
             )
 
             if (showAppleLoginButton) {
-                PlatformLoginButton(
+                AppleLoginButton(
                     onLoginClick = onAppleLoginClick,
                     modifier = Modifier.fillMaxWidth(),
                 )
