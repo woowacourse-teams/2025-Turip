@@ -8,6 +8,7 @@ import io.github.aakira.napier.Napier
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.darwin.Darwin
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.request.forms.FormDataContent
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -206,7 +207,13 @@ private suspend fun exchangeAuthorizationCodeForIdToken(
     code: String,
     codeVerifier: String,
 ): TuripResult<String> {
-    val httpClient = HttpClient(Darwin)
+    val httpClient =
+        HttpClient(Darwin) {
+            install(HttpTimeout) {
+                connectTimeoutMillis = 10_000L
+                requestTimeoutMillis = 20_000L
+            }
+        }
     return try {
         val response =
             httpClient.post(GOOGLE_TOKEN_ENDPOINT) {

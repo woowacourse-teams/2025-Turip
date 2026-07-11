@@ -33,8 +33,6 @@ class LoginViewModel(
     private val _uiEffect: Channel<LoginUiEffect> = Channel(Channel.BUFFERED)
     val uiEffect: Flow<LoginUiEffect> = _uiEffect.receiveAsFlow()
 
-    private var isLoginInProgress: Boolean = false
-
     fun initDeepLinkUrl(deepLinkUrl: String?) {
         val trimmedDeepLinkUrl: String? = deepLinkUrl?.trim()?.takeIf(String::isNotEmpty)
         if (_uiState.value.deepLinkUrl == trimmedDeepLinkUrl) return
@@ -53,8 +51,8 @@ class LoginViewModel(
     }
 
     fun loginWithGoogle(googleCredentialManager: GoogleCredentialManager) {
-        if (isLoginInProgress) return
-        isLoginInProgress = true
+        if (_uiState.value.isLoading) return
+        _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
             try {
                 googleCredentialManager
@@ -88,14 +86,14 @@ class LoginViewModel(
                         )
                     }
             } finally {
-                isLoginInProgress = false
+                _uiState.update { it.copy(isLoading = false) }
             }
         }
     }
 
     fun loginWithApple(appleCredentialManager: AppleCredentialManager) {
-        if (isLoginInProgress) return
-        isLoginInProgress = true
+        if (_uiState.value.isLoading) return
+        _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
             try {
                 appleCredentialManager
@@ -129,7 +127,7 @@ class LoginViewModel(
                         )
                     }
             } finally {
-                isLoginInProgress = false
+                _uiState.update { it.copy(isLoading = false) }
             }
         }
     }

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -110,6 +111,7 @@ fun LoginScreen(
                 .fillMaxSize()
                 .noRippleClickable { viewModel.updateHelpTextVisible(false) },
         showAppleLoginButton = showAppleLoginButton,
+        isLoading = uiState.isLoading,
         onHelpClick = { viewModel.updateHelpTextVisible(!uiState.showHelpText) },
         onGoogleLoginClick = { viewModel.loginWithGoogle(googleCredentialManager) },
         onAppleLoginClick = { viewModel.loginWithApple(appleCredentialManager) },
@@ -121,6 +123,7 @@ fun LoginScreen(
 private fun LoginScreenContent(
     isHelpTextVisible: Boolean,
     showAppleLoginButton: Boolean,
+    isLoading: Boolean,
     onHelpClick: () -> Unit,
     onGoogleLoginClick: () -> Unit,
     onAppleLoginClick: () -> Unit,
@@ -208,6 +211,22 @@ private fun LoginScreenContent(
             )
         }
     }
+
+    if (isLoading) {
+        Box(
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .background(TuripTheme.colors.black.copy(alpha = 0.3f))
+                    .noRippleClickable { },
+            contentAlignment = Alignment.Center,
+        ) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(60.dp),
+                color = TuripTheme.colors.white,
+            )
+        }
+    }
 }
 
 @Composable
@@ -217,6 +236,7 @@ private fun HelpVisibleLoginScreenPreview() {
         LoginScreenContent(
             isHelpTextVisible = true,
             showAppleLoginButton = false,
+            isLoading = false,
             onHelpClick = {},
             onGoogleLoginClick = {},
             onAppleLoginClick = {},
@@ -232,6 +252,7 @@ private fun HelpInvisibleLoginScreenPreview() {
         LoginScreenContent(
             isHelpTextVisible = false,
             showAppleLoginButton = false,
+            isLoading = false,
             onHelpClick = {},
             onGoogleLoginClick = {},
             onAppleLoginClick = {},
