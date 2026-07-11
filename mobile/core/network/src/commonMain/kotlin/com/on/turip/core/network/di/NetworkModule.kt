@@ -34,6 +34,7 @@ fun networkModule(
             tokenManager = get<TokenManager>(),
             authRepositoryProvider = { get<AuthRepository>() },
             deviceFidProvider = { fidManager.getFid() },
+            authTokenCacheController = get<DefaultAuthTokenCacheController>(),
         )
     }
 
@@ -54,6 +55,7 @@ fun networkModule(
             tokenManager = get<TokenManager>(),
             authRepositoryProvider = { get<AuthRepository>() },
             deviceFidProvider = { fidManager.getFid() },
+            authTokenCacheController = get<DefaultAuthTokenCacheController>(),
         )
     }
 

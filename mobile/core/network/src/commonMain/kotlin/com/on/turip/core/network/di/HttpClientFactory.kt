@@ -12,6 +12,8 @@ import io.ktor.client.HttpClientConfig
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.HttpTimeoutConfig.Companion.INFINITE_TIMEOUT_MS
 import io.ktor.client.plugins.auth.Auth
+import io.ktor.client.plugins.auth.authProvider
+import io.ktor.client.plugins.auth.providers.BearerAuthProvider
 import io.ktor.client.plugins.auth.providers.BearerTokens
 import io.ktor.client.plugins.auth.providers.bearer
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -52,6 +54,7 @@ fun buildDefaultHttpClient(
     tokenManager: TokenManager,
     authRepositoryProvider: () -> AuthRepository,
     deviceFidProvider: () -> String?,
+    authTokenCacheController: DefaultAuthTokenCacheController,
 ): HttpClient = createDefaultEngine {
     expectSuccess = true
 
@@ -60,7 +63,7 @@ fun buildDefaultHttpClient(
     contentNegotiationInterceptor()
     defaultRequestInterceptor(baseUrl, deviceFidProvider)
     headerInterceptor(tokenManager, authRepositoryProvider)
-}
+}.registerBearerTokenClear(authTokenCacheController)
 
 fun buildNoAuthHttpClient(
     baseUrl: String,
@@ -81,6 +84,7 @@ fun buildSseHttpClient(
     tokenManager: TokenManager,
     authRepositoryProvider: () -> AuthRepository,
     deviceFidProvider: () -> String?,
+    authTokenCacheController: DefaultAuthTokenCacheController,
 ): HttpClient = createSseEngine {
     expectSuccess = true
     install(SSE) {
@@ -95,7 +99,7 @@ fun buildSseHttpClient(
     contentNegotiationInterceptor()
     defaultRequestInterceptor(baseUrl, deviceFidProvider)
     headerInterceptor(tokenManager, authRepositoryProvider)
-}
+}.registerBearerTokenClear(authTokenCacheController)
 
 private fun HttpClientConfig<*>.timeoutInterceptor() {
     install(HttpTimeout) {
@@ -179,6 +183,19 @@ private fun HttpClientConfig<*>.headerInterceptor(
         }
     }
 }
+
+/**
+ * 토큰 무효화 시점에 Ktor [BearerAuthProvider]가 메모리에 캐싱한 토큰을 비우도록 등록한다.
+ * 재로그인(계정 전환) 후에도 이전 계정 토큰이 재사용되는 문제를 막는다.
+ */
+private fun HttpClient.registerBearerTokenClear(
+    authTokenCacheController: DefaultAuthTokenCacheController,
+): HttpClient =
+    apply {
+        authTokenCacheController.registerOnClear {
+            authProvider<BearerAuthProvider>()?.clearToken()
+        }
+    }
 
 @OptIn(ExperimentalSerializationApi::class)
 private object PrettyLogger : Logger {
