@@ -7,10 +7,12 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.firebase.messaging.BatchResponse;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
-import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.MessagingErrorCode;
+import com.google.firebase.messaging.MulticastMessage;
+import com.google.firebase.messaging.SendResponse;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,7 +38,19 @@ class FirebaseClientTest {
         String title = "테스트 제목";
         String body = "테스트 내용";
 
-        when(firebaseMessaging.send(any(Message.class))).thenReturn("message-id");
+        SendResponse successResponse1 = mock(SendResponse.class);
+        SendResponse successResponse2 = mock(SendResponse.class);
+        SendResponse successResponse3 = mock(SendResponse.class);
+        when(successResponse1.isSuccessful()).thenReturn(true);
+        when(successResponse2.isSuccessful()).thenReturn(true);
+        when(successResponse3.isSuccessful()).thenReturn(true);
+
+        BatchResponse batchResponse = mock(BatchResponse.class);
+        when(batchResponse.getResponses()).thenReturn(List.of(successResponse1, successResponse2, successResponse3));
+        when(batchResponse.getSuccessCount()).thenReturn(3);
+        when(batchResponse.getFailureCount()).thenReturn(0);
+
+        when(firebaseMessaging.sendEachForMulticast(any(MulticastMessage.class))).thenReturn(batchResponse);
 
         // when
         List<String> invalidTokens = firebaseClient.sendNotificationToMultipleDevicesAndReturnInvalidTokens(
@@ -45,7 +59,7 @@ class FirebaseClientTest {
 
         // then
         assertThat(invalidTokens).isEmpty();
-        verify(firebaseMessaging, times(3)).send(any(Message.class));
+        verify(firebaseMessaging, times(1)).sendEachForMulticast(any(MulticastMessage.class));
     }
 
     @Test
@@ -59,10 +73,22 @@ class FirebaseClientTest {
         FirebaseMessagingException unregisteredException = mock(FirebaseMessagingException.class);
         when(unregisteredException.getMessagingErrorCode()).thenReturn(MessagingErrorCode.UNREGISTERED);
 
-        when(firebaseMessaging.send(any(Message.class)))
-                .thenReturn("message-id")
-                .thenThrow(unregisteredException)
-                .thenReturn("message-id");
+        SendResponse successResponse1 = mock(SendResponse.class);
+        when(successResponse1.isSuccessful()).thenReturn(true);
+
+        SendResponse failedResponse = mock(SendResponse.class);
+        when(failedResponse.isSuccessful()).thenReturn(false);
+        when(failedResponse.getException()).thenReturn(unregisteredException);
+
+        SendResponse successResponse3 = mock(SendResponse.class);
+        when(successResponse3.isSuccessful()).thenReturn(true);
+
+        BatchResponse batchResponse = mock(BatchResponse.class);
+        when(batchResponse.getResponses()).thenReturn(List.of(successResponse1, failedResponse, successResponse3));
+        when(batchResponse.getSuccessCount()).thenReturn(2);
+        when(batchResponse.getFailureCount()).thenReturn(1);
+
+        when(firebaseMessaging.sendEachForMulticast(any(MulticastMessage.class))).thenReturn(batchResponse);
 
         // when
         List<String> invalidTokens = firebaseClient.sendNotificationToMultipleDevicesAndReturnInvalidTokens(
@@ -71,7 +97,7 @@ class FirebaseClientTest {
 
         // then
         assertThat(invalidTokens).hasSize(1).contains("invalid-token");
-        verify(firebaseMessaging, times(3)).send(any(Message.class));
+        verify(firebaseMessaging, times(1)).sendEachForMulticast(any(MulticastMessage.class));
     }
 
     @Test
@@ -85,10 +111,22 @@ class FirebaseClientTest {
         FirebaseMessagingException otherException = mock(FirebaseMessagingException.class);
         when(otherException.getMessagingErrorCode()).thenReturn(MessagingErrorCode.INTERNAL);
 
-        when(firebaseMessaging.send(any(Message.class)))
-                .thenReturn("message-id")
-                .thenThrow(otherException)
-                .thenReturn("message-id");
+        SendResponse successResponse1 = mock(SendResponse.class);
+        when(successResponse1.isSuccessful()).thenReturn(true);
+
+        SendResponse failedResponse = mock(SendResponse.class);
+        when(failedResponse.isSuccessful()).thenReturn(false);
+        when(failedResponse.getException()).thenReturn(otherException);
+
+        SendResponse successResponse3 = mock(SendResponse.class);
+        when(successResponse3.isSuccessful()).thenReturn(true);
+
+        BatchResponse batchResponse = mock(BatchResponse.class);
+        when(batchResponse.getResponses()).thenReturn(List.of(successResponse1, failedResponse, successResponse3));
+        when(batchResponse.getSuccessCount()).thenReturn(2);
+        when(batchResponse.getFailureCount()).thenReturn(1);
+
+        when(firebaseMessaging.sendEachForMulticast(any(MulticastMessage.class))).thenReturn(batchResponse);
 
         // when
         List<String> invalidTokens = firebaseClient.sendNotificationToMultipleDevicesAndReturnInvalidTokens(
@@ -97,6 +135,6 @@ class FirebaseClientTest {
 
         // then
         assertThat(invalidTokens).isEmpty();
-        verify(firebaseMessaging, times(3)).send(any(Message.class));
+        verify(firebaseMessaging, times(1)).sendEachForMulticast(any(MulticastMessage.class));
     }
 }
