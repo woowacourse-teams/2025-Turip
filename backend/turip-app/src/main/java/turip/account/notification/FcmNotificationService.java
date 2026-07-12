@@ -3,7 +3,6 @@ package turip.account.notification;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import turip.account.domain.Account;
 import turip.account.domain.FcmToken;
 import turip.account.repository.AccountRepository;
 import turip.infrastructure.client.FirebaseClient;
@@ -15,11 +14,7 @@ public class FcmNotificationService {
     private final FirebaseClient firebaseClient;
     private final AccountRepository accountRepository;
 
-    public void sendToAccounts(List<Account> accounts, FcmNotificationMessage fcmNotificationMessage) {
-        List<Long> accountIds = accounts.stream()
-                .map(Account::getId)
-                .toList();
-
+    public void sendToAccounts(List<Long> accountIds, FcmNotificationMessage fcmNotificationMessage) {
         List<FcmToken> fcmTokens = accountRepository.findFcmTokensByAccountIds(accountIds);
 
         List<String> tokens = fcmTokens.stream()

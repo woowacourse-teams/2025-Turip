@@ -45,7 +45,7 @@ class FcmNotificationServiceTest {
             // given
             Account account1 = createAccount(1L);
             Account account2 = createAccount(2L);
-            List<Account> accounts = List.of(account1, account2);
+            List<Long> accounts = List.of(account1.getId(), account2.getId());
 
             FcmToken fcmToken1 = new FcmToken(account1, "token1");
             FcmToken fcmToken2 = new FcmToken(account2, "token2");
@@ -55,7 +55,8 @@ class FcmNotificationServiceTest {
 
             when(accountRepository.findFcmTokensByAccountIds(List.of(1L, 2L)))
                     .thenReturn(fcmTokens);
-            when(firebaseClient.sendNotificationToMultipleDevicesAndReturnInvalidTokens(anyList(), anyString(), anyString()))
+            when(firebaseClient.sendNotificationToMultipleDevicesAndReturnInvalidTokens(anyList(), anyString(),
+                    anyString()))
                     .thenReturn(Collections.emptyList());
 
             // when
@@ -76,7 +77,7 @@ class FcmNotificationServiceTest {
         void sendToAccounts2() {
             // given
             Account account = createAccount(1L);
-            List<Account> accounts = List.of(account);
+            List<Long> accounts = List.of(account.getId());
 
             FcmNotificationMessage message = FcmNotificationMessage.of("테스트 제목", "테스트 내용");
 
@@ -100,7 +101,7 @@ class FcmNotificationServiceTest {
             Account account1 = createAccount(1L);
             Account account2 = createAccount(2L);
             Account account3 = createAccount(3L);
-            List<Account> accounts = List.of(account1, account2, account3);
+            List<Long> accounts = List.of(account1.getId(), account2.getId(), account3.getId());
 
             // account1, account2만 알림 활성화된 토큰
             FcmToken fcmToken1 = new FcmToken(account1, "token1");
@@ -134,7 +135,7 @@ class FcmNotificationServiceTest {
             // given
             Account account1 = createAccount(1L);
             Account account2 = createAccount(2L);
-            List<Account> accounts = List.of(account1, account2);
+            List<Long> accounts = List.of(account1.getId(), account2.getId());
 
             FcmToken fcmToken1 = new FcmToken(account1, "token1");
             FcmToken fcmToken2 = new FcmToken(account2, "invalid-token");

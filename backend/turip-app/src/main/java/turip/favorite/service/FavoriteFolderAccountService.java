@@ -68,8 +68,8 @@ public class FavoriteFolderAccountService {
         return favoriteFolderAccountRepository.findMembersByFavoriteFolderId(favoriteFolderId);
     }
 
-    public List<Account> findAccountsByFavoriteFolder(Long folderId) {
-        return favoriteFolderAccountRepository.findAccountsByFavoriteFolderId(folderId);
+    public List<Long> findAccountIdsByFavoriteFolder(Long folderId) {
+        return favoriteFolderAccountRepository.findAccountIdsByFavoriteFolderId(folderId);
     }
 
     public int countByFavoriteFolder(FavoriteFolder favoriteFolder) {

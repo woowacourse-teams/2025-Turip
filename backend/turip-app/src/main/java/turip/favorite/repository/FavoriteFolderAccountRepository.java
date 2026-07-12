@@ -36,10 +36,10 @@ public interface FavoriteFolderAccountRepository extends JpaRepository<FavoriteF
             "WHERE ffa.favoriteFolder.id = :favoriteFolderId")
     List<Member> findMembersByFavoriteFolderId(@Param("favoriteFolderId") Long favoriteFolderId);
 
-    @Query("SELECT a FROM Account a " +
+    @Query("SELECT a.id FROM Account a " +
             "WHERE a.id IN (SELECT ffa.account.id FROM FavoriteFolderAccount ffa " +
             "WHERE ffa.favoriteFolder.id = :favoriteFolderId)")
-    List<Account> findAccountsByFavoriteFolderId(Long favoriteFolderId);
+    List<Long> findAccountIdsByFavoriteFolderId(Long favoriteFolderId);
 
     @Modifying
     @Query("UPDATE FavoriteFolderAccount ffa " +

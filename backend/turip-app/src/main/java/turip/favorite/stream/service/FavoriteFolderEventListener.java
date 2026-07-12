@@ -7,7 +7,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
-import turip.account.domain.Account;
 import turip.account.notification.FcmNotificationService;
 import turip.account.notification.NotificationType;
 import turip.favorite.domain.FavoriteFolder;
@@ -62,9 +61,9 @@ public class FavoriteFolderEventListener {
             return;
         }
 
-        List<Account> accounts = favoriteFolderAccountService.findAccountsByFavoriteFolder(folderId);
-        List<Account> recipients = accounts.stream()
-                .filter(account -> !account.getId().equals(event.accountId()))
+        List<Long> accountIds = favoriteFolderAccountService.findAccountIdsByFavoriteFolder(folderId);
+        List<Long> recipients = accountIds.stream()
+                .filter(accountId -> !accountId.equals(event.accountId()))
                 .toList();
         if (recipients.isEmpty()) {
             return;
