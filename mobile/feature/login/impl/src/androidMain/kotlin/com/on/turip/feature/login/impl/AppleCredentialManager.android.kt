@@ -14,7 +14,7 @@ internal actual fun rememberAppleCredentialManager(): AppleCredentialManager =
 private class AndroidAppleCredentialManager : AppleCredentialManager {
     override suspend fun getCredential(): TuripResult<AppleCredential> =
         TuripResult.Failure(
-            errorType = ErrorType.Cancelled,
+            errorType = ErrorType.Unknown,
             cause = UnsupportedOperationException("Apple login is only available on iOS."),
         )
 }

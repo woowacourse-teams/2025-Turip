@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.on.turip.core.data.session.SessionManager
 import com.on.turip.core.model.result.ErrorType
+import com.on.turip.core.model.result.TuripResult
+import com.on.turip.core.model.result.map
 import com.on.turip.core.model.result.onFailure
 import com.on.turip.core.model.result.onFailureWithCause
 import com.on.turip.core.model.result.onSuccess
@@ -51,14 +53,30 @@ class LoginViewModel(
     }
 
     fun loginWithGoogle(googleCredentialManager: GoogleCredentialManager) {
+        login(providerName = "Google") {
+            googleCredentialManager.getIdToken().map { idToken -> SocialCredential.Google(idToken) }
+        }
+    }
+
+    fun loginWithApple(appleCredentialManager: AppleCredentialManager) {
+        login(providerName = "Apple") {
+            appleCredentialManager.getCredential().map { credential ->
+                SocialCredential.Apple(idToken = credential.idToken, rawNonce = credential.rawNonce)
+            }
+        }
+    }
+
+    private fun login(
+        providerName: String,
+        getCredential: suspend () -> TuripResult<SocialCredential>,
+    ) {
         if (_uiState.value.isLoading) return
         _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
             try {
-                googleCredentialManager
-                    .getIdToken()
-                    .onSuccess { idToken: String ->
-                        loginUseCase(idToken)
+                getCredential()
+                    .onSuccess { credential: SocialCredential ->
+                        loginUseCase(credential)
                             .onSuccess { isMigrationDecided: Boolean ->
                                 if (!isMigrationDecided) {
                                     _uiState.update { it.copy(showMigrationDialog = true) }
@@ -67,7 +85,7 @@ class LoginViewModel(
                                 }
                             }.onFailureWithCause { errorType, cause ->
                                 Napier.e(
-                                    message = "Google 로그인 API 실패. errorType=$errorType",
+                                    message = "$providerName 로그인 API 실패. errorType=$errorType",
                                     throwable = cause,
                                 )
                                 handleError(errorType)
@@ -75,54 +93,13 @@ class LoginViewModel(
                     }.onFailureWithCause { errorType: ErrorType, cause: Throwable ->
                         // 로그인 도중 사용자가 포기한 경우는 예외로 판단하지 않고 무시
                         if (errorType == ErrorType.Cancelled) {
-                            Napier.d("Google 로그인 취소")
+                            Napier.d("$providerName 로그인 취소")
                             return@onFailureWithCause
                         }
 
                         handleError(errorType)
                         Napier.e(
-                            message = "googleCredentialManager 에서 IdToken 불러오기 실패. errorType=$errorType",
-                            throwable = cause,
-                        )
-                    }
-            } finally {
-                _uiState.update { it.copy(isLoading = false) }
-            }
-        }
-    }
-
-    fun loginWithApple(appleCredentialManager: AppleCredentialManager) {
-        if (_uiState.value.isLoading) return
-        _uiState.update { it.copy(isLoading = true) }
-        viewModelScope.launch {
-            try {
-                appleCredentialManager
-                    .getCredential()
-                    .onSuccess { credential: AppleCredential ->
-                        loginUseCase
-                            .loginWithApple(idToken = credential.idToken, nonce = credential.rawNonce)
-                            .onSuccess { isMigrationDecided: Boolean ->
-                                if (!isMigrationDecided) {
-                                    _uiState.update { it.copy(showMigrationDialog = true) }
-                                } else {
-                                    _uiEffect.send(LoginUiEffect.NavigateToMain(_uiState.value.deepLinkUrl))
-                                }
-                            }.onFailureWithCause { errorType, cause ->
-                                Napier.e(
-                                    message = "Apple 로그인 API 실패. errorType=$errorType",
-                                    throwable = cause,
-                                )
-                                handleError(errorType)
-                            }
-                    }.onFailureWithCause { errorType: ErrorType, cause: Throwable ->
-                        if (errorType == ErrorType.Cancelled) {
-                            Napier.d("Apple 로그인 취소")
-                            return@onFailureWithCause
-                        }
-
-                        handleError(errorType)
-                        Napier.e(
-                            message = "appleCredentialManager 에서 credential 불러오기 실패. errorType=$errorType",
+                            message = "$providerName credentialManager 에서 credential 불러오기 실패. errorType=$errorType",
                             throwable = cause,
                         )
                     }

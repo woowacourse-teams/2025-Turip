@@ -7,6 +7,10 @@ import com.on.turip.core.model.result.TuripResult
 import io.github.aakira.napier.Napier
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.addressOf
+import kotlinx.cinterop.cValue
+import kotlinx.cinterop.convert
+import kotlinx.cinterop.usePinned
 import kotlinx.coroutines.suspendCancellableCoroutine
 import platform.AuthenticationServices.ASAuthorization
 import platform.AuthenticationServices.ASAuthorizationAppleIDCredential
@@ -14,15 +18,22 @@ import platform.AuthenticationServices.ASAuthorizationAppleIDProvider
 import platform.AuthenticationServices.ASAuthorizationController
 import platform.AuthenticationServices.ASAuthorizationControllerDelegateProtocol
 import platform.AuthenticationServices.ASAuthorizationControllerPresentationContextProvidingProtocol
+import platform.AuthenticationServices.ASAuthorizationErrorCanceled
+import platform.AuthenticationServices.ASAuthorizationErrorDomain
 import platform.AuthenticationServices.ASAuthorizationScopeEmail
 import platform.AuthenticationServices.ASPresentationAnchor
 import platform.Foundation.NSError
+import platform.Foundation.NSOperatingSystemVersion
+import platform.Foundation.NSProcessInfo
 import platform.Foundation.NSString
 import platform.Foundation.NSUTF8StringEncoding
-import platform.Foundation.NSUUID
 import platform.Foundation.create
+import platform.Security.SecRandomCopyBytes
+import platform.Security.kSecRandomDefault
 import platform.UIKit.UIApplication
+import platform.UIKit.UISceneActivationStateForegroundActive
 import platform.UIKit.UIWindow
+import platform.UIKit.UIWindowScene
 import platform.darwin.NSObject
 import kotlin.coroutines.resume
 
@@ -33,11 +44,20 @@ internal actual fun rememberAppleCredentialManager(): AppleCredentialManager =
     }
 
 private class IosAppleCredentialManager : AppleCredentialManager {
+    private var activeRequestId: Any? = null
     private var authorizationController: ASAuthorizationController? = null
     private var authorizationDelegate: AppleAuthorizationDelegate? = null
 
-    override suspend fun getCredential(): TuripResult<AppleCredential> =
-        suspendCancellableCoroutine { continuation ->
+    override suspend fun getCredential(): TuripResult<AppleCredential> {
+        if (activeRequestId != null) {
+            return TuripResult.Failure(
+                errorType = ErrorType.Cancelled,
+                cause = IllegalStateException("Apple 로그인 요청이 이미 진행 중입니다."),
+            )
+        }
+
+        return suspendCancellableCoroutine { continuation ->
+            val requestId = Any()
             val rawNonce = generateRawNonce()
             val hashedNonce = sha256(rawNonce)
 
@@ -53,30 +73,60 @@ private class IosAppleCredentialManager : AppleCredentialManager {
                 AppleAuthorizationDelegate(
                     rawNonce = rawNonce,
                     onCompleted = { result ->
-                        authorizationController = null
-                        authorizationDelegate = null
+                        if (activeRequestId === requestId) {
+                            activeRequestId = null
+                            authorizationController = null
+                            authorizationDelegate = null
+                        }
                         if (continuation.isActive) {
                             continuation.resume(result)
                         }
                     },
                 )
 
+            activeRequestId = requestId
             authorizationController = controller
             authorizationDelegate = delegate
             controller.delegate = delegate
             controller.presentationContextProvider = delegate
 
             continuation.invokeOnCancellation {
-                authorizationController = null
-                authorizationDelegate = null
+                if (activeRequestId === requestId) {
+                    activeRequestId = null
+                    authorizationController = null
+                    authorizationDelegate = null
+                }
+                cancelIfSupported(controller)
             }
 
             controller.performRequests()
         }
+    }
 }
 
-private fun generateRawNonce(): String =
-    NSUUID().UUIDString().replace("-", "") + NSUUID().UUIDString().replace("-", "")
+@OptIn(ExperimentalForeignApi::class)
+private fun cancelIfSupported(controller: ASAuthorizationController) {
+    val minimumVersion =
+        cValue<NSOperatingSystemVersion> {
+            majorVersion = 16
+            minorVersion = 0
+            patchVersion = 0
+        }
+    if (NSProcessInfo.processInfo.isOperatingSystemAtLeastVersion(minimumVersion)) {
+        controller.cancel()
+    }
+}
+
+@OptIn(ExperimentalForeignApi::class)
+private fun generateRawNonce(): String {
+    val nonceBytes = ByteArray(NONCE_BYTE_LENGTH)
+    nonceBytes.usePinned { pinned ->
+        SecRandomCopyBytes(kSecRandomDefault, NONCE_BYTE_LENGTH.convert(), pinned.addressOf(0))
+    }
+    return nonceBytes.joinToString("") { (it.toInt() and 0xff).toString(16).padStart(2, '0') }
+}
+
+private const val NONCE_BYTE_LENGTH = 32
 
 private fun sha256(input: String): String =
     sha256Digest(input).joinToString("") { (it.toInt() and 0xff).toString(16).padStart(2, '0') }
@@ -118,7 +168,9 @@ private class AppleAuthorizationDelegate(
                 "code=${didCompleteWithError.code}, message=${didCompleteWithError.localizedDescription}",
         )
         val errorType =
-            if (didCompleteWithError.code == APPLE_AUTHORIZATION_ERROR_CANCELED_CODE) {
+            if (didCompleteWithError.domain == ASAuthorizationErrorDomain &&
+                didCompleteWithError.code == ASAuthorizationErrorCanceled
+            ) {
                 ErrorType.Cancelled
             } else {
                 ErrorType.Unknown
@@ -142,9 +194,20 @@ private class AppleAuthorizationDelegate(
     override fun presentationAnchorForAuthorizationController(
         controller: ASAuthorizationController,
     ): ASPresentationAnchor {
-        val window = UIApplication.sharedApplication.windows.firstOrNull() as? UIWindow
-        return window ?: UIWindow()
+        val activeSceneKeyWindow = UIApplication.sharedApplication.connectedScenes
+            .filterIsInstance<UIWindowScene>()
+            .firstOrNull { it.activationState == UISceneActivationStateForegroundActive }
+            ?.windows
+            ?.filterIsInstance<UIWindow>()
+            ?.firstOrNull { it.keyWindow }
+
+        val fallbackWindow = UIApplication.sharedApplication.windows
+            .filterIsInstance<UIWindow>()
+            .firstOrNull { it.keyWindow }
+            ?: UIApplication.sharedApplication.windows.firstOrNull() as? UIWindow
+
+        return activeSceneKeyWindow ?: checkNotNull(fallbackWindow) {
+            "No UIWindow available to present Apple authorization sheet."
+        }
     }
 }
-
-private const val APPLE_AUTHORIZATION_ERROR_CANCELED_CODE = 1001L
