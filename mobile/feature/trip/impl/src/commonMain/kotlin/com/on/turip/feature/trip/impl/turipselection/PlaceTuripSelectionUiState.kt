@@ -13,6 +13,7 @@ data class PlaceTuripSelectionUiState(
     val turips: ImmutableList<TuripSelectionModel>,
     val selectedTuripPlaces: ImmutableList<TuripPlaceModel>,
     val isChanged: Boolean,
+    val isUpdatingTurips: Boolean = false,
 ) {
     companion object {
         val Idle =
@@ -23,6 +24,7 @@ data class PlaceTuripSelectionUiState(
                 turips = persistentListOf(),
                 selectedTuripPlaces = persistentListOf(),
                 isChanged = false,
+                isUpdatingTurips = false,
             )
     }
 }

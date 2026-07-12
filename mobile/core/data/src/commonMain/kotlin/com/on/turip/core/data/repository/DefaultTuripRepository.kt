@@ -34,6 +34,7 @@ class DefaultTuripRepository(
 ) : TuripRepository {
     private val _turips = MutableStateFlow<List<Turip>>(emptyList())
     override val turips: StateFlow<List<Turip>> = _turips.asStateFlow()
+    private var isUpdatingPlaceTurips = false
 
     override suspend fun loadTurip(turipId: Long): TuripResult<Turip> =
         turipRestRemoteDataSource.getTurip(turipId).mapCatching { it.toDomain() }.also { result ->
@@ -137,34 +138,41 @@ class DefaultTuripRepository(
         turipIds: List<Long>,
         previouslySelectedIds: Set<Long>,
     ): TuripResult<Unit> {
-        val turipIdsSet = turipIds.toSet()
-        return turipRestRemoteDataSource
-            .putPlaceTurips(
-                placeId = placeId,
-                placeTuripsRequest = PlaceTuripsRequest(turipIds),
-            ).also { result ->
-                result.onSuccess {
-                    _turips.update { current ->
-                        current.map { turip ->
-                            val wasSelected = turip.id in previouslySelectedIds
-                            val isNowSelected = turip.id in turipIdsSet
-                            when {
-                                !wasSelected && isNowSelected -> {
-                                    turip.copy(placeCount = turip.placeCount + 1)
-                                }
+        if (isUpdatingPlaceTurips) return TuripResult.Success(Unit)
+        isUpdatingPlaceTurips = true
 
-                                wasSelected && !isNowSelected -> {
-                                    turip.copy(placeCount = (turip.placeCount - 1).coerceAtLeast(0))
-                                }
+        try {
+            val turipIdsSet = turipIds.toSet()
+            return turipRestRemoteDataSource
+                .putPlaceTurips(
+                    placeId = placeId,
+                    placeTuripsRequest = PlaceTuripsRequest(turipIds),
+                ).also { result ->
+                    result.onSuccess {
+                        _turips.update { current ->
+                            current.map { turip ->
+                                val wasSelected = turip.id in previouslySelectedIds
+                                val isNowSelected = turip.id in turipIdsSet
+                                when {
+                                    !wasSelected && isNowSelected -> {
+                                        turip.copy(placeCount = turip.placeCount + 1)
+                                    }
 
-                                else -> {
-                                    turip
+                                    wasSelected && !isNowSelected -> {
+                                        turip.copy(placeCount = (turip.placeCount - 1).coerceAtLeast(0))
+                                    }
+
+                                    else -> {
+                                        turip
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
+        } finally {
+            isUpdatingPlaceTurips = false
+        }
     }
 
     override suspend fun createInvitationToken(turipId: Long): TuripResult<TuripInvitationToken> =

@@ -136,6 +136,9 @@ class PlaceTuripSelectionViewModel(
     }
 
     fun updateTuripsByPlace() {
+        if (uiState.value.isUpdatingTurips) return
+        _uiState.update { it.copy(isUpdatingTurips = true) }
+
         viewModelScope.launch {
             val selectedTuripIds = uiState.value.turips
                 .filter { it.isSelected }
@@ -145,6 +148,7 @@ class PlaceTuripSelectionViewModel(
             turipRepository
                 .updatePlaceTurips(placeId, selectedTuripIds, originTuripIds)
                 .onSuccess {
+                    _uiState.update { it.copy(isUpdatingTurips = false) }
                     _uiEffect.send(
                         PlaceTuripSelectionUiEffect.UpdateTuripsByPlace(
                             placeId = placeId,
@@ -154,6 +158,7 @@ class PlaceTuripSelectionViewModel(
                     _uiEffect.send(PlaceTuripSelectionUiEffect.Dismiss)
                     Napier.d("바텀시트, 선택한 장소에 대한 튜립들 현황 업데이트 성공")
                 }.onFailure { errorType ->
+                    _uiState.update { it.copy(isUpdatingTurips = false) }
                     sendErrorEffect(
                         errorType = errorType,
                         retryAction = PlaceTuripSelectionRetryAction.UpdateTuripsByPlace,

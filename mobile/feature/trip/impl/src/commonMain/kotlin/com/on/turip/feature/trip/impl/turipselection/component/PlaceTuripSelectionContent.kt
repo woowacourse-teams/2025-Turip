@@ -68,7 +68,7 @@ fun PlaceTuripSelectionContent(
                 PlaceTuripSelectionScreenMode.Turips -> {
                     TuripsContent(
                         placeName = uiState.placeName,
-                        enableConfirm = uiState.isChanged,
+                        enableConfirm = uiState.isChanged && !uiState.isUpdatingTurips,
                         turips = uiState.turips,
                         onAddTuripClick = onAddTuripClick,
                         onTuripPlaceClick = onTuripPlaceClickAtTurips,
