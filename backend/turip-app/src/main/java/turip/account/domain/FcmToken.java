@@ -18,7 +18,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import turip.common.domain.BaseTimeEntity;
 import turip.common.exception.ErrorTag;
-import turip.common.exception.custom.BadRequestException;
+import turip.common.exception.custom.IllegalArgumentException;
 
 @Entity
 @Getter
@@ -67,13 +67,13 @@ public class FcmToken extends BaseTimeEntity {
 
     private void validateDeviceFid(String deviceFid) {
         if (StringUtils.isBlank(deviceFid)) {
-            throw new BadRequestException(ErrorTag.DEVICE_FID_REQUIRED);
+            throw new IllegalArgumentException(ErrorTag.DEVICE_FID_REQUIRED);
         }
     }
 
     private void validateToken(String token) {
         if (StringUtils.isBlank(token)) {
-            throw new BadRequestException(ErrorTag.FCM_TOKEN_BLANK);
+            throw new IllegalArgumentException(ErrorTag.FCM_TOKEN_BLANK);
         }
     }
 }
