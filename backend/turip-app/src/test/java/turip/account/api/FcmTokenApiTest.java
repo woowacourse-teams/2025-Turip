@@ -136,18 +136,24 @@ class FcmTokenApiTest {
         }
 
         @Test
-        @DisplayName("인증되지 않은 요청은 401 Unauthorized를 응답한다")
+        @DisplayName("액세스 토큰 없이 device-fid만 있는 게스트 요청도 토큰을 등록한다")
         void register4() {
-            Map<String, String> requestBody = new HashMap<>(Map.of("token", "fcm-token-1"));
+            String deviceFid = "guest-device";
+            Map<String, String> requestBody = new HashMap<>(Map.of("token", "guest-fcm-token"));
 
             RestAssured
                     .given().log().all()
                     .contentType(ContentType.JSON)
-                    .header("device-fid", "device-1")
+                    .header("device-fid", deviceFid)
                     .body(requestBody)
                     .when().post("/api/v1/fcm-tokens")
                     .then().log().all()
-                    .statusCode(401);
+                    .statusCode(200);
+
+            Long count = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM fcm_token WHERE device_fid = ? AND token = ?",
+                    Long.class, deviceFid, "guest-fcm-token");
+            assertThat(count).isEqualTo(1);
         }
 
         @Test

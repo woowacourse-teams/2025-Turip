@@ -18,9 +18,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import turip.account.controller.dto.request.FcmTokenNotificationRequest;
 import turip.account.controller.dto.request.FcmTokenRegisterRequest;
-import turip.account.domain.Member;
+import turip.account.domain.Account;
 import turip.account.service.FcmTokenService;
-import turip.auth.resolver.AuthMember;
+import turip.auth.resolver.AuthAccount;
 import turip.common.exception.ErrorResponse;
 
 @RestController
@@ -114,9 +114,9 @@ public class FcmTokenController {
     @PostMapping
     public ResponseEntity<Void> register(
             @Parameter(hidden = true) @RequestHeader("device-fid") String deviceFid,
-            @Parameter(hidden = true) @AuthMember Member member,
+            @Parameter(hidden = true) @AuthAccount Account account,
             @RequestBody FcmTokenRegisterRequest request) {
-        fcmTokenService.registerOrUpdate(member.getAccount(), deviceFid, request.token());
+        fcmTokenService.registerOrUpdate(account, deviceFid, request.token());
         return ResponseEntity.ok().build();
     }
 
@@ -209,9 +209,9 @@ public class FcmTokenController {
     @PatchMapping("/notification")
     public ResponseEntity<Void> changeNotificationEnabled(
             @Parameter(hidden = true) @RequestHeader("device-fid") String deviceFid,
-            @Parameter(hidden = true) @AuthMember Member member,
+            @Parameter(hidden = true) @AuthAccount Account account,
             @RequestBody FcmTokenNotificationRequest request) {
-        fcmTokenService.changeNotificationEnabled(member.getAccount(), deviceFid, request.notificationEnabled());
+        fcmTokenService.changeNotificationEnabled(account, deviceFid, request.notificationEnabled());
         return ResponseEntity.noContent().build();
     }
 }
