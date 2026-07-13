@@ -66,6 +66,7 @@ import com.on.turip.core.designsystem.theme.TuripTheme
 import com.on.turip.core.model.turip.TuripType
 import com.on.turip.core.ui.util.formatResource
 import com.on.turip.feature.turip.impl.component.MyTuripCard
+import com.on.turip.feature.turip.impl.component.MyTuripCardSkeleton
 import com.on.turip.feature.turip.impl.component.MyTuripTabRow
 import com.on.turip.feature.turip.impl.component.TuripAddBottomSheet
 import com.on.turip.feature.turip.impl.model.MyTuripModel
@@ -76,6 +77,8 @@ import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+
+private const val MY_TURIP_SKELETON_ITEM_COUNT = 4
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -264,7 +267,19 @@ private fun MyTuripScreenContent(
                 },
             )
 
-            if (!isLoading) {
+            if (isLoading) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(TuripTheme.spacing.medium),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(top = TuripTheme.spacing.large),
+                ) {
+                    repeat(MY_TURIP_SKELETON_ITEM_COUNT) {
+                        MyTuripCardSkeleton()
+                    }
+                }
+            } else {
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(TuripTheme.spacing.medium),
                     modifier =
