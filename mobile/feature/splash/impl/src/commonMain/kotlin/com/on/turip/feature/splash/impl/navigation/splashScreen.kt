@@ -41,7 +41,6 @@ fun EntryProviderScope<NavKey>.splashScreen(
                     }
                 }
             },
-            onFinish = { navigator.goBack() },
         )
     }
 }

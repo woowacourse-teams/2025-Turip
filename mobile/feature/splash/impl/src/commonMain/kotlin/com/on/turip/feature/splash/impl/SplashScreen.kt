@@ -29,7 +29,6 @@ fun SplashScreen(
     onNavigateToMain: () -> Unit,
     onNavigateToLogin: () -> Unit,
     onNavigateToInvitationEntry: (deepLinkUrl: String) -> Unit,
-    onFinish: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SplashViewModel = koinViewModel(),
 ) {
