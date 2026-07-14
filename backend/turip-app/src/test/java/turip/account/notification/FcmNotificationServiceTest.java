@@ -47,8 +47,8 @@ class FcmNotificationServiceTest {
             Account account2 = createAccount(2L);
             List<Long> accounts = List.of(account1.getId(), account2.getId());
 
-            FcmToken fcmToken1 = new FcmToken(account1, "token1");
-            FcmToken fcmToken2 = new FcmToken(account2, "token2");
+            FcmToken fcmToken1 = new FcmToken(account1, "device1", "token1");
+            FcmToken fcmToken2 = new FcmToken(account2, "device2", "token2");
             List<FcmToken> fcmTokens = List.of(fcmToken1, fcmToken2);
 
             FcmNotificationMessage message = FcmNotificationMessage.of("테스트 제목", "테스트 내용");
@@ -104,8 +104,8 @@ class FcmNotificationServiceTest {
             List<Long> accounts = List.of(account1.getId(), account2.getId(), account3.getId());
 
             // account1, account2만 알림 활성화된 토큰
-            FcmToken fcmToken1 = new FcmToken(account1, "token1");
-            FcmToken fcmToken2 = new FcmToken(account2, "token2");
+            FcmToken fcmToken1 = new FcmToken(account1, "device1", "token1");
+            FcmToken fcmToken2 = new FcmToken(account2, "device2", "token2");
             List<FcmToken> fcmTokens = List.of(fcmToken1, fcmToken2);
 
             FcmNotificationMessage message = FcmNotificationMessage.of("테스트 제목", "테스트 내용");
@@ -137,8 +137,8 @@ class FcmNotificationServiceTest {
             Account account2 = createAccount(2L);
             List<Long> accounts = List.of(account1.getId(), account2.getId());
 
-            FcmToken fcmToken1 = new FcmToken(account1, "token1");
-            FcmToken fcmToken2 = new FcmToken(account2, "invalid-token");
+            FcmToken fcmToken1 = new FcmToken(account1, "device1", "token1");
+            FcmToken fcmToken2 = new FcmToken(account2, "device2", "invalid-token");
             List<FcmToken> fcmTokens = List.of(fcmToken1, fcmToken2);
 
             FcmNotificationMessage message = FcmNotificationMessage.of("테스트 제목", "테스트 내용");

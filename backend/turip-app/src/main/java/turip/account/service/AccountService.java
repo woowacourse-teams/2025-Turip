@@ -9,6 +9,7 @@ import turip.account.domain.Role;
 import turip.account.domain.nickname.NicknameCreator;
 import turip.account.repository.AccountInsertRepository;
 import turip.account.repository.AccountRepository;
+import turip.account.repository.FcmTokenRepository;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.InternalServerException;
 import turip.common.exception.custom.NotFoundException;
@@ -23,6 +24,7 @@ public class AccountService {
     private final FavoriteContentRepository favoriteContentRepository;
     private final FavoriteFolderService favoriteFolderService;
     private final AccountInsertRepository accountInsertRepository;
+    private final FcmTokenRepository fcmTokenRepository;
 
     @Transactional
     public Account create(NicknameCreator nicknameCreator) {
@@ -50,6 +52,7 @@ public class AccountService {
     public void deleteAccountAndFavorites(Account account) {
         favoriteContentRepository.deleteByAccount(account);
         favoriteFolderService.deleteAloneFoldersByAccount(account);
+        fcmTokenRepository.deleteByAccount(account);
         accountRepository.delete(account);
     }
 }
