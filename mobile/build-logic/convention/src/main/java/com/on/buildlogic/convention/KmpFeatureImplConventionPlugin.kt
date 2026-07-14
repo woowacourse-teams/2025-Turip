@@ -121,6 +121,9 @@ internal class KmpFeatureImplConventionPlugin : Plugin<Project> {
                         implementation(libs.library("jetbrains-navigation3-ui"))
                         implementation(libs.library("napier"))
                         implementation(libs.library("kotlinx-datetime"))
+                        implementation(libs.library("coil-compose"))
+                        implementation(libs.library("coil-network-ktor"))
+                        implementation(libs.library("material-icons-extended"))
                     }
                 }
             }

@@ -1,38 +1,12 @@
 package com.on.turip.di
 
-import com.on.turip.data.InMemoryMuseumStorage
-import com.on.turip.data.KtorMuseumApi
-import com.on.turip.data.MuseumApi
-import com.on.turip.data.MuseumRepository
-import com.on.turip.data.MuseumStorage
-import com.on.turip.screens.detail.DetailViewModel
-import com.on.turip.screens.list.ListViewModel
+import com.jetbrains.kmpapp.di.appModule
 import org.koin.core.context.startKoin
-import org.koin.core.module.dsl.factoryOf
-import org.koin.dsl.module
+import org.koin.dsl.KoinAppDeclaration
 
-val dataModule =
-    module {
-        single<MuseumApi> { KtorMuseumApi() }
-        single<MuseumStorage> { InMemoryMuseumStorage() }
-        single {
-            MuseumRepository(get(), get()).apply {
-                initialize()
-            }
-        }
-    }
-
-val viewModelModule =
-    module {
-        factoryOf(::ListViewModel)
-        factoryOf(::DetailViewModel)
-    }
-
-fun initKoin() {
+fun initKoin(config: KoinAppDeclaration? = null) {
     startKoin {
-        modules(
-            dataModule,
-            viewModelModule,
-        )
+        config?.invoke(this)
+        modules(appModule)
     }
 }

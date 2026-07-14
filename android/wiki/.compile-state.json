@@ -1,0 +1,32 @@
+{
+  "last_compiled": "2026-04-13",
+  "topics": [
+    "project-overview",
+    "navigation",
+    "turip",
+    "login-auth",
+    "session-token",
+    "home",
+    "search",
+    "trip",
+    "invitation",
+    "mypage",
+    "design-system",
+    "data-layer",
+    "di",
+    "lint-rules"
+  ],
+  "concepts": [
+    "clean-architecture-pattern",
+    "realtime-sync-pattern"
+  ],
+  "source_locations": [
+    "app/src/main/java/com/on/turip/",
+    "lint-rules/src/main/java/com/on/turip/lint/",
+    "app/build.gradle.kts",
+    "build.gradle.kts",
+    "settings.gradle.kts"
+  ],
+  "total_sources_scanned": 170,
+  "version": 2
+}

@@ -1,0 +1,81 @@
+{
+  "version": 2,
+  "mode": "codebase",
+  "name": "Turip Android",
+  "sources": [
+    {
+      "path": "./",
+      "exclude": [
+        "build/",
+        ".git/",
+        ".idea/",
+        "wiki/",
+        "gradle/",
+        ".gradle/",
+        "app/build/",
+        "lint-rules/build/"
+      ]
+    }
+  ],
+  "output": "wiki/",
+  "service_discovery": "auto",
+  "knowledge_files": [
+    "README.md",
+    "CLAUDE.md",
+    "AGENTS.md",
+    "ARCHITECTURE.md",
+    "CONTRIBUTING.md",
+    "*.proto",
+    "*.graphql",
+    "openapi.yaml",
+    "openapi.json",
+    "ADR-*.md",
+    "docs/adr/*.md",
+    "docker-compose.yml",
+    "Dockerfile",
+    ".env.example",
+    "CHANGELOG.md",
+    "build.gradle.kts",
+    "settings.gradle.kts",
+    "gradle.properties"
+  ],
+  "deep_scan": false,
+  "auto_update": "prompt",
+  "article_sections": [
+    {
+      "name": "목적",
+      "description": "이 모듈/기능이 무엇을 하는지, 누가 의존하는지",
+      "required": true
+    },
+    {
+      "name": "아키텍처",
+      "description": "주요 파일, 구조, 진입점 (ui/domain/data 레이어 구성)"
+    },
+    {
+      "name": "의존 관계",
+      "description": "다른 모듈/기능과의 의존 및 통신 패턴"
+    },
+    {
+      "name": "API 표면",
+      "description": "노출된 ViewModel, UseCase, Repository 인터페이스"
+    },
+    {
+      "name": "데이터",
+      "description": "Room 테이블, DataStore, 네트워크 엔드포인트, 상태 소유"
+    },
+    {
+      "name": "주요 결정사항",
+      "description": "왜 이렇게 설계되었는지, 트레이드오프"
+    },
+    {
+      "name": "주의사항",
+      "description": "알려진 이슈, 엣지 케이스, 실패 패턴"
+    },
+    {
+      "name": "출처",
+      "description": "기여한 모든 파일에 대한 역링크",
+      "required": true
+    }
+  ],
+  "link_style": "markdown"
+}

@@ -1,2 +1,7 @@
 .idea/
 /.idea
+
+# Wiki compiler outputs
+wiki/
+.wiki-compiler.json
+CLAUDE.md
