@@ -11,6 +11,7 @@ data class MyPageUiState(
     val bookmarkContentState: MyPageSectionState<ImmutableList<BookmarkContent>>,
     val dialogState: MyPageDialogState?,
     val isLoggingOut: Boolean = false,
+    val isWithdrawing: Boolean = false,
 ) {
     companion object {
         val Idle: MyPageUiState =

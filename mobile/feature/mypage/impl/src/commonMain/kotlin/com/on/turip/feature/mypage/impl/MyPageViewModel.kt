@@ -259,6 +259,7 @@ class MyPageViewModel(
     fun confirmWithdraw() {
         viewModelScope.launch {
             dismissDialog()
+            _uiState.update { it.copy(isWithdrawing = true) }
 
             memberRepository
                 .deleteMember()
@@ -270,6 +271,8 @@ class MyPageViewModel(
                     handleError(errorType, MyPageRetryAction.WITHDRAW)
                     Napier.e("회원탈퇴 실패")
                 }
+
+            _uiState.update { it.copy(isWithdrawing = false) }
         }
     }
 

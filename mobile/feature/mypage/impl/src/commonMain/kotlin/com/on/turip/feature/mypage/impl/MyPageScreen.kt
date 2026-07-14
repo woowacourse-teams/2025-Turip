@@ -246,7 +246,7 @@ private fun MyPageScreenContent(
         }
     }
 
-    if (uiState.isLoggingOut) {
+    if (uiState.isLoggingOut || uiState.isWithdrawing) {
         Box(
             modifier =
                 Modifier
