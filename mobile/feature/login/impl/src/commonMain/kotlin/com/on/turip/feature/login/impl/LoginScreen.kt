@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import com.on.turip.core.common.Platform
 import com.on.turip.core.common.currentPlatform
 import com.on.turip.core.designsystem.component.TuripDialog
+import com.on.turip.core.designsystem.component.TuripLoadingIndicator
 import com.on.turip.core.designsystem.generated.resources.Res
 import com.on.turip.core.designsystem.generated.resources.all_close_description
 import com.on.turip.core.designsystem.generated.resources.all_turip_description
@@ -221,10 +221,7 @@ private fun LoginScreenContent(
                     .noRippleClickable { },
             contentAlignment = Alignment.Center,
         ) {
-            CircularProgressIndicator(
-                modifier = Modifier.size(60.dp),
-                color = TuripTheme.colors.white,
-            )
+            TuripLoadingIndicator()
         }
     }
 }

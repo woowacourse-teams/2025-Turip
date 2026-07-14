@@ -17,8 +17,7 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
+    import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -32,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.on.turip.core.designsystem.component.TuripLoadingIndicator
 import com.on.turip.core.designsystem.generated.resources.Res
 import com.on.turip.core.designsystem.generated.resources.all_close_description
 import com.on.turip.core.designsystem.generated.resources.all_mascot_description
@@ -152,10 +152,7 @@ private fun BookmarkContentListLoading(modifier: Modifier = Modifier) {
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
-        CircularProgressIndicator(
-            modifier = Modifier.size(60.dp),
-            color = TuripTheme.colors.black,
-        )
+        TuripLoadingIndicator()
     }
 }
 
@@ -199,7 +196,9 @@ private fun BookmarkContentList(
     val threshold = 3
     val shouldLoadMore by remember {
         derivedStateOf {
-            if (!pagingState.hasNext || pagingState.isAppending || pagingState.errorUiState != ErrorUiState.None ||
+            if (!pagingState.hasNext ||
+                pagingState.isAppending ||
+                pagingState.errorUiState != ErrorUiState.None ||
                 pagingState.items.isEmpty()
             ) {
                 return@derivedStateOf false
@@ -284,10 +283,7 @@ private fun BookmarkContentList(
                                 .padding(TuripTheme.spacing.large),
                         contentAlignment = Alignment.Center,
                     ) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(24.dp),
-                            color = TuripTheme.colors.black,
-                        )
+                        TuripLoadingIndicator(size = 24.dp)
                     }
                 }
             } else if (pagingState.errorUiState != ErrorUiState.None) {
