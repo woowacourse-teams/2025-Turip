@@ -55,7 +55,6 @@ import com.on.turip.core.designsystem.generated.resources.bottom_sheet_turip_rem
 import com.on.turip.core.designsystem.generated.resources.bottom_sheet_turip_remove_title
 import com.on.turip.core.designsystem.generated.resources.btn_turip_selected
 import com.on.turip.core.designsystem.generated.resources.mascot
-import com.on.turip.core.designsystem.generated.resources.my_turip_screen_title
 import com.on.turip.core.designsystem.generated.resources.my_turip_together_turip_empty_description
 import com.on.turip.core.designsystem.generated.resources.my_turip_together_turip_empty_title
 import com.on.turip.core.designsystem.generated.resources.turip_add_turip
@@ -65,6 +64,7 @@ import com.on.turip.core.designsystem.snackbar.LocalSnackbarDelegate
 import com.on.turip.core.designsystem.theme.TuripTheme
 import com.on.turip.core.model.turip.TuripType
 import com.on.turip.core.ui.util.formatResource
+import com.on.turip.feature.turip.impl.component.MyTuripAppBar
 import com.on.turip.feature.turip.impl.component.MyTuripCard
 import com.on.turip.feature.turip.impl.component.MyTuripCardSkeleton
 import com.on.turip.feature.turip.impl.component.MyTuripTabRow
@@ -241,23 +241,13 @@ private fun MyTuripScreenContent(
                 Modifier
                     .fillMaxSize()
                     .systemBarsPadding()
-                    .padding(horizontal = TuripTheme.spacing.extraLarge)
                     .pointerInput(isDeleteMode) {
                         detectTapGestures {
                             if (isDeleteMode) isDeleteMode = false
                         }
                     },
         ) {
-            Text(
-                text = stringResource(Res.string.my_turip_screen_title),
-                style = TuripTheme.typography.display,
-                color = TuripTheme.colors.black,
-                modifier =
-                    Modifier.padding(
-                        top = TuripTheme.spacing.extraExtraLarge,
-                        bottom = TuripTheme.spacing.large,
-                    ),
-            )
+            MyTuripAppBar()
 
             MyTuripTabRow(
                 selectedTab = selectedTab,
@@ -265,6 +255,7 @@ private fun MyTuripScreenContent(
                     selectedTab = it
                     isDeleteMode = false
                 },
+                modifier = Modifier.padding(horizontal = TuripTheme.spacing.extraLarge),
             )
 
             if (isLoading) {
@@ -273,6 +264,7 @@ private fun MyTuripScreenContent(
                     modifier =
                         Modifier
                             .fillMaxWidth()
+                            .padding(horizontal = TuripTheme.spacing.extraLarge)
                             .padding(top = TuripTheme.spacing.large),
                 ) {
                     repeat(MY_TURIP_SKELETON_ITEM_COUNT) {
@@ -285,6 +277,7 @@ private fun MyTuripScreenContent(
                     modifier =
                         Modifier
                             .fillMaxWidth()
+                            .padding(horizontal = TuripTheme.spacing.extraLarge)
                             .padding(top = TuripTheme.spacing.large),
                 ) {
                     items(items = filteredTurips, key = { it.id }) { turip ->
@@ -310,7 +303,10 @@ private fun MyTuripScreenContent(
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center,
-                        modifier = Modifier.fillMaxSize(),
+                        modifier =
+                            Modifier
+                                .fillMaxSize()
+                                .padding(horizontal = TuripTheme.spacing.extraLarge),
                     ) {
                         Spacer(modifier = Modifier.height(TuripTheme.spacing.huge))
 
