@@ -10,6 +10,7 @@ data class MyPageUiState(
     val profileState: MyPageSectionState<ProfileModel>,
     val bookmarkContentState: MyPageSectionState<ImmutableList<BookmarkContent>>,
     val dialogState: MyPageDialogState?,
+    val isLoggingOut: Boolean = false,
 ) {
     companion object {
         val Idle: MyPageUiState =

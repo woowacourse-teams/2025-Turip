@@ -239,6 +239,7 @@ class MyPageViewModel(
     fun confirmLogout() {
         viewModelScope.launch {
             dismissDialog()
+            _uiState.update { it.copy(isLoggingOut = true) }
 
             memberRepository
                 .logout()
@@ -250,6 +251,8 @@ class MyPageViewModel(
                     handleError(errorType, MyPageRetryAction.LOGOUT)
                     Napier.e("로그아웃 실패")
                 }
+
+            _uiState.update { it.copy(isLoggingOut = false) }
         }
     }
 
