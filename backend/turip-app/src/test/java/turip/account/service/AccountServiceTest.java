@@ -19,6 +19,7 @@ import turip.account.domain.Account;
 import turip.account.domain.Role;
 import turip.account.repository.AccountInsertRepository;
 import turip.account.repository.AccountRepository;
+import turip.account.repository.FcmTokenRepository;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.InternalServerException;
 import turip.common.exception.custom.NotFoundException;
@@ -43,6 +44,9 @@ class AccountServiceTest {
 
     @Mock
     private FavoriteFolderService favoriteFolderService;
+
+    @Mock
+    private FcmTokenRepository fcmTokenRepository;
 
     @DisplayName("Account 생성 테스트")
     @Nested
@@ -134,6 +138,7 @@ class AccountServiceTest {
             // then
             verify(favoriteContentRepository).deleteByAccount(account);
             verify(favoriteFolderService).deleteAloneFoldersByAccount(account);
+            verify(fcmTokenRepository).deleteByAccount(account);
             verify(accountRepository).delete(account);
         }
     }

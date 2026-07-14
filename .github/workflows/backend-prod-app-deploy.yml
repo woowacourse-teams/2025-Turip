@@ -50,6 +50,13 @@ jobs:
           distribution: 'temurin'
           cache: 'gradle'
 
+      - name: Create Firebase service account file
+        env:
+          FIREBASE_CONFIG: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_PROD }}
+        run: |
+          printf '%s' "$FIREBASE_CONFIG" > \
+            turip-app/src/main/resources/firebase-service-account-prod.json
+
       - name: Build Module Jar
         run: |
           chmod +x gradlew

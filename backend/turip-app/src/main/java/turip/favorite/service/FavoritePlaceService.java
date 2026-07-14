@@ -153,7 +153,7 @@ public class FavoritePlaceService {
 
     private void publishFolderUpdateEvents(Set<Long> folderIds) {
         folderIds.forEach(folderId ->
-                eventPublisher.publishEvent(new FavoriteFolderUpdateEvent(folderId, ActionType.FOLDER_PLACE_CHANGED))
+                eventPublisher.publishEvent(FavoriteFolderUpdateEvent.of(folderId, ActionType.FOLDER_PLACE_CHANGED))
         );
     }
 
