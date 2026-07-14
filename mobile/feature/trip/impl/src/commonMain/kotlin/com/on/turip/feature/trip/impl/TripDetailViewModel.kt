@@ -24,7 +24,10 @@ import com.on.turip.feature.trip.impl.model.TripDetailInfoModel
 import io.github.aakira.napier.Napier
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -55,13 +58,16 @@ class TripDetailViewModel(
     private var confirmedBookmarked: Boolean = false
     private val bookmarkClickFlow = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
+    // 화면 이탈로 viewModelScope가 취소돼도 북마크 API 요청은 끝까지 이어지도록 분리한 스코프
+    private val bookmarkUpdateScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+
     init {
         handleBookmarkActions()
     }
 
     @OptIn(FlowPreview::class)
     private fun handleBookmarkActions() {
-        viewModelScope.launch {
+        bookmarkUpdateScope.launch {
             bookmarkClickFlow
                 .debounce(BOOKMARK_DEBOUNCE_MS)
                 .collect {
