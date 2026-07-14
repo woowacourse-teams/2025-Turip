@@ -97,11 +97,11 @@ private fun SearchResultItem(
                     horizontal = TuripTheme.spacing.extraLarge,
                     vertical = TuripTheme.spacing.small,
                 ).background(
-                    color = TuripTheme.colors.gray01,
+                    color = TuripTheme.colors.cardBackground,
                     shape = itemShape,
                 ).border(
                     width = 1.dp,
-                    color = TuripTheme.colors.border,
+                    color = TuripTheme.colors.cardBorder,
                     shape = itemShape,
                 ).clip(itemShape)
                 .clickable { onItemClick() }
