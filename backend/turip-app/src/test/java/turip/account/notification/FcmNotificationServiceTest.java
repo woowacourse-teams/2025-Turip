@@ -1,0 +1,169 @@
+package turip.account.notification;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.Collections;
+import java.util.List;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import turip.account.domain.Account;
+import turip.account.domain.FcmToken;
+import turip.account.domain.Role;
+import turip.account.repository.AccountRepository;
+import turip.infrastructure.client.FirebaseClient;
+
+@ExtendWith(MockitoExtension.class)
+class FcmNotificationServiceTest {
+
+    @Mock
+    private FirebaseClient firebaseClient;
+
+    @Mock
+    private AccountRepository accountRepository;
+
+    @InjectMocks
+    private FcmNotificationService fcmNotificationService;
+
+    @Nested
+    class SendToAccounts {
+
+        @Test
+        @DisplayName("계정 리스트에 FCM 알림을 성공적으로 전송한다")
+        void sendToAccounts1() {
+            // given
+            Account account1 = createAccount(1L);
+            Account account2 = createAccount(2L);
+            List<Long> accounts = List.of(account1.getId(), account2.getId());
+
+            FcmToken fcmToken1 = new FcmToken(account1, "device1", "token1");
+            FcmToken fcmToken2 = new FcmToken(account2, "device2", "token2");
+            List<FcmToken> fcmTokens = List.of(fcmToken1, fcmToken2);
+
+            FcmNotificationMessage message = FcmNotificationMessage.of("테스트 제목", "테스트 내용");
+
+            when(accountRepository.findFcmTokensByAccountIds(List.of(1L, 2L)))
+                    .thenReturn(fcmTokens);
+            when(firebaseClient.sendNotificationToMultipleDevicesAndReturnInvalidTokens(anyList(), anyString(),
+                    anyString()))
+                    .thenReturn(Collections.emptyList());
+
+            // when
+            fcmNotificationService.sendToAccounts(accounts, message);
+
+            // then
+            verify(accountRepository, times(1)).findFcmTokensByAccountIds(List.of(1L, 2L));
+            verify(firebaseClient, times(1)).sendNotificationToMultipleDevicesAndReturnInvalidTokens(
+                    eq(List.of("token1", "token2")),
+                    eq("테스트 제목"),
+                    eq("테스트 내용")
+            );
+            verify(accountRepository, never()).deleteFcmTokensByTokenIn(any());
+        }
+
+        @Test
+        @DisplayName("FCM 토큰이 없을 때 알림을 전송하지 않는다")
+        void sendToAccounts2() {
+            // given
+            Account account = createAccount(1L);
+            List<Long> accounts = List.of(account.getId());
+
+            FcmNotificationMessage message = FcmNotificationMessage.of("테스트 제목", "테스트 내용");
+
+            when(accountRepository.findFcmTokensByAccountIds(List.of(1L)))
+                    .thenReturn(List.of());
+
+            // when
+            fcmNotificationService.sendToAccounts(accounts, message);
+
+            // then
+            verify(accountRepository, times(1)).findFcmTokensByAccountIds(List.of(1L));
+            verify(firebaseClient, never()).sendNotificationToMultipleDevicesAndReturnInvalidTokens(
+                    anyList(), anyString(), anyString()
+            );
+        }
+
+        @Test
+        @DisplayName("여러 계정 중 알림이 활성화된 토큰만 조회하여 알림을 전송한다")
+        void sendToAccounts3() {
+            // given
+            Account account1 = createAccount(1L);
+            Account account2 = createAccount(2L);
+            Account account3 = createAccount(3L);
+            List<Long> accounts = List.of(account1.getId(), account2.getId(), account3.getId());
+
+            // account1, account2만 알림 활성화된 토큰
+            FcmToken fcmToken1 = new FcmToken(account1, "device1", "token1");
+            FcmToken fcmToken2 = new FcmToken(account2, "device2", "token2");
+            List<FcmToken> fcmTokens = List.of(fcmToken1, fcmToken2);
+
+            FcmNotificationMessage message = FcmNotificationMessage.of("테스트 제목", "테스트 내용");
+
+            when(accountRepository.findFcmTokensByAccountIds(List.of(1L, 2L, 3L)))
+                    .thenReturn(fcmTokens);
+            when(firebaseClient.sendNotificationToMultipleDevicesAndReturnInvalidTokens(
+                    anyList(), anyString(), anyString()
+            )).thenReturn(Collections.emptyList());
+
+            // when
+            fcmNotificationService.sendToAccounts(accounts, message);
+
+            // then
+            verify(accountRepository, times(1)).findFcmTokensByAccountIds(List.of(1L, 2L, 3L));
+            verify(firebaseClient, times(1)).sendNotificationToMultipleDevicesAndReturnInvalidTokens(
+                    eq(List.of("token1", "token2")),
+                    eq("테스트 제목"),
+                    eq("테스트 내용")
+            );
+            verify(accountRepository, never()).deleteFcmTokensByTokenIn(any());
+        }
+
+        @Test
+        @DisplayName("유효하지 않은 토큰이 있으면 삭제한다")
+        void sendToAccounts4() {
+            // given
+            Account account1 = createAccount(1L);
+            Account account2 = createAccount(2L);
+            List<Long> accounts = List.of(account1.getId(), account2.getId());
+
+            FcmToken fcmToken1 = new FcmToken(account1, "device1", "token1");
+            FcmToken fcmToken2 = new FcmToken(account2, "device2", "invalid-token");
+            List<FcmToken> fcmTokens = List.of(fcmToken1, fcmToken2);
+
+            FcmNotificationMessage message = FcmNotificationMessage.of("테스트 제목", "테스트 내용");
+
+            when(accountRepository.findFcmTokensByAccountIds(List.of(1L, 2L)))
+                    .thenReturn(fcmTokens);
+            when(firebaseClient.sendNotificationToMultipleDevicesAndReturnInvalidTokens(
+                    anyList(), anyString(), anyString()
+            )).thenReturn(List.of("invalid-token"));
+
+            // when
+            fcmNotificationService.sendToAccounts(accounts, message);
+
+            // then
+            verify(accountRepository, times(1)).findFcmTokensByAccountIds(List.of(1L, 2L));
+            verify(firebaseClient, times(1)).sendNotificationToMultipleDevicesAndReturnInvalidTokens(
+                    eq(List.of("token1", "invalid-token")),
+                    eq("테스트 제목"),
+                    eq("테스트 내용")
+            );
+            verify(accountRepository, times(1)).deleteFcmTokensByTokenIn(eq(List.of("invalid-token")));
+        }
+    }
+
+    private Account createAccount(Long id) {
+        return new Account(id, Role.USER, "nickname" + id);
+    }
+}

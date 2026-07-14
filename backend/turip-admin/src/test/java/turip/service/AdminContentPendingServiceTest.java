@@ -311,7 +311,8 @@ class AdminContentPendingServiceTest {
         @Test
         void getMyHistory3() {
             // given
-            ContentPending rejectedPending = new ContentPending(contentData, collectorAccount, validatorAccount, null, null);
+            ContentPending rejectedPending = new ContentPending(contentData, collectorAccount, validatorAccount, null,
+                    null);
             ReflectionTestUtils.setField(rejectedPending, "id", 3L);
             ReflectionTestUtils.setField(rejectedPending, "status", ContentPendingStatus.REJECTED);
             ReflectionTestUtils.setField(rejectedPending, "rejectReason", "부적절한 콘텐츠");
@@ -376,6 +377,52 @@ class AdminContentPendingServiceTest {
             );
         }
     }
+
+    @DisplayName("findByValidatorAccount() 테스트")
+    @Nested
+    class FindByValidatorAccount {
+
+        @DisplayName("PENDING 상태의 모든 콘텐츠를 ID 내림차순으로 조회할 수 있다")
+        @Test
+        void findByValidatorAccount1() {
+            // given
+            ContentPending pending1 = new ContentPending(contentData, collectorAccount, validatorAccount, null, null);
+            ReflectionTestUtils.setField(pending1, "id", 1L);
+
+            ContentPendingData.VideoData videoData2 = new ContentPendingData.VideoData(
+                    "videoId456",
+                    "Test Title 2",
+                    "http://test2.url",
+                    "Test Channel 2",
+                    "http://channel2.image",
+                    LocalDate.now()
+            );
+            ContentPendingData contentData2 = new ContentPendingData(
+                    "Busan",
+                    videoData2,
+                    contentData.contentPlaces()
+            );
+            ContentPending pending2 = new ContentPending(contentData2, collectorAccount, null, null, null);
+            ReflectionTestUtils.setField(pending2, "id", 2L);
+
+            given(contentPendingRepository.findAllByStatusAndValidatorAccountOrderByIdDesc(ContentPendingStatus.PENDING,
+                    validatorAccount))
+                    .willReturn(List.of(pending1));
+
+            // when
+            List<PendingListResponse> responses = adminContentPendingService.findByValidatorAccount(validatorAccount);
+
+            // then
+            assertAll(
+                    () -> assertThat(responses).hasSize(1),
+                    () -> assertThat(responses.get(0).id()).isEqualTo(1L),
+                    () -> assertThat(responses.get(0).videoTitle()).isEqualTo("Test Title"),
+                    () -> verify(contentPendingRepository).findAllByStatusAndValidatorAccountOrderByIdDesc(
+                            ContentPendingStatus.PENDING, validatorAccount)
+            );
+        }
+    }
+
 
     @DisplayName("pending() 테스트")
     @Nested

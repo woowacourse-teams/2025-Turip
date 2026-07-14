@@ -21,8 +21,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import turip.account.domain.Account;
 import turip.account.domain.Member;
 import turip.account.domain.Provider;
-import turip.auth.controller.dto.request.GoogleLoginRequest;
 import turip.auth.controller.dto.request.RefreshTokenRequest;
+import turip.auth.controller.dto.request.SocialLoginRequest;
 import turip.auth.controller.dto.request.TuripLoginRequest;
 import turip.auth.controller.dto.response.RefreshTokenResponse;
 import turip.auth.controller.dto.response.SocialLoginResponseV1;
@@ -189,7 +189,7 @@ public class AuthController {
     @PostMapping("/api/v1/auth/login/google")
     public ResponseEntity<SocialLoginResponseV1> loginWithGoogle(
             @Parameter(hidden = true) @RequestHeader("device-fid") String deviceFid,
-            @RequestBody GoogleLoginRequest request) {
+            @RequestBody SocialLoginRequest request) {
         SocialLoginResult result = authService.loginWithSocial(request, Provider.GOOGLE, deviceFid);
         SocialLoginResponseV1 response = SocialLoginResponseV1.of(result);
         return ResponseEntity.ok(response);
@@ -264,8 +264,83 @@ public class AuthController {
     @PostMapping("/api/v2/auth/login/google")
     public ResponseEntity<SocialLoginResponseV2> loginWithGoogleV2(
             @Parameter(hidden = true) @RequestHeader("device-fid") String deviceFid,
-            @RequestBody GoogleLoginRequest request) {
+            @RequestBody SocialLoginRequest request) {
         SocialLoginResult result = authService.loginWithSocial(request, Provider.GOOGLE, deviceFid);
+        SocialLoginResponseV2 response = SocialLoginResponseV2.of(result);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "애플 로그인 api",
+            description = "id token 기반 애플 소셜 로그인을 진행한다. 마이그레이션 결정 여부를 응답에 포함한다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "성공 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SocialLoginResponseV2.class),
+                            examples = @ExampleObject(
+                                    name = "success",
+                                    summary = "로그인 성공",
+                                    value = """
+                                            {
+                                              "accessToken": "jwt-access",
+                                              "refreshToken": "jwt-refresh",
+                                              "nickname": "메이",
+                                              "isMigrationDecided": false
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "invalid id token",
+                                            summary = "올바르지 않은 id token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ID_TOKEN_NOT_VALID",
+                                                    	"message": "유효하지 않은 id token입니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "account creation error",
+                                            summary = "계정 생성 실패(재시도 5번에 모두 실패)",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCOUNT_CREATION_ERROR",
+                                                    	"message": "계정 생성에 실패했습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            )
+    })
+    @PostMapping("/api/v1/auth/login/apple")
+    public ResponseEntity<SocialLoginResponseV2> loginWithApple(
+            @Parameter(hidden = true) @RequestHeader("device-fid") String deviceFid,
+            @RequestBody SocialLoginRequest request) {
+        SocialLoginResult result = authService.loginWithSocial(request, Provider.APPLE, deviceFid);
         SocialLoginResponseV2 response = SocialLoginResponseV2.of(result);
         return ResponseEntity.ok(response);
     }

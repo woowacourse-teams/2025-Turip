@@ -8,6 +8,7 @@ public record PendingListResponse(
         String videoTitle,
         String channelName,
         String collectorNickname,
+        String validatorNickname,
         LocalDateTime createdAt
 ) {
 
@@ -17,6 +18,7 @@ public record PendingListResponse(
                 p.getContentData().video().title(),
                 p.getContentData().video().channelName(),
                 p.getCollectorAccount().getNickname(),
+                p.getValidatorAccount() != null ? p.getValidatorAccount().getNickname() : null,
                 p.getCreatedAt()
         );
     }

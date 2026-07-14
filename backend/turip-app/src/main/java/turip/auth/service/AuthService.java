@@ -1,6 +1,7 @@
 package turip.auth.service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -8,18 +9,20 @@ import turip.account.domain.Account;
 import turip.account.domain.Member;
 import turip.account.domain.Provider;
 import turip.account.domain.Role;
+import turip.account.service.FcmTokenService;
 import turip.account.service.MemberService;
 import turip.account.service.SocialMemberService;
 import turip.account.service.TuripMemberService;
-import turip.auth.controller.dto.request.GoogleLoginRequest;
 import turip.auth.controller.dto.request.RefreshTokenRequest;
+import turip.auth.controller.dto.request.SocialLoginRequest;
 import turip.auth.controller.dto.request.TuripLoginRequest;
 import turip.auth.controller.dto.response.RefreshTokenResponse;
 import turip.auth.domain.RefreshToken;
 import turip.auth.service.dto.SocialLoginResult;
 import turip.auth.service.dto.TokenResult;
 import turip.auth.service.dto.TuripLoginResult;
-import turip.auth.token.GoogleTokenParser;
+import turip.auth.token.IdTokenParser;
+import turip.auth.token.IdTokenParserResolver;
 import turip.auth.token.JwtProvider;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.BadRequestException;
@@ -31,11 +34,12 @@ import turip.common.exception.custom.UnauthorizedException;
 public class AuthService {
 
     private final JwtProvider jwtProvider;
-    private final GoogleTokenParser googleTokenParser;
+    private final IdTokenParserResolver idTokenParserResolver;
     private final RefreshTokenService refreshTokenService;
     private final MemberService memberService;
     private final SocialMemberService socialMemberService;
     private final TuripMemberService turipMemberService;
+    private final FcmTokenService fcmTokenService;
 
     @Transactional
     public TuripLoginResult loginWithTurip(TuripLoginRequest request, String deviceFid) {
@@ -58,11 +62,24 @@ public class AuthService {
     }
 
     @Transactional
-    public SocialLoginResult loginWithSocial(GoogleLoginRequest request, Provider provider, String deviceFid) {
-        if (provider == Provider.GOOGLE) {
-            return loginWithGoogle(request, deviceFid);
+    public SocialLoginResult loginWithSocial(SocialLoginRequest request, Provider provider, String deviceFid) {
+        String idToken = request.idToken();
+        validateIdToken(idToken);
+
+        IdTokenParser parser = idTokenParserResolver.resolve(provider);
+        String providerId = parser.getProviderId(idToken);
+        String email = parser.getEmail(idToken);
+
+        Member member = findOrCreateSocialMember(provider, providerId, Optional.ofNullable(email));
+
+        boolean isNewMember = false;
+        if (member.isFirstLogin()) {
+            member.completeFirstLogin();
+            isNewMember = true;
         }
-        throw new UnauthorizedException(ErrorTag.UNAUTHORIZED);
+        TokenResult tokenResult = issueToken(deviceFid, member);
+
+        return SocialLoginResult.of(tokenResult, isNewMember, member);
     }
 
     @Transactional
@@ -97,6 +114,7 @@ public class AuthService {
     public void logout(Account account, String deviceFid) {
         Member member = getMemberByAccountId(account.getId());
         refreshTokenService.deleteByMemberAndDeviceFid(member, deviceFid);
+        fcmTokenService.deleteByAccountAndDeviceFid(account, deviceFid);
     }
 
     private TokenResult issueToken(String deviceFid, Member member) {
@@ -110,27 +128,7 @@ public class AuthService {
         return TokenResult.of(accessToken, refreshToken);
     }
 
-    private SocialLoginResult loginWithGoogle(GoogleLoginRequest request, String deviceFid) {
-        String idToken = request.idToken();
-        validateIdToken(idToken);
-
-        Provider provider = googleTokenParser.getProvider();
-        String providerId = googleTokenParser.getProviderId(idToken);
-        String email = googleTokenParser.getEmail(idToken);
-
-        Member member = findOrCreateSocialMember(provider, providerId, email);
-
-        boolean isNewMember = false;
-        if (member.isFirstLogin()) {
-            member.completeFirstLogin();
-            isNewMember = true;
-        }
-        TokenResult tokenResult = issueToken(deviceFid, member);
-
-        return SocialLoginResult.of(tokenResult, isNewMember, member);
-    }
-
-    private Member findOrCreateSocialMember(Provider provider, String providerId, String email) {
+    private Member findOrCreateSocialMember(Provider provider, String providerId, Optional<String> email) {
         return socialMemberService.findOrCreate(provider, providerId, email).getMember();
     }
 

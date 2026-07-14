@@ -216,7 +216,7 @@
                 <span class="badge" id="pendingBadge">0</span>
             </div>
             <div class="notification-dropdown" id="notifDropdown">
-                <div class="dropdown-header">최신 검수 요청</div>
+                <div class="dropdown-header">내 검수 요청</div>
                 <div class="dropdown-body" id="notifList">
                     <div class="empty-state">내역이 없습니다.</div>
                 </div>
@@ -268,7 +268,7 @@
     async function fetchRecentPending() {
         const container = document.getElementById('notifList');
         try {
-            const res = await fetch('/api/v1/admin/content-pendings/list');
+            const res = await fetch('/api/v1/admin/content-pendings/my-list');
 
             if (!res.ok) {
                 const errorData = await res.json().catch(() => null);
@@ -279,7 +279,7 @@
             const list = await res.json();
 
             if (!list || list.length === 0) {
-                container.innerHTML = '<div class="empty-state">새로운 요청이 없습니다.</div>';
+                container.innerHTML = '<div class="empty-state">나에게 배정된 요청이 없습니다.</div>';
                 return;
             }
 
@@ -309,16 +309,16 @@
 
     async function updatePendingCount() {
         try {
-            const res = await fetch('/api/v1/admin/content-pendings/list');
+            const res = await fetch('/api/v1/admin/content-pendings/my-count');
 
             if (!res.ok) {
                 throw new Error(`서버 오류 (${res.status})`);
             }
 
-            const list = await res.json();
+            const count = await res.json();
             const badge = document.getElementById('pendingBadge');
-            if (list.length > 0) {
-                badge.innerText = list.length > 99 ? '99+' : list.length;
+            if (count > 0) {
+                badge.innerText = count > 99 ? '99+' : count;
                 badge.style.display = 'block';
             } else {
                 badge.style.display = 'none';

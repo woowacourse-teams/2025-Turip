@@ -42,6 +42,7 @@ public class TestDataHelper {
         jdbcTemplate.update("DELETE FROM social_member");
         jdbcTemplate.update("DELETE FROM guest");
         jdbcTemplate.update("DELETE FROM refresh_token");
+        jdbcTemplate.update("DELETE FROM fcm_token");
         jdbcTemplate.update("DELETE FROM member");
 
         jdbcTemplate.update("DELETE FROM account");
@@ -64,6 +65,7 @@ public class TestDataHelper {
         jdbcTemplate.update("ALTER TABLE social_member ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE guest ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE refresh_token ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE fcm_token ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE member ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE account ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE content ALTER COLUMN id RESTART WITH 1");
@@ -121,6 +123,25 @@ public class TestDataHelper {
             ps.setString(2, email);
             ps.setBoolean(3, isFirstLogin);
             ps.setBoolean(4, false);
+            return ps;
+        }, keyHolder);
+
+        return extractGeneratedKey(keyHolder);
+    }
+
+    public Long insertFcmToken(Long accountId, String deviceFid, String token, boolean notificationEnabled) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(
+                    "INSERT INTO fcm_token "
+                            + "(account_id, device_fid, token, notification_enabled, created_at, updated_at) "
+                            + "VALUES (?, ?, ?, ?, NOW(), NOW())",
+                    Statement.RETURN_GENERATED_KEYS);
+            ps.setLong(1, accountId);
+            ps.setString(2, deviceFid);
+            ps.setString(3, token);
+            ps.setBoolean(4, notificationEnabled);
             return ps;
         }, keyHolder);
 
