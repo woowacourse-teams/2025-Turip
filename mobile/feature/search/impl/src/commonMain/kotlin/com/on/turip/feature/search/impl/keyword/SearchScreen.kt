@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -15,7 +14,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.input.pointer.pointerInput
@@ -23,6 +21,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import com.on.turip.core.designsystem.theme.TuripTheme
 import com.on.turip.core.ui.component.ErrorScreen
 import com.on.turip.feature.search.impl.component.SearchResultList
+import com.on.turip.feature.search.impl.component.SearchResultListSkeleton
 import com.on.turip.feature.search.impl.keyword.component.SearchAppBar
 import com.on.turip.feature.search.impl.keyword.component.SearchEmptyView
 import com.on.turip.feature.search.impl.keyword.component.SearchHistoryList
@@ -97,7 +96,7 @@ fun SearchScreen(
         ) {
             when (val state = uiState) {
                 SearchUiState.Loading -> {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                    SearchResultListSkeleton()
                 }
 
                 is SearchUiState.Empty -> {

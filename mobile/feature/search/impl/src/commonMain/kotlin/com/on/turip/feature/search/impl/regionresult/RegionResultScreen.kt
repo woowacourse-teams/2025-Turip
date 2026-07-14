@@ -4,17 +4,16 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.on.turip.core.designsystem.theme.TuripTheme
 import com.on.turip.core.ui.component.ErrorScreen
 import com.on.turip.feature.search.impl.component.SearchResultList
+import com.on.turip.feature.search.impl.component.SearchResultListSkeleton
 import com.on.turip.feature.search.impl.regionresult.component.RegionResultAppBar
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -55,7 +54,7 @@ fun RegionResultScreen(
         Box(modifier = Modifier.fillMaxSize()) {
             when (val state = uiState) {
                 RegionResultUiState.Loading -> {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                    SearchResultListSkeleton()
                 }
 
                 RegionResultUiState.Empty -> {
