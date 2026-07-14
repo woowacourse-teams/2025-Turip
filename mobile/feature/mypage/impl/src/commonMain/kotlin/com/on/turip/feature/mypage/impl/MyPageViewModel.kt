@@ -248,11 +248,12 @@ class MyPageViewModel(
                     _uiEffect.send(MyPageUiEffect.NavigateToLogin)
                     Napier.d("로그아웃 성공")
                 }.onFailure { errorType: ErrorType ->
-                    handleError(errorType, MyPageRetryAction.LOGOUT)
                     Napier.e("로그아웃 실패")
+                    val isNavigatingAway = handleError(errorType, MyPageRetryAction.LOGOUT)
+                    if (!isNavigatingAway) {
+                        _uiState.update { it.copy(isLoggingOut = false) }
+                    }
                 }
-
-            _uiState.update { it.copy(isLoggingOut = false) }
         }
     }
 
@@ -268,18 +269,20 @@ class MyPageViewModel(
                     _uiEffect.send(MyPageUiEffect.NavigateToLogin)
                     Napier.d("회원탈퇴 성공")
                 }.onFailure { errorType: ErrorType ->
-                    handleError(errorType, MyPageRetryAction.WITHDRAW)
                     Napier.e("회원탈퇴 실패")
+                    val isNavigatingAway = handleError(errorType, MyPageRetryAction.WITHDRAW)
+                    if (!isNavigatingAway) {
+                        _uiState.update { it.copy(isWithdrawing = false) }
+                    }
                 }
-
-            _uiState.update { it.copy(isWithdrawing = false) }
         }
     }
 
+    /** @return true면 로그인 화면으로 네비게이션이 발생해 화면이 곧 사라지므로, 로딩 상태를 되돌릴 필요가 없음을 의미 */
     private suspend fun handleError(
         errorType: ErrorType,
         retryAction: MyPageRetryAction,
-    ) {
+    ): Boolean {
         val uiError: UiError = errorType.toUiError()
         if (uiError is UiError.Global) {
             when (uiError) {
@@ -294,9 +297,11 @@ class MyPageViewModel(
                 UiError.Global.TokenExpired -> {
                     sessionManager.switchToGuest()
                     _uiEffect.send(MyPageUiEffect.NavigateToLogin)
+                    return true
                 }
             }
         }
+        return false
     }
 
     fun handleErrorRetryRequest(action: MyPageRetryAction) {
