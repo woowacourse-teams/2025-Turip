@@ -3,7 +3,6 @@ package com.on.turip.feature.mypage.impl.component
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -18,7 +17,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Refresh
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -49,6 +47,8 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+
+private const val BOOKMARK_CONTENT_SKELETON_ITEM_COUNT = 2
 
 @Composable
 fun MyPageBookmarkContentSection(
@@ -113,7 +113,10 @@ private fun BookmarkedContentHeader(
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.fillMaxWidth(),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .heightIn(min = 40.dp),
     ) {
         Text(
             text = stringResource(Res.string.my_page_bookmark_content_title),
@@ -189,20 +192,15 @@ private fun BookmarkedContentError(
 
 @Composable
 private fun BookmarkedContentLoading(modifier: Modifier = Modifier) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .heightIn(min = 200.dp),
+    LazyRow(
+        contentPadding = PaddingValues(end = TuripTheme.spacing.medium),
+        horizontalArrangement = Arrangement.spacedBy(TuripTheme.spacing.large),
+        userScrollEnabled = false,
+        modifier = modifier.padding(start = TuripTheme.spacing.large),
     ) {
-        CircularProgressIndicator(
-            modifier =
-                Modifier
-                    .size(36.dp)
-                    .align(Alignment.Center),
-            color = TuripTheme.colors.gray03,
-        )
+        items(BOOKMARK_CONTENT_SKELETON_ITEM_COUNT) {
+            MyPageBookmarkContentItemSkeleton(modifier = Modifier.width(280.dp))
+        }
     }
 }
 
