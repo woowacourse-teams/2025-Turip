@@ -7,6 +7,10 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Folder
@@ -39,6 +43,8 @@ import com.on.turip.feature.main.navigation.model.NavigationItem
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.painterResource
 
+private val NAVIGATION_BAR_CONTENT_HEIGHT = 64.dp
+
 /**
  * 튜립 디자인 시스템의 하단 내비게이션 바.
  * 화면 하단에 메뉴 목록을 표시하고, 선택된 메뉴를 강조합니다.
@@ -59,7 +65,13 @@ fun TuripNavigationBar(
         NavigationBar(
             containerColor = TuripTheme.colors.background,
             contentColor = TuripTheme.colors.black,
-            modifier = modifier,
+            modifier =
+                modifier.height(
+                    NAVIGATION_BAR_CONTENT_HEIGHT +
+                        WindowInsets.navigationBars
+                            .asPaddingValues()
+                            .calculateBottomPadding(),
+                ),
         ) {
             items.forEach { (navKey: NavKey, item: NavigationItem) ->
                 val isSelected: Boolean = selectedKey == navKey
