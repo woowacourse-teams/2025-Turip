@@ -22,7 +22,6 @@ import com.on.turip.core.ui.error.toUiError
 import com.on.turip.core.ui.model.namestatus.TuripNameStatusModel
 import com.on.turip.core.ui.model.turip.TuripEditModel
 import com.on.turip.core.ui.model.turip.TuripShareModel
-import com.on.turip.feature.turipdetail.impl.mapper.toEditModel
 import com.on.turip.feature.turipdetail.impl.mapper.toPlaceLatLngUiModel
 import com.on.turip.feature.turipdetail.impl.mapper.toShareModel
 import com.on.turip.feature.turipdetail.impl.mapper.toUiModel

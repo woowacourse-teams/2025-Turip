@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -28,7 +27,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -67,6 +65,7 @@ import com.on.turip.core.ui.model.turip.TuripShareModel
 import com.on.turip.core.ui.util.formatResource
 import com.on.turip.feature.turipdetail.impl.component.MemberListSheet
 import com.on.turip.feature.turipdetail.impl.component.MoreOptionBottomSheet
+import com.on.turip.feature.turipdetail.impl.component.TuripDetailSkeleton
 import com.on.turip.feature.turipdetail.impl.component.TuripInfoRow
 import com.on.turip.feature.turipdetail.impl.component.TuripMapContent
 import com.on.turip.feature.turipdetail.impl.component.TuripPlaces
@@ -279,7 +278,7 @@ fun TuripDetailScreen(
         Box(modifier = Modifier.fillMaxSize()) {
             when {
                 uiState.isLoading -> {
-                    LoadingContent()
+                    TuripDetailSkeleton()
                 }
 
                 uiState.errorUiState != ErrorUiState.None -> {
@@ -322,16 +321,6 @@ fun TuripDetailScreen(
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun LoadingContent() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
-    ) {
-        CircularProgressIndicator(color = TuripTheme.colors.primary)
     }
 }
 
