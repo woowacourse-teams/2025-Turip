@@ -40,6 +40,13 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="${google_maps_api_key}" />
+        <service
+            android:name=".TuripFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

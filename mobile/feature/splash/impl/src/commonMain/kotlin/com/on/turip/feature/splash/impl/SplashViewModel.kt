@@ -7,6 +7,8 @@ import com.on.turip.core.domain.repository.DeferredDeepLinkRepository
 import com.on.turip.core.domain.session.AuthStatus
 import com.on.turip.core.domain.session.SessionState
 import com.on.turip.core.domain.usecase.DetermineInitialSessionUseCase
+import com.on.turip.core.domain.usecase.RegisterFcmTokenUseCase
+import com.on.turip.core.model.result.onFailureWithCause
 import com.on.turip.core.model.turip.TuripInvitationToken
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.async
@@ -20,6 +22,7 @@ class SplashViewModel(
     private val determineInitialSessionUseCase: DetermineInitialSessionUseCase,
     private val sessionManager: SessionManager,
     private val deferredDeepLinkRepository: DeferredDeepLinkRepository,
+    private val registerFcmTokenUseCase: RegisterFcmTokenUseCase,
 ) : ViewModel() {
     private val _uiEffect: Channel<SplashUiEffect> = Channel(Channel.BUFFERED)
     val uiEffect: Flow<SplashUiEffect> = _uiEffect.receiveAsFlow()
@@ -89,8 +92,20 @@ class SplashViewModel(
 
     private suspend fun switchSession(authStatus: AuthStatus) {
         when (authStatus) {
-            AuthStatus.Authenticated -> sessionManager.switchToMember()
+            AuthStatus.Authenticated -> {
+                sessionManager.switchToMember()
+                registerFcmTokenIfNeeded()
+            }
             AuthStatus.UnAuthenticated -> sessionManager.switchToGuest()
+        }
+    }
+
+    /**
+     * 토큰 등록 실패는 사용자에게 노출하지 않는다. 다음 앱 시작/로그인 시 재시도되므로 치명적이지 않다.
+     */
+    private suspend fun registerFcmTokenIfNeeded() {
+        registerFcmTokenUseCase().onFailureWithCause { errorType, cause ->
+            Napier.w("FCM 토큰 등록 실패. errorType=$errorType", cause, tag = "FcmToken")
         }
     }
 }

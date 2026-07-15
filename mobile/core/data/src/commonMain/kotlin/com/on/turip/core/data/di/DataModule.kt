@@ -5,6 +5,7 @@ import com.on.turip.core.data.repository.DefaultAuthRepository
 import com.on.turip.core.data.repository.DefaultBookmarkRepository
 import com.on.turip.core.data.repository.DefaultContentRepository
 import com.on.turip.core.data.repository.DefaultDeferredDeepLinkRepository
+import com.on.turip.core.data.repository.DefaultFcmTokenRepository
 import com.on.turip.core.data.repository.DefaultGuestRepository
 import com.on.turip.core.data.repository.DefaultMemberRepository
 import com.on.turip.core.data.repository.DefaultRegionRepository
@@ -18,6 +19,7 @@ import com.on.turip.core.domain.repository.AuthRepository
 import com.on.turip.core.domain.repository.BookmarkRepository
 import com.on.turip.core.domain.repository.ContentRepository
 import com.on.turip.core.domain.repository.DeferredDeepLinkRepository
+import com.on.turip.core.domain.repository.FcmTokenRepository
 import com.on.turip.core.domain.repository.RegionRepository
 import com.on.turip.core.domain.repository.SearchHistoryRepository
 import com.on.turip.core.domain.repository.TuripRepository
@@ -27,6 +29,7 @@ import com.on.turip.core.domain.usecase.DeleteTuripUseCase
 import com.on.turip.core.domain.usecase.DetermineInitialSessionUseCase
 import com.on.turip.core.domain.usecase.DetermineInvitationEntryRouteUseCase
 import com.on.turip.core.domain.usecase.ObserveTuripStreamUseCase
+import com.on.turip.core.domain.usecase.RegisterFcmTokenUseCase
 import com.on.turip.core.domain.usecase.TuripStreamHeartbeatManager
 import com.on.turip.core.domain.usecase.UpdateBookmarkUseCase
 import com.on.turip.domain.login.GuestRepository
@@ -43,6 +46,7 @@ val dataModule = module {
     single<MemberRepository> { DefaultMemberRepository(get()) }
     single<RegionRepository> { DefaultRegionRepository(get()) }
     single<TuripRepository> { DefaultTuripRepository(get(), get()) }
+    single<FcmTokenRepository> { DefaultFcmTokenRepository(get(), get()) }
     single<UserStorageRepository> { DefaultUserStorageRepository(get()) }
     single<SearchHistoryRepository> { DefaultSearchHistoryRepository(get()) }
     single<TokenManager> { DefaultTokenManager(get(), get()) }
@@ -53,4 +57,5 @@ val dataModule = module {
     single<UpdateBookmarkUseCase> { UpdateBookmarkUseCase(get()) }
     single<TuripStreamHeartbeatManager> { TuripStreamHeartbeatManager() }
     single<ObserveTuripStreamUseCase> { ObserveTuripStreamUseCase(get(), get()) }
+    single<RegisterFcmTokenUseCase> { RegisterFcmTokenUseCase(get(), get()) }
 }

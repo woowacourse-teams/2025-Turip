@@ -62,6 +62,7 @@ multiplatformMarkdownRenderer = "0.37.0"
 
 # Firebase
 firebase-installations = "18.0.0"
+firebase-messaging = "24.1.2"
 install-referrer = "2.2"
 google-services = "4.4.2"
 googleMap = "8.1.0"
@@ -165,6 +166,7 @@ multiplatform-markdown-renderer-m3 = { module = "com.mikepenz:multiplatform-mark
 
 # Firebase
 firebase-installations = { group = "com.google.firebase", name = "firebase-installations-ktx", version.ref = "firebase-installations" }
+firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging-ktx", version.ref = "firebase-messaging" }
 install-referrer = { group = "com.android.installreferrer", name = "installreferrer", version.ref = "install-referrer" }
 kotlinx-coroutines-play-services = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-play-services", version.ref = "kotlinx-coroutines" }
 google-map = { module = "com.google.maps.android:maps-compose", version.ref = "googleMap" }
