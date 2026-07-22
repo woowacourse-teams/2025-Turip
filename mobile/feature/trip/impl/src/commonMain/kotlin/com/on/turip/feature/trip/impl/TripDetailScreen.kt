@@ -52,6 +52,7 @@ import com.on.turip.core.ui.component.ErrorScreen
 import com.on.turip.core.ui.component.NameEditorSheetContent
 import com.on.turip.core.ui.error.ErrorUiState
 import com.on.turip.core.ui.error.toUiModel
+import com.on.turip.core.ui.model.AppleMap
 import com.on.turip.core.ui.model.turip.TuripShareModel
 import com.on.turip.core.ui.util.formatResource
 import com.on.turip.feature.trip.impl.component.ContentBookmarkButton
@@ -418,6 +419,7 @@ private val samplePlaces =
             category = "역",
             mapLink = "kakao.com/123",
             timeLine = "01:03",
+            appleMap = AppleMap.Idle,
         ),
         PlaceModel(
             id = 2L,
@@ -426,6 +428,7 @@ private val samplePlaces =
             category = "명소",
             mapLink = "google.com/maps",
             timeLine = "03:12",
+            appleMap = AppleMap.Idle,
         ),
     )
 
