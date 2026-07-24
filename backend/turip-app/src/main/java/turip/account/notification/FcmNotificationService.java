@@ -5,13 +5,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import turip.account.domain.FcmToken;
 import turip.account.repository.AccountRepository;
-import turip.infrastructure.client.FirebaseClient;
+import turip.infrastructure.client.FcmClient;
 
 @Service
 @RequiredArgsConstructor
 public class FcmNotificationService {
 
-    private final FirebaseClient firebaseClient;
+    private final FcmClient fcmClient;
     private final AccountRepository accountRepository;
 
     public void sendToAccounts(List<Long> accountIds, FcmNotificationMessage fcmNotificationMessage) {
@@ -22,7 +22,7 @@ public class FcmNotificationService {
                 .toList();
 
         if (!tokens.isEmpty()) {
-            List<String> invalidTokens = firebaseClient.sendNotificationToMultipleDevicesAndReturnInvalidTokens(
+            List<String> invalidTokens = fcmClient.sendNotificationToMultipleDevicesAndReturnInvalidTokens(
                     tokens,
                     fcmNotificationMessage.title(),
                     fcmNotificationMessage.message()

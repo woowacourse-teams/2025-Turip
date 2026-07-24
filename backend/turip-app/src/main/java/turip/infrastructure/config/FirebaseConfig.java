@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.Resource;
 
-@Profile("!test & !test-mysql")
+@Profile("!test & !test-mysql & !loadtest")
 @Configuration
 public class FirebaseConfig {
 

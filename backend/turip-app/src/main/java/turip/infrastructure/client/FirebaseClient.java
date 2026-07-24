@@ -16,7 +16,8 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class FirebaseClient {
+@org.springframework.context.annotation.Profile("!loadtest")
+public class FirebaseClient implements FcmClient {
 
     private final FirebaseMessaging firebaseMessaging;
 
