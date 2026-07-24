@@ -42,3 +42,14 @@ logging:
   level:
     root: WARN
     turip: INFO
+
+google:
+  client-id: loadtest-google-client-id
+  ios-client-id: loadtest-google-ios-client-id
+
+apple:
+  client-id: loadtest-apple-client-id
+
+invitation:
+  jwt:
+    secret-key: loadtest-invitation-jwt-secret-key-for-testing-purposes-only

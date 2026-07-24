@@ -15,6 +15,7 @@ import turip.common.exception.custom.UnauthorizedException;
 
 @Slf4j
 @Component
+@org.springframework.context.annotation.Profile("!loadtest")
 public class GoogleTokenParser implements IdTokenParser {
 
     private final GoogleIdTokenVerifier verifier;
