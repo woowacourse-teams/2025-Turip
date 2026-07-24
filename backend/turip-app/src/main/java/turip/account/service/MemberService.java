@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import turip.account.domain.Account;
 import turip.account.domain.Guest;
 import turip.account.domain.Member;
+import turip.account.domain.nickname.RandomNicknameCreator;
 import turip.account.repository.MemberRepository;
 import turip.auth.service.RefreshTokenService;
 import turip.common.exception.ErrorTag;
@@ -15,6 +16,8 @@ import turip.common.exception.custom.NotFoundException;
 import turip.favorite.repository.FavoriteContentRepository;
 import turip.favorite.repository.FavoriteFolderAccountRepository;
 import turip.favorite.repository.FavoriteFolderRepository;
+import turip.favorite.service.FavoriteFolderAccountService;
+import turip.favorite.service.FavoriteFolderService;
 
 @Service
 @RequiredArgsConstructor
@@ -27,11 +30,14 @@ public class MemberService {
     private final RefreshTokenService refreshTokenService;
     private final FavoriteFolderAccountRepository favoriteFolderAccountRepository;
     private final FavoriteFolderRepository favoriteFolderRepository;
+    private final RandomNicknameCreator randomNicknameCreator;
+    private final FavoriteFolderService favoriteFolderService;
+    private final FavoriteFolderAccountService favoriteFolderAccountService;
 
     @Transactional
     public Member create(String email) {
         try {
-            Account account = accountService.create();
+            Account account = accountService.create(randomNicknameCreator);
             Member member = new Member(account, email, true);
             return memberRepository.save(member);
         } catch (IllegalArgumentException e) {
@@ -49,6 +55,12 @@ public class MemberService {
         migrateFavoriteContents(member, guest);
         migrateFavoriteFolders(member, guest);
         guestService.delete(guest);
+        member.decideMigration();
+    }
+
+    @Transactional
+    public void decideMigration(Member member) {
+        member.decideMigration();
     }
 
     @Transactional
@@ -64,7 +76,7 @@ public class MemberService {
     }
 
     private void migrateFavoriteFolders(Member member, Guest guest) {
-        favoriteFolderRepository.deletePersonalFoldersByAccount(guest.getAccount());
-        favoriteFolderAccountRepository.updateAccount(guest.getAccount(), member.getAccount());
+        favoriteFolderService.deleteDefaultFolderByAccount(member.getAccount());
+        favoriteFolderAccountService.updateAccount(guest.getAccount(), member.getAccount());
     }
 }

@@ -19,11 +19,11 @@ import turip.account.domain.Account;
 import turip.account.domain.Role;
 import turip.account.repository.AccountInsertRepository;
 import turip.account.repository.AccountRepository;
+import turip.account.repository.FcmTokenRepository;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.InternalServerException;
 import turip.common.exception.custom.NotFoundException;
 import turip.favorite.repository.FavoriteContentRepository;
-import turip.favorite.repository.FavoriteFolderRepository;
 import turip.favorite.service.FavoriteFolderService;
 import turip.util.fixture.AccountFixture;
 
@@ -43,10 +43,10 @@ class AccountServiceTest {
     private AccountInsertRepository accountInsertRepository;
 
     @Mock
-    private FavoriteFolderRepository favoriteFolderRepository;
+    private FavoriteFolderService favoriteFolderService;
 
     @Mock
-    private FavoriteFolderService favoriteFolderService;
+    private FcmTokenRepository fcmTokenRepository;
 
     @DisplayName("Account 생성 테스트")
     @Nested
@@ -61,7 +61,7 @@ class AccountServiceTest {
                     .willReturn(Optional.of(savedAccount));
 
             // when
-            Account result = accountService.create();
+            Account result = accountService.create(() -> "");
 
             // then
             assertThat(result).isEqualTo(savedAccount);
@@ -81,7 +81,7 @@ class AccountServiceTest {
                     .thenReturn(Optional.empty());
 
             // when & then
-            assertThatThrownBy(() -> accountService.create())
+            assertThatThrownBy(() -> accountService.create(() -> ""))
                     .isInstanceOf(InternalServerException.class)
                     .hasMessage(ErrorTag.ACCOUNT_CREATION_ERROR.getMessage());
         }
@@ -137,7 +137,8 @@ class AccountServiceTest {
 
             // then
             verify(favoriteContentRepository).deleteByAccount(account);
-            verify(favoriteFolderRepository).deletePersonalFoldersByAccount(account);
+            verify(favoriteFolderService).deleteAloneFoldersByAccount(account);
+            verify(fcmTokenRepository).deleteByAccount(account);
             verify(accountRepository).delete(account);
         }
     }

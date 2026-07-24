@@ -1,17 +1,13 @@
 package turip.account.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.mockito.Mockito.when;
 
 import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
-import java.util.HashMap;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -21,12 +17,14 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import turip.account.domain.Provider;
 import turip.account.domain.Role;
 import turip.auth.token.GoogleTokenParser;
+import turip.container.TestContainerConfig;
 import turip.favorite.domain.AccountRole;
 import turip.util.helper.TestDataHelper;
 
-@ActiveProfiles("test")
+@ActiveProfiles("test-mysql")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class MemberApiTest {
+class MemberApiTest extends TestContainerConfig {
 
     @LocalServerPort
     private int port;
@@ -44,33 +42,23 @@ class MemberApiTest {
     void setUp() {
         RestAssured.port = port;
 
-        jdbcTemplate.update("DELETE FROM refresh_token");
-        jdbcTemplate.update("DELETE FROM favorite_content");
-        jdbcTemplate.update("DELETE FROM favorite_place");
-        jdbcTemplate.update("DELETE FROM favorite_folder_account");
-        jdbcTemplate.update("DELETE FROM favorite_folder");
-        jdbcTemplate.update("DELETE FROM social_member");
-        jdbcTemplate.update("DELETE FROM member");
-        jdbcTemplate.update("DELETE FROM guest");
-        jdbcTemplate.update("DELETE FROM account");
-        jdbcTemplate.update("DELETE FROM content");
-        jdbcTemplate.update("DELETE FROM creator");
-        jdbcTemplate.update("DELETE FROM city");
-        jdbcTemplate.update("DELETE FROM country");
+        jdbcTemplate.execute("SET FOREIGN_KEY_CHECKS = 0");
 
-        jdbcTemplate.update("ALTER TABLE refresh_token ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE favorite_content ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE favorite_place ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE favorite_folder ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE social_member ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE member ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE guest ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE account ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE favorite_folder_account ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE content ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE creator ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE city ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE country ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("TRUNCATE TABLE refresh_token");
+        jdbcTemplate.update("TRUNCATE TABLE favorite_content");
+        jdbcTemplate.update("TRUNCATE TABLE favorite_place");
+        jdbcTemplate.update("TRUNCATE TABLE favorite_folder_account");
+        jdbcTemplate.update("TRUNCATE TABLE favorite_folder");
+        jdbcTemplate.update("TRUNCATE TABLE social_member");
+        jdbcTemplate.update("TRUNCATE TABLE member");
+        jdbcTemplate.update("TRUNCATE TABLE guest");
+        jdbcTemplate.update("TRUNCATE TABLE account");
+        jdbcTemplate.update("TRUNCATE TABLE content");
+        jdbcTemplate.update("TRUNCATE TABLE creator");
+        jdbcTemplate.update("TRUNCATE TABLE city");
+        jdbcTemplate.update("TRUNCATE TABLE country");
+
+        jdbcTemplate.execute("SET FOREIGN_KEY_CHECKS = 1");
     }
 
     @Nested
@@ -98,8 +86,10 @@ class MemberApiTest {
             testDataHelper.insertSocialMember(memberId, provider, providerId);
 
             // 3. Guest의 FavoriteFolder와 FavoriteContent 생성
+            Long folderId0 = testDataHelper.insertFavoriteFolder("기본 폴더", true, false);
             Long folderId1 = testDataHelper.insertFavoriteFolder("기본 폴더", true, false);
             Long folderId2 = testDataHelper.insertFavoriteFolder("커스텀 폴더");
+            testDataHelper.insertFavoriteFolderAccount(memberAccountId, folderId0, AccountRole.OWNER);
             testDataHelper.insertFavoriteFolderAccount(guestAccountId, folderId1, AccountRole.OWNER);
             testDataHelper.insertFavoriteFolderAccount(guestAccountId, folderId2, AccountRole.OWNER);
 
@@ -140,11 +130,20 @@ class MemberApiTest {
             );
             assertThat(favoriteContentCount).isEqualTo(1);
 
+            // 검증: 게스트에 존재하던 폴더가 모두 제거됐는지 확인
             Integer favoriteFolderAccountCount = jdbcTemplate.queryForObject(
-                    "SELECT COUNT(*) FROM favorite_folder_account WHERE account_id = 2",
-                    Integer.class
+                    "SELECT COUNT(*) FROM favorite_folder_account WHERE account_id = ?",
+                    Integer.class,
+                    guestAccountId
             );
-            assertThat(favoriteFolderAccountCount).isEqualTo(0); // Guest의 개인 폴더는 모두 삭제됨
+            assertThat(favoriteFolderAccountCount).isEqualTo(0);
+
+            // 검증: 기존에 member에 존재하던 폴더는 제거되고, 마이그레이션 된 폴더만 존재하는지 확인
+            Integer migratedFolderCount = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM favorite_folder_account WHERE account_id = ?",
+                    Integer.class,
+                    memberAccountId);
+            assertThat(migratedFolderCount).isEqualTo(2);
 
             // 검증: Guest가 삭제되었는지 확인
             Integer guestCount = jdbcTemplate.queryForObject(
@@ -192,6 +191,46 @@ class MemberApiTest {
                     .when().post("/api/v1/members/migration")
                     .then().log().all()
                     .statusCode(400);
+        }
+    }
+
+    @Nested
+    @DisplayName("/api/v1/members/migration/reject POST 마이그레이션 거절 테스트")
+    class RejectMigrateTest {
+
+        @Test
+        @DisplayName("마이그레이션을 거절한 뒤 204 No Content를 응답한다")
+        void reject1() {
+            // given
+            Long memberAccountId = testDataHelper.insertAccount(); // Member account
+            Long memberId = testDataHelper.insertMember(memberAccountId, "migration@gmail.com", true);
+            Provider provider = Provider.GOOGLE;
+            String providerId = "google-user-migration";
+            testDataHelper.insertSocialMember(memberId, provider, providerId);
+            String accessToken = testDataHelper.createAccessToken(memberAccountId);
+
+            // when & then
+            RestAssured
+                    .given().log().all()
+                    .header("Authorization", "Bearer " + accessToken)
+                    .when().post("/api/v1/members/migration/reject")
+                    .then().log().all()
+                    .statusCode(204);
+        }
+
+        @Test
+        @DisplayName("Authorization 헤더 없이 요청 시 401 Unauthorized를 응답한다")
+        void reject2() {
+            // given
+            String deviceFid = "device-123";
+
+            // when & then
+            RestAssured
+                    .given().log().all()
+                    .header("device-fid", deviceFid)
+                    .when().post("/api/v1/members/migration/reject")
+                    .then().log().all()
+                    .statusCode(401);
         }
     }
 

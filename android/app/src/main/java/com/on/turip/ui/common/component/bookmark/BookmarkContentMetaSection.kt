@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -75,7 +77,7 @@ fun BookmarkContentMetaSection(
             modifier = Modifier.size(48.dp),
         ) {
             Icon(
-                painter = painterResource(R.drawable.btn_bookmark_selected),
+                imageVector = Icons.Filled.Bookmark,
                 contentDescription = null,
                 tint = TuripTheme.colors.primary,
             )

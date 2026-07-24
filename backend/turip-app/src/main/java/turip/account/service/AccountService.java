@@ -1,40 +1,36 @@
 package turip.account.service;
 
-import java.security.SecureRandom;
 import java.util.Optional;
-import java.util.Random;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import turip.account.domain.Account;
-import turip.account.domain.NicknameWord;
 import turip.account.domain.Role;
+import turip.account.domain.nickname.NicknameCreator;
 import turip.account.repository.AccountInsertRepository;
 import turip.account.repository.AccountRepository;
+import turip.account.repository.FcmTokenRepository;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.InternalServerException;
 import turip.common.exception.custom.NotFoundException;
 import turip.favorite.repository.FavoriteContentRepository;
-import turip.favorite.repository.FavoriteFolderRepository;
 import turip.favorite.service.FavoriteFolderService;
 
 @Service
 @RequiredArgsConstructor
 public class AccountService {
 
-    private static final Random RANDOM = new SecureRandom();
-
     private final AccountRepository accountRepository;
     private final FavoriteContentRepository favoriteContentRepository;
-    private final FavoriteFolderRepository favoriteFolderRepository;
     private final FavoriteFolderService favoriteFolderService;
     private final AccountInsertRepository accountInsertRepository;
+    private final FcmTokenRepository fcmTokenRepository;
 
     @Transactional
-    public Account create() {
+    public Account create(NicknameCreator nicknameCreator) {
         int maxAttempts = 5;
         for (int attempt = 0; attempt < maxAttempts; attempt++) {
-            String nickname = NicknameWord.createRandomNickname(RANDOM);
+            String nickname = nicknameCreator.create();
             Account account = new Account(Role.USER, nickname);
             Optional<Account> savedAccountResult = accountInsertRepository.trySave(account);
             if (savedAccountResult.isEmpty()) {
@@ -55,7 +51,8 @@ public class AccountService {
     @Transactional
     public void deleteAccountAndFavorites(Account account) {
         favoriteContentRepository.deleteByAccount(account);
-        favoriteFolderRepository.deletePersonalFoldersByAccount(account);
+        favoriteFolderService.deleteAloneFoldersByAccount(account);
+        fcmTokenRepository.deleteByAccount(account);
         accountRepository.delete(account);
     }
 }

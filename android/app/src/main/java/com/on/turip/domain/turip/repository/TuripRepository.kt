@@ -5,11 +5,19 @@ import com.on.turip.domain.bookmark.TuripPlace
 import com.on.turip.domain.turip.Turip
 import com.on.turip.domain.turip.TuripInvitationInformation
 import com.on.turip.domain.turip.TuripInvitationToken
+import com.on.turip.domain.turip.TuripMember
+import com.on.turip.domain.turip.result.TuripStreamResult
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 interface TuripRepository {
+    val turips: StateFlow<List<Turip>>
+
     suspend fun loadTurip(turipId: Long): TuripResult<Turip>
 
     suspend fun loadTurips(): TuripResult<List<Turip>>
+
+    suspend fun loadTuripMembers(turipId: Long): TuripResult<List<TuripMember>>
 
     suspend fun createTurip(name: String): TuripResult<Turip>
 
@@ -19,6 +27,8 @@ interface TuripRepository {
     ): TuripResult<Unit>
 
     suspend fun deleteTurip(turipId: Long): TuripResult<Unit>
+
+    suspend fun exitTurip(turipId: Long): TuripResult<Unit>
 
     suspend fun loadTuripsByPlaceId(placeId: Long): TuripResult<List<Turip>>
 
@@ -42,6 +52,7 @@ interface TuripRepository {
     suspend fun updatePlaceTurips(
         placeId: Long,
         turipIds: List<Long>,
+        previouslySelectedIds: Set<Long>,
     ): TuripResult<Unit>
 
     suspend fun createInvitationToken(turipId: Long): TuripResult<TuripInvitationToken>
@@ -49,4 +60,18 @@ interface TuripRepository {
     suspend fun joinTurip(turipId: Long): TuripResult<Unit>
 
     suspend fun verifyInvitationToken(token: String): TuripResult<TuripInvitationInformation>
+
+    fun streamTuripEvents(turipId: Long): Flow<TuripStreamResult>
+
+    fun updateCachedTuripMemberCount(
+        turipId: Long,
+        memberCount: Int,
+    )
+
+    fun updateCachedTuripSharedStatus(
+        turipId: Long,
+        isShared: Boolean,
+    )
+
+    fun clearCache()
 }

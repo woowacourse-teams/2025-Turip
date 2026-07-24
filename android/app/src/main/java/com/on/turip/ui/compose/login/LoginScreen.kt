@@ -84,7 +84,7 @@ fun LoginScreen(
             confirmText = stringResource(R.string.login_dialog_confirm_text),
             dismissText = stringResource(R.string.my_page_logout_dialog_dismiss),
             onConfirmation = viewmodel::confirmMigration,
-            onDismissRequest = viewmodel::clearGuestData,
+            onDismissRequest = viewmodel::rejectMigration,
         )
     }
 

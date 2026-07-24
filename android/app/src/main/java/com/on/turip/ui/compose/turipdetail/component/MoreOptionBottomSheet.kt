@@ -14,8 +14,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Group
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -52,6 +55,7 @@ fun MoreOptionBottomSheet(
     onScreenModeChange: (turipPlaceScreenMode: TuripPlaceScreenMode) -> Unit,
     sheetState: SheetState,
     isDefault: Boolean,
+    isTogetherTurip: Boolean,
     onDismiss: () -> Unit,
     onShareTuripByTextClick: () -> Unit,
     onShareTuripInvitationLinkClick: () -> Unit,
@@ -75,20 +79,34 @@ fun MoreOptionBottomSheet(
             ),
             MoreOptionItem(
                 title = stringResource(R.string.all_turip_share_by_text),
-                icon = MoreOptionIcon.Resource(R.drawable.ic_text_area),
+                icon = MoreOptionIcon.Vector(Icons.Default.Share),
                 color = TuripTheme.colors.black,
                 onClick = onShareTuripByTextClick,
             ),
             MoreOptionItem(
                 title = stringResource(R.string.all_turip_invite_by_link),
-                icon = MoreOptionIcon.Resource(R.drawable.ic_people_fill),
+                icon = MoreOptionIcon.Vector(Icons.Default.Group),
                 color = TuripTheme.colors.black,
                 onClick = onShareTuripInvitationLinkClick,
                 enabled = !isDefault,
             ),
             MoreOptionItem(
-                title = stringResource(R.string.turip_more_option_bottom_sheet_delete),
-                icon = MoreOptionIcon.Vector(Icons.Default.Delete),
+                title =
+                    stringResource(
+                        if (isTogetherTurip) {
+                            R.string.turip_more_option_bottom_sheet_leave
+                        } else {
+                            R.string.turip_more_option_bottom_sheet_delete
+                        },
+                    ),
+                icon =
+                    MoreOptionIcon.Vector(
+                        if (isTogetherTurip) {
+                            Icons.AutoMirrored.Filled.Logout
+                        } else {
+                            Icons.Default.Delete
+                        },
+                    ),
                 color = TuripTheme.colors.error,
                 onClick = onDeleteClick,
                 enabled = !isDefault,
@@ -221,6 +239,7 @@ private fun MoreOptionBottomSheetPreviewContent(
             onScreenModeChange = {},
             sheetState = sheetState,
             isDefault = isDefault,
+            isTogetherTurip = false,
             onDismiss = {},
             onShareTuripByTextClick = {},
             onShareTuripInvitationLinkClick = {},

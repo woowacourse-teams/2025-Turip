@@ -1,8 +1,8 @@
 package com.on.turip.ui.compose.turipdetail
 
 import com.on.turip.ui.common.error.ErrorUiState
+import com.on.turip.ui.common.model.turip.TuripShareModel
 import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
-import com.on.turip.ui.compose.turipdetail.model.turip.TuripShareModel
 import kotlinx.collections.immutable.ImmutableList
 
 sealed interface TuripDetailUiEffect {
@@ -38,6 +38,10 @@ sealed interface TuripDetailUiEffect {
     data class ShowReorderDetailFailed(
         val retryAction: TuripPlaceRetryAction,
     ) : TuripDetailUiEffect
+
+    data object ShowNetworkUnstable : TuripDetailUiEffect
+
+    data object ShowNetworkRecovered : TuripDetailUiEffect
 }
 
 sealed interface TuripPlaceRetryAction {
@@ -54,4 +58,6 @@ sealed interface TuripPlaceRetryAction {
     data object TuripDelete : TuripPlaceRetryAction
 
     data object ShareTuripInvitationLink : TuripPlaceRetryAction
+
+    data object StreamConnectionLost : TuripPlaceRetryAction
 }

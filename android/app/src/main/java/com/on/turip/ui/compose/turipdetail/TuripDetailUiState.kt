@@ -3,10 +3,10 @@ package com.on.turip.ui.compose.turipdetail
 import androidx.compose.runtime.Immutable
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.model.namestatus.TuripNameStatusModel
+import com.on.turip.ui.common.model.turip.TuripEditModel
 import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
 import com.on.turip.ui.compose.turip.model.MyTuripModel
 import com.on.turip.ui.compose.turipdetail.model.turip.PlaceLatLngUiModel
-import com.on.turip.ui.folder.model.TuripEditModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
@@ -15,7 +15,9 @@ data class TuripDetailUiState(
     val isLoading: Boolean,
     val inputTuripName: String,
     val errorUiState: ErrorUiState,
-    val showBottomSheet: Boolean,
+    val showMoreOptionBottomSheet: Boolean,
+    val showMemberBottomSheet: Boolean,
+    val members: ImmutableList<String>,
     val turipNameStatus: TuripNameStatusModel,
     val screenMode: TuripPlaceScreenMode,
     val editModels: ImmutableList<TuripEditModel>,
@@ -31,7 +33,9 @@ data class TuripDetailUiState(
                 isLoading = true,
                 inputTuripName = "",
                 errorUiState = ErrorUiState.None,
-                showBottomSheet = false,
+                showMemberBottomSheet = false,
+                members = persistentListOf(),
+                showMoreOptionBottomSheet = false,
                 turipNameStatus = TuripNameStatusModel.EMPTY,
                 selectedTurip = MyTuripModel.Idle,
                 places = persistentListOf(),

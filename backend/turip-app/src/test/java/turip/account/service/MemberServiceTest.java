@@ -2,7 +2,6 @@ package turip.account.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -24,15 +23,11 @@ import turip.account.repository.MemberRepository;
 import turip.auth.service.RefreshTokenService;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.BadRequestException;
-import turip.favorite.domain.AccountRole;
 import turip.favorite.domain.FavoriteContent;
-import turip.favorite.domain.FavoriteFolder;
-import turip.favorite.domain.FavoriteFolderAccount;
 import turip.favorite.repository.FavoriteContentRepository;
-import turip.favorite.repository.FavoriteFolderAccountRepository;
-import turip.favorite.repository.FavoriteFolderRepository;
+import turip.favorite.service.FavoriteFolderAccountService;
+import turip.favorite.service.FavoriteFolderService;
 import turip.util.fixture.AccountFixture;
-import turip.util.fixture.FavoriteFolderFixture;
 import turip.util.fixture.GuestFixture;
 import turip.util.fixture.MemberFixture;
 
@@ -49,10 +44,10 @@ class MemberServiceTest {
     private FavoriteContentRepository favoriteContentRepository;
 
     @Mock
-    private FavoriteFolderAccountRepository favoriteFolderAccountRepository;
+    private FavoriteFolderService favoriteFolderService;
 
     @Mock
-    private FavoriteFolderRepository favoriteFolderRepository;
+    private FavoriteFolderAccountService favoriteFolderAccountService;
 
     @Mock
     private GuestService guestService;
@@ -73,7 +68,7 @@ class MemberServiceTest {
             // given
             String invalidEmail = "invalid-email";
             Account account = AccountFixture.createUser();
-            given(accountService.create())
+            given(accountService.create(any()))
                     .willReturn(account);
 
             // when & then
@@ -125,8 +120,8 @@ class MemberServiceTest {
             memberService.migrate(member, guest);
 
             // then
-            verify(favoriteFolderRepository).deletePersonalFoldersByAccount(guestAccount);
-            verify(favoriteFolderAccountRepository).updateAccount(guestAccount, memberAccount);
+            verify(favoriteFolderService).deleteDefaultFolderByAccount(memberAccount);
+            verify(favoriteFolderAccountService).updateAccount(guestAccount, memberAccount);
         }
 
         @DisplayName("마이그레이션이 완료되면 Guest를 삭제한다")
@@ -146,6 +141,46 @@ class MemberServiceTest {
 
             // then
             verify(guestService).delete(guest);
+        }
+
+        @DisplayName("마이그레이션이 완료되면 회원의 isMigrationDecided가 true로 변경된다.")
+        @Test
+        void isMigrationDecidedIsTrue() {
+            // given
+            Account memberAccount = AccountFixture.createCustomAccount(1L, Role.USER);
+            Account guestAccount = AccountFixture.createCustomAccount(2L, Role.USER);
+            Member member = MemberFixture.createCustomMember(memberAccount, "email@test.com", true);
+            Guest guest = GuestFixture.createCustomGuest(guestAccount, "device-fid-123");
+
+            given(favoriteContentRepository.findAllByAccount(any()))
+                    .willReturn(List.of());
+
+            // when
+            assertThat(member.isMigrationDecided()).isFalse();
+            memberService.migrate(member, guest);
+
+            // then
+            assertThat(member.isMigrationDecided()).isTrue();
+        }
+    }
+
+    @DisplayName("마이그레이션 여부 결정 테스트")
+    @Nested
+    class DecideMigration {
+
+        @DisplayName("마이그레이션 여부를 결정하면 isMigrationDecided가 true로 변경된다")
+        @Test
+        void decideMigration1() {
+            // given
+            Account memberAccount = AccountFixture.createCustomAccount(1L, Role.USER);
+            Member member = MemberFixture.createCustomMember(memberAccount, "email@test.com", true);
+
+            // when
+            assertThat(member.isMigrationDecided()).isFalse();
+            memberService.decideMigration(member);
+
+            // then
+            assertThat(member.isMigrationDecided()).isTrue();
         }
     }
 

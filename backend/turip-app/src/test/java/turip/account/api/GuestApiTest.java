@@ -8,17 +8,20 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
+import turip.container.TestContainerConfig;
 import turip.favorite.domain.AccountRole;
 import turip.util.helper.TestDataHelper;
 
-@ActiveProfiles("test")
+@ActiveProfiles("test-mysql")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class GuestApiTest {
+class GuestApiTest extends TestContainerConfig {
 
     @LocalServerPort
     private int port;
@@ -33,29 +36,21 @@ class GuestApiTest {
     void setUp() {
         RestAssured.port = port;
 
-        jdbcTemplate.update("DELETE FROM refresh_token");
-        jdbcTemplate.update("DELETE FROM favorite_content");
-        jdbcTemplate.update("DELETE FROM favorite_place");
-        jdbcTemplate.update("DELETE FROM favorite_folder");
-        jdbcTemplate.update("DELETE FROM member");
-        jdbcTemplate.update("DELETE FROM guest");
-        jdbcTemplate.update("DELETE FROM account");
-        jdbcTemplate.update("DELETE FROM content");
-        jdbcTemplate.update("DELETE FROM creator");
-        jdbcTemplate.update("DELETE FROM city");
-        jdbcTemplate.update("DELETE FROM country");
+        jdbcTemplate.execute("SET FOREIGN_KEY_CHECKS = 0");
 
-        jdbcTemplate.update("ALTER TABLE refresh_token ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE favorite_content ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE favorite_place ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE favorite_folder ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE member ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE guest ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE account ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE content ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE creator ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE city ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE country ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("TRUNCATE TABLE refresh_token");
+        jdbcTemplate.update("TRUNCATE TABLE favorite_content");
+        jdbcTemplate.update("TRUNCATE TABLE favorite_place");
+        jdbcTemplate.update("TRUNCATE TABLE favorite_folder");
+        jdbcTemplate.update("TRUNCATE TABLE member");
+        jdbcTemplate.update("TRUNCATE TABLE guest");
+        jdbcTemplate.update("TRUNCATE TABLE account");
+        jdbcTemplate.update("TRUNCATE TABLE content");
+        jdbcTemplate.update("TRUNCATE TABLE creator");
+        jdbcTemplate.update("TRUNCATE TABLE city");
+        jdbcTemplate.update("TRUNCATE TABLE country");
+
+        jdbcTemplate.execute("SET FOREIGN_KEY_CHECKS = 1");
     }
 
     @Nested

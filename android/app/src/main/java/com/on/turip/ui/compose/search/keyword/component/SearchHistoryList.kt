@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -19,11 +21,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.on.turip.R
 import com.on.turip.domain.searchhistory.SearchHistory
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import kotlinx.collections.immutable.ImmutableList
@@ -89,9 +88,9 @@ private fun SearchHistoryItem(
             modifier = Modifier.size(TuripTheme.spacing.extraExtraLarge),
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_search_cancel),
-                contentDescription = "삭제",
-                tint = Color.Unspecified,
+                imageVector = Icons.Default.Cancel,
+                contentDescription = null,
+                tint = TuripTheme.colors.gray02,
             )
         }
     }

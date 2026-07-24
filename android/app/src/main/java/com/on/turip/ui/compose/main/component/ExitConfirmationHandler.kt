@@ -35,7 +35,7 @@ fun ExitConfirmationHandler(appState: TuripAppState) {
         )
     }
 
-    LaunchedEffect(appState.navigationState.currentTopLevelKey) {
+    LaunchedEffect(appState.navigationState.currentKey) {
         appState.snackbarDelegate.dismissCurrentSnackbar()
     }
 

@@ -1,9 +1,8 @@
 package com.on.turip.domain.invitation.usecase
 
 import com.on.turip.core.result.fold
+import com.on.turip.core.session.SessionState
 import com.on.turip.domain.invitation.usecase.model.InvitationEntryResult
-import com.on.turip.domain.session.SessionState
-import com.on.turip.domain.session.SessionStore
 import com.on.turip.domain.turip.TuripInvitationInformation
 import com.on.turip.domain.turip.repository.TuripRepository
 import timber.log.Timber
@@ -21,10 +20,11 @@ import javax.inject.Inject
  */
 class DetermineInvitationEntryRouteUseCase @Inject constructor(
     private val turipRepository: TuripRepository,
-    private val sessionStore: SessionStore,
 ) {
-    suspend operator fun invoke(invitationToken: String?): InvitationEntryResult {
-        val sessionState: SessionState = sessionStore.state.value
+    suspend operator fun invoke(
+        sessionState: SessionState,
+        invitationToken: String?,
+    ): InvitationEntryResult {
         val trimmedInvitationToken: String =
             invitationToken?.takeIf(String::isNotBlank)?.trim()
                 ?: return InvitationEntryResult.InvalidInvitationToken

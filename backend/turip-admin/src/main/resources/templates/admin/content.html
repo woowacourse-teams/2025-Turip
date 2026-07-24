@@ -13,7 +13,7 @@
         body {
             background: linear-gradient(135deg, #becdfd, #ffffff);
             min-height: 100vh;
-            padding: 40px 0;
+            padding-bottom: 40px;
             font-family: 'Pretendard', sans-serif;
         }
 
@@ -103,6 +103,13 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            transition: all 0.2s;
+        }
+
+        .place-item:hover {
+            background-color: #f1f4ff;
+            border-color: #6e8efb;
+            transform: translateX(4px);
         }
 
         #map {
@@ -137,43 +144,31 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .header h1 {
-            color: #667eea;
-            font-size: 24px;
-            margin: 0;
-        }
-
-        .home-btn {
-            padding: 10px 20px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.3s;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .home-btn:hover {
-            background: #5568d3;
-            color: white;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
         }
     </style>
 </head>
 <body>
 
-<div class="header">
-    <h1>Turip 관리자 - 콘텐츠 수집</h1>
-    <a href="/admin/home" class="home-btn">홈으로 돌아가기</a>
+<!-- Toast 알림 -->
+<div aria-atomic="true" aria-live="polite" class="position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+    <div class="toast align-items-center border-0" id="errorToast" role="alert">
+        <div class="d-flex">
+            <div class="toast-body fw-bold" id="toastMessage"></div>
+            <button aria-label="Close" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" type="button"></button>
+        </div>
+    </div>
 </div>
 
-<div class="container">
+<div class="header">
+    <h1 style="color: #667eea; font-size: 22px; font-weight: 800; margin:0;">Turip Admin</h1>
+    <a class="btn btn-sm btn-outline-primary fw-bold" href="/admin/home">홈으로 돌아가기</a>
+</div>
+
+<div class="container" style="margin-top: 80px;">
     <div class="row justify-content-center">
         <div class="col-lg-12">
             <div class="admin-card">
@@ -249,7 +244,10 @@
                 <h3 class="section-title text-start">5. 최종 콘텐츠 저장</h3>
                 <div class="row mb-3 justify-content-center align-items-center">
                     <div class="col-md-3"><label class="small text-muted">도시 이름</label><input
-                            class="form-control text-center" id="cityName" placeholder="예: 서울" type="text"></div>
+                            class="form-control text-center" id="cityName" placeholder="예: 서울" type="text" list="cityList">
+                        <datalist id="cityList">
+                        </datalist>
+                    </div>
                     <div class="col-md-3"><label class="small text-muted">여행 기간</label><h4 class="fw-bold text-primary"
                                                                                            id="durationText">0박 1일</h4>
                         <input id="tripNights" type="hidden" value="0"><input id="tripDays" type="hidden" value="1">
@@ -271,6 +269,7 @@
     let collectedPlaces = [];
     let isYouTubeApiReady = false;
     let videoIdToLoad = null;
+    let previewMarker = null;
 
     async function authFetch(url, options = {}) {
         const defaultOptions = {headers: {'Content-Type': 'application/json'}};
@@ -328,7 +327,7 @@
             const pos = {lat: p.place.latitude, lng: p.place.longitude};
             const marker = new google.maps.Marker({
                 position: pos, map: map,
-                label: {text: String(idx + 1), color: "white", fontWeight: "bold"},
+                label: {text: `${p.visitDay}-${p.visitOrder}`, color: "white", fontWeight: "bold", fontSize: "12px"},
                 title: p.place.name
             });
             marker.addListener("click", () => {
@@ -340,6 +339,45 @@
         });
         if (collectedPlaces.length > 1) map.fitBounds(bounds);
         else if (collectedPlaces.length === 1) map.setCenter(markers[0].getPosition());
+    }
+
+    function showPreviewMarker(item) {
+        if (!map) return;
+
+        // 기존 미리보기 마커 제거
+        if (previewMarker) {
+            previewMarker.setMap(null);
+        }
+
+        // 새로운 미리보기 마커 생성 (노란색 핀)
+        const pos = {lat: item.latitude, lng: item.longitude};
+        previewMarker = new google.maps.Marker({
+            position: pos,
+            map: map,
+            icon: {
+                url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                    <svg xmlns="http://www.w3.org/2000/svg" width="27" height="43" viewBox="0 0 27 43">
+                        <path fill="#FFEB3B" stroke="#F57F17" stroke-width="2"
+                              d="M12.5 0C5.596 0 0 5.596 0 12.5c0 1.986.461 3.856 1.281 5.524l11.095 24.038c.112.243.357.438.624.438s.512-.195.624-.438l11.094-24.038C25.539 16.356 26 14.486 26 12.5 26 5.596 20.404 0 13.5 0h-1z"/>
+                        <circle fill="#FFF176" cx="13" cy="12" r="7"/>
+                    </svg>
+                `),
+                scaledSize: new google.maps.Size(27, 43),
+                anchor: new google.maps.Point(13, 43)
+            },
+            title: item.name,
+            animation: google.maps.Animation.DROP
+        });
+
+        // 미리보기 마커 클릭 시 정보 표시
+        previewMarker.addListener("click", () => {
+            infoWindow.setContent(`<div><strong>${item.name}</strong><br><small>${item.address}</small></div>`);
+            infoWindow.open(map, previewMarker);
+        });
+
+        // 지도 중심을 마커로 이동하고 줌 조정
+        map.setCenter(pos);
+        map.setZoom(15);
     }
 
     async function fetchChannelImage(channelId) {
@@ -397,10 +435,25 @@
             const data = await res.json();
             container.innerHTML = '';
             container.style.display = 'block';
+
+            if (!data.items || data.items.length === 0) {
+                container.innerHTML = '<div style="padding: 20px; text-align: center; color: #999;">검색 결과가 없습니다.<br><small>다른 검색어로 시도해보세요.</small></div>';
+                return;
+            }
+
             data.items.forEach(item => {
                 const div = document.createElement('div');
                 div.className = 'search-result-item';
-                div.innerHTML = `<strong>${item.name}</strong><br><small>${item.address}</small>`;
+
+                const strong = document.createElement('strong');
+                strong.textContent = item.name;
+                div.appendChild(strong);
+                div.appendChild(document.createElement('br'));
+
+                const small = document.createElement('small');
+                small.textContent = item.address;
+                div.appendChild(small);
+
                 div.onclick = () => {
                     selectedPlaceData = item;
                     document.getElementById('placeQuery').value = item.name;
@@ -410,7 +463,7 @@
                     }
                     container.style.display = 'none';
                     document.getElementById('btnAddPlace').disabled = false;
-                    if (map) map.setCenter({lat: item.latitude, lng: item.longitude});
+                    showPreviewMarker(item);
                 };
                 container.appendChild(div);
             });
@@ -435,12 +488,25 @@
     function addPlaceToList() {
         if (!selectedPlaceData) return;
         const day = parseInt(document.getElementById('visitDay').value);
+
+        // 해당 일차의 현재 장소 개수를 세서 visitOrder 설정
+        const placesInSameDay = collectedPlaces.filter(p => p.visitDay === day);
+        const visitOrder = placesInSameDay.length + 1;
+
         collectedPlaces.push({
             id: Date.now(),
             visitDay: day,
+            visitOrder: visitOrder,
             timeLine: document.getElementById('timeLine').value || "00:00",
             place: {...selectedPlaceData}
         });
+
+        // 미리보기 마커 제거
+        if (previewMarker) {
+            previewMarker.setMap(null);
+            previewMarker = null;
+        }
+
         renderPlaceList();
         calculateDuration();
         updateMapMarkers();
@@ -464,7 +530,33 @@
             container.appendChild(dayBox);
             const listDiv = document.getElementById(`day-list-${day}`);
             grouped[day].forEach(item => {
-                listDiv.insertAdjacentHTML('beforeend', `<div class="place-item" data-id="${item.id}"><div><b>${item.place.name}</b> <small>🕒 ${item.timeLine}</small></div><button class="btn btn-sm text-danger" onclick="removePlace(${item.id})">✕</button></div>`);
+                const placeDiv = document.createElement('div');
+                placeDiv.className = 'place-item';
+                placeDiv.setAttribute('data-id', item.id);
+                placeDiv.style.cursor = 'pointer';
+                placeDiv.onclick = () => focusOnPlace(item.id);
+
+                const infoDiv = document.createElement('div');
+                const placeName = document.createElement('b');
+                placeName.textContent = item.place.name;
+                infoDiv.appendChild(placeName);
+                infoDiv.appendChild(document.createTextNode(' '));
+
+                const timeSmall = document.createElement('small');
+                timeSmall.textContent = `🕒 ${item.timeLine}`;
+                infoDiv.appendChild(timeSmall);
+
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'btn btn-sm text-danger';
+                removeBtn.textContent = '✕';
+                removeBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    removePlace(item.id);
+                };
+
+                placeDiv.appendChild(infoDiv);
+                placeDiv.appendChild(removeBtn);
+                listDiv.appendChild(placeDiv);
             });
             Sortable.create(listDiv, {
                 group: 'places', animation: 150,
@@ -534,14 +626,41 @@
 
         try {
             saveButton.disabled = true;
-            saveButton.innerHTML = '💾 저장 중...';
-            await authFetch('/api/v1/admin/contents', {method: 'POST', body: JSON.stringify(payload)});
-            alert("🎉 콘텐츠 저장 완료!");
-            location.reload();
+
+            if (editPendingId) {
+                // 반려 후 재검수 요청: ContentPendingData 형식으로 POST
+                saveButton.innerHTML = '📨 요청 중...';
+                const pendingPayload = {
+                    cityName: cityName,
+                    video: {
+                        videoId: vId,
+                        url: document.getElementById('v_url').value,
+                        title: document.getElementById('v_video_title').innerText,
+                        channelName: document.getElementById('v_channel_name').innerText,
+                        channelImage: document.getElementById('v_channel_img').src,
+                        uploadedDate: document.getElementById('v_date_val').value || null
+                    },
+                    contentPlaces: collectedPlaces.map(p => ({
+                        visitDay: p.visitDay,
+                        visitOrder: p.visitOrder,
+                        timeLine: p.timeLine,
+                        place: p.place
+                    }))
+                };
+                await authFetch('/api/v1/admin/content-pendings', {method: 'POST', body: JSON.stringify(pendingPayload)});
+                alert("📨 재검수 요청이 완료되었습니다!");
+                location.href = '/admin/my';
+            } else {
+                saveButton.innerHTML = '📨 검수 요청 중...';
+                const { tripDuration, ...pendingPayload } = payload;
+                await authFetch('/api/v1/admin/content-pendings', {method: 'POST', body: JSON.stringify(pendingPayload)});
+                alert("📨 검수 요청이 완료되었습니다!");
+                location.href = '/admin/my';
+            }
         } catch (e) {
-            alert("⚠️ 저장 실패\n" + e.message);
+            showErrorToast(e.message);
             saveButton.disabled = false;
-            saveButton.innerHTML = '💾 서버에 콘텐츠 저장';
+            saveButton.innerHTML = editPendingId ? '📨 재검수 요청' : '💾 서버에 콘텐츠 저장';
         }
     }
 
@@ -551,6 +670,122 @@
         calculateDuration();
         updateMapMarkers();
     }
+
+    function focusOnPlace(id) {
+        if (!map) return;
+
+        // 해당 장소 찾기
+        const placeIndex = collectedPlaces.findIndex(p => p.id === id);
+        if (placeIndex === -1) return;
+
+        const place = collectedPlaces[placeIndex];
+
+        // 지도를 해당 위치로 이동하고 줌 조정
+        const pos = {lat: place.place.latitude, lng: place.place.longitude};
+        map.setCenter(pos);
+        map.setZoom(15);
+
+        // 해당 마커의 정보창 열기
+        if (markers[placeIndex]) {
+            infoWindow.setContent(`<div><strong>${place.visitDay}일차: ${place.place.name}</strong><br>🕒 ${place.timeLine}</div>`);
+            infoWindow.open(map, markers[placeIndex]);
+        }
+    }
+
+    async function loadCities() {
+        try {
+            const response = await authFetch('/api/v1/admin/cities');
+            const cities = await response.json();
+
+            const datalist = document.getElementById('cityList');
+            cities.forEach(city => {
+                const option = document.createElement('option');
+                option.value = city.name;
+                datalist.appendChild(option);
+            });
+        } catch (error) {
+            console.error('도시 목록 로드 실패:', error);
+            showErrorToast('도시 목록을 불러오는데 실패했습니다: ' + error.message);
+        }
+    }
+
+    function showErrorToast(message) {
+        const toastEl = document.getElementById('errorToast');
+        document.getElementById('toastMessage').textContent = '⚠️ ' + message;
+        toastEl.classList.remove('text-bg-success', 'text-bg-danger');
+        toastEl.classList.add('text-bg-danger');
+        bootstrap.Toast.getOrCreateInstance(toastEl, {delay: 5000}).show();
+    }
+
+    let editPendingId = null;
+
+    async function loadEditData(pendingId) {
+        try {
+            const res = await authFetch(`/api/v1/admin/content-pendings/${pendingId}`);
+            const data = await res.json();
+            const cd = data.contentData;
+
+            // 편집 모드 배너 표시
+            const banner = document.createElement('div');
+            banner.className = 'alert alert-warning';
+            banner.style.cssText = 'margin: 0 0 16px 0; border-radius: 12px;';
+            banner.textContent = '✏️ ';
+            const strong = document.createElement('strong');
+            strong.textContent = '반려된 콘텐츠 수정 중';
+            banner.appendChild(strong);
+            banner.appendChild(document.createTextNode(' — 반려 사유: ' + (data.rejectReason || '(사유 없음)')));
+            document.querySelector('.container').prepend(banner);
+
+            // 저장 버튼 텍스트 변경
+            document.getElementById('saveContentBtn').innerHTML = '📨 재검수 요청';
+
+            // 영상 정보 채우기
+            document.getElementById('videoUrlInput').value = cd.video.url;
+            document.getElementById('v_id').value = cd.video.videoId;
+            document.getElementById('v_url').value = cd.video.url;
+            document.getElementById('v_channel_name').innerText = cd.video.channelName;
+            document.getElementById('v_video_title').innerText = cd.video.title;
+            document.getElementById('v_channel_img').src = cd.video.channelImage || 'https://via.placeholder.com/90?text=No+Image';
+            document.getElementById('v_date_val').value = cd.video.uploadedDate || '';
+            document.getElementById('videoInfoArea').classList.remove('d-none');
+            createPlayer(cd.video.videoId);
+
+            // 도시 이름
+            document.getElementById('cityName').value = cd.cityName;
+
+            // 장소 목록 복원
+            collectedPlaces = cd.contentPlaces.map((cp, i) => ({
+                id: Date.now() + i,
+                visitDay: cp.visitDay,
+                visitOrder: cp.visitOrder,
+                timeLine: cp.timeLine,
+                place: {
+                    name: cp.place.name,
+                    url: cp.place.url,
+                    address: cp.place.address,
+                    latitude: cp.place.latitude,
+                    longitude: cp.place.longitude,
+                    categoryName: cp.place.categoryName
+                }
+            }));
+            renderPlaceList();
+            calculateDuration();
+            updateMapMarkers();
+        } catch (e) {
+            alert('기존 데이터를 불러오는 데 실패했습니다.\n' + e.message);
+        }
+    }
+
+    // 페이지 로드 시 도시 목록 불러오기 + editId 처리
+    document.addEventListener('DOMContentLoaded', async () => {
+        await loadCities();
+        const params = new URLSearchParams(location.search);
+        const editId = params.get('editId');
+        if (editId) {
+            editPendingId = editId;
+            await loadEditData(editId);
+        }
+    });
 
     /*]]>*/
 </script>

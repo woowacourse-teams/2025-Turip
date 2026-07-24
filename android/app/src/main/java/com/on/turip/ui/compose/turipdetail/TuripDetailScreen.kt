@@ -4,8 +4,10 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.icons.Icons
@@ -20,11 +22,11 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,22 +38,27 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.maps.model.LatLng
 import com.on.turip.R
+import com.on.turip.domain.turip.TuripType
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.toUiModel
+import com.on.turip.ui.common.model.turip.TuripShareModel
 import com.on.turip.ui.compose.designsystem.component.ErrorScreen
 import com.on.turip.ui.compose.designsystem.component.TuripAppBar
 import com.on.turip.ui.compose.designsystem.component.TuripDialog
+import com.on.turip.ui.compose.designsystem.model.SnackbarIconModel
 import com.on.turip.ui.compose.designsystem.snackbar.LocalSnackbarDelegate
 import com.on.turip.ui.compose.designsystem.theme.TuripTheme
 import com.on.turip.ui.compose.trip.model.MapModel
 import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
+import com.on.turip.ui.compose.turipdetail.component.MemberListSheet
 import com.on.turip.ui.compose.turipdetail.component.MoreOptionBottomSheet
+import com.on.turip.ui.compose.turipdetail.component.TuripInfoRow
 import com.on.turip.ui.compose.turipdetail.component.TuripMapContent
 import com.on.turip.ui.compose.turipdetail.component.TuripPlaces
 import com.on.turip.ui.compose.turipdetail.model.turip.PlaceLatLngUiModel
-import com.on.turip.ui.compose.turipdetail.model.turip.TuripShareModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -66,14 +73,21 @@ fun TuripDetailScreen(
 ) {
     val uiState: TuripDetailUiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarDelegate = LocalSnackbarDelegate.current
-    val resource = LocalResources.current
+    val resources = LocalResources.current
     var showLoginSuggestDialog by remember { mutableStateOf(false) }
     val modalBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val scope = rememberCoroutineScope()
 
-    BackHandler(enabled = !uiState.showBottomSheet) { onBack() }
-
-    DisposableEffect(Unit) {
-        onDispose { viewModel.resetUiState() }
+    BackHandler {
+        if (uiState.showMoreOptionBottomSheet) {
+            viewModel.dismissMoreOptionBottomSheet()
+        } else {
+            scope.launch {
+                viewModel.flushDeleteQueueAndAwait()
+                viewModel.syncMemberCountToCachedTurips()
+                onBack()
+            }
+        }
     }
 
     LaunchedEffect(selectedTuripId) {
@@ -88,12 +102,12 @@ fun TuripDetailScreen(
                 }
 
                 is TuripDetailUiEffect.ShareTuripByText -> {
-                    viewModel.dismissBottomSheet()
+                    viewModel.dismissMoreOptionBottomSheet()
                     onShareTuripByText(uiEffect.turipShareModel)
                 }
 
                 is TuripDetailUiEffect.ShareTuripInvitationLink -> {
-                    viewModel.dismissBottomSheet()
+                    viewModel.dismissMoreOptionBottomSheet()
                     onShareTuripInvitationLink(uiEffect.invitationLink)
                 }
 
@@ -104,8 +118,8 @@ fun TuripDetailScreen(
                 is TuripDetailUiEffect.ShowError -> {
                     val uiModel = uiEffect.errorUiState.toUiModel() ?: return@collect
                     snackbarDelegate.showSnackbar(
-                        message = resource.getString(uiModel.titleRes),
-                        actionLabel = resource.getString(uiModel.retryTextRes),
+                        message = resources.getString(uiModel.titleRes),
+                        actionLabel = resources.getString(uiModel.retryTextRes),
                         duration = SnackbarDuration.Long,
                         onAction = { viewModel.handleErrorRetryRequest(uiEffect.retryAction) },
                     )
@@ -117,13 +131,13 @@ fun TuripDetailScreen(
                 }
 
                 TuripDetailUiEffect.TuripUpdated -> {
-                    viewModel.dismissBottomSheet()
+                    viewModel.dismissMoreOptionBottomSheet()
                 }
 
                 is TuripDetailUiEffect.ShowTuripDetailRemoveFailed -> {
                     snackbarDelegate.showSnackbar(
                         message =
-                            resource.getString(
+                            resources.getString(
                                 R.string.trip_detail_bottom_sheet_snackbar_place_remove_failed,
                                 uiEffect.placeName,
                             ),
@@ -134,12 +148,12 @@ fun TuripDetailScreen(
                 is TuripDetailUiEffect.ShowTuripDetailRemoved -> {
                     snackbarDelegate.showSnackbar(
                         message =
-                            resource.getString(
+                            resources.getString(
                                 R.string.trip_detail_bottom_sheet_snackbar_place_removed,
                                 uiEffect.placeName,
                             ),
                         actionLabel =
-                            resource.getString(
+                            resources.getString(
                                 R.string.trip_detail_bottom_sheet_snackbar_place_remove_undo,
                             ),
                         onAction = viewModel::rollbackTuripPlaceDelete,
@@ -150,14 +164,30 @@ fun TuripDetailScreen(
                 is TuripDetailUiEffect.ShowReorderDetailFailed -> {
                     snackbarDelegate.showSnackbar(
                         message =
-                            resource.getString(
+                            resources.getString(
                                 R.string.trip_detail_bottom_sheet_snackbar_place_reorder_failed,
                             ),
                         actionLabel =
-                            resource.getString(
+                            resources.getString(
                                 R.string.trip_detail_bottom_sheet_snackbar_place_reorder_retry,
                             ),
                         onAction = { viewModel.handleErrorRetryRequest(uiEffect.retryAction) },
+                    )
+                }
+
+                TuripDetailUiEffect.ShowNetworkUnstable -> {
+                    snackbarDelegate.showSnackbar(
+                        message = resources.getString(R.string.turip_detail_sse_reconnecting),
+                        duration = SnackbarDuration.Short,
+                    )
+                }
+
+                TuripDetailUiEffect.ShowNetworkRecovered -> {
+                    snackbarDelegate.showSnackbar(
+                        message = resources.getString(R.string.turip_detail_sse_reconnected),
+                        duration = SnackbarDuration.Short,
+                        icon = SnackbarIconModel.Painter(R.drawable.btn_turip_selected),
+                        actionLabel = resources.getString(R.string.all_close_description),
                     )
                 }
             }
@@ -178,11 +208,12 @@ fun TuripDetailScreen(
         )
     }
 
-    if (uiState.showBottomSheet) {
+    if (uiState.showMoreOptionBottomSheet) {
         MoreOptionBottomSheet(
             sheetState = modalBottomSheetState,
             isDefault = uiState.selectedTurip.isDefault,
-            onDismiss = viewModel::dismissBottomSheet,
+            isTogetherTurip = uiState.selectedTurip.type == TuripType.TOGETHER,
+            onDismiss = viewModel::dismissMoreOptionBottomSheet,
             onShareTuripByTextClick = viewModel::shareTuripByText,
             onShareTuripInvitationLinkClick = viewModel::shareTuripInvitationLink,
             onDeleteClick = viewModel::showTuripRemoveDialog,
@@ -198,23 +229,39 @@ fun TuripDetailScreen(
     }
 
     if (uiState.showTuripRemoveDialog) {
+        val isTogetherTurip = uiState.selectedTurip.type == TuripType.TOGETHER
+        val title =
+            stringResource(if (isTogetherTurip) R.string.bottom_sheet_turip_leave else R.string.bottom_sheet_turip_delete)
+        val message =
+            stringResource(
+                if (isTogetherTurip) R.string.bottom_sheet_turip_leave_title else R.string.bottom_sheet_turip_remove_title,
+                uiState.selectedTurip.name,
+            )
+        val confirmText =
+            stringResource(if (isTogetherTurip) R.string.bottom_sheet_turip_leave_approve else R.string.bottom_sheet_turip_remove_approve)
+
         TuripDialog(
-            title = stringResource(R.string.bottom_sheet_turip_delete),
-            message =
-                stringResource(
-                    R.string.bottom_sheet_turip_remove_title,
-                    uiState.selectedTurip.name,
-                ),
-            confirmText = stringResource(R.string.bottom_sheet_turip_remove_approve),
+            title = title,
+            message = message,
+            confirmText = confirmText,
             dismissText = stringResource(R.string.bottom_sheet_turip_remove_cancel),
             confirmButtonColor = TuripTheme.colors.error,
             dismissButtonColor = TuripTheme.colors.gray02,
             onConfirmation = {
-                viewModel.deleteTurip(selectedTuripId)
-                viewModel.dismissBottomSheet()
+                viewModel.deleteTurip()
+                viewModel.dismissMoreOptionBottomSheet()
             },
             onDismissRequest = viewModel::dismissTuripRemoveDialog,
             modifier = Modifier.fillMaxSize(),
+        )
+    }
+
+    if (uiState.showMemberBottomSheet) {
+        MemberListSheet(
+            title = uiState.selectedTurip.name,
+            nickNames = uiState.members,
+            onDismiss = viewModel::dismissMemberBottomSheet,
+            sheetState = modalBottomSheetState,
         )
     }
 
@@ -232,7 +279,7 @@ fun TuripDetailScreen(
                     ErrorContent(
                         errorUiState = uiState.errorUiState,
                         onRetryClick = {
-                            viewModel.loadSelectedTurip(selectedTuripId)
+                            viewModel.loadTurip(selectedTuripId)
                             viewModel.loadPlaces(selectedTuripId)
                         },
                     )
@@ -240,6 +287,8 @@ fun TuripDetailScreen(
 
                 else -> {
                     TuripPlaceContent(
+                        nicknames = uiState.members,
+                        isTogetherTurip = uiState.selectedTurip.type == TuripType.TOGETHER,
                         selectedTuripId = uiState.selectedTurip.id,
                         selectedTuripName = uiState.selectedTurip.name,
                         turipPlaceModel = uiState.places,
@@ -248,13 +297,20 @@ fun TuripDetailScreen(
                             viewModel.applyTuripPlaceDelete(placeId = placeId)
                         },
                         currentPlaceLatLng = uiState.placesLatLng,
-                        onMoreOption = viewModel::showBottomSheet,
-                        onBack = onBack,
+                        onMoreOption = viewModel::showMoreOptionBottomSheet,
+                        onBack = {
+                            scope.launch {
+                                viewModel.flushDeleteQueueAndAwait()
+                                viewModel.syncMemberCountToCachedTurips()
+                                onBack()
+                            }
+                        },
                         selectedPlace = uiState.selectedPlace,
                         onItemClick = viewModel::updateSelectedPlace,
                         onDragStart = viewModel::onDragStart,
                         onDragPlace = viewModel::onDragMove,
                         onDragEnd = viewModel::onDragEnd,
+                        onClickMembers = viewModel::showMemberBottomSheet,
                     )
                 }
             }
@@ -287,6 +343,8 @@ private fun ErrorContent(
 
 @Composable
 private fun TuripPlaceContent(
+    nicknames: ImmutableList<String>,
+    isTogetherTurip: Boolean,
     selectedTuripId: Long,
     selectedTuripName: String,
     selectedPlace: PlaceLatLngUiModel,
@@ -295,6 +353,7 @@ private fun TuripPlaceContent(
     turipPlaceModel: ImmutableList<TuripPlaceModel>,
     navigateToMap: (map: MapModel) -> Unit,
     onClickTuripPlace: (placeId: Long) -> Unit,
+    onClickMembers: () -> Unit,
     onMoreOption: () -> Unit,
     onDragStart: () -> Unit,
     onDragPlace: (from: Int, to: Int) -> Unit,
@@ -302,9 +361,6 @@ private fun TuripPlaceContent(
     onBack: () -> Unit,
 ) {
     var currentPlaces: ImmutableList<TuripPlaceModel> by remember(turipPlaceModel) {
-        mutableStateOf(turipPlaceModel)
-    }
-    var dragStartPlaces: ImmutableList<TuripPlaceModel> by remember(turipPlaceModel) {
         mutableStateOf(turipPlaceModel)
     }
 
@@ -322,6 +378,17 @@ private fun TuripPlaceContent(
             onBackClick = onBack,
             onMoreOption = onMoreOption,
         )
+
+        TuripInfoRow(
+            savedPlaceCount = currentPlaceLatLng.size,
+            participantCount = nicknames.size,
+            showParticipant = isTogetherTurip,
+            onMembersClick = onClickMembers,
+            onPlacesClick = { isMapVisible = false },
+            modifier = Modifier.padding(vertical = TuripTheme.spacing.small),
+        )
+
+        Spacer(modifier = Modifier.size(TuripTheme.spacing.extraSmall))
 
         if (currentPlaceLatLng.isNotEmpty()) {
             TuripMapContent(
@@ -390,6 +457,7 @@ private fun Header(
 private fun TuripPlaceScreenPreview() {
     TuripTheme {
         TuripPlaceContent(
+            nicknames = persistentListOf("안녕", "하세", "요"),
             turipPlaceModel =
                 persistentListOf(
                     TuripPlaceModel.Idle.copy(
@@ -424,6 +492,8 @@ private fun TuripPlaceScreenPreview() {
             onDragStart = {},
             onDragPlace = { _, _ -> },
             onDragEnd = {},
+            onClickMembers = {},
+            isTogetherTurip = false,
         )
     }
 }

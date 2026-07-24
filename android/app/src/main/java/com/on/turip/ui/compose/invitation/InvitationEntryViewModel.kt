@@ -5,11 +5,11 @@ import androidx.lifecycle.viewModelScope
 import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
+import com.on.turip.core.session.SessionState
 import com.on.turip.domain.invitation.InvitationTokenParser
 import com.on.turip.domain.invitation.usecase.DetermineInvitationEntryRouteUseCase
 import com.on.turip.domain.invitation.usecase.model.InvitationEntryResult
-import com.on.turip.domain.session.SessionState
-import com.on.turip.domain.session.SessionStore
+import com.on.turip.domain.session.SessionManager
 import com.on.turip.domain.turip.repository.TuripRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -26,7 +26,7 @@ import javax.inject.Inject
 class InvitationEntryViewModel @Inject constructor(
     private val determineInvitationEntryRouteUseCase: DetermineInvitationEntryRouteUseCase,
     private val turipRepository: TuripRepository,
-    sessionStore: SessionStore,
+    private val sessionManager: SessionManager,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<InvitationEntryUiState> =
         MutableStateFlow(InvitationEntryUiState.Idle)
@@ -35,7 +35,7 @@ class InvitationEntryViewModel @Inject constructor(
     private val _uiEffect = Channel<InvitationEntryUiEffect>(Channel.BUFFERED)
     val uiEffect: Flow<InvitationEntryUiEffect> = _uiEffect.receiveAsFlow()
 
-    private val sessionState: StateFlow<SessionState> = sessionStore.state
+    private val sessionState: StateFlow<SessionState> = sessionManager.state
 
     fun initDeepLinkUrl(deepLinkUrl: String?) {
         _uiState.update { it.copy(deepLinkUrl = deepLinkUrl?.trim()?.takeIf(String::isNotEmpty)) }
@@ -43,10 +43,11 @@ class InvitationEntryViewModel @Inject constructor(
 
     fun resolveInvitationEntry() {
         viewModelScope.launch {
-            val invitationToken: String? = InvitationTokenParser.extractTokenFromUrl(_uiState.value.deepLinkUrl)
+            val invitationToken: String? =
+                InvitationTokenParser.extractTokenFromUrl(_uiState.value.deepLinkUrl)
             when (
                 val result: InvitationEntryResult =
-                    determineInvitationEntryRouteUseCase(invitationToken)
+                    determineInvitationEntryRouteUseCase(sessionState.value, invitationToken)
             ) {
                 is InvitationEntryResult.MemberValidated -> {
                     val isJoinedTurip = result.invitationInformation.alreadyJoined
@@ -92,6 +93,12 @@ class InvitationEntryViewModel @Inject constructor(
                 }
 
                 is InvitationEntryResult.Failure -> {
+                    if (result.errorType is ErrorType.Auth) {
+                        sessionManager.switchToGuest()
+                        _uiEffect.send(InvitationEntryUiEffect.NavigateToLogin)
+                        return@launch
+                    }
+
                     val target =
                         when (sessionState.value) {
                             SessionState.Member -> InvalidInvitationTarget.Home
@@ -135,6 +142,12 @@ class InvitationEntryViewModel @Inject constructor(
                 .onSuccess {
                     _uiEffect.send(InvitationEntryUiEffect.NavigateToTuripDetail(turipId))
                 }.onFailure { errorType ->
+                    if (errorType is ErrorType.Auth) {
+                        sessionManager.switchToGuest()
+                        _uiEffect.send(InvitationEntryUiEffect.NavigateToLogin)
+                        return@launch
+                    }
+
                     val target =
                         when (sessionState.value) {
                             SessionState.Member -> InvalidInvitationTarget.Home

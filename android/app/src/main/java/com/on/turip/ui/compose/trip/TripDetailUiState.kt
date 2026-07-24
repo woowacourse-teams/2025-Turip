@@ -2,6 +2,7 @@ package com.on.turip.ui.compose.trip
 
 import androidx.compose.runtime.Stable
 import com.on.turip.ui.common.error.ErrorUiState
+import com.on.turip.ui.common.model.namestatus.TuripNameStatusModel
 import com.on.turip.ui.compose.trip.model.PlaceModel
 import com.on.turip.ui.compose.trip.model.SelectedPlaceModel
 import com.on.turip.ui.compose.trip.model.TripDetailInfoModel
@@ -16,6 +17,10 @@ data class TripDetailUiState(
     val tripDetailInfo: TripDetailInfoModel,
     val isBookmarked: Boolean,
     val selectedPlaceModel: SelectedPlaceModel?,
+    val showAddTuripBottomSheet: Boolean = false,
+    val isCreatingTurip: Boolean = false,
+    val addTuripInputName: String = "",
+    val addTuripNameStatus: TuripNameStatusModel = TuripNameStatusModel.EMPTY,
 ) {
     companion object {
         val IDLE: TripDetailUiState =

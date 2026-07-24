@@ -6,6 +6,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
+import jakarta.persistence.EntityManager;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -44,6 +45,9 @@ class GuestServiceTest {
     @Mock
     private FavoriteFolderService favoriteFolderService;
 
+    @Mock
+    private EntityManager entityManager;
+
     @DisplayName("DeviceFid로 Guest 조회 또는 생성 테스트")
     @Nested
     class FindOrCreateByDeviceFid {
@@ -64,7 +68,7 @@ class GuestServiceTest {
 
             // then
             assertThat(result).isEqualTo(existingGuest);
-            verify(accountService, never()).create();
+            verify(accountService, never()).create(any());
             verify(guestRepository, never()).save(any());
         }
 
@@ -78,7 +82,7 @@ class GuestServiceTest {
 
             given(guestRepository.findByDeviceFid(deviceFid))
                     .willReturn(Optional.empty());
-            given(accountService.create())
+            given(accountService.create(any()))
                     .willReturn(newAccount);
             given(guestRepository.save(any(Guest.class)))
                     .willReturn(newGuest);
@@ -88,7 +92,7 @@ class GuestServiceTest {
 
             // then
             assertThat(result).isEqualTo(newGuest);
-            verify(accountService).create();
+            verify(accountService).create(any());
             verify(guestRepository).save(any(Guest.class));
         }
     }

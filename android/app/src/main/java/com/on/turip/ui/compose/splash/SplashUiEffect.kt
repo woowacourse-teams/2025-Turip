@@ -1,9 +1,11 @@
 package com.on.turip.ui.compose.splash
 
-import com.on.turip.core.navigation.InitialNavigationTarget
-
 sealed interface SplashUiEffect {
-    data class NavigateToMain(
-        val initialNavigationTarget: InitialNavigationTarget,
+    data object NavigateToMain : SplashUiEffect
+
+    data object NavigateToLogin : SplashUiEffect
+
+    data class NavigateToInvitationEntry(
+        val deepLinkUrl: String,
     ) : SplashUiEffect
 }

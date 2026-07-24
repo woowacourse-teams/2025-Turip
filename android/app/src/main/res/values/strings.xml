@@ -5,10 +5,8 @@
     <string name="all_total_place_count">%d개 장소</string>
     <string name="all_trip_duration">%1$d박 %2$d일</string>
     <string name="all_trip_day_trip_duration">당일치기</string>
-    <string name="all_loading">로딩 중…</string>
     <string name="all_video_description">%s · %s</string>
     <string name="all_close_description">닫기</string>
-    <string name="all_snackbar_redirect_login">로그인 하기</string>
     <string name="all_confirm">확인</string>
     <string name="all_turip_name_error_duplicate">중복된 튜립명이 존재합니다.</string>
     <string name="all_turip_name_same_default_name_error">\'기본 튜립\' 대신 다른 이름을 입력해 주세요</string>
@@ -21,7 +19,6 @@
     <string name="all_snackbar_not_found_map_url">지도 앱으로 이동에 문제가 발생 했어요</string>
     <string name="all_snackbar_not_found_privacy_policy_url">개인 정보 처리 방침 이동에 문제가 발생 했어요</string>
     <string name="all_snackbar_not_found_share">튜립을 공유하는 과정에 문제가 발생 했어요</string>
-    <string name="all_snackbar_not_found_trip_add">튜립 생성 화면으로 이동하는 과정에 문제가 발생 했어요</string>
     <string name="all_snackbar_not_found_video_url">영상 앱으로 이동에 문제가 발생 했어요</string>
     <string name="all_snackbar_not_found_inquiry_url">문의하기 이동에 문제가 발생 했어요</string>
     <string name="all_share_description">공유 하기</string>
@@ -36,16 +33,13 @@
 
     <!-- 검색 결과 페이지 -->
     <string name="search_result_no_result">\'%s\'의\n검색 결과가 없어요...</string>
-    <string name="search_result_video_description">%1$s · %2$s</string>
     <string name="search_result_exist_result">검색결과 %d개</string>
     <string name="search_result_hint_text">예시 검색: 1박 2일, 감성, 도쿄, 해수욕장</string>
     <string name="search_result_tip">TIP</string>
     <string name="search_result_tip_region">지역명으로 검색해보세요.</string>
 
     <!-- 지역 결과 페이지 -->
-    <string name="region_result_no_result">검색 결과가 없어요...</string>
     <string name="region_result_video_description">%1$s · %2$s</string>
-    <string name="region_result_exist_result">검색결과 %d개</string>
 
     <!-- 홈 페이지 -->
     <string name="home_top_title">😊 오늘의 기분은, 여행하기 딱 좋아요!</string>
@@ -70,7 +64,6 @@
     <string name="my_page_empty_bookmark_content">저장한 콘텐츠가 없어요\n홈에서 마음에 드는 콘텐츠를 저장해보세요</string>
     <string name="my_page_error">데이터를 불러오지 못했습니다</string>
     <string name="my_page_snackbar_bookmark_remove_failed">북마크 해제 실패했어요.</string>
-    <string name="my_page_snackbar_bookmark_remove_failed_action">새로고침</string>
     <string name="my_page_title">마이페이지</string>
     <string name="my_page_snackbar_profile_load_failed">프로필을 불러오지 못했어요.</string>
     <string name="my_page_snackbar_bookmarks_load_failed">저장한 콘텐츠들을 불러오지 못했어요.</string>
@@ -78,8 +71,6 @@
     <!-- 북마크 컨텐츠 목록 페이지 -->
     <string name="bookmark_content_title">저장한 콘텐츠</string>
     <string name="bookmark_content_count">콘텐츠 %d개</string>
-    <string name="bookmark_content_empty_suggest_title">컨텐츠를 저장 해보세요!</string>
-    <string name="bookmark_content_empty_suggest_description">원하는 동선이 담긴\n여행 일정을 저장해 보세요.</string>
     <string name="bookmark_content_load_more_fail_title">데이터를 불러올 수 없습니다. 잠시 후 재시도 해주세요</string>
     <string name="bookmark_content_count_fail">콘텐츠 -</string>
     <string name="bookmark_content_snackbar_bookmark_remove_failed">북마크 해제 실패했어요.</string>
@@ -87,19 +78,18 @@
     <!-- 튜립장소 목록 페이지 -->
     <string name="turip_place_empty_suggest_title">튜립에 장소를 추가 해보세요!</string>
     <string name="turip_place_empty_suggest_description">장소에 \'내 튜립\' 버튼을 눌러\n마음에 드는 튜립을 만들어 보세요.</string>
-    <string name="turip_place_suggest_login_for_share">로그인 후 이용 가능합니다.</string>
+
+    <!-- 튜립 목록 화면 -->
+    <string name="my_turip_together_turip_empty_title">친구와 함께 하는 튜립이 없어요</string>
+    <string name="my_turip_together_turip_empty_description">나홀로 튜립을 링크로 초대해서\n친구와 함께 여행을 떠나보세요.</string>
 
     <!-- 여행 상세 페이지 -->
     <string name="trip_detail_video_error">해당 영상은 제작자의 요청으로 유튜브로만 시청할 수 있습니다.\n클릭 시 유튜브로 이동합니다.</string>
     <string name="trip_detail_day_place_count">일정 %d개</string>
-    <string name="trip_detail_trip_day">%d일차</string>
-    <string name="trip_detail_trip_all_place">전체</string>
     <string name="trip_detail_snackbar_bookmark_save">북마크에 저장했어요</string>
     <string name="trip_detail_snackbar_bookmark_remove">북마크를 해제했어요</string>
-    <string name="trip_detail_info">%s • %d개 장소 • %s</string>
-    <string name="bottom_sheet_turip_title">튜립 목록</string>
-    <string name="bottom_sheet_turip_place_save_in_turip">%s에 저장했어요</string>
-    <string name="bottom_sheet_turip_place_remove_in_turip">%s에서 삭제했어요</string>
+    <string name="trip_detail_saved_places_label">저장된 장소</string>
+    <string name="trip_detail_participant_count_label">참여인원</string>
     <string name="trip_place_map">지도 보기</string>
     <string name="trip_turip_place">내 튜립</string>
     <string name="trip_place_time_line">%s~</string>
@@ -122,19 +112,17 @@
     <string name="trip_detail_bottom_sheet_turip_place_unselect_description">튜립에서 저장 해제</string>
 
     <!-- 튜립 페이지 -->
-    <string name="turip_title">튜립 편집</string>
     <string name="bottom_sheet_turip_add_title">튜립 추가</string>
     <string name="bottom_sheet_turip_delete">튜립 삭제</string>
+    <string name="bottom_sheet_turip_leave">튜립 나가기</string>
     <string name="bottom_sheet_turip_add_turip_name_hint">생성할 튜립명을 입력해주세요.</string>
     <string name="bottom_sheet_turip_modify_title">튜립 수정</string>
-    <string name="bottom_sheet_turip_modify_turip_name_hint">변경할 튜립명을 입력해주세요.</string>
     <string name="bottom_sheet_turip_remove_title">%s을 삭제하시겠습니까?</string>
+    <string name="bottom_sheet_turip_leave_title">%s에서 나가시겠습니까?</string>
     <string name="bottom_sheet_turip_add_turip">%s 튜립을 추가하였습니다.</string>
-    <string name="bottom_sheet_turip_delete_turip">%s 튜립을 제거하였습니다.</string>
     <string name="bottom_sheet_turip_remove_cancel">취소</string>
     <string name="bottom_sheet_turip_remove_approve">삭제</string>
-    <string name="turip_empty_suggest_title">나만의 튜립을 만들어보세요!</string>
-    <string name="turip_empty_suggest_description">튜립을 만들면 다양한 장소들을\n내 마음대로 나누어 보관할 수 있어요.</string>
+    <string name="bottom_sheet_turip_leave_approve">나가기</string>
     <string name="main_double_back_pressed_to_exit">한 번 더 누르면 종료됩니다.</string>
 
     <!-- 네트워크 오류 -->
@@ -170,6 +158,8 @@
     <!-- 추가 옵션 창 -->
     <string name="turip_more_option_bottom_sheet_change_name">이름 변경</string>
     <string name="turip_more_option_bottom_sheet_delete">삭제</string>
+    <string name="turip_more_option_bottom_sheet_leave">나가기</string>
+    <string name="turip_added_snackbar_message">\'%s\' 튜립이 추가됐어요</string>
 
     <!-- 튜립 화면 -->
     <string name="turip_card_together_turip">함께 튜립</string>
@@ -177,11 +167,11 @@
     <string name="turip_tab_together_turip">함께 튜립</string>
     <string name="turip_tab_solo_turip">나홀로 튜립</string>
     <string name="turip_tab_all">전체</string>
+    <string name="turip_detail_sse_reconnecting">네트워크 오류로 재연결 중입니다...</string>
+    <string name="turip_detail_sse_reconnected">재연결 되었습니다.</string>
     <string name="my_turip_screen_title">내 튜립</string>
     <string name="turip_add_turip">%s 튜립을 추가하였습니다.</string>
     <string name="turip_delete_turip">%s 튜립을 제거하였습니다.</string>
-    <string name="turip_remove_cancel">취소</string>
-    <string name="turip_remove_approve">삭제</string>
 
     <!-- 초대 링크 관련 -->
     <string name="invitation_loading_title">초대받은 튜립을 확인하는 중이에요</string>
@@ -199,7 +189,6 @@
     <string name="invitation_failure_dialog_title">초대 정보를 불러오지 못했어요</string>
     <string name="invitation_failure_dialog_message_home">네트워크 상태를 확인한 뒤 다시 시도해주세요.\n계속 실패하면 홈으로 이동해요.</string>
     <string name="invitation_failure_dialog_message_login">네트워크 상태를 확인한 뒤 다시 시도해주세요.\n계속 실패하면 로그인 화면으로 이동해요.</string>
-    <string name="invitation_failure_dialog_message_server">일시적인 서버 오류가 발생했어요.\n잠시 후 다시 시도해주세요.</string>
     <string name="invitation_failure_dialog_message_unhandled_home">현재 이 오류는 처리할 수 없어요.\n홈으로 이동할게요.</string>
     <string name="invitation_failure_dialog_message_unhandled_login">현재 이 오류는 처리할 수 없어요.\n로그인 화면으로 이동할게요.</string>
     <string name="invitation_failure_dialog_dismiss_home">홈으로 가기</string>

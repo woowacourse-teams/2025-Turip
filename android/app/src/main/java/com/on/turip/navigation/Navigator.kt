@@ -79,6 +79,7 @@ class Navigator(
         when (key) {
             in state.topLevelKeys -> {
                 state.topLevelStack.add(key)
+                state.subStacks[key]?.add(key)
             }
 
             else -> {
@@ -88,6 +89,7 @@ class Navigator(
                 val parentSubStack: NavBackStack<NavKey> =
                     state.subStacks[topLevelKey]
                         ?: error("Sub stack for $topLevelKey does not exist")
+                parentSubStack.add(topLevelKey)
                 parentSubStack.add(key)
             }
         }
@@ -105,6 +107,10 @@ class Navigator(
         state.topLevelStack.apply {
             if (key == state.startKey) clear() else remove(key)
             add(key)
+        }
+        val subStack = state.subStacks[key]
+        if (subStack != null && subStack.isEmpty()) {
+            subStack.add(key)
         }
     }
 
@@ -124,9 +130,8 @@ class Navigator(
 
     private fun clearAllStacks() {
         state.topLevelStack.clear()
-        state.subStacks.forEach { (topLevelKey, stack) ->
+        state.subStacks.forEach { (_, stack) ->
             stack.clear()
-            stack.add(topLevelKey)
         }
     }
 

@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import turip.account.domain.Account;
@@ -33,13 +32,14 @@ public interface FavoriteFolderRepository extends JpaRepository<FavoriteFolder, 
             "WHERE ffa.account = :account AND ff.isDefault = false")
     boolean existsCustomFolderByAccount(@Param("account") Account account);
 
-    @Modifying
-    @Query("DELETE FROM FavoriteFolder ff " +
-            "WHERE ff.id IN (" +
-            "   SELECT ffa.favoriteFolder.id " +
-            "   FROM FavoriteFolderAccount ffa " +
-            "   WHERE ffa.account = :account " +
-            ") " +
-            "AND ff.isShared = false")
-    void deletePersonalFoldersByAccount(@Param("account") Account account);
+    @Query("SELECT ff FROM FavoriteFolder ff " +
+            "JOIN FavoriteFolderAccount ffa ON ffa.favoriteFolder = ff " +
+            "WHERE ffa.account = :account " +
+            "AND (SELECT COUNT(ffa2) FROM FavoriteFolderAccount ffa2 WHERE ffa2.favoriteFolder = ff) = 1")
+    List<FavoriteFolder> findAloneFoldersByAccount(@Param("account") Account account);
+
+    @Query("SELECT ff FROM FavoriteFolder ff " +
+            "JOIN FavoriteFolderAccount ffa ON ffa.favoriteFolder = ff " +
+            "WHERE ffa.account = :account AND ff.isDefault = true")
+    Optional<FavoriteFolder> findDefaultFoldersByAccount(@Param("account") Account account);
 }

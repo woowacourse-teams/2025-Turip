@@ -43,6 +43,7 @@ kakao:
 
 google:
   client-id: ${GOOGLE_CLIENT_ID}
+  ios-client-id: ${GOOGLE_IOS_CLIENT_ID}
   api:
     key: ${GOOGLE_API_KEY}
     url: https://maps.googleapis.com/maps/api/place/textsearch/json
@@ -52,10 +53,16 @@ youtube:
     key: ${YOUTUBE_API_KEY}
     url: https://www.googleapis.com/youtube/v3/videos
 
+apple:
+  client-id: ${APPLE_CLIENT_ID}
+
 invitation:
   jwt:
     secret-key: ${INVITATION_JWT_SECRET_KEY}
     token-expiration: 7d # 604800000 # 7일
+
+firebase:
+  service-account-key-path: classpath:firebase-service-account-dev.json
 
 management:
   endpoints:

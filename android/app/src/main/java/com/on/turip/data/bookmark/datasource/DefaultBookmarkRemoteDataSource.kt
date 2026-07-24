@@ -4,6 +4,7 @@ import com.on.turip.core.result.TuripResult
 import com.on.turip.data.bookmark.dto.BookmarkAddRequest
 import com.on.turip.data.bookmark.dto.BookmarkContentsResponse
 import com.on.turip.data.bookmark.dto.BookmarkCountResponse
+import com.on.turip.data.bookmark.dto.BookmarkCreationResponse
 import com.on.turip.data.bookmark.service.BookmarkService
 import com.on.turip.data.result.safeApiCall
 import com.on.turip.domain.common.paging.Cursor
@@ -16,7 +17,7 @@ class DefaultBookmarkRemoteDataSource @Inject constructor(
     private val bookmarkService: BookmarkService,
     private val coroutineContext: CoroutineContext = Dispatchers.IO,
 ) : BookmarkRemoteDataSource {
-    override suspend fun postBookmark(bookmarkAddRequest: BookmarkAddRequest): TuripResult<Unit> =
+    override suspend fun postBookmark(bookmarkAddRequest: BookmarkAddRequest): TuripResult<BookmarkCreationResponse> =
         withContext(coroutineContext) {
             safeApiCall { bookmarkService.postBookmark(bookmarkAddRequest) }
         }

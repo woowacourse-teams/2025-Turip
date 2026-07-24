@@ -3,7 +3,9 @@ package com.on.turip.data.bookmark
 import com.on.turip.data.bookmark.dto.BookmarkAddRequest
 import com.on.turip.data.bookmark.dto.BookmarkContentResponse
 import com.on.turip.data.bookmark.dto.BookmarkContentsResponse
+import com.on.turip.data.bookmark.dto.BookmarkCreationResponse
 import com.on.turip.data.content.toDomain
+import com.on.turip.domain.bookmark.Bookmark
 import com.on.turip.domain.bookmark.BookmarkContent
 import com.on.turip.domain.common.paging.Page
 
@@ -21,5 +23,12 @@ fun BookmarkContentResponse.toDomain(): BookmarkContent =
         content = content.toDomain(),
         tripDuration = tripDuration.toDomain(),
         tripPlaceCount = tripPlaceCount,
+        createdAt = createdAt,
+    )
+
+fun BookmarkCreationResponse.toDomain(): Bookmark =
+    Bookmark(
+        id = id,
+        content = content.toDomain(),
         createdAt = createdAt,
     )

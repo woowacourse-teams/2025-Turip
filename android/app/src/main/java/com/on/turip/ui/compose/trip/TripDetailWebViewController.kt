@@ -1,9 +1,12 @@
 package com.on.turip.ui.compose.trip
 
+import android.app.Activity
 import android.content.Context
 import android.content.pm.ActivityInfo
 import android.view.View
+import android.view.ViewGroup
 import android.webkit.WebView
+import android.widget.FrameLayout
 import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -28,6 +31,7 @@ class TripDetailWebViewController(
     val webView: WebView,
     private val videoManager: VideoManager,
     val navigateToWebViewUrl: (webUrl: String) -> Unit,
+    private val activity: Activity,
 ) {
     var isFullScreen by mutableStateOf(false)
         private set
@@ -35,21 +39,47 @@ class TripDetailWebViewController(
         private set
     var isError by mutableStateOf(false)
         private set
-    var fullScreenVideo by mutableStateOf<View?>(null)
+    var isPlaybackRestoring by mutableStateOf(false)
         private set
+
+    private var fullscreenContainer: FrameLayout? = null
 
     private val webChromeClient =
         TuripWebChromeClient(
             onShowFullScreen = { video: View ->
-                fullScreenVideo = video
-                isFullScreen = true
+                // Compose state 변경 없이 decorView에 직접 추가 → config change 무관하게 안정적
+                val container =
+                    FrameLayout(activity).apply {
+                        layoutParams =
+                            ViewGroup.LayoutParams(
+                                ViewGroup.LayoutParams.MATCH_PARENT,
+                                ViewGroup.LayoutParams.MATCH_PARENT,
+                            )
+                    }
+                container.addView(
+                    video,
+                    ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                    ),
+                )
+                (activity.window.decorView as ViewGroup).addView(container)
+                fullscreenContainer = container
 
+                isFullScreen = true
+                webView.resumeTimers()
                 webView.resumeVideo()
             },
             onHideFullScreen = {
-                fullScreenVideo = null
+                fullscreenContainer?.let { container ->
+                    container.removeAllViews()
+                    (activity.window.decorView as ViewGroup).removeView(container)
+                }
+                fullscreenContainer = null
                 isFullScreen = false
 
+                webView.onResume()
+                webView.resumeTimers()
                 webView.resumeVideo()
             },
         )
@@ -66,14 +96,38 @@ class TripDetailWebViewController(
         webView.webChromeClient = webChromeClient
     }
 
-    fun loadVideo(url: String) {
+    fun loadVideo(
+        url: String,
+        initialSecond: Int,
+        onTimeUpdate: (time: Int) -> Unit,
+    ) {
         if (url.isNotEmpty() && url != webView.url) {
             if (isError) isError = false
-            videoManager.loadVideo(url) { isError = true }
+            if (initialSecond > 0) isPlaybackRestoring = true
+            videoManager.loadVideo(
+                url = url,
+                initialSecond = initialSecond,
+                onTimeUpdate = { second ->
+                    onTimeUpdate(second)
+                    if (isPlaybackRestoring && second > 0) {
+                        isPlaybackRestoring = false
+                    }
+                },
+                onError = {
+                    isError = true
+                    isPlaybackRestoring = false
+                },
+            )
         }
     }
 
     fun seekTo(seconds: Int) {
+        webView.navigateToTimeLine(seconds)
+    }
+
+    fun restoreTo(seconds: Int) {
+        if (seconds <= 0) return
+        isPlaybackRestoring = true
         webView.navigateToTimeLine(seconds)
     }
 
@@ -87,6 +141,12 @@ class TripDetailWebViewController(
     }
 
     fun clear() {
+        fullscreenContainer?.let { container ->
+            container.removeAllViews()
+            (activity.window.decorView as ViewGroup).removeView(container)
+        }
+        fullscreenContainer = null
+        isPlaybackRestoring = false
         videoManager.clear()
         webView.destroy()
     }
@@ -96,27 +156,35 @@ class TripDetailWebViewController(
 fun rememberTripDetailWebViewController(
     context: Context,
     navigateToWebViewUrl: (webUrl: String) -> Unit,
-): TripDetailWebViewController =
-    remember {
+): TripDetailWebViewController {
+    val activity = LocalActivity.current as? Activity
+    return remember {
         val webView = WebView(context).apply { applyVideoSettings() }
-
         TripDetailWebViewController(
             webView = webView,
             videoManager = VideoManager(webView),
             navigateToWebViewUrl = navigateToWebViewUrl,
+            activity = requireNotNull(activity) { "TripDetailWebViewController requires an Activity" },
         )
     }
+}
 
 @Composable
 fun HandleFullScreenWindowLaunchedEffect(isFullScreen: Boolean) {
     val activity = LocalActivity.current ?: return
+    val defaultOrientation =
+        if (activity.resources.configuration.smallestScreenWidthDp < 600) {
+            ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        } else {
+            ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        }
 
     DisposableEffect(activity) {
         onDispose {
             val window = activity.window
             val controller = WindowCompat.getInsetsController(window, window.decorView)
 
-            activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+            activity.requestedOrientation = defaultOrientation
             controller.show(WindowInsetsCompat.Type.systemBars())
             controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_DEFAULT
         }
@@ -132,7 +200,7 @@ fun HandleFullScreenWindowLaunchedEffect(isFullScreen: Boolean) {
             controller.systemBarsBehavior =
                 WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         } else {
-            activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+            activity.requestedOrientation = defaultOrientation
             controller.show(WindowInsetsCompat.Type.systemBars())
             controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_DEFAULT
         }

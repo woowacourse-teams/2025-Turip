@@ -5,20 +5,20 @@ import androidx.lifecycle.viewModelScope
 import com.on.turip.core.result.ErrorType
 import com.on.turip.core.result.onFailure
 import com.on.turip.core.result.onSuccess
+import com.on.turip.core.session.SessionState
 import com.on.turip.domain.bookmark.TuripPlace
-import com.on.turip.domain.session.SessionState
-import com.on.turip.domain.session.SessionStore
+import com.on.turip.domain.session.SessionManager
 import com.on.turip.domain.turip.TuripInvitationToken
 import com.on.turip.domain.turip.repository.TuripRepository
 import com.on.turip.ui.common.error.ErrorUiState
 import com.on.turip.ui.common.error.UiError
 import com.on.turip.ui.common.error.toUiError
 import com.on.turip.ui.common.extensions.toUrl
+import com.on.turip.ui.common.mapper.toUiModel
+import com.on.turip.ui.common.model.turip.TuripModel
+import com.on.turip.ui.common.model.turip.TuripShareModel
 import com.on.turip.ui.compose.trip.turipselection.model.DeletePlaceSnapshot
 import com.on.turip.ui.compose.trip.turipselection.model.TuripPlaceModel
-import com.on.turip.ui.compose.turipdetail.model.turip.TuripShareModel
-import com.on.turip.ui.main.favorite.model.TuripModel
-import com.on.turip.ui.main.favorite.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -31,6 +31,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -44,7 +45,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PlaceTuripSelectionViewModel @Inject constructor(
     private val turipRepository: TuripRepository,
-    sessionStore: SessionStore,
+    private val sessionManager: SessionManager,
 ) : ViewModel() {
     // 튜립 목록의 버튼 활성화 여부를 위한 캐싱
     private var originTuripIds: Set<Long> = setOf()
@@ -62,10 +63,22 @@ class PlaceTuripSelectionViewModel @Inject constructor(
     private val _uiEffect: Channel<PlaceTuripSelectionUiEffect> = Channel(Channel.BUFFERED)
     val uiEffect: Flow<PlaceTuripSelectionUiEffect> = _uiEffect.receiveAsFlow()
 
-    private val sessionState: StateFlow<SessionState> = sessionStore.state
+    private val sessionState: StateFlow<SessionState> = sessionManager.state
 
     init {
         registerDragEndEvents()
+        observeTuripChanges()
+    }
+
+    private fun observeTuripChanges() {
+        turipRepository.turips
+            .drop(1)
+            .onEach {
+                val state = uiState.value
+                if (state.screenMode is PlaceTuripSelectionScreenMode.Turips && state.selectionPlaceId != 0L) {
+                    loadTuripsByPlace(state.selectionPlaceId, state.placeName)
+                }
+            }.launchIn(viewModelScope)
     }
 
     fun loadTuripsByPlace(
@@ -139,7 +152,7 @@ class PlaceTuripSelectionViewModel @Inject constructor(
             val placeId = uiState.value.selectionPlaceId
 
             turipRepository
-                .updatePlaceTurips(placeId, selectedTuripIds)
+                .updatePlaceTurips(placeId, selectedTuripIds, originTuripIds)
                 .onSuccess {
                     _uiEffect.send(
                         PlaceTuripSelectionUiEffect.UpdateTuripsByPlace(
@@ -387,16 +400,20 @@ class PlaceTuripSelectionViewModel @Inject constructor(
                     ).onSuccess {
                         _uiState.update { it.copy(selectedTuripPlaces = reorderedTuripPlaces) }
                         Timber.d("장소 순서 변경 API 성공")
-                    }.onFailure {
+                    }.onFailure { errorType ->
+                        if (errorType is ErrorType.Auth) {
+                            sessionManager.switchToGuest()
+                            _uiEffect.send(PlaceTuripSelectionUiEffect.NavigateToLogin)
+                            return@launch
+                        }
+
                         if (reorderPlacesSnapshot != null) {
                             _uiState.update { it.copy(selectedTuripPlaces = reorderPlacesSnapshot!!) }
                         }
                         _uiEffect.send(
                             PlaceTuripSelectionUiEffect.ShowReorderPlaceFailed(
                                 retryAction =
-                                    PlaceTuripSelectionRetryAction.UpdateReorderedPlaces(
-                                        reorderedTuripPlaces,
-                                    ),
+                                    PlaceTuripSelectionRetryAction.UpdateReorderedPlaces(reorderedTuripPlaces),
                             ),
                         )
                         Timber.e("장소 순서 변경 API 실패")
@@ -434,6 +451,7 @@ class PlaceTuripSelectionViewModel @Inject constructor(
                 }
 
                 UiError.Global.TokenExpired -> {
+                    sessionManager.switchToGuest()
                     _uiEffect.send(PlaceTuripSelectionUiEffect.NavigateToLogin)
                 }
             }

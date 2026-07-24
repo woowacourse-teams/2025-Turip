@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import turip.account.domain.TuripMember;
 import turip.resolver.AuthAdmin;
@@ -36,7 +37,8 @@ public class AdminViewController {
     }
 
     @GetMapping("/home")
-    public String homePage(@AuthAdmin TuripMember admin) {
+    public String homePage(@AuthAdmin TuripMember admin, Model model) {
+        model.addAttribute("admin", admin);
         return "admin/home";
     }
 
@@ -45,5 +47,22 @@ public class AdminViewController {
         model.addAttribute("googleApiKey", googleApiKey);
         model.addAttribute("youtubeApiKey", youtubeApiKey);
         return "admin/content";
+    }
+
+    @GetMapping("/contents/pending")
+    public String pendingListPage(@AuthAdmin TuripMember admin) {
+        return "admin/pending-list";
+    }
+
+    @GetMapping("/contents/pending/{id}")
+    public String pendingReviewPage(@AuthAdmin TuripMember admin, @PathVariable Long id, Model model) {
+        model.addAttribute("pendingId", id);
+        return "admin/pending-review";
+    }
+
+    @GetMapping("/my")
+    public String myPage(@AuthAdmin TuripMember admin, Model model) {
+        model.addAttribute("admin", admin);
+        return "admin/my";
     }
 }

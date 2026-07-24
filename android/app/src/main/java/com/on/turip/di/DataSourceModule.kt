@@ -10,18 +10,22 @@ import com.on.turip.data.invitation.datasource.DefaultDeferredDeepLinkLocalDataS
 import com.on.turip.data.invitation.datasource.DefaultInstallReferrerDataSource
 import com.on.turip.data.invitation.datasource.DeferredDeepLinkLocalDataSource
 import com.on.turip.data.invitation.datasource.InstallReferrerDataSource
-import com.on.turip.data.login.datasource.AuthDataSource
+import com.on.turip.data.login.datasource.AuthRefreshRemoteDataSource
 import com.on.turip.data.login.datasource.AuthRemoteDataSource
-import com.on.turip.data.login.datasource.GuestDataSource
+import com.on.turip.data.login.datasource.DefaultAuthRefreshRemoteDataSource
+import com.on.turip.data.login.datasource.DefaultAuthRemoteDataSource
+import com.on.turip.data.login.datasource.DefaultGuestRemoteDataSource
+import com.on.turip.data.login.datasource.DefaultMemberRemoteDataSource
 import com.on.turip.data.login.datasource.GuestRemoteDataSource
-import com.on.turip.data.login.datasource.MemberDataSource
 import com.on.turip.data.login.datasource.MemberRemoteDataSource
 import com.on.turip.data.region.datasource.DefaultRegionRemoteDataSource
 import com.on.turip.data.region.datasource.RegionRemoteDataSource
 import com.on.turip.data.searchhistory.datasource.DefaultSearchHistoryDataSource
 import com.on.turip.data.searchhistory.datasource.SearchHistoryDataSource
 import com.on.turip.data.turip.datasource.DefaultTuripRemoteDataSource
+import com.on.turip.data.turip.datasource.DefaultTuripSseStreamDataSource
 import com.on.turip.data.turip.datasource.TuripRemoteDataSource
+import com.on.turip.data.turip.datasource.TuripSseStreamDataSource
 import com.on.turip.data.userstorage.datasource.DefaultUserStorageLocalDataSource
 import com.on.turip.data.userstorage.datasource.UserStorageLocalDataSource
 import dagger.Binds
@@ -61,15 +65,25 @@ abstract class DataSourceModule {
 
     @Binds
     @Singleton
-    abstract fun bindAuthRemoteDataSource(authRemoteDataSource: AuthRemoteDataSource): AuthDataSource
+    abstract fun bindTuripSseStreamDataSource(defaultTuripSseStreamDataSource: DefaultTuripSseStreamDataSource): TuripSseStreamDataSource
 
     @Binds
     @Singleton
-    abstract fun bindMemberRemoteDataSource(memberRemoteDataSource: MemberRemoteDataSource): MemberDataSource
+    abstract fun bindAuthRemoteDataSource(defaultAuthRemoteDataSource: DefaultAuthRemoteDataSource): AuthRemoteDataSource
 
     @Binds
     @Singleton
-    abstract fun bindGuestRemoteDataSource(guestRemoteDataSource: GuestRemoteDataSource): GuestDataSource
+    abstract fun bindAuthRefreshRemoteDataSource(
+        defaultAuthRefreshRemoteDataSource: DefaultAuthRefreshRemoteDataSource,
+    ): AuthRefreshRemoteDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindMemberRemoteDataSource(defaultMemberRemoteDataSource: DefaultMemberRemoteDataSource): MemberRemoteDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindGuestRemoteDataSource(defaultGuestRemoteDataSource: DefaultGuestRemoteDataSource): GuestRemoteDataSource
 
     @Binds
     @Singleton

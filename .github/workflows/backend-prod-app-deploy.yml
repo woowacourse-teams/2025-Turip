@@ -2,12 +2,12 @@ name: prod App CI/CD
 
 on:
   push:
-    branches: [ 'release-be/**' ]
+    branches: [ 'release-be' ]
     paths:
       - 'backend/turip-app/**'
       - 'backend/build.gradle'
   pull_request:
-    branches: [ 'release-be/**' ]
+    branches: [ 'release-be' ]
     paths:
       - 'backend/turip-app/**'
       - 'backend/build.gradle'
@@ -49,6 +49,13 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: 'temurin'
           cache: 'gradle'
+
+      - name: Create Firebase service account file
+        env:
+          FIREBASE_CONFIG: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_PROD }}
+        run: |
+          printf '%s' "$FIREBASE_CONFIG" > \
+            turip-app/src/main/resources/firebase-service-account-prod.json
 
       - name: Build Module Jar
         run: |
@@ -127,6 +134,8 @@ jobs:
           CSV_IMPORT_PASSWORD=${{ secrets.CSV_IMPORT_PASSWORD }}
           JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}
           GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_IOS_CLIENT_ID=${{ secrets.GOOGLE_IOS_CLIENT_ID }}
+          APPLE_CLIENT_ID=${{ secrets.APPLE_CLIENT_ID }}
           KAKAO_API_KEY=${{ secrets.KAKAO_API_KEY }}
           GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}
           YOUTUBE_API_KEY=${{ secrets.YOUTUBE_API_KEY }}
