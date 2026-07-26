@@ -5,16 +5,22 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import turip.region.domain.City;
 import turip.content.repository.ContentRepository;
-import turip.region.domain.Country;
+import turip.infrastructure.client.KoreaTourismRelatedSpotClient;
+import turip.infrastructure.client.dto.KoreaTourismRelatedSpotResponse.RelatedSpot;
 import turip.region.controller.dto.response.RegionCategoriesResponse;
 import turip.region.controller.dto.response.RegionCategoryResponse;
+import turip.region.controller.dto.response.RelatedSpotsResponse;
+import turip.region.domain.City;
+import turip.region.domain.Country;
 import turip.region.domain.DomesticRegionCategory;
 import turip.region.domain.OverseasRegionCategory;
+import turip.region.domain.TourApiAreaCode;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RegionCategoryService {
@@ -25,6 +31,8 @@ public class RegionCategoryService {
     private final CityService cityService;
     private final CountryService countryService;
     private final ContentRepository contentRepository;
+    private final KoreaTourismRelatedSpotClient koreaTourismRelatedSpotClient;
+
     @Value("${region.category.domestic.etc.image-url}")
     private String domesticEtcImageUrl;
     @Value("${region.category.overseas.etc.image-url}")
@@ -35,6 +43,18 @@ public class RegionCategoryService {
             return RegionCategoriesResponse.from(findDomesticRegionCategories());
         }
         return RegionCategoriesResponse.from(findOverseasRegionCategories());
+    }
+
+    public RelatedSpotsResponse findRelatedSpotsByRegionCategory(DomesticRegionCategory category) {
+        TourApiAreaCode areaCode = TourApiAreaCode.fromDomesticRegionCategory(category);
+
+        if (!areaCode.isFound()) {
+            log.warn("지역 카테고리에 매핑되는 TourAPI 지역 코드를 찾을 수 없습니다: {}", category);
+            return RelatedSpotsResponse.empty();
+        }
+
+        List<RelatedSpot> relatedSpots = koreaTourismRelatedSpotClient.searchRelatedSpots(areaCode);
+        return RelatedSpotsResponse.from(relatedSpots);
     }
 
     private List<RegionCategoryResponse> findDomesticRegionCategories() {

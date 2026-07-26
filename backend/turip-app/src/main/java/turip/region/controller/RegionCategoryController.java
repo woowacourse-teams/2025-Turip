@@ -1,6 +1,7 @@
 package turip.region.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -14,11 +15,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import turip.region.controller.dto.response.RegionCategoriesResponse;
+import turip.region.controller.dto.response.RelatedSpotsResponse;
+import turip.region.domain.DomesticRegionCategory;
 import turip.region.service.RegionCategoryService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/region-categories")
+@RequestMapping("/api/v1")
 @Tag(name = "RegionCategory", description = "지역 카테고리 API")
 public class RegionCategoryController {
 
@@ -66,10 +69,23 @@ public class RegionCategoryController {
                     )
             )
     })
-    @GetMapping
+    @GetMapping("/region-categories")
     public ResponseEntity<RegionCategoriesResponse> readRegionCategories(
             @RequestParam(name = "isKorea") boolean isDomestic) {
         RegionCategoriesResponse response = regionCategoryService.findRegionCategoriesByCountryType(isDomestic);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "지역별 연관 관광지 조회",
+            description = "국내 지역 카테고리를 기반으로 연관 관광지 목록을 조회합니다."
+    )
+    @GetMapping("/related-spots")
+    public ResponseEntity<RelatedSpotsResponse> getRelatedSpots(
+            @Parameter(description = "지역 카테고리 (SEOUL, BUSAN, JEJU, INCHEON, DAEJEON, JEONJU, GANGNEUNG, SOKCHO, GYEONGJU)", required = true)
+            @RequestParam(name = "regionCategory") DomesticRegionCategory regionCategory
+    ) {
+        RelatedSpotsResponse response = regionCategoryService.findRelatedSpotsByRegionCategory(regionCategory);
         return ResponseEntity.ok(response);
     }
 }
