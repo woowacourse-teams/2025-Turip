@@ -14,107 +14,47 @@ public enum TourApiAreaCode {
     /**
      * 서울특별시 areaCode: 1
      */
-    SEOUL(1, null, DomesticRegionCategory.SEOUL),
+    SEOUL(11, 11110, DomesticRegionCategory.SEOUL),
 
     /**
      * 인천광역시 areaCode: 2
      */
-    INCHEON(2, null, DomesticRegionCategory.INCHEON),
+    INCHEON(2, 18710, DomesticRegionCategory.INCHEON),
 
     /**
      * 대전광역시 areaCode: 3
      */
-    DAEJEON(3, null, DomesticRegionCategory.DAEJEON),
-
-    /**
-     * 대구광역시 areaCode: 4
-     */
-    DAEGU(4, null, null),
-
-    /**
-     * 광주광역시 areaCode: 5
-     */
-    GWANGJU(5, null, null),
+    DAEJEON(3, 30140, DomesticRegionCategory.DAEJEON),
 
     /**
      * 부산광역시 areaCode: 6
      */
-    BUSAN(6, null, DomesticRegionCategory.BUSAN),
+    BUSAN(6, 26230, DomesticRegionCategory.BUSAN),
 
     /**
-     * 울산광역시 areaCode: 7
+     * 강원도 > 강릉시 areaCode: 51, sigunguCode: 51159
      */
-    ULSAN(7, null, null),
+    GANGNEUNG(51, 51150, DomesticRegionCategory.GANGNEUNG),
 
     /**
-     * 세종특별자치시 areaCode: 8
+     * 강원도 > 속초시 areaCode: 51, sigunguCode: 51219
      */
-    SEJONG(8, null, null),
+    SOKCHO(51, 51210, DomesticRegionCategory.SOKCHO),
 
     /**
-     * 경기도 areaCode: 31
+     * 경상북도 > 경주시 areaCode: 47, sigunguCode: 47130
      */
-    GYEONGGI(31, null, null),
+    GYEONGJU(47, 47130, DomesticRegionCategory.GYEONGJU),
 
     /**
-     * 강원특별자치도 areaCode: 32
+     * 전북특별자치도 > 전주시 areaCode: 52, sigunguCode: 52111
      */
-    GANGWON(32, null, null),
+    JEONJU(52, 52111, DomesticRegionCategory.JEONJU),
 
     /**
-     * 강원도 > 강릉시 areaCode: 32, sigunguCode: 1
+     * 제주특별자치도 areaCode: 50
      */
-    GANGNEUNG(32, 1, DomesticRegionCategory.GANGNEUNG),
-
-    /**
-     * 강원도 > 속초시 areaCode: 32, sigunguCode: 3
-     */
-    SOKCHO(32, 3, DomesticRegionCategory.SOKCHO),
-
-    /**
-     * 충청북도 areaCode: 33
-     */
-    CHUNGBUK(33, null, null),
-
-    /**
-     * 충청남도 areaCode: 34
-     */
-    CHUNGNAM(34, null, null),
-
-    /**
-     * 경상북도 areaCode: 35
-     */
-    GYEONGBUK(35, null, null),
-
-    /**
-     * 경상북도 > 경주시 areaCode: 35, sigunguCode: 2
-     */
-    GYEONGJU(35, 2, DomesticRegionCategory.GYEONGJU),
-
-    /**
-     * 경상남도 areaCode: 36
-     */
-    GYEONGNAM(36, null, null),
-
-    /**
-     * 전북특별자치도 areaCode: 37
-     */
-    JEONBUK(37, null, null),
-
-    /**
-     * 전북특별자치도 > 전주시 areaCode: 37, sigunguCode: 2
-     */
-    JEONJU(37, 2, DomesticRegionCategory.JEONJU),
-
-    /**
-     * 전라남도 areaCode: 38
-     */
-    JEONNAM(38, null, null),
-
-    /**
-     * 제주특별자치도 areaCode: 39
-     */
-    JEJU(39, null, DomesticRegionCategory.JEJU),
+    JEJU(50, 50130, DomesticRegionCategory.JEJU),
 
     /**
      * 매핑되지 않는 지역 (OTHER_DOMESTIC 등)

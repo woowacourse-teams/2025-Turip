@@ -2,6 +2,8 @@ package turip.region.controller.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import turip.infrastructure.client.dto.KoreaTourismRelatedSpotResponse.RelatedSpot;
 
 /**
@@ -9,14 +11,26 @@ import turip.infrastructure.client.dto.KoreaTourismRelatedSpotResponse.RelatedSp
  */
 public record RelatedSpotsResponse(
         @JsonProperty("relatedSpots")
-        List<RelatedSpotResponse> relatedSpots
+        List<CategoryRelatedSpots> relatedSpots
 ) {
 
     public static RelatedSpotsResponse from(List<RelatedSpot> relatedSpots) {
-        List<RelatedSpotResponse> responses = relatedSpots.stream()
-                .map(RelatedSpotResponse::from)
+        // relatedCategoryLargeName으로 그룹화
+        Map<String, List<String>> groupedByCategory = relatedSpots.stream()
+                .collect(Collectors.groupingBy(
+                        RelatedSpot::getRelatedCategoryLargeName,
+                        Collectors.mapping(
+                                RelatedSpot::getRelatedSpotName,
+                                Collectors.toList()
+                        )
+                ));
+
+        // CategoryRelatedSpots 리스트로 변환
+        List<CategoryRelatedSpots> categorySpots = groupedByCategory.entrySet().stream()
+                .map(entry -> new CategoryRelatedSpots(entry.getKey(), entry.getValue()))
                 .toList();
-        return new RelatedSpotsResponse(responses);
+
+        return new RelatedSpotsResponse(categorySpots);
     }
 
     public static RelatedSpotsResponse empty() {
@@ -24,45 +38,14 @@ public record RelatedSpotsResponse(
     }
 
     /**
-     * 연관 관광지 응답
+     * 카테고리별 연관 관광지 목록
      */
-    public record RelatedSpotResponse(
-            @JsonProperty("touristSpotName")
-            String touristSpotName,
+    public record CategoryRelatedSpots(
+            @JsonProperty("category")
+            String category,
 
-            @JsonProperty("areaName")
-            String areaName,
-
-            @JsonProperty("relatedSpotName")
-            String relatedSpotName,
-
-            @JsonProperty("relatedRegionName")
-            String relatedRegionName,
-
-            @JsonProperty("relatedCategoryLargeName")
-            String relatedCategoryLargeName,
-
-            @JsonProperty("relatedCategoryMediumName")
-            String relatedCategoryMediumName,
-
-            @JsonProperty("relatedCategorySmallName")
-            String relatedCategorySmallName,
-
-            @JsonProperty("relatedRank")
-            Integer relatedRank
+            @JsonProperty("spots")
+            List<String> spots
     ) {
-
-        public static RelatedSpotResponse from(RelatedSpot relatedSpot) {
-            return new RelatedSpotResponse(
-                    relatedSpot.getTouristSpotName(),
-                    relatedSpot.getAreaName(),
-                    relatedSpot.getRelatedSpotName(),
-                    relatedSpot.getRelatedRegionName(),
-                    relatedSpot.getRelatedCategoryLargeName(),
-                    relatedSpot.getRelatedCategoryMediumName(),
-                    relatedSpot.getRelatedCategorySmallName(),
-                    relatedSpot.getRelatedRank()
-            );
-        }
     }
 }

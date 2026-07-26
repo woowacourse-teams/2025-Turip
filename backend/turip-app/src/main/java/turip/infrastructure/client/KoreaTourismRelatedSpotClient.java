@@ -42,8 +42,7 @@ public class KoreaTourismRelatedSpotClient {
      * @return 연관 관광지 목록
      */
     public List<RelatedSpot> searchRelatedSpots(TourApiAreaCode tourApiAreaCode) {
-        String baseYm = getCurrentYearMonth();
-
+        String baseYm = getPreviousYearMonth();
         // URI를 완전히 수동으로 생성 (이중 인코딩 방지)
         StringBuilder uriString = new StringBuilder(koreaTourismApiUrl)
                 .append("?serviceKey=").append(koreaTourismApiKey)
@@ -53,12 +52,8 @@ public class KoreaTourismRelatedSpotClient {
                 .append("&MobileApp=").append(MOBILE_APP)
                 .append("&_type=").append(RESPONSE_TYPE)
                 .append("&baseYm=").append(baseYm)
-                .append("&areaCd=").append(tourApiAreaCode.getAreaCode());
-
-        // 시군구 코드가 있는 경우에만 추가
-        if (tourApiAreaCode.getSigunguCode() != null) {
-            uriString.append("&signguCd=").append(tourApiAreaCode.getSigunguCode());
-        }
+                .append("&areaCd=").append(tourApiAreaCode.getAreaCode())
+                .append("&signguCd=").append(tourApiAreaCode.getSigunguCode());
 
         URI uri = URI.create(uriString.toString());
         log.info("한국관광공사 API 요청 URI: {}", uri);
@@ -83,7 +78,7 @@ public class KoreaTourismRelatedSpotClient {
         return response.getRelatedSpots();
     }
 
-    private String getCurrentYearMonth() {
-        return YearMonth.now().format(BASE_YM_FORMATTER);
+    private String getPreviousYearMonth() {
+        return YearMonth.now().minusMonths(1).format(BASE_YM_FORMATTER);
     }
 }
