@@ -1,0 +1,86 @@
+package turip.infrastructure.client;
+
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClient;
+import turip.infrastructure.client.dto.KoreaTourismRelatedSpotResponse;
+import turip.infrastructure.client.dto.KoreaTourismRelatedSpotResponse.RelatedSpot;
+import turip.region.domain.TourApiAreaCode;
+
+@Slf4j
+@Component
+public class KoreaTourismRelatedSpotClient {
+
+    private static final String MOBILE_OS = "ETC";
+    private static final String MOBILE_APP = "Turip";
+    private static final String RESPONSE_TYPE = "json";
+    private static final int DEFAULT_NUM_OF_ROWS = 50;
+    private static final int DEFAULT_PAGE_NO = 1;
+    private static final DateTimeFormatter BASE_YM_FORMATTER = DateTimeFormatter.ofPattern("yyyyMM");
+
+    private final RestClient restClient;
+    private final String koreaTourismApiKey;
+
+    public KoreaTourismRelatedSpotClient(RestClient baseRestClient,
+                                         @Value("${korea-tourism.api.key}") String koreaTourismApiKey,
+                                         @Value("${korea-tourism.api.url}") String koreaTourismApiUrl) {
+        this.restClient = baseRestClient.mutate()
+                .baseUrl(koreaTourismApiUrl)
+                .build();
+        this.koreaTourismApiKey = koreaTourismApiKey;
+    }
+
+    /**
+     * 지역 코드 기반으로 연관 관광지 목록을 조회한다
+     *
+     * @param tourApiAreaCode TourAPI 지역 코드
+     * @return 연관 관광지 목록
+     */
+    public List<RelatedSpot> searchRelatedSpots(TourApiAreaCode tourApiAreaCode) {
+        String baseYm = getCurrentYearMonth();
+
+        KoreaTourismRelatedSpotResponse response = restClient.get()
+                .uri(uriBuilder -> {
+                    uriBuilder
+                            .queryParam("serviceKey", koreaTourismApiKey)
+                            .queryParam("pageNo", DEFAULT_PAGE_NO)
+                            .queryParam("numOfRows", DEFAULT_NUM_OF_ROWS)
+                            .queryParam("MobileOS", MOBILE_OS)
+                            .queryParam("MobileApp", MOBILE_APP)
+                            .queryParam("_type", RESPONSE_TYPE)
+                            .queryParam("baseYm", baseYm)
+                            .queryParam("areaCd", tourApiAreaCode.getAreaCode());
+
+                    // 시군구 코드가 있는 경우에만 추가
+                    if (tourApiAreaCode.getSigunguCode() != null) {
+                        uriBuilder.queryParam("signguCd", tourApiAreaCode.getSigunguCode());
+                    }
+
+                    return uriBuilder.build();
+                })
+                .retrieve()
+                .body(KoreaTourismRelatedSpotResponse.class);
+
+        if (response == null) {
+            log.warn("한국관광공사 API 응답이 null입니다. areaCode={}, sigunguCode={}",
+                    tourApiAreaCode.getAreaCode(), tourApiAreaCode.getSigunguCode());
+            return List.of();
+        }
+
+        if (!response.isSuccess()) {
+            log.error("한국관광공사 API 호출 실패. areaCode={}, sigunguCode={}, response={}",
+                    tourApiAreaCode.getAreaCode(), tourApiAreaCode.getSigunguCode(), response);
+            return List.of();
+        }
+
+        return response.getRelatedSpots();
+    }
+
+    private String getCurrentYearMonth() {
+        return YearMonth.now().format(BASE_YM_FORMATTER);
+    }
+}
