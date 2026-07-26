@@ -78,11 +78,43 @@ public class RegionCategoryController {
 
     @Operation(
             summary = "지역별 연관 관광지 조회",
-            description = "국내 지역 카테고리를 기반으로 연관 관광지 목록을 조회합니다."
+            description = "국내 지역 카테고리를 기반으로 연관 관광지 목록을 조회합니다. 한국관광공사 API 데이터를 기반으로 카테고리별로 그룹화하여 반환합니다."
     )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "성공 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = RelatedSpotsResponse.class),
+                            examples = @ExampleObject(
+                                    name = "success",
+                                    summary = "서울 지역 연관 관광지 조회 성공",
+                                    value = """
+                                            {
+                                                "relatedSpots": [
+                                                    {
+                                                        "category": "관광지",
+                                                        "spots": ["종묘", "북촌한옥마을", "경복궁", "창덕궁"]
+                                                    },
+                                                    {
+                                                        "category": "쇼핑",
+                                                        "spots": ["명동", "동대문시장"]
+                                                    },
+                                                    {
+                                                        "category": "문화시설",
+                                                        "spots": ["국립중앙박물관", "서울역사박물관"]
+                                                    }
+                                                ]
+                                            }
+                                            """
+                            )
+                    )
+            )
+    })
     @GetMapping("/related-spots")
     public ResponseEntity<RelatedSpotsResponse> getRelatedSpots(
-            @Parameter(description = "지역 카테고리 (서울, 부산, 제주, 인천, 대전, 전주, 강릉, 속초, 경주)", required = true)
+            @Parameter(description = "지역 카테고리 (서울, 부산, 제주, 인천, 대전, 전주, 강릉, 속초, 경주)", required = true, example = "서울")
             @RequestParam(name = "regionCategory") DomesticRegionCategory regionCategory
     ) {
         RelatedSpotsResponse response = regionCategoryService.findRelatedSpotsByRegionCategory(regionCategory);
