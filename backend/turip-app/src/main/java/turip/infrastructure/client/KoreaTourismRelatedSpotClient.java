@@ -1,5 +1,6 @@
 package turip.infrastructure.client;
 
+import java.net.URI;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -24,14 +25,14 @@ public class KoreaTourismRelatedSpotClient {
 
     private final RestClient restClient;
     private final String koreaTourismApiKey;
+    private final String koreaTourismApiUrl;
 
     public KoreaTourismRelatedSpotClient(RestClient baseRestClient,
                                          @Value("${korea-tourism.api.key}") String koreaTourismApiKey,
                                          @Value("${korea-tourism.api.url}") String koreaTourismApiUrl) {
-        this.restClient = baseRestClient.mutate()
-                .baseUrl(koreaTourismApiUrl)
-                .build();
+        this.restClient = baseRestClient;
         this.koreaTourismApiKey = koreaTourismApiKey;
+        this.koreaTourismApiUrl = koreaTourismApiUrl;
     }
 
     /**
@@ -43,25 +44,27 @@ public class KoreaTourismRelatedSpotClient {
     public List<RelatedSpot> searchRelatedSpots(TourApiAreaCode tourApiAreaCode) {
         String baseYm = getCurrentYearMonth();
 
+        // URI를 완전히 수동으로 생성 (이중 인코딩 방지)
+        StringBuilder uriString = new StringBuilder(koreaTourismApiUrl)
+                .append("?serviceKey=").append(koreaTourismApiKey)
+                .append("&pageNo=").append(DEFAULT_PAGE_NO)
+                .append("&numOfRows=").append(DEFAULT_NUM_OF_ROWS)
+                .append("&MobileOS=").append(MOBILE_OS)
+                .append("&MobileApp=").append(MOBILE_APP)
+                .append("&_type=").append(RESPONSE_TYPE)
+                .append("&baseYm=").append(baseYm)
+                .append("&areaCd=").append(tourApiAreaCode.getAreaCode());
+
+        // 시군구 코드가 있는 경우에만 추가
+        if (tourApiAreaCode.getSigunguCode() != null) {
+            uriString.append("&signguCd=").append(tourApiAreaCode.getSigunguCode());
+        }
+
+        URI uri = URI.create(uriString.toString());
+        log.info("한국관광공사 API 요청 URI: {}", uri);
+
         KoreaTourismRelatedSpotResponse response = restClient.get()
-                .uri(uriBuilder -> {
-                    uriBuilder
-                            .queryParam("serviceKey", koreaTourismApiKey)
-                            .queryParam("pageNo", DEFAULT_PAGE_NO)
-                            .queryParam("numOfRows", DEFAULT_NUM_OF_ROWS)
-                            .queryParam("MobileOS", MOBILE_OS)
-                            .queryParam("MobileApp", MOBILE_APP)
-                            .queryParam("_type", RESPONSE_TYPE)
-                            .queryParam("baseYm", baseYm)
-                            .queryParam("areaCd", tourApiAreaCode.getAreaCode());
-
-                    // 시군구 코드가 있는 경우에만 추가
-                    if (tourApiAreaCode.getSigunguCode() != null) {
-                        uriBuilder.queryParam("signguCd", tourApiAreaCode.getSigunguCode());
-                    }
-
-                    return uriBuilder.build();
-                })
+                .uri(uri)
                 .retrieve()
                 .body(KoreaTourismRelatedSpotResponse.class);
 
