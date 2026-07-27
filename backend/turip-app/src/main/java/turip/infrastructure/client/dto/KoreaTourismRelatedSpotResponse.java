@@ -2,9 +2,11 @@ package turip.infrastructure.client.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import turip.infrastructure.client.dto.deserializer.EmptyStringAsNullDeserializer;
 
 /**
  * 한국관광공사 TourAPI의 지역별 연관 관광지 조회 응답
@@ -65,6 +67,7 @@ public class KoreaTourismRelatedSpotResponse {
     public static class Body {
 
         @JsonProperty("items")
+        @JsonDeserialize(using = EmptyStringAsNullDeserializer.class)
         private Items items;
 
         @JsonProperty("numOfRows")
