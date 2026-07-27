@@ -13,9 +13,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import turip.content.repository.ContentRepository;
+import turip.infrastructure.client.KoreaTourismRelatedSpotClient;
+import turip.infrastructure.client.dto.KoreaTourismRelatedSpotResponse.RelatedSpot;
 import turip.region.controller.dto.response.RegionCategoriesResponse;
+import turip.region.controller.dto.response.RelatedSpotsResponse;
 import turip.region.domain.City;
 import turip.region.domain.Country;
+import turip.region.domain.DomesticRegionCategory;
+import turip.region.domain.TourApiAreaCode;
 
 @ExtendWith(MockitoExtension.class)
 class RegionCategoryServiceTest {
@@ -31,6 +36,9 @@ class RegionCategoryServiceTest {
 
     @Mock
     private ContentRepository contentRepository;
+
+    @Mock
+    private KoreaTourismRelatedSpotClient koreaTourismRelatedSpotClient;
 
     @DisplayName("국내 지역 카테고리 조회 시 국내 도시 목록과 기타 카테고리를 반환한다")
     @Test
@@ -144,5 +152,49 @@ class RegionCategoryServiceTest {
         // then
         assertThat(response.regionCategories()).hasSize(1);
         assertThat(response.regionCategories().getFirst().name()).isEqualTo("해외 기타");
+    }
+
+    @DisplayName("지역 카테고리로 연관 관광지를 조회한다")
+    @Test
+    void findRelatedSpotsByRegionCategory1() {
+        // given
+        DomesticRegionCategory category = DomesticRegionCategory.SEOUL;
+
+        RelatedSpot spot1 = mock(RelatedSpot.class);
+        RelatedSpot spot2 = mock(RelatedSpot.class);
+
+        given(spot1.getRelatedCategoryLargeName()).willReturn("관광지");
+        given(spot1.getRelatedSpotName()).willReturn("북촌한옥마을");
+        given(spot2.getRelatedCategoryLargeName()).willReturn("관광지");
+        given(spot2.getRelatedSpotName()).willReturn("경복궁");
+
+        List<RelatedSpot> spots = List.of(spot1, spot2);
+
+        given(koreaTourismRelatedSpotClient.searchRelatedSpots(TourApiAreaCode.SEOUL))
+                .willReturn(spots);
+
+        // when
+        RelatedSpotsResponse response = regionCategoryService.findRelatedSpotsByRegionCategory(category);
+
+        // then
+        assertAll(
+                () -> assertThat(response.relatedSpots()).hasSize(1),
+                () -> assertThat(response.relatedSpots().getFirst().category()).isEqualTo("관광지"),
+                () -> assertThat(response.relatedSpots().getFirst().spots())
+                        .containsExactlyInAnyOrder("북촌한옥마을", "경복궁")
+        );
+    }
+
+    @DisplayName("매핑되지 않는 지역 카테고리는 빈 응답을 반환한다")
+    @Test
+    void findRelatedSpotsByRegionCategory2() {
+        // given
+        DomesticRegionCategory category = DomesticRegionCategory.OTHER_DOMESTIC;
+
+        // when
+        RelatedSpotsResponse response = regionCategoryService.findRelatedSpotsByRegionCategory(category);
+
+        // then
+        assertThat(response.relatedSpots()).isEmpty();
     }
 } 
