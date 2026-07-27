@@ -1,6 +1,7 @@
 package turip.region.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
@@ -185,16 +186,14 @@ class RegionCategoryServiceTest {
         );
     }
 
-    @DisplayName("매핑되지 않는 지역 카테고리는 빈 응답을 반환한다")
+    @DisplayName("'국내 기타' 카테고리는 예외를 던진다")
     @Test
     void findRelatedSpotsByRegionCategory2() {
         // given
         DomesticRegionCategory category = DomesticRegionCategory.OTHER_DOMESTIC;
 
-        // when
-        RelatedSpotsResponse response = regionCategoryService.findRelatedSpotsByRegionCategory(category);
-
-        // then
-        assertThat(response.relatedSpots()).isEmpty();
+        // when & then
+        assertThatThrownBy(() -> regionCategoryService.findRelatedSpotsByRegionCategory(category))
+                .isInstanceOf(turip.common.exception.custom.IllegalArgumentException.class);
     }
 } 

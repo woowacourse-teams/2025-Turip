@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import turip.common.exception.ErrorTag;
+import turip.common.exception.custom.IllegalArgumentException;
 import turip.content.repository.ContentRepository;
 import turip.infrastructure.client.KoreaTourismRelatedSpotClient;
 import turip.infrastructure.client.dto.KoreaTourismRelatedSpotResponse.RelatedSpot;
@@ -46,6 +48,10 @@ public class RegionCategoryService {
     }
 
     public RelatedSpotsResponse findRelatedSpotsByRegionCategory(DomesticRegionCategory category) {
+        if (category == DomesticRegionCategory.OTHER_DOMESTIC) {
+            throw new IllegalArgumentException(ErrorTag.REGION_CATEGORY_INVALID);
+        }
+
         TourApiAreaCode areaCode = TourApiAreaCode.fromDomesticRegionCategory(category);
 
         if (!areaCode.isFound()) {

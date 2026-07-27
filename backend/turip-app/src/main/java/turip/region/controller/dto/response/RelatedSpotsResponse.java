@@ -25,8 +25,9 @@ public record RelatedSpotsResponse(
                         )
                 ));
 
-        // CategoryRelatedSpots 리스트로 변환
+        // CategoryRelatedSpots 리스트로 변환 (카테고리 이름 순으로 정렬)
         List<CategoryRelatedSpots> categorySpots = groupedByCategory.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
                 .map(entry -> new CategoryRelatedSpots(entry.getKey(), entry.getValue()))
                 .toList();
 

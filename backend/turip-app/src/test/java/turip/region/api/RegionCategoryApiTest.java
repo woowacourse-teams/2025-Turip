@@ -245,6 +245,17 @@ class RegionCategoryApiTest {
                     .statusCode(400);
         }
 
+        @DisplayName("'국내 기타' 카테고리로 조회 시 400 Bad Request를 응답한다")
+        @Test
+        void readRelatedSpots4() {
+            // when & then
+            RestAssured.given().port(port)
+                    .queryParam("regionCategory", "국내 기타")
+                    .when().get("/api/v1/related-spots")
+                    .then()
+                    .statusCode(400);
+        }
+
         private RelatedSpot createRelatedSpot(String touristSpotName, String relatedSpotName,
                                               String relatedCategoryLargeName) {
             RelatedSpot spot = new RelatedSpot();
