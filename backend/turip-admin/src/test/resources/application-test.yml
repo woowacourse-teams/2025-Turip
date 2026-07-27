@@ -50,6 +50,11 @@ youtube:
     key: test-youtube-api-key
     url: https://test.youtube.com
 
+korea-tourism:
+  api:
+    key: test-korea-tourism-api-key
+    url: https://test.apis.data.go.kr
+
 apple:
   client-id: com.teamturip.test
 

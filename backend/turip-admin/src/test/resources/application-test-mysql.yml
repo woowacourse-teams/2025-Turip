@@ -44,6 +44,11 @@ youtube:
 apple:
   client-id: com.teamturip.test
 
+korea-tourism:
+  api:
+    key: test-korea-tourism-api-key
+    url: https://test.apis.data.go.kr
+
 # CSV Import 설정
 csv:
   import:
