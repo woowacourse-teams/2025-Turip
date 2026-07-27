@@ -40,28 +40,37 @@ public class KoreaTourismRelatedSpotClient {
      * @return 연관 관광지 목록
      */
     public List<RelatedSpot> searchRelatedSpots(TourApiAreaCode tourApiAreaCode) {
-        // URI를 완전히 수동으로 생성 (이중 인코딩 방지)
-        StringBuilder uriString = new StringBuilder(koreaTourismApiUrl)
-                .append("?serviceKey=").append(koreaTourismApiKey)
-                .append("&pageNo=").append(DEFAULT_PAGE_NO)
-                .append("&numOfRows=").append(DEFAULT_NUM_OF_ROWS)
-                .append("&MobileOS=").append(MOBILE_OS)
-                .append("&MobileApp=").append(MOBILE_APP)
-                .append("&_type=").append(RESPONSE_TYPE)
-                .append("&baseYm=").append(BASE_YM)
-                .append("&areaCd=").append(tourApiAreaCode.getAreaCode())
-                .append("&signguCd=").append(tourApiAreaCode.getSigunguCode());
+        try {
+            // URI를 완전히 수동으로 생성 (이중 인코딩 방지)
+            StringBuilder uriString = new StringBuilder(koreaTourismApiUrl)
+                    .append("?serviceKey=").append(koreaTourismApiKey)
+                    .append("&pageNo=").append(DEFAULT_PAGE_NO)
+                    .append("&numOfRows=").append(DEFAULT_NUM_OF_ROWS)
+                    .append("&MobileOS=").append(MOBILE_OS)
+                    .append("&MobileApp=").append(MOBILE_APP)
+                    .append("&_type=").append(RESPONSE_TYPE)
+                    .append("&baseYm=").append(BASE_YM)
+                    .append("&areaCd=").append(tourApiAreaCode.getAreaCode())
+                    .append("&signguCd=").append(tourApiAreaCode.getSigunguCode());
 
-        URI uri = URI.create(uriString.toString());
-        KoreaTourismRelatedSpotResponse response = restClient.get()
-                .uri(uri)
-                .retrieve()
-                .body(KoreaTourismRelatedSpotResponse.class);
+            URI uri = URI.create(uriString.toString());
+            KoreaTourismRelatedSpotResponse response = restClient.get()
+                    .uri(uri)
+                    .retrieve()
+                    .body(KoreaTourismRelatedSpotResponse.class);
 
-        if (response == null || !response.isSuccess()) {
+            if (response == null || !response.isSuccess()) {
+                log.warn("한국관광공사 연관 관광지 API 응답 실패: response={}", response);
+                return List.of();
+            }
+
+            return response.getRelatedSpots();
+        } catch (Exception e) {
+            log.warn("한국관광공사 연관 관광지 API 호출 실패: areaCode={}, sigunguCode={}, message={}",
+                    tourApiAreaCode.getAreaCode(),
+                    tourApiAreaCode.getSigunguCode(),
+                    e.getMessage());
             return List.of();
         }
-
-        return response.getRelatedSpots();
     }
 }
