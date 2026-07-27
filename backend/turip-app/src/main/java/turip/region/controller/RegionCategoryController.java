@@ -113,7 +113,7 @@ public class RegionCategoryController {
             )
     })
     @GetMapping("/related-spots")
-    public ResponseEntity<RelatedSpotsResponse> getRelatedSpots(
+    public ResponseEntity<RelatedSpotsResponse> readRelatedSpots(
             @Parameter(description = "지역 카테고리 (서울, 부산, 제주, 인천, 대전, 전주, 강릉, 속초, 경주)", required = true, example = "서울")
             @RequestParam(name = "regionCategory") DomesticRegionCategory regionCategory
     ) {
