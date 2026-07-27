@@ -1,75 +1,13 @@
+# MySQL 데이터베이스 전용 설정
+
 spring:
   sql:
     init:
       mode: always
       schema-locations: classpath:init-test-db.sql
-      data-locations: [ ]
       continue-on-error: false
+
   jpa:
-    defer-datasource-initialization: true
-    hibernate:
-      ddl-auto: create-drop
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
-
-  # 테스트 환경에서 Flyway 비활성화
-  flyway:
-    enabled: false
-
-# JWT 설정 (테스트용)
-jwt:
-  secret-key: turip-test-jwt-secret-key-for-testing-purposes-only-32bytes
-  access-token-expiration-ms: 3600000  # 1시간
-  refresh-token-expiration-ms: 604800000  # 7일
-
-# Google OAuth 설정 (테스트용)
-google:
-  client-id: test-google-client-id.apps.googleusercontent.com
-  ios-client-id: test-google-ios-client-id.apps.googleusercontent.com
-  api:
-    key: test-google-api-key
-    url: https://test.google.com
-
-kakao:
-  api:
-    key: test-kakao-api-key
-    url: https://test.kakao.com
-
-youtube:
-  api:
-    key: test-youtube-api-key
-    url: https://test.youtube.com
-
-apple:
-  client-id: com.teamturip.test
-
-korea-tourism:
-  api:
-    key: test-korea-tourism-api-key
-    url: https://test.apis.data.go.kr
-
-# CSV Import 설정
-csv:
-  import:
-    password: test_password_123
-
-# Region Category 기타 이미지 설정 (테스트용 더미 값)
-region:
-  category:
-    domestic:
-      etc:
-        image-url: https://test.example.com/domestic-etc.jpg
-    overseas:
-      etc:
-        image-url: https://test.example.com/overseas-etc.jpg
-
-invitation:
-  jwt:
-    secret-key: turip-test-invitation-jwt-secret-key-for-testing-purposes
-    token-expiration: 1h
-
-# SSE 설정 (테스트용 - 빠른 하트비트)
-sse:
-  heartbeat:
-    interval: 2  # 2초

@@ -37,7 +37,7 @@ import turip.common.exception.custom.InternalServerException;
 import turip.common.exception.custom.UnauthorizedException;
 import turip.util.helper.TestDataHelper;
 
-@ActiveProfiles("test")
+@ActiveProfiles({"test", "h2"})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class AuthApiTest {
 
