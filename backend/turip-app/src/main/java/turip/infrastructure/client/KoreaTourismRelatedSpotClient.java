@@ -1,8 +1,6 @@
 package turip.infrastructure.client;
 
 import java.net.URI;
-import java.time.YearMonth;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +19,7 @@ public class KoreaTourismRelatedSpotClient {
     private static final String RESPONSE_TYPE = "json";
     private static final int DEFAULT_NUM_OF_ROWS = 50;
     private static final int DEFAULT_PAGE_NO = 1;
-    private static final DateTimeFormatter BASE_YM_FORMATTER = DateTimeFormatter.ofPattern("yyyyMM");
+    private static final String BASE_YM = "202606"; // API 제공 데이터 최신 기준월
 
     private final RestClient restClient;
     private final String koreaTourismApiKey;
@@ -42,7 +40,6 @@ public class KoreaTourismRelatedSpotClient {
      * @return 연관 관광지 목록
      */
     public List<RelatedSpot> searchRelatedSpots(TourApiAreaCode tourApiAreaCode) {
-        String baseYm = getPreviousYearMonth();
         // URI를 완전히 수동으로 생성 (이중 인코딩 방지)
         StringBuilder uriString = new StringBuilder(koreaTourismApiUrl)
                 .append("?serviceKey=").append(koreaTourismApiKey)
@@ -51,7 +48,7 @@ public class KoreaTourismRelatedSpotClient {
                 .append("&MobileOS=").append(MOBILE_OS)
                 .append("&MobileApp=").append(MOBILE_APP)
                 .append("&_type=").append(RESPONSE_TYPE)
-                .append("&baseYm=").append(baseYm)
+                .append("&baseYm=").append(BASE_YM)
                 .append("&areaCd=").append(tourApiAreaCode.getAreaCode())
                 .append("&signguCd=").append(tourApiAreaCode.getSigunguCode());
 
@@ -66,9 +63,5 @@ public class KoreaTourismRelatedSpotClient {
         }
 
         return response.getRelatedSpots();
-    }
-
-    private String getPreviousYearMonth() {
-        return YearMonth.now().minusMonths(1).format(BASE_YM_FORMATTER);
     }
 }
