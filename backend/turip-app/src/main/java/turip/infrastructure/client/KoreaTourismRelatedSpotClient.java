@@ -56,22 +56,12 @@ public class KoreaTourismRelatedSpotClient {
                 .append("&signguCd=").append(tourApiAreaCode.getSigunguCode());
 
         URI uri = URI.create(uriString.toString());
-        log.info("한국관광공사 API 요청 URI: {}", uri);
-
         KoreaTourismRelatedSpotResponse response = restClient.get()
                 .uri(uri)
                 .retrieve()
                 .body(KoreaTourismRelatedSpotResponse.class);
 
-        if (response == null) {
-            log.warn("한국관광공사 API 응답이 null입니다. areaCode={}, sigunguCode={}",
-                    tourApiAreaCode.getAreaCode(), tourApiAreaCode.getSigunguCode());
-            return List.of();
-        }
-
-        if (!response.isSuccess()) {
-            log.error("한국관광공사 API 호출 실패. areaCode={}, sigunguCode={}, response={}",
-                    tourApiAreaCode.getAreaCode(), tourApiAreaCode.getSigunguCode(), response);
+        if (response == null || !response.isSuccess()) {
             return List.of();
         }
 
