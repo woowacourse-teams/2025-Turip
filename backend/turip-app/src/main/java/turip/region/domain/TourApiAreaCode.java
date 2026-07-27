@@ -19,7 +19,7 @@ public enum TourApiAreaCode {
     /**
      * 인천광역시 areaCode: 2
      */
-    INCHEON(2, 18710, DomesticRegionCategory.INCHEON),
+    INCHEON(2, 28710, DomesticRegionCategory.INCHEON),
 
     /**
      * 대전광역시 areaCode: 3
