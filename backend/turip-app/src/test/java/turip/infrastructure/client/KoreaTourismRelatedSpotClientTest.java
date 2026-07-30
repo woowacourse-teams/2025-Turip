@@ -18,7 +18,6 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import turip.common.configuration.RestClientConfiguration;
 import turip.common.log.ExternalApiLoggingInterceptor;
 import turip.infrastructure.client.dto.KoreaTourismRelatedSpotResponse.RelatedSpot;
-import turip.region.domain.TourApiAreaCode;
 
 @ActiveProfiles({"test", "h2"})
 @RestClientTest(KoreaTourismRelatedSpotClient.class)
@@ -83,7 +82,7 @@ class KoreaTourismRelatedSpotClientTest {
         String expectedUrl = koreaTourismApiUrl
                 + "?serviceKey=" + koreaTourismApiKey
                 + "&pageNo=1"
-                + "&numOfRows=50"
+                + "&numOfRows=30"
                 + "&MobileOS=ETC"
                 + "&MobileApp=Turip"
                 + "&_type=json"
@@ -95,7 +94,7 @@ class KoreaTourismRelatedSpotClientTest {
                 .andRespond(withSuccess(mockResponse, MediaType.APPLICATION_JSON));
 
         // when
-        List<RelatedSpot> result = koreaTourismRelatedSpotClient.searchRelatedSpots(TourApiAreaCode.SEOUL);
+        List<RelatedSpot> result = koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11110);
 
         // then
         assertAll(
@@ -128,7 +127,7 @@ class KoreaTourismRelatedSpotClientTest {
                     },
                     "body": {
                       "items": "",
-                      "numOfRows": 50,
+                      "numOfRows": 30,
                       "pageNo": 1,
                       "totalCount": 0
                     }
@@ -139,7 +138,7 @@ class KoreaTourismRelatedSpotClientTest {
         String expectedUrl = koreaTourismApiUrl
                 + "?serviceKey=" + koreaTourismApiKey
                 + "&pageNo=1"
-                + "&numOfRows=50"
+                + "&numOfRows=30"
                 + "&MobileOS=ETC"
                 + "&MobileApp=Turip"
                 + "&_type=json"
@@ -151,7 +150,7 @@ class KoreaTourismRelatedSpotClientTest {
                 .andRespond(withSuccess(mockResponse, MediaType.APPLICATION_JSON));
 
         // when
-        List<RelatedSpot> result = koreaTourismRelatedSpotClient.searchRelatedSpots(TourApiAreaCode.SEOUL);
+        List<RelatedSpot> result = koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11110);
 
         // then
         assertThat(result).isEmpty();

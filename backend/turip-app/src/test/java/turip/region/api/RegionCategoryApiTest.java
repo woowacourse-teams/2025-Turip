@@ -202,7 +202,8 @@ class RegionCategoryApiTest {
             RelatedSpot spot2 = createRelatedSpot("경복궁", "인사동", "관광지");
             RelatedSpot spot3 = createRelatedSpot("경복궁", "종로맛집", "음식점");
 
-            given(koreaTourismRelatedSpotClient.searchRelatedSpots(TourApiAreaCode.SEOUL))
+            given(koreaTourismRelatedSpotClient.searchRelatedSpots(TourApiAreaCode.SEOUL.getAreaCode(),
+                    TourApiAreaCode.SEOUL.getSigunguCodes().get(0)))
                     .willReturn(List.of(spot1, spot2, spot3));
 
             // when & then
@@ -222,7 +223,8 @@ class RegionCategoryApiTest {
         @Test
         void readRelatedSpots2() {
             // given
-            given(koreaTourismRelatedSpotClient.searchRelatedSpots(TourApiAreaCode.BUSAN))
+            given(koreaTourismRelatedSpotClient.searchRelatedSpots(TourApiAreaCode.BUSAN.getAreaCode(),
+                    TourApiAreaCode.BUSAN.getSigunguCodes().get(0)))
                     .willReturn(List.of());
 
             // when & then

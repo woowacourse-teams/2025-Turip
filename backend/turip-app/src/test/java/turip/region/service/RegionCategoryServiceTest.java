@@ -21,7 +21,6 @@ import turip.region.controller.dto.response.RelatedSpotsResponse;
 import turip.region.domain.City;
 import turip.region.domain.Country;
 import turip.region.domain.DomesticRegionCategory;
-import turip.region.domain.TourApiAreaCode;
 
 @ExtendWith(MockitoExtension.class)
 class RegionCategoryServiceTest {
@@ -163,16 +162,22 @@ class RegionCategoryServiceTest {
 
         RelatedSpot spot1 = mock(RelatedSpot.class);
         RelatedSpot spot2 = mock(RelatedSpot.class);
+        RelatedSpot spot3 = mock(RelatedSpot.class);
 
         given(spot1.getRelatedCategoryLargeName()).willReturn("관광지");
         given(spot1.getRelatedSpotName()).willReturn("북촌한옥마을");
         given(spot2.getRelatedCategoryLargeName()).willReturn("관광지");
         given(spot2.getRelatedSpotName()).willReturn("경복궁");
+        given(spot3.getRelatedCategoryLargeName()).willReturn("관광지");
+        given(spot3.getRelatedSpotName()).willReturn("남산타워");
 
-        List<RelatedSpot> spots = List.of(spot1, spot2);
-
-        given(koreaTourismRelatedSpotClient.searchRelatedSpots(TourApiAreaCode.SEOUL))
-                .willReturn(spots);
+        // 서울의 3개 시군구 코드에 대해 각각 모킹
+        given(koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11110))
+                .willReturn(List.of(spot1));
+        given(koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11440))
+                .willReturn(List.of(spot2));
+        given(koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11140))
+                .willReturn(List.of(spot3));
 
         // when
         RelatedSpotsResponse response = regionCategoryService.findRelatedSpotsByRegionCategory(category);
@@ -182,7 +187,7 @@ class RegionCategoryServiceTest {
                 () -> assertThat(response.relatedSpots()).hasSize(1),
                 () -> assertThat(response.relatedSpots().getFirst().category()).isEqualTo("관광지"),
                 () -> assertThat(response.relatedSpots().getFirst().spots())
-                        .containsExactlyInAnyOrder("북촌한옥마을", "경복궁")
+                        .containsExactlyInAnyOrder("북촌한옥마을", "경복궁", "남산타워")
         );
     }
 

@@ -59,7 +59,15 @@ public class RegionCategoryService {
             return RelatedSpotsResponse.empty();
         }
 
-        List<RelatedSpot> relatedSpots = koreaTourismRelatedSpotClient.searchRelatedSpots(areaCode);
+        // 여러 시군구 코드에 대해 병렬로 API 호출
+        List<RelatedSpot> relatedSpots = areaCode.getSigunguCodes().parallelStream()
+                .map(sigunguCode -> koreaTourismRelatedSpotClient.searchRelatedSpots(
+                        areaCode.getAreaCode(),
+                        sigunguCode
+                ))
+                .flatMap(List::stream)
+                .toList();
+
         return RelatedSpotsResponse.from(relatedSpots);
     }
 
