@@ -16,6 +16,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.tooling.preview.Preview
 import com.on.turip.core.designsystem.component.TuripSnackbar
 import com.on.turip.core.designsystem.theme.TuripTheme
+import com.on.turip.core.model.turip.TuripNameStatus
 import com.on.turip.core.ui.component.NameEditorSheetContent
 import com.on.turip.core.ui.model.namestatus.TuripNameStatusModel
 
@@ -44,6 +45,7 @@ fun TuripAddBottomSheet(
                 NameEditorSheetContent(
                     title = title,
                     initialTuripName = initialTuripName,
+                    maxLength = TuripNameStatus.MAX_LENGTH,
                     turipNameStatus = turipNameStatus,
                     isConfirmEnabled = isConfirmEnabled,
                     onNameChanged = onNameChanged,
@@ -59,6 +61,7 @@ fun TuripAddBottomSheet(
             NameEditorSheetContent(
                 title = title,
                 initialTuripName = initialTuripName,
+                maxLength = TuripNameStatus.MAX_LENGTH,
                 turipNameStatus = turipNameStatus,
                 isConfirmEnabled = isConfirmEnabled,
                 onNameChanged = onNameChanged,

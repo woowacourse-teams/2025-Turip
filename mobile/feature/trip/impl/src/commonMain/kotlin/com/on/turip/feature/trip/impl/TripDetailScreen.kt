@@ -48,6 +48,7 @@ import com.on.turip.core.designsystem.generated.resources.trip_detail_turip_sele
 import com.on.turip.core.designsystem.generated.resources.turip_added_snackbar_message
 import com.on.turip.core.designsystem.snackbar.LocalSnackbarDelegate
 import com.on.turip.core.designsystem.theme.TuripTheme
+import com.on.turip.core.model.turip.TuripNameStatus
 import com.on.turip.core.ui.component.ErrorScreen
 import com.on.turip.core.ui.component.NameEditorSheetContent
 import com.on.turip.core.ui.error.ErrorUiState
@@ -313,6 +314,7 @@ fun TripDetailScreen(
             NameEditorSheetContent(
                 title = stringResource(Res.string.bottom_sheet_turip_add_title),
                 initialTuripName = uiState.addTuripInputName,
+                maxLength = TuripNameStatus.MAX_LENGTH,
                 turipNameStatus = uiState.addTuripNameStatus,
                 isConfirmEnabled = uiState.addTuripNameStatus.isConfirmEnabled && !uiState.isCreatingTurip,
                 onNameChanged = viewModel::updateAddTuripInputName,

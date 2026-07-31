@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import com.on.turip.core.designsystem.generated.resources.*
 import com.on.turip.core.designsystem.generated.resources.Res
 import com.on.turip.core.designsystem.theme.TuripTheme
+import com.on.turip.core.model.turip.TuripNameStatus
 import com.on.turip.core.ui.component.NameEditorSheetContent
 import com.on.turip.core.ui.model.namestatus.TuripNameStatusModel
 import com.on.turip.feature.turipdetail.impl.TuripPlaceScreenMode
@@ -148,6 +149,7 @@ fun MoreOptionBottomSheet(
                     NameEditorSheetContent(
                         title = stringResource(Res.string.bottom_sheet_turip_modify_title),
                         initialTuripName = initialTuripName,
+                        maxLength = TuripNameStatus.MAX_LENGTH,
                         onBack = { onScreenModeChange(TuripPlaceScreenMode.MoreOption) },
                         turipNameStatus = turipNameStatus,
                         isConfirmEnabled = turipNameStatus.isConfirmEnabled,

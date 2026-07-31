@@ -45,7 +45,6 @@ import com.on.turip.core.designsystem.generated.resources.Res
 import com.on.turip.core.designsystem.generated.resources.all_confirm
 import com.on.turip.core.designsystem.generated.resources.bottom_sheet_turip_add_turip_name_hint
 import com.on.turip.core.designsystem.theme.TuripTheme
-import com.on.turip.core.model.turip.TuripNameStatus
 import com.on.turip.core.ui.model.namestatus.TuripNameStatusModel
 import kotlinx.coroutines.flow.drop
 import org.jetbrains.compose.resources.stringResource
@@ -58,11 +57,15 @@ import org.jetbrains.compose.resources.stringResource
  * 왕복시키면 조합 도중 한 프레임 뒤늦게 값이 되돌아와 조합이 끊어진다.
  * 그래서 [initialTuripName] 은 최초 구성 시 초기값으로만 쓰이고, 이후에는 [onNameChanged] 로
  * 단방향 통지만 한다. 외부에서 텍스트를 갱신하려면 이 컴포저블을 다시 구성해야 한다.
+ *
+ * [maxLength] 는 입력 버퍼에 글자를 더 넣을지 말지만 정한다. 이름이 유효한지에 대한 판정은
+ * 도메인(`TuripNameStatus`)이 하고, 그 결과가 [turipNameStatus] 로 들어온다.
  */
 @Composable
 fun NameEditorSheetContent(
     title: String,
     initialTuripName: String,
+    maxLength: Int,
     turipNameStatus: TuripNameStatusModel,
     isConfirmEnabled: Boolean,
     onNameChanged: (turipName: String) -> Unit,
@@ -133,7 +136,7 @@ fun NameEditorSheetContent(
             lineLimits = TextFieldLineLimits.SingleLine,
             // 길이 제한은 ViewModel 에서 입력을 되돌리지 않고 여기서 처리한다.
             // 되돌리면 iOS 에서 IME 의 marked text 와 상태가 어긋나 한글 조합이 깨진다.
-            inputTransformation = InputTransformation.maxLength(TuripNameStatus.MAX_LENGTH),
+            inputTransformation = InputTransformation.maxLength(maxLength),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             onKeyboardAction = KeyboardActionHandler { if (isConfirmEnabled) onConfirmClick() },
             decorator = TextFieldDecorator { innerTextField ->
@@ -220,6 +223,7 @@ private fun NameEditorSheetContentPreview() {
             onConfirmClick = {},
             onBack = {},
             initialTuripName = "",
+            maxLength = 20,
             isConfirmEnabled = true,
             focusRequester = focusRequester,
         )
