@@ -312,7 +312,7 @@ fun TripDetailScreen(
             val focusRequester = remember { FocusRequester() }
             NameEditorSheetContent(
                 title = stringResource(Res.string.bottom_sheet_turip_add_title),
-                turipName = uiState.addTuripInputName,
+                initialTuripName = uiState.addTuripInputName,
                 turipNameStatus = uiState.addTuripNameStatus,
                 isConfirmEnabled = uiState.addTuripNameStatus.isConfirmEnabled && !uiState.isCreatingTurip,
                 onNameChanged = viewModel::updateAddTuripInputName,

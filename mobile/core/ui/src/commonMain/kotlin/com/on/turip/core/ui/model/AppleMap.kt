@@ -24,7 +24,7 @@ data class AppleMap(
             }
         }
 
-    companion object{
+    companion object {
         val Idle = AppleMap("", 0.0, 0.0)
     }
 }

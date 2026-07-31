@@ -162,7 +162,7 @@ fun MyTuripScreen(
         if (uiState.showAddBottomSheet) {
             TuripAddBottomSheet(
                 title = stringResource(Res.string.bottom_sheet_turip_add_title),
-                turipName = uiState.inputTuripName,
+                initialTuripName = uiState.inputTuripName,
                 sheetState = sheetState,
                 turipNameStatus = uiState.turipNameStatus,
                 isConfirmEnabled = uiState.turipNameStatus.isConfirmEnabled && !uiState.isCreatingTurip,

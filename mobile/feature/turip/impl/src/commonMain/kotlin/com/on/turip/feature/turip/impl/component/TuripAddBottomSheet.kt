@@ -23,7 +23,7 @@ import com.on.turip.core.ui.model.namestatus.TuripNameStatusModel
 @Composable
 fun TuripAddBottomSheet(
     title: String,
-    turipName: String,
+    initialTuripName: String,
     sheetState: SheetState,
     turipNameStatus: TuripNameStatusModel,
     isConfirmEnabled: Boolean,
@@ -43,7 +43,7 @@ fun TuripAddBottomSheet(
             Box(modifier = Modifier.imePadding()) {
                 NameEditorSheetContent(
                     title = title,
-                    turipName = turipName,
+                    initialTuripName = initialTuripName,
                     turipNameStatus = turipNameStatus,
                     isConfirmEnabled = isConfirmEnabled,
                     onNameChanged = onNameChanged,
@@ -58,7 +58,7 @@ fun TuripAddBottomSheet(
         } else {
             NameEditorSheetContent(
                 title = title,
-                turipName = turipName,
+                initialTuripName = initialTuripName,
                 turipNameStatus = turipNameStatus,
                 isConfirmEnabled = isConfirmEnabled,
                 onNameChanged = onNameChanged,
@@ -83,7 +83,7 @@ private fun TuripAddBottomSheetStatusPreview() {
     TuripTheme {
         TuripAddBottomSheet(
             title = "튜립 추가",
-            turipName = "",
+            initialTuripName = "",
             sheetState = sheetState,
             turipNameStatus = TuripNameStatusModel.OK,
             isConfirmEnabled = true,
