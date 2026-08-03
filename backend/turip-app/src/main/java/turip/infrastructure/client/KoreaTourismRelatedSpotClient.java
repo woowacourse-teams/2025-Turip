@@ -32,13 +32,6 @@ public class KoreaTourismRelatedSpotClient {
         this.koreaTourismApiUrl = koreaTourismApiUrl;
     }
 
-    /**
-     * 지역 코드와 시군구 코드 기반으로 연관 관광지 목록을 조회한다
-     *
-     * @param areaCode    지역 코드 (시도 단위)
-     * @param sigunguCode 시군구 코드
-     * @return 연관 관광지 목록
-     */
     public List<RelatedSpot> searchRelatedSpots(int areaCode, int sigunguCode) {
         try {
             // URI를 완전히 수동으로 생성 (이중 인코딩 방지)
