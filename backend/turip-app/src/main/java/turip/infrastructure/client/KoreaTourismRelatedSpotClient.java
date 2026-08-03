@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientResponseException;
 import turip.infrastructure.client.dto.KoreaTourismRelatedSpotResponse;
 import turip.infrastructure.client.dto.KoreaTourismRelatedSpotResponse.RelatedSpot;
 
@@ -64,6 +65,13 @@ public class KoreaTourismRelatedSpotClient {
             }
 
             return response.getRelatedSpots();
+        } catch (RestClientResponseException e) {
+            log.warn("한국관광공사 연관 관광지 API 호출 실패: areaCode={}, sigunguCode={}, statusCode={}, message={}",
+                    areaCode,
+                    sigunguCode,
+                    e.getStatusCode().value(),
+                    e.getMessage());
+            return List.of();
         } catch (Exception e) {
             log.warn("한국관광공사 연관 관광지 API 호출 실패: areaCode={}, sigunguCode={}, message={}",
                     areaCode,
