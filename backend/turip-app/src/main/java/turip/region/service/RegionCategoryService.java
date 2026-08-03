@@ -8,19 +8,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import turip.common.exception.ErrorTag;
-import turip.common.exception.custom.IllegalArgumentException;
 import turip.content.repository.ContentRepository;
-import turip.infrastructure.client.KoreaTourismRelatedSpotClient;
-import turip.infrastructure.client.dto.KoreaTourismRelatedSpotResponse.RelatedSpot;
 import turip.region.controller.dto.response.RegionCategoriesResponse;
 import turip.region.controller.dto.response.RegionCategoryResponse;
-import turip.region.controller.dto.response.RelatedSpotsResponse;
 import turip.region.domain.City;
 import turip.region.domain.Country;
 import turip.region.domain.DomesticRegionCategory;
 import turip.region.domain.OverseasRegionCategory;
-import turip.region.domain.TourApiAreaCode;
 
 @Slf4j
 @Service
@@ -33,7 +27,6 @@ public class RegionCategoryService {
     private final CityService cityService;
     private final CountryService countryService;
     private final ContentRepository contentRepository;
-    private final KoreaTourismRelatedSpotClient koreaTourismRelatedSpotClient;
 
     @Value("${region.category.domestic.etc.image-url}")
     private String domesticEtcImageUrl;
@@ -45,30 +38,6 @@ public class RegionCategoryService {
             return RegionCategoriesResponse.from(findDomesticRegionCategories());
         }
         return RegionCategoriesResponse.from(findOverseasRegionCategories());
-    }
-
-    public RelatedSpotsResponse findRelatedSpotsByRegionCategory(DomesticRegionCategory category) {
-        if (category == DomesticRegionCategory.OTHER_DOMESTIC) {
-            throw new IllegalArgumentException(ErrorTag.REGION_CATEGORY_INVALID);
-        }
-
-        TourApiAreaCode areaCode = TourApiAreaCode.fromDomesticRegionCategory(category);
-
-        if (!areaCode.isFound()) {
-            log.warn("지역 카테고리에 매핑되는 TourAPI 지역 코드를 찾을 수 없습니다: {}", category);
-            return RelatedSpotsResponse.empty();
-        }
-
-        // 여러 시군구 코드에 대해 병렬로 API 호출
-        List<RelatedSpot> relatedSpots = areaCode.getSigunguCodes().parallelStream()
-                .map(sigunguCode -> koreaTourismRelatedSpotClient.searchRelatedSpots(
-                        areaCode.getAreaCode(),
-                        sigunguCode
-                ))
-                .flatMap(List::stream)
-                .toList();
-
-        return RelatedSpotsResponse.from(relatedSpots);
     }
 
     private List<RegionCategoryResponse> findDomesticRegionCategories() {
