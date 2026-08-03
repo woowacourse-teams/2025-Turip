@@ -10,6 +10,7 @@ import turip.infrastructure.client.KoreaTourismRelatedSpotClient;
 import turip.infrastructure.client.dto.KoreaTourismRelatedSpotResponse.RelatedSpot;
 import turip.region.controller.dto.response.RelatedSpotsResponse;
 import turip.region.domain.DomesticRegionCategory;
+import turip.region.domain.RelatedTuripSpots;
 import turip.region.domain.TourApiAreaCode;
 
 @Slf4j
@@ -39,6 +40,12 @@ public class RelatedSpotService {
                 ))
                 .flatMap(List::stream)
                 .toList();
+
+        // RelatedSpot이 빈 리스트인 경우, 튜립의 place로 채워주기
+        if (relatedSpots.isEmpty()) {
+            RelatedTuripSpots relatedTuripSpots = RelatedTuripSpots.from(category);
+            return RelatedSpotsResponse.from(relatedTuripSpots);
+        }
 
         return RelatedSpotsResponse.from(relatedSpots);
     }

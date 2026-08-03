@@ -74,4 +74,25 @@ class RelatedSpotServiceTest {
         assertThatThrownBy(() -> relatedSpotService.findRelatedSpotsByRegionCategory(category))
                 .isInstanceOf(turip.common.exception.custom.IllegalArgumentException.class);
     }
+
+    @DisplayName("외부 API가 빈 응답을 반환하면 fallback 데이터를 사용한다")
+    @Test
+    void findRelatedSpotsByRegionCategory3() {
+        // given
+        DomesticRegionCategory category = DomesticRegionCategory.SEOUL;
+
+        // 서울의 3개 시군구 코드에 대해 모두 빈 리스트 반환
+        given(koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11110))
+                .willReturn(List.of());
+        given(koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11440))
+                .willReturn(List.of());
+        given(koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11140))
+                .willReturn(List.of());
+
+        // when
+        RelatedSpotsResponse response = relatedSpotService.findRelatedSpotsByRegionCategory(category);
+
+        // then
+        assertThat(response.relatedSpots()).isNotEmpty();
+    }
 }

@@ -1,5 +1,6 @@
 package turip.region.api;
 
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
 
@@ -70,7 +71,7 @@ class RelatedSpotApiTest {
                     .body("relatedSpots[1].spots.size()", is(1));
         }
 
-        @DisplayName("외부 API에서 빈 응답이 오면 200 OK 코드와 빈 목록을 응답한다")
+        @DisplayName("외부 API에서 빈 응답이 오면 200 OK 코드와 튜립에서 수집한 장소를 리턴한다")
         @Test
         void readRelatedSpots2() {
             // given
@@ -84,7 +85,7 @@ class RelatedSpotApiTest {
                     .when().get("/api/v1/related-spots")
                     .then()
                     .statusCode(200)
-                    .body("relatedSpots.size()", is(0));
+                    .body("relatedSpots.size()", greaterThan(0));
         }
 
         @DisplayName("지원하지 않는 지역 카테고리로 조회 시 400 Bad Request를 응답한다")
