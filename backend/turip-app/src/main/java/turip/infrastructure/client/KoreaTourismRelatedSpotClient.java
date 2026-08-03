@@ -52,8 +52,14 @@ public class KoreaTourismRelatedSpotClient {
                     .retrieve()
                     .body(KoreaTourismRelatedSpotResponse.class);
 
-            if (response == null || !response.isSuccess()) {
-                log.warn("한국관광공사 연관 관광지 API 응답 실패: response={}", response);
+            if (response == null) {
+                log.warn("한국관광공사 연관 관광지 API 응답 파싱 실패");
+                return List.of();
+            }
+
+            if (!response.isSuccess()) {
+                log.warn("한국관광공사 연관 관광지 API 응답 실패: resultCode={}, resultMsg={}",
+                        response.getResultCode(), response.getResultMsg());
                 return List.of();
             }
 

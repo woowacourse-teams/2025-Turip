@@ -33,6 +33,14 @@ public class KoreaTourismRelatedSpotResponse {
                 && response.header.isSuccess();
     }
 
+    public String getResultCode() {
+        return response != null && response.header != null ? response.header.resultCode : null;
+    }
+
+    public String getResultMsg() {
+        return response != null && response.header != null ? response.header.resultMsg : null;
+    }
+
     @Getter
     @NoArgsConstructor
     @JsonIgnoreProperties(ignoreUnknown = true)
