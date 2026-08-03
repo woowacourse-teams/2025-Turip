@@ -1,8 +1,10 @@
 package turip.region.service;
 
 import java.util.List;
-import lombok.RequiredArgsConstructor;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.IllegalArgumentException;
@@ -16,10 +18,17 @@ import turip.region.domain.TourApiAreaCode;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class RelatedSpotService {
 
     private final KoreaTourismRelatedSpotClient koreaTourismRelatedSpotClient;
+    private final Executor koreaTourismApiExecutor;
+
+    public RelatedSpotService(
+            KoreaTourismRelatedSpotClient koreaTourismRelatedSpotClient,
+            @Qualifier("koreaTourismApiExecutor") Executor koreaTourismApiExecutor) {
+        this.koreaTourismRelatedSpotClient = koreaTourismRelatedSpotClient;
+        this.koreaTourismApiExecutor = koreaTourismApiExecutor;
+    }
 
     public RelatedSpotsResponse findRelatedSpotsByRegionCategory(DomesticRegionCategory category) {
         TourApiAreaCode areaCode = parseToAreaCode(category);
@@ -51,12 +60,28 @@ public class RelatedSpotService {
     }
 
     private List<RelatedSpotResult> getRelatedSpotsByAreaCode(TourApiAreaCode areaCode) {
-        // 여러 시군구 코드에 대해 병렬로 API 호출
-        return areaCode.getSigunguCodes().parallelStream()
-                .map(sigunguCode -> koreaTourismRelatedSpotClient.searchRelatedSpots(
-                        areaCode.getAreaCode(),
-                        sigunguCode
-                )).toList();
+        // 여러 시군구 코드에 대해 전용 스레드풀에서 병렬로 API 호출
+        List<CompletableFuture<RelatedSpotResult>> futures = areaCode.getSigunguCodes().stream()
+                .map(sigunguCode -> CompletableFuture.supplyAsync(
+                        () -> koreaTourismRelatedSpotClient.searchRelatedSpots(
+                                areaCode.getAreaCode(),
+                                sigunguCode
+                        ),
+                        koreaTourismApiExecutor
+                ))
+                .toList();
+
+        // 모든 비동기 작업 완료 대기 (스레드풀 거부 등 예외 발생 시 실패로 처리)
+        return futures.stream()
+                .map(future -> {
+                    try {
+                        return future.join();
+                    } catch (Exception e) {
+                        log.warn("연관 관광지 API 호출 중 예외 발생: {}", e.getMessage());
+                        return RelatedSpotResult.failure();
+                    }
+                })
+                .toList();
     }
 
     private boolean shouldUseFallback(List<RelatedSpotResult> results) {

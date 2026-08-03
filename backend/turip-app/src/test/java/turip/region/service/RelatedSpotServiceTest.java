@@ -3,10 +3,14 @@ package turip.region.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 
 import java.util.List;
+import java.util.concurrent.Executor;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,6 +31,19 @@ class RelatedSpotServiceTest {
 
     @Mock
     private KoreaTourismRelatedSpotClient koreaTourismRelatedSpotClient;
+
+    @Mock
+    private Executor koreaTourismApiExecutor;
+
+    @BeforeEach
+    void setUp() {
+        // Executor가 동기적으로 즉시 실행되도록 모킹
+        lenient().doAnswer(invocation -> {
+            Runnable task = invocation.getArgument(0);
+            task.run();
+            return null;
+        }).when(koreaTourismApiExecutor).execute(any(Runnable.class));
+    }
 
     @DisplayName("지역 카테고리로 연관 관광지를 조회한다")
     @Test

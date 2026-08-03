@@ -53,4 +53,25 @@ public class AsyncConfiguration {
 
         return executor;
     }
+
+    @Bean(name = "koreaTourismApiExecutor")
+    public Executor koreaTourismApiExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(10);
+        executor.setMaxPoolSize(10);
+        executor.setQueueCapacity(50);
+        executor.setThreadNamePrefix("KOREA-TOURISM-API-");
+
+        executor.setRejectedExecutionHandler((r, executorInstance) -> log.warn(
+                        "[KOREA-TOURISM-API-ThreadPool] API 호출 거부됨 - Thread pool 포화 상태 (현재 활성 스레드: {}, 잔여 큐 용량: {})",
+                        executorInstance.getActiveCount(),
+                        executorInstance.getQueue().remainingCapacity()
+                )
+        );
+
+        executor.setWaitForTasksToCompleteOnShutdown(true);
+        executor.setAwaitTerminationSeconds(30);
+
+        return executor;
+    }
 }
