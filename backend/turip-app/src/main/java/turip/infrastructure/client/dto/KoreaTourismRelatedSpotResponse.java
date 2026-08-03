@@ -65,7 +65,7 @@ public class KoreaTourismRelatedSpotResponse {
         private String resultMsg;
 
         public boolean isSuccess() {
-            return "0000".equals(resultCode) || "00".equals(resultCode);
+            return "0000".equals(resultCode);
         }
     }
 
