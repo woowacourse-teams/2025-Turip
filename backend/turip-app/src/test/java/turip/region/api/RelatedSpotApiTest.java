@@ -2,6 +2,7 @@ package turip.region.api;
 
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.BDDMockito.given;
 
 import io.restassured.RestAssured;
@@ -18,7 +19,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import turip.infrastructure.client.KoreaTourismRelatedSpotClient;
 import turip.infrastructure.client.dto.KoreaTourismRelatedSpotResponse.RelatedSpot;
-import turip.region.domain.TourApiAreaCode;
+import turip.infrastructure.client.dto.RelatedSpotResult;
 import turip.util.helper.TestDataHelper;
 
 @ActiveProfiles({"test", "h2"})
@@ -54,9 +55,13 @@ class RelatedSpotApiTest {
             RelatedSpot spot2 = createRelatedSpot("경복궁", "인사동", "관광지");
             RelatedSpot spot3 = createRelatedSpot("경복궁", "종로맛집", "음식점");
 
-            given(koreaTourismRelatedSpotClient.searchRelatedSpots(TourApiAreaCode.SEOUL.getAreaCode(),
-                    TourApiAreaCode.SEOUL.getSigunguCodes().get(0)))
-                    .willReturn(List.of(spot1, spot2, spot3));
+            // 서울의 3개 시군구 코드에 대해 모킹
+            given(koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11110))
+                    .willReturn(RelatedSpotResult.success(List.of(spot1)));
+            given(koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11440))
+                    .willReturn(RelatedSpotResult.success(List.of(spot2)));
+            given(koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11140))
+                    .willReturn(RelatedSpotResult.success(List.of(spot3)));
 
             // when & then
             RestAssured.given().port(port)
@@ -75,9 +80,8 @@ class RelatedSpotApiTest {
         @Test
         void readRelatedSpots2() {
             // given
-            given(koreaTourismRelatedSpotClient.searchRelatedSpots(TourApiAreaCode.BUSAN.getAreaCode(),
-                    TourApiAreaCode.BUSAN.getSigunguCodes().get(0)))
-                    .willReturn(List.of());
+            given(koreaTourismRelatedSpotClient.searchRelatedSpots(anyInt(), anyInt()))
+                    .willReturn(RelatedSpotResult.failure());
 
             // when & then
             RestAssured.given().port(port)

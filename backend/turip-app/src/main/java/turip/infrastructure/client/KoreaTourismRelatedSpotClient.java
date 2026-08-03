@@ -3,14 +3,13 @@ package turip.infrastructure.client;
 import java.net.URI;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 import turip.infrastructure.client.dto.KoreaTourismRelatedSpotResponse;
-import turip.infrastructure.client.dto.KoreaTourismRelatedSpotResponse.RelatedSpot;
+import turip.infrastructure.client.dto.RelatedSpotResult;
 
 @Slf4j
 @Component
@@ -39,7 +38,7 @@ public class KoreaTourismRelatedSpotClient {
         this.koreaTourismApiUrl = koreaTourismApiUrl;
     }
 
-    public List<RelatedSpot> searchRelatedSpots(int areaCode, int sigunguCode) {
+    public RelatedSpotResult searchRelatedSpots(int areaCode, int sigunguCode) {
         try {
             // URI를 완전히 수동으로 생성 (이중 인코딩 방지)
             StringBuilder uriString = new StringBuilder(koreaTourismApiUrl)
@@ -61,29 +60,30 @@ public class KoreaTourismRelatedSpotClient {
 
             if (response == null) {
                 log.warn("한국관광공사 연관 관광지 API 응답 파싱 실패");
-                return List.of();
+                return RelatedSpotResult.failure();
             }
 
             if (!response.isSuccess()) {
                 log.warn("한국관광공사 연관 관광지 API 응답 실패: resultCode={}, resultMsg={}",
                         response.getResultCode(), response.getResultMsg());
-                return List.of();
+                return RelatedSpotResult.failure();
             }
 
-            return response.getRelatedSpots();
+            // API 호출 성공, 데이터가 비어있어도 success로 반환
+            return RelatedSpotResult.success(response.getRelatedSpots());
         } catch (RestClientResponseException e) {
             log.warn("한국관광공사 연관 관광지 API 호출 실패: areaCode={}, sigunguCode={}, statusCode={}, message={}",
                     areaCode,
                     sigunguCode,
                     e.getStatusCode().value(),
                     e.getMessage());
-            return List.of();
+            return RelatedSpotResult.failure();
         } catch (Exception e) {
             log.warn("한국관광공사 연관 관광지 API 호출 실패: areaCode={}, sigunguCode={}, message={}",
                     areaCode,
                     sigunguCode,
                     e.getMessage());
-            return List.of();
+            return RelatedSpotResult.failure();
         }
     }
 
@@ -124,7 +124,8 @@ public class KoreaTourismRelatedSpotClient {
                         .retrieve()
                         .body(KoreaTourismRelatedSpotResponse.class);
 
-                if (response != null && response.isSuccess() && !response.getRelatedSpots().isEmpty()) {
+                // API 응답 성공이면 해당 기준월이 유효한 것으로 판단 (데이터 유무 무관)
+                if (response != null && response.isSuccess()) {
                     log.info("최신 기준월 발견: {}", baseYm);
                     return baseYm;
                 }

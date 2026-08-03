@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import turip.infrastructure.client.KoreaTourismRelatedSpotClient;
 import turip.infrastructure.client.dto.KoreaTourismRelatedSpotResponse.RelatedSpot;
+import turip.infrastructure.client.dto.RelatedSpotResult;
 import turip.region.controller.dto.response.RelatedSpotsResponse;
 import turip.region.domain.DomesticRegionCategory;
 
@@ -46,11 +47,11 @@ class RelatedSpotServiceTest {
 
         // 서울의 3개 시군구 코드에 대해 각각 모킹
         given(koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11110))
-                .willReturn(List.of(spot1));
+                .willReturn(RelatedSpotResult.success(List.of(spot1)));
         given(koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11440))
-                .willReturn(List.of(spot2));
+                .willReturn(RelatedSpotResult.success(List.of(spot2)));
         given(koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11140))
-                .willReturn(List.of(spot3));
+                .willReturn(RelatedSpotResult.success(List.of(spot3)));
 
         // when
         RelatedSpotsResponse response = relatedSpotService.findRelatedSpotsByRegionCategory(category);
@@ -75,19 +76,40 @@ class RelatedSpotServiceTest {
                 .isInstanceOf(turip.common.exception.custom.IllegalArgumentException.class);
     }
 
-    @DisplayName("외부 API가 빈 응답을 반환하면 fallback 데이터를 사용한다")
+    @DisplayName("외부 API 호출이 실패하면 fallback 데이터를 사용한다")
     @Test
     void findRelatedSpotsByRegionCategory3() {
         // given
         DomesticRegionCategory category = DomesticRegionCategory.SEOUL;
 
-        // 서울의 3개 시군구 코드에 대해 모두 빈 리스트 반환
+        // 서울의 3개 시군구 코드에 대해 모두 실패 반환
         given(koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11110))
-                .willReturn(List.of());
+                .willReturn(RelatedSpotResult.failure());
         given(koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11440))
-                .willReturn(List.of());
+                .willReturn(RelatedSpotResult.failure());
         given(koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11140))
-                .willReturn(List.of());
+                .willReturn(RelatedSpotResult.failure());
+
+        // when
+        RelatedSpotsResponse response = relatedSpotService.findRelatedSpotsByRegionCategory(category);
+
+        // then
+        assertThat(response.relatedSpots()).isNotEmpty();
+    }
+
+    @DisplayName("외부 API 성공했지만 데이터가 비어있으면 fallback 데이터를 사용한다")
+    @Test
+    void findRelatedSpotsByRegionCategory4() {
+        // given
+        DomesticRegionCategory category = DomesticRegionCategory.SEOUL;
+
+        // 서울의 3개 시군구 코드에 대해 성공했지만 빈 데이터 반환
+        given(koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11110))
+                .willReturn(RelatedSpotResult.success(List.of()));
+        given(koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11440))
+                .willReturn(RelatedSpotResult.success(List.of()));
+        given(koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11140))
+                .willReturn(RelatedSpotResult.success(List.of()));
 
         // when
         RelatedSpotsResponse response = relatedSpotService.findRelatedSpotsByRegionCategory(category);

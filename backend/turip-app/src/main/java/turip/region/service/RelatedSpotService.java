@@ -8,6 +8,7 @@ import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.IllegalArgumentException;
 import turip.infrastructure.client.KoreaTourismRelatedSpotClient;
 import turip.infrastructure.client.dto.KoreaTourismRelatedSpotResponse.RelatedSpot;
+import turip.infrastructure.client.dto.RelatedSpotResult;
 import turip.region.controller.dto.response.RelatedSpotsResponse;
 import turip.region.domain.DomesticRegionCategory;
 import turip.region.domain.RelatedTuripSpots;
@@ -33,16 +34,19 @@ public class RelatedSpotService {
         }
 
         // 여러 시군구 코드에 대해 병렬로 API 호출
-        List<RelatedSpot> relatedSpots = areaCode.getSigunguCodes().parallelStream()
+        List<RelatedSpotResult> results = areaCode.getSigunguCodes().parallelStream()
                 .map(sigunguCode -> koreaTourismRelatedSpotClient.searchRelatedSpots(
                         areaCode.getAreaCode(),
                         sigunguCode
-                ))
-                .flatMap(List::stream)
+                )).toList();
+
+        // API 호출이 모두 실패했거나, 성공했지만 데이터가 비어있는 경우 fallback 사용
+        boolean anySuccess = results.stream().anyMatch(RelatedSpotResult::isSuccess);
+        List<RelatedSpot> relatedSpots = results.stream()
+                .flatMap(result -> result.spots().stream())
                 .toList();
 
-        // RelatedSpot이 빈 리스트인 경우, 튜립의 place로 채워주기
-        if (relatedSpots.isEmpty()) {
+        if (!anySuccess || relatedSpots.isEmpty()) {
             RelatedTuripSpots relatedTuripSpots = RelatedTuripSpots.from(category);
             return RelatedSpotsResponse.from(relatedTuripSpots);
         }

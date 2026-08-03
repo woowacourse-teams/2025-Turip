@@ -18,6 +18,7 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import turip.common.configuration.RestClientConfiguration;
 import turip.common.log.ExternalApiLoggingInterceptor;
 import turip.infrastructure.client.dto.KoreaTourismRelatedSpotResponse.RelatedSpot;
+import turip.infrastructure.client.dto.RelatedSpotResult;
 
 @ActiveProfiles({"test", "h2"})
 @RestClientTest(KoreaTourismRelatedSpotClient.class)
@@ -94,15 +95,15 @@ class KoreaTourismRelatedSpotClientTest {
                 .andRespond(withSuccess(mockResponse, MediaType.APPLICATION_JSON));
 
         // when
-        List<RelatedSpot> result = koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11110);
+        RelatedSpotResult result = koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11110);
 
         // then
         assertAll(
-                () -> assertThat(result).isNotNull(),
-                () -> assertThat(result).hasSize(1)
+                () -> assertThat(result.isSuccess()).isTrue(),
+                () -> assertThat(result.spots()).hasSize(1)
         );
 
-        RelatedSpot spot = result.getFirst();
+        RelatedSpot spot = result.spots().getFirst();
         assertAll(
                 () -> assertThat(spot.getTouristSpotName()).isEqualTo("경복궁"),
                 () -> assertThat(spot.getAreaName()).isEqualTo("서울특별시"),
@@ -150,10 +151,13 @@ class KoreaTourismRelatedSpotClientTest {
                 .andRespond(withSuccess(mockResponse, MediaType.APPLICATION_JSON));
 
         // when
-        List<RelatedSpot> result = koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11110);
+        RelatedSpotResult result = koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11110);
 
         // then
-        assertThat(result).isEmpty();
+        assertAll(
+                () -> assertThat(result.isSuccess()).isTrue(),
+                () -> assertThat(result.spots()).isEmpty()
+        );
 
         mockRestServiceServer.verify();
     }
