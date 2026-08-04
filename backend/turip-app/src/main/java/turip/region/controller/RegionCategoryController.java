@@ -18,7 +18,7 @@ import turip.region.service.RegionCategoryService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/region-categories")
+@RequestMapping("/api/v1")
 @Tag(name = "RegionCategory", description = "지역 카테고리 API")
 public class RegionCategoryController {
 
@@ -66,7 +66,7 @@ public class RegionCategoryController {
                     )
             )
     })
-    @GetMapping
+    @GetMapping("/region-categories")
     public ResponseEntity<RegionCategoriesResponse> readRegionCategories(
             @RequestParam(name = "isKorea") boolean isDomestic) {
         RegionCategoriesResponse response = regionCategoryService.findRegionCategoriesByCountryType(isDomestic);

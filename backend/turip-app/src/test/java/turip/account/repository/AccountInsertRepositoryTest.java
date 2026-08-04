@@ -16,7 +16,7 @@ import turip.account.domain.Role;
 import turip.container.TestContainerConfig;
 
 @SpringBootTest
-@ActiveProfiles("test-mysql")
+@ActiveProfiles({"test", "test-mysql"})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AccountInsertRepositoryTest extends TestContainerConfig {
 
