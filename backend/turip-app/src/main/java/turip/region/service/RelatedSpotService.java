@@ -32,7 +32,7 @@ public class RelatedSpotService {
 
     public RelatedSpotsResponse findRelatedSpotsByRegionCategory(DomesticRegionCategory category) {
         TourApiAreaCode areaCode = parseToAreaCode(category);
-        if (areaCode == null) {
+        if (!areaCode.isFound()) {
             log.warn("지역 카테고리에 매핑되는 TourAPI 지역 코드를 찾을 수 없습니다: {}", category);
             return RelatedSpotsResponse.empty();
         }
