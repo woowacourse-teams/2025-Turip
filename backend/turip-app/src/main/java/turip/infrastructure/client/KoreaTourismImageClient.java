@@ -35,15 +35,15 @@ public class KoreaTourismImageClient {
             return Optional.empty();
         }
 
-        StringBuilder uriString = new StringBuilder(koreaTourismApiUrl)
-                .append("?serviceKey=").append(koreaTourismApiKey)
-                .append("&MobileOS=AND")
-                .append("&MobileApp=Turip")
-                .append("&lDongRegnCd=").append(legalDistrictCode)
-                .append("&_type=json")
-                .append("&numOfRows=1");
-
         try {
+            StringBuilder uriString = new StringBuilder(koreaTourismApiUrl)
+                    .append("?serviceKey=").append(koreaTourismApiKey)
+                    .append("&MobileOS=AND")
+                    .append("&MobileApp=Turip")
+                    .append("&lDongRegnCd=").append(legalDistrictCode)
+                    .append("&_type=json")
+                    .append("&numOfRows=1");
+
             URI uri = URI.create(uriString.toString());
             KoreaTourismImageResponse response = restClient.get()
                     .uri(uri)
