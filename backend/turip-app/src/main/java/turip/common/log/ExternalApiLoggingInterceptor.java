@@ -17,10 +17,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class ExternalApiLoggingInterceptor implements ClientHttpRequestInterceptor {
 
-    private static final Set<String> SENSITIVE_PARAMS = Set.of("key", "apikey", "api_key", "token");
+    private static final Set<String> SENSITIVE_PARAMS = Set.of("key", "apikey", "api_key", "token", "servicekey");
 
     private String maskSensitiveParams(URI uri) {
-        String query = uri.getQuery();
+        String query = uri.getRawQuery();
         if (query == null) {
             return uri.toString();
         }

@@ -45,8 +45,6 @@ public class KoreaTourismImageClient {
 
         try {
             URI uri = URI.create(uriString.toString());
-            log.info("한국관광공사 이미지 API 요청 URI: {}", uri);
-
             KoreaTourismImageResponse response = restClient.get()
                     .uri(uri)
                     .retrieve()
