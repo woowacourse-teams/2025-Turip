@@ -20,7 +20,14 @@ public interface ContentPendingRepository extends JpaRepository<ContentPending, 
 
     long countByStatus(ContentPendingStatus status);
 
+    long countByStatusAndValidatorAccount(ContentPendingStatus status, Account validatorAccount);
+
     List<ContentPending> findAllByStatusOrderByIdDesc(ContentPendingStatus status);
+
+    List<ContentPending> findAllByStatusAndValidatorAccountOrderByIdDesc(
+            ContentPendingStatus status,
+            Account validatorAccount
+    );
 
     List<ContentPending> findAllByCollectorAccountOrderByIdDesc(Account collectorAccount);
 

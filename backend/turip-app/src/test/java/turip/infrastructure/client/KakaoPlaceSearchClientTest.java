@@ -20,7 +20,7 @@ import turip.common.log.ExternalApiLoggingInterceptor;
 import turip.place.controller.dto.response.PlaceSearchResponse;
 import turip.place.domain.PlaceSearchProvider;
 
-@ActiveProfiles("test")
+@ActiveProfiles({"test", "h2"})
 @RestClientTest(KakaoPlaceSearchClient.class)
 @Import({RestClientConfiguration.class, ExternalApiLoggingInterceptor.class})
 class KakaoPlaceSearchClientTest {

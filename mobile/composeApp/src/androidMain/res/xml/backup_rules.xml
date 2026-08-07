@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 10–11 (API 29–30) 백업 제외 규칙 -->
+<full-backup-content>
+    <!-- DataStore — access/refresh token 저장 위치 -->
+    <exclude domain="file" path="datastore" />
+    <!-- Room DB — 검색 기록 등 로컬 데이터 -->
+    <exclude domain="database" path="turip.db" />
+</full-backup-content>

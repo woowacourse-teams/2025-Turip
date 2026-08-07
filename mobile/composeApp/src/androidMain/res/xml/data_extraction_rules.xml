@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 12+ (API 31+) 백업/기기 이전 제외 규칙 -->
+<data-extraction-rules>
+    <cloud-backup>
+        <!-- DataStore — access/refresh token 저장 위치 -->
+        <exclude domain="file" path="datastore" />
+        <!-- Room DB — 검색 기록 등 로컬 데이터 -->
+        <exclude domain="database" path="turip.db" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="file" path="datastore" />
+        <exclude domain="database" path="turip.db" />
+    </device-transfer>
+</data-extraction-rules>

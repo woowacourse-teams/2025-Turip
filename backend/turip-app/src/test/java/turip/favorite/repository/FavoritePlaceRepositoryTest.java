@@ -18,7 +18,7 @@ import turip.util.fixture.FavoritePlaceFixture;
 import turip.util.fixture.PlaceFixture;
 
 @DataJpaTest
-@ActiveProfiles("test")
+@ActiveProfiles({"test", "h2"})
 class FavoritePlaceRepositoryTest {
 
     @Autowired

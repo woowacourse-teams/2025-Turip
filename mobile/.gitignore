@@ -5,6 +5,9 @@
 xcuserdata
 !src/**/build/
 local.properties
+google-services.json
+GoogleService-Info.plist
+iosApp/iosApp/GoogleService-Info.plist
 .idea
 .DS_Store
 captures
@@ -16,3 +19,9 @@ captures
 !*.xcodeproj/project.xcworkspace/
 !*.xcworkspace/contents.xcworkspacedata
 **/xcshareddata/WorkspaceSettings.xcsettings
+
+CLAUDE.md
+progress.md
+troubleShot.md
+solve.md
+codereview.md

@@ -5,7 +5,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
-import java.util.Collections;
+import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -19,9 +19,11 @@ public class GoogleTokenParser implements IdTokenParser {
 
     private final GoogleIdTokenVerifier verifier;
 
-    public GoogleTokenParser(@Value("${google.client-id}") String clientId) {
+    public GoogleTokenParser(
+            @Value("${google.client-id}") String clientId,
+            @Value("${google.ios-client-id}") String iosClientId) {
         this.verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
-                .setAudience(Collections.singletonList(clientId))
+                .setAudience(Arrays.asList(clientId, iosClientId))
                 .build();
     }
 

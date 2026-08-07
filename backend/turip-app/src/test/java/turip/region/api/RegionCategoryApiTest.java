@@ -19,7 +19,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import turip.infrastructure.client.KoreaTourismApiClient;
 import turip.util.helper.TestDataHelper;
 
-@ActiveProfiles("test")
+@ActiveProfiles({"test", "h2"})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class RegionCategoryApiTest {
 

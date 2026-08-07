@@ -35,6 +35,7 @@ composeNavigationEvent = "1.0.0"
 
 # Navigation
 multiplatform-nav3 = "1.0.0-alpha05"
+navigation3-runtime = "1.0.0-rc01"
 compose-multiplatform-lifecycle = "2.10.0-alpha05"
 
 # Room Database
@@ -54,9 +55,19 @@ build-konfig = "0.17.1"
 # Image
 coil = "3.3.0"
 imagepicker = "1.0.30"
+kmp-sharing = "0.2.0"
 
 # Markdown
 multiplatformMarkdownRenderer = "0.37.0"
+
+# Firebase
+firebase-installations = "18.0.0"
+install-referrer = "2.2"
+google-services = "4.4.2"
+googleMap = "8.1.0"
+playServicesMaps = "19.2.0"
+credentials = "1.5.0"
+googleid = "1.1.1"
 
 # Util
 sentry-kmp = "0.25.0"
@@ -95,6 +106,7 @@ kotlinx-collections-immutable = { group = "org.jetbrains.kotlinx", name = "kotli
 
 # Androidx
 androidx-core = { group = "androidx.core", name = "core", version.ref = "androidx-core" }
+androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidx-activity-compose" }
 androidx-datastore = { group = "androidx.datastore", name = "datastore", version.ref = "androidx-datastore" }
 androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "androidx-datastore" }
 androidx-startup = { group = "androidx.startup", name = "startup-runtime", version.ref = "androidx-startup" }
@@ -110,7 +122,7 @@ compose-navigationevent = { module = "org.jetbrains.androidx.navigationevent:nav
 material-icons-extended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
 
 # Navigation
-jetbrains-navigation3-runtime = { module = "org.jetbrains.androidx.navigation3:navigation3-runtime", version.ref = "multiplatform-nav3" }
+jetbrains-navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "navigation3-runtime" }
 jetbrains-navigation3-ui = { module = "org.jetbrains.androidx.navigation3:navigation3-ui", version.ref = "multiplatform-nav3" }
 jetbrains-lifecycle-viewmodelNavigation3 = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "compose-multiplatform-lifecycle" }
 
@@ -118,7 +130,9 @@ jetbrains-lifecycle-viewmodelNavigation3 = { module = "org.jetbrains.androidx.li
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
+ktor-client-auth = { module = "io.ktor:ktor-client-auth", version.ref = "ktor" }
 ktorfit = { module = "de.jensklingenberg.ktorfit:ktorfit-lib", version.ref = "ktorfit" }
+ktorfit-ksp = { module = "de.jensklingenberg.ktorfit:ktorfit-ksp", version.ref = "ktorfit" }
 ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
 
 # Room Database
@@ -143,10 +157,21 @@ ktor-client-darwin = { group = "io.ktor", name = "ktor-client-darwin", version.r
 coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
 coil-network-ktor = { group = "io.coil-kt.coil3", name = "coil-network-ktor3", version.ref = "coil" }
 imagepicker = { module = "io.github.ismoy:imagepickerkmp", version.ref = "imagepicker" }
+kmp-sharing = { module = "com.swmansion.kmpsharing:kmp-sharing", version.ref = "kmp-sharing" }
 
 # Markdown
 multiplatform-markdown-renderer = { module = "com.mikepenz:multiplatform-markdown-renderer", version.ref = "multiplatformMarkdownRenderer" }
 multiplatform-markdown-renderer-m3 = { module = "com.mikepenz:multiplatform-markdown-renderer-m3", version.ref = "multiplatformMarkdownRenderer" }
+
+# Firebase
+firebase-installations = { group = "com.google.firebase", name = "firebase-installations-ktx", version.ref = "firebase-installations" }
+install-referrer = { group = "com.android.installreferrer", name = "installreferrer", version.ref = "install-referrer" }
+kotlinx-coroutines-play-services = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-play-services", version.ref = "kotlinx-coroutines" }
+google-map = { module = "com.google.maps.android:maps-compose", version.ref = "googleMap" }
+play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "playServicesMaps" }
+androidx-credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }
+androidx-credentials-play-services-auth = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
+googleid = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleid" }
 
 # Util
 napier = { group = "io.github.aakira", name = "napier", version.ref = "napier" }
@@ -194,6 +219,9 @@ ksp-gradle-plugin = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 
 # Buildkonfig
 buildkonfig = { id = "com.codingfeline.buildkonfig", version.ref = "build-konfig" }
+
+# Firebase
+google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
 
 # Test
 android-test = { id = "com.android.test", version.ref = "android-gradle-plugin" }

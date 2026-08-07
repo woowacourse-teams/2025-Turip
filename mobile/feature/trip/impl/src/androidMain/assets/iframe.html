@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
+    <style> html, body { margin: 0; padding: 0; width: 100%; height: 100%; }
+        #player { width: 100%; height: 100%; }
+    </style>
+</head>
+<body>
+<div id="player"></div>
+<script>
+    var tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+    var player;
+    function onYouTubeIframeAPIReady() {
+        player = new YT.Player('player', {
+            width: window.innerWidth,
+            height: window.innerHeight,
+            videoId: videoBridge.videoId(),
+            playerVars: { 'controls': 1 },
+            events: {
+                'onReady': onPlayerReady,
+                'onError': onPlayerError
+            }
+        });
+    }
+    function seekToSecond(seconds) {
+        if(player && typeof player.seekTo == 'function') {
+            player.seekTo(seconds, true);
+        }
+    }
+
+    function onPlayerReady(event) {
+        const iframe = event.target.getIframe();
+        iframe.setAttribute("referrerpolicy", "strict-origin-when-cross-origin");
+        event.target.playVideo();
+        if (window.videoBridge) {
+            window.videoBridge.onPlayerReady();
+        }
+        setInterval(function() {
+            if (player && window.videoBridge && typeof player.getCurrentTime === 'function') {
+                var state = player.getPlayerState();
+                if (state >= 0) {
+                    window.videoBridge.onTimeUpdate(Math.floor(player.getCurrentTime()));
+                }
+            }
+        }, 1000);
+    }
+
+    function onPlayerError(event) {
+        if (window.videoBridge) {
+            window.videoBridge.onPlayerError(event.data);
+        }
+    }
+
+</script>
+</body>
+</html>

@@ -7,6 +7,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
+import static turip.common.exception.ErrorTag.ACCOUNT_CREATION_ERROR;
+import static turip.common.exception.ErrorTag.ID_TOKEN_NOT_VALID;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -16,24 +18,50 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import turip.account.domain.Provider;
 import turip.account.domain.Role;
 import turip.account.service.AccountService;
+import turip.auth.token.AppleTokenParser;
 import turip.auth.token.GoogleTokenParser;
-import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.InternalServerException;
+import turip.common.exception.custom.UnauthorizedException;
 import turip.util.helper.TestDataHelper;
 
-@ActiveProfiles("test")
+@ActiveProfiles({"test", "h2"})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class AuthApiTest {
+
+    private static GoogleTokenParser googleTokenParserMock;
+    private static AppleTokenParser appleTokenParserMock;
+
+    @TestConfiguration
+    static class TestConfig {
+        @Bean
+        @Primary
+        public GoogleTokenParser googleTokenParser() {
+            googleTokenParserMock = Mockito.mock(GoogleTokenParser.class);
+            Mockito.when(googleTokenParserMock.getProvider()).thenReturn(Provider.GOOGLE);
+            return googleTokenParserMock;
+        }
+
+        @Bean
+        @Primary
+        public AppleTokenParser appleTokenParser() {
+            appleTokenParserMock = Mockito.mock(AppleTokenParser.class);
+            Mockito.when(appleTokenParserMock.getProvider()).thenReturn(Provider.APPLE);
+            return appleTokenParserMock;
+        }
+    }
 
     @LocalServerPort
     private int port;
@@ -44,9 +72,6 @@ class AuthApiTest {
     @Autowired
     private TestDataHelper testDataHelper;
 
-    @MockitoBean
-    private GoogleTokenParser googleTokenParser;
-
     @MockitoSpyBean
     private AccountService accountService;
 
@@ -54,6 +79,11 @@ class AuthApiTest {
     void setUp() {
         RestAssured.port = port;
         testDataHelper.cleanDatabase();
+
+        // Mock 리셋
+        Mockito.reset(googleTokenParserMock, appleTokenParserMock, accountService);
+        Mockito.when(googleTokenParserMock.getProvider()).thenReturn(Provider.GOOGLE);
+        Mockito.when(appleTokenParserMock.getProvider()).thenReturn(Provider.APPLE);
     }
 
     @Nested
@@ -147,9 +177,9 @@ class AuthApiTest {
             String idToken = "valid-google-id-token";
             String deviceFid = "device-123";
 
-            when(googleTokenParser.getProvider()).thenReturn(Provider.GOOGLE);
-            when(googleTokenParser.getProviderId(idToken)).thenReturn("google-user-123");
-            when(googleTokenParser.getEmail(idToken)).thenReturn("newuser@gmail.com");
+            when(googleTokenParserMock.getProvider()).thenReturn(Provider.GOOGLE);
+            when(googleTokenParserMock.getProviderId(idToken)).thenReturn("google-user-123");
+            when(googleTokenParserMock.getEmail(idToken)).thenReturn("newuser@gmail.com");
 
             Map<String, String> requestBody = new HashMap<>();
             requestBody.put("idToken", idToken);
@@ -180,9 +210,9 @@ class AuthApiTest {
             String idToken = "valid-google-id-token";
             String deviceFid = "device-456";
 
-            when(googleTokenParser.getProvider()).thenReturn(provider);
-            when(googleTokenParser.getProviderId(idToken)).thenReturn(providerId);
-            when(googleTokenParser.getEmail(idToken)).thenReturn(email);
+            when(googleTokenParserMock.getProvider()).thenReturn(provider);
+            when(googleTokenParserMock.getProviderId(idToken)).thenReturn(providerId);
+            when(googleTokenParserMock.getEmail(idToken)).thenReturn(email);
 
             Map<String, String> requestBody = new HashMap<>();
             requestBody.put("idToken", idToken);
@@ -208,10 +238,10 @@ class AuthApiTest {
             String invalidIdToken = "invalid-token";
             String deviceFid = "device-123";
 
-            when(googleTokenParser.getProvider()).thenReturn(Provider.GOOGLE);
-            when(googleTokenParser.getProviderId(anyString()))
-                    .thenThrow(new turip.common.exception.custom.UnauthorizedException(
-                            turip.common.exception.ErrorTag.ID_TOKEN_NOT_VALID));
+            when(googleTokenParserMock.getProvider()).thenReturn(Provider.GOOGLE);
+            when(googleTokenParserMock.getProviderId(anyString()))
+                    .thenThrow(new UnauthorizedException(
+                            ID_TOKEN_NOT_VALID));
 
             Map<String, String> requestBody = new HashMap<>();
             requestBody.put("idToken", invalidIdToken);
@@ -239,10 +269,10 @@ class AuthApiTest {
             String idToken = "valid-google-id-token";
             String deviceFid = "device-456";
 
-            when(googleTokenParser.getProvider()).thenReturn(provider);
-            when(googleTokenParser.getProviderId(idToken)).thenReturn(providerId);
-            when(googleTokenParser.getEmail(idToken)).thenReturn(email);
-            doThrow(new InternalServerException(ErrorTag.ACCOUNT_CREATION_ERROR))
+            when(googleTokenParserMock.getProvider()).thenReturn(provider);
+            when(googleTokenParserMock.getProviderId(idToken)).thenReturn(providerId);
+            when(googleTokenParserMock.getEmail(idToken)).thenReturn(email);
+            doThrow(new InternalServerException(ACCOUNT_CREATION_ERROR))
                     .when(accountService)
                     .create(any());
             Map<String, String> requestBody = new HashMap<>();
@@ -272,9 +302,9 @@ class AuthApiTest {
             String idToken = "valid-google-id-token";
             String deviceFid = "device-123";
 
-            when(googleTokenParser.getProvider()).thenReturn(Provider.GOOGLE);
-            when(googleTokenParser.getProviderId(idToken)).thenReturn("google-user-123");
-            when(googleTokenParser.getEmail(idToken)).thenReturn("newuser@gmail.com");
+            when(googleTokenParserMock.getProvider()).thenReturn(Provider.GOOGLE);
+            when(googleTokenParserMock.getProviderId(idToken)).thenReturn("google-user-123");
+            when(googleTokenParserMock.getEmail(idToken)).thenReturn("newuser@gmail.com");
 
             Map<String, String> requestBody = new HashMap<>();
             requestBody.put("idToken", idToken);
@@ -300,10 +330,9 @@ class AuthApiTest {
             String invalidIdToken = "invalid-token";
             String deviceFid = "device-123";
 
-            when(googleTokenParser.getProvider()).thenReturn(Provider.GOOGLE);
-            when(googleTokenParser.getProviderId(anyString()))
-                    .thenThrow(new turip.common.exception.custom.UnauthorizedException(
-                            turip.common.exception.ErrorTag.ID_TOKEN_NOT_VALID));
+            when(googleTokenParserMock.getProvider()).thenReturn(Provider.GOOGLE);
+            when(googleTokenParserMock.getProviderId(anyString()))
+                    .thenThrow(new UnauthorizedException(ID_TOKEN_NOT_VALID));
 
             Map<String, String> requestBody = new HashMap<>();
             requestBody.put("idToken", invalidIdToken);
@@ -331,10 +360,10 @@ class AuthApiTest {
             String idToken = "valid-google-id-token";
             String deviceFid = "device-456";
 
-            when(googleTokenParser.getProvider()).thenReturn(provider);
-            when(googleTokenParser.getProviderId(idToken)).thenReturn(providerId);
-            when(googleTokenParser.getEmail(idToken)).thenReturn(email);
-            doThrow(new InternalServerException(ErrorTag.ACCOUNT_CREATION_ERROR))
+            when(googleTokenParserMock.getProvider()).thenReturn(provider);
+            when(googleTokenParserMock.getProviderId(idToken)).thenReturn(providerId);
+            when(googleTokenParserMock.getEmail(idToken)).thenReturn(email);
+            doThrow(new InternalServerException(ACCOUNT_CREATION_ERROR))
                     .when(accountService)
                     .create(any());
             Map<String, String> requestBody = new HashMap<>();
@@ -347,6 +376,162 @@ class AuthApiTest {
                     .header("device-fid", deviceFid)
                     .body(requestBody)
                     .when().post("/api/v2/auth/login/google")
+                    .then().log().all()
+                    .statusCode(500)
+                    .body("tag", is("ACCOUNT_CREATION_ERROR"));
+        }
+    }
+
+    @Nested
+    @DisplayName("/api/v1/auth/login/apple POST 애플 로그인 테스트")
+    class LoginWithAppleTest {
+
+        @Test
+        @DisplayName("신규 소셜 회원 로그인 성공 시 200 Ok와 토큰을 응답한다")
+        void loginNewMemberSuccess() {
+            // given
+            String idToken = "valid-apple-id-token";
+            String deviceFid = "device-123";
+
+            when(appleTokenParserMock.getProviderId(idToken)).thenReturn("apple-user-123");
+            when(appleTokenParserMock.getEmail(idToken)).thenReturn("newuser@icloud.com");
+
+            Map<String, String> requestBody = new HashMap<>();
+            requestBody.put("idToken", idToken);
+
+            // when & then
+            RestAssured
+                    .given().log().all()
+                    .contentType(ContentType.JSON)
+                    .header("device-fid", deviceFid)
+                    .body(requestBody)
+                    .when().post("/api/v1/auth/login/apple")
+                    .then().log().all()
+                    .statusCode(200)
+                    .body("accessToken", notNullValue())
+                    .body("refreshToken", notNullValue())
+                    .body("nickname", notNullValue())
+                    .body("isMigrationDecided", is(false));
+        }
+
+        @Test
+        @DisplayName("기존 소셜 회원 로그인 성공 시 200 OK와 토큰을 응답한다")
+        void loginExistingMemberSuccess() {
+            // given
+            String email = "existing@icloud.com";
+            Provider provider = Provider.APPLE;
+            String providerId = "apple-user-existing";
+            testDataHelper.insertSocialMember(email, false, provider, providerId);
+
+            String idToken = "valid-apple-id-token";
+            String deviceFid = "device-456";
+
+            when(appleTokenParserMock.getProviderId(idToken)).thenReturn(providerId);
+            when(appleTokenParserMock.getEmail(idToken)).thenReturn(email);
+
+            Map<String, String> requestBody = new HashMap<>();
+            requestBody.put("idToken", idToken);
+
+            // when & then
+            RestAssured
+                    .given().log().all()
+                    .contentType(ContentType.JSON)
+                    .header("device-fid", deviceFid)
+                    .body(requestBody)
+                    .when().post("/api/v1/auth/login/apple")
+                    .then().log().all()
+                    .statusCode(200)
+                    .body("accessToken", notNullValue())
+                    .body("refreshToken", notNullValue())
+                    .body("nickname", notNullValue())
+                    .body("isMigrationDecided", is(false));
+        }
+
+        @Test
+        @DisplayName("애플 재로그인 시 email이 없어도 로그인에 성공한다")
+        void loginExistingMemberWithoutEmail() {
+            // given - 첫 로그인 시 email로 회원가입된 상태
+            String email = "existing@icloud.com";
+            Provider provider = Provider.APPLE;
+            String providerId = "apple-user-relogin";
+            testDataHelper.insertSocialMember(email, false, provider, providerId);
+
+            String idToken = "valid-apple-id-token-relogin";
+            String deviceFid = "device-relogin-456";
+
+            // 애플 재로그인 시에는 email이 null
+            when(appleTokenParserMock.getProviderId(idToken)).thenReturn(providerId);
+            when(appleTokenParserMock.getEmail(idToken)).thenReturn(null);
+
+            Map<String, String> requestBody = new HashMap<>();
+            requestBody.put("idToken", idToken);
+
+            // when & then
+            RestAssured
+                    .given().log().all()
+                    .contentType(ContentType.JSON)
+                    .header("device-fid", deviceFid)
+                    .body(requestBody)
+                    .when().post("/api/v1/auth/login/apple")
+                    .then().log().all()
+                    .statusCode(200)
+                    .body("accessToken", notNullValue())
+                    .body("refreshToken", notNullValue())
+                    .body("nickname", notNullValue())
+                    .body("isMigrationDecided", is(false));
+        }
+
+        @Test
+        @DisplayName("유효하지 않은 ID 토큰인 경우 401 Unauthorized를 응답한다")
+        void loginWithInvalidIdToken() {
+            // given
+            String invalidIdToken = "invalid-token";
+            String deviceFid = "device-123";
+
+            when(appleTokenParserMock.getProviderId(anyString()))
+                    .thenThrow(new UnauthorizedException(
+                            ID_TOKEN_NOT_VALID));
+
+            Map<String, String> requestBody = new HashMap<>();
+            requestBody.put("idToken", invalidIdToken);
+
+            // when & then
+            RestAssured
+                    .given().log().all()
+                    .contentType(ContentType.JSON)
+                    .header("device-fid", deviceFid)
+                    .body(requestBody)
+                    .when().post("/api/v1/auth/login/apple")
+                    .then().log().all()
+                    .statusCode(401)
+                    .body("tag", is("ID_TOKEN_NOT_VALID"));
+        }
+
+        @Test
+        @DisplayName("계정 생성에 실패한 경우 500 Internal Server Error를 응답한다")
+        void accountCreationFailed() {
+            // given
+            String email = "newuser@icloud.com";
+            String providerId = "apple-user-new";
+
+            String idToken = "valid-apple-id-token";
+            String deviceFid = "device-456";
+
+            when(appleTokenParserMock.getProviderId(idToken)).thenReturn(providerId);
+            when(appleTokenParserMock.getEmail(idToken)).thenReturn(email);
+            doThrow(new InternalServerException(ACCOUNT_CREATION_ERROR))
+                    .when(accountService)
+                    .create(any());
+            Map<String, String> requestBody = new HashMap<>();
+            requestBody.put("idToken", idToken);
+
+            // when & then
+            RestAssured
+                    .given().log().all()
+                    .contentType(ContentType.JSON)
+                    .header("device-fid", deviceFid)
+                    .body(requestBody)
+                    .when().post("/api/v1/auth/login/apple")
                     .then().log().all()
                     .statusCode(500)
                     .body("tag", is("ACCOUNT_CREATION_ERROR"));
@@ -370,9 +555,9 @@ class AuthApiTest {
             String idToken = "valid-google-id-token";
             String deviceFid = "device-refresh-123";
 
-            when(googleTokenParser.getProvider()).thenReturn(provider);
-            when(googleTokenParser.getProviderId(idToken)).thenReturn(providerId);
-            when(googleTokenParser.getEmail(idToken)).thenReturn(email);
+            when(googleTokenParserMock.getProvider()).thenReturn(provider);
+            when(googleTokenParserMock.getProviderId(idToken)).thenReturn(providerId);
+            when(googleTokenParserMock.getEmail(idToken)).thenReturn(email);
 
             Map<String, String> loginRequest = new HashMap<>();
             loginRequest.put("idToken", idToken);
@@ -437,9 +622,9 @@ class AuthApiTest {
             String idToken = "valid-google-id-token";
             String deviceFid = "device-mismatch-123";
 
-            when(googleTokenParser.getProvider()).thenReturn(provider);
-            when(googleTokenParser.getProviderId(idToken)).thenReturn(providerId);
-            when(googleTokenParser.getEmail(idToken)).thenReturn(email);
+            when(googleTokenParserMock.getProvider()).thenReturn(provider);
+            when(googleTokenParserMock.getProviderId(idToken)).thenReturn(providerId);
+            when(googleTokenParserMock.getEmail(idToken)).thenReturn(email);
 
             Map<String, String> loginRequest = new HashMap<>();
             loginRequest.put("idToken", idToken);
@@ -462,8 +647,8 @@ class AuthApiTest {
             String otherIdToken = "other-valid-google-id-token";
             String otherDeviceFid = "device-other-123";
 
-            when(googleTokenParser.getProviderId(otherIdToken)).thenReturn(providerId2);
-            when(googleTokenParser.getEmail(otherIdToken)).thenReturn(email2);
+            when(googleTokenParserMock.getProviderId(otherIdToken)).thenReturn(providerId2);
+            when(googleTokenParserMock.getEmail(otherIdToken)).thenReturn(email2);
 
             Map<String, String> otherLoginRequest = new HashMap<>();
             otherLoginRequest.put("idToken", otherIdToken);
@@ -510,9 +695,9 @@ class AuthApiTest {
             String idToken = "valid-google-id-token";
             String deviceFid = "device-logout-123";
 
-            when(googleTokenParser.getProvider()).thenReturn(provider);
-            when(googleTokenParser.getProviderId(idToken)).thenReturn(providerId);
-            when(googleTokenParser.getEmail(idToken)).thenReturn(email);
+            when(googleTokenParserMock.getProvider()).thenReturn(provider);
+            when(googleTokenParserMock.getProviderId(idToken)).thenReturn(providerId);
+            when(googleTokenParserMock.getEmail(idToken)).thenReturn(email);
 
             Map<String, String> loginRequest = new HashMap<>();
             loginRequest.put("idToken", idToken);
@@ -551,9 +736,9 @@ class AuthApiTest {
             String idToken = "valid-google-id-token";
             String deviceFid = "device-logout-delete-123";
 
-            when(googleTokenParser.getProvider()).thenReturn(provider);
-            when(googleTokenParser.getProviderId(idToken)).thenReturn(providerId);
-            when(googleTokenParser.getEmail(idToken)).thenReturn(email);
+            when(googleTokenParserMock.getProvider()).thenReturn(provider);
+            when(googleTokenParserMock.getProviderId(idToken)).thenReturn(providerId);
+            when(googleTokenParserMock.getEmail(idToken)).thenReturn(email);
 
             Map<String, String> loginRequest = new HashMap<>();
             loginRequest.put("idToken", idToken);

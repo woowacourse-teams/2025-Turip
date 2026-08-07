@@ -15,7 +15,7 @@ import org.springframework.test.context.ActiveProfiles;
 import turip.favorite.domain.AccountRole;
 import turip.util.helper.TestDataHelper;
 
-@ActiveProfiles("test")
+@ActiveProfiles({"test", "h2"})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class ContentPlaceApiTest {
 

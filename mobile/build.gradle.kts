@@ -12,6 +12,7 @@ plugins {
     alias(libs.plugins.ktorfit) apply false
     alias(libs.plugins.buildkonfig) apply false
     alias(libs.plugins.sentry.kmp) apply false
+    alias(libs.plugins.google.services) apply false
 }
 
 subprojects {

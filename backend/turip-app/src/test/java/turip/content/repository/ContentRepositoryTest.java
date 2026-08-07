@@ -30,7 +30,7 @@ import turip.region.repository.CityRepository;
 import turip.region.repository.CountryRepository;
 
 @DataJpaTest
-@ActiveProfiles("test-mysql")
+@ActiveProfiles({"test", "test-mysql"})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ContentRepositoryTest extends TestContainerConfig {
 

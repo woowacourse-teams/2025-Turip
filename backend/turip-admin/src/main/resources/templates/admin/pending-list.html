@@ -118,6 +118,46 @@
             font-weight: 600;
             color: #444;
         }
+
+        .validator-name {
+            font-weight: 600;
+            color: #6e8efb;
+        }
+
+        .not-assigned {
+            color: #999;
+            font-style: italic;
+        }
+
+        /* 탭 스타일 */
+        .tab-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .tab-button {
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            color: #888;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .tab-button:hover {
+            color: #6e8efb;
+        }
+
+        .tab-button.active {
+            color: #6e8efb;
+            border-bottom-color: #6e8efb;
+        }
     </style>
 </head>
 <body>
@@ -131,13 +171,19 @@
     <div class="admin-card">
         <h3 class="section-title">검수 대기 목록</h3>
 
+        <div class="tab-container">
+            <button class="tab-button active" data-tab="my" onclick="switchTab('my')">내 검수 요청</button>
+            <button class="tab-button" data-tab="all" onclick="switchTab('all')">전체 검수 요청</button>
+        </div>
+
         <div class="table-responsive">
             <table class="table table-hover">
                 <thead>
                 <tr>
                     <th style="width: 50px;">ID</th>
                     <th>영상 정보</th>
-                    <th style="width: 200px;">수집자</th>
+                    <th style="width: 150px;">수집자</th>
+                    <th style="width: 150px;">담당자</th>
                     <th style="width: 100px; text-align: center;">상태</th>
                     <th style="width: 120px; text-align: right;">관리</th>
                 </tr>
@@ -150,10 +196,29 @@
 </div>
 
 <script>
-    async function loadPendingList() {
+    let currentTab = 'my'; // 기본 탭은 '내 검수 요청'
+
+    function switchTab(tab) {
+        currentTab = tab;
+
+        // 탭 버튼 active 클래스 변경
+        document.querySelectorAll('.tab-button').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+
+        // 데이터 로드
+        loadPendingList(tab);
+    }
+
+    async function loadPendingList(tab = 'my') {
         const tbody = document.getElementById('pendingTableBody');
+        const endpoint = tab === 'my'
+            ? '/api/v1/admin/content-pendings/my-list'
+            : '/api/v1/admin/content-pendings/list';
+
         try {
-            const res = await fetch('/api/v1/admin/content-pendings/list');
+            const res = await fetch(endpoint);
 
             if (!res.ok) {
                 const errorData = await res.json().catch(() => null);
@@ -164,7 +229,10 @@
             const list = await res.json();
 
             if (list.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="text-center py-5 text-muted">검수 대기 중인 콘텐츠가 없습니다.</td></tr>';
+                const emptyMessage = tab === 'my'
+                    ? '나에게 배정된 검수 요청이 없습니다.'
+                    : '검수 대기 중인 콘텐츠가 없습니다.';
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-5 text-muted">${emptyMessage}</td></tr>`;
                 return;
             }
 
@@ -192,6 +260,16 @@
                 tdCollector.textContent = item.collectorNickname;
                 tr.appendChild(tdCollector);
 
+                const tdValidator = document.createElement('td');
+                if (item.validatorNickname) {
+                    tdValidator.className = 'validator-name';
+                    tdValidator.textContent = item.validatorNickname;
+                } else {
+                    tdValidator.className = 'not-assigned';
+                    tdValidator.textContent = '미배정';
+                }
+                tr.appendChild(tdValidator);
+
                 const tdStatus = document.createElement('td');
                 tdStatus.className = 'text-center';
                 const statusBadge = document.createElement('span');
@@ -213,11 +291,11 @@
             });
         } catch (e) {
             console.error("데이터 로드 실패:", e);
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-5 text-danger">⚠️ 데이터를 불러오는데 실패했습니다: ' + e.message + '</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center py-5 text-danger">⚠️ 데이터를 불러오는데 실패했습니다: ' + e.message + '</td></tr>';
         }
     }
 
-    document.addEventListener('DOMContentLoaded', loadPendingList);
+    document.addEventListener('DOMContentLoaded', () => loadPendingList('my'));
 </script>
 </body>
 </html>

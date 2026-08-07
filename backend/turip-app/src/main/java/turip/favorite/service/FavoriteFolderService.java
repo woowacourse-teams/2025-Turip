@@ -78,7 +78,8 @@ public class FavoriteFolderService {
 
         FavoriteFolderAccount favoriteFolderAccount = favoriteFolderAccountService.findOrCreate(favoriteFolder,
                 member.getAccount());
-        eventPublisher.publishEvent(FavoriteFolderUpdateEvent.of(favoriteFolderId, ActionType.MEMBER_JOINED));
+        eventPublisher.publishEvent(
+                FavoriteFolderUpdateEvent.of(favoriteFolderId, ActionType.MEMBER_JOINED, member.getAccount().getId()));
 
         return FavoriteFolderJoinResponse.from(favoriteFolderAccount);
     }

@@ -13,3 +13,6 @@ spring:
     show-sql: false
 jwt:
   access-token-expiration-ms: 10800000  # 3시간
+
+firebase:
+  service-account-key-path: classpath:firebase-service-account-prod.json

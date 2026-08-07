@@ -25,7 +25,7 @@ import turip.region.repository.CountryRepository;
 import turip.util.fixture.AccountFixture;
 
 @DataJpaTest
-@ActiveProfiles("test")
+@ActiveProfiles({"test", "h2"})
 class FavoriteContentRepositoryTest {
 
     @Autowired

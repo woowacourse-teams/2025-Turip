@@ -27,7 +27,7 @@ import turip.util.fixture.AccountFixture;
 import turip.util.fixture.ContentPendingFixture;
 import turip.util.helper.TestDataHelper;
 
-@ActiveProfiles("test-mysql")
+@ActiveProfiles({"test", "test-mysql"})
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         classes = turip.TuripAdminApplication.class
@@ -343,7 +343,8 @@ class AdminPendingContentApiTest extends TestContainerConfig {
 
             // validator로 지정될 다른 admin 계정 생성
             Long validatorAccountId = testDataHelper.insertAccount(Role.ADMIN);
-            testDataHelper.insertTuripMember(validatorAccountId, "validator@turip.com", false, "validator", "password123!");
+            testDataHelper.insertTuripMember(validatorAccountId, "validator@turip.com", false, "validator",
+                    "password123!");
 
             ContentPendingData contentData = ContentPendingFixture.createTestContentData("서울");
 
@@ -388,7 +389,8 @@ class AdminPendingContentApiTest extends TestContainerConfig {
 
             // validator로 지정될 다른 admin 계정 생성
             Long validatorAccountId = testDataHelper.insertAccount(Role.ADMIN);
-            testDataHelper.insertTuripMember(validatorAccountId, "validator@turip.com", false, "validator", "password123!");
+            testDataHelper.insertTuripMember(validatorAccountId, "validator@turip.com", false, "validator",
+                    "password123!");
 
             Account collectorAccount = AccountFixture.createCustomAccount(1L, Role.ADMIN);
             Long collectorAccountId = testDataHelper.insertAccount(collectorAccount);
@@ -515,6 +517,231 @@ class AdminPendingContentApiTest extends TestContainerConfig {
             RestAssured.given().port(port)
                     .header("Authorization", "Bearer " + userAccessToken)
                     .when().get("/api/v1/admin/content-pendings/list")
+                    .then()
+                    .statusCode(403);
+        }
+    }
+
+    @DisplayName("/api/v1/admin/content-pendings/my-list GET 나의 펜딩 콘텐츠 목록 조회 테스트")
+    @Nested
+    class FindMyPendingTest {
+
+        @DisplayName("관리자가 나의 펜딩 콘텐츠 목록을 조회하면 200 OK와 PENDING 상태의 콘텐츠 리스트를 응답한다")
+        @Test
+        void findMyPending1() {
+            // given
+            Account validator = AccountFixture.createCustomAccount(1L, Role.ADMIN);
+            Long validatorAccountId = testDataHelper.insertAccount(validator);
+            testDataHelper.insertTuripMember(validatorAccountId, "admin@turip.com", false, "admin", "password123!");
+            String validatorAccessToken = testDataHelper.createAccessToken(validatorAccountId, Role.ADMIN);
+
+            Account collectorAccount1 = AccountFixture.createCustomAccount(2L, Role.ADMIN);
+            Long collectorAccountId1 = testDataHelper.insertAccount(collectorAccount1);
+            ReflectionTestUtils.setField(collectorAccount1, "id", collectorAccountId1);
+
+            Account collectorAccount2 = AccountFixture.createCustomAccount(3L, Role.ADMIN);
+            Long collectorAccountId2 = testDataHelper.insertAccount(collectorAccount2);
+            ReflectionTestUtils.setField(collectorAccount2, "id", collectorAccountId2);
+
+            ContentPendingData contentData1 = ContentPendingFixture.createTestContentData("서울");
+            ContentPending contentPending1 = new ContentPending(contentData1, collectorAccount1, validator, null, null);
+            contentPendingRepository.save(contentPending1);
+
+            ContentPendingData contentData2 = ContentPendingFixture.createTestContentData("부산");
+            ContentPending contentPending2 = new ContentPending(contentData2, collectorAccount2, collectorAccount1,
+                    null, null);
+            contentPendingRepository.save(contentPending2);
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + validatorAccessToken)
+                    .when().get("/api/v1/admin/content-pendings/my-list")
+                    .then()
+                    .statusCode(200)
+                    .body("$", hasSize(1))
+                    .body("[0].id", notNullValue())
+                    .body("[0].videoTitle", is("테스트 비디오"))
+                    .body("[0].channelName", is("테스트 채널"))
+                    .body("[0].collectorNickname", notNullValue())
+                    .body("[0].createdAt", notNullValue());
+        }
+
+        @DisplayName("펜딩 콘텐츠가 없는 경우 빈 리스트를 응답한다")
+        @Test
+        void findMyPending_EmptyList() {
+            // given
+            Long adminAccountId = testDataHelper.insertAccount(Role.ADMIN);
+            testDataHelper.insertTuripMember(adminAccountId, "admin@turip.com", false, "admin", "password123!");
+            String adminAccessToken = testDataHelper.createAccessToken(adminAccountId, Role.ADMIN);
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + adminAccessToken)
+                    .when().get("/api/v1/admin/content-pendings/my-list")
+                    .then()
+                    .statusCode(200)
+                    .body("$", hasSize(0));
+        }
+
+        @DisplayName("PENDING 상태가 아닌 콘텐츠는 목록에 포함되지 않는다")
+        @Test
+        void findMyPending_OnlyPendingStatus() {
+            // given
+            Account validator = AccountFixture.createCustomAccount(1L, Role.ADMIN);
+            Long validatorAccountId = testDataHelper.insertAccount(validator);
+            testDataHelper.insertTuripMember(validatorAccountId, "admin@turip.com", false, "admin", "password123!");
+            String validatorAccessToken = testDataHelper.createAccessToken(validatorAccountId, Role.ADMIN);
+
+            Account collectorAccount1 = AccountFixture.createCustomAccount(2L, Role.ADMIN);
+            Long collectorAccountId1 = testDataHelper.insertAccount(collectorAccount1);
+            ReflectionTestUtils.setField(collectorAccount1, "id", collectorAccountId1);
+
+            Account collectorAccount2 = AccountFixture.createCustomAccount(3L, Role.ADMIN);
+            Long collectorAccountId2 = testDataHelper.insertAccount(collectorAccount2);
+            ReflectionTestUtils.setField(collectorAccount2, "id", collectorAccountId2);
+
+            ContentPendingData contentData1 = ContentPendingFixture.createTestContentData("서울");
+            ContentPending contentPending1 = new ContentPending(contentData1, collectorAccount1, validator, null, null);
+            contentPendingRepository.save(contentPending1);
+
+            // REJECTED 콘텐츠
+            ContentPendingData contentData2 = ContentPendingFixture.createTestContentData("부산");
+            ContentPending contentPending2 = new ContentPending(contentData2, collectorAccount2, validator, null, null);
+            contentPending2.reject(validator, "거절 사유");
+            contentPendingRepository.save(contentPending2);
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + validatorAccessToken)
+                    .when().get("/api/v1/admin/content-pendings/my-list")
+                    .then()
+                    .statusCode(200)
+                    .body("$", hasSize(1))
+                    .body("[0].id", is(1));
+        }
+
+        @DisplayName("관리자가 아닌 사용자가 목록을 조회하면 403 Forbidden을 응답한다")
+        @Test
+        void findMyPending_Forbidden() {
+            // given
+            Long userAccountId = testDataHelper.insertAccount(Role.USER);
+            String userAccessToken = testDataHelper.createAccessToken(userAccountId, Role.USER);
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + userAccessToken)
+                    .when().get("/api/v1/admin/content-pendings/my-list")
+                    .then()
+                    .statusCode(403);
+        }
+    }
+
+    @DisplayName("/api/v1/admin/content-pendings/my-count GET 나의 펜딩 콘텐츠 개수 조회 테스트")
+    @Nested
+    class CountMyPendingTest {
+
+        @DisplayName("관리자가 나의 펜딩 콘텐츠 개수를 조회하면 200 OK와 개수를 응답한다")
+        @Test
+        void countMyPending_Success() {
+            // given
+            Account validator = AccountFixture.createCustomAccount(1L, Role.ADMIN);
+            Long validatorAccountId = testDataHelper.insertAccount(validator);
+            testDataHelper.insertTuripMember(validatorAccountId, "admin@turip.com", false, "admin", "password123!");
+            String validatorAccessToken = testDataHelper.createAccessToken(validatorAccountId, Role.ADMIN);
+
+            Account collectorAccount1 = AccountFixture.createCustomAccount(2L, Role.ADMIN);
+            Long collectorAccountId1 = testDataHelper.insertAccount(collectorAccount1);
+            ReflectionTestUtils.setField(collectorAccount1, "id", collectorAccountId1);
+
+            Account collectorAccount2 = AccountFixture.createCustomAccount(3L, Role.ADMIN);
+            Long collectorAccountId2 = testDataHelper.insertAccount(collectorAccount2);
+            ReflectionTestUtils.setField(collectorAccount2, "id", collectorAccountId2);
+
+            // validator에게 배정된 콘텐츠 2개
+            ContentPendingData contentData1 = ContentPendingFixture.createTestContentData("서울");
+            ContentPending contentPending1 = new ContentPending(contentData1, collectorAccount1, validator, null, null);
+            contentPendingRepository.save(contentPending1);
+
+            ContentPendingData contentData2 = ContentPendingFixture.createTestContentData("부산");
+            ContentPending contentPending2 = new ContentPending(contentData2, collectorAccount2, validator, null, null);
+            contentPendingRepository.save(contentPending2);
+
+            // 다른 validator에게 배정된 콘텐츠 1개
+            ContentPendingData contentData3 = ContentPendingFixture.createTestContentData("대구");
+            ContentPending contentPending3 = new ContentPending(contentData3, collectorAccount1, collectorAccount2,
+                    null, null);
+            contentPendingRepository.save(contentPending3);
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + validatorAccessToken)
+                    .when().get("/api/v1/admin/content-pendings/my-count")
+                    .then()
+                    .statusCode(200)
+                    .body("$", is(2));
+        }
+
+        @DisplayName("펜딩 콘텐츠가 없는 경우 0을 응답한다")
+        @Test
+        void countMyPending_Zero() {
+            // given
+            Long adminAccountId = testDataHelper.insertAccount(Role.ADMIN);
+            testDataHelper.insertTuripMember(adminAccountId, "admin@turip.com", false, "admin", "password123!");
+            String adminAccessToken = testDataHelper.createAccessToken(adminAccountId, Role.ADMIN);
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + adminAccessToken)
+                    .when().get("/api/v1/admin/content-pendings/my-count")
+                    .then()
+                    .statusCode(200)
+                    .body("$", is(0));
+        }
+
+        @DisplayName("PENDING 상태가 아닌 콘텐츠는 개수에 포함되지 않는다")
+        @Test
+        void countMyPending_OnlyPendingStatus() {
+            // given
+            Account validator = AccountFixture.createCustomAccount(1L, Role.ADMIN);
+            Long validatorAccountId = testDataHelper.insertAccount(validator);
+            testDataHelper.insertTuripMember(validatorAccountId, "admin@turip.com", false, "admin", "password123!");
+            String validatorAccessToken = testDataHelper.createAccessToken(validatorAccountId, Role.ADMIN);
+
+            Account collectorAccount = AccountFixture.createCustomAccount(2L, Role.ADMIN);
+            Long collectorAccountId = testDataHelper.insertAccount(collectorAccount);
+            ReflectionTestUtils.setField(collectorAccount, "id", collectorAccountId);
+
+            // PENDING 콘텐츠
+            ContentPendingData contentData1 = ContentPendingFixture.createTestContentData("서울");
+            ContentPending contentPending1 = new ContentPending(contentData1, collectorAccount, validator, null, null);
+            contentPendingRepository.save(contentPending1);
+
+            // REJECTED 콘텐츠
+            ContentPendingData contentData2 = ContentPendingFixture.createTestContentData("부산");
+            ContentPending contentPending2 = new ContentPending(contentData2, collectorAccount, validator, null, null);
+            contentPending2.reject(validator, "거절 사유");
+            contentPendingRepository.save(contentPending2);
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + validatorAccessToken)
+                    .when().get("/api/v1/admin/content-pendings/my-count")
+                    .then()
+                    .statusCode(200)
+                    .body("$", is(1));
+        }
+
+        @DisplayName("관리자가 아닌 사용자가 개수를 조회하면 403 Forbidden을 응답한다")
+        @Test
+        void countMyPending_Forbidden() {
+            // given
+            Long userAccountId = testDataHelper.insertAccount(Role.USER);
+            String userAccessToken = testDataHelper.createAccessToken(userAccountId, Role.USER);
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + userAccessToken)
+                    .when().get("/api/v1/admin/content-pendings/my-count")
                     .then()
                     .statusCode(403);
         }
