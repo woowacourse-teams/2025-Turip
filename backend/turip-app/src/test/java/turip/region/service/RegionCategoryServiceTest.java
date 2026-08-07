@@ -1,7 +1,6 @@
 package turip.region.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
@@ -15,7 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import turip.content.repository.ContentRepository;
-import turip.infrastructure.client.KoreaTourismApiClient;
+import turip.infrastructure.client.KoreaTourismImageClient;
 import turip.region.controller.dto.response.RegionCategoriesResponse;
 import turip.region.domain.City;
 import turip.region.domain.Country;
@@ -36,7 +35,7 @@ class RegionCategoryServiceTest {
     private ContentRepository contentRepository;
 
     @Mock
-    private KoreaTourismApiClient koreaTourismApiClient;
+    private KoreaTourismImageClient koreaTourismImageClient;
 
     @DisplayName("국내 지역 카테고리 조회 시 국내 도시 목록과 기타 카테고리를 반환한다")
     @Test
@@ -64,9 +63,9 @@ class RegionCategoryServiceTest {
         given(contentRepository.countByCityName("부산")).willReturn(1);
         given(contentRepository.countDomesticEtcContents(List.of("서울", "부산"))).willReturn(0);
 
-        given(koreaTourismApiClient.searchRegionImage("서울"))
+        given(koreaTourismImageClient.searchRegionImage("서울"))
                 .willReturn(Optional.of("https://api.example.com/seoul.jpg"));
-        given(koreaTourismApiClient.searchRegionImage("부산"))
+        given(koreaTourismImageClient.searchRegionImage("부산"))
                 .willReturn(Optional.of("https://api.example.com/busan.jpg"));
 
         // when

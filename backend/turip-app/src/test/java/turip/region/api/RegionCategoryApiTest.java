@@ -16,7 +16,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import turip.infrastructure.client.KoreaTourismApiClient;
+import turip.infrastructure.client.KoreaTourismImageClient;
 import turip.util.helper.TestDataHelper;
 
 @ActiveProfiles({"test", "h2"})
@@ -33,14 +33,14 @@ class RegionCategoryApiTest {
     private TestDataHelper testDataHelper;
 
     @MockitoBean
-    private KoreaTourismApiClient koreaTourismApiClient;
+    private KoreaTourismImageClient koreaTourismImageClient;
 
     @BeforeEach
     void setUp() {
         testDataHelper.cleanDatabase();
 
         // KoreaTourismApiClient mock 설정 - 실제 API 호출하지 않도록
-        when(koreaTourismApiClient.searchRegionImage(anyString()))
+        when(koreaTourismImageClient.searchRegionImage(anyString()))
                 .thenReturn(Optional.empty());
     }
 

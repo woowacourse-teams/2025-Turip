@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import turip.content.repository.ContentRepository;
-import turip.infrastructure.client.KoreaTourismApiClient;
+import turip.infrastructure.client.KoreaTourismImageClient;
 import turip.region.controller.dto.response.RegionCategoriesResponse;
 import turip.region.controller.dto.response.RegionCategoryResponse;
 import turip.region.domain.City;
@@ -28,7 +28,7 @@ public class RegionCategoryService {
     private final CityService cityService;
     private final CountryService countryService;
     private final ContentRepository contentRepository;
-    private final KoreaTourismApiClient koreaTourismApiClient;
+    private final KoreaTourismImageClient koreaTourismImageClient;
 
     @Value("${region.category.domestic.etc.image-url}")
     private String domesticEtcImageUrl;
@@ -64,7 +64,7 @@ public class RegionCategoryService {
 
     private RegionCategoryResponse createRegionCategoryResponseWithImage(City city) {
         if (LegalDistrictCode.isSupportedCity(city.getName())) {
-            String imageUrl = koreaTourismApiClient.searchRegionImage(city.getName())
+            String imageUrl = koreaTourismImageClient.searchRegionImage(city.getName())
                     .orElse(city.getImageUrl());
             return RegionCategoryResponse.of(city, imageUrl);
         }

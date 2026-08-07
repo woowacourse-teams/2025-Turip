@@ -32,7 +32,7 @@ public class KoreaTourismRelatedSpotClient {
 
     public KoreaTourismRelatedSpotClient(RestClient baseRestClient,
                                          @Value("${korea-tourism.api.key}") String koreaTourismApiKey,
-                                         @Value("${korea-tourism.api.url}") String koreaTourismApiUrl) {
+                                         @Value("${korea-tourism.api.related-spot-url}") String koreaTourismApiUrl) {
         this.restClient = baseRestClient;
         this.koreaTourismApiKey = koreaTourismApiKey;
         this.koreaTourismApiUrl = koreaTourismApiUrl;

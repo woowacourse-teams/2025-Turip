@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
-import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +30,7 @@ class KoreaTourismRelatedSpotClientTest {
     @Autowired
     private KoreaTourismRelatedSpotClient koreaTourismRelatedSpotClient;
 
-    @Value("${korea-tourism.api.url}")
+    @Value("${korea-tourism.api.related-spot-url}")
     private String koreaTourismApiUrl;
 
     @Value("${korea-tourism.api.key}")
