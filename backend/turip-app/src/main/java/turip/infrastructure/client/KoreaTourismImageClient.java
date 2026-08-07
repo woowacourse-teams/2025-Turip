@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 import turip.common.configuration.CacheConfiguration;
-import turip.infrastructure.client.dto.KoreaTourismResponse;
+import turip.infrastructure.client.dto.KoreaTourismImageResponse;
 import turip.region.domain.LegalDistrictCode;
 
 @Slf4j
@@ -47,15 +47,24 @@ public class KoreaTourismImageClient {
             URI uri = URI.create(uriString.toString());
             log.info("한국관광공사 이미지 API 요청 URI: {}", uri);
 
-            KoreaTourismResponse response = restClient.get()
+            KoreaTourismImageResponse response = restClient.get()
                     .uri(uri)
                     .retrieve()
-                    .body(KoreaTourismResponse.class);
+                    .body(KoreaTourismImageResponse.class);
 
             if (response == null) {
                 log.warn("한국관광공사 이미지 API 응답 파싱 실패: cityName={}", cityName);
                 return Optional.empty();
             }
+
+            if (!response.isSuccess()) {
+                log.warn("한국관광공사 이미지 API 응답 실패: cityName={}, resultCode={}, resultMsg={}",
+                        cityName,
+                        response.getResultCode(),
+                        response.getResultMsg());
+                return Optional.empty();
+            }
+
             return response.getFirstThumbImageUrl();
         } catch (RestClientResponseException e) {
             log.warn("한국관광공사 이미지 API 호출 실패: cityName={}, statusCode={}, message={}",
