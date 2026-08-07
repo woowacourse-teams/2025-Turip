@@ -5,11 +5,10 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import turip.infrastructure.client.dto.deserializer.EmptyStringAsNullDeserializer;
+import turip.infrastructure.client.dto.deserializer.EmptyStringAsNullRelatedSpotDeserializer;
 
 /**
- * 한국관광공사 TourAPI의 지역별 연관 관광지 조회 응답
- * API: TarRlteTarService1/areaBasedList1
+ * 한국관광공사 TourAPI의 지역별 연관 관광지 조회 응답 API: TarRlteTarService1/areaBasedList1
  */
 @Getter
 @NoArgsConstructor
@@ -70,7 +69,7 @@ public class KoreaTourismRelatedSpotResponse {
     public static class Body {
 
         @JsonProperty("items")
-        @JsonDeserialize(using = EmptyStringAsNullDeserializer.class)
+        @JsonDeserialize(using = EmptyStringAsNullRelatedSpotDeserializer.class)
         private Items items;
     }
 

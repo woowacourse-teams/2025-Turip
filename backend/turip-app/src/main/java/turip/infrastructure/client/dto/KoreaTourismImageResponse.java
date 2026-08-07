@@ -1,10 +1,12 @@
 package turip.infrastructure.client.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.List;
 import java.util.Optional;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import turip.infrastructure.client.dto.deserializer.EmptyStringAsNullImageItemsDeserializer;
 
 @Getter
 @NoArgsConstructor
@@ -64,6 +66,7 @@ public class KoreaTourismImageResponse {
     @NoArgsConstructor
     public static class Body {
         @JsonProperty("items")
+        @JsonDeserialize(using = EmptyStringAsNullImageItemsDeserializer.class)
         private Items items;
     }
 
