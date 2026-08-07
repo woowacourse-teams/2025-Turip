@@ -2,15 +2,17 @@ package turip.infrastructure.client;
 
 import java.net.URI;
 import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientResponseException;
 import turip.common.configuration.CacheConfiguration;
 import turip.infrastructure.client.dto.KoreaTourismResponse;
 import turip.region.domain.LegalDistrictCode;
 
-// TODO: 로그 추가하기
+@Slf4j
 @Component
 public class KoreaTourismImageClient {
 
@@ -41,14 +43,31 @@ public class KoreaTourismImageClient {
                 .append("&_type=json")
                 .append("&numOfRows=1");
 
-        KoreaTourismResponse response = restClient.get()
-                .uri(URI.create(uriString.toString()))
-                .retrieve()
-                .body(KoreaTourismResponse.class);
+        try {
+            URI uri = URI.create(uriString.toString());
+            log.info("한국관광공사 이미지 API 요청 URI: {}", uri);
 
-        if (response == null) {
+            KoreaTourismResponse response = restClient.get()
+                    .uri(uri)
+                    .retrieve()
+                    .body(KoreaTourismResponse.class);
+
+            if (response == null) {
+                log.warn("한국관광공사 이미지 API 응답 파싱 실패: cityName={}", cityName);
+                return Optional.empty();
+            }
+            return response.getFirstThumbImageUrl();
+        } catch (RestClientResponseException e) {
+            log.warn("한국관광공사 이미지 API 호출 실패: cityName={}, statusCode={}, message={}",
+                    cityName,
+                    e.getStatusCode().value(),
+                    e.getMessage());
+            return Optional.empty();
+        } catch (Exception e) {
+            log.warn("한국관광공사 이미지 API 호출 실패: cityName={}, message={}",
+                    cityName,
+                    e.getMessage());
             return Optional.empty();
         }
-        return response.getFirstThumbImageUrl();
     }
 }
