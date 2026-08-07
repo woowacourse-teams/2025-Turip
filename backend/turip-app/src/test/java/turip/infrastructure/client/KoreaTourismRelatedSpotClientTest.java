@@ -104,11 +104,8 @@ class KoreaTourismRelatedSpotClientTest {
 
         RelatedSpot spot = result.spots().getFirst();
         assertAll(
-                () -> assertThat(spot.getTouristSpotName()).isEqualTo("경복궁"),
-                () -> assertThat(spot.getAreaName()).isEqualTo("서울특별시"),
                 () -> assertThat(spot.getRelatedSpotName()).isEqualTo("북촌한옥마을"),
-                () -> assertThat(spot.getRelatedCategoryLargeName()).isEqualTo("관광지"),
-                () -> assertThat(spot.getRelatedRank()).isEqualTo(1)
+                () -> assertThat(spot.getRelatedCategoryLargeName()).isEqualTo("관광지")
         );
 
         mockRestServiceServer.verify();

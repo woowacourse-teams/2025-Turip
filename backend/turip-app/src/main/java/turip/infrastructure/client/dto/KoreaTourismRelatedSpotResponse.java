@@ -1,6 +1,5 @@
 package turip.infrastructure.client.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.List;
@@ -14,7 +13,6 @@ import turip.infrastructure.client.dto.deserializer.EmptyStringAsNullDeserialize
  */
 @Getter
 @NoArgsConstructor
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class KoreaTourismRelatedSpotResponse {
 
     @JsonProperty("response")
@@ -43,7 +41,6 @@ public class KoreaTourismRelatedSpotResponse {
 
     @Getter
     @NoArgsConstructor
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Response {
 
         @JsonProperty("header")
@@ -55,7 +52,6 @@ public class KoreaTourismRelatedSpotResponse {
 
     @Getter
     @NoArgsConstructor
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Header {
 
         @JsonProperty("resultCode")
@@ -71,26 +67,15 @@ public class KoreaTourismRelatedSpotResponse {
 
     @Getter
     @NoArgsConstructor
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Body {
 
         @JsonProperty("items")
         @JsonDeserialize(using = EmptyStringAsNullDeserializer.class)
         private Items items;
-
-        @JsonProperty("numOfRows")
-        private Integer numOfRows;
-
-        @JsonProperty("pageNo")
-        private Integer pageNo;
-
-        @JsonProperty("totalCount")
-        private Integer totalCount;
     }
 
     @Getter
     @NoArgsConstructor
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Items {
 
         @JsonProperty("item")
@@ -106,58 +91,12 @@ public class KoreaTourismRelatedSpotResponse {
      */
     @Getter
     @NoArgsConstructor
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class RelatedSpot {
-
-        @JsonProperty("tAtsCd")
-        private String touristSpotCode;
-
-        @JsonProperty("tAtsNm")
-        private String touristSpotName;
-
-        @JsonProperty("areaCd")
-        private String areaCode;
-
-        @JsonProperty("areaNm")
-        private String areaName;
-
-        @JsonProperty("signguCd")
-        private String sigunguCode;
-
-        @JsonProperty("signguNm")
-        private String sigunguName;
-
-        @JsonProperty("baseYm")
-        private String baseYearMonth;
-
-        @JsonProperty("rlteTatsCd")
-        private String relatedSpotCode;
 
         @JsonProperty("rlteTatsNm")
         private String relatedSpotName;
 
-        @JsonProperty("rlteRegnCd")
-        private String relatedRegionCode;
-
-        @JsonProperty("rlteRegnNm")
-        private String relatedRegionName;
-
-        @JsonProperty("rlteSignguCd")
-        private String relatedSigunguCode;
-
-        @JsonProperty("rlteSignguNm")
-        private String relatedSigunguName;
-
         @JsonProperty("rlteCtgryLclsNm")
         private String relatedCategoryLargeName;
-
-        @JsonProperty("rlteCtgryMclsNm")
-        private String relatedCategoryMediumName;
-
-        @JsonProperty("rlteCtgrySclsNm")
-        private String relatedCategorySmallName;
-
-        @JsonProperty("rlteRank")
-        private Integer relatedRank;
     }
 }
