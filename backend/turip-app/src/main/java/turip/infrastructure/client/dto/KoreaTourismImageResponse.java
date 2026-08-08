@@ -20,7 +20,8 @@ public class KoreaTourismImageResponse {
                 || response.body.items.item == null || response.body.items.item.isEmpty()) {
             return Optional.empty();
         }
-        return Optional.ofNullable(response.body.items.item.get(0).thumbImage);
+        return Optional.ofNullable(response.body.items.item.get(0).thumbImage)
+                .filter(url -> !url.isBlank());
     }
 
     public boolean isSuccess() {
