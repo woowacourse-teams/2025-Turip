@@ -24,6 +24,6 @@ public class CacheConfiguration {
     private Caffeine<Object, Object> caffeineCacheBuilder() {
         return Caffeine.newBuilder()
                 .expireAfterWrite(7, TimeUnit.DAYS) // 7일 주기로 동기화
-                .maximumSize(1000);
+                .maximumSize(10); // 지원 도시 수(TourApiLegalDongCode) 기준 여유값
     }
 }
