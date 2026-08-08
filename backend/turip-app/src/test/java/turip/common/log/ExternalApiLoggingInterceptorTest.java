@@ -50,7 +50,7 @@ class ExternalApiLoggingInterceptorTest {
     void maskSensitiveParamsWithServiceKey() throws Exception {
         // given
         URI uri = new URI(
-                "https://apis.data.go.kr/B551011/PhokoAwrdService/phokoAwrdList?serviceKey=SOMj9u0mLcWBW4CqEjVKFOmKCj7eMBHoDVRsRlr0P6kpxQslfjcJ%2FSnS0XDeC1%2FHNy%2BVGxOHCxf7FsAy6FjEnw%3D%3D&MobileOS=AND&MobileApp=Turip&lDongRegnCd=26&_type=json&numOfRows=1");
+                "https://apis.data.go.kr/B551011/PhokoAwrdService/phokoAwrdList?serviceKey=dummyServiceKey%2FAbCdEfGhIjKlMnOp%2BQrStUvWxYz%3D%3D&MobileOS=AND&MobileApp=Turip&lDongRegnCd=26&_type=json&numOfRows=1");
         Method method = ExternalApiLoggingInterceptor.class.getDeclaredMethod("maskSensitiveParams", URI.class);
         method.setAccessible(true);
 
@@ -59,7 +59,7 @@ class ExternalApiLoggingInterceptorTest {
 
         // then
         assertThat(maskedUri).contains("serviceKey=***");
-        assertThat(maskedUri).doesNotContain("SOMj9u0m");
+        assertThat(maskedUri).doesNotContain("dummyServiceKey");
         assertThat(maskedUri).contains("lDongRegnCd=26");
     }
 
