@@ -10,7 +10,7 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 import turip.common.configuration.CacheConfiguration;
 import turip.infrastructure.client.dto.KoreaTourismImageResponse;
-import turip.region.domain.LegalDistrictCode;
+import turip.region.domain.TourApiLegalDongCode;
 
 @Slf4j
 @Component
@@ -30,7 +30,7 @@ public class KoreaTourismImageClient {
 
     @Cacheable(value = CacheConfiguration.KOREA_TOURISM_IMAGE_CACHE, key = "#cityName", unless = "#result == null || #result.isEmpty()")
     public Optional<String> searchRegionImage(String cityName) {
-        String legalDistrictCode = LegalDistrictCode.getCodeByCityName(cityName);
+        String legalDistrictCode = TourApiLegalDongCode.getCodeByCityName(cityName);
         if (legalDistrictCode == null) {
             return Optional.empty();
         }

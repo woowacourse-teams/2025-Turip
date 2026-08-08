@@ -14,8 +14,8 @@ import turip.region.controller.dto.response.RegionCategoryResponse;
 import turip.region.domain.City;
 import turip.region.domain.Country;
 import turip.region.domain.DomesticRegionCategory;
-import turip.region.domain.LegalDistrictCode;
 import turip.region.domain.OverseasRegionCategory;
+import turip.region.domain.TourApiLegalDongCode;
 
 @Service
 @RequiredArgsConstructor
@@ -63,7 +63,7 @@ public class RegionCategoryService {
     }
 
     private RegionCategoryResponse createRegionCategoryResponseWithImage(City city) {
-        if (LegalDistrictCode.isSupportedCity(city.getName())) {
+        if (TourApiLegalDongCode.isSupportedCity(city.getName())) {
             String imageUrl = koreaTourismImageClient.searchRegionImage(city.getName())
                     .orElse(city.getImageUrl());
             return RegionCategoryResponse.of(city, imageUrl);

@@ -2,7 +2,10 @@ package turip.region.domain;
 
 import java.util.Arrays;
 
-public enum LegalDistrictCode {
+/**
+ * 한국관광공사 TourAPI의 법정동 코드를 튜립 서버의 city name으로 매핑하여 관광사진 조회에 사용
+ */
+public enum TourApiLegalDongCode {
     SEOUL("서울", "11"),
     BUSAN("부산", "26"),
     INCHEON("인천", "28"),
@@ -12,7 +15,7 @@ public enum LegalDistrictCode {
     private final String cityName;
     private final String code;
 
-    LegalDistrictCode(String cityName, String code) {
+    TourApiLegalDongCode(String cityName, String code) {
         this.cityName = cityName;
         this.code = code;
     }
