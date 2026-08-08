@@ -2,11 +2,9 @@ package turip.common.configuration;
 
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.http.client.ClientHttpRequestFactoryBuilder;
 import org.springframework.boot.http.client.ClientHttpRequestFactorySettings;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 import turip.common.log.ExternalApiLoggingInterceptor;
 
@@ -20,14 +18,15 @@ public class RestClientConfiguration {
     private final ExternalApiLoggingInterceptor loggingInterceptor;
 
     @Bean
-    public RestClient baseRestClient(RestClient.Builder builder) {
-        ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.defaults()
+    public ClientHttpRequestFactorySettings clientHttpRequestFactorySettings() {
+        return ClientHttpRequestFactorySettings.defaults()
                 .withConnectTimeout(CONNECT_TIMEOUT)
                 .withReadTimeout(READ_TIMEOUT);
-        ClientHttpRequestFactory requestFactory = ClientHttpRequestFactoryBuilder.detect().build(settings);
+    }
 
+    @Bean
+    public RestClient baseRestClient(RestClient.Builder builder) {
         return builder
-                .requestFactory(requestFactory)
                 .requestInterceptor(loggingInterceptor)
                 .build();
     }
