@@ -97,6 +97,7 @@ jobs:
           OVERSEAS_ETC_IMAGE_URL=${{ secrets.OVERSEAS_ETC_IMAGE_URL }}
           CSV_IMPORT_PASSWORD=${{ secrets.CSV_IMPORT_PASSWORD }}
           INVITATION_JWT_SECRET_KEY=${{ secrets.INVITATION_JWT_SECRET_KEY }}
+          KOREA_TOURISM_API_KEY=${{ secrets.KOREA_TOURISM_API_KEY }}
           ENVEOF
 
       # ── 배포 ──────────────────────────────────────────────────────────────
