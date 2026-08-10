@@ -3,8 +3,6 @@ name: Load Test CD
 on:
   push:
     branches: [ loadtest ]
-    paths:
-      - 'backend/**'
   workflow_dispatch:
     inputs:
       skip_build:
@@ -23,15 +21,15 @@ env:
   SPRING_PROFILES_ACTIVE: loadtest
 
 jobs:
-  deploy:
-    runs-on: [ self-hosted, "turip-server-dev" ]
+  build:
+    if: github.event_name == 'push' || github.event.inputs.skip_build != 'yes'
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up JDK ${{ env.JAVA_VERSION }}
-        if: github.event.inputs.skip_build != 'yes'
         uses: actions/setup-java@v4
         with:
           java-version: ${{ env.JAVA_VERSION }}
@@ -39,14 +37,12 @@ jobs:
           cache: 'gradle'
 
       - name: Build Jar (테스트 스킵)
-        if: github.event.inputs.skip_build != 'yes'
         working-directory: ${{ env.WORKING_DIR }}
         run: |
           chmod +x gradlew
           ./gradlew :turip-app:bootJar -x test
 
       - name: Prepare OpenTelemetry agent
-        if: github.event.inputs.skip_build != 'yes'
         working-directory: ${{ env.WORKING_DIR }}
         run: |
           mkdir -p otel
@@ -54,20 +50,18 @@ jobs:
           https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v2.10.0/opentelemetry-javaagent.jar
 
       - name: Login to Docker Hub
-        if: github.event.inputs.skip_build != 'yes'
         uses: docker/login-action@v3.3.0
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Set up QEMU (arm64 크로스 빌드용)
+        uses: docker/setup-qemu-action@v3
+
       - name: Set up Docker Buildx
-        if: github.event.inputs.skip_build != 'yes'
         uses: docker/setup-buildx-action@v3.7.1
-        with:
-          driver-opts: network=host
 
       - name: Build and push image
-        if: github.event.inputs.skip_build != 'yes'
         uses: docker/build-push-action@v6.10.0
         with:
           context: ./${{ env.WORKING_DIR }}
@@ -77,6 +71,15 @@ jobs:
           tags: ${{ env.DOCKER_IMAGE_REPO }}:${{ env.IMAGE_TAG }}
           cache-from: type=registry,ref=${{ env.DOCKER_IMAGE_REPO }}:${{ env.IMAGE_TAG }}
           cache-to:   type=inline
+
+  deploy:
+    needs: build
+    if: always() && (needs.build.result == 'success' || needs.build.result == 'skipped')
+    runs-on: [ self-hosted, "turip-server-dev" ]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Write .env
         working-directory: ${{ env.WORKING_DIR }}
@@ -99,6 +102,9 @@ jobs:
           INVITATION_JWT_SECRET_KEY=${{ secrets.INVITATION_JWT_SECRET_KEY }}
           KOREA_TOURISM_API_KEY=${{ secrets.KOREA_TOURISM_API_KEY }}
           ENVEOF
+
+      - name: Pull latest image
+        run: docker pull ${{ env.DOCKER_IMAGE_REPO }}:${{ env.IMAGE_TAG }}
 
       # ── 배포 ──────────────────────────────────────────────────────────────
       - name: Deploy
