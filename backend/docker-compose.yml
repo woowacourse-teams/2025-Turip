@@ -22,6 +22,8 @@ services:
     environment:
       OTEL_SERVICE_NAME: turip-app
       OTEL_RESOURCE_ATTRIBUTES: "deployment.environment.name=${SPRING_PROFILES_ACTIVE:-unknown}"
+      JAVA_OPTS: ${JAVA_OPTS:-}
+      SERVER_TOMCAT_THREADS_MAX: ${SERVER_TOMCAT_THREADS_MAX:-10}
     networks:
       - turip-network
     volumes:
@@ -38,6 +40,8 @@ services:
     environment:
       OTEL_SERVICE_NAME: turip-app
       OTEL_RESOURCE_ATTRIBUTES: "deployment.environment.name=${SPRING_PROFILES_ACTIVE:-unknown}"
+      JAVA_OPTS: ${JAVA_OPTS:-}
+      SERVER_TOMCAT_THREADS_MAX: ${SERVER_TOMCAT_THREADS_MAX:-10}
     networks:
       - turip-network
     volumes:
