@@ -1,0 +1,19 @@
+# H2 데이터베이스 전용 설정
+
+spring:
+  h2:
+    console:
+      enabled: true
+
+  datasource:
+    url: jdbc:h2:mem:database
+
+  sql:
+    init:
+      mode: never
+
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true

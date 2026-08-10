@@ -16,7 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import turip.container.TestContainerConfig;
 
-@ActiveProfiles("test-mysql")
+@ActiveProfiles({"test", "test-mysql"})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Transactional(propagation = org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED)
