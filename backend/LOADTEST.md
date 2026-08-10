@@ -101,4 +101,4 @@ docker run -e SPRING_PROFILES_ACTIVE=loadtest ...
 - `turip-app/src/main/java/turip/infrastructure/client/FcmClient.java` - FCM 인터페이스
 - `turip-app/src/main/java/turip/infrastructure/config/FirebaseConfig.java` - Firebase 설정 (loadtest 제외)
 - `turip-app/src/main/java/turip/auth/token/GoogleTokenParser.java` - Google OAuth (loadtest 제외)
-- `turip-app/src/main/java/turip/auth/token/AppleTokenParser.java` - Apple OAuth (loadtest 제외)
+- `turip-app/src/main/java/turip/auth/token/AppleTokenParser.java` - Apple OAuth (loadtest 제외) 
