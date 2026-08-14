@@ -21,7 +21,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -30,6 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.on.turip.core.designsystem.component.TuripAppBar
 import com.on.turip.core.designsystem.component.TuripDialog
 import com.on.turip.core.designsystem.generated.resources.Res
@@ -59,7 +59,7 @@ fun NotificationSettingScreen(
     modifier: Modifier = Modifier,
     viewModel: NotificationSettingViewModel = koinViewModel(),
 ) {
-    val uiState: NotificationSettingState by viewModel.uiState.collectAsState()
+    val uiState: NotificationSettingState by viewModel.uiState.collectAsStateWithLifecycle()
     val permissionActions = rememberNotificationPermissionActions()
     val coroutineScope = rememberCoroutineScope()
     val snackbarDelegate = LocalSnackbarDelegate.current
