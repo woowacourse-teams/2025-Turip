@@ -47,4 +47,11 @@ public enum DomesticRegionCategory {
     public boolean matchesDisplayName(String name) {
         return this.displayName.equals(name);
     }
+
+    public static DomesticRegionCategory fromDisplayName(String displayName) {
+        return Arrays.stream(values())
+                .filter(category -> category.matchesDisplayName(displayName))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException(ErrorTag.REGION_CATEGORY_INVALID));
+    }
 }

@@ -5,6 +5,7 @@ import com.on.turip.core.data.datasource.AuthRefreshRemoteDataSource
 import com.on.turip.core.data.datasource.AuthRemoteDataSource
 import com.on.turip.core.data.datasource.BookmarkRemoteDataSource
 import com.on.turip.core.data.datasource.ContentRemoteDataSource
+import com.on.turip.core.data.datasource.FcmTokenRemoteDataSource
 import com.on.turip.core.data.datasource.GuestRemoteDataSource
 import com.on.turip.core.data.datasource.MemberRemoteDataSource
 import com.on.turip.core.data.datasource.RegionRemoteDataSource
@@ -15,6 +16,7 @@ import com.on.turip.core.network.datasourceimpl.DefaultAuthRefreshRemoteDataSour
 import com.on.turip.core.network.datasourceimpl.DefaultAuthRemoteDataSource
 import com.on.turip.core.network.datasourceimpl.DefaultBookmarkRemoteDataSource
 import com.on.turip.core.network.datasourceimpl.DefaultContentRemoteDataSource
+import com.on.turip.core.network.datasourceimpl.DefaultFcmTokenRemoteDataSource
 import com.on.turip.core.network.datasourceimpl.DefaultGuestRemoteDataSource
 import com.on.turip.core.network.datasourceimpl.DefaultMemberRemoteDataSource
 import com.on.turip.core.network.datasourceimpl.DefaultRegionRemoteDataSource
@@ -44,6 +46,7 @@ fun datasourceModule(baseUrl: String) = module {
     single<MemberRemoteDataSource> { DefaultMemberRemoteDataSource(memberService = get()) }
     single<RegionRemoteDataSource> { DefaultRegionRemoteDataSource(regionService = get()) }
     single<TuripRemoteDataSource> { DefaultTuripRemoteDataSource(turipService = get()) }
+    single<FcmTokenRemoteDataSource> { DefaultFcmTokenRemoteDataSource(fcmTokenService = get()) }
     single {
         Json {
             ignoreUnknownKeys = true

@@ -17,7 +17,7 @@ import turip.account.domain.Role;
 import turip.auth.token.GoogleTokenParser;
 import turip.util.helper.TestDataHelper;
 
-@ActiveProfiles("test")
+@ActiveProfiles({"test", "h2"})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class AccountApiTest {
 

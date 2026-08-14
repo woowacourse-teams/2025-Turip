@@ -27,7 +27,7 @@ import turip.util.fixture.AccountFixture;
 import turip.util.fixture.ContentPendingFixture;
 import turip.util.helper.TestDataHelper;
 
-@ActiveProfiles("test-mysql")
+@ActiveProfiles({"test", "test-mysql"})
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         classes = turip.TuripAdminApplication.class

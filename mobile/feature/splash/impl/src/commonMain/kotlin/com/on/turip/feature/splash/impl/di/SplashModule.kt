@@ -16,6 +16,6 @@ val splashModule = module {
     single { InvitationNavigationCoordinator() }
     single { SplashNavKeyProvider(get()) } bind NavKeyProvider::class
     viewModel {
-        SplashViewModel(get(), get(), get())
+        SplashViewModel(get(), get(), get(), get())
     }
 }

@@ -26,7 +26,7 @@ import turip.content.domain.ContentPendingStatus;
 
 @DataJpaTest
 @EnableJpaAuditing
-@ActiveProfiles("test-mysql")
+@ActiveProfiles({"test", "test-mysql"})
 class ContentPendingRepositoryTest extends TestContainerConfig {
 
     @Autowired

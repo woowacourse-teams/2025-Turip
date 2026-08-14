@@ -5,16 +5,18 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import turip.region.domain.City;
 import turip.content.repository.ContentRepository;
-import turip.region.domain.Country;
 import turip.region.controller.dto.response.RegionCategoriesResponse;
 import turip.region.controller.dto.response.RegionCategoryResponse;
+import turip.region.domain.City;
+import turip.region.domain.Country;
 import turip.region.domain.DomesticRegionCategory;
 import turip.region.domain.OverseasRegionCategory;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RegionCategoryService {
@@ -25,6 +27,7 @@ public class RegionCategoryService {
     private final CityService cityService;
     private final CountryService countryService;
     private final ContentRepository contentRepository;
+
     @Value("${region.category.domestic.etc.image-url}")
     private String domesticEtcImageUrl;
     @Value("${region.category.overseas.etc.image-url}")

@@ -56,6 +56,7 @@ fun MyPageScreen(
     onNavigateToInquiry: (mail: InquiryMail) -> Unit,
     onNavigateToPrivacyPolicy: (url: String) -> Unit,
     onNavigateToLogin: () -> Unit,
+    onNavigateToNotificationSetting: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MyPageViewModel = koinViewModel(),
 ) {
@@ -138,6 +139,7 @@ fun MyPageScreen(
         onDialogConfirmLogout = viewModel::confirmLogout,
         onDialogConfirmWithdraw = viewModel::confirmWithdraw,
         onDialogDismiss = viewModel::dismissDialog,
+        onNotificationSettingClick = onNavigateToNotificationSetting,
         modifier = modifier,
     )
 }
@@ -159,6 +161,7 @@ private fun MyPageScreenContent(
     onDialogConfirmLogout: () -> Unit,
     onDialogConfirmWithdraw: () -> Unit,
     onDialogDismiss: () -> Unit,
+    onNotificationSettingClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     uiState.dialogState?.let { dialogState: MyPageDialogState ->
@@ -198,7 +201,7 @@ private fun MyPageScreenContent(
                 .background(TuripTheme.colors.white)
                 .systemBarsPadding(),
     ) {
-        MyPageAppBar()
+        MyPageAppBar(onNotificationSettingClick = onNotificationSettingClick)
         LazyColumn(
             contentPadding =
                 PaddingValues(

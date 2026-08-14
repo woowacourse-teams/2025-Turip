@@ -22,7 +22,7 @@ import turip.util.fixture.FavoriteFolderFixture;
 import turip.util.fixture.MemberFixture;
 
 @DataJpaTest
-@ActiveProfiles("test")
+@ActiveProfiles({"test", "h2"})
 class FavoriteFolderAccountRepositoryTest {
 
     @Autowired
