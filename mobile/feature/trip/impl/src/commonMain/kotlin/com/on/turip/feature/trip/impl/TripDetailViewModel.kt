@@ -241,8 +241,9 @@ class TripDetailViewModel(
             }
         }
 
+    // 길이 제한은 NameEditorSheetContent 의 InputTransformation 이 담당한다.
+    // 여기서 입력을 되돌리면 iOS 한글 IME 의 조합이 깨진다.
     fun updateAddTuripInputName(name: String) {
-        if (name.length > MAX_NAME_LENGTH) return
         val status = TuripNameStatusModel.of(name, persistentListOf())
         _uiState.update {
             it.copy(
@@ -317,8 +318,6 @@ class TripDetailViewModel(
     }
 
     private companion object {
-        private const val MAX_NAME_LENGTH = 20
-
         private const val INVALID_ID = -1L
         private const val BOOKMARK_DEBOUNCE_MS = 500L
     }

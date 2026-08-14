@@ -95,9 +95,9 @@ class MyTuripViewModel(
     fun dismissTuripRemoveDialog() = _uiState.update { it.copy(dialogState = null) }
 
     // 함께 튜립명은 나홀로 튜립 또는 함께 튜립과 중복될 수 있으므로 중복 검사 대상이 아니다.
+    // 길이 제한은 NameEditorSheetContent 의 InputTransformation 이 담당한다.
+    // 여기서 입력을 되돌리면 iOS 한글 IME 의 조합이 깨진다.
     fun updateInputName(name: String) {
-        if (name.length > MAX_NAME_LENGTH) return
-
         val editModels: List<TuripEditModel> =
             _uiState.value.turips
                 .filter { it.type != TuripType.TOGETHER }
@@ -251,9 +251,5 @@ class MyTuripViewModel(
                     _uiState.update { MyTuripUiState.Idle }
                 }
         }
-    }
-
-    companion object {
-        private const val MAX_NAME_LENGTH = 20
     }
 }
