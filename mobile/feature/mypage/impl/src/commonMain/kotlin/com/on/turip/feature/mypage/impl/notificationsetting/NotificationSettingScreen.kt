@@ -33,6 +33,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.on.turip.core.designsystem.component.TuripAppBar
 import com.on.turip.core.designsystem.component.TuripDialog
 import com.on.turip.core.designsystem.generated.resources.Res
+import com.on.turip.core.designsystem.generated.resources.all_back_description
 import com.on.turip.core.designsystem.generated.resources.all_close_description
 import com.on.turip.core.designsystem.generated.resources.my_page_notification_permission_banner
 import com.on.turip.core.designsystem.generated.resources.my_page_notification_permission_dialog_confirm
@@ -119,7 +120,7 @@ fun NotificationSettingScreen(
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = null,
+                        contentDescription = stringResource(Res.string.all_back_description),
                         tint = TuripTheme.colors.black,
                     )
                 }

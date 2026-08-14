@@ -12,6 +12,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.on.turip.core.designsystem.component.TuripAppBar
 import com.on.turip.core.designsystem.generated.resources.Res
+import com.on.turip.core.designsystem.generated.resources.my_page_notification_setting
 import com.on.turip.core.designsystem.generated.resources.my_page_title
 import com.on.turip.core.designsystem.theme.TuripTheme
 import org.jetbrains.compose.resources.stringResource
@@ -32,7 +33,7 @@ fun MyPageAppBar(onNotificationSettingClick: () -> Unit) {
             ) {
                 Icon(
                     imageVector = Icons.Default.Settings,
-                    contentDescription = null,
+                    contentDescription = stringResource(Res.string.my_page_notification_setting),
                     tint = TuripTheme.colors.black,
                 )
             }
