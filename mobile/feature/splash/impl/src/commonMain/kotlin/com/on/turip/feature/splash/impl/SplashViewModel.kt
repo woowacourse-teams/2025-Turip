@@ -3,6 +3,7 @@ package com.on.turip.feature.splash.impl
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.on.turip.core.data.session.SessionManager
+import com.on.turip.core.domain.fcm.FcmTokenRegistrar
 import com.on.turip.core.domain.repository.DeferredDeepLinkRepository
 import com.on.turip.core.domain.session.AuthStatus
 import com.on.turip.core.domain.session.SessionState
@@ -20,6 +21,7 @@ class SplashViewModel(
     private val determineInitialSessionUseCase: DetermineInitialSessionUseCase,
     private val sessionManager: SessionManager,
     private val deferredDeepLinkRepository: DeferredDeepLinkRepository,
+    private val fcmTokenRegistrar: FcmTokenRegistrar,
 ) : ViewModel() {
     private val _uiEffect: Channel<SplashUiEffect> = Channel(Channel.BUFFERED)
     val uiEffect: Flow<SplashUiEffect> = _uiEffect.receiveAsFlow()
@@ -89,7 +91,10 @@ class SplashViewModel(
 
     private suspend fun switchSession(authStatus: AuthStatus) {
         when (authStatus) {
-            AuthStatus.Authenticated -> sessionManager.switchToMember()
+            AuthStatus.Authenticated -> {
+                sessionManager.switchToMember()
+                fcmTokenRegistrar.register()
+            }
             AuthStatus.UnAuthenticated -> sessionManager.switchToGuest()
         }
     }

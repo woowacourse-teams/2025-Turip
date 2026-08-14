@@ -4,6 +4,7 @@ import com.on.turip.core.network.service.AccountService
 import com.on.turip.core.network.service.AuthService
 import com.on.turip.core.network.service.BookmarkService
 import com.on.turip.core.network.service.ContentService
+import com.on.turip.core.network.service.FcmTokenService
 import com.on.turip.core.network.service.GuestService
 import com.on.turip.core.network.service.MemberService
 import com.on.turip.core.network.service.RegionService
@@ -12,6 +13,7 @@ import com.on.turip.core.network.service.createAccountService
 import com.on.turip.core.network.service.createAuthService
 import com.on.turip.core.network.service.createBookmarkService
 import com.on.turip.core.network.service.createContentService
+import com.on.turip.core.network.service.createFcmTokenService
 import com.on.turip.core.network.service.createGuestService
 import com.on.turip.core.network.service.createMemberService
 import com.on.turip.core.network.service.createRegionService
@@ -34,4 +36,5 @@ val serviceModule = module {
     single<ContentService> { get<Ktorfit>(named(DEFAULT_KTORFIT)).createContentService() }
     single<BookmarkService> { get<Ktorfit>(named(DEFAULT_KTORFIT)).createBookmarkService() }
     single<RegionService> { get<Ktorfit>(named(DEFAULT_KTORFIT)).createRegionService() }
+    single<FcmTokenService> { get<Ktorfit>(named(DEFAULT_KTORFIT)).createFcmTokenService() }
 }

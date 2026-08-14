@@ -23,6 +23,9 @@ private object ErrorTag {
     const val TURIP_PLACE_NOT_FOUND = "TURIP_PLACE_NOT_FOUND"
     const val DUPLICATE_PLACE_IN_TURIP = "DUPLICATE_PLACE_IN_TURIP"
     const val DUPLICATE_BOOKMARKED = "DUPLICATE_BOOKMARKED"
+    const val FCM_TOKEN_BLANK = "FCM_TOKEN_BLANK"
+    const val NOTIFICATION_ENABLED_REQUIRED = "NOTIFICATION_ENABLED_REQUIRED"
+    const val FCM_TOKEN_NOT_FOUND = "FCM_TOKEN_NOT_FOUND"
 }
 
 fun String.toNetworkError(): NetworkError = when (this) {
@@ -46,5 +49,8 @@ fun String.toNetworkError(): NetworkError = when (this) {
     ErrorTag.TURIP_PLACE_NOT_FOUND -> NetworkError.TuripPlace.NotFound
     ErrorTag.DUPLICATE_PLACE_IN_TURIP -> NetworkError.TuripPlace.DuplicatePlaceInTurip
     ErrorTag.DUPLICATE_BOOKMARKED -> NetworkError.Bookmark.DuplicateBookmarked
+    ErrorTag.FCM_TOKEN_BLANK -> NetworkError.FcmToken.Blank
+    ErrorTag.NOTIFICATION_ENABLED_REQUIRED -> NetworkError.FcmToken.NotificationEnabledRequired
+    ErrorTag.FCM_TOKEN_NOT_FOUND -> NetworkError.FcmToken.NotFound
     else -> NetworkError.Unknown()
 }

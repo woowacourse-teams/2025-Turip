@@ -10,7 +10,7 @@ import org.koin.dsl.module
 
 val loginModule = module {
     single { LoginNavKeyProvider() } bind NavKeyProvider::class
-    single { LoginUseCase(get(), get(), get()) }
+    single { LoginUseCase(get(), get(), get(), get()) }
     viewModel {
         LoginViewModel(get(), get(), get(), get())
     }
