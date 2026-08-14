@@ -32,7 +32,7 @@
 
 ### 2단계 — DTO (core:data)
 
-```
+```text
 core/data/.../dto/fcm/
 ├── FcmTokenRegisterRequest.kt        # @Serializable, val token: String
 └── FcmNotificationEnabledRequest.kt  # @Serializable, val notificationEnabled: Boolean
@@ -133,7 +133,7 @@ class RegisterFcmTokenUseCase(
 
 현재 로컬 상태 스위치를 표준 MVIA 구조로 재작성:
 
-```
+```text
 feature/mypage/impl/.../notificationsetting/
 ├── NotificationSettingScreen.kt              # koinViewModel() + effect collect
 ├── NotificationSettingViewModel.kt           # BaseViewModel 상속
