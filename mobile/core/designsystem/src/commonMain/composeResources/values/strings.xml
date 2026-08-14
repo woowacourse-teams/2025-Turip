@@ -60,6 +60,7 @@
     <string name="my_page_notification_permission_banner">기기 알림 설정이 꺼져 있어 알림을 받을 수 없어요</string>
     <string name="my_page_notification_permission_go_to_settings">설정으로 이동</string>
     <string name="my_page_notification_update_failed">알림 설정 변경에 실패했어요</string>
+    <string name="my_page_notification_load_failed">알림 설정을 불러오지 못했어요</string>
     <string name="my_page_inquiry">문의하기</string>
     <string name="my_page_privacy_policy">개인 정보 처리 방침</string>
     <string name="my_page_login">로그인</string>

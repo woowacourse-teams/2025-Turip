@@ -6,4 +6,6 @@ sealed interface NotificationSettingEffect : UiEffect {
     data object OpenNotificationSettings : NotificationSettingEffect
 
     data object ShowUpdateFailed : NotificationSettingEffect
+
+    data object ShowLoadFailed : NotificationSettingEffect
 }

@@ -7,5 +7,5 @@ interface FcmTokenRepository {
 
     suspend fun updateNotificationEnabled(enabled: Boolean): TuripResult<Unit>
 
-    suspend fun getNotificationEnabled(): Boolean
+    suspend fun getNotificationEnabled(): TuripResult<Boolean>
 }

@@ -5,7 +5,10 @@ import com.on.turip.core.domain.repository.FcmTokenRepository
 import com.on.turip.core.domain.usecase.RegisterFcmTokenUseCase
 import com.on.turip.core.model.result.ErrorType
 import com.on.turip.core.model.result.TuripResult
+import com.on.turip.core.model.result.onFailureWithCause
+import com.on.turip.core.model.result.onSuccess
 import com.on.turip.core.ui.BaseViewModel
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
@@ -32,8 +35,15 @@ class NotificationSettingViewModel(
 
     private fun loadNotificationEnabled() {
         viewModelScope.launch {
-            val enabled = fcmTokenRepository.getNotificationEnabled()
-            updateState { copy(isPushNotificationEnabled = enabled, isLoading = false) }
+            fcmTokenRepository
+                .getNotificationEnabled()
+                .onSuccess { enabled ->
+                    updateState { copy(isPushNotificationEnabled = enabled, isLoading = false) }
+                }.onFailureWithCause { errorType, cause ->
+                    Napier.w("알림 설정 조회 실패. errorType=$errorType", cause, tag = "FcmToken")
+                    updateState { copy(isLoading = false) }
+                    emitEffect(NotificationSettingEffect.ShowLoadFailed)
+                }
         }
     }
 

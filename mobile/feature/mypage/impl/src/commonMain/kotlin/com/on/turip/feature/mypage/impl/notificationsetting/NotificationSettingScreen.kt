@@ -40,6 +40,7 @@ import com.on.turip.core.designsystem.generated.resources.my_page_notification_p
 import com.on.turip.core.designsystem.generated.resources.my_page_notification_permission_dialog_dismiss
 import com.on.turip.core.designsystem.generated.resources.my_page_notification_permission_dialog_message
 import com.on.turip.core.designsystem.generated.resources.my_page_notification_permission_dialog_title
+import com.on.turip.core.designsystem.generated.resources.my_page_notification_load_failed
 import com.on.turip.core.designsystem.generated.resources.my_page_notification_permission_go_to_settings
 import com.on.turip.core.designsystem.generated.resources.my_page_notification_setting
 import com.on.turip.core.designsystem.generated.resources.my_page_notification_update_failed
@@ -82,6 +83,14 @@ fun NotificationSettingScreen(
                 NotificationSettingEffect.ShowUpdateFailed -> {
                     snackbarDelegate.showSnackbar(
                         message = getString(Res.string.my_page_notification_update_failed),
+                        actionLabel = getString(Res.string.all_close_description),
+                        duration = SnackbarDuration.Short,
+                    )
+                }
+
+                NotificationSettingEffect.ShowLoadFailed -> {
+                    snackbarDelegate.showSnackbar(
+                        message = getString(Res.string.my_page_notification_load_failed),
                         actionLabel = getString(Res.string.all_close_description),
                         duration = SnackbarDuration.Short,
                     )
