@@ -35,12 +35,12 @@ import com.on.turip.core.designsystem.component.TuripDialog
 import com.on.turip.core.designsystem.generated.resources.Res
 import com.on.turip.core.designsystem.generated.resources.all_back_description
 import com.on.turip.core.designsystem.generated.resources.all_close_description
+import com.on.turip.core.designsystem.generated.resources.my_page_notification_load_failed
 import com.on.turip.core.designsystem.generated.resources.my_page_notification_permission_banner
 import com.on.turip.core.designsystem.generated.resources.my_page_notification_permission_dialog_confirm
 import com.on.turip.core.designsystem.generated.resources.my_page_notification_permission_dialog_dismiss
 import com.on.turip.core.designsystem.generated.resources.my_page_notification_permission_dialog_message
 import com.on.turip.core.designsystem.generated.resources.my_page_notification_permission_dialog_title
-import com.on.turip.core.designsystem.generated.resources.my_page_notification_load_failed
 import com.on.turip.core.designsystem.generated.resources.my_page_notification_permission_go_to_settings
 import com.on.turip.core.designsystem.generated.resources.my_page_notification_setting
 import com.on.turip.core.designsystem.generated.resources.my_page_notification_update_failed

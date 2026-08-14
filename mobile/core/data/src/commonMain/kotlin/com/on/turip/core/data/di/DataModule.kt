@@ -14,6 +14,7 @@ import com.on.turip.core.data.repository.DefaultTuripRepository
 import com.on.turip.core.data.session.SessionManager
 import com.on.turip.core.data.userstorage.DefaultTokenManager
 import com.on.turip.core.data.userstorage.DefaultUserStorageRepository
+import com.on.turip.core.domain.fcm.FcmTokenRegistrar
 import com.on.turip.core.domain.repository.AccountRepository
 import com.on.turip.core.domain.repository.AuthRepository
 import com.on.turip.core.domain.repository.BookmarkRepository
@@ -58,4 +59,5 @@ val dataModule = module {
     single<TuripStreamHeartbeatManager> { TuripStreamHeartbeatManager() }
     single<ObserveTuripStreamUseCase> { ObserveTuripStreamUseCase(get(), get()) }
     single<RegisterFcmTokenUseCase> { RegisterFcmTokenUseCase(get(), get()) }
+    single { FcmTokenRegistrar(registerFcmTokenUseCase = get()) }
 }
