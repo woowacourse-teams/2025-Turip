@@ -24,7 +24,7 @@ import turip.util.fixture.AccountFixture;
 import turip.util.fixture.ContentPendingFixture;
 import turip.util.helper.TestDataHelper;
 
-@ActiveProfiles("test")
+@ActiveProfiles({"test", "h2"})
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         classes = turip.TuripAdminApplication.class

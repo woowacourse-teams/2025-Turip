@@ -59,6 +59,11 @@ youtube:
     key: ${YOUTUBE_API_KEY}
     url: https://www.googleapis.com/youtube/v3/videos
 
+korea-tourism:
+  api:
+    key: ${KOREA_TOURISM_API_KEY}
+    url: https://apis.data.go.kr/B551011/TarRlteTarService1/areaBasedList1
+
 apple:
   client-id: ${APPLE_CLIENT_ID}
 

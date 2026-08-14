@@ -18,7 +18,7 @@ import turip.util.fixture.FavoriteFolderAccountFixture;
 import turip.util.fixture.FavoriteFolderFixture;
 
 @DataJpaTest
-@ActiveProfiles("test")
+@ActiveProfiles({"test", "h2"})
 class FavoriteFolderRepositoryTest {
 
     @Autowired
