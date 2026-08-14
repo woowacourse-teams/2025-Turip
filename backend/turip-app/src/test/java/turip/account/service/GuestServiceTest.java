@@ -6,6 +6,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
+import jakarta.persistence.EntityManager;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -43,6 +44,9 @@ class GuestServiceTest {
 
     @Mock
     private FavoriteFolderService favoriteFolderService;
+
+    @Mock
+    private EntityManager entityManager;
 
     @DisplayName("DeviceFid로 Guest 조회 또는 생성 테스트")
     @Nested

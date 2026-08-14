@@ -15,6 +15,8 @@ import turip.favorite.repository.dto.FavoriteFolderItemCountResult;
 
 public interface FavoriteFolderAccountRepository extends JpaRepository<FavoriteFolderAccount, Long> {
 
+    List<FavoriteFolderAccount> findByAccount(Account account);
+
     int countByFavoriteFolder(FavoriteFolder favoriteFolder);
 
     @Query("""
@@ -33,6 +35,11 @@ public interface FavoriteFolderAccountRepository extends JpaRepository<FavoriteF
             "JOIN FavoriteFolderAccount ffa ON ffa.account.id = a.id " +
             "WHERE ffa.favoriteFolder.id = :favoriteFolderId")
     List<Member> findMembersByFavoriteFolderId(@Param("favoriteFolderId") Long favoriteFolderId);
+
+    @Query("SELECT a.id FROM Account a " +
+            "WHERE a.id IN (SELECT ffa.account.id FROM FavoriteFolderAccount ffa " +
+            "WHERE ffa.favoriteFolder.id = :favoriteFolderId)")
+    List<Long> findAccountIdsByFavoriteFolderId(Long favoriteFolderId);
 
     @Modifying
     @Query("UPDATE FavoriteFolderAccount ffa " +

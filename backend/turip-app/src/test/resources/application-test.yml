@@ -33,6 +33,7 @@ jwt:
 # Google OAuth 설정 (테스트용)
 google:
   client-id: test-google-client-id.apps.googleusercontent.com
+  ios-client-id: test-google-ios-client-id.apps.googleusercontent.com
   api:
     key: test-google-api-key
     url: https://test.google.com
@@ -46,6 +47,9 @@ youtube:
   api:
     key: test-youtube-api-key
     url: https://test.youtube.com
+
+apple:
+  client-id: com.teamturip.test
 
 # CSV Import 설정
 csv:

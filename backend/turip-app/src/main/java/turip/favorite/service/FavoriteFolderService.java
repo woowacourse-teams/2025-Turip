@@ -78,7 +78,8 @@ public class FavoriteFolderService {
 
         FavoriteFolderAccount favoriteFolderAccount = favoriteFolderAccountService.findOrCreate(favoriteFolder,
                 member.getAccount());
-        eventPublisher.publishEvent(FavoriteFolderUpdateEvent.of(favoriteFolderId, ActionType.MEMBER_JOINED));
+        eventPublisher.publishEvent(
+                FavoriteFolderUpdateEvent.of(favoriteFolderId, ActionType.MEMBER_JOINED, member.getAccount().getId()));
 
         return FavoriteFolderJoinResponse.from(favoriteFolderAccount);
     }
@@ -219,6 +220,21 @@ public class FavoriteFolderService {
         return FavoriteFolderExitResponse.of(false);
     }
 
+    @Transactional
+    public void deleteAloneFoldersByAccount(Account account) {
+        List<FavoriteFolder> aloneFolders = favoriteFolderRepository.findAloneFoldersByAccount(account);
+        for (FavoriteFolder personalFolder : aloneFolders) {
+            deleteFavoriteFolderWithAssociations(account, personalFolder);
+        }
+    }
+
+    @Transactional
+    public void deleteDefaultFolderByAccount(Account account) {
+        FavoriteFolder defaultFolder = favoriteFolderRepository.findDefaultFoldersByAccount(account)
+                .orElseThrow(() -> new NotFoundException(ErrorTag.DEFAULT_FOLDER_NOT_FOUND));
+        deleteFavoriteFolderWithAssociations(account, defaultFolder);
+    }
+
     public void validateFolderExists(Long favoriteFolderId) {
         if (!favoriteFolderRepository.existsById(favoriteFolderId)) {
             throw new NotFoundException(ErrorTag.FAVORITE_FOLDER_NOT_FOUND);
@@ -271,5 +287,11 @@ public class FavoriteFolderService {
     private void removeFavoriteFolderWithFavoritePlaces(Long favoriteFolderId, FavoriteFolder favoriteFolder) {
         favoritePlaceRepository.deleteAllByFavoriteFolder(favoriteFolder);
         favoriteFolderRepository.deleteById(favoriteFolderId);
+    }
+
+    private void deleteFavoriteFolderWithAssociations(Account account, FavoriteFolder defaultFolder) {
+        favoritePlaceRepository.deleteAllByFavoriteFolder(defaultFolder);
+        favoriteFolderAccountService.deleteByFavoriteFolderAndAccount(defaultFolder, account);
+        favoriteFolderRepository.delete(defaultFolder);
     }
 }

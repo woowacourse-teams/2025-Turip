@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import turip.account.domain.Provider;
@@ -26,9 +25,6 @@ class AccountApiTest {
     private int port;
 
     @Autowired
-    private JdbcTemplate jdbcTemplate;
-
-    @Autowired
     private TestDataHelper testDataHelper;
 
     @MockitoBean
@@ -37,34 +33,7 @@ class AccountApiTest {
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
-
-        jdbcTemplate.update("DELETE FROM refresh_token");
-        jdbcTemplate.update("DELETE FROM favorite_content");
-        jdbcTemplate.update("DELETE FROM favorite_place");
-        jdbcTemplate.update("DELETE FROM favorite_folder_account");
-        jdbcTemplate.update("DELETE FROM favorite_folder");
-        jdbcTemplate.update("DELETE FROM social_member");
-        jdbcTemplate.update("DELETE FROM member");
-        jdbcTemplate.update("DELETE FROM guest");
-        jdbcTemplate.update("DELETE FROM account");
-        jdbcTemplate.update("DELETE FROM content");
-        jdbcTemplate.update("DELETE FROM creator");
-        jdbcTemplate.update("DELETE FROM city");
-        jdbcTemplate.update("DELETE FROM country");
-
-        jdbcTemplate.update("ALTER TABLE refresh_token ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE favorite_content ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE favorite_place ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE favorite_folder ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE social_member ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE member ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE guest ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE account ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE favorite_folder_account ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE content ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE creator ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE city ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE country ALTER COLUMN id RESTART WITH 1");
+        testDataHelper.cleanDatabase();
     }
 
     @Nested

@@ -500,7 +500,7 @@ class FavoriteFolderServiceTest {
                     () -> assertThat(response.isShared()).isTrue(),
                     () -> assertThat(response.accountId()).isEqualTo(accountId),
                     () -> verify(eventPublisher).publishEvent(
-                            FavoriteFolderUpdateEvent.of(turipId, ActionType.MEMBER_JOINED))
+                            FavoriteFolderUpdateEvent.of(turipId, ActionType.MEMBER_JOINED, accountId))
             );
         }
 
@@ -823,6 +823,89 @@ class FavoriteFolderServiceTest {
             assertThatThrownBy(() -> favoriteFolderService.exitFolder(nonMemberAccount, folderId))
                     .isInstanceOf(ForbiddenException.class)
                     .hasMessage(ErrorTag.FORBIDDEN.getMessage());
+        }
+    }
+
+    @DisplayName("개인 폴더 삭제 테스트")
+    @Nested
+    class DeletePersonalFoldersByAccount {
+
+        @DisplayName("개인 폴더들을 삭제할 수 있다")
+        @Test
+        void deletePersonalFoldersByAccount() {
+            // given
+            Long accountId = 1L;
+            Long folderId1 = 1L;
+            Long folderId2 = 2L;
+
+            Account account = AccountFixture.createCustomAccount(accountId, Role.USER);
+            FavoriteFolder personalFolder1 = FavoriteFolderFixture.createCustomFolderWithId(folderId1, "개인 폴더 1");
+            FavoriteFolder personalFolder2 = FavoriteFolderFixture.createCustomFolderWithId(folderId2, "개인 폴더 2");
+
+            given(favoriteFolderRepository.findAloneFoldersByAccount(account))
+                    .willReturn(List.of(personalFolder1, personalFolder2));
+
+            // when
+            favoriteFolderService.deleteAloneFoldersByAccount(account);
+
+            // then
+            assertAll(
+                    () -> verify(favoritePlaceRepository).deleteAllByFavoriteFolder(personalFolder1),
+                    () -> verify(favoritePlaceRepository).deleteAllByFavoriteFolder(personalFolder2),
+                    () -> verify(favoriteFolderAccountService).deleteByFavoriteFolderAndAccount(personalFolder1,
+                            account),
+                    () -> verify(favoriteFolderAccountService).deleteByFavoriteFolderAndAccount(personalFolder2,
+                            account),
+                    () -> verify(favoriteFolderRepository).delete(personalFolder1),
+                    () -> verify(favoriteFolderRepository).delete(personalFolder2)
+            );
+        }
+    }
+
+    @DisplayName("기본 폴더 삭제 테스트")
+    @Nested
+    class DeleteDefaultFolderByAccount {
+
+        @DisplayName("계정 삭제 혹은 마이그레이션을 위해 기본 폴더를 삭제할 수 있다")
+        @Test
+        void deleteDefaultFolderByAccount1() {
+            // given
+            Long accountId = 1L;
+            Long folderId = 1L;
+
+            Account account = AccountFixture.createCustomAccount(accountId, Role.USER);
+            FavoriteFolder defaultFolder = FavoriteFolderFixture.createDefaultFolderWithId(folderId);
+
+            given(favoriteFolderRepository.findDefaultFoldersByAccount(account))
+                    .willReturn(Optional.of(defaultFolder));
+
+            // when
+            favoriteFolderService.deleteDefaultFolderByAccount(account);
+
+            // then
+            assertAll(
+                    () -> verify(favoritePlaceRepository).deleteAllByFavoriteFolder(defaultFolder),
+                    () -> verify(favoriteFolderAccountService).deleteByFavoriteFolderAndAccount(defaultFolder,
+                            account),
+                    () -> verify(favoriteFolderRepository).delete(defaultFolder)
+            );
+        }
+
+        @DisplayName("기본 폴더를 찾을 수 없는 경우 예외가 발생한다")
+        @Test
+        void deleteDefaultFolderByAccount2() {
+            // given
+            Long accountId = 1L;
+
+            Account account = AccountFixture.createCustomAccount(accountId, Role.USER);
+
+            given(favoriteFolderRepository.findDefaultFoldersByAccount(account))
+                    .willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> favoriteFolderService.deleteDefaultFolderByAccount(account))
+                    .isInstanceOf(NotFoundException.class)
+                    .hasMessage(ErrorTag.DEFAULT_FOLDER_NOT_FOUND.getMessage());
         }
     }
 

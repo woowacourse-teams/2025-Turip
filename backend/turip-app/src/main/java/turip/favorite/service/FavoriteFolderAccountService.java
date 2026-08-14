@@ -68,12 +68,22 @@ public class FavoriteFolderAccountService {
         return favoriteFolderAccountRepository.findMembersByFavoriteFolderId(favoriteFolderId);
     }
 
+    public List<Long> findAccountIdsByFavoriteFolder(Long folderId) {
+        return favoriteFolderAccountRepository.findAccountIdsByFavoriteFolderId(folderId);
+    }
+
     public int countByFavoriteFolder(FavoriteFolder favoriteFolder) {
         return favoriteFolderAccountRepository.countByFavoriteFolder(favoriteFolder);
     }
 
     public List<FavoriteFolderItemCountResult> countByFavoriteFolderIdsIn(List<Long> folderIds) {
         return favoriteFolderAccountRepository.countByFavoriteFolderIdsIn(folderIds);
+    }
+
+    @Transactional
+    public void updateAccount(Account oldAccount, Account newAccount) {
+        List<FavoriteFolderAccount> folders = favoriteFolderAccountRepository.findByAccount(oldAccount);
+        folders.forEach(folder -> folder.updateAccount(newAccount));
     }
 
     @Transactional

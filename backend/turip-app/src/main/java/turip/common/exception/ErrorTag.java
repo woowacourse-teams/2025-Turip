@@ -9,6 +9,9 @@ public enum ErrorTag {
     DEFAULT_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED("기본 찜폴더에는 이 작업을 수행할 수 없습니다."),
     REGION_CATEGORY_INVALID("잘못된 지역 카테고리입니다."),
     DEVICE_FID_REQUIRED("요청 헤더에 device_fid가 존재하지 않습니다."),
+    FCM_TOKEN_BLANK("FCM 토큰은 비워둘 수 없습니다."),
+    NOTIFICATION_ENABLED_REQUIRED("알림 수신 여부는 필수 값입니다."),
+
     FAVORITE_PLACE_FOLDER_MISMATCH("장소 찜이 해당 폴더에 존재하지 않습니다."),
     SHARED_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED("공유 찜폴더에는 이 작업을 수행할 수 없습니다."),
     PERSONAL_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED("개인 찜폴더에는 이 작업을 수행할 수 없습니다."),
@@ -40,11 +43,14 @@ public enum ErrorTag {
     ACCOUNT_NOT_FOUND("계정을 찾을 수 없습니다."),
     CONTENT_NOT_FOUND("컨텐츠를 찾을 수 없습니다."),
     FAVORITE_FOLDER_NOT_FOUND("찜폴더를 찾을 수 없습니다."),
+    DEFAULT_FOLDER_NOT_FOUND("기본 찜폴더를 찾을 수 없습니다."),
     PLACE_NOT_FOUND("장소를 찾을 수 없습니다."),
     FAVORITE_PLACE_NOT_FOUND("찜한 장소를 찾을 수 없습니다."),
     CREATOR_NOT_FOUND("크리에이터를 찾을 수 없습니다."),
     FAVORITE_CONTENT_NOT_FOUND("찜한 컨텐츠를 찾을 수 없습니다."),
     FAVORITE_FOLDER_ACCOUNT_NOT_FOUND("찜폴더에 참여중인 계정 목록에서 해당 계정을 찾을 수 없습니다."),
+    FCM_TOKEN_NOT_FOUND("FCM 토큰을 찾을 수 없습니다."),
+
 
     // 409 Conflict
     FAVORITE_FOLDER_NAME_CONFLICT("이미 존재하는 찜폴더 이름입니다."),
@@ -67,10 +73,18 @@ public enum ErrorTag {
     INVALID_YOUTUBE_URL("유효하지 않은 유튜브 URL입니다."),
     INVALID_TIMELINE_FORMAT("타임라인 형식이 올바르지 않습니다."),
     IS_ALREADY_APPROVED("이미 승인된 콘텐츠입니다."),
+    CONTENT_PENDING_NOT_FOUND("펜딩 콘텐츠를 찾을 수 없습니다."),
+    REJECT_REASON_REQUIRED("거절 사유를 입력해주세요."),
+    VALIDATOR_NOT_VALID("해당 콘텐츠를 검증할 권한이 없습니다."),
 
     // 404 Not Found
     YOUTUBE_VIDEO_NOT_FOUND("유튜브 영상을 찾을 수 없습니다."),
     CITY_NOT_FOUND("도시를 찾을 수 없습니다."),
+    ADMIN_NOT_FOUND("관리자 계정을 찾을 수 없습니다."),
+    NO_AVAILABLE_VALIDATOR("검수를 담당할 수 있는 다른 관리자가 없습니다. 관리자를 추가한 후 다시 시도해주세요."),
+
+    // 409 Conflict
+    DUPLICATE_PENDING_CONTENT("이미 검수 대기 중인 콘텐츠입니다."),
 
     // 500 Internal Server Error
     YOUTUBE_API_SERVER_ERROR("유튜브 API 서버에 에러가 발생했습니다.");

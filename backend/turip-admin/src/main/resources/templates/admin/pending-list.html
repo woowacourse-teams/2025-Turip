@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Turip Admin - 검수 대기 목록</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+        body {
+            background: linear-gradient(135deg, #becdfd, #ffffff);
+            min-height: 100vh;
+            font-family: 'Pretendard', sans-serif;
+            padding: 40px 0;
+        }
+
+        .header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .admin-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 35px;
+            margin-top: 60px;
+        }
+
+        .section-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: #333;
+            margin-bottom: 30px;
+            border-left: 6px solid #6e8efb;
+            padding-left: 20px;
+            letter-spacing: -1px;
+        }
+
+        /* 테이블 스타일 개선 (이미지 스타일 반영) */
+        .table {
+            --bs-table-hover-bg: #f8faff;
+            vertical-align: middle;
+        }
+
+        .table thead th {
+            border-bottom: 2px solid #f0f0f0;
+            color: #444;
+            font-weight: 700;
+            font-size: 15px;
+            padding: 15px 10px;
+        }
+
+        .table tbody td {
+            padding: 20px 10px;
+            border-bottom: 1px solid #f1f1f1;
+            color: #555;
+            font-size: 14px;
+        }
+
+        /* 영상 정보 텍스트 처리 */
+        .video-title {
+            font-weight: 700;
+            color: #333;
+            font-size: 15px;
+            margin-bottom: 4px;
+            display: block;
+            line-height: 1.4;
+        }
+
+        .channel-name {
+            font-size: 13px;
+            color: #888;
+            font-weight: 500;
+        }
+
+        /* 배지 스타일 (이미지의 부드러운 노란색 배지) */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 700;
+            background: #fef9e7; /* 이미지와 유사한 연한 노랑 */
+            color: #d4ac0d;
+            border: 1px solid #f9ebbe;
+        }
+
+        /* 상세 검수 버튼 (이미지의 파란색 둥근 스타일) */
+        .btn-review {
+            background: #8099ff; /* 이미지와 유사한 파란색 */
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 12px 12px 12px 2px; /* 살짝 변형된 둥근 모서리 */
+            font-size: 13px;
+            font-weight: 700;
+            transition: 0.2s;
+            text-decoration: none;
+            box-shadow: 0 4px 10px rgba(128, 153, 255, 0.3);
+        }
+
+        .btn-review:hover {
+            background: #6684ff;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .collector-name {
+            font-weight: 600;
+            color: #444;
+        }
+
+        .validator-name {
+            font-weight: 600;
+            color: #6e8efb;
+        }
+
+        .not-assigned {
+            color: #999;
+            font-style: italic;
+        }
+
+        /* 탭 스타일 */
+        .tab-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .tab-button {
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            color: #888;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .tab-button:hover {
+            color: #6e8efb;
+        }
+
+        .tab-button.active {
+            color: #6e8efb;
+            border-bottom-color: #6e8efb;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1 style="color: #667eea; font-size: 22px; font-weight: 800; margin:0;">Turip Admin</h1>
+    <a class="btn btn-sm btn-outline-primary fw-bold" href="/admin/home">홈으로 돌아가기</a>
+</div>
+
+<div class="container">
+    <div class="admin-card">
+        <h3 class="section-title">검수 대기 목록</h3>
+
+        <div class="tab-container">
+            <button class="tab-button active" data-tab="my" onclick="switchTab('my')">내 검수 요청</button>
+            <button class="tab-button" data-tab="all" onclick="switchTab('all')">전체 검수 요청</button>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th style="width: 50px;">ID</th>
+                    <th>영상 정보</th>
+                    <th style="width: 150px;">수집자</th>
+                    <th style="width: 150px;">담당자</th>
+                    <th style="width: 100px; text-align: center;">상태</th>
+                    <th style="width: 120px; text-align: right;">관리</th>
+                </tr>
+                </thead>
+                <tbody id="pendingTableBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentTab = 'my'; // 기본 탭은 '내 검수 요청'
+
+    function switchTab(tab) {
+        currentTab = tab;
+
+        // 탭 버튼 active 클래스 변경
+        document.querySelectorAll('.tab-button').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+
+        // 데이터 로드
+        loadPendingList(tab);
+    }
+
+    async function loadPendingList(tab = 'my') {
+        const tbody = document.getElementById('pendingTableBody');
+        const endpoint = tab === 'my'
+            ? '/api/v1/admin/content-pendings/my-list'
+            : '/api/v1/admin/content-pendings/list';
+
+        try {
+            const res = await fetch(endpoint);
+
+            if (!res.ok) {
+                const errorData = await res.json().catch(() => null);
+                const errorMessage = errorData?.message || `서버 오류 (${res.status})`;
+                throw new Error(errorMessage);
+            }
+
+            const list = await res.json();
+
+            if (list.length === 0) {
+                const emptyMessage = tab === 'my'
+                    ? '나에게 배정된 검수 요청이 없습니다.'
+                    : '검수 대기 중인 콘텐츠가 없습니다.';
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-5 text-muted">${emptyMessage}</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = '';
+            list.forEach(item => {
+                const tr = document.createElement('tr');
+
+                const tdId = document.createElement('td');
+                tdId.textContent = item.id;
+                tr.appendChild(tdId);
+
+                const tdVideo = document.createElement('td');
+                const videoTitle = document.createElement('span');
+                videoTitle.className = 'video-title';
+                videoTitle.textContent = item.videoTitle;
+                const channelName = document.createElement('span');
+                channelName.className = 'channel-name';
+                channelName.textContent = item.channelName;
+                tdVideo.appendChild(videoTitle);
+                tdVideo.appendChild(channelName);
+                tr.appendChild(tdVideo);
+
+                const tdCollector = document.createElement('td');
+                tdCollector.className = 'collector-name';
+                tdCollector.textContent = item.collectorNickname;
+                tr.appendChild(tdCollector);
+
+                const tdValidator = document.createElement('td');
+                if (item.validatorNickname) {
+                    tdValidator.className = 'validator-name';
+                    tdValidator.textContent = item.validatorNickname;
+                } else {
+                    tdValidator.className = 'not-assigned';
+                    tdValidator.textContent = '미배정';
+                }
+                tr.appendChild(tdValidator);
+
+                const tdStatus = document.createElement('td');
+                tdStatus.className = 'text-center';
+                const statusBadge = document.createElement('span');
+                statusBadge.className = 'status-badge';
+                statusBadge.textContent = '대기 중';
+                tdStatus.appendChild(statusBadge);
+                tr.appendChild(tdStatus);
+
+                const tdAction = document.createElement('td');
+                tdAction.className = 'text-end';
+                const link = document.createElement('a');
+                link.href = `/admin/contents/pending/${item.id}`;
+                link.className = 'btn-review';
+                link.textContent = '상세 검수';
+                tdAction.appendChild(link);
+                tr.appendChild(tdAction);
+
+                tbody.appendChild(tr);
+            });
+        } catch (e) {
+            console.error("데이터 로드 실패:", e);
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center py-5 text-danger">⚠️ 데이터를 불러오는데 실패했습니다: ' + e.message + '</td></tr>';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => loadPendingList('my'));
+</script>
+</body>
+</html>

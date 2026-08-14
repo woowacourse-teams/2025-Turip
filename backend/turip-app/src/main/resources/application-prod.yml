@@ -32,3 +32,6 @@ csv:
 logging:
   level:
     root: INFO
+
+firebase:
+  service-account-key-path: classpath:firebase-service-account-prod.json

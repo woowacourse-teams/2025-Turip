@@ -2,17 +2,15 @@ package turip.favorite.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import jakarta.persistence.EntityManager;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 import turip.account.domain.Account;
 import turip.account.repository.AccountRepository;
-import turip.container.TestContainerConfig;
 import turip.favorite.domain.AccountRole;
 import turip.favorite.domain.FavoriteFolder;
 import turip.util.fixture.AccountFixture;
@@ -20,9 +18,8 @@ import turip.util.fixture.FavoriteFolderAccountFixture;
 import turip.util.fixture.FavoriteFolderFixture;
 
 @DataJpaTest
-@ActiveProfiles("test-mysql")
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class FavoriteFolderRepositoryTest extends TestContainerConfig {
+@ActiveProfiles("test")
+class FavoriteFolderRepositoryTest {
 
     @Autowired
     private FavoriteFolderRepository favoriteFolderRepository;
@@ -32,9 +29,6 @@ class FavoriteFolderRepositoryTest extends TestContainerConfig {
 
     @Autowired
     private AccountRepository accountRepository;
-
-    @Autowired
-    private EntityManager entityManager;
 
     @Test
     @DisplayName("계정의 모든 폴더를 조회한다")
@@ -123,59 +117,54 @@ class FavoriteFolderRepositoryTest extends TestContainerConfig {
     }
 
     @Test
-    @DisplayName("계정에 대한 폴더를 삭제할 때, 공유 폴더는 삭제하지 않는다")
-    void deletePersonalFoldersByAccount() {
+    @DisplayName("계정에 대해 혼자 참여중인 폴더들을 조회한다")
+    void findAloneFoldersByAccount() {
         // given
-        Account account = accountRepository.save(AccountFixture.createEntity());
+        Account account1 = accountRepository.save(AccountFixture.createEntity());
+        Account account2 = accountRepository.save(AccountFixture.createEntity());
 
-        // Personal folders (isShared = false)
-        FavoriteFolder personalFolder1 = favoriteFolderRepository.save(
-                FavoriteFolderFixture.createCustomFolder("개인 폴더1"));
-        FavoriteFolder personalFolder2 = favoriteFolderRepository.save(FavoriteFolderFixture.createDefaultFolder());
+        FavoriteFolder folder1 = favoriteFolderRepository.save(FavoriteFolderFixture.createDefaultFolder());
+        FavoriteFolder folder2 = favoriteFolderRepository.save(FavoriteFolderFixture.createSharedFolder("공유 폴더"));
+        FavoriteFolder folder3 = favoriteFolderRepository.save(FavoriteFolderFixture.createCustomFolder("개인 폴더"));
 
-        // Shared folder (isShared = true)
-        FavoriteFolder sharedFolder = favoriteFolderRepository.save(FavoriteFolderFixture.createCustomFolder("공유 폴더"));
-        sharedFolder.convertToSharedFolder();
-        favoriteFolderRepository.save(sharedFolder);
-
-        // 폴더와 계정 연결
         favoriteFolderAccountRepository.save(
-                FavoriteFolderAccountFixture.createFavoriteFolderAccount(personalFolder1, account, AccountRole.OWNER));
+                FavoriteFolderAccountFixture.createFavoriteFolderAccount(folder1, account1, AccountRole.OWNER));
         favoriteFolderAccountRepository.save(
-                FavoriteFolderAccountFixture.createFavoriteFolderAccount(personalFolder2, account, AccountRole.OWNER));
+                FavoriteFolderAccountFixture.createFavoriteFolderAccount(folder2, account1, AccountRole.OWNER));
         favoriteFolderAccountRepository.save(
-                FavoriteFolderAccountFixture.createFavoriteFolderAccount(sharedFolder, account, AccountRole.OWNER));
+                FavoriteFolderAccountFixture.createFavoriteFolderAccount(folder2, account2, AccountRole.MEMBER));
+        favoriteFolderAccountRepository.save(
+                FavoriteFolderAccountFixture.createFavoriteFolderAccount(folder3, account1, AccountRole.OWNER));
 
         // when
-        favoriteFolderRepository.deletePersonalFoldersByAccount(account);
-        entityManager.flush();
-        entityManager.clear();
+        List<FavoriteFolder> personalFolders = favoriteFolderRepository.findAloneFoldersByAccount(account1);
 
         // then
-        assertThat(favoriteFolderRepository.findById(personalFolder1.getId())).isEmpty();
-        assertThat(favoriteFolderRepository.findById(personalFolder2.getId())).isEmpty();
-        assertThat(favoriteFolderRepository.findById(sharedFolder.getId())).isPresent();
+        assertThat(personalFolders).hasSize(2);
+        assertThat(personalFolders).containsExactly(folder1, folder3);
     }
 
     @Test
-    @DisplayName("특정 계정의 기본 폴더를 삭제할 수 있다")
-    void deleteDefaultFoldersByAccount() {
+    @DisplayName("계정에 대한 기본 폴더를 조회한다")
+    void findDefaultFoldersByAccount() {
         // given
-        Account account = accountRepository.save(AccountFixture.createEntity());
+        Account account1 = accountRepository.save(AccountFixture.createEntity());
 
-        FavoriteFolder defaultFolder = favoriteFolderRepository.save(FavoriteFolderFixture.createDefaultFolder());
+        FavoriteFolder folder1 = favoriteFolderRepository.save(FavoriteFolderFixture.createDefaultFolder());
+        FavoriteFolder folder2 = favoriteFolderRepository.save(FavoriteFolderFixture.createSharedFolder("공유 폴더"));
+        FavoriteFolder folder3 = favoriteFolderRepository.save(FavoriteFolderFixture.createCustomFolder("개인 폴더"));
 
-        // 폴더와 계정 연결
         favoriteFolderAccountRepository.save(
-                FavoriteFolderAccountFixture.createFavoriteFolderAccount(defaultFolder, account, AccountRole.OWNER));
+                FavoriteFolderAccountFixture.createFavoriteFolderAccount(folder1, account1, AccountRole.OWNER));
+        favoriteFolderAccountRepository.save(
+                FavoriteFolderAccountFixture.createFavoriteFolderAccount(folder2, account1, AccountRole.OWNER));
+        favoriteFolderAccountRepository.save(
+                FavoriteFolderAccountFixture.createFavoriteFolderAccount(folder3, account1, AccountRole.OWNER));
 
         // when
-        favoriteFolderRepository.deleteDefaultFolderByAccount(account);
-        entityManager.flush();
-        entityManager.clear();
+        Optional<FavoriteFolder> defaultFolder = favoriteFolderRepository.findDefaultFoldersByAccount(account1);
 
         // then
-        assertThat(favoriteFolderRepository.findById(defaultFolder.getId())).isEmpty();
-        assertThat(favoriteFolderAccountRepository.findByFavoriteFolderAndAccount(defaultFolder, account)).isEmpty();
+        assertThat(defaultFolder.get()).isEqualTo(folder1);
     }
 }
