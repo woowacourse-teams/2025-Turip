@@ -19,19 +19,19 @@ public enum TourApiAreaCode {
     SEOUL(11, List.of(11110, 11440, 11140), DomesticRegionCategory.SEOUL),
 
     /**
-     * 인천광역시 areaCode: 2 sigunguCodes: 중구(28110), 강화군(28710), 연수구(28185)
+     * 인천광역시 areaCode: 28 sigunguCodes: 중구(28110), 강화군(28710), 연수구(28185)
      */
-    INCHEON(2, List.of(28110, 28710, 28185), DomesticRegionCategory.INCHEON),
+    INCHEON(28, List.of(28110, 28710, 28185), DomesticRegionCategory.INCHEON),
 
     /**
-     * 대전광역시 areaCode: 3 sigunguCodes: 유성구(30200), 중구(30140), 서구(30170)
+     * 대전광역시 areaCode: 30 sigunguCodes: 유성구(30200), 중구(30140), 서구(30170)
      */
-    DAEJEON(3, List.of(30200, 30140, 30170), DomesticRegionCategory.DAEJEON),
+    DAEJEON(30, List.of(30200, 30140, 30170), DomesticRegionCategory.DAEJEON),
 
     /**
-     * 부산광역시 areaCode: 6 sigunguCodes: 해운대구(26350), 중구(26110), 부산진구(26230)
+     * 부산광역시 areaCode: 26 sigunguCodes: 해운대구(26350), 중구(26110), 부산진구(26230)
      */
-    BUSAN(6, List.of(26350, 26110, 26230), DomesticRegionCategory.BUSAN),
+    BUSAN(26, List.of(26350, 26110, 26230), DomesticRegionCategory.BUSAN),
 
     /**
      * 강원도 > 강릉시 areaCode: 51 sigunguCodes: 강릉시(51150)
