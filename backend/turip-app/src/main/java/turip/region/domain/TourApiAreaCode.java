@@ -59,6 +59,31 @@ public enum TourApiAreaCode {
     JEJU(50, List.of(50110, 50130), DomesticRegionCategory.JEJU),
 
     /**
+     * 충청남도 > 공주시 areaCode: 44 sigunguCodes: 공주시(44150)
+     */
+    GONGJU(44, List.of(44150), DomesticRegionCategory.GONGJU),
+
+    /**
+     * 전라남도 > 여수시 areaCode: 46 sigunguCodes: 여수시(46130)
+     */
+    YEOSU(46, List.of(46130), DomesticRegionCategory.YEOSU),
+
+    /**
+     * 경기도 > 수원시 areaCode: 41 sigunguCodes: 장안구(41111), 팔달구(41115), 영통구(41117)
+     */
+    SUWON(41, List.of(41111, 41115, 41117), DomesticRegionCategory.SUWON),
+
+    /**
+     * 전북특별자치도 > 군산시 areaCode: 52 sigunguCodes: 군산시(52130)
+     */
+    GUNSAN(52, List.of(52130), DomesticRegionCategory.GUNSAN),
+
+    /**
+     * 대구광역시 areaCode: 27 sigunguCodes: 중구(27110), 수성구(27260), 달서구(27290)
+     */
+    DAEGU(27, List.of(27110, 27260, 27290), DomesticRegionCategory.DAEGU),
+
+    /**
      * 매핑되지 않는 지역 (OTHER_DOMESTIC 등)
      */
     NOT_FOUND(null, Collections.emptyList(), null);
