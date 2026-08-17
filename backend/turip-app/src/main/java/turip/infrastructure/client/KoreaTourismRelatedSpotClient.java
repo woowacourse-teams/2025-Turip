@@ -4,10 +4,12 @@ import java.net.URI;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.client.RestClientResponseException;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 import turip.infrastructure.client.dto.KoreaTourismRelatedSpotResponse;
 import turip.infrastructure.client.dto.RelatedSpotResult;
 
@@ -25,66 +27,66 @@ public class KoreaTourismRelatedSpotClient {
     private static final DateTimeFormatter YEAR_MONTH_FORMATTER = DateTimeFormatter.ofPattern("yyyyMM");
 
     private final RestClient restClient;
+    private final WebClient webClient;
     private final String koreaTourismApiKey;
     private final String koreaTourismApiUrl;
 
     private volatile String currentBaseYm = DEFAULT_BASE_YM; // 동적으로 관리되는 기준월
 
     public KoreaTourismRelatedSpotClient(RestClient baseRestClient,
+                                         @Qualifier("koreaTourismWebClient") WebClient koreaTourismWebClient,
                                          @Value("${korea-tourism.api.key}") String koreaTourismApiKey,
                                          @Value("${korea-tourism.api.url}") String koreaTourismApiUrl) {
         this.restClient = baseRestClient;
+        this.webClient = koreaTourismWebClient;
         this.koreaTourismApiKey = koreaTourismApiKey;
         this.koreaTourismApiUrl = koreaTourismApiUrl;
     }
 
-    public RelatedSpotResult searchRelatedSpots(int areaCode, int sigunguCode) {
-        try {
-            // URI를 완전히 수동으로 생성 (이중 인코딩 방지)
-            StringBuilder uriString = new StringBuilder(koreaTourismApiUrl)
-                    .append("?serviceKey=").append(koreaTourismApiKey)
-                    .append("&pageNo=").append(DEFAULT_PAGE_NO)
-                    .append("&numOfRows=").append(DEFAULT_NUM_OF_ROWS)
-                    .append("&MobileOS=").append(MOBILE_OS)
-                    .append("&MobileApp=").append(MOBILE_APP)
-                    .append("&_type=").append(RESPONSE_TYPE)
-                    .append("&baseYm=").append(currentBaseYm)
-                    .append("&areaCd=").append(areaCode)
-                    .append("&signguCd=").append(sigunguCode);
+    public Mono<RelatedSpotResult> searchRelatedSpots(int areaCode, int sigunguCode) {
+        URI uri = buildUri(currentBaseYm, areaCode, sigunguCode, DEFAULT_NUM_OF_ROWS);
 
-            URI uri = URI.create(uriString.toString());
-            KoreaTourismRelatedSpotResponse response = restClient.get()
-                    .uri(uri)
-                    .retrieve()
-                    .body(KoreaTourismRelatedSpotResponse.class);
+        return webClient.get()
+                .uri(uri)
+                .retrieve()
+                .bodyToMono(KoreaTourismRelatedSpotResponse.class)
+                .map(response -> toResult(response, areaCode, sigunguCode))
+                .onErrorResume(e -> {
+                    log.warn("한국관광공사 연관 관광지 API 호출 실패: areaCode={}, sigunguCode={}, message={}",
+                            areaCode, sigunguCode, e.getMessage());
+                    return Mono.just(RelatedSpotResult.failure());
+                });
+    }
 
-            if (response == null) {
-                log.warn("한국관광공사 연관 관광지 API 응답 파싱 실패");
-                return RelatedSpotResult.failure();
-            }
-
-            if (!response.isSuccess()) {
-                log.warn("한국관광공사 연관 관광지 API 응답 실패: resultCode={}, resultMsg={}",
-                        response.getResultCode(), response.getResultMsg());
-                return RelatedSpotResult.failure();
-            }
-
-            // API 호출 성공, 데이터가 비어있어도 success로 반환
-            return RelatedSpotResult.success(response.getRelatedSpots());
-        } catch (RestClientResponseException e) {
-            log.warn("한국관광공사 연관 관광지 API 호출 실패: areaCode={}, sigunguCode={}, statusCode={}, message={}",
-                    areaCode,
-                    sigunguCode,
-                    e.getStatusCode().value(),
-                    e.getMessage());
-            return RelatedSpotResult.failure();
-        } catch (Exception e) {
-            log.warn("한국관광공사 연관 관광지 API 호출 실패: areaCode={}, sigunguCode={}, message={}",
-                    areaCode,
-                    sigunguCode,
-                    e.getMessage());
+    private RelatedSpotResult toResult(KoreaTourismRelatedSpotResponse response, int areaCode, int sigunguCode) {
+        if (response == null) {
+            log.warn("한국관광공사 연관 관광지 API 응답 파싱 실패");
             return RelatedSpotResult.failure();
         }
+
+        if (!response.isSuccess()) {
+            log.warn("한국관광공사 연관 관광지 API 응답 실패: areaCode={}, sigunguCode={}, resultCode={}, resultMsg={}",
+                    areaCode, sigunguCode, response.getResultCode(), response.getResultMsg());
+            return RelatedSpotResult.failure();
+        }
+
+        // API 호출 성공, 데이터가 비어있어도 success로 반환
+        return RelatedSpotResult.success(response.getRelatedSpots());
+    }
+
+    private URI buildUri(String baseYm, int areaCode, int sigunguCode, int numOfRows) {
+        // URI를 완전히 수동으로 생성 (이중 인코딩 방지)
+        StringBuilder uriString = new StringBuilder(koreaTourismApiUrl)
+                .append("?serviceKey=").append(koreaTourismApiKey)
+                .append("&pageNo=").append(DEFAULT_PAGE_NO)
+                .append("&numOfRows=").append(numOfRows)
+                .append("&MobileOS=").append(MOBILE_OS)
+                .append("&MobileApp=").append(MOBILE_APP)
+                .append("&_type=").append(RESPONSE_TYPE)
+                .append("&baseYm=").append(baseYm)
+                .append("&areaCd=").append(areaCode)
+                .append("&signguCd=").append(sigunguCode);
+        return URI.create(uriString.toString());
     }
 
     /**
@@ -107,18 +109,7 @@ public class KoreaTourismRelatedSpotClient {
             }
 
             try {
-                StringBuilder uriString = new StringBuilder(koreaTourismApiUrl)
-                        .append("?serviceKey=").append(koreaTourismApiKey)
-                        .append("&pageNo=").append(DEFAULT_PAGE_NO)
-                        .append("&numOfRows=").append(1) // 1개만 조회
-                        .append("&MobileOS=").append(MOBILE_OS)
-                        .append("&MobileApp=").append(MOBILE_APP)
-                        .append("&_type=").append(RESPONSE_TYPE)
-                        .append("&baseYm=").append(baseYm)
-                        .append("&areaCd=").append(areaCode)
-                        .append("&signguCd=").append(sigunguCode);
-
-                URI uri = URI.create(uriString.toString());
+                URI uri = buildUri(baseYm, areaCode, sigunguCode, 1); // 1개만 조회
                 KoreaTourismRelatedSpotResponse response = restClient.get()
                         .uri(uri)
                         .retrieve()
