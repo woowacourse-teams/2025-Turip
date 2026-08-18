@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import turip.account.domain.Account;
 import turip.auth.resolver.AuthAccount;
 import turip.common.exception.ErrorResponse;
+import turip.favorite.controller.dto.request.FavoritePlaceBatchCreateRequest;
 import turip.favorite.controller.dto.request.FavoritePlaceMultiFolderRequest;
 import turip.favorite.controller.dto.request.FavoritePlaceOrderRequest;
 import turip.favorite.controller.dto.response.FavoriteFolderWithFavoriteStatusResponse.FavoritePlaceResponse;
@@ -183,6 +185,124 @@ public class FavoritePlaceController {
         FavoritePlaceResponse response = favoritePlaceService.create(account, favoriteFolderId, placeId);
         return ResponseEntity.created(URI.create("/api/v1/turips/places/" + response.id()))
                 .body(response);
+    }
+
+    @Operation(
+            summary = "튜립 장소 일괄 추가 api",
+            description = "내 튜립에 여러 장소를 한 번에 추가한다. 이미 추가된 장소나 존재하지 않는 장소는 건너뛰고 나머지만 추가한다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "성공 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(type = "array", implementation = FavoritePlaceResponse.class),
+                            examples = @ExampleObject(
+                                    name = "success",
+                                    summary = "튜립 장소 일괄 추가 성공",
+                                    value = """
+                                            [
+                                                {
+                                                    "id": 1,
+                                                    "turipId": 10,
+                                                    "placeId": 1
+                                                },
+                                                {
+                                                    "id": 2,
+                                                    "turipId": 10,
+                                                    "placeId": 2
+                                                }
+                                            ]
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "access token expired",
+                                            summary = "만료된 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_EXPIRED",
+                                                    	"message": "access token이 만료됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "invalid signature access token",
+                                            summary = "서명값이 올바르지 않은 access token",
+                                            value = """
+                                                    {
+                                                    	"tag": "ACCESS_TOKEN_SIGNATURE_INVALID",
+                                                    	"message": "access token이 위조됐습니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "unauthorized",
+                                            summary = "알 수 없는 이유로 인증 실패",
+                                            value = """
+                                                    {
+                                                    	"tag": "UNAUTHORIZED",
+                                                    	"message": "토큰 기반 인증에 실패했습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "not_turip_owner",
+                                    summary = "튜립 소유자가 아닌 사용자가 요청한 경우",
+                                    value = """
+                                            {
+                                                "tag": "FORBIDDEN",
+                                                "message": "접근 권한이 없습니다."
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "turip_not_found",
+                                    summary = "turipId에 대한 튜립을 찾을 수 없는 경우",
+                                    value = """
+                                            {
+                                                "tag": "FAVORITE_FOLDER_NOT_FOUND",
+                                                "message": "찜폴더를 찾을 수 없습니다."
+                                            }
+                                            """
+                            )
+                    )
+            )
+    })
+    @PostMapping("/batch")
+    public ResponseEntity<List<FavoritePlaceResponse>> batchCreate(
+            @Parameter(hidden = true) @AuthAccount Account account,
+            @RequestBody FavoritePlaceBatchCreateRequest request
+    ) {
+        List<FavoritePlaceResponse> responses = favoritePlaceService.batchCreate(
+                account, request.favoriteFolderId(), request.placeIds());
+        return ResponseEntity.status(HttpStatus.CREATED).body(responses);
     }
 
     @Operation(

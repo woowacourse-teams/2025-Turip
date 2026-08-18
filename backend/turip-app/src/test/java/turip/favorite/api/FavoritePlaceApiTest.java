@@ -264,6 +264,169 @@ class FavoritePlaceApiTest {
         }
     }
 
+    @DisplayName("/api/v1/turips/places/batch POST 여러 장소 찜 일괄 생성 테스트")
+    @Nested
+    class BatchCreate {
+
+        @DisplayName("여러 장소 찜 생성에 성공한 경우 201 CREATED 코드와 생성된 장소 찜 목록을 응답한다")
+        @Test
+        void batchCreate1() {
+            // given
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
+            Long folderId = testDataHelper.insertFavoriteFolder("테스트 폴더");
+            testDataHelper.insertFavoriteFolderAccount(accountId, folderId, AccountRole.OWNER);
+            jdbcTemplate.update(
+                    "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('장소1','https://naver.me/place1', '장소1 주소', 37.1234, 127.1234)");
+            jdbcTemplate.update(
+                    "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('장소2','https://naver.me/place2', '장소2 주소', 37.5678, 127.5678)");
+
+            // when & then
+            Map<String, Object> request = new HashMap<>();
+            request.put("turipId", 1L);
+            request.put("placeIds", List.of(1L, 2L));
+
+            RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .body(request)
+                    .contentType(ContentType.JSON)
+                    .when().post("/api/v1/turips/places/batch")
+                    .then()
+                    .statusCode(201)
+                    .body("size()", is(2))
+                    .body("[0].placeId", is(1))
+                    .body("[1].placeId", is(2));
+        }
+
+        @DisplayName("이미 폴더에 추가된 장소는 건너뛰고 나머지만 생성한다")
+        @Test
+        void batchCreate2() {
+            // given
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
+            Long folderId = testDataHelper.insertFavoriteFolder("테스트 폴더");
+            testDataHelper.insertFavoriteFolderAccount(accountId, folderId, AccountRole.OWNER);
+            jdbcTemplate.update(
+                    "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('장소1','https://naver.me/place1', '장소1 주소', 37.1234, 127.1234)");
+            jdbcTemplate.update(
+                    "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('장소2','https://naver.me/place2', '장소2 주소', 37.5678, 127.5678)");
+            jdbcTemplate.update(
+                    "INSERT INTO favorite_place (favorite_folder_id, place_id, favorite_order) VALUES (1, 1, 1)");
+
+            // when & then
+            Map<String, Object> request = new HashMap<>();
+            request.put("turipId", 1L);
+            request.put("placeIds", List.of(1L, 2L));
+
+            RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .body(request)
+                    .contentType(ContentType.JSON)
+                    .when().post("/api/v1/turips/places/batch")
+                    .then()
+                    .statusCode(201)
+                    .body("size()", is(1))
+                    .body("[0].placeId", is(2));
+        }
+
+        @DisplayName("존재하지 않는 placeId는 건너뛰고 나머지만 생성한다")
+        @Test
+        void batchCreate3() {
+            // given
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
+            Long folderId = testDataHelper.insertFavoriteFolder("테스트 폴더");
+            testDataHelper.insertFavoriteFolderAccount(accountId, folderId, AccountRole.OWNER);
+            jdbcTemplate.update(
+                    "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('장소1','https://naver.me/place1', '장소1 주소', 37.1234, 127.1234)");
+
+            // when & then
+            Map<String, Object> request = new HashMap<>();
+            request.put("turipId", 1L);
+            request.put("placeIds", List.of(1L, 999L));
+
+            RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .body(request)
+                    .contentType(ContentType.JSON)
+                    .when().post("/api/v1/turips/places/batch")
+                    .then()
+                    .statusCode(201)
+                    .body("size()", is(1))
+                    .body("[0].placeId", is(1));
+        }
+
+        @DisplayName("placeIds가 빈 배열이면 빈 배열을 응답한다")
+        @Test
+        void batchCreate4() {
+            // given
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
+            Long folderId = testDataHelper.insertFavoriteFolder("테스트 폴더");
+            testDataHelper.insertFavoriteFolderAccount(accountId, folderId, AccountRole.OWNER);
+
+            // when & then
+            Map<String, Object> request = new HashMap<>();
+            request.put("turipId", 1L);
+            request.put("placeIds", List.of());
+
+            RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .body(request)
+                    .contentType(ContentType.JSON)
+                    .when().post("/api/v1/turips/places/batch")
+                    .then()
+                    .statusCode(201)
+                    .body("size()", is(0));
+        }
+
+        @DisplayName("폴더 소유자의 기기id와 요청자의 기기id가 같지 않은 경우 403 FORBIDDEN을 응답한다")
+        @Test
+        void batchCreate5() {
+            // given
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'may')", accountId);
+            Long folderId = testDataHelper.insertFavoriteFolder("테스트 폴더");
+            testDataHelper.insertFavoriteFolderAccount(accountId, folderId, AccountRole.OWNER);
+            jdbcTemplate.update(
+                    "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('장소1','https://naver.me/place1', '장소1 주소', 37.1234, 127.1234)");
+
+            // when & then
+            Map<String, Object> request = new HashMap<>();
+            request.put("turipId", 1L);
+            request.put("placeIds", List.of(1L));
+
+            RestAssured.given().port(port)
+                    .header("device-fid", "cool")
+                    .body(request)
+                    .contentType(ContentType.JSON)
+                    .when().post("/api/v1/turips/places/batch")
+                    .then()
+                    .statusCode(403);
+        }
+
+        @DisplayName("turipId에 대한 폴더가 존재하지 않는 경우 404 NOT FOUND를 응답한다")
+        @Test
+        void batchCreate6() {
+            // given
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
+
+            // when & then
+            Map<String, Object> request = new HashMap<>();
+            request.put("turipId", 999L);
+            request.put("placeIds", List.of(1L));
+
+            RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .body(request)
+                    .contentType(ContentType.JSON)
+                    .when().post("/api/v1/turips/places/batch")
+                    .then()
+                    .statusCode(404);
+        }
+    }
+
     @DisplayName("/api/v1/turips/places GET 장소 찜 폴더의 장소 찜 목록 조회 테스트")
     @Nested
     class ReadAllByFolder {
