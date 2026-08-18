@@ -1,5 +1,6 @@
 package turip.favorite.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -54,6 +55,28 @@ public class FavoritePlaceService {
         eventPublisher.publishEvent(FavoriteFolderUpdateEvent.of(favoriteFolderId, ActionType.PLACE_ADDED));
 
         return FavoritePlaceResponse.from(savedFavoritePlace);
+    }
+
+    @Transactional
+    public List<FavoritePlaceResponse> batchCreate(Account account, Long favoriteFolderId, List<Long> placeIds) {
+        if (placeIds == null) {
+            throw new BadRequestException(ErrorTag.BAD_REQUEST);
+        }
+
+        FavoriteFolder favoriteFolder = getFavoriteFolderById(favoriteFolderId);
+        favoriteFolderAccountService.validateMembership(account, favoriteFolder);
+
+        List<Place> requestedPlaces = placeRepository.findAllById(placeIds);
+        List<Place> placesToAdd = filterPlacesToAdd(favoriteFolder, requestedPlaces);
+        List<FavoritePlace> savedFavoritePlaces = saveFavoritePlaces(favoriteFolder, placesToAdd);
+
+        if (!savedFavoritePlaces.isEmpty()) {
+            eventPublisher.publishEvent(FavoriteFolderUpdateEvent.of(favoriteFolderId, ActionType.PLACE_ADDED));
+        }
+
+        return savedFavoritePlaces.stream()
+                .map(FavoritePlaceResponse::from)
+                .toList();
     }
 
     @Transactional
@@ -220,6 +243,31 @@ public class FavoritePlaceService {
         if (isAlreadyFavorite) {
             throw new ConflictException(ErrorTag.FAVORITE_PLACE_IN_FOLDER_CONFLICT);
         }
+    }
+
+    private List<Place> filterPlacesToAdd(FavoriteFolder favoriteFolder, List<Place> requestedPlaces) {
+        // 이미 튜립에 추가되어 있는 장소들
+        Set<Place> alreadyAddedPlaces = favoritePlaceRepository
+                .findAllByFavoriteFolderAndPlaceIn(favoriteFolder, requestedPlaces)
+                .stream()
+                .map(FavoritePlace::getPlace)
+                .collect(Collectors.toSet());
+
+        return requestedPlaces.stream()
+                .filter(place -> !alreadyAddedPlaces.contains(place))
+                .toList();
+    }
+
+    private List<FavoritePlace> saveFavoritePlaces(FavoriteFolder favoriteFolder, List<Place> placesToAdd) {
+        int nextOrder = favoritePlaceRepository.findMaxFavoriteOrderByFavoriteFolder(favoriteFolder).orElse(0) + 1;
+
+        List<FavoritePlace> newFavoritePlaces = new ArrayList<>();
+        for (Place place : placesToAdd) {
+            newFavoritePlaces.add(new FavoritePlace(favoriteFolder, place, nextOrder));
+            nextOrder++;
+        }
+
+        return favoritePlaceRepository.saveAll(newFavoritePlaces);
     }
 
     private void validateFavoritePlaceBelongsToFolder(FavoritePlace favoritePlace, FavoriteFolder favoriteFolder) {

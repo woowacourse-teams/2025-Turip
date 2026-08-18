@@ -8,6 +8,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import java.util.List;
@@ -182,6 +183,210 @@ class FavoritePlaceServiceTest {
             // when & then
             assertThatThrownBy(() -> favoritePlaceService.create(account, favoriteFolderId, placeId))
                     .isInstanceOf(ConflictException.class);
+        }
+    }
+
+    @DisplayName("여러 장소 찜 일괄 생성 테스트")
+    @Nested
+    class BatchCreate {
+
+        @DisplayName("여러 장소 찜을 한 번에 생성하고 알림 이벤트를 발행한다")
+        @Test
+        void batchCreate1() {
+            // given
+            Long favoriteFolderId = 1L;
+            Account account = AccountFixture.createUser();
+            FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(favoriteFolderId, "폴더1");
+            Place place1 = new Place(1L, "장소1", "url1", "주소1", 1, 1);
+            Place place2 = new Place(2L, "장소2", "url2", "주소2", 2, 2);
+
+            given(favoriteFolderRepository.findById(favoriteFolderId))
+                    .willReturn(Optional.of(favoriteFolder));
+            given(placeRepository.findAllById(List.of(1L, 2L)))
+                    .willReturn(List.of(place1, place2));
+            given(favoritePlaceRepository.findAllByFavoriteFolderAndPlaceIn(favoriteFolder, List.of(place1, place2)))
+                    .willReturn(List.of());
+            given(favoritePlaceRepository.findMaxFavoriteOrderByFavoriteFolder(favoriteFolder))
+                    .willReturn(Optional.empty());
+            given(favoritePlaceRepository.saveAll(any()))
+                    .willReturn(List.of(
+                            new FavoritePlace(10L, favoriteFolder, place1, 1),
+                            new FavoritePlace(11L, favoriteFolder, place2, 2)
+                    ));
+
+            // when
+            List<FavoritePlaceResponse> responses =
+                    favoritePlaceService.batchCreate(account, favoriteFolderId, List.of(1L, 2L));
+
+            // then
+            assertAll(
+                    () -> assertThat(responses).hasSize(2),
+                    () -> assertThat(responses.get(0).placeId()).isEqualTo(1L),
+                    () -> assertThat(responses.get(1).placeId()).isEqualTo(2L),
+                    () -> verify(eventPublisher).publishEvent(
+                            FavoriteFolderUpdateEvent.of(favoriteFolderId, ActionType.PLACE_ADDED))
+            );
+        }
+
+        @DisplayName("이미 폴더에 추가된 장소는 건너뛰고 나머지만 생성한다")
+        @Test
+        void batchCreate2() {
+            // given
+            Long favoriteFolderId = 1L;
+            Account account = AccountFixture.createUser();
+            FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(favoriteFolderId, "폴더1");
+            Place place1 = new Place(1L, "장소1", "url1", "주소1", 1, 1);
+            Place place2 = new Place(2L, "장소2", "url2", "주소2", 2, 2);
+            FavoritePlace alreadyFavorited = new FavoritePlace(5L, favoriteFolder, place1, 1);
+
+            given(favoriteFolderRepository.findById(favoriteFolderId))
+                    .willReturn(Optional.of(favoriteFolder));
+            given(placeRepository.findAllById(List.of(1L, 2L)))
+                    .willReturn(List.of(place1, place2));
+            given(favoritePlaceRepository.findAllByFavoriteFolderAndPlaceIn(favoriteFolder, List.of(place1, place2)))
+                    .willReturn(List.of(alreadyFavorited));
+            given(favoritePlaceRepository.findMaxFavoriteOrderByFavoriteFolder(favoriteFolder))
+                    .willReturn(Optional.of(1));
+            given(favoritePlaceRepository.saveAll(any()))
+                    .willReturn(List.of(new FavoritePlace(11L, favoriteFolder, place2, 2)));
+
+            // when
+            List<FavoritePlaceResponse> responses =
+                    favoritePlaceService.batchCreate(account, favoriteFolderId, List.of(1L, 2L));
+
+            // then
+            assertAll(
+                    () -> assertThat(responses).hasSize(1),
+                    () -> assertThat(responses.get(0).placeId()).isEqualTo(2L)
+            );
+        }
+
+        @DisplayName("존재하지 않는 placeId는 건너뛰고 나머지만 생성한다")
+        @Test
+        void batchCreate3() {
+            // given
+            Long favoriteFolderId = 1L;
+            Account account = AccountFixture.createUser();
+            FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(favoriteFolderId, "폴더1");
+            Place place1 = new Place(1L, "장소1", "url1", "주소1", 1, 1);
+
+            given(favoriteFolderRepository.findById(favoriteFolderId))
+                    .willReturn(Optional.of(favoriteFolder));
+            given(placeRepository.findAllById(List.of(1L, 999L)))
+                    .willReturn(List.of(place1));
+            given(favoritePlaceRepository.findAllByFavoriteFolderAndPlaceIn(favoriteFolder, List.of(place1)))
+                    .willReturn(List.of());
+            given(favoritePlaceRepository.findMaxFavoriteOrderByFavoriteFolder(favoriteFolder))
+                    .willReturn(Optional.empty());
+            given(favoritePlaceRepository.saveAll(any()))
+                    .willReturn(List.of(new FavoritePlace(10L, favoriteFolder, place1, 1)));
+
+            // when
+            List<FavoritePlaceResponse> responses =
+                    favoritePlaceService.batchCreate(account, favoriteFolderId, List.of(1L, 999L));
+
+            // then
+            assertThat(responses).hasSize(1);
+            assertThat(responses.get(0).placeId()).isEqualTo(1L);
+        }
+
+        @DisplayName("placeIds가 빈 배열이면 빈 리스트를 반환하고 이벤트를 발행하지 않는다")
+        @Test
+        void batchCreate4() {
+            // given
+            Long favoriteFolderId = 1L;
+            Account account = AccountFixture.createUser();
+            FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(favoriteFolderId, "폴더1");
+
+            given(favoriteFolderRepository.findById(favoriteFolderId))
+                    .willReturn(Optional.of(favoriteFolder));
+
+            // when
+            List<FavoritePlaceResponse> responses =
+                    favoritePlaceService.batchCreate(account, favoriteFolderId, List.of());
+
+            // then
+            assertAll(
+                    () -> assertThat(responses).isEmpty(),
+                    () -> verify(eventPublisher, never()).publishEvent(any())
+            );
+        }
+
+        @DisplayName("모든 placeId가 이미 추가되어 있으면 빈 리스트를 반환하고 이벤트를 발행하지 않는다")
+        @Test
+        void batchCreate5() {
+            // given
+            Long favoriteFolderId = 1L;
+            Account account = AccountFixture.createUser();
+            FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(favoriteFolderId, "폴더1");
+            Place place1 = new Place(1L, "장소1", "url1", "주소1", 1, 1);
+            FavoritePlace alreadyFavorited = new FavoritePlace(5L, favoriteFolder, place1, 1);
+
+            given(favoriteFolderRepository.findById(favoriteFolderId))
+                    .willReturn(Optional.of(favoriteFolder));
+            given(placeRepository.findAllById(List.of(1L)))
+                    .willReturn(List.of(place1));
+            given(favoritePlaceRepository.findAllByFavoriteFolderAndPlaceIn(favoriteFolder, List.of(place1)))
+                    .willReturn(List.of(alreadyFavorited));
+
+            // when
+            List<FavoritePlaceResponse> responses =
+                    favoritePlaceService.batchCreate(account, favoriteFolderId, List.of(1L));
+
+            // then
+            assertAll(
+                    () -> assertThat(responses).isEmpty(),
+                    () -> verify(eventPublisher, never()).publishEvent(any())
+            );
+        }
+
+        @DisplayName("폴더 소유자가 아닌 요청자가 시도하면 ForbiddenException을 발생시킨다")
+        @Test
+        void batchCreate6() {
+            // given
+            Long favoriteFolderId = 1L;
+            Account requestAccount = AccountFixture.createCustomAccount(2L, Role.USER);
+            FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(favoriteFolderId, "폴더1");
+
+            given(favoriteFolderRepository.findById(favoriteFolderId))
+                    .willReturn(Optional.of(favoriteFolder));
+            doThrow(new ForbiddenException(ErrorTag.FORBIDDEN))
+                    .when(favoriteFolderAccountService)
+                    .validateMembership(requestAccount, favoriteFolder);
+
+            // when & then
+            assertThatThrownBy(
+                    () -> favoritePlaceService.batchCreate(requestAccount, favoriteFolderId, List.of(1L)))
+                    .isInstanceOf(ForbiddenException.class);
+        }
+
+        @DisplayName("favoriteFolderId에 대한 폴더가 존재하지 않는 경우 NotFoundException을 발생시킨다")
+        @Test
+        void batchCreate7() {
+            // given
+            Long favoriteFolderId = 1L;
+            Account account = AccountFixture.createUser();
+
+            given(favoriteFolderRepository.findById(favoriteFolderId))
+                    .willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> favoritePlaceService.batchCreate(account, favoriteFolderId, List.of(1L)))
+                    .isInstanceOf(NotFoundException.class)
+                    .hasMessage(ErrorTag.FAVORITE_FOLDER_NOT_FOUND.getMessage());
+        }
+
+        @DisplayName("placeIds가 null이면 BadRequestException을 발생시킨다")
+        @Test
+        void batchCreate8() {
+            // given
+            Long favoriteFolderId = 1L;
+            Account account = AccountFixture.createUser();
+
+            // when & then
+            assertThatThrownBy(() -> favoritePlaceService.batchCreate(account, favoriteFolderId, null))
+                    .isInstanceOf(BadRequestException.class)
+                    .hasMessage(ErrorTag.BAD_REQUEST.getMessage());
         }
     }
 
