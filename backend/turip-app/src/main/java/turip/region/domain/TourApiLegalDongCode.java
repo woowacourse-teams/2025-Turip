@@ -22,7 +22,7 @@ public enum TourApiLegalDongCode {
 
     public static String getCodeByCityName(String cityName) {
         return Arrays.stream(values())
-                .filter(district -> cityName.contains(district.cityName))
+                .filter(district -> cityName.equals(district.cityName))
                 .findFirst()
                 .map(district -> district.code)
                 .orElse(null);
