@@ -425,6 +425,44 @@ class FavoritePlaceApiTest {
                     .then()
                     .statusCode(404);
         }
+
+        @DisplayName("placeIds를 id 역순으로 요청해도 요청 순서대로 응답하고 favorite_order도 요청 순서대로 저장된다")
+        @Test
+        void batchCreate7() {
+            // given
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
+            Long folderId = testDataHelper.insertFavoriteFolder("테스트 폴더");
+            testDataHelper.insertFavoriteFolderAccount(accountId, folderId, AccountRole.OWNER);
+            jdbcTemplate.update(
+                    "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('장소1','https://naver.me/place1', '장소1 주소', 37.1234, 127.1234)");
+            jdbcTemplate.update(
+                    "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('장소2','https://naver.me/place2', '장소2 주소', 37.5678, 127.5678)");
+            jdbcTemplate.update(
+                    "INSERT INTO place (name, url, address, latitude, longitude) VALUES ('장소3','https://naver.me/place3', '장소3 주소', 37.9999, 127.9999)");
+
+            // when & then
+            Map<String, Object> request = new HashMap<>();
+            request.put("turipId", 1L);
+            request.put("placeIds", List.of(3L, 1L, 2L));
+
+            RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .body(request)
+                    .contentType(ContentType.JSON)
+                    .when().post("/api/v1/turips/places/batch")
+                    .then()
+                    .statusCode(201)
+                    .body("size()", is(3))
+                    .body("[0].placeId", is(3))
+                    .body("[1].placeId", is(1))
+                    .body("[2].placeId", is(2));
+
+            List<Long> savedOrderByPlaceId = jdbcTemplate.queryForList(
+                    "SELECT place_id FROM favorite_place WHERE favorite_folder_id = ? ORDER BY favorite_order ASC",
+                    Long.class, folderId);
+            assertThat(savedOrderByPlaceId).containsExactly(3L, 1L, 2L);
+        }
     }
 
     @DisplayName("/api/v1/turips/places GET 장소 찜 폴더의 장소 찜 목록 조회 테스트")

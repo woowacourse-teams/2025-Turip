@@ -3,6 +3,7 @@ package turip.favorite.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -66,7 +67,7 @@ public class FavoritePlaceService {
         FavoriteFolder favoriteFolder = getFavoriteFolderById(favoriteFolderId);
         favoriteFolderAccountService.validateMembership(account, favoriteFolder);
 
-        List<Place> requestedPlaces = placeRepository.findAllById(placeIds);
+        List<Place> requestedPlaces = findPlacesByIdInRequestOrder(placeIds);
         List<Place> placesToAdd = filterPlacesToAdd(favoriteFolder, requestedPlaces);
         List<FavoritePlace> savedFavoritePlaces = saveFavoritePlaces(favoriteFolder, placesToAdd);
 
@@ -154,6 +155,17 @@ public class FavoritePlaceService {
     private FavoriteFolder getFavoriteFolderById(Long favoriteFolderId) {
         return favoriteFolderRepository.findById(favoriteFolderId)
                 .orElseThrow(() -> new NotFoundException(ErrorTag.FAVORITE_FOLDER_NOT_FOUND));
+    }
+
+    private List<Place> findPlacesByIdInRequestOrder(List<Long> placeIds) {
+        Map<Long, Place> placesById = placeRepository.findAllById(placeIds).stream()
+                .collect(Collectors.toMap(Place::getId, place -> place));
+
+        return placeIds.stream()
+                .distinct()
+                .map(placesById::get)
+                .filter(Objects::nonNull)
+                .toList();
     }
 
     private Place getPlaceById(Long placeId) {

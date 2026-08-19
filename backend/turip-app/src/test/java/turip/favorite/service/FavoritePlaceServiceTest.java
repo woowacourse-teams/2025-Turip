@@ -11,6 +11,7 @@ import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -387,6 +388,51 @@ class FavoritePlaceServiceTest {
             assertThatThrownBy(() -> favoritePlaceService.batchCreate(account, favoriteFolderId, null))
                     .isInstanceOf(BadRequestException.class)
                     .hasMessage(ErrorTag.BAD_REQUEST.getMessage());
+        }
+
+        @DisplayName("요청한 placeIds의 순서대로 응답 및 favoriteOrder가 지정된다")
+        @Test
+        void batchCreate9() {
+            // given
+            Long favoriteFolderId = 1L;
+            Account account = AccountFixture.createUser();
+            FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(favoriteFolderId, "폴더1");
+            Place place1 = new Place(1L, "장소1", "url1", "주소1", 1, 1);
+            Place place2 = new Place(2L, "장소2", "url2", "주소2", 2, 2);
+            Place place3 = new Place(3L, "장소3", "url3", "주소3", 3, 3);
+
+            // 저장소는 요청과 다른 순서(오름차순 id)로 결과를 반환한다
+            given(favoriteFolderRepository.findById(favoriteFolderId))
+                    .willReturn(Optional.of(favoriteFolder));
+            given(placeRepository.findAllById(List.of(3L, 1L, 2L)))
+                    .willReturn(List.of(place1, place2, place3));
+            given(favoritePlaceRepository.findAllByFavoriteFolderAndPlaceIn(favoriteFolder, List.of(place3, place1, place2)))
+                    .willReturn(List.of());
+            given(favoritePlaceRepository.findMaxFavoriteOrderByFavoriteFolder(favoriteFolder))
+                    .willReturn(Optional.empty());
+            given(favoritePlaceRepository.saveAll(any()))
+                    .willAnswer(invocation -> {
+                        List<FavoritePlace> favoritePlaces = invocation.getArgument(0);
+                        List<FavoritePlace> saved = new ArrayList<>();
+                        long id = 10L;
+                        for (FavoritePlace favoritePlace : favoritePlaces) {
+                            saved.add(new FavoritePlace(id++, favoriteFolder, favoritePlace.getPlace(),
+                                    favoritePlace.getFavoriteOrder()));
+                        }
+                        return saved;
+                    });
+
+            // when
+            List<FavoritePlaceResponse> responses =
+                    favoritePlaceService.batchCreate(account, favoriteFolderId, List.of(3L, 1L, 2L));
+
+            // then
+            assertAll(
+                    () -> assertThat(responses).hasSize(3),
+                    () -> assertThat(responses.get(0).placeId()).isEqualTo(3L),
+                    () -> assertThat(responses.get(1).placeId()).isEqualTo(1L),
+                    () -> assertThat(responses.get(2).placeId()).isEqualTo(2L)
+            );
         }
     }
 
