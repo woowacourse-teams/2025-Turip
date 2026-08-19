@@ -41,7 +41,8 @@ youtube:
 korea-tourism:
   api:
     key: test-korea-tourism-api-key
-    url: https://test.apis.data.go.kr
+    image-url: https://test.apis.data.go.kr
+    related-spot-url: https://test.apis.data.go.kr
 
 apple:
   client-id: com.teamturip.test

@@ -62,7 +62,8 @@ youtube:
 korea-tourism:
   api:
     key: ${KOREA_TOURISM_API_KEY}
-    url: https://apis.data.go.kr/B551011/TarRlteTarService1/areaBasedList1
+    image-url: https://apis.data.go.kr/B551011/PhokoAwrdService/phokoAwrdList
+    related-spot-url: https://apis.data.go.kr/B551011/TarRlteTarService1/areaBasedList1
 
 apple:
   client-id: ${APPLE_CLIENT_ID}

@@ -46,6 +46,24 @@ class ExternalApiLoggingInterceptorTest {
     }
 
     @Test
+    @DisplayName("URI의 쿼리 파라미터에 민감한 정보(serviceKey)가 percent-encoding을 포함해도 마스킹한다.")
+    void maskSensitiveParamsWithServiceKey() throws Exception {
+        // given
+        URI uri = new URI(
+                "https://apis.data.go.kr/B551011/PhokoAwrdService/phokoAwrdList?serviceKey=dummyServiceKey%2FAbCdEfGhIjKlMnOp%2BQrStUvWxYz%3D%3D&MobileOS=AND&MobileApp=Turip&lDongRegnCd=26&_type=json&numOfRows=1");
+        Method method = ExternalApiLoggingInterceptor.class.getDeclaredMethod("maskSensitiveParams", URI.class);
+        method.setAccessible(true);
+
+        // when
+        String maskedUri = (String) method.invoke(interceptor, uri);
+
+        // then
+        assertThat(maskedUri).contains("serviceKey=***");
+        assertThat(maskedUri).doesNotContain("dummyServiceKey");
+        assertThat(maskedUri).contains("lDongRegnCd=26");
+    }
+
+    @Test
     @DisplayName("URI의 쿼리 파라미터에 민감한 정보가 없으면 그대로 반환한다.")
     void maskSensitiveParamsWithoutSensitiveInfo() throws Exception {
         // given

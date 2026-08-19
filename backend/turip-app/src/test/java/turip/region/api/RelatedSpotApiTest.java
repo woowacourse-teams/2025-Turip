@@ -51,9 +51,9 @@ class RelatedSpotApiTest {
         @Test
         void readRelatedSpots1() {
             // given
-            RelatedSpot spot1 = createRelatedSpot("경복궁", "북촌한옥마을", "관광지");
-            RelatedSpot spot2 = createRelatedSpot("경복궁", "인사동", "관광지");
-            RelatedSpot spot3 = createRelatedSpot("경복궁", "종로맛집", "음식점");
+            RelatedSpot spot1 = createRelatedSpot("북촌한옥마을", "관광지");
+            RelatedSpot spot2 = createRelatedSpot("인사동", "관광지");
+            RelatedSpot spot3 = createRelatedSpot("종로맛집", "음식점");
 
             // 서울의 3개 시군구 코드에 대해 모킹
             given(koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11110))
@@ -114,14 +114,9 @@ class RelatedSpotApiTest {
                     .statusCode(400);
         }
 
-        private RelatedSpot createRelatedSpot(String touristSpotName, String relatedSpotName,
-                                              String relatedCategoryLargeName) {
+        private RelatedSpot createRelatedSpot(String relatedSpotName, String relatedCategoryLargeName) {
             RelatedSpot spot = new RelatedSpot();
             try {
-                java.lang.reflect.Field touristSpotField = RelatedSpot.class.getDeclaredField("touristSpotName");
-                touristSpotField.setAccessible(true);
-                touristSpotField.set(spot, touristSpotName);
-
                 java.lang.reflect.Field relatedSpotField = RelatedSpot.class.getDeclaredField("relatedSpotName");
                 relatedSpotField.setAccessible(true);
                 relatedSpotField.set(spot, relatedSpotName);

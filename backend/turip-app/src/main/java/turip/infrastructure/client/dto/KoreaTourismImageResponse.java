@@ -3,25 +3,25 @@ package turip.infrastructure.client.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.List;
+import java.util.Optional;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import turip.infrastructure.client.dto.deserializer.EmptyStringAsNullRelatedSpotDeserializer;
+import turip.infrastructure.client.dto.deserializer.EmptyStringAsNullImageItemsDeserializer;
 
-/**
- * 한국관광공사 TourAPI의 지역별 연관 관광지 조회 응답 API: TarRlteTarService1/areaBasedList1
- */
 @Getter
 @NoArgsConstructor
-public class KoreaTourismRelatedSpotResponse {
+public class KoreaTourismImageResponse {
 
     @JsonProperty("response")
     private Response response;
 
-    public List<RelatedSpot> getRelatedSpots() {
-        if (response == null || response.body == null || response.body.items == null) {
-            return List.of();
+    public Optional<String> getFirstThumbImageUrl() {
+        if (response == null || response.body == null || response.body.items == null
+                || response.body.items.item == null || response.body.items.item.isEmpty()) {
+            return Optional.empty();
         }
-        return response.body.items.getItemsOrEmpty();
+        return Optional.ofNullable(response.body.items.item.get(0).thumbImage)
+                .filter(url -> !url.isBlank());
     }
 
     public boolean isSuccess() {
@@ -41,7 +41,6 @@ public class KoreaTourismRelatedSpotResponse {
     @Getter
     @NoArgsConstructor
     public static class Response {
-
         @JsonProperty("header")
         private Header header;
 
@@ -67,35 +66,22 @@ public class KoreaTourismRelatedSpotResponse {
     @Getter
     @NoArgsConstructor
     public static class Body {
-
         @JsonProperty("items")
-        @JsonDeserialize(using = EmptyStringAsNullRelatedSpotDeserializer.class)
+        @JsonDeserialize(using = EmptyStringAsNullImageItemsDeserializer.class)
         private Items items;
     }
 
     @Getter
     @NoArgsConstructor
     public static class Items {
-
         @JsonProperty("item")
-        private List<RelatedSpot> item;
-
-        public List<RelatedSpot> getItemsOrEmpty() {
-            return item != null ? item : List.of();
-        }
+        private List<Item> item;
     }
 
-    /**
-     * 연관 관광지 정보
-     */
     @Getter
     @NoArgsConstructor
-    public static class RelatedSpot {
-
-        @JsonProperty("rlteTatsNm")
-        private String relatedSpotName;
-
-        @JsonProperty("rlteCtgryLclsNm")
-        private String relatedCategoryLargeName;
+    public static class Item {
+        @JsonProperty("thumbImage")
+        private String thumbImage;
     }
 }
