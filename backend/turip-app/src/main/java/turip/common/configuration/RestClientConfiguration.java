@@ -12,8 +12,8 @@ import turip.common.log.ExternalApiLoggingInterceptor;
 @RequiredArgsConstructor
 public class RestClientConfiguration {
 
-    private static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(5);
-    private static final Duration READ_TIMEOUT = Duration.ofSeconds(10);
+    private static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(2);
+    private static final Duration READ_TIMEOUT = Duration.ofSeconds(5);
 
     private final ExternalApiLoggingInterceptor loggingInterceptor;
 
