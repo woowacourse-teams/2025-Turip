@@ -21,6 +21,9 @@ public enum TourApiLegalDongCode {
     }
 
     public static String getCodeByCityName(String cityName) {
+        if (cityName == null || cityName.isBlank()) {
+            return null;
+        }
         return Arrays.stream(values())
                 .filter(district -> cityName.equals(district.cityName))
                 .findFirst()
