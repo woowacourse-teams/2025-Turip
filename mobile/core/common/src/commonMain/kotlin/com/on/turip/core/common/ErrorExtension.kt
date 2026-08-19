@@ -35,5 +35,8 @@ private fun String.toErrorType(): ErrorType =
         "FAVORITE_PLACE_NOT_FOUND" -> ErrorType.TuripPlace.NotFound
         "FAVORITE_PLACE_IN_FOLDER_CONFLICT" -> ErrorType.TuripPlace.DuplicatePlaceInTurip
         "FAVORITE_CONTENT_CONFLICT" -> ErrorType.Bookmark.DuplicateBookmarked
+        "FCM_TOKEN_BLANK" -> ErrorType.FcmToken.Blank
+        "NOTIFICATION_ENABLED_REQUIRED" -> ErrorType.FcmToken.NotificationEnabledRequired
+        "FCM_TOKEN_NOT_FOUND" -> ErrorType.FcmToken.NotFound
         else -> ErrorType.Unknown
     }

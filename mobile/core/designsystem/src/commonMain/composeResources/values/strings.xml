@@ -50,6 +50,17 @@
     <string name="my_page_bookmark_content_title">저장한 콘텐츠</string>
     <string name="my_page_view_all_content">모두 보기</string>
     <string name="my_page_settings_title">고객 지원 및 설정</string>
+    <string name="my_page_notification_setting">알림 설정</string>
+    <string name="my_page_push_notification">푸시 알림 수신</string>
+    <string name="my_page_push_notification_description">해제하면 푸시 알림을 수신할 수 없습니다</string>
+    <string name="my_page_notification_permission_dialog_title">기기 알림이 꺼져 있어요</string>
+    <string name="my_page_notification_permission_dialog_message">알림을 받으려면 기기 설정에서 알림을 허용해주세요</string>
+    <string name="my_page_notification_permission_dialog_confirm">설정으로 이동</string>
+    <string name="my_page_notification_permission_dialog_dismiss">취소</string>
+    <string name="my_page_notification_permission_banner">기기 알림 설정이 꺼져 있어 알림을 받을 수 없어요</string>
+    <string name="my_page_notification_permission_go_to_settings">설정으로 이동</string>
+    <string name="my_page_notification_update_failed">알림 설정 변경에 실패했어요</string>
+    <string name="my_page_notification_load_failed">알림 설정을 불러오지 못했어요</string>
     <string name="my_page_inquiry">문의하기</string>
     <string name="my_page_privacy_policy">개인 정보 처리 방침</string>
     <string name="my_page_login">로그인</string>
