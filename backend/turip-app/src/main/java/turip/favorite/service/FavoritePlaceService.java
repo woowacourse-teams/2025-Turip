@@ -124,7 +124,7 @@ public class FavoritePlaceService {
     @Transactional
     public void updatePlaceOrder(Account account, Long favoriteFolderId,
                                  FavoritePlaceOrderRequest request) {
-        FavoriteFolder favoriteFolder = getFavoriteFolderById(favoriteFolderId);
+        FavoriteFolder favoriteFolder = getFavoriteFolderByIdWithLock(favoriteFolderId);
         favoriteFolderAccountService.validateMembership(account, favoriteFolder);
 
         List<Long> favoritePlaceIdsOrder = request.favoritePlaceIdsOrder();
@@ -141,7 +141,7 @@ public class FavoritePlaceService {
 
     @Transactional
     public void remove(Account account, Long favoriteFolderId, Long placeId) {
-        FavoriteFolder favoriteFolder = getFavoriteFolderById(favoriteFolderId);
+        FavoriteFolder favoriteFolder = getFavoriteFolderByIdWithLock(favoriteFolderId);
         Place place = getPlaceById(placeId);
 
         favoriteFolderAccountService.validateMembership(account, favoriteFolder);
