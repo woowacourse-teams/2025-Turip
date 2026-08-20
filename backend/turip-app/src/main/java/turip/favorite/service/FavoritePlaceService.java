@@ -85,7 +85,7 @@ public class FavoritePlaceService {
                                                              List<Long> favoriteFolderIds,
                                                              Long placeId) {
         List<Long> requestIds = favoriteFolderIds.stream().distinct().toList();
-        List<FavoriteFolder> requestFolders = favoriteFolderRepository.findAllById(requestIds);
+        List<FavoriteFolder> requestFolders = favoriteFolderRepository.findAllByIdInWithLock(requestIds);
         validateMultiFolder(account, requestFolders, requestIds);
 
         Place place = getPlaceById(placeId);
