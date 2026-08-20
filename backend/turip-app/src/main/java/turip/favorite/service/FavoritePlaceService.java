@@ -41,7 +41,7 @@ public class FavoritePlaceService {
 
     @Transactional
     public FavoritePlaceResponse create(Account account, Long favoriteFolderId, Long placeId) {
-        FavoriteFolder favoriteFolder = getFavoriteFolderById(favoriteFolderId);
+        FavoriteFolder favoriteFolder = getFavoriteFolderByIdWithLock(favoriteFolderId);
         Place place = getPlaceById(placeId);
 
         favoriteFolderAccountService.validateMembership(account, favoriteFolder);
@@ -64,7 +64,7 @@ public class FavoritePlaceService {
             throw new BadRequestException(ErrorTag.BAD_REQUEST);
         }
 
-        FavoriteFolder favoriteFolder = getFavoriteFolderById(favoriteFolderId);
+        FavoriteFolder favoriteFolder = getFavoriteFolderByIdWithLock(favoriteFolderId);
         favoriteFolderAccountService.validateMembership(account, favoriteFolder);
 
         List<Place> requestedPlaces = findPlacesByIdInRequestOrder(placeIds);
@@ -291,5 +291,10 @@ public class FavoritePlaceService {
     private FavoritePlace getByFavoriteFolderAndPlace(FavoriteFolder favoriteFolder, Place place) {
         return favoritePlaceRepository.findByFavoriteFolderAndPlace(favoriteFolder, place)
                 .orElseThrow(() -> new NotFoundException(ErrorTag.FAVORITE_PLACE_NOT_FOUND));
+    }
+
+    private FavoriteFolder getFavoriteFolderByIdWithLock(Long favoriteFolderId) {
+        return favoriteFolderRepository.findByIdWithLock(favoriteFolderId)
+                .orElseThrow(() -> new NotFoundException(ErrorTag.FAVORITE_FOLDER_NOT_FOUND));
     }
 }
