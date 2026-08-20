@@ -406,7 +406,8 @@ class FavoritePlaceServiceTest {
                     .willReturn(Optional.of(favoriteFolder));
             given(placeRepository.findAllById(List.of(3L, 1L, 2L)))
                     .willReturn(List.of(place1, place2, place3));
-            given(favoritePlaceRepository.findAllByFavoriteFolderAndPlaceIn(favoriteFolder, List.of(place3, place1, place2)))
+            given(favoritePlaceRepository.findAllByFavoriteFolderAndPlaceIn(favoriteFolder,
+                    List.of(place3, place1, place2)))
                     .willReturn(List.of());
             given(favoritePlaceRepository.findMaxFavoriteOrderByFavoriteFolder(favoriteFolder))
                     .willReturn(Optional.empty());
@@ -663,7 +664,7 @@ class FavoritePlaceServiceTest {
             Place place = new Place(placeId, "장소 이름", "장소 url", "주소", 1, 1);
             FavoritePlace favoritePlace = new FavoritePlace(favoriteFolder, place, 1);
 
-            given(favoriteFolderRepository.findById(favoriteFolderId))
+            given(favoriteFolderRepository.findByIdWithLock(favoriteFolderId))
                     .willReturn(Optional.of(favoriteFolder));
             given(placeRepository.findById(placeId))
                     .willReturn(Optional.of(place));
@@ -689,7 +690,7 @@ class FavoritePlaceServiceTest {
             FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(1L, "폴더1");
             Place place = new Place(placeId, "장소 이름", "장소 url", "주소", 1, 1);
 
-            given(favoriteFolderRepository.findById(favoriteFolderId))
+            given(favoriteFolderRepository.findByIdWithLock(favoriteFolderId))
                     .willReturn(Optional.of(favoriteFolder));
             given(placeRepository.findById(placeId))
                     .willReturn(Optional.of(place));
@@ -710,7 +711,7 @@ class FavoritePlaceServiceTest {
             Long placeId = 1L;
             Account account = AccountFixture.createUser();
 
-            given(favoriteFolderRepository.findById(favoriteFolderId))
+            given(favoriteFolderRepository.findByIdWithLock(favoriteFolderId))
                     .willReturn(Optional.empty());
 
             // when & then
@@ -728,7 +729,7 @@ class FavoritePlaceServiceTest {
             Account account = AccountFixture.createUser();
             FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(favoriteFolderId, "폴더1");
 
-            given(favoriteFolderRepository.findById(favoriteFolderId))
+            given(favoriteFolderRepository.findByIdWithLock(favoriteFolderId))
                     .willReturn(Optional.of(favoriteFolder));
             given(placeRepository.findById(placeId))
                     .willReturn(Optional.empty());
@@ -749,7 +750,7 @@ class FavoritePlaceServiceTest {
             FavoriteFolder favoriteFolder = FavoriteFolderFixture.createCustomFolderWithId(favoriteFolderId, "폴더1");
             Place place = new Place(placeId, "장소 이름", "장소 url", "주소", 1, 1);
 
-            given(favoriteFolderRepository.findById(favoriteFolderId))
+            given(favoriteFolderRepository.findByIdWithLock(favoriteFolderId))
                     .willReturn(Optional.of(favoriteFolder));
             given(placeRepository.findById(placeId))
                     .willReturn(Optional.of(place));
