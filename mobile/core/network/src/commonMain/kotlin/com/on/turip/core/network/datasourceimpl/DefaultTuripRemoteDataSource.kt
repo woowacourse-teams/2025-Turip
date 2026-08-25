@@ -9,7 +9,9 @@ import com.on.turip.core.data.dto.turip.TuripInvitationTokenResponse
 import com.on.turip.core.data.dto.turip.TuripJoinResponse
 import com.on.turip.core.data.dto.turip.TuripMembersResponse
 import com.on.turip.core.data.dto.turip.TuripPatchRequest
+import com.on.turip.core.data.dto.turip.TuripPlaceCreationResponse
 import com.on.turip.core.data.dto.turip.TuripPlaceOrderRequest
+import com.on.turip.core.data.dto.turip.TuripPlacesBatchRequest
 import com.on.turip.core.data.dto.turip.TuripPlacesResponse
 import com.on.turip.core.data.dto.turip.TuripPostRequest
 import com.on.turip.core.data.dto.turip.TuripResponse
@@ -76,6 +78,12 @@ class DefaultTuripRemoteDataSource(
         turipId: Long,
         placeId: Long,
     ): TuripResult<Unit> = safeApiCall { turipService.postTuripPlace(turipId, placeId) }
+
+    override suspend fun createTuripPlaces(
+        turipId: Long,
+        turipPlacesBatchRequest: TuripPlacesBatchRequest,
+    ): TuripResult<List<TuripPlaceCreationResponse>> =
+        safeApiCall { turipService.postTuripPlaces(turipId, turipPlacesBatchRequest) }
 
     override suspend fun deleteTuripPlace(
         turipId: Long,

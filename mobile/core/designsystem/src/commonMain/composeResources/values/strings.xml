@@ -5,11 +5,11 @@
     <string name="all_total_place_count">%d개 장소</string>
     <string name="all_trip_duration">%1$d박 %2$d일</string>
     <string name="all_trip_day_trip_duration">당일치기</string>
-    <string name="all_video_description">%s · %s</string>
+    <string name="all_video_description">%1$s · %2$s</string>
     <string name="all_close_description">닫기</string>
     <string name="all_confirm">확인</string>
     <string name="all_turip_name_error_duplicate">중복된 튜립명이 존재합니다.</string>
-    <string name="all_turip_name_same_default_name_error">\'기본 튜립\' 대신 다른 이름을 입력해 주세요</string>
+    <string name="all_turip_name_same_default_name_error">'기본 튜립' 대신 다른 이름을 입력해 주세요</string>
     <string name="all_turip_name_error_out_of_bound">튜립명은 1 ~ 20 글자 범위 입니다.</string>
     <string name="all_turip_name_warning_max_length">튜립명은 최대 20글자 입니다.(현재 20 글자)</string>
     <string name="all_turip_description">직진만 남은 여행</string>
@@ -32,7 +32,7 @@
     <string name="bottom_navigation_my_page">마이페이지</string>
 
     <!-- 검색 결과 페이지 -->
-    <string name="search_result_no_result">\'%s\'의\n검색 결과가 없어요...</string>
+    <string name="search_result_no_result">'%s'의\n검색 결과가 없어요...</string>
     <string name="search_result_exist_result">검색결과 %d개</string>
     <string name="search_result_hint_text">예시 검색: 1박 2일, 감성, 도쿄, 해수욕장</string>
     <string name="search_result_tip">TIP</string>
@@ -44,6 +44,52 @@
     <!-- 홈 페이지 -->
     <string name="home_top_title">😊 오늘의 기분은, 여행하기 딱 좋아요!</string>
     <string name="home_users_like_content_title">❤️ 한 주간 가장 많이 북마크 된 콘텐츠</string>
+    <string name="home_random_travel_cta">🎲 어디로 떠나볼까?</string>
+    <string name="home_random_travel_unavailable">지역 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요</string>
+
+    <!-- 랜덤 여행 -->
+    <string name="random_travel_title">랜덤 여행</string>
+    <string name="random_travel_spinning_title">오늘의 여행지를 뽑는 중이에요</string>
+    <string name="random_travel_confirmed_title">✨ Today's Destination</string>
+    <string name="random_travel_ticket_title">TURIP PASS</string>
+    <string name="random_travel_ticket_destination_label">DESTINATION</string>
+    <string name="random_travel_ticket_region_label">REGION</string>
+    <string name="random_travel_ticket_video_label">VIDEOS</string>
+    <string name="random_travel_ticket_domestic">국내</string>
+    <string name="random_travel_ticket_abroad">해외</string>
+    <string name="random_travel_ticket_video_count">%d개</string>
+    <string name="random_travel_ticket_serial">NO. %s</string>
+    <string name="random_travel_ticket_code">TURIP · %s</string>
+    <string name="random_travel_briefing_video_title">🎥 %s 여행 영상</string>
+    <string name="random_travel_briefing_video_count">%d개</string>
+    <string name="random_travel_briefing_related_spot_title">🎉 %s 연관 관광지</string>
+    <string name="random_travel_related_spot_count">%d곳</string>
+    <string name="random_travel_related_spot_unsupported">이 여행지는 아직 관광지 정보를 제공하지 않아요</string>
+    <string name="random_travel_related_spot_empty">등록된 관광지가 없어요</string>
+    <string name="random_travel_related_spot_error">관광지 정보를 불러오지 못했어요</string>
+    <string name="random_travel_related_spot_detail_title">%1$s %2$s</string>
+    <string name="random_travel_related_spot_detail_total">총 %d곳</string>
+    <string name="random_travel_related_spot_detail_empty">이 카테고리에는 아직 등록된 장소가 없어요</string>
+    <string name="random_travel_related_spot_more_description">전체 보기</string>
+    <string name="random_travel_confirmed_label">여행지가 정해졌어요</string>
+    <string name="random_travel_empty_video">아직 이 여행지의 영상이 없어요\n다시 돌려볼까요?</string>
+    <string name="random_travel_briefing_error">영상을 불러오지 못했어요</string>
+    <string name="random_travel_selected_video">선택한 영상</string>
+    <string name="random_travel_select_video_guide">영상을 선택하면 여행을 시작할 수 있어요</string>
+    <string name="random_travel_start_trip">🧳 이 여행 시작하기</string>
+    <string name="random_travel_reroll">🎲 다시 돌리기</string>
+    <string name="random_travel_turip_draft_title">이 여행을 튜립으로 담을까요?</string>
+    <string name="random_travel_turip_draft_place_section">담을 장소 %1$d / %2$d곳</string>
+    <string name="random_travel_turip_draft_select_all">전체 선택</string>
+    <string name="random_travel_turip_draft_clear_all">전체 해제</string>
+    <string name="random_travel_turip_draft_confirm">담고 영상 보기</string>
+    <string name="random_travel_turip_draft_skip">영상만 보기</string>
+    <string name="random_travel_turip_draft_places_error">장소를 불러오지 못했어요</string>
+    <string name="random_travel_turip_draft_retry">다시 시도</string>
+    <string name="random_travel_turip_created">\'%1$s\' 튜립에 %2$d곳을 담았어요</string>
+    <string name="random_travel_turip_created_partial">\'%1$s\' 튜립에 %2$d곳만 담겼어요</string>
+    <string name="random_travel_turip_create_failed">튜립을 만들지 못했어요</string>
+    <string name="random_travel_turip_place_failed">\'%1$s\' 튜립을 만들었지만 장소를 담지 못했어요</string>
 
     <!-- 마이 페이지 -->
     <string name="my_page_profile_image_description">프로필 이미지</string>

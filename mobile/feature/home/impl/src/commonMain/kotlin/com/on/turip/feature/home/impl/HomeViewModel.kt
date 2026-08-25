@@ -80,6 +80,20 @@ class HomeViewModel(
         }
     }
 
+    /**
+     * 랜덤 여행은 지역 목록을 재료로 슬롯을 돌린다.
+     * 목록을 확보하지 못한 상태(오프라인 등)에서는 화면을 전환하지 않고 안내만 한다.
+     */
+    fun clickRandomTravel() {
+        viewModelScope.launch {
+            if (uiState.value.regionCategories.isEmpty()) {
+                _uiEffect.send(HomeUiEffect.ShowRandomTravelUnavailable)
+                return@launch
+            }
+            _uiEffect.send(HomeUiEffect.NavigateToRandomTravel)
+        }
+    }
+
     fun updateDomesticSelected(isDomesticSelected: Boolean) {
         Napier.d(if (isDomesticSelected) "국내 클릭" else "해외 클릭")
         viewModelScope.launch {
