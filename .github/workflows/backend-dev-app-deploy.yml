@@ -2,10 +2,8 @@ name: Dev App CI/CD
 
 on:
   push:
-    branches: [ develop ]
     paths:
-      - 'backend/turip-app/**'
-      - 'backend/build.gradle'
+      - '**'
   pull_request:
     branches: [ develop ]
     paths:
