@@ -66,10 +66,14 @@ class AdminBookmarkServiceTest {
             Account admin1 = AccountFixture.createCustomAccount(1L, Role.ADMIN);
             Account admin2 = AccountFixture.createCustomAccount(2L, Role.ADMIN);
 
+            LocalDate lastWeekMonday = LocalDate.now().minusWeeks(1).with(DayOfWeek.MONDAY);
+            LocalDate lastWeekSunday = lastWeekMonday.plusDays(6);
+
             given(contentRepository.findById(contentId)).willReturn(Optional.of(content));
             given(accountRepository.findAllByRole(Role.ADMIN)).willReturn(List.of(admin1, admin2));
-            given(favoriteContentRepository.findByAccountIdInAndContentId(List.of(1L, 2L), contentId))
-                    .willReturn(List.of(new FavoriteContent(LocalDate.now(), admin1, content)));
+            given(favoriteContentRepository.findByAccountIdInAndContentIdAndCreatedAtBetween(List.of(1L, 2L),
+                    contentId, lastWeekMonday, lastWeekSunday))
+                    .willReturn(List.of(new FavoriteContent(lastWeekMonday, admin1, content)));
 
             // when
             List<AdminBookmarkStatusResponse> response = adminBookmarkService.findAdminAccountBookmarkStatuses(
@@ -82,15 +86,46 @@ class AdminBookmarkServiceTest {
             assertThat(response.get(1).accountId()).isEqualTo(2L);
             assertThat(response.get(1).isBookmarked()).isFalse();
         }
+
+        @DisplayName("지난주 기간 밖 날짜로 북마크되어 있으면 북마크되지 않은 것으로 취급한다")
+        @Test
+        void findAccountBookmarkStatuses2() {
+            // given
+            Long contentId = 1L;
+            Creator creator = new Creator("여행하는 메이", "profile");
+            Country country = new Country("대한민국", "image");
+            City city = new City(country, null, "속초", "image");
+            Content content = new Content(contentId, creator, city, "제목", "url", LocalDate.now());
+
+            Account admin1 = AccountFixture.createCustomAccount(1L, Role.ADMIN);
+
+            LocalDate lastWeekMonday = LocalDate.now().minusWeeks(1).with(DayOfWeek.MONDAY);
+            LocalDate lastWeekSunday = lastWeekMonday.plusDays(6);
+
+            given(contentRepository.findById(contentId)).willReturn(Optional.of(content));
+            given(accountRepository.findAllByRole(Role.ADMIN)).willReturn(List.of(admin1));
+            // admin1이 지난주가 아닌 날짜(오늘)로 이미 찜해두었더라도, 조회 대상(지난주 기간) 밖이라 빈 결과를 반환
+            given(favoriteContentRepository.findByAccountIdInAndContentIdAndCreatedAtBetween(List.of(1L),
+                    contentId, lastWeekMonday, lastWeekSunday))
+                    .willReturn(List.of());
+
+            // when
+            List<AdminBookmarkStatusResponse> response = adminBookmarkService.findAdminAccountBookmarkStatuses(
+                    contentId);
+
+            // then
+            assertThat(response).hasSize(1);
+            assertThat(response.get(0).isBookmarked()).isFalse();
+        }
     }
 
     @DisplayName("ADMIN 계정의 지난주 북마크 등록 기능 테스트")
     @Nested
-    class CreateBookmark {
+    class UpsertBookmark {
 
         @DisplayName("아직 북마크하지 않은 경우 지난주 월요일 날짜로 북마크를 생성한다")
         @Test
-        void createBookmark1() {
+        void upsertBookmark1() {
             // given
             Long accountId = 1L;
             Long contentId = 1L;
@@ -105,7 +140,7 @@ class AdminBookmarkServiceTest {
                     .willReturn(Optional.empty());
 
             // when
-            adminBookmarkService.createBookmark(accountId, contentId);
+            adminBookmarkService.upsertBookmark(accountId, contentId);
 
             // then
             ArgumentCaptor<FavoriteContent> captor = ArgumentCaptor.forClass(FavoriteContent.class);
@@ -113,16 +148,17 @@ class AdminBookmarkServiceTest {
             assertThat(captor.getValue().getCreatedAt()).isEqualTo(lastWeekMonday);
         }
 
-        @DisplayName("이미 북마크한 경우 아무 것도 하지 않는다")
+        @DisplayName("이미 지난주 날짜로 북마크되어 있으면 아무 것도 하지 않는다")
         @Test
-        void createBookmark2() {
+        void upsertBookmark2() {
             // given
             Long accountId = 1L;
             Long contentId = 1L;
             Account admin = AccountFixture.createCustomAccount(accountId, Role.ADMIN);
             Content content = new Content(contentId, new Creator("메이", "profile"),
                     new City(new Country("대한민국", "image"), null, "속초", "image"), "제목", "url", LocalDate.now());
-            FavoriteContent existing = new FavoriteContent(LocalDate.now().minusWeeks(1), admin, content);
+            LocalDate lastWeekMonday = LocalDate.now().minusWeeks(1).with(DayOfWeek.MONDAY);
+            FavoriteContent existing = new FavoriteContent(lastWeekMonday, admin, content);
 
             given(accountRepository.findById(accountId)).willReturn(Optional.of(admin));
             given(contentRepository.findById(contentId)).willReturn(Optional.of(content));
@@ -130,15 +166,41 @@ class AdminBookmarkServiceTest {
                     .willReturn(Optional.of(existing));
 
             // when
-            adminBookmarkService.createBookmark(accountId, contentId);
+            adminBookmarkService.upsertBookmark(accountId, contentId);
 
             // then
             verify(favoriteContentRepository, never()).save(any());
+            assertThat(existing.getCreatedAt()).isEqualTo(lastWeekMonday);
+        }
+
+        @DisplayName("지난주가 아닌 날짜로 북마크되어 있으면 지난주 월요일로 날짜를 갱신한다")
+        @Test
+        void upsertBookmark3() {
+            // given
+            Long accountId = 1L;
+            Long contentId = 1L;
+            Account admin = AccountFixture.createCustomAccount(accountId, Role.ADMIN);
+            Content content = new Content(contentId, new Creator("메이", "profile"),
+                    new City(new Country("대한민국", "image"), null, "속초", "image"), "제목", "url", LocalDate.now());
+            LocalDate lastWeekMonday = LocalDate.now().minusWeeks(1).with(DayOfWeek.MONDAY);
+            FavoriteContent existing = new FavoriteContent(LocalDate.now().minusWeeks(2), admin, content);
+
+            given(accountRepository.findById(accountId)).willReturn(Optional.of(admin));
+            given(contentRepository.findById(contentId)).willReturn(Optional.of(content));
+            given(favoriteContentRepository.findByAccountIdAndContentId(accountId, contentId))
+                    .willReturn(Optional.of(existing));
+
+            // when
+            adminBookmarkService.upsertBookmark(accountId, contentId);
+
+            // then
+            verify(favoriteContentRepository, never()).save(any());
+            assertThat(existing.getCreatedAt()).isEqualTo(lastWeekMonday);
         }
 
         @DisplayName("ADMIN이 아닌 계정이면 예외를 던진다")
         @Test
-        void createBookmark3() {
+        void upsertBookmark4() {
             // given
             Long accountId = 1L;
             Long contentId = 1L;
@@ -147,13 +209,13 @@ class AdminBookmarkServiceTest {
             given(accountRepository.findById(accountId)).willReturn(Optional.of(user));
 
             // when & then
-            assertThatThrownBy(() -> adminBookmarkService.createBookmark(accountId, contentId))
+            assertThatThrownBy(() -> adminBookmarkService.upsertBookmark(accountId, contentId))
                     .isInstanceOf(NotFoundException.class);
         }
 
         @DisplayName("존재하지 않는 계정이면 예외를 던진다")
         @Test
-        void createBookmark4() {
+        void upsertBookmark5() {
             // given
             Long accountId = 1L;
             Long contentId = 1L;
@@ -161,13 +223,13 @@ class AdminBookmarkServiceTest {
             given(accountRepository.findById(accountId)).willReturn(Optional.empty());
 
             // when & then
-            assertThatThrownBy(() -> adminBookmarkService.createBookmark(accountId, contentId))
+            assertThatThrownBy(() -> adminBookmarkService.upsertBookmark(accountId, contentId))
                     .isInstanceOf(NotFoundException.class);
         }
 
         @DisplayName("존재하지 않는 콘텐츠면 예외를 던진다")
         @Test
-        void createBookmark5() {
+        void upsertBookmark6() {
             // given
             Long accountId = 1L;
             Long contentId = 1L;
@@ -177,7 +239,7 @@ class AdminBookmarkServiceTest {
             given(contentRepository.findById(contentId)).willReturn(Optional.empty());
 
             // when & then
-            assertThatThrownBy(() -> adminBookmarkService.createBookmark(accountId, contentId))
+            assertThatThrownBy(() -> adminBookmarkService.upsertBookmark(accountId, contentId))
                     .isInstanceOf(NotFoundException.class);
         }
     }

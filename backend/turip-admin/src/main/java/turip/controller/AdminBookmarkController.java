@@ -32,12 +32,12 @@ public class AdminBookmarkController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> createBookmark(
+    public ResponseEntity<Void> upsertBookmark(
             @AuthAdmin TuripMember admin,
             @RequestParam(name = "accountId") Long accountId,
             @RequestParam(name = "contentId") Long contentId
     ) {
-        adminBookmarkService.createBookmark(accountId, contentId);
+        adminBookmarkService.upsertBookmark(accountId, contentId);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 

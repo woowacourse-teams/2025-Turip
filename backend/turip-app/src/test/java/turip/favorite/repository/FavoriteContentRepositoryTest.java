@@ -83,8 +83,8 @@ class FavoriteContentRepositoryTest {
     }
 
     @Test
-    @DisplayName("계정 id 목록과 콘텐츠 id로 해당 계정들이 그 콘텐츠를 찜한 FavoriteContent만 조회한다")
-    void findByAccountIdInAndContentId1() {
+    @DisplayName("계정 id 목록, 콘텐츠 id, 기간으로 해당 계정들이 그 기간에 그 콘텐츠를 찜한 FavoriteContent만 조회한다")
+    void findByAccountIdInAndContentIdAndCreatedAtBetween1() {
         // given
         Country country = countryRepository.findByName("대한민국")
                 .orElseGet(() -> countryRepository.save(new Country("대한민국", "https://example.com/korea.jpg")));
@@ -103,14 +103,19 @@ class FavoriteContentRepositoryTest {
         Account account2 = accountRepository.save(AccountFixture.createEntity());
         Account account3 = accountRepository.save(AccountFixture.createEntity());
 
-        favoriteContentRepository.save(new FavoriteContent(LocalDate.now(), account1, content1));
-        favoriteContentRepository.save(new FavoriteContent(LocalDate.now(), account2, content1));
+        LocalDate lastWeekMonday = LocalDate.now().minusWeeks(1).with(java.time.DayOfWeek.MONDAY);
+        LocalDate lastWeekSunday = lastWeekMonday.plusDays(6);
+
+        favoriteContentRepository.save(new FavoriteContent(lastWeekMonday, account1, content1));
+        favoriteContentRepository.save(new FavoriteContent(lastWeekMonday, account2, content1));
+        // account3는 기간 밖(오늘 날짜)에 찜함 -> 조회 대상에서 제외되어야 함
         favoriteContentRepository.save(new FavoriteContent(LocalDate.now(), account3, content1));
-        favoriteContentRepository.save(new FavoriteContent(LocalDate.now(), account1, content2));
+        favoriteContentRepository.save(new FavoriteContent(lastWeekMonday, account1, content2));
 
         // when
-        List<FavoriteContent> result = favoriteContentRepository.findByAccountIdInAndContentId(
-                List.of(account1.getId(), account2.getId()), content1.getId());
+        List<FavoriteContent> result = favoriteContentRepository.findByAccountIdInAndContentIdAndCreatedAtBetween(
+                List.of(account1.getId(), account2.getId(), account3.getId()), content1.getId(), lastWeekMonday,
+                lastWeekSunday);
 
         // then
         assertThat(result).hasSize(2);

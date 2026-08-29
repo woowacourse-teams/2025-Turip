@@ -38,9 +38,12 @@ public class AdminBookmarkService {
                 .map(Account::getId)
                 .toList();
 
-        // 어드민 계정 중 해당 콘텐츠를 북마크한 계정의 id 조회
-        Set<Long> bookmarkedAccountIds = favoriteContentRepository.findByAccountIdInAndContentId(adminAccountIds,
-                        contentId).stream()
+        LocalDate lastWeekMonday = getLastWeekMonday();
+        LocalDate lastWeekSunday = lastWeekMonday.plusDays(6);
+
+        // 어드민 계정 중 지난주 기간에 해당 콘텐츠를 북마크한 계정의 id 조회
+        Set<Long> bookmarkedAccountIds = favoriteContentRepository.findByAccountIdInAndContentIdAndCreatedAtBetween(
+                        adminAccountIds, contentId, lastWeekMonday, lastWeekSunday).stream()
                 .map(favoriteContent -> favoriteContent.getAccount().getId())
                 .collect(Collectors.toSet());
 
@@ -50,13 +53,14 @@ public class AdminBookmarkService {
     }
 
     @Transactional
-    public void createBookmark(Long accountId, Long contentId) {
+    public void upsertBookmark(Long accountId, Long contentId) {
         Account admin = getAdmin(accountId);
         Content content = getContent(contentId);
 
         Optional<FavoriteContent> existing = favoriteContentRepository.findByAccountIdAndContentId(accountId,
                 contentId);
         if (existing.isPresent()) {
+            existing.get().updateCreatedAt(getLastWeekMonday());
             return;
         }
 
