@@ -25,6 +25,7 @@
             top: 0;
             width: 100%;
             z-index: 1000;
+            height: 64px;
         }
 
         .header h1 {
@@ -159,55 +160,24 @@
 
         .logout-btn:hover { background: #e2e8f0; color: #333; }
 
-        .main-content {
-            max-width: 900px;
-            margin: 100px auto 40px;
-            padding: 0 20px;
+        .home-main {
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .welcome-card {
             background: white;
             border-radius: 20px;
-            padding: 50px;
+            padding: 60px 70px;
             text-align: center;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         }
 
-        .welcome-card h2 { color: #333; font-size: 28px; margin-bottom: 10px; }
-        .welcome-card p { color: #888; margin-bottom: 35px; }
-
-        .btn-group { display: flex; gap: 15px; justify-content: center; }
-
-        .action-btn {
-            padding: 16px 32px;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-decoration: none;
-        }
-
-        .btn-collect { background: #667eea; color: white; }
-
-        .btn-collect:hover {
-            background: #5568d3;
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
-        }
-
-        .btn-pending { background: #fff; color: #667eea; border: 2px solid #667eea; }
-
-        .btn-pending:hover { background: #f8faff; transform: translateY(-3px); }
-
-        .btn-popular { background: #fff; color: #ff8a5c; border: 2px solid #ff8a5c; }
-
-        .btn-popular:hover { background: #fff6f2; transform: translateY(-3px); }
+        .welcome-card h2 { color: #333; font-size: 26px; margin-bottom: 12px; }
+        .welcome-card p { color: #888; }
     </style>
+    <th:block th:replace="~{admin/fragments/sidebar :: sidebar-style}"></th:block>
 </head>
 <body>
 
@@ -238,20 +208,13 @@
     </div>
 </div>
 
-<div class="main-content">
-    <div class="welcome-card">
-        <h2>반갑습니다, <span style="color:#667eea;" th:text="${admin.member.account.nickname}">관리자</span>님! 👋</h2>
-        <p>오늘도 새로운 여행 콘텐츠를 수집해볼까요?</p>
-        <div class="btn-group">
-            <a class="action-btn btn-collect" href="/admin/contents">
-                <i class="fa-solid fa-plus"></i> 콘텐츠 수집하기
-            </a>
-            <a class="action-btn btn-pending" href="/admin/contents/pending">
-                <i class="fa-solid fa-list-check"></i> 검수 대기 목록
-            </a>
-            <a class="action-btn btn-popular" href="/admin/contents/popular">
-                <i class="fa-solid fa-fire"></i> 인기 콘텐츠 관리
-            </a>
+<div class="layout">
+    <div class="sidebar" th:replace="~{admin/fragments/sidebar :: sidebar(${activeMenu})}"></div>
+
+    <div class="main-content home-main">
+        <div class="welcome-card">
+            <h2>반갑습니다, <span style="color:#667eea;" th:text="${admin.member.account.nickname}">관리자</span>님! 👋</h2>
+            <p>오늘도 새로운 여행 콘텐츠를 수집해볼까요?</p>
         </div>
     </div>
 </div>

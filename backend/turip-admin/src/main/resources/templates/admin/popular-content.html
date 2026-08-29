@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Turip Admin - 인기 콘텐츠 관리</title>
@@ -11,13 +11,12 @@
             background: linear-gradient(135deg, #becdfd, #ffffff);
             min-height: 100vh;
             font-family: 'Pretendard', sans-serif;
-            padding: 40px 0;
         }
 
         .header {
             background: white;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            padding: 20px 40px;
+            padding: 15px 40px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -25,6 +24,7 @@
             top: 0;
             width: 100%;
             z-index: 1000;
+            height: 64px;
         }
 
         .admin-card {
@@ -32,7 +32,6 @@
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             padding: 35px;
-            margin-top: 60px;
             margin-bottom: 25px;
         }
 
@@ -169,6 +168,7 @@
             margin-bottom: 25px;
         }
     </style>
+    <th:block th:replace="~{admin/fragments/sidebar :: sidebar-style}"></th:block>
 </head>
 <body>
 
@@ -187,7 +187,9 @@
     <a class="btn btn-sm btn-outline-primary fw-bold" href="/admin/home">홈으로 돌아가기</a>
 </div>
 
-<div class="container">
+<div class="layout">
+    <div class="sidebar" th:replace="~{admin/fragments/sidebar :: sidebar(${activeMenu})}"></div>
+    <div class="main-content">
     <div class="admin-card">
         <h3 class="section-title" style="font-size: 22px;">이번 주 예상 인기 콘텐츠 (지난주 기준)</h3>
         <div id="previewList"></div>
@@ -217,6 +219,7 @@
         <div class="load-more-wrapper">
             <button class="btn-load-more d-none" id="loadMoreBtn" onclick="loadContents(false)">더 보기</button>
         </div>
+    </div>
     </div>
 </div>
 

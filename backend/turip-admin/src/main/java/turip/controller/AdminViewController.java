@@ -39,6 +39,7 @@ public class AdminViewController {
     @GetMapping("/home")
     public String homePage(@AuthAdmin TuripMember admin, Model model) {
         model.addAttribute("admin", admin);
+        model.addAttribute("activeMenu", "home");
         return "admin/home";
     }
 
@@ -46,28 +47,33 @@ public class AdminViewController {
     public String createContentPage(@AuthAdmin TuripMember admin, Model model) {
         model.addAttribute("googleApiKey", googleApiKey);
         model.addAttribute("youtubeApiKey", youtubeApiKey);
+        model.addAttribute("activeMenu", "collect");
         return "admin/content";
     }
 
     @GetMapping("/contents/pending")
-    public String pendingListPage(@AuthAdmin TuripMember admin) {
+    public String pendingListPage(@AuthAdmin TuripMember admin, Model model) {
+        model.addAttribute("activeMenu", "pending");
         return "admin/pending-list";
     }
 
     @GetMapping("/contents/pending/{id}")
     public String pendingReviewPage(@AuthAdmin TuripMember admin, @PathVariable Long id, Model model) {
         model.addAttribute("pendingId", id);
+        model.addAttribute("activeMenu", "pending");
         return "admin/pending-review";
     }
 
     @GetMapping("/contents/popular")
-    public String popularContentPage(@AuthAdmin TuripMember admin) {
+    public String popularContentPage(@AuthAdmin TuripMember admin, Model model) {
+        model.addAttribute("activeMenu", "popular");
         return "admin/popular-content";
     }
 
     @GetMapping("/my")
     public String myPage(@AuthAdmin TuripMember admin, Model model) {
         model.addAttribute("admin", admin);
+        model.addAttribute("activeMenu", "my");
         return "admin/my";
     }
 }
