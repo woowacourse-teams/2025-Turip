@@ -60,6 +60,11 @@ public class AdminViewController {
         return "admin/pending-review";
     }
 
+    @GetMapping("/contents/popular")
+    public String popularContentPage(@AuthAdmin TuripMember admin) {
+        return "admin/popular-content";
+    }
+
     @GetMapping("/my")
     public String myPage(@AuthAdmin TuripMember admin, Model model) {
         model.addAttribute("admin", admin);

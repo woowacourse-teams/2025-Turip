@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Turip Admin - 인기 콘텐츠 관리</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+        body {
+            background: linear-gradient(135deg, #becdfd, #ffffff);
+            min-height: 100vh;
+            font-family: 'Pretendard', sans-serif;
+            padding: 40px 0;
+        }
+
+        .header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .admin-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 35px;
+            margin-top: 60px;
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: #333;
+            margin-bottom: 30px;
+            border-left: 6px solid #6e8efb;
+            padding-left: 20px;
+            letter-spacing: -1px;
+        }
+
+        .table {
+            --bs-table-hover-bg: #f8faff;
+            vertical-align: middle;
+        }
+
+        .table thead th {
+            border-bottom: 2px solid #f0f0f0;
+            color: #444;
+            font-weight: 700;
+            font-size: 15px;
+            padding: 15px 10px;
+        }
+
+        .table tbody td {
+            padding: 16px 10px;
+            border-bottom: 1px solid #f1f1f1;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .video-title {
+            font-weight: 700;
+            color: #333;
+            font-size: 15px;
+            margin-bottom: 4px;
+            display: block;
+            line-height: 1.4;
+        }
+
+        .channel-name {
+            font-size: 13px;
+            color: #888;
+            font-weight: 500;
+        }
+
+        .content-info-row {
+            display: flex;
+            gap: 14px;
+            align-items: center;
+        }
+
+        .content-thumbnail {
+            width: 100px;
+            height: 56px;
+            object-fit: cover;
+            border-radius: 8px;
+            background: #f1f1f1;
+            flex-shrink: 0;
+        }
+
+        .content-info-text {
+            min-width: 0;
+        }
+
+        .admin-checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            align-items: center;
+        }
+
+        .admin-checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 13px;
+            color: #555;
+        }
+
+        .vote-count {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 700;
+            background: #eef1ff;
+            color: #6e8efb;
+        }
+
+        .vote-count.zero {
+            background: #f5f5f5;
+            color: #aaa;
+        }
+
+        .load-more-wrapper {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .btn-load-more {
+            border: 1px solid #ddd;
+            background: white;
+            color: #555;
+            padding: 10px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .btn-load-more:hover {
+            background: #f8faff;
+            border-color: #6e8efb;
+            color: #6e8efb;
+        }
+
+        .preview-rank {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: #6e8efb;
+            color: white;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+    </style>
+</head>
+<body>
+
+<div aria-atomic="true" aria-live="polite" class="position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+    <div class="toast align-items-center border-0" id="errorToast" role="alert">
+        <div class="d-flex">
+            <div class="toast-body fw-bold" id="toastMessage"></div>
+            <button aria-label="Close" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                    type="button"></button>
+        </div>
+    </div>
+</div>
+
+<div class="header">
+    <h1 style="color: #667eea; font-size: 22px; font-weight: 800; margin:0;">Turip Admin</h1>
+    <a class="btn btn-sm btn-outline-primary fw-bold" href="/admin/home">홈으로 돌아가기</a>
+</div>
+
+<div class="container">
+    <div class="admin-card">
+        <h3 class="section-title" style="font-size: 22px;">이번 주 예상 인기 콘텐츠 (지난주 기준)</h3>
+        <div id="previewList"></div>
+    </div>
+
+    <div class="admin-card">
+        <h3 class="section-title">인기 콘텐츠 관리</h3>
+
+        <div class="search-box">
+            <input class="form-control" id="keywordInput" onkeypress="if(event.keyCode==13) searchContents()"
+                   placeholder="콘텐츠 제목, 채널명, 장소명으로 검색 (비우면 전체 목록)" type="text">
+            <button class="btn btn-primary" onclick="searchContents()">검색</button>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th>콘텐츠 정보</th>
+                    <th style="width: 55%;">ADMIN 계정별 북마크</th>
+                </tr>
+                </thead>
+                <tbody id="contentsTableBody"></tbody>
+            </table>
+        </div>
+
+        <div class="load-more-wrapper">
+            <button class="btn-load-more d-none" id="loadMoreBtn" onclick="loadContents(false)">더 보기</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let lastContentId = 0;
+    let currentKeyword = '';
+
+    async function authFetch(url, options = {}) {
+        const defaultOptions = {headers: {'Content-Type': 'application/json'}};
+        const mergedOptions = {...options, headers: {...defaultOptions.headers, ...options.headers}};
+        const response = await fetch(url, mergedOptions);
+        if (!response.ok) {
+            let errorMessage = `[에러 ${response.status}] 서버 응답 실패`;
+            try {
+                const errorBody = await response.json();
+                if (errorBody && errorBody.message) {
+                    errorMessage = errorBody.message;
+                }
+            } catch (jsonError) {
+                // response body was not JSON, use default message
+            }
+            throw new Error(errorMessage);
+        }
+        return response;
+    }
+
+    function showErrorToast(message) {
+        const toastEl = document.getElementById('errorToast');
+        document.getElementById('toastMessage').textContent = '⚠️ ' + message;
+        toastEl.classList.remove('text-bg-success');
+        toastEl.classList.add('text-bg-danger');
+        bootstrap.Toast.getOrCreateInstance(toastEl, {delay: 5000}).show();
+    }
+
+    function searchContents() {
+        currentKeyword = document.getElementById('keywordInput').value.trim();
+        lastContentId = 0;
+        document.getElementById('contentsTableBody').innerHTML = '';
+        loadContents(true);
+    }
+
+    async function loadContents(isFirstPage) {
+        const tbody = document.getElementById('contentsTableBody');
+        const loadMoreBtn = document.getElementById('loadMoreBtn');
+        const params = new URLSearchParams({size: 10, lastId: lastContentId});
+        if (currentKeyword) {
+            params.set('keyword', currentKeyword);
+        }
+
+        try {
+            const res = await authFetch(`/api/v1/admin/contents?${params.toString()}`);
+            const data = await res.json();
+
+            if (isFirstPage && data.contents.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="2" class="text-center py-5 text-muted">콘텐츠가 없습니다.</td></tr>';
+                loadMoreBtn.classList.add('d-none');
+                return;
+            }
+
+            data.contents.forEach(content => {
+                tbody.appendChild(createContentRow(content));
+                lastContentId = content.id;
+            });
+
+            loadMoreBtn.classList.toggle('d-none', !data.loadable);
+        } catch (e) {
+            showErrorToast('콘텐츠 목록을 불러오지 못했습니다: ' + e.message);
+        }
+    }
+
+    function extractVideoId(url) {
+        if (!url) return null;
+        const patterns = [
+            /youtu\.be\/([A-Za-z0-9_-]{11})/,
+            /[?&]v=([A-Za-z0-9_-]{11})/,
+            /embed\/([A-Za-z0-9_-]{11})/,
+            /shorts\/([A-Za-z0-9_-]{11})/
+        ];
+        for (const pattern of patterns) {
+            const match = url.match(pattern);
+            if (match) return match[1];
+        }
+        return null;
+    }
+
+    function createContentRow(content) {
+        const tr = document.createElement('tr');
+        tr.dataset.contentId = content.id;
+
+        const tdInfo = document.createElement('td');
+        const infoRow = document.createElement('div');
+        infoRow.className = 'content-info-row';
+
+        const videoId = extractVideoId(content.url);
+        const thumbnail = document.createElement('img');
+        thumbnail.className = 'content-thumbnail';
+        thumbnail.alt = content.title;
+        thumbnail.src = videoId
+            ? `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`
+            : 'https://via.placeholder.com/100x56?text=No+Image';
+        infoRow.appendChild(thumbnail);
+
+        const textWrapper = document.createElement('div');
+        textWrapper.className = 'content-info-text';
+        const titleSpan = document.createElement('span');
+        titleSpan.className = 'video-title';
+        titleSpan.textContent = content.title;
+        const metaSpan = document.createElement('span');
+        metaSpan.className = 'channel-name';
+        metaSpan.textContent = `${content.creatorChannelName} · ${content.cityName}`;
+        textWrapper.appendChild(titleSpan);
+        textWrapper.appendChild(metaSpan);
+        infoRow.appendChild(textWrapper);
+
+        tdInfo.appendChild(infoRow);
+        tr.appendChild(tdInfo);
+
+        const tdBookmarks = document.createElement('td');
+        const group = document.createElement('div');
+        group.className = 'admin-checkbox-group';
+        group.id = `admin-checkbox-group-${content.id}`;
+        const loadingSpan = document.createElement('span');
+        loadingSpan.className = 'text-muted';
+        loadingSpan.textContent = '불러오는 중...';
+        group.appendChild(loadingSpan);
+        tdBookmarks.appendChild(group);
+        tr.appendChild(tdBookmarks);
+
+        loadBookmarkStatuses(content.id);
+
+        return tr;
+    }
+
+    async function loadBookmarkStatuses(contentId) {
+        const group = document.getElementById(`admin-checkbox-group-${contentId}`);
+        try {
+            const res = await authFetch(`/api/v1/admin/bookmarks?contentId=${contentId}`);
+            const accounts = await res.json();
+            renderBookmarkCheckboxes(contentId, accounts);
+        } catch (e) {
+            group.innerHTML = '';
+            const errorSpan = document.createElement('span');
+            errorSpan.className = 'text-danger';
+            errorSpan.textContent = '불러오기 실패';
+            group.appendChild(errorSpan);
+        }
+    }
+
+    function renderBookmarkCheckboxes(contentId, accounts) {
+        const group = document.getElementById(`admin-checkbox-group-${contentId}`);
+        group.innerHTML = '';
+
+        accounts.forEach(account => {
+            const label = document.createElement('label');
+            label.className = 'admin-checkbox-item';
+
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.checked = account.isBookmarked;
+            checkbox.onchange = () => toggleBookmark(contentId, account.accountId, checkbox);
+
+            const nameSpan = document.createElement('span');
+            nameSpan.textContent = account.nickname;
+
+            label.appendChild(checkbox);
+            label.appendChild(nameSpan);
+            group.appendChild(label);
+        });
+
+        const voteBadge = document.createElement('span');
+        voteBadge.id = `vote-count-${contentId}`;
+        const count = accounts.filter(a => a.isBookmarked).length;
+        updateVoteBadge(voteBadge, count);
+        group.appendChild(voteBadge);
+    }
+
+    function updateVoteBadge(badgeEl, count) {
+        badgeEl.className = count > 0 ? 'vote-count' : 'vote-count zero';
+        badgeEl.textContent = `${count}표`;
+    }
+
+    async function toggleBookmark(contentId, accountId, checkboxEl) {
+        checkboxEl.disabled = true;
+        const params = new URLSearchParams({accountId, contentId});
+
+        try {
+            if (checkboxEl.checked) {
+                await authFetch(`/api/v1/admin/bookmarks?${params.toString()}`, {method: 'POST'});
+            } else {
+                await authFetch(`/api/v1/admin/bookmarks?${params.toString()}`, {method: 'DELETE'});
+            }
+
+            const group = document.getElementById(`admin-checkbox-group-${contentId}`);
+            const checkedCount = group.querySelectorAll('input[type="checkbox"]:checked').length;
+            updateVoteBadge(document.getElementById(`vote-count-${contentId}`), checkedCount);
+
+            loadPreview();
+        } catch (e) {
+            checkboxEl.checked = !checkboxEl.checked;
+            showErrorToast('북마크 처리에 실패했습니다: ' + e.message);
+        } finally {
+            checkboxEl.disabled = false;
+        }
+    }
+
+    async function loadPreview() {
+        const container = document.getElementById('previewList');
+        try {
+            const res = await authFetch('/api/v1/admin/contents/popular?size=10');
+            const data = await res.json();
+
+            if (data.contents.length === 0) {
+                container.innerHTML = '<p class="text-muted mb-0">아직 지난주 북마크된 콘텐츠가 없습니다.</p>';
+                return;
+            }
+
+            container.innerHTML = '';
+            data.contents.forEach((content, index) => {
+                const row = document.createElement('div');
+                row.className = 'd-flex align-items-center gap-3 mb-2';
+
+                const rank = document.createElement('span');
+                rank.className = 'preview-rank';
+                rank.textContent = index + 1;
+
+                const title = document.createElement('span');
+                title.className = 'video-title';
+                title.style.marginBottom = '0';
+                title.textContent = content.title;
+
+                row.appendChild(rank);
+                row.appendChild(title);
+                container.appendChild(row);
+            });
+        } catch (e) {
+            container.innerHTML = '';
+            const errorP = document.createElement('p');
+            errorP.className = 'text-danger mb-0';
+            errorP.textContent = '예상 인기목록을 불러오지 못했습니다: ' + e.message;
+            container.appendChild(errorP);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        loadContents(true);
+        loadPreview();
+    });
+</script>
+</body>
+</html>
