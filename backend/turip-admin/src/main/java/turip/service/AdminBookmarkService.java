@@ -63,6 +63,12 @@ public class AdminBookmarkService {
         favoriteContentRepository.save(new FavoriteContent(getLastWeekMonday(), admin, content));
     }
 
+    @Transactional
+    public void deleteBookmark(Long accountId, Long contentId) {
+        favoriteContentRepository.findByAccountIdAndContentId(accountId, contentId)
+                .ifPresent(favoriteContentRepository::delete);
+    }
+
     private Account getAdmin(Long accountId) {
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new NotFoundException(ErrorTag.ADMIN_NOT_FOUND));

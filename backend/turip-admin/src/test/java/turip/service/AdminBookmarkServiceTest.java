@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.time.DayOfWeek;
@@ -178,6 +179,49 @@ class AdminBookmarkServiceTest {
             // when & then
             assertThatThrownBy(() -> adminBookmarkService.createBookmark(accountId, contentId))
                     .isInstanceOf(NotFoundException.class);
+        }
+    }
+
+    @DisplayName("ADMIN 계정의 북마크 삭제 기능 테스트")
+    @Nested
+    class DeleteBookmark {
+
+        @DisplayName("북마크가 존재하면 삭제한다")
+        @Test
+        void deleteBookmark1() {
+            // given
+            Long accountId = 1L;
+            Long contentId = 1L;
+            Account admin = AccountFixture.createCustomAccount(accountId, Role.ADMIN);
+            Content content = new Content(contentId, new Creator("메이", "profile"),
+                    new City(new Country("대한민국", "image"), null, "속초", "image"), "제목", "url", LocalDate.now());
+            FavoriteContent existing = new FavoriteContent(LocalDate.now().minusWeeks(1), admin, content);
+
+            given(favoriteContentRepository.findByAccountIdAndContentId(accountId, contentId))
+                    .willReturn(Optional.of(existing));
+
+            // when
+            adminBookmarkService.deleteBookmark(accountId, contentId);
+
+            // then
+            verify(favoriteContentRepository, times(1)).delete(existing);
+        }
+
+        @DisplayName("북마크가 존재하지 않으면 아무 것도 하지 않는다")
+        @Test
+        void deleteBookmark2() {
+            // given
+            Long accountId = 1L;
+            Long contentId = 1L;
+
+            given(favoriteContentRepository.findByAccountIdAndContentId(accountId, contentId))
+                    .willReturn(Optional.empty());
+
+            // when
+            adminBookmarkService.deleteBookmark(accountId, contentId);
+
+            // then
+            verify(favoriteContentRepository, never()).delete(any());
         }
     }
 }
