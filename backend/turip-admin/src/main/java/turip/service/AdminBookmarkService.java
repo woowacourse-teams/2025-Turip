@@ -1,22 +1,30 @@
 package turip.service;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import turip.account.domain.Account;
 import turip.account.domain.Role;
 import turip.account.repository.AccountRepository;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.NotFoundException;
+import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
 import turip.controller.dto.response.AdminBookmarkStatusResponse;
+import turip.favorite.domain.FavoriteContent;
 import turip.favorite.repository.FavoriteContentRepository;
 
 @Service
 @RequiredArgsConstructor
 public class AdminBookmarkService {
+
+    private static final int ONE_WEEK = 1;
 
     private final AccountRepository accountRepository;
     private final ContentRepository contentRepository;
@@ -41,8 +49,39 @@ public class AdminBookmarkService {
                 .toList();
     }
 
-    private void validateContentExists(Long contentId) {
-        contentRepository.findById(contentId)
+    @Transactional
+    public void createBookmark(Long accountId, Long contentId) {
+        Account admin = getAdmin(accountId);
+        Content content = getContent(contentId);
+
+        Optional<FavoriteContent> existing = favoriteContentRepository.findByAccountIdAndContentId(accountId,
+                contentId);
+        if (existing.isPresent()) {
+            return;
+        }
+
+        favoriteContentRepository.save(new FavoriteContent(getLastWeekMonday(), admin, content));
+    }
+
+    private Account getAdmin(Long accountId) {
+        Account account = accountRepository.findById(accountId)
+                .orElseThrow(() -> new NotFoundException(ErrorTag.ADMIN_NOT_FOUND));
+        if (account.getRole() != Role.ADMIN) {
+            throw new NotFoundException(ErrorTag.ADMIN_NOT_FOUND);
+        }
+        return account;
+    }
+
+    private Content getContent(Long contentId) {
+        return contentRepository.findById(contentId)
                 .orElseThrow(() -> new NotFoundException(ErrorTag.CONTENT_NOT_FOUND));
+    }
+
+    private void validateContentExists(Long contentId) {
+        getContent(contentId);
+    }
+
+    private LocalDate getLastWeekMonday() {
+        return LocalDate.now().with(DayOfWeek.MONDAY).minusWeeks(ONE_WEEK);
     }
 }
