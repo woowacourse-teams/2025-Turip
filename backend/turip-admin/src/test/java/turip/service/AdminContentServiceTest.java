@@ -7,6 +7,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
@@ -31,6 +32,7 @@ import turip.controller.dto.request.AdminContentSaveRequest;
 import turip.controller.dto.response.AdminContentsResponse;
 import turip.creator.domain.Creator;
 import turip.creator.repository.CreatorRepository;
+import turip.favorite.repository.FavoriteContentRepository;
 import turip.place.domain.Category;
 import turip.place.domain.Place;
 import turip.place.domain.PlaceCategory;
@@ -62,6 +64,8 @@ class AdminContentServiceTest {
     private CategoryRepository categoryRepository;
     @Mock
     private PlaceCategoryRepository placeCategoryRepository;
+    @Mock
+    private FavoriteContentRepository favoriteContentRepository;
 
     private AdminContentSaveRequest request;
     private Creator creator;
@@ -262,6 +266,35 @@ class AdminContentServiceTest {
             // then
             assertThat(response.contents()).hasSize(1);
             assertThat(response.contents().get(0).id()).isEqualTo(1L);
+        }
+    }
+
+    @DisplayName("지난주 인기 콘텐츠 미리보기 기능 테스트")
+    @Nested
+    class FindWeeklyPopularContents {
+
+        @DisplayName("지난주(월~일) 찜 수 기준 인기 콘텐츠를 순위대로 조회한다")
+        @Test
+        void findWeeklyPopularContents1() {
+            // given
+            int size = 2;
+            LocalDate startDate = LocalDate.now().minusWeeks(1).with(DayOfWeek.MONDAY);
+            LocalDate endDate = startDate.plusDays(6);
+
+            Content content1 = new Content(1L, creator, city, "메이의 서울 여행", "url1", LocalDate.now());
+            Content content2 = new Content(2L, creator, city, "메이의 부산 여행", "url2", LocalDate.now());
+
+            given(favoriteContentRepository.findPopularContentsByFavoriteBetweenDatesWithLimit(startDate, endDate,
+                    size))
+                    .willReturn(List.of(content2, content1));
+
+            // when
+            AdminContentsResponse response = adminContentService.findWeeklyPopularContents(size);
+
+            // then
+            assertThat(response.contents()).hasSize(2);
+            assertThat(response.contents().get(0).id()).isEqualTo(2L);
+            assertThat(response.contents().get(1).id()).isEqualTo(1L);
         }
     }
 }

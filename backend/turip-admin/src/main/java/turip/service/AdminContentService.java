@@ -1,5 +1,7 @@
 package turip.service;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -24,6 +26,7 @@ import turip.controller.dto.response.AdminContentResponse;
 import turip.controller.dto.response.AdminContentsResponse;
 import turip.creator.domain.Creator;
 import turip.creator.repository.CreatorRepository;
+import turip.favorite.repository.FavoriteContentRepository;
 import turip.place.domain.Category;
 import turip.place.domain.Place;
 import turip.place.domain.PlaceCategory;
@@ -37,6 +40,9 @@ import turip.region.repository.CityRepository;
 @RequiredArgsConstructor
 public class AdminContentService {
 
+    private static final int DAYS_UNTIL_SUNDAY = 6;
+    private static final int ONE_WEEK = 1;
+
     private final ContentRepository contentRepository;
     private final PlaceRepository placeRepository;
     private final ContentPlaceRepository contentPlaceRepository;
@@ -44,6 +50,7 @@ public class AdminContentService {
     private final CityRepository cityRepository;
     private final CategoryRepository categoryRepository;
     private final PlaceCategoryRepository placeCategoryRepository;
+    private final FavoriteContentRepository favoriteContentRepository;
 
     @Transactional
     public Long save(AdminContentSaveRequest request) {
@@ -79,6 +86,20 @@ public class AdminContentService {
                 .map(AdminContentResponse::from)
                 .toList();
         return AdminContentsResponse.of(contents, contentSlice.hasNext());
+    }
+
+    public AdminContentsResponse findWeeklyPopularContents(int size) {
+        List<LocalDate> lastWeekPeriod = getLastWeekPeriod();
+        LocalDate startDate = lastWeekPeriod.getFirst();
+        LocalDate endDate = lastWeekPeriod.getLast();
+
+        List<Content> popularContents = favoriteContentRepository.findPopularContentsByFavoriteBetweenDatesWithLimit(
+                startDate, endDate, size);
+
+        List<AdminContentResponse> contents = popularContents.stream()
+                .map(AdminContentResponse::from)
+                .toList();
+        return AdminContentsResponse.of(contents, false);
     }
 
     private City findCity(AdminContentSaveRequest request) {
@@ -171,5 +192,12 @@ public class AdminContentService {
         // 검색어가 존재하는 경우 boolean mode 기반 keyword search
         String booleanModeKeyword = contentRepository.createBooleanModeKeyword(keyword);
         return contentRepository.findByKeywordContaining(booleanModeKeyword, lastId, pageable);
+    }
+
+    private List<LocalDate> getLastWeekPeriod() {
+        LocalDate thisWeekMonday = LocalDate.now().with(DayOfWeek.MONDAY);
+        LocalDate lastWeekMonday = thisWeekMonday.minusWeeks(ONE_WEEK);
+        LocalDate lastWeekSunday = lastWeekMonday.plusDays(DAYS_UNTIL_SUNDAY);
+        return List.of(lastWeekMonday, lastWeekSunday);
     }
 }

@@ -51,4 +51,13 @@ public class AdminContentController {
         AdminContentsResponse response = adminContentService.findContents(keyword, lastId, size);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/popular")
+    public ResponseEntity<AdminContentsResponse> findWeeklyPopularContents(
+            @AuthAdmin TuripMember admin,
+            @RequestParam(name = "size") int size
+    ) {
+        AdminContentsResponse response = adminContentService.findWeeklyPopularContents(size);
+        return ResponseEntity.ok(response);
+    }
 }
