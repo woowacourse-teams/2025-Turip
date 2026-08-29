@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
 import turip.account.domain.Account;
@@ -39,6 +40,9 @@ class AdminContentApiTest {
 
     @Autowired
     private ContentPendingRepository contentPendingRepository;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @BeforeEach
     void setUp() {
@@ -115,6 +119,61 @@ class AdminContentApiTest {
             RestAssured.given().port(port)
                     .header("Authorization", "Bearer " + userAccessToken)
                     .when().get("/api/v1/admin/contents/my")
+                    .then()
+                    .statusCode(403);
+        }
+    }
+
+    @Nested
+    @DisplayName("/api/v1/admin/contents GET 콘텐츠 검색/목록 조회 테스트")
+    class FindContentsTest {
+
+        @Test
+        @DisplayName("keyword 없이 조회하면 전체 콘텐츠를 id 내림차순으로 응답한다")
+        void findContents1() {
+            // given
+            jdbcTemplate.update(
+                    "INSERT INTO creator (profile_image, channel_name) VALUES (?, ?)",
+                    "https://image.example.com/creator1.jpg", "TravelMate");
+            jdbcTemplate.update(
+                    "INSERT INTO country (name, image_url) VALUES ('대한민국', 'https://image.example.com/korea.jpg')");
+            jdbcTemplate.update(
+                    "INSERT INTO city (name, country_id, image_url) VALUES ('서울', 1, 'https://image.example.com/seoul.jpg')");
+            jdbcTemplate.update(
+                    "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (?, ?, ?, ?, ?)",
+                    1, 1, "https://youtube.com/watch?v=abcd1", "서울 데이트 코스 추천", "2024-07-01");
+            jdbcTemplate.update(
+                    "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (?, ?, ?, ?, ?)",
+                    1, 1, "https://youtube.com/watch?v=abcd2", "서울 맛집 투어", "2024-08-01");
+
+            Long adminAccountId = testDataHelper.insertAccount(Role.ADMIN);
+            testDataHelper.insertTuripMember(adminAccountId, "admin@turip.com", false, "admin", "password123!");
+            String adminAccessToken = testDataHelper.createAccessToken(adminAccountId, Role.ADMIN);
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + adminAccessToken)
+                    .when().get("/api/v1/admin/contents?size=10&lastId=0")
+                    .then()
+                    .statusCode(200)
+                    .body("contents", hasSize(2))
+                    .body("contents[0].id", is(2))
+                    .body("contents[0].title", is("서울 맛집 투어"))
+                    .body("contents[1].id", is(1))
+                    .body("loadable", is(false));
+        }
+
+        @Test
+        @DisplayName("관리자가 아닌 사용자가 조회하면 403 Forbidden을 응답한다")
+        void findContents2() {
+            // given
+            Long userAccountId = testDataHelper.insertAccount(Role.USER);
+            String userAccessToken = testDataHelper.createAccessToken(userAccountId, Role.USER);
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + userAccessToken)
+                    .when().get("/api/v1/admin/contents?size=10&lastId=0")
                     .then()
                     .statusCode(403);
         }

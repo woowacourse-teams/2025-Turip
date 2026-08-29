@@ -3,7 +3,10 @@ package turip.service;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import turip.common.exception.ErrorTag;
@@ -17,6 +20,8 @@ import turip.content.repository.ContentRepository;
 import turip.controller.dto.request.AdminContentSaveRequest;
 import turip.controller.dto.request.AdminContentSaveRequest.ContentPlaceRequest;
 import turip.controller.dto.request.AdminContentSaveRequest.PlaceRequest;
+import turip.controller.dto.response.AdminContentResponse;
+import turip.controller.dto.response.AdminContentsResponse;
 import turip.creator.domain.Creator;
 import turip.creator.repository.CreatorRepository;
 import turip.place.domain.Category;
@@ -61,6 +66,19 @@ public class AdminContentService {
         });
 
         return content.getId();
+    }
+
+    public AdminContentsResponse findContents(String keyword, long lastId, int size) {
+        long targetLastId = lastId;
+        if (lastId == 0) {
+            targetLastId = Long.MAX_VALUE;
+        }
+        Slice<Content> contentSlice = findContentSlice(keyword, targetLastId, size);
+
+        List<AdminContentResponse> contents = contentSlice.getContent().stream()
+                .map(AdminContentResponse::from)
+                .toList();
+        return AdminContentsResponse.of(contents, contentSlice.hasNext());
     }
 
     private City findCity(AdminContentSaveRequest request) {
@@ -141,5 +159,17 @@ public class AdminContentService {
                         () -> placeCategoryRepository.save(new PlaceCategory(place, category))
                 );
     }
-}
 
+    private Slice<Content> findContentSlice(String keyword, long lastId, int size) {
+        PageRequest pageable = PageRequest.of(0, size);
+
+        // 검색어가 존재하지 않는 경우 전체 콘텐츠 search
+        if (keyword == null || keyword.isBlank()) {
+            return contentRepository.findAllByIdLessThanOrderByIdDesc(lastId, pageable);
+        }
+
+        // 검색어가 존재하는 경우 boolean mode 기반 keyword search
+        String booleanModeKeyword = contentRepository.createBooleanModeKeyword(keyword);
+        return contentRepository.findByKeywordContaining(booleanModeKeyword, lastId, pageable);
+    }
+}

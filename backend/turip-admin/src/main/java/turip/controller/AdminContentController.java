@@ -9,9 +9,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import turip.account.domain.TuripMember;
 import turip.controller.dto.request.AdminContentSaveRequest;
+import turip.controller.dto.response.AdminContentsResponse;
 import turip.controller.dto.response.MyCollectContentResponse;
 import turip.resolver.AuthAdmin;
 import turip.service.AdminContentPendingService;
@@ -37,5 +39,16 @@ public class AdminContentController {
     @GetMapping("/my")
     public ResponseEntity<List<MyCollectContentResponse>> getMyHistory(@AuthAdmin TuripMember admin) {
         return ResponseEntity.ok(adminContentPendingService.getMyHistory(admin.getMember().getAccount()));
+    }
+
+    @GetMapping
+    public ResponseEntity<AdminContentsResponse> findContents(
+            @AuthAdmin TuripMember admin,
+            @RequestParam(name = "keyword", required = false) String keyword,
+            @RequestParam(name = "lastId") long lastId,
+            @RequestParam(name = "size") int size
+    ) {
+        AdminContentsResponse response = adminContentService.findContents(keyword, lastId, size);
+        return ResponseEntity.ok(response);
     }
 }
