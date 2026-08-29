@@ -161,6 +161,7 @@ class AdminContentApiTest {
                     .body("contents", hasSize(2))
                     .body("contents[0].id", is(2))
                     .body("contents[0].title", is("서울 맛집 투어"))
+                    .body("contents[0].url", is("https://youtube.com/watch?v=abcd2"))
                     .body("contents[1].id", is(1))
                     .body("loadable", is(false));
         }
