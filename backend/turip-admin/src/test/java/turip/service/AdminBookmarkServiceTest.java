@@ -23,6 +23,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import turip.account.domain.Account;
 import turip.account.domain.Role;
 import turip.account.repository.AccountRepository;
+import turip.common.exception.custom.BadRequestException;
 import turip.common.exception.custom.NotFoundException;
 import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
@@ -210,7 +211,7 @@ class AdminBookmarkServiceTest {
 
             // when & then
             assertThatThrownBy(() -> adminBookmarkService.upsertBookmark(accountId, contentId))
-                    .isInstanceOf(NotFoundException.class);
+                    .isInstanceOf(BadRequestException.class);
         }
 
         @DisplayName("존재하지 않는 계정이면 예외를 던진다")
@@ -259,6 +260,7 @@ class AdminBookmarkServiceTest {
                     new City(new Country("대한민국", "image"), null, "속초", "image"), "제목", "url", LocalDate.now());
             FavoriteContent existing = new FavoriteContent(LocalDate.now().minusWeeks(1), admin, content);
 
+            given(accountRepository.findById(accountId)).willReturn(Optional.of(admin));
             given(favoriteContentRepository.findByAccountIdAndContentId(accountId, contentId))
                     .willReturn(Optional.of(existing));
 
@@ -275,7 +277,9 @@ class AdminBookmarkServiceTest {
             // given
             Long accountId = 1L;
             Long contentId = 1L;
+            Account admin = AccountFixture.createCustomAccount(accountId, Role.ADMIN);
 
+            given(accountRepository.findById(accountId)).willReturn(Optional.of(admin));
             given(favoriteContentRepository.findByAccountIdAndContentId(accountId, contentId))
                     .willReturn(Optional.empty());
 
@@ -283,6 +287,37 @@ class AdminBookmarkServiceTest {
             adminBookmarkService.deleteBookmark(accountId, contentId);
 
             // then
+            verify(favoriteContentRepository, never()).delete(any());
+        }
+
+        @DisplayName("ADMIN이 아닌 계정이면 예외를 던지고 삭제하지 않는다")
+        @Test
+        void deleteBookmark3() {
+            // given
+            Long accountId = 1L;
+            Long contentId = 1L;
+            Account user = AccountFixture.createCustomAccount(accountId, Role.USER);
+
+            given(accountRepository.findById(accountId)).willReturn(Optional.of(user));
+
+            // when & then
+            assertThatThrownBy(() -> adminBookmarkService.deleteBookmark(accountId, contentId))
+                    .isInstanceOf(BadRequestException.class);
+            verify(favoriteContentRepository, never()).delete(any());
+        }
+
+        @DisplayName("존재하지 않는 계정이면 예외를 던진다")
+        @Test
+        void deleteBookmark4() {
+            // given
+            Long accountId = 1L;
+            Long contentId = 1L;
+
+            given(accountRepository.findById(accountId)).willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> adminBookmarkService.deleteBookmark(accountId, contentId))
+                    .isInstanceOf(NotFoundException.class);
             verify(favoriteContentRepository, never()).delete(any());
         }
     }

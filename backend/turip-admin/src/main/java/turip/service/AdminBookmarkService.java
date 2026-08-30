@@ -13,6 +13,7 @@ import turip.account.domain.Account;
 import turip.account.domain.Role;
 import turip.account.repository.AccountRepository;
 import turip.common.exception.ErrorTag;
+import turip.common.exception.custom.BadRequestException;
 import turip.common.exception.custom.NotFoundException;
 import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
@@ -69,6 +70,8 @@ public class AdminBookmarkService {
 
     @Transactional
     public void deleteBookmark(Long accountId, Long contentId) {
+        getAdmin(accountId);
+
         favoriteContentRepository.findByAccountIdAndContentId(accountId, contentId)
                 .ifPresent(favoriteContentRepository::delete);
     }
@@ -77,7 +80,7 @@ public class AdminBookmarkService {
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new NotFoundException(ErrorTag.ADMIN_NOT_FOUND));
         if (account.getRole() != Role.ADMIN) {
-            throw new NotFoundException(ErrorTag.ADMIN_NOT_FOUND);
+            throw new BadRequestException(ErrorTag.NOT_ADMIN_ACCOUNT);
         }
         return account;
     }
