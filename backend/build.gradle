@@ -45,8 +45,6 @@ subprojects {
 
     test {
         useJUnitPlatform()
-        testLogging {
-            showStandardStreams = true
-        }
+        systemProperty 'user.timezone', 'Asia/Seoul'
     }
 }

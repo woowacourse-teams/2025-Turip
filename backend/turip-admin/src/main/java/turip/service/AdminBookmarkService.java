@@ -95,11 +95,6 @@ public class AdminBookmarkService {
     }
 
     private LocalDate getLastWeekMonday() {
-        LocalDate result = LocalDate.now().with(DayOfWeek.MONDAY).minusWeeks(ONE_WEEK);
-        System.out.println("[DEBUG getLastWeekMonday] result=" + result
-                + ", LocalDate.now()=" + LocalDate.now()
-                + ", zoneId=" + java.time.ZoneId.systemDefault()
-                + ", instant=" + java.time.Instant.now());
-        return result;
+        return LocalDate.now().with(DayOfWeek.MONDAY).minusWeeks(ONE_WEEK);
     }
 }

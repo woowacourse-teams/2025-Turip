@@ -176,10 +176,6 @@ class AdminBookmarkApiTest {
             String adminAccessToken = testDataHelper.createAccessToken(adminAccountId, Role.ADMIN);
 
             LocalDate lastWeekMonday = LocalDate.now().minusWeeks(1).with(DayOfWeek.MONDAY);
-            System.out.println("[DEBUG upsertBookmark1] test-computed lastWeekMonday=" + lastWeekMonday
-                    + ", LocalDate.now()=" + LocalDate.now()
-                    + ", zoneId=" + java.time.ZoneId.systemDefault()
-                    + ", instant=" + java.time.Instant.now());
 
             // when & then
             RestAssured.given().port(port)
@@ -190,8 +186,6 @@ class AdminBookmarkApiTest {
 
             FavoriteContent favoriteContent = favoriteContentRepository.findByAccountIdAndContentId(adminAccountId, 1L)
                     .orElseThrow();
-            System.out.println("[DEBUG upsertBookmark1] server-saved createdAt=" + favoriteContent.getCreatedAt()
-                    + ", expected lastWeekMonday=" + lastWeekMonday);
             assertThat(favoriteContent.getCreatedAt()).isEqualTo(lastWeekMonday);
         }
 
@@ -218,10 +212,6 @@ class AdminBookmarkApiTest {
                     "2024-01-01", adminAccountId, 1);
 
             LocalDate lastWeekMonday = LocalDate.now().minusWeeks(1).with(DayOfWeek.MONDAY);
-            System.out.println("[DEBUG upsertBookmark2] test-computed lastWeekMonday=" + lastWeekMonday
-                    + ", LocalDate.now()=" + LocalDate.now()
-                    + ", zoneId=" + java.time.ZoneId.systemDefault()
-                    + ", instant=" + java.time.Instant.now());
 
             // when & then
             RestAssured.given().port(port)
@@ -232,8 +222,6 @@ class AdminBookmarkApiTest {
 
             FavoriteContent favoriteContent = favoriteContentRepository.findByAccountIdAndContentId(adminAccountId, 1L)
                     .orElseThrow();
-            System.out.println("[DEBUG upsertBookmark2] server-saved createdAt=" + favoriteContent.getCreatedAt()
-                    + ", expected lastWeekMonday=" + lastWeekMonday);
             assertThat(favoriteContent.getCreatedAt()).isEqualTo(lastWeekMonday);
         }
 
