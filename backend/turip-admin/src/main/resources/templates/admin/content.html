@@ -741,7 +741,7 @@
             strong.textContent = '반려된 콘텐츠 수정 중';
             banner.appendChild(strong);
             banner.appendChild(document.createTextNode(' — 반려 사유: ' + (data.rejectReason || '(사유 없음)')));
-            document.querySelector('.container').prepend(banner);
+            document.querySelector('.container-fluid').prepend(banner);
 
             // 저장 버튼 텍스트 변경
             document.getElementById('saveContentBtn').innerHTML = '📨 재검수 요청';

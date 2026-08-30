@@ -254,6 +254,8 @@
         bootstrap.Toast.getOrCreateInstance(toastEl, {delay: 5000}).show();
     }
 
+    let latestRequestId = 0;
+
     function searchContents() {
         currentKeyword = document.getElementById('keywordInput').value.trim();
         lastContentId = 0;
@@ -262,6 +264,7 @@
     }
 
     async function loadContents(isFirstPage) {
+        const requestId = ++latestRequestId;
         const tbody = document.getElementById('contentsTableBody');
         const loadMoreBtn = document.getElementById('loadMoreBtn');
         const params = new URLSearchParams({size: 10, lastId: lastContentId});
@@ -272,6 +275,10 @@
         try {
             const res = await authFetch(`/api/v1/admin/contents?${params.toString()}`);
             const data = await res.json();
+
+            if (requestId !== latestRequestId) {
+                return;
+            }
 
             if (isFirstPage && data.contents.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="2" class="text-center py-5 text-muted">콘텐츠가 없습니다.</td></tr>';
@@ -286,7 +293,9 @@
 
             loadMoreBtn.classList.toggle('d-none', !data.loadable);
         } catch (e) {
-            showErrorToast('콘텐츠 목록을 불러오지 못했습니다: ' + e.message);
+            if (requestId === latestRequestId) {
+                showErrorToast('콘텐츠 목록을 불러오지 못했습니다: ' + e.message);
+            }
         }
     }
 
@@ -419,6 +428,11 @@
             loadPreview();
         } catch (e) {
             checkboxEl.checked = !checkboxEl.checked;
+
+            const group = document.getElementById(`admin-checkbox-group-${contentId}`);
+            const checkedCount = group.querySelectorAll('input[type="checkbox"]:checked').length;
+            updateVoteBadge(document.getElementById(`vote-count-${contentId}`), checkedCount);
+
             showErrorToast('북마크 처리에 실패했습니다: ' + e.message);
         } finally {
             checkboxEl.disabled = false;
