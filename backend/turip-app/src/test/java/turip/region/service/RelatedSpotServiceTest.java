@@ -3,17 +3,20 @@ package turip.region.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 
 import java.util.List;
+import java.util.concurrent.Executor;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import reactor.core.publisher.Mono;
 import turip.infrastructure.client.KoreaTourismRelatedSpotClient;
 import turip.infrastructure.client.dto.KoreaTourismRelatedSpotResponse.RelatedSpot;
 import turip.infrastructure.client.dto.RelatedSpotResult;
@@ -28,6 +31,19 @@ class RelatedSpotServiceTest {
 
     @Mock
     private KoreaTourismRelatedSpotClient koreaTourismRelatedSpotClient;
+
+    @Mock
+    private Executor koreaTourismApiExecutor;
+
+    @BeforeEach
+    void setUp() {
+        // Executor가 동기적으로 즉시 실행되도록 모킹
+        lenient().doAnswer(invocation -> {
+            Runnable task = invocation.getArgument(0);
+            task.run();
+            return null;
+        }).when(koreaTourismApiExecutor).execute(any(Runnable.class));
+    }
 
     @DisplayName("지역 카테고리로 연관 관광지를 조회한다")
     @Test
@@ -48,11 +64,11 @@ class RelatedSpotServiceTest {
 
         // 서울의 3개 시군구 코드에 대해 각각 모킹
         given(koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11110))
-                .willReturn(Mono.just(RelatedSpotResult.success(List.of(spot1))));
+                .willReturn(RelatedSpotResult.success(List.of(spot1)));
         given(koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11440))
-                .willReturn(Mono.just(RelatedSpotResult.success(List.of(spot2))));
+                .willReturn(RelatedSpotResult.success(List.of(spot2)));
         given(koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11140))
-                .willReturn(Mono.just(RelatedSpotResult.success(List.of(spot3))));
+                .willReturn(RelatedSpotResult.success(List.of(spot3)));
 
         // when
         RelatedSpotsResponse response = relatedSpotService.findRelatedSpotsByRegionCategory(category);
@@ -85,11 +101,11 @@ class RelatedSpotServiceTest {
 
         // 서울의 3개 시군구 코드에 대해 모두 실패 반환
         given(koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11110))
-                .willReturn(Mono.just(RelatedSpotResult.failure()));
+                .willReturn(RelatedSpotResult.failure());
         given(koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11440))
-                .willReturn(Mono.just(RelatedSpotResult.failure()));
+                .willReturn(RelatedSpotResult.failure());
         given(koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11140))
-                .willReturn(Mono.just(RelatedSpotResult.failure()));
+                .willReturn(RelatedSpotResult.failure());
 
         // when
         RelatedSpotsResponse response = relatedSpotService.findRelatedSpotsByRegionCategory(category);
@@ -106,11 +122,11 @@ class RelatedSpotServiceTest {
 
         // 서울의 3개 시군구 코드에 대해 성공했지만 빈 데이터 반환
         given(koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11110))
-                .willReturn(Mono.just(RelatedSpotResult.success(List.of())));
+                .willReturn(RelatedSpotResult.success(List.of()));
         given(koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11440))
-                .willReturn(Mono.just(RelatedSpotResult.success(List.of())));
+                .willReturn(RelatedSpotResult.success(List.of()));
         given(koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11140))
-                .willReturn(Mono.just(RelatedSpotResult.success(List.of())));
+                .willReturn(RelatedSpotResult.success(List.of()));
 
         // when
         RelatedSpotsResponse response = relatedSpotService.findRelatedSpotsByRegionCategory(category);

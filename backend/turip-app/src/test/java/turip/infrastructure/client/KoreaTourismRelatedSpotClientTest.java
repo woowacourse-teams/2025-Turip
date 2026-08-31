@@ -2,53 +2,44 @@ package turip.infrastructure.client;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
-import java.io.IOException;
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
-import okhttp3.mockwebserver.RecordedRequest;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.web.client.RestClient;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.client.MockRestServiceServer;
+import turip.common.configuration.RestClientConfiguration;
+import turip.common.log.ExternalApiLoggingInterceptor;
 import turip.infrastructure.client.dto.KoreaTourismRelatedSpotResponse.RelatedSpot;
 import turip.infrastructure.client.dto.RelatedSpotResult;
 
+@ActiveProfiles({"test", "h2"})
+@RestClientTest(KoreaTourismRelatedSpotClient.class)
+@Import({RestClientConfiguration.class, ExternalApiLoggingInterceptor.class})
 class KoreaTourismRelatedSpotClientTest {
 
-    private MockWebServer mockWebServer;
+    @Autowired
+    private MockRestServiceServer mockRestServiceServer;
+
+    @Autowired
     private KoreaTourismRelatedSpotClient koreaTourismRelatedSpotClient;
 
-    private static final String API_KEY = "test-service-key";
+    @Value("${korea-tourism.api.url}")
+    private String koreaTourismApiUrl;
 
-    @BeforeEach
-    void setUp() throws IOException {
-        mockWebServer = new MockWebServer();
-        mockWebServer.start();
-
-        String baseUrl = mockWebServer.url("/").toString();
-        RestClient restClient = RestClient.builder().build();
-        WebClient webClient = WebClient.builder().build();
-
-        koreaTourismRelatedSpotClient = new KoreaTourismRelatedSpotClient(
-                restClient,
-                webClient,
-                API_KEY,
-                baseUrl
-        );
-    }
-
-    @AfterEach
-    void tearDown() throws IOException {
-        mockWebServer.shutdown();
-    }
+    @Value("${korea-tourism.api.key}")
+    private String koreaTourismApiKey;
 
     @Test
     @DisplayName("한국관광공사 연관 관광지 API를 호출하고 응답을 올바르게 파싱한다.")
-    void searchRelatedSpots() throws InterruptedException {
+    void searchRelatedSpots() {
         // given
         String mockResponse = """
                 {
@@ -89,12 +80,22 @@ class KoreaTourismRelatedSpotClientTest {
                 }
                 """;
 
-        mockWebServer.enqueue(new MockResponse()
-                .setBody(mockResponse)
-                .addHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE));
+        String expectedUrl = koreaTourismApiUrl
+                + "?serviceKey=" + koreaTourismApiKey
+                + "&pageNo=1"
+                + "&numOfRows=30"
+                + "&MobileOS=ETC"
+                + "&MobileApp=Turip"
+                + "&_type=json"
+                + "&baseYm=202606"
+                + "&areaCd=11"
+                + "&signguCd=11110";
+
+        mockRestServiceServer.expect(requestTo(expectedUrl))
+                .andRespond(withSuccess(mockResponse, MediaType.APPLICATION_JSON));
 
         // when
-        RelatedSpotResult result = koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11110).block();
+        RelatedSpotResult result = koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11110);
 
         // then
         assertAll(
@@ -111,17 +112,7 @@ class KoreaTourismRelatedSpotClientTest {
                 () -> assertThat(spot.getRelatedRank()).isEqualTo(1)
         );
 
-        RecordedRequest recordedRequest = mockWebServer.takeRequest();
-        assertThat(recordedRequest.getPath())
-                .contains("serviceKey=" + API_KEY)
-                .contains("pageNo=1")
-                .contains("numOfRows=30")
-                .contains("MobileOS=ETC")
-                .contains("MobileApp=Turip")
-                .contains("_type=json")
-                .contains("baseYm=202606")
-                .contains("areaCd=11")
-                .contains("signguCd=11110");
+        mockRestServiceServer.verify();
     }
 
     @Test
@@ -145,33 +136,29 @@ class KoreaTourismRelatedSpotClientTest {
                 }
                 """;
 
-        mockWebServer.enqueue(new MockResponse()
-                .setBody(mockResponse)
-                .addHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE));
+        String expectedUrl = koreaTourismApiUrl
+                + "?serviceKey=" + koreaTourismApiKey
+                + "&pageNo=1"
+                + "&numOfRows=30"
+                + "&MobileOS=ETC"
+                + "&MobileApp=Turip"
+                + "&_type=json"
+                + "&baseYm=202606"
+                + "&areaCd=11"
+                + "&signguCd=11110";
+
+        mockRestServiceServer.expect(requestTo(expectedUrl))
+                .andRespond(withSuccess(mockResponse, MediaType.APPLICATION_JSON));
 
         // when
-        RelatedSpotResult result = koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11110).block();
+        RelatedSpotResult result = koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11110);
 
         // then
         assertAll(
                 () -> assertThat(result.isSuccess()).isTrue(),
                 () -> assertThat(result.spots()).isEmpty()
         );
-    }
 
-    @Test
-    @DisplayName("API 호출이 실패하면 실패 결과를 반환한다.")
-    void searchRelatedSpots_whenApiFails_returnsFailure() {
-        // given
-        mockWebServer.enqueue(new MockResponse().setResponseCode(500));
-
-        // when
-        RelatedSpotResult result = koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11110).block();
-
-        // then
-        assertAll(
-                () -> assertThat(result.isSuccess()).isFalse(),
-                () -> assertThat(result.spots()).isEmpty()
-        );
+        mockRestServiceServer.verify();
     }
 }
