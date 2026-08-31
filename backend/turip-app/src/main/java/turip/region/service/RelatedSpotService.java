@@ -25,15 +25,18 @@ public class RelatedSpotService {
         this.koreaTourismRelatedSpotClient = koreaTourismRelatedSpotClient;
     }
 
-    public RelatedSpotsResponse findRelatedSpotsByRegionCategory(DomesticRegionCategory category) {
+    public Mono<RelatedSpotsResponse> findRelatedSpotsByRegionCategory(DomesticRegionCategory category) {
         TourApiAreaCode areaCode = parseToAreaCode(category);
         if (!areaCode.isFound()) {
             log.warn("지역 카테고리에 매핑되는 TourAPI 지역 코드를 찾을 수 없습니다: {}", category);
-            return RelatedSpotsResponse.empty();
+            return Mono.just(RelatedSpotsResponse.empty());
         }
 
-        List<RelatedSpotResult> results = getRelatedSpotsByAreaCode(areaCode);
+        return getRelatedSpotsByAreaCode(areaCode)
+                .map(results -> toResponse(category, results));
+    }
 
+    private RelatedSpotsResponse toResponse(DomesticRegionCategory category, List<RelatedSpotResult> results) {
         // API 호출이 모두 실패했거나, 성공했지만 데이터가 비어있는 경우 fallback 사용
         if (shouldUseFallback(results)) {
             RelatedTuripSpots relatedTuripSpots = RelatedTuripSpots.from(category);
@@ -54,7 +57,7 @@ public class RelatedSpotService {
         return TourApiAreaCode.fromDomesticRegionCategory(category);
     }
 
-    private List<RelatedSpotResult> getRelatedSpotsByAreaCode(TourApiAreaCode areaCode) {
+    private Mono<List<RelatedSpotResult>> getRelatedSpotsByAreaCode(TourApiAreaCode areaCode) {
         // 여러 시군구 코드에 대해 WebClient로 비동기 논블로킹 병렬 호출
         List<Mono<RelatedSpotResult>> monos = areaCode.getSigunguCodes().stream()
                 .map(sigunguCode -> koreaTourismRelatedSpotClient.searchRelatedSpots(
@@ -63,15 +66,14 @@ public class RelatedSpotService {
                 ))
                 .toList();
 
-        // 시군구 코드가 1개뿐인 지역(강릉/속초/경주 등)은 zip 없이 바로 구독
+        // 시군구 코드가 1개뿐인 지역(강릉/속초/경주 등)은 zip 없이 바로 매핑
         if (monos.size() == 1) {
-            return List.of(monos.getFirst().block());
+            return monos.getFirst().map(List::of);
         }
 
         return Mono.zip(monos, results -> Arrays.stream(results)
-                        .map(result -> (RelatedSpotResult) result)
-                        .toList())
-                .block();
+                .map(result -> (RelatedSpotResult) result)
+                .toList());
     }
 
     private boolean shouldUseFallback(List<RelatedSpotResult> results) {
