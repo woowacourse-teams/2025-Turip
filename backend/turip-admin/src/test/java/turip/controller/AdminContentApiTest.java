@@ -6,6 +6,8 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
 import io.restassured.RestAssured;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -13,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
 import turip.account.domain.Account;
@@ -39,6 +42,9 @@ class AdminContentApiTest {
 
     @Autowired
     private ContentPendingRepository contentPendingRepository;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @BeforeEach
     void setUp() {
@@ -115,6 +121,126 @@ class AdminContentApiTest {
             RestAssured.given().port(port)
                     .header("Authorization", "Bearer " + userAccessToken)
                     .when().get("/api/v1/admin/contents/my")
+                    .then()
+                    .statusCode(403);
+        }
+    }
+
+    @Nested
+    @DisplayName("/api/v1/admin/contents GET 콘텐츠 검색/목록 조회 테스트")
+    class FindContentsTest {
+
+        @Test
+        @DisplayName("keyword 없이 조회하면 전체 콘텐츠를 id 내림차순으로 응답한다")
+        void findContents1() {
+            // given
+            jdbcTemplate.update(
+                    "INSERT INTO creator (profile_image, channel_name) VALUES (?, ?)",
+                    "https://image.example.com/creator1.jpg", "TravelMate");
+            jdbcTemplate.update(
+                    "INSERT INTO country (name, image_url) VALUES ('대한민국', 'https://image.example.com/korea.jpg')");
+            jdbcTemplate.update(
+                    "INSERT INTO city (name, country_id, image_url) VALUES ('서울', 1, 'https://image.example.com/seoul.jpg')");
+            jdbcTemplate.update(
+                    "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (?, ?, ?, ?, ?)",
+                    1, 1, "https://youtube.com/watch?v=abcd1", "서울 데이트 코스 추천", "2024-07-01");
+            jdbcTemplate.update(
+                    "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (?, ?, ?, ?, ?)",
+                    1, 1, "https://youtube.com/watch?v=abcd2", "서울 맛집 투어", "2024-08-01");
+
+            Long adminAccountId = testDataHelper.insertAccount(Role.ADMIN);
+            testDataHelper.insertTuripMember(adminAccountId, "admin@turip.com", false, "admin", "password123!");
+            String adminAccessToken = testDataHelper.createAccessToken(adminAccountId, Role.ADMIN);
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + adminAccessToken)
+                    .when().get("/api/v1/admin/contents?size=10&lastId=0")
+                    .then()
+                    .statusCode(200)
+                    .body("contents", hasSize(2))
+                    .body("contents[0].id", is(2))
+                    .body("contents[0].title", is("서울 맛집 투어"))
+                    .body("contents[0].url", is("https://youtube.com/watch?v=abcd2"))
+                    .body("contents[1].id", is(1))
+                    .body("loadable", is(false));
+        }
+
+        @Test
+        @DisplayName("관리자가 아닌 사용자가 조회하면 403 Forbidden을 응답한다")
+        void findContents2() {
+            // given
+            Long userAccountId = testDataHelper.insertAccount(Role.USER);
+            String userAccessToken = testDataHelper.createAccessToken(userAccountId, Role.USER);
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + userAccessToken)
+                    .when().get("/api/v1/admin/contents?size=10&lastId=0")
+                    .then()
+                    .statusCode(403);
+        }
+    }
+
+    @Nested
+    @DisplayName("/api/v1/admin/contents/popular GET 지난주 인기 콘텐츠 미리보기 테스트")
+    class FindWeeklyPopularContentsTest {
+
+        @Test
+        @DisplayName("지난주 찜 수가 많은 콘텐츠부터 순서대로 응답한다")
+        void findWeeklyPopularContents1() {
+            // given
+            jdbcTemplate.update(
+                    "INSERT INTO creator (profile_image, channel_name) VALUES (?, ?)",
+                    "https://image.example.com/creator1.jpg", "TravelMate");
+            jdbcTemplate.update(
+                    "INSERT INTO country (name, image_url) VALUES ('대한민국', 'https://image.example.com/korea.jpg')");
+            jdbcTemplate.update(
+                    "INSERT INTO city (name, country_id, image_url) VALUES ('서울', 1, 'https://image.example.com/seoul.jpg')");
+            jdbcTemplate.update(
+                    "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (?, ?, ?, ?, ?)",
+                    1, 1, "https://youtube.com/watch?v=abcd1", "적은 찜 콘텐츠", "2024-07-01");
+            jdbcTemplate.update(
+                    "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (?, ?, ?, ?, ?)",
+                    1, 1, "https://youtube.com/watch?v=abcd2", "많은 찜 콘텐츠", "2024-08-01");
+
+            Long adminAccountId1 = testDataHelper.insertAccount(Role.ADMIN);
+            testDataHelper.insertTuripMember(adminAccountId1, "admin1@turip.com", false, "admin1", "password123!");
+            Long adminAccountId2 = testDataHelper.insertAccount(Role.ADMIN);
+            testDataHelper.insertTuripMember(adminAccountId2, "admin2@turip.com", false, "admin2", "password123!");
+
+            LocalDate lastWeekMonday = LocalDate.now().minusWeeks(1).with(DayOfWeek.MONDAY);
+            jdbcTemplate.update("INSERT INTO favorite_content (created_at, account_id, content_id) VALUES (?, ?, ?)",
+                    lastWeekMonday, adminAccountId1, 1);
+            jdbcTemplate.update("INSERT INTO favorite_content (created_at, account_id, content_id) VALUES (?, ?, ?)",
+                    lastWeekMonday, adminAccountId1, 2);
+            jdbcTemplate.update("INSERT INTO favorite_content (created_at, account_id, content_id) VALUES (?, ?, ?)",
+                    lastWeekMonday, adminAccountId2, 2);
+
+            String adminAccessToken = testDataHelper.createAccessToken(adminAccountId1, Role.ADMIN);
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + adminAccessToken)
+                    .when().get("/api/v1/admin/contents/popular?size=10")
+                    .then()
+                    .statusCode(200)
+                    .body("contents", hasSize(2))
+                    .body("contents[0].title", is("많은 찜 콘텐츠"))
+                    .body("contents[1].title", is("적은 찜 콘텐츠"));
+        }
+
+        @Test
+        @DisplayName("관리자가 아닌 사용자가 조회하면 403 Forbidden을 응답한다")
+        void findWeeklyPopularContents2() {
+            // given
+            Long userAccountId = testDataHelper.insertAccount(Role.USER);
+            String userAccessToken = testDataHelper.createAccessToken(userAccountId, Role.USER);
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + userAccessToken)
+                    .when().get("/api/v1/admin/contents/popular?size=10")
                     .then()
                     .statusCode(403);
         }

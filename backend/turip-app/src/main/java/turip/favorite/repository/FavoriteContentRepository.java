@@ -35,6 +35,13 @@ public interface FavoriteContentRepository extends JpaRepository<FavoriteContent
 
     List<FavoriteContent> findByAccountIdAndContentIdIn(Long accountId, List<Long> contentIds);
 
+    List<FavoriteContent> findByAccountIdInAndContentIdAndCreatedAtBetween(
+            List<Long> accountIds,
+            Long contentId,
+            LocalDate startDate,
+            LocalDate endDate
+    );
+
     @Query("""
                 SELECT f
                 FROM FavoriteContent f

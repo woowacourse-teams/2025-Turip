@@ -20,6 +20,9 @@ public interface ContentRepository extends JpaRepository<Content, Long> {
 
     Optional<Content> findByTitleAndUrl(String title, String url);
 
+    @EntityGraph(attributePaths = {"creator", "city"}, type = EntityGraph.EntityGraphType.FETCH)
+    Slice<Content> findAllByIdLessThanOrderByIdDesc(Long lastId, Pageable pageable);
+
     @Query("""
             SELECT COUNT(c) FROM Content c
             WHERE c.city.name = :cityName

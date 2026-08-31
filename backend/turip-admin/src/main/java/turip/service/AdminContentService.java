@@ -1,9 +1,14 @@
 package turip.service;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import turip.common.exception.ErrorTag;
@@ -17,8 +22,11 @@ import turip.content.repository.ContentRepository;
 import turip.controller.dto.request.AdminContentSaveRequest;
 import turip.controller.dto.request.AdminContentSaveRequest.ContentPlaceRequest;
 import turip.controller.dto.request.AdminContentSaveRequest.PlaceRequest;
+import turip.controller.dto.response.AdminContentResponse;
+import turip.controller.dto.response.AdminContentsResponse;
 import turip.creator.domain.Creator;
 import turip.creator.repository.CreatorRepository;
+import turip.favorite.repository.FavoriteContentRepository;
 import turip.place.domain.Category;
 import turip.place.domain.Place;
 import turip.place.domain.PlaceCategory;
@@ -32,6 +40,9 @@ import turip.region.repository.CityRepository;
 @RequiredArgsConstructor
 public class AdminContentService {
 
+    private static final int DAYS_UNTIL_SUNDAY = 6;
+    private static final int ONE_WEEK = 1;
+
     private final ContentRepository contentRepository;
     private final PlaceRepository placeRepository;
     private final ContentPlaceRepository contentPlaceRepository;
@@ -39,6 +50,7 @@ public class AdminContentService {
     private final CityRepository cityRepository;
     private final CategoryRepository categoryRepository;
     private final PlaceCategoryRepository placeCategoryRepository;
+    private final FavoriteContentRepository favoriteContentRepository;
 
     @Transactional
     public Long save(AdminContentSaveRequest request) {
@@ -61,6 +73,33 @@ public class AdminContentService {
         });
 
         return content.getId();
+    }
+
+    public AdminContentsResponse findContents(String keyword, long lastId, int size) {
+        long targetLastId = lastId;
+        if (lastId == 0) {
+            targetLastId = Long.MAX_VALUE;
+        }
+        Slice<Content> contentSlice = findContentSlice(keyword, targetLastId, size);
+
+        List<AdminContentResponse> contents = contentSlice.getContent().stream()
+                .map(AdminContentResponse::from)
+                .toList();
+        return AdminContentsResponse.of(contents, contentSlice.hasNext());
+    }
+
+    public AdminContentsResponse findWeeklyPopularContents(int size) {
+        List<LocalDate> lastWeekPeriod = getLastWeekPeriod();
+        LocalDate startDate = lastWeekPeriod.getFirst();
+        LocalDate endDate = lastWeekPeriod.getLast();
+
+        List<Content> popularContents = favoriteContentRepository.findPopularContentsByFavoriteBetweenDatesWithLimit(
+                startDate, endDate, size);
+
+        List<AdminContentResponse> contents = popularContents.stream()
+                .map(AdminContentResponse::from)
+                .toList();
+        return AdminContentsResponse.of(contents, false);
     }
 
     private City findCity(AdminContentSaveRequest request) {
@@ -141,5 +180,24 @@ public class AdminContentService {
                         () -> placeCategoryRepository.save(new PlaceCategory(place, category))
                 );
     }
-}
 
+    private Slice<Content> findContentSlice(String keyword, long lastId, int size) {
+        PageRequest pageable = PageRequest.of(0, size);
+
+        // 검색어가 존재하지 않는 경우 전체 콘텐츠 search
+        if (keyword == null || keyword.isBlank()) {
+            return contentRepository.findAllByIdLessThanOrderByIdDesc(lastId, pageable);
+        }
+
+        // 검색어가 존재하는 경우 boolean mode 기반 keyword search
+        String booleanModeKeyword = contentRepository.createBooleanModeKeyword(keyword);
+        return contentRepository.findByKeywordContaining(booleanModeKeyword, lastId, pageable);
+    }
+
+    private List<LocalDate> getLastWeekPeriod() {
+        LocalDate thisWeekMonday = LocalDate.now().with(DayOfWeek.MONDAY);
+        LocalDate lastWeekMonday = thisWeekMonday.minusWeeks(ONE_WEEK);
+        LocalDate lastWeekSunday = lastWeekMonday.plusDays(DAYS_UNTIL_SUNDAY);
+        return List.of(lastWeekMonday, lastWeekSunday);
+    }
+}

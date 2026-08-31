@@ -45,5 +45,6 @@ subprojects {
 
     test {
         useJUnitPlatform()
+        systemProperty 'user.timezone', 'Asia/Seoul'
     }
 }
