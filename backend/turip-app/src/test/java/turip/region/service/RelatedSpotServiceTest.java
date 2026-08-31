@@ -55,7 +55,7 @@ class RelatedSpotServiceTest {
                 .willReturn(Mono.just(RelatedSpotResult.success(List.of(spot3))));
 
         // when
-        RelatedSpotsResponse response = relatedSpotService.findRelatedSpotsByRegionCategory(category).block();
+        RelatedSpotsResponse response = relatedSpotService.findRelatedSpotsByRegionCategory(category);
 
         // then
         assertAll(
@@ -92,7 +92,7 @@ class RelatedSpotServiceTest {
                 .willReturn(Mono.just(RelatedSpotResult.failure()));
 
         // when
-        RelatedSpotsResponse response = relatedSpotService.findRelatedSpotsByRegionCategory(category).block();
+        RelatedSpotsResponse response = relatedSpotService.findRelatedSpotsByRegionCategory(category);
 
         // then
         assertThat(response.relatedSpots()).isNotEmpty();
@@ -113,7 +113,7 @@ class RelatedSpotServiceTest {
                 .willReturn(Mono.just(RelatedSpotResult.success(List.of())));
 
         // when
-        RelatedSpotsResponse response = relatedSpotService.findRelatedSpotsByRegionCategory(category).block();
+        RelatedSpotsResponse response = relatedSpotService.findRelatedSpotsByRegionCategory(category);
 
         // then
         assertThat(response.relatedSpots()).isNotEmpty();
