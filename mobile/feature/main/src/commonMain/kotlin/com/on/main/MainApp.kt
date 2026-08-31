@@ -39,6 +39,7 @@ import com.on.turip.feature.invitation.api.InvitationEntryNavKey
 import com.on.turip.feature.login.api.LoginNavKey
 import com.on.turip.feature.main.component.ExitConfirmationHandler
 import com.on.turip.feature.main.component.LocalSystemBarStyleController
+import com.on.turip.feature.main.component.NotificationPermissionEffect
 import com.on.turip.feature.main.component.SystemBarStyleEffect
 import com.on.turip.feature.main.component.TuripNavigationBar
 import com.on.turip.feature.main.navigation.SavedStateConfigurationProvider
@@ -134,6 +135,7 @@ fun MainApp(
 
     TuripTheme {
         SystemBarStyleEffect(style = systemBarStyleController.style)
+        NotificationPermissionEffect()
 
         Scaffold(
             containerColor = TuripTheme.colors.background,

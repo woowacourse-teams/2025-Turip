@@ -59,6 +59,14 @@ sealed interface NetworkError {
         data object DuplicateBookmarked : Bookmark
     }
 
+    sealed interface FcmToken : NetworkError {
+        data object Blank : FcmToken
+
+        data object NotificationEnabledRequired : FcmToken
+
+        data object NotFound : FcmToken
+    }
+
     data object Network : NetworkError
 
     data object Cancelled : NetworkError

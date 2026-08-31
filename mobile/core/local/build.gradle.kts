@@ -9,6 +9,7 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.koin.android)
             implementation(libs.firebase.installations)
+            implementation(libs.firebase.messaging)
             implementation(libs.install.referrer)
             implementation(libs.kotlinx.coroutines.play.services)
         }
