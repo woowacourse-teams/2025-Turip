@@ -58,8 +58,8 @@ public class AsyncConfiguration {
     @Bean(name = "koreaTourismApiExecutor")
     public Executor koreaTourismApiExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(10);
-        executor.setMaxPoolSize(10);
+        executor.setCorePoolSize(50);
+        executor.setMaxPoolSize(50);
         executor.setQueueCapacity(50);
         executor.setThreadNamePrefix("KOREA-TOURISM-API-");
 
