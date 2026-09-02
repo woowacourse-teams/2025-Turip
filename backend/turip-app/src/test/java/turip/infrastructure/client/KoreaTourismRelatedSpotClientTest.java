@@ -171,4 +171,23 @@ class KoreaTourismRelatedSpotClientTest {
                 () -> assertThat(result.spots()).isEmpty()
         );
     }
+
+    @Test
+    @DisplayName("응답 본문이 완전히 비어있으면 실패 결과를 반환한다.")
+    void searchRelatedSpots_whenBodyIsEmpty_returnsFailure() {
+        // given
+        mockWebServer.enqueue(new MockResponse()
+                .setBody("")
+                .addHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE));
+
+        // when
+        RelatedSpotResult result = koreaTourismRelatedSpotClient.searchRelatedSpots(11, 11110).block();
+
+        // then
+        assertAll(
+                () -> assertThat(result).isNotNull(),
+                () -> assertThat(result.isSuccess()).isFalse(),
+                () -> assertThat(result.spots()).isEmpty()
+        );
+    }
 }

@@ -61,6 +61,9 @@ public class KoreaTourismRelatedSpotClient {
                 .uri(uri)
                 .retrieve()
                 .bodyToMono(KoreaTourismRelatedSpotResponse.class)
+                .switchIfEmpty(Mono.fromRunnable(() ->
+                        log.warn("한국관광공사 연관 관광지 API 응답 본문이 비어있음: areaCode={}, sigunguCode={}",
+                                areaCode, sigunguCode)))
                 .map(response -> {
                     if (!response.isSuccess()) {
                         log.warn("한국관광공사 연관 관광지 API 응답 실패: resultCode={}, resultMsg={}",
@@ -70,6 +73,7 @@ public class KoreaTourismRelatedSpotClient {
                     // API 호출 성공, 데이터가 비어있어도 success로 반환
                     return RelatedSpotResult.success(response.getRelatedSpots());
                 })
+                .defaultIfEmpty(RelatedSpotResult.failure())
                 .onErrorResume(e -> {
                     log.warn("한국관광공사 연관 관광지 API 호출 실패: areaCode={}, sigunguCode={}, message={}",
                             areaCode, sigunguCode, e.getMessage());
