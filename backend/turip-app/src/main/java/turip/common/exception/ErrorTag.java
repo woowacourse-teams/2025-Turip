@@ -22,6 +22,15 @@ public enum ErrorTag {
     INVITATION_TOKEN_EXPIRED("초대 토큰이 만료됐습니다."),
     INVALID_INVITATION_TOKEN("유효하지 않은 초대 토큰입니다."),
 
+    ARTICLE_TITLE_BLANK("아티클 제목은 비워둘 수 없습니다."),
+    ARTICLE_TITLE_TOO_LONG("아티클 제목의 최대 길이를 초과했습니다."),
+    ARTICLE_SUBTITLE_BLANK("아티클 부제목은 비워둘 수 없습니다."),
+    ARTICLE_SUBTITLE_TOO_LONG("아티클 부제목의 최대 길이를 초과했습니다."),
+    ARTICLE_CONTENT_BLANK("아티클 본문은 비워둘 수 없습니다."),
+    ARTICLE_CONTENT_TOO_LONG("아티클 본문의 최대 길이를 초과했습니다."),
+    TAG_NAME_BLANK("태그 이름은 비워둘 수 없습니다."),
+    TAG_NAME_TOO_LONG("태그 이름의 최대 길이를 초과했습니다."),
+
     // 401 Unauthorized
     UNAUTHORIZED("토큰 기반 인증에 실패했습니다."),
     ID_TOKEN_NOT_VALID("유효하지 않은 id token입니다."),
@@ -50,7 +59,6 @@ public enum ErrorTag {
     FAVORITE_CONTENT_NOT_FOUND("찜한 컨텐츠를 찾을 수 없습니다."),
     FAVORITE_FOLDER_ACCOUNT_NOT_FOUND("찜폴더에 참여중인 계정 목록에서 해당 계정을 찾을 수 없습니다."),
     FCM_TOKEN_NOT_FOUND("FCM 토큰을 찾을 수 없습니다."),
-
 
     // 409 Conflict
     FAVORITE_FOLDER_NAME_CONFLICT("이미 존재하는 찜폴더 이름입니다."),
