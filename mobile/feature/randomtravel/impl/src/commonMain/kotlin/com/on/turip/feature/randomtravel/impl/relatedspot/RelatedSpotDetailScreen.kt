@@ -25,6 +25,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -33,14 +34,18 @@ import com.on.turip.core.designsystem.component.TuripAppBar
 import com.on.turip.core.designsystem.component.TuripLoadingIndicator
 import com.on.turip.core.designsystem.generated.resources.Res
 import com.on.turip.core.designsystem.generated.resources.all_back_description
+import com.on.turip.core.designsystem.generated.resources.btn_kakao_map_basic
 import com.on.turip.core.designsystem.generated.resources.random_travel_related_spot_detail_empty
 import com.on.turip.core.designsystem.generated.resources.random_travel_related_spot_detail_title
 import com.on.turip.core.designsystem.generated.resources.random_travel_related_spot_detail_total
+import com.on.turip.core.designsystem.generated.resources.random_travel_related_spot_kakao_map_description
 import com.on.turip.core.designsystem.theme.TuripTheme
 import com.on.turip.core.ui.component.ErrorScreen
+import com.on.turip.core.ui.util.encodeAsUrlComponent
 import com.on.turip.core.ui.util.formatResource
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.collectLatest
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -50,6 +55,7 @@ fun RelatedSpotDetailScreen(
     spotCategory: String,
     onBackClick: () -> Unit,
     onNavigateToLoginScreen: () -> Unit,
+    onOpenKakaoMap: (url: String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: RelatedSpotDetailViewModel = koinViewModel(),
 ) {
@@ -74,6 +80,7 @@ fun RelatedSpotDetailScreen(
         uiState = uiState,
         onIntent = viewModel::onIntent,
         onBackClick = onBackClick,
+        onSpotMapClick = onOpenKakaoMap,
         modifier = modifier,
     )
 }
@@ -83,6 +90,7 @@ private fun RelatedSpotDetailContent(
     uiState: RelatedSpotDetailState,
     onIntent: (RelatedSpotDetailIntent) -> Unit,
     onBackClick: () -> Unit,
+    onSpotMapClick: (url: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -151,6 +159,7 @@ private fun RelatedSpotDetailContent(
             else -> {
                 RelatedSpotList(
                     spots = uiState.spots,
+                    onSpotMapClick = onSpotMapClick,
                     modifier = Modifier.fillMaxSize(),
                 )
             }
@@ -161,6 +170,7 @@ private fun RelatedSpotDetailContent(
 @Composable
 private fun RelatedSpotList(
     spots: List<String>,
+    onSpotMapClick: (url: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -194,7 +204,11 @@ private fun RelatedSpotList(
         }
 
         itemsIndexed(spots) { index, spot ->
-            RelatedSpotRow(order = index + 1, spot = spot)
+            RelatedSpotRow(
+                order = index + 1,
+                spot = spot,
+                onMapClick = { onSpotMapClick(spot.toKakaoMapSearchUrl()) },
+            )
         }
     }
 }
@@ -206,6 +220,7 @@ private fun RelatedSpotList(
 private fun RelatedSpotRow(
     order: Int,
     spot: String,
+    onMapClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -241,12 +256,29 @@ private fun RelatedSpotRow(
                     .padding(start = TuripTheme.spacing.medium)
                     .weight(1f),
         )
+
+        IconButton(
+            onClick = onMapClick,
+            modifier = Modifier.size(MAP_ICON_BUTTON_SIZE),
+        ) {
+            Icon(
+                painter = painterResource(Res.drawable.btn_kakao_map_basic),
+                contentDescription = stringResource(Res.string.random_travel_related_spot_kakao_map_description),
+                tint = Color.Unspecified,
+                modifier = Modifier.size(MAP_ICON_SIZE),
+            )
+        }
     }
 }
 
+private fun String.toKakaoMapSearchUrl(): String = "$KAKAO_MAP_SEARCH_BASE_URL${encodeAsUrlComponent()}"
+
 private val APP_BAR_ICON_SIZE = 36.dp
 private val ORDER_BADGE_SIZE = 24.dp
+private val MAP_ICON_BUTTON_SIZE = 28.dp
+private val MAP_ICON_SIZE = 20.dp
 private const val TOTAL_COUNT_ITEM_KEY: String = "total_count"
+private const val KAKAO_MAP_SEARCH_BASE_URL = "https://map.kakao.com/link/search/"
 
 @Preview(showBackground = true, name = "연관 관광지 전체 목록")
 @Composable
@@ -272,6 +304,7 @@ private fun RelatedSpotDetailPreview() {
                 ),
             onIntent = {},
             onBackClick = {},
+            onSpotMapClick = {},
         )
     }
 }

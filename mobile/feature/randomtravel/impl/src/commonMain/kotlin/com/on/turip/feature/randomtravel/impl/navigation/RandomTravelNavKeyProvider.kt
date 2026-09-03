@@ -8,6 +8,7 @@ import com.on.turip.feature.login.api.LoginNavKey
 import com.on.turip.feature.randomtravel.api.RandomTravelNavKey
 import com.on.turip.feature.randomtravel.api.RelatedSpotDetailNavKey
 import com.on.turip.feature.randomtravel.impl.RandomTravelScreen
+import com.on.turip.feature.randomtravel.impl.platform.rememberRelatedSpotDetailPlatformActions
 import com.on.turip.feature.randomtravel.impl.relatedspot.RelatedSpotDetailScreen
 import com.on.turip.feature.trip.api.TripDetailNavKey
 import kotlinx.serialization.modules.PolymorphicModuleBuilder
@@ -37,11 +38,13 @@ class RandomTravelNavKeyProvider : NavKeyProvider {
         }
 
         entry<RelatedSpotDetailNavKey> { key ->
+            val platformActions = rememberRelatedSpotDetailPlatformActions()
             RelatedSpotDetailScreen(
                 regionCategoryName = key.regionCategoryName,
                 spotCategory = key.spotCategory,
                 onBackClick = navigator::goBack,
                 onNavigateToLoginScreen = { navigator.goWithAllClear(LoginNavKey()) },
+                onOpenKakaoMap = platformActions.openKakaoMapUrl,
             )
         }
     }
