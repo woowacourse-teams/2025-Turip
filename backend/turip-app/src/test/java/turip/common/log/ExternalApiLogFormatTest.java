@@ -1,26 +1,21 @@
 package turip.common.log;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import java.lang.reflect.Method;
-import java.net.URI;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ExternalApiLoggingInterceptorTest {
+import java.net.URI;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
-    private final ExternalApiLoggingInterceptor interceptor = new ExternalApiLoggingInterceptor();
+class ExternalApiLogFormatTest {
 
     @Test
     @DisplayName("URI의 쿼리 파라미터에 민감한 정보(key)가 포함되어 있으면 마스킹한다.")
     void maskSensitiveParamsWithKey() throws Exception {
         // given
         URI uri = new URI("https://www.googleapis.com/youtube/v3/videos?part=snippet&id=videoId&key=AIzaSyA_...&other=param");
-        Method method = ExternalApiLoggingInterceptor.class.getDeclaredMethod("maskSensitiveParams", URI.class);
-        method.setAccessible(true);
 
         // when
-        String maskedUri = (String) method.invoke(interceptor, uri);
+        String maskedUri = ExternalApiLogFormat.maskSensitiveParams(uri);
 
         // then
         assertThat(maskedUri).contains("key=***");
@@ -33,11 +28,9 @@ class ExternalApiLoggingInterceptorTest {
     void maskSensitiveParamsWithApiKey() throws Exception {
         // given
         URI uri = new URI("https://www.googleapis.com/youtube/v3/videos?part=snippet&id=videoId&apiKey=AIzaSyA_...&other=param");
-        Method method = ExternalApiLoggingInterceptor.class.getDeclaredMethod("maskSensitiveParams", URI.class);
-        method.setAccessible(true);
 
         // when
-        String maskedUri = (String) method.invoke(interceptor, uri);
+        String maskedUri = ExternalApiLogFormat.maskSensitiveParams(uri);
 
         // then
         assertThat(maskedUri).contains("apiKey=***");
@@ -50,11 +43,9 @@ class ExternalApiLoggingInterceptorTest {
     void maskSensitiveParamsWithoutSensitiveInfo() throws Exception {
         // given
         URI uri = new URI("https://www.googleapis.com/youtube/v3/videos?part=snippet&id=videoId&other=param");
-        Method method = ExternalApiLoggingInterceptor.class.getDeclaredMethod("maskSensitiveParams", URI.class);
-        method.setAccessible(true);
 
         // when
-        String maskedUri = (String) method.invoke(interceptor, uri);
+        String maskedUri = ExternalApiLogFormat.maskSensitiveParams(uri);
 
         // then
         assertThat(maskedUri).isEqualTo(uri.toString());
@@ -65,11 +56,9 @@ class ExternalApiLoggingInterceptorTest {
     void maskSensitiveParamsWithoutQuery() throws Exception {
         // given
         URI uri = new URI("https://www.googleapis.com/youtube/v3/videos");
-        Method method = ExternalApiLoggingInterceptor.class.getDeclaredMethod("maskSensitiveParams", URI.class);
-        method.setAccessible(true);
 
         // when
-        String maskedUri = (String) method.invoke(interceptor, uri);
+        String maskedUri = ExternalApiLogFormat.maskSensitiveParams(uri);
 
         // then
         assertThat(maskedUri).isEqualTo(uri.toString());
