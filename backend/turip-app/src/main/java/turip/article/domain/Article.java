@@ -78,6 +78,10 @@ public class Article extends BaseTimeEntity {
         this.isPublished = false;
     }
 
+    public void publish() {
+        this.isPublished = true;
+    }
+
     private void validateTitle(String title) {
         if (title == null || title.isBlank()) {
             throw new IllegalArgumentException(ErrorTag.ARTICLE_TITLE_BLANK);
