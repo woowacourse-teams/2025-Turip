@@ -84,10 +84,11 @@ public class KoreaTourismVisitorClient {
      * @return 데이터가 존재하는 최신 월 (yyyyMM), 찾지 못하면 Optional.empty()
      */
     public Optional<String> findLatestBaseMonth() {
-        YearMonth currentMonth = YearMonth.now();
+        // 진행 중인 이번 달은 완결되지 않았으므로 지난 달부터 역순 탐색한다.
+        YearMonth lastCompletedMonth = YearMonth.now().minusMonths(1);
 
         for (int i = 0; i < MAX_MONTH_TO_CHECK; i++) {
-            YearMonth candidate = currentMonth.minusMonths(i);
+            YearMonth candidate = lastCompletedMonth.minusMonths(i);
             String firstDay = candidate.atDay(1).format(YMD_FORMATTER);
 
             try {
