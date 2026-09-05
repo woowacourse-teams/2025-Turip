@@ -1,5 +1,9 @@
 package turip.infrastructure.client;
 
+import static turip.infrastructure.client.KoreaTourismApiConstants.MOBILE_APP;
+import static turip.infrastructure.client.KoreaTourismApiConstants.MOBILE_OS;
+import static turip.infrastructure.client.KoreaTourismApiConstants.RESPONSE_TYPE;
+
 import java.net.URI;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
@@ -15,9 +19,6 @@ import turip.infrastructure.client.dto.RelatedSpotResult;
 @Component
 public class KoreaTourismRelatedSpotClient {
 
-    private static final String MOBILE_OS = "ETC";
-    private static final String MOBILE_APP = "Turip";
-    private static final String RESPONSE_TYPE = "json";
     private static final int DEFAULT_NUM_OF_ROWS = 30;
     private static final int DEFAULT_PAGE_NO = 1;
     private static final String DEFAULT_BASE_YM = "202606"; // 초기 기준월
