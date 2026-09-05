@@ -19,19 +19,19 @@ public enum TourApiAreaCode {
     SEOUL(11, List.of(11110, 11440, 11140), DomesticRegionCategory.SEOUL),
 
     /**
-     * 인천광역시 areaCode: 2 sigunguCodes: 중구(28110), 강화군(28710), 연수구(28185)
+     * 인천광역시 areaCode: 28 sigunguCodes: 중구(28110), 강화군(28710), 연수구(28185)
      */
-    INCHEON(2, List.of(28110, 28710, 28185), DomesticRegionCategory.INCHEON),
+    INCHEON(28, List.of(28110, 28710, 28185), DomesticRegionCategory.INCHEON),
 
     /**
-     * 대전광역시 areaCode: 3 sigunguCodes: 유성구(30200), 중구(30140), 서구(30170)
+     * 대전광역시 areaCode: 30 sigunguCodes: 유성구(30200), 중구(30140), 서구(30170)
      */
-    DAEJEON(3, List.of(30200, 30140, 30170), DomesticRegionCategory.DAEJEON),
+    DAEJEON(30, List.of(30200, 30140, 30170), DomesticRegionCategory.DAEJEON),
 
     /**
-     * 부산광역시 areaCode: 6 sigunguCodes: 해운대구(26350), 중구(26110), 부산진구(26230)
+     * 부산광역시 areaCode: 26 sigunguCodes: 해운대구(26350), 중구(26110), 부산진구(26230)
      */
-    BUSAN(6, List.of(26350, 26110, 26230), DomesticRegionCategory.BUSAN),
+    BUSAN(26, List.of(26350, 26110, 26230), DomesticRegionCategory.BUSAN),
 
     /**
      * 강원도 > 강릉시 areaCode: 51 sigunguCodes: 강릉시(51150)
@@ -57,6 +57,31 @@ public enum TourApiAreaCode {
      * 제주특별자치도 areaCode: 50 sigunguCodes: 제주시(50110), 서귀포시(50130)
      */
     JEJU(50, List.of(50110, 50130), DomesticRegionCategory.JEJU),
+
+    /**
+     * 충청남도 > 공주시 areaCode: 44 sigunguCodes: 공주시(44150)
+     */
+    GONGJU(44, List.of(44150), DomesticRegionCategory.GONGJU),
+
+    /**
+     * 전라남도 > 여수시 areaCode: 46 sigunguCodes: 여수시(46130)
+     */
+    YEOSU(46, List.of(46130), DomesticRegionCategory.YEOSU),
+
+    /**
+     * 경기도 > 수원시 areaCode: 41 sigunguCodes: 장안구(41111), 팔달구(41115), 영통구(41117)
+     */
+    SUWON(41, List.of(41111, 41115, 41117), DomesticRegionCategory.SUWON),
+
+    /**
+     * 전북특별자치도 > 군산시 areaCode: 52 sigunguCodes: 군산시(52130)
+     */
+    GUNSAN(52, List.of(52130), DomesticRegionCategory.GUNSAN),
+
+    /**
+     * 대구광역시 areaCode: 27 sigunguCodes: 중구(27110), 수성구(27260), 달서구(27290)
+     */
+    DAEGU(27, List.of(27110, 27260, 27290), DomesticRegionCategory.DAEGU),
 
     /**
      * 매핑되지 않는 지역 (OTHER_DOMESTIC 등)
