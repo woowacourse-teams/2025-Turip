@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import turip.infrastructure.client.dto.deserializer.EmptyStringAsNullDeserializer;
+import turip.infrastructure.client.dto.deserializer.EmptyStringAsNullVisitorItemsDeserializer;
 
 @Getter
 @NoArgsConstructor
@@ -78,7 +78,7 @@ public class KoreaTourismVisitorResponse {
     public static class Body {
 
         @JsonProperty("items")
-        @JsonDeserialize(using = EmptyStringAsNullDeserializer.class)
+        @JsonDeserialize(using = EmptyStringAsNullVisitorItemsDeserializer.class)
         private Items items;
 
         @JsonProperty("numOfRows")
