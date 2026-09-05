@@ -51,10 +51,22 @@ public class RegionPopularityService {
     public RegionPopularitySnapshot getPopularity() {
         RegionPopularitySnapshot current = snapshot.get();
         if (current.isEmpty()) {
-            refresh();
-            current = snapshot.get();
+            return refreshIfEmpty();
         }
         return current;
+    }
+
+    /**
+     * 지연 로딩 경로. 락 획득 후 스냅샷이 여전히 비어있을 때만 갱신한다.
+     * 대기하는 동안 앞선 스레드가 이미 채웠다면 중복 갱신(무거운 API 호출)을 피한다.
+     * (스케줄러의 월간 강제 갱신은 refresh()를 직접 호출한다.)
+     */
+    private synchronized RegionPopularitySnapshot refreshIfEmpty() {
+        if (!snapshot.get().isEmpty()) {
+            return snapshot.get();
+        }
+        refresh();
+        return snapshot.get();
     }
 
     /**
