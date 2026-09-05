@@ -72,10 +72,19 @@ public class RegionPopularityService {
         String startYmd = yearMonth.atDay(1).format(YMD_FORMATTER);
         String endYmd = yearMonth.atEndOfMonth().format(YMD_FORMATTER);
 
-        List<ProvinceVisitorCount> provinceVisitors = fetchProvinceVisitors(startYmd, endYmd);
+        // 광역/기초 중 하나라도 실패하면 부분 데이터로 스냅샷을 덮어쓰지 않고 기존 스냅샷을 유지한다.
+        VisitorFetchResult provinceResult = visitorClient.fetchProvinceVisitors(startYmd, endYmd);
+        VisitorFetchResult cityResult = visitorClient.fetchCityVisitors(startYmd, endYmd);
+        if (!provinceResult.isSuccess() || !cityResult.isSuccess()) {
+            log.warn("방문자 수 조회 실패로 인기도 스냅샷을 유지합니다. baseMonth={}, provinceSuccess={}, citySuccess={}",
+                    baseMonth, provinceResult.isSuccess(), cityResult.isSuccess());
+            return;
+        }
+
+        List<ProvinceVisitorCount> provinceVisitors = aggregateProvinceVisitors(provinceResult.items());
         Map<DomesticRegionCategory, Long> categoryCounts = new EnumMap<>(DomesticRegionCategory.class);
         putProvinceCategoryCounts(categoryCounts, provinceVisitors);
-        putCityCategoryCounts(categoryCounts, startYmd, endYmd);
+        putCityCategoryCounts(categoryCounts, cityResult.items());
 
         if (provinceVisitors.isEmpty() && categoryCounts.isEmpty()) {
             log.warn("방문자 수 집계 결과가 비어 인기도 스냅샷을 유지합니다. baseMonth={}", baseMonth);
@@ -88,17 +97,11 @@ public class RegionPopularityService {
     }
 
     /**
-     * 광역(metco)에서 전체 시도의 방문 인원수를 시도별로 집계한다.
+     * 광역(metco) 응답 항목을 전체 시도의 방문 인원수로 시도별 집계한다.
      */
-    private List<ProvinceVisitorCount> fetchProvinceVisitors(String startYmd, String endYmd) {
-        VisitorFetchResult result = visitorClient.fetchProvinceVisitors(startYmd, endYmd);
-        if (!result.isSuccess()) {
-            log.warn("광역 방문자 수 조회 실패. 시도 히트맵 데이터를 이번 갱신에서 제외합니다.");
-            return List.of();
-        }
-
+    private List<ProvinceVisitorCount> aggregateProvinceVisitors(List<VisitorItem> items) {
         // areaCode 기준으로 그룹화 (숫자 코드만), 순서 유지
-        Map<String, List<VisitorItem>> groupedByArea = result.items().stream()
+        Map<String, List<VisitorItem>> groupedByArea = items.stream()
                 .filter(item -> item.getAreaCode() != null && item.getAreaCode().chars().allMatch(Character::isDigit))
                 .collect(Collectors.groupingBy(VisitorItem::getAreaCode, LinkedHashMap::new, Collectors.toList()));
 
@@ -132,20 +135,14 @@ public class RegionPopularityService {
     }
 
     /**
-     * 기초(locgo)에서 지원하는 시 카테고리(강릉 등)의 방문자 수를 signguCode로 필터해 채운다.
+     * 기초(locgo) 응답 항목에서 지원하는 시 카테고리(강릉 등)의 방문자 수를 signguCode로 필터해 채운다.
      */
-    private void putCityCategoryCounts(Map<DomesticRegionCategory, Long> counts, String startYmd, String endYmd) {
-        VisitorFetchResult result = visitorClient.fetchCityVisitors(startYmd, endYmd);
-        if (!result.isSuccess()) {
-            log.warn("기초 방문자 수 조회 실패. 시 단위 지역을 이번 갱신에서 제외합니다.");
-            return;
-        }
-
+    private void putCityCategoryCounts(Map<DomesticRegionCategory, Long> counts, List<VisitorItem> cityItems) {
         for (TourApiAreaCode areaCode : TourApiAreaCode.findByVisitorQueryLevel(VisitorQueryLevel.CITY)) {
             Set<String> targetSignguCodes = areaCode.getSigunguCodes().stream()
                     .map(String::valueOf)
                     .collect(Collectors.toSet());
-            List<VisitorItem> items = result.items().stream()
+            List<VisitorItem> items = cityItems.stream()
                     .filter(item -> targetSignguCodes.contains(item.getSignguCode()))
                     .toList();
             counts.put(areaCode.getDomesticRegionCategory(), sumTouristCounts(items));
