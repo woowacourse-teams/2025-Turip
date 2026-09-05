@@ -39,11 +39,14 @@ public class RegionPopularityService {
     private static final Set<String> TOURIST_DIVISION_CODES = Set.of("2", "3");
     private static final DateTimeFormatter YEAR_MONTH_FORMATTER = DateTimeFormatter.ofPattern("yyyyMM");
     private static final DateTimeFormatter YMD_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
+    // 빈 스냅샷 상태에서 갱신이 실패하면 이 간격 동안은 지연 로딩 갱신을 재시도하지 않는다.
+    private static final long LAZY_REFRESH_RETRY_INTERVAL_MILLIS = 60_000L;
 
     private final KoreaTourismVisitorClient visitorClient;
 
     private final AtomicReference<RegionPopularitySnapshot> snapshot =
             new AtomicReference<>(RegionPopularitySnapshot.empty());
+    private volatile long lastRefreshFailedAtMillis = 0L;
 
     /**
      * 캐시된 인기도 스냅샷을 반환한다. 스냅샷이 비어있으면 동기적으로 한 번 갱신한다.
@@ -59,24 +62,38 @@ public class RegionPopularityService {
     /**
      * 지연 로딩 경로. 락 획득 후 스냅샷이 여전히 비어있을 때만 갱신한다.
      * 대기하는 동안 앞선 스레드가 이미 채웠다면 중복 갱신(무거운 API 호출)을 피한다.
+     * 외부 API 장애로 최근 갱신이 실패했다면 재시도 간격 전까지는 빈 스냅샷을 즉시 반환해
+     * 요청마다 실패하는 API를 직렬로 호출하는 것을 막는다.
      * (스케줄러의 월간 강제 갱신은 refresh()를 직접 호출한다.)
      */
     private synchronized RegionPopularitySnapshot refreshIfEmpty() {
-        if (!snapshot.get().isEmpty()) {
-            return snapshot.get();
+        RegionPopularitySnapshot current = snapshot.get();
+        if (!current.isEmpty()) {
+            return current;
+        }
+        if (System.currentTimeMillis() - lastRefreshFailedAtMillis < LAZY_REFRESH_RETRY_INTERVAL_MILLIS) {
+            return current;
         }
         refresh();
         return snapshot.get();
     }
 
     /**
-     * 방문자 수 API를 호출해 스냅샷을 갱신한다. 갱신에 실패하면 기존 스냅샷을 유지한다.
+     * 방문자 수 API를 호출해 스냅샷을 갱신한다. 갱신에 실패하면 기존 스냅샷을 유지하고 실패 시각을 기록한다.
      */
     public synchronized void refresh() {
+        if (updateSnapshot()) {
+            lastRefreshFailedAtMillis = 0L;
+        } else {
+            lastRefreshFailedAtMillis = System.currentTimeMillis();
+        }
+    }
+
+    private boolean updateSnapshot() {
         Optional<String> latestBaseMonth = visitorClient.findLatestBaseMonth();
         if (latestBaseMonth.isEmpty()) {
             log.warn("방문자 수 기준월을 찾지 못해 인기도 스냅샷 갱신을 건너뜁니다.");
-            return;
+            return false;
         }
         String baseMonth = latestBaseMonth.get();
 
@@ -90,7 +107,7 @@ public class RegionPopularityService {
         if (!provinceResult.isSuccess() || !cityResult.isSuccess()) {
             log.warn("방문자 수 조회 실패로 인기도 스냅샷을 유지합니다. baseMonth={}, provinceSuccess={}, citySuccess={}",
                     baseMonth, provinceResult.isSuccess(), cityResult.isSuccess());
-            return;
+            return false;
         }
 
         List<ProvinceVisitorCount> provinceVisitors = aggregateProvinceVisitors(provinceResult.items());
@@ -100,12 +117,13 @@ public class RegionPopularityService {
 
         if (provinceVisitors.isEmpty() && categoryCounts.isEmpty()) {
             log.warn("방문자 수 집계 결과가 비어 인기도 스냅샷을 유지합니다. baseMonth={}", baseMonth);
-            return;
+            return false;
         }
 
         snapshot.set(new RegionPopularitySnapshot(baseMonth, provinceVisitors, categoryCounts));
         log.info("지역 인기도 스냅샷 갱신 완료. baseMonth={}, 시도 수={}, 지원 지역 수={}",
                 baseMonth, provinceVisitors.size(), categoryCounts.size());
+        return true;
     }
 
     /**
