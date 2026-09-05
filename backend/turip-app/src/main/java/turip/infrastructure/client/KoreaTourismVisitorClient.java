@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientResponseException;
 import turip.infrastructure.client.dto.KoreaTourismVisitorResponse;
 import turip.infrastructure.client.dto.KoreaTourismVisitorResponse.VisitorItem;
 import turip.infrastructure.client.dto.VisitorFetchResult;
@@ -113,8 +114,14 @@ public class KoreaTourismVisitorClient {
                     log.info("방문자 수 최신 완결 월 발견: {}", baseMonth);
                     return Optional.of(baseMonth);
                 }
+            } catch (RestClientResponseException e) {
+                // 응답 오류(4xx/5xx)는 상태코드만 남긴다.
+                log.info("방문자 수 기준월 {} 탐색 실패: status={}",
+                        candidate.format(YEAR_MONTH_FORMATTER), e.getStatusCode());
             } catch (Exception e) {
-                log.info("방문자 수 기준월 {} 탐색 실패: {}", candidate.format(YEAR_MONTH_FORMATTER), e.getMessage());
+                // I/O 오류 등은 메시지에 serviceKey가 담긴 요청 URI가 포함될 수 있어 예외 타입만 남긴다.
+                log.info("방문자 수 기준월 {} 탐색 실패: {}",
+                        candidate.format(YEAR_MONTH_FORMATTER), e.getClass().getSimpleName());
             }
         }
 
@@ -147,8 +154,11 @@ public class KoreaTourismVisitorClient {
                 }
             }
             return VisitorFetchResult.success(collected);
+        } catch (RestClientResponseException e) {
+            log.warn("방문자 수 API 호출 실패: status={}", e.getStatusCode());
+            return VisitorFetchResult.failure();
         } catch (Exception e) {
-            log.warn("방문자 수 API 호출 실패", e);
+            log.warn("방문자 수 API 호출 실패: {}", e.getClass().getSimpleName());
             return VisitorFetchResult.failure();
         }
     }
