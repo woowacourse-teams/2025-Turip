@@ -26,4 +26,7 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
             """)
     Slice<Article> findNextPageByIsPublishedTrue(@Param("cursorDisplayOrder") int cursorDisplayOrder,
                                                  Pageable pageable);
+
+    @Query("SELECT MIN(a.displayOrder) FROM Article a")
+    Optional<Integer> findMinDisplayOrder();
 }

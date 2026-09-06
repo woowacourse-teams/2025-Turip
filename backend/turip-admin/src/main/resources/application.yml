@@ -32,6 +32,10 @@ region:
       etc:
         image-url: ${OVERSEAS_ETC_IMAGE_URL}
 
+turip:
+  article:
+    default-thumbnail-url: ${ARTICLE_DEFAULT_THUMBNAIL_URL}
+
 jwt:
   secret-key: ${JWT_SECRET_KEY}
   refresh-token-expiration-ms: 2592000000  # 30일

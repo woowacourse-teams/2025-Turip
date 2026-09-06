@@ -51,6 +51,10 @@ csv:
   import:
     password: test_password_123
 
+turip:
+  article:
+    default-thumbnail-url: https://test.example.com/article-default-thumbnail.jpg
+
 # Region Category 기타 이미지 설정 (테스트용 더미 값)
 region:
   category:
