@@ -3,7 +3,6 @@ package turip.content.service;
 import static turip.region.domain.DomesticRegionCategory.OTHER_DOMESTIC;
 import static turip.region.domain.OverseasRegionCategory.OTHER_OVERSEAS;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +18,7 @@ import turip.account.domain.Account;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.BadRequestException;
 import turip.common.exception.custom.NotFoundException;
+import turip.common.util.DateRangeCalculator;
 import turip.content.controller.dto.response.content.ContentCountResponse;
 import turip.content.controller.dto.response.content.ContentDetailResponse;
 import turip.content.controller.dto.response.content.ContentDetailsWithLoadableResponse;
@@ -35,9 +35,6 @@ import turip.region.domain.OverseasRegionCategory;
 @Service
 @RequiredArgsConstructor
 public class ContentService {
-
-    private static final int DAYS_UNTIL_SUNDAY = 6;
-    private static final int ONE_WEEK = 1;
 
     private final ContentRepository contentRepository;
     private final ContentPlaceService contentPlaceService;
@@ -82,9 +79,8 @@ public class ContentService {
 
     public WeeklyPopularFavoriteContentsResponse findWeeklyPopularFavoriteContents(Account account,
                                                                                    int topContentSize) {
-        List<LocalDate> lastWeekPeriod = getLastWeekPeriod();
-        LocalDate startDate = lastWeekPeriod.getFirst();
-        LocalDate endDate = lastWeekPeriod.getLast();
+        LocalDate startDate = DateRangeCalculator.lastWeekMonday();
+        LocalDate endDate = DateRangeCalculator.lastWeekSunday();
 
         List<Content> popularContents = favoriteContentRepository.findPopularContentsByFavoriteBetweenDatesWithLimit(
                 startDate, endDate, topContentSize);
@@ -206,12 +202,5 @@ public class ContentService {
 
         boolean loadable = contentSlice.hasNext();
         return ContentDetailsWithLoadableResponse.of(contentDetails, loadable);
-    }
-
-    private List<LocalDate> getLastWeekPeriod() {
-        LocalDate thisWeekMonday = LocalDate.now().with(DayOfWeek.MONDAY);
-        LocalDate lastWeekMonday = thisWeekMonday.minusWeeks(ONE_WEEK);
-        LocalDate lastWeekSunday = lastWeekMonday.plusDays(DAYS_UNTIL_SUNDAY);
-        return new ArrayList<>(List.of(lastWeekMonday, lastWeekSunday));
     }
 }

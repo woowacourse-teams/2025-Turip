@@ -1,6 +1,5 @@
 package turip.service;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -15,6 +14,7 @@ import turip.account.repository.AccountRepository;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.BadRequestException;
 import turip.common.exception.custom.NotFoundException;
+import turip.common.util.DateRangeCalculator;
 import turip.content.domain.Content;
 import turip.content.repository.ContentRepository;
 import turip.controller.dto.response.AdminBookmarkStatusResponse;
@@ -24,8 +24,6 @@ import turip.favorite.repository.FavoriteContentRepository;
 @Service
 @RequiredArgsConstructor
 public class AdminBookmarkService {
-
-    private static final int ONE_WEEK = 1;
 
     private final AccountRepository accountRepository;
     private final ContentRepository contentRepository;
@@ -39,8 +37,8 @@ public class AdminBookmarkService {
                 .map(Account::getId)
                 .toList();
 
-        LocalDate lastWeekMonday = getLastWeekMonday();
-        LocalDate lastWeekSunday = lastWeekMonday.plusDays(6);
+        LocalDate lastWeekMonday = DateRangeCalculator.lastWeekMonday();
+        LocalDate lastWeekSunday = DateRangeCalculator.lastWeekSunday();
 
         // 어드민 계정 중 지난주 기간에 해당 콘텐츠를 북마크한 계정의 id 조회
         Set<Long> bookmarkedAccountIds = favoriteContentRepository.findByAccountIdInAndContentIdAndCreatedAtBetween(
@@ -61,11 +59,11 @@ public class AdminBookmarkService {
         Optional<FavoriteContent> existing = favoriteContentRepository.findByAccountIdAndContentId(accountId,
                 contentId);
         if (existing.isPresent()) {
-            existing.get().updateCreatedAt(getLastWeekMonday());
+            existing.get().updateCreatedAt(DateRangeCalculator.lastWeekMonday());
             return;
         }
 
-        favoriteContentRepository.save(new FavoriteContent(getLastWeekMonday(), admin, content));
+        favoriteContentRepository.save(new FavoriteContent(DateRangeCalculator.lastWeekMonday(), admin, content));
     }
 
     @Transactional
@@ -92,9 +90,5 @@ public class AdminBookmarkService {
 
     private void validateContentExists(Long contentId) {
         getContent(contentId);
-    }
-
-    private LocalDate getLastWeekMonday() {
-        return LocalDate.now().with(DayOfWeek.MONDAY).minusWeeks(ONE_WEEK);
     }
 }

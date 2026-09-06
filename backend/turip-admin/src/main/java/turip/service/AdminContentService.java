@@ -1,6 +1,5 @@
 package turip.service;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -15,6 +14,7 @@ import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.BadRequestException;
 import turip.common.exception.custom.ConflictException;
 import turip.common.exception.custom.NotFoundException;
+import turip.common.util.DateRangeCalculator;
 import turip.content.domain.Content;
 import turip.content.domain.ContentPlace;
 import turip.content.repository.ContentPlaceRepository;
@@ -39,9 +39,6 @@ import turip.region.repository.CityRepository;
 @Service
 @RequiredArgsConstructor
 public class AdminContentService {
-
-    private static final int DAYS_UNTIL_SUNDAY = 6;
-    private static final int ONE_WEEK = 1;
 
     private final ContentRepository contentRepository;
     private final PlaceRepository placeRepository;
@@ -89,9 +86,8 @@ public class AdminContentService {
     }
 
     public AdminContentsResponse findWeeklyPopularContents(int size) {
-        List<LocalDate> lastWeekPeriod = getLastWeekPeriod();
-        LocalDate startDate = lastWeekPeriod.getFirst();
-        LocalDate endDate = lastWeekPeriod.getLast();
+        LocalDate startDate = DateRangeCalculator.lastWeekMonday();
+        LocalDate endDate = DateRangeCalculator.lastWeekSunday();
 
         List<Content> popularContents = favoriteContentRepository.findPopularContentsByFavoriteBetweenDatesWithLimit(
                 startDate, endDate, size);
@@ -192,12 +188,5 @@ public class AdminContentService {
         // 검색어가 존재하는 경우 boolean mode 기반 keyword search
         String booleanModeKeyword = contentRepository.createBooleanModeKeyword(keyword);
         return contentRepository.findByKeywordContaining(booleanModeKeyword, lastId, pageable);
-    }
-
-    private List<LocalDate> getLastWeekPeriod() {
-        LocalDate thisWeekMonday = LocalDate.now().with(DayOfWeek.MONDAY);
-        LocalDate lastWeekMonday = thisWeekMonday.minusWeeks(ONE_WEEK);
-        LocalDate lastWeekSunday = lastWeekMonday.plusDays(DAYS_UNTIL_SUNDAY);
-        return List.of(lastWeekMonday, lastWeekSunday);
     }
 }
