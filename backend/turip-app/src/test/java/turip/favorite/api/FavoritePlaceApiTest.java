@@ -5,6 +5,8 @@ import static org.hamcrest.Matchers.is;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -462,6 +464,92 @@ class FavoritePlaceApiTest {
                     "SELECT place_id FROM favorite_place WHERE favorite_folder_id = ? ORDER BY favorite_order ASC",
                     Long.class, folderId);
             assertThat(savedOrderByPlaceId).containsExactly(3L, 1L, 2L);
+        }
+
+        @DisplayName("turipId가 누락된 경우 400 BAD REQUEST를 응답한다")
+        @Test
+        void batchCreate8() {
+            // given
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
+
+            // when & then
+            Map<String, Object> request = new HashMap<>();
+            request.put("placeIds", List.of(1L));
+
+            RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .body(request)
+                    .contentType(ContentType.JSON)
+                    .when().post("/api/v1/turips/places/batch")
+                    .then()
+                    .statusCode(400);
+        }
+
+        @DisplayName("placeIds가 누락된 경우 400 BAD REQUEST를 응답한다")
+        @Test
+        void batchCreate9() {
+            // given
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
+
+            // when & then
+            Map<String, Object> request = new HashMap<>();
+            request.put("turipId", 1L);
+
+            RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .body(request)
+                    .contentType(ContentType.JSON)
+                    .when().post("/api/v1/turips/places/batch")
+                    .then()
+                    .statusCode(400);
+        }
+
+        @DisplayName("placeIds에 null이 포함된 경우 400 BAD REQUEST를 응답한다")
+        @Test
+        void batchCreate10() {
+            // given
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
+
+            // when & then
+            Map<String, Object> request = new HashMap<>();
+            request.put("turipId", 1L);
+            request.put("placeIds", Arrays.asList(1L, null));
+
+            RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .body(request)
+                    .contentType(ContentType.JSON)
+                    .when().post("/api/v1/turips/places/batch")
+                    .then()
+                    .statusCode(400);
+        }
+
+        @DisplayName("placeIds 개수가 70개를 초과하면 400 BAD REQUEST를 응답한다")
+        @Test
+        void batchCreate11() {
+            // given
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
+            List<Long> placeIds = new ArrayList<>();
+            for (long id = 1L; id <= 71L; id++) {
+                placeIds.add(id);
+            }
+
+            // when & then
+            Map<String, Object> request = new HashMap<>();
+            request.put("turipId", 1L);
+            request.put("placeIds", placeIds);
+
+            RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .body(request)
+                    .contentType(ContentType.JSON)
+                    .when().post("/api/v1/turips/places/batch")
+                    .then()
+                    .statusCode(400);
         }
     }
 

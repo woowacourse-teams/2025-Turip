@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -298,7 +299,7 @@ public class FavoritePlaceController {
     @PostMapping("/batch")
     public ResponseEntity<List<FavoritePlaceResponse>> batchCreate(
             @Parameter(hidden = true) @AuthAccount Account account,
-            @RequestBody FavoritePlaceBatchCreateRequest request
+            @Valid @RequestBody FavoritePlaceBatchCreateRequest request
     ) {
         List<FavoritePlaceResponse> responses = favoritePlaceService.batchCreate(
                 account, request.favoriteFolderId(), request.placeIds());

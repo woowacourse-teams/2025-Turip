@@ -12,7 +12,6 @@ public enum ErrorTag {
     FCM_TOKEN_BLANK("FCM 토큰은 비워둘 수 없습니다."),
     NOTIFICATION_ENABLED_REQUIRED("알림 수신 여부는 필수 값입니다."),
 
-    FAVORITE_PLACE_BATCH_SIZE_EXCEEDED("한 번에 추가할 수 있는 장소 개수를 초과했습니다."),
     FAVORITE_PLACE_FOLDER_MISMATCH("장소 찜이 해당 폴더에 존재하지 않습니다."),
     SHARED_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED("공유 찜폴더에는 이 작업을 수행할 수 없습니다."),
     PERSONAL_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED("개인 찜폴더에는 이 작업을 수행할 수 없습니다."),

@@ -377,19 +377,6 @@ class FavoritePlaceServiceTest {
                     .hasMessage(ErrorTag.FAVORITE_FOLDER_NOT_FOUND.getMessage());
         }
 
-        @DisplayName("placeIds가 null이면 BadRequestException을 발생시킨다")
-        @Test
-        void batchCreate8() {
-            // given
-            Long favoriteFolderId = 1L;
-            Account account = AccountFixture.createUser();
-
-            // when & then
-            assertThatThrownBy(() -> favoritePlaceService.batchCreate(account, favoriteFolderId, null))
-                    .isInstanceOf(BadRequestException.class)
-                    .hasMessage(ErrorTag.BAD_REQUEST.getMessage());
-        }
-
         @DisplayName("요청한 placeIds의 순서대로 응답 및 favoriteOrder가 지정된다")
         @Test
         void batchCreate9() {
@@ -436,22 +423,6 @@ class FavoritePlaceServiceTest {
             );
         }
 
-        @DisplayName("placeIds 개수가 70개를 초과하면 BadRequestException을 발생시킨다")
-        @Test
-        void batchCreate10() {
-            // given
-            Long favoriteFolderId = 1L;
-            Account account = AccountFixture.createUser();
-            List<Long> placeIds = new ArrayList<>();
-            for (long id = 1L; id <= 71L; id++) {
-                placeIds.add(id);
-            }
-
-            // when & then
-            assertThatThrownBy(() -> favoritePlaceService.batchCreate(account, favoriteFolderId, placeIds))
-                    .isInstanceOf(BadRequestException.class)
-                    .hasMessage(ErrorTag.FAVORITE_PLACE_BATCH_SIZE_EXCEEDED.getMessage());
-        }
     }
 
     @DisplayName("특정 폴더의 장소 찜 조회 테스트")

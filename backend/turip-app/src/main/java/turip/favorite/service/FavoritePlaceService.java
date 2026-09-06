@@ -60,8 +60,6 @@ public class FavoritePlaceService {
 
     @Transactional
     public List<FavoritePlaceResponse> batchCreate(Account account, Long favoriteFolderId, List<Long> placeIds) {
-        validatePlaceIds(placeIds);
-
         FavoriteFolder favoriteFolder = getFavoriteFolderByIdWithLock(favoriteFolderId);
         favoriteFolderAccountService.validateMembership(account, favoriteFolder);
 
@@ -246,15 +244,6 @@ public class FavoritePlaceService {
             throw new NotFoundException(ErrorTag.FAVORITE_FOLDER_NOT_FOUND);
         }
         requestedFavoriteFolders.forEach(folder -> favoriteFolderAccountService.validateMembership(account, folder));
-    }
-
-    private void validatePlaceIds(List<Long> placeIds) {
-        if (placeIds == null) {
-            throw new BadRequestException(ErrorTag.BAD_REQUEST);
-        }
-        if (placeIds.size() > 70) {
-            throw new BadRequestException(ErrorTag.FAVORITE_PLACE_BATCH_SIZE_EXCEEDED);
-        }
     }
 
     private void validateDuplicated(FavoriteFolder favoriteFolder, Place place) {
