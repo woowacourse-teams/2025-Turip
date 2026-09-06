@@ -28,7 +28,7 @@ class ArticleTest {
             Account author = AccountFixture.createUser();
 
             // when & then
-            assertThatThrownBy(() -> new Article(invalidTitle, "부제목", "본문", null, author, 1))
+            assertThatThrownBy(() -> new Article(invalidTitle, "부제목", "본문", null, author, 1, false))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage(ErrorTag.ARTICLE_TITLE_BLANK.getMessage());
         }
@@ -41,7 +41,7 @@ class ArticleTest {
             String tooLongTitle = "a".repeat(101);
 
             // when & then
-            assertThatThrownBy(() -> new Article(tooLongTitle, "부제목", "본문", null, author, 1))
+            assertThatThrownBy(() -> new Article(tooLongTitle, "부제목", "본문", null, author, 1, false))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage(ErrorTag.ARTICLE_TITLE_TOO_LONG.getMessage());
         }
@@ -60,7 +60,7 @@ class ArticleTest {
             Account author = AccountFixture.createUser();
 
             // when & then
-            assertThatThrownBy(() -> new Article("제목", invalidSubtitle, "본문", null, author, 1))
+            assertThatThrownBy(() -> new Article("제목", invalidSubtitle, "본문", null, author, 1, false))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage(ErrorTag.ARTICLE_SUBTITLE_BLANK.getMessage());
         }
@@ -73,7 +73,7 @@ class ArticleTest {
             String tooLongSubtitle = "a".repeat(201);
 
             // when & then
-            assertThatThrownBy(() -> new Article("제목", tooLongSubtitle, "본문", null, author, 1))
+            assertThatThrownBy(() -> new Article("제목", tooLongSubtitle, "본문", null, author, 1, false))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage(ErrorTag.ARTICLE_SUBTITLE_TOO_LONG.getMessage());
         }
@@ -92,7 +92,7 @@ class ArticleTest {
             Account author = AccountFixture.createUser();
 
             // when & then
-            assertThatThrownBy(() -> new Article("제목", "부제목", invalidContent, null, author, 1))
+            assertThatThrownBy(() -> new Article("제목", "부제목", invalidContent, null, author, 1, false))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage(ErrorTag.ARTICLE_CONTENT_BLANK.getMessage());
         }
@@ -106,7 +106,7 @@ class ArticleTest {
             String tooLongContent = "가".repeat(21846);
 
             // when & then
-            assertThatThrownBy(() -> new Article("제목", "부제목", tooLongContent, null, author, 1))
+            assertThatThrownBy(() -> new Article("제목", "부제목", tooLongContent, null, author, 1, false))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage(ErrorTag.ARTICLE_CONTENT_TOO_LONG.getMessage());
         }

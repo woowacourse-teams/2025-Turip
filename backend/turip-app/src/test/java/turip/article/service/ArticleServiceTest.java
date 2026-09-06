@@ -54,7 +54,7 @@ class ArticleServiceTest {
             String defaultThumbnailUrl = "https://turip.com/static/default-thumbnail.png";
             ReflectionTestUtils.setField(articleService, "defaultThumbnailUrl", defaultThumbnailUrl);
 
-            Article article = new Article("제목", "부제목", "본문", null, null, 1);
+            Article article = new Article("제목", "부제목", "본문", null, null, 1, false);
             ReflectionTestUtils.setField(article, "id", 1L);
             given(articleRepository.findFirstPageByIsPublishedTrue(PageRequest.of(0, size)))
                     .willReturn(new SliceImpl<>(List.of(article)));

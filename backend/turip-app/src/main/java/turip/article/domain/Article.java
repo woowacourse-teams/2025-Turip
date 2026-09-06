@@ -63,7 +63,8 @@ public class Article extends BaseTimeEntity {
             String content,
             String thumbnailUrl,
             Account author,
-            int displayOrder
+            int displayOrder,
+            boolean isPublished
     ) {
         validateTitle(title);
         validateSubtitle(subtitle);
@@ -75,11 +76,7 @@ public class Article extends BaseTimeEntity {
         this.thumbnailUrl = thumbnailUrl;
         this.author = author;
         this.displayOrder = displayOrder;
-        this.isPublished = false;
-    }
-
-    public void publish() {
-        this.isPublished = true;
+        this.isPublished = isPublished;
     }
 
     private void validateTitle(String title) {

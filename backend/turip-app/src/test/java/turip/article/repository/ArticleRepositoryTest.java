@@ -28,10 +28,7 @@ class ArticleRepositoryTest {
     private TestEntityManager entityManager;
 
     private Article createAndPersist(String title, int displayOrder, boolean isPublished) {
-        Article article = new Article(title, "부제목", "본문", null, null, displayOrder);
-        if (isPublished) {
-            article.publish();
-        }
+        Article article = new Article(title, "부제목", "본문", null, null, displayOrder, isPublished);
         entityManager.persist(article);
         return article;
     }
