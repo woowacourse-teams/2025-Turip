@@ -11,11 +11,12 @@ public class DateRangeCalculator {
     private DateRangeCalculator() {
     }
 
-    public static LocalDate lastWeekMonday() {
-        return LocalDate.now().with(DayOfWeek.MONDAY).minusWeeks(ONE_WEEK);
+    public record DateRange(LocalDate startDate, LocalDate endDate) {
     }
 
-    public static LocalDate lastWeekSunday() {
-        return lastWeekMonday().plusDays(DAYS_UNTIL_SUNDAY);
+    public static DateRange lastWeekRange() {
+        LocalDate lastWeekMonday = LocalDate.now().with(DayOfWeek.MONDAY).minusWeeks(ONE_WEEK);
+        LocalDate lastWeekSunday = lastWeekMonday.plusDays(DAYS_UNTIL_SUNDAY);
+        return new DateRange(lastWeekMonday, lastWeekSunday);
     }
 }

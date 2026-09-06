@@ -37,8 +37,9 @@ public class AdminBookmarkService {
                 .map(Account::getId)
                 .toList();
 
-        LocalDate lastWeekMonday = DateRangeCalculator.lastWeekMonday();
-        LocalDate lastWeekSunday = DateRangeCalculator.lastWeekSunday();
+        DateRangeCalculator.DateRange lastWeek = DateRangeCalculator.lastWeekRange();
+        LocalDate lastWeekMonday = lastWeek.startDate();
+        LocalDate lastWeekSunday = lastWeek.endDate();
 
         // 어드민 계정 중 지난주 기간에 해당 콘텐츠를 북마크한 계정의 id 조회
         Set<Long> bookmarkedAccountIds = favoriteContentRepository.findByAccountIdInAndContentIdAndCreatedAtBetween(
@@ -58,12 +59,13 @@ public class AdminBookmarkService {
 
         Optional<FavoriteContent> existing = favoriteContentRepository.findByAccountIdAndContentId(accountId,
                 contentId);
+        LocalDate lastWeekMonday = DateRangeCalculator.lastWeekRange().startDate();
         if (existing.isPresent()) {
-            existing.get().updateCreatedAt(DateRangeCalculator.lastWeekMonday());
+            existing.get().updateCreatedAt(lastWeekMonday);
             return;
         }
 
-        favoriteContentRepository.save(new FavoriteContent(DateRangeCalculator.lastWeekMonday(), admin, content));
+        favoriteContentRepository.save(new FavoriteContent(lastWeekMonday, admin, content));
     }
 
     @Transactional

@@ -79,8 +79,9 @@ public class ContentService {
 
     public WeeklyPopularFavoriteContentsResponse findWeeklyPopularFavoriteContents(Account account,
                                                                                    int topContentSize) {
-        LocalDate startDate = DateRangeCalculator.lastWeekMonday();
-        LocalDate endDate = DateRangeCalculator.lastWeekSunday();
+        DateRangeCalculator.DateRange lastWeek = DateRangeCalculator.lastWeekRange();
+        LocalDate startDate = lastWeek.startDate();
+        LocalDate endDate = lastWeek.endDate();
 
         List<Content> popularContents = favoriteContentRepository.findPopularContentsByFavoriteBetweenDatesWithLimit(
                 startDate, endDate, topContentSize);
