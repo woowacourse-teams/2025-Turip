@@ -14,6 +14,7 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
 
     @Query("""
             SELECT a FROM Article a
+            LEFT JOIN FETCH a.author
             WHERE (:onlyPublished = false OR a.isPublished = true)
             ORDER BY a.displayOrder ASC
             """)
@@ -21,6 +22,7 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
 
     @Query("""
             SELECT a FROM Article a
+            LEFT JOIN FETCH a.author
             WHERE (:onlyPublished = false OR a.isPublished = true) AND a.displayOrder > :cursorDisplayOrder
             ORDER BY a.displayOrder ASC
             """)
