@@ -220,6 +220,56 @@ public class FavoritePlaceController {
                     )
             ),
             @ApiResponse(
+                    responseCode = "400",
+                    description = "실패 예시",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "bad request 1",
+                                            summary = "turipId가 null인 경우",
+                                            value = """
+                                                    {
+                                                        "tag": "BAD_REQUEST",
+                                                        "message": "올바르지 않은 요청입니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "bad request 2",
+                                            summary = "placeIds가 null인 경우",
+                                            value = """
+                                                    {
+                                                        "tag": "BAD_REQUEST",
+                                                        "message": "올바르지 않은 요청입니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "bad request 3",
+                                            summary = "placeId가 null인 경우",
+                                            value = """
+                                                    {
+                                                        "tag": "BAD_REQUEST",
+                                                        "message": "올바르지 않은 요청입니다."
+                                                    }
+                                                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "bad request 4",
+                                            summary = "추가하려는 장소찜 수가 제한을 초과하는 경우",
+                                            value = """
+                                                    {
+                                                        "tag": "BAD_REQUEST",
+                                                        "message": "한 번에 추가할 수 있는 장소 개수를 초과했습니다."
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
                     responseCode = "401",
                     description = "실패 예시",
                     content = @Content(
