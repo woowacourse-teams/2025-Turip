@@ -85,13 +85,16 @@ public class FavoritePlaceService {
                                                              List<Long> favoriteFolderIds,
                                                              Long placeId) {
         List<Long> requestIds = favoriteFolderIds.stream().distinct().toList();
-        List<FavoriteFolder> requestFolders = favoriteFolderRepository.findAllByIdInWithLock(requestIds);
-        validateMultiFolder(account, requestFolders, requestIds);
-
         Place place = getPlaceById(placeId);
         List<FavoritePlace> existingPlaces = favoritePlaceRepository.findAllByPlaceAndAccount(place, account);
 
         Set<Long> affectedFolderIds = calculateAffectedFolderIds(existingPlaces, requestIds);
+        List<FavoriteFolder> lockedFolders = favoriteFolderRepository.findAllByIdInWithLock(affectedFolderIds.stream().toList());
+
+        List<FavoriteFolder> requestFolders = lockedFolders.stream()
+                .filter(folder -> requestIds.contains(folder.getId()))
+                .toList();
+        validateMultiFolder(account, requestFolders, requestIds);
 
         deleteRemovedFavoritePlaces(existingPlaces, requestIds);
         List<FavoritePlace> createdPlaces = createFavoritePlaces(place, existingPlaces, requestFolders, requestIds);
