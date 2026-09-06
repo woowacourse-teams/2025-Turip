@@ -1,0 +1,21 @@
+# Terraform state — S3 backend 사용. 로컬에 떨어지는 state도 혹시 몰라 제외
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+
+# 크래시 로그
+crash.log
+crash.*.log
+
+# 프로바이더/모듈 캐시
+.terraform/
+.terraform.lock.hcl
+
+# 로컬 오버라이드
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# 민감 값이 들어갈 수 있는 개인 tfvars
+*.auto.tfvars
