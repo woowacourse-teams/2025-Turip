@@ -1,6 +1,7 @@
 package turip.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.never;
@@ -12,11 +13,14 @@ import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.test.util.ReflectionTestUtils;
 import turip.account.domain.Account;
 import turip.account.domain.TuripMember;
@@ -28,10 +32,14 @@ import turip.article.repository.ArticlePlaceRepository;
 import turip.article.repository.ArticleRepository;
 import turip.article.repository.ArticleTagRepository;
 import turip.article.repository.TagRepository;
+import turip.common.exception.custom.NotFoundException;
 import turip.controller.dto.request.AdminArticleCreateRequest;
+import turip.controller.dto.response.AdminArticleResponse;
+import turip.controller.dto.response.AdminArticlesResponse;
 import turip.place.domain.Place;
 import turip.place.repository.PlaceRepository;
 import turip.util.fixture.AccountFixture;
+import turip.util.fixture.ArticleFixture;
 import turip.util.fixture.MemberFixture;
 import turip.util.fixture.PlaceFixture;
 import turip.util.fixture.TuripMemberFixture;
@@ -142,5 +150,100 @@ class AdminArticleServiceTest {
 
         // then
         verify(articlePlaceRepository, times(1)).save(any(ArticlePlace.class));
+    }
+
+    @DisplayName("아티클 목록 조회 기능 테스트")
+    @Nested
+    class FindArticles {
+
+        @DisplayName("lastId가 없으면 공개·비공개 상관없이 첫 페이지를 조회한다")
+        @Test
+        void findArticles1() {
+            // given
+            int size = 10;
+            Article publishedArticle = ArticleFixture.createWithId(1L, null);
+            Article unpublishedArticle = ArticleFixture.createWithId(2L, null);
+
+            when(articleRepository.findFirstPage(false, PageRequest.of(0, size)))
+                    .thenReturn(new SliceImpl<>(List.of(unpublishedArticle, publishedArticle)));
+            when(articleTagRepository.findAllByArticleIdIn(List.of(2L, 1L)))
+                    .thenReturn(List.of());
+
+            // when
+            AdminArticlesResponse response = adminArticleService.findArticles(size, null);
+
+            // then
+            assertThat(response.articles()).hasSize(2);
+        }
+
+        @DisplayName("lastId가 있으면 해당 아티클의 displayOrder 이후를 조회한다")
+        @Test
+        void findArticles2() {
+            // given
+            int size = 10;
+            Long lastId = 1L;
+            Article cursorArticle = ArticleFixture.createWithId(lastId, null);
+            Article nextArticle = ArticleFixture.createWithId(2L, null);
+
+            when(articleRepository.findById(lastId)).thenReturn(Optional.of(cursorArticle));
+            when(articleRepository.findNextPage(false, cursorArticle.getDisplayOrder(), PageRequest.of(0, size)))
+                    .thenReturn(new SliceImpl<>(List.of(nextArticle)));
+            when(articleTagRepository.findAllByArticleIdIn(List.of(2L)))
+                    .thenReturn(List.of());
+
+            // when
+            AdminArticlesResponse response = adminArticleService.findArticles(size, lastId);
+
+            // then
+            assertThat(response.articles()).hasSize(1);
+            assertThat(response.articles().getFirst().id()).isEqualTo(2L);
+        }
+
+        @DisplayName("존재하지 않는 lastId로 조회하면 NotFoundException을 발생시킨다")
+        @Test
+        void findArticles3() {
+            // given
+            Long lastId = 999L;
+            when(articleRepository.findById(lastId)).thenReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> adminArticleService.findArticles(10, lastId))
+                    .isInstanceOf(NotFoundException.class);
+        }
+    }
+
+    @DisplayName("아티클 상세 조회 기능 테스트")
+    @Nested
+    class GetArticle {
+
+        @DisplayName("비공개 아티클도 상세 정보를 반환한다")
+        @Test
+        void getArticle1() {
+            // given
+            Long articleId = 1L;
+            Article article = ArticleFixture.createWithId(articleId, null);
+
+            when(articleRepository.findById(articleId)).thenReturn(Optional.of(article));
+            when(articleTagRepository.findAllByArticleId(articleId)).thenReturn(List.of());
+            when(articlePlaceRepository.findAllByArticleId(articleId)).thenReturn(List.of());
+
+            // when
+            AdminArticleResponse response = adminArticleService.getArticle(articleId);
+
+            // then
+            assertThat(response.id()).isEqualTo(articleId);
+        }
+
+        @DisplayName("존재하지 않는 아티클을 조회하면 NotFoundException을 발생시킨다")
+        @Test
+        void getArticle2() {
+            // given
+            Long articleId = 999L;
+            when(articleRepository.findById(articleId)).thenReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> adminArticleService.getArticle(articleId))
+                    .isInstanceOf(NotFoundException.class);
+        }
     }
 }

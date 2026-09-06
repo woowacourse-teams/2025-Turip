@@ -69,10 +69,10 @@ public class ArticleService {
     private Slice<Article> findArticleSlice(Integer size, Long lastId) {
         PageRequest pageable = PageRequest.of(0, size);
         if (lastId == null) {
-            return articleRepository.findFirstPageByIsPublishedTrue(pageable);
+            return articleRepository.findFirstPage(true, pageable);
         }
         Article cursorArticle = findPublishedArticle(lastId);
-        return articleRepository.findNextPageByIsPublishedTrue(cursorArticle.getDisplayOrder(), pageable);
+        return articleRepository.findNextPage(true, cursorArticle.getDisplayOrder(), pageable);
     }
 
     private Article findPublishedArticle(Long articleId) {

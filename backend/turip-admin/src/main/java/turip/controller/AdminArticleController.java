@@ -3,12 +3,17 @@ package turip.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import turip.account.domain.TuripMember;
 import turip.controller.dto.request.AdminArticleCreateRequest;
+import turip.controller.dto.response.AdminArticleResponse;
+import turip.controller.dto.response.AdminArticlesResponse;
 import turip.resolver.AuthAdmin;
 import turip.service.AdminArticleService;
 
@@ -23,5 +28,19 @@ public class AdminArticleController {
     public ResponseEntity<Long> create(@AuthAdmin TuripMember admin, @RequestBody AdminArticleCreateRequest request) {
         Long articleId = adminArticleService.create(request, admin);
         return ResponseEntity.status(HttpStatus.CREATED).body(articleId);
+    }
+
+    @GetMapping
+    public ResponseEntity<AdminArticlesResponse> findArticles(
+            @AuthAdmin TuripMember admin,
+            @RequestParam(required = false, defaultValue = "10") Integer size,
+            @RequestParam(required = false) Long lastId
+    ) {
+        return ResponseEntity.ok(adminArticleService.findArticles(size, lastId));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<AdminArticleResponse> getArticle(@AuthAdmin TuripMember admin, @PathVariable Long id) {
+        return ResponseEntity.ok(adminArticleService.getArticle(id));
     }
 }
