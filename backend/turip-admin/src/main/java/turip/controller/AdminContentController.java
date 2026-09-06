@@ -1,10 +1,13 @@
 package turip.controller;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,6 +23,7 @@ import turip.service.AdminContentPendingService;
 import turip.service.AdminContentService;
 
 @Slf4j
+@Validated
 @RestController
 @RequestMapping("/api/v1/admin/contents")
 @RequiredArgsConstructor
@@ -46,7 +50,7 @@ public class AdminContentController {
             @AuthAdmin TuripMember admin,
             @RequestParam(name = "keyword", required = false) String keyword,
             @RequestParam(name = "lastId") long lastId,
-            @RequestParam(name = "size") int size
+            @RequestParam(name = "size") @Min(value = 1, message = "size는 1 이상이어야 합니다.") @Max(value = 10, message = "size는 10 이하여야 합니다.") int size
     ) {
         AdminContentsResponse response = adminContentService.findContents(keyword, lastId, size);
         return ResponseEntity.ok(response);
@@ -55,7 +59,7 @@ public class AdminContentController {
     @GetMapping("/popular")
     public ResponseEntity<AdminContentsResponse> findWeeklyPopularContents(
             @AuthAdmin TuripMember admin,
-            @RequestParam(name = "size") int size
+            @RequestParam(name = "size") @Min(value = 1, message = "size는 1 이상이어야 합니다.") @Max(value = 10, message = "size는 10 이하여야 합니다.") int size
     ) {
         AdminContentsResponse response = adminContentService.findWeeklyPopularContents(size);
         return ResponseEntity.ok(response);

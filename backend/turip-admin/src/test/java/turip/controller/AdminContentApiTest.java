@@ -180,6 +180,38 @@ class AdminContentApiTest {
                     .then()
                     .statusCode(403);
         }
+
+        @Test
+        @DisplayName("size가 1 미만이면 400 Bad Request를 응답한다")
+        void findContents3() {
+            // given
+            Long adminAccountId = testDataHelper.insertAccount(Role.ADMIN);
+            testDataHelper.insertTuripMember(adminAccountId, "admin@turip.com", false, "admin", "password123!");
+            String adminAccessToken = testDataHelper.createAccessToken(adminAccountId, Role.ADMIN);
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + adminAccessToken)
+                    .when().get("/api/v1/admin/contents?size=0&lastId=0")
+                    .then()
+                    .statusCode(400);
+        }
+
+        @Test
+        @DisplayName("size가 10을 초과하면 400 Bad Request를 응답한다")
+        void findContents4() {
+            // given
+            Long adminAccountId = testDataHelper.insertAccount(Role.ADMIN);
+            testDataHelper.insertTuripMember(adminAccountId, "admin@turip.com", false, "admin", "password123!");
+            String adminAccessToken = testDataHelper.createAccessToken(adminAccountId, Role.ADMIN);
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + adminAccessToken)
+                    .when().get("/api/v1/admin/contents?size=11&lastId=0")
+                    .then()
+                    .statusCode(400);
+        }
     }
 
     @Nested
@@ -243,6 +275,38 @@ class AdminContentApiTest {
                     .when().get("/api/v1/admin/contents/popular?size=10")
                     .then()
                     .statusCode(403);
+        }
+
+        @Test
+        @DisplayName("size가 1 미만이면 400 Bad Request를 응답한다")
+        void findWeeklyPopularContents3() {
+            // given
+            Long adminAccountId = testDataHelper.insertAccount(Role.ADMIN);
+            testDataHelper.insertTuripMember(adminAccountId, "admin@turip.com", false, "admin", "password123!");
+            String adminAccessToken = testDataHelper.createAccessToken(adminAccountId, Role.ADMIN);
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + adminAccessToken)
+                    .when().get("/api/v1/admin/contents/popular?size=0")
+                    .then()
+                    .statusCode(400);
+        }
+
+        @Test
+        @DisplayName("size가 10을 초과하면 400 Bad Request를 응답한다")
+        void findWeeklyPopularContents4() {
+            // given
+            Long adminAccountId = testDataHelper.insertAccount(Role.ADMIN);
+            testDataHelper.insertTuripMember(adminAccountId, "admin@turip.com", false, "admin", "password123!");
+            String adminAccessToken = testDataHelper.createAccessToken(adminAccountId, Role.ADMIN);
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + adminAccessToken)
+                    .when().get("/api/v1/admin/contents/popular?size=11")
+                    .then()
+                    .statusCode(400);
         }
     }
 }
