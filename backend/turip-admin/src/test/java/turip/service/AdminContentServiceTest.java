@@ -284,9 +284,11 @@ class AdminContentServiceTest {
             Content content1 = new Content(1L, creator, city, "메이의 서울 여행", "url1", LocalDate.now());
             Content content2 = new Content(2L, creator, city, "메이의 부산 여행", "url2", LocalDate.now());
 
-            given(favoriteContentRepository.findPopularContentsByFavoriteBetweenDatesWithLimit(startDate, endDate,
+            given(favoriteContentRepository.findPopularContentIdsByFavoriteBetweenDatesWithLimit(startDate, endDate,
                     size))
-                    .willReturn(List.of(content2, content1));
+                    .willReturn(List.of(2L, 1L));
+            given(contentRepository.findAllByIdIn(List.of(2L, 1L)))
+                    .willReturn(List.of(content1, content2));
 
             // when
             AdminContentsResponse response = adminContentService.findWeeklyPopularContents(size);

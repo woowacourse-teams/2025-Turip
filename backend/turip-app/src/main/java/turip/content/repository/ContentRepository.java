@@ -23,6 +23,9 @@ public interface ContentRepository extends JpaRepository<Content, Long> {
     @EntityGraph(attributePaths = {"creator", "city"}, type = EntityGraph.EntityGraphType.FETCH)
     Slice<Content> findAllByIdLessThanOrderByIdDesc(Long lastId, Pageable pageable);
 
+    @EntityGraph(attributePaths = {"creator", "city"}, type = EntityGraph.EntityGraphType.FETCH)
+    List<Content> findAllByIdIn(List<Long> ids);
+
     @Query("""
             SELECT COUNT(c) FROM Content c
             WHERE c.city.name = :cityName

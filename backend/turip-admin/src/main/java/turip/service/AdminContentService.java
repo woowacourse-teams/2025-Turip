@@ -4,7 +4,10 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
@@ -90,10 +93,10 @@ public class AdminContentService {
         LocalDate startDate = lastWeek.startDate();
         LocalDate endDate = lastWeek.endDate();
 
-        List<Content> popularContents = favoriteContentRepository.findPopularContentsByFavoriteBetweenDatesWithLimit(
+        List<Long> popularContentIds = favoriteContentRepository.findPopularContentIdsByFavoriteBetweenDatesWithLimit(
                 startDate, endDate, size);
 
-        List<AdminContentResponse> contents = popularContents.stream()
+        List<AdminContentResponse> contents = findContentsOrderedByPopularity(popularContentIds).stream()
                 .map(AdminContentResponse::from)
                 .toList();
         return AdminContentsResponse.of(contents, false);
@@ -189,5 +192,16 @@ public class AdminContentService {
         // 검색어가 존재하는 경우 boolean mode 기반 keyword search
         String booleanModeKeyword = contentRepository.createBooleanModeKeyword(keyword);
         return contentRepository.findByKeywordContaining(booleanModeKeyword, lastId, pageable);
+    }
+
+    private List<Content> findContentsOrderedByPopularity(List<Long> popularContentIds) {
+        Map<Long, Integer> orderById = new HashMap<>();
+        for (int i = 0; i < popularContentIds.size(); i++) {
+            orderById.put(popularContentIds.get(i), i);
+        }
+        // findAllByIdIn은 IN 절 순서를 보장하지 않으므로 찜 많은 순으로 다시 정렬한다
+        return contentRepository.findAllByIdIn(popularContentIds).stream()
+                .sorted(Comparator.comparing(content -> orderById.get(content.getId())))
+                .toList();
     }
 }

@@ -9,7 +9,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import turip.account.domain.Account;
-import turip.content.domain.Content;
 import turip.favorite.domain.FavoriteContent;
 
 public interface FavoriteContentRepository extends JpaRepository<FavoriteContent, Long> {
@@ -19,15 +18,14 @@ public interface FavoriteContentRepository extends JpaRepository<FavoriteContent
     Optional<FavoriteContent> findByAccountIdAndContentId(Long accountId, Long contentId);
 
     @Query(value = """
-            SELECT c.*
+            SELECT f.content_id
             FROM favorite_content f
-            JOIN content c ON f.content_id = c.id
             WHERE f.created_at BETWEEN :startDate AND :endDate
             GROUP BY f.content_id
             ORDER BY COUNT(*) DESC
             LIMIT :topContentSize
             """, nativeQuery = true)
-    List<Content> findPopularContentsByFavoriteBetweenDatesWithLimit(
+    List<Long> findPopularContentIdsByFavoriteBetweenDatesWithLimit(
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,
             @Param("topContentSize") int topContentSize
