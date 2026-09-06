@@ -64,6 +64,10 @@ public class FavoritePlaceService {
         favoriteFolderAccountService.validateMembership(account, favoriteFolder);
 
         List<Place> requestedPlaces = findPlacesByIdInRequestOrder(placeIds);
+        if (requestedPlaces.isEmpty()) {
+            return List.of();
+        }
+
         List<Place> placesToAdd = filterPlacesToAdd(favoriteFolder, requestedPlaces);
         List<FavoritePlace> savedFavoritePlaces = saveFavoritePlaces(favoriteFolder, placesToAdd);
 

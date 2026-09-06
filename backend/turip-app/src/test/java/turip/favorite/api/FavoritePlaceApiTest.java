@@ -551,6 +551,30 @@ class FavoritePlaceApiTest {
                     .then()
                     .statusCode(400);
         }
+
+        @DisplayName("요청한 placeIds가 모두 존재하지 않으면 빈 배열을 응답한다")
+        @Test
+        void batchCreate12() {
+            // given
+            Long accountId = testDataHelper.insertAccount();
+            jdbcTemplate.update("INSERT INTO guest (account_id, device_fid) VALUES (?, 'testDeviceFid')", accountId);
+            Long folderId = testDataHelper.insertFavoriteFolder("테스트 폴더");
+            testDataHelper.insertFavoriteFolderAccount(accountId, folderId, AccountRole.OWNER);
+
+            // when & then
+            Map<String, Object> request = new HashMap<>();
+            request.put("turipId", 1L);
+            request.put("placeIds", List.of(998L, 999L));
+
+            RestAssured.given().port(port)
+                    .header("device-fid", "testDeviceFid")
+                    .body(request)
+                    .contentType(ContentType.JSON)
+                    .when().post("/api/v1/turips/places/batch")
+                    .then()
+                    .statusCode(201)
+                    .body("size()", is(0));
+        }
     }
 
     @DisplayName("/api/v1/turips/places GET 장소 찜 폴더의 장소 찜 목록 조회 테스트")
