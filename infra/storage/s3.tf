@@ -34,6 +34,21 @@ resource "aws_s3_bucket_policy" "turip" {
         }
         Action   = "s3:PutObject"
         Resource = "${aws_s3_bucket.turip.arn}/*"
+      },
+      {
+        Sid       = "DenyInsecureTransport"
+        Effect    = "Deny"
+        Principal = "*"
+        Action    = "s3:*"
+        Resource = [
+          aws_s3_bucket.turip.arn,
+          "${aws_s3_bucket.turip.arn}/*",
+        ]
+        Condition = {
+          Bool = {
+            "aws:SecureTransport" = "false"
+          }
+        }
       }
     ]
   })
