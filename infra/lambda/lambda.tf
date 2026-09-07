@@ -4,6 +4,15 @@ data "archive_file" "dev_server_controller" {
   output_path = "${path.module}/build/dev-server-controller.zip"
 }
 
+resource "aws_secretsmanager_secret" "discord_bot_token" {
+  name = "${local.function_name}/discord-bot-token"
+}
+
+resource "aws_secretsmanager_secret_version" "discord_bot_token" {
+  secret_id     = aws_secretsmanager_secret.discord_bot_token.id
+  secret_string = var.discord_bot_token
+}
+
 resource "aws_lambda_layer_version" "pynacl" {
   layer_name          = "PyNaCl"
   filename            = "${path.module}/layers/pynacl-layer.zip"
@@ -26,13 +35,13 @@ resource "aws_lambda_function" "dev_server_controller" {
 
   environment {
     variables = {
-      DISCORD_PUBLIC_KEY = var.discord_public_key
-      DISCORD_BOT_TOKEN  = var.discord_bot_token
-      INSTANCE_ID        = local.dev_instance_id
-      SCHEDULER_ROLE_ARN = aws_iam_role.scheduler_invoke.arn
-      TARGET_LAMBDA_ARN  = local.function_arn
-      SCHEDULE_NAME      = var.schedule_name
-      AWS_REGION_NAME    = var.region
+      DISCORD_PUBLIC_KEY           = var.discord_public_key
+      DISCORD_BOT_TOKEN_SECRET_ARN = aws_secretsmanager_secret.discord_bot_token.arn
+      INSTANCE_ID                  = local.dev_instance_id
+      SCHEDULER_ROLE_ARN           = aws_iam_role.scheduler_invoke.arn
+      TARGET_LAMBDA_ARN            = local.function_arn
+      SCHEDULE_NAME                = var.schedule_name
+      AWS_REGION_NAME              = var.region
     }
   }
 

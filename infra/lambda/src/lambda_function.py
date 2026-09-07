@@ -5,7 +5,7 @@ Lambda 함수: dev-server-controller
 
 환경 변수:
   DISCORD_PUBLIC_KEY        - Discord General Information의 Public Key
-  DISCORD_BOT_TOKEN         - Discord Bot Token (후속 webhook 메시지 전송용)
+  DISCORD_BOT_TOKEN_SECRET_ARN - Discord Bot Token이 저장된 Secrets Manager 시크릿 ARN (후속 webhook 메시지 전송용)
   INSTANCE_ID               - 개발서버 EC2 인스턴스 ID (i-xxxx)
   SCHEDULER_ROLE_ARN        - dev-server-scheduler-invoke-role의 ARN
   TARGET_LAMBDA_ARN         - 이 람다 자신의 ARN (stop 액션을 자기 자신에게 다시 호출시키기 위함)
@@ -34,7 +34,7 @@ from nacl.exceptions import BadSignatureError
 import urllib.request
 
 DISCORD_PUBLIC_KEY = os.environ["DISCORD_PUBLIC_KEY"]
-DISCORD_BOT_TOKEN = os.environ["DISCORD_BOT_TOKEN"]
+DISCORD_BOT_TOKEN_SECRET_ARN = os.environ["DISCORD_BOT_TOKEN_SECRET_ARN"]
 INSTANCE_ID = os.environ["INSTANCE_ID"]
 SCHEDULER_ROLE_ARN = os.environ["SCHEDULER_ROLE_ARN"]
 TARGET_LAMBDA_ARN = os.environ["TARGET_LAMBDA_ARN"]
@@ -43,8 +43,12 @@ REGION = os.environ.get("AWS_REGION_NAME", "ap-northeast-2")
 
 ec2 = boto3.client("ec2", region_name=REGION)
 scheduler = boto3.client("scheduler", region_name=REGION)
+secretsmanager = boto3.client("secretsmanager", region_name=REGION)
 
 VERIFY_KEY = VerifyKey(bytes.fromhex(DISCORD_PUBLIC_KEY))
+DISCORD_BOT_TOKEN = secretsmanager.get_secret_value(
+    SecretId=DISCORD_BOT_TOKEN_SECRET_ARN
+)["SecretString"]
 
 
 # ---------- 공통 유틸 ----------

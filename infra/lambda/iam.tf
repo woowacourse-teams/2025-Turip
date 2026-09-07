@@ -42,6 +42,12 @@ resource "aws_iam_role_policy" "lambda" {
         Resource = "*"
       },
       {
+        Sid      = "GetDiscordBotToken"
+        Effect   = "Allow"
+        Action   = "secretsmanager:GetSecretValue"
+        Resource = aws_secretsmanager_secret.discord_bot_token.arn
+      },
+      {
         Sid    = "EC2StartStop"
         Effect = "Allow"
         Action = [
