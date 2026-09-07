@@ -256,6 +256,63 @@ class AdminArticleApiTest {
         }
     }
 
+    @Nested
+    @DisplayName("/api/v1/admin/articles/{id} DELETE 아티클 삭제 테스트")
+    class RemoveTest {
+
+        @Test
+        @DisplayName("관리자가 아티클을 삭제하면 204 No Content를 응답한다")
+        void remove1() {
+            // given
+            String adminAccessToken = createAdminAccessToken();
+            Long articleId = createArticle(adminAccessToken, false);
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + adminAccessToken)
+                    .when().delete("/api/v1/admin/articles/" + articleId)
+                    .then()
+                    .statusCode(204);
+
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + adminAccessToken)
+                    .when().get("/api/v1/admin/articles/" + articleId)
+                    .then()
+                    .statusCode(404);
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 아티클을 삭제하면 404 Not Found를 응답한다")
+        void remove2() {
+            // given
+            String adminAccessToken = createAdminAccessToken();
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + adminAccessToken)
+                    .when().delete("/api/v1/admin/articles/999")
+                    .then()
+                    .statusCode(404);
+        }
+
+        @Test
+        @DisplayName("관리자가 아닌 사용자가 아티클을 삭제하면 403 Forbidden을 응답한다")
+        void remove3() {
+            // given
+            String adminAccessToken = createAdminAccessToken();
+            Long articleId = createArticle(adminAccessToken, false);
+            Long userAccountId = testDataHelper.insertAccount(Role.USER);
+            String userAccessToken = testDataHelper.createAccessToken(userAccountId, Role.USER);
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + userAccessToken)
+                    .when().delete("/api/v1/admin/articles/" + articleId)
+                    .then()
+                    .statusCode(403);
+        }
+    }
+
     private String createAdminAccessToken() {
         Long adminAccountId = testDataHelper.insertAccount(Role.ADMIN);
         testDataHelper.insertTuripMember(adminAccountId, "admin@turip.com", false, "admin", "password123!");

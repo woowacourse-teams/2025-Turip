@@ -302,4 +302,36 @@ class AdminArticleServiceTest {
                     .isInstanceOf(NotFoundException.class);
         }
     }
+
+    @DisplayName("아티클 삭제 기능 테스트")
+    @Nested
+    class Remove {
+
+        @DisplayName("존재하는 아티클을 삭제한다")
+        @Test
+        void remove1() {
+            // given
+            Long articleId = 1L;
+            Article article = ArticleFixture.createWithId(articleId, null);
+            when(articleRepository.findById(articleId)).thenReturn(Optional.of(article));
+
+            // when
+            adminArticleService.remove(articleId);
+
+            // then
+            verify(articleRepository, times(1)).delete(article);
+        }
+
+        @DisplayName("존재하지 않는 아티클을 삭제하면 NotFoundException을 발생시킨다")
+        @Test
+        void remove2() {
+            // given
+            Long articleId = 999L;
+            when(articleRepository.findById(articleId)).thenReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> adminArticleService.remove(articleId))
+                    .isInstanceOf(NotFoundException.class);
+        }
+    }
 }

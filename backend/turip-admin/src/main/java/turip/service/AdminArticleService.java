@@ -123,6 +123,12 @@ public class AdminArticleService {
         return AdminArticleResponse.of(article, resolveThumbnailUrl(article), tagNames, places);
     }
 
+    @Transactional
+    public void remove(Long articleId) {
+        Article article = getById(articleId);
+        articleRepository.delete(article);
+    }
+
     private void saveArticleTags(Article article, List<String> tagNames) {
         if (tagNames.isEmpty()) {
             return;
