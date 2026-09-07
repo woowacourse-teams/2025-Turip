@@ -35,6 +35,9 @@ region:
 turip:
   article:
     default-thumbnail-url: ${ARTICLE_DEFAULT_THUMBNAIL_URL}
+    s3:
+      bucket: ${ARTICLE_S3_BUCKET}
+      region: ${ARTICLE_S3_REGION}
 
 jwt:
   secret-key: ${JWT_SECRET_KEY}

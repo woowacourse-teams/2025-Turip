@@ -54,6 +54,9 @@ csv:
 turip:
   article:
     default-thumbnail-url: https://test.example.com/article-default-thumbnail.jpg
+    s3:
+      bucket: test-bucket
+      region: ap-northeast-2
 
 # Region Category 기타 이미지 설정 (테스트용 더미 값)
 region:
