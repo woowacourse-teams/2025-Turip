@@ -21,4 +21,6 @@ override.tf.json
 *.auto.tfvars
 
 # archive_file data source 산출물(zip 빌드 결과)
-build/
+# 디렉터리 자체는 archive_file이 생성하지 않으므로 .gitkeep으로 존재를 보장
+build/*
+!build/.gitkeep
