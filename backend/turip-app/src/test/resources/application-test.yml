@@ -1,28 +1,18 @@
+# 테스트 공통 설정 (DB 설정은 h2 또는 mysql 프로필 참조)
+
 spring:
-  h2:
-    console:
-      enabled: true
-
-  datasource:
-    url: jdbc:h2:mem:database
-
-  sql:
-    init:
-      mode: never
-      data-locations: [ ]
-
-  jpa:
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-    hibernate:
-      ddl-auto: create-drop
-    defer-datasource-initialization: true
-
   # 테스트 환경에서 Flyway 비활성화
   flyway:
     enabled: false
+
+  jpa:
+    defer-datasource-initialization: true
+    hibernate:
+      ddl-auto: create-drop
+
+  sql:
+    init:
+      data-locations: [ ]
 
 # JWT 설정 (테스트용)
 jwt:
@@ -47,6 +37,11 @@ youtube:
   api:
     key: test-youtube-api-key
     url: https://test.youtube.com
+
+korea-tourism:
+  api:
+    key: test-korea-tourism-api-key
+    url: https://test.apis.data.go.kr
 
 apple:
   client-id: com.teamturip.test

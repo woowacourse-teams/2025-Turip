@@ -18,7 +18,7 @@ import turip.container.TestContainerConfig;
 import turip.favorite.domain.AccountRole;
 import turip.util.helper.TestDataHelper;
 
-@ActiveProfiles("test-mysql")
+@ActiveProfiles({"test", "test-mysql"})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class GuestApiTest extends TestContainerConfig {

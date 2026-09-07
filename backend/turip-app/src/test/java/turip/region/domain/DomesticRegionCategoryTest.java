@@ -43,4 +43,34 @@ class DomesticRegionCategoryTest {
         assertThat(DomesticRegionCategory.getDisplayNamesExcludingEtc())
                 .doesNotContain(DomesticRegionCategory.OTHER_DOMESTIC.getDisplayName());
     }
+
+    @DisplayName("한글 지역명으로 DomesticRegionCategory를 조회할 수 있다.")
+    @ParameterizedTest
+    @CsvSource({
+            "서울, SEOUL",
+            "부산, BUSAN",
+            "제주, JEJU",
+            "인천, INCHEON",
+            "대전, DAEJEON",
+            "전주, JEONJU",
+            "강릉, GANGNEUNG",
+            "속초, SOKCHO",
+            "경주, GYEONGJU"
+    })
+    void fromDisplayName1(String displayName, DomesticRegionCategory expected) {
+        // given & when
+        DomesticRegionCategory result = DomesticRegionCategory.fromDisplayName(displayName);
+
+        // then
+        assertThat(result).isEqualTo(expected);
+    }
+
+    @DisplayName("존재하지 않는 지역명으로 조회 시 예외를 발생시킨다.")
+    @ParameterizedTest
+    @ValueSource(strings = {"공주", "파리", "존재하지않는지역"})
+    void fromDisplayName2(String invalidName) {
+        // when & then
+        assertThatThrownBy(() -> DomesticRegionCategory.fromDisplayName(invalidName))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
 }

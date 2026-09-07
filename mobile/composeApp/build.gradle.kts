@@ -30,6 +30,9 @@ kotlin {
             implementation(project(":feature:turipdetail:impl"))
             implementation(project(":feature:trip:impl"))
         }
+        androidMain.dependencies {
+            implementation(libs.firebase.messaging)
+        }
     }
 }
 

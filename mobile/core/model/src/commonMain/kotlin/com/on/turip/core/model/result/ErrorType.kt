@@ -88,6 +88,17 @@ sealed interface ErrorType {
     }
 
     /**
+     * FCM 토큰에 대한 에러 타입
+     */
+    sealed interface FcmToken : ErrorType {
+        data object Blank : FcmToken
+
+        data object NotificationEnabledRequired : FcmToken
+
+        data object NotFound : FcmToken
+    }
+
+    /**
      * 네트워크 에러에 대한 에러 타입
      */
     data object Network : ErrorType

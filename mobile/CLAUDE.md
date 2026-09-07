@@ -13,13 +13,13 @@ mobile/
 ├── composeApp/                    # 앱 엔트리포인트 & DI 조립
 ├── core/
 │   ├── common/                    # NetworkError, 유틸, 확장함수
-│   ├── data/                      # Repository 구현체 (XxxDefaultRepository)
+│   ├── data/                      # Repository 구현체 (DefaultXxxRepository), DataSource 인터페이스
 │   ├── designsystem/              # 디자인 토큰, 테마, 공통 컴포넌트
 │   ├── domain/                    # Repository 인터페이스, UseCase
 │   ├── local/                     # Room DB, DataStore
 │   ├── model/                     # 공유 도메인 모델
 │   ├── navigation/                # NavKeyProvider 인터페이스
-│   ├── network/                   # Datasource 인터페이스/구현, DTO
+│   ├── network/                   # DataSource 구현체(datasourceimpl), Service, DTO
 │   └── ui/                        # BaseViewModel, 공통 UI 컴포넌트
 ├── feature/
 │   ├── feature1/
@@ -38,7 +38,7 @@ mobile/
 ### 레이어 의존 방향
 
 ```
-Screen → ViewModel → UseCase → Repository(interface) ← DefaultRepository → Datasource → HTTP
+Screen → ViewModel → UseCase → Repository(interface) ← DefaultXxxRepository → DataSource → HTTP
                                      ↑
                                core:domain          core:data          core:network
 ```
@@ -60,9 +60,9 @@ Screen → ViewModel → UseCase → Repository(interface) ← DefaultRepository
 | 이펙트 | `XxxEffect.kt` | `DiscussionListEffect.kt` |
 | UI 모델 | `XxxUiModel.kt` | `DiscussionUiModel.kt` |
 | Repository 인터페이스 | `XxxRepository.kt` | `DiscussionRepository.kt` |
-| Repository 구현체 | `XxxDefaultRepository.kt` | `DiscussionDefaultRepository.kt` |
-| Datasource 인터페이스 | `XxxDatasource.kt` | `DiscussionDatasource.kt` |
-| Datasource 구현체 | `XxxRemoteDatasource.kt` | `DiscussionRemoteDatasource.kt` |
+| Repository 구현체 | `DefaultXxxRepository.kt` | `DefaultDiscussionRepository.kt` |
+| DataSource 인터페이스 | `XxxRemoteDataSource.kt`, `XxxLocalDataSource.kt` | `DiscussionRemoteDataSource.kt` |
+| DataSource 구현체 | `DefaultXxxRemoteDataSource.kt` | `DefaultDiscussionRemoteDataSource.kt` |
 | DI 모듈 | `XxxModule.kt` | `DiscussionListModule.kt` |
 | NavKey | `XxxNavKey.kt` | `DiscussionListNavKey.kt` |
 | 컴포넌트 | `XxxTopAppBar.kt`, `XxxCard.kt` | `DiscussionCard.kt` |
@@ -188,11 +188,11 @@ interface DiscussionRepository {
 }
 
 // core:data — 구현체
-class DiscussionDefaultRepository(
-    private val discussionDatasource: DiscussionDatasource,
+class DefaultDiscussionRepository(
+    private val discussionRemoteDataSource: DiscussionRemoteDataSource,
 ) : DiscussionRepository {
     override suspend fun getDiscussions(...): Result<DiscussionCatalogCursorPage> =
-        discussionDatasource
+        discussionRemoteDataSource
             .getDiscussions(query = discussionCriteria.toQuery(), cursor = cursor, size = size)
             .mapCatching { it.toDomain() }  // DTO → Domain 변환, 예외도 Result로 감쌈
 }
@@ -345,10 +345,10 @@ feature/newfeature/
 
 ### 신규 API 엔드포인트 추가 시
 
-1. `core/network` — Datasource 인터페이스 메서드 추가 + RemoteDatasource 구현
+1. `core/data` — DataSource 인터페이스 메서드 추가 / `core/network` — `DefaultXxxRemoteDataSource` 구현
 2. `core/network` — Request/Response DTO 추가 (`@Serializable`)
 3. `core/domain` — Repository 인터페이스 메서드 추가
-4. `core/data` — DefaultRepository 구현 (`.mapCatching { it.toDomain() }`)
+4. `core/data` — `DefaultXxxRepository` 구현 (`.mapCatching { it.toDomain() }`)
 5. `core/model` — 필요 시 도메인 모델 추가
 
 ---

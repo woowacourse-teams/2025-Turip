@@ -23,7 +23,7 @@ import turip.common.exception.custom.NotFoundException;
 import turip.common.log.ExternalApiLoggingInterceptor;
 import turip.infrastructure.client.dto.YoutubeVideoSearchResponse;
 
-@ActiveProfiles("test")
+@ActiveProfiles({"test", "h2"})
 @RestClientTest(YoutubeVideoSearchClient.class)
 @Import({RestClientConfiguration.class, ExternalApiLoggingInterceptor.class})
 class YoutubeVideoSearchClientTest {
