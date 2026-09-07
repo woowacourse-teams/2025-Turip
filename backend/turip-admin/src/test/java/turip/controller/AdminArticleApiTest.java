@@ -360,6 +360,89 @@ class AdminArticleApiTest {
         }
     }
 
+    @Nested
+    @DisplayName("/api/v1/admin/articles/order PATCH 아티클 순서 재배치 테스트")
+    class ReorderTest {
+
+        @Test
+        @DisplayName("관리자가 순서를 재배치하면 200 OK를 응답하고 순서가 반영된다")
+        void reorder1() {
+            // given
+            // AdminArticleService.create()는 displayOrder를 findMinDisplayOrder()-1로 배정한다.
+            // 빈 DB에서 첫 생성(articleId1)은 0, 두 번째 생성(articleId2)은 -1이 된다.
+            String adminAccessToken = createAdminAccessToken();
+            Long articleId1 = createArticle(adminAccessToken, false);
+            Long articleId2 = createArticle(adminAccessToken, false);
+
+            Map<String, Object> request = Map.of(
+                    "orders", List.of(
+                            Map.of("id", articleId1, "displayOrder", -1),
+                            Map.of("id", articleId2, "displayOrder", 0)
+                    )
+            );
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + adminAccessToken)
+                    .contentType(ContentType.JSON)
+                    .body(request)
+                    .when().patch("/api/v1/admin/articles/order")
+                    .then()
+                    .statusCode(200);
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 id가 섞여 있으면 400 Bad Request를 응답한다")
+        void reorder2() {
+            // given
+            // 빈 DB에서 첫 생성이므로 articleId1의 displayOrder는 0이다.
+            String adminAccessToken = createAdminAccessToken();
+            Long articleId1 = createArticle(adminAccessToken, false);
+
+            Map<String, Object> request = Map.of(
+                    "orders", List.of(
+                            Map.of("id", articleId1, "displayOrder", 0),
+                            Map.of("id", 999999L, "displayOrder", -1)
+                    )
+            );
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + adminAccessToken)
+                    .contentType(ContentType.JSON)
+                    .body(request)
+                    .when().patch("/api/v1/admin/articles/order")
+                    .then()
+                    .statusCode(400);
+        }
+
+        @Test
+        @DisplayName("관리자가 아닌 사용자가 순서를 재배치하면 403 Forbidden을 응답한다")
+        void reorder3() {
+            // given
+            // 빈 DB에서 첫 생성이므로 articleId1의 displayOrder는 0이다.
+            String adminAccessToken = createAdminAccessToken();
+            Long articleId1 = createArticle(adminAccessToken, false);
+            Long userAccountId = testDataHelper.insertAccount(Role.USER);
+            String userAccessToken = testDataHelper.createAccessToken(userAccountId, Role.USER);
+
+            Map<String, Object> request = Map.of(
+                    "orders", List.of(
+                            Map.of("id", articleId1, "displayOrder", 0)
+                    )
+            );
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + userAccessToken)
+                    .contentType(ContentType.JSON)
+                    .body(request)
+                    .when().patch("/api/v1/admin/articles/order")
+                    .then()
+                    .statusCode(403);
+        }
+    }
+
     private String createAdminAccessToken() {
         Long adminAccountId = testDataHelper.insertAccount(Role.ADMIN);
         testDataHelper.insertTuripMember(adminAccountId, "admin@turip.com", false, "admin", "password123!");

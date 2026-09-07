@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import turip.account.domain.TuripMember;
 import turip.controller.dto.request.AdminArticleCreateRequest;
+import turip.controller.dto.request.AdminArticleOrderRequest;
 import turip.controller.dto.request.AdminArticleUpdateRequest;
 import turip.controller.dto.response.AdminArticleImageResponse;
 import turip.controller.dto.response.AdminArticleResponse;
@@ -71,5 +72,14 @@ public class AdminArticleController {
     ) {
         String url = adminArticleService.uploadImage(image);
         return ResponseEntity.status(HttpStatus.CREATED).body(AdminArticleImageResponse.from(url));
+    }
+
+    @PatchMapping("/order")
+    public ResponseEntity<Void> reorder(
+            @AuthAdmin TuripMember admin,
+            @RequestBody AdminArticleOrderRequest request
+    ) {
+        adminArticleService.reorder(request);
+        return ResponseEntity.ok().build();
     }
 }

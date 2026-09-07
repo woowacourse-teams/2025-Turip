@@ -117,4 +117,8 @@ public class Article extends BaseTimeEntity {
         this.thumbnailUrl = thumbnailUrl;
         this.isPublished = isPublished;
     }
+
+    public void reorder(int displayOrder) {
+        this.displayOrder = displayOrder;
+    }
 }

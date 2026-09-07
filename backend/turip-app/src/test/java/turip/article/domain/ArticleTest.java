@@ -39,6 +39,25 @@ class ArticleTest {
         }
     }
 
+    @DisplayName("reorder() 단위 테스트")
+    @Nested
+    class Reorder {
+
+        @DisplayName("displayOrder를 새 값으로 갱신한다.")
+        @Test
+        void reorder1() {
+            // given
+            Account author = AccountFixture.createUser();
+            Article article = new Article("제목", "부제목", "본문", null, author, 1, false);
+
+            // when
+            article.reorder(5);
+
+            // then
+            assertThat(article.getDisplayOrder()).isEqualTo(5);
+        }
+    }
+
     @DisplayName("validateTitle() 단위 테스트")
     @Nested
     class ValidateTitle {

@@ -3,6 +3,7 @@ package turip.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,8 +22,11 @@ import turip.article.repository.ArticleRepository;
 import turip.article.repository.ArticleTagRepository;
 import turip.article.repository.TagRepository;
 import turip.common.exception.ErrorTag;
+import turip.common.exception.custom.BadRequestException;
 import turip.common.exception.custom.NotFoundException;
 import turip.controller.dto.request.AdminArticleCreateRequest;
+import turip.controller.dto.request.AdminArticleOrderItem;
+import turip.controller.dto.request.AdminArticleOrderRequest;
 import turip.controller.dto.request.AdminArticleUpdateRequest;
 import turip.controller.dto.response.AdminArticleResponse;
 import turip.controller.dto.response.AdminArticleSummaryResponse;
@@ -136,6 +140,23 @@ public class AdminArticleService {
         return adminArticleImageUploader.upload(image);
     }
 
+    @Transactional
+    public void reorder(AdminArticleOrderRequest request) {
+        List<Long> requestIds = request.orders().stream()
+                .map(AdminArticleOrderItem::id)
+                .toList();
+
+        List<Article> articles = articleRepository.findAllById(requestIds);
+        validateReorderRequest(request, articles);
+
+        Map<Long, Integer> newDisplayOrderById = request.orders().stream()
+                .collect(Collectors.toMap(AdminArticleOrderItem::id, AdminArticleOrderItem::displayOrder));
+
+        for (Article article : articles) {
+            article.reorder(newDisplayOrderById.get(article.getId()));
+        }
+    }
+
     private void saveArticleTags(Article article, List<String> tagNames) {
         if (tagNames.isEmpty()) {
             return;
@@ -188,5 +209,22 @@ public class AdminArticleService {
     private Article getById(Long articleId) {
         return articleRepository.findById(articleId)
                 .orElseThrow(() -> new NotFoundException(ErrorTag.ARTICLE_NOT_FOUND));
+    }
+    
+    private void validateReorderRequest(AdminArticleOrderRequest request, List<Article> articles) {
+        if (articles.size() != request.orders().size()) {
+            throw new BadRequestException(ErrorTag.ARTICLE_ORDER_INVALID);
+        }
+
+        Set<Integer> currentDisplayOrders = articles.stream()
+                .map(Article::getDisplayOrder)
+                .collect(Collectors.toSet());
+        Set<Integer> requestedDisplayOrders = request.orders().stream()
+                .map(AdminArticleOrderItem::displayOrder)
+                .collect(Collectors.toSet());
+
+        if (!currentDisplayOrders.equals(requestedDisplayOrders)) {
+            throw new BadRequestException(ErrorTag.ARTICLE_ORDER_INVALID);
+        }
     }
 }

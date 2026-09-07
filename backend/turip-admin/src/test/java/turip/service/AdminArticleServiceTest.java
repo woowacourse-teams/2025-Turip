@@ -33,8 +33,11 @@ import turip.article.repository.ArticlePlaceRepository;
 import turip.article.repository.ArticleRepository;
 import turip.article.repository.ArticleTagRepository;
 import turip.article.repository.TagRepository;
+import turip.common.exception.custom.BadRequestException;
 import turip.common.exception.custom.NotFoundException;
 import turip.controller.dto.request.AdminArticleCreateRequest;
+import turip.controller.dto.request.AdminArticleOrderItem;
+import turip.controller.dto.request.AdminArticleOrderRequest;
 import turip.controller.dto.request.AdminArticleUpdateRequest;
 import turip.controller.dto.response.AdminArticleResponse;
 import turip.controller.dto.response.AdminArticlesResponse;
@@ -358,6 +361,75 @@ class AdminArticleServiceTest {
 
             // then
             assertThat(url).isEqualTo(expectedUrl);
+        }
+    }
+
+    @DisplayName("아티클 순서 재배치 기능 테스트")
+    @Nested
+    class Reorder {
+
+        @DisplayName("요청받은 id·displayOrder 집합이 DB 상태와 일치하면 순서를 반영한다")
+        @Test
+        void reorder1() {
+            // given
+            Article article1 = ArticleFixture.createWithId(1L, null);
+            ReflectionTestUtils.setField(article1, "displayOrder", 0);
+            Article article2 = ArticleFixture.createWithId(2L, null);
+            ReflectionTestUtils.setField(article2, "displayOrder", 1);
+
+            AdminArticleOrderRequest request = new AdminArticleOrderRequest(List.of(
+                    new AdminArticleOrderItem(1L, 1),
+                    new AdminArticleOrderItem(2L, 0)
+            ));
+
+            when(articleRepository.findAllById(List.of(1L, 2L))).thenReturn(List.of(article1, article2));
+
+            // when
+            adminArticleService.reorder(request);
+
+            // then
+            assertThat(article1.getDisplayOrder()).isEqualTo(1);
+            assertThat(article2.getDisplayOrder()).isEqualTo(0);
+        }
+
+        @DisplayName("요청에 존재하지 않는 id가 섞여 있으면 BadRequestException을 발생시킨다")
+        @Test
+        void reorder2() {
+            // given
+            Article article1 = ArticleFixture.createWithId(1L, null);
+            ReflectionTestUtils.setField(article1, "displayOrder", 0);
+
+            AdminArticleOrderRequest request = new AdminArticleOrderRequest(List.of(
+                    new AdminArticleOrderItem(1L, 0),
+                    new AdminArticleOrderItem(999L, 1)
+            ));
+
+            when(articleRepository.findAllById(List.of(1L, 999L))).thenReturn(List.of(article1));
+
+            // when & then
+            assertThatThrownBy(() -> adminArticleService.reorder(request))
+                    .isInstanceOf(BadRequestException.class);
+        }
+
+        @DisplayName("요청의 displayOrder 집합이 DB의 기존 집합과 다르면 BadRequestException을 발생시킨다")
+        @Test
+        void reorder3() {
+            // given
+            Article article1 = ArticleFixture.createWithId(1L, null);
+            ReflectionTestUtils.setField(article1, "displayOrder", 0);
+            Article article2 = ArticleFixture.createWithId(2L, null);
+            ReflectionTestUtils.setField(article2, "displayOrder", 1);
+
+            AdminArticleOrderRequest request = new AdminArticleOrderRequest(List.of(
+                    new AdminArticleOrderItem(1L, 5),
+                    new AdminArticleOrderItem(2L, 6)
+            ));
+
+            when(articleRepository.findAllById(List.of(1L, 2L))).thenReturn(List.of(article1, article2));
+
+            // when & then
+            assertThatThrownBy(() -> adminArticleService.reorder(request))
+                    .isInstanceOf(BadRequestException.class);
         }
     }
 }

@@ -87,6 +87,7 @@ public enum ErrorTag {
     VALIDATOR_NOT_VALID("해당 콘텐츠를 검증할 권한이 없습니다."),
     ARTICLE_IMAGE_INVALID_TYPE("이미지 파일만 업로드할 수 있습니다. (jpg, jpeg, png, webp, gif만 허용)"),
     ARTICLE_IMAGE_TOO_LARGE("이미지 파일의 최대 크기(10MB)를 초과했습니다."),
+    ARTICLE_ORDER_INVALID("요청한 아티클 순서 정보가 현재 목록과 일치하지 않습니다."),
 
     // 404 Not Found
     YOUTUBE_VIDEO_NOT_FOUND("유튜브 영상을 찾을 수 없습니다."),
