@@ -56,6 +56,16 @@ resource "aws_security_group_rule" "db_mysql" {
   description              = "mysql ${each.value} from was-sg-turip"
 }
 
+resource "aws_security_group_rule" "db_ssh" {
+  type              = "ingress"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp"
+  cidr_blocks       = ["10.0.0.183/32"] # prod EC2 private IP (infra/compute/terraform.tfvars 참조)
+  security_group_id = aws_security_group.db.id
+  description       = "ssh from prod only (bastion jump)"
+}
+
 resource "aws_security_group_rule" "db_egress" {
   type              = "egress"
   from_port         = 0
