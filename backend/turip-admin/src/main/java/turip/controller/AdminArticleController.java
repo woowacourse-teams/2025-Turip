@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import turip.account.domain.TuripMember;
 import turip.controller.dto.request.AdminArticleCreateRequest;
+import turip.controller.dto.request.AdminArticleUpdateRequest;
 import turip.controller.dto.response.AdminArticleResponse;
 import turip.controller.dto.response.AdminArticlesResponse;
 import turip.resolver.AuthAdmin;
@@ -42,5 +44,14 @@ public class AdminArticleController {
     @GetMapping("/{id}")
     public ResponseEntity<AdminArticleResponse> getArticle(@AuthAdmin TuripMember admin, @PathVariable Long id) {
         return ResponseEntity.ok(adminArticleService.getArticle(id));
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<AdminArticleResponse> update(
+            @AuthAdmin TuripMember admin,
+            @PathVariable Long id,
+            @RequestBody AdminArticleUpdateRequest request
+    ) {
+        return ResponseEntity.ok(adminArticleService.update(id, request));
     }
 }

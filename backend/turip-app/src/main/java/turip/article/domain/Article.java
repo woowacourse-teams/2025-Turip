@@ -105,4 +105,16 @@ public class Article extends BaseTimeEntity {
             throw new IllegalArgumentException(ErrorTag.ARTICLE_CONTENT_TOO_LONG);
         }
     }
+
+    public void update(String title, String subtitle, String content, String thumbnailUrl, boolean isPublished) {
+        validateTitle(title);
+        validateSubtitle(subtitle);
+        validateContent(content);
+
+        this.title = title;
+        this.subtitle = subtitle;
+        this.content = content;
+        this.thumbnailUrl = thumbnailUrl;
+        this.isPublished = isPublished;
+    }
 }

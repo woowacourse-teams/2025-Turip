@@ -1,5 +1,6 @@
 package turip.article.domain;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.jupiter.api.DisplayName;
@@ -14,6 +15,29 @@ import turip.common.exception.custom.IllegalArgumentException;
 import turip.util.fixture.AccountFixture;
 
 class ArticleTest {
+
+    @DisplayName("update() 단위 테스트")
+    @Nested
+    class Update {
+
+        @DisplayName("유효한 값으로 수정하면 필드가 모두 반영된다.")
+        @Test
+        void update1() {
+            // given
+            Account author = AccountFixture.createUser();
+            Article article = new Article("제목", "부제목", "본문", null, author, 1, false);
+
+            // when
+            article.update("새 제목", "새 부제목", "새 본문", "https://turip.com/new.png", true);
+
+            // then
+            assertThat(article.getTitle()).isEqualTo("새 제목");
+            assertThat(article.getSubtitle()).isEqualTo("새 부제목");
+            assertThat(article.getContent()).isEqualTo("새 본문");
+            assertThat(article.getThumbnailUrl()).isEqualTo("https://turip.com/new.png");
+            assertThat(article.isPublished()).isTrue();
+        }
+    }
 
     @DisplayName("validateTitle() 단위 테스트")
     @Nested

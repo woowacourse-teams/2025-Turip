@@ -12,4 +12,6 @@ public interface ArticlePlaceRepository extends JpaRepository<ArticlePlace, Long
 
     @EntityGraph(attributePaths = {"place"}, type = EntityGraph.EntityGraphType.FETCH)
     List<ArticlePlace> findAllByArticleId(Long articleId);
+
+    void deleteAllByArticleId(Long articleId);
 }

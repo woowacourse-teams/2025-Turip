@@ -1,6 +1,7 @@
 package turip.controller;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
 import io.restassured.RestAssured;
@@ -165,6 +166,93 @@ class AdminArticleApiTest {
                     .when().get("/api/v1/admin/articles/999")
                     .then()
                     .statusCode(404);
+        }
+    }
+
+    @Nested
+    @DisplayName("/api/v1/admin/articles/{id} PATCH 아티클 수정 테스트")
+    class UpdateTest {
+
+        @Test
+        @DisplayName("관리자가 아티클을 수정하면 200 OK와 수정된 아티클을 응답한다")
+        void update1() {
+            // given
+            String adminAccessToken = createAdminAccessToken();
+            Long articleId = createArticle(adminAccessToken, false);
+
+            Map<String, Object> request = Map.of(
+                    "title", "새 제목",
+                    "subtitle", "새 부제목",
+                    "content", "새 본문",
+                    "isPublished", true,
+                    "tagNames", List.of("여행"),
+                    "placeIds", List.of()
+            );
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + adminAccessToken)
+                    .contentType(ContentType.JSON)
+                    .body(request)
+                    .when().patch("/api/v1/admin/articles/" + articleId)
+                    .then()
+                    .statusCode(200)
+                    .body("title", is("새 제목"))
+                    .body("isPublished", is(true))
+                    .body("tags", hasSize(1));
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 아티클을 수정하면 404 Not Found를 응답한다")
+        void update2() {
+            // given
+            String adminAccessToken = createAdminAccessToken();
+
+            Map<String, Object> request = Map.of(
+                    "title", "새 제목",
+                    "subtitle", "새 부제목",
+                    "content", "새 본문",
+                    "isPublished", true,
+                    "tagNames", List.of(),
+                    "placeIds", List.of()
+            );
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + adminAccessToken)
+                    .contentType(ContentType.JSON)
+                    .body(request)
+                    .when().patch("/api/v1/admin/articles/999")
+                    .then()
+                    .statusCode(404);
+        }
+
+        @Test
+        @DisplayName("관리자가 아닌 사용자가 아티클을 수정하면 403 Forbidden을 응답한다")
+        void update3() {
+            // given
+            String adminAccessToken = createAdminAccessToken();
+            Long articleId = createArticle(adminAccessToken, false);
+            Long userAccountId = testDataHelper.insertAccount(Role.USER);
+            String userAccessToken = testDataHelper.createAccessToken(userAccountId, Role.USER);
+
+            Map<String, Object> request = Map.of(
+                    "title", "새 제목",
+                    "subtitle", "새 부제목",
+                    "content", "새 본문",
+                    "isPublished", true,
+                    "tagNames", List.of(),
+                    "placeIds", List.of()
+            );
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + userAccessToken)
+                    .contentType(ContentType.JSON)
+                    .body(request)
+                    .when().patch("/api/v1/admin/articles/" + articleId)
+                    .then()
+                    .statusCode(403);
         }
     }
 

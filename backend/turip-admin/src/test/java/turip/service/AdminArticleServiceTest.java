@@ -34,6 +34,7 @@ import turip.article.repository.ArticleTagRepository;
 import turip.article.repository.TagRepository;
 import turip.common.exception.custom.NotFoundException;
 import turip.controller.dto.request.AdminArticleCreateRequest;
+import turip.controller.dto.request.AdminArticleUpdateRequest;
 import turip.controller.dto.response.AdminArticleResponse;
 import turip.controller.dto.response.AdminArticlesResponse;
 import turip.place.domain.Place;
@@ -243,6 +244,61 @@ class AdminArticleServiceTest {
 
             // when & then
             assertThatThrownBy(() -> adminArticleService.getArticle(articleId))
+                    .isInstanceOf(NotFoundException.class);
+        }
+    }
+
+    @DisplayName("아티클 수정 기능 테스트")
+    @Nested
+    class Update {
+
+        @DisplayName("존재하는 아티클을 수정하면 필드와 태그/장소가 갱신된다")
+        @Test
+        void update1() {
+            // given
+            Long articleId = 1L;
+            Article article = ArticleFixture.createWithId(articleId, null);
+            AdminArticleUpdateRequest request = new AdminArticleUpdateRequest(
+                    "새 제목", "새 부제목", "새 본문", "https://turip.com/new.png", true,
+                    List.of("여행"), List.of(1L)
+            );
+
+            Tag existingTag = new Tag("여행");
+            ReflectionTestUtils.setField(existingTag, "id", 10L);
+            Place existingPlace = PlaceFixture.createWithId(1L);
+
+            when(articleRepository.findById(articleId)).thenReturn(Optional.of(article));
+            when(tagRepository.findAllByNameIn(List.of("여행"))).thenReturn(List.of(existingTag));
+            when(placeRepository.findAllById(List.of(1L))).thenReturn(List.of(existingPlace));
+            when(articleTagRepository.findAllByArticleId(articleId)).thenReturn(List.of());
+            when(articlePlaceRepository.findAllByArticleId(articleId)).thenReturn(List.of());
+
+            // when
+            AdminArticleResponse response = adminArticleService.update(articleId, request);
+
+            // then
+            assertThat(response.title()).isEqualTo("새 제목");
+            assertThat(response.subtitle()).isEqualTo("새 부제목");
+            assertThat(response.content()).isEqualTo("새 본문");
+            assertThat(response.isPublished()).isTrue();
+            verify(articleTagRepository, times(1)).deleteAllByArticleId(articleId);
+            verify(articlePlaceRepository, times(1)).deleteAllByArticleId(articleId);
+            verify(articleTagRepository, times(1)).save(any(ArticleTag.class));
+            verify(articlePlaceRepository, times(1)).save(any(ArticlePlace.class));
+        }
+
+        @DisplayName("존재하지 않는 아티클을 수정하면 NotFoundException을 발생시킨다")
+        @Test
+        void update2() {
+            // given
+            Long articleId = 999L;
+            AdminArticleUpdateRequest request = new AdminArticleUpdateRequest(
+                    "새 제목", "새 부제목", "새 본문", null, true, List.of(), List.of()
+            );
+            when(articleRepository.findById(articleId)).thenReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> adminArticleService.update(articleId, request))
                     .isInstanceOf(NotFoundException.class);
         }
     }

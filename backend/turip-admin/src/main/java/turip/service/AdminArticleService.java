@@ -22,6 +22,7 @@ import turip.article.repository.TagRepository;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.NotFoundException;
 import turip.controller.dto.request.AdminArticleCreateRequest;
+import turip.controller.dto.request.AdminArticleUpdateRequest;
 import turip.controller.dto.response.AdminArticleResponse;
 import turip.controller.dto.response.AdminArticleSummaryResponse;
 import turip.controller.dto.response.AdminArticlesResponse;
@@ -87,7 +88,29 @@ public class AdminArticleService {
     }
 
     public AdminArticleResponse getArticle(Long articleId) {
-        Article article = findArticle(articleId);
+        Article article = getById(articleId);
+
+        List<String> tagNames = articleTagRepository.findAllByArticleId(articleId).stream()
+                .map(articleTag -> articleTag.getTag().getName())
+                .toList();
+
+        List<PlaceResponse> places = articlePlaceRepository.findAllByArticleId(articleId).stream()
+                .map(articlePlace -> PlaceResponse.from(articlePlace.getPlace()))
+                .toList();
+
+        return AdminArticleResponse.of(article, resolveThumbnailUrl(article), tagNames, places);
+    }
+
+    @Transactional
+    public AdminArticleResponse update(Long articleId, AdminArticleUpdateRequest request) {
+        Article article = getById(articleId);
+        article.update(request.title(), request.subtitle(), request.content(), request.thumbnailUrl(),
+                request.isPublished());
+
+        articleTagRepository.deleteAllByArticleId(articleId);
+        articlePlaceRepository.deleteAllByArticleId(articleId);
+        saveArticleTags(article, request.tagNames());
+        saveArticlePlaces(article, request.placeIds());
 
         List<String> tagNames = articleTagRepository.findAllByArticleId(articleId).stream()
                 .map(articleTag -> articleTag.getTag().getName())
@@ -126,7 +149,7 @@ public class AdminArticleService {
         if (lastId == null) {
             return articleRepository.findFirstPage(false, pageable);
         }
-        Article cursorArticle = findArticle(lastId);
+        Article cursorArticle = getById(lastId);
         return articleRepository.findNextPage(false, cursorArticle.getDisplayOrder(), pageable);
     }
 
@@ -149,7 +172,7 @@ public class AdminArticleService {
         return article.getThumbnailUrl();
     }
 
-    private Article findArticle(Long articleId) {
+    private Article getById(Long articleId) {
         return articleRepository.findById(articleId)
                 .orElseThrow(() -> new NotFoundException(ErrorTag.ARTICLE_NOT_FOUND));
     }
