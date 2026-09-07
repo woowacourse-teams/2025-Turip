@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import turip.account.domain.TuripMember;
 import turip.article.domain.Article;
 import turip.article.domain.ArticlePlace;
@@ -26,6 +27,7 @@ import turip.controller.dto.request.AdminArticleUpdateRequest;
 import turip.controller.dto.response.AdminArticleResponse;
 import turip.controller.dto.response.AdminArticleSummaryResponse;
 import turip.controller.dto.response.AdminArticlesResponse;
+import turip.infrastructure.AdminArticleImageUploader;
 import turip.place.controller.dto.response.PlaceResponse;
 import turip.place.domain.Place;
 import turip.place.repository.PlaceRepository;
@@ -39,6 +41,7 @@ public class AdminArticleService {
     private final ArticlePlaceRepository articlePlaceRepository;
     private final TagRepository tagRepository;
     private final PlaceRepository placeRepository;
+    private final AdminArticleImageUploader adminArticleImageUploader;
 
     @Value("${turip.article.default-thumbnail-url}")
     private String defaultThumbnailUrl;
@@ -127,6 +130,10 @@ public class AdminArticleService {
     public void remove(Long articleId) {
         Article article = getById(articleId);
         articleRepository.delete(article);
+    }
+
+    public String uploadImage(MultipartFile image) {
+        return adminArticleImageUploader.upload(image);
     }
 
     private void saveArticleTags(Article article, List<String> tagNames) {

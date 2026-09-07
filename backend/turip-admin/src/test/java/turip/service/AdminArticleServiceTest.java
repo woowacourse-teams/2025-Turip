@@ -21,6 +21,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.SliceImpl;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
 import turip.account.domain.Account;
 import turip.account.domain.TuripMember;
@@ -37,6 +38,7 @@ import turip.controller.dto.request.AdminArticleCreateRequest;
 import turip.controller.dto.request.AdminArticleUpdateRequest;
 import turip.controller.dto.response.AdminArticleResponse;
 import turip.controller.dto.response.AdminArticlesResponse;
+import turip.infrastructure.AdminArticleImageUploader;
 import turip.place.domain.Place;
 import turip.place.repository.PlaceRepository;
 import turip.util.fixture.AccountFixture;
@@ -61,6 +63,8 @@ class AdminArticleServiceTest {
     private TagRepository tagRepository;
     @Mock
     private PlaceRepository placeRepository;
+    @Mock
+    private AdminArticleImageUploader adminArticleImageUploader;
 
     private TuripMember admin;
 
@@ -332,6 +336,28 @@ class AdminArticleServiceTest {
             // when & then
             assertThatThrownBy(() -> adminArticleService.remove(articleId))
                     .isInstanceOf(NotFoundException.class);
+        }
+    }
+
+    @DisplayName("아티클 이미지 업로드 기능 테스트")
+    @Nested
+    class UploadImage {
+
+        @DisplayName("이미지를 업로드하면 업로더가 반환한 URL을 그대로 반환한다")
+        @Test
+        void uploadImage1() {
+            // given
+            MockMultipartFile file = new MockMultipartFile(
+                    "image", "photo.png", "image/png", "dummy-image-bytes".getBytes()
+            );
+            String expectedUrl = "https://test-bucket.s3.ap-northeast-2.amazonaws.com/article/abc.png";
+            when(adminArticleImageUploader.upload(file)).thenReturn(expectedUrl);
+
+            // when
+            String url = adminArticleService.uploadImage(file);
+
+            // then
+            assertThat(url).isEqualTo(expectedUrl);
         }
     }
 }

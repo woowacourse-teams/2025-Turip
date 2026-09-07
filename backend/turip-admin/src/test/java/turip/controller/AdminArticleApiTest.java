@@ -3,6 +3,8 @@ package turip.controller;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -16,7 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import turip.account.domain.Role;
+import turip.infrastructure.AdminArticleImageUploader;
 import turip.util.helper.TestDataHelper;
 
 @ActiveProfiles({"test", "h2"})
@@ -31,6 +35,9 @@ class AdminArticleApiTest {
 
     @Autowired
     private TestDataHelper testDataHelper;
+
+    @MockitoBean
+    private AdminArticleImageUploader adminArticleImageUploader;
 
     @BeforeEach
     void setUp() {
@@ -308,6 +315,46 @@ class AdminArticleApiTest {
             RestAssured.given().port(port)
                     .header("Authorization", "Bearer " + userAccessToken)
                     .when().delete("/api/v1/admin/articles/" + articleId)
+                    .then()
+                    .statusCode(403);
+        }
+    }
+
+    @Nested
+    @DisplayName("/api/v1/admin/articles/images POST 아티클 이미지 업로드 테스트")
+    class UploadImageTest {
+
+        @Test
+        @DisplayName("관리자가 이미지를 업로드하면 201 Created와 업로드된 이미지 URL을 응답한다")
+        void uploadImage1() {
+            // given
+            String adminAccessToken = createAdminAccessToken();
+            String expectedUrl = "https://test-bucket.s3.ap-northeast-2.amazonaws.com/article/abc.png";
+            when(adminArticleImageUploader.upload(any()))
+                    .thenReturn(expectedUrl);
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + adminAccessToken)
+                    .multiPart("image", "photo.png", "dummy-image-bytes".getBytes(), "image/png")
+                    .when().post("/api/v1/admin/articles/images")
+                    .then()
+                    .statusCode(201)
+                    .body("url", is(expectedUrl));
+        }
+
+        @Test
+        @DisplayName("관리자가 아닌 사용자가 이미지를 업로드하면 403 Forbidden을 응답한다")
+        void uploadImage2() {
+            // given
+            Long userAccountId = testDataHelper.insertAccount(Role.USER);
+            String userAccessToken = testDataHelper.createAccessToken(userAccountId, Role.USER);
+
+            // when & then
+            RestAssured.given().port(port)
+                    .header("Authorization", "Bearer " + userAccessToken)
+                    .multiPart("image", "photo.png", "dummy-image-bytes".getBytes(), "image/png")
+                    .when().post("/api/v1/admin/articles/images")
                     .then()
                     .statusCode(403);
         }

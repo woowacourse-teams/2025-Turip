@@ -12,9 +12,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import turip.account.domain.TuripMember;
 import turip.controller.dto.request.AdminArticleCreateRequest;
 import turip.controller.dto.request.AdminArticleUpdateRequest;
+import turip.controller.dto.response.AdminArticleImageResponse;
 import turip.controller.dto.response.AdminArticleResponse;
 import turip.controller.dto.response.AdminArticlesResponse;
 import turip.resolver.AuthAdmin;
@@ -60,5 +62,14 @@ public class AdminArticleController {
     public ResponseEntity<Void> remove(@AuthAdmin TuripMember admin, @PathVariable Long id) {
         adminArticleService.remove(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/images")
+    public ResponseEntity<AdminArticleImageResponse> uploadImage(
+            @AuthAdmin TuripMember admin,
+            @RequestParam("image") MultipartFile image
+    ) {
+        String url = adminArticleService.uploadImage(image);
+        return ResponseEntity.status(HttpStatus.CREATED).body(AdminArticleImageResponse.from(url));
     }
 }
