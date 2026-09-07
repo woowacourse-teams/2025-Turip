@@ -19,3 +19,6 @@ override.tf.json
 
 # 민감 값이 들어갈 수 있는 개인 tfvars
 *.auto.tfvars
+
+# archive_file data source 산출물(zip 빌드 결과)
+build/
