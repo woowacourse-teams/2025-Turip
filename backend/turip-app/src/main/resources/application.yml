@@ -15,6 +15,10 @@ spring:
   jackson:
     time-zone: Asia/Seoul
 
+turip:
+  article:
+    default-thumbnail-url: ${ARTICLE_DEFAULT_THUMBNAIL_URL}
+
 region:
   category:
     domestic:
