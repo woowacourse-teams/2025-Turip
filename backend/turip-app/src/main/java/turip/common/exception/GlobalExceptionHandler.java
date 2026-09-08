@@ -1,5 +1,7 @@
 package turip.common.exception;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.http.HttpStatus;
@@ -65,6 +67,15 @@ public class GlobalExceptionHandler {
         FieldError fieldError = e.getBindingResult().getFieldError();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponse(ErrorTag.BAD_REQUEST.name(), fieldError.getDefaultMessage()));
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException e) {
+        log.warn(e.getMessage(), e);
+
+        ConstraintViolation<?> violation = e.getConstraintViolations().iterator().next();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(ErrorTag.BAD_REQUEST.name(), violation.getMessage()));
     }
 
     @ExceptionHandler(RuntimeException.class)

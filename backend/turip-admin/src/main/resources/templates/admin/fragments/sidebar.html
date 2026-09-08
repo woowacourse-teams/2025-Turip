@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <style th:fragment="sidebar-style">
+        .layout {
+            display: flex;
+            padding-top: 64px;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 220px;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+            padding: 30px 0;
+            position: fixed;
+            top: 64px;
+            bottom: 0;
+            left: 0;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            margin: 0;
+            padding: 0;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 30px;
+            color: #666;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 600;
+            border-left: 4px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .sidebar-link i { width: 18px; text-align: center; color: #999; }
+
+        .sidebar-link:hover {
+            background: #f5f7ff;
+            color: #667eea;
+        }
+
+        .sidebar-link:hover i { color: #667eea; }
+
+        .sidebar-link.active {
+            background: #f0f3ff;
+            color: #667eea;
+            border-left-color: #667eea;
+        }
+
+        .sidebar-link.active i { color: #667eea; }
+
+        .main-content {
+            flex: 1;
+            margin-left: 220px;
+            padding: 40px 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="sidebar" th:fragment="sidebar(activeMenu)">
+    <ul class="sidebar-menu">
+        <li>
+            <a class="sidebar-link" th:classappend="${activeMenu == 'collect'} ? 'active'" href="/admin/contents">
+                <i class="fa-solid fa-plus"></i> 콘텐츠 수집
+            </a>
+        </li>
+        <li>
+            <a class="sidebar-link" th:classappend="${activeMenu == 'pending'} ? 'active'"
+               href="/admin/contents/pending">
+                <i class="fa-solid fa-list-check"></i> 검수 대기
+            </a>
+        </li>
+        <li>
+            <a class="sidebar-link" th:classappend="${activeMenu == 'popular'} ? 'active'"
+               href="/admin/contents/popular">
+                <i class="fa-solid fa-fire"></i> 인기 콘텐츠 관리
+            </a>
+        </li>
+    </ul>
+</div>
+</body>
+</html>
