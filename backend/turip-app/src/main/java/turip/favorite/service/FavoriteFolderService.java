@@ -178,7 +178,7 @@ public class FavoriteFolderService {
     @Transactional
     public FavoriteFolderResponse updateName(Account account, Long favoriteFolderId,
                                              FavoriteFolderNameRequest request) {
-        FavoriteFolder favoriteFolder = getById(favoriteFolderId);
+        FavoriteFolder favoriteFolder = getByIdWithLock(favoriteFolderId);
         if (favoriteFolder.isDefault()) {
             throw new BadRequestException(ErrorTag.DEFAULT_FAVORITE_FOLDER_OPERATION_NOT_ALLOWED);
         }
@@ -195,7 +195,7 @@ public class FavoriteFolderService {
 
     @Transactional
     public void remove(Account account, Long favoriteFolderId) {
-        FavoriteFolder favoriteFolder = getById(favoriteFolderId);
+        FavoriteFolder favoriteFolder = getByIdWithLock(favoriteFolderId);
         validateRemovableFolder(account, favoriteFolder);
         removeFavoriteFolderWithFavoritePlaces(favoriteFolderId, favoriteFolder);
         eventPublisher.publishEvent(FavoriteFolderUpdateEvent.of(favoriteFolderId, ActionType.FOLDER_DELETED));
