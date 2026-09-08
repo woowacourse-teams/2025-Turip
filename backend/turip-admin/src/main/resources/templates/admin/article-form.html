@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Turip Admin - 아티클 작성</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+        body {
+            background: linear-gradient(135deg, #becdfd, #ffffff);
+            min-height: 100vh;
+            font-family: 'Pretendard', sans-serif;
+        }
+
+        .header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            height: 64px;
+        }
+
+        .admin-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 35px;
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: #333;
+            margin-bottom: 25px;
+            border-left: 6px solid #6e8efb;
+            padding-left: 20px;
+        }
+
+        .field-label {
+            font-weight: 700;
+            color: #444;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .thumbnail-preview {
+            width: 160px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 10px;
+            background: #f1f1f1;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .content-image-gallery-label {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 8px;
+        }
+
+        .content-image-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .content-image-item {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: border-color 0.15s;
+        }
+
+        .content-image-item:hover {
+            border-color: #c7d2fe;
+        }
+
+        .content-image-item.selected {
+            border-color: #6e8efb;
+        }
+
+        .markdown-editor-row {
+            display: flex;
+            gap: 16px;
+        }
+
+        .markdown-editor-row textarea {
+            flex: 1;
+            height: 320px;
+            resize: none;
+            overflow-y: auto;
+            font-family: 'SFMono-Regular', Consolas, monospace;
+            font-size: 14px;
+        }
+
+        .markdown-preview {
+            flex: 1;
+            height: 320px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 16px;
+            overflow-y: auto;
+            background: #fafafa;
+        }
+
+        .markdown-preview img {
+            max-width: 100%;
+        }
+
+        .chip-input-box {
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            padding: 8px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .chip-input-box input {
+            border: none;
+            outline: none;
+            flex: 1;
+            min-width: 120px;
+            padding: 4px;
+        }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 50px;
+            background: #eef1ff;
+            color: #6e8efb;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .chip .chip-remove {
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .place-search-results {
+            border: 1px solid #eee;
+            border-radius: 8px;
+            max-height: 220px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+
+        .place-search-item {
+            padding: 10px 14px;
+            cursor: pointer;
+            border-bottom: 1px solid #f2f2f2;
+        }
+
+        .place-search-item:hover {
+            background: #f5f7ff;
+        }
+
+        .selected-place-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 14px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            margin-bottom: 6px;
+        }
+    </style>
+    <th:block th:replace="~{admin/fragments/sidebar :: sidebar-style}"></th:block>
+</head>
+<body>
+
+<div aria-atomic="true" aria-live="polite" class="position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+    <div class="toast align-items-center border-0" id="errorToast" role="alert">
+        <div class="d-flex">
+            <div class="toast-body fw-bold" id="toastMessage"></div>
+            <button aria-label="Close" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                    type="button"></button>
+        </div>
+    </div>
+</div>
+
+<div class="header">
+    <h1 style="color: #667eea; font-size: 22px; font-weight: 800; margin:0;">Turip Admin</h1>
+    <a class="btn btn-sm btn-outline-primary fw-bold" href="/admin/home">홈으로 돌아가기</a>
+</div>
+
+<div class="layout">
+    <div class="sidebar" th:replace="~{admin/fragments/sidebar :: sidebar(${activeMenu})}"></div>
+    <div class="main-content">
+        <div class="admin-card">
+            <h3 class="section-title" id="formTitle">새 아티클 작성</h3>
+
+            <div class="mb-3">
+                <label class="field-label">제목</label>
+                <input class="form-control" id="titleInput" type="text">
+            </div>
+
+            <div class="mb-3">
+                <label class="field-label">부제</label>
+                <input class="form-control" id="subtitleInput" type="text">
+            </div>
+
+            <div class="mb-3">
+                <div class="d-flex justify-content-between align-items-center" style="margin-bottom: 8px;">
+                    <label class="field-label" style="margin-bottom: 0;">본문 (마크다운)</label>
+                    <button class="btn btn-sm btn-outline-secondary" id="insertImageBtn" type="button">🖼 본문에 이미지 삽입</button>
+                </div>
+                <input accept="image/*" class="d-none" id="contentImageFileInput" type="file">
+                <div class="markdown-editor-row">
+                    <textarea class="form-control" id="contentInput" placeholder="마크다운 문법으로 작성하세요"></textarea>
+                    <div class="markdown-preview" id="contentPreview"></div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="field-label">썸네일</label>
+                <input accept="image/*" class="form-control" id="thumbnailFileInput" type="file">
+                <input id="thumbnailUrlInput" type="hidden">
+                <img alt="썸네일 미리보기" class="thumbnail-preview" id="thumbnailPreview">
+                <div id="contentImageGallery" style="margin-top: 12px;"></div>
+            </div>
+
+            <div class="mb-3">
+                <label class="field-label">공개 여부</label>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" id="isPublishedInput" type="checkbox">
+                    <label class="form-check-label" for="isPublishedInput">공개</label>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="field-label">태그</label>
+                <div class="chip-input-box" id="tagChipBox">
+                    <input id="tagInput" placeholder="태그 입력 후 Enter" type="text">
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="field-label">연관 장소</label>
+                <div class="input-group mb-2">
+                    <input class="form-control" id="placeQueryInput" onkeypress="if(event.keyCode==13) searchPlaces()"
+                           placeholder="장소명 검색" type="text">
+                    <button class="btn btn-outline-secondary" onclick="searchPlaces()" type="button">검색</button>
+                </div>
+                <div class="place-search-results d-none" id="placeSearchResults"></div>
+                <div id="selectedPlaceList" style="margin-top: 12px;"></div>
+            </div>
+
+            <button class="btn btn-primary btn-lg" id="saveBtn" onclick="saveArticle()">저장</button>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const articleId = /*[[${articleId}]]*/ null;
+    /*]]>*/
+
+    let selectedTags = [];
+    let selectedPlaces = [];
+
+    async function authFetch(url, options = {}) {
+        const response = await fetch(url, options);
+        if (!response.ok) {
+            let errorMessage = `[에러 ${response.status}] 서버 응답 실패`;
+            try {
+                const errorBody = await response.json();
+                if (errorBody && errorBody.message) {
+                    errorMessage = errorBody.message;
+                }
+            } catch (jsonError) {
+                // response body was not JSON, use default message
+            }
+            throw new Error(errorMessage);
+        }
+        return response;
+    }
+
+    function showErrorToast(message) {
+        const toastEl = document.getElementById('errorToast');
+        document.getElementById('toastMessage').textContent = '⚠️ ' + message;
+        toastEl.classList.remove('text-bg-success');
+        toastEl.classList.add('text-bg-danger');
+        bootstrap.Toast.getOrCreateInstance(toastEl, {delay: 5000}).show();
+    }
+
+    // ---- 본문 마크다운 미리보기 ----
+    const contentInput = document.getElementById('contentInput');
+    const contentPreview = document.getElementById('contentPreview');
+    contentInput.addEventListener('input', () => {
+        contentPreview.innerHTML = marked.parse(contentInput.value);
+        syncContentImageGalleryWithText();
+    });
+
+    // ---- 이미지 업로드 공통 함수 ----
+    async function uploadImage(file) {
+        const formData = new FormData();
+        formData.append('image', file);
+        const res = await authFetch('/api/v1/admin/articles/images', {method: 'POST', body: formData});
+        const data = await res.json();
+        return data.url;
+    }
+
+    // ---- 썸네일 업로드 ----
+    document.getElementById('thumbnailFileInput').addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        try {
+            const url = await uploadImage(file);
+            document.getElementById('thumbnailUrlInput').value = url;
+            const preview = document.getElementById('thumbnailPreview');
+            preview.src = url;
+            preview.style.display = 'block';
+        } catch (err) {
+            showErrorToast('썸네일 업로드에 실패했습니다: ' + err.message);
+        } finally {
+            e.target.value = '';
+        }
+    });
+
+    // ---- 본문 중간 이미지 삽입 ----
+    const contentImageFileInput = document.getElementById('contentImageFileInput');
+
+    document.getElementById('insertImageBtn').addEventListener('click', () => {
+        contentImageFileInput.click();
+    });
+
+    contentImageFileInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        try {
+            const url = await uploadImage(file);
+            insertMarkdownImageAtCursor(url, file.name);
+        } catch (err) {
+            showErrorToast('본문 이미지 업로드에 실패했습니다: ' + err.message);
+        } finally {
+            e.target.value = '';
+        }
+    });
+
+    function insertMarkdownImageAtCursor(url, altText) {
+        const markdownImage = `![${altText}](${url})`;
+        const start = contentInput.selectionStart;
+        const end = contentInput.selectionEnd;
+        const before = contentInput.value.slice(0, start);
+        const after = contentInput.value.slice(end);
+
+        contentInput.value = `${before}${markdownImage}${after}`;
+        contentPreview.innerHTML = marked.parse(contentInput.value);
+
+        const cursorPosition = start + markdownImage.length;
+        contentInput.focus();
+        contentInput.setSelectionRange(cursorPosition, cursorPosition);
+
+        addContentImageToGallery(url);
+    }
+
+    // ---- 본문 첨부 사진 중에서 썸네일 고르기 ----
+    let contentImageUrls = [];
+
+    function extractImageUrlsFromMarkdown(markdown) {
+        const urls = [];
+        const openBracket = String.fromCharCode(91);
+        const closeBracket = String.fromCharCode(93);
+        const patternSource = '!\\' + openBracket + '[^\\' + closeBracket + closeBracket
+            + '*\\' + closeBracket + '\\(([^)]+)\\)';
+        const pattern = new RegExp(patternSource, 'g');
+        let match;
+        while ((match = pattern.exec(markdown || '')) !== null) {
+            urls.push(match[1]);
+        }
+        return urls;
+    }
+
+    function addContentImageToGallery(url) {
+        if (contentImageUrls.includes(url)) return;
+        contentImageUrls.push(url);
+        renderContentImageGallery();
+    }
+
+    function renderContentImageGallery() {
+        const container = document.getElementById('contentImageGallery');
+        container.innerHTML = '';
+
+        if (contentImageUrls.length === 0) return;
+
+        const label = document.createElement('div');
+        label.className = 'content-image-gallery-label';
+        label.textContent = '본문에 첨부한 사진 중에서 고르기';
+        container.appendChild(label);
+
+        const gallery = document.createElement('div');
+        gallery.className = 'content-image-gallery';
+        const currentThumbnailUrl = document.getElementById('thumbnailUrlInput').value;
+
+        contentImageUrls.forEach(url => {
+            const img = document.createElement('img');
+            img.className = 'content-image-item';
+            if (url === currentThumbnailUrl) img.classList.add('selected');
+            img.src = url;
+            img.alt = '본문 첨부 사진';
+            img.onclick = () => selectThumbnailFromGallery(url);
+            gallery.appendChild(img);
+        });
+
+        container.appendChild(gallery);
+    }
+
+    function selectThumbnailFromGallery(url) {
+        document.getElementById('thumbnailUrlInput').value = url;
+        const preview = document.getElementById('thumbnailPreview');
+        preview.src = url;
+        preview.style.display = 'block';
+        renderContentImageGallery();
+    }
+
+    function syncContentImageGalleryWithText() {
+        const urlsInText = extractImageUrlsFromMarkdown(contentInput.value);
+        contentImageUrls = contentImageUrls.filter(url => urlsInText.includes(url));
+        urlsInText.forEach(url => {
+            if (!contentImageUrls.includes(url)) contentImageUrls.push(url);
+        });
+        renderContentImageGallery();
+    }
+
+    // ---- 태그 칩 입력 ----
+    const tagInput = document.getElementById('tagInput');
+    const tagChipBox = document.getElementById('tagChipBox');
+
+    tagInput.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' || e.isComposing) return;
+        e.preventDefault();
+        const value = tagInput.value.trim();
+        if (!value || selectedTags.includes(value)) {
+            tagInput.value = '';
+            return;
+        }
+        selectedTags.push(value);
+        tagInput.value = '';
+        renderTagChips();
+    });
+
+    function renderTagChips() {
+        tagChipBox.querySelectorAll('.chip').forEach(el => el.remove());
+        selectedTags.forEach(tag => {
+            const chip = document.createElement('span');
+            chip.className = 'chip';
+            const label = document.createElement('span');
+            label.textContent = tag;
+            const remove = document.createElement('span');
+            remove.className = 'chip-remove';
+            remove.textContent = '×';
+            remove.onclick = () => {
+                selectedTags = selectedTags.filter(t => t !== tag);
+                renderTagChips();
+            };
+            chip.appendChild(label);
+            chip.appendChild(remove);
+            tagChipBox.insertBefore(chip, tagInput);
+        });
+    }
+
+    // ---- 연관 장소 검색/선택 ----
+    async function searchPlaces() {
+        const query = document.getElementById('placeQueryInput').value.trim();
+        const resultsBox = document.getElementById('placeSearchResults');
+
+        try {
+            const params = new URLSearchParams({size: 20});
+            if (query) params.set('query', query);
+            const res = await authFetch(`/api/v1/admin/places?${params.toString()}`);
+            const places = await res.json();
+
+            resultsBox.innerHTML = '';
+            resultsBox.classList.remove('d-none');
+
+            if (places.length === 0) {
+                resultsBox.innerHTML = '<div class="place-search-item text-muted">검색 결과가 없습니다.</div>';
+                return;
+            }
+
+            places.forEach(place => {
+                const item = document.createElement('div');
+                item.className = 'place-search-item';
+                const strong = document.createElement('strong');
+                strong.textContent = place.name;
+                const small = document.createElement('small');
+                small.className = 'text-muted d-block';
+                small.textContent = place.address;
+                item.appendChild(strong);
+                item.appendChild(small);
+                item.onclick = () => addSelectedPlace(place);
+                resultsBox.appendChild(item);
+            });
+        } catch (err) {
+            showErrorToast('장소 검색에 실패했습니다: ' + err.message);
+        }
+    }
+
+    function addSelectedPlace(place) {
+        if (selectedPlaces.some(p => p.id === place.id)) return;
+        selectedPlaces.push(place);
+        renderSelectedPlaces();
+    }
+
+    function renderSelectedPlaces() {
+        const container = document.getElementById('selectedPlaceList');
+        container.innerHTML = '';
+        selectedPlaces.forEach(place => {
+            const row = document.createElement('div');
+            row.className = 'selected-place-item';
+
+            const nameSpan = document.createElement('span');
+            nameSpan.textContent = place.name;
+
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'btn btn-sm btn-outline-danger';
+            removeBtn.textContent = '삭제';
+            removeBtn.onclick = () => {
+                selectedPlaces = selectedPlaces.filter(p => p.id !== place.id);
+                renderSelectedPlaces();
+            };
+
+            row.appendChild(nameSpan);
+            row.appendChild(removeBtn);
+            container.appendChild(row);
+        });
+    }
+
+    // ---- 저장 ----
+    async function saveArticle() {
+        const saveBtn = document.getElementById('saveBtn');
+        const title = document.getElementById('titleInput').value.trim();
+        const subtitle = document.getElementById('subtitleInput').value.trim();
+        const content = contentInput.value;
+        const thumbnailUrl = document.getElementById('thumbnailUrlInput').value || null;
+        const isPublished = document.getElementById('isPublishedInput').checked;
+
+        if (!title) {
+            showErrorToast('제목을 입력하세요.');
+            return;
+        }
+
+        const payload = {
+            title,
+            subtitle,
+            content,
+            thumbnailUrl,
+            isPublished,
+            tagNames: selectedTags,
+            placeIds: selectedPlaces.map(p => p.id)
+        };
+
+        saveBtn.disabled = true;
+        try {
+            if (articleId) {
+                await authFetch(`/api/v1/admin/articles/${articleId}`, {
+                    method: 'PATCH',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+            } else {
+                await authFetch('/api/v1/admin/articles', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+            }
+            location.href = '/admin/articles';
+        } catch (err) {
+            showErrorToast('저장에 실패했습니다: ' + err.message);
+            saveBtn.disabled = false;
+        }
+    }
+
+    // ---- 수정 모드 초기 데이터 로드 ----
+    async function loadArticleForEdit() {
+        document.getElementById('formTitle').textContent = '아티클 수정';
+        try {
+            const res = await authFetch(`/api/v1/admin/articles/${articleId}`);
+            const article = await res.json();
+
+            document.getElementById('titleInput').value = article.title;
+            document.getElementById('subtitleInput').value = article.subtitle;
+            contentInput.value = article.content;
+            contentPreview.innerHTML = marked.parse(article.content || '');
+            document.getElementById('isPublishedInput').checked = article.isPublished;
+
+            if (article.thumbnailUrl) {
+                document.getElementById('thumbnailUrlInput').value = article.thumbnailUrl;
+                const preview = document.getElementById('thumbnailPreview');
+                preview.src = article.thumbnailUrl;
+                preview.style.display = 'block';
+            }
+
+            contentImageUrls = extractImageUrlsFromMarkdown(article.content);
+            renderContentImageGallery();
+
+            selectedTags = [...article.tags];
+            renderTagChips();
+
+            selectedPlaces = [...article.places];
+            renderSelectedPlaces();
+        } catch (err) {
+            showErrorToast('아티클 정보를 불러오지 못했습니다: ' + err.message);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        if (articleId) {
+            loadArticleForEdit();
+        }
+    });
+</script>
+</body>
+</html>
