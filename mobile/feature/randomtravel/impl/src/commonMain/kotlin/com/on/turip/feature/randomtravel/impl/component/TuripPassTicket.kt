@@ -3,7 +3,6 @@ package com.on.turip.feature.randomtravel.impl.component
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -178,8 +177,6 @@ internal fun TuripPassTicket(
 
             Spacer(modifier = Modifier.height(TuripTheme.spacing.large))
 
-            TicketBarcode(seed = destination.name)
-
             Text(
                 text =
                     stringResource(Res.string.random_travel_ticket_code)
@@ -338,44 +335,6 @@ private fun TicketPerforation(modifier: Modifier = Modifier) {
 }
 
 /**
- * 여행지 이름에서 만든 고정 패턴의 바코드. 같은 여행지는 항상 같은 모양으로 나온다.
- */
-@Composable
-private fun TicketBarcode(
-    seed: String,
-    modifier: Modifier = Modifier,
-) {
-    val barColor: Color = TuripTheme.colors.gray05
-    val barWeights: List<Float> = remember(seed) { seed.toBarWeights() }
-
-    Canvas(
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .height(BARCODE_HEIGHT),
-    ) {
-        val totalWeight: Float = barWeights.sum()
-        if (totalWeight <= 0f || barWeights.isEmpty()) return@Canvas
-
-        val gap: Float = BARCODE_GAP_RATIO * size.width / barWeights.size
-        val drawableWidth: Float = size.width - gap * (barWeights.size - 1)
-        var currentX = 0f
-
-        barWeights.forEachIndexed { index, weight ->
-            val barWidth: Float = drawableWidth * (weight / totalWeight)
-            if (index % 2 == 0) {
-                drawRect(
-                    color = barColor,
-                    topLeft = Offset(currentX, 0f),
-                    size = Size(barWidth, size.height),
-                )
-            }
-            currentX += barWidth + gap
-        }
-    }
-}
-
-/**
  * 좌우에 노치(반원 홈)가 파인 티켓 외곽선.
  */
 private data class TicketShape(
@@ -421,21 +380,11 @@ private fun RandomDestinationModel.serialNumber(): String =
         .toString()
         .padStart(SERIAL_DIGITS, '0')
 
-private fun String.toBarWeights(): List<Float> {
-    if (isEmpty()) return emptyList()
-
-    return List(BARCODE_BAR_COUNT) { index ->
-        val code: Int = (this[index % length].code * (index + 1) * BAR_SEED_MULTIPLIER)
-        MIN_BAR_WEIGHT + code.mod(BAR_WEIGHT_STEPS).toFloat()
-    }
-}
-
 private val TICKET_IMAGE_HEIGHT: Dp = 150.dp
 private val TICKET_CORNER_RADIUS: Dp = 16.dp
 private val NOTCH_RADIUS: Dp = 10.dp
 private val TICKET_ELEVATION: Dp = 8.dp
 private val PERFORATION_STROKE: Dp = 1.dp
-private val BARCODE_HEIGHT: Dp = 36.dp
 
 private const val PRINT_DURATION_MILLIS: Int = 900
 private const val SCRIM_TOP_ALPHA: Float = 0.35f
@@ -443,10 +392,5 @@ private const val SCRIM_BOTTOM_ALPHA: Float = 0.6f
 private const val SUBTLE_TEXT_ALPHA: Float = 0.75f
 private const val DASH_LENGTH: Float = 12f
 private const val DASH_GAP: Float = 10f
-private const val BARCODE_BAR_COUNT: Int = 47
-private const val BARCODE_GAP_RATIO: Float = 0.25f
-private const val MIN_BAR_WEIGHT: Float = 1f
-private const val BAR_WEIGHT_STEPS: Int = 3
-private const val BAR_SEED_MULTIPLIER: Int = 31
 private const val SERIAL_RANGE: Int = 10000
 private const val SERIAL_DIGITS: Int = 4
