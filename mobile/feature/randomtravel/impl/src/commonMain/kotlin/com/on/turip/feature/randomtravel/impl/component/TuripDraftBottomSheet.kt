@@ -81,7 +81,10 @@ private val TOGGLE_ICON_SIZE = 24.dp
  * `이 여행 시작하기`를 누르면 뜨는 확인 시트.
  *
  * 예전에는 곧장 영상으로 이동했는데, 지금은 영상의 장소를 담을 튜립을 여기서 한 번 확인받는다.
- * 담지 않고 영상만 보는 길([RandomTravelIntent.SkipTuripDraft])을 항상 함께 열어 둔다.
+ * 다만 아직 영상을 보지 않은 채로 담을 장소를 고르는 건 어색하므로, 결정을 미루고 영상부터 보러 가는
+ * 길([RandomTravelIntent.WatchVideoAndReturn])을 항상 함께 열어 둔다. 이 경우 시트 상태를 지우지 않고
+ * 영상으로 이동하며, 영상에서 뒤로 돌아오면(RandomTravelScreen이 Navigation 3 백스택에 남아있는 동안
+ * ViewModel도 살아있다) 같은 시트가 이어서 떠서 그때 다시 결정할 수 있다.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -176,7 +179,7 @@ private fun TuripDraftErrorContent(
             isLoading = false,
             onClick = { onIntent(RandomTravelIntent.RetryTuripDraftPlaces) },
         )
-        TuripDraftSkipButton(onIntent = onIntent)
+        TuripDraftWatchLaterButton(onIntent = onIntent)
     }
 }
 
@@ -264,7 +267,7 @@ private fun TuripDraftReadyContent(
         )
 
         if (!turipDraftUiState.isSaving) {
-            TuripDraftSkipButton(
+            TuripDraftWatchLaterButton(
                 onIntent = onIntent,
                 modifier = Modifier.padding(horizontal = SHEET_HORIZONTAL_PADDING),
             )
@@ -447,12 +450,12 @@ private fun TuripDraftPrimaryButton(
 }
 
 @Composable
-private fun TuripDraftSkipButton(
+private fun TuripDraftWatchLaterButton(
     onIntent: (RandomTravelIntent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     TextButton(
-        onClick = { onIntent(RandomTravelIntent.SkipTuripDraft) },
+        onClick = { onIntent(RandomTravelIntent.WatchVideoAndReturn) },
         modifier = modifier.fillMaxWidth(),
     ) {
         Text(

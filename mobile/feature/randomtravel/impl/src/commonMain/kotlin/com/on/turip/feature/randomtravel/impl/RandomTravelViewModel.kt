@@ -66,7 +66,7 @@ class RandomTravelViewModel(
             is RandomTravelIntent.ToggleTuripDraftPlace -> toggleTuripDraftPlace(intent.placeId)
             RandomTravelIntent.ToggleTuripDraftAllPlaces -> toggleTuripDraftAllPlaces()
             RandomTravelIntent.ConfirmTuripDraft -> confirmTuripDraft()
-            RandomTravelIntent.SkipTuripDraft -> skipTuripDraft()
+            RandomTravelIntent.WatchVideoAndReturn -> watchVideoAndReturn()
             RandomTravelIntent.DismissTuripDraft -> dismissTuripDraft()
             is RandomTravelIntent.SelectVideo -> selectVideo(intent.contentId)
         }
@@ -461,10 +461,9 @@ class RandomTravelViewModel(
         updateState { copy(turipDraftUiState = draft.copy(places = places)) }
     }
 
-    private fun skipTuripDraft() {
+    private fun watchVideoAndReturn() {
         val contentId: Long = currentState.selectedContentId ?: return
         turipDraftJob?.cancel()
-        updateState { copy(turipDraftUiState = TuripDraftUiState.Hidden) }
         emitEffect(RandomTravelEffect.NavigateToTripDetail(contentId))
     }
 

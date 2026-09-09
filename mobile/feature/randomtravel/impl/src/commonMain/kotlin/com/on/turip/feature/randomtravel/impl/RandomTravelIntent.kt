@@ -39,8 +39,11 @@ sealed interface RandomTravelIntent : UiIntent {
     /** 튜립을 만들어 장소를 담고 영상으로 이동 */
     data object ConfirmTuripDraft : RandomTravelIntent
 
-    /** 튜립을 만들지 않고 영상으로 이동 */
-    data object SkipTuripDraft : RandomTravelIntent
+    /**
+     * 결정을 미루고 영상부터 보러 간다.
+     * 시트 상태는 그대로 남겨 둬서, 영상에서 뒤로 돌아오면 같은 시트가 이어서 뜬다.
+     */
+    data object WatchVideoAndReturn : RandomTravelIntent
 
     data object DismissTuripDraft : RandomTravelIntent
 

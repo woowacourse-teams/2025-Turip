@@ -84,7 +84,7 @@
     <string name="random_travel_turip_draft_select_all">전체 선택</string>
     <string name="random_travel_turip_draft_clear_all">전체 해제</string>
     <string name="random_travel_turip_draft_confirm">담고 영상 보기</string>
-    <string name="random_travel_turip_draft_skip">영상만 보기</string>
+    <string name="random_travel_turip_draft_skip">영상 보고 오기</string>
     <string name="random_travel_turip_draft_places_error">장소를 불러오지 못했어요</string>
     <string name="random_travel_turip_draft_retry">다시 시도</string>
     <string name="random_travel_turip_created">\'%1$s\' 튜립에 %2$d곳을 담았어요</string>
