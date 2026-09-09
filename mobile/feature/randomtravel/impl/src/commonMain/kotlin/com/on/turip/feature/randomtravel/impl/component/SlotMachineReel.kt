@@ -30,10 +30,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
@@ -45,9 +44,12 @@ import com.on.turip.core.designsystem.theme.TuripTheme
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.isActive
+import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.ceil
+import kotlin.math.cos
 import kotlin.math.floor
+import kotlin.math.sin
 
 /**
  * 슬롯 릴의 회전 단계.
@@ -117,6 +119,10 @@ internal fun SlotMachineReel(
 /**
  * 지역명이 위아래로 움직이는 영역. 이 안에서만 릴이 움직이고, 위아래 끝은 기계 안쪽으로
  * 말려 들어가듯 서서히 사라진다.
+ *
+ * 칸은 평면이 아니라 원통 표면에 붙어 있다고 보고 그린다. 중앙에서 [DEGREES_PER_SLOT]씩 떨어진
+ * 각도로 매핑해 세로 위치는 `R·sin θ`, 기울기는 `-θ`, 크기·투명도는 `cos θ` 로 계산한다.
+ * 그래서 가운데는 정면으로 크게, 끝으로 갈수록 눕고 촘촘해지며 드럼이 굴러가는 입체감이 생긴다.
  */
 @Composable
 private fun ReelWindow(
@@ -180,6 +186,9 @@ private fun ReelWindow(
     val currentOffset: Float = reelOffset.value
     val baseIndex: Int = floor(currentOffset).toInt()
     val fraction: Float = currentOffset - baseIndex
+    // 드럼 반지름은 창 높이의 절반. 정확히 ±90°인 칸이 창 위아래 끝에 닿으므로 드럼의
+    // 앞면 절반이 창을 빈틈없이 채우고, 끝 칸은 완전히 눕는다.
+    val reelRadiusPx: Float = itemHeightPx * VISIBLE_ITEM_COUNT / 2f
 
     Box(
         modifier =
@@ -188,11 +197,18 @@ private fun ReelWindow(
                 .height(SLOT_ITEM_HEIGHT * VISIBLE_ITEM_COUNT)
                 .clip(TuripTheme.shape.chip)
                 .background(TuripTheme.colors.white)
-                // 위아래를 잘라내지 않고 흐리게 지워야 릴이 기계 안으로 이어지는 것처럼 보인다.
-                .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
+                // 칸 경계마다 얇은 홈. 릴 자체는 움직여도 기계의 창살은 제자리에 있다.
                 .drawWithContent {
+                    for (line in 1 until VISIBLE_ITEM_COUNT) {
+                        val y: Float = size.height * line / VISIBLE_ITEM_COUNT
+                        drawLine(
+                            color = SLOT_DIVIDER_COLOR,
+                            start = Offset(x = 0f, y = y),
+                            end = Offset(x = size.width, y = y),
+                            strokeWidth = SLOT_DIVIDER_WIDTH.toPx(),
+                        )
+                    }
                     drawContent()
-                    drawRect(brush = FadeMaskBrush, blendMode = BlendMode.DstIn)
                 }.clipToBounds(),
         contentAlignment = Alignment.Center,
     ) {
@@ -202,6 +218,11 @@ private fun ReelWindow(
 
             val index: Int = (baseIndex + delta).mod(displayNames.size)
             val distance: Float = abs(slotPosition)
+            val angleDegrees: Float = slotPosition * DEGREES_PER_SLOT
+            val angleCosine: Float = cos(angleDegrees * DEGREES_TO_RADIANS)
+
+            // 뒤로 넘어간 칸은 그리지 않는다.
+            if (angleCosine <= 0f) continue
 
             Text(
                 text = displayNames[index],
@@ -220,14 +241,26 @@ private fun ReelWindow(
                         .fillMaxWidth()
                         .padding(horizontal = TuripTheme.spacing.medium)
                         .graphicsLayer {
-                            translationY = slotPosition * itemHeightPx
-                            alpha = (1f - distance * FADE_PER_SLOT).coerceIn(0f, 1f)
-                            val scale: Float = (1f - distance * SHRINK_PER_SLOT).coerceIn(0f, 1f)
+                            cameraDistance = CAMERA_DISTANCE_MULTIPLIER * density
+                            translationY = reelRadiusPx * sin(angleDegrees * DEGREES_TO_RADIANS)
+                            rotationX = -angleDegrees
+                            alpha =
+                                (MIN_SLOT_ALPHA + (1f - MIN_SLOT_ALPHA) * angleCosine)
+                                    .coerceIn(0f, 1f)
+                            val scale: Float = MIN_SLOT_SCALE + (1f - MIN_SLOT_SCALE) * angleCosine
                             scaleX = scale
                             scaleY = scale
                         },
             )
         }
+
+        // 드럼이 안쪽으로 말려 들어가며 생기는 위아래 음영.
+        Box(
+            modifier =
+                Modifier
+                    .matchParentSize()
+                    .background(CylinderShadeBrush),
+        )
     }
 }
 
@@ -316,16 +349,27 @@ private fun nextStopOffset(
 private val IDLE_PLACEHOLDER_NAMES: ImmutableList<String> =
     persistentListOf("서울", "부산", "제주", "인천", "대전", "전주", "강릉", "속초")
 
-/** 위아래 끝을 서서히 지우는 마스크. DstIn 으로 그려 릴의 알파만 깎는다. */
-private val FadeMaskBrush: Brush =
+/**
+ * 원통 곡면의 명암. 끝으로 갈수록 급격히 어두워지고 가운데 두 칸 구간은 거의 흰색으로 남는다.
+ * 칸을 지우지 않고 어둡게만 덮기 때문에 시안처럼 맨 끝 지역명도 잘린 채 비쳐 보인다.
+ */
+private val CylinderShadeBrush: Brush =
     Brush.verticalGradient(
-        0f to Color.Transparent,
-        0.22f to Color.Black,
-        0.78f to Color.Black,
-        1f to Color.Transparent,
+        0f to Color.Black.copy(alpha = 0.42f),
+        0.08f to Color.Black.copy(alpha = 0.26f),
+        0.20f to Color.Black.copy(alpha = 0.09f),
+        0.36f to Color.Black.copy(alpha = 0.015f),
+        0.5f to Color.Transparent,
+        0.64f to Color.Black.copy(alpha = 0.015f),
+        0.80f to Color.Black.copy(alpha = 0.09f),
+        0.92f to Color.Black.copy(alpha = 0.26f),
+        1f to Color.Black.copy(alpha = 0.42f),
     )
 
-private val SLOT_ITEM_HEIGHT: Dp = 44.dp
+private val SLOT_DIVIDER_COLOR: Color = Color.Black.copy(alpha = 0.05f)
+private val SLOT_DIVIDER_WIDTH: Dp = 1.dp
+
+private val SLOT_ITEM_HEIGHT: Dp = 56.dp
 private val MACHINE_WIDTH: Dp = 200.dp
 private val MACHINE_PADDING: Dp = 8.dp
 private val BORDER_WIDTH: Dp = 1.dp
@@ -335,12 +379,24 @@ private val MARKER_WIDTH: Dp = 8.dp
 private val MARKER_HEIGHT: Dp = 12.dp
 
 private const val VISIBLE_ITEM_COUNT: Int = 5
-private const val DRAWN_ITEM_RANGE: Int = 3
+private const val DRAWN_ITEM_RANGE: Int = 4
 private const val SPIN_DURATION_MILLIS: Int = 2400
 private const val IDLE_STEP_DURATION_MILLIS: Int = 550
-private const val FADE_PER_SLOT: Float = 0.3f
-private const val SHRINK_PER_SLOT: Float = 0.06f
 private const val CENTER_SLOT_THRESHOLD: Float = 0.5f
+
+/**
+ * 한 칸이 차지하는 원통 각도. 값이 클수록 적은 칸으로 90°에 도달해 곡률이 강해진다.
+ * 24°면 중앙 이웃 칸 간격이 한 칸 높이와 거의 같아진다(`2.5 · sin 24° ≈ 1.02`).
+ */
+private const val DEGREES_PER_SLOT: Float = 24f
+private const val DEGREES_TO_RADIANS: Float = (PI / 180.0).toFloat()
+
+/** 원근 강도. 값이 작을수록 눕는 칸이 더 크게 왜곡된다. */
+private const val CAMERA_DISTANCE_MULTIPLIER: Float = 7f
+private const val MIN_SLOT_SCALE: Float = 0.82f
+
+/** 끝 칸도 음영 아래로 비쳐 보여야 하므로 완전히 투명해지지는 않는다. */
+private const val MIN_SLOT_ALPHA: Float = 0.55f
 
 /** 빠르게 시작해 끝에서 길게 감속하는 커브 */
 private val SpinEasing: Easing = CubicBezierEasing(0.05f, 0.7f, 0.1f, 1f)

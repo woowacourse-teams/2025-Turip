@@ -235,7 +235,8 @@ private fun RelatedSpotRow(
                 .background(
                     color = TuripTheme.colors.container,
                     shape = TuripTheme.shape.chip,
-                ).clickable { onMapClick() }.padding(TuripTheme.spacing.medium),
+                ).clickable { onMapClick() }
+                .padding(TuripTheme.spacing.medium),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
