@@ -135,24 +135,29 @@ internal fun TuripDraftBottomSheet(
             )
 
             when (turipDraftUiState) {
-                TuripDraftUiState.Hidden -> Unit
+                TuripDraftUiState.Hidden -> {
+                    Unit
+                }
 
-                TuripDraftUiState.Loading ->
+                TuripDraftUiState.Loading -> {
                     Box(
                         modifier = Modifier.fillMaxWidth().height(PLACE_LIST_MAX_HEIGHT),
                         contentAlignment = Alignment.Center,
                     ) {
                         TuripLoadingIndicator()
                     }
+                }
 
-                TuripDraftUiState.Error ->
+                TuripDraftUiState.Error -> {
                     TuripDraftErrorContent(onIntent = onIntent)
+                }
 
-                is TuripDraftUiState.Ready ->
+                is TuripDraftUiState.Ready -> {
                     TuripDraftReadyContent(
                         turipDraftUiState = turipDraftUiState,
                         onIntent = onIntent,
                     )
+                }
             }
         }
     }

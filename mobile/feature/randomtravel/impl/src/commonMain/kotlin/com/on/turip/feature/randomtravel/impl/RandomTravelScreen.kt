@@ -104,44 +104,58 @@ fun RandomTravelScreen(
     LaunchedEffect(Unit) {
         viewModel.effect.collectLatest { effect: RandomTravelEffect ->
             when (effect) {
-                RandomTravelEffect.PerformDestinationHaptic ->
+                RandomTravelEffect.PerformDestinationHaptic -> {
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                }
 
-                is RandomTravelEffect.NavigateToTripDetail -> onContentClick(effect.contentId)
-                is RandomTravelEffect.NavigateToTuripDetail -> onTuripClick(effect.turipId)
-                RandomTravelEffect.NavigateToLogin -> onNavigateToLoginScreen()
+                is RandomTravelEffect.NavigateToTripDetail -> {
+                    onContentClick(effect.contentId)
+                }
+
+                is RandomTravelEffect.NavigateToTuripDetail -> {
+                    onTuripClick(effect.turipId)
+                }
+
+                RandomTravelEffect.NavigateToLogin -> {
+                    onNavigateToLoginScreen()
+                }
 
                 // 스낵바 호스트가 앱 전역이라 다음 화면으로 이동한 뒤에도 결과가 그대로 보인다.
-                is RandomTravelEffect.ShowTuripCreated ->
+                is RandomTravelEffect.ShowTuripCreated -> {
                     snackbarDelegate.showSnackbar(
                         message =
                             when {
-                                effect.savedCount == 0 ->
+                                effect.savedCount == 0 -> {
                                     getString(
                                         Res.string.random_travel_turip_place_failed,
                                         effect.turipName,
                                     )
+                                }
 
-                                effect.savedCount == effect.requestedCount ->
+                                effect.savedCount == effect.requestedCount -> {
                                     getString(
                                         Res.string.random_travel_turip_created,
                                         effect.turipName,
                                         effect.savedCount,
                                     )
+                                }
 
-                                else ->
+                                else -> {
                                     getString(
                                         Res.string.random_travel_turip_created_partial,
                                         effect.turipName,
                                         effect.savedCount,
                                     )
+                                }
                             },
                     )
+                }
 
-                RandomTravelEffect.ShowTuripCreateFailed ->
+                RandomTravelEffect.ShowTuripCreateFailed -> {
                     snackbarDelegate.showSnackbar(
                         message = getString(Res.string.random_travel_turip_create_failed),
                     )
+                }
             }
         }
     }

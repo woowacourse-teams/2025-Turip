@@ -67,8 +67,14 @@ fun HomeScreen(
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collectLatest { uiEffect: HomeUiEffect ->
             when (uiEffect) {
-                HomeUiEffect.NavigateToLogin -> onNavigateToLoginScreen()
-                HomeUiEffect.NavigateToRandomTravel -> onRandomTravelClick()
+                HomeUiEffect.NavigateToLogin -> {
+                    onNavigateToLoginScreen()
+                }
+
+                HomeUiEffect.NavigateToRandomTravel -> {
+                    onRandomTravelClick()
+                }
+
                 HomeUiEffect.ShowRandomTravelUnavailable -> {
                     snackbarDelegate.showSnackbar(
                         message = getString(Res.string.home_random_travel_unavailable),

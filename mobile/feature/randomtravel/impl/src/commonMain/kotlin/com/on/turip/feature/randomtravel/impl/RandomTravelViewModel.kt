@@ -89,8 +89,10 @@ class RandomTravelViewModel(
 
                 val regions: List<RegionCategory> =
                     when (val result = regionRepository.loadRegionCategories(IS_DOMESTIC)) {
-                        is TuripResult.Success ->
+                        is TuripResult.Success -> {
                             result.value.filterNot { it.name == DOMESTIC_ETC_REGION_NAME }
+                        }
+
                         is TuripResult.Failure -> {
                             Napier.e("랜덤 여행 - 지역 목록 조회 실패", result.cause)
                             handlePreSpinError(result)
@@ -141,7 +143,10 @@ class RandomTravelViewModel(
 
             val videoCount: Int =
                 when (val result = contentRepository.loadContentsSizeByRegion(candidate.name)) {
-                    is TuripResult.Success -> result.value
+                    is TuripResult.Success -> {
+                        result.value
+                    }
+
                     is TuripResult.Failure -> {
                         Napier.e("랜덤 여행 - 콘텐츠 수 조회 실패: ${candidate.name}", result.cause)
                         handlePreSpinError(result)
@@ -306,7 +311,7 @@ class RandomTravelViewModel(
                             )
                         }
 
-                        is TuripResult.Failure ->
+                        is TuripResult.Failure -> {
                             if (result.errorType == ErrorType.Region.InvalidCategory) {
                                 Napier.d("랜덤 여행 - 연관 관광지 미지원 지역: $regionCategoryName")
                                 RelatedSpotsUiState.Unsupported
@@ -314,6 +319,7 @@ class RandomTravelViewModel(
                                 Napier.w("랜덤 여행 - 연관 관광지 조회 실패: $regionCategoryName", result.cause)
                                 RelatedSpotsUiState.Error
                             }
+                        }
                     }
 
                 updateState { copy(relatedSpotsUiState = relatedSpotsUiState) }
@@ -352,7 +358,10 @@ class RandomTravelViewModel(
                 }
 
                 when (val result: TuripResult<Trip> = contentRepository.loadTripInfo(contentId)) {
-                    is TuripResult.Success -> showTuripDraft(contentId, result.value)
+                    is TuripResult.Success -> {
+                        showTuripDraft(contentId, result.value)
+                    }
+
                     is TuripResult.Failure -> {
                         Napier.e("랜덤 여행 - 여행 장소 조회 실패", result.cause)
                         if (result.errorType.toUiError() == UiError.Global.TokenExpired) {
@@ -491,7 +500,10 @@ class RandomTravelViewModel(
 
                 val turip: Turip =
                     when (val result: TuripResult<Turip> = turipRepository.createTurip(turipName)) {
-                        is TuripResult.Success -> result.value
+                        is TuripResult.Success -> {
+                            result.value
+                        }
+
                         is TuripResult.Failure -> {
                             Napier.e("랜덤 여행 - 튜립 생성 실패: $turipName", result.cause)
                             handleTuripCreateFailure(result, draft)
@@ -504,7 +516,10 @@ class RandomTravelViewModel(
                         val result: TuripResult<List<Long>> =
                             turipRepository.createTuripPlaces(turip.id, placeIds)
                     ) {
-                        is TuripResult.Success -> result.value.size
+                        is TuripResult.Success -> {
+                            result.value.size
+                        }
+
                         is TuripResult.Failure -> {
                             Napier.e("랜덤 여행 - 장소 일괄 담기 실패: ${turip.id}", result.cause)
                             0
@@ -529,7 +544,7 @@ class RandomTravelViewModel(
         draft: TuripDraftUiState.Ready,
     ) {
         when {
-            failure.errorType == ErrorType.Turip.DuplicatedName ->
+            failure.errorType == ErrorType.Turip.DuplicatedName -> {
                 updateState {
                     copy(
                         turipDraftUiState =
@@ -539,6 +554,7 @@ class RandomTravelViewModel(
                             ),
                     )
                 }
+            }
 
             failure.errorType.toUiError() == UiError.Global.TokenExpired -> {
                 updateState { copy(turipDraftUiState = TuripDraftUiState.Hidden) }
@@ -573,13 +589,18 @@ class RandomTravelViewModel(
     private fun handleBriefingError(failure: TuripResult.Failure) {
         val briefingError: ErrorUiState =
             when (failure.errorType.toUiError()) {
-                UiError.Global.Network -> ErrorUiState.Network
+                UiError.Global.Network -> {
+                    ErrorUiState.Network
+                }
+
                 UiError.Global.TokenExpired -> {
                     navigateToLogin()
                     return
                 }
 
-                else -> ErrorUiState.Server
+                else -> {
+                    ErrorUiState.Server
+                }
             }
         updateState {
             copy(

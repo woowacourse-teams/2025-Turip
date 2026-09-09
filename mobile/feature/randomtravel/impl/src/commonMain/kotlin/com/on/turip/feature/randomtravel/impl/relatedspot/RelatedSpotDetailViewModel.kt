@@ -64,7 +64,10 @@ class RelatedSpotDetailViewModel(
                 updateState { copy(isLoading = true, errorUiState = ErrorUiState.None) }
 
                 when (val result = regionRepository.loadRelatedSpots(regionCategoryName)) {
-                    is TuripResult.Success -> handleLoadSuccess(result.value)
+                    is TuripResult.Success -> {
+                        handleLoadSuccess(result.value)
+                    }
+
                     is TuripResult.Failure -> {
                         Napier.e("연관 관광지 상세 - 조회 실패: $regionCategoryName", result.cause)
                         handleLoadFailure(result)
@@ -93,14 +96,22 @@ class RelatedSpotDetailViewModel(
     private fun handleLoadFailure(failure: TuripResult.Failure) {
         val errorUiState: ErrorUiState =
             when (failure.errorType.toUiError()) {
-                UiError.Global.Network -> ErrorUiState.Network
-                UiError.Global.Server -> ErrorUiState.Server
+                UiError.Global.Network -> {
+                    ErrorUiState.Network
+                }
+
+                UiError.Global.Server -> {
+                    ErrorUiState.Server
+                }
+
                 UiError.Global.TokenExpired -> {
                     navigateToLogin()
                     return
                 }
 
-                else -> ErrorUiState.Unexpected
+                else -> {
+                    ErrorUiState.Unexpected
+                }
             }
 
         updateState {
