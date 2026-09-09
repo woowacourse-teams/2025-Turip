@@ -69,7 +69,7 @@ fun NameEditorSheetContent(
     turipNameStatus: TuripNameStatusModel,
     isConfirmEnabled: Boolean,
     onNameChanged: (turipName: String) -> Unit,
-    onConfirmClick: () -> Unit,
+    onConfirmClick: (turipName: String) -> Unit,
     focusRequester: FocusRequester,
     modifier: Modifier = Modifier,
     onBack: (() -> Unit)? = null,
@@ -138,7 +138,10 @@ fun NameEditorSheetContent(
             // 되돌리면 iOS 에서 IME 의 marked text 와 상태가 어긋나 한글 조합이 깨진다.
             inputTransformation = InputTransformation.maxLength(maxLength),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-            onKeyboardAction = KeyboardActionHandler { if (isConfirmEnabled) onConfirmClick() },
+            onKeyboardAction =
+                KeyboardActionHandler {
+                    if (isConfirmEnabled) onConfirmClick(textFieldState.text.toString())
+                },
             decorator = TextFieldDecorator { innerTextField ->
                 Box(
                     modifier =
@@ -186,7 +189,7 @@ fun NameEditorSheetContent(
         }
 
         Button(
-            onClick = onConfirmClick,
+            onClick = { onConfirmClick(textFieldState.text.toString()) },
             enabled = isConfirmEnabled,
             shape = TuripTheme.shape.wideButton,
             colors =

@@ -138,12 +138,22 @@ class MyTuripViewModel(
         }
     }
 
-    fun addTurip() {
+    fun addTurip(name: String = uiState.value.inputTuripName) {
         val currentState = uiState.value
-        if (currentState.isCreatingTurip || !currentState.turipNameStatus.isConfirmEnabled) return
+        val editModels: List<TuripEditModel> =
+            currentState.turips
+                .filter { it.type != TuripType.TOGETHER }
+                .map { it.toEditModel() }
+        val status = TuripNameStatusModel.of(name, editModels)
+        if (currentState.isCreatingTurip || !status.isConfirmEnabled) return
 
-        _uiState.update { it.copy(isCreatingTurip = true) }
-        val name = currentState.inputTuripName
+        _uiState.update {
+            it.copy(
+                isCreatingTurip = true,
+                inputTuripName = name,
+                turipNameStatus = status,
+            )
+        }
 
         viewModelScope.launch {
             try {

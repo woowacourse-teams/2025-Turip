@@ -253,11 +253,17 @@ class TripDetailViewModel(
         }
     }
 
-    fun addTurip() {
+    fun addTurip(name: String = _uiState.value.addTuripInputName) {
         val currentState = _uiState.value
-        if (currentState.isCreatingTurip || !currentState.addTuripNameStatus.isConfirmEnabled) return
-        _uiState.update { it.copy(isCreatingTurip = true) }
-        val name = currentState.addTuripInputName
+        val status = TuripNameStatusModel.of(name, persistentListOf())
+        if (currentState.isCreatingTurip || !status.isConfirmEnabled) return
+        _uiState.update {
+            it.copy(
+                isCreatingTurip = true,
+                addTuripInputName = name,
+                addTuripNameStatus = status,
+            )
+        }
         viewModelScope.launch {
             turipRepository
                 .createTurip(name)

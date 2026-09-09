@@ -59,7 +59,7 @@ fun MoreOptionBottomSheet(
     turipNameStatus: TuripNameStatusModel,
     initialTuripName: String,
     onNameChanged: (name: String) -> Unit,
-    onConfirmClick: () -> Unit,
+    onConfirmClick: (name: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val focusRequester = remember { FocusRequester() }
