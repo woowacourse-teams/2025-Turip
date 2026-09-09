@@ -12,7 +12,6 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -64,6 +63,7 @@ import com.on.turip.core.designsystem.generated.resources.random_travel_ticket_s
 import com.on.turip.core.designsystem.generated.resources.random_travel_ticket_title
 import com.on.turip.core.designsystem.theme.TuripTheme
 import com.on.turip.core.ui.util.formatResource
+import com.on.turip.core.ui.util.noRippleClickable
 import com.on.turip.feature.randomtravel.impl.model.RandomDestinationModel
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
@@ -91,6 +91,19 @@ internal fun TicketDispenser(
 
     // 드래그 거리를 진행률로 환산하려면 티켓 높이가 필요하다. 배치된 뒤에 채워진다.
     var ticketHeightPx: Float by remember { mutableFloatStateOf(0f) }
+
+    // 티켓과 안내가 한 덩어리로 움직이도록 흔들림은 여기서 한 번만 만들어 둘 다에 넘긴다.
+    val bounceDistancePx: Float = with(LocalDensity.current) { BOUNCE_DISTANCE.toPx() }
+    val bounce: State<Float> =
+        rememberInfiniteTransition().animateFloat(
+            initialValue = 0f,
+            targetValue = if (reduceMotion) 0f else -bounceDistancePx,
+            animationSpec =
+                infiniteRepeatable(
+                    animation = tween(durationMillis = BOUNCE_DURATION_MILLIS),
+                    repeatMode = RepeatMode.Reverse,
+                ),
+        )
 
     LaunchedEffect(isDispensing, reduceMotion) {
         if (!isDispensing) {
@@ -142,6 +155,7 @@ internal fun TicketDispenser(
             if (destination != null) {
                 PullHint(
                     progress = dispenseProgress.asState(),
+                    bounceOffset = bounce,
                     ticketHeightPx = ticketHeightPx,
                     modifier = Modifier.align(Alignment.BottomCenter),
                 )
@@ -149,7 +163,7 @@ internal fun TicketDispenser(
                 TuripTicketStub(
                     destination = destination,
                     hintProgress = dispenseProgress.asState(),
-                    reduceMotion = reduceMotion,
+                    bounceOffset = bounce,
                     modifier =
                         Modifier
                             .width(TICKET_WIDTH)
@@ -172,7 +186,7 @@ internal fun TicketDispenser(
                                 }
                             }
                             // 드래그가 어려운 경우를 위한 대체 동작. 탭해도 끝까지 뽑힌다.
-                            .clickable(
+                            .noRippleClickable(
                                 onClickLabel = stringResource(Res.string.random_travel_ticket_pull_hint),
                             ) {
                                 scope.launch {
@@ -197,11 +211,12 @@ internal fun TicketDispenser(
  * 이동 영역의 위쪽이 아니라 **티켓의 드러난 윗변** 바로 위에 붙는다. 영역은 남는 공간을 모두 차지해서
  * 기기마다 높이가 다른데, 거기에 맞춰 두면 안내가 티켓에서 멀찍이 떨어져 무엇을 가리키는지 흐려진다.
  *
- * 진행률은 [State] 로 받아 그리기 단계에서만 읽는다. 드래그하는 동안 매 프레임 재구성되지 않는다.
+ * 진행률과 흔들림은 [State] 로 받아 그리기 단계에서만 읽는다. 드래그하는 동안 매 프레임 재구성되지 않는다.
  */
 @Composable
 private fun PullHint(
     progress: State<Float>,
+    bounceOffset: State<Float>,
     ticketHeightPx: Float,
     modifier: Modifier = Modifier,
 ) {
@@ -209,9 +224,12 @@ private fun PullHint(
         modifier =
             modifier
                 .graphicsLayer {
-                    // 티켓이 올라온 만큼 함께 밀려 올라간다.
-                    translationY = -(ticketHeightPx * progress.value) - HINT_GAP.toPx()
-                    alpha = hintAlpha(progress.value)
+                    val hintStrength: Float = hintAlpha(progress.value)
+                    // 티켓이 올라온 만큼 함께 밀려 올라가고, 흔들림도 티켓과 같은 값으로 따라간다.
+                    translationY =
+                        -(ticketHeightPx * progress.value) - HINT_GAP.toPx() +
+                        bounceOffset.value * hintStrength
+                    alpha = hintStrength
                 },
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -277,7 +295,7 @@ private fun DispenserSlot(
 private fun TuripTicketStub(
     destination: RandomDestinationModel,
     hintProgress: State<Float>,
-    reduceMotion: Boolean,
+    bounceOffset: State<Float>,
     modifier: Modifier = Modifier,
 ) {
     val ticketShape: Shape =
@@ -289,23 +307,11 @@ private fun TuripTicketStub(
             )
         }
 
-    val bounceDistancePx: Float = with(LocalDensity.current) { BOUNCE_DISTANCE.toPx() }
-    val bounce: State<Float> =
-        rememberInfiniteTransition().animateFloat(
-            initialValue = 0f,
-            targetValue = if (reduceMotion) 0f else -bounceDistancePx,
-            animationSpec =
-                infiniteRepeatable(
-                    animation = tween(durationMillis = BOUNCE_DURATION_MILLIS),
-                    repeatMode = RepeatMode.Reverse,
-                ),
-        )
-
     Column(
         modifier =
             modifier
                 // 걸쳐 있을 때만 흔들리고, 당기기 시작하면 곧바로 멈춘다.
-                .graphicsLayer { translationY = bounce.value * hintAlpha(hintProgress.value) }
+                .graphicsLayer { translationY = bounceOffset.value * hintAlpha(hintProgress.value) }
                 .shadow(elevation = STUB_ELEVATION, shape = ticketShape, clip = false)
                 .background(color = TuripTheme.colors.white, shape = ticketShape)
                 .border(width = STUB_BORDER_WIDTH, color = TuripTheme.colors.cardBorder, shape = ticketShape)

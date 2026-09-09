@@ -55,7 +55,7 @@
     <string name="random_travel_slot_dispensing">여행지가 정해졌어요!\n티켓을 뽑아 여행을 확인해보세요.</string>
     <string name="random_travel_confirmed_title">✨ Today's Destination</string>
     <string name="random_travel_ticket_title">TURIP PASS</string>
-    <string name="random_travel_ticket_pull_hint">티켓을 댕겨보세요</string>
+    <string name="random_travel_ticket_pull_hint">티켓을 당겨보세요</string>
     <string name="random_travel_ticket_destination_label">DESTINATION</string>
     <string name="random_travel_ticket_region_label">REGION</string>
     <string name="random_travel_ticket_video_label">VIDEOS</string>
