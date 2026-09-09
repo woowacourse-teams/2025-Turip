@@ -5,7 +5,6 @@ import com.on.turip.core.data.session.SessionManager
 import com.on.turip.core.domain.repository.ContentRepository
 import com.on.turip.core.domain.repository.RegionRepository
 import com.on.turip.core.domain.repository.TuripRepository
-import com.on.turip.core.domain.session.SessionState
 import com.on.turip.core.model.region.RegionCategory
 import com.on.turip.core.model.result.ErrorType
 import com.on.turip.core.model.result.TuripResult
@@ -335,16 +334,11 @@ class RandomTravelViewModel(
     /**
      * 예전에는 곧장 영상으로 이동했지만, 지금은 영상의 장소를 담을 튜립을 먼저 제안한다.
      *
-     * 튜립은 로그인한 회원만 가질 수 있고, 담을 장소가 없는 영상도 있다.
-     * 두 경우에는 제안할 것이 없으므로 예전처럼 바로 영상으로 이동한다.
+     * 튜립은 게스트도 device-fid 기준으로 가질 수 있으므로 세션과 무관하게 제안한다.
+     * 담을 장소가 없는 영상은 제안할 것이 없으므로 예전처럼 바로 영상으로 이동한다.
      */
     private fun startTrip() {
         val contentId: Long = currentState.selectedContentId ?: return
-
-        if (sessionManager.state.value != SessionState.Member) {
-            emitEffect(RandomTravelEffect.NavigateToTripDetail(contentId))
-            return
-        }
 
         turipDraftJob?.cancel()
         turipDraftJob =
