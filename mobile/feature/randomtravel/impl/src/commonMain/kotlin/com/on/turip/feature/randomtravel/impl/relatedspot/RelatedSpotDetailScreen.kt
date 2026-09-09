@@ -1,6 +1,7 @@
 package com.on.turip.feature.randomtravel.impl.relatedspot
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +26,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -229,10 +231,11 @@ private fun RelatedSpotRow(
         modifier =
             modifier
                 .fillMaxWidth()
+                .clip(TuripTheme.shape.chip)
                 .background(
                     color = TuripTheme.colors.container,
                     shape = TuripTheme.shape.chip,
-                ).padding(TuripTheme.spacing.medium),
+                ).clickable { onMapClick() }.padding(TuripTheme.spacing.medium),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
@@ -259,25 +262,20 @@ private fun RelatedSpotRow(
                     .weight(1f),
         )
 
-        IconButton(
-            onClick = onMapClick,
-            modifier = Modifier.size(MAP_ICON_BUTTON_SIZE),
-        ) {
-            Icon(
-                painter = painterResource(Res.drawable.btn_kakao_map_basic),
-                contentDescription = stringResource(Res.string.random_travel_related_spot_kakao_map_description),
-                tint = Color.Unspecified,
-                modifier = Modifier.size(MAP_ICON_SIZE),
-            )
-        }
+        Icon(
+            painter = painterResource(Res.drawable.btn_kakao_map_basic),
+            contentDescription = stringResource(Res.string.random_travel_related_spot_kakao_map_description),
+            tint = Color.Unspecified,
+            modifier = Modifier.size(MAP_ICON_SIZE),
+        )
     }
 }
 
-private fun String.toKakaoMapSearchUrl(): String = "$KAKAO_MAP_SEARCH_BASE_URL${encodeAsUrlComponent()}"
+private fun String.toKakaoMapSearchUrl(): String =
+    "$KAKAO_MAP_SEARCH_BASE_URL${replace(oldChar = '/', newChar = ' ').encodeAsUrlComponent()}"
 
 private val APP_BAR_ICON_SIZE = 36.dp
 private val ORDER_BADGE_SIZE = 24.dp
-private val MAP_ICON_BUTTON_SIZE = 28.dp
 private val MAP_ICON_SIZE = 20.dp
 private const val TOTAL_COUNT_ITEM_KEY: String = "total_count"
 private const val KAKAO_MAP_SEARCH_BASE_URL = "https://map.kakao.com/link/search/"
