@@ -24,7 +24,7 @@ sealed interface RandomTravelPhase {
     /** 결과가 확정돼 당첨 칸으로 감속 정지 (2~3초). 탭하면 즉시 [Confirmed] 로 건너뛴다. */
     data object Spinning : RandomTravelPhase
 
-    /** ✨ Today's Destination (0.3~0.5초) */
+    /** 여행지 확정. 배출구에서 티켓이 올라온다 (1.4초) */
     data object Confirmed : RandomTravelPhase
 
     /** 티켓 출력 + 여행 브리핑 */

@@ -6,6 +6,9 @@ sealed interface RandomTravelIntent : UiIntent {
     /** 슬롯 회전이 끝까지 재생됨 */
     data object FinishSlot : RandomTravelIntent
 
+    /** 배출구에 걸쳐 있는 티켓을 끝까지 당겨 뽑음 */
+    data object PullTicket : RandomTravelIntent
+
     /** 지역 목록 조회 실패 후 재시도 */
     data object RetryDraw : RandomTravelIntent
 

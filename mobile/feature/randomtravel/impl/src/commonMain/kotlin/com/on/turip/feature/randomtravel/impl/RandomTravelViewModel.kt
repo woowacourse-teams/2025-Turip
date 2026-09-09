@@ -27,7 +27,6 @@ import io.github.aakira.napier.Napier
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class RandomTravelViewModel(
@@ -55,6 +54,7 @@ class RandomTravelViewModel(
     override fun onIntent(intent: RandomTravelIntent) {
         when (intent) {
             RandomTravelIntent.FinishSlot -> confirmDestination()
+            RandomTravelIntent.PullTicket -> pullTicket()
             RandomTravelIntent.RetryDraw -> drawDestination()
             RandomTravelIntent.RetryBriefing -> retryBriefing()
             RandomTravelIntent.RetryRelatedSpots -> retryRelatedSpots()
@@ -181,19 +181,23 @@ class RandomTravelViewModel(
 
     /**
      * 슬롯 회전이 끝까지 재생된 뒤(FinishSlot) 호출된다.
+     *
+     * 여기서 바로 브리핑으로 넘기지 않는다. 티켓이 배출구에 걸쳐 나온 채로 기다리다가,
+     * 사용자가 [pullTicket] 으로 직접 뽑아야 다음 화면으로 넘어간다.
      */
     private fun confirmDestination() {
         if (currentState.phase != RandomTravelPhase.Spinning) return
 
         updateState { copy(phase = RandomTravelPhase.Confirmed) }
         emitEffect(RandomTravelEffect.PerformDestinationHaptic)
+    }
 
-        viewModelScope.launch {
-            delay(CONFIRM_DURATION_MILLIS)
-            if (currentState.phase == RandomTravelPhase.Confirmed) {
-                updateState { copy(phase = RandomTravelPhase.Briefing) }
-            }
-        }
+    /** 배출구에 걸쳐 있는 티켓을 끝까지 당겨 뽑았다. */
+    private fun pullTicket() {
+        if (currentState.phase != RandomTravelPhase.Confirmed) return
+
+        updateState { copy(phase = RandomTravelPhase.Briefing) }
+        emitEffect(RandomTravelEffect.PerformDestinationHaptic)
     }
 
     private fun retryBriefing() {
@@ -605,7 +609,7 @@ class RandomTravelViewModel(
         private const val DOMESTIC_ETC_REGION_NAME: String = "국내 기타"
         private const val MAX_DRAW_ATTEMPTS: Int = 3
         private const val REEL_SIZE: Int = 24
-        private const val CONFIRM_DURATION_MILLIS: Long = 400L
+
         private const val BRIEFING_PAGE_SIZE: Int = 20
         private const val INITIAL_LAST_ID: Long = 0L
         private const val TURIP_NAME_SUFFIX: String = " 여행"

@@ -310,7 +310,7 @@ private fun TicketInfoColumn(
 
 /** 절취선. 좌우 노치와 같은 높이에 그려져 한 줄로 이어져 보인다. */
 @Composable
-private fun TicketPerforation(modifier: Modifier = Modifier) {
+internal fun TicketPerforation(modifier: Modifier = Modifier) {
     val lineColor: Color = TuripTheme.colors.gray02
 
     Box(
@@ -337,7 +337,7 @@ private fun TicketPerforation(modifier: Modifier = Modifier) {
 /**
  * 좌우에 노치(반원 홈)가 파인 티켓 외곽선.
  */
-private data class TicketShape(
+internal data class TicketShape(
     private val cornerRadius: Dp,
     private val notchRadius: Dp,
     private val notchCenterY: Dp,
@@ -373,7 +373,7 @@ private data class TicketShape(
 }
 
 /** 여행지마다 고정된 4자리 발권 번호 */
-private fun RandomDestinationModel.serialNumber(): String =
+internal fun RandomDestinationModel.serialNumber(): String =
     name
         .hashCode()
         .mod(SERIAL_RANGE)

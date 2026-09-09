@@ -1,9 +1,5 @@
 package com.on.turip.feature.randomtravel.impl
 
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -38,8 +34,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.style.TextAlign
@@ -56,15 +50,15 @@ import com.on.turip.core.designsystem.generated.resources.random_travel_briefing
 import com.on.turip.core.designsystem.generated.resources.random_travel_briefing_related_spot_title
 import com.on.turip.core.designsystem.generated.resources.random_travel_briefing_video_count
 import com.on.turip.core.designsystem.generated.resources.random_travel_briefing_video_title
-import com.on.turip.core.designsystem.generated.resources.random_travel_confirmed_label
-import com.on.turip.core.designsystem.generated.resources.random_travel_confirmed_title
 import com.on.turip.core.designsystem.generated.resources.random_travel_empty_video
 import com.on.turip.core.designsystem.generated.resources.random_travel_related_spot_empty
 import com.on.turip.core.designsystem.generated.resources.random_travel_related_spot_error
 import com.on.turip.core.designsystem.generated.resources.random_travel_related_spot_unsupported
 import com.on.turip.core.designsystem.generated.resources.random_travel_reroll
 import com.on.turip.core.designsystem.generated.resources.random_travel_select_video_guide
-import com.on.turip.core.designsystem.generated.resources.random_travel_spinning_title
+import com.on.turip.core.designsystem.generated.resources.random_travel_slot_dispensing
+import com.on.turip.core.designsystem.generated.resources.random_travel_slot_guide
+import com.on.turip.core.designsystem.generated.resources.random_travel_slot_headline
 import com.on.turip.core.designsystem.generated.resources.random_travel_start_trip
 import com.on.turip.core.designsystem.generated.resources.random_travel_title
 import com.on.turip.core.designsystem.generated.resources.random_travel_turip_create_failed
@@ -82,6 +76,7 @@ import com.on.turip.feature.randomtravel.impl.component.RandomTravelRelatedSpotI
 import com.on.turip.feature.randomtravel.impl.component.RandomTravelVideoItem
 import com.on.turip.feature.randomtravel.impl.component.SlotMachineReel
 import com.on.turip.feature.randomtravel.impl.component.SlotReelPhase
+import com.on.turip.feature.randomtravel.impl.component.TicketDispenser
 import com.on.turip.feature.randomtravel.impl.component.TuripDraftBottomSheet
 import com.on.turip.feature.randomtravel.impl.model.RandomDestinationModel
 import com.on.turip.feature.randomtravel.impl.model.RandomTravelRelatedSpotModel
@@ -234,6 +229,13 @@ private fun RandomTravelContent(
     }
 }
 
+/**
+ * 뽑기 화면. 세 영역이 위에서 아래로 겹치지 않게 놓인다.
+ *
+ * 1. 안내 문구 — 고정
+ * 2. 기계 외형 + 지역 릴([SlotMachineReel]) — 세로 이동만 일어난다
+ * 3. 티켓 이동 영역 + 배출구([TicketDispenser]) — 확정된 뒤에만 티켓이 올라온다
+ */
 @Composable
 private fun SlotSection(
     uiState: RandomTravelState,
@@ -252,56 +254,58 @@ private fun SlotSection(
             else -> SlotReelPhase.Stopped
         }
 
-    // 확정되는 순간 살짝 커지며 테두리에 색이 들어와 "멈췄다"는 신호를 준다.
-    val reelScale: Float by animateFloatAsState(
-        targetValue = if (isDeciding) 1f else CONFIRMED_REEL_SCALE,
-        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
-    )
-    val reelBorderColor: Color by animateColorAsState(
-        targetValue = if (isDeciding) TuripTheme.colors.border else TuripTheme.colors.primary,
-    )
-
     Column(
-        modifier = modifier.padding(horizontal = TuripTheme.spacing.extraLarge),
-        verticalArrangement = Arrangement.Center,
+        modifier =
+            modifier.padding(
+                horizontal = TuripTheme.spacing.extraLarge,
+                vertical = TuripTheme.spacing.medium,
+            ),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
-            text =
-                if (isDeciding) {
-                    stringResource(Res.string.random_travel_spinning_title)
-                } else {
-                    stringResource(Res.string.random_travel_confirmed_label)
-                },
-            style = TuripTheme.typography.title1,
-            color = TuripTheme.colors.gray04,
-            textAlign = TextAlign.Center,
+            text = stringResource(Res.string.random_travel_slot_headline),
+            style = TuripTheme.typography.display,
+            color = TuripTheme.colors.black,
+            modifier = Modifier.fillMaxWidth(),
         )
 
         Text(
-            text = if (isDeciding) "" else stringResource(Res.string.random_travel_confirmed_title),
-            style = TuripTheme.typography.info1,
-            color = TuripTheme.colors.primary,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(top = TuripTheme.spacing.extraSmall),
+            text =
+                if (isDeciding) {
+                    stringResource(Res.string.random_travel_slot_guide)
+                } else {
+                    stringResource(Res.string.random_travel_slot_dispensing)
+                },
+            style = TuripTheme.typography.body2,
+            color = TuripTheme.colors.gray03,
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(top = TuripTheme.spacing.medium),
         )
 
-        Spacer(modifier = Modifier.height(TuripTheme.spacing.extraExtraLarge))
+        Spacer(modifier = Modifier.height(TuripTheme.spacing.extraHuge))
 
         SlotMachineReel(
             reelNames = uiState.reelNames,
             reelPhase = reelPhase,
             reduceMotion = reduceMotion,
             onSpinFinished = { onIntent(RandomTravelIntent.FinishSlot) },
-            borderColor = reelBorderColor,
-            modifier =
-                Modifier.graphicsLayer {
-                    scaleX = reelScale
-                    scaleY = reelScale
-                },
         )
 
-        Spacer(modifier = Modifier.height(TuripTheme.spacing.extraExtraLarge))
+        // 뽑는 동안에는 배출구 위가 비어 있다. 확정되면 티켓이 배출구에 걸쳐 나오고,
+        // 사용자가 위로 당겨 뽑아야 브리핑으로 넘어간다.
+        TicketDispenser(
+            destination = uiState.destination.takeIf { !isDeciding },
+            isDispensing = !isDeciding,
+            reduceMotion = reduceMotion,
+            onPullTicket = { onIntent(RandomTravelIntent.PullTicket) },
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .padding(top = TuripTheme.spacing.large),
+        )
     }
 }
 
@@ -720,7 +724,6 @@ private val BRIEFING_PLACEHOLDER_HEIGHT = 160.dp
 private val REEL_BORDER_WIDTH = 1.5.dp
 private val DIVIDER_HEIGHT = 1.dp
 private val MORE_BUTTON_LOADING_SIZE = 16.dp
-private const val CONFIRMED_REEL_SCALE: Float = 1.06f
 private const val VIDEO_PREVIEW_COUNT: Int = 3
 private const val TICKET_ITEM_KEY: String = "ticket"
 private const val VIDEO_TITLE_ITEM_KEY: String = "video_title"
@@ -743,6 +746,29 @@ private fun RandomTravelSpinningPreview() {
                 RandomTravelState(
                     phase = RandomTravelPhase.Spinning,
                     reelNames = persistentListOf("서울", "부산", "제주", "강릉"),
+                ),
+            onIntent = {},
+            onBackClick = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "티켓 배출")
+@Composable
+private fun RandomTravelDispensingPreview() {
+    TuripTheme {
+        RandomTravelContent(
+            uiState =
+                RandomTravelState(
+                    phase = RandomTravelPhase.Confirmed,
+                    reelNames = persistentListOf("서울", "부산", "제주", "강릉"),
+                    destination =
+                        RandomDestinationModel(
+                            name = "강릉",
+                            imageUrl = "",
+                            isDomestic = true,
+                            videoCount = 12,
+                        ),
                 ),
             onIntent = {},
             onBackClick = {},
