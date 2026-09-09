@@ -82,6 +82,14 @@ internal object SidoAreas {
     fun areaOf(areaCode: Int): SidoArea? = AREAS[areaCode]
 
     /**
+     * [areaCode] 의 경계를 그리는 데 필요한 실제 행정구역 코드.
+     *
+     * 통합시는 경계 데이터가 따로 없으므로 흡수한 시도들의 코드를, 나머지는 자기 자신을 돌려준다.
+     */
+    fun mergedAreaCodesOf(areaCode: Int): List<Int> =
+        SUPERSEDED_AREA_CODES[areaCode]?.toList() ?: listOf(areaCode)
+
+    /**
      * [presentAreaCodes] 에 통합시가 있을 때, 거기에 흡수돼 지도에서 접어야 할 코드들.
      *
      * 통합시가 내려오지 않으면 빈 집합이라 옛 시도가 그대로 그려진다.

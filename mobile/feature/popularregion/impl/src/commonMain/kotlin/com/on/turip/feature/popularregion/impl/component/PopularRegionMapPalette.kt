@@ -10,8 +10,6 @@ import androidx.compose.ui.graphics.Color
  */
 internal object PopularRegionMapPalette {
     val Sea = Color(0xFFBFE3EE)
-    val Land = Color(0xFFFDF2F0)
-    val LandLine = Color(0xFFE0D0CC)
 
     /** 범례 `많음` 쪽 끝 색 */
     val HeatHigh = Color(0xFFE23B3B)
@@ -19,11 +17,18 @@ internal object PopularRegionMapPalette {
     /** 범례 `적음` 쪽 끝 색 */
     val HeatLow = Color(0xFFFFF1EF)
 
-    /** 지역 구획선. 땅 위에 얹히므로 흰빛으로 빼서 목업의 행정경계선처럼 보이게 한다. */
-    val CellLine = Color(0x8CFFFFFF)
+    /**
+     * 방문자 수가 아직 오지 않은 지역의 땅 색.
+     *
+     * `적음`([HeatLow]) 과 헷갈리지 않도록 붉은 기를 뺐다. 값이 0 인 것과 값을 모르는 것은 다르다.
+     */
+    val UnknownLand = Color(0xFFEDEAE9)
 
-    /** 선택된 구획의 테두리 */
-    val SelectedCellLine = Color(0xFFC22B2B)
+    /** 시도 경계선. 칠해진 땅 위에 얹히므로 흰빛으로 빼서 색을 가리지 않게 한다. */
+    val BoundaryLine = Color(0x8CFFFFFF)
+
+    /** 선택된 지역의 테두리 */
+    val SelectedBoundaryLine = Color(0xFFC22B2B)
 
     val Label = Color(0xFF4A4A4A)
     val SelectedLabel = Color(0xFFC22B2B)

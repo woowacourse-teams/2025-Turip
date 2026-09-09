@@ -16,10 +16,34 @@ import kotlin.math.min
  * 보정하지 않으면 한반도가 가로로 퍼져 보인다.
  */
 internal class KoreaMapProjection private constructor(
-    private val scale: Float,
-    private val offsetX: Float,
-    private val offsetY: Float,
+    val scale: Float,
+    val offsetX: Float,
+    val offsetY: Float,
 ) {
+    /**
+     * 이 투영으로 찍은 좌표를 [target] 투영의 좌표로 옮기는 배율과 이동량.
+     *
+     * 두 투영은 배율과 평행이동만 다르므로, 폴리곤을 매번 다시 투영하지 않고
+     * 이미 만들어 둔 [androidx.compose.ui.graphics.Path] 를 변환해 쓸 수 있다.
+     * 바텀시트가 열리고 닫히는 동안 지도가 매 프레임 새로 만들어지는 것을 막는다.
+     *
+     * 원점 기준으로 [Transform.scale] 배 키운 뒤 [Transform.translateX] · [Transform.translateY] 만큼 옮기면 된다.
+     */
+    fun transformTo(target: KoreaMapProjection): Transform {
+        val ratio: Float = target.scale / scale
+        return Transform(
+            scale = ratio,
+            translateX = target.offsetX - (ratio * offsetX),
+            translateY = target.offsetY - (ratio * offsetY),
+        )
+    }
+
+    data class Transform(
+        val scale: Float,
+        val translateX: Float,
+        val translateY: Float,
+    )
+
     fun project(point: GeoPoint): Offset = project(point.latitude, point.longitude)
 
     fun project(
