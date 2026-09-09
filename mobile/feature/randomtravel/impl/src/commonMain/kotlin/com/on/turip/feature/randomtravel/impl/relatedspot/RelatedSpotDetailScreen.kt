@@ -158,6 +158,7 @@ private fun RelatedSpotDetailContent(
 
             else -> {
                 RelatedSpotList(
+                    regionCategoryName = uiState.regionCategoryName,
                     spots = uiState.spots,
                     onSpotMapClick = onSpotMapClick,
                     modifier = Modifier.fillMaxSize(),
@@ -169,6 +170,7 @@ private fun RelatedSpotDetailContent(
 
 @Composable
 private fun RelatedSpotList(
+    regionCategoryName: String,
     spots: List<String>,
     onSpotMapClick: (url: String) -> Unit,
     modifier: Modifier = Modifier,
@@ -207,7 +209,7 @@ private fun RelatedSpotList(
             RelatedSpotRow(
                 order = index + 1,
                 spot = spot,
-                onMapClick = { onSpotMapClick(spot.toKakaoMapSearchUrl()) },
+                onMapClick = { onSpotMapClick("$spot+$regionCategoryName".toKakaoMapSearchUrl()) },
             )
         }
     }
