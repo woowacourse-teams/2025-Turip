@@ -1,9 +1,12 @@
 package com.on.turip.feature.popularregion.impl
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,9 +27,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.on.turip.core.designsystem.theme.TuripTheme
@@ -110,16 +120,35 @@ private fun PopularRegionContent(
 
     // 지도는 늘 화면 전체에 그리고, 시트가 덮는 만큼만 위로 밀어 맞춘다.
     // 시트가 없을 때 그 높이가 빈 칸으로 남지 않게 하려는 것이다.
-    val mapBottomInset: Dp by animateDpAsState(
-        targetValue = if (uiState.shouldShowSheet) sheetPeekHeight else 0.dp,
-        label = "mapBottomInset",
-    )
+    //
+    // 밀어내는 양은 따로 애니메이션하지 않고 시트의 현재 위치에서 곧장 구한다.
+    // 애니메이션을 두 개 돌리면 시트와 지도가 서로 다른 속도로 움직여 따로 노는 것처럼 보이고,
+    // 손으로 시트를 끌 때는 지도가 아예 따라오지 않는다.
+    var scaffoldHeight: Int by remember { mutableIntStateOf(0) }
+    val density: Density = LocalDensity.current
+    val mapBottomInset: Dp =
+        if (scaffoldHeight == 0) {
+            0.dp
+        } else {
+            // requireOffset 은 시트 윗변이 위에서 얼마나 내려와 있는지다. 배치 전에는 값이 없다.
+            val sheetTop: Float =
+                runCatching { scaffoldState.bottomSheetState.requireOffset() }
+                    .getOrDefault(scaffoldHeight.toFloat())
+            with(density) { (scaffoldHeight - sheetTop).coerceAtLeast(0f).toDp() }
+        }
 
     // 사용자가 시트를 아래로 끌어 내린 경우에도 선택 상태를 함께 비운다.
     LaunchedEffect(scaffoldState.bottomSheetState.currentValue) {
         if (scaffoldState.bottomSheetState.currentValue == SheetValue.Hidden) {
             onIntent(PopularRegionIntent.DismissSheet)
         }
+    }
+
+    // 선택이 풀리자마자 본문을 비우면 빈 시트가 미끄러져 내려가는 게 보인다.
+    // 시트가 완전히 닫힐 때까지 마지막으로 보던 지역을 그대로 둔다.
+    var lastShownRegion: PopularRegionModel? by remember { mutableStateOf(null) }
+    LaunchedEffect(uiState.selectedRegion) {
+        uiState.selectedRegion?.let { lastShownRegion = it }
     }
 
     val baseMonthLabel: String =
@@ -156,26 +185,48 @@ private fun PopularRegionContent(
             sheetShape = TuripTheme.shape.bottomSheetRounded,
             containerColor = TuripTheme.colors.white,
             sheetContent = {
-                val region: PopularRegionModel? = uiState.selectedRegion
-                if (region != null) {
-                    PopularRegionSheetContent(
-                        region = region,
-                        isTopRegion = region.code == uiState.topRegionCode,
-                        baseMonthText = baseMonthLabel,
-                        contentsUiState = uiState.contentsUiState,
-                        onRelatedContentsClick = {
-                            onIntent(PopularRegionIntent.ClickRelatedContents)
-                        },
-                        onContentClick = { onIntent(PopularRegionIntent.ClickContent(it)) },
-                        onRetryContentsClick = { onIntent(PopularRegionIntent.RetryContents) },
-                    )
+                // 시트가 열린 채로 다른 지역을 누르면 본문만 바뀐다. 그대로 갈아 끼우면 툭 튀므로
+                // 살짝 밀려 올라오며 겹쳐 넘긴다. 같은 지역이면 전환하지 않는다.
+                AnimatedContent(
+                    targetState = uiState.selectedRegion ?: lastShownRegion,
+                    contentKey = { region -> region?.code },
+                    transitionSpec = {
+                        (
+                            fadeIn(animationSpec = tween(SHEET_CONTENT_FADE_MILLIS)) +
+                                slideInVertically(
+                                    animationSpec = tween(SHEET_CONTENT_FADE_MILLIS),
+                                    initialOffsetY = { height -> height / SHEET_CONTENT_SLIDE_DIVISOR },
+                                )
+                        ) togetherWith fadeOut(animationSpec = tween(SHEET_CONTENT_FADE_MILLIS))
+                    },
+                    label = "sheetContent",
+                ) { region: PopularRegionModel? ->
+                    if (region != null) {
+                        PopularRegionSheetContent(
+                            region = region,
+                            isTopRegion = region.code == uiState.topRegionCode,
+                            baseMonthText = baseMonthLabel,
+                            contentsUiState = uiState.contentsUiState,
+                            onRelatedContentsClick = {
+                                onIntent(PopularRegionIntent.ClickRelatedContents)
+                            },
+                            onContentClick = { onIntent(PopularRegionIntent.ClickContent(it)) },
+                            onRetryContentsClick = { onIntent(PopularRegionIntent.RetryContents) },
+                        )
+                    }
                 }
             },
             modifier = Modifier.fillMaxSize(),
         ) {
             // innerPadding 을 쓰지 않는다. 그걸 적용하면 시트가 닫혀 있을 때도
             // 시트 높이만큼 빈 칸이 남는다. 대신 지도에 bottomInset 을 넘겨 맞춘다.
-            Box(modifier = Modifier.fillMaxSize()) {
+            Box(
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        // 시트가 덮은 높이를 재려면 시트를 담고 있는 영역의 높이가 필요하다.
+                        .onSizeChanged { size -> scaffoldHeight = size.height },
+            ) {
                 KoreaHeatMap(
                     heatPoints = uiState.heatPoints,
                     selectedRegionCode = uiState.selectedRegionCode,
@@ -236,6 +287,11 @@ private fun MapHintOverlay(
 
 /** 내비게이션 바 높이를 뺀, 시트가 기본으로 보여줄 내용 높이 */
 private val SHEET_PEEK_HEIGHT = 360.dp
+
+private const val SHEET_CONTENT_FADE_MILLIS: Int = 220
+
+/** 새 본문이 이만큼 아래에서 밀려 올라온다. 시트 높이의 몇 분의 1 인지. */
+private const val SHEET_CONTENT_SLIDE_DIVISOR: Int = 6
 
 @Preview(showBackground = true, name = "지역 선택 전")
 @Composable

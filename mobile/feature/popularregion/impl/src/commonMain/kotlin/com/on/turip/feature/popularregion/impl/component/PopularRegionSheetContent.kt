@@ -1,5 +1,6 @@
 package com.on.turip.feature.popularregion.impl.component
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -117,10 +118,13 @@ internal fun PopularRegionSheetContent(
                 ),
         )
 
+        // 로딩 자리표시자와 실제 카드의 높이가 달라, 값이 도착할 때 시트가 덜컥 늘어난다.
+        // 높이 변화를 애니메이션으로 이어 준다.
         RegionContentsSection(
             contentsUiState = contentsUiState,
             onContentClick = onContentClick,
             onRetryClick = onRetryContentsClick,
+            modifier = Modifier.animateContentSize(),
         )
     }
 }
@@ -130,70 +134,73 @@ private fun RegionContentsSection(
     contentsUiState: RegionContentsUiState,
     onContentClick: (contentId: Long) -> Unit,
     onRetryClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    when (contentsUiState) {
-        RegionContentsUiState.Loading -> {
-            Box(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .height(CONTENTS_PLACEHOLDER_HEIGHT),
-                contentAlignment = Alignment.Center,
-            ) {
-                CircularProgressIndicator(
-                    color = TuripTheme.colors.primary,
-                    modifier = Modifier.size(PROGRESS_SIZE),
-                )
-            }
-        }
-
-        RegionContentsUiState.Unsupported -> {
-            ContentsMessage(text = stringResource(Res.string.popular_region_sheet_contents_unsupported))
-        }
-
-        RegionContentsUiState.Error -> {
-            Column(modifier = Modifier.padding(horizontal = TuripTheme.spacing.extraLarge)) {
-                Text(
-                    text = stringResource(Res.string.popular_region_sheet_contents_error),
-                    style = TuripTheme.typography.body2,
-                    color = TuripTheme.colors.gray03,
-                    modifier = Modifier.padding(vertical = TuripTheme.spacing.large),
-                )
-                Text(
-                    text = stringResource(Res.string.popular_region_sheet_contents_retry),
-                    style = TuripTheme.typography.title3,
-                    color = TuripTheme.colors.primary,
+    Column(modifier = modifier) {
+        when (contentsUiState) {
+            RegionContentsUiState.Loading -> {
+                Box(
                     modifier =
                         Modifier
-                            .clip(TuripTheme.shape.wideButton)
-                            .clickable(onClick = onRetryClick)
-                            .padding(
-                                horizontal = TuripTheme.spacing.medium,
-                                vertical = TuripTheme.spacing.small,
-                            ),
-                )
-            }
-        }
-
-        is RegionContentsUiState.Success -> {
-            if (contentsUiState.contents.isEmpty()) {
-                ContentsMessage(text = stringResource(Res.string.popular_region_sheet_contents_empty))
-                return
-            }
-
-            LazyRow(
-                modifier = Modifier.padding(top = TuripTheme.spacing.medium),
-                contentPadding = PaddingValues(horizontal = TuripTheme.spacing.extraLarge),
-                horizontalArrangement = Arrangement.spacedBy(TuripTheme.spacing.medium),
-            ) {
-                items(
-                    items = contentsUiState.contents,
-                    key = { it.contentId },
-                ) { content ->
-                    RegionContentCard(
-                        content = content,
-                        onClick = { onContentClick(content.contentId) },
+                            .fillMaxWidth()
+                            .height(CONTENTS_PLACEHOLDER_HEIGHT),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    CircularProgressIndicator(
+                        color = TuripTheme.colors.primary,
+                        modifier = Modifier.size(PROGRESS_SIZE),
                     )
+                }
+            }
+
+            RegionContentsUiState.Unsupported -> {
+                ContentsMessage(text = stringResource(Res.string.popular_region_sheet_contents_unsupported))
+            }
+
+            RegionContentsUiState.Error -> {
+                Column(modifier = Modifier.padding(horizontal = TuripTheme.spacing.extraLarge)) {
+                    Text(
+                        text = stringResource(Res.string.popular_region_sheet_contents_error),
+                        style = TuripTheme.typography.body2,
+                        color = TuripTheme.colors.gray03,
+                        modifier = Modifier.padding(vertical = TuripTheme.spacing.large),
+                    )
+                    Text(
+                        text = stringResource(Res.string.popular_region_sheet_contents_retry),
+                        style = TuripTheme.typography.title3,
+                        color = TuripTheme.colors.primary,
+                        modifier =
+                            Modifier
+                                .clip(TuripTheme.shape.wideButton)
+                                .clickable(onClick = onRetryClick)
+                                .padding(
+                                    horizontal = TuripTheme.spacing.medium,
+                                    vertical = TuripTheme.spacing.small,
+                                ),
+                    )
+                }
+            }
+
+            is RegionContentsUiState.Success -> {
+                if (contentsUiState.contents.isEmpty()) {
+                    ContentsMessage(text = stringResource(Res.string.popular_region_sheet_contents_empty))
+                    return@Column
+                }
+
+                LazyRow(
+                    modifier = Modifier.padding(top = TuripTheme.spacing.medium),
+                    contentPadding = PaddingValues(horizontal = TuripTheme.spacing.extraLarge),
+                    horizontalArrangement = Arrangement.spacedBy(TuripTheme.spacing.medium),
+                ) {
+                    items(
+                        items = contentsUiState.contents,
+                        key = { it.contentId },
+                    ) { content ->
+                        RegionContentCard(
+                            content = content,
+                            onClick = { onContentClick(content.contentId) },
+                        )
+                    }
                 }
             }
         }
