@@ -257,4 +257,26 @@
     <string name="invitation_failure_dialog_dismiss_home">홈으로 가기</string>
     <string name="invitation_failure_dialog_dismiss_login">로그인으로 가기</string>
 
+    <!-- 인기 관광지 지도 -->
+    <string name="home_popular_region_cta">🗺️ 요즘 뜨는 여행지 지도</string>
+    <string name="popular_region_title">%s 인기 관광지</string>
+    <string name="popular_region_base_month">%s년 %s월</string>
+    <string name="popular_region_recent_month">최근 한 달</string>
+    <string name="popular_region_map_badge">%s 방문자 수 기준 인기 지역</string>
+    <string name="popular_region_legend_title">방문자 수</string>
+    <string name="popular_region_legend_high">많음</string>
+    <string name="popular_region_legend_low">적음</string>
+    <string name="popular_region_map_hint">지도에서 지역을 눌러보세요</string>
+    <string name="popular_region_sheet_popular_badge">인기 지역</string>
+    <string name="popular_region_sheet_base_month_label">%s 방문자 수</string>
+    <string name="popular_region_sheet_related_contents">연관 콘텐츠 보기</string>
+    <string name="popular_region_sheet_tag_hot">⭐ 핫플</string>
+    <string name="popular_region_sheet_tag_content_count">콘텐츠 %d개</string>
+    <string name="popular_region_sheet_contents_title">%s 관련 콘텐츠</string>
+    <string name="popular_region_sheet_contents_empty">아직 등록된 콘텐츠가 없어요</string>
+    <string name="popular_region_sheet_contents_unsupported">아직 튜립이 다루지 않는 지역이에요</string>
+    <string name="popular_region_sheet_contents_error">콘텐츠를 불러오지 못했어요</string>
+    <string name="popular_region_sheet_contents_retry">다시 시도</string>
+    <string name="popular_region_bookmark_description">북마크</string>
+
 </resources>

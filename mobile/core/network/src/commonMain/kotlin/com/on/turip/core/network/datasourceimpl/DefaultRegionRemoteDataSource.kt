@@ -3,6 +3,7 @@ package com.on.turip.core.network.datasourceimpl
 import com.on.turip.core.common.safeApiCall
 import com.on.turip.core.data.datasource.RegionRemoteDataSource
 import com.on.turip.core.data.dto.region.RegionCategoriesResponse
+import com.on.turip.core.data.dto.region.RegionPopularityResponse
 import com.on.turip.core.data.dto.region.RelatedSpotsResponse
 import com.on.turip.core.model.result.TuripResult
 import com.on.turip.core.network.service.RegionService
@@ -23,5 +24,10 @@ class DefaultRegionRemoteDataSource(
     override suspend fun getRelatedSpots(regionCategoryName: String): TuripResult<RelatedSpotsResponse> =
         withContext(coroutineContext) {
             safeApiCall { regionService.getRelatedSpots(regionCategoryName) }
+        }
+
+    override suspend fun getRegionPopularity(): TuripResult<RegionPopularityResponse> =
+        withContext(coroutineContext) {
+            safeApiCall { regionService.getRegionPopularity() }
         }
 }

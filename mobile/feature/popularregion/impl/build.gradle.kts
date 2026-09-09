@@ -5,9 +5,7 @@ plugins {
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            implementation(project(":feature:home:api"))
             implementation(project(":feature:popularregion:api"))
-            implementation(project(":feature:randomtravel:api"))
             implementation(project(":feature:search:api"))
             implementation(project(":feature:trip:api"))
             implementation(project(":feature:login:api"))
@@ -17,5 +15,5 @@ kotlin {
 }
 
 android {
-    namespace = "com.on.turip.feature.home.impl"
+    namespace = "com.on.turip.feature.popularregion.impl"
 }
