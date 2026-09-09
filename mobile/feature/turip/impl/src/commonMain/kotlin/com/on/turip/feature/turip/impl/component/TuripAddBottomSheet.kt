@@ -16,6 +16,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.tooling.preview.Preview
 import com.on.turip.core.designsystem.component.TuripSnackbar
 import com.on.turip.core.designsystem.theme.TuripTheme
+import com.on.turip.core.model.turip.TuripNameStatus
 import com.on.turip.core.ui.component.NameEditorSheetContent
 import com.on.turip.core.ui.model.namestatus.TuripNameStatusModel
 
@@ -23,12 +24,12 @@ import com.on.turip.core.ui.model.namestatus.TuripNameStatusModel
 @Composable
 fun TuripAddBottomSheet(
     title: String,
-    turipName: String,
+    initialTuripName: String,
     sheetState: SheetState,
     turipNameStatus: TuripNameStatusModel,
     isConfirmEnabled: Boolean,
     onNameChanged: (name: String) -> Unit,
-    onConfirmClick: () -> Unit,
+    onConfirmClick: (name: String) -> Unit,
     onDismiss: () -> Unit,
     snackbarHostState: SnackbarHostState? = null,
 ) {
@@ -43,7 +44,8 @@ fun TuripAddBottomSheet(
             Box(modifier = Modifier.imePadding()) {
                 NameEditorSheetContent(
                     title = title,
-                    turipName = turipName,
+                    initialTuripName = initialTuripName,
+                    maxLength = TuripNameStatus.MAX_LENGTH,
                     turipNameStatus = turipNameStatus,
                     isConfirmEnabled = isConfirmEnabled,
                     onNameChanged = onNameChanged,
@@ -58,7 +60,8 @@ fun TuripAddBottomSheet(
         } else {
             NameEditorSheetContent(
                 title = title,
-                turipName = turipName,
+                initialTuripName = initialTuripName,
+                maxLength = TuripNameStatus.MAX_LENGTH,
                 turipNameStatus = turipNameStatus,
                 isConfirmEnabled = isConfirmEnabled,
                 onNameChanged = onNameChanged,
@@ -83,7 +86,7 @@ private fun TuripAddBottomSheetStatusPreview() {
     TuripTheme {
         TuripAddBottomSheet(
             title = "튜립 추가",
-            turipName = "",
+            initialTuripName = "",
             sheetState = sheetState,
             turipNameStatus = TuripNameStatusModel.OK,
             isConfirmEnabled = true,
