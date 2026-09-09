@@ -10,6 +10,11 @@ sealed interface RandomTravelEffect : UiEffect {
         val contentId: Long,
     ) : RandomTravelEffect
 
+    /** 장소를 담은 직후에는 영상이 아니라 방금 만든 튜립을 보여준다. */
+    data class NavigateToTuripDetail(
+        val turipId: Long,
+    ) : RandomTravelEffect
+
     data object NavigateToLogin : RandomTravelEffect
 
     /**

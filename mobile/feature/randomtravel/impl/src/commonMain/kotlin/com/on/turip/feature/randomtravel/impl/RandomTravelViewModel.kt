@@ -472,7 +472,7 @@ class RandomTravelViewModel(
     }
 
     /**
-     * 튜립을 만든 뒤 선택한 장소를 한 번에 담는다.
+     * 튜립을 만든 뒤 선택한 장소를 한 번에 담고, 방금 만든 튜립 상세로 이동한다.
      *
      * 튜립 생성과 장소 담기는 별개 요청이라, 장소 담기가 실패해도 튜립은 이미 만들어져 있다.
      * 되돌리지 않고 몇 곳이 담겼는지를 그대로 알린다.
@@ -480,7 +480,6 @@ class RandomTravelViewModel(
     private fun confirmTuripDraft() {
         val draft: TuripDraftUiState.Ready = readyTuripDraft() ?: return
         if (!draft.canConfirm) return
-        val contentId: Long = currentState.selectedContentId ?: return
 
         val turipName: String = draft.name.trim()
         val placeIds: List<Long> = draft.selectedPlaceIds
@@ -521,7 +520,7 @@ class RandomTravelViewModel(
                         requestedCount = placeIds.size,
                     ),
                 )
-                emitEffect(RandomTravelEffect.NavigateToTripDetail(contentId))
+                emitEffect(RandomTravelEffect.NavigateToTuripDetail(turip.id))
             }
     }
 

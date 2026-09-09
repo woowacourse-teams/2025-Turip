@@ -91,6 +91,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun RandomTravelScreen(
     onBackClick: () -> Unit,
     onContentClick: (contentId: Long) -> Unit,
+    onTuripClick: (turipId: Long) -> Unit,
     onRelatedSpotClick: (regionCategoryName: String, spotCategory: String) -> Unit,
     onNavigateToLoginScreen: () -> Unit,
     modifier: Modifier = Modifier,
@@ -107,9 +108,10 @@ fun RandomTravelScreen(
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
 
                 is RandomTravelEffect.NavigateToTripDetail -> onContentClick(effect.contentId)
+                is RandomTravelEffect.NavigateToTuripDetail -> onTuripClick(effect.turipId)
                 RandomTravelEffect.NavigateToLogin -> onNavigateToLoginScreen()
 
-                // 스낵바 호스트가 앱 전역이라 영상 상세로 이동한 뒤에도 결과가 그대로 보인다.
+                // 스낵바 호스트가 앱 전역이라 다음 화면으로 이동한 뒤에도 결과가 그대로 보인다.
                 is RandomTravelEffect.ShowTuripCreated ->
                     snackbarDelegate.showSnackbar(
                         message =

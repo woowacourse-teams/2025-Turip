@@ -11,6 +11,7 @@ import com.on.turip.feature.randomtravel.impl.RandomTravelScreen
 import com.on.turip.feature.randomtravel.impl.platform.rememberRelatedSpotDetailPlatformActions
 import com.on.turip.feature.randomtravel.impl.relatedspot.RelatedSpotDetailScreen
 import com.on.turip.feature.trip.api.TripDetailNavKey
+import com.on.turip.feature.turipdetail.api.TuripDetailNavKey
 import kotlinx.serialization.modules.PolymorphicModuleBuilder
 
 class RandomTravelNavKeyProvider : NavKeyProvider {
@@ -25,6 +26,7 @@ class RandomTravelNavKeyProvider : NavKeyProvider {
                 onBackClick = navigator::goBack,
                 // 랜덤 여행은 새 도메인이 아니라 기존 Turip 생성 플로우로 들어가는 또 하나의 입구다.
                 onContentClick = { contentId -> navigator.navigate(TripDetailNavKey(contentId)) },
+                onTuripClick = { turipId -> navigator.navigate(TuripDetailNavKey(turipId)) },
                 onRelatedSpotClick = { regionCategoryName, spotCategory ->
                     navigator.navigate(
                         RelatedSpotDetailNavKey(

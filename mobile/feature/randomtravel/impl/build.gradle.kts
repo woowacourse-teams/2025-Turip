@@ -7,6 +7,7 @@ kotlin {
         commonMain.dependencies {
             implementation(project(":feature:randomtravel:api"))
             implementation(project(":feature:trip:api"))
+            implementation(project(":feature:turipdetail:api"))
             implementation(project(":feature:login:api"))
             implementation(project(":core:data"))
         }
