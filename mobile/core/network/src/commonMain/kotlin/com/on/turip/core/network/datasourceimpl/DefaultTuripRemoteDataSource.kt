@@ -83,7 +83,7 @@ class DefaultTuripRemoteDataSource(
         turipId: Long,
         turipPlacesBatchRequest: TuripPlacesBatchRequest,
     ): TuripResult<List<TuripPlaceCreationResponse>> =
-        safeApiCall { turipService.postTuripPlaces(turipId, turipPlacesBatchRequest) }
+        safeApiCall { turipService.postTuripPlaces(turipPlacesBatchRequest) }
 
     override suspend fun deleteTuripPlace(
         turipId: Long,

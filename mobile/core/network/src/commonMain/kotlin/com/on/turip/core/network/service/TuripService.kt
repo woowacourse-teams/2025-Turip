@@ -78,7 +78,6 @@ interface TuripService {
 
     @POST(ApiPath.V1 + "turips/places/batch")
     suspend fun postTuripPlaces(
-        @Query("turipId") turipId: Long,
         @Body turipPlacesBatchRequest: TuripPlacesBatchRequest,
     ): List<TuripPlaceCreationResponse>
 

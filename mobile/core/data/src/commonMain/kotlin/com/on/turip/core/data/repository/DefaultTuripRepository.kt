@@ -109,7 +109,7 @@ class DefaultTuripRepository(
         placeIds: List<Long>,
     ): TuripResult<List<Long>> =
         turipRestRemoteDataSource
-            .createTuripPlaces(turipId, TuripPlacesBatchRequest(placeIds))
+            .createTuripPlaces(turipId, TuripPlacesBatchRequest(turipId = turipId, placeIds = placeIds))
             .mapCatching { responses -> responses.map { it.placeId } }
             .also { result ->
                 result.onSuccess { savedPlaceIds ->

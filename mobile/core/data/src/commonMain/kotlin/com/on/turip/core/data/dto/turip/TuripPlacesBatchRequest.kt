@@ -5,6 +5,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class TuripPlacesBatchRequest(
+    @SerialName("turipId")
+    val turipId: Long,
     @SerialName("placeIds")
     val placeIds: List<Long>,
 )
