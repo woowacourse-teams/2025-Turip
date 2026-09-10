@@ -68,17 +68,21 @@ fun PopularRegionScreen(
     LaunchedEffect(Unit) {
         viewModel.effect.collectLatest { effect: PopularRegionEffect ->
             when (effect) {
-                is PopularRegionEffect.NavigateToRegionBriefing ->
+                is PopularRegionEffect.NavigateToRegionBriefing -> {
                     onRegionBriefingClick(
                         effect.regionCategoryName,
                         effect.visitorCount,
                         effect.baseMonth,
                     )
+                }
 
-                is PopularRegionEffect.NavigateToTripDetail ->
+                is PopularRegionEffect.NavigateToTripDetail -> {
                     onContentClick(effect.contentId)
+                }
 
-                PopularRegionEffect.NavigateToLogin -> onNavigateToLoginScreen()
+                PopularRegionEffect.NavigateToLogin -> {
+                    onNavigateToLoginScreen()
+                }
             }
         }
     }

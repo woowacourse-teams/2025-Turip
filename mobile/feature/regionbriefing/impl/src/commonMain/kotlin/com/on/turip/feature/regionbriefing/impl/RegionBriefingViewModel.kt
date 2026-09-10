@@ -42,10 +42,21 @@ class RegionBriefingViewModel(
                 emitEffect(RegionBriefingEffect.NavigateToTripDetail(intent.contentId))
             }
 
-            is RegionBriefingIntent.ClickRelatedSpot -> clickRelatedSpot(intent.spotCategory)
-            RegionBriefingIntent.LoadMoreVideos -> loadMoreVideos()
-            RegionBriefingIntent.RetryVideos -> loadVideos()
-            RegionBriefingIntent.RetryRelatedSpots -> loadRelatedSpots()
+            is RegionBriefingIntent.ClickRelatedSpot -> {
+                clickRelatedSpot(intent.spotCategory)
+            }
+
+            RegionBriefingIntent.LoadMoreVideos -> {
+                loadMoreVideos()
+            }
+
+            RegionBriefingIntent.RetryVideos -> {
+                loadVideos()
+            }
+
+            RegionBriefingIntent.RetryRelatedSpots -> {
+                loadRelatedSpots()
+            }
         }
     }
 

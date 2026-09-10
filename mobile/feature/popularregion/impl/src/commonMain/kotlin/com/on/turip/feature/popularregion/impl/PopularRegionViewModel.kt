@@ -59,14 +59,29 @@ class PopularRegionViewModel(
 
     override fun onIntent(intent: PopularRegionIntent) {
         when (intent) {
-            is PopularRegionIntent.SelectRegion -> selectRegion(intent.regionCode)
-            PopularRegionIntent.DismissSheet -> clearSelection()
-            PopularRegionIntent.ClickRelatedContents -> navigateToRelatedContents()
-            is PopularRegionIntent.ClickContent ->
-                emitEffect(PopularRegionEffect.NavigateToTripDetail(intent.contentId))
+            is PopularRegionIntent.SelectRegion -> {
+                selectRegion(intent.regionCode)
+            }
 
-            PopularRegionIntent.RetryLoad -> loadRegions()
-            PopularRegionIntent.RetryContents -> retryContents()
+            PopularRegionIntent.DismissSheet -> {
+                clearSelection()
+            }
+
+            PopularRegionIntent.ClickRelatedContents -> {
+                navigateToRelatedContents()
+            }
+
+            is PopularRegionIntent.ClickContent -> {
+                emitEffect(PopularRegionEffect.NavigateToTripDetail(intent.contentId))
+            }
+
+            PopularRegionIntent.RetryLoad -> {
+                loadRegions()
+            }
+
+            PopularRegionIntent.RetryContents -> {
+                retryContents()
+            }
         }
     }
 
@@ -117,7 +132,10 @@ class PopularRegionViewModel(
                 val popularityResult: TuripResult<RegionPopularity> = popularityDeferred.await()
                 val popularity: RegionPopularity =
                     when (popularityResult) {
-                        is TuripResult.Success -> popularityResult.value
+                        is TuripResult.Success -> {
+                            popularityResult.value
+                        }
+
                         is TuripResult.Failure -> {
                             Napier.e("인기 관광지 - 시도 방문자 수 조회 실패", popularityResult.cause)
                             // 먼저 세워 둔 칩을 거둔다. 에러 화면이 지도를 대신하는 동안
@@ -252,7 +270,10 @@ class PopularRegionViewModel(
 
                 val paged: PagedContentsResult =
                     when (result) {
-                        is TuripResult.Success -> result.value
+                        is TuripResult.Success -> {
+                            result.value
+                        }
+
                         is TuripResult.Failure -> {
                             Napier.w("인기 관광지 - ${region.name} 콘텐츠 조회 실패", result.cause)
                             if (result.errorType.toUiError() == UiError.Global.TokenExpired) {
@@ -295,15 +316,21 @@ class PopularRegionViewModel(
 
     private fun handleLoadError(failure: TuripResult.Failure) {
         when (failure.errorType.toUiError()) {
-            UiError.Global.Network ->
+            UiError.Global.Network -> {
                 updateState { copy(isLoading = false, errorUiState = ErrorUiState.Network) }
+            }
 
-            UiError.Global.Server ->
+            UiError.Global.Server -> {
                 updateState { copy(isLoading = false, errorUiState = ErrorUiState.Server) }
+            }
 
-            UiError.Global.TokenExpired -> navigateToLogin()
+            UiError.Global.TokenExpired -> {
+                navigateToLogin()
+            }
 
-            else -> updateState { copy(isLoading = false, errorUiState = ErrorUiState.Unexpected) }
+            else -> {
+                updateState { copy(isLoading = false, errorUiState = ErrorUiState.Unexpected) }
+            }
         }
     }
 

@@ -100,13 +100,17 @@ fun RegionBriefingScreen(
     LaunchedEffect(Unit) {
         viewModel.effect.collectLatest { effect: RegionBriefingEffect ->
             when (effect) {
-                is RegionBriefingEffect.NavigateToTripDetail -> onContentClick(effect.contentId)
+                is RegionBriefingEffect.NavigateToTripDetail -> {
+                    onContentClick(effect.contentId)
+                }
 
                 is RegionBriefingEffect.NavigateToRelatedSpotDetail -> {
                     onRelatedSpotClick(effect.regionCategoryName, effect.spotCategory)
                 }
 
-                RegionBriefingEffect.NavigateToLogin -> onNavigateToLoginScreen()
+                RegionBriefingEffect.NavigateToLogin -> {
+                    onNavigateToLoginScreen()
+                }
             }
         }
     }
