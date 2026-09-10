@@ -43,6 +43,9 @@ korea-tourism:
     key: test-korea-tourism-api-key
     image-url: https://test.apis.data.go.kr
     related-spot-url: https://test.apis.data.go.kr
+  visitor-api:
+    metco-url: https://test.apis.data.go.kr/metco
+    locgo-url: https://test.apis.data.go.kr/locgo
 
 apple:
   client-id: com.teamturip.test

@@ -98,6 +98,43 @@ class ContentRepositoryTest extends TestContainerConfig {
         }
     }
 
+    @DisplayName("id 기준 최신순 전체 조회 메서드 테스트")
+    @Nested
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    class FindAllByIdLessThan {
+
+        @DisplayName("lastId보다 작은 id를 가진 콘텐츠들을 id 내림차순으로 원하는 수만큼 가져온다")
+        @Test
+        void findAllByIdLessThan1() {
+            // given
+            Country country = countryRepository.findByName("대한민국")
+                    .orElseGet(() -> countryRepository.save(new Country("대한민국", "https://example.com/korea.jpg")));
+            City city = cityRepository.findByName("서울")
+                    .orElseGet(
+                            () -> cityRepository.save(new City(country, null, "서울", "https://example.com/seoul.jpg")));
+            Creator creator = new Creator("여행하는 메이", "https://example.com/creator.jpg");
+            creatorRepository.save(creator);
+
+            Content content1 = new Content(creator, city, "메이의 대구 여행", "https://example.com/content1", LocalDate.now());
+            Content content2 = new Content(creator, city, "메이의 부산 여행", "https://example.com/content2", LocalDate.now());
+            Content content3 = new Content(creator, city, "메이의 서울 여행", "https://example.com/content3", LocalDate.now());
+            List<Content> savedContents = contentRepository.saveAll(List.of(content1, content2, content3));
+            Long lastSavedId = savedContents.get(2).getId();
+
+            // when
+            Slice<Content> contents = contentRepository.findAllByIdLessThanOrderByIdDesc(lastSavedId + 1,
+                    PageRequest.of(0, 2));
+
+            // then
+            Assertions.assertAll(
+                    () -> assertThat(contents.getContent()).hasSize(2),
+                    () -> assertThat(contents.getContent().get(0).getId()).isEqualTo(lastSavedId),
+                    () -> assertThat(contents.getContent().get(1).getId()).isEqualTo(lastSavedId - 1),
+                    () -> assertThat(contents.hasNext()).isTrue()
+            );
+        }
+    }
+
     @DisplayName("페이지네이션 기반 키워드 검색 메서드 테스트")
     @Nested
     @Transactional(propagation = Propagation.NOT_SUPPORTED)

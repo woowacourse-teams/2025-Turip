@@ -1,15 +1,23 @@
 package turip.service;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import turip.common.exception.ErrorTag;
 import turip.common.exception.custom.BadRequestException;
 import turip.common.exception.custom.ConflictException;
 import turip.common.exception.custom.NotFoundException;
+import turip.common.util.DateRangeCalculator;
 import turip.content.domain.Content;
 import turip.content.domain.ContentPlace;
 import turip.content.repository.ContentPlaceRepository;
@@ -17,8 +25,11 @@ import turip.content.repository.ContentRepository;
 import turip.controller.dto.request.AdminContentSaveRequest;
 import turip.controller.dto.request.AdminContentSaveRequest.ContentPlaceRequest;
 import turip.controller.dto.request.AdminContentSaveRequest.PlaceRequest;
+import turip.controller.dto.response.AdminContentResponse;
+import turip.controller.dto.response.AdminContentsResponse;
 import turip.creator.domain.Creator;
 import turip.creator.repository.CreatorRepository;
+import turip.favorite.repository.FavoriteContentRepository;
 import turip.place.domain.Category;
 import turip.place.domain.Place;
 import turip.place.domain.PlaceCategory;
@@ -39,6 +50,7 @@ public class AdminContentService {
     private final CityRepository cityRepository;
     private final CategoryRepository categoryRepository;
     private final PlaceCategoryRepository placeCategoryRepository;
+    private final FavoriteContentRepository favoriteContentRepository;
 
     @Transactional
     public Long save(AdminContentSaveRequest request) {
@@ -61,6 +73,33 @@ public class AdminContentService {
         });
 
         return content.getId();
+    }
+
+    public AdminContentsResponse findContents(String keyword, long lastId, int size) {
+        long targetLastId = lastId;
+        if (lastId == 0) {
+            targetLastId = Long.MAX_VALUE;
+        }
+        Slice<Content> contentSlice = findContentSlice(keyword, targetLastId, size);
+
+        List<AdminContentResponse> contents = contentSlice.getContent().stream()
+                .map(AdminContentResponse::from)
+                .toList();
+        return AdminContentsResponse.of(contents, contentSlice.hasNext());
+    }
+
+    public AdminContentsResponse findWeeklyPopularContents(int size) {
+        DateRangeCalculator.DateRange lastWeek = DateRangeCalculator.lastWeekRange();
+        LocalDate startDate = lastWeek.startDate();
+        LocalDate endDate = lastWeek.endDate();
+
+        List<Long> popularContentIds = favoriteContentRepository.findPopularContentIdsByFavoriteBetweenDatesWithLimit(
+                startDate, endDate, size);
+
+        List<AdminContentResponse> contents = findContentsOrderedByPopularity(popularContentIds).stream()
+                .map(AdminContentResponse::from)
+                .toList();
+        return AdminContentsResponse.of(contents, false);
     }
 
     private City findCity(AdminContentSaveRequest request) {
@@ -141,5 +180,28 @@ public class AdminContentService {
                         () -> placeCategoryRepository.save(new PlaceCategory(place, category))
                 );
     }
-}
 
+    private Slice<Content> findContentSlice(String keyword, long lastId, int size) {
+        PageRequest pageable = PageRequest.of(0, size);
+
+        // 검색어가 존재하지 않는 경우 전체 콘텐츠 search
+        if (keyword == null || keyword.isBlank()) {
+            return contentRepository.findAllByIdLessThanOrderByIdDesc(lastId, pageable);
+        }
+
+        // 검색어가 존재하는 경우 boolean mode 기반 keyword search
+        String booleanModeKeyword = contentRepository.createBooleanModeKeyword(keyword);
+        return contentRepository.findByKeywordContaining(booleanModeKeyword, lastId, pageable);
+    }
+
+    private List<Content> findContentsOrderedByPopularity(List<Long> popularContentIds) {
+        Map<Long, Integer> orderById = new HashMap<>();
+        for (int i = 0; i < popularContentIds.size(); i++) {
+            orderById.put(popularContentIds.get(i), i);
+        }
+        // findAllByIdIn은 IN 절 순서를 보장하지 않으므로 찜 많은 순으로 다시 정렬한다
+        return contentRepository.findAllByIdIn(popularContentIds).stream()
+                .sorted(Comparator.comparing(content -> orderById.get(content.getId())))
+                .toList();
+    }
+}

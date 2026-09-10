@@ -1,8 +1,17 @@
 package com.on.turip.core.data.datasource
 
+import com.on.turip.core.data.dto.region.PopularDestinationResponse
 import com.on.turip.core.data.dto.region.RegionCategoriesResponse
+import com.on.turip.core.data.dto.region.RegionPopularityResponse
+import com.on.turip.core.data.dto.region.RelatedSpotsResponse
 import com.on.turip.core.model.result.TuripResult
 
 interface RegionRemoteDataSource {
     suspend fun getRegionCategories(isDomestic: Boolean): TuripResult<RegionCategoriesResponse>
+
+    suspend fun getRelatedSpots(regionCategoryName: String): TuripResult<RelatedSpotsResponse>
+
+    suspend fun getRegionPopularity(): TuripResult<RegionPopularityResponse>
+
+    suspend fun getPopularDestinations(): TuripResult<PopularDestinationResponse>
 }
