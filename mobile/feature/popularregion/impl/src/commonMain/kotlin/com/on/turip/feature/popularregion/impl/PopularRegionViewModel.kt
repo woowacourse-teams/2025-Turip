@@ -5,7 +5,8 @@ import com.on.turip.core.data.session.SessionManager
 import com.on.turip.core.domain.repository.ContentRepository
 import com.on.turip.core.domain.repository.RegionRepository
 import com.on.turip.core.model.content.PagedContentsResult
-import com.on.turip.core.model.region.RegionCategory
+import com.on.turip.core.model.region.DestinationVisitor
+import com.on.turip.core.model.region.PopularDestination
 import com.on.turip.core.model.region.RegionPopularity
 import com.on.turip.core.model.region.RegionVisitor
 import com.on.turip.core.model.result.TuripResult
@@ -13,6 +14,7 @@ import com.on.turip.core.ui.BaseViewModel
 import com.on.turip.core.ui.error.ErrorUiState
 import com.on.turip.core.ui.error.UiError
 import com.on.turip.core.ui.error.toUiError
+import com.on.turip.feature.popularregion.impl.map.PopularDestinationShapes
 import com.on.turip.feature.popularregion.impl.map.SidoAreas
 import com.on.turip.feature.popularregion.impl.model.PopularRegionModel
 import com.on.turip.feature.popularregion.impl.model.RegionContentModel
@@ -20,12 +22,10 @@ import com.on.turip.feature.popularregion.impl.model.RegionContentsUiState
 import com.on.turip.feature.popularregion.impl.model.toUiModel
 import io.github.aakira.napier.Napier
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 
 /**
@@ -34,9 +34,9 @@ import kotlinx.coroutines.launch
  * 지도 선택 상태의 단일 진실 공급원은 [PopularRegionState.selectedRegionCode] 하나다.
  * 바텀시트는 이 값을 따라 열리고 닫힐 뿐, 스스로 상태를 갖지 않는다.
  *
- * 지도에 칠하는 값은 방문자 수 API(최근 한 달, 시도 17개)에서 오고,
- * 시트 안 영상 목록은 기존 콘텐츠 API에서 온다. 두 API의 지역 단위가 달라
- * 시도 ↔ 지역 카테고리는 [SidoAreas] 가 이어준다.
+ * 지도는 두 층이다. 아래층은 시도 방문자 수 API(최근 한 달, 시도 17개)로 국토를 빈 칸 없이 칠하고,
+ * 위층은 인기 관광지 API(튜립 지역 카테고리 14곳 중 상위 10곳)로 순위를 얹는다.
+ * 시트 안 영상 목록은 위층의 지역 카테고리로 기존 콘텐츠 API에서 가져온다.
  */
 class PopularRegionViewModel(
     private val regionRepository: RegionRepository,
@@ -87,81 +87,108 @@ class PopularRegionViewModel(
 
                 val popularityDeferred: Deferred<TuripResult<RegionPopularity>> =
                     async { regionRepository.loadRegionPopularity() }
-                val categoriesDeferred: Deferred<TuripResult<List<RegionCategory>>> =
-                    async { regionRepository.loadRegionCategories(IS_DOMESTIC) }
+                val destinationsDeferred: Deferred<TuripResult<PopularDestination>> =
+                    async { regionRepository.loadPopularDestinations() }
 
                 val popularityResult: TuripResult<RegionPopularity> = popularityDeferred.await()
-                val categoriesResult: TuripResult<List<RegionCategory>> = categoriesDeferred.await()
+                val destinationsResult: TuripResult<PopularDestination> = destinationsDeferred.await()
 
                 val popularity: RegionPopularity =
                     when (popularityResult) {
                         is TuripResult.Success -> popularityResult.value
                         is TuripResult.Failure -> {
-                            Napier.e("인기 관광지 - 방문자 수 조회 실패", popularityResult.cause)
+                            Napier.e("인기 관광지 - 시도 방문자 수 조회 실패", popularityResult.cause)
                             handleLoadError(popularityResult)
                             return@launch
                         }
                     }
 
-                if (categoriesResult is TuripResult.Failure) {
-                    Napier.w("인기 관광지 - 지역 카테고리 조회 실패, 콘텐츠 없이 지도만 그린다", categoriesResult.cause)
+                // 위층이 없어도 국토는 칠할 수 있다. 배경만 남을 뿐이라 지도를 막을 이유가 없다.
+                if (destinationsResult is TuripResult.Failure) {
+                    Napier.w("인기 관광지 - 관광지 순위 조회 실패, 시도 층만 그린다", destinationsResult.cause)
                 }
 
-                val regionCategoryNames: Map<Int, ImmutableList<String>> =
-                    (categoriesResult as? TuripResult.Success)
+                val destinations: List<PopularRegionModel> =
+                    (destinationsResult as? TuripResult.Success)
                         ?.value
+                        ?.destinations
                         .orEmpty()
-                        .groupBy { SidoAreas.areaCodeOf(it.name) }
-                        .mapNotNull { (areaCode, categories) ->
-                            areaCode?.let { it to categories.map(RegionCategory::name).toImmutableList() }
-                        }.toMap()
-
-                // 통합시와 그 구성 지역이 함께 내려오면 같은 땅이 여러 조각으로 나뉘고
-                // 방문자 수도 중복 집계된다. 통합시 쪽을 남기고 구성 지역을 접는다.
-                val supersededAreaCodes: Set<Int> =
-                    SidoAreas.supersededAreaCodes(
-                        popularity.regions.map(RegionVisitor::areaCode).toSet(),
-                    )
-                val visitors: List<RegionVisitor> =
-                    popularity.regions.filterNot { it.areaCode in supersededAreaCodes }
-
-                if (supersededAreaCodes.isNotEmpty()) {
-                    Napier.w("인기 관광지 - 통합시에 흡수된 시도 코드 $supersededAreaCodes 를 지도에서 제외")
-                }
-
-                // 행정구역 개편으로 새 코드가 생기면 지도에 놓을 자리를 몰라 빠진다.
-                // 조용히 사라지면 알아챌 방법이 없으므로 남는 코드를 남겨 둔다.
-                val unmappedVisitors: List<RegionVisitor> =
-                    visitors.filter { SidoAreas.areaOf(it.areaCode) == null }
-                if (unmappedVisitors.isNotEmpty()) {
-                    Napier.w(
-                        "인기 관광지 - 지도에 없는 시도 코드 " +
-                            unmappedVisitors.joinToString { "${it.areaCode}(${it.name})" },
-                    )
-                }
-
-                val regions: ImmutableList<PopularRegionModel> =
-                    visitors
-                        .mapNotNull { visitor ->
-                            visitor.toUiModel(
-                                regionCategoryNames = regionCategoryNames[visitor.areaCode]
-                                    ?: persistentListOf(),
-                            )
-                        }.toImmutableList()
-
-                Napier.d("인기 관광지 - 기준월 ${popularity.baseMonth}, 지역 ${regions.size}개 로드")
+                        .toDestinationModels()
 
                 updateState {
                     copy(
                         baseMonth = popularity.baseMonth,
-                        regions = regions,
+                        regions =
+                            (popularity.toSidoModels(destinations) + destinations)
+                                .sortedByDescending { it.visitorCount }
+                                .toImmutableList(),
                         selectedRegionCode = null,
                         isLoading = false,
-                        errorUiState =
-                            if (regions.isEmpty()) ErrorUiState.Unexpected else ErrorUiState.None,
+                        errorUiState = ErrorUiState.None,
                     )
                 }
             }
+    }
+
+    /**
+     * 아래층(시도)을 만든다.
+     *
+     * 시도 하나가 통째로 인기 관광지인 곳(서울·부산 등 6곳)은 위층이 같은 땅을 덮으므로 여기서 뺀다.
+     * 남겨 두면 같은 폴리곤을 두 번 그리게 되고, 탭도 어느 쪽이 잡힐지 순서에 기대게 된다.
+     */
+    private fun RegionPopularity.toSidoModels(
+        destinations: List<PopularRegionModel>,
+    ): List<PopularRegionModel> {
+        // 통합시와 그 구성 지역이 함께 내려오면 같은 땅이 여러 조각으로 나뉘고
+        // 방문자 수도 중복 집계된다. 통합시 쪽을 남기고 구성 지역을 접는다.
+        val supersededAreaCodes: Set<Int> =
+            SidoAreas.supersededAreaCodes(regions.map(RegionVisitor::areaCode).toSet())
+        if (supersededAreaCodes.isNotEmpty()) {
+            Napier.w("인기 관광지 - 통합시에 흡수된 시도 코드 $supersededAreaCodes 를 지도에서 제외")
+        }
+
+        val coveredAreaCodes: Set<Int> =
+            destinations
+                .mapNotNull { destination ->
+                    destination.regionCategoryName
+                        ?.let { PopularDestinationShapes.destinationOf(it) }
+                        ?.sidoAreaCode
+                }.toSet()
+
+        val visitors: List<RegionVisitor> =
+            regions.filterNot { it.areaCode in supersededAreaCodes || it.areaCode in coveredAreaCodes }
+
+        // 행정구역 개편으로 새 코드가 생기면 지도에 놓을 자리를 몰라 빠진다.
+        // 조용히 사라지면 알아챌 방법이 없으므로 남는 코드를 남겨 둔다.
+        val unmappedVisitors: List<RegionVisitor> =
+            visitors.filter { SidoAreas.areaOf(it.areaCode) == null }
+        if (unmappedVisitors.isNotEmpty()) {
+            Napier.w(
+                "인기 관광지 - 지도에 없는 시도 코드 " +
+                    unmappedVisitors.joinToString { "${it.areaCode}(${it.name})" },
+            )
+        }
+
+        return visitors.mapNotNull { it.toUiModel() }
+    }
+
+    /**
+     * 위층(인기 관광지)을 만든다.
+     *
+     * 서버가 좌표를 주지 않아 지도에 놓을 자리는 [PopularDestinationShapes] 가 갖고 있다.
+     * 후보 14곳은 서버가 정하므로, 표에 없는 이름이 새로 생기면 조용히 사라지지 않게 경고를 남긴다.
+     */
+    private fun List<DestinationVisitor>.toDestinationModels(): List<PopularRegionModel> {
+        val unmapped: List<DestinationVisitor> =
+            filter { it.regionCategoryName !in PopularDestinationShapes.regionCategoryNames }
+        if (unmapped.isNotEmpty()) {
+            Napier.w(
+                "인기 관광지 - 지도에 없는 지역 카테고리 " +
+                    unmapped.joinToString { it.regionCategoryName },
+            )
+        }
+
+        return mapNotNull { it.toUiModel() }
     }
 
     private fun selectRegion(regionCode: String) {
@@ -181,13 +208,15 @@ class PopularRegionViewModel(
     }
 
     /**
-     * 시도 하나에 지역 카테고리가 여럿 붙을 수 있어(강원 → 강릉·속초) 한 번에 모아 온다.
-     * 카테고리 하나가 실패하면 그 지역만 빠지고, 전부 실패했을 때만 에러로 본다.
+     * 선택한 지역의 연관 콘텐츠를 가져온다.
+     *
+     * 지역 카테고리가 붙는 것은 위층(인기 관광지)뿐이라 호출은 언제나 한 번이다.
+     * 아래층 시도를 눌렀을 때는 방문자 수만 보여 준다.
      */
     private fun loadContents(region: PopularRegionModel) {
         contentsJob?.cancel()
 
-        if (!region.hasRegionCategory) {
+        val regionCategoryName: String = region.regionCategoryName ?: run {
             updateState { copy(contentsUiState = RegionContentsUiState.Unsupported) }
             return
         }
@@ -201,47 +230,30 @@ class PopularRegionViewModel(
             viewModelScope.launch {
                 updateState { copy(contentsUiState = RegionContentsUiState.Loading) }
 
-                val results: List<TuripResult<PagedContentsResult>> =
-                    region.regionCategoryNames
-                        .map { categoryName ->
-                            async {
-                                contentRepository.loadContentsByRegion(
-                                    regionCategoryName = categoryName,
-                                    size = CONTENTS_PAGE_SIZE,
-                                    lastId = INITIAL_LAST_ID,
-                                )
+                val result: TuripResult<PagedContentsResult> =
+                    contentRepository.loadContentsByRegion(
+                        regionCategoryName = regionCategoryName,
+                        size = CONTENTS_PAGE_SIZE,
+                        lastId = INITIAL_LAST_ID,
+                    )
+
+                val paged: PagedContentsResult =
+                    when (result) {
+                        is TuripResult.Success -> result.value
+                        is TuripResult.Failure -> {
+                            Napier.w("인기 관광지 - ${region.name} 콘텐츠 조회 실패", result.cause)
+                            if (result.errorType.toUiError() == UiError.Global.TokenExpired) {
+                                navigateToLogin()
+                            } else {
+                                updateState { copy(contentsUiState = RegionContentsUiState.Error) }
                             }
-                        }.awaitAll()
-
-                results.filterIsInstance<TuripResult.Failure>().forEach { failure ->
-                    Napier.w("인기 관광지 - ${region.name} 콘텐츠 조회 실패", failure.cause)
-                }
-
-                val tokenExpired: Boolean =
-                    results
-                        .filterIsInstance<TuripResult.Failure>()
-                        .any { it.errorType.toUiError() == UiError.Global.TokenExpired }
-                if (tokenExpired) {
-                    navigateToLogin()
-                    return@launch
-                }
-
-                val successes: List<PagedContentsResult> =
-                    results
-                        .filterIsInstance<TuripResult.Success<PagedContentsResult>>()
-                        .map { it.value }
-
-                if (successes.isEmpty()) {
-                    updateState { copy(contentsUiState = RegionContentsUiState.Error) }
-                    return@launch
-                }
+                            return@launch
+                        }
+                    }
 
                 val contents: ImmutableList<RegionContentModel> =
-                    successes
-                        .flatMap { it.videos }
+                    paged.videos
                         .map { it.toUiModel() }
-                        .distinctBy { it.contentId }
-                        .take(CONTENTS_PAGE_SIZE)
                         .toImmutableList()
 
                 cachedContents[region.code] = contents
@@ -258,7 +270,7 @@ class PopularRegionViewModel(
 
     private fun navigateToRelatedContents() {
         val regionCategoryName: String =
-            currentState.selectedRegion?.primaryRegionCategoryName ?: return
+            currentState.selectedRegion?.regionCategoryName ?: return
         emitEffect(PopularRegionEffect.NavigateToRegionResult(regionCategoryName))
     }
 
@@ -284,7 +296,6 @@ class PopularRegionViewModel(
     }
 
     companion object {
-        private const val IS_DOMESTIC: Boolean = true
         private const val CONTENTS_PAGE_SIZE: Int = 10
         private const val INITIAL_LAST_ID: Long = 0L
     }

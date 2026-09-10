@@ -42,6 +42,7 @@ import com.on.turip.core.designsystem.generated.resources.popular_region_sheet_t
 import com.on.turip.core.designsystem.theme.TuripTheme
 import com.on.turip.core.ui.util.formatResource
 import com.on.turip.feature.popularregion.impl.map.GeoPoint
+import com.on.turip.feature.popularregion.impl.map.RegionShapeKey
 import com.on.turip.feature.popularregion.impl.model.PopularRegionModel
 import com.on.turip.feature.popularregion.impl.model.RegionContentModel
 import com.on.turip.feature.popularregion.impl.model.RegionContentsUiState
@@ -416,11 +417,12 @@ private fun PopularRegionSheetContentPreview() {
         PopularRegionSheetContent(
             region =
                 PopularRegionModel(
-                    code = "51",
-                    name = "강원",
-                    location = GeoPoint(37.8228, 128.1555),
-                    visitorCount = 7_600_000L,
-                    regionCategoryNames = persistentListOf("강릉", "속초"),
+                    shapeKey = RegionShapeKey.Destination("강릉"),
+                    name = "강릉",
+                    location = GeoPoint(37.7519, 128.8761),
+                    visitorCount = 4_800_000L,
+                    rank = 1,
+                    regionCategoryName = "강릉",
                 ),
             isTopRegion = true,
             baseMonthText = "2025년 6월",

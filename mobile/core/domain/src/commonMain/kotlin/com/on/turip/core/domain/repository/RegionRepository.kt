@@ -1,5 +1,6 @@
 package com.on.turip.core.domain.repository
 
+import com.on.turip.core.model.region.PopularDestination
 import com.on.turip.core.model.region.RegionCategory
 import com.on.turip.core.model.region.RegionPopularity
 import com.on.turip.core.model.region.RelatedSpotCategory
@@ -21,4 +22,6 @@ interface RegionRepository {
      * 한 달에 한 번만 바뀌는 값이라 앱이 살아 있는 동안은 다시 요청하지 않는다.
      */
     suspend fun loadRegionPopularity(): TuripResult<RegionPopularity>
+
+    suspend fun loadPopularDestinations(): TuripResult<PopularDestination>
 }

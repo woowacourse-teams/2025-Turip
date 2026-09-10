@@ -266,7 +266,7 @@
     <string name="popular_region_legend_title">방문자 수</string>
     <string name="popular_region_legend_high">많음</string>
     <string name="popular_region_legend_low">적음</string>
-    <string name="popular_region_map_hint">지도에서 지역을 눌러보세요</string>
+    <string name="popular_region_map_hint">인기 관광지를 눌러보세요</string>
     <string name="popular_region_sheet_popular_badge">인기 지역</string>
     <string name="popular_region_sheet_base_month_label">%s 방문자 수</string>
     <string name="popular_region_sheet_related_contents">연관 콘텐츠 보기</string>

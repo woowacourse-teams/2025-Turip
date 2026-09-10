@@ -12,6 +12,8 @@ import kotlinx.collections.immutable.toImmutableList
 
 /**
  * @param baseMonth 방문자 수 기준월(`yyyyMM`). 서버에 수집된 데이터가 없으면 null 이다.
+ * @param regions 시도 층과 인기 관광지 층을 합친 목록. 각 원소가 어느 층인지는
+ * [PopularRegionModel.isDestination] 로 구분한다.
  */
 @Immutable
 data class PopularRegionState(
@@ -28,27 +30,35 @@ data class PopularRegionState(
     /**
      * 지도에 칠할 열 목록.
      *
-     * [regions] 는 방문자 수 내림차순이므로 첫 원소가 곧 최댓값이다.
-     * 시도는 17개뿐이라 라벨은 전부 켠다.
+     * 층마다 따로 정규화한다. 시도(수백만)와 관광지(수십만)를 한 자로 재면
+     * 작은 시는 늘 가장 옅게 나와 순위를 읽을 수 없다.
+     *
+     * 인기 관광지를 앞에 둬 라벨 자리를 먼저 잡게 한다. 겹칠 때 살아남는 쪽이
+     * 눌러서 콘텐츠를 볼 수 있는 지역이어야 하기 때문이다.
      */
     val heatPoints: ImmutableList<RegionHeatPoint> =
-        regions
-            .let { sorted ->
-                val maxVisitorCount: Long = sorted.firstOrNull()?.visitorCount ?: 1L
-                sorted.map { region ->
-                    RegionHeatPoint(
-                        code = region.code,
-                        name = region.name,
-                        location = region.location,
-                        intensity = (region.visitorCount.toFloat() / maxVisitorCount)
-                            .coerceIn(MIN_INTENSITY, 1f),
-                        isLabeled = true,
-                    )
-                }
-            }.toImmutableList()
+        buildList {
+            val (destinations: List<PopularRegionModel>, sidoRegions: List<PopularRegionModel>) =
+                regions.partition { it.isDestination }
+            addAll(destinations.toHeatPoints())
+            addAll(sidoRegions.toHeatPoints())
+        }.toImmutableList()
 
-    /** 방문자 수 1위 지역. 시트에 `인기 지역` 배지를 붙일지 판단한다. */
-    val topRegionCode: String? = regions.firstOrNull()?.code
+    /**
+     * 상단 칩 줄에 늘어놓을 인기 관광지. 순위 오름차순이다.
+     *
+     * 지도에서 속초·수원처럼 작은 지역은 손가락으로 정확히 누르기 어렵다.
+     * 칩은 그 지역들로 가는 두 번째 길이고, 고르면 지도를 탭한 것과 같은 선택이 일어난다.
+     */
+    val destinationChips: ImmutableList<PopularRegionModel> =
+        regions
+            .filter { it.isDestination }
+            .sortedBy { it.rank ?: Int.MAX_VALUE }
+            .toImmutableList()
+
+    /** 방문자 수 1위 관광지. 시트에 `인기 지역` 배지를 붙일지 판단한다. */
+    val topRegionCode: String? =
+        regions.firstOrNull { it.rank == TOP_RANK }?.code
 
     val shouldShowSheet: Boolean = selectedRegion != null
 
@@ -64,9 +74,25 @@ data class PopularRegionState(
             ?.toIntOrNull()
             ?.takeIf { it in MONTH_RANGE }
 
+    /** 한 층을 그 층의 최댓값 기준으로 정규화한다. 방문자 수 내림차순이라 첫 원소가 최댓값이다. */
+    private fun List<PopularRegionModel>.toHeatPoints(): List<RegionHeatPoint> {
+        val maxVisitorCount: Long = firstOrNull()?.visitorCount ?: return emptyList()
+        return map { region ->
+            RegionHeatPoint(
+                shapeKey = region.shapeKey,
+                name = region.name,
+                location = region.location,
+                intensity = (region.visitorCount.toFloat() / maxVisitorCount)
+                    .coerceIn(MIN_INTENSITY, 1f),
+                isLabeled = true,
+            )
+        }
+    }
+
     companion object {
         /** 열이 아예 안 보이는 지역이 없도록 하한을 둔다. */
         private const val MIN_INTENSITY: Float = 0.12f
+        private const val TOP_RANK: Int = 1
         private const val BASE_MONTH_LENGTH: Int = 6
         private const val YEAR_LENGTH: Int = 4
         private val MONTH_RANGE: IntRange = 1..12

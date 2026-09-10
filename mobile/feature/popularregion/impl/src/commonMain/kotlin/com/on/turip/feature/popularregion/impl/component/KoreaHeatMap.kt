@@ -29,8 +29,10 @@ import com.on.turip.core.designsystem.theme.TuripTheme
 import com.on.turip.feature.popularregion.impl.map.GeoPoint
 import com.on.turip.feature.popularregion.impl.map.KoreaMapProjection
 import com.on.turip.feature.popularregion.impl.map.KoreaRegionShapes
+import com.on.turip.feature.popularregion.impl.map.RegionShapeKey
 import com.on.turip.feature.popularregion.impl.map.containsProjected
 import com.on.turip.feature.popularregion.impl.map.geoArea
+import com.on.turip.feature.popularregion.impl.map.shapes
 import com.on.turip.feature.popularregion.impl.map.toUnionPath
 import com.on.turip.feature.popularregion.impl.model.RegionHeatPoint
 import kotlinx.collections.immutable.ImmutableList
@@ -39,12 +41,18 @@ import kotlinx.collections.immutable.ImmutableList
  * 대한민국 인기 지역 히트맵.
  *
  * 지도 SDK 없이 Compose Canvas 로만 그린다.
- * - 경계: [KoreaRegionShapes] 의 실제 시도 행정경계 폴리곤
+ * - 경계: 실제 행정경계 폴리곤. 시도는 [KoreaRegionShapes], 관광지는
+ *   [com.on.turip.feature.popularregion.impl.map.PopularDestinationShapes] 가 갖고 있다.
  * - 색: 지역을 방문자 수에 따라 통째로 칠하는 단계구분도(choropleth)
  * - 탭: 누른 점을 품는 폴리곤을 찾는다. 넓이가 작은 지역이 우선이라
  *   전남 안의 광주처럼 감싸인 지역도 정확히 잡힌다.
+ *   **다만 인기 관광지 층만 눌린다.** 아래층 시도(경기·전남광주 등)는 튜립이 다루는 지역이 아니라
+ *   열어 보여 줄 내용이 없다. 눌리면 빈 시트가 열리므로 빈 곳을 누른 것과 같이 다룬다.
  *
  * 좁은 지역이 넓은 지역에 덮이지 않도록, 칠하기는 넓은 쪽부터 하고 탭 판정은 그 반대로 본다.
+ * 관광지(강릉)는 언제나 자기가 속한 시도(강원)보다 좁으므로 이 한 가지 규칙으로 두 층이 함께 정렬된다.
+ * 두 층은 같은 붉은 띠를 쓰되 **층마다 따로 정규화**한다. 시도 값으로 관광지를 칠하면
+ * 작은 시(속초)가 늘 가장 옅게 나와 순위를 읽을 수 없다.
  *
  * @param heatPoints 방문자 수 내림차순. [RegionHeatPoint.intensity] 는 0..1 로 정규화돼 있다.
  * @param bottomInset 바텀시트가 아래에서 덮는 높이. 캔버스(바다)는 항상 화면을 꽉 채우고,
@@ -70,22 +78,26 @@ internal fun KoreaHeatMap(
     // 칠하지 않고([RegionShape.heatPointIndex] 가 null), 이름도 붙이지 않고, 눌러도 반응하지 않는다.
     val shapes: List<RegionShape> =
         remember(heatPoints) {
-            val sources: List<Pair<Int?, Int>> =
+            val sources: List<Pair<Int?, RegionShapeKey>> =
                 if (heatPoints.isEmpty()) {
-                    KoreaRegionShapes.areaCodes.map { areaCode -> null to areaCode }
+                    KoreaRegionShapes.areaCodes.map { areaCode -> null to RegionShapeKey.Sido(areaCode) }
                 } else {
-                    heatPoints.mapIndexedNotNull { index, point ->
-                        point.code.toIntOrNull()?.let { areaCode -> index to areaCode }
-                    }
+                    heatPoints.mapIndexed { index, point -> index to point.shapeKey }
                 }
 
             sources
-                .mapNotNull { (heatPointIndex, areaCode) ->
-                    val rings: List<List<GeoPoint>> = KoreaRegionShapes.shapesOf(areaCode)
+                .mapNotNull { (heatPointIndex, shapeKey) ->
+                    val rings: List<List<GeoPoint>> = shapeKey.shapes()
                     if (rings.isEmpty()) {
                         null
                     } else {
-                        RegionShape(heatPointIndex, rings, rings.geoArea())
+                        RegionShape(
+                            heatPointIndex = heatPointIndex,
+                            rings = rings,
+                            area = rings.geoArea(),
+                            isSelectable =
+                                heatPointIndex != null && heatPoints[heatPointIndex].isDestination,
+                        )
                     }
                 }.sortedByDescending { it.area }
         }
@@ -115,13 +127,15 @@ internal fun KoreaHeatMap(
                                 size = Size(size.width.toFloat(), size.height.toFloat()),
                                 bottomInset = currentBottomInset.toPx(),
                             )
-                        // 좁은 지역부터 본다. 광주는 전남 링 안에도 들어 있어서
-                        // 넓은 쪽부터 보면 광주를 영영 고를 수 없다.
+                        // 좁은 지역부터 본다. 관광지는 자기가 속한 시도 링 안에도 들어 있어서
+                        // 넓은 쪽부터 보면 수원을 영영 고를 수 없다.
+                        //
+                        // 시도는 아예 후보에서 뺀다. 관광지 밖을 누르면 그 아래 시도가 잡히는데,
+                        // 그걸 선택으로 치면 보여 줄 내용이 없는 시트가 열린다.
                         val hit: RegionShape? =
                             shapes.lastOrNull { shape ->
-                                shape.rings.containsProjected(projection, tap)
+                                shape.isSelectable && shape.rings.containsProjected(projection, tap)
                             }
-                        // 아직 값이 없는 지역은 열어 보여 줄 내용이 없어 빈 곳과 같이 다룬다.
                         val hitIndex: Int? = hit?.heatPointIndex
                         if (hitIndex == null) {
                             onEmptyClick()
@@ -272,11 +286,14 @@ internal fun KoreaHeatMap(
  * @param heatPointIndex 이 지역이 [KoreaHeatMap] 의 `heatPoints` 에서 몇 번째인지.
  * 방문자 수가 아직 오지 않아 모양만 그리는 지역은 null 이다.
  * @param area 위경도 기준 넓이. 그리는 순서와 탭 우선순위를 정한다.
+ * @param isSelectable 눌러서 고를 수 있는지. 인기 관광지 층만 true 다.
+ * 시도는 칠하기만 하고 누르면 반응하지 않는다.
  */
 private data class RegionShape(
     val heatPointIndex: Int?,
     val rings: List<List<GeoPoint>>,
     val area: Double,
+    val isSelectable: Boolean,
 )
 
 private data class RegionDrawing(

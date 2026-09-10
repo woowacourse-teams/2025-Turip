@@ -44,6 +44,7 @@ import com.on.turip.core.ui.component.ErrorScreen
 import com.on.turip.core.ui.error.ErrorUiState
 import com.on.turip.feature.popularregion.impl.component.HeatLegendCard
 import com.on.turip.feature.popularregion.impl.component.KoreaHeatMap
+import com.on.turip.feature.popularregion.impl.component.PopularDestinationChipRow
 import com.on.turip.feature.popularregion.impl.component.PopularRegionAppBar
 import com.on.turip.feature.popularregion.impl.component.PopularRegionMapBadge
 import com.on.turip.feature.popularregion.impl.component.PopularRegionMapHint
@@ -168,6 +169,14 @@ private fun PopularRegionContent(
         PopularRegionAppBar(
             baseMonthText = baseMonthLabel,
             onBackClick = onBackClick,
+        )
+
+        // 지도 위가 아니라 앱바 바로 아래에 둔다. 지도에 겹치면 배지·범례와 자리를 다투고,
+        // 시트가 올라올 때 같이 가려진다. 칩은 시트가 열려 있는 동안에도 눌러 지역을 바꿀 수 있어야 한다.
+        PopularDestinationChipRow(
+            destinations = uiState.destinationChips,
+            selectedRegionCode = uiState.selectedRegionCode,
+            onDestinationClick = { onIntent(PopularRegionIntent.SelectRegion(it)) },
         )
 
         if (uiState.errorUiState != ErrorUiState.None) {

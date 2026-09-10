@@ -10,22 +10,12 @@ package com.on.turip.feature.popularregion.impl.map
  * 18만 점을 2,934점으로 줄였고(원본의 1.6%), 화면 1dp 남짓의 오차만 남는다.
  * 면적이 아주 작은 섬은 이 크기에서 점 하나로 뭉개지므로 뺐다.
  *
- * ### 좌표 형식
- * 지역 하나가 문자열 하나다. 링은 `|`, 점은 공백, 위도와 경도는 `,` 로 나눈다.
- * 값은 1/10000도 단위 정수이고 **직전 점과의 차이**만 적는다. 첫 점은 0 에서 시작하므로 절댓값이 된다.
- * 이렇게 두면 좌표 대부분이 두세 자리라 파일이 절반 이하로 줄고, 눈으로 읽고 고칠 수도 있다.
+ * 좌표 형식은 [decodeRings] 참고. 지역 하나가 문자열 하나다.
  *
  * 여기에는 실제 행정구역 17개만 둔다.
  * 통합시처럼 여러 시도를 합친 지역은 [shapesOf] 가 구성 지역의 링을 이어 붙여 만든다.
  */
 internal object KoreaRegionShapes {
-    /** 좌표 정수의 실제 단위. 1/10000도 ≈ 11m */
-    private const val COORDINATE_SCALE: Double = 10_000.0
-
-    private const val RING_SEPARATOR: Char = '|'
-    private const val POINT_SEPARATOR: Char = ' '
-    private const val VALUE_SEPARATOR: Char = ','
-
     /**
      * 경계를 갖고 있는 시도 코드.
      *
@@ -47,26 +37,6 @@ internal object KoreaRegionShapes {
     private val decoded: Map<Int, List<List<GeoPoint>>> by lazy {
         ENCODED_SHAPES.mapValues { (_, encoded) -> encoded.decodeRings() }
     }
-
-    /**
-     * 델타로 적힌 좌표를 위경도로 되돌린다.
-     *
-     * 누적합이라 한 점이라도 건너뛰면 이후가 전부 어긋난다. 손으로 고칠 때 주의할 부분이다.
-     */
-    private fun String.decodeRings(): List<List<GeoPoint>> =
-        split(RING_SEPARATOR).map { ring ->
-            var latitude = 0
-            var longitude = 0
-            ring.split(POINT_SEPARATOR).map { point ->
-                val separatorIndex: Int = point.indexOf(VALUE_SEPARATOR)
-                latitude += point.substring(0, separatorIndex).toInt()
-                longitude += point.substring(separatorIndex + 1).toInt()
-                GeoPoint(
-                    latitude = latitude / COORDINATE_SCALE,
-                    longitude = longitude / COORDINATE_SCALE,
-                )
-            }
-        }
 
     private val ENCODED_SHAPES: Map<Int, String> =
         mapOf(
