@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -123,6 +124,9 @@ private fun PopularDestinationChip(
             modifier
                 .background(color = containerColor, shape = ChipShape)
                 .border(width = CHIP_BORDER_WIDTH, color = borderColor, shape = ChipShape)
+                // clickable 앞에서 잘라야 리플이 알약 모양을 따른다.
+                // background/border 의 shape 만으로는 리플이 사각형으로 퍼진다.
+                .clip(ChipShape)
                 .clickable(onClick = onClick)
                 .padding(
                     horizontal = TuripTheme.spacing.extraLarge,

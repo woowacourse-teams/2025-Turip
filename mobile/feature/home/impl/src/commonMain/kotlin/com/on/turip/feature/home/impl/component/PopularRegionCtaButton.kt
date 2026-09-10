@@ -30,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -64,10 +65,14 @@ fun PopularRegionCtaButton(
             modifier
                 .fillMaxWidth()
                 .border(
-                    width = 1.dp,
+                    width = CARD_BORDER_WIDTH,
                     color = TuripTheme.colors.border,
                     shape = TuripTheme.shape.wideButton,
-                ).clickable(onClick = onClick)
+                )
+                // clickable 앞에서 잘라야 리플이 카드의 둥근 모서리를 따른다.
+                // border 의 shape 만으로는 리플이 사각형으로 퍼진다.
+                .clip(TuripTheme.shape.wideButton)
+                .clickable(onClick = onClick)
                 .padding(
                     horizontal = TuripTheme.spacing.extraLarge,
                     vertical = TuripTheme.spacing.large,
@@ -187,6 +192,7 @@ private fun RankBadge(
 }
 
 private const val ROLL_INTERVAL_MILLIS: Long = 3_000L
+private val CARD_BORDER_WIDTH = 1.dp
 private val ROLL_ROW_HEIGHT = 24.dp
 private val RANK_BADGE_SIZE = 24.dp
 private val CHEVRON_SIZE = 20.dp
