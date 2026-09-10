@@ -23,7 +23,8 @@ data class RegionBriefingState(
     val baseMonth: String? = null,
     val videos: ImmutableList<VideoSummaryModel> = persistentListOf(),
     val relatedSpotsUiState: RelatedSpotsUiState = RelatedSpotsUiState.Loading,
-    val isVideoListLoading: Boolean = false,
+    /** 진입하자마자 조회를 시작하므로 첫 프레임부터 스켈레톤을 보여준다. */
+    val isVideoListLoading: Boolean = true,
     val isVideoListFetched: Boolean = false,
     val isVideoListLoadable: Boolean = false,
     val isLoadingMoreVideos: Boolean = false,

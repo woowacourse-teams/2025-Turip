@@ -59,6 +59,8 @@ import com.on.turip.core.ui.model.region.RelatedSpotsUiState
 import com.on.turip.core.ui.util.baseMonthText
 import com.on.turip.core.ui.util.formatResource
 import com.on.turip.feature.regionbriefing.impl.component.RegionVisitorCard
+import com.on.turip.feature.regionbriefing.impl.component.RelatedSpotListSkeleton
+import com.on.turip.feature.regionbriefing.impl.component.VideoListSkeleton
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.collectLatest
 import org.jetbrains.compose.resources.stringResource
@@ -225,9 +227,7 @@ private fun LazyListScope.videoSection(
     when {
         uiState.isVideoListLoading -> {
             item(key = VIDEO_LOADING_ITEM_KEY) {
-                BriefingPlaceholder {
-                    TuripLoadingIndicator()
-                }
+                VideoListSkeleton()
             }
         }
 
@@ -307,7 +307,7 @@ private fun LazyListScope.relatedSpotSection(
     when (relatedSpotsUiState) {
         RelatedSpotsUiState.Loading -> {
             item(key = RELATED_SPOT_LOADING_ITEM_KEY) {
-                BriefingNotice { TuripLoadingIndicator() }
+                RelatedSpotListSkeleton()
             }
         }
 
@@ -403,6 +403,7 @@ private fun RegionBriefingPreview() {
                                 placeCount = 15,
                             ),
                         ),
+                    isVideoListLoading = false,
                     isVideoListFetched = true,
                     relatedSpotsUiState =
                         RelatedSpotsUiState.Success(
