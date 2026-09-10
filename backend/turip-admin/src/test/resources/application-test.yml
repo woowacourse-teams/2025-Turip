@@ -42,6 +42,9 @@ korea-tourism:
   api:
     key: test-korea-tourism-api-key
     url: https://test.apis.data.go.kr
+  visitor-api:
+    metco-url: https://test.apis.data.go.kr/metco
+    locgo-url: https://test.apis.data.go.kr/locgo
 
 apple:
   client-id: com.teamturip.test
