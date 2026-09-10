@@ -2,31 +2,59 @@ package com.on.turip.feature.article.impl.component
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
+import com.mikepenz.markdown.coil3.Coil3ImageTransformerImpl
+import com.mikepenz.markdown.m3.Markdown
+import com.mikepenz.markdown.m3.markdownColor
+import com.mikepenz.markdown.m3.markdownTypography
 import com.on.turip.core.designsystem.theme.TuripTheme
 
 /**
- * 아티클 본문.
+ * 아티클 본문. 서버가 내려주는 마크다운 원문을 그대로 그린다.
  *
- * [content] 는 서버가 내려주는 **마크다운 원문**이다. 이미지도 `![](url)` 형태로 본문 안에 들어 있다.
- *
- * TODO: 마크다운 렌더러로 교체할 지점. 현재는 원문을 그대로 그린다.
- *  교체 시 이 함수 본문만 바꾸면 되고 호출부(ArticleDetailScreen)는 손댈 필요 없다.
- *  본문 좌우 여백은 20dp로, 홈 카드(16dp)와 일부러 다르게 둔다.
- *  이미지는 이 여백 없이 full-bleed로 그려 대비를 만드는 것이 원래 디자인 의도였다.
+ * 이미지도 `![](url)` 형태로 본문 안에 들어 있어 [Coil3ImageTransformerImpl] 로 로딩한다.
+ * 본문 좌우 여백은 20dp로, 홈 카드(16dp)와 일부러 다르게 둔다.
  */
 @Composable
 fun ArticleContent(
     content: String,
     modifier: Modifier = Modifier,
 ) {
-    Text(
-        text = content,
-        color = TuripTheme.colors.gray05,
-        style = TuripTheme.typography.body1,
+    Markdown(
+        content = content,
+        colors =
+            markdownColor(
+                text = TuripTheme.colors.gray05,
+                codeBackground = TuripTheme.colors.container,
+                inlineCodeBackground = TuripTheme.colors.container,
+                dividerColor = TuripTheme.colors.border,
+            ),
+        typography =
+            markdownTypography(
+                text = TuripTheme.typography.body1,
+                paragraph = TuripTheme.typography.body1,
+                h1 = TuripTheme.typography.title1,
+                h2 = TuripTheme.typography.title2,
+                h3 = TuripTheme.typography.title3,
+                quote = TuripTheme.typography.body1,
+                ordered = TuripTheme.typography.body1,
+                bullet = TuripTheme.typography.body1,
+                list = TuripTheme.typography.body1,
+                textLink =
+                    TextLinkStyles(
+                        style =
+                            SpanStyle(
+                                color = TuripTheme.colors.primary,
+                                textDecoration = TextDecoration.Underline,
+                            ),
+                    ),
+            ),
+        imageTransformer = Coil3ImageTransformerImpl,
         modifier =
             modifier
                 .fillMaxWidth()

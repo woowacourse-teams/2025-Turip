@@ -8,6 +8,10 @@ kotlin {
             implementation(project(":feature:article:api"))
             implementation(project(":feature:login:api"))
             implementation(project(":core:data"))
+
+            implementation(libs.multiplatform.markdown.renderer)
+            implementation(libs.multiplatform.markdown.renderer.m3)
+            implementation(libs.multiplatform.markdown.renderer.coil3)
         }
     }
 }
