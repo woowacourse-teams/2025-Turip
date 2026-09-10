@@ -70,8 +70,6 @@ data class PopularRegionState(
     val topRegionCode: String? =
         regions.firstOrNull { it.rank == TOP_RANK }?.code
 
-    val shouldShowSheet: Boolean = selectedRegion != null
-
     val shouldShowMapHint: Boolean = !isLoading && selectedRegion == null
 
     /** 기준월을 화면에 적기 위해 `202506` 을 연/월로 나눠 둔다. 형식이 다르면 둘 다 null 이다. */
