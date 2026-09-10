@@ -114,8 +114,11 @@ internal fun KoreaHeatMap(
             color = PopularRegionMapPalette.Label,
             fontSize = LABEL_FONT_SIZE,
         )
-    val selectedLabelStyle: TextStyle =
-        labelStyle.copy(color = PopularRegionMapPalette.SelectedLabel)
+    // 선택 색은 지도 팔레트가 아니라 앱의 선택 색을 그대로 쓴다.
+    // 상단 칩의 선택 색과 같아야 "칩에서 고른 것"과 "지도에서 고른 것"이 한 가지 언어로 읽힌다.
+    // 관광지 테두리(검정)가 `누를 수 있음`을 맡으므로 선택은 다른 색이어야 한다.
+    val selectedColor: Color = TuripTheme.colors.primary
+    val selectedLabelStyle: TextStyle = labelStyle.copy(color = selectedColor)
 
     Box(
         modifier =
@@ -174,6 +177,7 @@ internal fun KoreaHeatMap(
                                         )
                                     },
                                 isSelected = shape.heatPointIndex == selectedIndex,
+                                isSelectable = shape.isSelectable,
                             )
                         }
 
@@ -220,6 +224,7 @@ internal fun KoreaHeatMap(
 
                     // 지도를 줄여 그리면 선도 같이 얇아진다. 배율로 나눠 두께를 원래대로 되돌린다.
                     val boundaryStroke: Float = BOUNDARY_STROKE_WIDTH.toPx() / transform.scale
+                    val selectableStroke: Float = SELECTABLE_BOUNDARY_STROKE_WIDTH.toPx() / transform.scale
                     val selectedStroke: Float = SELECTED_BOUNDARY_STROKE_WIDTH.toPx() / transform.scale
                     val seamStroke: Float = SEAM_STROKE_WIDTH.toPx() / transform.scale
                     val pinMetrics = PinMetrics(PIN_RADIUS.toPx(), PIN_TAIL_HEIGHT.toPx())
@@ -246,7 +251,9 @@ internal fun KoreaHeatMap(
                                 )
                             }
 
+                            // 시도는 흐린 흰 선. 칠하기만 하고 누를 수 없는 배경이다.
                             regions.forEach { region ->
+                                if (region.isSelectable) return@forEach
                                 drawPath(
                                     path = region.path,
                                     color = PopularRegionMapPalette.BoundaryLine,
@@ -254,11 +261,23 @@ internal fun KoreaHeatMap(
                                 )
                             }
 
+                            // 관광지는 진한 선. 지도에서 이 선이 둘린 곳만 눌린다는 표시다.
+                            // 시도 선 위에 얹혀야 경계가 맞닿는 곳에서 흐린 선에 잘리지 않는다.
+                            regions.forEach { region ->
+                                if (!region.isSelectable) return@forEach
+                                drawPath(
+                                    path = region.path,
+                                    color = PopularRegionMapPalette.SelectableBoundaryLine,
+                                    style = Stroke(width = selectableStroke),
+                                )
+                            }
+
                             // 선택한 지역의 테두리는 다른 지역에 덮이지 않도록 맨 위에 다시 그린다.
+                            // 검정보다 굵게 그어 `누를 수 있음` 위에 `지금 선택됨`을 덮는다.
                             regions.firstOrNull { it.isSelected }?.let { region ->
                                 drawPath(
                                     path = region.path,
-                                    color = PopularRegionMapPalette.SelectedBoundaryLine,
+                                    color = selectedColor,
                                     style = Stroke(width = selectedStroke),
                                 )
                             }
@@ -274,7 +293,9 @@ internal fun KoreaHeatMap(
                                     ),
                             )
                         }
-                        selectedCenter?.let { drawPin(center = it, metrics = pinMetrics) }
+                        selectedCenter?.let {
+                            drawPin(center = it, metrics = pinMetrics, color = selectedColor)
+                        }
                     }
                 },
     )
@@ -300,6 +321,8 @@ private data class RegionDrawing(
     val path: Path,
     val color: Color,
     val isSelected: Boolean,
+    /** 눌러서 고를 수 있는지. 테두리를 진하게 그을지 정한다. */
+    val isSelectable: Boolean,
 )
 
 private data class MapLabel(
@@ -316,6 +339,7 @@ private data class PinMetrics(
 private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawPin(
     center: Offset,
     metrics: PinMetrics,
+    color: Color,
 ) {
     val headCenter = Offset(center.x, center.y - metrics.tailHeight - metrics.radius)
     val tail =
@@ -325,9 +349,9 @@ private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawPin(
             lineTo(center.x + (metrics.radius * PIN_TAIL_WIDTH_RATIO), headCenter.y)
             close()
         }
-    drawPath(path = tail, color = PopularRegionMapPalette.HeatHigh)
+    drawPath(path = tail, color = color)
     drawCircle(
-        color = PopularRegionMapPalette.HeatHigh,
+        color = color,
         radius = metrics.radius,
         center = headCenter,
     )
@@ -346,7 +370,11 @@ private val LABEL_GAP = 6.dp
 private val LABEL_COLLISION_PADDING = 2.dp
 
 private val BOUNDARY_STROKE_WIDTH = 1.dp
-private val SELECTED_BOUNDARY_STROKE_WIDTH = 2.dp
+
+/** 누를 수 있는 지역의 테두리. 시도 경계선보다 굵어야 붉은 땅 위에서 떠오른다. */
+private val SELECTABLE_BOUNDARY_STROKE_WIDTH = 1.5.dp
+
+private val SELECTED_BOUNDARY_STROKE_WIDTH = 2.5.dp
 
 /** 단순화로 생긴 1px 어긋남을 메우는 덧칠 두께 */
 private val SEAM_STROKE_WIDTH = 1.dp

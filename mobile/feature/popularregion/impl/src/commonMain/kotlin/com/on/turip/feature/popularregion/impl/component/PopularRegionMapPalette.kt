@@ -27,9 +27,16 @@ internal object PopularRegionMapPalette {
     /** 시도 경계선. 칠해진 땅 위에 얹히므로 흰빛으로 빼서 색을 가리지 않게 한다. */
     val BoundaryLine = Color(0x8CFFFFFF)
 
-    /** 선택된 지역의 테두리 */
-    val SelectedBoundaryLine = Color(0xFFC22B2B)
+    /**
+     * 인기 관광지의 테두리.
+     *
+     * 지도에서 **누를 수 있는 곳은 이 선이 둘린 곳뿐**이라는 표시다.
+     * 시도는 칠하기만 하고 눌러도 반응하지 않으므로 흰 경계선([BoundaryLine])으로 남는다.
+     *
+     * 붉은 열 색 위에서 확실히 떠오르려면 이 정도로 진해야 한다.
+     * 수원처럼 경기의 1% 남짓한 작은 지역도 이 선 덕분에 눈에 들어온다.
+     */
+    val SelectableBoundaryLine = Color(0xFF151515)
 
     val Label = Color(0xFF4A4A4A)
-    val SelectedLabel = Color(0xFFC22B2B)
 }
