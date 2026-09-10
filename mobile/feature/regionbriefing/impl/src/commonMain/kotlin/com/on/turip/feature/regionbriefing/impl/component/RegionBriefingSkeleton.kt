@@ -169,6 +169,7 @@ private fun RelatedSpotItemSkeleton(modifier: Modifier = Modifier) {
                     .background(TuripTheme.colors.border),
         )
 
+        // 나머지 장소 자리는 실제 카드가 늘 두 줄을 차지하므로 여기서도 두 줄을 그린다.
         Column(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(TuripTheme.spacing.extraSmall),
@@ -181,6 +182,14 @@ private fun RelatedSpotItemSkeleton(modifier: Modifier = Modifier) {
             SkeletonBox(
                 shape = TuripTheme.shape.container,
                 modifier = Modifier.fillMaxWidth(REMAIN_SPOTS_WIDTH_RATIO).height(LINE_HEIGHT),
+            )
+
+            SkeletonBox(
+                shape = TuripTheme.shape.container,
+                modifier =
+                    Modifier
+                        .fillMaxWidth(REMAIN_SPOTS_LAST_LINE_WIDTH_RATIO)
+                        .height(LINE_HEIGHT),
             )
         }
 
@@ -200,6 +209,9 @@ private const val RELATED_SPOT_SKELETON_ITEM_COUNT: Int = 3
 private const val TITLE_WIDTH_RATIO: Float = 0.7f
 private const val HEADLINE_SPOT_WIDTH_RATIO: Float = 0.5f
 private const val REMAIN_SPOTS_WIDTH_RATIO: Float = 0.8f
+
+/** 마지막 줄은 문장이 중간에 끊긴 것처럼 보이도록 짧게 둔다. */
+private const val REMAIN_SPOTS_LAST_LINE_WIDTH_RATIO: Float = 0.55f
 
 private val CARD_BORDER_WIDTH = 1.dp
 private val PROFILE_IMAGE_SIZE = 42.dp

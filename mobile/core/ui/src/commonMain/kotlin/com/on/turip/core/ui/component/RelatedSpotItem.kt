@@ -2,6 +2,7 @@ package com.on.turip.core.ui.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -84,16 +85,17 @@ fun RelatedSpotItem(
                 overflow = TextOverflow.Ellipsis,
             )
 
-            if (relatedSpot.hasRemainSpots) {
-                Text(
-                    text = relatedSpot.remainSpots,
-                    style = TuripTheme.typography.info1,
-                    color = TuripTheme.colors.gray03,
-                    maxLines = REMAIN_SPOTS_MAX_LINES,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(top = TuripTheme.spacing.extraSmall),
-                )
-            }
+            // 나머지 장소가 한 줄이거나 아예 없어도 두 줄 자리를 그대로 비워 둔다.
+            // 카드 높이가 장소 수에 따라 들쭉날쭉하면 목록이 계단처럼 보인다.
+            Text(
+                text = relatedSpot.remainSpots,
+                style = TuripTheme.typography.info1,
+                color = TuripTheme.colors.gray03,
+                minLines = REMAIN_SPOTS_LINES,
+                maxLines = REMAIN_SPOTS_LINES,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(top = TuripTheme.spacing.extraSmall),
+            )
         }
 
         Surface(
@@ -129,27 +131,48 @@ private val CATEGORY_LABEL_WIDTH = 46.dp
 private val DIVIDER_WIDTH = 1.dp
 private val DIVIDER_HEIGHT = 32.dp
 private val CHEVRON_SIZE = 20.dp
-private const val REMAIN_SPOTS_MAX_LINES: Int = 2
+private const val REMAIN_SPOTS_LINES: Int = 2
 
+/** 장소 수와 무관하게 카드 높이가 같은지 보려고 세 가지를 나란히 둔다. */
 @Preview(showBackground = true, name = "연관 관광지 카드")
 @Composable
 private fun RelatedSpotItemPreview() {
     TuripTheme {
-        RelatedSpotItem(
-            relatedSpot =
-                RelatedSpotModel(
-                    category = "관광지",
-                    spots =
-                        persistentListOf(
-                            "종묘",
-                            "북촌한옥마을",
-                            "광장시장",
-                            "남산케이블카",
-                            "국립중앙박물관",
-                            "청계천",
-                        ),
-                ),
-            onClick = {},
-        )
+        Column(verticalArrangement = Arrangement.spacedBy(TuripTheme.spacing.large)) {
+            RelatedSpotItem(
+                relatedSpot =
+                    RelatedSpotModel(
+                        category = "관광지",
+                        spots =
+                            persistentListOf(
+                                "종묘",
+                                "북촌한옥마을",
+                                "광장시장",
+                                "남산케이블카",
+                                "국립중앙박물관",
+                                "청계천",
+                            ),
+                    ),
+                onClick = {},
+            )
+
+            RelatedSpotItem(
+                relatedSpot =
+                    RelatedSpotModel(
+                        category = "숙박",
+                        spots = persistentListOf("롯데호텔", "호텔국도"),
+                    ),
+                onClick = {},
+            )
+
+            RelatedSpotItem(
+                relatedSpot =
+                    RelatedSpotModel(
+                        category = "음식",
+                        spots = persistentListOf("토속촌삼계탕"),
+                    ),
+                onClick = {},
+            )
+        }
     }
 }

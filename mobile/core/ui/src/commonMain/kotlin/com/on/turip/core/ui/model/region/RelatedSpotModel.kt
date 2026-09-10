@@ -19,8 +19,6 @@ data class RelatedSpotModel(
 
     val remainSpots: String = spots.drop(1).joinToString(SPOT_SEPARATOR)
 
-    val hasRemainSpots: Boolean = remainSpots.isNotEmpty()
-
     companion object {
         private const val SPOT_SEPARATOR: String = " · "
     }
