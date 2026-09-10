@@ -22,6 +22,7 @@ kotlin {
             implementation(project(":feature:splash:impl"))
             implementation(project(":feature:login:impl"))
             implementation(project(":feature:invitation:impl"))
+            implementation(project(":feature:article:impl"))
             implementation(project(":feature:home:impl"))
             implementation(project(":feature:bookmark:impl"))
             implementation(project(":feature:mypage:impl"))
