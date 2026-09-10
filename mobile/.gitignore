@@ -5,6 +5,11 @@
 xcuserdata
 !src/**/build/
 local.properties
+# signing
+key/
+*.keystore
+*.jks
+keystore.properties
 google-services.json
 GoogleService-Info.plist
 iosApp/iosApp/GoogleService-Info.plist

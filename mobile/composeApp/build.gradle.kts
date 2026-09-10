@@ -123,6 +123,14 @@ android {
                 keyAlias = androidKeystoreProperties.getProperty("debug_key_alias")
                 keyPassword = androidKeystoreProperties.getProperty("debug_key_password")
             }
+            androidKeystoreProperties.getProperty("release_store_file")?.let { releaseStoreFile ->
+                create("release") {
+                    storeFile = file(releaseStoreFile)
+                    storePassword = androidKeystoreProperties.getProperty("release_store_password")
+                    keyAlias = androidKeystoreProperties.getProperty("release_key_alias")
+                    keyPassword = androidKeystoreProperties.getProperty("release_key_password")
+                }
+            }
         }
     }
 
@@ -145,6 +153,7 @@ android {
             isDebuggable = false
             isMinifyEnabled = true
             isShrinkResources = true
+            signingConfig = signingConfigs.findByName("release")
             manifestPlaceholders +=
                 mapOf(
                     "appName" to "@string/app_name",

@@ -7,6 +7,6 @@ import kotlinx.serialization.Serializable
 data class ArticleAuthorResponse(
     @SerialName("id")
     val id: Long,
-    @SerialName("name")
+    @SerialName("nickname")
     val name: String,
 )
