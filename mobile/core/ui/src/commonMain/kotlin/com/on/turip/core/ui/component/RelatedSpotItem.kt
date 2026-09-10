@@ -1,4 +1,4 @@
-package com.on.turip.feature.randomtravel.impl.component
+package com.on.turip.core.ui.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -24,11 +24,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.on.turip.core.designsystem.generated.resources.Res
-import com.on.turip.core.designsystem.generated.resources.random_travel_related_spot_count
-import com.on.turip.core.designsystem.generated.resources.random_travel_related_spot_more_description
+import com.on.turip.core.designsystem.generated.resources.briefing_related_spot_count
+import com.on.turip.core.designsystem.generated.resources.briefing_related_spot_more_description
 import com.on.turip.core.designsystem.theme.TuripTheme
+import com.on.turip.core.ui.model.region.RelatedSpotModel
 import com.on.turip.core.ui.util.formatResource
-import com.on.turip.feature.randomtravel.impl.model.RandomTravelRelatedSpotModel
 import kotlinx.collections.immutable.persistentListOf
 import org.jetbrains.compose.resources.stringResource
 
@@ -39,8 +39,8 @@ import org.jetbrains.compose.resources.stringResource
  * 왼쪽 고정폭 라벨 · 세로 구분선 · 본문(대표 장소 + 나머지) · 오른쪽 개수 칩.
  */
 @Composable
-internal fun RandomTravelRelatedSpotItem(
-    relatedSpot: RandomTravelRelatedSpotModel,
+fun RelatedSpotItem(
+    relatedSpot: RelatedSpotModel,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -103,7 +103,7 @@ internal fun RandomTravelRelatedSpotItem(
         ) {
             Text(
                 text =
-                    stringResource(Res.string.random_travel_related_spot_count)
+                    stringResource(Res.string.briefing_related_spot_count)
                         .formatResource(relatedSpot.spots.size),
                 style = TuripTheme.typography.info1,
                 color = TuripTheme.colors.gray05,
@@ -118,7 +118,7 @@ internal fun RandomTravelRelatedSpotItem(
 
         Icon(
             imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-            contentDescription = stringResource(Res.string.random_travel_related_spot_more_description),
+            contentDescription = stringResource(Res.string.briefing_related_spot_more_description),
             tint = TuripTheme.colors.gray02,
             modifier = Modifier.size(CHEVRON_SIZE),
         )
@@ -133,11 +133,11 @@ private const val REMAIN_SPOTS_MAX_LINES: Int = 2
 
 @Preview(showBackground = true, name = "연관 관광지 카드")
 @Composable
-private fun RandomTravelRelatedSpotItemPreview() {
+private fun RelatedSpotItemPreview() {
     TuripTheme {
-        RandomTravelRelatedSpotItem(
+        RelatedSpotItem(
             relatedSpot =
-                RandomTravelRelatedSpotModel(
+                RelatedSpotModel(
                     category = "관광지",
                     spots =
                         persistentListOf(

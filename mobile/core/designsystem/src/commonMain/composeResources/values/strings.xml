@@ -64,22 +64,22 @@
     <string name="random_travel_ticket_video_count">%d개</string>
     <string name="random_travel_ticket_serial">NO. %s</string>
     <string name="random_travel_ticket_code">TURIP · %s</string>
-    <string name="random_travel_briefing_video_title">🎥 %s 여행 영상</string>
-    <string name="random_travel_briefing_video_count">%d개</string>
-    <string name="random_travel_briefing_related_spot_title">🎉 %s 연관 관광지</string>
-    <string name="random_travel_related_spot_count">%d곳</string>
-    <string name="random_travel_related_spot_unsupported">이 여행지는 아직 관광지 정보를 제공하지 않아요</string>
-    <string name="random_travel_related_spot_empty">등록된 관광지가 없어요</string>
-    <string name="random_travel_related_spot_error">관광지 정보를 불러오지 못했어요</string>
+    <string name="briefing_video_title">🎥 %s 여행 영상</string>
+    <string name="briefing_video_count">%d개</string>
+    <string name="briefing_related_spot_title">🎉 %s 연관 관광지</string>
+    <string name="briefing_related_spot_count">%d곳</string>
+    <string name="briefing_related_spot_unsupported">이 여행지는 아직 관광지 정보를 제공하지 않아요</string>
+    <string name="briefing_related_spot_empty">등록된 관광지가 없어요</string>
+    <string name="briefing_related_spot_error">관광지 정보를 불러오지 못했어요</string>
     <string name="random_travel_related_spot_detail_title">%1$s %2$s</string>
     <string name="random_travel_related_spot_detail_total">총 %d곳</string>
     <string name="random_travel_related_spot_detail_empty">이 카테고리에는 아직 등록된 장소가 없어요</string>
     <string name="random_travel_related_spot_kakao_map_description">카카오맵에서 보기</string>
-    <string name="random_travel_related_spot_more_description">전체 보기</string>
+    <string name="briefing_related_spot_more_description">전체 보기</string>
     <string name="random_travel_confirmed_label">여행지가 정해졌어요</string>
     <string name="random_travel_empty_video">아직 이 여행지의 영상이 없어요\n다시 돌려볼까요?</string>
-    <string name="random_travel_briefing_error">영상을 불러오지 못했어요</string>
-    <string name="random_travel_selected_video">선택한 영상</string>
+    <string name="briefing_video_error">영상을 불러오지 못했어요</string>
+    <string name="briefing_selected_video">선택한 영상</string>
     <string name="random_travel_select_video_guide">영상을 선택하면 여행을 시작할 수 있어요</string>
     <string name="random_travel_start_trip">🧳 이 여행 시작하기</string>
     <string name="random_travel_reroll">🎲 다시 돌리기</string>
@@ -280,5 +280,7 @@
     <string name="popular_region_sheet_contents_error">콘텐츠를 불러오지 못했어요</string>
     <string name="popular_region_sheet_contents_retry">다시 시도</string>
     <string name="popular_region_bookmark_description">북마크</string>
+    <string name="region_briefing_visitor_label">%s 방문자 수</string>
+    <string name="region_briefing_empty_video">아직 이 지역의 영상이 없어요</string>
 
 </resources>

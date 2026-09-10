@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import com.on.turip.core.designsystem.theme.TuripTheme
 import com.on.turip.core.ui.component.ErrorScreen
 import com.on.turip.core.ui.error.ErrorUiState
+import com.on.turip.core.ui.util.baseMonthText
 import com.on.turip.feature.popularregion.impl.component.HeatLegendCard
 import com.on.turip.feature.popularregion.impl.component.KoreaHeatMap
 import com.on.turip.feature.popularregion.impl.component.PopularDestinationChipRow
@@ -49,7 +50,6 @@ import com.on.turip.feature.popularregion.impl.component.PopularRegionAppBar
 import com.on.turip.feature.popularregion.impl.component.PopularRegionMapBadge
 import com.on.turip.feature.popularregion.impl.component.PopularRegionMapHint
 import com.on.turip.feature.popularregion.impl.component.PopularRegionSheetContent
-import com.on.turip.feature.popularregion.impl.component.baseMonthText
 import com.on.turip.feature.popularregion.impl.model.PopularRegionModel
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.compose.viewmodel.koinViewModel

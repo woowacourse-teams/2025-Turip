@@ -3,6 +3,8 @@ package com.on.turip.feature.popularregion.impl
 import androidx.compose.runtime.Immutable
 import com.on.turip.core.ui.UiState
 import com.on.turip.core.ui.error.ErrorUiState
+import com.on.turip.core.ui.util.toBaseMonthOfYear
+import com.on.turip.core.ui.util.toBaseYear
 import com.on.turip.feature.popularregion.impl.model.PopularRegionModel
 import com.on.turip.feature.popularregion.impl.model.RegionContentsUiState
 import com.on.turip.feature.popularregion.impl.model.RegionHeatPoint
@@ -65,14 +67,9 @@ data class PopularRegionState(
     val shouldShowMapHint: Boolean = !isLoading && selectedRegion == null
 
     /** 기준월을 화면에 적기 위해 `202506` 을 연/월로 나눠 둔다. 형식이 다르면 둘 다 null 이다. */
-    val baseYear: Int? = baseMonth?.takeIf { it.length == BASE_MONTH_LENGTH }?.take(YEAR_LENGTH)?.toIntOrNull()
+    val baseYear: Int? = baseMonth.toBaseYear()
 
-    val baseMonthOfYear: Int? =
-        baseMonth
-            ?.takeIf { it.length == BASE_MONTH_LENGTH }
-            ?.drop(YEAR_LENGTH)
-            ?.toIntOrNull()
-            ?.takeIf { it in MONTH_RANGE }
+    val baseMonthOfYear: Int? = baseMonth.toBaseMonthOfYear()
 
     /** 한 층을 그 층의 최댓값 기준으로 정규화한다. 방문자 수 내림차순이라 첫 원소가 최댓값이다. */
     private fun List<PopularRegionModel>.toHeatPoints(): List<RegionHeatPoint> {
@@ -93,8 +90,5 @@ data class PopularRegionState(
         /** 열이 아예 안 보이는 지역이 없도록 하한을 둔다. */
         private const val MIN_INTENSITY: Float = 0.12f
         private const val TOP_RANK: Int = 1
-        private const val BASE_MONTH_LENGTH: Int = 6
-        private const val YEAR_LENGTH: Int = 4
-        private val MONTH_RANGE: IntRange = 1..12
     }
 }

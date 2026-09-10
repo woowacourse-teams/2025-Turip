@@ -33,11 +33,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -46,14 +44,14 @@ import com.on.turip.core.designsystem.component.TuripLoadingIndicator
 import com.on.turip.core.designsystem.generated.resources.Res
 import com.on.turip.core.designsystem.generated.resources.all_back_description
 import com.on.turip.core.designsystem.generated.resources.all_text_expand
-import com.on.turip.core.designsystem.generated.resources.random_travel_briefing_error
-import com.on.turip.core.designsystem.generated.resources.random_travel_briefing_related_spot_title
-import com.on.turip.core.designsystem.generated.resources.random_travel_briefing_video_count
-import com.on.turip.core.designsystem.generated.resources.random_travel_briefing_video_title
+import com.on.turip.core.designsystem.generated.resources.briefing_related_spot_empty
+import com.on.turip.core.designsystem.generated.resources.briefing_related_spot_error
+import com.on.turip.core.designsystem.generated.resources.briefing_related_spot_title
+import com.on.turip.core.designsystem.generated.resources.briefing_related_spot_unsupported
+import com.on.turip.core.designsystem.generated.resources.briefing_video_count
+import com.on.turip.core.designsystem.generated.resources.briefing_video_error
+import com.on.turip.core.designsystem.generated.resources.briefing_video_title
 import com.on.turip.core.designsystem.generated.resources.random_travel_empty_video
-import com.on.turip.core.designsystem.generated.resources.random_travel_related_spot_empty
-import com.on.turip.core.designsystem.generated.resources.random_travel_related_spot_error
-import com.on.turip.core.designsystem.generated.resources.random_travel_related_spot_unsupported
 import com.on.turip.core.designsystem.generated.resources.random_travel_reroll
 import com.on.turip.core.designsystem.generated.resources.random_travel_select_video_guide
 import com.on.turip.core.designsystem.generated.resources.random_travel_slot_dispensing
@@ -68,18 +66,24 @@ import com.on.turip.core.designsystem.generated.resources.random_travel_turip_pl
 import com.on.turip.core.designsystem.generated.resources.retry
 import com.on.turip.core.designsystem.snackbar.LocalSnackbarDelegate
 import com.on.turip.core.designsystem.theme.TuripTheme
+import com.on.turip.core.ui.component.BriefingErrorView
+import com.on.turip.core.ui.component.BriefingNotice
+import com.on.turip.core.ui.component.BriefingNoticeText
+import com.on.turip.core.ui.component.BriefingPlaceholder
+import com.on.turip.core.ui.component.BriefingSectionHeader
 import com.on.turip.core.ui.component.ErrorScreen
+import com.on.turip.core.ui.component.RelatedSpotItem
+import com.on.turip.core.ui.component.VideoSummaryItem
 import com.on.turip.core.ui.error.ErrorUiState
+import com.on.turip.core.ui.model.region.RelatedSpotModel
+import com.on.turip.core.ui.model.region.RelatedSpotsUiState
 import com.on.turip.core.ui.util.formatResource
 import com.on.turip.feature.randomtravel.impl.component.PrintedTicket
-import com.on.turip.feature.randomtravel.impl.component.RandomTravelRelatedSpotItem
-import com.on.turip.feature.randomtravel.impl.component.RandomTravelVideoItem
 import com.on.turip.feature.randomtravel.impl.component.SlotMachineReel
 import com.on.turip.feature.randomtravel.impl.component.SlotReelPhase
 import com.on.turip.feature.randomtravel.impl.component.TicketDispenser
 import com.on.turip.feature.randomtravel.impl.component.TuripDraftBottomSheet
 import com.on.turip.feature.randomtravel.impl.model.RandomDestinationModel
-import com.on.turip.feature.randomtravel.impl.model.RandomTravelRelatedSpotModel
 import com.on.turip.feature.randomtravel.impl.platform.rememberReduceMotionEnabled
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.collectLatest
@@ -358,10 +362,10 @@ private fun BriefingSection(
             item(key = VIDEO_TITLE_ITEM_KEY) {
                 BriefingSectionHeader(
                     title =
-                        stringResource(Res.string.random_travel_briefing_video_title)
+                        stringResource(Res.string.briefing_video_title)
                             .formatResource(destination.name),
                     trailingText =
-                        stringResource(Res.string.random_travel_briefing_video_count)
+                        stringResource(Res.string.briefing_video_count)
                             .formatResource(destination.videoCount)
                             .takeIf { uiState.isBriefingFetched && uiState.videos.isNotEmpty() },
                 )
@@ -379,6 +383,7 @@ private fun BriefingSection(
                 uiState.briefingErrorUiState != ErrorUiState.None -> {
                     item(key = BRIEFING_ERROR_ITEM_KEY) {
                         BriefingErrorView(
+                            message = stringResource(Res.string.briefing_video_error),
                             onRetryClick = { onIntent(RandomTravelIntent.RetryBriefing) },
                         )
                     }
@@ -405,7 +410,7 @@ private fun BriefingSection(
                         items = visibleVideos,
                         key = { it.contentId },
                     ) { video ->
-                        RandomTravelVideoItem(
+                        VideoSummaryItem(
                             video = video,
                             isSelected = video.contentId == uiState.selectedContentId,
                             onClick = {
@@ -451,7 +456,7 @@ private fun BriefingSection(
             item(key = RELATED_SPOT_TITLE_ITEM_KEY) {
                 BriefingSectionHeader(
                     title =
-                        stringResource(Res.string.random_travel_briefing_related_spot_title)
+                        stringResource(Res.string.briefing_related_spot_title)
                             .formatResource(destination.name),
                     modifier = Modifier.padding(top = TuripTheme.spacing.small),
                 )
@@ -467,7 +472,7 @@ private fun BriefingSection(
                 RelatedSpotsUiState.Unsupported -> {
                     item(key = RELATED_SPOT_NOTICE_ITEM_KEY) {
                         BriefingNotice {
-                            NoticeText(stringResource(Res.string.random_travel_related_spot_unsupported))
+                            BriefingNoticeText(stringResource(Res.string.briefing_related_spot_unsupported))
                         }
                     }
                 }
@@ -476,7 +481,7 @@ private fun BriefingSection(
                     item(key = RELATED_SPOT_ERROR_ITEM_KEY) {
                         BriefingNotice {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                NoticeText(stringResource(Res.string.random_travel_related_spot_error))
+                                BriefingNoticeText(stringResource(Res.string.briefing_related_spot_error))
 
                                 TextButton(
                                     onClick = { onIntent(RandomTravelIntent.RetryRelatedSpots) },
@@ -496,7 +501,7 @@ private fun BriefingSection(
                     if (relatedSpotsUiState.isEmpty) {
                         item(key = RELATED_SPOT_EMPTY_ITEM_KEY) {
                             BriefingNotice {
-                                NoticeText(stringResource(Res.string.random_travel_related_spot_empty))
+                                BriefingNoticeText(stringResource(Res.string.briefing_related_spot_empty))
                             }
                         }
                     } else {
@@ -504,7 +509,7 @@ private fun BriefingSection(
                             items = relatedSpotsUiState.relatedSpots,
                             key = { it.category },
                         ) { relatedSpot ->
-                            RandomTravelRelatedSpotItem(
+                            RelatedSpotItem(
                                 relatedSpot = relatedSpot,
                                 onClick = {
                                     onRelatedSpotClick(destination.name, relatedSpot.category)
@@ -522,121 +527,6 @@ private fun BriefingSection(
             onStartTripClick = { onIntent(RandomTravelIntent.ClickStartTrip) },
             onRerollClick = { onIntent(RandomTravelIntent.ClickReroll) },
         )
-    }
-}
-
-/**
- * 브리핑 본문의 섹션 제목. HTML 프로토타입의 `.sec .head`(왼쪽 제목 + 오른쪽 보조 텍스트)에 대응한다.
- */
-@Composable
-private fun BriefingSectionHeader(
-    title: String,
-    modifier: Modifier = Modifier,
-    trailingText: String? = null,
-) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            text = title,
-            style = TuripTheme.typography.title1,
-            color = TuripTheme.colors.gray04,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.weight(1f, fill = false),
-        )
-
-        if (trailingText != null) {
-            Text(
-                text = trailingText,
-                style = TuripTheme.typography.info1,
-                color = TuripTheme.colors.gray03,
-                modifier =
-                    Modifier
-                        .padding(start = TuripTheme.spacing.small)
-                        .clip(TuripTheme.shape.chip)
-                        .background(TuripTheme.colors.container)
-                        .padding(
-                            horizontal = TuripTheme.spacing.small,
-                            vertical = TuripTheme.spacing.extraSmall,
-                        ),
-            )
-        }
-    }
-}
-
-/**
- * 섹션 하나가 목록 대신 짧은 안내(로딩/미지원/빈 상태/에러)를 보여줄 때 쓰는 자리.
- * [BriefingPlaceholder] 와 달리 높이를 고정하지 않아 한두 줄짜리 안내에 어울린다.
- */
-@Composable
-private fun BriefingNotice(
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit,
-) {
-    Box(
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .padding(vertical = TuripTheme.spacing.large),
-        contentAlignment = Alignment.Center,
-        content = { content() },
-    )
-}
-
-@Composable
-private fun NoticeText(text: String) {
-    Text(
-        text = text,
-        style = TuripTheme.typography.body2,
-        color = TuripTheme.colors.gray03,
-        textAlign = TextAlign.Center,
-    )
-}
-
-@Composable
-private fun BriefingPlaceholder(
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit,
-) {
-    Box(
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .height(BRIEFING_PLACEHOLDER_HEIGHT),
-        contentAlignment = Alignment.Center,
-        content = { content() },
-    )
-}
-
-@Composable
-private fun BriefingErrorView(
-    onRetryClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .height(BRIEFING_PLACEHOLDER_HEIGHT),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Text(
-            text = stringResource(Res.string.random_travel_briefing_error),
-            style = TuripTheme.typography.body1,
-            color = TuripTheme.colors.gray03,
-            textAlign = TextAlign.Center,
-        )
-
-        TextButton(onClick = onRetryClick) {
-            Text(
-                text = stringResource(Res.string.retry),
-                style = TuripTheme.typography.body2,
-                color = TuripTheme.colors.primary,
-            )
-        }
     }
 }
 
@@ -736,7 +626,6 @@ private fun RandomTravelCtaSection(
 
 private val APP_BAR_ICON_SIZE = 36.dp
 private val CTA_HEIGHT = 52.dp
-private val BRIEFING_PLACEHOLDER_HEIGHT = 160.dp
 private val REEL_BORDER_WIDTH = 1.5.dp
 private val DIVIDER_HEIGHT = 1.dp
 private val MORE_BUTTON_LOADING_SIZE = 16.dp
@@ -810,7 +699,7 @@ private fun RandomTravelBriefingPreview() {
                     relatedSpotsUiState =
                         RelatedSpotsUiState.Success(
                             persistentListOf(
-                                RandomTravelRelatedSpotModel(
+                                RelatedSpotModel(
                                     category = "관광지",
                                     spots =
                                         persistentListOf(
@@ -820,11 +709,11 @@ private fun RandomTravelBriefingPreview() {
                                             "남산케이블카",
                                         ),
                                 ),
-                                RandomTravelRelatedSpotModel(
+                                RelatedSpotModel(
                                     category = "숙박",
                                     spots = persistentListOf("롯데호텔/서울점", "호텔국도", "로얄호텔서울"),
                                 ),
-                                RandomTravelRelatedSpotModel(
+                                RelatedSpotModel(
                                     category = "음식",
                                     spots = persistentListOf("토속촌삼계탕", "신마포회관"),
                                 ),

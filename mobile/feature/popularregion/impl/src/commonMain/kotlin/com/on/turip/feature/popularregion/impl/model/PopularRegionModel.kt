@@ -1,9 +1,9 @@
 package com.on.turip.feature.popularregion.impl.model
 
 import androidx.compose.runtime.Immutable
+import com.on.turip.core.ui.util.toVisitorCountText
 import com.on.turip.feature.popularregion.impl.map.GeoPoint
 import com.on.turip.feature.popularregion.impl.map.RegionShapeKey
-import kotlin.math.round
 
 /**
  * 지도에 찍히는 지역 한 곳.
@@ -33,17 +33,8 @@ data class PopularRegionModel(
     val isDestination: Boolean = shapeKey is RegionShapeKey.Destination
 
     /** "2847만" 처럼 만 단위로 줄여 표기한다. */
-    val visitorCountText: String = visitorCount.toManUnitText()
+    val visitorCountText: String = visitorCount.toVisitorCountText()
 
     /** 연관 콘텐츠를 조회할 수 있는 지역인지. */
     val hasRegionCategory: Boolean = regionCategoryName != null
-}
-
-private const val MAN: Double = 10_000.0
-
-private fun Long.toManUnitText(): String {
-    val man: Double = this / MAN
-    val rounded: Double = round(man * 10) / 10
-    val hasFraction: Boolean = rounded != round(rounded)
-    return if (hasFraction) "${rounded}만" else "${rounded.toLong()}만"
 }
