@@ -16,6 +16,10 @@ public interface FavoriteFolderRepository extends JpaRepository<FavoriteFolder, 
     @Query("SELECT ff FROM FavoriteFolder ff WHERE ff.id = :id")
     Optional<FavoriteFolder> findByIdWithLock(@Param("id") Long favoriteFolderId);
 
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT ff FROM FavoriteFolder ff WHERE ff.id IN :ids ORDER BY ff.id ASC")
+    List<FavoriteFolder> findAllByIdInWithLock(@Param("ids") List<Long> favoriteFolderIds);
+
     @Query("SELECT ff FROM FavoriteFolder ff " +
             "JOIN FavoriteFolderAccount ffa ON ffa.favoriteFolder = ff " +
             "WHERE ffa.account = :account ")

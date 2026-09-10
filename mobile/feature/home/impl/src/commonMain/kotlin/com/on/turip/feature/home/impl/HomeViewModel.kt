@@ -6,6 +6,7 @@ import com.on.turip.core.data.session.SessionManager
 import com.on.turip.core.domain.repository.ContentRepository
 import com.on.turip.core.domain.repository.RegionRepository
 import com.on.turip.core.model.content.UsersLikeContent
+import com.on.turip.core.model.region.PopularDestination
 import com.on.turip.core.model.region.RegionCategory
 import com.on.turip.core.model.result.ErrorType
 import com.on.turip.core.model.result.TuripResult
@@ -38,6 +39,30 @@ class HomeViewModel(
 
     init {
         loadContents()
+        loadPopularDestinations()
+    }
+
+    /**
+     * 인기 관광지 CTA 에 쓸 Top 10 을 조회한다.
+     *
+     * [loadContents] 의 병렬 조회에 넣지 않는다. 거기서는 하나만 실패해도 홈 전체가 에러 화면으로 떨어지는데,
+     * CTA 한 줄 때문에 홈이 닫히면 안 된다. 실패하면 목록을 비워 둔 채 버튼은 지도로 그대로 이동한다.
+     */
+    private fun loadPopularDestinations() {
+        viewModelScope.launch {
+            regionRepository
+                .loadPopularDestinations()
+                .onSuccess { popularDestination: PopularDestination ->
+                    _uiState.update { state: HomeUiState ->
+                        state.copy(
+                            popularDestinations = popularDestination.destinations.map { it.toUiModel() },
+                        )
+                    }
+                    Napier.d("인기 관광지 조회: ${popularDestination.destinations}")
+                }.onFailure {
+                    Napier.e("인기 관광지 조회 실패")
+                }
+        }
     }
 
     fun loadContents() {
@@ -77,6 +102,20 @@ class HomeViewModel(
 
             Napier.d("인기 북마크 목록: $usersLikeContents")
             Napier.d("지역 카테고리 조회: $regionCategories")
+        }
+    }
+
+    /**
+     * 랜덤 여행은 지역 목록을 재료로 슬롯을 돌린다.
+     * 목록을 확보하지 못한 상태(오프라인 등)에서는 화면을 전환하지 않고 안내만 한다.
+     */
+    fun clickRandomTravel() {
+        viewModelScope.launch {
+            if (uiState.value.regionCategories.isEmpty()) {
+                _uiEffect.send(HomeUiEffect.ShowRandomTravelUnavailable)
+                return@launch
+            }
+            _uiEffect.send(HomeUiEffect.NavigateToRandomTravel)
         }
     }
 

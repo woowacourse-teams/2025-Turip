@@ -96,12 +96,12 @@ class ContentCountApiTest {
                     "INSERT INTO creator (profile_image, channel_name) VALUES ('https://image.example.com/creator1.jpg', 'TravelMate')");
             jdbcTemplate.update("INSERT INTO country (name, image_url) VALUES ('대한민국', 'https://image.example.com/korea.jpg')");
             jdbcTemplate.update("INSERT INTO city (name, country_id, image_url) VALUES ('서울', 1, 'https://image.example.com/seoul.jpg')");
-            jdbcTemplate.update("INSERT INTO city (name, country_id, image_url) VALUES ('대구', 1, 'https://image.example.com/daegu.jpg')");
+            jdbcTemplate.update("INSERT INTO city (name, country_id, image_url) VALUES ('광주', 1, 'https://image.example.com/gwangju.jpg')");
             jdbcTemplate.update("INSERT INTO city (name, country_id, image_url) VALUES ('울산', 1, 'https://image.example.com/ulsan.jpg')");
             jdbcTemplate.update(
                     "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 1, 'https://youtube.com/watch?v=abcd1', '서울 여행', '2024-07-01')");
             jdbcTemplate.update(
-                    "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 2, 'https://youtube.com/watch?v=abcd2', '대구 여행', '2024-07-02')");
+                    "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 2, 'https://youtube.com/watch?v=abcd2', '광주 여행', '2024-07-02')");
             jdbcTemplate.update(
                     "INSERT INTO content (creator_id, city_id, url, title, uploaded_date) VALUES (1, 3, 'https://youtube.com/watch?v=abcd3', '울산 여행', '2024-07-03')");
 
@@ -111,7 +111,7 @@ class ContentCountApiTest {
                     .when().get("/api/v1/contents/count")
                     .then()
                     .statusCode(200)
-                    .body("count", is(2)); // 대구, 울산
+                    .body("count", is(2)); // 광주, 울산
         }
 
         @DisplayName("해외 기타 조회 성공 시 200 OK 코드와 OverseasRegionCategory에 없는 국가들의 컨텐츠 수를 응답한다")
