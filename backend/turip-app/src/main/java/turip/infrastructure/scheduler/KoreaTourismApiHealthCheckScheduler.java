@@ -26,7 +26,7 @@ public class KoreaTourismApiHealthCheckScheduler {
             RelatedSpotResult result = koreaTourismRelatedSpotClient.searchRelatedSpots(
                     TourApiAreaCode.SEOUL.getAreaCode(),
                     TourApiAreaCode.SEOUL.getSigunguCodes().get(0)
-            );
+            ).block();
 
             if (!result.isSuccess()) {
                 log.error("{} 헬스체크 실패 - API 응답 실패", LOG_HEADER);

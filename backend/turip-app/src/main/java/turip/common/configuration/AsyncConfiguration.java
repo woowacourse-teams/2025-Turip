@@ -1,7 +1,6 @@
 package turip.common.configuration;
 
 import java.util.concurrent.Executor;
-import java.util.concurrent.RejectedExecutionException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -48,29 +47,6 @@ public class AsyncConfiguration {
                         executorInstance.getQueue().remainingCapacity()
                 )
         );
-
-        executor.setWaitForTasksToCompleteOnShutdown(true);
-        executor.setAwaitTerminationSeconds(30);
-
-        return executor;
-    }
-
-    @Bean(name = "koreaTourismApiExecutor")
-    public Executor koreaTourismApiExecutor() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(10);
-        executor.setMaxPoolSize(10);
-        executor.setQueueCapacity(50);
-        executor.setThreadNamePrefix("KOREA-TOURISM-API-");
-
-        executor.setRejectedExecutionHandler((r, executorInstance) -> {
-            log.warn(
-                    "[KOREA-TOURISM-API-ThreadPool] API 호출 거부됨 - Thread pool 포화 상태 (현재 활성 스레드: {}, 잔여 큐 용량: {})",
-                    executorInstance.getActiveCount(),
-                    executorInstance.getQueue().remainingCapacity()
-            );
-            throw new RejectedExecutionException("Thread pool 포화로 인한 API 호출 거부");
-        });
 
         executor.setWaitForTasksToCompleteOnShutdown(true);
         executor.setAwaitTerminationSeconds(30);
