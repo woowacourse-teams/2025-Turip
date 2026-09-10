@@ -37,14 +37,22 @@ data class PopularRegionState(
      *
      * 인기 관광지를 앞에 둬 라벨 자리를 먼저 잡게 한다. 겹칠 때 살아남는 쪽이
      * 눌러서 콘텐츠를 볼 수 있는 지역이어야 하기 때문이다.
+     *
+     * 두 층은 도착 시점이 다르다. 상단 칩을 빨리 세우려고 관광지 층만 먼저 반영하는데,
+     * 그때 지도를 그리면 시도 배경 없이 관광지 14곳만 뜬 반쪽 지도가 보인다.
+     * 두 층이 다 모이는 [isLoading] 종료까지 지도는 비워 둔다.
      */
     val heatPoints: ImmutableList<RegionHeatPoint> =
-        buildList {
-            val (destinations: List<PopularRegionModel>, sidoRegions: List<PopularRegionModel>) =
-                regions.partition { it.isDestination }
-            addAll(destinations.toHeatPoints())
-            addAll(sidoRegions.toHeatPoints())
-        }.toImmutableList()
+        if (isLoading) {
+            persistentListOf()
+        } else {
+            buildList {
+                val (destinations: List<PopularRegionModel>, sidoRegions: List<PopularRegionModel>) =
+                    regions.partition { it.isDestination }
+                addAll(destinations.toHeatPoints())
+                addAll(sidoRegions.toHeatPoints())
+            }.toImmutableList()
+        }
 
     /**
      * 상단 칩 줄에 늘어놓을 인기 관광지. 순위 오름차순이다.

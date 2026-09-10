@@ -22,6 +22,7 @@ import com.on.turip.feature.popularregion.impl.model.RegionContentsUiState
 import com.on.turip.feature.popularregion.impl.model.toUiModel
 import io.github.aakira.napier.Napier
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
@@ -74,6 +75,10 @@ class PopularRegionViewModel(
      *
      * 카테고리 조회가 실패해도 지도는 그린다. 그 경우 모든 지역이 `콘텐츠 없음`으로 보일 뿐이라
      * 지도 자체를 막을 이유가 없다.
+     *
+     * 상단 칩은 관광지 층만 있으면 그릴 수 있고 그 응답은 홈에서 이미 받아 캐시돼 있다.
+     * 그래서 두 응답을 함께 기다리지 않고, 관광지 층이 오는 대로 먼저 반영한다.
+     * 같이 기다리면 칩이 아직 캐시되지 않은 시도 방문자 수를 따라 늦게 나타난다.
      */
     private fun loadRegions() {
         loadJob?.cancel()
@@ -90,18 +95,7 @@ class PopularRegionViewModel(
                 val destinationsDeferred: Deferred<TuripResult<PopularDestination>> =
                     async { regionRepository.loadPopularDestinations() }
 
-                val popularityResult: TuripResult<RegionPopularity> = popularityDeferred.await()
                 val destinationsResult: TuripResult<PopularDestination> = destinationsDeferred.await()
-
-                val popularity: RegionPopularity =
-                    when (popularityResult) {
-                        is TuripResult.Success -> popularityResult.value
-                        is TuripResult.Failure -> {
-                            Napier.e("인기 관광지 - 시도 방문자 수 조회 실패", popularityResult.cause)
-                            handleLoadError(popularityResult)
-                            return@launch
-                        }
-                    }
 
                 // 위층이 없어도 국토는 칠할 수 있다. 배경만 남을 뿐이라 지도를 막을 이유가 없다.
                 if (destinationsResult is TuripResult.Failure) {
@@ -114,6 +108,25 @@ class PopularRegionViewModel(
                         ?.destinations
                         .orEmpty()
                         .toDestinationModels()
+
+                // 칩만 먼저 세운다. isLoading 이 아직 true 라 지도는 그대로 비어 있다.
+                if (destinations.isNotEmpty()) {
+                    updateState { copy(regions = destinations.toImmutableList()) }
+                }
+
+                val popularityResult: TuripResult<RegionPopularity> = popularityDeferred.await()
+                val popularity: RegionPopularity =
+                    when (popularityResult) {
+                        is TuripResult.Success -> popularityResult.value
+                        is TuripResult.Failure -> {
+                            Napier.e("인기 관광지 - 시도 방문자 수 조회 실패", popularityResult.cause)
+                            // 먼저 세워 둔 칩을 거둔다. 에러 화면이 지도를 대신하는 동안
+                            // 칩을 눌러도 열릴 시트가 없어 누를 수 있는 것처럼 보이면 안 된다.
+                            updateState { copy(regions = persistentListOf()) }
+                            handleLoadError(popularityResult)
+                            return@launch
+                        }
+                    }
 
                 updateState {
                     copy(
