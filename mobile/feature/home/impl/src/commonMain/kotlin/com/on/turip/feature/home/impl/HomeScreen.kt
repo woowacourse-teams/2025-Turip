@@ -46,6 +46,7 @@ import com.on.turip.feature.home.impl.component.RegionList
 import com.on.turip.feature.home.impl.component.RegionTypeButtons
 import com.on.turip.feature.home.impl.component.SearchTextField
 import com.on.turip.feature.home.impl.component.UsersLikeList
+import com.on.turip.feature.home.impl.model.PopularDestinationModel
 import com.on.turip.feature.home.impl.model.UsersLikeContentModel
 import kotlinx.coroutines.flow.collectLatest
 import org.jetbrains.compose.resources.getString
@@ -185,8 +186,6 @@ private fun HomeScreenContent(
                     modifier = Modifier.padding(top = TuripTheme.spacing.extraSmall),
                 )
 
-                PopularRegionCtaButton(onClick = onPopularRegionClick)
-
                 Text(
                     text = stringResource(Res.string.home_users_like_content_title),
                     modifier = Modifier.padding(top = TuripTheme.spacing.medium),
@@ -197,6 +196,11 @@ private fun HomeScreenContent(
                 UsersLikeList(
                     usersLikeContents = uiState.usersLikeContents,
                     onContentClick = onContentClick,
+                )
+
+                PopularRegionCtaButton(
+                    destinations = uiState.popularDestinations,
+                    onClick = onPopularRegionClick,
                 )
 
                 RegionTypeButtons(
@@ -245,6 +249,11 @@ private fun HomeSuccessPreview() {
             isDomesticSelected = true,
             usersLikeContents = emptyList(),
             errorUiState = ErrorUiState.None,
+            popularDestinations =
+                listOf(
+                    PopularDestinationModel(rank = 1, regionCategoryName = "서울", visitorCountText = "2847만"),
+                    PopularDestinationModel(rank = 2, regionCategoryName = "부산", visitorCountText = "1204만"),
+                ),
         )
     TuripTheme {
         Scaffold(topBar = { HomeAppBar() }) { innerPadding ->

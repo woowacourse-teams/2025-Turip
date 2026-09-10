@@ -258,7 +258,9 @@
     <string name="invitation_failure_dialog_dismiss_login">로그인으로 가기</string>
 
     <!-- 인기 관광지 지도 -->
-    <string name="home_popular_region_cta">🗺️ 요즘 뜨는 여행지 지도</string>
+    <string name="home_popular_region_cta">🗺️ 요즘 뜨는 여행지</string>
+    <string name="home_popular_region_cta_map">지도로 전체보기</string>
+    <string name="home_popular_region_cta_visitor">%s 명이 다녀갔어요</string>
     <string name="popular_region_title">%s 인기 관광지</string>
     <string name="popular_region_base_month">%s년 %s월</string>
     <string name="popular_region_recent_month">최근 한 달</string>
