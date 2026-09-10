@@ -27,6 +27,7 @@ kotlin {
             implementation(project(":feature:mypage:impl"))
             implementation(project(":feature:popularregion:impl"))
             implementation(project(":feature:randomtravel:impl"))
+            implementation(project(":feature:regionbriefing:impl"))
             implementation(project(":feature:search:impl"))
             implementation(project(":feature:turip:impl"))
             implementation(project(":feature:turipdetail:impl"))
