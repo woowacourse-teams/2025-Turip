@@ -7,8 +7,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +22,7 @@ import turip.article.controller.dto.response.ArticlesResponse;
 import turip.article.service.ArticleService;
 import turip.common.exception.ErrorResponse;
 
+@Validated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/articles")
@@ -84,7 +88,10 @@ public class ArticleController {
     })
     @GetMapping
     public ResponseEntity<ArticlesResponse> readArticles(
-            @RequestParam(name = "size", required = false, defaultValue = "10") Integer size,
+            @RequestParam(name = "size", required = false, defaultValue = "10")
+            @Min(value = 1, message = "size는 1 이상이어야 합니다.")
+            @Max(value = 10, message = "size는 10 이하여야 합니다.")
+            Integer size,
             @RequestParam(name = "lastId", required = false) Long lastId
     ) {
         ArticlesResponse response = articleService.findArticles(size, lastId);
